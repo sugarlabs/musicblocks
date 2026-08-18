@@ -150,14 +150,70 @@ describe("setupToneActions", () => {
     describe("setTimbre", () => {
         it("should set timbre correctly for known voice", () => {
             Singer.ToneActions.setTimbre("piano", 0, 1);
+            expect(targetTurtle.inSetTimbre).toBe(true);
             expect(targetTurtle.singer.instrumentNames).toContain("grand-piano");
             expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "grand-piano");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_settimbre_0");
 
             if (listenerCallbacks["_settimbre_0"]) {
                 listenerCallbacks["_settimbre_0"]();
                 expect(targetTurtle.inSetTimbre).toBe(false);
                 expect(targetTurtle.singer.instrumentNames.length).toBe(0);
             }
+        });
+
+        it("should not touch phraseMaker instrument name when not in matrix", () => {
+            activity.logo.inMatrix = false;
+            Singer.ToneActions.setTimbre("piano", 0, 1);
+            expect(activity.logo.phraseMaker._instrumentName).toBeNull();
+        });
+
+        it("should not re-initialize synthVolume for a synth that was pushed and popped previously", () => {
+            Singer.ToneActions.setTimbre("piano", 0, 1);
+            listenerCallbacks["_settimbre_0"]();
+            expect(targetTurtle.singer.instrumentNames).not.toContain("grand-piano");
+            expect(targetTurtle.singer.synthVolume["grand-piano"]).toBeDefined();
+
+            targetTurtle.singer.synthVolume["grand-piano"] = [0.7];
+            targetTurtle.singer.synthVolume["default-voice"] = [1];
+
+            Singer.ToneActions.setTimbre("piano", 0, 1);
+
+            expect(targetTurtle.singer.synthVolume["grand-piano"]).toEqual([0.7]);
+        });
+
+        it("should not push, load, or pop when the synth is already registered", () => {
+            targetTurtle.singer.instrumentNames = ["grand-piano"];
+            targetTurtle.singer.synthVolume["grand-piano"] = [0.5];
+            targetTurtle.singer.crescendoInitialVolume["grand-piano"] = [0.5];
+
+            Singer.ToneActions.setTimbre("piano", 0, 1);
+
+            expect(activity.logo.synth.loadSynth).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
+            expect(targetTurtle.singer.synthVolume["grand-piano"]).toEqual([0.5]);
+
+            listenerCallbacks["_settimbre_0"]();
+            expect(targetTurtle.inSetTimbre).toBe(false);
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
+        });
+
+        it("should not call setDispatchBlock when blk is not in blockList", () => {
+            const mouse = Mouse.getMouseFromTurtle(targetTurtle);
+            mouse.MB.listeners = [];
+            Singer.ToneActions.setTimbre("piano", 0, 999);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(mouse.MB.listeners).toContain("_settimbre_0");
+        });
+
+        it("should dispatch via neither branch when blk is not in blockList and not running", () => {
+            MusicBlocks.isRun = false;
+            const mouse = Mouse.getMouseFromTurtle(targetTurtle);
+            mouse.MB.listeners = [];
+            Singer.ToneActions.setTimbre("piano", 0, 999);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(mouse.MB.listeners).not.toContain("_settimbre_0");
+            MusicBlocks.isRun = true;
         });
 
         it("should handle direct synth name", () => {
@@ -251,12 +307,44 @@ describe("setupToneActions", () => {
             expect(activity.logo.timbre.vibratoEffect).toContain(blk);
             expect(activity.logo.timbre.vibratoParams).toContain(intensity);
             expect(global.instrumentsEffects[0]["default-voice"].vibratoActive).toBe(true);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_vibrato_0");
 
             if (listenerCallbacks["_vibrato_0"]) {
                 listenerCallbacks["_vibrato_0"]();
                 expect(targetTurtle.singer.vibratoIntensity.length).toBe(0);
                 expect(targetTurtle.singer.vibratoRate.length).toBe(0);
             }
+        });
+
+        it("should accept vibrato intensity at the lower boundary (1)", () => {
+            Singer.ToneActions.doVibrato(1, 10, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.vibratoIntensity).toContain(0.01);
+        });
+
+        it("should accept vibrato intensity at the upper boundary (100)", () => {
+            Singer.ToneActions.doVibrato(100, 10, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.vibratoIntensity).toContain(1);
+        });
+
+        it("should not call setDispatchBlock when blk is not in blockList", () => {
+            const mouse = Mouse.getMouseFromTurtle(targetTurtle);
+            mouse.MB.listeners = [];
+            Singer.ToneActions.doVibrato(50, 10, 0, 999);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(mouse.MB.listeners).toContain("_vibrato_0");
+        });
+
+        it("should show error for vibrato intensity below the lower boundary", () => {
+            Singer.ToneActions.doVibrato(0, 5, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Vibrato intensity must be between 1 and 100.",
+                1
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.vibratoIntensity).toEqual([]);
+            expect(targetTurtle.singer.vibratoRate).toEqual([]);
         });
 
         it("should show error for invalid vibrato intensity", () => {
@@ -290,6 +378,9 @@ describe("setupToneActions", () => {
             expect(activity.logo.timbre.vibratoParams).toContain(50);
             expect(activity.logo.timbre.vibratoParams).toContain(0.1);
             expect(global.instrumentsEffects[0]["default-voice"].vibratoFrequency).toBe(10);
+            expect(global.instrumentsEffects[0]["default-voice"].vibratoIntensity).toBe(
+                targetTurtle.singer.vibratoIntensity
+            );
         });
 
         it("should skip timbre‑mode params when not in timbre", () => {
@@ -323,6 +414,7 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.chorusRate).toContain(1.5);
             expect(targetTurtle.singer.delayTime).toContain(20);
             expect(targetTurtle.singer.chorusDepth).toContain(0.5);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_chorus_0");
 
             if (listenerCallbacks["_chorus_0"]) {
                 listenerCallbacks["_chorus_0"]();
@@ -350,6 +442,26 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.chorusDepth).toEqual([]);
         });
 
+        it("should accept chorus depth at the lower boundary (0)", () => {
+            Singer.ToneActions.doChorus(1.5, 20, 0, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.chorusDepth).toContain(0);
+        });
+
+        it("should accept chorus depth at the upper boundary (100)", () => {
+            Singer.ToneActions.doChorus(1.5, 20, 100, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.chorusDepth).toContain(1);
+        });
+
+        it("should not call setDispatchBlock when blk is not in blockList", () => {
+            const mouse = Mouse.getMouseFromTurtle(targetTurtle);
+            mouse.MB.listeners = [];
+            Singer.ToneActions.doChorus(1.5, 20, 50, 0, 999);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(mouse.MB.listeners).toContain("_chorus_0");
+        });
+
         it("should NOT register a mouse listener when blk is undefined", () => {
             MusicBlocks.isRun = false;
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
@@ -375,6 +487,7 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.rate).toContain(2);
             expect(targetTurtle.singer.octaves).toContain(3);
             expect(targetTurtle.singer.baseFrequency).toContain(100);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_phaser_0");
 
             if (listenerCallbacks["_phaser_0"]) {
                 listenerCallbacks["_phaser_0"]();
@@ -382,6 +495,14 @@ describe("setupToneActions", () => {
                 expect(targetTurtle.singer.octaves.length).toBe(0);
                 expect(targetTurtle.singer.baseFrequency.length).toBe(0);
             }
+        });
+
+        it("should not call setDispatchBlock when blk is not in blockList", () => {
+            const mouse = Mouse.getMouseFromTurtle(targetTurtle);
+            mouse.MB.listeners = [];
+            Singer.ToneActions.doPhaser(2, 3, 100, 0, 999);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(mouse.MB.listeners).toContain("_phaser_0");
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -432,6 +553,26 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.tremoloDepth).toEqual([]);
         });
 
+        it("should accept tremolo depth at the lower boundary (0)", () => {
+            Singer.ToneActions.doTremolo(5, 0, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.tremoloDepth).toContain(0);
+        });
+
+        it("should accept tremolo depth at the upper boundary (100)", () => {
+            Singer.ToneActions.doTremolo(5, 100, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.tremoloDepth).toContain(1);
+        });
+
+        it("should not call setDispatchBlock when blk is not in blockList", () => {
+            const mouse = Mouse.getMouseFromTurtle(targetTurtle);
+            mouse.MB.listeners = [];
+            Singer.ToneActions.doTremolo(5, 50, 0, 999);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(mouse.MB.listeners).toContain("_tremolo_0");
+        });
+
         it("should NOT register a mouse listener when blk is undefined", () => {
             MusicBlocks.isRun = false;
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
@@ -474,6 +615,26 @@ describe("setupToneActions", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("Distortion must be from 0 to 100.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
             expect(targetTurtle.singer.distortionAmount).toEqual([]);
+        });
+
+        it("should accept distortion at the lower boundary (0)", () => {
+            Singer.ToneActions.doDistortion(0, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.distortionAmount).toContain(0);
+        });
+
+        it("should accept distortion at the upper boundary (100)", () => {
+            Singer.ToneActions.doDistortion(100, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.distortionAmount).toContain(1);
+        });
+
+        it("should not call setDispatchBlock when blk is not in blockList", () => {
+            const mouse = Mouse.getMouseFromTurtle(targetTurtle);
+            mouse.MB.listeners = [];
+            Singer.ToneActions.doDistortion(50, 0, 999);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(mouse.MB.listeners).toContain("_distortion_0");
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -537,6 +698,14 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.partials[0]).toEqual([1]);
         });
 
+        it("should not call setDispatchBlock when blk is not in blockList", () => {
+            const mouse = Mouse.getMouseFromTurtle(targetTurtle);
+            mouse.MB.listeners = [];
+            Singer.ToneActions.doHarmonic(2, 0, 999);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(mouse.MB.listeners).toContain("_harmonic_0_999");
+        });
+
         it("should NOT register a mouse listener when blk is undefined", () => {
             MusicBlocks.isRun = false;
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
@@ -560,7 +729,7 @@ describe("setupToneActions", () => {
     describe("defFMSynth", () => {
         it("should define FM synth correctly", () => {
             Singer.ToneActions.defFMSynth(10, 0, 1);
-            expect(activity.logo.timbre.FMSynthParams).toContain(10);
+            expect(activity.logo.timbre.FMSynthParams).toEqual([10]);
             expect(activity.logo.synth.createSynth).toHaveBeenCalledWith(
                 0,
                 "default-voice",
@@ -572,13 +741,25 @@ describe("setupToneActions", () => {
         it("should handle null modulationIndex", () => {
             Singer.ToneActions.defFMSynth(null, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
-            expect(activity.logo.timbre.FMSynthParams).toContain(10);
+            expect(activity.logo.timbre.FMSynthParams).toEqual([10]);
+        });
+
+        it("should handle non-numeric modulationIndex", () => {
+            Singer.ToneActions.defFMSynth("string", 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
+            expect(activity.logo.timbre.FMSynthParams).toEqual([10]);
         });
 
         it("should handle negative modulationIndex", () => {
             Singer.ToneActions.defFMSynth(-10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("The input cannot be negative.");
-            expect(activity.logo.timbre.FMSynthParams).toContain(10);
+            expect(activity.logo.timbre.FMSynthParams).toEqual([10]);
+        });
+
+        it("should accept modulationIndex at the boundary (0) without a negative-input error", () => {
+            Singer.ToneActions.defFMSynth(0, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(activity.logo.timbre.FMSynthParams).toEqual([0]);
         });
 
         it("should show error and halt when oscillators exist", () => {
@@ -595,12 +776,20 @@ describe("setupToneActions", () => {
             Singer.ToneActions.defFMSynth(10, 0, 1);
             expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
         });
+
+        it("should ignore a pre-existing oscillator when not in timbre mode", () => {
+            activity.logo.inTimbre = false;
+            activity.logo.timbre.osc = [{}];
+            Singer.ToneActions.defFMSynth(10, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
+        });
     });
 
     describe("defAMSynth", () => {
         it("should define AM synth correctly", () => {
             Singer.ToneActions.defAMSynth(5, 0, 1);
-            expect(activity.logo.timbre.AMSynthParams).toContain(5);
+            expect(activity.logo.timbre.AMSynthParams).toEqual([5]);
             expect(activity.logo.synth.createSynth).toHaveBeenCalledWith(
                 0,
                 "default-voice",
@@ -612,19 +801,25 @@ describe("setupToneActions", () => {
         it("should handle null harmonicity", () => {
             Singer.ToneActions.defAMSynth(null, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
-            expect(activity.logo.timbre.AMSynthParams).toContain(1);
+            expect(activity.logo.timbre.AMSynthParams).toEqual([1]);
         });
 
         it("should handle non-numeric harmonicity", () => {
             Singer.ToneActions.defAMSynth("string", 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
-            expect(activity.logo.timbre.AMSynthParams).toContain(1);
+            expect(activity.logo.timbre.AMSynthParams).toEqual([1]);
         });
 
         it("should handle negative harmonicity", () => {
             Singer.ToneActions.defAMSynth(-5, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("The input cannot be negative.");
-            expect(activity.logo.timbre.AMSynthParams).toContain(5);
+            expect(activity.logo.timbre.AMSynthParams).toEqual([5]);
+        });
+
+        it("should accept harmonicity at the boundary (0) without a negative-input error", () => {
+            Singer.ToneActions.defAMSynth(0, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(activity.logo.timbre.AMSynthParams).toEqual([0]);
         });
 
         it("should show error and halt when oscillators exist", () => {
@@ -641,13 +836,21 @@ describe("setupToneActions", () => {
             Singer.ToneActions.defAMSynth(5, 0, 1);
             expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
         });
+
+        it("should ignore a pre-existing oscillator when not in timbre mode", () => {
+            activity.logo.inTimbre = false;
+            activity.logo.timbre.osc = [{}];
+            Singer.ToneActions.defAMSynth(5, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
+        });
     });
 
     describe("defDuoSynth", () => {
         it("should define Duo synth correctly", () => {
             Singer.ToneActions.defDuoSynth(10, 20, 0, 1);
-            expect(activity.logo.timbre.duoSynthParams).toContain(10);
-            expect(activity.logo.timbre.duoSynthParams).toContain(20);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(activity.logo.timbre.duoSynthParams).toEqual([10, 20]);
             expect(activity.logo.synth.createSynth).toHaveBeenCalledWith(
                 0,
                 "default-voice",
@@ -659,31 +862,30 @@ describe("setupToneActions", () => {
         it("should handle null vibratoRate", () => {
             Singer.ToneActions.defDuoSynth(null, 20, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
-            expect(activity.logo.timbre.duoSynthParams).toContain(10);
+            expect(activity.logo.timbre.duoSynthParams).toEqual([10, 20]);
         });
 
         it("should handle non-numeric vibratoRate", () => {
             Singer.ToneActions.defDuoSynth("string", 20, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
-            expect(activity.logo.timbre.duoSynthParams).toContain(10);
+            expect(activity.logo.timbre.duoSynthParams).toEqual([10, 20]);
         });
 
         it("should handle null vibratoAmount", () => {
             Singer.ToneActions.defDuoSynth(10, null, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
-            expect(activity.logo.timbre.duoSynthParams).toContain(50);
+            expect(activity.logo.timbre.duoSynthParams).toEqual([10, 50]);
         });
 
         it("should handle non-numeric vibratoAmount", () => {
             Singer.ToneActions.defDuoSynth(10, "string", 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
-            expect(activity.logo.timbre.duoSynthParams).toContain(50);
+            expect(activity.logo.timbre.duoSynthParams).toEqual([10, 50]);
         });
 
         it("should handle negative inputs correctly", () => {
             Singer.ToneActions.defDuoSynth(-10, -20, 0, 1);
-            expect(activity.logo.timbre.duoSynthParams).toContain(10);
-            expect(activity.logo.timbre.duoSynthParams).toContain(20);
+            expect(activity.logo.timbre.duoSynthParams).toEqual([10, 20]);
         });
 
         it("should show error and halt when oscillators exist", () => {
@@ -698,6 +900,14 @@ describe("setupToneActions", () => {
         it("should not create parameters when not in timbre mode", () => {
             activity.logo.inTimbre = false;
             Singer.ToneActions.defDuoSynth(10, 20, 0, 1);
+            expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
+        });
+
+        it("should ignore a pre-existing oscillator when not in timbre mode", () => {
+            activity.logo.inTimbre = false;
+            activity.logo.timbre.osc = [{}];
+            Singer.ToneActions.defDuoSynth(10, 20, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
             expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
         });
     });
