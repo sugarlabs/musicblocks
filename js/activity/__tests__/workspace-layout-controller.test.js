@@ -118,7 +118,13 @@ function makeActivity({ blockList = {}, turtleList = [] } = {}) {
         palettes: { updatePalettes: jest.fn() },
         homeButtonContainer: { children: [{}] },
         _changeBlockVisibility: jest.fn(),
-        __tick: jest.fn()
+        __tick: jest.fn(),
+        closeHelpfulWheel: jest.fn(() => {
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            const wasOpen = Boolean(helpfulWheelDiv && helpfulWheelDiv.style.display !== "none");
+            if (wasOpen) helpfulWheelDiv.style.display = "none";
+            return wasOpen;
+        })
     };
 }
 

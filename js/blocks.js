@@ -4564,7 +4564,7 @@ class Blocks {
                     this.selectedBlocksObj[0][3] =
                         helpfulWheelDiv.offsetTop + 130 - this.activity.blocksContainer.y;
 
-                    helpfulWheelDiv.style.display = "none";
+                    this.activity.closeHelpfulWheel();
                 } else {
                     this.selectedBlocksObj[0][2] =
                         175 - this.activity.blocksContainer.x + this.pasteDx;

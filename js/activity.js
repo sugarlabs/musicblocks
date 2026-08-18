@@ -634,7 +634,8 @@ class Activity {
         // Context menu / helpful wheel / bottom toolbar functionality has been
         // extracted to ContextMenuController (js/context-menu-controller.js).
         // setupContextMenuController() installs the delegation stubs below:
-        // setHelpfulSearchDiv, _displayHelpfulSearchDiv, _hideHelpfulSearchWidget,
+        // closeHelpfulWheel, setHelpfulSearchDiv, _displayHelpfulSearchDiv,
+        // _hideHelpfulSearchWidget,
         // doContextMenus, displayHelpfulWheel, setupPaletteMenu, makeButton,
         // loadButtonDragHandler, openAuxMenu, _showHideAuxMenu, showHideAuxMenu,
         // hideAuxMenu, deltaY.
@@ -819,10 +820,7 @@ class Activity {
                     table.remove();
                 }
 
-                // Cache DOM element reference for performance
-                const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-                if (helpfulWheelDiv.style.display !== "none") {
-                    helpfulWheelDiv.style.display = "none";
+                if (this.closeHelpfulWheel()) {
                     this.__tick();
                 }
 
@@ -1020,11 +1018,7 @@ class Activity {
         const setScroller = activity => {
             activity._setScroller();
             activity._setupBlocksContainerEvents();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-            }
+            activity.closeHelpfulWheel();
         };
         // Exposed so ContextMenuController (activity/context-menu-controller.js) can
         // reference it from the helpfulWheelItems registry it builds.
@@ -2200,11 +2194,7 @@ class Activity {
          */
         const chooseKeyMenu = that => {
             piemenuKey(that);
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-            }
+            that.closeHelpfulWheel();
         };
         // Exposed so ContextMenuController (activity/context-menu-controller.js) can
         // reference it from the helpfulWheelItems registry it builds.

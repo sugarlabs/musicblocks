@@ -448,7 +448,12 @@ describe("Toolbar Class", () => {
                 { label: "Turtle Wrap Off", display: false },
                 { label: "Turtle Wrap On", display: true }
             ],
-            textMsg: jest.fn()
+            textMsg: jest.fn(),
+            closeHelpfulWheel: jest.fn(() => {
+                const wasOpen = helpfulWheelDiv.style.display !== "none";
+                if (wasOpen) helpfulWheelDiv.style.display = "none";
+                return wasOpen;
+            })
         };
 
         const wrapIcon = {

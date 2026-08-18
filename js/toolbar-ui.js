@@ -881,9 +881,7 @@ class ToolbarUI {
             delay: 100
         });
 
-        if (docById("helpfulWheelDiv").style.display !== "none") {
-            docById("helpfulWheelDiv").style.display = "none";
-        }
+        activity.closeHelpfulWheel();
     }
 
     /**

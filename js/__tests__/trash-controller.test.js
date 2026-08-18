@@ -74,7 +74,13 @@ function makeActivity() {
         refreshCanvas: jest.fn(),
         textMsg: jest.fn(),
         cellSize: 10,
-        __tick: jest.fn()
+        __tick: jest.fn(),
+        closeHelpfulWheel: jest.fn(() => {
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            const wasOpen = Boolean(helpfulWheelDiv && helpfulWheelDiv.style.display !== "none");
+            if (wasOpen) helpfulWheelDiv.style.display = "none";
+            return wasOpen;
+        })
     };
 
     return activity;

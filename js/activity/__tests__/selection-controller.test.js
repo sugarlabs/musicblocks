@@ -73,6 +73,12 @@ function makeActivity() {
         scrollBlockContainer: false,
         refreshCanvas: jest.fn(),
         textMsg: jest.fn(),
+        closeHelpfulWheel: jest.fn(() => {
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            const wasOpen = Boolean(helpfulWheelDiv && helpfulWheelDiv.style.display !== "none");
+            if (wasOpen) helpfulWheelDiv.style.display = "none";
+            return wasOpen;
+        }),
         moving: true,
         addEventListener: jest.fn((target, event, handler) => {
             listeners[event] = listeners[event] || [];

@@ -28,9 +28,7 @@
  * (not `controller.fn(activity)`), so anything they call must not depend on `this`.
  */
 const closeHelpfulWheelAndTick = activity => {
-    const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-    if (helpfulWheelDiv.style.display !== "none") {
-        helpfulWheelDiv.style.display = "none";
+    if (activity.closeHelpfulWheel()) {
         activity.__tick();
     }
 };
@@ -41,6 +39,34 @@ class ContextMenuController {
      */
     constructor(activity) {
         this.activity = activity;
+        this._helpfulWheelCloseListener = event => {
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv && !helpfulWheelDiv.contains(event.target)) {
+                this.closeHelpfulWheel();
+            }
+        };
+        this._helpfulWheelCloseListenerAttached = false;
+    }
+
+    /**
+     * Hides the helpful wheel and removes its document-level close listener.
+     *
+     * @returns {boolean} Whether the wheel was visible before it was closed.
+     */
+    closeHelpfulWheel() {
+        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+        const wasOpen = Boolean(helpfulWheelDiv && helpfulWheelDiv.style.display !== "none");
+
+        if (this._helpfulWheelCloseListenerAttached) {
+            this.activity.removeEventListener(document, "click", this._helpfulWheelCloseListener);
+            this._helpfulWheelCloseListenerAttached = false;
+        }
+
+        if (helpfulWheelDiv && wasOpen) {
+            helpfulWheelDiv.style.display = "none";
+        }
+
+        return wasOpen;
     }
 
     /**
@@ -76,6 +102,7 @@ class ContextMenuController {
      */
     displayHelpfulWheel(event) {
         const activity = this.activity;
+        this.closeHelpfulWheel();
         // Cache DOM element reference for performance (7 lookups reduced to 1)
         const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
         helpfulWheelDiv.style.position = "absolute";
@@ -146,15 +173,8 @@ class ContextMenuController {
             wheel.navItems[i].setTooltip(_(ele.label));
             wheel.navItems[i].navigateFunction = () => ele.fn(activity);
         });
-        const closeHelpfulWheel = e => {
-            const isClickInside = helpfulWheelDiv.contains(e.target);
-            if (!isClickInside) {
-                helpfulWheelDiv.style.display = "none";
-                activity.removeEventListener(document, "click", closeHelpfulWheel);
-            }
-        };
-
-        activity.addEventListener(document, "click", closeHelpfulWheel);
+        activity.addEventListener(document, "click", this._helpfulWheelCloseListener);
+        this._helpfulWheelCloseListenerAttached = true;
     }
 
     /**
@@ -657,6 +677,7 @@ const setupContextMenuController = activity => {
     activity.contextMenuController = controller;
 
     activity.doContextMenus = (...args) => controller.doContextMenus(...args);
+    activity.closeHelpfulWheel = (...args) => controller.closeHelpfulWheel(...args);
     activity.displayHelpfulWheel = (...args) => controller.displayHelpfulWheel(...args);
     activity.setupPaletteMenu = (...args) => controller.setupPaletteMenu(...args);
     activity.makeButton = (...args) => controller.makeButton(...args);
