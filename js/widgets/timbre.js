@@ -769,7 +769,8 @@ class TimbreWidget {
 
             for (let i = 0; i < 2; i++) {
                 docById("myRangeFx" + i).value = parseFloat(this.tremoloParams[i]);
-                docById("myspanFx" + i).textContent = this.tremoloParams[i];
+                docById("myspanFx" + i).textContent =
+                    Math.round(parseFloat(this.tremoloParams[i]) * 100) / 100;
                 this._update(blockValue, this.tremoloParams[i], i);
             }
         } else if (this.isActive["vibrato"] === true) {
@@ -780,7 +781,13 @@ class TimbreWidget {
 
             for (let i = 0; i < 2; i++) {
                 docById("myRangeFx" + i).value = parseFloat(this.vibratoParams[i]);
-                docById("myspanFx" + i).textContent = this.vibratoParams[i];
+                if (i === 1) {
+                    const obj = oneHundredToFraction(this.vibratoParams[i]);
+                    docById("myspanFx" + i).textContent = obj[0] + "/" + obj[1];
+                } else {
+                    docById("myspanFx" + i).textContent =
+                        Math.round(parseFloat(this.vibratoParams[i]) * 100) / 100;
+                }
                 this._update(blockValue, this.vibratoParams[i], i);
             }
         } else if (this.isActive["phaser"] === true) {
@@ -791,7 +798,8 @@ class TimbreWidget {
 
             for (let i = 0; i < 3; i++) {
                 docById("myRangeFx" + i).value = parseFloat(this.phaserParams[i]);
-                docById("myspanFx" + i).textContent = this.phaserParams[i];
+                docById("myspanFx" + i).textContent =
+                    Math.round(parseFloat(this.phaserParams[i]) * 100) / 100;
                 this._update(blockValue, this.phaserParams[i], i);
             }
         } else if (this.isActive["chorus"] === true) {
@@ -802,7 +810,8 @@ class TimbreWidget {
 
             for (let i = 0; i < 3; i++) {
                 docById("myRangeFx" + i).value = parseFloat(this.chorusParams[i]);
-                docById("myspanFx" + i).textContent = this.chorusParams[i];
+                docById("myspanFx" + i).textContent =
+                    Math.round(parseFloat(this.chorusParams[i]) * 100) / 100;
                 this._update(blockValue, this.chorusParams[i], i);
             }
         } else if (this.isActive["distortion"] === true) {
@@ -812,7 +821,8 @@ class TimbreWidget {
             }
 
             docById("myRangeFx0").value = parseFloat(this.distortionParams[0]);
-            docById("myspanFx0").textContent = this.distortionParams[0];
+            docById("myspanFx0").textContent =
+                Math.round(parseFloat(this.distortionParams[0]) * 100) / 100;
             this._update(blockValue, this.distortionParams[0], 0);
         }
 
@@ -2443,7 +2453,8 @@ class TimbreWidget {
                         const myspanFxs = [docById("myspanFx0"), docById("myspanFx1")];
                         for (let j = 0; j < 2; j++) {
                             myRangeFxs[j].value = parseFloat(this.tremoloParams[j]);
-                            myspanFxs[j].textContent = this.tremoloParams[j];
+                            myspanFxs[j].textContent =
+                                Math.round(parseFloat(this.tremoloParams[j]) * 100) / 100;
                             this._update(blockValue, this.tremoloParams[j], j);
                         }
                     }
@@ -2473,9 +2484,13 @@ class TimbreWidget {
 
                     document.getElementById("wrapperFx0").addEventListener("change", event => {
                         const elem = event.target;
-                        const val = parseFloat(elem.value);
+                        let val = parseFloat(elem.value);
+                        val = Math.round(val * 100) / 100;
+                        if (!instrumentsEffects[0][this.instrumentName]) {
+                            instrumentsEffects[0][this.instrumentName] = {};
+                        }
                         docById("myRangeFx0").value = val;
-                        docById("myspanFx0").textContent = elem.value;
+                        docById("myspanFx0").textContent = val;
                         instrumentsEffects[0][this.instrumentName]["tremoloFrequency"] = val;
                         this.tremoloParams[0] = elem.value;
                         this._update(this.tremoloEffect.length - 1, val, 0);
@@ -2484,9 +2499,13 @@ class TimbreWidget {
 
                     document.getElementById("wrapperFx1").addEventListener("change", event => {
                         const elem = event.target;
-                        const val = parseFloat(elem.value);
+                        let val = parseFloat(elem.value);
+                        val = Math.round(val * 100) / 100;
+                        if (!instrumentsEffects[0][this.instrumentName]) {
+                            instrumentsEffects[0][this.instrumentName] = {};
+                        }
                         docById("myRangeFx1").value = val;
-                        docById("myspanFx1").textContent = elem.value;
+                        docById("myspanFx1").textContent = val;
                         instrumentsEffects[0][this.instrumentName]["tremoloDepth"] = val / 100;
                         this.tremoloParams[1] = elem.value;
                         this._update(this.tremoloEffect.length - 1, val, 1);
@@ -2509,7 +2528,8 @@ class TimbreWidget {
 
                     if (this.vibratoEffect.length > 0) {
                         myRangeFxs[0].value = parseFloat(this.vibratoParams[0]);
-                        myspanFxs[0].textContent = this.vibratoParams[0];
+                        myspanFxs[0].textContent =
+                            Math.round(parseFloat(this.vibratoParams[0]) * 100) / 100;
                         // Scale of rate is 0 to 1, so we need to multiply by 100
                         myRangeFxs[1].value = 100 / parseFloat(this.vibratoParams[1]);
                         const obj = rationalToFraction(1 / parseFloat(this.vibratoParams[1]));
@@ -2554,9 +2574,13 @@ class TimbreWidget {
                     // Add the listeners for the sliders.
                     document.getElementById("wrapperFx0").addEventListener("change", event => {
                         const elem = event.target;
-                        const val = parseFloat(elem.value);
+                        let val = parseFloat(elem.value);
+                        val = Math.round(val * 100) / 100;
+                        if (!instrumentsEffects[0][this.instrumentName]) {
+                            instrumentsEffects[0][this.instrumentName] = {};
+                        }
                         myRangeFxs[0].value = val;
-                        myspanFxs[0].textContent = elem.value;
+                        myspanFxs[0].textContent = val;
                         instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] = val / 100;
                         this.vibratoParams[0] = elem.value;
                         this._update(this.vibratoEffect.length - 1, val, 0);
@@ -2565,9 +2589,13 @@ class TimbreWidget {
 
                     document.getElementById("wrapperFx1").addEventListener("change", event => {
                         const elem = event.target;
-                        const val = parseFloat(elem.value);
+                        let val = parseFloat(elem.value);
+                        val = Math.round(val * 100) / 100;
+                        if (!instrumentsEffects[0][this.instrumentName]) {
+                            instrumentsEffects[0][this.instrumentName] = {};
+                        }
                         myRangeFxs[1].value = val;
-                        const obj = oneHundredToFraction(elem.value);
+                        const obj = oneHundredToFraction(val);
                         myspanFxs[1].textContent = obj[0] + "/" + obj[1];
                         const temp = parseFloat(obj[0]) / parseFloat(obj[1]);
 
@@ -2616,7 +2644,8 @@ class TimbreWidget {
                         ];
                         for (let i = 0; i < 3; i++) {
                             myRangeFxs[i].value = parseFloat(this.chorusParams[i]);
-                            myspanFxs[i].textContent = this.chorusParams[i];
+                            myspanFxs[i].textContent =
+                                Math.round(parseFloat(this.chorusParams[i]) * 100) / 100;
                             this._update(blockValue, this.chorusParams[i], i);
                         }
                     }
@@ -2660,9 +2689,13 @@ class TimbreWidget {
                             .addEventListener("change", event => {
                                 const elem = event.target;
                                 const m = Number(elem.id.slice(-1));
-                                const val = parseFloat(elem.value);
+                                let val = parseFloat(elem.value);
+                                val = Math.round(val * 100) / 100;
+                                if (!instrumentsEffects[0][this.instrumentName]) {
+                                    instrumentsEffects[0][this.instrumentName] = {};
+                                }
                                 myRangeFxs[m].value = val;
-                                myspanFxs[m].textContent = elem.value;
+                                myspanFxs[m].textContent = val;
 
                                 if (m === 0) {
                                     instrumentsEffects[0][this.instrumentName]["chorusRate"] = val;
@@ -2726,7 +2759,8 @@ class TimbreWidget {
                         ];
                         for (let i = 0; i < 3; i++) {
                             myRangeFxs[i].value = parseFloat(this.phaserParams[i]);
-                            myspanFxs[i].textContent = this.phaserParams[i];
+                            myspanFxs[i].textContent =
+                                Math.round(parseFloat(this.phaserParams[i]) * 100) / 100;
                             this._update(blockValue, this.phaserParams[i], i);
                         }
                     }
@@ -2771,9 +2805,13 @@ class TimbreWidget {
                             .addEventListener("change", event => {
                                 const elem = event.target;
                                 const m = Number(elem.id.slice(-1));
-                                const val = parseFloat(elem.value);
+                                let val = parseFloat(elem.value);
+                                val = Math.round(val * 100) / 100;
+                                if (!instrumentsEffects[0][this.instrumentName]) {
+                                    instrumentsEffects[0][this.instrumentName] = {};
+                                }
                                 myRangeFxs[m].value = val;
-                                myspanFxs[m].textContent = elem.value;
+                                myspanFxs[m].textContent = val;
 
                                 if (m === 0) {
                                     instrumentsEffects[0][this.instrumentName]["rate"] = val;
@@ -2811,7 +2849,8 @@ class TimbreWidget {
                     if (this.distortionEffect.length !== 0) {
                         blockValue = this.distortionEffect.length - 1;
                         docById("myRangeFx0").value = parseFloat(this.distortionParams[0]);
-                        docById("myspanFx0").textContent = this.distortionParams[0];
+                        docById("myspanFx0").textContent =
+                            Math.round(parseFloat(this.distortionParams[0]) * 100) / 100;
                         this._update(blockValue, this.distortionParams[0], 0);
                     }
 
@@ -2836,12 +2875,16 @@ class TimbreWidget {
 
                     document.getElementById("wrapperFx0").addEventListener("change", event => {
                         const elem = event.target;
-                        const val = parseFloat(elem.value);
+                        let val = parseFloat(elem.value);
+                        val = Math.round(val * 100) / 100;
+                        if (!instrumentsEffects[0][this.instrumentName]) {
+                            instrumentsEffects[0][this.instrumentName] = {};
+                        }
                         docById("myRangeFx0").value = val;
-                        docById("myspanFx0").textContent = elem.value;
+                        docById("myspanFx0").textContent = val;
                         instrumentsEffects[0][this.instrumentName]["distortionAmount"] = val / 100;
-                        this.distortionParams[0] = elem.value;
-                        this._update(blockValue, elem.value, 0);
+                        this.distortionParams[0] = val;
+                        this._update(blockValue, val, 0);
                         this._playNote("G4", 1 / 8);
                     });
                 }
