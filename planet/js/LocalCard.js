@@ -40,7 +40,7 @@ class LocalCard {
                                 <i class="material-icons small">cloud_done</i>
                             </a>
                             <span class="git-repo-badge tooltipped" data-position="top" data-delay="50" data-tooltip="${_(
-                                "Has a saved spot"
+                                "Being tracked"
                             )}" style="display:none;" id="local-project-git-{ID}">
                                 <img src="https://cdn.jsdelivr.net/npm/@phosphor-icons/core/assets/bold/git-branch-bold.svg"
                                      alt="GitHub repository"
