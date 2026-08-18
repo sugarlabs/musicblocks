@@ -153,7 +153,12 @@ Follow these steps when contributing:
     ```
 
 6.  **Open a Pull Request:**
-    - Use a clear and descriptive title.
+    - Use a Conventional Commit title: `<type>: <subject>` (for example,
+      `fix: correct drag offset on touch devices`). Allowed types are
+      `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `i18n`, `perf`, `refactor`,
+      `revert`, `style`, and `test`. The title is linted by
+      `pr-title-check.yml`. See [Releases and the Changelog](#releases-and-the-changelog)
+      for why this matters when a PR is squash-merged.
     - Link the related issue using `Related to #XXXX` or `Partially addresses #XXXX`.
     - Explain what changed and why.
     - Keep pull requests focused on a single topic or feature.
@@ -265,7 +270,7 @@ What this means for you as a contributor:
   line verbatim, so `fix(palette): correct drag offset on touch devices`
   reads well and `fix: stuff` does not.
 - `feat`, `fix`, `perf`, `docs`, and `revert` appear in the changelog.
-  `build`, `chore`, `ci`, `refactor`, `style`, and `test` are still valid
+  `build`, `chore`, `ci`, `i18n`, `refactor`, `style`, and `test` are still valid
   commit types and still required to pass linting — they are just hidden
   from the changelog. Two of those are deliberate policy rather than
   housekeeping: **added or changed tests** and **pure refactors** are not
