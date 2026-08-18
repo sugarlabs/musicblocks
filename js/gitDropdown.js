@@ -39,7 +39,11 @@ class GitDropdownUI {
             if (!e.data) return;
 
             if (e.data.type === "MB_GIT_STATE") {
-                this._applyGitState(e.data.repoName || "", e.data.hashedKey || "");
+                this._applyGitState(
+                    e.data.repoName || "",
+                    e.data.hashedKey || "",
+                    e.data.projectName || ""
+                );
                 // Persist the planet project ID so MB_OFFLINE_COMMIT can include it
                 // even after the iframe re-initialises (online-created project + go offline).
                 if (e.data.projectId) {
@@ -50,6 +54,7 @@ class GitDropdownUI {
                 // Clear all git tracking immediately — same as _afterDelete in activity.js.
                 localStorage.removeItem("mbGitRepoName");
                 localStorage.removeItem("mbGitHashedKey");
+                localStorage.removeItem("mbGitDisplayName");
                 localStorage.removeItem("mbGitLastSavedHash");
                 localStorage.removeItem("mbGitCurrentSha");
                 localStorage.removeItem("mbGitCurrentDraftId");
@@ -97,13 +102,19 @@ class GitDropdownUI {
      * @param {string} repoName   - repo slug, or "" to clear
      * @param {string} hashedKey  - ownership key for the repo
      */
-    _applyGitState(repoName, hashedKey) {
+    _applyGitState(repoName, hashedKey, displayName) {
         if (repoName) {
             localStorage.setItem("mbGitRepoName", repoName);
             localStorage.setItem("mbGitHashedKey", hashedKey || "");
+            // Store the user-facing display name if provided; preserve any
+            // existing name if not (e.g. from a plain MB_GIT_STATE ping).
+            if (displayName) {
+                localStorage.setItem("mbGitDisplayName", displayName);
+            }
         } else {
             localStorage.removeItem("mbGitRepoName");
             localStorage.removeItem("mbGitHashedKey");
+            localStorage.removeItem("mbGitDisplayName");
         }
         // Reset the current-SHA so the history panel marks the latest commit
         // as current whenever we switch to a different project.
@@ -119,6 +130,25 @@ class GitDropdownUI {
 
     _getRepoName() {
         return localStorage.getItem("mbGitRepoName") || "";
+    }
+    _getDisplayName() {
+        let liveName = "";
+        try {
+            if (
+                this.activity &&
+                this.activity.planet &&
+                typeof this.activity.planet.getCurrentProjectName === "function"
+            ) {
+                liveName = this.activity.planet.getCurrentProjectName();
+            }
+        } catch (_) {
+            /* ignore error if planet interface is not ready */
+        }
+        return (
+            liveName ||
+            localStorage.getItem("mbGitDisplayName") ||
+            this._prettifyRepoName(this._getRepoName())
+        );
     }
     _getHashedKey() {
         return localStorage.getItem("mbGitHashedKey") || "";
@@ -212,8 +242,8 @@ class GitDropdownUI {
         const btn = document.getElementById("gitProjectBtn");
         if (btn) {
             const tip = this._getRepoName()
-                ? `My Project — ${this._prettifyRepoName(this._getRepoName())}`
-                : "My Project";
+                ? `My project: ${this._getDisplayName()}`
+                : "Start tracking my project";
             btn.setAttribute("data-tooltip", tip);
             btn.setAttribute("aria-label", tip);
         }
@@ -247,17 +277,17 @@ class GitDropdownUI {
     async _showCreateFlow() {
         if (this._getRepoName()) {
             await window.MBDialog.alert(
-                'You already have a save spot called "' +
+                'You are already tracking a project called "' +
                     this._prettifyRepoName(this._getRepoName()) +
-                    '".\n\nTo start a fresh save spot, first use New Project (the + icon) to clear your canvas, then try again.',
-                "Save Spot Already Exists"
+                    '".\n\nTo track a new project, first use New Project (the + icon) to start fresh, then try again.',
+                "Your Project is Tracked"
             );
             return;
         }
 
         const rawName = await window.MBDialog.prompt({
-            title: "Create My Save Spot",
-            message: "What do you want to call your project? (You can change this later)",
+            title: "Track My Project",
+            message: "Give your project a name so you can find it later!",
             defaultValue: this._getDefaultProjectName(),
             okText: "Next",
             cancelText: "Cancel"
@@ -265,10 +295,10 @@ class GitDropdownUI {
         if (rawName === null || rawName.trim() === "") return;
 
         const desc = await window.MBDialog.prompt({
-            title: "Create My Save Spot",
-            message: "Write a short sentence about what your project does (optional):",
+            title: "About Your Project",
+            message: "Write a short description about what your project does:",
             defaultValue: "",
-            okText: "Create Save Spot",
+            okText: "Start Tracking",
             cancelText: "Cancel"
         });
         if (desc === null) return;
@@ -287,10 +317,13 @@ class GitDropdownUI {
         // Same pattern as _doCommit: if the device has no network right now,
         // skip the fetch entirely and queue the repo creation locally.
         if (this._isOffline()) {
-            this._showToast("You're offline. Queuing save spot for when you reconnect…", "info");
+            this._showToast(
+                "You are offline. Your project will start tracking when you reconnect…",
+                "info"
+            );
             const planetIframe = document.getElementById("planet-iframe");
             if (!planetIframe || !planetIframe.contentWindow) {
-                this._showToast("Could not queue save spot — planet frame unavailable.", "error");
+                this._showToast("Could not start tracking — planet frame unavailable.", "error");
                 return;
             }
 
@@ -313,21 +346,22 @@ class GitDropdownUI {
                     const offlineRepo = result.repository;
                     localStorage.setItem("mbGitRepoName", offlineRepo);
                     localStorage.setItem("mbGitHashedKey", "");
+                    localStorage.setItem("mbGitDisplayName", rawName.trim());
                     this.onSaveLocally();
                     this._syncMenuState();
                     this._showToast(
-                        "Save spot queued! It will be created on GitHub when you reconnect. ✔",
+                        "Got it! We will set up tracking when you are back online. ✔",
                         "success"
                     );
                 } else {
                     this._showToast(
-                        "Could not queue save spot — " + (result.error || "unknown error"),
+                        "Could not start tracking — " + (result.error || "unknown error"),
                         "error"
                     );
                 }
             } catch (e) {
                 console.error("[GitDropdownUI] offline create bridge timeout:", e);
-                this._showToast("Offline queue timed out — please try again.", "error");
+                this._showToast("Offline setup timed out — please try again.", "error");
             }
             return;
         }
@@ -351,7 +385,7 @@ class GitDropdownUI {
         };
 
         try {
-            this._showToast("Creating your save spot…", "info");
+            this._showToast("Setting up tracking…", "info");
             const res = await fetch(`${this._BASE_URL}/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -381,6 +415,9 @@ class GitDropdownUI {
             localStorage.setItem("mbGitRepoName", savedRepoName);
             localStorage.setItem("mbGitHashedKey", savedKey);
             localStorage.setItem("mb_git_key_" + savedRepoName, savedKey);
+            // Store the user-facing display name so the toolbar tooltip shows
+            // "My project: Guitar Song" instead of the sanitised repo slug.
+            localStorage.setItem("mbGitDisplayName", displayName);
             localStorage.removeItem("mbGitCurrentSha");
             localStorage.removeItem("mbGitCurrentDraftId");
             this.onSaveLocally();
@@ -405,7 +442,10 @@ class GitDropdownUI {
                 );
             }
 
-            this._showToast("Save spot created! Your project is now being tracked.", "success");
+            this._showToast(
+                "Tracking started! Every moment you save will be remembered.",
+                "success"
+            );
         } catch (e) {
             window.removeEventListener("offline", abortCreateOnOffline);
 
@@ -416,13 +456,13 @@ class GitDropdownUI {
             if (isNetworkFailure) {
                 console.warn("[GitDropdownUI] Network lost during create — queuing offline.", e);
                 this._showToast(
-                    "You're offline. Queuing save spot for when you reconnect…",
+                    "You are offline. Your project will start tracking when you reconnect…",
                     "info"
                 );
                 const planetIframe = document.getElementById("planet-iframe");
                 if (!planetIframe || !planetIframe.contentWindow) {
                     this._showToast(
-                        "Could not queue save spot — planet frame unavailable.",
+                        "Could not start tracking — planet frame unavailable.",
                         "error"
                     );
                     return;
@@ -444,26 +484,27 @@ class GitDropdownUI {
                     if (result.success) {
                         localStorage.setItem("mbGitRepoName", result.repository);
                         localStorage.setItem("mbGitHashedKey", "");
+                        localStorage.setItem("mbGitDisplayName", displayName);
                         this.onSaveLocally();
                         this._syncMenuState();
                         this._showToast(
-                            "Save spot queued! It will be created on GitHub when you reconnect. ✔",
+                            "Got it! We will set up tracking when you are back online. ✔",
                             "success"
                         );
                     } else {
                         this._showToast(
-                            "Could not queue save spot — " + (result.error || "unknown error"),
+                            "Could not start tracking — " + (result.error || "unknown error"),
                             "error"
                         );
                     }
                 } catch (_) {
-                    this._showToast("Offline queue timed out — please try again.", "error");
+                    this._showToast("Offline setup timed out — please try again.", "error");
                 }
             } else {
                 // Server-side error — still report it
                 console.error("[GitDropdownUI] create server error:", e);
                 this._showToast(
-                    "Could not create save spot — the server returned an error.",
+                    "Could not start tracking — the server returned an error.",
                     "error"
                 );
             }
@@ -474,8 +515,8 @@ class GitDropdownUI {
         const repoName = this._getRepoName();
         if (!repoName) {
             await window.MBDialog.alert(
-                'Create a save spot first by clicking "Create My Save Spot".',
-                "No Save Spot Yet"
+                'Start tracking your project first by clicking "Track my project".',
+                "Not Tracking Yet"
             );
             return;
         }
@@ -485,7 +526,7 @@ class GitDropdownUI {
             title: "Mark This Moment",
             message: "What did you change or add?",
             defaultValue: defaultMsg,
-            okText: "Save This Moment",
+            okText: "Mark This Moment",
             cancelText: "Cancel"
         });
         if (message === null) return;
@@ -618,7 +659,7 @@ class GitDropdownUI {
                 );
             } else if (result.error === "NO_REPO_WHILE_OFFLINE") {
                 this._showToast(
-                    "Create a save spot first (while online), then you can save offline.",
+                    "Start tracking your project first (while online), then you can save offline.",
                     "error"
                 );
             } else {
@@ -637,8 +678,8 @@ class GitDropdownUI {
         const repoName = this._getRepoName();
         if (!repoName) {
             await window.MBDialog.alert(
-                'Create a save spot first by clicking "Create My Save Spot".',
-                "No Save Spot Yet"
+                'Start tracking your project first by clicking "Track my project".',
+                "Not Tracking Yet"
             );
             return;
         }
@@ -732,7 +773,7 @@ class GitDropdownUI {
             }
             // Online but genuinely empty — prompt the student to save
             await window.MBDialog.alert(
-                'You haven\'t saved any moments yet. Click "Mark This Moment" to save your first one!',
+                'No moments marked yet. Click "Mark this moment" to save your first one!',
                 "No Saved Moments Yet"
             );
             return;
@@ -957,10 +998,10 @@ class GitDropdownUI {
             btnRow.className = "git-tt-btn-row";
 
             if (isNow) {
-                // "Clear Changes" — lets student discard unsaved edits and restore to this save
+                // "Undo my changes" — lets student discard unsaved edits and restore to this save
                 const clearBtn = document.createElement("button");
                 clearBtn.className = "git-tt-clear-btn";
-                clearBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Clear Changes`;
+                clearBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Undo my changes`;
                 clearBtn.addEventListener("click", () => {
                     close();
                     this._clearChanges(commit, commit.message);
@@ -969,7 +1010,7 @@ class GitDropdownUI {
             } else {
                 const btn = document.createElement("button");
                 btn.className = "git-tt-go-btn";
-                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Take me here`;
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Go back to this version`;
                 btn.addEventListener("click", () => {
                     close();
                     this._confirmTimeTravel(commit, commit.message);
@@ -988,7 +1029,7 @@ class GitDropdownUI {
             wrap.appendChild(stop);
         });
 
-        // last stop — start flag (always shown; "Take me here" restores to origin)
+        // last stop — start flag (always shown; "Go back to this version" restores to origin)
         {
             // The origin is "now" only when no other commit node already claimed that position.
             // Without this guard, a project with 1 pending commit and no stored SHA/draftId
@@ -1038,22 +1079,22 @@ class GitDropdownUI {
             flagMsgEl.className = "git-tt-msg";
             flagMsgEl.textContent = "Where your project started ✦";
 
-            // Show "Save Spot Pending" badge on the origin flag when the
+            // Show "Setting Up Tracking" badge on the origin flag when the
             // project itself was created offline and the GitHub repo hasn't been created yet.
             if (isRepoPending) {
                 const repoNote = document.createElement("span");
                 repoNote.className = "git-tt-sync-pending-badge";
-                repoNote.textContent = "Save Spot Pending";
+                repoNote.textContent = "Setting Up Tracking";
                 flagMsgEl.appendChild(repoNote);
             }
 
             const flagBtnRow = document.createElement("div");
             flagBtnRow.className = "git-tt-btn-row";
             if (isAtOrigin) {
-                // Only show the Clear Changes button — no "your song right now" chip
+                // Only show the Undo my changes button — no "your song right now" chip
                 const clearOriginBtn = document.createElement("button");
                 clearOriginBtn.className = "git-tt-clear-btn";
-                clearOriginBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Clear Changes`;
+                clearOriginBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Undo my changes`;
                 clearOriginBtn.addEventListener("click", () => {
                     close();
                     this._clearChanges(originTarget || "origin", "Start point");
@@ -1062,7 +1103,7 @@ class GitDropdownUI {
             } else if (originTarget) {
                 const flagBtn = document.createElement("button");
                 flagBtn.className = "git-tt-go-btn";
-                flagBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Take me here`;
+                flagBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Go back to this version`;
                 flagBtn.addEventListener("click", () => {
                     close();
                     this._confirmTimeTravel(originTarget, "Start point");
@@ -1288,9 +1329,10 @@ class GitDropdownUI {
                     const defaultMsg = this._defaultCommitMessage();
                     const msg = await window.MBDialog.prompt({
                         title: "Mark This Moment",
-                        message: "What did you change or add? (Auto-saving before time travel)",
+                        message:
+                            "What did you change or add? Saving a moment before you time travel.",
                         defaultValue: defaultMsg,
-                        okText: "Save & Go Back",
+                        okText: "Mark & Go Back",
                         cancelText: "Cancel"
                     });
                     if (msg === null) return;
@@ -1305,7 +1347,7 @@ class GitDropdownUI {
     }
 
     async _clearChanges(commitTarget, commitMessage) {
-        const { frame, widget, cleanup } = this._buildSystemDialog("Clear Your Changes");
+        const { frame, widget, cleanup } = this._buildSystemDialog("Undo Your Changes");
         this._centerFrame(frame);
 
         const msgEl = document.createElement("p");
@@ -1316,7 +1358,7 @@ class GitDropdownUI {
         )
             ? "Start point"
             : commitMessage;
-        msgEl.textContent = `This will erase everything you've done since your last save and restore "${displayLabel}". What would you like to do?`;
+        msgEl.textContent = `This will undo your recent changes and take you back to "${displayLabel}". Do you want to mark this moment first?`;
 
         const actions = document.createElement("div");
         actions.style.cssText = "display:flex;flex-direction:column;gap:10px;";
@@ -1328,7 +1370,7 @@ class GitDropdownUI {
             b.style.cssText = "width:100%;text-align:left;";
             return b;
         };
-        const btnSave = mkBtn("confirm-button", "Save a backup first, then clear");
+        const btnSave = mkBtn("confirm-button", "Mark a moment first, then go back");
         const btnDiscard = mkBtn(
             "cancel-button git-guard-discard-btn",
             "Discard changes — I don't need them"
@@ -1343,10 +1385,10 @@ class GitDropdownUI {
             if (repoName) {
                 const defaultMsg = this._defaultCommitMessage();
                 const userMsg = await window.MBDialog.prompt({
-                    title: "Save Backup",
-                    message: "Name this backup before clearing:",
+                    title: "Mark This Moment",
+                    message: "Describe your changes before going back:",
                     defaultValue: defaultMsg,
-                    okText: "Save & Clear",
+                    okText: "Mark & Go Back",
                     cancelText: "Cancel"
                 });
                 if (userMsg === null) return;
@@ -1445,21 +1487,21 @@ class GitDropdownUI {
             )
                 ? "Start point"
                 : message;
-            this._showToast(`Restored: "${displayLabel}"`, "success");
+            this._showToast(`Traveled back to: "${displayLabel}" ✔`, "success");
         } catch (e) {
             console.error("[GitDropdownUI] restoreCommit error:", e);
-            this._showToast("Could not restore that saved moment. Try again.", "error");
+            this._showToast("Could not travel back to that version. Try again.", "error");
         }
     }
 
     _showUnsavedGuard(onSaveFirst, onJustGoBack) {
-        const { frame, widget, cleanup } = this._buildSystemDialog("You Have Unsaved Work");
+        const { frame, widget, cleanup } = this._buildSystemDialog("You Have Unsaved Changes");
         this._centerFrame(frame);
 
         const msg = document.createElement("p");
         msg.style.margin = "0";
         msg.textContent =
-            "Going back will replace what you're working on right now. What would you like to do?";
+            "Going back will replace what you are working on right now. What would you like to do?";
 
         const actions = document.createElement("div");
         actions.style.cssText = "display:flex;flex-direction:column;gap:10px;";
@@ -1471,12 +1513,12 @@ class GitDropdownUI {
             b.style.cssText = "width:100%;text-align:left;";
             return b;
         };
-        const btnSave = mkBtn("confirm-button", "Save a Checkpoint First, Then Go Back");
+        const btnSave = mkBtn("confirm-button", "Mark a moment first, then go back");
         const btnGoBack = mkBtn(
             "cancel-button git-guard-discard-btn",
-            "Just Go Back (I don't need to save)"
+            "Go back without saving changes"
         );
-        const btnCancel = mkBtn("cancel-button", "Cancel — Stay Here");
+        const btnCancel = mkBtn("cancel-button", "Keep editing");
 
         btnCancel.addEventListener("click", cleanup);
         btnSave.addEventListener("click", () => {

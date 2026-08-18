@@ -19,9 +19,9 @@
  * from the Help (?) dropdown.
  *
  * Steps:
- *   1. Save a Spot       - creates a GitHub repo
- *   2. Mark this Moment  - commit / version snapshot
- *   3. Timeline          - commit history + time travel
+ *   1. Track my project  - creates a GitHub repo
+ *   2. Mark this moment  - commit / version snapshot
+ *   3. Time travel       - commit history + time travel
  *   4. Fork from Planet  - copy a project from Planet
  *
  * Video behaviour:
@@ -35,15 +35,15 @@ const GitTutorial = (() => {
     // Source: https://phosphoricons.com  (MIT licence)
     // Each helper returns a self-contained <svg> string at 1em × 1em.
     const ICONS = {
-        /** MapPin — “Save a Spot” */
+        /** MapPin — “Track my project” */
         mapPin: `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
             <path d="M128 16a96 96 0 1 0 96 96A96.11 96.11 0 0 0 128 16Zm0 56a40 40 0 1 1-40 40 40 40 0 0 1 40-40Zm0 176a95.61 95.61 0 0 1-64-24.44V216a8 8 0 0 0 8 8h112a8 8 0 0 0 8-8v-12.44A95.61 95.61 0 0 1 128 248Z"/>
         </svg>`,
-        /** Camera — “Mark this Moment” */
+        /** Camera — “Mark this moment” */
         camera: `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
             <path d="M208 56h-27.31l-14.73-22.09A8 8 0 0 0 160 32H96a8 8 0 0 0-6.68 3.57L74.06 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24Zm8 136a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V80a8 8 0 0 1 8-8h32a8 8 0 0 0 6.68-3.57L101.06 48h53.88l14.38 20.43A8 8 0 0 0 176 72h32a8 8 0 0 1 8 8ZM128 88a44 44 0 1 0 44 44 44.05 44.05 0 0 0-44-44Zm0 72a28 28 0 1 1 28-28 28 28 0 0 1-28 28Z"/>
         </svg>`,
-        /** ClockCounterClockwise — “Timeline” */
+        /** ClockCounterClockwise — “Time travel” */
         clock: `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
             <path d="M136 80v43.47l36.12 21.67a8 8 0 0 1-8.24 13.72l-40-24A8 8 0 0 1 120 128V80a8 8 0 0 1 16 0Zm-8-48A96 96 0 0 0 47.08 60H32a8 8 0 0 0 0 16H72a8 8 0 0 0 8-8V28a8 8 0 0 0-16 0v13.22A80 80 0 1 1 48 128a8 8 0 0 0-16 0 96 96 0 1 0 96-96Z"/>
         </svg>`,
@@ -61,50 +61,49 @@ const GitTutorial = (() => {
     const STEPS = [
         {
             chipIcon: "mapPin",
-            chip: "Save a Spot",
-            title: "Save a Spot",
-            heading: "Create a space for your project.",
-            body: `Click <strong>Save a Spot</strong> in the Git menu to give your project a home
-                      on the internet, called a <strong>repository</strong>.<br><br>
-                      It's like getting your own locker at school. Nobody else can touch it
-                      unless you choose to publish it.`,
-            tip: "You only need to do this once per project. After that, your spot is saved forever!",
+            chip: "Track my project",
+            title: "Track my project",
+            heading: "Save your project!",
+            body: `Click <strong>Track my project</strong> in the Git menu to save your project.
+                      Think of it like a <strong>scrapbook</strong> that remembers everything you do.<br><br>
+                      Each time you save a moment, it gets kept forever.
+                      When you are ready, you can share your project with others and even work on it together!`,
+            tip: "You only need to do this once per project. After that, every moment you save is kept forever!",
             media: { type: "video", src: "videos/git-save-a-spot.mp4" }
         },
         {
             chipIcon: "camera",
-            chip: "Mark this Moment",
-            title: "Mark this Moment",
-            heading: "Snap a copy of your project right now!",
-            body: `Made something you like? Click <strong>Mark this Moment</strong> to save
-                      an exact copy of your work at this point in time.<br><br>
-                      Even if you change things later, you can always come back to
-                      <em>this exact version</em>.`,
+            chip: "Mark this moment",
+            title: "Mark this moment",
+            heading: "Take a snapshot of your project right now!",
+            body: `Made something you like? Click <strong>Mark this moment</strong> to save
+                      a copy of your project at this point in time.<br><br>
+                      Write a short note about what you did. That note helps you remember your changes,
+                      and helps you figure out what went wrong if something breaks later. That is how programmers find and fix bugs!`,
             tip: 'Type a short note like "added drums" so you remember what you changed!',
             media: { type: "video", src: "videos/git-mark-this-moment.mp4" }
         },
         {
             chipIcon: "clock",
-            chip: "Timeline",
-            title: "Timeline",
-            heading: "See every version of your project!",
-            body: `Click <strong>Timeline</strong> to see all the moments you marked,
-                      from newest to oldest.<br><br>
-                      See something you want to go back to? Hit <strong>Jump back here</strong>
-                      and your project goes right back to that version!`,
-            tip: "Every version is saved. You can always undo changes with the Timeline.",
+            chip: "Time travel",
+            title: "Time travel",
+            heading: "Travel back to any saved moment of your project!",
+            body: `Click <strong>Time travel</strong> to see every moment you have saved,
+                      from most recent to oldest.<br><br>
+                      See a version you want to go back to? Click <strong>Go back to this version</strong>
+                      and your project jumps right back to that moment. This is how programmers find and fix mistakes: they go back in time to see what changed!`,
+            tip: "Every saved moment is stored. Go back, compare, and figure out what changed and why!",
             media: { type: "video", src: "videos/git-timeline.mp4" }
         },
         {
             chipIcon: "gitFork",
             chip: "Fork from Planet",
             title: "Fork from Planet",
-            heading: "Make someone's project your own!",
-            body: `Seen a cool project on the Planet gallery? Click <strong>Fork from Planet</strong>
-                      on any card.<br><br>
-                      You get your own <em>fresh copy</em> of that project that belongs only to
-                      <strong>you</strong>. Change it, remix it, build on it however you want!`,
-            tip: "The original project is safe. You are working on your own copy, not theirs.",
+            heading: "Learn from others. Build something new together.",
+            body: `Seen a cool project on Planet? Click <strong>Fork project</strong>
+                      on any card to get your own copy.<br><br>
+                      Study how they built it. Remix it with your own ideas. Change the melody, add new instruments, take it somewhere new. This is how programmers work together: they learn from each other and build something even better!`,
+            tip: "The original project is always safe. Share what you make back to Planet so others can learn from you too!",
             media: { type: "image", src: "images/fork_planet.png", alt: "Fork from Planet" }
         }
     ];
@@ -285,7 +284,7 @@ const GitTutorial = (() => {
     }
 
     function _showCompletionToast() {
-        const msg = "Start by clicking Save a Spot in the Git menu!";
+        const msg = 'Ready! Click "Track my project" in the Git menu to save your project!';
         if (_activity && typeof _activity.textMsg === "function") {
             _activity.textMsg(msg, 4000);
             return;
