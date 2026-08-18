@@ -22,6 +22,7 @@
                 { "type": "refactor", "section": "Code Refactoring", "hidden": true },
                 { "type": "build", "section": "Build System", "hidden": true },
                 { "type": "chore", "section": "Miscellaneous Chores", "hidden": true },
+                { "type": "i18n", "section": "Internationalization", "hidden": true },
                 { "type": "ci", "section": "Continuous Integration", "hidden": true },
                 { "type": "style", "section": "Styles", "hidden": true },
                 { "type": "test", "section": "Tests", "hidden": true }

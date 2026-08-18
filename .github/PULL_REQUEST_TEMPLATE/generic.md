@@ -9,7 +9,7 @@ about: Submit changes to the project for review and inclusion
 
 Format: `<type>: <subject>`
 
-Valid types: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`
+Valid types: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `i18n`, `perf`, `refactor`, `revert`, `style`, `test`
 
 Example: `fix: correct drag offset on touch devices`
 
