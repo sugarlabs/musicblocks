@@ -26,6 +26,8 @@ const { setupImageMock } = require("../../test/utils/imageMock");
 const { setupSVGMock } = require("../../test/utils/svgMock");
 const { setupGlobalEnvironment } = require("../../test/setup/globalSetup");
 
+global.makeKeyboardAccessible = require("../utils/dom-helpers").makeKeyboardAccessible;
+
 const REAL_CREATE_ELEMENT = global.document.createElement;
 
 global.LEADING = 10;
@@ -158,6 +160,53 @@ describe("Palettes Class", () => {
             palettes.init_selectors();
 
             expect(spyMakeSelectorButton).toHaveBeenCalledTimes(MULTIPALETTES.length);
+        });
+    });
+
+    describe("palette keyboard activation", () => {
+        test("consumes Space and activates the current palette item", () => {
+            const paletteElement = document.createElement("div");
+            paletteElement.id = "palette";
+            document.body.appendChild(paletteElement);
+            global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
+
+            palettes._activateCurrentNavItem = jest.fn();
+            palettes._setupPaletteKeyboardNav();
+
+            const event = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            paletteElement.dispatchEvent(event);
+
+            expect(event.defaultPrevented).toBe(true);
+            expect(palettes._activateCurrentNavItem).toHaveBeenCalledWith([]);
+        });
+
+        test("consumes Escape and exits palette keyboard navigation", () => {
+            const paletteElement = document.createElement("div");
+            paletteElement.id = "palette";
+            document.body.appendChild(paletteElement);
+            global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
+
+            const exitKeyboardNavigation = jest.fn();
+            const previousFocusManager = window._focusCycleManager;
+            window._focusCycleManager = { exitKeyboardNavigation };
+            palettes._keyboardNavActive = true;
+            palettes._setupPaletteKeyboardNav();
+
+            const event = new KeyboardEvent("keydown", {
+                key: "Escape",
+                bubbles: true,
+                cancelable: true
+            });
+            paletteElement.dispatchEvent(event);
+
+            expect(event.defaultPrevented).toBe(true);
+            expect(palettes._keyboardNavActive).toBe(false);
+            expect(exitKeyboardNavigation).toHaveBeenCalled();
+            window._focusCycleManager = previousFocusManager;
         });
     });
 

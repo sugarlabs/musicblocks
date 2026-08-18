@@ -19,7 +19,7 @@ const _paletteIconCache = new Map();
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES, base64Encode,
    safeSVG, blockIsMacro, getMacroExpansion, StatusMatrix,
-   activity, cameraPALETTE, mediaPALETTE, videoPALETTE
+   activity, cameraPALETTE, mediaPALETTE, videoPALETTE, makeKeyboardAccessible
 */
 
 /* exported Palettes, initPalettes */
@@ -158,7 +158,39 @@ class Palettes {
 
         palette.addEventListener("keydown", event => {
             const key = event.key;
-            if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"].includes(key)) {
+
+            // Exit palette keyboard navigation without allowing Escape to reach
+            // the global play shortcut.
+            const isEscape = key === "Escape" || key === "Esc" || event.keyCode === 27;
+            if (isEscape) {
+                const searchWidget = document.getElementById("search");
+                if (searchWidget && document.activeElement === searchWidget) return;
+
+                event.preventDefault();
+                event.stopPropagation();
+                this.resetKeyboardNavigation({ closeMenus: true, blur: true });
+
+                if (
+                    typeof window !== "undefined" &&
+                    window._focusCycleManager &&
+                    typeof window._focusCycleManager.exitKeyboardNavigation === "function"
+                ) {
+                    window._focusCycleManager.exitKeyboardNavigation();
+                }
+                return;
+            }
+
+            if (
+                ![
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "ArrowUp",
+                    "ArrowDown",
+                    "Enter",
+                    " ",
+                    "Spacebar"
+                ].includes(key)
+            ) {
                 return;
             }
 
@@ -274,7 +306,7 @@ class Palettes {
                     }
                 }
                 this._updateKeyboardFocus(tr, blockRows);
-            } else if (key === "Enter") {
+            } else if (key === "Enter" || key === " " || key === "Spacebar") {
                 this._activateCurrentNavItem(blockRows);
             }
         });
@@ -703,6 +735,8 @@ class Palettes {
 
             toggleBtn.style.fontWeight = "bold";
             toggleBtn.style.fontSize = "14px";
+
+            makeKeyboardAccessible(toggleBtn, _("Toggle Palette"));
         }
 
         const tr = docById("palette").children[0].children[0].children[0].children[0];
@@ -1556,6 +1590,7 @@ class Palette {
             closeImg.setAttribute("role", "button");
             closeImg.tabIndex = 0;
             closeImg.onclick = () => this.hideMenu();
+            makeKeyboardAccessible(closeImg, _("Close"));
             closeImg.onmouseover = () => (document.body.style.cursor = "pointer");
             closeImg.onmouseleave = () => (document.body.style.cursor = "default");
             closeDownImg.appendChild(closeImg);

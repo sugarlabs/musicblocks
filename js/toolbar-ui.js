@@ -1824,12 +1824,20 @@ class ToolbarUI {
             buttons = getNavigableButtons();
 
             // Add click handlers for mouse support - clicking a button sets keyboard focus
-            buttons.allButtons.forEach((btn, index) => {
+            buttons.allButtons.forEach(btn => {
                 makeKeyboardAccessible(btn, undefined, activateFocusedButton);
 
                 // Avoid adding duplicate listeners
                 if (!btn.hasAttribute("data-kb-nav-listener")) {
                     btn.setAttribute("data-kb-nav-listener", "true");
+                    btn.addEventListener("focus", () => {
+                        const focusedIndex = buttons.allButtons.indexOf(btn);
+                        if (focusedIndex < 0) return;
+
+                        currentFocusIndex = focusedIndex;
+                        clearFocus();
+                        btn.classList.add("toolbar-btn-focused");
+                    });
                     btn.addEventListener("click", () => {
                         // Check if this is a mode toggle button
                         const isModeToggle = btn.id === "beginnerMode" || btn.id === "advancedMode";
@@ -1909,6 +1917,13 @@ class ToolbarUI {
             closeAllDropdowns();
             clearFocus();
             currentFocusIndex = -1;
+
+            if (
+                window._focusCycleManager &&
+                typeof window._focusCycleManager.exitKeyboardNavigation === "function"
+            ) {
+                window._focusCycleManager.exitKeyboardNavigation();
+            }
 
             const activeElement = document.activeElement;
             if (activeElement && typeof activeElement.blur === "function") {
