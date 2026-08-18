@@ -5,6 +5,12 @@ const PracticeUI = {
     badgeCheckTimer: null,
     noticeTimer: null,
     currentLevel: null,
+    PANEL_WIDTH: 360,
+    PANEL_GAP: 16,
+    COLLAPSE_TOGGLE_WIDTH: 24,
+    COLLAPSE_TOGGLE_HEIGHT: 52,
+    COLLAPSE_TOGGLE_GAP: 12,
+    COLLAPSED_LANE_TOP: 120,
 
     getActivity() {
         if (window.ActivityContext && typeof window.ActivityContext.getActivity === "function") {
@@ -18,6 +24,175 @@ const PracticeUI = {
         return null;
     },
 
+    getJournalDefaultRight() {
+        const practicePanel = document.getElementById("practice-panel");
+        if (practicePanel && practicePanel.style.display !== "none") {
+            return `${this.PANEL_WIDTH + this.PANEL_GAP}px`;
+        }
+
+        return "0";
+    },
+
+    refreshJournalPanelOffset() {
+        const journalPanel = document.getElementById("explorer-journal-panel");
+        if (
+            !journalPanel ||
+            journalPanel.style.display === "none" ||
+            journalPanel.classList.contains("practice-panel-collapsed")
+        ) {
+            return;
+        }
+
+        if (!journalPanel.dataset.userMoved || journalPanel.dataset.userMoved !== "true") {
+            journalPanel.style.left = "auto";
+            journalPanel.style.right = this.getJournalDefaultRight();
+        }
+    },
+
+    createPanelShell(id, title, closeButtonId, contentId, headerClass) {
+        const panel = document.createElement("div");
+        panel.id = id;
+        panel.innerHTML = `
+      <button
+        type="button"
+        class="practice-panel-collapse-toggle"
+        aria-expanded="true"
+        aria-label="${id === "practice-panel" ? "Collapse Lesson Plans" : "Collapse Explorer Journal"}">
+        &#9654;
+      </button>
+      <div class="practice-panel-frame">
+        <div class="practice-menu-header ${headerClass || ""}">
+          <h3>${title}</h3>
+          <button id="${closeButtonId}">X</button>
+        </div>
+        <div id="${contentId}"></div>
+      </div>
+    `;
+
+        this.wirePanelCollapse(panel);
+        return panel;
+    },
+
+    getVisiblePanel(id) {
+        const panel = document.getElementById(id);
+        if (!panel || panel.style.display === "none") return null;
+        return panel;
+    },
+
+    savePanelExpandState(panel) {
+        panel.dataset.savedLeft = panel.style.left || "";
+        panel.dataset.savedTop = panel.style.top || "";
+        panel.dataset.savedRight = panel.style.right || "";
+        panel.dataset.savedUserMoved = panel.dataset.userMoved || "false";
+    },
+
+    restorePanelExpandState(panel) {
+        panel.style.left = panel.dataset.savedLeft || "auto";
+        panel.style.top = panel.dataset.savedTop || "64px";
+        panel.style.right = panel.dataset.savedRight || "0";
+        panel.dataset.userMoved = panel.dataset.savedUserMoved || "false";
+        panel.style.transform = "translateX(0)";
+    },
+
+    getCollapsedLaneTop(panel) {
+        const practicePanel = this.getVisiblePanel("practice-panel");
+        const practiceCollapsed =
+            practicePanel && practicePanel.classList.contains("practice-panel-collapsed");
+
+        if (panel.id === "practice-panel") {
+            return this.COLLAPSED_LANE_TOP;
+        }
+
+        if (practicePanel && practiceCollapsed) {
+            return this.COLLAPSED_LANE_TOP + this.COLLAPSE_TOGGLE_HEIGHT + this.COLLAPSE_TOGGLE_GAP;
+        }
+
+        return this.COLLAPSED_LANE_TOP;
+    },
+
+    syncCollapseToggle(panel) {
+        const toggle = panel.querySelector(".practice-panel-collapse-toggle");
+        if (!toggle) return;
+
+        const collapsed = panel.classList.contains("practice-panel-collapsed");
+        toggle.innerHTML = collapsed ? "&#9664;" : "&#9654;";
+        toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+        toggle.setAttribute(
+            "aria-label",
+            collapsed
+                ? panel.id === "practice-panel"
+                    ? "Expand Lesson Plans"
+                    : "Expand Explorer Journal"
+                : panel.id === "practice-panel"
+                  ? "Collapse Lesson Plans"
+                  : "Collapse Explorer Journal"
+        );
+    },
+
+    applyCollapsedDock(panel) {
+        panel.classList.add("practice-panel-collapsed");
+        panel.style.left = "auto";
+        panel.style.right = "0";
+        panel.style.top = `${this.getCollapsedLaneTop(panel)}px`;
+        panel.style.transform = "none";
+        this.syncCollapseToggle(panel);
+    },
+
+    applyExpandedDock(panel) {
+        panel.classList.remove("practice-panel-collapsed");
+        this.restorePanelExpandState(panel);
+        this.syncCollapseToggle(panel);
+
+        if (panel.id === "explorer-journal-panel") {
+            if (panel.dataset.userMoved !== "true") {
+                panel.style.left = "auto";
+                panel.style.right = this.getJournalDefaultRight();
+            }
+        }
+    },
+
+    refreshCollapsedLane() {
+        const practicePanel = this.getVisiblePanel("practice-panel");
+        const journalPanel = this.getVisiblePanel("explorer-journal-panel");
+
+        [practicePanel, journalPanel].forEach(panel => {
+            if (panel && panel.classList.contains("practice-panel-collapsed")) {
+                panel.style.top = `${this.getCollapsedLaneTop(panel)}px`;
+            }
+        });
+    },
+
+    wirePanelCollapse(panel) {
+        const toggle = panel.querySelector(".practice-panel-collapse-toggle");
+        if (!toggle) return;
+
+        toggle.onpointerdown = event => {
+            event.stopPropagation();
+        };
+
+        toggle.onclick = event => {
+            event.stopPropagation();
+            this.togglePanelCollapse(panel);
+        };
+    },
+
+    togglePanelCollapse(panel) {
+        const collapsed = !panel.classList.contains("practice-panel-collapsed");
+
+        if (collapsed) {
+            this.savePanelExpandState(panel);
+            this.applyCollapsedDock(panel);
+        } else {
+            this.applyExpandedDock(panel);
+        }
+
+        this.refreshCollapsedLane();
+
+        if (panel.id === "practice-panel") {
+            this.refreshJournalPanelOffset();
+        }
+    },
+
     makePanelDraggable(panel, handle) {
         let startX = 0;
         let startY = 0;
@@ -28,6 +203,7 @@ const PracticeUI = {
         handle.classList.add("practice-draggable-header");
         handle.onpointerdown = event => {
             if (event.target.closest("button")) return;
+            if (panel.classList.contains("practice-panel-collapsed")) return;
 
             const rect = panel.getBoundingClientRect();
             dragging = true;
@@ -35,6 +211,11 @@ const PracticeUI = {
             startY = event.clientY;
             startLeft = rect.left;
             startTop = rect.top;
+
+            panel.dataset.userMoved = "true";
+            panel.classList.remove("practice-panel-collapsed");
+            panel.style.transform = "translateX(0)";
+            this.syncCollapseToggle(panel);
 
             panel.classList.add("dragging");
             this.bringPanelToFront(panel);
@@ -77,8 +258,9 @@ const PracticeUI = {
 
     restorePanel(panel, fallbackRight) {
         panel.style.display = "flex";
-        if (!panel.style.left && fallbackRight !== undefined) {
-            panel.style.right = fallbackRight;
+        if (!panel.dataset.userMoved || panel.dataset.userMoved !== "true") {
+            panel.style.left = "auto";
+            panel.style.right = fallbackRight !== undefined ? fallbackRight : "0";
         }
         this.bringPanelToFront(panel);
     },
@@ -117,6 +299,7 @@ const PracticeUI = {
         const existingPanel = document.getElementById("practice-panel");
         if (existingPanel) {
             this.restorePanel(existingPanel, "0");
+            this.refreshJournalPanelOffset();
             if (this.currentLevel) {
                 const problem = PracticeProblems.find(p => p.level === this.currentLevel);
                 this.startBadgeMonitor(problem);
@@ -124,17 +307,12 @@ const PracticeUI = {
             return;
         }
 
-        const panel = document.createElement("div");
-        panel.id = "practice-panel";
-
-        panel.innerHTML = `
-      <div class="practice-menu-header">
-        <h3>Practice</h3>
-        <button id="close-practice">X</button>
-      </div>
-
-      <div id="practice-content"></div>
-    `;
+        const panel = this.createPanelShell(
+            "practice-panel",
+            "Practice",
+            "close-practice",
+            "practice-content"
+        );
 
         document.body.appendChild(panel);
         this.makePanelDraggable(panel, panel.querySelector(".practice-menu-header"));
@@ -144,6 +322,8 @@ const PracticeUI = {
             this.stopBadgeMonitor();
             this.dismissQuestNotice();
             panel.style.display = "none";
+            this.refreshJournalPanelOffset();
+            this.refreshCollapsedLane();
         };
 
         this.renderLevelMenu();
@@ -537,25 +717,23 @@ const ExplorerJournalUI = {
 
         const existingPanel = document.getElementById("explorer-journal-panel");
         if (existingPanel) {
-            PracticeUI.restorePanel(existingPanel, "376px");
+            PracticeUI.restorePanel(existingPanel, PracticeUI.getJournalDefaultRight());
             return;
         }
 
         PracticeUI.dismissQuestNotice();
 
-        const panel = document.createElement("div");
-        panel.id = "explorer-journal-panel";
-        panel.innerHTML = `
-      <div class="practice-menu-header journal-header">
-        <h3>Explorer Journal</h3>
-        <button id="close-explorer-journal">X</button>
-      </div>
-      <div id="explorer-journal-content"></div>
-    `;
+        const panel = PracticeUI.createPanelShell(
+            "explorer-journal-panel",
+            "Explorer Journal",
+            "close-explorer-journal",
+            "explorer-journal-content",
+            "journal-header"
+        );
 
         document.body.appendChild(panel);
         PracticeUI.makePanelDraggable(panel, panel.querySelector(".practice-menu-header"));
-        PracticeUI.restorePanel(panel, document.getElementById("practice-panel") ? "376px" : "0");
+        PracticeUI.restorePanel(panel, PracticeUI.getJournalDefaultRight());
         document.getElementById("close-explorer-journal").onclick = () => this.close();
         this.renderIndex();
     },
@@ -563,6 +741,7 @@ const ExplorerJournalUI = {
     close() {
         const panel = document.getElementById("explorer-journal-panel");
         if (panel) panel.style.display = "none";
+        PracticeUI.refreshCollapsedLane();
         this.closeCompletionPrompt();
     },
 
