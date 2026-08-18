@@ -258,6 +258,43 @@ describe("FocusCycleManager - dispose", () => {
     });
 });
 
+describe("ToolbarUI - renderGitDropdownIcon", () => {
+    test("wires click, mouseenter, and focus to call gitDropdownUI._syncMenuState", () => {
+        const toolbar = new ToolbarUI();
+        const mockBtn = createMockElement("gitProjectBtn");
+        global.document.getElementById = jest.fn(id => {
+            if (id === "gitProjectBtn") return mockBtn;
+            return createMockElement(id);
+        });
+
+        const mockGitDropdownUI = {
+            _syncMenuState: jest.fn()
+        };
+
+        toolbar.renderGitDropdownIcon(mockGitDropdownUI);
+
+        expect(mockBtn.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
+        expect(mockBtn.addEventListener).toHaveBeenCalledWith("mouseenter", expect.any(Function));
+        expect(mockBtn.addEventListener).toHaveBeenCalledWith("focus", expect.any(Function));
+
+        const clickHandler = mockBtn.addEventListener.mock.calls.find(c => c[0] === "click")[1];
+        const hoverHandler = mockBtn.addEventListener.mock.calls.find(
+            c => c[0] === "mouseenter"
+        )[1];
+        const focusHandler = mockBtn.addEventListener.mock.calls.find(c => c[0] === "focus")[1];
+
+        clickHandler();
+        expect(mockGitDropdownUI._syncMenuState).toHaveBeenCalledTimes(1);
+
+        hoverHandler();
+        expect(mockGitDropdownUI._syncMenuState).toHaveBeenCalledTimes(2);
+
+        focusHandler();
+        expect(mockGitDropdownUI._syncMenuState).toHaveBeenCalledTimes(3);
+    });
+});
+
+
 describe("ToolbarUI keyboard activation", () => {
     test("activates the button that received focus instead of the first button", () => {
         const toolbarElement = document.createElement("div");
