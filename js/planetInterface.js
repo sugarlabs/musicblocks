@@ -77,6 +77,14 @@ class PlanetInterface {
             window.scroll(0, 0);
             docById("buttoncontainerBOTTOM").style.display = "block";
             docById("buttoncontainerTOP").style.display = "block";
+
+            if (
+                this.activity &&
+                this.activity.gitDropdownUI &&
+                typeof this.activity.gitDropdownUI._syncMenuState === "function"
+            ) {
+                this.activity.gitDropdownUI._syncMenuState();
+            }
         };
 
         /**

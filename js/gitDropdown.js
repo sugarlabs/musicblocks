@@ -207,7 +207,7 @@ class GitDropdownUI {
 
     _prefetchCommits() {
         const repoName = this._getRepoName();
-        if (!repoName) return;
+        if (!repoName || typeof fetch !== "function") return;
 
         this._prefetchPromise = fetch(
             `${this._BASE_URL}/commitHistory?repoName=${encodeURIComponent(repoName)}`
@@ -241,11 +241,22 @@ class GitDropdownUI {
 
         const btn = document.getElementById("gitProjectBtn");
         if (btn) {
-            const tip = this._getRepoName()
+            const tip = hasRepo
                 ? `My project: ${this._getDisplayName()}`
                 : "Start tracking my project";
             btn.setAttribute("data-tooltip", tip);
             btn.setAttribute("aria-label", tip);
+
+            const tooltipId = btn.getAttribute("data-tooltip-id");
+            if (tooltipId) {
+                const tooltipEl = document.getElementById(tooltipId);
+                if (tooltipEl) {
+                    const span = tooltipEl.querySelector("span");
+                    if (span) {
+                        span.textContent = tip;
+                    }
+                }
+            }
         }
     }
 
@@ -254,12 +265,26 @@ class GitDropdownUI {
      * Clears all git tracking state so the new project starts with a clean slate.
      */
     clearForNewProject() {
+        localStorage.removeItem("mbGitRepoName");
+        localStorage.removeItem("mbGitHashedKey");
+        localStorage.removeItem("mbGitDisplayName");
+        localStorage.removeItem("mbGitLastSavedHash");
+        localStorage.removeItem("mbGitCurrentSha");
+        localStorage.removeItem("mbGitCurrentDraftId");
+        localStorage.removeItem("mbGitCurrentProjectId");
         // Invalidate any cached commit list from the previous project
         this._prefetchPromise = null;
         this._syncMenuState();
     }
 
     _bindButtons() {
+        const btn = document.getElementById("gitProjectBtn");
+        if (btn) {
+            const sync = () => this._syncMenuState();
+            btn.addEventListener("mouseenter", sync);
+            btn.addEventListener("focus", sync);
+        }
+
         const bind = (id, fn) => {
             const el = document.getElementById(id);
             if (el) {

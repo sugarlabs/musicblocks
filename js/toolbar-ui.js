@@ -2386,11 +2386,15 @@ class ToolbarUI {
         const btn = docById("gitProjectBtn");
         if (!btn) return;
 
-        btn.addEventListener("click", () => {
+        const sync = () => {
             if (gitDropdownUI && typeof gitDropdownUI._syncMenuState === "function") {
                 gitDropdownUI._syncMenuState();
             }
-        });
+        };
+
+        btn.addEventListener("click", sync);
+        btn.addEventListener("mouseenter", sync);
+        btn.addEventListener("focus", sync);
     }
 }
 

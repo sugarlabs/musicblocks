@@ -130,6 +130,9 @@ class ProjectStorage {
     async renameProject(id, name) {
         this.data.Projects[id].ProjectName = name;
         await this.save();
+        if (this.Planet && typeof this.Planet._postGitState === "function") {
+            this.Planet._postGitState(id);
+        }
     }
 
     async addPublishedData(id, data) {

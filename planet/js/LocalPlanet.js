@@ -115,7 +115,9 @@ class LocalPlanet {
         // Notify the parent window of the new project's git state so that
         // the "My Project" toolbar menu (gitDropdownUI) shows Time Travel
         // when the opened project has a GitHub save spot.
-        Planet._postGitState(id);
+        if (typeof Planet._postGitState === "function") {
+            Planet._postGitState(id);
+        }
         Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
     }
 

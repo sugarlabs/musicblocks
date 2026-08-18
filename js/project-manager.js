@@ -359,8 +359,11 @@ class ProjectManager {
         // reached via a different code path).
         localStorage.removeItem("mbGitRepoName");
         localStorage.removeItem("mbGitHashedKey");
+        localStorage.removeItem("mbGitDisplayName");
         localStorage.removeItem("mbGitLastSavedHash");
         localStorage.removeItem("mbGitCurrentSha");
+        localStorage.removeItem("mbGitCurrentDraftId");
+        localStorage.removeItem("mbGitCurrentProjectId");
         if (that.gitDropdownUI && typeof that.gitDropdownUI.clearForNewProject === "function") {
             that.gitDropdownUI.clearForNewProject();
         } else if (that.gitDropdownUI && typeof that.gitDropdownUI._syncMenuState === "function") {
@@ -831,6 +834,12 @@ class ProjectManager {
                                     that.stage.addEventListener("trashsignal", __listener, false);
                                     that.sendAllToTrash(false, false);
                                     that._allClear(false, true);
+                                    if (
+                                        that.gitDropdownUI &&
+                                        typeof that.gitDropdownUI.clearForNewProject === "function"
+                                    ) {
+                                        that.gitDropdownUI.clearForNewProject();
+                                    }
                                     if (that.planet) {
                                         that.planet.closePlanet();
                                         that.planet.initialiseNewProject(

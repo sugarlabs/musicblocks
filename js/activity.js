@@ -2537,8 +2537,11 @@ class Activity {
             // Clear the Git tracking for the new project
             localStorage.removeItem("mbGitRepoName");
             localStorage.removeItem("mbGitHashedKey");
+            localStorage.removeItem("mbGitDisplayName");
             localStorage.removeItem("mbGitLastSavedHash");
             localStorage.removeItem("mbGitCurrentSha");
+            localStorage.removeItem("mbGitCurrentDraftId");
+            localStorage.removeItem("mbGitCurrentProjectId");
             if (that.gitDropdownUI) {
                 // clearForNewProject() resets the prefetch cache in addition
                 // to updating the menu — prevents old project's commits from
