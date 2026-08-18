@@ -221,7 +221,14 @@ describe("setupDrumActions", () => {
             Singer.DrumActions[actionName]("d1", 0, 1);
             expect(activity.logo._currentDrumBlock).toBe(1);
             expect(activity.logo.rhythmRuler.Drums).toContain(1);
-            expect(activity.logo.rhythmRuler.Rulers).toHaveLength(1);
+            expect(activity.logo.rhythmRuler.Rulers).toEqual([[[], []]]);
+        });
+
+        it("does not touch rhythm ruler state when inRhythmRuler is false", () => {
+            Singer.DrumActions[actionName]("d1", 0, 1);
+            expect(activity.logo._currentDrumBlock).toBeNull();
+            expect(activity.logo.rhythmRuler.Drums).toHaveLength(0);
+            expect(activity.logo.rhythmRuler.Rulers).toHaveLength(0);
         });
 
         it("removes drumStyle on listener", () => {
@@ -256,6 +263,34 @@ describe("setupDrumActions", () => {
                 expect.any(String),
                 expect.any(Function)
             );
+        });
+
+        it("does not dispatch when blk is defined but not in blockList", () => {
+            Singer.DrumActions[actionName]("d1", 0, 999);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                prefix,
+                expect.any(Function)
+            );
+        });
+
+        it("does not throw and skips the mouse listener when MusicBlocks is undefined", () => {
+            const originalMusicBlocks = global.MusicBlocks;
+            delete global.MusicBlocks;
+            try {
+                expect(() => Singer.DrumActions[actionName]("d1", 0)).not.toThrow();
+                expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+                expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
+                expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                    0,
+                    prefix,
+                    expect.any(Function)
+                );
+            } finally {
+                global.MusicBlocks = originalMusicBlocks;
+            }
         });
     });
 
@@ -317,6 +352,15 @@ describe("setupDrumActions", () => {
             Singer.DrumActions.playNoise("n1", 0, 4);
             expect(targetTurtle.singer.synthVolume["noise1"]).toEqual([50]);
             expect(targetTurtle.singer.crescendoInitialVolume["noise1"]).toEqual([60]);
+        });
+
+        it("resolves a nickname that does not match the first NOISENAMES entry", () => {
+            targetTurtle.singer.inNoteBlock.push(2);
+            targetTurtle.singer.noteDrums[2] = [];
+            targetTurtle.singer.noteBeatValues[2] = [];
+            Singer.DrumActions.playNoise("n2", 0, 1);
+            expect(targetTurtle.singer.noteDrums[2]).toContain("noise2");
+            expect(targetTurtle.singer.noteDrums[2]).not.toContain("n2");
         });
     });
 });
