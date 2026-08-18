@@ -624,6 +624,65 @@ describe("PhraseMaker Widget", () => {
 
         expect(phraseMaker.sorted).toBe(true);
     });
+    test("_sort correctly merges marked columns for duplicate pitch rows without adding row indices", () => {
+        phraseMaker.init = jest.fn();
+        phraseMaker.makeClickable = jest.fn();
+        phraseMaker.rowLabels = ["sol", "sol"];
+        phraseMaker.rowArgs = [4, 4];
+        phraseMaker._noteStored = ["sol4", "sol4"];
+        phraseMaker.columnBlocksMap = [[0], [1]];
+        phraseMaker._rows = [
+            {
+                cells: [
+                    { style: { backgroundColor: "black" } },
+                    { style: { backgroundColor: "white" } }
+                ]
+            },
+            {
+                cells: [
+                    { style: { backgroundColor: "white" } },
+                    { style: { backgroundColor: "black" } }
+                ]
+            }
+        ];
+
+        phraseMaker._deps.noteToFrequency = jest.fn(() => 392);
+        phraseMaker.activity = {
+            turtles: { ithTurtle: () => ({ singer: { keySignature: 0 } }) },
+            logo: { tupletRhythms: [] }
+        };
+
+        phraseMaker._sort();
+
+        expect(phraseMaker.sorted).toBe(true);
+        // Marked columns in the preserved row (original row index 0) should contain [0, 1] (column indices), NOT row index 1
+        expect(phraseMaker._markedColsInRow[0]).toEqual([0, 1]);
+    });
+    test("makeClickable safely handles sorted rows when cells are undefined", () => {
+        phraseMaker.sorted = true;
+        phraseMaker._rowMapper = [0];
+        phraseMaker._sortedRowMap = [0];
+        phraseMaker._markedColsInRow = [[5]]; // index 5 does not exist in cells
+        phraseMaker._rows = [
+            {
+                cells: [
+                    {
+                        style: {},
+                        setAttribute: jest.fn(),
+                        addEventListener: jest.fn(),
+                        removeEventListener: jest.fn()
+                    }
+                ]
+            }
+        ];
+        phraseMaker._noteValueRow = { cells: phraseMaker._rows[0].cells };
+        phraseMaker._tupletValueRow = { cells: [] };
+        phraseMaker._setNoteCell = jest.fn();
+
+        expect(() => {
+            phraseMaker.makeClickable();
+        }).not.toThrow();
+    });
     test("recalculateBlocks calls PhraseMakerUtils", () => {
         phraseMaker.activity = {
             logo: { tupletRhythms: [] }
