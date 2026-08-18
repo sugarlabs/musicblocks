@@ -259,6 +259,12 @@ function MusicKeyboard(activity) {
     this.instrumentMapper = {};
 
     /**
+     * Mapping between note names with octaves and keyboard element IDs.
+     * @type {Object}
+     */
+    this.getElement = {};
+
+    /**
      * Flag to track first note while using metronome.
      * @type {boolean}
      */
@@ -2386,10 +2392,18 @@ function MusicKeyboard(activity) {
                     this._createTable();
                     const n = this.layout.length;
                     const key = this.layout[n - 1];
-                    this.getElement[key.noteName.toString() + key.noteOctave.toString()] =
-                        key.objId;
-                    this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] =
-                        key.objId; //convet solfege to alphabetic.
+                    if (!this.getElement) {
+                        this.getElement = {};
+                    }
+                    if (key) {
+                        this.getElement[key.noteName.toString() + key.noteOctave.toString()] =
+                            key.objId;
+                        if (FIXEDSOLFEGE1 && FIXEDSOLFEGE1[key.noteName.toString()]) {
+                            this.getElement[
+                                FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave
+                            ] = key.objId; //convet solfege to alphabetic.
+                        }
+                    }
                 }, 500);
             } else {
                 debugLog("Could not find anywhere to insert new block.");
@@ -3578,9 +3592,13 @@ function MusicKeyboard(activity) {
 
         for (let idx = 0; idx < this.layout.length; idx++) {
             const key = this.layout[idx];
-            this.getElement[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
-            this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] =
-                key.objId; //convet solfege to alphabetic.
+            if (key) {
+                this.getElement[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
+                if (FIXEDSOLFEGE1 && FIXEDSOLFEGE1[key.noteName.toString()]) {
+                    this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] =
+                        key.objId; //convet solfege to alphabetic.
+                }
+            }
         }
 
         /**

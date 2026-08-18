@@ -208,6 +208,47 @@ describe("MusicKeyboard add-row submenu", () => {
         );
     });
 
+    test("initializes getElement and safely updates when inserting a new note block via pie menu", () => {
+        jest.useFakeTimers();
+        const blockList = [{ connections: [null, null] }];
+        const loadNewBlocks = jest.fn().mockImplementation(() => {
+            blockList.push({ connections: [null, null] });
+            return [blockList.length - 1];
+        });
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            refreshCanvas: jest.fn(),
+            turtles: {
+                ithTurtle: () => ({ singer: { keySignature: "C" } })
+            },
+            blocks: {
+                blockList: blockList,
+                loadNewBlocks,
+                adjustExpandableClampBlock: jest.fn()
+            }
+        });
+
+        expect(keyboard.getElement).toBeDefined();
+        expect(typeof keyboard.getElement).toBe("object");
+
+        keyboard.layout = [
+            { noteName: "do", noteOctave: 4, blockNumber: 0, voice: 0, objId: "cell-1" }
+        ];
+
+        keyboard._createKeyboard = jest.fn();
+        keyboard._createTable = jest.fn();
+        keyboard._syncLayouts = jest.fn();
+
+        keyboard._createAddRowPieSubmenu();
+        keyboard._menuWheel.selectedNavItemIndex = 0;
+        keyboard._menuWheel.navItems[0].navigateFunction();
+
+        expect(() => jest.advanceTimersByTime(500)).not.toThrow();
+        expect(keyboard.getElement).toBeDefined();
+        jest.useRealTimers();
+    });
+
     test("creates pie submenu and sets z-index, top position, and exit wheel correctly", () => {
         window.configureExitWheel = jest.fn();
         document.body.innerHTML =
