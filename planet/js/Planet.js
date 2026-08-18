@@ -116,7 +116,16 @@ class Planet {
                 ? gitData.hashedKey || localStorage.getItem("mb_git_key_" + repoName) || ""
                 : "";
             window.parent.postMessage(
-                { type: "MB_GIT_STATE", repoName, hashedKey, projectId: id },
+                {
+                    type: "MB_GIT_STATE",
+                    repoName,
+                    hashedKey,
+                    projectId: id,
+                    // Send the human-readable project name so the toolbar tooltip
+                    // always shows the name the user gave (e.g. "Checking Planet Updates")
+                    // rather than the sanitised repo slug.
+                    projectName: project ? project.ProjectName || "" : ""
+                },
                 "*"
             );
         } catch (e) {
