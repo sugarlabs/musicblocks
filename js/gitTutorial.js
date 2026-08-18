@@ -22,7 +22,7 @@
  *   1. Track my project  - creates a GitHub repo
  *   2. Mark this moment  - commit / version snapshot
  *   3. Time travel       - commit history + time travel
- *   4. Fork from Planet  - copy a project from Planet
+ *   4. Remix from Planet - copy a project from Planet
  *
  * Video behaviour:
  *   - Videos loop continuously while the slide is active (loop attribute).
@@ -47,7 +47,7 @@ const GitTutorial = (() => {
         clock: `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
             <path d="M136 80v43.47l36.12 21.67a8 8 0 0 1-8.24 13.72l-40-24A8 8 0 0 1 120 128V80a8 8 0 0 1 16 0Zm-8-48A96 96 0 0 0 47.08 60H32a8 8 0 0 0 0 16H72a8 8 0 0 0 8-8V28a8 8 0 0 0-16 0v13.22A80 80 0 1 1 48 128a8 8 0 0 0-16 0 96 96 0 1 0 96-96Z"/>
         </svg>`,
-        /** GitFork — “Fork from Planet” */
+        /** GitFork — “Remix from Planet” */
         gitFork: `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
             <path d="M236 64a28 28 0 1 0-36 26.87V96a20 20 0 0 1-20 20h-44V90.87a28 28 0 1 0-16 0V116H76a20 20 0 0 1-20-20v-5.13a28 28 0 1 0-16 0V96a36 36 0 0 0 36 36h44v33.13a28 28 0 1 0 16 0V132h44a36 36 0 0 0 36-36v-5.13A28 28 0 0 0 236 64ZM56 64a12 12 0 1 1 12 12 12 12 0 0 1-12-12Zm72 128a12 12 0 1 1-12-12 12 12 0 0 1 12 12ZM116 64a12 12 0 1 1 12 12 12 12 0 0 1-12-12Zm72 12a12 12 0 1 1 12-12 12 12 0 0 1-12 12Z"/>
         </svg>`,
@@ -97,14 +97,14 @@ const GitTutorial = (() => {
         },
         {
             chipIcon: "gitFork",
-            chip: "Fork from Planet",
-            title: "Fork from Planet",
+            chip: "Remix from Planet",
+            title: "Remix from Planet",
             heading: "Learn from others. Build something new together.",
-            body: `Seen a cool project on Planet? Click <strong>Fork project</strong>
+            body: `Seen a cool project on Planet? Click <strong>Remix project</strong>
                       on any card to get your own copy.<br><br>
                       Study how they built it. Remix it with your own ideas. Change the melody, add new instruments, take it somewhere new. This is how programmers work together: they learn from each other and build something even better!`,
             tip: "The original project is always safe. Share what you make back to Planet so others can learn from you too!",
-            media: { type: "image", src: "images/fork_planet.png", alt: "Fork from Planet" }
+            media: { type: "image", src: "images/fork_planet.png", alt: "Remix from Planet" }
         }
     ];
 

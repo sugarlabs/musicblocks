@@ -57,7 +57,7 @@ class GlobalCard {
                                 "Open in Music Blocks"
                             )}" id="global-project-open-{ID}"><i class="material-icons">launch</i></a>
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
-                                "Fork project"
+                                "Remix project"
                             )}" id="global-project-fork-{ID}"><i class="material-icons">call_split</i></a>
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                 "Merge with current project"
@@ -134,14 +134,15 @@ class GlobalCard {
         // Cards render immediately with a shimmer placeholder.
         // The real thumbnail URL is only fetched when the card scrolls
         // into view (via IntersectionObserver), keeping initial render fast.
-        const imageId  = `global-project-image-${this.id}`;
-        const imgEl    = frag.getElementById(imageId);
-        const placeholder = this.ProjectData.ProjectIsMusicBlocks === 1
-            ? this.PlaceholderMBImage
-            : this.PlaceholderTBImage;
+        const imageId = `global-project-image-${this.id}`;
+        const imgEl = frag.getElementById(imageId);
+        const placeholder =
+            this.ProjectData.ProjectIsMusicBlocks === 1
+                ? this.PlaceholderMBImage
+                : this.PlaceholderTBImage;
 
         const hasThumbnail = this.ProjectData.hasThumbnail;
-        const dataUrl      = this.ProjectData.ProjectImage;
+        const dataUrl = this.ProjectData.ProjectImage;
 
         if (dataUrl && dataUrl !== "" && !hasThumbnail) {
             // Already in memory (data-URL from migrated project) — apply immediately.
