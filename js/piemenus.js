@@ -3843,7 +3843,6 @@ const piemenuModes = (block, selectedMode) => {
         block._modeGroupWheel.navItems[i].navigateFunction = __buildModeWheel;
         if (block._modeGroupWheel.navItems[i].title === modeGroup) {
             block._modeGroupWheel.navigateWheel(i);
-            break;
         }
     }
 

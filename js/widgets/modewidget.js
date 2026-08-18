@@ -543,7 +543,7 @@ class ModeWidget {
 
         // EDO/Tuning — transparent select overlay on top of the icon.
         // The select is full-size but invisible; it IS the click target.
-        const tuningIcon = iconButton("menu-button.svg", _("Tuning"), null);
+        const tuningIcon = iconButton("menu-button.svg", _("temperament"), null);
         // Transparent select overlay — IS the click target; the icon behind
         // it is purely decorative.
         const edoSelect = document.createElement("select");
@@ -551,8 +551,8 @@ class ModeWidget {
         this._edoSelect = edoSelect;
         this._initEdoSelect(edoSelect);
         this._wireEdoSelect(edoSelect);
-        edoSelect.title = _("Tuning");
-        edoSelect.setAttribute("aria-label", _("Tuning"));
+        edoSelect.title = _("temperament");
+        edoSelect.setAttribute("aria-label", _("temperament"));
         Object.assign(edoSelect.style, {
             position: "absolute",
             top: 0,
@@ -580,7 +580,7 @@ class ModeWidget {
         tuningGroup.appendChild(edoSelect);
 
         // Modes: open piemenu instead of a <select> dropdown
-        const modeBtn = iconButton("pie-chart.svg", _("Select Mode"), () => {
+        const modeBtn = iconButton("pie-chart.svg", _("Switch mode"), () => {
             this._piemenuModes();
         });
         modeBtn.id = "modeSelectBtn";
@@ -596,7 +596,7 @@ class ModeWidget {
         nameInput.style.flexShrink = "1";
 
         // Save button
-        const saveBtn = iconButton("save-button.svg", _("Save Mode"), () => {
+        const saveBtn = iconButton("save-button.svg", _("Save"), () => {
             const name = nameInput.value.trim();
             if (!name) {
                 this.errorMsg(_("Please enter a mode name."));
@@ -614,7 +614,7 @@ class ModeWidget {
         });
 
         // Delete button
-        const deleteBtn = iconButton("delete.svg", _("Delete Mode"), () => {
+        const deleteBtn = iconButton("delete.svg", _("Delete"), () => {
             const name = this._selectedModeName;
             if (!name) {
                 this.errorMsg(_("No mode selected."));
