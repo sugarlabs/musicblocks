@@ -290,7 +290,6 @@ class ModeWidget {
             select.appendChild(opt);
         }
     }
-
     _wireEdoSelect(select) {
         select.addEventListener("change", () => {
             const newEDO = parseInt(select.value, 10);
@@ -307,59 +306,33 @@ class ModeWidget {
             // Close any open mode piemenu; it will be rebuilt on reopen.
             this._closeModePiemenu();
 
-            // Check cache first: if we have a pre-saved state for this EDO,
-            // restore it exactly rather than applying a translation mapping.
-            if (this._edoNoteCache[newEDO] !== undefined) {
-                // Cache outgoing state so round-trip preserves intermediate edits
-                this._cacheState(this._activeEDO);
+            // Cache outgoing state so round-trip preserves intermediate edits
+            this._cacheState(this._activeEDO);
 
+            // Determine new notes: use cached state if available, otherwise translate
+            if (this._edoNoteCache[newEDO] !== undefined) {
                 this._restoreState(newEDO);
-                this._rebuildWheel(newEDO);
-                this.textMsg(_(`Switched to ${newEDO}-EDO tuning.`), 3000);
-                this._setModeName();
-                return;
+            } else {
+                this._translateNotesToEDO(newEDO);
             }
 
-            // Cache the current EDO's state before translating so we can
-            // restore it losslessly when the user switches back.
-            this._cacheState(this._activeEDO);
-            const oldEDO = this._activeEDO;
-
-            this._translateNotesToEDO(newEDO);
-            // Save the resulting state for this EDO so future round-trips
-            // can restore it exactly.
-            this._cacheState(newEDO);
             this._rebuildWheel(newEDO);
+            this.textMsg(_(`Switched to ${newEDO}-EDO tuning.`), 3000);
+            this._setModeName();
 
             // Only warn when going to a lesser EDO, where notes can be dropped
             // by the rounding in _translateNotesToEDO. Lesser→greater only adds
-            // steps, so no notes are lost and no message is needed.
-            if (oldEDO > newEDO) {
+            // steps, so no message is needed.
+            if (this._activeEDO > newEDO) {
                 this.textMsg(
                     _(
-                        `Mode remapped from ${oldEDO}-EDO to ${newEDO}-EDO. Some notes may have changed.`
+                        `Mode remapped from ${this._activeEDO}-EDO to ${newEDO}-EDO. Some notes may have changed.`
                     ),
                     3000
                 );
             }
-
-            // Update mode name display without wiping the control bar.
-            this._setModeName();
         });
     }
-
-    _updateTemperament(newEDO) {
-        if (!this.logo || !this.logo.synth) {
-            return;
-        }
-        this.logo.synth.inTemperament = this._temperamentKeyForEDO(newEDO);
-    }
-
-    /**
-     * Tear down the existing SVG slices and rebuild the pie wheel for the
-     * given EDO count. Shared by the tuning dropdown and saved-mode loading.
-     * @param {number} edoCount - The number of steps per octave.
-     */
     _rebuildWheel(edoCount) {
         this._cancelAnimations();
         this._activeEDO = edoCount;
@@ -480,6 +453,7 @@ class ModeWidget {
         }
 
         MUSICALMODES[name] = pattern;
+        MUSICALMODES[name.toLowerCase()] = pattern;
         return true;
     }
 

@@ -77,9 +77,9 @@ function setupWidgetBlocks(activity) {
      * Environment-aware lazy module loader.
      * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
      */
-    function _lazyRequire(modules, callback, onError) {
+    function _lazyRequire(modules, callback) {
         if (typeof define === "function" && define.amd) {
-            require(Array.isArray(modules) ? modules : [modules], callback, onError);
+            require(Array.isArray(modules) ? modules : [modules], callback);
         } else {
             callback();
         }
@@ -112,16 +112,11 @@ function setupWidgetBlocks(activity) {
      */
     function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
         if (logo[widgetKey] === null || logo[widgetKey] === undefined) {
-            logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
-            _lazyRequire(modules, function () {
-                logo[widgetKey] = initFn();
-                if (typeof logo.runFromBlockNow === "function") {
-                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
-                }
-            });
-            return [null, 0, true];
-        } else if (logo[widgetKey] === "loading") {
-            return [null, 0, true]; // Still loading, continue to interrupt
+            logo[widgetKey] = initFn();
+            if (typeof logo.runFromBlockNow === "function") {
+                logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
+            }
+            return null;
         }
         return null;
     }
@@ -141,15 +136,11 @@ function setupWidgetBlocks(activity) {
      * @param {Function} factory - Builds the widget instance.
      * @param {Function} [onReady] - Optional callback run after assignment.
      */
-    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady, onError) {
-        _lazyRequire(
-            modules,
-            () => {
-                logo[widgetKey] = factory();
-                onReady?.();
-            },
-            () => onError?.()
-        );
+    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
+        _lazyRequire(modules, () => {
+            logo[widgetKey] = factory();
+            onReady?.();
+        });
     }
 
     function _hasValidMeterWidgetInput(logo) {
@@ -696,10 +687,7 @@ function setupWidgetBlocks(activity) {
                         typeof MeterWidget !== "undefined" ? MeterWidget : null,
                         ["widgets/meterwidget"]
                     ),
-                    () => new MeterWidget(activity, blk),
-                    () => {
-                        logo.insideMeterWidget = false;
-                    }
+                    () => new MeterWidget(activity, blk)
                 );
             };
 
@@ -776,10 +764,7 @@ function setupWidgetBlocks(activity) {
                         typeof Oscilloscope !== "undefined" ? Oscilloscope : null,
                         ["widgets/oscilloscope"]
                     ),
-                    () => new Oscilloscope(activity),
-                    () => {
-                        logo.inOscilloscope = false;
-                    }
+                    () => new Oscilloscope(activity)
                 );
             };
 
@@ -854,9 +839,7 @@ function setupWidgetBlocks(activity) {
                     _getWidgetDependencies(typeof ModeWidget !== "undefined" ? ModeWidget : null, [
                         "widgets/modewidget"
                     ]),
-                    () => new ModeWidget(activity),
-                    resetFlag,
-                    resetFlag
+                    () => new ModeWidget(activity)
                 );
             };
 
