@@ -2478,6 +2478,8 @@ rows that represent notes in the current mode are highlighted.
 The horizonal axis is time and the verical axis is half-step offsets
 from the base note.
 
+The toolbar on the left includes buttons to play the sequence, save the pattern to a custom chord block, clear the grid, and move (shift) the active note pattern up or down by an octave.
+
 The sequence in the pattern above is ```do mi sol do do mi do sol mi
 do do sol```.
 
