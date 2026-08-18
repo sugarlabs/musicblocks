@@ -120,6 +120,28 @@ NOTE: Only run `prettier` on the files you have modified.
 
 If formatting fails, run `npx prettier --write .` to fix it.
 
+### Developer Certificate of Origin (DCO)
+
+Every commit must include a `Signed-off-by` trailer certifying you wrote the
+change or otherwise have the right to submit it under the project's license
+(see the [Developer Certificate of Origin](https://developercertificate.org/)
+for the full text). A CI check enforces this on every pull request.
+
+Add the trailer automatically with the `-s` flag:
+
+```bash
+git commit -s -m "docs: add AI contribution guidelines (Related to #XXXX)"
+```
+
+Forgot it on a commit that's already made? Fix it with:
+
+```bash
+git commit -s --amend                # amends only the last commit
+git rebase --signoff master          # adds it to every commit on the branch
+```
+
+Then force-push the branch: `git push --force-with-lease`.
+
 ### Creating Pull Requests
 
 Follow these steps when contributing:
