@@ -41,11 +41,6 @@ global.ABCJS = {
 global.getVoiceSynthName = jest.fn(() => "mock-synth");
 global.platformColor = jest.fn(() => "#000000");
 global.slicePath = jest.fn(p => p);
-global.DOUBLEFLAT = "𝄫";
-global.FLAT = "♭";
-global.NATURAL = "♮";
-global.SHARP = "♯";
-global.DOUBLESHARP = "𝄪";
 global.instruments = [{}];
 global.REFERENCESAMPLE = "electronic synth";
 

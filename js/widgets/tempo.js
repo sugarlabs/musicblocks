@@ -31,6 +31,9 @@
 
 /* exported Tempo */
 class Tempo {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/tempo"];
+
     static TEMPOSYNTH = "bottle";
     static TEMPOINTERVAL = 5;
     static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8

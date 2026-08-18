@@ -37,12 +37,22 @@ global.Singer = {
 global.FlowBlock = jest.fn().mockImplementation((name, displayName) => ({
     name,
     displayName,
+    capabilities: Object.create(null),
     setPalette: jest.fn().mockReturnThis(),
     setHelpString: jest.fn().mockReturnThis(),
     formBlock: jest.fn().mockReturnThis(),
     makeMacro: jest.fn().mockReturnThis(),
     setup: jest.fn().mockReturnThis(),
     beginnerBlock: jest.fn().mockReturnThis(),
+    setCapability: jest.fn(function (capability, value = true) {
+        this.capabilities[capability] = !!value;
+        return this;
+    }),
+    getCapability: jest.fn(function (capability) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, capability)
+            ? this.capabilities[capability]
+            : undefined;
+    }),
     flow: jest.fn()
 }));
 global.ValueBlock = jest.fn().mockImplementation((name, displayName) => ({
@@ -521,6 +531,7 @@ describe("real DrumBlocks instances - direct method coverage", () => {
             constructor(name) {
                 this.name = name;
                 instances[name] = this;
+                this.capabilities = Object.create(null);
             }
             setPalette() {}
             setHelpString() {}
@@ -528,6 +539,15 @@ describe("real DrumBlocks instances - direct method coverage", () => {
             setup() {}
             beginnerBlock() {}
             makeMacro() {}
+            setCapability(name, value = true) {
+                this.capabilities[name] = !!value;
+                return this;
+            }
+            getCapability(name) {
+                return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                    ? this.capabilities[name]
+                    : undefined;
+            }
         };
         global.FlowClampBlock = class {
             constructor(name) {
@@ -545,6 +565,7 @@ describe("real DrumBlocks instances - direct method coverage", () => {
             constructor(name) {
                 this.name = name;
                 instances[name] = this;
+                this.capabilities = Object.create(null);
             }
             setPalette() {}
             setHelpString() {}
@@ -552,6 +573,15 @@ describe("real DrumBlocks instances - direct method coverage", () => {
             setup() {}
             beginnerBlock() {}
             makeMacro() {}
+            setCapability(name, value = true) {
+                this.capabilities[name] = !!value;
+                return this;
+            }
+            getCapability(name) {
+                return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                    ? this.capabilities[name]
+                    : undefined;
+            }
         };
 
         setupDrumBlocks(activity);
@@ -559,6 +589,12 @@ describe("real DrumBlocks instances - direct method coverage", () => {
         global.FlowBlock = origFlowBlock;
         global.FlowClampBlock = origFlowClampBlock;
         global.ValueBlock = origValueBlock;
+    });
+
+    test("name selector blocks declare the wideLabel capability", () => {
+        expect(instances["noisename"].getCapability("wideLabel")).toBe(true);
+        expect(instances["drumname"].getCapability("wideLabel")).toBe(true);
+        expect(instances["effectsname"].getCapability("wideLabel")).toBe(true);
     });
 
     test("real PlayNoiseBlock flow() calls errorMsg for invalid args", () => {

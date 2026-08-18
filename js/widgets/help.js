@@ -116,6 +116,7 @@ class HelpWidget {
 
                 const helpScrollWrapper = document.createElement("div");
                 helpScrollWrapper.id = "helpScrollWrapper";
+                helpScrollWrapper.tabIndex = 0;
 
                 const helpBodyDiv = document.createElement("div");
                 helpBodyDiv.id = "helpBodyDiv";
@@ -726,6 +727,7 @@ class HelpWidget {
 
                 const helpScrollWrapper = document.createElement("div");
                 helpScrollWrapper.id = "helpScrollWrapper";
+                helpScrollWrapper.tabIndex = 0;
 
                 const helpBodyDiv = document.createElement("div");
                 helpBodyDiv.id = "helpBodyDiv";

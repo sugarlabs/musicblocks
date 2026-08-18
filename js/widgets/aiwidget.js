@@ -18,6 +18,9 @@
 */
 
 /* exported Abhijeet Singh */
+/** AMD module dependencies for lazy loading. */
+AIWidget.dependencies = ["widgets/aiwidget"];
+
 /**
  * Represents a AI Widget.
  * @constructor

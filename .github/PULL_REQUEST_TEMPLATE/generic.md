@@ -3,6 +3,18 @@ name: Pull Request
 about: Submit changes to the project for review and inclusion
 ---
 
+## PR Title
+
+<!--- CI ENFORCED: The pull request TITLE (the field above this form) must be a Conventional Commit. -->
+
+Format: `<type>: <subject>`
+
+Valid types: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `i18n`, `perf`, `refactor`, `revert`, `style`, `test`
+
+Example: `fix: correct drag offset on touch devices`
+
+<!--- The PR Category checkboxes below are for labels only and are separate from the PR title type. -->
+
 ## Description
 
 <!--- Describe the changes introduced by this pull request. -->
@@ -20,45 +32,47 @@ This PR fixes #
 <!--- CI ENFORCED: You MUST check at least ONE category below or the CI will fail. -->
 <!--- Check all categories that apply to this pull request. -->
 
--   [ ] Bug Fix — Fixes a bug or incorrect behavior
--   [ ] Feature — Adds new functionality
--   [ ] Performance — Improves performance (load time, memory, rendering, etc.)
--   [ ] Tests — Adds or updates test coverage
--   [ ] Documentation — Updates to docs, comments, or README
--   [ ] Chore / Refactor — Maintenance, cleanup, or refactoring with no behavior change
--   [ ] CI/CD — Changes to CI/CD workflows and automation
+- [ ] Bug Fix — Fixes a bug or incorrect behavior
+- [ ] Feature — Adds new functionality
+- [ ] Performance — Improves performance (load time, memory, rendering, etc.)
+- [ ] Tests — Adds or updates test coverage
+- [ ] Documentation — Updates to docs, comments, or README
+- [ ] Chore / Refactor — Maintenance, cleanup, or refactoring with no behavior change
+- [ ] i18n — Internationalization and localization changes
+- [ ] CI/CD — Changes to CI/CD workflows and automation
 
 ## Changes Made
 
 <!--- Provide a summary of the changes made in this pull request. -->
 <!--- Include any relevant technical details or architecture changes. -->
 
--   Change 1
--   Change 2
--   ...
+- Change 1
+- Change 2
+- ...
 
 ## Testing Performed
 
 <!--- Describe the testing that you have performed to validate these changes. -->
 <!--- Include information about test cases, testing environments, and results. -->
 
--   Tested feature X in scenario Y.
--   Ran unit tests for component Z.
--   Tested on browsers A, B, and C.
--   ...
+- Tested feature X in scenario Y.
+- Ran unit tests for component Z.
+- Tested on browsers A, B, and C.
+- ...
 
 ## Checklist
 
 <!--- Please check the boxes that apply to this pull request. -->
 <!--- You can add or remove items as needed. -->
 
--   [ ] I have tested these changes locally and they work as expected.
--   [ ] I have added/updated tests that prove the effectiveness of these changes.
--   [ ] I have updated the documentation to reflect these changes, if applicable.
--   [ ] I have followed the project's coding style guidelines.
--   [ ] I have run `npm run lint` and `npx prettier --check .` with no errors.
--   [ ] I have addressed the code review feedback from the previous submission, if applicable.
--   [ ] I have enabled **"Allow edits from maintainers"** _(required for auto-rebase; this only affects the PR branch, not your fork)_.
+- [ ] I have tested these changes locally and they work as expected.
+- [ ] I have included before/after screenshots if applicable, especially for UX/feature changes.
+- [ ] I have added/updated tests that prove the effectiveness of these changes.
+- [ ] I have updated the documentation to reflect these changes, if applicable.
+- [ ] I have followed the project's coding style guidelines.
+- [ ] I have run `npm run lint` and `npx prettier --check .` with no errors.
+- [ ] I have addressed the code review feedback from the previous submission, if applicable.
+- [ ] I have enabled **"Allow edits from maintainers"** _(required for auto-rebase; this only affects the PR branch, not your fork)_.
 
 ## Additional Notes for Reviewers
 

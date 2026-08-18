@@ -38,6 +38,9 @@
  * @classdesc pertains to setting up all features of the Oscilloscope Widget.
  */
 class Oscilloscope {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/oscilloscope"];
+
     static ICONSIZE = 40;
     static analyserSize = 8192;
     static DRAW_TIMEOUT = 1000;
@@ -182,6 +185,15 @@ class Oscilloscope {
         this._stopAnimation();
 
         document.removeEventListener("visibilitychange", this._handleVisibilityChange);
+
+        for (const key of Object.keys(this.pitchAnalysers)) {
+            if (
+                this.pitchAnalysers[key] &&
+                typeof this.pitchAnalysers[key].dispose === "function"
+            ) {
+                this.pitchAnalysers[key].dispose();
+            }
+        }
 
         this.drawVisualIDs = {};
         this._canvasState = {};

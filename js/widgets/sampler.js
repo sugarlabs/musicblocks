@@ -15,10 +15,13 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor
+   instruments, slicePath, platformColor, TunerDisplay, TunerUtils
 */
 
 /* exported SampleWidget */
+/** AMD module dependencies for lazy loading. */
+SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
+
 /**
  * Represents a Sample Widget.
  * @constructor
@@ -541,7 +544,23 @@ function SampleWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
+            // Dispose Tone.Analyser nodes to free Web Audio resources
+            for (const key in this.pitchAnalysers) {
+                if (
+                    this.pitchAnalysers[key] &&
+                    typeof this.pitchAnalysers[key].dispose === "function"
+                ) {
+                    this.pitchAnalysers[key].dispose();
+                }
+            }
             this.pitchAnalysers = {};
+
+            // Remove any dangling file chooser listener
+            const fileChooser = docById("myOpenAll");
+            if (fileChooser && this._fileChangeHandler) {
+                fileChooser.removeEventListener("change", this._fileChangeHandler);
+                this._fileChangeHandler = null;
+            }
 
             if (this._dropZone) {
                 this._dropZone.removeEventListener("dragover", this._dragOverHandler);
@@ -585,14 +604,20 @@ function SampleWidget() {
                 stopTuner();
                 const fileChooser = docById("myOpenAll");
 
-                const __readerAction = function (event) {
+                // Remove any previously attached listener to prevent duplicates
+                if (that._fileChangeHandler) {
+                    fileChooser.removeEventListener("change", that._fileChangeHandler);
+                }
+
+                that._fileChangeHandler = function (event) {
                     window.scroll(0, 0);
                     const sampleFile = fileChooser.files[0];
                     that.handleFiles(sampleFile);
-                    fileChooser.removeEventListener("change", __readerAction);
+                    fileChooser.removeEventListener("change", that._fileChangeHandler);
+                    that._fileChangeHandler = null;
                 };
 
-                fileChooser.addEventListener("change", __readerAction, false);
+                fileChooser.addEventListener("change", that._fileChangeHandler, false);
                 fileChooser.focus();
                 fileChooser.click();
                 window.scroll(0, 0);
@@ -647,13 +672,6 @@ function SampleWidget() {
         this._playbackBtn = widgetWindow.addButton("playback.svg", ICONSIZE, _("Playback"), "");
 
         this._promptBtn = widgetWindow.addButton("prompt.svg", ICONSIZE, _("Prompt"), "");
-
-        // this._trimBtn = widgetWindow.addButton(
-        //     "trim.svg",
-        //     ICONSIZE,
-        //     _("Trim"),
-        //     ""
-        // );
 
         let generating = false;
         this.audioPreview = null;
@@ -849,162 +867,6 @@ function SampleWidget() {
             container.appendChild(textArea);
             container.appendChild(buttonDiv);
         };
-
-        // Commented out the audio trimmer code because it doesn't provide a visual trimming interface.
-
-        // this._trimBtn.onclick = () => {
-
-        //     this.widgetWindow.clearScreen();
-        //     let width, height;
-        //     if (!this.widgetWindow.isMaximized()) {
-        //         width = SAMPLEWIDTH;
-        //         height = SAMPLEHEIGHT;
-        //     } else {
-        //         width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
-        //         height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
-        //     }
-
-        //     const container = document.createElement("div");
-        //     container.id = "samplerPrompt";
-        //     this.widgetWindow.getWidgetBody().appendChild(container);
-
-        //     container.style.height = height + "px";
-        //     container.style.width = width + "px";
-        //     container.style.display = "flex";
-        //     container.style.flexDirection = "column";
-        //     container.style.alignItems = "center";
-        //     container.style.justifyContent = "center";
-        //     container.style.gap = "20px";
-
-        //     const h1 = document.createElement("h1");
-        //     h1.innerHTML = "Audio Trimmer";
-        //     h1.style.fontSize = "40px";
-        //     h1.style.marginTop = "0";
-        //     h1.style.marginBottom = "0px";
-        //     h1.style.fontWeight = "200";
-
-        //     const divUploadSample = document.createElement("div");
-        //     divUploadSample.style.backgroundColor = "#8cc6ff";
-        //     divUploadSample.style.width = "50px";
-        //     divUploadSample.style.height = "50px";
-        //     divUploadSample.style.display = "flex";
-        //     divUploadSample.style.cursor = "pointer";
-        //     divUploadSample.style.justifyContent = "center";
-        //     divUploadSample.style.alignItems = "center";
-
-        //     const uploadSample = document.createElement("img");
-        //     uploadSample.setAttribute("src", "/header-icons/load-media.svg");
-        //     uploadSample.style.height = "32px";
-        //     uploadSample.style.width = "32px";
-
-        //     divUploadSample.appendChild(uploadSample);
-
-        //     const fileChooser = document.createElement("input");
-        //     fileChooser.type = "file";
-
-        //     divUploadSample.onclick = function () {
-        //         fileChooser.click();
-        //     };
-
-        //     fileChooser.onchange = function () {
-        //         const file = fileChooser.files[0];
-        //         const audioPlayer = document.createElement("audio");
-        //         audioPlayer.controls = true;
-        //         const fileURL = URL.createObjectURL(file);
-        //         audioPlayer.src = fileURL;
-        //         container.replaceChild(audioPlayer, divUploadSample);
-        //     };
-
-        //     const inputDiv = document.createElement("div");
-        //     inputDiv.style.width = "400px";
-        //     inputDiv.style.display = "flex";
-        //     inputDiv.style.justifyContent = "space-between";
-
-        //     const fromInputBox = document.createElement("input");
-        //     fromInputBox.type = "text";
-        //     fromInputBox.title = "Enter start time (in seconds)";
-        //     fromInputBox.placeholder = "0.00";
-        //     fromInputBox.style.width = "152px";
-        //     fromInputBox.style.height = "61px";
-        //     fromInputBox.style.backgroundColor = "#FFFFFF";
-        //     fromInputBox.style.color = "#766C6C";
-        //     fromInputBox.style.fontSize = "32px";
-        //     fromInputBox.style.font = "Inter";
-        //     fromInputBox.style.borderRadius = "10px"
-        //     fromInputBox.style.border = "none"
-        //     fromInputBox.style.padding = "8px";
-        //     fromInputBox.style.textAlign = "center";
-        //     fromInputBox.type = "number";
-
-        //     const toInputBox = document.createElement("input");
-        //     toInputBox.type = "text";
-        //     toInputBox.title = "Enter end time (in seconds)";
-        //     toInputBox.placeholder = "10.00";
-        //     toInputBox.style.width = "152px";
-        //     toInputBox.style.height = "61px";
-        //     toInputBox.style.backgroundColor = "#FFFFFF";
-        //     toInputBox.style.color = "#766C6C";
-        //     toInputBox.style.fontSize = "32px";
-        //     toInputBox.style.font = "Inter";
-        //     toInputBox.style.borderRadius = "10px";
-        //     toInputBox.style.border = "none";
-        //     toInputBox.style.padding = "8px";
-        //     toInputBox.style.textAlign = "center";
-        //     toInputBox.type = "number";
-
-        //     inputDiv.appendChild(fromInputBox);
-        //     inputDiv.appendChild(toInputBox);
-
-        //     const buttonDiv = document.createElement("div");
-        //     buttonDiv.style.width = "400px";
-        //     buttonDiv.style.display = "flex";
-        //     buttonDiv.style.justifyContent = "space-between";
-
-        //     const preview = document.createElement("button");
-        //     preview.style.width = "152px";
-        //     preview.style.height = "61px";
-        //     preview.style.fontSize = "32px";
-        //     preview.style.borderRadius = "10px";
-        //     preview.style.border = "none";
-        //     preview.style.cursor = "pointer";
-        //     preview.innerHTML = "Preview";
-
-        //     preview.onclick = async function() {
-        //         const from = fromInputBox.value
-        //         const to = toInputBox.value
-        //         const audioURL = `http://13.61.94.100:8000/trim-preview?start=${from}&end=${to}`;
-        //         const audio = new Audio(audioURL);
-        //         audio.play();
-        //         save.disabled = false;
-        //     };
-
-        //     const save = document.createElement("button");
-        //     save.style.width = "152px";
-        //     save.style.height = "61px";
-        //     save.style.fontSize = "32px";
-        //     save.style.borderRadius = "10px";
-        //     save.style.border = "none";
-        //     save.style.cursor = "pointer";
-        //     save.innerHTML = "Save";
-        //     save.disabled = true;
-        //     save.onclick = function (){
-        //         const audioURL = `http://13.61.94.100:8000/trim-save`;
-        //         const link = document.createElement('a');
-        //         link.href = audioURL;
-        //         link.download = 'trimmed-output.wav';
-        //         document.body.appendChild(link);
-        //         link.click();
-        //         document.body.removeChild(link);
-        //     };
-
-        //     buttonDiv.appendChild(preview);
-        //     buttonDiv.appendChild(save);
-
-        //     container.appendChild(h1);
-        //     container.appendChild(divUploadSample);
-        //     container.appendChild(inputDiv);
-        //     container.appendChild(buttonDiv);
-        // };
 
         this._playbackBtn.id = "playbackBtn";
         this._playbackBtn.classList.add("disabled");
@@ -1547,16 +1409,17 @@ function SampleWidget() {
      * Calculates the frequency in Hz for the current pitch.
      * @returns {number} The frequency in Hz
      */
-    this._calculateFrequency = function () {
+    this._calculateFrequency = function (edo) {
+        const currentEDO = edo || 12;
         let semitones = 0;
 
-        semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
+        semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * currentEDO;
         semitones += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
         semitones += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
 
         // A4 = 440Hz at semitone position 57
         const netChange = semitones - 57;
-        const frequency = Math.floor(440 * Math.pow(2, netChange / 12));
+        const frequency = Math.floor(440 * Math.pow(2, netChange / currentEDO));
 
         return frequency;
     };
@@ -1587,18 +1450,19 @@ function SampleWidget() {
      * Plays the reference pitch based on the current sample's pitch, accidental, and octave.
      * @returns {void}
      */
-    this._playReferencePitch = function () {
+    this._playReferencePitch = function (edo) {
+        const currentEDO = edo || 12;
         this._updateSamplePitchValues();
         this._updateBlocks();
 
         let finalCenter = 0;
 
-        finalCenter += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
+        finalCenter += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * currentEDO;
         finalCenter += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
         finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
 
         const netChange = finalCenter - 57;
-        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange / 12));
+        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange / currentEDO));
 
         this.activity.logo.synth.trigger(
             0,
@@ -2242,21 +2106,12 @@ function SampleWidget() {
     /**
      * Convert frequency to note and cents
      */
-    const frequencyToNote = frequency => {
+    const frequencyToNote = (frequency, edo) => {
         if (frequency <= 0) return { note: "---", cents: 0 };
 
-        const A4 = 440;
-        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-        const midiNote = 69 + 12 * Math.log2(frequency / A4);
-        const roundedMidi = Math.round(midiNote);
-
-        const noteIndex = roundedMidi % 12;
-        const octave = Math.floor(roundedMidi / 12) - 1;
-        const noteName = noteNames[noteIndex] + octave;
-
-        const nearestFreq = A4 * Math.pow(2, (roundedMidi - 69) / 12);
-        const centsOffset = Math.round(1200 * Math.log2(frequency / nearestFreq));
+        const result = TunerUtils.frequencyToPitch(frequency, edo);
+        const noteName = result[0] + result[1];
+        const centsOffset = result[2];
 
         return { note: noteName, cents: centsOffset };
     };

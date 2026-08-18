@@ -285,6 +285,7 @@ class SearchController {
                     const term = (request.term || "").toLowerCase().trim();
                     response(that.filterSuggestions(term));
                 },
+                delay: 400,
                 appendTo: "body",
                 select: (event, ui) => {
                     event.preventDefault();
@@ -298,6 +299,13 @@ class SearchController {
                     event.preventDefault();
                 }
             });
+
+            // Anchor the dropdown to the search input now that the widget
+            // exists — see window.fixSearchAutocompletePosition in
+            // js/utils/jquery-setup.js (issue #8069).
+            if (typeof window.fixSearchAutocompletePosition === "function") {
+                window.fixSearchAutocompletePosition();
+            }
 
             const instance = $search.autocomplete("instance");
             if (instance) {
@@ -354,8 +362,8 @@ class SearchController {
                             document.removeEventListener("mousemove", onMouseMove);
                             document.removeEventListener("touchmove", onMouseMove);
 
-                            const x = parseInt(img.style.left);
-                            const y = parseInt(img.style.top);
+                            const x = parseInt(img.style.left, 10);
+                            const y = parseInt(img.style.top, 10);
 
                             img.style.position = posit;
                             img.style.zIndex = zInd;
@@ -469,8 +477,8 @@ class SearchController {
             handle.addEventListener("pointerdown", e => {
                 dragStartX = e.clientX;
                 dragStartY = e.clientY;
-                dragStartLeft = parseInt(activity.searchWidget.style.left) || 0;
-                dragStartTop = parseInt(activity.searchWidget.style.top) || 0;
+                dragStartLeft = parseInt(activity.searchWidget.style.left, 10) || 0;
+                dragStartTop = parseInt(activity.searchWidget.style.top, 10) || 0;
                 activity.searchWidget.style.transition = "none";
                 handle.setPointerCapture(e.pointerId);
                 handle.style.cursor = "grabbing";
@@ -555,8 +563,8 @@ class SearchController {
         dragHandle.addEventListener("pointerdown", e => {
             dragStartX = e.clientX;
             dragStartY = e.clientY;
-            dragStartLeft = parseInt(this.helpfulSearchDiv.style.left) || 0;
-            dragStartTop = parseInt(this.helpfulSearchDiv.style.top) || 0;
+            dragStartLeft = parseInt(this.helpfulSearchDiv.style.left, 10) || 0;
+            dragStartTop = parseInt(this.helpfulSearchDiv.style.top, 10) || 0;
             dragHandle.setPointerCapture(e.pointerId);
             dragHandle.style.cursor = "grabbing";
         });
@@ -610,10 +618,7 @@ class SearchController {
      * Hides and removes the helpfulSearchDiv from the DOM.
      */
     _hideHelpfulSearchWidget() {
-        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-        if (helpfulWheelDiv.style.display !== "none") {
-            helpfulWheelDiv.style.display = "none";
-        }
+        this.activity.closeHelpfulWheel();
         if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
             this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
         }
@@ -639,7 +644,7 @@ class SearchController {
         if (this.helpfulSearchDiv.style.display === "block") {
             activity.helpfulSearchWidget.value = null;
             activity.helpfulSearchWidget.style.visibility = "visible";
-            document.getElementById("helpfulWheelDiv").style.display = "none";
+            activity.closeHelpfulWheel();
             this.searchBlockPosition = [100, 100];
             this.prepSearchWidget();
             const that = this;
@@ -669,6 +674,7 @@ class SearchController {
                     const term = (request.term || "").toLowerCase().trim();
                     response(that.filterSuggestions(term));
                 },
+                delay: 400,
                 appendTo: "body",
                 select: (event, ui) => {
                     event.preventDefault();

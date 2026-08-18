@@ -245,7 +245,7 @@ const platformThemes = {
         },
 
         disconnected: "#C4C4C4", // disconnected block color
-        header: platform.FF ? "#4DA6FF" : "#4DA6FF",
+        header: "#4DA6FF",
         aux: "#1A8CFF",
         sub: "#8CC6FF",
         doHeaderShadow: !platform.FF,

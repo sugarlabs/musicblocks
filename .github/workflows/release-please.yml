@@ -1,0 +1,100 @@
+name: Release Please
+
+# Maintains CHANGELOG.md and the release process from Conventional Commits.
+#
+# How it works:
+#   1. On every push to master, release-please scans the commits since the
+#      last release and opens (or updates) a single "chore(release): vX.Y.Z"
+#      pull request. That PR contains the CHANGELOG.md entries, the bumped
+#      version in package.json, and the updated .release-please-manifest.json.
+#   2. Nothing is released while that PR sits open — it just accumulates.
+#   3. When a maintainer merges the release PR, this workflow tags the commit
+#      (vX.Y.Z) and creates the matching GitHub release.
+#
+# Commit types that appear in the changelog are configured in
+# release-please-config.json; the types themselves are enforced on every PR by
+# the commitlint job in ci.yml and by pr-title-check.yml.
+#
+# IMPORTANT — why post-release steps must live in THIS workflow:
+# The tag and release are created with the default GITHUB_TOKEN, and GitHub
+# deliberately does not let a GITHUB_TOKEN-driven event trigger further
+# workflow runs. A separate workflow keyed on `release: [published]` or
+# `push: tags: ['v*']` will therefore NEVER fire for these releases. Anything
+# that must happen on a release (build, publish, deploy, notify) has to be a
+# downstream job here, gated on the `release_created` output below. The
+# alternative is a GitHub App token or PAT, which trades least-privilege for
+# convenience.
+#
+# The same restriction means CI does not run on the release PR itself. That is
+# acceptable because every commit in it already passed CI on master — but see
+# the branch-protection caveat in CONTRIBUTING.md before enabling this.
+
+on:
+    push:
+        branches: [master]
+    workflow_dispatch:
+
+# Least privilege by default; the job below opts into what it needs.
+permissions:
+    contents: read
+
+# Never run two release-please passes at once — they would fight over the
+# same release PR. Queue instead of cancelling so no push is skipped.
+concurrency:
+    group: release-please
+    cancel-in-progress: false
+
+jobs:
+    release-please:
+        name: Maintain release PR and changelog
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        # Skip on forks: the action needs write access to this repository.
+        if: github.repository == 'sugarlabs/musicblocks'
+        permissions:
+            contents: write # create tags, releases, and the release commit
+            pull-requests: write # open and update the release PR
+        # Exposed so downstream jobs can gate on an actual release happening.
+        # On a normal push these are empty/false; they are only populated on
+        # the run that merges the release PR.
+        outputs:
+            release_created: ${{ steps.release.outputs.release_created }}
+            tag_name: ${{ steps.release.outputs.tag_name }}
+            version: ${{ steps.release.outputs.version }}
+            major: ${{ steps.release.outputs.major }}
+            minor: ${{ steps.release.outputs.minor }}
+            patch: ${{ steps.release.outputs.patch }}
+        steps:
+            - name: Run release-please
+              id: release
+              uses: googleapis/release-please-action@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  config-file: release-please-config.json
+                  manifest-file: .release-please-manifest.json
+                  # Explicit rather than inherited from the repo default branch,
+                  # so this does not silently retarget if the default changes.
+                  # `target-branch` is an action input only — it is not a valid
+                  # key in release-please-config.json, whose schema sets
+                  # additionalProperties: false. Keep in sync with the `on:`
+                  # trigger above.
+                  target-branch: master
+
+    # Runs only on the push that merges the release PR. Today it just reports
+    # the release; add build / publish / deploy steps here rather than in a
+    # new workflow (see the note above about GITHUB_TOKEN not chaining).
+    # Production deploys for Music Blocks remain manual by policy.
+    on-release:
+        name: Post-release
+        needs: release-please
+        if: needs.release-please.outputs.release_created == 'true'
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        permissions:
+            contents: read
+        steps:
+            - name: Report released version
+              run: |
+                  echo "Released ${{ needs.release-please.outputs.tag_name }}"
+                  echo "version: ${{ needs.release-please.outputs.version }}"
+                  echo "Deployment is manual — see CONTRIBUTING.md."

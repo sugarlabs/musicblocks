@@ -926,6 +926,7 @@ function setupNumberBlocks(activity) {
     class NumberBlock extends ValueBlock {
         constructor() {
             super("number", _("number"));
+            this.setCapability("valueDrivenLabel");
             this.setPalette("number", activity);
             this.beginnerBlock(true);
 

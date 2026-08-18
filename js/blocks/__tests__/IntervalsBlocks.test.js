@@ -33,6 +33,7 @@ describe("setupIntervalsBlocks", () => {
         constructor(name) {
             this.name = name;
             createdBlocks[name] = this;
+            this.capabilities = Object.create(null);
         }
         setPalette() {
             return this;
@@ -52,6 +53,15 @@ describe("setupIntervalsBlocks", () => {
         }
         setup() {
             return this;
+        }
+        setCapability(name, value = true) {
+            this.capabilities[name] = !!value;
+            return this;
+        }
+        getCapability(name) {
+            return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                ? this.capabilities[name]
+                : undefined;
         }
     }
 
@@ -94,6 +104,7 @@ describe("setupIntervalsBlocks", () => {
         global.Singer = {
             IntervalsActions: {
                 setTemperament: jest.fn(),
+                getTemperamentLength: jest.fn(() => 12),
                 GetIntervalNumber: jest.fn(() => 5),
                 GetCurrentInterval: jest.fn(() => 7),
                 setSemitoneInterval: jest.fn(),
@@ -175,6 +186,49 @@ describe("setupIntervalsBlocks", () => {
 
         turtleIndex = 0;
         setupIntervalsBlocks(activity);
+    });
+
+    describe("valueDrivenLabel capability", () => {
+        it("marks temperamentname as value-driven", () => {
+            expect(createdBlocks["temperamentname"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
+        it("marks modename as value-driven", () => {
+            expect(createdBlocks["modename"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
+        it("does not mark intervalnumber as value-driven", () => {
+            expect(
+                createdBlocks["intervalnumber"].getCapability("valueDrivenLabel")
+            ).toBeUndefined();
+        });
+    });
+
+    describe("inlineCollapsible capability", () => {
+        it("interval declares collapsible and inlineCollapsible", () => {
+            expect(createdBlocks.interval.getCapability("collapsible")).toBe(true);
+            expect(createdBlocks.interval.getCapability("inlineCollapsible")).toBe(true);
+        });
+
+        // definemode was historically in INLINECOLLAPSIBLES and already declares
+        // inlineCollapsible; size/toggle paths must treat it like other inline blocks.
+        it("definemode declares collapsible and inlineCollapsible", () => {
+            expect(createdBlocks.definemode.getCapability("collapsible")).toBe(true);
+            expect(createdBlocks.definemode.getCapability("inlineCollapsible")).toBe(true);
+        });
+    });
+
+    describe("wideLabel capability", () => {
+        it("marks temperament/mode/chord/interval name blocks as wideLabel", () => {
+            expect(createdBlocks["temperamentname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["modename"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["chordname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["intervalname"].getCapability("wideLabel")).toBe(true);
+        });
+
+        it("does not mark intervalnumber as wideLabel", () => {
+            expect(createdBlocks["intervalnumber"].getCapability("wideLabel")).toBeUndefined();
+        });
     });
 
     describe("Setup", () => {
@@ -319,6 +373,27 @@ describe("setupIntervalsBlocks", () => {
         it("calls setTemperament", () => {
             createdBlocks.settemperament.flow(["equal", "C", 4], logo, turtleIndex, "blk");
             expect(Singer.IntervalsActions.setTemperament).toHaveBeenCalledWith("equal", "C", 4);
+        });
+    });
+
+    describe("TemperamentLengthBlock", () => {
+        it("creates the temperamentlength block", () => {
+            expect(createdBlocks.temperamentlength).toBeDefined();
+        });
+
+        it("returns temperament length via arg()", () => {
+            Singer.IntervalsActions.getTemperamentLength = jest.fn(() => 19);
+            const result = createdBlocks.temperamentlength.arg(logo, turtleIndex, "blk");
+            expect(result).toBe(19);
+        });
+
+        it("registers status field when under print in status matrix", () => {
+            logo.inStatusMatrix = true;
+            activity.blocks.blockList.blk = { connections: ["print1"] };
+            activity.blocks.blockList.print1 = { name: "print" };
+            createdBlocks.temperamentlength.arg(logo, turtleIndex, "blk");
+            expect(logo.statusFields).toContainEqual(["blk", "temperamentlength"]);
+            logo.inStatusMatrix = false;
         });
     });
 
@@ -793,7 +868,7 @@ describe("setupIntervalsBlocks", () => {
             expect(activity.blocks.blockList.hidden1.connections[1]).toBeNull();
         });
 
-        it("listener restores disconnected links", async () => {
+        it("listener restores disconnected links synchronously without polling", () => {
             activity.blocks.blockList.blkArp = { name: "arpeggio", connections: [null] };
             activity.blocks.blockList.child1 = {
                 name: "note",
@@ -812,12 +887,32 @@ describe("setupIntervalsBlocks", () => {
             const listener =
                 logo.setTurtleListener.mock.calls[logo.setTurtleListener.mock.calls.length - 1][2];
 
-            await listener();
+            jest.useFakeTimers();
+            expect(listener()).toBeUndefined();
+            expect(jest.getTimerCount()).toBe(0);
+            jest.useRealTimers();
 
             expect(activity.blocks.blockList.child1.connections[2]).toBe("child2");
             expect(activity.blocks.blockList.child2.connections[0]).toBe("child1");
             expect(turtleState.singer.duplicateFactor).toBe(1);
             expect(turtleState.singer.inDuplicate).toBe(false);
+            expect(logo.connectionStoreLock).toBe(false);
+        });
+
+        it("listener releases lock when restoration throws", () => {
+            activity.blocks.blockList.blkArp = { name: "arpeggio", connections: [null] };
+            activity.blocks.blockList.child1 = {
+                name: "note",
+                connections: ["blkArp", null, null]
+            };
+            activity.blocks.findBottomBlock = jest.fn(() => "child1");
+
+            createdBlocks.arpeggio.flow(["major", "child1"], logo, turtleIndex, "blkArp", "arg");
+            logo.connectionStore[0].blkArp = [["missing", 0, null]];
+            const listener =
+                logo.setTurtleListener.mock.calls[logo.setTurtleListener.mock.calls.length - 1][2];
+
+            expect(() => listener()).toThrow();
             expect(logo.connectionStoreLock).toBe(false);
         });
     });

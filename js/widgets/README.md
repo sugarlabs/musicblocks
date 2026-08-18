@@ -23,7 +23,61 @@ imported in `js/activity.js`.
 
     This class will contain the code that defines the behavior of your widget.
 
-3. **Initialize the Class**
+3. **Declare the widget's lazy-load dependencies:**
+   If your widget is loaded lazily by `js/blocks/WidgetBlocks.js` (via
+   `_ensureWidget()` or `_lazyLoadWidget()`), declare its AMD module id(s) as a
+   `dependencies` property on the widget definition itself, rather than
+   passing a literal array at the call site. The widget definition is the
+   single source of truth for this list — `WidgetBlocks.js` reads
+   `Widget.dependencies` instead of maintaining its own copy.
+
+    `WidgetBlocks.js` offers two loading helpers, both sharing the same
+    `(logo, widgetKey, modules, factory, ...)` argument shape and both
+    built on the same AMD/CommonJS-aware `_lazyRequire()` primitive
+    underneath — pick whichever matches where your block constructs its
+    widget:
+
+    - **`_ensureWidget(logo, widgetKey, modules, factory, turtle, blk, receivedArg)`**
+      — for widgets constructed directly in `flow()`. Guards against
+      concurrent loads, returns an interruption signal `[null, 0, true]`
+      while the widget is loading, and calls `logo.runFromBlockNow(...)`
+      once it's ready so the interpreter re-enters the block. Use this when
+      the rest of the block's `flow()` logic depends on the widget already
+      existing. This is the standard loading path — most widgets use it,
+      e.g. `TemperamentWidget`.
+    - **`_lazyLoadWidget(logo, widgetKey, modules, factory, onReady)`**
+      — for widgets constructed inside a turtle listener (registered via
+      `logo.setTurtleListener`) rather than in `flow()` itself. No guard or
+      interruption signal: the listener already runs once, after the
+      interpreter has moved on, so there's nothing for an interruption to
+      interrupt. `onReady` runs after the widget is assigned to `logo`, for
+      any cleanup that used to follow the assignment inline. Used by
+      listener-deferred widgets that load only once their turtle listener
+      fires, e.g. `MeterWidget`, `Oscilloscope`, and `ModeWidget`.
+
+    Do not write a third, ad hoc lazy-loading pattern at a new call site —
+    route through one of these two.
+
+    For an ES6 class widget, use a `static` field:
+
+    ```javascript
+    class UniqueClass {
+        static dependencies = ["widgets/UniqueClassFileName"];
+        // Blocks with some functionality
+    }
+    ```
+
+    For a constructor-function widget, assign the property on the function
+    itself, since `static` class-field syntax doesn't apply:
+
+    ```javascript
+    function UniqueClass() {
+        // Blocks with some functionality
+    }
+    UniqueClass.dependencies = ["widgets/UniqueClassFileName"];
+    ```
+
+4. **Initialize the Class**
    Define the block that will be used to launch your widget in `js/blocks/WidgetBlocks.`
    Don't forget to initialize the class. (Look at the code towards the end of the file.)
 
@@ -31,7 +85,7 @@ imported in `js/activity.js`.
     new UniqueClass().setup(activity);
     ```
 
-4. **Import the widget**
+5. **Import the widget**
    In `js/activity.js`, import the widget code.
 
     ```javascript

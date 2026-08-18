@@ -223,7 +223,8 @@ function createMockTurtle(overrides = {}) {
             doStartFill: jest.fn(),
             doEndFill: jest.fn(),
             doStartHollowLine: jest.fn(),
-            doEndHollowLine: jest.fn()
+            doEndHollowLine: jest.fn(),
+            doClear: jest.fn()
         }
     };
     return {
@@ -919,6 +920,7 @@ describe("Logo doStopTurtles", () => {
         logo.sounds = [];
         logo.synth = makeSynth();
         logo._restoreConnections = jest.fn();
+        logo.deps.instruments = { 0: {} };
     });
 
     afterEach(() => jest.restoreAllMocks());
@@ -1177,7 +1179,9 @@ describe("Logo runLogoCommands", () => {
     });
 
     test("handles already-running state and status widget initialization", () => {
-        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => {});
+        const clearManagedTimerSpy = jest
+            .spyOn(logo._timerManager, "clearTimeout")
+            .mockReturnValue(true);
         logo._alreadyRunning = true;
         logo._runningBlock = 7;
         logo._lastNoteTimeout = 99;
@@ -1190,10 +1194,10 @@ describe("Logo runLogoCommands", () => {
 
         logo.runLogoCommands(null, null);
 
-        expect(clearTimeoutSpy).toHaveBeenCalledWith(99);
+        expect(clearManagedTimerSpy).toHaveBeenCalledWith(99);
         expect(statusInit).toHaveBeenCalledWith(mockActivity);
         expect(logo.statusFields).toEqual([[2, "currentpitch"]]);
-        clearTimeoutSpy.mockRestore();
+        clearManagedTimerSpy.mockRestore();
     });
 
     test("builds actions dictionary from action stack", () => {
@@ -1212,6 +1216,126 @@ describe("Logo runLogoCommands", () => {
         logo.runLogoCommands(null, null);
 
         expect(logo.actions["my-action"]).toBe(2);
+    });
+
+    test("fires _cleanupAfterCompletion when _lastNoteTimeout is cancelled on re-run", () => {
+        logo._lastNoteTimeout = 42;
+        logo._cleanupAfterCompletion = jest.fn();
+        logo._synthsInitialized = true;
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo._cleanupAfterCompletion).toHaveBeenCalled();
+        expect(logo._lastNoteTimeout).toBeNull();
+    });
+
+    test("pending _lastNoteTimeout triggers full synth teardown on re-run", () => {
+        const savedTone = global.Tone;
+        global.Tone = {
+            Transport: { cancel: jest.fn(), seconds: 0, start: jest.fn(), stop: jest.fn() },
+            UserMedia: savedTone.UserMedia
+        };
+
+        const stopSpy = jest.spyOn(logo.synth, "stop");
+        const disposeSpy = jest.spyOn(logo.synth, "disposeAllInstruments");
+        const cancelSpy = jest.spyOn(logo.synth.transport, "cancel");
+
+        logo._lastNoteTimeout = 77;
+        logo._synthsInitialized = true;
+
+        logo.runLogoCommands(null, null);
+
+        expect(stopSpy).toHaveBeenCalled();
+        expect(disposeSpy).toHaveBeenCalled();
+        expect(cancelSpy).toHaveBeenCalled();
+        expect(logo._synthsInitialized).toBe(false);
+
+        global.Tone = savedTone;
+    });
+
+    test("second _cleanupAfterCompletion call is a no-op when synths already disposed", () => {
+        const savedTone = global.Tone;
+        global.Tone = {
+            Transport: { cancel: jest.fn(), seconds: 0, start: jest.fn(), stop: jest.fn() },
+            UserMedia: savedTone.UserMedia
+        };
+
+        const stopSpy = jest.spyOn(logo.synth, "stop");
+        const disposeSpy = jest.spyOn(logo.synth, "disposeAllInstruments");
+
+        logo._synthsInitialized = true;
+
+        logo._cleanupAfterCompletion();
+        expect(stopSpy).toHaveBeenCalledTimes(1);
+        expect(disposeSpy).toHaveBeenCalledTimes(1);
+        expect(logo._synthsInitialized).toBe(false);
+
+        logo._cleanupAfterCompletion();
+        expect(stopSpy).toHaveBeenCalledTimes(1);
+        expect(disposeSpy).toHaveBeenCalledTimes(1);
+
+        global.Tone = savedTone;
+    });
+
+    test("two turtles finishing far apart do not double-dispose instruments", () => {
+        const savedTone = global.Tone;
+        global.Tone = {
+            Transport: { cancel: jest.fn(), seconds: 0, start: jest.fn(), stop: jest.fn() },
+            UserMedia: savedTone.UserMedia
+        };
+
+        const disposeSpy = jest.spyOn(logo.synth, "disposeAllInstruments");
+
+        logo._synthsInitialized = true;
+        logo._cleanupAfterCompletion();
+        expect(disposeSpy).toHaveBeenCalledTimes(1);
+        expect(logo._synthsInitialized).toBe(false);
+
+        logo._synthsInitialized = false;
+        logo._cleanupAfterCompletion();
+        expect(disposeSpy).toHaveBeenCalledTimes(1);
+
+        global.Tone = savedTone;
+    });
+
+    describe("performance instrumentation", () => {
+        let savedTracker;
+        let savedDebugFlag;
+
+        beforeEach(() => {
+            savedTracker = global.performanceTracker;
+            savedDebugFlag = window.DEBUG_PERFORMANCE;
+            global.performanceTracker = {
+                enable: jest.fn(),
+                disable: jest.fn(),
+                startRun: jest.fn()
+            };
+            mockActivity.blocks.stackList = [];
+            logo.blockList = [];
+        });
+
+        afterEach(() => {
+            global.performanceTracker = savedTracker;
+            window.DEBUG_PERFORMANCE = savedDebugFlag;
+        });
+
+        test("disables the tracker when performance mode is off", () => {
+            logo.runLogoCommands(null, null);
+
+            expect(global.performanceTracker.disable).toHaveBeenCalled();
+            expect(global.performanceTracker.enable).not.toHaveBeenCalled();
+            expect(global.performanceTracker.startRun).toHaveBeenCalled();
+        });
+
+        test("enables the tracker when performance mode is on", () => {
+            window.DEBUG_PERFORMANCE = true;
+
+            logo.runLogoCommands(null, null);
+
+            expect(global.performanceTracker.enable).toHaveBeenCalled();
+            expect(global.performanceTracker.disable).not.toHaveBeenCalled();
+            expect(global.performanceTracker.startRun).toHaveBeenCalled();
+        });
     });
 });
 
@@ -1440,6 +1564,56 @@ describe("Logo runFromBlock", () => {
             expect(scheduleSpy).toHaveBeenCalledWith(expect.any(Function), 20);
         });
     });
+
+    describe("fast-export synchronous scheduling", () => {
+        test("runs runFromBlockNow synchronously while exporting notation", () => {
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 5;
+            });
+            logo.runFromBlockNow = jest.fn();
+            logo.turtleDelay = 25;
+            logo.stopTurtle = false;
+            turtle0.waitTime = 10;
+            logo.runningLilypond = true;
+
+            logo.runFromBlock(logo, 0, 3, 1, "x");
+
+            expect(timeoutSpy).not.toHaveBeenCalled();
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
+        });
+
+        test("yields via setGuardedTimeout every _EXPORT_YIELD_AFTER_SYNC_RUNS transitions", () => {
+            const guardedSpy = jest.spyOn(logo.timerManager, "setGuardedTimeout");
+            logo.runFromBlockNow = jest.fn();
+            logo.turtleDelay = 25;
+            logo.stopTurtle = false;
+            turtle0.waitTime = 10;
+            logo.runningMxml = true;
+
+            for (let i = 0; i < logo._EXPORT_YIELD_AFTER_SYNC_RUNS; i++) {
+                logo.runFromBlock(logo, 0, 3, 1, "x");
+            }
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(
+                logo._EXPORT_YIELD_AFTER_SYNC_RUNS - 1
+            );
+            expect(guardedSpy).toHaveBeenCalledTimes(1);
+            expect(guardedSpy).toHaveBeenCalledWith(expect.any(Function), 0, expect.any(Function));
+
+            logo.runFromBlock(logo, 0, 3, 1, "x");
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(logo._EXPORT_YIELD_AFTER_SYNC_RUNS);
+            expect(guardedSpy).toHaveBeenCalledTimes(1);
+        });
+
+        test("_exportingNotation is false outside exports", () => {
+            logo.runningLilypond = false;
+            logo.runningAbc = false;
+            logo.runningMxml = false;
+            logo.runningMIDI = false;
+            expect(logo._exportingNotation).toBe(false);
+        });
+    });
 });
 
 // ─── Logo runFromBlockNow ─────────────────────────────────────────────────────
@@ -1592,6 +1766,60 @@ describe("Logo runFromBlockNow", () => {
 
             expect(global.performanceTracker.enterBlock).toHaveBeenCalledTimes(1);
         });
+
+        test("profiling exits the block when the iteration-budget guard trips", () => {
+            let now = 0;
+            global.performanceTracker = {
+                isEnabled: () => true,
+                enterBlock: jest.fn(),
+                exitBlock: jest.fn(),
+                disable: jest.fn()
+            };
+            global.performance = {
+                now: jest.fn(() => {
+                    now += 5;
+                    return now;
+                })
+            };
+
+            logo._iterationBudget = 1;
+            logo.blockList = [makeFlowBlock("noop")];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            expect(global.performanceTracker.enterBlock).toHaveBeenCalledTimes(1);
+            expect(global.performanceTracker.exitBlock).toHaveBeenCalledTimes(1);
+        });
+
+        test("profiling on exits the block when the flow does not return early", () => {
+            global.performanceTracker = {
+                isEnabled: () => true,
+                enterBlock: jest.fn(),
+                exitBlock: jest.fn(),
+                disable: jest.fn()
+            };
+            global.performance = { now: jest.fn(() => 100) };
+            mockActivity.blocks.visible = false;
+            logo.blockList = [
+                {
+                    name: "noop",
+                    protoblock: {
+                        args: 0,
+                        dockTypes: [],
+                        flow: jest.fn(() => undefined)
+                    },
+                    connections: [null],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                }
+            ];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(global.performanceTracker.enterBlock).toHaveBeenCalledTimes(1);
+            expect(global.performanceTracker.exitBlock).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("limits and plugin dispatch", () => {
@@ -1664,6 +1892,7 @@ describe("Logo runFromBlockNow", () => {
             expect(mockActivity.statsWindow.displayInfo).toHaveBeenCalled();
             expect(logo.runningLilypond).toBe(false);
 
+            logo._exportNotationFinished = false;
             logo.runningLilypond = false;
             logo.collectingStats = false;
             logo.runFromBlockNow(logo, 0, 0, 0, null);
@@ -1675,14 +1904,97 @@ describe("Logo runFromBlockNow", () => {
             logo.runFromBlockNow(logo, 0, 0, 0, null);
             expect(mockActivity.save.afterSaveAbc).toHaveBeenCalled();
 
+            logo._exportNotationFinished = false;
             logo.runningMxml = true;
             logo.runFromBlockNow(logo, 0, 0, 0, null);
             expect(mockActivity.save.afterSaveMxml).toHaveBeenCalled();
 
+            logo._exportNotationFinished = false;
             turtle0.singer.suppressOutput = true;
             logo.recording = false;
             logo.runFromBlockNow(logo, 0, 0, 0, null);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith("Playback is ready.", undefined);
+        });
+
+        test("does not execute evalOnStopList on natural completion", () => {
+            logo.evalOnStopList = {
+                hookA: "code-a",
+                hookB: "code-b"
+            };
+            logo.safePluginExecute = jest.fn();
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.safePluginExecute).not.toHaveBeenCalled();
+        });
+
+        test("clears stale sounds array on natural completion", () => {
+            const mockSound = { stop: jest.fn() };
+            logo.sounds = [mockSound];
+            logo.safePluginExecute = jest.fn();
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.sounds).toEqual([]);
+        });
+
+        test("does not execute evalOnStopList when turtles are still running", () => {
+            logo.safePluginExecute = jest.fn();
+            logo.evalOnStopList = { hookA: "code-a" };
+            mockActivity.turtles.running.mockReturnValue(true);
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.safePluginExecute).not.toHaveBeenCalled();
+        });
+
+        test("does not clear sounds when turtles are still running", () => {
+            logo.safePluginExecute = jest.fn();
+            logo.sounds = [{ stop: jest.fn() }];
+            mockActivity.turtles.running.mockReturnValue(true);
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.sounds).toHaveLength(1);
+        });
+
+        test("natural completion cleans up audio but preserves drawing", () => {
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 11;
+            });
+            logo.sounds = [{ stop: jest.fn() }];
+            logo.synth = makeSynth();
+            logo._synthsInitialized = true;
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.sounds).toEqual([]);
+            expect(logo._synthsInitialized).toBe(false);
+            expect(turtle0.painter.doClear).not.toHaveBeenCalled();
+        });
+
+        test("!logo.turtles.running() guard skips cleanup during active run", () => {
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 12;
+            });
+            logo._cleanupAfterCompletion = jest.fn();
+            mockActivity.turtles.running.mockReturnValue(true);
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+        });
+
+        test("_cleanupAfterCompletion does not stop WAV recorder", () => {
+            const recorderStop = jest.fn();
+            logo.synth = makeSynth();
+            logo.synth.recorder = { state: "recording", stop: recorderStop };
+
+            logo._cleanupAfterCompletion();
+
+            expect(recorderStop).not.toHaveBeenCalled();
         });
     });
 
@@ -1710,6 +2022,30 @@ describe("Logo runFromBlockNow", () => {
         expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("sig1");
         expect(logo.statusMatrix.updateAll).toHaveBeenCalled();
         expect(mockActivity.blocks.updateParameterBlock).toHaveBeenCalledWith(logo, 0, 10);
+    });
+
+    test("refreshes slow execution only when a parameter display changes", () => {
+        timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(() => 32);
+        logo.blockList = [
+            {
+                ...makeFlowBlock("print"),
+                connections: [null, 1]
+            },
+            makeFlowBlock()
+        ];
+        turtle0.parameterQueue = [10];
+        logo.turtleDelay = 10;
+
+        mockActivity.blocks.updateParameterBlock.mockReturnValue(false);
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+        expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
+
+        mockActivity.blocks.updateParameterBlock.mockClear();
+        mockActivity.blocks.updateParameterBlock.mockReturnValue(true);
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(mockActivity.blocks.updateParameterBlock).toHaveBeenCalledWith(logo, 0, 10);
+        expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(1);
     });
 });
 

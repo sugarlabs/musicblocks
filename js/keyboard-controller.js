@@ -35,6 +35,33 @@ class KeyboardController {
         document.addEventListener("keydown", this._handleKeyDown);
     }
 
+    /**
+     * Checks if a specific widget window is open safely.
+     * @param {string} name
+     * @returns {boolean}
+     */
+    _isWidgetOpen(name) {
+        return !!(
+            typeof window !== "undefined" &&
+            window.widgetWindows &&
+            typeof window.widgetWindows.isOpen === "function" &&
+            window.widgetWindows.isOpen(name)
+        );
+    }
+
+    /**
+     * Checks if any widget window is open safely.
+     * @returns {boolean}
+     */
+    _hasOpenWidget() {
+        return !!(
+            typeof window !== "undefined" &&
+            window.widgetWindows &&
+            window.widgetWindows.openWindows &&
+            Object.values(window.widgetWindows.openWindows).some(w => w)
+        );
+    }
+
     /*
      * Handles keyboard shortcuts in MB
      */
@@ -42,7 +69,7 @@ class KeyboardController {
         const activity = this.activity;
 
         // First, check if the pitch slider is open
-        if (window.widgetWindows.isOpen("slider") === true) {
+        if (this._isWidgetOpen("slider")) {
             // If the event is an arrow key, let the PitchSlider handle it
             if (
                 event.keyCode === 37 ||
@@ -58,7 +85,7 @@ class KeyboardController {
             }
         }
 
-        if (window.widgetWindows.isOpen("JavaScript Editor") === true) return;
+        if (this._isWidgetOpen("JavaScript Editor")) return;
         if (!activity.keyboardEnableFlag) {
             return;
         }
@@ -194,9 +221,7 @@ class KeyboardController {
                     }
 
                     // Check if any widget window is open
-                    const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
-                        w => w
-                    );
+                    const hasOpenWidget = this._hasOpenWidget();
                     if (activity.turtles.running()) {
                         activity._doHardStopButton();
                     } else if (!hasOpenWidget) {
@@ -270,7 +295,7 @@ class KeyboardController {
                 }
             } else if (event.keyCode === SPACE) {
                 // Check if any widget window is open
-                const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(w => w);
+                const hasOpenWidget = this._hasOpenWidget();
                 if (activity.turtles.running()) {
                     event.preventDefault();
                     activity._doHardStopButton();
@@ -407,9 +432,7 @@ class KeyboardController {
                         break;
                     case RETURN: {
                         // Check if any widget window is open
-                        const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
-                            w => w
-                        );
+                        const hasOpenWidget = this._hasOpenWidget();
                         if (activity.turtles.running()) {
                             event.preventDefault();
                             activity._doHardStopButton();

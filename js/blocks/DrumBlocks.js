@@ -30,6 +30,9 @@ function setupDrumBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
             super("noisename", _("noise name"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             /**
              * Sets the palette for the block.
@@ -73,6 +76,9 @@ function setupDrumBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
             super("drumname", _("drum name"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             /**
              * Sets the palette for the block.
@@ -117,6 +123,9 @@ function setupDrumBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
             super("effectsname", _("effects name"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             /**
              * Sets the palette for the block.
@@ -494,6 +503,7 @@ function setupDrumBlocks(activity) {
             /**
              * Set the palette, configure as a beginner block, and form the block.
              */
+            this.setCapability("soundSpecifier");
             this.setPalette("drum", activity);
             this.beginnerBlock(true);
 
@@ -578,6 +588,13 @@ function setupDrumBlocks(activity) {
                 logo.musicKeyboard.noteNames.push("drum");
                 logo.musicKeyboard.octaves.push(null);
                 logo.musicKeyboard.addRowBlock(blk);
+            } else if (
+                tur.singer.inNoteBlock.length > 0 ||
+                (activity.blocks.blockList[blk].connections[0] === null &&
+                    last(activity.blocks.blockList[blk].connections) === null)
+            ) {
+                // Handle other contexts
+                Singer.DrumActions.playDrum(args[0], turtle, blk);
             } else {
                 // Runtime playback: in-note or stand-alone under Start / flow
                 Singer.DrumActions.playDrum(args[0], turtle, blk);

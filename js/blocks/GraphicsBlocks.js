@@ -101,7 +101,7 @@ function setupGraphicsBlocks(activity) {
             const parentId = connections[0] ?? null;
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -186,7 +186,7 @@ function setupGraphicsBlocks(activity) {
             const parentId = connections[0] ?? null;
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -272,7 +272,7 @@ function setupGraphicsBlocks(activity) {
             const parentId = connections[0] ?? null;
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -584,12 +584,21 @@ function setupGraphicsBlocks(activity) {
             this.piemenuValuesC2 = [25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300];
 
             // Set the help string for the Arc block
-            this.setHelpString([
-                _("The Arc block moves the turtle in an arc."),
-                "documentation",
-                null,
-                "archelp"
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Arc block moves the mouse in an arc."),
+                    "documentation",
+                    null,
+                    "archelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Arc block moves the turtle in an arc."),
+                    "documentation",
+                    null,
+                    "archelp"
+                ]);
+            }
 
             // Form the block with specific parameters
             this.formBlock({
@@ -612,7 +621,7 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 2) {
-                if ((args[1] > 5000 || args[1] < -5000) && (isWrap === false || isWrap == null)) {
+                if ((args[1] > 5000 || args[1] < -5000) && (isWrap === false || isWrap === null)) {
                     activity.errorMsg(
                         _("Value must be within -5000 to 5000 when Wrap Mode is off."),
                         blk
@@ -767,7 +776,7 @@ function setupGraphicsBlocks(activity) {
             if (args.length === 2) {
                 if (
                     (args[0] > 5000 || args[1] > 5000 || args[0] < -5000 || args[1] < -5000) &&
-                    (isWrap === false || isWrap == null)
+                    (isWrap === false || isWrap === null)
                 ) {
                     activity.errorMsg(
                         _("Value must be within -5000 to 5000 when Wrap Mode is off."),
@@ -1020,7 +1029,7 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 1) {
-                if ((args[0] > 5000 || args[0] < -5000) && (isWrap === false || isWrap == null)) {
+                if ((args[0] > 5000 || args[0] < -5000) && (isWrap === false || isWrap === null)) {
                     activity.errorMsg(
                         _("Value must be within -5000 to 5000 when Wrap Mode is off."),
                         blk
@@ -1109,7 +1118,7 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 1) {
-                if ((args[0] > 5000 || args[0] < -5000) && (isWrap === false || isWrap == null)) {
+                if ((args[0] > 5000 || args[0] < -5000) && (isWrap === false || isWrap === null)) {
                     activity.errorMsg(
                         _("Value must be within -5000 to 5000 when Wrap Mode is off."),
                         blk
@@ -1157,6 +1166,8 @@ function setupGraphicsBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class
             super("wrapmode");
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
 
             // Set the palette, activity, and form the block with specific parameters
             this.setPalette("graphics", activity);

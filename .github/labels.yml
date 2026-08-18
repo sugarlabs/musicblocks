@@ -1,0 +1,52 @@
+# Label definitions synced to the repo by .github/workflows/label-sync.yml
+#
+# Colors are chosen to stay consistent with the palette already used for
+# PR-category labels in .github/workflows/pr-category-check.yml, so that
+# related concepts (e.g. "bug fix" on PRs and "Issue-Bug" on issues) share
+# the same color.
+#
+# Names must match the repo's existing labels EXACTLY (case-sensitive) or
+# the syncer will create duplicates instead of recoloring the originals.
+# Verified against github.com/sugarlabs/musicblocks/labels.
+#
+# To add or update a label: edit this file and open a PR. The sync
+# workflow will create/update the label in the repo automatically once
+# merged to master.
+
+- name: Issue-Bug
+  color: D73A4A
+  description: Fixes a bug or incorrect behavior
+
+- name: Issue-Enhancement
+  color: 9333EA
+  description: Adds new functionality or improves an existing feature
+
+- name: Issue-Documentation
+  color: 10B981
+  description: Updates to docs, comments, or README
+
+- name: Issue-Performance
+  color: F97316
+  description: Improves performance (load time, memory, rendering)
+
+
+
+- name: Issue-Testing
+  color: 3B82F6
+  description: Adds or updates test coverage
+
+- name: Issue-Question
+  color: D876E3
+  description: Further information is requested
+
+- name: Issue-Wontfix
+  color: FFFFFF
+  description: This will not be worked on
+
+- name: Issue-Duplicate
+  color: CFD3D7
+  description: This issue or pull request already exists
+
+- name: Good first issue
+  color: 7EE787
+  description: Good for newcomers

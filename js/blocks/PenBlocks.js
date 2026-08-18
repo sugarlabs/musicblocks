@@ -305,7 +305,8 @@ function setupPenBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
+                parentId !== undefined &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -373,7 +374,8 @@ function setupPenBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
+                parentId !== undefined &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -444,7 +446,8 @@ function setupPenBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
+                parentId !== undefined &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -487,7 +490,8 @@ function setupPenBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
+                parentId !== undefined &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {

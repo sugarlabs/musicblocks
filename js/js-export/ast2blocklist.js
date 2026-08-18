@@ -125,8 +125,8 @@ class AST2BlockList {
                                 }
                             } else if (
                                 "has_value" in identifier &&
-                                ((!identifier.has_value && value == null) ||
-                                    (identifier.has_value && value != null))
+                                ((!identifier.has_value && value === null) ||
+                                    (identifier.has_value && value !== null))
                             ) {
                                 groupMatched = true;
                                 break;

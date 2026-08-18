@@ -354,6 +354,10 @@ describe("Utility Functions (logic-only)", () => {
         it("converts hex to rgba string", () => {
             expect(hex2rgb("ff0000")).toBe("rgba(255,0,0,1)");
         });
+
+        it("handles leading hash prefix", () => {
+            expect(hex2rgb("#ff0000")).toBe("rgba(255,0,0,1)");
+        });
     });
 
     describe("format() function logic", () => {
@@ -1161,6 +1165,23 @@ describe("processMacroData()", () => {
         processMacroData("{invalid", palettes, blocks, macroDict);
         expect(palettes.makePalettes).not.toHaveBeenCalled();
         spy.mockRestore();
+    });
+
+    it("does not pollute Object.prototype when macroData contains a __proto__ key", () => {
+        const macroDict = {};
+        const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+        const blocks = { addToMyPalette: jest.fn() };
+        const maliciousData = JSON.stringify({
+            __proto__: { polluted: true },
+            constructor: { polluted: true }
+        });
+
+        processMacroData(maliciousData, palettes, blocks, macroDict);
+
+        expect({}.polluted).toBeUndefined();
+        expect(Object.prototype.polluted).toBeUndefined();
+        expect(Object.prototype.hasOwnProperty.call(macroDict, "__proto__")).toBe(false);
+        expect(Object.prototype.hasOwnProperty.call(macroDict, "constructor")).toBe(false);
     });
 });
 

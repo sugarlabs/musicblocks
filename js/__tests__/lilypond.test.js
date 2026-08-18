@@ -47,14 +47,9 @@ global.NOTATIONSTACCATO = NOTATIONSTACCATO;
 global.NOTATIONTUPLETVALUE = NOTATIONTUPLETVALUE;
 global.NOTATIONDOTCOUNT = NOTATIONDOTCOUNT;
 
-global.SHARP = "♯";
-global.FLAT = "♭";
-global.NATURAL = "♮";
-global.DOUBLESHARP = "𝄪";
-global.DOUBLEFLAT = "𝄫";
-
 global._ = jest.fn(str => str);
 global.last = jest.fn(array => array[array.length - 1]);
+global.getCurrentEDO = jest.fn(() => 12);
 
 const { getLilypondHeader, processLilypondNotes, saveLilypondOutput } = require("../lilypond");
 
@@ -83,6 +78,9 @@ describe("processLilypondNotes", () => {
                 notationStaging: {
                     [turtle]: [[["G4"], 4, 0, null, 0, -1, false], "meter", 4, 4]
                 }
+            },
+            synth: {
+                inTemperament: "equal"
             }
         };
         lilypond = "";
@@ -384,7 +382,10 @@ describe("saveLilypondOutput", () => {
                 notationOutput: "",
                 guitarOutputHead: "",
                 guitarOutputEnd: "",
-                MIDIOutput: ""
+                MIDIOutput: "",
+                synth: {
+                    inTemperament: "equal"
+                }
             },
             turtles: {
                 turtleList: {
@@ -623,7 +624,7 @@ describe("saveLilypondOutput", () => {
         };
         const result = saveLilypondOutput(activity);
         expect(result).toBeDefined();
-        expect(frequencyToPitch).toHaveBeenCalledWith(440);
+        expect(frequencyToPitch).toHaveBeenCalledWith(440, "equal");
     });
     test("should handle short name collision for names without spaces (longer loop)", () => {
         activity.turtles.turtleList = {

@@ -59,6 +59,7 @@ class DummyValueBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
         this.extraWidth = 0;
+        this.capabilities = Object.create(null);
     }
     setPalette(palette, activity) {
         return this;
@@ -79,6 +80,15 @@ class DummyValueBlock {
     }
     setup(activity) {
         return this;
+    }
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    }
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
     arg(logo, turtle, blk) {
         return global.activity.blocks.blockList[blk].value;
@@ -967,6 +977,10 @@ describe("setupNumberBlocks", () => {
     });
 
     describe("NumberBlock", () => {
+        it("declares the valueDrivenLabel capability", () => {
+            expect(createdBlocks["number"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
         it("should return the block's numeric value", () => {
             activity.blocks.blockList[230] = { value: "123.45" };
             const numberBlock = createdBlocks["number"];
