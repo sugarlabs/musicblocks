@@ -68,7 +68,8 @@ const _b64Cache = new Map();
     MODEPIEMENU_GROUP_FONT_RATIO, MODEPIEMENU_NAME_FONT_MIN_RATIO,
     MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
     getModeLabel, getModeNameFromLabel, getModeSliceColors,
-    updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont
+    updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
+    configureWheel
 */
 
 /**
@@ -1889,7 +1890,7 @@ const getSavedCustomModes = () => {
  */
 const getModeNamesForGroup = (grp, customModeNames = []) => {
     if (grp !== "custom") {
-        return MODE_PIE_MENUS[grp];
+        return MODE_PIE_MENUS[grp].slice();
     }
     const names = customModeNames.slice(0, MODEPIEMENU_SLOT_COUNT);
     while (names.length < MODEPIEMENU_SLOT_COUNT) {

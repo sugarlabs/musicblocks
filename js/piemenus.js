@@ -3465,6 +3465,8 @@ const piemenuIntervals = (block, selectedInterval) => {
 const piemenuModes = (block, selectedMode) => {
     // pie menu for mode selection
 
+    wheelnav.cssMode = true;
+
     if (block.blocks.stageClick) {
         return;
     }
@@ -3515,7 +3517,8 @@ const piemenuModes = (block, selectedMode) => {
         colors: platformColor.modeGroupWheelcolors,
         minRadius: MODEPIEMENU_GROUP_RING.minRadius,
         maxRadius: MODEPIEMENU_GROUP_RING.maxRadius,
-        titleFont: getModeGroupTitleFont(block._modeWheel.wheelRadius)
+        titleFont: getModeGroupTitleFont(block._modeWheel.wheelRadius),
+        selectionPaths: true
     });
 
     const xlabels = [];
@@ -3599,7 +3602,8 @@ const piemenuModes = (block, selectedMode) => {
             configureWheel(that._modeNameWheel, {
                 colors: [],
                 minRadius: MODEPIEMENU_NAME_RING.minRadius,
-                maxRadius: MODEPIEMENU_NAME_RING.maxRadius
+                maxRadius: MODEPIEMENU_NAME_RING.maxRadius,
+                selectionPaths: true
             });
             that._modeNameWheel.keynavigateEnabled = false;
             newWheel = true;
@@ -3839,6 +3843,7 @@ const piemenuModes = (block, selectedMode) => {
         block._modeGroupWheel.navItems[i].navigateFunction = __buildModeWheel;
         if (block._modeGroupWheel.navItems[i].title === modeGroup) {
             block._modeGroupWheel.navigateWheel(i);
+            break;
         }
     }
 

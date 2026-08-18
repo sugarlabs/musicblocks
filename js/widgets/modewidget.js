@@ -18,7 +18,8 @@
    numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
    getSavedCustomModes, getModeNamesForGroup, getModeLabel, getModeNameFromLabel,
    getModeSliceColors, updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
-   configureWheel, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING
+   configureWheel, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
+   scalePatternToEDO
  */
 
 /*
@@ -70,6 +71,7 @@ class ModeWidget {
         this._undoStack = [];
         this._playing = false;
         this._selectedNotes = [];
+        this._newPattern = null;
         this._edoNoteCache = {};
         // Non-EDO temperaments (just intonation, Pythagorean, meantone) are
         // mapped to their pitch count by getCurrentEDO. The widget operates on
@@ -354,6 +356,7 @@ class ModeWidget {
     _rebuildWheel(edoCount) {
         this._cancelAnimations();
         this._activeEDO = edoCount;
+        this._undoStack = []; // Clear stale undo entries from old EDO
         this.logo.synth.inTemperament = this._temperamentKeyForEDO(edoCount);
         this._piemenuMode();
     }
@@ -374,13 +377,16 @@ class ModeWidget {
             return;
         }
 
-        const newSelected = this._blankNotes(newEDO);
+        // Extract the interval pattern from the current selection, rescale it
+        // to the new EDO, and reconstruct _selectedNotes from the result.
+        const pattern = this._calculateMode();
+        const rescaled = scalePatternToEDO(pattern, newEDO);
 
-        for (let i = 1; i < n; i++) {
-            if (this._selectedNotes[i]) {
-                const scaledIdx = Math.round((i / n) * newEDO) % newEDO;
-                newSelected[scaledIdx] = true;
-            }
+        const newSelected = this._blankNotes(newEDO);
+        let pos = 0;
+        for (let i = 0; i < rescaled.length; i++) {
+            pos = (pos + rescaled[i]) % newEDO;
+            newSelected[pos] = true;
         }
 
         this._selectedNotes = newSelected;
@@ -789,7 +795,7 @@ class ModeWidget {
             this._noteWheel.navItems[n - i].navItem.hide();
         }
 
-        if (i === Math.floor(n / 2) - 1) {
+        if (i === Math.floor((n - 1) / 2)) {
             this._saveState();
             this._setModeName();
             this._locked = false;

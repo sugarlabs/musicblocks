@@ -687,7 +687,10 @@ function setupWidgetBlocks(activity) {
                         typeof MeterWidget !== "undefined" ? MeterWidget : null,
                         ["widgets/meterwidget"]
                     ),
-                    () => new MeterWidget(activity, blk)
+                    () => new MeterWidget(activity, blk),
+                    () => {
+                        logo.insideMeterWidget = false;
+                    }
                 );
             };
 
@@ -764,7 +767,10 @@ function setupWidgetBlocks(activity) {
                         typeof Oscilloscope !== "undefined" ? Oscilloscope : null,
                         ["widgets/oscilloscope"]
                     ),
-                    () => new Oscilloscope(activity)
+                    () => new Oscilloscope(activity),
+                    () => {
+                        logo.inOscilloscope = false;
+                    }
                 );
             };
 
