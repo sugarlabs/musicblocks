@@ -1435,14 +1435,15 @@ class PhraseMaker {
                 setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
                 let i;
                 for (i = 0; i < this.columnBlocksMap.length; i++) {
-                    if (this.columnBlocksMap[i][0] === aboveBlock) {
+                    if (this.columnBlocksMap[i] && this.columnBlocksMap[i][0] === aboveBlock) {
                         break;
                     }
                 }
 
-                this.rowLabels.splice(i + 1, 0, rLabel);
-                this.rowArgs.splice(i + 1, 0, rArg);
-                this._rowBlocks.splice(i + 1, 0, newBlock);
+                const insertIndex = i < this.columnBlocksMap.length ? i + 1 : this.rowLabels.length;
+                this.rowLabels.splice(insertIndex, 0, rLabel);
+                this.rowArgs.splice(insertIndex, 0, rArg);
+                this._rowBlocks.splice(insertIndex, 0, newBlock);
             }
 
             this.sorted = false;
