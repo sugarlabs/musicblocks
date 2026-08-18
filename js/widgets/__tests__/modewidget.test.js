@@ -231,8 +231,6 @@ document.createElement = jest.fn().mockImplementation(tag => ({
     }),
     getElementById: jest.fn().mockReturnValue({ src: "" })
 }));
-document.getElementById = document.createElement; // For internal usage
-
 // Add replaceChildren to modeTableDiv mock (used in constructor)
 const originalCreateElement = document.createElement;
 document.createElement = jest.fn(tag => {

@@ -42,6 +42,9 @@ class ModeWidget {
     static ROTATESPEED = 125;
     static RESET_NOTES_DELAY = 500;
     static WHEELSIZE = 400;
+    static MAX_TITLE_FONT_SIZE = 48;
+    static MIN_TITLE_FONT_SIZE = 10;
+    static TITLE_FONT_SCALE = 580;
 
     /**
      * @param {object} activity
@@ -309,6 +312,9 @@ class ModeWidget {
             // Cache outgoing state so round-trip preserves intermediate edits
             this._cacheState(this._activeEDO);
 
+            // Capture old EDO before it gets overwritten by _rebuildWheel
+            const oldEDO = this._activeEDO;
+
             // Determine new notes: use cached state if available, otherwise translate
             if (this._edoNoteCache[newEDO] !== undefined) {
                 this._restoreState(newEDO);
@@ -318,15 +324,27 @@ class ModeWidget {
 
             this._rebuildWheel(newEDO);
             this.textMsg(_(`Switched to ${newEDO}-EDO tuning.`), 3000);
-            this._setModeName();
+
+            // Preserve the current mode name across EDO switches.
+            // _setModeName() does a reverse-lookup from the note pattern,
+            // which changes when notes are translated to a different EDO.
+            // Instead, use the stored mode name so it persists.
+            const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
+            const name = currentKey + " " + _(this._selectedModeName);
+            this._updateModeDisplay(name);
+            if (this._nameInput) {
+                this._nameInput.value = _(this._selectedModeName);
+            }
+            // Still sync the modename block in the workspace
+            this._syncModeBlockName();
 
             // Only warn when going to a lesser EDO, where notes can be dropped
             // by the rounding in _translateNotesToEDO. Lesser→greater only adds
             // steps, so no message is needed.
-            if (this._activeEDO > newEDO) {
+            if (oldEDO > newEDO) {
                 this.textMsg(
                     _(
-                        `Mode remapped from ${this._activeEDO}-EDO to ${newEDO}-EDO. Some notes may have changed.`
+                        `Mode remapped from ${oldEDO}-EDO to ${newEDO}-EDO. Some notes may have changed.`
                     ),
                     3000
                 );
@@ -336,7 +354,7 @@ class ModeWidget {
     _rebuildWheel(edoCount) {
         this._cancelAnimations();
         this._activeEDO = edoCount;
-        this._updateTemperament(edoCount);
+        this.logo.synth.inTemperament = this._temperamentKeyForEDO(edoCount);
         this._piemenuMode();
     }
 
@@ -453,7 +471,9 @@ class ModeWidget {
         }
 
         MUSICALMODES[name] = pattern;
-        MUSICALMODES[name.toLowerCase()] = pattern;
+        if (name !== name.toLowerCase()) {
+            MUSICALMODES[name.toLowerCase()] = pattern;
+        }
         return true;
     }
 
@@ -463,6 +483,9 @@ class ModeWidget {
         this._saveCustomModesList(filtered);
 
         delete MUSICALMODES[name];
+        if (name !== name.toLowerCase()) {
+            delete MUSICALMODES[name.toLowerCase()];
+        }
     }
 
     _getModeEDO(modeName) {
@@ -558,6 +581,7 @@ class ModeWidget {
 
         // Mode name input (kept narrow so the row fits on one line)
         const nameInput = document.createElement("input");
+        this._nameInput = nameInput;
         nameInput.id = "customModeName";
         nameInput.type = "text";
         nameInput.placeholder = _("Mode name");
@@ -1032,42 +1056,89 @@ class ModeWidget {
         const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
         const customNames = new Set(getSavedCustomModes().map(m => m.name));
 
-        for (const mode in MUSICALMODES) {
-            // Custom modes are stored with EDO-specific step patterns; built-in
-            // patterns are 12-EDO intervals scaled to the active EDO.
-            const pattern = customNames.has(mode)
-                ? MUSICALMODES[mode]
-                : getModePattern(mode, this._activeEDO);
+        // Check custom modes first — they take priority over built-in modes
+        // when patterns match, since they are EDO-specific.
+        let matchedMode = null;
+        for (const mode of customNames) {
+            if (!(mode in MUSICALMODES)) {
+                continue;
+            }
+            const pattern = MUSICALMODES[mode];
             if (JSON.stringify(pattern) === currentMode) {
-                if (this._modeBlock !== null) {
-                    // Only update the modename block connected to the widget's
-                    // setkey2 block, plus its sibling notename block.
-                    const modeBlock = this.blocks.blockList[this._modeBlock];
-                    if (modeBlock && modeBlock.name === "modename") {
-                        modeBlock.value = mode;
-                        modeBlock.text.text = _(mode);
-                        modeBlock.updateCache();
-
-                        const parent = this.blocks.blockList[modeBlock.connections[0]];
-                        const notenameBlock =
-                            parent?.name === "setkey2" &&
-                            this.blocks.blockList[parent.connections[1]];
-                        if (notenameBlock?.name === "notename") {
-                            notenameBlock.value = currentKey;
-                            notenameBlock.text.text = _(currentKey);
-                            notenameBlock.updateCache();
-                        }
-                    }
-                    this.refreshCanvas();
-                }
-
-                const name = currentKey + " " + _(mode);
-                this._updateModeDisplay(name);
-                return;
+                matchedMode = mode;
+                break;
             }
         }
 
+        // If no custom mode matched, check built-in modes.
+        if (!matchedMode) {
+            for (const mode in MUSICALMODES) {
+                if (customNames.has(mode)) {
+                    continue;
+                }
+                const pattern = getModePattern(mode, this._activeEDO);
+                if (JSON.stringify(pattern) === currentMode) {
+                    matchedMode = mode;
+                    break;
+                }
+            }
+        }
+        if (matchedMode) {
+            this._selectedModeName = matchedMode;
+            if (this._modeBlock !== null) {
+                // Only update the modename block connected to the widget's
+                // setkey2 block, plus its sibling notename block.
+                const modeBlock = this.blocks.blockList[this._modeBlock];
+                if (modeBlock && modeBlock.name === "modename") {
+                    modeBlock.value = matchedMode;
+                    modeBlock.text.text = _(matchedMode);
+                    modeBlock.updateCache();
+
+                    const parent = this.blocks.blockList[modeBlock.connections[0]];
+                    const notenameBlock =
+                        parent?.name === "setkey2" && this.blocks.blockList[parent.connections[1]];
+                    if (notenameBlock?.name === "notename") {
+                        notenameBlock.value = currentKey;
+                        notenameBlock.text.text = _(currentKey);
+                        notenameBlock.updateCache();
+                    }
+                }
+                this.refreshCanvas();
+            }
+
+            const name = currentKey + " " + _(matchedMode);
+            if (this._nameInput) {
+                this._nameInput.value = _(matchedMode);
+            }
+            this._updateModeDisplay(name);
+            return;
+        }
+
         this._updateModeDisplay("");
+        if (this._nameInput) {
+            this._nameInput.value = "";
+        }
+    }
+
+    // ── Block sync ────────────────────────────────────────────────
+
+    /**
+     * Sync the modename block in the workspace with the stored mode name.
+     * Called after EDO switches to keep the block value consistent with
+     * the widget display, without re-deriving the name from the (possibly
+     * translated) note pattern.
+     */
+    _syncModeBlockName() {
+        if (this._modeBlock === null) {
+            return;
+        }
+        const modeBlock = this.blocks.blockList[this._modeBlock];
+        if (modeBlock && modeBlock.name === "modename") {
+            modeBlock.value = this._selectedModeName;
+            modeBlock.text.text = _(this._selectedModeName);
+            modeBlock.updateCache();
+        }
+        this.refreshCanvas();
     }
 
     _updateModeDisplay(name) {
@@ -1234,14 +1305,17 @@ class ModeWidget {
     }
 
     _createModeWheel(n) {
-        const titleFontSize = Math.min(48, Math.max(10, Math.floor(580 / n)));
+        const titleFontSize = Math.min(
+            ModeWidget.MAX_TITLE_FONT_SIZE,
+            Math.max(ModeWidget.MIN_TITLE_FONT_SIZE, Math.floor(ModeWidget.TITLE_FONT_SCALE / n))
+        );
         configureWheel(this._modeWheel, {
             colors: platformColor.modeWheelcolors,
             minRadius: 0.4,
             maxRadius: 0.75,
             clickModeRotate: false,
             selectionPaths: true,
-            titleFont: "400 " + titleFontSize + "px Times New Roman"
+            titleFont: "400 " + titleFontSize + "px sans-serif"
         });
         this._modeWheel.createWheel(Array.from({ length: n }, (_, i) => String(i)));
     }

@@ -125,16 +125,13 @@ const {
     PITCH_COLLECTIONS_EDO_OVERRIDES,
     getModePattern,
     generateNoteNames,
-    MODEPIEMENU_GROUP_RING,
-    MODEPIEMENU_NAME_RING,
     getSavedCustomModes,
     getModeNamesForGroup,
     getModeLabel,
     getModeNameFromLabel,
     getModeSliceColors,
     updateModeWheelItems,
-    getModeGroupTitleFont,
-    getModeSliceFont
+    getModeGroupTitleFont
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";

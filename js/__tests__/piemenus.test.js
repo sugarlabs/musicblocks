@@ -147,7 +147,7 @@ global.getModeNameFromLabel = (label, modes) => {
     if (label === "minor / aeolian") {
         return "aeolian";
     }
-    return modes.includes(label) ? label : label;
+    return label;
 };
 global.getModeSliceColors = (modes, colors) =>
     modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));

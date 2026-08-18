@@ -3494,7 +3494,6 @@ const piemenuModes = (block, selectedMode) => {
 
     //Use advanced constructor for more wheelnav on same div
     block._modeWheel = new wheelnav("wheelDiv", null, 1200, 1200);
-    block._modeGroupWheel = new wheelnav("_modeGroupWheel", block._modeWheel.raphael);
     block._modeNameWheel = null; // We build block wheel based on the group selection.
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._modeWheel.raphael);
