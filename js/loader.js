@@ -386,6 +386,15 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         });
     }
 
+    // Shared with activity.js so the two never drift apart; see
+    // js/utils/language-utils.js. Falls back to an identity map in the unlikely
+    // event the helper has not executed yet.
+    function toLocaleCode(language) {
+        return typeof window.normalizeLanguageCode === "function"
+            ? window.normalizeLanguageCode(language)
+            : language;
+    }
+
     function resolveInitialLanguage() {
         try {
             const savedLanguage = window.localStorage && window.localStorage.languagePreference;
@@ -400,14 +409,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                     window.localStorage.setItem("kanaPreference", "kanji");
                     return "ja";
                 }
-                // The language menu stores enUS/enUK, but the locale files are en/en_GB.
-                if (savedLanguage === "enUS") {
-                    return "en";
-                }
-                if (savedLanguage === "enUK") {
-                    return "en_GB";
-                }
-                return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
+                return toLocaleCode(savedLanguage);
             }
         } catch (e) {
             // Continue with navigator fallback when storage is unavailable.

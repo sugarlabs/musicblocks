@@ -62,7 +62,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML, pubsub
+   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode
  */
 
 /*
@@ -434,10 +434,10 @@ class Activity {
                     this.storage.languagePreference = "ja";
                     this.storage.kanaPreference = "kanji";
                     lang = "ja";
-                } else if (lang.startsWith("ja")) {
-                    lang = "ja"; // normalize Japanese
                 }
-                i18next.changeLanguage(lang);
+                // The menu stores codes like enUS/enUK/zhCN; the locale files are
+                // named en/en_GB/zh_CN. Hand i18next the file name, not the menu id.
+                i18next.changeLanguage(normalizeLanguageCode(lang));
             } else {
                 lang = navigator.language;
                 if (lang.includes("-")) {
