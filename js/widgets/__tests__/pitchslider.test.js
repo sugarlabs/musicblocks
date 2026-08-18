@@ -22,6 +22,7 @@
 
 global._ = msg => msg;
 global.getCurrentEDO = () => 12;
+global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
 
 const mockOscillator = {
     toDestination: jest.fn().mockReturnThis(),
@@ -645,6 +646,35 @@ describe("PitchSlider Widget", () => {
             expect(stack[1][4]).toEqual([0]);
             // Hertz block: [0, freq, hidden] - connects to note, frequency, hidden
             expect(stack[2][4]).toEqual([0, 3, 4]);
+        });
+    });
+
+    describe("Frequency Stepping (_stepFrequency)", () => {
+        const semitone = Math.pow(2, 1 / 12);
+
+        test("steps up by semitone ratio", () => {
+            const result = slider._stepFrequency(440, "up", semitone, 220, 880);
+            expect(result).toBeCloseTo(440 * semitone, 2);
+        });
+
+        test("steps down by semitone ratio", () => {
+            const result = slider._stepFrequency(440, "down", semitone, 220, 880);
+            expect(result).toBeCloseTo(440 / semitone, 2);
+        });
+
+        test("clamps upper bound to max", () => {
+            const result = slider._stepFrequency(870, "up", semitone, 220, 880);
+            expect(result).toBe(880);
+        });
+
+        test("clamps lower bound to min", () => {
+            const result = slider._stepFrequency(225, "down", semitone, 220, 880);
+            expect(result).toBe(220);
+        });
+
+        test("parses numeric string inputs correctly", () => {
+            const result = slider._stepFrequency("440", "up", semitone, 220, 880);
+            expect(result).toBeCloseTo(440 * semitone, 2);
         });
     });
 });
