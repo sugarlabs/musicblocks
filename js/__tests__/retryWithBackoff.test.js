@@ -68,6 +68,21 @@ describe("retryWithBackoff", () => {
 
             expect(onRetry).not.toHaveBeenCalled();
         });
+
+        it("should handle maxRetries of 0 (pass immediately if check is truthy)", async () => {
+            const check = jest.fn(() => true);
+            const onSuccess = jest.fn();
+
+            await retryWithBackoff({
+                check,
+                onSuccess,
+                delayFn: instantDelay,
+                maxRetries: 0
+            });
+
+            expect(check).toHaveBeenCalledTimes(1);
+            expect(onSuccess).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("retry behavior", () => {
@@ -295,6 +310,22 @@ describe("retryWithBackoff", () => {
                 })
             ).rejects.toThrow("async onSuccess failed");
         });
+
+        it("should await an async onSuccess to resolve before returning", async () => {
+            let resolved = false;
+
+            await retryWithBackoff({
+                check: () => true,
+                onSuccess: async () => {
+                    await new Promise(r => setTimeout(r, 10)); // tiny delay
+                    resolved = true;
+                },
+                delayFn: instantDelay
+            });
+
+            // If retryWithBackoff didn't await onSuccess, it would return before the timeout
+            expect(resolved).toBe(true);
+        });
     });
 
     describe("edge cases", () => {
@@ -328,16 +359,17 @@ describe("retryWithBackoff", () => {
             expect(onSuccess).toHaveBeenCalledWith([1, 2, 3]);
         });
 
-        it("should treat 0, empty string, and false as falsy (trigger retry)", async () => {
+        it("should treat 0, empty string, false, null, and undefined as falsy (trigger retry)", async () => {
             let callCount = 0;
 
-            // Returns 0 first, then true
             await retryWithBackoff({
                 check: () => {
                     callCount++;
                     if (callCount === 1) return 0;
                     if (callCount === 2) return "";
                     if (callCount === 3) return false;
+                    if (callCount === 4) return null;
+                    if (callCount === 5) return undefined;
                     return "success";
                 },
                 onSuccess: jest.fn(),
@@ -345,7 +377,7 @@ describe("retryWithBackoff", () => {
                 maxRetries: 10
             });
 
-            expect(callCount).toBe(4);
+            expect(callCount).toBe(6);
         });
 
         it("should handle maxRetries of 0 (fail immediately if check is falsy)", async () => {
