@@ -351,24 +351,24 @@ describe("PitchDrumMatrix Widget", () => {
             expect(docById).not.toHaveBeenCalled();
         });
 
-        test("should access DOM if playing", () => {
+        test("should execute logic if playing", () => {
             pdm._playing = true;
-            docById.mockClear();
 
-            // Mock simple cell structure for docById calls
+            // Mock simple cell structure
             const mockCell = { style: {} };
             const mockRow = { cells: [mockCell] };
             const mockTable = { rows: [mockRow] };
-            docById.mockReturnValue(mockTable);
+
+            pdm._pdmTable = mockTable;
+            pdm._pdmDrumTable = mockTable;
+            pdm._pdmCellTables = [mockTable];
 
             // We mock _setPairCell because it's called internally
             pdm._setPairCell = jest.fn();
 
             pdm._playPitchDrum(0, [[0, 0]]);
 
-            expect(docById).toHaveBeenCalledWith("pdmTable");
-            expect(docById).toHaveBeenCalledWith("pdmDrumTable");
-            expect(docById).toHaveBeenCalledWith("pdmCellTable0");
+            expect(pdm._setPairCell).toHaveBeenCalled();
         });
 
         test("should not attempt to modify style of rows when playing turns false during timeout", () => {
@@ -396,7 +396,9 @@ describe("PitchDrumMatrix Widget", () => {
                 }
             });
 
-            docById.mockReturnValue(mockTable);
+            pdm._pdmTable = mockTable;
+            pdm._pdmDrumTable = mockTable;
+            pdm._pdmCellTables = [mockTable];
             pdm._setPairCell = jest.fn();
 
             pdm._playPitchDrum(0, [[0, 0]]);
@@ -432,15 +434,9 @@ describe("PitchDrumMatrix Widget", () => {
             const mockRow = { cells: [mockCell] };
             const mockTable = { rows: [mockRow, mockRow] };
 
-            docById.mockImplementation(id => {
-                if (id === "pdmTable" || id === "pdmDrumTable") {
-                    return mockTable;
-                }
-                if (id === "pdmCellTable0") {
-                    return { rows: [mockRow] };
-                }
-                return { style: {} };
-            });
+            pdm._pdmTable = mockTable;
+            pdm._pdmDrumTable = mockTable;
+            pdm._pdmCellTables = [mockTable];
 
             pdm._setPairCell = jest.fn();
             pdm._playing = true;
@@ -477,15 +473,9 @@ describe("PitchDrumMatrix Widget", () => {
             const mockRow = { cells: [mockCell] };
             const mockTable = { rows: [mockRow, mockRow] };
 
-            docById.mockImplementation(id => {
-                if (id === "pdmTable" || id === "pdmDrumTable") {
-                    return mockTable;
-                }
-                if (id === "pdmCellTable0") {
-                    return { rows: [mockRow] };
-                }
-                return { style: {} };
-            });
+            pdm._pdmTable = mockTable;
+            pdm._pdmDrumTable = mockTable;
+            pdm._pdmCellTables = [mockTable];
 
             pdm._setPairCell = jest.fn();
             pdm._playing = true;
@@ -517,7 +507,7 @@ describe("PitchDrumMatrix Widget", () => {
             pdm.init(mockActivity);
 
             const mockTable = { rows: [] };
-            docById.mockReturnValue(mockTable);
+            pdm._pdmTable = mockTable;
 
             pdm._playing = true;
             pdm._playAll();
@@ -526,6 +516,81 @@ describe("PitchDrumMatrix Widget", () => {
                 "Click in the grid to map notes to drums.",
                 3000
             );
+        });
+    });
+
+    // --- makeClickable and _clear Tests ---
+    describe("UI interactions (Coverage)", () => {
+        test("should apply color on click via makeClickable", () => {
+            pdm._playing = false;
+            pdm.rowLabels = ["C", "D"];
+            pdm.rowArgs = [4, 4];
+
+            const cell00 = {
+                id: "0,0",
+                style: {},
+                setAttribute: jest.fn(),
+                addEventListener: jest.fn()
+            };
+            const cell01 = {
+                id: "0,1",
+                style: {},
+                setAttribute: jest.fn(),
+                addEventListener: jest.fn()
+            };
+            const cell10 = {
+                id: "1,0",
+                style: {},
+                setAttribute: jest.fn(),
+                addEventListener: jest.fn()
+            };
+
+            pdm._pdmCellTables = [
+                { rows: [{ cells: [cell00, cell01] }] },
+                { rows: [{ cells: [cell10, {}] }] }
+            ];
+            pdm._pdmTable = { rows: [{}, {}, {}] }; // length 3 so loop runs 2 times
+            pdm._pdmDrumTable = { rows: [{ cells: [{}, {}] }, {}, {}] };
+
+            pdm.makeClickable();
+
+            // makeClickable assigns onclick
+            expect(typeof cell00.onclick).toBe("function");
+
+            // Trigger the click listener on cell00 manually
+            const clickHandler = cell00.onclick;
+            pdm._getBackgroundColor = jest.fn(() => "blue");
+            pdm._setCellPitchDrum = jest.fn();
+
+            clickHandler({ target: cell00 });
+
+            expect(cell00.style.backgroundColor).toBe("black");
+            expect(pdm._setCellPitchDrum).toHaveBeenCalledWith("0", "0", true);
+        });
+
+        test("should clear the grid and handle _clear", () => {
+            const mockActivity = {
+                logo: { synth: { stop: jest.fn() } },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+
+            pdm._playing = true;
+            pdm.playButton = { replaceChildren: jest.fn() };
+
+            const cell00 = { style: { backgroundColor: "black" } };
+            const cell01 = { style: { backgroundColor: "black" } };
+            pdm._pdmCellTables = [{ rows: [{ cells: [cell00, cell01] }] }];
+            pdm._pdmTable = { rows: [{}, {}] }; // length 2 so loop runs 1 time
+
+            pdm._getBackgroundColor = jest.fn(() => "white");
+            pdm._setCellPitchDrum = jest.fn();
+
+            pdm._clear();
+
+            expect(cell00.style.backgroundColor).toBe(platformColor.selectorBackground);
+            expect(pdm._setCellPitchDrum).toHaveBeenCalled();
         });
     });
 });

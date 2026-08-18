@@ -891,10 +891,37 @@ describe("TimbreWidget", () => {
             expect(global.instrumentsEffects[0]["custom"]["tremoloDepth"]).toBe(0.55);
         });
 
+        test("should not throw TypeError if instrumentsEffects gets reset during effect change", async () => {
+            timbre._effects();
+            await selectEffect("Tremolo");
+
+            // Simulate Logo engine resetting global state
+            global.instrumentsEffects[0]["custom"] = undefined;
+
+            // This should not throw a TypeError and should recreate the object
+            expect(() => {
+                triggerChange("myRangeFx0", "45");
+            }).not.toThrow();
+
+            expect(global.instrumentsEffects[0]["custom"]).toBeDefined();
+            expect(global.instrumentsEffects[0]["custom"]["tremoloFrequency"]).toBe(45);
+        });
+
         test("should update Vibrato params", async () => {
             timbre._effects();
             await selectEffect("Vibrato");
             triggerChange("myRangeFx0", "30");
+            expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.25);
+        });
+
+        test("should not throw TypeError if instrumentsEffects gets reset during Vibrato effect change", async () => {
+            timbre._effects();
+            await selectEffect("Vibrato");
+            global.instrumentsEffects[0]["custom"] = undefined;
+            expect(() => {
+                triggerChange("myRangeFx0", "30");
+            }).not.toThrow();
+            expect(global.instrumentsEffects[0]["custom"]).toBeDefined();
             expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.25);
         });
 
@@ -909,6 +936,17 @@ describe("TimbreWidget", () => {
             expect(global.instrumentsEffects[0]["custom"]["chorusDepth"]).toBe(0.5);
         });
 
+        test("should not throw TypeError if instrumentsEffects gets reset during Chorus effect change", async () => {
+            timbre._effects();
+            await selectEffect("Chorus");
+            global.instrumentsEffects[0]["custom"] = undefined;
+            expect(() => {
+                triggerChange("myRangeFx0", "20");
+            }).not.toThrow();
+            expect(global.instrumentsEffects[0]["custom"]).toBeDefined();
+            expect(global.instrumentsEffects[0]["custom"]["chorusRate"]).toBe(20);
+        });
+
         test("should update Phaser params", async () => {
             timbre._effects();
             await selectEffect("Phaser");
@@ -920,10 +958,64 @@ describe("TimbreWidget", () => {
             expect(global.instrumentsEffects[0]["custom"]["baseFrequency"]).toBe(400);
         });
 
+        test("should not throw TypeError if instrumentsEffects gets reset during Phaser effect change", async () => {
+            timbre._effects();
+            await selectEffect("Phaser");
+            global.instrumentsEffects[0]["custom"] = undefined;
+            expect(() => {
+                triggerChange("myRangeFx0", "12");
+            }).not.toThrow();
+            expect(global.instrumentsEffects[0]["custom"]).toBeDefined();
+            expect(global.instrumentsEffects[0]["custom"]["rate"]).toBe(12);
+        });
+
+        test("should reuse existing Tremolo params", async () => {
+            timbre.tremoloEffect.push(1);
+            timbre.tremoloParams.push(15);
+            timbre.tremoloParams.push(0.2);
+            timbre._effects();
+            await selectEffect("Tremolo");
+            triggerChange("myRangeFx0", "16");
+            expect(global.instrumentsEffects[0]["custom"]["tremoloFrequency"]).toBe(16);
+        });
+
+        test("should reuse existing Chorus params", async () => {
+            timbre.chorusEffect.push(1);
+            timbre.chorusParams.push(5);
+            timbre.chorusParams.push(5);
+            timbre.chorusParams.push(50);
+            timbre._effects();
+            await selectEffect("Chorus");
+            triggerChange("myRangeFx1", "6");
+            expect(global.instrumentsEffects[0]["custom"]["delayTime"]).toBe(6);
+        });
+
+        test("should reuse existing Phaser params", async () => {
+            timbre.phaserEffect.push(1);
+            timbre.phaserParams.push(10);
+            timbre.phaserParams.push(2);
+            timbre.phaserParams.push(200);
+            timbre._effects();
+            await selectEffect("Phaser");
+            triggerChange("myRangeFx2", "250");
+            expect(global.instrumentsEffects[0]["custom"]["baseFrequency"]).toBe(250);
+        });
+
         test("should update Distortion params", async () => {
             timbre._effects();
             await selectEffect("Distortion");
             triggerChange("myRangeFx0", "75");
+            expect(global.instrumentsEffects[0]["custom"]["distortionAmount"]).toBe(0.75);
+        });
+
+        test("should not throw TypeError if instrumentsEffects gets reset during Distortion effect change", async () => {
+            timbre._effects();
+            await selectEffect("Distortion");
+            global.instrumentsEffects[0]["custom"] = undefined;
+            expect(() => {
+                triggerChange("myRangeFx0", "75");
+            }).not.toThrow();
+            expect(global.instrumentsEffects[0]["custom"]).toBeDefined();
             expect(global.instrumentsEffects[0]["custom"]["distortionAmount"]).toBe(0.75);
         });
 
