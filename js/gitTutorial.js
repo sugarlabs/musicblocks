@@ -977,3 +977,7 @@ const GitTutorial = (() => {
 
     return { open, close };
 })();
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = GitTutorial;
+}

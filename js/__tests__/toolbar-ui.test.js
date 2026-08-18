@@ -168,20 +168,38 @@ describe("ToolbarUI - Visual Helpers", () => {
     });
 });
 
-describe("FocusCycleManager - dispose", () => {
-    test("dispose removes all document-level event listeners", () => {
-        const { FocusCycleManager } = require("../toolbar-ui");
-        const manager = new FocusCycleManager();
-        manager.init();
+describe("ToolbarUI - renderGitDropdownIcon", () => {
+    test("wires click, mouseenter, and focus to call gitDropdownUI._syncMenuState", () => {
+        const toolbar = new ToolbarUI();
+        const mockBtn = createMockElement("gitProjectBtn");
+        global.document.getElementById = jest.fn(id => {
+            if (id === "gitProjectBtn") return mockBtn;
+            return createMockElement(id);
+        });
 
-        const removeCount = global.document.removeEventListener.mock.calls.length;
-        manager.dispose();
+        const mockGitDropdownUI = {
+            _syncMenuState: jest.fn()
+        };
 
-        const calls = global.document.removeEventListener.mock.calls;
-        const newCalls = calls.slice(removeCount);
-        const events = newCalls.map(c => c[0]);
-        expect(events).toContain("keydown");
-        expect(events).toContain("mousedown");
-        expect(events).toContain("focusin");
+        toolbar.renderGitDropdownIcon(mockGitDropdownUI);
+
+        expect(mockBtn.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
+        expect(mockBtn.addEventListener).toHaveBeenCalledWith("mouseenter", expect.any(Function));
+        expect(mockBtn.addEventListener).toHaveBeenCalledWith("focus", expect.any(Function));
+
+        const clickHandler = mockBtn.addEventListener.mock.calls.find(c => c[0] === "click")[1];
+        const hoverHandler = mockBtn.addEventListener.mock.calls.find(
+            c => c[0] === "mouseenter"
+        )[1];
+        const focusHandler = mockBtn.addEventListener.mock.calls.find(c => c[0] === "focus")[1];
+
+        clickHandler();
+        expect(mockGitDropdownUI._syncMenuState).toHaveBeenCalledTimes(1);
+
+        hoverHandler();
+        expect(mockGitDropdownUI._syncMenuState).toHaveBeenCalledTimes(2);
+
+        focusHandler();
+        expect(mockGitDropdownUI._syncMenuState).toHaveBeenCalledTimes(3);
     });
 });

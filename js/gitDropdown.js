@@ -217,7 +217,8 @@ class GitDropdownUI {
                 return res.json();
             })
             .then(raw => {
-                return (raw.data || raw).map(c => ({
+                const list = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
+                return list.map(c => ({
                     sha: c.sha,
                     message: c.commit?.message || c.message || "Saved moment",
                     date: c.commit?.author?.date || c.date || null
@@ -371,7 +372,7 @@ class GitDropdownUI {
                     const offlineRepo = result.repository;
                     localStorage.setItem("mbGitRepoName", offlineRepo);
                     localStorage.setItem("mbGitHashedKey", "");
-                    localStorage.setItem("mbGitDisplayName", rawName.trim());
+                    localStorage.setItem("mbGitDisplayName", (displayName || "").trim());
                     this.onSaveLocally();
                     this._syncMenuState();
                     this._showToast(
