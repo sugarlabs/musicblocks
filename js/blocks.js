@@ -41,7 +41,7 @@
         CAMERAVALUE, VIDEOVALUE
    - js/block.js
         Block
-   - js/block-drag-controller.js
+   - js/activity/block-drag-controller.js
         setupBlockDragController
    - js/connection-validator.js
         ConnectionValidator
