@@ -6,16 +6,77 @@
     width: 360px;
     max-width: calc(100vw - 16px);
     height: min(760px, calc(100% - 80px));
-    background: var(--panel-bg, #fdfefe);
     z-index: 9000;
     display: flex;
     flex-direction: column;
+    font-family: "Arial Rounded MT Bold", "Segoe UI", sans-serif;
+    overflow: visible;
+    resize: none;
+    transition:
+        top 0.25s ease,
+        transform 0.25s ease;
+}
+
+.practice-panel-frame {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    background: var(--panel-bg, #fdfefe);
     border: 2px solid var(--border, #e0e0e0);
     border-radius: 8px;
     box-shadow: -4px 0 12px rgba(0, 0, 0, 0.08);
-    font-family: "Arial Rounded MT Bold", "Segoe UI", sans-serif;
     overflow: hidden;
     resize: both;
+}
+
+.practice-panel-collapse-toggle {
+    position: absolute;
+    top: 50%;
+    left: -24px;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    background: var(--accent, #2196f3);
+    border-radius: 30px 0 0 30px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    touch-action: manipulation;
+}
+
+.practice-panel-collapse-toggle:hover {
+    filter: brightness(1.08);
+}
+
+#practice-panel.practice-panel-collapsed,
+#explorer-journal-panel.practice-panel-collapsed {
+    width: 0;
+    height: 52px;
+    min-height: 0;
+    overflow: visible;
+    pointer-events: none;
+}
+
+#practice-panel.practice-panel-collapsed .practice-panel-frame,
+#explorer-journal-panel.practice-panel-collapsed .practice-panel-frame {
+    display: none;
+}
+
+#practice-panel.practice-panel-collapsed .practice-panel-collapse-toggle,
+#explorer-journal-panel.practice-panel-collapsed .practice-panel-collapse-toggle {
+    top: 0;
+    transform: none;
+    pointer-events: auto;
 }
 
 /* === HEADER === */
@@ -39,6 +100,11 @@
 #practice-panel.dragging,
 #explorer-journal-panel.dragging {
     opacity: 0.96;
+    transition: none;
+}
+
+#practice-panel.dragging .practice-panel-frame,
+#explorer-journal-panel.dragging .practice-panel-frame {
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
