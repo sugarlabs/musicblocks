@@ -152,7 +152,7 @@ let MYDEFINES = [
     "activity/block-scale-controller",
     "activity/context-menu-controller",
     "search-ui",
-    "keyboard-controller",
+    "activity/keyboard-controller",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
