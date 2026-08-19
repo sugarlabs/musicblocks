@@ -2270,27 +2270,39 @@ function MusicKeyboard(activity) {
             const newBlock = this.activity.blocks.blockList.length;
 
             if (label === "pitch") {
-                let i;
-                for (i = 0; i < pitchLabels.length; i++) {
-                    let lastNote,
-                        c = this.layout.length - 1;
-                    while (c > -1) {
-                        if (this.layout[c].noteName !== "hertz") {
+                // Find the most-recent non-hertz note in the layout so we can
+                // pick the next pitch in sequence. This lookup is done once,
+                // before the search loop, because it only depends on the layout
+                // (not on the loop variable i).
+                let lastNote = null;
+                let c = this.layout.length - 1;
+                while (c > -1) {
+                    if (this.layout[c].noteName !== "hertz") {
+                        break;
+                    }
+                    c--;
+                }
+                if (this.layout[c] && this.layout[c].noteName !== "hertz") {
+                    lastNote = this.layout[c].noteName;
+                }
+
+                // Find the index in pitchLabels that matches the last pitch.
+                // When the layout contains only hertz entries (lastNote is null)
+                // there is no reference pitch, so we start from index 0 ("do").
+                let i = 0;
+                if (lastNote !== null) {
+                    for (i = 0; i < pitchLabels.length; i++) {
+                        if (
+                            pitchLabels[i].includes(lastNote) ||
+                            lastNote.includes(pitchLabels[i])
+                        ) {
                             break;
                         }
-                        c--;
                     }
-                    if (this.layout[c] && this.layout[c].noteName !== "hertz") {
-                        lastNote = this.layout[c].noteName;
-                    } else {
-                        lastNote = null;
-                    }
-
-                    if (
-                        lastNote !== null &&
-                        (pitchLabels[i].includes(lastNote) || lastNote.includes(pitchLabels[i]))
-                    ) {
-                        break;
+                    // If no match was found (shouldn't happen with a valid note),
+                    // reset to 0 so the do-while below starts from a safe index.
+                    if (i >= pitchLabels.length) {
+                        i = 0;
                     }
                 }
 
@@ -2306,12 +2318,16 @@ function MusicKeyboard(activity) {
                         break;
                     }
                 } while (this.layout.some(note => note.noteName === rLabel));
+
+                // Find the octave to use from the most recent pitch entry.
+                // When all layout entries are hertz, their noteOctave values are
+                // large frequency numbers (e.g. 392) which fail the 1–8 octave
+                // range check. Default to octave 4 in that case.
+                rArg = 4;
                 for (let j = this.layout.length; j > 0; j--) {
-                    rArg = this.layout[j - 1].noteOctave;
-                    if (isNaN(rArg)) {
-                        continue;
-                    }
-                    if (rArg > 0 && rArg < 9) {
+                    const oct = this.layout[j - 1].noteOctave;
+                    if (!isNaN(oct) && oct > 0 && oct < 9) {
+                        rArg = oct;
                         break;
                     }
                 }

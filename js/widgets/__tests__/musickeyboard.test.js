@@ -166,12 +166,135 @@ describe("MusicKeyboard add-row submenu", () => {
 
         keyboard._createAddRowPieSubmenu();
 
+        // Must not throw (the original bug: TypeError on null.includes).
         expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
+        // When all layout entries are hertz there is no reference pitch, so the
+        // widget starts from index 0 ("do") and picks the next unused pitch.
+        // Because no pitch entries exist, "do♯" (index 1) is the first to add.
+        // The octave must be the safe default 4, NOT a raw hertz frequency.
         expect(loadNewBlocks).toHaveBeenCalledWith([
             [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
-            [1, ["solfege", { value: "do♯" }], 0, 0, [0]],
-            [2, ["number", { value: 392 }], 0, 0, [0]]
+            [1, ["solfege", { value: "do\u266f" }], 0, 0, [0]],
+            [2, ["number", { value: 4 }], 0, 0, [0]]
         ]);
+    });
+
+    test("uses octave 4 as the default when every layout entry is a hertz row", () => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            }
+        });
+
+        // Layout has only one hertz entry with a large frequency value.
+        keyboard.layout = [{ noteName: "hertz", noteOctave: 440, blockNumber: 100001 }];
+
+        keyboard._createAddRowPieSubmenu();
+        keyboard._menuWheel.navItems[0].navigateFunction();
+
+        // The octave argument in the loadNewBlocks call must be 4 (valid musical
+        // octave), not 440 (which is a frequency in Hz, not a valid octave).
+        const calledArgs = loadNewBlocks.mock.calls[0][0];
+        const octaveBlock = calledArgs.find(
+            block => Array.isArray(block[1]) && block[1][0] === "number"
+        );
+        expect(octaveBlock[1][1].value).toBe(4);
+    });
+
+    test("bumps the octave when adding 'ti' (due to existing code logic)", () => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            }
+        });
+
+        // The current code bumps the octave when `(i + 1) % 12 === 0`, which is when i=11 ('ti').
+        // Add 'la♯' at octave 4. Next pitch will be 'ti' (index 11).
+        keyboard.layout = [{ noteName: "la\u266f", noteOctave: 4, blockNumber: 100001 }];
+
+        keyboard._createAddRowPieSubmenu();
+        keyboard._menuWheel.navItems[0].navigateFunction();
+
+        const calledArgs = loadNewBlocks.mock.calls[0][0];
+        const octaveBlock = calledArgs.find(
+            block => Array.isArray(block[1]) && block[1][0] === "number"
+        );
+        expect(octaveBlock[1][1].value).toBe(5);
+    });
+
+    test("resets to index 0 when last note does not match any pitch label", () => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            }
+        });
+
+        // Add a note with an invalid noteName. It shouldn't match any pitchLabel.
+        // It will reset `i` to 0, which corresponds to 'do'. The next pitch to add is 'do♯' (index 1).
+        keyboard.layout = [{ noteName: "invalid_pitch", noteOctave: 4, blockNumber: 100001 }];
+
+        keyboard._createAddRowPieSubmenu();
+        keyboard._menuWheel.navItems[0].navigateFunction();
+
+        const calledArgs = loadNewBlocks.mock.calls[0][0];
+        const pitchBlock = calledArgs.find(
+            block => Array.isArray(block[1]) && block[1][0] === "solfege"
+        );
+        expect(pitchBlock[1][1].value).toBe("do\u266f");
+    });
+
+    test("shows an error message when all 12 pitches are already in the layout", () => {
+        const loadNewBlocks = jest.fn();
+        const errorMsg = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            },
+            errorMsg
+        });
+
+        const pitchLabels = [
+            "do",
+            "do♯",
+            "re",
+            "re♯",
+            "mi",
+            "fa",
+            "fa♯",
+            "sol",
+            "sol♯",
+            "la",
+            "la♯",
+            "ti"
+        ];
+
+        keyboard.layout = pitchLabels.map((name, index) => ({
+            noteName: name,
+            noteOctave: 4,
+            blockNumber: 100001 + index
+        }));
+
+        keyboard._createAddRowPieSubmenu();
+        keyboard._menuWheel.navItems[0].navigateFunction();
+
+        expect(errorMsg).toHaveBeenCalledWith(
+            "All 12 pitches are already in the keyboard. Adding duplicate."
+        );
     });
 
     test("logs via debugLog for unrecognized label and when no valid aboveBlock exists", () => {
