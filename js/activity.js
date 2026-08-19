@@ -690,7 +690,7 @@ class Activity {
         //if any window resize event occurs:
         this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
-        // Sets up HelpController (js/help-controller.js), which owns the help
+        // Sets up HelpController (js/activity/help-controller.js), which owns the help
         // window, about page, keyboard shortcuts dialog, statistics window,
         // JavaScript editor launch, and the Alt-H save-help-block workflow.
         // this.showHelp, this.showAboutPage, this.showKeyboardShortcuts,
