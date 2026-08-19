@@ -2735,9 +2735,6 @@ class Activity {
                 event.currentTarget.value = "";
             });
 
-            // Enable touch interactions if supported on the current device.
-            createjs.Touch.enable(this.stage, false, true);
-
             // Keep tracking the mouse even when it leaves the canvas.
             this.stage.mouseMoveOutside = true;
 
