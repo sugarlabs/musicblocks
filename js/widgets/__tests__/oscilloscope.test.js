@@ -466,6 +466,17 @@ describe("Oscilloscope", () => {
             expect(osc.pitchAnalysers).toEqual({});
         });
 
+        test("catches errors if dispose throws during pitchAnalysers cleanup", () => {
+            const osc = createOscilloscope();
+            const failingDispose = jest.fn(() => {
+                throw new Error("AudioContext closed");
+            });
+            osc.pitchAnalysers = { 0: { dispose: failingDispose } };
+
+            expect(() => osc.close()).not.toThrow();
+            expect(failingDispose).toHaveBeenCalled();
+            expect(osc.pitchAnalysers).toEqual({});
+        });
         test("calls widgetWindow.destroy", () => {
             const osc = createOscilloscope();
 
