@@ -390,6 +390,10 @@ function setupRhythmActions(activity) {
         static multiplyNoteValue(factor, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            if (typeof factor !== "number" || isNaN(factor) || factor === 0) {
+                return;
+            }
+
             tur.singer.beatFactor /= factor;
 
             const listenerName = "_multiplybeat_" + turtle;
@@ -422,6 +426,12 @@ function setupRhythmActions(activity) {
             if (tur.singer.suppressOutput) {
                 activity.logo.notation.notationSwing(turtle);
             } else {
+                if (typeof swingValue !== "number" || isNaN(swingValue) || swingValue === 0) {
+                    return;
+                }
+                if (typeof noteValue !== "number" || isNaN(noteValue) || noteValue === 0) {
+                    return;
+                }
                 tur.singer.swing.push(1 / swingValue);
                 tur.singer.swingTarget.push(1 / noteValue);
             }
