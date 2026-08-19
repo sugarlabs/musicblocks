@@ -689,6 +689,32 @@ describe("Blocks Foundation", () => {
             expect(mockActivity._suppressRefresh).toBe(false);
         });
 
+        it("detects and rejects multi-block cycles in loadNewBlocks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+
+            // Multi-block cycle: 0 -> 1 -> 0
+            const twoBlockCycle = [
+                [0, "forward", 0, 0, [null, 1]],
+                [1, "forward", 0, 0, [null, 0]]
+            ];
+
+            mockActivity._suppressRefresh = true;
+            blocks.loadNewBlocks(twoBlockCycle);
+            expect(mockActivity._suppressRefresh).toBe(false);
+
+            // Three-block cycle: 0 -> 1 -> 2 -> 0
+            const threeBlockCycle = [
+                [0, "forward", 0, 0, [null, 1]],
+                [1, "forward", 0, 0, [null, 2]],
+                [2, "forward", 0, 0, [null, 0]]
+            ];
+
+            mockActivity._suppressRefresh = true;
+            blocks.loadNewBlocks(threeBlockCycle);
+            expect(mockActivity._suppressRefresh).toBe(false);
+        });
+
         it("resets _suppressRefresh after cleanupAfterLoad finishes", async () => {
             const blocks = new Blocks(mockActivity);
             blocks._loadCounter = 1;
