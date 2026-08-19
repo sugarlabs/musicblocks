@@ -168,7 +168,7 @@ class Blocks {
         this._deferCheckBounds = false;
 
         /** We keep a dictionary for the proto blocks, */
-        this.protoBlockDict = {};
+        this.protoBlockDict = Object.create(null);
         /** and a list of the blocks we create. */
         this.blockList = [];
 

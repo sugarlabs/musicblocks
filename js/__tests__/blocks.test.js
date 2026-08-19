@@ -677,6 +677,23 @@ describe("Blocks Foundation", () => {
             expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
         });
 
+        it.each(["toString", "constructor", "hasOwnProperty", "valueOf", "__proto__"])(
+            "loads a block named '%s' without throwing",
+            reservedName => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.newStorein2Block = jest.fn();
+                blocks.newNamedboxBlock = jest.fn();
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks.customTemperamentDefined = true;
+                blocks._makeNewBlockWithConnections = jest.fn();
+
+                const blockObjs = [[0, reservedName, 0, 0, [null, null, null]]];
+
+                expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            }
+        );
+
         it("resets _suppressRefresh on circular connection early return", () => {
             const blocks = new Blocks(mockActivity);
             blocks.blockList = [];

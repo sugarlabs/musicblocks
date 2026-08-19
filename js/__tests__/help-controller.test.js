@@ -301,6 +301,25 @@ describe("HelpController.saveHelpBlocks", () => {
         );
     });
 
+    test("loads the block directly when protoBlockDict has no prototype chain", () => {
+        // blocks.js builds protoBlockDict via Object.create(null), so
+        // helper code reading it can't rely on inherited Object.prototype
+        // methods like .hasOwnProperty() being present.
+        const activity = makeActivity();
+        activity.blocks.protoBlockDict = Object.assign(Object.create(null), {
+            empty: { helpString: "" },
+            note: { helpString: ["a", "b", "c"] }
+        });
+        const controller = new HelpController(activity);
+
+        expect(() => {
+            controller.saveHelpBlocks();
+            jest.advanceTimersByTime(1000 + 500);
+        }).not.toThrow();
+
+        expect(activity.palettes.dict.paletteName.makeBlockFromSearch).toHaveBeenCalled();
+    });
+
     test("loads a macro when the help block message points to a macro name", () => {
         const activity = makeActivity();
         activity.blocks.protoBlockDict = {
