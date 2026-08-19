@@ -745,6 +745,15 @@ describe("_() i18n translation", () => {
         expect(_("test")).toBe("漢字");
     });
 
+    it("falls back to kanji when localStorage.getItem throws", () => {
+        i18next.language = "ja";
+        getItemSpy.mockImplementation(() => {
+            throw new Error("SecurityError: storage disabled");
+        });
+        i18next.t.mockReturnValue({ kanji: "漢字", kana: "かな" });
+        expect(_("test")).toBe("漢字");
+    });
+
     it("returns key when Japanese translation object lacks the script key", () => {
         i18next.language = "ja";
         getItemSpy.mockReturnValue("kanji");
