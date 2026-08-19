@@ -253,6 +253,7 @@ requirejs.config({
         "activity/block-drag-controller": "js/activity/block-drag-controller",
         "activity/trash-controller": "js/activity/trash-controller",
         "activity/help-controller": "js/activity/help-controller",
+        "activity/context-menu-controller": "js/activity/context-menu-controller",
         "search-ui": "js/search-ui",
         "project-manager": "js/project-manager",
         "activity/keyboard-controller": "js/activity/keyboard-controller",
