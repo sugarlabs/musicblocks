@@ -295,6 +295,16 @@ describe("widgetWindows", () => {
             expect(clickSpy).toHaveBeenCalled();
         });
 
+        test("updates the accessible label when the button changes", () => {
+            const win = createTestWindow();
+            const btn = win.addButton("play.svg", 24, "Play");
+
+            win.modifyButton(0, "stop.svg", 24, "Stop");
+
+            expect(btn.getAttribute("aria-label")).toBe("Stop");
+            expect(btn.querySelector("img").getAttribute("alt")).toBe("Stop");
+        });
+
         test("adds button to _buttons array", () => {
             const win = createTestWindow();
             expect(win._buttons).toHaveLength(0);

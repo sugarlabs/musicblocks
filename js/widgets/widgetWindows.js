@@ -490,6 +490,7 @@ class WidgetWindow {
         img.height = iconSize;
         img.width = iconSize;
         this._buttons[index].replaceChildren(img);
+        this._buttons[index].setAttribute("aria-label", label);
         return this._buttons[index];
     }
 
