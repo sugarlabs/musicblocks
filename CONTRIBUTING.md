@@ -165,7 +165,7 @@ Follow these steps when contributing:
 4.  Commit with clear, descriptive messages:
 
     ```
-    git commit -m "docs: add AI contribution guidelines (Related to #XXXX)"
+    git commit -s -m "docs: add AI contribution guidelines (Related to #XXXX)"
     ```
 
 5.  Push your branch:
