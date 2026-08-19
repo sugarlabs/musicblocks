@@ -4813,22 +4813,74 @@ class Blocks {
                     blockObjs.pop();
                 }
 
-                /** Check for blocks connected to themselves, */
-                /** and for action blocks not connected to text blocks. */
-                for (let b = 0; b < blockObjs.length; b++) {
-                    const blkData = blockObjs[b];
+                /** Check for circular connections in block data using iterative DFS. */
+                const hasCycle = () => {
+                    const adj = new Map();
+                    for (let b = 0; b < blockObjs.length; b++) {
+                        const blkData = blockObjs[b];
+                        const id = blkData[0];
+                        const connections = blkData[4] || [];
 
-                    for (const c in blkData[4]) {
-                        if (blkData[4][c] === blkData[0]) {
-                            console.debug("Circular connection in block data: " + blkData);
+                        // All non-null connections (including parent dock 0)
+                        const neighbors = [];
+                        for (let c = 0; c < connections.length; c++) {
+                            const connId = connections[c];
+                            if (connId !== null && connId !== undefined) {
+                                neighbors.push(connId);
+                            }
+                        }
+                        adj.set(id, neighbors);
+                    }
 
-                            console.debug("Punting loading of new blocks!");
+                    const visited = new Set();
+                    const activeStack = new Set();
 
-                            console.debug(blockObjs);
-                            this.activity._suppressRefresh = false;
-                            return;
+                    for (let b = 0; b < blockObjs.length; b++) {
+                        const startId = blockObjs[b][0];
+                        if (visited.has(startId)) {
+                            continue;
+                        }
+
+                        // Stack stores tuple: [nodeId, neighborIndex]
+                        const stack = [[startId, 0]];
+                        visited.add(startId);
+                        activeStack.add(startId);
+
+                        while (stack.length > 0) {
+                            const top = stack[stack.length - 1];
+                            const nodeId = top[0];
+                            const neighborIndex = top[1];
+                            const neighbors = adj.get(nodeId) || [];
+
+                            if (neighborIndex < neighbors.length) {
+                                top[1]++;
+                                const neighborId = neighbors[neighborIndex];
+
+                                if (activeStack.has(neighborId)) {
+                                    return true;
+                                }
+
+                                if (!visited.has(neighborId)) {
+                                    visited.add(neighborId);
+                                    activeStack.add(neighborId);
+                                    stack.push([neighborId, 0]);
+                                }
+                            } else {
+                                activeStack.delete(nodeId);
+                                stack.pop();
+                            }
                         }
                     }
+                    return false;
+                };
+
+                if (hasCycle()) {
+                    console.warn(
+                        "Circular connection detected in block data. Punting loading of new blocks!"
+                    );
+                    console.debug("Circular block data:", blockObjs);
+                    this.activity._suppressRefresh = false;
+                    return;
                 }
 
                 /** We'll need a list of existing storein and action names. */
