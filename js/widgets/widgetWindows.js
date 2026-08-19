@@ -100,8 +100,8 @@ window.widgetWindows = {
         }
 
         const windows = Object.values(this.openWindows).filter(win => win !== undefined);
-        let clickedWindow = null;
 
+        let clickedWindow = null;
         for (let i = 0; i < windows.length; i++) {
             const win = windows[i];
             if (win._frame && (e.target === win._frame || win._frame.contains(e.target))) {

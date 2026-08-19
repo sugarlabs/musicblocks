@@ -821,7 +821,6 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.openWindows["FallbackTitle"]).toBe(win);
         });
     });
-
     describe("_handleGlobalMouseDown and focus management", () => {
         test("focuses clicked window and dims other windows", () => {
             const win1 = createTestWindow("Window 1");
@@ -850,6 +849,7 @@ describe("widgetWindows", () => {
 
             win2._widget.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
             expect(window.widgetWindows.focused).toBe(win2);
+
             expect(win2._frame.style.opacity).toBe("1");
             expect(win2._frame.style.zIndex).toBe("10000");
             expect(win1._frame.style.opacity).toBe("0.7");
