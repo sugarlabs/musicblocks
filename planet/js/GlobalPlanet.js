@@ -501,6 +501,12 @@ class GlobalPlanet {
         );
     }
 
+    destroy() {
+        if (this.ProjectViewer) {
+            this.ProjectViewer.destroy();
+        }
+    }
+
     init() {
         const Planet = this.Planet;
 

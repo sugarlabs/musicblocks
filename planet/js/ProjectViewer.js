@@ -188,8 +188,6 @@ class ProjectViewer {
     }
 
     init() {
-        this.destroy(); // ensure any previous listeners are cleared
-
         const register = (elemId, type, handler) => {
             const el = document.getElementById(elemId);
             if (!el) return;
