@@ -142,10 +142,10 @@ function setupRhythmActions(activity) {
                 if (tur.singer.inNoteBlock.length > 0) {
                     if (tur.singer.inNeighbor.length > 0) {
                         tur.singer.neighborArgBeat.push(
-                            tur.singer.beatFactor * (1 / tur.singer.neighborNoteValue)
+                            tur.singer.beatFactor * (1 / last(tur.singer.neighborNoteValue))
                         );
 
-                        const nextBeat = 1 / noteBeatValue - 2 * tur.singer.neighborNoteValue;
+                        const nextBeat = 1 / noteBeatValue - 2 * last(tur.singer.neighborNoteValue);
                         if (nextBeat <= 0 || !isFinite(nextBeat)) {
                             activity.errorMsg(
                                 _(
