@@ -30,6 +30,9 @@ class StatsWindow {
         this.widgetWindow = window.widgetWindows.windowFor(this, "stats", "stats");
         this.widgetWindow.clear();
         this.widgetWindow.show();
+        this.widgetWindow.addButton("reload.svg", 32, _("Refresh")).onclick = () => {
+            this.refresh();
+        };
         this.widgetWindow.onclose = () => {
             this.isOpen = false;
             this.activity.blocks.showBlocks();
@@ -65,6 +68,26 @@ class StatsWindow {
             this.doAnalytics();
         };
         this.widgetWindow.sendToCenter();
+    }
+
+    /**
+     * Re-runs analytics and updates the chart display.
+     * @public
+     * @returns {void}
+     */
+    refresh() {
+        this.widgetWindow.getWidgetBody().replaceChildren();
+        if (typeof window.Chart !== "undefined") {
+            this.doAnalytics();
+        } else {
+            this._ensureChartLoaded()
+                .then(() => {
+                    this.doAnalytics();
+                })
+                .catch(err => {
+                    console.error("Failed to load Chart.js:", err);
+                });
+        }
     }
 
     /**
