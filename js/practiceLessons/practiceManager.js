@@ -24,7 +24,7 @@ const normalizeGeneralNote = note => {
 
     return {
         id: note.id,
-        title: note.title || "Untitled Note",
+        title: note.title || _("Untitled Note"),
         createdAt: note.createdAt || new Date().toISOString(),
         updatedAt: note.updatedAt || new Date().toISOString(),
         artifacts: {
@@ -238,7 +238,7 @@ const PracticeManager = {
 
     createGeneralNote(title, initialText) {
         const now = Date.now();
-        const trimmedTitle = String(title || "").trim() || "Untitled Note";
+        const trimmedTitle = String(title || "").trim() || _("Untitled Note");
         const trimmedText = String(initialText || "").trim();
         const page = normalizeGeneralNote({
             id: `general-${now}`,
@@ -252,7 +252,7 @@ const PracticeManager = {
             page.artifacts.notes.push({
                 id: `note-general-${now}`,
                 type: "text",
-                prompt: "My thought",
+                prompt: _("My thought"),
                 text: trimmedText,
                 createdAt: new Date(now).toISOString(),
                 updatedAt: new Date(now).toISOString()
@@ -273,7 +273,7 @@ const PracticeManager = {
         const page = this.journal.generalNotes?.find(item => item.id === notePageId);
         if (!page) return null;
 
-        page.title = String(title || "").trim() || "Untitled Note";
+        page.title = String(title || "").trim() || _("Untitled Note");
         page.updatedAt = new Date().toISOString();
         this.saveJournal();
 
@@ -293,7 +293,7 @@ const PracticeManager = {
             createdAt: new Date(now).toISOString()
         };
 
-        note.prompt = "My thought";
+        note.prompt = _("My thought");
         note.text = trimmedText;
         note.updatedAt = new Date(now).toISOString();
 

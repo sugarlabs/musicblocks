@@ -7210,5 +7210,361 @@
   "low": {
     "kanji": "低",
     "kana": "低"
+  },
+  "Collapse Lesson Plans": {
+    "kanji": "レッスンプランをたたむ",
+    "kana": "レッスンプランをたたむ"
+  },
+  "Collapse Explorer Journal": {
+    "kanji": "たんけん日記をたたむ",
+    "kana": "たんけん日記をたたむ"
+  },
+  "Expand Lesson Plans": {
+    "kanji": "レッスンプランをひらく",
+    "kana": "レッスンプランをひらく"
+  },
+  "Expand Explorer Journal": {
+    "kanji": "たんけん日記をひらく",
+    "kana": "たんけん日記をひらく"
+  },
+  "Practice Lessons Not Ready": {
+    "kanji": "れんしゅうレッスンのじゅんびができていません",
+    "kana": "れんしゅうレッスンのじゅんびができていません"
+  },
+  "The lesson file could not be loaded. Please check js/practiceLessons/practiceLessons.json.": {
+    "kanji": "レッスンのファイルを読みこめませんでした。js/practiceLessons/practiceLessons.json をたしかめてください。",
+    "kana": "レッスンのファイルを読みこめませんでした。js/practiceLessons/practiceLessons.json をたしかめてください。"
+  },
+  "Practice": {
+    "kanji": "れんしゅう",
+    "kana": "れんしゅう"
+  },
+  "Level": {
+    "kanji": "レベル",
+    "kana": "レベル"
+  },
+  "Back": {
+    "kanji": "もどる",
+    "kana": "もどる"
+  },
+  "Check My Work": {
+    "kanji": "できたかチェック",
+    "kana": "できたかチェック"
+  },
+  "Quest Rewards": {
+    "kanji": "ぼうけんのごほうび",
+    "kana": "ぼうけんのごほうび"
+  },
+  "Discoveries": {
+    "kanji": "はっけん",
+    "kana": "はっけん"
+  },
+  "The lesson song shines, and the island answers.": {
+    "kanji": "レッスンの歌がかがやき、島がこたえます。",
+    "kana": "レッスンの歌がかがやき、島がこたえます。"
+  },
+  "Melody Fragment restored. Captain's Journal Page found.": {
+    "kanji": "メロディのかけらを取りもどしました。船長の日記のページを見つけました。",
+    "kana": "メロディのかけらを取りもどしました。船長の日記のページを見つけました。"
+  },
+  "The bridge song is still shining.": {
+    "kanji": "橋の歌はまだかがやいています。",
+    "kana": "橋の歌はまだかがやいています。"
+  },
+  "Discovery Already Saved": {
+    "kanji": "はっけんはもう保存ずみです",
+    "kana": "はっけんはもう保存ずみです"
+  },
+  "Lyra has this mark in her map. Keep exploring the island for another secret.": {
+    "kanji": "ライラの地図にはもうこのしるしがあります。べつのひみつをさがして、島をたんけんしつづけましょう。",
+    "kana": "ライラの地図にはもうこのしるしがあります。べつのひみつをさがして、島をたんけんしつづけましょう。"
+  },
+  "Hidden Discovery": {
+    "kanji": "かくれた発見",
+    "kana": "かくれた発見"
+  },
+  "The Bridge Is Still Sleeping": {
+    "kanji": "橋はまだねむっています",
+    "kana": "橋はまだねむっています"
+  },
+  "Beat hears a few echoes, but the stone tablet is waiting for A A B A. Try the bridge song again, then press Check My Work.": {
+    "kanji": "ビートにはこだまが少し聞こえますが、石のいたは A A B A を待っています。もう一度橋の歌をためして、できたかチェックをおしてください。",
+    "kana": "ビートにはこだまが少し聞こえますが、石のいたは A A B A を待っています。もう一度橋の歌をためして、できたかチェックをおしてください。"
+  },
+  "Discovery badge": {
+    "kanji": "はっけんバッジ",
+    "kana": "はっけんバッジ"
+  },
+  "Explorer Journal": {
+    "kanji": "たんけん日記",
+    "kana": "たんけん日記"
+  },
+  "My Explorer Book": {
+    "kanji": "わたしのたんけんノート",
+    "kana": "わたしのたんけんノート"
+  },
+  "Memories from every island you have helped wake up.": {
+    "kanji": "きみが目ざめさせた島じまの思い出です。",
+    "kana": "きみが目ざめさせた島じまの思い出です。"
+  },
+  "Island Pages": {
+    "kanji": "島のページ",
+    "kana": "島のページ"
+  },
+  "My Notes": {
+    "kanji": "わたしのメモ",
+    "kana": "わたしのメモ"
+  },
+  "Save your own ideas, drawings-in-words, or music thoughts here.": {
+    "kanji": "じぶんのアイデアや、ことばでかいた絵、音楽について思ったことをここに残しましょう。",
+    "kana": "じぶんのアイデアや、ことばでかいた絵、音楽について思ったことをここに残しましょう。"
+  },
+  "Add new note": {
+    "kanji": "新しいメモをくわえる",
+    "kana": "新しいメモをくわえる"
+  },
+  "+ New Note": {
+    "kanji": "+ 新しいメモ",
+    "kana": "+ 新しいメモ"
+  },
+  "Page": {
+    "kanji": "ページ",
+    "kana": "ページ"
+  },
+  "Notes": {
+    "kanji": "メモ",
+    "kana": "メモ"
+  },
+  "Entries": {
+    "kanji": "書きこみ",
+    "kana": "書きこみ"
+  },
+  "New Note": {
+    "kanji": "新しいメモ",
+    "kana": "新しいメモ"
+  },
+  "Title": {
+    "kanji": "タイトル",
+    "kana": "タイトル"
+  },
+  "Give your note a name...": {
+    "kanji": "メモに名前をつけよう...",
+    "kana": "メモに名前をつけよう..."
+  },
+  "First thought": {
+    "kanji": "さいしょに思ったこと",
+    "kana": "さいしょに思ったこと"
+  },
+  "Write anything you want to remember...": {
+    "kanji": "おぼえておきたいことを何でも書こう...",
+    "kana": "おぼえておきたいことを何でも書こう..."
+  },
+  "Save Note": {
+    "kanji": "メモを保存する",
+    "kana": "メモを保存する"
+  },
+  "Blank Page Waiting": {
+    "kanji": "白いページが待っています",
+    "kana": "白いページが待っています"
+  },
+  "Add a title or a thought first, or come back when you are ready.": {
+    "kanji": "さきにタイトルか思ったことを書くか、じゅんびができたらもどってきてね。",
+    "kana": "さきにタイトルか思ったことを書くか、じゅんびができたらもどってきてね。"
+  },
+  "Note Saved": {
+    "kanji": "メモを保存しました",
+    "kana": "メモを保存しました"
+  },
+  "Your personal note is tucked safely in My Notes.": {
+    "kanji": "きみのメモは「わたしのメモ」にしまわれました。",
+    "kana": "きみのメモは「わたしのメモ」にしまわれました。"
+  },
+  "Add another thought": {
+    "kanji": "べつの思いつきをくわえる",
+    "kana": "べつの思いつきをくわえる"
+  },
+  "Write more here...": {
+    "kanji": "ここにもっと書こう...",
+    "kana": "ここにもっと書こう..."
+  },
+  "Add Entry": {
+    "kanji": "書きこみをくわえる",
+    "kana": "書きこみをくわえる"
+  },
+  "Delete Note": {
+    "kanji": "メモをけす",
+    "kana": "メモをけす"
+  },
+  "Note Removed": {
+    "kanji": "メモをけしました",
+    "kana": "メモをけしました"
+  },
+  "That personal note has been cleared from your book.": {
+    "kanji": "そのメモはノートからけしました。",
+    "kana": "そのメモはノートからけしました。"
+  },
+  "Entry Added": {
+    "kanji": "書きこみをくわえました",
+    "kana": "書きこみをくわえました"
+  },
+  "Another thought has been added to your note.": {
+    "kanji": "メモにべつの思いつきがくわわりました。",
+    "kana": "メモにべつの思いつきがくわわりました。"
+  },
+  "Entry Removed": {
+    "kanji": "書きこみをけしました",
+    "kana": "書きこみをけしました"
+  },
+  "That entry has been removed from your note.": {
+    "kanji": "その書きこみはメモからけしました。",
+    "kana": "その書きこみはメモからけしました。"
+  },
+  "Things I learned": {
+    "kanji": "おぼえたこと",
+    "kana": "おぼえたこと"
+  },
+  "Add a new memory": {
+    "kanji": "新しい思い出をくわえる",
+    "kana": "新しい思い出をくわえる"
+  },
+  "Today I discovered...": {
+    "kanji": "きょう見つけたのは...",
+    "kana": "きょう見つけたのは..."
+  },
+  "Add Note": {
+    "kanji": "メモをくわえる",
+    "kana": "メモをくわえる"
+  },
+  "Note Added": {
+    "kanji": "メモをくわえました",
+    "kana": "メモをくわえました"
+  },
+  "A new memory has been tucked into this page.": {
+    "kanji": "このページに新しい思い出をしまいました。",
+    "kana": "このページに新しい思い出をしまいました。"
+  },
+  "That memory has been removed from this page.": {
+    "kanji": "その思い出はこのページからけしました。",
+    "kana": "その思い出はこのページからけしました。"
+  },
+  "Note Updated": {
+    "kanji": "メモを書きかえました",
+    "kana": "メモを書きかえました"
+  },
+  "Your Explorer Book remembers the new version.": {
+    "kanji": "たんけんノートは新しいほうをおぼえています。",
+    "kana": "たんけんノートは新しいほうをおぼえています。"
+  },
+  "Title Updated": {
+    "kanji": "タイトルを書きかえました",
+    "kana": "タイトルを書きかえました"
+  },
+  "Your note title has been saved.": {
+    "kanji": "メモのタイトルを保存しました。",
+    "kana": "メモのタイトルを保存しました。"
+  },
+  "That memory has been removed.": {
+    "kanji": "その思い出をけしました。",
+    "kana": "その思い出をけしました。"
+  },
+  "Write a small memory first, or come back when you are ready.": {
+    "kanji": "さきに小さな思い出を書くか、じゅんびができたらもどってきてね。",
+    "kana": "さきに小さな思い出を書くか、じゅんびができたらもどってきてね。"
+  },
+  "No notes yet": {
+    "kanji": "まだメモはありません",
+    "kana": "まだメモはありません"
+  },
+  "This page is ready whenever you want to write.": {
+    "kanji": "書きたくなったら、いつでもこのページが待っています。",
+    "kana": "書きたくなったら、いつでもこのページが待っています。"
+  },
+  "Your book is waiting": {
+    "kanji": "ノートが待っています",
+    "kana": "ノートが待っています"
+  },
+  "Complete a practice level and Captain Cadence will share the first page.": {
+    "kanji": "れんしゅうのレベルをクリアすると、ケイデンス船長が最初のページをくれます。",
+    "kana": "れんしゅうのレベルをクリアすると、ケイデンス船長が最初のページをくれます。"
+  },
+  "Close Explorer Journal prompt": {
+    "kanji": "たんけん日記のメッセージをとじる",
+    "kana": "たんけん日記のメッセージをとじる"
+  },
+  "Captain's Journal": {
+    "kanji": "船長の日記",
+    "kana": "船長の日記"
+  },
+  "Every explorer notices something different. Before you sail onward, save one tiny memory from today.": {
+    "kanji": "たんけん家はそれぞれちがうことに気づきます。つぎへ出発する前に、きょうの小さな思い出をひとつ残しましょう。",
+    "kana": "たんけん家はそれぞれちがうことに気づきます。つぎへ出発する前に、きょうの小さな思い出をひとつ残しましょう。"
+  },
+  "What surprised you today?": {
+    "kanji": "きょう、おどろいたことは何ですか。",
+    "kana": "きょう、おどろいたことは何ですか。"
+  },
+  "I discovered...": {
+    "kanji": "見つけたのは...",
+    "kana": "見つけたのは..."
+  },
+  "Skip": {
+    "kanji": "スキップ",
+    "kana": "スキップ"
+  },
+  "Explorer Book Updated": {
+    "kanji": "たんけんノートを書きかえました",
+    "kana": "たんけんノートを書きかえました"
+  },
+  "Captain Cadence saves your page. You can edit it later from Help > Explorer Journal.": {
+    "kanji": "ケイデンス船長がページを保存しました。あとから ヘルプ > たんけん日記 で書きかえられます。",
+    "kana": "ケイデンス船長がページを保存しました。あとから ヘルプ > たんけん日記 で書きかえられます。"
+  },
+  "Page Saved For Later": {
+    "kanji": "ページはあとのために残しました",
+    "kana": "ページはあとのために残しました"
+  },
+  "The Explorer Book keeps a blank page ready whenever you want to write.": {
+    "kanji": "たんけんノートは、書きたくなったときのために白いページをいつも用意しています。",
+    "kana": "たんけんノートは、書きたくなったときのために白いページをいつも用意しています。"
+  },
+  "Saved in your journal": {
+    "kanji": "日記に保存ずみ",
+    "kana": "日記に保存ずみ"
+  },
+  "Untitled Note": {
+    "kanji": "名前のないメモ",
+    "kana": "名前のないメモ"
+  },
+  "My thought": {
+    "kanji": "思ったこと",
+    "kana": "思ったこと"
+  },
+  "Practice levels": {
+    "kanji": "れんしゅうレベル",
+    "kana": "れんしゅうレベル"
+  },
+  "Try this": {
+    "kanji": "やってみよう",
+    "kana": "やってみよう"
+  },
+  "What does this mean in music?": {
+    "kanji": "音楽ではどんな意味?",
+    "kana": "音楽ではどんな意味?"
+  },
+  "What it means in music": {
+    "kanji": "音楽での意味",
+    "kana": "音楽での意味"
+  },
+  "How do I do it?": {
+    "kanji": "どうやってやるの?",
+    "kana": "どうやってやるの?"
+  },
+  "Changing the octave number keeps the pitch name but makes the note sound higher or lower.": {
+    "kanji": "オクターヴの数字を変えても音の名前はそのままですが、音は高くなったり低くなったりします。",
+    "kana": "オクターヴの数字を変えても音の名前はそのままですが、音は高くなったり低くなったりします。"
+  },
+  "You can rename an Action block to give a music chunk a helpful name.": {
+    "kanji": "アクションブロックの名前を変えると、音楽のかたまりにわかりやすい名前をつけられます。",
+    "kana": "アクションブロックの名前を変えると、音楽のかたまりにわかりやすい名前をつけられます。"
   }
 }

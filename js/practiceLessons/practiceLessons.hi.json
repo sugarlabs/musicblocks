@@ -1,0 +1,608 @@
+{
+    "theme": {
+        "title": "खोई हुई धुन के द्वीप",
+        "subtitle": "छिपे खजाने की खोज",
+        "intro": "\n      <section class=\"story-card\">\n      <h4>कहानी यहाँ से शुरू होती है</h4>\n\n      <div class=\"character-row\" aria-label=\"Meet Lyra and Choon\">\n      <span class=\"character-token lyra-token\">\n        <span class=\"character-name\">\n            Lyra\n        </span>\n\n        <span class=\"character-role\">अन्वेषक</span>\n      </span>\n\n      <span class=\"character-token beat-token\">\n        <span class=\"character-name\">\n            Choon\n        </span>\n        <span class=\"character-role\">संगीत रोबोट</span>\n      </span>\n    </div>\n\n      <p>हर रोमांच के लिए एक टोली चाहिए! <b>लायरा</b> एक निडर अन्वेषक है, और <b>चून</b> उसका खुशमिज़ाज संगीत रोबोट है, जो हर जगह छिपी हुई धुनें सुन सकता है।</p>\n\n      <p>जादुई <b>महान धुन</b>, जो कभी सारे द्वीपों को जोड़ती थी, गायब हो गई है। उसके टुकड़े समुद्र में बिखर गए हैं। संगीत की पहेलियाँ सुलझाओ, छिपी हुई धुनें खोजो, और अपने नए दोस्तों की मदद करो, ताकि द्वीपों के हमेशा के लिए चुप हो जाने से पहले गीत लौट आए।</p>\n    </section>\n    "
+    },
+    "bigBadges": {
+        "echo_island": {
+            "label": "गूँज द्वीप का रक्षक",
+            "shortLabel": "रक्षक",
+            "message": "बड़ा बैज खुला: गूँज द्वीप का रक्षक। द्वीप फिर से संगीत सुन सकता है!"
+        },
+        "harmony_geometry_reef": {
+            "label": "ज्यामिति भित्ति का नाविक",
+            "shortLabel": "नाविक",
+            "message": "बड़ा बैज खुला: ज्यामिति भित्ति का नाविक। अब लायरा भित्ति का आकार-लय नक्शा पढ़ सकती है!"
+        },
+        "broadcast_bay": {
+            "label": "प्रसारण खाड़ी का संकेत-रक्षक",
+            "shortLabel": "संकेत",
+            "message": "बड़ा बैज खुला: प्रसारण खाड़ी का संकेत-रक्षक। अब खाड़ी का हर माउस अपनी पुकार का जवाब देता है!"
+        },
+        "starlight_summit": {
+            "label": "महान धुन का रक्षक",
+            "shortLabel": "महान धुन",
+            "message": "बड़ा बैज खुला: महान धुन का रक्षक। जो गीत कभी सारे द्वीपों को जोड़ता था, वह फिर से पूरा हो गया है।"
+        }
+    },
+    "problems": {
+        "1": {
+            "title": "गूँज द्वीप का पुल",
+            "description": "\n      <section class=\"story-card\">\n        <p>लायरा और चून गूँज द्वीप पर कदम रखते हैं। पुल गायब है, पर समुद्र अब भी गुनगुना रहा है। चून पत्थर पर खुदे एक पुराने गीत-नक्शे की ओर इशारा करता है।</p>\n        <div class=\"bridge-map\" aria-label=\"Bridge song pattern A A B A\">\n          <div class=\"bridge-gate\"></div>\n          <div class=\"bridge-letters\">\n            <span>A</span>\n            <span>A</span>\n            <span>B</span>\n            <span>A</span>\n          </div>\n          <div class=\"bridge-waves\"></div>\n        </div>\n        <p>\"ये निशान आवाज़ें हैं,\" चून धीरे से कहता है। \"अगर हम उन्हें पहले सुन लें, तो पुल को जगा सकते हैं।\"</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>पुल का गीत</h4>\n        <p>अलग पड़े <b>A</b> और <b>B</b> टुकड़ों को बजाकर देखो। जब उनकी आवाज़ जानी-पहचानी लगने लगे, तो उन्हें <b>प्रारंभ</b> के नीचे रखो ताकि वे ऊपर के गीत-नक्शे से मेल खाएँ।</p>\n        <p><b>बजाएं</b> दबाओ। अगर पुल चमकने लगे, तो <b>मेरा काम जाँचें</b> दबाओ।</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>गुप्त रास्ते</h4>\n        <p>पुल उठ जाने के बाद एक छोटा-सा बदलाव करके देखो। हो सकता है द्वीप जवाब दे।</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"changeOctave\">ऑक्टेव बदलो</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">स्थानांतरण का प्रयोग करो</button>\n          <button type=\"button\" data-secret-help=\"makeLonger\">इसे और लंबा बनाओ</button>\n          <button type=\"button\" data-secret-help=\"renameChunks\">टुकड़ों के नाम बदलो</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "गूँज द्वीप",
+                "island": "गूँज द्वीप",
+                "learned": ["पैटर्न", "दोहराने वाले ब्लॉक"]
+            },
+            "rewards": [
+                "धुन का टुकड़ा #1",
+                "कैप्टन की डायरी का पन्ना #1",
+                "खजाने का सुराग: पहला रास्ता वहीं से शुरू होता है जहाँ गूँज दो बार जवाब देती है।"
+            ],
+            "badges": {
+                "bridge_builder": {
+                    "label": "पुल निर्माता",
+                    "shortLabel": "पुल",
+                    "message": "पत्थर की पट्टिका चमकने लगती है। संगीत पूरे द्वीप में गूँजता है और समुद्र से धीरे-धीरे एक चमकीला पुल उठता है।"
+                },
+                "name_keeper": {
+                    "label": "नाम रक्षक",
+                    "shortLabel": "नाम",
+                    "message": "छिपी खोज: नाम रक्षक। लायरा संगीत के नक्शे पर अपने अन्वेषक अंदाज़ में नाम लिखती है।"
+                },
+                "sky_builder": {
+                    "label": "आकाश निर्माता",
+                    "shortLabel": "आकाश",
+                    "message": "छिपी खोज: आकाश निर्माता। पुल और ऊपर, बादलों तक फैल जाता है।"
+                },
+                "melody_shifter": {
+                    "label": "धुन बदलने वाला",
+                    "shortLabel": "बदलाव",
+                    "message": "छिपी खोज: धुन बदलने वाला। पुल एक नए रंग से चमक उठता है।"
+                },
+                "secret_treasure_coin": {
+                    "label": "गुप्त खजाने का सिक्का",
+                    "shortLabel": "सिक्का",
+                    "message": "गुप्त खजाने का सिक्का मिला। तुमने वह रास्ता खोज लिया जो कैप्टन कैडेंस ने कभी दर्ज नहीं किया।"
+                }
+            },
+            "secretHelpCards": {
+                "changeOctave": {
+                    "title": "ऑक्टेव बदलो"
+                },
+                "useTranspose": {
+                    "title": "स्थानांतरण का प्रयोग करो"
+                },
+                "makeLonger": {
+                    "title": "इसे और लंबा बनाओ",
+                    "heading": "आवाज़ को और देर तक चलाओ",
+                    "description": "तुम किसी सुर या रास्ते को लंबा कर सकते हो: गीत के बाद एक और क्रिया-टुकड़ा जोड़कर, अपने पसंदीदा टुकड़े को दोहराकर, या दोबारा बजाने से पहले किसी क्रिया के अंदर और नोट रखकर।<br>संगीत की दृष्टि से इससे धुन को चलने के लिए और समय मिल जाता है, जबकि मुख्य विचार वही रहता है।"
+                },
+                "renameChunks": {
+                    "title": "टुकड़ों के नाम बदलो"
+                }
+            }
+        },
+        "2": {
+            "title": "सकुरा उपवन की गूँज",
+            "description": "\n      <section class=\"story-card\">\n        <p>नए पुल के पार लायरा और चून को एक चुप सकुरा उपवन मिलता है। एक डाल से डायरी का पन्ना फड़फड़ाता हुआ गिरता है: \"फूलों की पुरानी धुन गाओ, और पंखुड़ियाँ अगला सुराग दिखा देंगी।\"</p>\n        <div class=\"sakura-grove\" aria-label=\"Silent Sakura grove\">\n          <div class=\"sakura-sky-note\"></div>\n          <div class=\"sakura-tree sakura-tree-left\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"sakura-tree sakura-tree-right\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"journal-page\">#2</div>\n          <div class=\"petal petal-one\"></div>\n          <div class=\"petal petal-two\"></div>\n          <div class=\"petal petal-three\"></div>\n        </div>\n        <p>चून को <b>सकुरा सकुरा</b> के चार सोए हुए टुकड़े सुनाई देते हैं। उन्हें एक बार बजाओ, फिर पंखुड़ियों की पगडंडी पर आगे बढ़ाओ।</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>पंखुड़ियों का गीत</h4>\n        <div class=\"petal-song-map\" aria-label=\"Sakura melody path\">\n          <span>Sakura</span>\n          <span>yayoi</span>\n          <span>miwatasu</span>\n          <span>yayoi</span>\n          <span>miwatasu</span>\n          <span>Sakura</span>\n          <span>miniyukan</span>\n        </div>\n        <p>टुकड़ों को ऊपर दिखाई गई पगडंडी के क्रम में <b>प्रारंभ</b> के नीचे रखो। पगडंडी को <b>4 बार</b> खिलने दो, <b>बजाएं</b> दबाओ, और फिर उपवन को देखो।</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>छिपी पंखुड़ियाँ</h4>\n        <p>जब पेड़ जवाब दें, तो कुछ नया आज़माओ। कुछ पंखुड़ियों में गुप्त बैज छिपे हैं।</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"renameChunks\">टुकड़ों के नाम बदलो</button>\n          <button type=\"button\" data-secret-help=\"changeOctave\">पंखुड़ियाँ उठाओ</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">स्थानांतरण का प्रयोग करो</button>\n          <button type=\"button\" data-secret-help=\"makeLonger\">और लंबा रास्ता बनाओ</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "सकुरा उपवन",
+                "island": "गूँज द्वीप",
+                "learned": ["लंबी धुनें", "धुन के टुकड़े"]
+            },
+            "rewards": [
+                "धुन का टुकड़ा #2",
+                "कैप्टन की डायरी का पन्ना #2",
+                "खजाने का सुराग: जब पुराना उपवन चार बार गाए, तब पंखुड़ियों के पीछे चलो।"
+            ],
+            "badges": {
+                "sakura_echo": {
+                    "label": "सकुरा गूँज",
+                    "shortLabel": "सकुरा",
+                    "message": "सकुरा के पेड़ गाने लगते हैं। पंखुड़ियाँ हवा में घूमती हैं और कैप्टन कैडेंस की डायरी का अगला पन्ना दिखा देती हैं।"
+                },
+                "grove_name_keeper": {
+                    "label": "उपवन का नाम रक्षक",
+                    "shortLabel": "नाम",
+                    "message": "छिपी खोज: उपवन का नाम रक्षक। लायरा सकुरा के नक्शे पर अपने नाम जोड़ती है।"
+                },
+                "petal_lifter": {
+                    "label": "पंखुड़ी उठाने वाला",
+                    "shortLabel": "पंखुड़ी",
+                    "message": "छिपी खोज: पंखुड़ी उठाने वाला। धुन ऊपर चढ़ते ही फूल और ऊँचे तैरने लगते हैं।"
+                },
+                "grove_shifter": {
+                    "label": "उपवन बदलने वाला",
+                    "shortLabel": "बदलाव",
+                    "message": "छिपी खोज: उपवन बदलने वाला। सकुरा उपवन एक नए रंग से चमक उठता है।"
+                },
+                "petal_trail_coin": {
+                    "label": "पंखुड़ी पगडंडी का सिक्का",
+                    "shortLabel": "सिक्का",
+                    "message": "गुप्त खजाने का सिक्का मिला। तुम्हारे लंबे सकुरा रास्ते ने वे पंखुड़ियाँ दिखा दीं जिनके पीछे कैप्टन कैडेंस कभी नहीं गया।"
+                }
+            },
+            "secretHelpCards": {
+                "renameChunks": {
+                    "title": "टुकड़ों के नाम बदलो"
+                },
+                "changeOctave": {
+                    "title": "पंखुड़ियाँ उठाओ"
+                },
+                "useTranspose": {
+                    "title": "स्थानांतरण का प्रयोग करो"
+                },
+                "makeLonger": {
+                    "title": "और लंबा रास्ता बनाओ",
+                    "heading": "पंखुड़ियों की पगडंडी बढ़ाओ",
+                    "description": "तुम रास्ते को लंबा कर सकते हो: एक और क्रिया-टुकड़ा जोड़कर, अपने पसंदीदा सकुरा टुकड़े को दोहराकर, या दोबारा उपयोग करने से पहले किसी क्रिया के अंदर और नोट रखकर।<br>संगीत की दृष्टि से लंबा रास्ता धुन को खिलने के लिए और समय देता है, फिर भी पैटर्न जुड़ा हुआ लगता है।"
+                }
+            }
+        },
+        "3": {
+            "title": "धड़कन गुफा की लय",
+            "description": "\n      <section class=\"story-card\">\n        <p>सकुरा उपवन के आगे लायरा और चून को एक नीली गुफा के भीतर हल्की थपथपाहट सुनाई देती है। खजाने का नक्शा चुप है, पर गुफा की दीवारें दिल की धड़कन की तरह टिमटिमा रही हैं।</p>\n        <div class=\"rhythm-cave\" aria-label=\"Pulse Cave beat map\">\n          <div class=\"cave-mouth\"></div>\n          <div class=\"pulse-lights\">\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"rhythm-river\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"journal-page rhythm-journal-page\">#3</div>\n        </div>\n        <p>\"यह सुराग पहले धुन नहीं है,\" चून कहता है। \"यह एक धड़कन है। अगला गीत जागने से पहले हमें ताल बनानी होगी।\"</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>धड़कन गुफा की ताल</h4>\n        <p><b>रिदम बनाने वाला</b> खोलो। एक ठहरी हुई ताल बनाओ, कुछ लंबे और छोटे लय-बदलाव आज़माओ, फिर <b>लय सहेजें</b> पर क्लिक करो।</p>\n        <p>निर्यात की गई लय क्रिया को <b>क्रिया</b> पैलेट में ढूँढ़ो, उसे <b>प्रारंभ</b> के नीचे रखो, <b>बजाएं</b> दबाओ, और गुफा की धड़कन सुनो।</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>गुप्त धड़कनें</h4>\n        <p>जब गुफा टिमटिमाने लगे, तो लय का एक प्रयोग करो। ये खोजें धड़कन, अवधि और ढोल के रंग के बारे में हैं।</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openMaker\">रिदम बनाने वाला खोलो</button>\n          <button type=\"button\" data-secret-help=\"saveRhythm\">लय सहेजें</button>\n          <button type=\"button\" data-secret-help=\"changeLength\">नोट की अवधि बदलो</button>\n          <button type=\"button\" data-secret-help=\"swapDrum\">कोई दूसरा ढोल आज़माओ</button>\n          <button type=\"button\" data-secret-help=\"drumMachine\">ड्रम मशीन सहेजो</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "धड़कन गुफा",
+                "island": "गूँज द्वीप",
+                "completeTitle": "धड़कन गुफा पूरी हुई",
+                "learned": ["धड़कन", "रिदम बनाने वाला", "निर्यात की गई लय क्रियाएँ"]
+            },
+            "rewards": [
+                "धुन का टुकड़ा #3",
+                "कैप्टन की डायरी का पन्ना #3",
+                "खजाने का सुराग: अगला रास्ता तब खुलता है जब ठहरी हुई धड़कन बदलती हुई लय को साथ ले चले।"
+            ],
+            "badges": {
+                "pulse_cave_keeper": {
+                    "label": "धड़कन गुफा का रक्षक",
+                    "shortLabel": "धड़कन",
+                    "message": "गुफा की रोशनियाँ ताल पर टिमटिमाती हैं। लायरा और चून लय का रास्ता कैप्टन कैडेंस की डायरी में सहेज लेते हैं।"
+                },
+                "beat_shaper": {
+                    "label": "ताल गढ़ने वाला",
+                    "shortLabel": "ताल",
+                    "message": "छिपी खोज: ताल गढ़ने वाला। तुम्हारे नोट लंबे और छोटे होते ही गुफा की धड़कन खिंचती और सिमटती है।"
+                },
+                "drum_taster": {
+                    "label": "ढोल परखने वाला",
+                    "shortLabel": "ढोल",
+                    "message": "छिपी खोज: ढोल परखने वाला। गुफा की दीवार से एक नया ढोल-रंग गूँजता है।"
+                },
+                "drum_machine_builder": {
+                    "label": "ड्रम मशीन निर्माता",
+                    "shortLabel": "मशीन",
+                    "message": "छिपी खोज: ड्रम मशीन निर्माता। गुफा एक पूरे ताल-वाद्य पैटर्न से जवाब देती है।"
+                }
+            },
+            "secretHelpCards": {
+                "openMaker": {
+                    "title": "रिदम बनाने वाला खोलो"
+                },
+                "saveRhythm": {
+                    "title": "लय सहेजें",
+                    "heading": "अपनी ताल को एक टुकड़े में बदलो",
+                    "description": "रिदम बनाने वाला से धड़कन को आकार दो, फिर लय सहेजें दबाओ। Music Blocks rhythm नाम की एक नई क्रिया बनाता है। उस क्रिया को प्रारंभ के नीचे रखो ताकि तुम्हारा प्रोग्राम उसे बजा सके।<br>संगीत की दृष्टि से निर्यात करने पर तुम्हारा लय-विचार दोबारा इस्तेमाल होने लायक पैटर्न बन जाता है।"
+                },
+                "changeLength": {
+                    "title": "नोट की अवधि बदलो",
+                    "heading": "ताल को खींचो या छोटा करो",
+                    "description": "रिदम बनाने वाला खोलो और एक लय-मान बदलो ताकि धड़कन की सारी अवधि एक जैसी न रहे। लय को 1/1 से 1/2, 1/4 या किसी और मान में बदलकर दोबारा सुनो।<br>इससे ताल गढ़ने वाला खोज खुलती है, क्योंकि लंबे और छोटे नोट पैटर्न बदल देते हैं जबकि धड़कन चलती रहती है।"
+                },
+                "swapDrum": {
+                    "title": "कोई दूसरा ढोल आज़माओ"
+                },
+                "drumMachine": {
+                    "title": "ड्रम मशीन सहेजो",
+                    "heading": "गुफा से ढोलों में जवाब दिलाओ",
+                    "description": "कोई लय आज़माने के बाद रिदम बनाने वाला में ड्रम मशीन सहेजो दबाओ। इससे एक ऐसी क्रिया बनती है जो सीधे ढोल की आवाज़ें बजाती है। इसका उपयोग तब करो जब तुम चाहो कि धड़कन सिर्फ लय-मार्गदर्शक नहीं, बल्कि पूरा ताल-वाद्य पैटर्न लगे।"
+                }
+            },
+            "incomplete": {
+                "title": "धड़कन गुफा अब भी चुप है",
+                "message": "चून को रिदम बनाने वाला में ताल सुनाई देती है, पर प्रारंभ अभी निर्यात की गई लय नहीं बजा रहा। लय सहेजें पर क्लिक करो, लय क्रिया ढूँढ़ो, उसे प्रारंभ के नीचे रखो, फिर मेरा काम जाँचें दबाओ।"
+            }
+        },
+        "4": {
+            "title": "छाती, चुटकी, ताली - लय बनाओ",
+            "description": "\n      <section class=\"story-card\">\n        <p>धड़कन गुफा एक चमकीली पत्थर की खाड़ी में खुलती है। रेत पर तीन नक्काशियाँ चमकती हैं: <b>छाती</b>, <b>चुटकी</b> और <b>ताली</b>। चून अपने धातु के खोल पर वह पैटर्न बजाता है, और चट्टानें जवाब देती हैं।</p>\n        <div class=\"body-beat-cove\" aria-label=\"Chest snap clap rhythm map\">\n          <div class=\"cove-sun\"></div>\n          <div class=\"body-beat-row\">\n            <span>Chest</span>\n            <span>Snap</span>\n            <span>Clap</span>\n          </div>\n          <div class=\"body-beat-grid\">\n            <span></span><span></span><span></span><span></span>\n            <span></span><span></span><span></span><span></span>\n          </div>\n          <div class=\"journal-page body-beat-journal-page\">#4</div>\n        </div>\n        <p>\"इस लय के दो हिस्से हैं,\" लायरा कहती है। \"अगर हम शरीर की आवाज़ों को समय के साथ बनाएँ, तो खाड़ी अगला खजाना-निशान दिखा देगी।\"</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>शरीर-ताल का नक्शा</h4>\n        <p><b>वाक्य निर्माता</b> खोलो और शरीर की आवाज़ों के लिए ढोल वाली पंक्तियाँ इस्तेमाल करो। पहला हिस्सा <b>8 अष्टांश नोट</b> से बनाओ।</p>\n        <p>दूसरा हिस्सा <b>7 अष्टांश नोट और 2 षोडशांश नोट</b> से बनाओ। दोनों हिस्सों को <b>क्रिया</b> ब्लॉक के रूप में निर्यात करो, उन्हें <b>प्रारंभ</b> के नीचे रखो, और लय को दोहराने के लिए <b>दोहराएँ</b> ब्लॉक का उपयोग करो।</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>गुप्त शरीर-तालें</h4>\n        <p>जब खाड़ी ताली से जवाब देने लगे, तो शरीर-लय का एक नया प्रयोग करो। ये खोजें रूप, चक्र, आवाज़ के चुनाव और रीमिक्स के बारे में हैं।</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openPhraseMaker\">वाक्य निर्माता खोलो</button>\n          <button type=\"button\" data-secret-help=\"exportHalves\">दोनों हिस्से निर्यात करो</button>\n          <button type=\"button\" data-secret-help=\"loopGroove\">ग्रूव को दोहराओ</button>\n          <button type=\"button\" data-secret-help=\"swapBodySounds\">शरीर की आवाज़ें बदलो</button>\n          <button type=\"button\" data-secret-help=\"remixGroove\">अपना ग्रूव बनाओ</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "शरीर-ताल खाड़ी",
+                "island": "गूँज द्वीप",
+                "completeTitle": "शरीर-ताल खाड़ी पूरी हुई",
+                "learned": ["वाक्य निर्माता", "दो-हिस्सों वाला रूप", "शरीर ताल-वाद्य"]
+            },
+            "rewards": [
+                "धुन का टुकड़ा #4",
+                "कैप्टन की डायरी का पन्ना #4",
+                "खजाने का सुराग: खजाने का दरवाज़ा एक ही चक्र के भीतर दो शरीर-ताल जवाबों को सुनता है।"
+            ],
+            "badges": {
+                "body_beat_builder": {
+                    "label": "शरीर-ताल निर्माता",
+                    "shortLabel": "शरीर",
+                    "message": "खाड़ी दो हिस्सों में ताली बजाकर जवाब देती है। लायरा शरीर की लय कैप्टन कैडेंस की डायरी में दर्ज करती है।"
+                },
+                "two_part_mapper": {
+                    "label": "दो-हिस्सों का नक्शाकार",
+                    "shortLabel": "हिस्से",
+                    "message": "छिपी खोज: दो-हिस्सों का नक्शाकार। तुम्हारा पहला और दूसरा हिस्सा एक-दूसरे को साफ़-साफ़ जवाब देते हैं।"
+                },
+                "loop_leader": {
+                    "label": "चक्र नायक",
+                    "shortLabel": "चक्र",
+                    "message": "छिपी खोज: चक्र नायक। शरीर की ताल तब तक घूमती रहती है जब तक सब ग्रूव महसूस न कर लें।"
+                },
+                "body_sound_designer": {
+                    "label": "शरीर-ध्वनि डिज़ाइनर",
+                    "shortLabel": "ध्वनि",
+                    "message": "छिपी खोज: शरीर-ध्वनि डिज़ाइनर। वही लय अब एक नए ध्वनि-रंग में बोलती है।"
+                },
+                "cove_remixer": {
+                    "label": "खाड़ी रीमिक्सर",
+                    "shortLabel": "रीमिक्स",
+                    "message": "गुप्त खजाने का सिक्का मिला। तुम्हारे अतिरिक्त शरीर-ताल विचार से खाड़ी एक नए ढंग से नाचती है।"
+                }
+            },
+            "secretHelpCards": {
+                "openPhraseMaker": {
+                    "title": "वाक्य निर्माता खोलो"
+                },
+                "exportHalves": {
+                    "title": "दोनों हिस्से निर्यात करो",
+                    "heading": "लय के दो टुकड़े बनाओ",
+                    "description": "वाक्य निर्माता से पहला हिस्सा बनाओ, फिर उसे एक क्रिया के रूप में सहेजो। दूसरा हिस्सा उसके छोटे षोडशांश अंत के साथ बनाओ और उसे भी सहेजो। दोनों क्रिया-टुकड़ों को प्रारंभ के नीचे रखो।<br>संगीत की दृष्टि से दो टुकड़े मिलकर सवाल-जवाब का रूप बनाते हैं: पहला हिस्सा पैटर्न तय करता है और दूसरा अंत बदल देता है।"
+                },
+                "loopGroove": {
+                    "title": "ग्रूव को दोहराओ",
+                    "heading": "शरीर की ताल को दोहराते रहो",
+                    "description": "प्रारंभ के नीचे एक दोहराएँ ब्लॉक रखो और वाक्य निर्माता के दोनों क्रिया-टुकड़े उसके अंदर रखो। पूरे ग्रूव को 2 या 4 बार दोहराकर देखो।<br>इससे चक्र नायक खोज खुलती है, क्योंकि लय दोबारा आने पर महसूस करना आसान हो जाता है।"
+                },
+                "swapBodySounds": {
+                    "title": "शरीर की आवाज़ें बदलो",
+                    "heading": "खाड़ी की शरीर-ध्वनियाँ बदलो",
+                    "description": "अपनी वाक्य निर्माता क्रिया के भीतर किसी ढोल के नाम पर क्लिक करो और गोल मेन्यू से कोई दूसरी आवाज़ चुनो। जैसे किसी ढोल की जगह घंटी, ताली या कोई और ताल-वाद्य रखो।<br>संगीत की दृष्टि से समय वही रहता है, पर लय का रंग बदल जाता है।"
+                },
+                "remixGroove": {
+                    "title": "अपना ग्रूव बनाओ",
+                    "heading": "एक अतिरिक्त शरीर-ताल विचार जोड़ो",
+                    "description": "जब तुम्हारी दो-हिस्सों वाली लय काम करने लगे, तो वाक्य निर्माता से निर्यात की गई एक और क्रिया जोड़ो, या प्रारंभ के नीचे अपनी किसी क्रिया को एक बार और बुलाओ।<br>इससे खाड़ी रीमिक्सर खोज खुलती है, क्योंकि तुम माँगी गई लय से आगे बढ़कर रूप बढ़ा रहे हो।"
+                }
+            },
+            "incomplete": {
+                "title": "शरीर-ताल खाड़ी इंतज़ार कर रही है",
+                "message": "चून को कुछ थपथपाहट सुनाई देती है, पर खाड़ी को प्रारंभ के नीचे वाक्य निर्माता की दो क्रियाएँ चाहिए, जो दोहराएँ ब्लॉक से दोहराई जा रही हों। दोनों हिस्से निर्यात करो, दोनों क्रियाएँ चक्र के अंदर रखो, फिर दोबारा जाँचो।"
+            }
+        },
+        "5": {
+            "title": "आकार-ढोल भित्ति",
+            "description": "\n      <section class=\"story-card\">\n        <p>शरीर-ताल खाड़ी के जवाब देने के बाद कैप्टन कैडेंस का नक्शा तीन चमकती रूपरेखाओं में मुड़ जाता है। चून हर आकार को एक लय की तरह सुनता है: एक पूरा घेरा बराबर धड़कनों में बँटा हुआ।</p>\n        <div class=\"geometry-reef\" aria-label=\"Triangle square and pentagon reef map\">\n          <div class=\"geometry-orbit\"></div>\n          <div class=\"geometry-shape geometry-triangle\"></div>\n          <div class=\"geometry-shape geometry-square\"></div>\n          <div class=\"geometry-shape geometry-pentagon\"></div>\n          <div class=\"journal-page geometry-journal-page\">#5</div>\n        </div>\n        <p>\"एक पूरा चक्कर <b>360 अंश</b> का होता है,\" चून कहता है। \"चक्कर को भुजाओं में बाँटो, और माउस किसी आकार की लय बना देगा।\"</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>आकार की लय</h4>\n        <p>अलग पड़े <b>दोहराएँ</b>, <b>आगे</b> और <b>दायाँ</b> ब्लॉकों से एक <b>वर्ग</b> बनाओ: दोहराएँ <b>4</b>, आगे <b>100</b>, दायाँ <b>90</b>।</p>\n        <p>फिर इसी विचार को दोहराकर तीन अलग <b>प्रारंभ</b> प्रोग्राम रखो: एक <b>त्रिभुज</b>, एक <b>वर्ग</b> और एक <b>पंचभुज</b>।</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>छिपी आकार-धड़कनें</h4>\n        <p>जब तीनों आकार दिख जाएँ, तो ज्यामिति की एक और गहरी तरकीब आज़माओ। भित्ति गणित, रंग और नए बहुभुजों में बैज छिपाती है।</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"repeatSides\">भुजाएँ दोहराओ</button>\n          <button type=\"button\" data-secret-help=\"turnRight\">दाईं ओर मुड़ो</button>\n          <button type=\"button\" data-secret-help=\"divideCircle\">360 को बाँटो</button>\n          <button type=\"button\" data-secret-help=\"useBox\">बक्से का प्रयोग करो</button>\n          <button type=\"button\" data-secret-help=\"colorShape\">रंग बदलो</button>\n          <button type=\"button\" data-secret-help=\"extraPolygon\">कोई और आकार बनाओ</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "आकार-ढोल भित्ति",
+                "island": "सामंजस्य ज्यामिति भित्ति",
+                "completeTitle": "आकार-ढोल भित्ति पूरी हुई",
+                "learned": ["360 अंश के चक्कर", "बहुभुज", "ज्यामिति और लय"]
+            },
+            "rewards": [
+                "धुन का टुकड़ा #5",
+                "कैप्टन की डायरी का पन्ना #5",
+                "खजाने का सुराग: सामंजस्य का हृदय उन घेरों को सुनता है जो बराबर आकार-धड़कनों में बँटे हों।"
+            ],
+            "badges": {
+                "shape_reef_builder": {
+                    "label": "आकार भित्ति निर्माता",
+                    "shortLabel": "आकार",
+                    "message": "भित्ति त्रिभुज, वर्ग और पंचभुज की लय से जगमगा उठती है। लायरा आकार का सुराग कैप्टन कैडेंस की डायरी में सहेज लेती है।"
+                },
+                "circle_divider": {
+                    "label": "घेरा बाँटने वाला",
+                    "shortLabel": "बाँटो",
+                    "message": "छिपी खोज: घेरा बाँटने वाला। तुमने 360 अंश को वैसे ही बाँटा जैसे एक पूर्ण नोट धड़कनों में बँटता है।"
+                },
+                "box_geometer": {
+                    "label": "बक्सा ज्यामितिज्ञ",
+                    "shortLabel": "बक्सा",
+                    "message": "छिपी खोज: बक्सा ज्यामितिज्ञ। अब एक ही सहेजी हुई संख्या आकार की पुनरावृत्ति और मोड़ दोनों चलाती है।"
+                },
+                "reef_colorist": {
+                    "label": "भित्ति रंगकार",
+                    "shortLabel": "रंग",
+                    "message": "छिपी खोज: भित्ति रंगकार। ज्यामिति भित्ति एक नए रंग से चमक उठती है।"
+                },
+                "polygon_explorer": {
+                    "label": "बहुभुज अन्वेषक",
+                    "shortLabel": "बहुभुज",
+                    "message": "गुप्त खजाने का सिक्का मिला। तुमने वह आकार बनाया जो कैप्टन कैडेंस ने भित्ति पर कभी अंकित नहीं किया।"
+                }
+            },
+            "secretHelpCards": {
+                "repeatSides": {
+                    "title": "भुजाएँ दोहराओ"
+                },
+                "turnRight": {
+                    "title": "दाईं ओर मुड़ो"
+                },
+                "divideCircle": {
+                    "title": "360 को बाँटो"
+                },
+                "useBox": {
+                    "title": "बक्से का प्रयोग करो"
+                },
+                "colorShape": {
+                    "title": "रंग बदलो"
+                },
+                "extraPolygon": {
+                    "title": "कोई और आकार बनाओ",
+                    "heading": "घेरे का नया बँटवारा आज़माओ",
+                    "description": "जब त्रिभुज, वर्ग और पंचभुज काम करने लगें, तो किसी एक प्रारंभ प्रोग्राम की नकल बनाओ और दोहराएँ की संख्या तथा मोड़ का कोण बदलकर कोई और बहुभुज बनाओ। जैसे 6 भुजाओं के लिए 60 अंश का मोड़, क्योंकि 360 को 6 से बाँटने पर 60 आता है।<br>इससे बहुभुज अन्वेषक खोज खुलती है, क्योंकि तुमने पूरे घेरे वाला वही विचार माँगे गए आकारों से आगे बढ़ाकर इस्तेमाल किया।"
+                }
+            },
+            "incomplete": {
+                "title": "आकार भित्ति अब भी धुँधली है",
+                "message": "चून को भित्ति का कुछ हिस्सा दिखता है, पर इसके लिए तीन अलग प्रारंभ प्रोग्राम चाहिए: त्रिभुज, वर्ग और पंचभुज। हर एक में दोहराएँ, आगे और दायाँ का सही मोड़ के साथ उपयोग होना चाहिए।"
+            }
+        },
+        "6": {
+            "title": "घूमती बहुलय झील",
+            "description": "\n      <section class=\"story-card\">\n        <p>आकार-ढोल भित्ति के आगे लायरा को एक झील मिलती है जहाँ दो लहरें एक साथ नाचती हैं। एक लहर <b>2</b> पर थाप देती है। दूसरी <b>3</b> पर। चून धीरे से कहता है, \"यही <b>बहुलय</b> है: दो लय एक साथ चलती हैं, मिलती हैं और अलग हो जाती हैं।\"</p>\n        <div class=\"polyrhythm-lagoon\" aria-label=\"Two rhythm ripples and a spinning avatar\">\n          <div class=\"lagoon-ring lagoon-ring-two\"><span>2</span></div>\n          <div class=\"lagoon-ring lagoon-ring-three\"><span>3</span></div>\n          <div class=\"avatar-orb\"></div>\n          <div class=\"journal-page lagoon-journal-page\">#6</div>\n        </div>\n        <p>कैप्टन कैडेंस का पन्ना कहता है: \"जब धड़कनें अलग-अलग चलें, तो किसी अवतार से गति दिखाओ ताकि तुम्हारी आँखें भी लय सुन सकें।\"</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>झील का अभियान</h4>\n        <p>स्क्रीन पर मौजूद दोनों लय-मापकों का उपयोग करो: एक को <b>द्विक</b> लय और दूसरे को <b>त्रिक</b> लय रखो। फिर एक <b>अवतार</b> और <b>हर नोट पर करें</b> क्रिया जोड़ो ताकि संगीत किसी चीज़ को हिलाए।</p>\n        <p>बजाएं दबाओ और उस पल को सुनो जब 2 धड़कन वाली लहर और 3 धड़कन वाली लहर फिर से मिलती हैं।</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>छिपी लहर-तरकीबें</h4>\n        <p>झील उन अन्वेषकों के लिए अतिरिक्त निशान रखती है जो लय को नए तरीकों से दिखाई देने लायक बनाते हैं।</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"dupletTriplet\">द्विक + त्रिक</button>\n          <button type=\"button\" data-secret-help=\"extraRipple\">नई लय-लहर</button>\n          <button type=\"button\" data-secret-help=\"everyNote\">हर नोट पर क्रिया</button>\n          <button type=\"button\" data-secret-help=\"avatar\">अवतार</button>\n          <button type=\"button\" data-secret-help=\"noteMotion\">नोट-अवधि से गति</button>\n          <button type=\"button\" data-secret-help=\"pitchVoice\">पिच वाली आवाज़</button>\n          <button type=\"button\" data-secret-help=\"turnMotion\">मुड़ने की गति</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "घूमती बहुलय झील",
+                "island": "सामंजस्य ज्यामिति भित्ति",
+                "completeTitle": "बहुलय झील पूरी हुई",
+                "learned": ["बहुलय", "द्विक और त्रिक", "ध्वनि के साथ चलती एनिमेशन"]
+            },
+            "rewards": [
+                "धुन का टुकड़ा #6",
+                "कैप्टन की डायरी का पन्ना #6",
+                "खजाने का सुराग: सामंजस्य का हृदय तब प्रकट होता है जब अलग-अलग धड़कनें अपना रास्ता खोए बिना साथ चलती हैं।"
+            ],
+            "badges": {
+                "lagoon_conductor": {
+                    "label": "झील का संचालक",
+                    "shortLabel": "झील",
+                    "message": "द्विक और त्रिक लहरें साथ-साथ घूमने लगती हैं। लायरा झील की चलती हुई लय कैप्टन कैडेंस की डायरी में जोड़ती है।"
+                },
+                "extra_ripple_maker": {
+                    "label": "अतिरिक्त लहर निर्माता",
+                    "shortLabel": "लहर",
+                    "message": "छिपी खोज: अतिरिक्त लहर निर्माता। तुमने झील के 2 और 3 वाले पैटर्न से आगे एक और लय-लहर जोड़ी।"
+                },
+                "avatar_spark": {
+                    "label": "अवतार की चिंगारी",
+                    "shortLabel": "अवतार",
+                    "message": "छिपी खोज: अवतार की चिंगारी। अब झील में एक कलाकार भी है।"
+                },
+                "note_motion_mapper": {
+                    "label": "नोट-गति नक्शाकार",
+                    "shortLabel": "गति",
+                    "message": "छिपी खोज: नोट-गति नक्शाकार। तुम्हारा एनिमेशन नोट की अवधि सुनता है, ठीक वैसे ही जैसे कैप्टन कैडेंस ने संकेत दिया था।"
+                },
+                "singing_ripple": {
+                    "label": "गाती लहर",
+                    "shortLabel": "आवाज़",
+                    "message": "छिपी खोज: गाती लहर। तुमने चलती हुई लय में पिच वाली आवाज़ जोड़ दी।"
+                },
+                "spin_choreographer": {
+                    "label": "घुमाव नृत्य-निर्देशक",
+                    "shortLabel": "घुमाव",
+                    "message": "गुप्त खजाने का सिक्का मिला। तुम्हारा अवतार लय के साथ घूमता है और झील का अंतर दिखाता है।"
+                }
+            },
+            "secretHelpCards": {
+                "dupletTriplet": {
+                    "title": "द्विक + त्रिक"
+                },
+                "everyNote": {
+                    "title": "हर नोट पर क्रिया"
+                },
+                "avatar": {
+                    "title": "अवतार"
+                },
+                "noteMotion": {
+                    "title": "नोट-अवधि से गति",
+                    "heading": "नोटों से गति चलवाओ",
+                    "description": "एनिमेशन क्रिया के अंदर माउस नोट अवधि या माउस द्वारा बजाए गए नोट वाला ब्लॉक इस्तेमाल करो। छोटा नोट छोटा मोड़ बना सकता है और लंबा नोट बड़ा मोड़। इससे अवतार लय सिर्फ बजाता नहीं, दिखाता भी है।"
+                },
+                "pitchVoice": {
+                    "title": "पिच वाली आवाज़"
+                },
+                "turnMotion": {
+                    "title": "मुड़ने की गति"
+                },
+                "extraRipple": {
+                    "title": "नई लय-लहर"
+                }
+            },
+            "incomplete": {
+                "title": "झील अब भी शांत है",
+                "message": "चून को 2 और 3 धड़कन वाली लहरें सुनाई देती हैं, पर झील को एनिमेशन भी चाहिए। एक हर नोट पर करें क्रिया और एक अवतार जोड़ो ताकि लय से स्क्रीन पर गति बने।"
+            }
+        },
+        "7": {
+            "title": "संचालक का संकेत-घेरा",
+            "description": "\n      <section class=\"story-card\">\n        <p>घूमती झील लायरा और चून को <b>प्रसारण खाड़ी</b> तक ले जाती है। बारह छोटे ढोलची माउस एक चौड़े घेरे में अपने ढोल थामे बैठे हैं, और उनमें से कोई भी आवाज़ नहीं करता। \"वे धड़कन महसूस नहीं कर पा रहे,\" चून कहता है। \"हर माउस अपना नाम सुनने का इंतज़ार कर रहा है।\"</p>\n        <div class=\"signal-ring\" aria-label=\"Twelve drum mice in a circle around the conductor mouse\">\n          <div class=\"signal-ring-track\"></div>\n          <span class=\"ring-drum ring-drum-active\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <div class=\"ring-conductor\"></div>\n          <div class=\"journal-page ring-journal-page\">#7</div>\n        </div>\n        <p>बीच में <b>Mr. Mouse</b> खड़ा है, संचालक। कैप्टन कैडेंस का पन्ना कहता है: \"एक पुकारने वाला, बहुत से सुनने वाले। हवा में एक नाम भेजो, और जवाब सिर्फ वही माउस देगा जिसका वह नाम है।\"</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>घेरे के लिए दो तरकीबें</h4>\n        <p><b>शब्द जोड़ना।</b> <b>प्लस (+)</b> ब्लॉक संख्याएँ जोड़ता है, पर यह शब्दों को भी आपस में चिपका सकता है। \"event\" + \"5\" मिलकर <span class=\"tablet-code\">event5</span> बन जाता है। इसी तरह एक ही प्रसारण हर चक्कर में किसी अलग माउस को बुला सकता है।</p>\n        <p><b>घेरे में गिनना।</b> <b>मॉड</b> ब्लॉक गिनता है और फिर दोबारा शुरू हो जाता है। मॉड 12 सिर्फ 0, 1, 2 ... 11 देता है, और फिर 0 पर लौट आता है। यह ठीक वैसे ही चलता है जैसे किसी ताल-खंड की धड़कनें गिनना, बस घेरा 1 की जगह 0 से शुरू होता है।</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>घेरे का अभियान</h4>\n        <p>कैनवास पर मौजूद दोनों क्रिया-टुकड़े पहले से ही ढोलची माउसों के हैं, और उनके पास पड़े अलग ब्लॉक तुम्हारी सामग्री हैं। तुम्हारा काम संचालक को जगाना है।</p>\n        <ol>\n          <li><b>हमेशा के लिए</b> चक्र को Mr. Mouse के प्रारंभ ब्लॉक के नीचे जोड़ो, फिर उसके अंदर <b>चाप</b> ब्लॉक रखो, ताकि संचालक घेरे के चारों ओर चलता रहे।</li>\n          <li>एक <b>प्रसारण</b> जोड़ो जिसका नाम <b>प्लस (+)</b> ब्लॉक से बने, ताकि वह event0, event1, event2 और आगे इसी तरह पुकारे।</li>\n          <li><b>मॉड</b> ब्लॉक का उपयोग करो ताकि गिनती 11 के बाद 0 पर लौट आए और संचालक के पास बुलाने को माउस कभी कम न पड़ें।</li>\n          <li><b>mouse setup</b> टुकड़े को बनाए रखो, जो <b>पर</b> और <b>xy सेट करें</b> का उपयोग करता है ताकि हर ढोलची माउस अपना नाम सुनते ही घेरे में अपनी जगह पर कूद जाए।</li>\n        </ol>\n        <p>बजाएं दबाओ, फिर किसी ढोलची माउस पर क्लिक करके उसकी जवाब देने वाली आवाज़ बदलो।</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>सोचने के लिए</h4>\n        <ul>\n          <li>कंप्यूटर के बाहर प्रसारण का क्या अर्थ है? कौन सुनता है?</li>\n          <li>Mr. Mouse उस संचालक जैसा कैसे है जो ढोलचियों के घेरे में 1, 2, 3 गिनता है?</li>\n          <li>मॉड 12 कभी 12 तक क्यों नहीं पहुँच सकता?</li>\n          <li>अगर दो माउस एक ही नाम सुनने लगें तो क्या होगा?</li>\n        </ul>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>छिपे संकेत</h4>\n        <p>खाड़ी उन अन्वेषकों के लिए निशान रखती है जो घेरे को और बड़ा, और ऊँचा या और जीवंत बनाते हैं।</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"broadcastEvent\">प्रसारण</button>\n          <button type=\"button\" data-secret-help=\"listenEvent\">नाम सुनो</button>\n          <button type=\"button\" data-secret-help=\"eventName\">शब्द जोड़ो</button>\n          <button type=\"button\" data-secret-help=\"modCount\">घेरे में गिनो</button>\n          <button type=\"button\" data-secret-help=\"walkCircle\">घेरे पर चलो</button>\n          <button type=\"button\" data-secret-help=\"placeMouse\">माउस रखो</button>\n          <button type=\"button\" data-secret-help=\"nameMouse\">माउस का नाम रखो</button>\n          <button type=\"button\" data-secret-help=\"makeMice\">माउसों का घेरा बनाओ</button>\n          <button type=\"button\" data-secret-help=\"useBox\">बक्से का प्रयोग करो</button>\n          <button type=\"button\" data-secret-help=\"readBox\">बक्सा पढ़ो</button>\n          <button type=\"button\" data-secret-help=\"toggleTrick\">1 और 0 के बीच बदलो</button>\n          <button type=\"button\" data-secret-help=\"ringDrum\">घेरे का ढोल</button>\n          <button type=\"button\" data-secret-help=\"mouseDance\">माउस का नाच</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "संचालक का संकेत-घेरा",
+                "island": "प्रसारण खाड़ी",
+                "completeTitle": "संकेत-घेरा पूरा हुआ",
+                "learned": ["प्रसारण और सुनना", "प्लस (+) से बने घटना-नाम", "मॉड से गिनती"]
+            },
+            "rewards": [
+                "धुन का टुकड़ा #7",
+                "कैप्टन की डायरी का पन्ना #7",
+                "खजाने का सुराग: आखिरी दरवाज़ा वहाँ खुलता है जहाँ एक आवाज़ पुकारती है और बहुत सी आवाज़ें अपनी-अपनी बारी पर जवाब देती हैं।"
+            ],
+            "badges": {
+                "ring_conductor": {
+                    "label": "घेरे का संचालक",
+                    "shortLabel": "घेरा",
+                    "message": "Mr. Mouse एक नाम पुकारता है, एक ढोलची माउस जवाब देता है, और घेरा घूमने लगता है। लायरा संकेतों का घेरा कैप्टन कैडेंस की डायरी में उतार लेती है।"
+                },
+                "toggle_trickster": {
+                    "label": "पलटने वाला जादूगर",
+                    "shortLabel": "पलटो",
+                    "message": "छिपी खोज: पलटने वाला जादूगर। एक छोटी-सी घटाव अब एक ढोल को दो आवाज़ों के बीच पलटा देती है।"
+                },
+                "ring_drummer": {
+                    "label": "घेरे का ढोलची",
+                    "shortLabel": "ढोल",
+                    "message": "छिपी खोज: घेरे का ढोलची। प्रसारण खाड़ी को आखिरकार वह धड़कन सुनाई देती है जिसका वह इंतज़ार कर रही थी।"
+                },
+                "mouse_ringmaker": {
+                    "label": "माउस घेरा रचयिता",
+                    "shortLabel": "माउस",
+                    "message": "छिपी खोज: माउस घेरा रचयिता। तुम्हारे घेरे में अब इतने माउस हैं कि धड़कन एक से दूसरे तक पहुँच सके।"
+                },
+                "box_reader": {
+                    "label": "बक्सा पाठक",
+                    "shortLabel": "बक्सा",
+                    "message": "छिपी खोज: बक्सा पाठक। संचालक बक्से के भीतर देखकर जान सकता है कि कौन-सा ढोल बुलाना है।"
+                },
+                "ring_dancer": {
+                    "label": "घेरे का नर्तक",
+                    "shortLabel": "नाच",
+                    "message": "गुप्त खजाने का सिक्का मिला। ढोलची माउस अब सिर्फ बजाते नहीं, अपना नाम सुनते ही नाचते भी हैं।"
+                }
+            },
+            "secretHelpCards": {
+                "broadcastEvent": {
+                    "title": "प्रसारण"
+                },
+                "listenEvent": {
+                    "title": "नाम सुनो"
+                },
+                "eventName": {
+                    "title": "शब्द जोड़ो"
+                },
+                "modCount": {
+                    "title": "घेरे में गिनो"
+                },
+                "walkCircle": {
+                    "title": "घेरे पर चलो"
+                },
+                "placeMouse": {
+                    "title": "माउस रखो"
+                },
+                "nameMouse": {
+                    "title": "माउस का नाम रखो"
+                },
+                "makeMice": {
+                    "title": "माउसों का घेरा बनाओ",
+                    "heading": "हर ढोल को अपना माउस दो",
+                    "description": "घेरे का हर ढोल अपने आप में एक माउस है, इसलिए हर ढोल को अपना प्रारंभ ब्लॉक चाहिए। एक प्रारंभ ब्लॉक जोड़ो, नाम सेट करें ब्लॉक से उसे 0 नाम दो, और फिर mouse setup टुकड़े को बुलाओ ताकि वह event0 सुने। फिर 1 नाम का दूसरा प्रारंभ जोड़ो, फिर 2, और इसी तरह आगे बढ़ो।<br>बारह माउस बारह धड़कनें देते हैं, पर तीन या चार से ही घेरा घूमता सुनाई देने लगता है।"
+                },
+                "useBox": {
+                    "title": "बक्से का प्रयोग करो"
+                },
+                "readBox": {
+                    "title": "बक्सा पढ़ो"
+                },
+                "toggleTrick": {
+                    "title": "1 और 0 के बीच बदलो",
+                    "heading": "एक संख्या जो खुद पलट जाती है",
+                    "description": "change क्रिया के अंदर बक्से में 1 घटा बक्सा वाला मान भंडारित करो। अगर बक्से में 0 है, तो 1 - 0 = 1। अगर बक्से में 1 है, तो 1 - 1 = 0, इसलिए हर बार माउस पर क्लिक करते ही संख्या पलट जाती है।<br>संगीत की दृष्टि से यही एक संख्या तय करती है कि माउस दो ढोलों में से किससे जवाब देगा।"
+                },
+                "ringDrum": {
+                    "title": "घेरे का ढोल"
+                },
+                "mouseDance": {
+                    "title": "माउस का नाच"
+                }
+            },
+            "incomplete": {
+                "title": "घेरा अब भी चुप है",
+                "message": "चून को माउस दिखते हैं, पर उन्हें कोई बुला नहीं रहा। संचालक को एक चक्र के भीतर चाप चाहिए, एक ऐसा प्रसारण जिसका नाम प्लस (+) ब्लॉक से बना हो, और एक मॉड ब्लॉक ताकि गिनती 0 पर लौटे। mouse setup टुकड़े को उसके पर और xy सेट करें ब्लॉकों के साथ बनाए रखो।"
+            }
+        },
+        "8": {
+            "title": "तारों भरे आकाश का गीत",
+            "description": "\n      <section class=\"story-card\">\n        <p>संकेत-घेरे की आखिरी पुकार दुनिया के सबसे ऊँचे सिरे पर बना दरवाज़ा खोल देती है। उसके पार लायरा और चून <b>तारों की चोटी</b> पर चढ़ते हैं, जहाँ महान धुन पहली बार गाई गई थी। ऊपर आकाश अँधेरा है। \"जब गीत खो गया, तब तारे चुप हो गए,\" चून कहता है। \"उन्हें फिर से गाओ और वे चमक उठेंगे।\"</p>\n        <div class=\"star-sky\" aria-label=\"Pitch over time graph of the first Twinkle Twinkle phrase\">\n          <div class=\"star-graph\">\n            <div class=\"star-graph-labels\">\n              <span>La</span><span>Sol</span><span>Fa</span>\n              <span>Mi</span><span>Re</span><span>Do</span>\n            </div>\n            <div class=\"star-graph-plot\">\n            <span class=\"star-note star-beat-1 star-pitch-do\"></span>\n            <span class=\"star-note star-beat-2 star-pitch-do\"></span>\n            <span class=\"star-note star-beat-3 star-pitch-sol\"></span>\n            <span class=\"star-note star-beat-4 star-pitch-sol\"></span>\n            <span class=\"star-note star-beat-5 star-pitch-la\"></span>\n            <span class=\"star-note star-beat-6 star-pitch-la\"></span>\n            <span class=\"star-note star-beat-7 star-pitch-sol\"></span>\n            </div>\n          </div>\n          <div class=\"journal-page star-journal-page\">#8</div>\n        </div>\n        <p>हर तारा अपनी ही ऊँचाई पर बैठा है। आकाश में नीचे का तारा नीचा सुर है, और ऊपर का तारा ऊँचा सुर। बाएँ से दाएँ पढ़ना समय में आगे बढ़ना है। यही <b>समय के साथ पिच</b> है, और ऊपर के तारे तारा-गीत का पहला वाक्य लिखते हैं।</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>तारों का गीत</h4>\n        <p>बनाने से पहले इसे एक बार गाओ, ताकि तुम्हारे कान जान लें कि यह कहाँ जाता है। Twinkle Twinkle में तीन वाक्य हैं:</p>\n        <ul>\n          <li><b>A1:</b> Do Do Sol Sol La La Sol</li>\n          <li><b>A2:</b> Fa Fa Mi Mi Re Re Do</li>\n          <li><b>B:</b> Sol Sol Fa Fa Mi Mi Re</li>\n        </ul>\n        <p>हर पिच <b>4</b> ऑक्टेव का उपयोग करती है, और वाक्य निर्माता की लय पहले से ही ठीक बैठती है: छह छोटे नोट और एक लंबा, यानी हर वाक्य में ठीक सात तारे।</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>चोटी का अभियान</h4>\n        <p>वाक्य निर्माता में Do, Re, Mi, Fa, Sol और La पहले से तैयार हैं। तुम्हें बस तारे रखने हैं।</p>\n        <ol>\n          <li>ग्रिड खोलने के लिए <b>वाक्य निर्माता</b> ब्लॉक पर क्लिक करो, फिर खानों पर क्लिक करके <b>A1</b> वाक्य बनाओ।</li>\n          <li>उस वाक्य को क्रिया ब्लॉक में बदलने के लिए <b>सहेजें</b> दबाओ, फिर इसी तरह <b>A2</b> और <b>B</b> बनाकर सहेजो।</li>\n          <li>अपनी तीनों सहेजी हुई क्रियाएँ <b>क्रिया</b> पैलेट में ढूँढ़ो और उन्हें गीत के क्रम में <b>प्रारंभ</b> के नीचे सजाओ: <b>A1 A2 B B A1 A2</b>।</li>\n          <li>बजाएं दबाओ। अगर यह तारा-गीत जैसा सुनाई दे, तो आकाश जगमगा उठेगा।</li>\n        </ol>\n        <p>क्रम याद रखने की चून की तरकीब: यह एक सैंडविच है। दोनों <b>A</b> वाक्य बाहर की रोटी हैं, और बीच में <b>B</b> भरावन है।</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>सोचने के लिए</h4>\n        <ul>\n          <li>गीत का कौन-सा हिस्सा ऊपर चढ़ता है और कौन-सा वापस नीचे आता है?</li>\n          <li>बीच में B वाक्य दो बार क्यों बजता है?</li>\n          <li>अगर कोई तारा एक पंक्ति ऊपर चला जाए, तो वहाँ गीत ऊँचा सुनाई देगा या नीचा?</li>\n        </ul>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>छिपी तारों की रोशनी</h4>\n        <p>चोटी उन अन्वेषकों के लिए निशान रखती है जो तारा-गीत को अपना बना लेते हैं।</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openPhraseMaker\">वाक्य निर्माता खोलो</button>\n          <button type=\"button\" data-secret-help=\"solfegeNames\">Do Re Mi नाम</button>\n          <button type=\"button\" data-secret-help=\"exportParts\">हर वाक्य सहेजो</button>\n          <button type=\"button\" data-secret-help=\"sandwichForm\">सैंडविच रूप</button>\n          <button type=\"button\" data-secret-help=\"renameChunks\">अपने वाक्यों के नाम बदलो</button>\n          <button type=\"button\" data-secret-help=\"changeOctave\">ऊँचा या नीचा</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">कोई बदलाव आज़माओ</button>\n          <button type=\"button\" data-secret-help=\"starDance\">तारों का नाच</button>\n          <button type=\"button\" data-secret-help=\"harmonize\">दूसरी आवाज़ जोड़ो</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "तारों भरे आकाश का गीत",
+                "island": "तारों की चोटी",
+                "completeTitle": "तारों भरा आकाश पूरा हुआ",
+                "learned": [
+                    "समय के साथ पिच",
+                    "वाक्य निर्माता से धुनें",
+                    "गीत का रूप A1 A2 B B A1 A2"
+                ]
+            },
+            "rewards": [
+                "धुन का टुकड़ा #8",
+                "कैप्टन की डायरी का पन्ना #8",
+                "खजाना मिला: महान धुन फिर से पूरी हो गई है, और तुमने जिन द्वीपों को जगाया वे सब उसे गाकर लौटाते हैं।"
+            ],
+            "badges": {
+                "star_song_keeper": {
+                    "label": "तारा-गीत का रक्षक",
+                    "shortLabel": "तारा",
+                    "message": "एक-एक तारे के साथ चोटी जगमगा उठती है और महान धुन लौट आती है। लायरा कैप्टन कैडेंस की डायरी का आखिरी पन्ना लिखती है।"
+                },
+                "sandwich_namer": {
+                    "label": "सैंडविच नामकार",
+                    "shortLabel": "नाम",
+                    "message": "छिपी खोज: सैंडविच नामकार। तुम्हारे वाक्यों के नाम तुम्हारे चुने हुए हैं, इसलिए रूप किसी विधि की तरह पढ़ा जाता है।"
+                },
+                "high_star": {
+                    "label": "ऊँचा तारा",
+                    "shortLabel": "ऊँचा",
+                    "message": "छिपी खोज: ऊँचा तारा। अब एक सुर किसी और ऑक्टेव से चमकता है।"
+                },
+                "star_variation": {
+                    "label": "तारा भिन्नता",
+                    "shortLabel": "बदलाव",
+                    "message": "छिपी खोज: तारा भिन्नता। तुमने पूरे गीत को नई जगह पर सरका दिया, ठीक वैसे ही जैसे मोत्सार्ट ने इसी धुन के साथ किया था।"
+                },
+                "star_dancer": {
+                    "label": "तारों का नर्तक",
+                    "shortLabel": "नाच",
+                    "message": "छिपी खोज: तारों का नर्तक। माउस धुन के साथ घूमता है और गाते-गाते आकाश बनाता है।"
+                },
+                "second_voice": {
+                    "label": "दूसरी आवाज़",
+                    "shortLabel": "आवाज़",
+                    "message": "गुप्त खजाने का सिक्का मिला। एक दूसरा प्रारंभ ब्लॉक साथ जुड़ता है, और तारा-गीत में सुरमेल आ जाता है।"
+                }
+            },
+            "secretHelpCards": {
+                "openPhraseMaker": {
+                    "title": "वाक्य निर्माता खोलो"
+                },
+                "solfegeNames": {
+                    "title": "Do Re Mi नाम"
+                },
+                "exportParts": {
+                    "title": "हर वाक्य सहेजो",
+                    "heading": "एक वाक्य को क्रिया ब्लॉक में बदलो",
+                    "description": "जब वाक्य निर्माता की ग्रिड में कोई वाक्य ठीक दिखने लगे, तो विजेट पर सहेजें बटन दबाओ। Music Blocks action नाम का नया क्रिया ब्लॉक बनाता है, फिर action1, फिर action2, और वे क्रिया पैलेट में दिखने लगते हैं।<br>संगीत की दृष्टि से हर सहेजी हुई क्रिया गीत का एक वाक्य है, जिसे तुम जब चाहो दोबारा बजा सकते हो।"
+                },
+                "sandwichForm": {
+                    "title": "सैंडविच रूप",
+                    "heading": "रोटी बाहर, भरावन अंदर",
+                    "description": "अपनी सहेजी हुई क्रियाओं को प्रारंभ के नीचे इस क्रम में सजाओ: A1, A2, B, B, A1, A2। दोनों A वाक्य सैंडविच के बाहर की रोटी हैं, और बीच का B वाक्य भरावन है।<br>संगीत की दृष्टि से अंत में A वाक्यों पर लौटना ही गीत को पूरा होने का एहसास देता है।"
+                },
+                "renameChunks": {
+                    "title": "अपने वाक्यों के नाम बदलो"
+                },
+                "changeOctave": {
+                    "title": "ऊँचा या नीचा"
+                },
+                "useTranspose": {
+                    "title": "कोई बदलाव आज़माओ"
+                },
+                "starDance": {
+                    "title": "तारों का नाच"
+                },
+                "harmonize": {
+                    "title": "दूसरी आवाज़ जोड़ो"
+                }
+            },
+            "incomplete": {
+                "title": "तारे अब भी मंद हैं",
+                "message": "चून को तारा-गीत का कुछ हिस्सा सुनाई देता है। वाक्य निर्माता में तीनों वाक्य क्रिया ब्लॉक के रूप में सहेजे जाने चाहिए - Do Do Sol Sol La La Sol, फिर Fa Fa Mi Mi Re Re Do, फिर Sol Sol Fa Fa Mi Mi Re - और वे क्रियाएँ प्रारंभ के नीचे A1 A2 B B A1 A2 के क्रम में सजी होनी चाहिए।"
+            }
+        }
+    }
+}

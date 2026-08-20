@@ -1,0 +1,608 @@
+{
+    "theme": {
+        "title": "うしなわれたメロディの島じま",
+        "subtitle": "かくされた宝をさがす旅",
+        "intro": "\n      <section class=\"story-card\">\n      <h4>物語のはじまり</h4>\n\n      <div class=\"character-row\" aria-label=\"Meet Lyra and Choon\">\n      <span class=\"character-token lyra-token\">\n        <span class=\"character-name\">\n            Lyra\n        </span>\n\n        <span class=\"character-role\">たんけん家</span>\n      </span>\n\n      <span class=\"character-token beat-token\">\n        <span class=\"character-name\">\n            Choon\n        </span>\n        <span class=\"character-role\">音楽ロボット</span>\n      </span>\n    </div>\n\n      <p>どんなぼうけんにも仲間がひつよう! <b>ライラ</b>はこわいもの知らずのたんけん家、<b>チューン</b>はどこにかくれたメロディでも聞きとれる、元気な音楽ロボットです。</p>\n\n      <p>すべての島をむすんでいた、まほうの<b>グランドメロディ</b>が消えてしまいました。そのかけらは海じゅうに散らばっています。音楽のなぞをとき、かくれたメロディを見つけて、島じまが永遠にしずまりかえってしまう前に、新しい仲間たちと歌を取りもどしましょう。</p>\n    </section>\n    "
+    },
+    "bigBadges": {
+        "echo_island": {
+            "label": "こだま島の守り手",
+            "shortLabel": "守り手",
+            "message": "ビッグバッジ獲得: こだま島の守り手。島はまた音楽を聞けるようになりました!"
+        },
+        "harmony_geometry_reef": {
+            "label": "ハーモニー幾何さんごしょうの水先案内人",
+            "shortLabel": "案内人",
+            "message": "ビッグバッジ獲得: ハーモニー幾何さんごしょうの水先案内人。ライラはさんごしょうの「形とリズムの地図」を読めるようになりました!"
+        },
+        "broadcast_bay": {
+            "label": "ブロードキャスト湾の信号守り",
+            "shortLabel": "信号",
+            "message": "ビッグバッジ獲得: ブロードキャスト湾の信号守り。湾のネズミたちが、みんな自分の名前にこたえるようになりました!"
+        },
+        "starlight_summit": {
+            "label": "グランドメロディの守り手",
+            "shortLabel": "グランドメロディ",
+            "message": "ビッグバッジ獲得: グランドメロディの守り手。すべての島をむすんでいた歌が、またひとつにもどりました。"
+        }
+    },
+    "problems": {
+        "1": {
+            "title": "こだま島の橋",
+            "description": "\n      <section class=\"story-card\">\n        <p>ライラとチューンはこだま島に上陸します。橋は消えていますが、海はまだハミングをつづけています。チューンは石にきざまれた古い「歌の地図」を指さしました。</p>\n        <div class=\"bridge-map\" aria-label=\"Bridge song pattern A A B A\">\n          <div class=\"bridge-gate\"></div>\n          <div class=\"bridge-letters\">\n            <span>A</span>\n            <span>A</span>\n            <span>B</span>\n            <span>A</span>\n          </div>\n          <div class=\"bridge-waves\"></div>\n        </div>\n        <p>「このしるしは音だよ」とチューンがささやきます。「さきに音を聞けば、橋を目ざめさせられる。」</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>橋の歌</h4>\n        <p>はなれている <b>A</b> と <b>B</b> のかたまりを鳴らしてみましょう。音がなじんできたら、上の「歌の地図」と合うように <b>スタート</b> の下につなげます。</p>\n        <p><b>実行</b> をおします。橋が光りはじめたら <b>できたかチェック</b> をおしましょう。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>ひみつの道</h4>\n        <p>橋が立ちあがったら、小さな変こうをためしてみましょう。島がこたえてくれるかもしれません。</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"changeOctave\">オクターヴを変える</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">移調をつかう</button>\n          <button type=\"button\" data-secret-help=\"makeLonger\">もっと長くする</button>\n          <button type=\"button\" data-secret-help=\"renameChunks\">かたまりの名前を変える</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "こだま島",
+                "island": "こだま島",
+                "learned": ["パターン", "くり返しのブロック"]
+            },
+            "rewards": [
+                "メロディのかけら #1",
+                "船長の日記 #1ページ",
+                "宝のてがかり: 最初の道は、こだまが二度こたえる場所からはじまる。"
+            ],
+            "badges": {
+                "bridge_builder": {
+                    "label": "橋づくりの名人",
+                    "shortLabel": "橋",
+                    "message": "石のいたが光りはじめます。音楽が島じゅうにこだまし、海からかがやく橋がゆっくりと立ちあがりました。"
+                },
+                "name_keeper": {
+                    "label": "名前の守り手",
+                    "shortLabel": "名前",
+                    "message": "かくれた発見: 名前の守り手。ライラは音楽の地図に、じぶんらしい名前を書きこみました。"
+                },
+                "sky_builder": {
+                    "label": "空づくりの名人",
+                    "shortLabel": "空",
+                    "message": "かくれた発見: 空づくりの名人。橋は雲のほうへ、もっと高くのびていきます。"
+                },
+                "melody_shifter": {
+                    "label": "メロディを動かす者",
+                    "shortLabel": "変化",
+                    "message": "かくれた発見: メロディを動かす者。橋が新しい色にかがやきます。"
+                },
+                "secret_treasure_coin": {
+                    "label": "ひみつの宝コイン",
+                    "shortLabel": "コイン",
+                    "message": "ひみつの宝コインを見つけました。ケイデンス船長が記録しなかった道を見つけたのです。"
+                }
+            },
+            "secretHelpCards": {
+                "changeOctave": {
+                    "title": "オクターヴを変える"
+                },
+                "useTranspose": {
+                    "title": "移調をつかう"
+                },
+                "makeLonger": {
+                    "title": "もっと長くする",
+                    "heading": "音をもっと長くつづかせよう",
+                    "description": "音や道を長くするには、歌のあとにアクションのかたまりをもうひとつ足すか、お気に入りのかたまりをくり返すか、もう一度鳴らす前にアクションの中に音符をふやします。<br>音楽としては、これでメロディが進むための時間がふえますが、いちばん大事な考えは変わりません。"
+                },
+                "renameChunks": {
+                    "title": "かたまりの名前を変える"
+                }
+            }
+        },
+        "2": {
+            "title": "さくらの林のこだま",
+            "description": "\n      <section class=\"story-card\">\n        <p>新しい橋をわたると、ライラとチューンはしずかなさくらの林につきました。えだから日記の1ページがひらひらと落ちてきます。「古い花のメロディを歌えば、花びらがつぎのてがかりを見せてくれる。」</p>\n        <div class=\"sakura-grove\" aria-label=\"Silent Sakura grove\">\n          <div class=\"sakura-sky-note\"></div>\n          <div class=\"sakura-tree sakura-tree-left\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"sakura-tree sakura-tree-right\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"journal-page\">#2</div>\n          <div class=\"petal petal-one\"></div>\n          <div class=\"petal petal-two\"></div>\n          <div class=\"petal petal-three\"></div>\n        </div>\n        <p>チューンには <b>さくらさくら</b> のねむった4つのかたまりが聞こえます。一度鳴らしてから、花びらの小道にそってならべましょう。</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>花びらの歌</h4>\n        <div class=\"petal-song-map\" aria-label=\"Sakura melody path\">\n          <span>Sakura</span>\n          <span>yayoi</span>\n          <span>miwatasu</span>\n          <span>yayoi</span>\n          <span>miwatasu</span>\n          <span>Sakura</span>\n          <span>miniyukan</span>\n        </div>\n        <p>上に見えている小道のとおりに、かたまりを <b>スタート</b> の下にならべます。小道を <b>4回</b> さかせて <b>実行</b> をおし、林をたしかめましょう。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>かくれた花びら</h4>\n        <p>木がこたえたら、新しいくふうをためしてみましょう。花びらのなかにはひみつのバッジがかくれています。</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"renameChunks\">かたまりの名前を変える</button>\n          <button type=\"button\" data-secret-help=\"changeOctave\">花びらをもちあげる</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">移調をつかう</button>\n          <button type=\"button\" data-secret-help=\"makeLonger\">もっと長い道をつくる</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "さくらの林",
+                "island": "こだま島",
+                "learned": ["長いメロディ", "メロディのかたまり"]
+            },
+            "rewards": [
+                "メロディのかけら #2",
+                "船長の日記 #2ページ",
+                "宝のてがかり: 古い林が四度うたうとき、花びらのあとを追え。"
+            ],
+            "badges": {
+                "sakura_echo": {
+                    "label": "さくらのこだま",
+                    "shortLabel": "さくら",
+                    "message": "さくらの木がうたいはじめます。花びらが空にまいあがり、ケイデンス船長の日記のつぎのページがあらわれました。"
+                },
+                "grove_name_keeper": {
+                    "label": "林の名前の守り手",
+                    "shortLabel": "名前",
+                    "message": "かくれた発見: 林の名前の守り手。ライラはさくらの地図に、じぶんの名前をつけくわえます。"
+                },
+                "petal_lifter": {
+                    "label": "花びらをもちあげる者",
+                    "shortLabel": "花びら",
+                    "message": "かくれた発見: 花びらをもちあげる者。メロディが上がると、花はもっと高くただよいます。"
+                },
+                "grove_shifter": {
+                    "label": "林を動かす者",
+                    "shortLabel": "変化",
+                    "message": "かくれた発見: 林を動かす者。さくらの林が新しい色にかがやきます。"
+                },
+                "petal_trail_coin": {
+                    "label": "花びらの小道コイン",
+                    "shortLabel": "コイン",
+                    "message": "ひみつの宝コインを見つけました。長くしたさくらの道が、ケイデンス船長が追わなかった花びらを見せてくれます。"
+                }
+            },
+            "secretHelpCards": {
+                "renameChunks": {
+                    "title": "かたまりの名前を変える"
+                },
+                "changeOctave": {
+                    "title": "花びらをもちあげる"
+                },
+                "useTranspose": {
+                    "title": "移調をつかう"
+                },
+                "makeLonger": {
+                    "title": "もっと長い道をつくる",
+                    "heading": "花びらの小道をのばそう",
+                    "description": "道を長くするには、アクションのかたまりをもうひとつ足すか、お気に入りのさくらのかたまりをくり返すか、もう一度つかう前にアクションの中に音符をふやします。<br>音楽としては、長い道はメロディがさくための時間をふやしますが、パターンのつながりは残ります。"
+                }
+            }
+        },
+        "3": {
+            "title": "こどうのどうくつのリズム",
+            "description": "\n      <section class=\"story-card\">\n        <p>さくらの林のさきで、ライラとチューンは青いどうくつの中から小さくたたく音を聞きます。宝の地図はしずかですが、どうくつのかべは心ぞうのようにまたたいています。</p>\n        <div class=\"rhythm-cave\" aria-label=\"Pulse Cave beat map\">\n          <div class=\"cave-mouth\"></div>\n          <div class=\"pulse-lights\">\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"rhythm-river\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"journal-page rhythm-journal-page\">#3</div>\n        </div>\n        <p>「このてがかりは、まずメロディじゃないね」とチューンが言います。「これはこどうだ。つぎの歌が目ざめる前に、ビートをつくらないと。」</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>こどうのどうくつのビート</h4>\n        <p><b>リズムメーカー</b> をひらきます。ゆれないビートをつくり、長い音と短い音をいくつかためしてから、<b>リズムを保存する</b> をクリックします。</p>\n        <p>書き出されたリズムのアクションを <b>アクション</b> パレットで見つけ、<b>スタート</b> の下におき、<b>実行</b> をおして、どうくつのこどうを聞きましょう。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>ひみつのビート</h4>\n        <p>どうくつがまたたきはじめたら、リズムの実験をしてみましょう。ここでの発見は、ビート・長さ・ドラムの音色についてです。</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openMaker\">リズムメーカーをひらく</button>\n          <button type=\"button\" data-secret-help=\"saveRhythm\">リズムを保存する</button>\n          <button type=\"button\" data-secret-help=\"changeLength\">音符の長さを変える</button>\n          <button type=\"button\" data-secret-help=\"swapDrum\">べつのドラムをためす</button>\n          <button type=\"button\" data-secret-help=\"drumMachine\">ドラムマシンを保存する</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "こどうのどうくつ",
+                "island": "こだま島",
+                "completeTitle": "こどうのどうくつクリア",
+                "learned": ["ビート", "リズムメーカー", "書き出したリズムのアクション"]
+            },
+            "rewards": [
+                "メロディのかけら #3",
+                "船長の日記 #3ページ",
+                "宝のてがかり: つぎの道は、ゆれないこどうが変わるリズムをはこぶときにひらく。"
+            ],
+            "badges": {
+                "pulse_cave_keeper": {
+                    "label": "こどうのどうくつの守り手",
+                    "shortLabel": "こどう",
+                    "message": "どうくつの光がビートに合わせてまたたきます。ライラとチューンはリズムの道をケイデンス船長の日記に残しました。"
+                },
+                "beat_shaper": {
+                    "label": "ビートをかたちづくる者",
+                    "shortLabel": "ビート",
+                    "message": "かくれた発見: ビートをかたちづくる者。音符が長くなったり短くなったりすると、どうくつのこどうものびちぢみします。"
+                },
+                "drum_taster": {
+                    "label": "ドラムをきき分ける者",
+                    "shortLabel": "ドラム",
+                    "message": "かくれた発見: ドラムをきき分ける者。新しいドラムの音色がどうくつのかべにこだまします。"
+                },
+                "drum_machine_builder": {
+                    "label": "ドラムマシンづくりの名人",
+                    "shortLabel": "マシン",
+                    "message": "かくれた発見: ドラムマシンづくりの名人。どうくつがパーカッションのパターンでこたえてくれます。"
+                }
+            },
+            "secretHelpCards": {
+                "openMaker": {
+                    "title": "リズムメーカーをひらく"
+                },
+                "saveRhythm": {
+                    "title": "リズムを保存する",
+                    "heading": "ビートをかたまりに変えよう",
+                    "description": "リズムメーカーでこどうをかたちづくり、リズムを保存するをおします。Music Blocks が rhythm という新しいアクションをつくります。そのアクションをスタートの下におけば、プログラムが鳴らせます。<br>音楽としては、書き出すことでリズムのアイデアが、何度もつかえるパターンになります。"
+                },
+                "changeLength": {
+                    "title": "音符の長さを変える",
+                    "heading": "ビートをのばしたり、ちぢめたり",
+                    "description": "リズムメーカーをひらき、リズムの値をひとつ変えて、こどうの長さがぜんぶ同じでないようにします。リズムを 1/1 から 1/2 や 1/4 などに変えて、もう一度聞いてみましょう。<br>これで「ビートをかたちづくる者」の発見がひらきます。ビートは進みつづけたまま、長い音と短い音がパターンを変えるからです。"
+                },
+                "swapDrum": {
+                    "title": "べつのドラムをためす"
+                },
+                "drumMachine": {
+                    "title": "ドラムマシンを保存する",
+                    "heading": "どうくつにドラムでこたえてもらおう",
+                    "description": "リズムをためしたあと、リズムメーカーでドラムマシンを保存するをおします。ドラムの音をそのまま鳴らすアクションができます。ビートをリズムの目じるしではなく、パーカッションのパターンとして鳴らしたいときにつかいましょう。"
+                }
+            },
+            "incomplete": {
+                "title": "こどうのどうくつはまだしずかです",
+                "message": "チューンにはリズムメーカーのビートが聞こえますが、スタートはまだ書き出したリズムを鳴らしていません。リズムを保存するをクリックし、リズムのアクションを見つけてスタートの下におき、もう一度できたかチェックをおしてください。"
+            }
+        },
+        "4": {
+            "title": "むね・ゆびパッチン・手びょうし - リズムをつくろう",
+            "description": "\n      <section class=\"story-card\">\n        <p>こどうのどうくつをぬけると、明るい石の入り江が広がります。すなの上に3つのほりものが光っています: <b>むね</b>、<b>ゆびパッチン</b>、<b>手びょうし</b>。チューンが金ぞくのからだでそのパターンをたたくと、岩がこたえました。</p>\n        <div class=\"body-beat-cove\" aria-label=\"Chest snap clap rhythm map\">\n          <div class=\"cove-sun\"></div>\n          <div class=\"body-beat-row\">\n            <span>Chest</span>\n            <span>Snap</span>\n            <span>Clap</span>\n          </div>\n          <div class=\"body-beat-grid\">\n            <span></span><span></span><span></span><span></span>\n            <span></span><span></span><span></span><span></span>\n          </div>\n          <div class=\"journal-page body-beat-journal-page\">#4</div>\n        </div>\n        <p>「このリズムは2つの半分でできてるね」とライラが言います。「からだの音を時間にそってならべれば、入り江がつぎの宝のしるしを見せてくれる。」</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>からだのリズムの地図</h4>\n        <p><b>フレーズメーカー</b> をひらき、からだの音にドラムの行をつかいます。前半は <b>8分音符を8つ</b> でつくります。</p>\n        <p>後半は <b>8分音符を7つと16分音符を2つ</b> でつくります。両方の半分を <b>アクション</b> ブロックとして書き出し、<b>スタート</b> の下におき、リズムをくり返すために <b>～回くり返す</b> ブロックをつかいましょう。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>ひみつのからだリズム</h4>\n        <p>入り江が手びょうしでこたえはじめたら、からだリズムのくふうをためしましょう。ここでの発見は、形・くり返し・音えらび・アレンジについてです。</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openPhraseMaker\">フレーズメーカーをひらく</button>\n          <button type=\"button\" data-secret-help=\"exportHalves\">2つの半分を書き出す</button>\n          <button type=\"button\" data-secret-help=\"loopGroove\">グルーヴをくり返す</button>\n          <button type=\"button\" data-secret-help=\"swapBodySounds\">からだの音を入れかえる</button>\n          <button type=\"button\" data-secret-help=\"remixGroove\">じぶんのグルーヴをつくる</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "からだリズムの入り江",
+                "island": "こだま島",
+                "completeTitle": "からだリズムの入り江クリア",
+                "learned": ["フレーズメーカー", "2つの部分でできた形", "からだパーカッション"]
+            },
+            "rewards": [
+                "メロディのかけら #4",
+                "船長の日記 #4ページ",
+                "宝のてがかり: 宝のとびらは、ひとつのくり返しの中にある2つのからだリズムのこたえを聞いている。"
+            ],
+            "badges": {
+                "body_beat_builder": {
+                    "label": "からだリズムづくりの名人",
+                    "shortLabel": "からだ",
+                    "message": "入り江が2つの部分で手びょうしをかえします。ライラはからだのリズムをケイデンス船長の日記に書きとめました。"
+                },
+                "two_part_mapper": {
+                    "label": "2部形式の地図をかく者",
+                    "shortLabel": "部分",
+                    "message": "かくれた発見: 2部形式の地図をかく者。前半と後半が、はっきりとこたえ合っています。"
+                },
+                "loop_leader": {
+                    "label": "くり返しのリーダー",
+                    "shortLabel": "くり返し",
+                    "message": "かくれた発見: くり返しのリーダー。からだのリズムは、みんながグルーヴを感じられるまでまわりつづけます。"
+                },
+                "body_sound_designer": {
+                    "label": "からだの音のデザイナー",
+                    "shortLabel": "音",
+                    "message": "かくれた発見: からだの音のデザイナー。同じリズムが、新しい音色で話しはじめます。"
+                },
+                "cove_remixer": {
+                    "label": "入り江のリミキサー",
+                    "shortLabel": "アレンジ",
+                    "message": "ひみつの宝コインを見つけました。足したからだリズムのアイデアで、入り江が新しい形でおどりだします。"
+                }
+            },
+            "secretHelpCards": {
+                "openPhraseMaker": {
+                    "title": "フレーズメーカーをひらく"
+                },
+                "exportHalves": {
+                    "title": "2つの半分を書き出す",
+                    "heading": "リズムのかたまりを2つつくろう",
+                    "description": "フレーズメーカーで前半をつくり、アクションとして保存します。後半は短い16分音符のおわりをつけてつくり、それも保存します。2つのアクションのかたまりをスタートの下におきましょう。<br>音楽としては、2つのかたまりが「よびかけとこたえ」の形をつくります。前半がパターンを決め、後半がおわりを変えるのです。"
+                },
+                "loopGroove": {
+                    "title": "グルーヴをくり返す",
+                    "heading": "からだのリズムをくり返そう",
+                    "description": "スタートの下に～回くり返すブロックをおき、フレーズメーカーのアクションのかたまりを2つとも中に入れます。グルーヴぜんたいを2回や4回くり返してみましょう。<br>これで「くり返しのリーダー」の発見がひらきます。リズムはもう一度まわってくると、感じとりやすくなるからです。"
+                },
+                "swapBodySounds": {
+                    "title": "からだの音を入れかえる",
+                    "heading": "入り江のからだの音を変えよう",
+                    "description": "フレーズメーカーのアクションの中でドラムの名前をクリックし、パイメニューからべつの音をえらびます。たとえば、ドラムをベルや手びょうし、ほかのパーカッションに変えてみましょう。<br>音楽としては、タイミングは同じままで、リズムの色だけが変わります。"
+                },
+                "remixGroove": {
+                    "title": "じぶんのグルーヴをつくる",
+                    "heading": "からだリズムのアイデアをもうひとつ足そう",
+                    "description": "2つの部分のリズムがうまくいったら、フレーズメーカーから書き出したアクションをもうひとつ足すか、スタートの下でじぶんのアクションをもう一度よび出します。<br>これで「入り江のリミキサー」の発見がひらきます。もとめられたリズムより先へ、形を広げているからです。"
+                }
+            },
+            "incomplete": {
+                "title": "からだリズムの入り江が待っています",
+                "message": "チューンにはいくつかのたたく音が聞こえますが、入り江にはスタートの下にフレーズメーカーのアクションが2つひつようで、～回くり返すブロックでくり返されていなければなりません。両方の半分を書き出し、2つのアクションをくり返しの中に入れて、もう一度チェックしてください。"
+            }
+        },
+        "5": {
+            "title": "形のドラムさんごしょう",
+            "description": "\n      <section class=\"story-card\">\n        <p>からだリズムの入り江がこたえたあと、ケイデンス船長の地図が3つの光るりんかくにおりたたまれます。チューンにはどの形もリズムに聞こえます。ひとつの円が、ひとしいビートに分けられているのです。</p>\n        <div class=\"geometry-reef\" aria-label=\"Triangle square and pentagon reef map\">\n          <div class=\"geometry-orbit\"></div>\n          <div class=\"geometry-shape geometry-triangle\"></div>\n          <div class=\"geometry-shape geometry-square\"></div>\n          <div class=\"geometry-shape geometry-pentagon\"></div>\n          <div class=\"journal-page geometry-journal-page\">#5</div>\n        </div>\n        <p>「ひとまわりは <b>360度</b> だよ」とチューンが言います。「まわる角を辺の数で分ければ、ネズミが形のリズムをえがくんだ。」</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>形のリズム</h4>\n        <p>はなれている <b>～回くり返す</b>、<b>前へ進む</b>、<b>ざひょうち（右）</b> のブロックで <b>正方形</b> をかきます: くり返す <b>4</b>、前へ進む <b>100</b>、右へ <b>90</b>。</p>\n        <p>つぎに同じ考えでふやして、<b>スタート</b> のプログラムを3つ別々にもちましょう: <b>三角形</b>、<b>正方形</b>、<b>五角形</b> です。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>かくれた形のビート</h4>\n        <p>3つの形が出たら、もう少し深い幾何のくふうをためしましょう。さんごしょうは計算・色・新しい多角形の中にバッジをかくしています。</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"repeatSides\">辺をくり返す</button>\n          <button type=\"button\" data-secret-help=\"turnRight\">右にまわる</button>\n          <button type=\"button\" data-secret-help=\"divideCircle\">360をわる</button>\n          <button type=\"button\" data-secret-help=\"useBox\">箱をつかう</button>\n          <button type=\"button\" data-secret-help=\"colorShape\">色を変える</button>\n          <button type=\"button\" data-secret-help=\"extraPolygon\">べつの形をつくる</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "形のドラムさんごしょう",
+                "island": "ハーモニー幾何さんごしょう",
+                "completeTitle": "形のドラムさんごしょうクリア",
+                "learned": ["360度のまわり", "多角形", "幾何とリズム"]
+            },
+            "rewards": [
+                "メロディのかけら #5",
+                "船長の日記 #5ページ",
+                "宝のてがかり: ハーモニーの心は、ひとしい形のビートに分けられた円に耳をすます。"
+            ],
+            "badges": {
+                "shape_reef_builder": {
+                    "label": "形のさんごしょうづくりの名人",
+                    "shortLabel": "形",
+                    "message": "さんごしょうが三角形・正方形・五角形のリズムで光ります。ライラは形のてがかりをケイデンス船長の日記に残しました。"
+                },
+                "circle_divider": {
+                    "label": "円を分ける者",
+                    "shortLabel": "わる",
+                    "message": "かくれた発見: 円を分ける者。全音符がビートに分かれるように、360度を分けました。"
+                },
+                "box_geometer": {
+                    "label": "箱の幾何学者",
+                    "shortLabel": "箱",
+                    "message": "かくれた発見: 箱の幾何学者。しまわれたひとつの数が、形のくり返しとまわりの両方を動かします。"
+                },
+                "reef_colorist": {
+                    "label": "さんごしょうの色づかい",
+                    "shortLabel": "色",
+                    "message": "かくれた発見: さんごしょうの色づかい。幾何のさんごしょうが新しい色にかがやきます。"
+                },
+                "polygon_explorer": {
+                    "label": "多角形のたんけん家",
+                    "shortLabel": "多角形",
+                    "message": "ひみつの宝コインを見つけました。ケイデンス船長がさんごしょうにしるさなかった形をかいたのです。"
+                }
+            },
+            "secretHelpCards": {
+                "repeatSides": {
+                    "title": "辺をくり返す"
+                },
+                "turnRight": {
+                    "title": "右にまわる"
+                },
+                "divideCircle": {
+                    "title": "360をわる"
+                },
+                "useBox": {
+                    "title": "箱をつかう"
+                },
+                "colorShape": {
+                    "title": "色を変える"
+                },
+                "extraPolygon": {
+                    "title": "べつの形をつくる",
+                    "heading": "円の新しい分けかたをためそう",
+                    "description": "三角形・正方形・五角形がうまくいったら、スタートのプログラムをひとつコピーして、くり返す数とまわる角度を変え、べつの多角形をつくります。たとえば6つの辺なら60度ずつまわります。360を6でわると60だからです。<br>これで「多角形のたんけん家」の発見がひらきます。もとめられた形より先へ、円ぜんたいの考えをつかったからです。"
+                }
+            },
+            "incomplete": {
+                "title": "形のさんごしょうはまだぼんやりしています",
+                "message": "チューンにはさんごしょうの一部が見えますが、三角形・正方形・五角形の3つのスタートのプログラムが別々にひつようです。どれも～回くり返す、前へ進む、右へまわるを正しい角度でつかってください。"
+            }
+        },
+        "6": {
+            "title": "まわるポリリズムのラグーン",
+            "description": "\n      <section class=\"story-card\">\n        <p>形のドラムさんごしょうのむこうで、ライラは2つのさざなみが同時におどるラグーンを見つけます。ひとつのさざなみは <b>2</b> できざみます。もうひとつは <b>3</b> できざみます。チューンがささやきます。「これが <b>ポリリズム</b> だよ。2つのリズムがいっしょに動いて、出会って、またはなれるんだ。」</p>\n        <div class=\"polyrhythm-lagoon\" aria-label=\"Two rhythm ripples and a spinning avatar\">\n          <div class=\"lagoon-ring lagoon-ring-two\"><span>2</span></div>\n          <div class=\"lagoon-ring lagoon-ring-three\"><span>3</span></div>\n          <div class=\"avatar-orb\"></div>\n          <div class=\"journal-page lagoon-journal-page\">#6</div>\n        </div>\n        <p>ケイデンス船長のページにはこうあります。「ビートのうごきがちがうときは、アバターに動きを見せてもらおう。目でもリズムが聞けるように。」</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>ラグーンのミッション</h4>\n        <p>画面にある2つのリズムものさしをつかいます。ひとつは <b>2連ぷ</b> のリズム、もうひとつは <b>3連ぷ</b> のリズムのままにします。そして <b>ネズミへんこう</b> と <b>音符ごとにする</b> アクションをつないで、音楽が何かを動かすようにしましょう。</p>\n        <p>実行をおして、2ビートのさざなみと3ビートのさざなみがまた出会うしゅんかんを聞きましょう。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>かくれたさざなみのくふう</h4>\n        <p>ラグーンは、リズムを新しいかたちで目に見えるようにするたんけん家に、とくべつなしるしをのこしています。</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"dupletTriplet\">2連ぷ + 3連ぷ</button>\n          <button type=\"button\" data-secret-help=\"extraRipple\">新しいリズムのさざなみ</button>\n          <button type=\"button\" data-secret-help=\"everyNote\">音符ごとのアクション</button>\n          <button type=\"button\" data-secret-help=\"avatar\">アバター</button>\n          <button type=\"button\" data-secret-help=\"noteMotion\">音の長さで動かす</button>\n          <button type=\"button\" data-secret-help=\"pitchVoice\">音の高さの声</button>\n          <button type=\"button\" data-secret-help=\"turnMotion\">まわる動き</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "まわるポリリズムのラグーン",
+                "island": "ハーモニー幾何さんごしょう",
+                "completeTitle": "ポリリズムのラグーンクリア",
+                "learned": ["ポリリズム", "2連ぷと3連ぷ", "音に合わせたアニメーション"]
+            },
+            "rewards": [
+                "メロディのかけら #6",
+                "船長の日記 #6ページ",
+                "宝のてがかり: ハーモニーの心は、ちがうビートがそれぞれの道をうしなわずにいっしょに動くとき、あらわれる。"
+            ],
+            "badges": {
+                "lagoon_conductor": {
+                    "label": "ラグーンの指揮者",
+                    "shortLabel": "ラグーン",
+                    "message": "2連ぷと3連ぷのさざなみがいっしょにまわりはじめます。ライラはラグーンの動くリズムをケイデンス船長の日記にくわえました。"
+                },
+                "extra_ripple_maker": {
+                    "label": "さざなみを足す者",
+                    "shortLabel": "さざなみ",
+                    "message": "かくれた発見: さざなみを足す者。ラグーンの2と3のパターンより先に、新しいリズムのさざなみをくわえました。"
+                },
+                "avatar_spark": {
+                    "label": "アバターのひらめき",
+                    "shortLabel": "アバター",
+                    "message": "かくれた発見: アバターのひらめき。ラグーンにえんそう者があらわれました。"
+                },
+                "note_motion_mapper": {
+                    "label": "音の動きの地図をかく者",
+                    "shortLabel": "動き",
+                    "message": "かくれた発見: 音の動きの地図をかく者。アニメーションが音の長さを聞いています。ケイデンス船長のヒントのとおりです。"
+                },
+                "singing_ripple": {
+                    "label": "うたうさざなみ",
+                    "shortLabel": "声",
+                    "message": "かくれた発見: うたうさざなみ。動くリズムに、音の高さのある声をくわえました。"
+                },
+                "spin_choreographer": {
+                    "label": "まわる振りつけ師",
+                    "shortLabel": "まわる",
+                    "message": "ひみつの宝コインを見つけました。アバターがリズムに合わせてまわり、ラグーンのずれを見せてくれます。"
+                }
+            },
+            "secretHelpCards": {
+                "dupletTriplet": {
+                    "title": "2連ぷ + 3連ぷ"
+                },
+                "everyNote": {
+                    "title": "音符ごとのアクション"
+                },
+                "avatar": {
+                    "title": "アバター"
+                },
+                "noteMotion": {
+                    "title": "音の長さで動かす",
+                    "heading": "音符に動きをまかせよう",
+                    "description": "アニメーションのアクションの中で、ネズミの音の長さや、ネズミが鳴らした音符のブロックをつかいます。短い音は小さくまわり、長い音は大きくまわるようにできます。こうするとアバターはリズムを鳴らすだけでなく、見せてくれます。"
+                },
+                "pitchVoice": {
+                    "title": "音の高さの声"
+                },
+                "turnMotion": {
+                    "title": "まわる動き"
+                },
+                "extraRipple": {
+                    "title": "新しいリズムのさざなみ"
+                }
+            },
+            "incomplete": {
+                "title": "ラグーンはまだしずかです",
+                "message": "チューンには2ビートと3ビートのさざなみが聞こえますが、ラグーンにはアニメーションもひつようです。音符ごとにするアクションとネズミへんこうをつないで、リズムが画面の動きになるようにしましょう。"
+            }
+        },
+        "7": {
+            "title": "指揮者の信号のわ",
+            "description": "\n      <section class=\"story-card\">\n        <p>まわるラグーンは、ライラとチューンを <b>ブロードキャスト湾</b> へはこびます。12ひきの小さなドラムのネズミが大きなわになってドラムをかかえてすわっていますが、だれも音を出しません。「ビートを感じられないんだ」とチューンが言います。「どのネズミも、じぶんの名前がよばれるのを待っているんだよ。」</p>\n        <div class=\"signal-ring\" aria-label=\"Twelve drum mice in a circle around the conductor mouse\">\n          <div class=\"signal-ring-track\"></div>\n          <span class=\"ring-drum ring-drum-active\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <div class=\"ring-conductor\"></div>\n          <div class=\"journal-page ring-journal-page\">#7</div>\n        </div>\n        <p>まん中に立っているのは指揮者の <b>Mr. Mouse</b> です。ケイデンス船長のページにはこうあります。「よぶ者はひとり、聞く者はおおぜい。名前を空にはなてば、その名前をもつネズミだけがこたえる。」</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>わのための2つのくふう</h4>\n        <p><b>ことばを足す。</b> <b>プラス (+)</b> ブロックは数を足しますが、ことばをくっつけることもできます。「event」+「5」で <span class=\"tablet-code\">event5</span> になります。こうすれば、ひとつのイベント発生でまわるたびにちがうネズミをよべます。</p>\n        <p><b>わになって数える。</b> <b>mod</b> ブロックは数えてから、また最初にもどります。mod 12 は 0, 1, 2 ... 11 だけを出して、そのあと 0 にもどります。小節のビートを数えるのと同じですが、わは 1 ではなく 0 からはじまります。</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>わのミッション</h4>\n        <p>キャンバスにある2つのアクションのかたまりは、もうドラムのネズミたちのものです。そのそばにはなれているブロックが、きみのざいりょうです。きみの仕事は指揮者を目ざめさせることです。</p>\n        <ol>\n          <li><b>ずっとくり返す</b> を Mr. Mouse のスタートブロックの下につなぎ、その中に <b>円をえがいていどう</b> ブロックを入れて、指揮者がわのまわりを歩きつづけるようにします。</li>\n          <li>名前が <b>プラス (+)</b> ブロックでつくられる <b>イベント発生</b> をくわえて、event0、event1、event2 とよんでいくようにします。</li>\n          <li><b>mod</b> ブロックをつかって、数が 11 のつぎに 0 にもどるようにし、指揮者がよぶネズミにこまらないようにします。</li>\n          <li><b>mouse setup</b> のかたまりはそのまま残します。これは <b>のとき</b> と <b>指定ざひょうにいどう</b> をつかって、どのドラムのネズミもじぶんの名前を聞いたらわの中の場所へとびこむようにするからです。</li>\n        </ol>\n        <p>実行をおしてから、ドラムのネズミをクリックして、こたえる音を変えてみましょう。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>考えてみよう</h4>\n        <ul>\n          <li>コンピューターの外で「ブロードキャスト」はどんな意味でしょう。だれが聞いているでしょう。</li>\n          <li>Mr. Mouse は、ドラムのわのまわりで 1, 2, 3 と数える指揮者とどこがにていますか。</li>\n          <li>mod 12 はどうして 12 にとどかないのでしょう。</li>\n          <li>もし2ひきのネズミが同じ名前を聞いていたら、どうなるでしょう。</li>\n        </ul>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>かくれた信号</h4>\n        <p>湾は、わをもっと大きく、もっとにぎやかに、もっといきいきとさせるたんけん家にしるしをのこしています。</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"broadcastEvent\">イベント発生</button>\n          <button type=\"button\" data-secret-help=\"listenEvent\">名前を聞く</button>\n          <button type=\"button\" data-secret-help=\"eventName\">ことばを足す</button>\n          <button type=\"button\" data-secret-help=\"modCount\">わになって数える</button>\n          <button type=\"button\" data-secret-help=\"walkCircle\">円のまわりを歩く</button>\n          <button type=\"button\" data-secret-help=\"placeMouse\">ネズミをおく</button>\n          <button type=\"button\" data-secret-help=\"nameMouse\">ネズミに名前をつける</button>\n          <button type=\"button\" data-secret-help=\"makeMice\">ネズミのわをつくる</button>\n          <button type=\"button\" data-secret-help=\"useBox\">箱をつかう</button>\n          <button type=\"button\" data-secret-help=\"readBox\">箱を読む</button>\n          <button type=\"button\" data-secret-help=\"toggleTrick\">1と0を切りかえる</button>\n          <button type=\"button\" data-secret-help=\"ringDrum\">わのドラム</button>\n          <button type=\"button\" data-secret-help=\"mouseDance\">ネズミのダンス</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "指揮者の信号のわ",
+                "island": "ブロードキャスト湾",
+                "completeTitle": "信号のわクリア",
+                "learned": ["イベント発生と受信", "プラス (+) でつくる名前", "mod で数える"]
+            },
+            "rewards": [
+                "メロディのかけら #7",
+                "船長の日記 #7ページ",
+                "宝のてがかり: 最後のとびらは、ひとつの声がよび、おおぜいがじゅんばんにこたえる場所でひらく。"
+            ],
+            "badges": {
+                "ring_conductor": {
+                    "label": "わの指揮者",
+                    "shortLabel": "わ",
+                    "message": "Mr. Mouse が名前をよび、ドラムのネズミがこたえ、わがまわりはじめます。ライラは信号のわをケイデンス船長の日記にうつしました。"
+                },
+                "toggle_trickster": {
+                    "label": "切りかえの達人",
+                    "shortLabel": "切りかえ",
+                    "message": "かくれた発見: 切りかえの達人。小さなひき算ひとつで、ドラムが2つの音を行ったり来たりします。"
+                },
+                "ring_drummer": {
+                    "label": "わのドラマー",
+                    "shortLabel": "ドラム",
+                    "message": "かくれた発見: わのドラマー。ブロードキャスト湾がついに、待っていたビートを聞きました。"
+                },
+                "mouse_ringmaker": {
+                    "label": "ネズミのわをつくる者",
+                    "shortLabel": "ネズミ",
+                    "message": "かくれた発見: ネズミのわをつくる者。ビートをじゅんばんにわたせるだけのネズミがそろいました。"
+                },
+                "box_reader": {
+                    "label": "箱を読む者",
+                    "shortLabel": "箱",
+                    "message": "かくれた発見: 箱を読む者。指揮者は箱の中を見て、どのドラムをよぶかわかるようになりました。"
+                },
+                "ring_dancer": {
+                    "label": "わのダンサー",
+                    "shortLabel": "ダンス",
+                    "message": "ひみつの宝コインを見つけました。ドラムのネズミは鳴らすだけでなく、名前をよばれるとおどりだします。"
+                }
+            },
+            "secretHelpCards": {
+                "broadcastEvent": {
+                    "title": "イベント発生"
+                },
+                "listenEvent": {
+                    "title": "名前を聞く"
+                },
+                "eventName": {
+                    "title": "ことばを足す"
+                },
+                "modCount": {
+                    "title": "わになって数える"
+                },
+                "walkCircle": {
+                    "title": "円のまわりを歩く"
+                },
+                "placeMouse": {
+                    "title": "ネズミをおく"
+                },
+                "nameMouse": {
+                    "title": "ネズミに名前をつける"
+                },
+                "makeMice": {
+                    "title": "ネズミのわをつくる",
+                    "heading": "ドラムごとにネズミをあげよう",
+                    "description": "わのドラムはどれもべつのネズミなので、ドラムごとにスタートブロックがひつようです。スタートブロックをくわえ、名前をせっていブロックで 0 と名づけ、それから mouse setup のかたまりをよんで event0 を聞くようにします。つぎに 1 という名前のスタート、そのつぎに 2 と、つづけていきましょう。<br>12 ひきなら 12 のビートになりますが、3 びきか 4 ひきいれば、わがまわるのが聞こえます。"
+                },
+                "useBox": {
+                    "title": "箱をつかう"
+                },
+                "readBox": {
+                    "title": "箱を読む"
+                },
+                "toggleTrick": {
+                    "title": "1と0を切りかえる",
+                    "heading": "じぶんでひっくり返る数",
+                    "description": "change アクションの中で、箱に「1 ひく 箱」の値を入れます。箱が 0 なら 1 - 0 = 1。箱が 1 なら 1 - 1 = 0 になるので、ネズミをクリックするたびに数がひっくり返ります。<br>音楽としては、このひとつの数が、ネズミが2つのドラムのどちらでこたえるかを決めます。"
+                },
+                "ringDrum": {
+                    "title": "わのドラム"
+                },
+                "mouseDance": {
+                    "title": "ネズミのダンス"
+                }
+            },
+            "incomplete": {
+                "title": "わはまだしずかです",
+                "message": "チューンにはネズミたちが見えますが、だれもよんでいません。指揮者には、くり返しの中の円をえがいていどうと、名前がプラス (+) ブロックでつくられるイベント発生と、数が 0 にもどるための mod ブロックがひつようです。mouse setup のかたまりは、のときと指定ざひょうにいどうのブロックといっしょに残してください。"
+            }
+        },
+        "8": {
+            "title": "星空の歌",
+            "description": "\n      <section class=\"story-card\">\n        <p>信号のわの最後のよびかけが、世界のいちばん高いところにあるとびらをひらきます。そのむこうで、ライラとチューンは <b>星あかりの頂上</b> へのぼります。グランドメロディがはじめてうたわれた場所です。空は暗いままです。「歌がうしなわれたとき、星はだまってしまったんだ」とチューンが言います。「歌ってあげれば、また光るよ。」</p>\n        <div class=\"star-sky\" aria-label=\"Pitch over time graph of the first Twinkle Twinkle phrase\">\n          <div class=\"star-graph\">\n            <div class=\"star-graph-labels\">\n              <span>La</span><span>Sol</span><span>Fa</span>\n              <span>Mi</span><span>Re</span><span>Do</span>\n            </div>\n            <div class=\"star-graph-plot\">\n            <span class=\"star-note star-beat-1 star-pitch-do\"></span>\n            <span class=\"star-note star-beat-2 star-pitch-do\"></span>\n            <span class=\"star-note star-beat-3 star-pitch-sol\"></span>\n            <span class=\"star-note star-beat-4 star-pitch-sol\"></span>\n            <span class=\"star-note star-beat-5 star-pitch-la\"></span>\n            <span class=\"star-note star-beat-6 star-pitch-la\"></span>\n            <span class=\"star-note star-beat-7 star-pitch-sol\"></span>\n            </div>\n          </div>\n          <div class=\"journal-page star-journal-page\">#8</div>\n        </div>\n        <p>どの星もじぶんの高さにあります。空の低いところの星は低い音、高いところの星は高い音です。左から右へ読むことは、時間を先へ進むことです。これが <b>時間にそった音の高さ</b> で、上の星たちは星の歌の最初のフレーズをつづっています。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>星の歌</h4>\n        <p>つくる前に一度うたって、どこへ進むのか耳におぼえさせましょう。Twinkle Twinkle には3つのフレーズがあります:</p>\n        <ul>\n          <li><b>A1:</b> Do Do Sol Sol La La Sol</li>\n          <li><b>A2:</b> Fa Fa Mi Mi Re Re Do</li>\n          <li><b>B:</b> Sol Sol Fa Fa Mi Mi Re</li>\n        </ul>\n        <p>どの音も <b>4</b> のオクターヴをつかいます。フレーズメーカーのリズムはもうぴったりです。短い音符が6つと長い音符が1つ、つまりフレーズごとにちょうど7つの星です。</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>頂上のミッション</h4>\n        <p>フレーズメーカーには Do, Re, Mi, Fa, Sol, La がもう用意されています。きみは星をおくだけです。</p>\n        <ol>\n          <li><b>フレーズメーカー</b> ブロックをクリックしてグリッドをひらき、マスをクリックして <b>A1</b> のフレーズをつくります。</li>\n          <li><b>保存する</b> をおしてそのフレーズをアクションブロックに変え、同じように <b>A2</b> と <b>B</b> もつくって保存します。</li>\n          <li>保存した3つのアクションを <b>アクション</b> パレットで見つけ、歌のじゅんばんで <b>スタート</b> の下にかさねます: <b>A1 A2 B B A1 A2</b>。</li>\n          <li>実行をおします。星の歌のように聞こえたら、空が明るくなります。</li>\n        </ol>\n        <p>じゅんばんをおぼえるチューンのくふう: これはサンドイッチです。2つの <b>A</b> のフレーズが外がわのパン、まん中の <b>B</b> がぐです。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>考えてみよう</h4>\n        <ul>\n          <li>歌のどの部分が上がって、どの部分がまた下がりますか。</li>\n          <li>どうして B のフレーズはまん中で2回鳴るのでしょう。</li>\n          <li>星がひとつ上の行にうつったら、そこは高く聞こえますか、低く聞こえますか。</li>\n        </ul>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>かくれた星あかり</h4>\n        <p>頂上は、星の歌をじぶんのものにするたんけん家にしるしをのこしています。</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openPhraseMaker\">フレーズメーカーをひらく</button>\n          <button type=\"button\" data-secret-help=\"solfegeNames\">Do Re Mi の名前</button>\n          <button type=\"button\" data-secret-help=\"exportParts\">フレーズごとに保存する</button>\n          <button type=\"button\" data-secret-help=\"sandwichForm\">サンドイッチの形</button>\n          <button type=\"button\" data-secret-help=\"renameChunks\">フレーズの名前を変える</button>\n          <button type=\"button\" data-secret-help=\"changeOctave\">高いか低いか</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">変そうをためす</button>\n          <button type=\"button\" data-secret-help=\"starDance\">星のダンス</button>\n          <button type=\"button\" data-secret-help=\"harmonize\">2つめの声をくわえる</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "星空の歌",
+                "island": "星あかりの頂上",
+                "completeTitle": "星空クリア",
+                "learned": [
+                    "時間にそった音の高さ",
+                    "フレーズメーカーのメロディ",
+                    "A1 A2 B B A1 A2 の形"
+                ]
+            },
+            "rewards": [
+                "メロディのかけら #8",
+                "船長の日記 #8ページ",
+                "宝を発見: グランドメロディがまたひとつになり、きみが目ざめさせたすべての島がその歌をかえしてくれます。"
+            ],
+            "badges": {
+                "star_song_keeper": {
+                    "label": "星の歌の守り手",
+                    "shortLabel": "星",
+                    "message": "星がひとつずつ光り、頂上が明るくなって、グランドメロディがもどってきます。ライラはケイデンス船長の日記の最後のページを書きました。"
+                },
+                "sandwich_namer": {
+                    "label": "サンドイッチの名づけ親",
+                    "shortLabel": "名前",
+                    "message": "かくれた発見: サンドイッチの名づけ親。フレーズにじぶんで決めた名前がついて、形がレシピのように読めます。"
+                },
+                "high_star": {
+                    "label": "高い星",
+                    "shortLabel": "高い",
+                    "message": "かくれた発見: 高い星。ひとつの音が、べつのオクターヴから光っています。"
+                },
+                "star_variation": {
+                    "label": "星の変そう",
+                    "shortLabel": "変化",
+                    "message": "かくれた発見: 星の変そう。モーツァルトがこのメロディでやったように、歌ぜんたいを新しい場所へうつしました。"
+                },
+                "star_dancer": {
+                    "label": "星のダンサー",
+                    "shortLabel": "ダンス",
+                    "message": "かくれた発見: 星のダンサー。ネズミがメロディに合わせてまわり、うたいながら空をえがきます。"
+                },
+                "second_voice": {
+                    "label": "2つめの声",
+                    "shortLabel": "声",
+                    "message": "ひみつの宝コインを見つけました。2つめのスタートブロックがくわわり、星の歌にハーモニーが生まれます。"
+                }
+            },
+            "secretHelpCards": {
+                "openPhraseMaker": {
+                    "title": "フレーズメーカーをひらく"
+                },
+                "solfegeNames": {
+                    "title": "Do Re Mi の名前"
+                },
+                "exportParts": {
+                    "title": "フレーズごとに保存する",
+                    "heading": "フレーズをアクションブロックに変えよう",
+                    "description": "フレーズメーカーのグリッドでフレーズがうまくできたら、ウィジェットの保存するボタンをおします。Music Blocks が action という新しいアクションブロックをつくり、つぎは action1、そのつぎは action2 となって、アクションパレットにあらわれます。<br>音楽としては、保存したアクションのひとつひとつが歌のフレーズで、いつでも鳴らしなおせます。"
+                },
+                "sandwichForm": {
+                    "title": "サンドイッチの形",
+                    "heading": "パンは外、ぐはまん中",
+                    "description": "保存したアクションをスタートの下にこのじゅんばんでかさねます: A1, A2, B, B, A1, A2。2つの A のフレーズがサンドイッチの外がわのパンで、まん中の B のフレーズがぐです。<br>音楽としては、最後に A のフレーズへもどることが、歌がおわった感じをつくります。"
+                },
+                "renameChunks": {
+                    "title": "フレーズの名前を変える"
+                },
+                "changeOctave": {
+                    "title": "高いか低いか"
+                },
+                "useTranspose": {
+                    "title": "変そうをためす"
+                },
+                "starDance": {
+                    "title": "星のダンス"
+                },
+                "harmonize": {
+                    "title": "2つめの声をくわえる"
+                }
+            },
+            "incomplete": {
+                "title": "星はまだ暗いままです",
+                "message": "チューンには星の歌の一部が聞こえます。フレーズメーカーで3つのフレーズすべてをアクションブロックとして保存し (Do Do Sol Sol La La Sol、つぎに Fa Fa Mi Mi Re Re Do、つぎに Sol Sol Fa Fa Mi Mi Re)、そのアクションをスタートの下に A1 A2 B B A1 A2 のじゅんばんでかさねてください。"
+            }
+        }
+    }
+}

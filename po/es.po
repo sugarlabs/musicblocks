@@ -9026,3 +9026,441 @@ msgstr "alta"
 #: plugins/weather.rtp:149
 msgid "low"
 msgstr "baja"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Collapse Lesson Plans"
+msgstr "Contraer los planes de lección"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Collapse Explorer Journal"
+msgstr "Contraer el diario del explorador"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Expand Lesson Plans"
+msgstr "Expandir los planes de lección"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Expand Explorer Journal"
+msgstr "Expandir el diario del explorador"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Practice Lessons Not Ready"
+msgstr "Las lecciones de práctica no están listas"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The lesson file could not be loaded. Please check js/practiceLessons/practiceLessons.json."
+msgstr "No se pudo cargar el archivo de lecciones. Comprueba js/practiceLessons/practiceLessons.json."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Practice"
+msgstr "Práctica"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Level"
+msgstr "Nivel"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Back"
+msgstr "Atrás"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Check My Work"
+msgstr "Comprobar mi trabajo"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Quest Rewards"
+msgstr "Recompensas de la misión"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Discoveries"
+msgstr "Descubrimientos"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The lesson song shines, and the island answers."
+msgstr "La canción de la lección brilla y la isla responde."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Melody Fragment restored. Captain's Journal Page found."
+msgstr "Fragmento de melodía recuperado. Página del diario del capitán encontrada."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The bridge song is still shining."
+msgstr "La canción del puente sigue brillando."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Discovery Already Saved"
+msgstr "Descubrimiento ya guardado"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Lyra has this mark in her map. Keep exploring the island for another secret."
+msgstr "Lyra ya tiene esta marca en su mapa. Sigue explorando la isla para hallar otro secreto."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Hidden Discovery"
+msgstr "Descubrimiento oculto"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The Bridge Is Still Sleeping"
+msgstr "El puente sigue dormido"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Beat hears a few echoes, but the stone tablet is waiting for A A B A. Try the bridge song again, then press Check My Work."
+msgstr "Beat oye algunos ecos, pero la tabla de piedra espera A A B A. Prueba otra vez la canción del puente y pulsa Comprobar mi trabajo."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Discovery badge"
+msgstr "Insignia de descubrimiento"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Explorer Journal"
+msgstr "Diario del explorador"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "My Explorer Book"
+msgstr "Mi libro de exploradora"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Memories from every island you have helped wake up."
+msgstr "Recuerdos de cada isla que has ayudado a despertar."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Island Pages"
+msgstr "Páginas de las islas"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "My Notes"
+msgstr "Mis notas"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Save your own ideas, drawings-in-words, or music thoughts here."
+msgstr "Guarda aquí tus propias ideas, dibujos con palabras o pensamientos musicales."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add new note"
+msgstr "Añadir una nota nueva"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "+ New Note"
+msgstr "+ Nota nueva"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Page"
+msgstr "Página"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Notes"
+msgstr "Notas"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Entries"
+msgstr "Entradas"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "New Note"
+msgstr "Nota nueva"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Title"
+msgstr "Título"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Give your note a name..."
+msgstr "Ponle un nombre a tu nota..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "First thought"
+msgstr "Primera idea"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Write anything you want to remember..."
+msgstr "Escribe cualquier cosa que quieras recordar..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Save Note"
+msgstr "Guardar nota"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Blank Page Waiting"
+msgstr "Una página en blanco espera"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add a title or a thought first, or come back when you are ready."
+msgstr "Primero añade un título o una idea, o vuelve cuando estés listo."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Saved"
+msgstr "Nota guardada"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your personal note is tucked safely in My Notes."
+msgstr "Tu nota personal está guardada a salvo en Mis notas."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add another thought"
+msgstr "Añadir otra idea"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Write more here..."
+msgstr "Escribe más aquí..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add Entry"
+msgstr "Añadir entrada"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Delete Note"
+msgstr "Borrar nota"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Removed"
+msgstr "Nota borrada"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That personal note has been cleared from your book."
+msgstr "Esa nota personal se ha borrado de tu libro."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Entry Added"
+msgstr "Entrada añadida"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Another thought has been added to your note."
+msgstr "Se ha añadido otra idea a tu nota."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Entry Removed"
+msgstr "Entrada borrada"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That entry has been removed from your note."
+msgstr "Esa entrada se ha borrado de tu nota."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Things I learned"
+msgstr "Cosas que aprendí"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add a new memory"
+msgstr "Añadir un recuerdo nuevo"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Today I discovered..."
+msgstr "Hoy descubrí..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add Note"
+msgstr "Añadir nota"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Added"
+msgstr "Nota añadida"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "A new memory has been tucked into this page."
+msgstr "Un recuerdo nuevo se ha guardado en esta página."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That memory has been removed from this page."
+msgstr "Ese recuerdo se ha borrado de esta página."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Updated"
+msgstr "Nota actualizada"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your Explorer Book remembers the new version."
+msgstr "Tu libro de exploradora recuerda la versión nueva."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Title Updated"
+msgstr "Título actualizado"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your note title has been saved."
+msgstr "Se ha guardado el título de tu nota."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That memory has been removed."
+msgstr "Ese recuerdo se ha borrado."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Write a small memory first, or come back when you are ready."
+msgstr "Escribe primero un recuerdo pequeño, o vuelve cuando estés listo."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "No notes yet"
+msgstr "Todavía no hay notas"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "This page is ready whenever you want to write."
+msgstr "Esta página está lista para cuando quieras escribir."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your book is waiting"
+msgstr "Tu libro está esperando"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Complete a practice level and Captain Cadence will share the first page."
+msgstr "Completa un nivel de práctica y el capitán Cadence te dará la primera página."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Close Explorer Journal prompt"
+msgstr "Cerrar el aviso del diario del explorador"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Captain's Journal"
+msgstr "Diario del capitán"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Every explorer notices something different. Before you sail onward, save one tiny memory from today."
+msgstr "Cada explorador se fija en algo distinto. Antes de zarpar, guarda un recuerdo pequeñito de hoy."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "What surprised you today?"
+msgstr "¿Qué te sorprendió hoy?"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "I discovered..."
+msgstr "Descubrí..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Skip"
+msgstr "Omitir"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Explorer Book Updated"
+msgstr "Libro de exploradora actualizado"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Captain Cadence saves your page. You can edit it later from Help > Explorer Journal."
+msgstr "El capitán Cadence guarda tu página. Puedes editarla más tarde desde Ayuda > Diario del explorador."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Page Saved For Later"
+msgstr "Página guardada para después"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The Explorer Book keeps a blank page ready whenever you want to write."
+msgstr "El libro de exploradora guarda una página en blanco para cuando quieras escribir."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Saved in your journal"
+msgstr "Guardado en tu diario"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Untitled Note"
+msgstr "Nota sin título"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "My thought"
+msgstr "Mi idea"
+
+#: js/toolbar.js
+msgid "Practice levels"
+msgstr "Niveles de práctica"
+
+#: js/widgets/help.js
+msgid "Try this"
+msgstr "Prueba esto"
+
+#: js/widgets/help.js
+msgid "What does this mean in music?"
+msgstr "¿Qué significa esto en música?"
+
+#: js/widgets/help.js
+msgid "What it means in music"
+msgstr "Qué significa en música"
+
+#: js/widgets/help.js
+msgid "How do I do it?"
+msgstr "¿Cómo lo hago?"
+
+#: js/blocks/PitchBlocks.js
+msgid "Changing the octave number keeps the pitch name but makes the note sound higher or lower."
+msgstr "Cambiar el número de octava mantiene el nombre de la nota, pero hace que suene más aguda o más grave."
+
+#: js/blocks/ActionBlocks.js
+msgid "You can rename an Action block to give a music chunk a helpful name."
+msgstr "Puedes cambiar el nombre de un bloque de acción para darle un nombre útil a un trozo de música."
