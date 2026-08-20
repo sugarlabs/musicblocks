@@ -108,6 +108,8 @@ understanding of the codebase.
 
 ### Before You Push
 
+For detailed testing guidance, including the shared test infrastructure and reusable test utilities, see the [Testing Guide](Docs/TESTING.md#shared-test-infrastructure).
+
 Run these commands locally before submitting a PR:
 
 ```bash
