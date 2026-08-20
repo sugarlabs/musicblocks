@@ -8,7 +8,8 @@ const COMPLETION_CRITERIA = [
     "completePhraseWorkflow",
     "completeBasicShapeSet",
     "completeAnimatedPolyrhythm",
-    "completeCircularRhythmRing"
+    "completeCircularRhythmRing",
+    "completeTwinkleForm"
 ];
 
 const PracticeUI = {
@@ -350,7 +351,8 @@ const PracticeUI = {
             4: "phrase_maker_level4.tb",
             5: "geometry_rhythm_level5.tb",
             6: "animated_polyrhythms_level6.tb",
-            7: "circular_rhythm_level7.tb"
+            7: "circular_rhythm_level7.tb",
+            8: "twinkle_phrase_maker_level8.tb"
         };
 
         const file = projectFiles[level];

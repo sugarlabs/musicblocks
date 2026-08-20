@@ -890,6 +890,126 @@
     transform: rotate(5deg);
 }
 
+/* The Level 8 sky doubles as the lesson's handout: pitch on the vertical axis, time across. */
+.star-sky {
+    position: relative;
+    padding: 12px 12px 64px;
+    border: 1px solid #4b478f;
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 14% 22%, rgba(255, 244, 190, 0.9) 0 1.5px, transparent 2px),
+        radial-gradient(circle at 86% 16%, rgba(255, 244, 190, 0.75) 0 1.5px, transparent 2px),
+        radial-gradient(circle at 72% 88%, rgba(255, 244, 190, 0.6) 0 1.5px, transparent 2px),
+        linear-gradient(180deg, #33306e 0 55%, #4d4590 56% 100%);
+}
+
+.star-graph {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 6px;
+    height: 108px;
+}
+
+.star-graph-labels {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    align-items: center;
+    color: #ffeaa7;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: right;
+}
+
+.star-graph-plot {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    border-left: 2px solid rgba(255, 234, 167, 0.55);
+    border-bottom: 2px solid rgba(255, 234, 167, 0.55);
+    background: repeating-linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.16) 0 1px,
+        transparent 1px calc(100% / 6)
+    );
+}
+
+.star-note {
+    place-self: center;
+    width: 17px;
+    height: 17px;
+    background: radial-gradient(circle at 50% 42%, #fffbe6 0 28%, #ffd93d 29% 100%);
+    clip-path: polygon(
+        50% 0,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 91%,
+        50% 70%,
+        21% 91%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+    );
+}
+
+.star-beat-1 {
+    grid-column: 1;
+}
+
+.star-beat-2 {
+    grid-column: 2;
+}
+
+.star-beat-3 {
+    grid-column: 3;
+}
+
+.star-beat-4 {
+    grid-column: 4;
+}
+
+.star-beat-5 {
+    grid-column: 5;
+}
+
+.star-beat-6 {
+    grid-column: 6;
+}
+
+.star-beat-7 {
+    grid-column: 7;
+}
+
+.star-pitch-la {
+    grid-row: 1;
+}
+
+.star-pitch-sol {
+    grid-row: 2;
+}
+
+.star-pitch-fa {
+    grid-row: 3;
+}
+
+.star-pitch-mi {
+    grid-row: 4;
+}
+
+.star-pitch-re {
+    grid-row: 5;
+}
+
+.star-pitch-do {
+    grid-row: 6;
+}
+
+.star-journal-page {
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%) rotate(-4deg);
+}
+
 .petal-song-map span {
     position: relative;
     min-height: 34px;
@@ -1096,6 +1216,10 @@
 
 .journal-level-7 {
     border-left-color: color-mix(in srgb, var(--accent, #2196f3) 46%, #7b5ea7);
+}
+
+.journal-level-8 {
+    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 42%, #ffd93d);
 }
 
 .journal-page-top {
@@ -1648,6 +1772,10 @@
 
 .level-badge-mice::after {
     content: "12";
+}
+
+.level-badge-star::after {
+    content: "St";
 }
 
 .level-badge-discovery::after {
