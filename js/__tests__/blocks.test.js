@@ -317,6 +317,29 @@ describe("Blocks Foundation", () => {
     });
 
     describe("Constructor", () => {
+        it("_getStackSize does not throw on an out-of-range block index", () => {
+            const blocks = new Blocks(mockActivity);
+            // Non-empty so the loop-counter guard (sizeCounter > blockList.length * 2)
+            // doesn't short-circuit before reaching the out-of-range dereference.
+            blocks.blockList = [{}, {}];
+
+            expect(() => blocks._getStackSize(99999)).not.toThrow();
+        });
+
+        it("adjustExpandableClampBlock does not throw on an out-of-range block index", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [{}, {}];
+            blocks.clampBlocksToCheck = [[99999, 0]];
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+            expect(() => blocks.adjustExpandableClampBlock()).not.toThrow();
+            expect(debugSpy).toHaveBeenCalledWith(
+                expect.stringContaining("Something very broken in adjustExpandableClampBlock")
+            );
+
+            debugSpy.mockRestore();
+        });
+
         it("should initialize using an activity object", () => {
             const blocks = new Blocks(mockActivity);
 

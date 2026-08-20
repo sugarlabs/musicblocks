@@ -682,6 +682,11 @@ class Blocks {
 
             const myBlock = this.blockList[blk];
 
+            if (myBlock === null || myBlock === undefined) {
+                console.debug("Something very broken in adjustExpandableClampBlock: " + blk);
+                return;
+            }
+
             if (myBlock.isArgFlowClampBlock() || myBlock.isLeftClampBlock()) {
                 /** Make sure myBlock is a clamp block. */
             } else if (myBlock.isArgBlock() || myBlock.isTwoArgBlock()) {
@@ -981,7 +986,7 @@ class Blocks {
             }
 
             const myBlock = this.blockList[blk];
-            if (myBlock === null) {
+            if (myBlock === null || myBlock === undefined) {
                 console.debug("Something very broken in _getStackSize.");
                 return size;
             }
