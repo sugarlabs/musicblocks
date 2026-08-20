@@ -19,7 +19,9 @@ const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7
 requirejs.config({
     baseUrl: "./",
     urlArgs: ASSET_VERSION,
-    waitSeconds: 60,
+    // Keep the bootstrap alive while modules download or evaluate on slow
+    // connections. The loading splash remains visible until initialization completes.
+    waitSeconds: 0,
     shim: {
         "easeljs.min": {
             exports: "createjs"
@@ -179,7 +181,7 @@ requirejs.config({
                 "activity/block-scale-controller",
                 "search-ui",
                 "project-manager",
-                "keyboard-controller",
+                "activity/keyboard-controller",
                 "activity/selection-controller",
                 "activity/trash-controller",
                 "activity/help-controller",
@@ -233,9 +235,10 @@ requirejs.config({
         "activity/selection-controller": "js/activity/selection-controller",
         "activity/block-scale-controller": "js/activity/block-scale-controller",
         "activity/block-drag-controller": "js/activity/block-drag-controller",
+        "activity/trash-controller": "js/activity/trash-controller",
         "search-ui": "js/search-ui",
         "project-manager": "js/project-manager",
-        "keyboard-controller": "js/keyboard-controller",
+        "activity/keyboard-controller": "js/activity/keyboard-controller",
         "activity/pubsub": "js/pubsub",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",

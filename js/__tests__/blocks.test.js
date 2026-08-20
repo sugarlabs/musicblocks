@@ -677,6 +677,23 @@ describe("Blocks Foundation", () => {
             expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
         });
 
+        it.each(["toString", "constructor", "hasOwnProperty", "valueOf", "__proto__"])(
+            "loads a block named '%s' without throwing",
+            reservedName => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.newStorein2Block = jest.fn();
+                blocks.newNamedboxBlock = jest.fn();
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks.customTemperamentDefined = true;
+                blocks._makeNewBlockWithConnections = jest.fn();
+
+                const blockObjs = [[0, reservedName, 0, 0, [null, null, null]]];
+
+                expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            }
+        );
+
         it("resets _suppressRefresh on circular connection early return", () => {
             const blocks = new Blocks(mockActivity);
             blocks.blockList = [];
@@ -1293,6 +1310,75 @@ describe("Blocks Foundation", () => {
             expect(wideBlock.text.text).toBe(longLabel);
             expect(normalBlock.text.text.endsWith("...")).toBe(true);
             expect(normalBlock.text.text.length).toBeLessThan(longLabel.length);
+        });
+    });
+
+    describe("sendStackToTrash DOM safety", () => {
+        it("should safely complete sendStackToTrash when #hideContents element is missing from DOM", () => {
+            const mockActivity = {
+                palettes: { dict: {} },
+                refreshCanvas: jest.fn(),
+                trashcan: { stopHighlightAnimation: jest.fn() }
+            };
+            const blocksInstance = new Blocks(mockActivity);
+
+            const mockBlock = {
+                blockIndex: 1,
+                connections: [null],
+                container: { uncache: jest.fn() },
+                protoblock: { style: "normal", parameter: false, staticLabels: ["test"] },
+                hide: jest.fn()
+            };
+
+            blocksInstance.blockList[1] = mockBlock;
+            blocksInstance.captureStackPreview = jest.fn().mockReturnValue(null);
+            blocksInstance._cleanupStacks = jest.fn();
+
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue(null);
+
+            try {
+                expect(() => blocksInstance.sendStackToTrash(mockBlock)).not.toThrow();
+            } finally {
+                document.getElementById = originalGetElementById;
+            }
+        });
+
+        it("should click #hideContents when it exists in DOM", () => {
+            const mockActivity = {
+                palettes: { dict: {} },
+                refreshCanvas: jest.fn(),
+                trashcan: { stopHighlightAnimation: jest.fn() }
+            };
+            const blocksInstance = new Blocks(mockActivity);
+
+            const mockBlock = {
+                blockIndex: 1,
+                connections: [null],
+                container: { uncache: jest.fn() },
+                protoblock: { style: "normal", parameter: false, staticLabels: ["test"] },
+                hide: jest.fn()
+            };
+
+            blocksInstance.blockList[1] = mockBlock;
+            blocksInstance.captureStackPreview = jest.fn().mockReturnValue(null);
+            blocksInstance._cleanupStacks = jest.fn();
+
+            const mockClick = jest.fn();
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockImplementation(id => {
+                if (id === "hideContents") {
+                    return { click: mockClick };
+                }
+                return null;
+            });
+
+            try {
+                blocksInstance.sendStackToTrash(mockBlock);
+                expect(mockClick).toHaveBeenCalled();
+            } finally {
+                document.getElementById = originalGetElementById;
+            }
         });
     });
 });

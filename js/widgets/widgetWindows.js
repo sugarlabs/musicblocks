@@ -95,32 +95,33 @@ window.widgetWindows = {
                 e.target.closest(".dropdown-content") ||
                 e.target.closest(".dropdown-trigger"));
 
+        if (isToolbarInteraction) {
+            return;
+        }
+
         const windows = Object.values(this.openWindows).filter(win => win !== undefined);
-        let focusedAny = false;
+        let clickedWindow = null;
 
         for (let i = 0; i < windows.length; i++) {
             const win = windows[i];
-            if (
-                e.target === win._frame ||
-                win._frame.contains(e.target) ||
-                win._fullscreenEnabled ||
-                isToolbarInteraction
-            ) {
-                // Focus this window
+            if (win._frame && (e.target === win._frame || win._frame.contains(e.target))) {
+                clickedWindow = win;
+                break;
+            }
+        }
+
+        for (let i = 0; i < windows.length; i++) {
+            const win = windows[i];
+            if (win === clickedWindow) {
                 win._frame.style.opacity = "1";
                 win._frame.style.zIndex = "10000";
-                this.focused = win;
-                focusedAny = true;
             } else {
-                // Dim other windows
-                win._frame.style.opacity = ".7";
+                win._frame.style.opacity = "0.7";
                 win._frame.style.zIndex = "0";
             }
         }
 
-        if (!focusedAny) {
-            this.focused = null;
-        }
+        this.focused = clickedWindow;
     }
 };
 

@@ -845,4 +845,114 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.openWindows["FallbackTitle"]).toBe(win);
         });
     });
+
+    describe("_handleGlobalMouseDown and focus management", () => {
+        test("focuses clicked window and dims other windows", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+
+            // win2 was created last so it took focus initially
+            expect(window.widgetWindows.focused).toBe(win2);
+
+            // Simulate mousedown inside win1
+            const clickEvent = new MouseEvent("mousedown", { bubbles: true });
+            win1._frame.dispatchEvent(clickEvent);
+
+            expect(window.widgetWindows.focused).toBe(win1);
+            expect(win1._frame.style.opacity).toBe("1");
+            expect(win1._frame.style.zIndex).toBe("10000");
+            expect(win2._frame.style.opacity).toBe("0.7");
+            expect(win2._frame.style.zIndex).toBe("0");
+        });
+
+        test("switches focus back to another window when clicked", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+            expect(window.widgetWindows.focused).toBe(win1);
+
+            win2._widget.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+            expect(window.widgetWindows.focused).toBe(win2);
+            expect(win2._frame.style.opacity).toBe("1");
+            expect(win2._frame.style.zIndex).toBe("10000");
+            expect(win1._frame.style.opacity).toBe("0.7");
+            expect(win1._frame.style.zIndex).toBe("0");
+        });
+
+        test("clears focus and dims all windows when clicking outside all windows", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+
+            expect(window.widgetWindows.focused).toBe(win2);
+
+            // Simulate clicking on canvas / document body
+            canvas.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(window.widgetWindows.focused).toBeNull();
+            expect(win1._frame.style.opacity).toBe("0.7");
+            expect(win1._frame.style.zIndex).toBe("0");
+            expect(win2._frame.style.opacity).toBe("0.7");
+            expect(win2._frame.style.zIndex).toBe("0");
+        });
+
+        test("preserves focus when clicking inside toolbar", () => {
+            const toolbars = document.createElement("div");
+            toolbars.id = "toolbars";
+            document.body.appendChild(toolbars);
+
+            try {
+                const win1 = createTestWindow("Window 1");
+                const win2 = createTestWindow("Window 2");
+
+                win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+                expect(window.widgetWindows.focused).toBe(win1);
+
+                toolbars.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+                expect(window.widgetWindows.focused).toBe(win1);
+                expect(win1._frame.style.opacity).toBe("1");
+                expect(win1._frame.style.zIndex).toBe("10000");
+            } finally {
+                toolbars.remove();
+            }
+        });
+
+        test("Escape key closes only the currently focused window", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+
+            const closeSpy1 = jest.spyOn(win1, "onclose");
+            const closeSpy2 = jest.spyOn(win2, "onclose");
+
+            // Focus win1
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+            expect(window.widgetWindows.focused).toBe(win1);
+
+            const escEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            window.dispatchEvent(escEvent);
+
+            expect(closeSpy1).toHaveBeenCalledTimes(1);
+            expect(closeSpy2).not.toHaveBeenCalled();
+        });
+
+        test("Cmd/Ctrl+Shift+M maximizes only the currently focused window", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+            expect(window.widgetWindows.focused).toBe(win1);
+
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            window.dispatchEvent(maxEvent);
+
+            expect(win1.isMaximized()).toBe(true);
+            expect(win2.isMaximized()).toBe(false);
+        });
+    });
 });

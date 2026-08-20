@@ -72,8 +72,13 @@ jobs:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   config-file: release-please-config.json
                   manifest-file: .release-please-manifest.json
-                  # Explicit rather than inherited from the repo default branch,
-                  # so this does not silently retarget if the default changes.
+                  # This repo uses release-please's GitHub changelog notes generator,
+                  # so the generated release includes contributors from merged PRs in
+                  # the release window, including single-PR contributors. We keep the
+                  # visible changelog sections limited to user-facing feature entries
+                  # via changelog-sections. Explicitly configure this instead of
+                  # inheriting the repo default branch, so this does not silently
+                  # retarget if the default changes.
                   # `target-branch` is an action input only — it is not a valid
                   # key in release-please-config.json, whose schema sets
                   # additionalProperties: false. Keep in sync with the `on:`

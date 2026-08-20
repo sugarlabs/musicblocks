@@ -168,7 +168,7 @@ class Blocks {
         this._deferCheckBounds = false;
 
         /** We keep a dictionary for the proto blocks, */
-        this.protoBlockDict = {};
+        this.protoBlockDict = Object.create(null);
         /** and a list of the blocks we create. */
         this.blockList = [];
 
@@ -6769,7 +6769,10 @@ class Blocks {
             }
             this.activity.refreshCanvas();
             this.activity.trashcan.stopHighlightAnimation();
-            document.getElementById("hideContents").click();
+            const hideContents = document.getElementById("hideContents");
+            if (hideContents && typeof hideContents.click === "function") {
+                hideContents.click();
+            }
         };
 
         /***

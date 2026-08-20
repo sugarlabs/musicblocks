@@ -152,7 +152,7 @@ let MYDEFINES = [
     "activity/block-scale-controller",
     "activity/context-menu-controller",
     "search-ui",
-    "keyboard-controller",
+    "activity/keyboard-controller",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -1901,7 +1901,7 @@ class Activity {
             this._handleOrientationChangeResizeCanvas
         );
 
-        // Sets up TrashController (js/trash-controller.js), which owns restoring
+        // Sets up TrashController (js/activity/trash-controller.js), which owns restoring
         // blocks from the trash (individually, in bulk, or the most recent one),
         // rendering the trash panel, and the restoreIcon click handling.
         // this.restoreTrash, this.restoreTrashPop, this._restoreTrashById,
@@ -2734,9 +2734,6 @@ class Activity {
             this.allFilesChooser.addEventListener("click", event => {
                 event.currentTarget.value = "";
             });
-
-            // Enable touch interactions if supported on the current device.
-            createjs.Touch.enable(this.stage, false, true);
 
             // Keep tracking the mouse even when it leaves the canvas.
             this.stage.mouseMoveOutside = true;

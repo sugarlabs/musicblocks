@@ -208,6 +208,134 @@ describe("MusicKeyboard add-row submenu", () => {
         );
     });
 
+    test("initializes noteToKeyMap and safely updates when inserting a new note block via pie menu", () => {
+        jest.useFakeTimers();
+        global.FIXEDSOLFEGE1 = { "do♯": "C#" };
+        const blockList = [{ connections: [null, null] }];
+        const loadNewBlocks = jest.fn().mockImplementation(() => {
+            blockList.push({ connections: [null, null] });
+            return [blockList.length - 1];
+        });
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            refreshCanvas: jest.fn(),
+            turtles: {
+                ithTurtle: () => ({ singer: { keySignature: "C" } })
+            },
+            blocks: {
+                blockList: blockList,
+                loadNewBlocks,
+                adjustExpandableClampBlock: jest.fn()
+            }
+        });
+
+        expect(keyboard.noteToKeyMap).toBeDefined();
+        expect(typeof keyboard.noteToKeyMap).toBe("object");
+
+        keyboard.layout = [
+            { noteName: "do", noteOctave: 4, blockNumber: 0, voice: 0, objId: "cell-0" }
+        ];
+
+        keyboard._addNotesBlockBetween = jest.fn();
+        keyboard._sortLayout = jest.fn();
+        keyboard._createKeyboard = jest.fn();
+        keyboard._createTable = jest.fn().mockImplementation(() => {
+            if (keyboard.layout.length > 0) {
+                keyboard.layout[keyboard.layout.length - 1].objId = "cell-new";
+            }
+        });
+        keyboard._syncLayouts = jest.fn();
+
+        keyboard._createAddRowPieSubmenu();
+        keyboard._menuWheel.selectedNavItemIndex = 0;
+        keyboard._menuWheel.navItems[0].navigateFunction();
+
+        expect(() => jest.advanceTimersByTime(500)).not.toThrow();
+        expect(keyboard.noteToKeyMap).toBeDefined();
+        expect(keyboard.noteToKeyMap["do♯4"]).toBe("cell-new");
+        expect(keyboard.noteToKeyMap["C#4"]).toBe("cell-new");
+        jest.useRealTimers();
+    });
+
+    test("safely handles if noteToKeyMap is null or undefined when inserting a new note block", () => {
+        jest.useFakeTimers();
+        global.FIXEDSOLFEGE1 = { "do♯": "C#" };
+        const blockList = [{ connections: [null, null] }];
+        const loadNewBlocks = jest.fn().mockImplementation(() => {
+            blockList.push({ connections: [null, null] });
+            return [blockList.length - 1];
+        });
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            refreshCanvas: jest.fn(),
+            turtles: {
+                ithTurtle: () => ({ singer: { keySignature: "C" } })
+            },
+            blocks: {
+                blockList: blockList,
+                loadNewBlocks,
+                adjustExpandableClampBlock: jest.fn()
+            }
+        });
+
+        keyboard.noteToKeyMap = null;
+        keyboard.layout = [
+            { noteName: "do", noteOctave: 4, blockNumber: 0, voice: 0, objId: "cell-0" }
+        ];
+
+        keyboard._addNotesBlockBetween = jest.fn();
+        keyboard._sortLayout = jest.fn();
+        keyboard._createKeyboard = jest.fn();
+        keyboard._createTable = jest.fn().mockImplementation(() => {
+            if (keyboard.layout.length > 0) {
+                keyboard.layout[keyboard.layout.length - 1].objId = "cell-new";
+            }
+        });
+        keyboard._syncLayouts = jest.fn();
+
+        keyboard._createAddRowPieSubmenu();
+        keyboard._menuWheel.selectedNavItemIndex = 0;
+        keyboard._menuWheel.navItems[0].navigateFunction();
+
+        expect(() => jest.advanceTimersByTime(500)).not.toThrow();
+        expect(keyboard.noteToKeyMap).toBeDefined();
+        expect(keyboard.noteToKeyMap["do♯4"]).toBe("cell-new");
+        expect(keyboard.noteToKeyMap["C#4"]).toBe("cell-new");
+        jest.useRealTimers();
+    });
+
+    test("doMIDI populates noteToKeyMap from layout including solfege conversion", async () => {
+        global.FIXEDSOLFEGE1 = { do: "C", re: "D" };
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            textMsg: jest.fn(),
+            errorMsg: jest.fn()
+        });
+
+        keyboard.layout = [
+            { noteName: "do", noteOctave: 4, objId: "cell-do4" },
+            { noteName: "D", noteOctave: 4, objId: "cell-d4" }
+        ];
+
+        const originalRequestMIDIAccess = navigator.requestMIDIAccess;
+        navigator.requestMIDIAccess = jest.fn().mockResolvedValue({ inputs: new Map() });
+
+        keyboard.doMIDI();
+
+        expect(keyboard.noteToKeyMap).toBeDefined();
+        expect(keyboard.noteToKeyMap["do4"]).toBe("cell-do4");
+        expect(keyboard.noteToKeyMap["C4"]).toBe("cell-do4");
+        expect(keyboard.noteToKeyMap["D4"]).toBe("cell-d4");
+
+        // allow promise to resolve cleanly
+        await Promise.resolve();
+
+        navigator.requestMIDIAccess = originalRequestMIDIAccess;
+    });
+
     test("creates pie submenu and sets z-index, top position, and exit wheel correctly", () => {
         window.configureExitWheel = jest.fn();
         document.body.innerHTML =

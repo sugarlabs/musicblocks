@@ -96,6 +96,7 @@ describe("loader.js coverage", () => {
         expect(mockRequireJSConfig).toHaveBeenCalledWith(
             expect.objectContaining({
                 baseUrl: "./",
+                waitSeconds: 0,
                 paths: expect.any(Object),
                 shim: expect.objectContaining({
                     "tweenjs.min": expect.objectContaining({
