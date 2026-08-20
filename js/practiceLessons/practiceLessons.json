@@ -24,6 +24,13 @@
                 "shortLabel": "Signal",
                 "iconKey": "island",
                 "message": "Big Badge unlocked: Broadcast Bay Signalkeeper. Every mouse in the bay answers its own call now!"
+            },
+            "starlight_summit": {
+                "id": "grand_melody_keeper",
+                "label": "Keeper of the Grand Melody",
+                "shortLabel": "Grand Melody",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Keeper of the Grand Melody. The song that once joined every island is whole again."
             }
         }
     },
@@ -783,6 +790,131 @@
                 }
             ],
             "bigBadgeId": "broadcast_bay"
+        },
+        {
+            "level": 8,
+            "island": "starlight_summit",
+            "title": "The Starlight Sky Song",
+            "journal": {
+                "title": "Starlight Sky Song",
+                "island": "Starlight Summit",
+                "completeTitle": "Starlight Sky Complete",
+                "learned": ["Pitch over time", "Phrase Maker melodies", "Song form A1 A2 B B A1 A2"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          The signal ring's last call swings open the door at the top of the\n          world. Beyond it Lyra and Choon climb to <b>Starlight Summit</b>,\n          where the Grand Melody was first sung. The sky above is dark. \"The\n          stars went quiet when the song was lost,\" Choon says. \"Sing them back\n          and they will shine.\"\n        </p>\n        <div class=\"star-sky\" aria-label=\"Pitch over time graph of the first Twinkle Twinkle phrase\">\n          <div class=\"star-graph\">\n            <div class=\"star-graph-labels\">\n              <span>La</span><span>Sol</span><span>Fa</span>\n              <span>Mi</span><span>Re</span><span>Do</span>\n            </div>\n            <div class=\"star-graph-plot\">\n            <span class=\"star-note star-beat-1 star-pitch-do\"></span>\n            <span class=\"star-note star-beat-2 star-pitch-do\"></span>\n            <span class=\"star-note star-beat-3 star-pitch-sol\"></span>\n            <span class=\"star-note star-beat-4 star-pitch-sol\"></span>\n            <span class=\"star-note star-beat-5 star-pitch-la\"></span>\n            <span class=\"star-note star-beat-6 star-pitch-la\"></span>\n            <span class=\"star-note star-beat-7 star-pitch-sol\"></span>\n            </div>\n          </div>\n          <div class=\"journal-page star-journal-page\">#8</div>\n        </div>\n        <p>\n          Every star sits at its own height. A star low in the sky is a low\n          note, and a star high in the sky is a high note. Reading left to right\n          is reading forward in time. That is <b>pitch over time</b>, and the\n          stars above spell the first phrase of the star song.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>The Star Song</h4>\n        <p>\n          Sing it once before you build it, so your ears know where it goes.\n          Twinkle Twinkle has three phrases:\n        </p>\n        <ul>\n          <li><b>A1:</b> Do Do Sol Sol La La Sol</li>\n          <li><b>A2:</b> Fa Fa Mi Mi Re Re Do</li>\n          <li><b>B:</b> Sol Sol Fa Fa Mi Mi Re</li>\n        </ul>\n        <p>\n          Every pitch uses octave <b>4</b>, and Phrase Maker's rhythm already\n          fits: six short notes and one long one, exactly seven stars per\n          phrase.\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Summit Mission</h4>\n        <p>\n          Phrase Maker is already set up with Do, Re, Mi, Fa, Sol and La. You\n          only need to place the stars.\n        </p>\n        <ol>\n          <li>\n            Click the <b>Phrase Maker</b> block to open the grid, then click\n            squares to build phrase <b>A1</b>.\n          </li>\n          <li>\n            Press <b>Save</b> to turn that phrase into an action block, then\n            build and save <b>A2</b> and <b>B</b> the same way.\n          </li>\n          <li>\n            Find your three saved actions in the <b>Actions</b> palette and\n            stack them under <b>Start</b> in song order:\n            <b>A1 A2 B B A1 A2</b>.\n          </li>\n          <li>\n            Press Play. If it sounds like the star song, the sky lights up.\n          </li>\n        </ol>\n        <p>\n          Choon's trick for remembering the order: it is a sandwich. The two\n          <b>A</b> phrases are the bread on the outside, and <b>B</b> is the\n          peanut butter and jelly in the middle.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Think About</h4>\n        <ul>\n          <li>Which part of the song climbs, and which part comes back down?</li>\n          <li>Why does the B phrase get played twice in the middle?</li>\n          <li>\n            If a star moved one row higher, would the song sound higher or\n            lower there?\n          </li>\n        </ul>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Starlight</h4>\n        <p>\n          The summit keeps marks for explorers who make the star song their own.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openPhraseMaker\">Open Phrase Maker</button>\n          <button type=\"button\" data-secret-help=\"solfegeNames\">Do Re Mi names</button>\n          <button type=\"button\" data-secret-help=\"exportParts\">Save each part</button>\n          <button type=\"button\" data-secret-help=\"sandwichForm\">Sandwich form</button>\n          <button type=\"button\" data-secret-help=\"renameChunks\">Rename your parts</button>\n          <button type=\"button\" data-secret-help=\"changeOctave\">Higher or lower</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">Try a variation</button>\n          <button type=\"button\" data-secret-help=\"starDance\">Star dance</button>\n          <button type=\"button\" data-secret-help=\"harmonize\">Add a second voice</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "openPhraseMaker": {
+                    "title": "Open Phrase Maker",
+                    "type": "block",
+                    "blockName": "matrix"
+                },
+                "solfegeNames": {
+                    "title": "Do Re Mi names",
+                    "type": "block",
+                    "blockName": "solfege"
+                },
+                "exportParts": {
+                    "title": "Save each part",
+                    "heading": "Turn one phrase into an action block",
+                    "description": "When a phrase looks right in the Phrase Maker grid, press the Save button on the widget. Music Blocks builds a new action block named action, then action1, then action2 for the ones after it, and they appear in the Actions palette.<br>Musically, each saved action is one phrase of the song that you can play back whenever you want.",
+                    "singlePage": true
+                },
+                "sandwichForm": {
+                    "title": "Sandwich form",
+                    "heading": "Bread outside, peanut butter inside",
+                    "description": "Stack your saved actions under Start in this order: A1, A2, B, B, A1, A2. The two A phrases are the bread on the outside of the sandwich, and the B phrase in the middle is the peanut butter and jelly.<br>Musically, coming back to the A phrases at the end is what makes a song feel finished.",
+                    "singlePage": true
+                },
+                "renameChunks": {
+                    "title": "Rename your parts",
+                    "type": "block",
+                    "blockName": "action"
+                },
+                "changeOctave": {
+                    "title": "Higher or lower",
+                    "type": "block",
+                    "blockName": "pitch"
+                },
+                "useTranspose": {
+                    "title": "Try a variation",
+                    "type": "block",
+                    "blockName": "settransposition"
+                },
+                "starDance": {
+                    "title": "Star dance",
+                    "type": "block",
+                    "blockName": "right"
+                },
+                "harmonize": {
+                    "title": "Add a second voice",
+                    "type": "block",
+                    "blockName": "start"
+                }
+            },
+            "expected": {
+                "twinklePhraseMaker": true,
+                "chunkNames": ["action", "action1", "action2", "action3", "action4", "action5"]
+            },
+            "incomplete": {
+                "title": "The Stars Are Still Dim",
+                "message": "Choon hears part of the star song. Phrase Maker needs all three phrases saved as action blocks - Do Do Sol Sol La La Sol, then Fa Fa Mi Mi Re Re Do, then Sol Sol Fa Fa Mi Mi Re - and those actions stacked under Start as A1 A2 B B A1 A2."
+            },
+            "rewards": [
+                "Melody Fragment #8",
+                "Captain's Journal Page #8",
+                "Treasure Found: The Grand Melody is whole again, and every island you woke up sings it back."
+            ],
+            "badges": [
+                {
+                    "id": "star_song_keeper",
+                    "label": "Star Song Keeper",
+                    "shortLabel": "Star",
+                    "iconKey": "star",
+                    "criterion": "completeTwinkleForm",
+                    "message": "Star by star the summit lights up, and the Grand Melody returns. Lyra writes the last page of Captain Cadence's journal."
+                },
+                {
+                    "id": "sandwich_namer",
+                    "label": "Sandwich Namer",
+                    "shortLabel": "Names",
+                    "iconKey": "name",
+                    "criterion": "renamedChunks",
+                    "message": "Hidden Discovery: Sandwich Namer. Your phrases have names you chose, so the form reads like a recipe."
+                },
+                {
+                    "id": "high_star",
+                    "label": "High Star",
+                    "shortLabel": "Higher",
+                    "iconKey": "sky",
+                    "criterion": "changedOctave",
+                    "message": "Hidden Discovery: High Star. One note now shines from a different octave."
+                },
+                {
+                    "id": "star_variation",
+                    "label": "Star Variation",
+                    "shortLabel": "Shift",
+                    "iconKey": "shift",
+                    "criterion": "usedTranspose",
+                    "message": "Hidden Discovery: Star Variation. You moved the whole song to a new place, the way Mozart did with this very tune."
+                },
+                {
+                    "id": "star_dancer",
+                    "label": "Star Dancer",
+                    "shortLabel": "Dance",
+                    "iconKey": "spin",
+                    "criterion": "changedAnimationTurn",
+                    "message": "Hidden Discovery: Star Dancer. The mouse turns with the melody and draws the sky as it sings."
+                },
+                {
+                    "id": "second_voice",
+                    "label": "Second Voice",
+                    "shortLabel": "Voice",
+                    "iconKey": "voice",
+                    "criterion": "addedHarmonyVoice",
+                    "message": "Secret Treasure Coin found. A second Start block joins in, and the star song has harmony."
+                }
+            ],
+            "bigBadgeId": "starlight_summit"
         }
     ]
 }

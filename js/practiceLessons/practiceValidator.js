@@ -22,11 +22,23 @@ const LOOP_BODY_CONNECTION = new Map([
 ]);
 // A signal ring counts as built once the conductor and at least three drum mice exist.
 const RING_MOUSE_MINIMUM = 4;
+// The three phrases Phrase Maker exports for Twinkle Twinkle, in solfege at octave 4.
+const TWINKLE_SECTIONS = new Map([
+    ["A1", ["do4", "do4", "sol4", "sol4", "la4", "la4", "sol4"]],
+    ["A2", ["fa4", "fa4", "mi4", "mi4", "re4", "re4", "do4"]],
+    ["B", ["sol4", "sol4", "fa4", "fa4", "mi4", "mi4", "re4"]]
+]);
+// The song's form, the bread of the sandwich on the outside and the filling in the middle.
+const TWINKLE_SONG_FORM = ["A1", "A2", "B", "B", "A1", "A2"];
 
 const PracticeValidator = {
     validate(problem) {
         if (problem?.expected?.circularRhythmRing) {
             return this.validateCircularRhythmRing();
+        }
+
+        if (problem?.expected?.twinklePhraseMaker) {
+            return this.validateTwinklePhraseMaker();
         }
 
         if (problem?.expected?.animatedPolyrhythm) {
@@ -185,6 +197,10 @@ const PracticeValidator = {
                 return this.countStartBlocks() >= RING_MOUSE_MINIMUM;
             case "readBoxValue":
                 return this.hasConnectedBlockNamed(["namedbox", "box", "box1", "box2"]);
+            case "completeTwinkleForm":
+                return this.validateTwinklePhraseMaker();
+            case "addedHarmonyVoice":
+                return this.countStartBlocks() >= 2;
             default:
                 return false;
         }
@@ -479,6 +495,77 @@ const PracticeValidator = {
         return Object.values(this.getBlockList()).filter(
             block => block?.name === "start" && !block.trash
         ).length;
+    },
+
+    validateTwinklePhraseMaker() {
+        const blockList = this.getBlockList();
+        if (!this.hasBlockNamed(["matrix"])) return false;
+
+        const sectionByActionName = this.getTwinkleSectionsByActionName(blockList);
+        const transcribed = new Set(sectionByActionName.values());
+        if ([...TWINKLE_SECTIONS.keys()].some(section => !transcribed.has(section))) return false;
+
+        const performed = this.getStartActionReferences(blockList).map(actionName =>
+            sectionByActionName.get(actionName)
+        );
+
+        return JSON.stringify(performed) === JSON.stringify(TWINKLE_SONG_FORM);
+    },
+
+    getTwinkleSectionsByActionName(blockList) {
+        const sectionByActionName = new Map();
+
+        Object.values(blockList).forEach(block => {
+            if (!block || block.trash || block.name !== "action") return;
+
+            const actionName = this.getActionName(block, blockList);
+            if (!actionName) return;
+
+            const pitches = [];
+            this.collectPitchSequence(block.connections?.[2], blockList, pitches);
+            if (!pitches.length) return;
+
+            TWINKLE_SECTIONS.forEach((phrase, section) => {
+                if (JSON.stringify(pitches) === JSON.stringify(phrase)) {
+                    sectionByActionName.set(actionName, section);
+                }
+            });
+        });
+
+        return sectionByActionName;
+    },
+
+    // Phrase Maker nests its pitches inside note clamps, so the walk descends into every note.
+    collectPitchSequence(blockId, blockList, sequence, seen = new Set()) {
+        let currentId = this.unwrapHiddenFlow(blockId, blockList);
+        let guard = 0;
+
+        while (currentId && guard < 200) {
+            if (seen.has(currentId)) return;
+            seen.add(currentId);
+
+            const block = blockList[currentId];
+            if (!block || block.trash) return;
+
+            if (block.name === "pitch") {
+                const pitchName = this.getPitchName(block, blockList);
+                if (pitchName) sequence.push(pitchName);
+            } else if (block.name === "newnote") {
+                this.collectPitchSequence(block.connections?.[2], blockList, sequence, seen);
+            }
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
+        }
+    },
+
+    getPitchName(pitchBlock, blockList) {
+        const name = blockList[pitchBlock.connections?.[1]]?.value;
+        const octave = Number(blockList[pitchBlock.connections?.[2]]?.value);
+
+        if (!name || !Number.isFinite(octave)) return "";
+
+        return `${String(name).toLowerCase()}${octave}`;
     },
 
     hasRhythmDivisors(requiredDivisors) {
