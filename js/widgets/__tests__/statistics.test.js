@@ -49,6 +49,7 @@ describe("StatsWindow", () => {
             show: jest.fn(),
             destroy: jest.fn(),
             sendToCenter: jest.fn(),
+            addButton: jest.fn().mockReturnValue({ onclick: null }),
             onclose: null,
             onmaximize: null,
             getWidgetBody: jest.fn().mockReturnValue(body),
@@ -251,5 +252,31 @@ describe("StatsWindow", () => {
         expect(html).toContain("524Hz"); // 523.25 + 0.5 rounded
         expect(html).toContain("rests used: 4");
         expect(html).toContain("ornaments used: 1");
+    });
+
+    test("adds reload.svg Refresh button to toolbar and re-runs analytics on click", () => {
+        const sw = new StatsWindow(activity);
+        expect(widgetWin.addButton).toHaveBeenCalledWith("reload.svg", 32, "Refresh");
+
+        const btnObj = widgetWin.addButton.mock.results[0].value;
+        expect(typeof btnObj.onclick).toBe("function");
+
+        global.analyzeProject.mockClear();
+        btnObj.onclick();
+
+        expect(global.analyzeProject).toHaveBeenCalledTimes(1);
+    });
+
+    test("refresh method clears body and re-executes doAnalytics", () => {
+        const sw = new StatsWindow(activity);
+        const stale = document.createElement("div");
+        stale.textContent = "stale-data";
+        body.appendChild(stale);
+
+        global.analyzeProject.mockClear();
+        sw.refresh();
+
+        expect(body.textContent).not.toContain("stale-data");
+        expect(global.analyzeProject).toHaveBeenCalledTimes(1);
     });
 });
