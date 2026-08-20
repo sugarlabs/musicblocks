@@ -404,6 +404,12 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
             return;
         }
 
+        // Fix for Chrome CSP which blocks Function("return this")() typically found in webpack bundles
+        code = code.replace(
+            /(?:new\s+)?Function\s*\(\s*['"]return this['"]\s*\)\s*\(\)/g,
+            "window"
+        );
+
         // We wrap the code in a closure that provides activity and globalActivity.
         // We'll execute these after the Blob script is loaded and populates the registry.
         pendingSafeEvals.push({ code, label });
@@ -576,11 +582,6 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     }
 
     // Create the plugin protoblocks.
-    // FIXME: On Chrome, plugins are broken (They still work on Firefox):
-    // EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self' blob: filesystem: chrome-extension-resource:".
-    // Maybe:
-    // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
-
     if ("BLOCKPLUGINS" in obj) {
         for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
             if (isUnsafeObjectKey(block)) continue;
