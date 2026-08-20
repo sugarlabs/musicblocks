@@ -15,13 +15,9 @@ module.exports = {
         "planet/js/**/*.js",
         "!planet/js/__tests__/**"
     ],
-    coverageReporters: ["text-summary", "text", "lcov", "json-summary"],
-    coverageThreshold: {
-        global: {
-            statements: 34,
-            branches: 29,
-            functions: 41,
-            lines: 34
-        }
-    }
+    coverageReporters: ["text-summary", "text", "lcov", "json-summary"]
+    // No hard-coded coverageThreshold: CI's "Coverage delta vs base" job
+    // compares this PR's coverage-summary.json against the base branch's
+    // and fails if statements/branches/functions/lines drop, instead of a
+    // static floor that needs manual bumps as coverage grows.
 };
