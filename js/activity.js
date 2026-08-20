@@ -1901,7 +1901,7 @@ class Activity {
             this._handleOrientationChangeResizeCanvas
         );
 
-        // Sets up TrashController (js/trash-controller.js), which owns restoring
+        // Sets up TrashController (js/activity/trash-controller.js), which owns restoring
         // blocks from the trash (individually, in bulk, or the most recent one),
         // rendering the trash panel, and the restoreIcon click handling.
         // this.restoreTrash, this.restoreTrashPop, this._restoreTrashById,
