@@ -15,8 +15,20 @@ function getActivity() {
     return null;
 }
 
+// Loop clamps hold their body in a different connection slot depending on the block.
+const LOOP_BODY_CONNECTION = new Map([
+    ["repeat", 2],
+    ["forever", 1]
+]);
+// A signal ring counts as built once the conductor and at least three drum mice exist.
+const RING_MOUSE_MINIMUM = 4;
+
 const PracticeValidator = {
     validate(problem) {
+        if (problem?.expected?.circularRhythmRing) {
+            return this.validateCircularRhythmRing();
+        }
+
         if (problem?.expected?.animatedPolyrhythm) {
             return this.validateAnimatedPolyrhythm();
         }
@@ -163,6 +175,16 @@ const PracticeValidator = {
                 return this.hasConnectedBlockNamed(["pitch", "settimbre"]);
             case "changedAnimationTurn":
                 return this.hasConnectedBlockNamed(["right", "left", "setheading"]);
+            case "completeCircularRhythmRing":
+                return this.validateCircularRhythmRing();
+            case "usedOneMinusToggle":
+                return this.hasToggleStore();
+            case "playedRingDrum":
+                return this.hasConnectedBlockNamed(["playdrum", "setdrum"]);
+            case "builtMouseRing":
+                return this.countStartBlocks() >= RING_MOUSE_MINIMUM;
+            case "readBoxValue":
+                return this.hasConnectedBlockNamed(["namedbox", "box", "box1", "box2"]);
             default:
                 return false;
         }
@@ -363,6 +385,100 @@ const PracticeValidator = {
             this.hasConnectedBlockNamed(["everybeatdo"]) &&
             this.hasConnectedBlockNamed(["turtleshell"])
         );
+    },
+
+    validateCircularRhythmRing() {
+        return (
+            this.hasBroadcastWithBuiltName() &&
+            this.hasLoopContainingBlockNamed(["arc"]) &&
+            this.hasConnectedBlockNamed(["mod"]) &&
+            this.hasListeningRingAction()
+        );
+    },
+
+    hasBroadcastWithBuiltName() {
+        const blockList = this.getBlockList();
+        const nameBlocks = new Set(["plus"]);
+
+        return Object.values(blockList).some(block => {
+            if (!block || block.trash || block.name !== "dispatch") return false;
+
+            return this.argTreeContainsNamed(block.connections?.[1], blockList, nameBlocks);
+        });
+    },
+
+    hasListeningRingAction() {
+        const blockList = this.getBlockList();
+
+        return Object.values(blockList).some(block => {
+            if (!block || block.trash || block.name !== "action") return false;
+
+            return (
+                this.actionContainsBlockNamed(block, blockList, ["listen"]) &&
+                this.actionContainsBlockNamed(block, blockList, ["setxy"])
+            );
+        });
+    },
+
+    hasToggleStore() {
+        const blockList = this.getBlockList();
+        const minusBlock = new Set(["minus"]);
+
+        return Object.values(blockList).some(block => {
+            if (!block || block.trash) return false;
+
+            const valueId = this.getStoreValueId(block);
+            if (valueId === null || valueId === undefined) return false;
+
+            return this.argTreeContainsNamed(valueId, blockList, minusBlock);
+        });
+    },
+
+    getStoreValueId(block) {
+        if (block.name === "storein") return block.connections?.[2];
+        if (block.name === "storein2") return block.connections?.[1];
+
+        return null;
+    },
+
+    hasLoopContainingBlockNamed(names) {
+        const blockList = this.getBlockList();
+
+        return Object.values(blockList).some(block => {
+            if (!block || block.trash) return false;
+
+            const bodyConnection = LOOP_BODY_CONNECTION.get(block.name);
+            if (bodyConnection === undefined) return false;
+
+            return this.flowContainsBlockNamed(
+                block.connections?.[bodyConnection],
+                blockList,
+                names
+            );
+        });
+    },
+
+    // Connection 0 points back at the parent, so an argument subtree walks the rest.
+    argTreeContainsNamed(blockId, blockList, blockNames, seen = new Set()) {
+        if (blockId === null || blockId === undefined || seen.has(blockId)) return false;
+
+        const block = blockList[blockId];
+        if (!block || block.trash) return false;
+
+        seen.add(blockId);
+        if (blockNames.has(block.name)) return true;
+
+        return (block.connections || [])
+            .slice(1)
+            .some(connectionId =>
+                this.argTreeContainsNamed(connectionId, blockList, blockNames, seen)
+            );
+    },
+
+    countStartBlocks() {
+        return Object.values(this.getBlockList()).filter(
+            block => block?.name === "start" && !block.trash
+        ).length;
     },
 
     hasRhythmDivisors(requiredDivisors) {

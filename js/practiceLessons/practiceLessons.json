@@ -17,6 +17,13 @@
                 "shortLabel": "Navigator",
                 "iconKey": "island",
                 "message": "Big Badge unlocked: Geometry Reef Navigator. Lyra can now read the reef's shape-rhythm map!"
+            },
+            "broadcast_bay": {
+                "id": "broadcast_bay_signalkeeper",
+                "label": "Broadcast Bay Signalkeeper",
+                "shortLabel": "Signal",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Broadcast Bay Signalkeeper. Every mouse in the bay answers its own call now!"
             }
         }
     },
@@ -628,6 +635,154 @@
                 }
             ],
             "bigBadgeId": "harmony_geometry_reef"
+        },
+        {
+            "level": 7,
+            "island": "broadcast_bay",
+            "title": "The Conductor's Signal Ring",
+            "journal": {
+                "title": "Conductor's Signal Ring",
+                "island": "Broadcast Bay",
+                "completeTitle": "Signal Ring Complete",
+                "learned": [
+                    "Broadcast and listen",
+                    "Event names built with plus",
+                    "Counting with mod"
+                ]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          The spinning lagoon carries Lyra and Choon into <b>Broadcast Bay</b>.\n          Twelve small drum mice sit in a wide circle holding their drums, and\n          not one of them makes a sound. \"They cannot feel the beat,\" Choon\n          says. \"Each mouse is waiting to hear its own name.\"\n        </p>\n        <div class=\"signal-ring\" aria-label=\"Twelve drum mice in a circle around the conductor mouse\">\n          <div class=\"signal-ring-track\"></div>\n          <span class=\"ring-drum ring-drum-active\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <div class=\"ring-conductor\"></div>\n          <div class=\"journal-page ring-journal-page\">#7</div>\n        </div>\n        <p>\n          In the middle stands <b>Mr. Mouse</b>, the conductor. Captain\n          Cadence's page says: \"One caller, many listeners. Send a name into the\n          air, and only the mouse who owns that name will answer.\"\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Two Tricks for the Ring</h4>\n        <p>\n          <b>Adding words.</b> The <b>plus (+)</b> block adds numbers, but it\n          can also stick words together. \"event\" + \"5\" becomes\n          <span class=\"tablet-code\">event5</span>. That is how one broadcast can\n          call a different mouse every time around.\n        </p>\n        <p>\n          <b>Counting in a circle.</b> The <b>mod</b> block counts and then\n          starts over. Mod 12 only ever gives 0, 1, 2 ... 11, and then goes back\n          to 0. It works like counting beats in a measure, except the ring\n          starts at 0 instead of 1.\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Ring Mission</h4>\n        <p>\n          The two action chunks on the canvas already belong to the drum mice,\n          and the loose blocks beside them are your ingredients. Your job is to\n          wake up the conductor.\n        </p>\n        <ol>\n          <li>\n            Snap the <b>forever</b> loop under Mr. Mouse's Start block, then put\n            the <b>arc</b> block inside it so the conductor keeps walking around\n            the ring.\n          </li>\n          <li>\n            Add a <b>broadcast</b> whose name is built by the <b>plus (+)</b>\n            block, so it calls event0, event1, event2, and onward.\n          </li>\n          <li>\n            Use the <b>mod</b> block so the count wraps back to 0 after 11 and\n            the conductor never runs out of mice to call.\n          </li>\n          <li>\n            Keep the <b>mouse setup</b> chunk, which uses <b>listen</b> and\n            <b>setxy</b> so each drum mouse jumps into the ring when it hears\n            its name.\n          </li>\n        </ol>\n        <p>\n          Press Play, then click a drum mouse to change the sound it answers\n          with.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Think About</h4>\n        <ul>\n          <li>What does broadcast mean outside of computers? Who listens?</li>\n          <li>\n            How is Mr. Mouse like a conductor counting 1, 2, 3 around a circle\n            of drummers?\n          </li>\n          <li>Why can mod 12 never reach 12?</li>\n          <li>What would happen if two mice listened for the same name?</li>\n        </ul>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Signals</h4>\n        <p>\n          The bay keeps marks for explorers who make the ring bigger, louder, or\n          more alive.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"broadcastEvent\">Broadcast</button>\n          <button type=\"button\" data-secret-help=\"listenEvent\">Listen for a name</button>\n          <button type=\"button\" data-secret-help=\"eventName\">Add words together</button>\n          <button type=\"button\" data-secret-help=\"modCount\">Count in a circle</button>\n          <button type=\"button\" data-secret-help=\"walkCircle\">Walk the circle</button>\n          <button type=\"button\" data-secret-help=\"placeMouse\">Place a mouse</button>\n          <button type=\"button\" data-secret-help=\"nameMouse\">Name a mouse</button>\n          <button type=\"button\" data-secret-help=\"makeMice\">Make the ring of mice</button>\n          <button type=\"button\" data-secret-help=\"useBox\">Use box</button>\n          <button type=\"button\" data-secret-help=\"readBox\">Read the box</button>\n          <button type=\"button\" data-secret-help=\"toggleTrick\">Switch 1 and 0</button>\n          <button type=\"button\" data-secret-help=\"ringDrum\">Ring drum</button>\n          <button type=\"button\" data-secret-help=\"mouseDance\">Mouse dance</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "broadcastEvent": {
+                    "title": "Broadcast",
+                    "type": "block",
+                    "blockName": "dispatch"
+                },
+                "listenEvent": {
+                    "title": "Listen for a name",
+                    "type": "block",
+                    "blockName": "listen"
+                },
+                "eventName": {
+                    "title": "Add words together",
+                    "type": "block",
+                    "blockName": "plus"
+                },
+                "modCount": {
+                    "title": "Count in a circle",
+                    "type": "block",
+                    "blockName": "mod"
+                },
+                "walkCircle": {
+                    "title": "Walk the circle",
+                    "type": "block",
+                    "blockName": "arc"
+                },
+                "placeMouse": {
+                    "title": "Place a mouse",
+                    "type": "block",
+                    "blockName": "setxy"
+                },
+                "nameMouse": {
+                    "title": "Name a mouse",
+                    "type": "block",
+                    "blockName": "setturtlename2"
+                },
+                "makeMice": {
+                    "title": "Make the ring of mice",
+                    "heading": "Give every drum its own mouse",
+                    "description": "Every drum in the ring is its own mouse, so every drum needs its own Start block. Add a Start block, use a set name block to call it 0, and then call the mouse setup chunk so it listens for event0. Add another Start named 1, then 2, and keep going.<br>Twelve mice give you twelve beats, but three or four are already enough to hear the ring turn.",
+                    "singlePage": true
+                },
+                "useBox": {
+                    "title": "Use box",
+                    "type": "block",
+                    "blockName": "storein"
+                },
+                "readBox": {
+                    "title": "Read the box",
+                    "type": "block",
+                    "blockName": "namedbox"
+                },
+                "toggleTrick": {
+                    "title": "Switch 1 and 0",
+                    "heading": "One number that flips itself",
+                    "description": "Inside the change action, store in the box the value 1 minus the box. If the box holds 0, then 1 - 0 = 1. If the box holds 1, then 1 - 1 = 0, so the number flips every time the mouse is clicked.<br>Musically, that single number chooses which of two drums the mouse answers with.",
+                    "singlePage": true
+                },
+                "ringDrum": {
+                    "title": "Ring drum",
+                    "type": "block",
+                    "blockName": "playdrum"
+                },
+                "mouseDance": {
+                    "title": "Mouse dance",
+                    "type": "block",
+                    "blockName": "right"
+                }
+            },
+            "expected": {
+                "circularRhythmRing": true
+            },
+            "incomplete": {
+                "title": "The Ring Is Still Silent",
+                "message": "Choon can see the mice, but nobody is calling them. The conductor needs an arc inside a loop, a broadcast whose name is built with the plus (+) block, and a mod block so the count wraps back to 0. Keep the mouse setup chunk with its listen and setxy blocks."
+            },
+            "rewards": [
+                "Melody Fragment #7",
+                "Captain's Journal Page #7",
+                "Treasure Clue: The last door opens where one voice calls and many answer, each in its turn."
+            ],
+            "badges": [
+                {
+                    "id": "ring_conductor",
+                    "label": "Ring Conductor",
+                    "shortLabel": "Ring",
+                    "iconKey": "ring",
+                    "criterion": "completeCircularRhythmRing",
+                    "message": "Mr. Mouse calls a name, a drum mouse answers, and the ring begins to turn. Lyra copies the signal circle into Captain Cadence's journal."
+                },
+                {
+                    "id": "toggle_trickster",
+                    "label": "Toggle Trickster",
+                    "shortLabel": "Toggle",
+                    "iconKey": "toggle",
+                    "criterion": "usedOneMinusToggle",
+                    "message": "Hidden Discovery: Toggle Trickster. One small subtraction now flips a drum between two sounds."
+                },
+                {
+                    "id": "ring_drummer",
+                    "label": "Ring Drummer",
+                    "shortLabel": "Drum",
+                    "iconKey": "drum",
+                    "criterion": "playedRingDrum",
+                    "message": "Hidden Discovery: Ring Drummer. Broadcast Bay finally hears the beat it was waiting for."
+                },
+                {
+                    "id": "mouse_ringmaker",
+                    "label": "Mouse Ringmaker",
+                    "shortLabel": "Mice",
+                    "iconKey": "mice",
+                    "criterion": "builtMouseRing",
+                    "message": "Hidden Discovery: Mouse Ringmaker. Your ring has enough mice to pass the beat all the way around."
+                },
+                {
+                    "id": "box_reader",
+                    "label": "Box Reader",
+                    "shortLabel": "Box",
+                    "iconKey": "box",
+                    "criterion": "readBoxValue",
+                    "message": "Hidden Discovery: Box Reader. The conductor can look inside a box and learn which drum to call for."
+                },
+                {
+                    "id": "ring_dancer",
+                    "label": "Ring Dancer",
+                    "shortLabel": "Dance",
+                    "iconKey": "spin",
+                    "criterion": "changedAnimationTurn",
+                    "message": "Secret Treasure Coin found. The drum mice do not only play now, they dance when their name is called."
+                }
+            ],
+            "bigBadgeId": "broadcast_bay"
         }
     ]
 }

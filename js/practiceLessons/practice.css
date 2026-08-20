@@ -768,6 +768,128 @@
     transform: translateX(-50%) rotate(4deg);
 }
 
+/* CSS-only ring art keeps the Level 7 broadcast story lightweight and themeable. */
+.signal-ring {
+    position: relative;
+    min-height: 178px;
+    overflow: hidden;
+    border: 1px solid #c3b0dd;
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.72) 0 13%, transparent 14%),
+        linear-gradient(180deg, #f4edff 0 46%, #d9c9f6 47% 100%);
+}
+
+.signal-ring-track {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    box-sizing: border-box;
+    width: 131px;
+    height: 131px;
+    transform: translate(-50%, -50%);
+    border: 3px dashed #7b5ea7;
+    border-radius: 50%;
+}
+
+.ring-drum {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffd166, #ef8354);
+    border: 2px solid rgba(87, 54, 12, 0.35);
+    /* Each drum is rotated onto the ring, then pushed out to the track radius. */
+    transform: rotate(var(--ring-angle, 0deg)) translateY(-64px);
+}
+
+.ring-drum:nth-of-type(1) {
+    --ring-angle: 0deg;
+}
+
+.ring-drum:nth-of-type(2) {
+    --ring-angle: 30deg;
+}
+
+.ring-drum:nth-of-type(3) {
+    --ring-angle: 60deg;
+}
+
+.ring-drum:nth-of-type(4) {
+    --ring-angle: 90deg;
+}
+
+.ring-drum:nth-of-type(5) {
+    --ring-angle: 120deg;
+}
+
+.ring-drum:nth-of-type(6) {
+    --ring-angle: 150deg;
+}
+
+.ring-drum:nth-of-type(7) {
+    --ring-angle: 180deg;
+}
+
+.ring-drum:nth-of-type(8) {
+    --ring-angle: 210deg;
+}
+
+.ring-drum:nth-of-type(9) {
+    --ring-angle: 240deg;
+}
+
+.ring-drum:nth-of-type(10) {
+    --ring-angle: 270deg;
+}
+
+.ring-drum:nth-of-type(11) {
+    --ring-angle: 300deg;
+}
+
+.ring-drum:nth-of-type(12) {
+    --ring-angle: 330deg;
+}
+
+.ring-drum-active {
+    background: linear-gradient(135deg, #fff3b0, #ffb703);
+    box-shadow: 0 0 0 4px rgba(255, 183, 3, 0.35);
+}
+
+.ring-conductor {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: 42px;
+    height: 42px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 34%, #fff6cf 0 19%, transparent 20%),
+        linear-gradient(135deg, #a3c4f3, #5390d9);
+    border: 3px solid rgba(30, 61, 89, 0.35);
+    box-shadow: 0 5px 14px rgba(58, 40, 92, 0.24);
+}
+
+.ring-conductor::after {
+    content: "";
+    position: absolute;
+    inset: -13px;
+    border-radius: 50%;
+    border: 2px solid rgba(83, 144, 217, 0.45);
+}
+
+.ring-journal-page {
+    left: auto;
+    right: 14px;
+    bottom: 12px;
+    transform: rotate(5deg);
+}
+
 .petal-song-map span {
     position: relative;
     min-height: 34px;
@@ -962,6 +1084,18 @@
 
 .journal-level-4 {
     border-left-color: color-mix(in srgb, var(--accent, #2196f3) 58%, #ffca3a);
+}
+
+.journal-level-5 {
+    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 54%, #2a9d8f);
+}
+
+.journal-level-6 {
+    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 50%, #4dabf7);
+}
+
+.journal-level-7 {
+    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 46%, #7b5ea7);
 }
 
 .journal-page-top {
@@ -1501,6 +1635,19 @@
 
 .level-badge-spin::after {
     content: "Sp";
+}
+
+.level-badge-ring::after {
+    content: "Rg";
+}
+
+.level-badge-toggle::after {
+    content: "1-0";
+    font-size: 9px;
+}
+
+.level-badge-mice::after {
+    content: "12";
 }
 
 .level-badge-discovery::after {
