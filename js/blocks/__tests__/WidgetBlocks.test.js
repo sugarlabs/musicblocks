@@ -60,6 +60,17 @@ class DummyFlowBlock {
     makeMacro(fn) {
         this.macroFunc = fn;
     }
+    setCapability(name, value = true) {
+        if (!this.capabilities) {
+            this.capabilities = Object.create(null);
+        }
+        this.capabilities[name] = !!value;
+    }
+    hasCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities || {}, name)
+            ? !!this.capabilities[name]
+            : false;
+    }
 }
 
 class DummyStackClampBlock extends DummyFlowBlock {
@@ -124,7 +135,7 @@ global.TimbreWidget = jest.fn(() => ({
 }));
 global.TimbreWidget.dependencies = ["widgets/timbre"];
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
-global.SampleWidget.dependencies = ["widgets/sampler"];
+global.SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
 global.AIDebuggerWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
 global.TemperamentWidget = jest.fn(() => ({
@@ -154,7 +165,7 @@ global.PitchStaircase = jest.fn();
 global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
 global.RhythmRuler = jest.fn();
 global.RhythmRuler.dependencies = ["widgets/rhythmruler"];
-global.ReflectionMatrix = jest.fn();
+global.ReflectionMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();
 global.LegoWidget.dependencies = ["widgets/legobricks"];
@@ -594,7 +605,10 @@ describe("setupWidgetBlocks", () => {
 
             status.flow(["childBlk"], logo, 0, "statusBlk");
 
-            expect(initSnapshots[0]).toEqual(["3:outputtools", "6:beatvalue"]);
+            // The widget is only built once the listener fires at the end
+            // of the clamp, not eagerly inside flow() itself.
+            expect(logo.statusMatrix.init).not.toHaveBeenCalled();
+
             const listener = logo.setTurtleListener.mock.calls[0][2];
             logo.statusFields = [
                 [3, "outputtools"],
@@ -605,7 +619,8 @@ describe("setupWidgetBlocks", () => {
 
             listener();
 
-            expect(initSnapshots[1]).toEqual(["3:outputtools", "6:beatvalue"]);
+            expect(logo.statusMatrix.init).toHaveBeenCalledTimes(1);
+            expect(initSnapshots[0]).toEqual(["3:outputtools", "6:beatvalue"]);
         });
 
         it("rebuilds status fields from the stack when runtime registration is empty", () => {
@@ -642,35 +657,63 @@ describe("setupWidgetBlocks", () => {
 
             status.flow(["childBlk"], logo, 0, "statusBlk");
 
-            expect(initSnapshots[0]).toEqual(["field1:beatvalue"]);
+            // The widget is only built once the listener fires at the end
+            // of the clamp, not eagerly inside flow() itself.
+            expect(logo.statusMatrix.init).not.toHaveBeenCalled();
 
             const listener = logo.setTurtleListener.mock.calls[0][2];
             logo.statusFields = [];
 
             listener();
 
-            expect(initSnapshots[1]).toEqual(["field1:beatvalue"]);
+            expect(logo.statusMatrix.init).toHaveBeenCalledTimes(1);
+            expect(initSnapshots[0]).toEqual(["field1:beatvalue"]);
         });
     });
 
-    describe("Widget dependency metadata wiring", () => {
-        // _ensureWidget()/_lazyRequire() are local closures inside
+    describe("ReflectionBlock", () => {
+        it("does not initialize the widget until its listener fires", () => {
+            const reflection = getBlock("reflection");
+
+            // First call: widget lazy-loads, flow() returns before reaching init().
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            // Second call: widget is now cached, flow() proceeds.
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+
+            expect(logo.reflection.init).not.toHaveBeenCalled();
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(logo.reflection.init).toHaveBeenCalledTimes(1);
+        });
+
+        it("constructs the widget once and initializes once per open", () => {
+            const reflection = getBlock("reflection");
+
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(global.ReflectionMatrix).toHaveBeenCalledTimes(1);
+            expect(logo.reflection.init).toHaveBeenCalledTimes(1);
+            expect(logo.inReflectionMatrix).toBe(false);
+        });
+    });
+
+    describe("Widget dependency resolution", () => {
+        // _ensureWidget()/_lazyLoadWidget() are local closures inside
         // setupWidgetBlocks() and aren't exported, so their `modules`
         // argument can't be intercepted at runtime without changing the
         // loader itself, and in this non-AMD test environment `_lazyRequire`
-        // ignores `modules` entirely, so no behavioural test can observe it
-        // either. As a last resort, a single source-text check confirms
-        // every call site reads modules from the widget's own static
-        // `dependencies` rather than a hardcoded literal; kept to one test
-        // (not one per widget) since it's the wiring itself being checked,
-        // not per-widget behaviour -- the behavioural tests below cover that.
-        //
-        // Caveat: this relies on source-text matching, which can become
-        // brittle during future refactors (e.g. reformatting the
-        // _ensureWidget calls). If dependency resolution is ever exposed
-        // through a helper or otherwise made observable behaviourally,
-        // prefer replacing these regex assertions with behavioural tests.
-        it("every _ensureWidget/_lazyRequire call site reads modules from its widget's dependencies", () => {
+        // (which both of them delegate to) ignores `modules` entirely, so no
+        // behavioural test can observe it either. As a last resort, a single
+        // source-text check confirms every call site resolves dependencies
+        // from the widget metadata when available and supplies a fallback
+        // module id when the widget is not part of the startup dependency
+        // graph. The behavioural tests below cover the loading paths.
+        it("resolves widget dependencies with startup-safe fallbacks", () => {
             const widgetBlocksSource = require("fs").readFileSync(
                 require("path").join(__dirname, "..", "WidgetBlocks.js"),
                 "utf8"
@@ -692,27 +735,28 @@ describe("setupWidgetBlocks", () => {
                 ["legoWidget", "LegoWidget"],
                 ["aiDebugger", "AIDebuggerWidget"]
             ];
-            const lazyRequireSites = ["MeterWidget", "Oscilloscope", "ModeWidget"];
+            const lazyLoadWidgetSites = [
+                ["meterWidget", "MeterWidget"],
+                ["Oscilloscope", "Oscilloscope"],
+                ["modeWidget", "ModeWidget"]
+            ];
 
             const notWired = [];
             for (const [widgetKey, className] of ensureWidgetSites) {
                 const callSite = new RegExp(
-                    `_ensureWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*${className}\\.dependencies,`
+                    `_ensureWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*_getWidgetDependencies\\(\\s*typeof ${className} !== "undefined" \\? ${className} : null,`
+                );
+                if (!callSite.test(widgetBlocksSource)) {
+                    notWired.push(`_ensureWidget("${widgetKey}") is missing a dependency fallback`);
+                }
+            }
+            for (const [widgetKey, className] of lazyLoadWidgetSites) {
+                const callSite = new RegExp(
+                    `_lazyLoadWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*_getWidgetDependencies\\(\\s*typeof ${className} !== "undefined" \\? ${className} : null,`
                 );
                 if (!callSite.test(widgetBlocksSource)) {
                     notWired.push(
-                        `_ensureWidget("${widgetKey}") should read ${className}.dependencies`
-                    );
-                }
-            }
-            for (const className of lazyRequireSites) {
-                if (
-                    !new RegExp(`_lazyRequire\\(${className}\\.dependencies,`).test(
-                        widgetBlocksSource
-                    )
-                ) {
-                    notWired.push(
-                        `_lazyRequire(...) for ${className} should read ${className}.dependencies`
+                        `_lazyLoadWidget("${widgetKey}") is missing a dependency fallback`
                     );
                 }
             }
@@ -720,9 +764,8 @@ describe("setupWidgetBlocks", () => {
             expect(notWired).toEqual([]);
         });
 
-        // Exercise the previously-untested call sites so the metadata read
-        // (Widget.dependencies) actually executes, not just gets matched
-        // textually above.
+        // Exercise the previously-untested call sites so dependency
+        // resolution actually executes, not just gets matched textually above.
         it.each([
             ["arpeggiomatrix", "arpBlk", "arpeggio", global.Arpeggio],
             ["pitchdrummatrix", "pdmBlk", "pitchDrumMatrix", global.PitchDrumMatrix],
@@ -746,14 +789,83 @@ describe("setupWidgetBlocks", () => {
             ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
             ["modewidget", "modeBlk", "modeWidget", global.ModeWidget]
         ])("%s lazy-loads its widget once its listener fires", (type, blk, logoKey, Widget) => {
+            if (type === "meterwidget") {
+                activity.blocks.blockList = {
+                    1: { connections: [null, 2, 3] },
+                    2: { value: 4 },
+                    3: { connections: [null, 4, 5] },
+                    4: { value: 1 },
+                    5: { value: 4 }
+                };
+            }
+
             const block = getBlock(type);
             block.flow(["childBlk"], logo, 0, blk);
+            if (type === "meterwidget") {
+                logo._meterBlock = 1;
+            }
             const listener = logo.setTurtleListener.mock.calls[0][2];
 
             listener();
 
             expect(Widget).toHaveBeenCalledTimes(1);
             expect(logo[logoKey]).toBeDefined();
+        });
+
+        it("does not open when the meter block input is disconnected", () => {
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, null] },
+                2: { value: 4 }
+            };
+
+            const meterWidget = getBlock("meterwidget");
+            meterWidget.flow(["childBlk"], logo, 0, "meterBlk");
+            logo._meterBlock = 1;
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.MeterWidget).not.toHaveBeenCalled();
+            expect(logo.insideMeterWidget).toBe(false);
+        });
+
+        it("does not open when the meter block is missing", () => {
+            logo._meterBlock = 1;
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, 3] },
+                2: { value: 4 },
+                3: { connections: [null, 4, 5] },
+                4: { value: 1 },
+                5: { value: 4 }
+            };
+
+            const meterWidget = getBlock("meterwidget");
+            meterWidget.flow(["childBlk"], logo, 0, "meterBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.MeterWidget).not.toHaveBeenCalled();
+            expect(logo.insideMeterWidget).toBe(false);
+        });
+
+        it("does not open when the note value numerator is disconnected", () => {
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, 3] },
+                2: { value: 4 },
+                3: { connections: [null, null, 4] },
+                4: { value: 4 }
+            };
+
+            const meterWidget = getBlock("meterwidget");
+            meterWidget.flow(["childBlk"], logo, 0, "meterBlk");
+            logo._meterBlock = 1;
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.MeterWidget).not.toHaveBeenCalled();
+            expect(logo.insideMeterWidget).toBe(false);
         });
 
         it("aimusic lazy-loads AIWidget once its listener fires", () => {

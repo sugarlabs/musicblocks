@@ -74,7 +74,13 @@ function makeActivity() {
         refreshCanvas: jest.fn(),
         textMsg: jest.fn(),
         cellSize: 10,
-        __tick: jest.fn()
+        __tick: jest.fn(),
+        closeHelpfulWheel: jest.fn(() => {
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            const wasOpen = Boolean(helpfulWheelDiv && helpfulWheelDiv.style.display !== "none");
+            if (wasOpen) helpfulWheelDiv.style.display = "none";
+            return wasOpen;
+        })
     };
 
     return activity;
@@ -112,6 +118,15 @@ describe("TrashController.restoreTrash", () => {
         expect(document.getElementById("helpfulWheelDiv").style.display).toBe("none");
         expect(activity.__tick).toHaveBeenCalled();
     });
+
+    test("does not throw when helpfulWheelDiv is not present in the DOM", () => {
+        const activity = makeActivity();
+        activity.blocks.trashStacks = ["blk1"];
+        document.getElementById("helpfulWheelDiv").remove();
+        const controller = new TrashController(activity);
+
+        expect(() => controller.restoreTrash()).not.toThrow();
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -140,6 +155,16 @@ describe("TrashController.restoreLastFromTrash", () => {
 
         expect(spy).toHaveBeenCalledWith("blk2");
         expect(activity.textMsg).toHaveBeenCalledWith("Item restored from the trash.", 3000);
+    });
+
+    test("does not throw when helpfulWheelDiv is not present in the DOM", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList.blk1 = makeBlock();
+        activity.blocks.trashStacks = ["blk1"];
+        document.getElementById("helpfulWheelDiv").remove();
+        const controller = new TrashController(activity);
+
+        expect(() => controller.restoreLastFromTrash()).not.toThrow();
     });
 });
 
@@ -258,6 +283,16 @@ describe("TrashController.restoreTrashById", () => {
         expect(actionArg.value).toBe("action2");
         expect(activity.blocks.newNameddoBlock).toHaveBeenCalledWith("action2", false, false);
         expect(activity.palettes.updatePalettes).toHaveBeenCalledWith("action");
+    });
+
+    test("restores a trashed action block with no argument block without throwing", () => {
+        const activity = makeActivity();
+        const block = makeBlock({ name: "action", connections: [null, null] });
+        activity.blocks.blockList.blk1 = block;
+        activity.blocks.trashStacks = ["blk1"];
+
+        const controller = new TrashController(activity);
+        expect(() => controller.restoreTrashById("blk1")).not.toThrow();
     });
 });
 

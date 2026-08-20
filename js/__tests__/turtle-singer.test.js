@@ -20,6 +20,7 @@
 global.DEFAULTVOLUME = 100;
 global.TARGETBPM = 120;
 global.TONEBPM = 60;
+global.clampNumber = require("../utils/utils-logic").clampNumber;
 
 const Singer = require("../turtle-singer");
 
@@ -973,6 +974,24 @@ describe("processNote regression behavior", () => {
         const setTimeoutSpy = jest.spyOn(global, "setTimeout");
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
         expect(setTimeoutSpy).not.toHaveBeenCalled();
+    });
+
+    test("shows an error when a weighted-partials clamp has no Partial blocks", () => {
+        activityMock.errorMsg = jest.fn();
+        singer.inHarmonic = ["mockBlk"];
+        singer.partials = [[]];
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(activityMock.errorMsg).toHaveBeenCalledWith(
+            "You must have at least one Partial block inside of a Weighted-partial block"
+        );
+    });
+
+    test("does not show the partials error when the clamp has Partial blocks", () => {
+        activityMock.errorMsg = jest.fn();
+        singer.inHarmonic = ["mockBlk"];
+        singer.partials = [[0, 1, 0]];
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(activityMock.errorMsg).not.toHaveBeenCalled();
     });
 });
 

@@ -27,7 +27,7 @@
     - js/utils/platformstyle.js
         platformColor
     - js/utils/utils-logic.js
-        resolveObject
+        resolveObject, isUnsafeObjectKey
     - js/utils/browser-utils.js
         canvasPixelRatio, doBrowserCheck, fnBrowserDetect, windowHeight, windowWidth
 */
@@ -36,7 +36,7 @@ if (typeof module !== "undefined" && module.exports) {
     var UtilsLogic =
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
-    var { resolveObject } = UtilsLogic;
+    var { resolveObject, isUnsafeObjectKey } = UtilsLogic;
 
     var DomHelpers =
         (typeof window !== "undefined" && window.DomHelpers) ||
@@ -45,13 +45,17 @@ if (typeof module !== "undefined" && module.exports) {
     var BrowserUtils =
         (typeof window !== "undefined" && window.BrowserUtils) ||
         (typeof require !== "undefined" ? require("./browser-utils") : {});
+
+    var HttpUtils =
+        (typeof window !== "undefined" && window.HttpUtils) ||
+        (typeof require !== "undefined" ? require("./http-utils") : {});
 }
 
 /* exported
    announceToScreenReader, changeImage, closeBlkWidgets,
    delayExecution,
    doPublish, doStopVideoCam, doSVG,
-   doUseCamera, format, getTextWidth, httpGet, httpPost, HttpRequest,
+   doUseCamera, format, getTextWidth,
    importMembers, isSVGEmpty, prepareMacroExports, preparePluginExports,
    processMacroData, processPluginData, processRawPluginData, waitForReadiness
 */
@@ -173,107 +177,6 @@ let format = (str, data) => {
         return _(item);
     });
 };
-
-/**
- * Performs an HTTP GET request to retrieve data from the server.
- * Uses async fetch to avoid blocking the UI during network requests.
- * @param {string|null} projectName - The name of the project (or null for the base URL).
- * @throws {Error} Throws an error if the HTTP status code is greater than 299.
- * @returns {Promise<string>} A promise that resolves to the response text from the server.
- */
-let httpGet = async projectName => {
-    const url = projectName === null ? window.server : window.server + projectName;
-    const response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "x-api-key": window.MB_PROJECT_API_KEY || ""
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error("Error from server");
-    }
-
-    return response.text();
-};
-
-/**
- * Performs an HTTP POST request to send data to the server.
- * Uses async fetch to avoid blocking the UI during network requests.
- * @param {string} projectName - The name of the project.
- * @param {string} data - The data to be sent in the POST request.
- * @returns {Promise<string>} A promise that resolves to the response text from the server.
- */
-let httpPost = async (projectName, data) => {
-    const response = await fetch(window.server + projectName, {
-        method: "POST",
-        headers: {
-            "x-api-key": window.MB_PROJECT_API_KEY || ""
-        },
-        body: data
-    });
-
-    if (!response.ok) {
-        throw new Error("Error from server");
-    }
-
-    return response.text();
-};
-
-/**
- * Constructor function for making an HTTP request.
- * @constructor
- * @param {string} url - The URL to make the HTTP request to.
- * @param {function} loadCallback - The callback function to handle the loaded response.
- * @param {function} [userCallback] - An optional user-defined callback function.
- */
-function HttpRequest(url, loadCallback, userCallback) {
-    const req = (this.request = new XMLHttpRequest());
-    this.handler = loadCallback;
-    this.url = url;
-    this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
-    this.userCallback = userCallback;
-
-    try {
-        req.open("GET", url);
-
-        req.onload = () => {
-            if ((req.status >= 200 && req.status < 300) || this.localmode) {
-                if (typeof this.handler === "function") this.handler();
-                if (typeof this.userCallback === "function") {
-                    this.userCallback(true, req.responseText);
-                }
-            } else {
-                if (typeof this.handler === "function") this.handler();
-                if (typeof this.userCallback === "function") {
-                    this.userCallback(false, `Error: ${req.status}`);
-                }
-            }
-        };
-
-        req.onerror = () => {
-            if (typeof this.handler === "function") this.handler();
-            if (typeof this.userCallback === "function") {
-                this.userCallback(false, "network error");
-            }
-        };
-
-        req.onabort = req.onerror;
-        req.ontimeout = req.onerror;
-
-        req.send("");
-    } catch (e) {
-        if (self.console) {
-            console.debug("Failed to load resource from " + url + ": Network error.", e);
-        }
-
-        if (typeof this.userCallback === "function") {
-            this.userCallback(false, "network error");
-        }
-
-        this.request = this.handler = this.userCallback = null;
-    }
-}
 
 /**
  * Wait for critical dependencies to be ready before calling callback.
@@ -521,7 +424,8 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     let newPalette = false,
         paletteName = null;
     if ("PALETTEPLUGINS" in obj) {
-        for (const name in obj["PALETTEPLUGINS"]) {
+        for (const name of Object.keys(obj["PALETTEPLUGINS"])) {
+            if (isUnsafeObjectKey(name)) continue;
             paletteName = name;
             PALETTEICONS[name] = obj["PALETTEPLUGINS"][name];
             let fillColor = "#ff0066";
@@ -589,7 +493,8 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
 
     // Define the image blocks
     if ("IMAGES" in obj) {
-        for (const blkName in obj["IMAGES"]) {
+        for (const blkName of Object.keys(obj["IMAGES"])) {
+            if (isUnsafeObjectKey(blkName)) continue;
             activity.pluginsImages[blkName] = obj["IMAGES"][blkName];
         }
     }
@@ -597,7 +502,8 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     // Populate the flow-block dictionary, i.e., the code that is
     // compiled into a function for hot-path execution.
     if ("FLOWPLUGINS" in obj) {
-        for (const flow in obj["FLOWPLUGINS"]) {
+        for (const flow of Object.keys(obj["FLOWPLUGINS"])) {
+            if (isUnsafeObjectKey(flow)) continue;
             // Pre-compile trusted plugins for performance.
             // UNTRUSTED plugins (if any made it past confirmation) are stored as strings
             // and handled via whitelist in safePluginExecute.
@@ -618,7 +524,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, rec
 
     // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
-        for (const arg in obj["ARGPLUGINS"]) {
+        for (const arg of Object.keys(obj["ARGPLUGINS"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const argCode = obj["ARGPLUGINS"][arg];
                 const registryName = `arg_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -637,7 +544,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
     // Populate the macro dictionary, i.e., the code that is
     // eval'd by this block.
     if ("MACROPLUGINS" in obj) {
-        for (const macro in obj["MACROPLUGINS"]) {
+        for (const macro of Object.keys(obj["MACROPLUGINS"])) {
+            if (isUnsafeObjectKey(macro)) continue;
             try {
                 activity.palettes.pluginMacros[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
@@ -650,7 +558,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
 
     // Populate the setter dictionary
     if ("SETTERPLUGINS" in obj) {
-        for (const setter in obj["SETTERPLUGINS"]) {
+        for (const setter of Object.keys(obj["SETTERPLUGINS"])) {
+            if (isUnsafeObjectKey(setter)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const setterCode = obj["SETTERPLUGINS"][setter];
                 const registryName = `setter_${setter}_${Math.random().toString(36).substr(2, 9)}`;
@@ -673,7 +582,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
 
     if ("BLOCKPLUGINS" in obj) {
-        for (const block in obj["BLOCKPLUGINS"]) {
+        for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
+            if (isUnsafeObjectKey(block)) continue;
             console.debug("adding plugin block " + block);
             safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
@@ -685,7 +595,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     }
 
     if ("PARAMETERPLUGINS" in obj) {
-        for (const parameter in obj["PARAMETERPLUGINS"]) {
+        for (const parameter of Object.keys(obj["PARAMETERPLUGINS"])) {
+            if (isUnsafeObjectKey(parameter)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const paramCode = obj["PARAMETERPLUGINS"][parameter];
                 const registryName = `param_${parameter}_${Math.random()
@@ -705,14 +616,16 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
 
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
-        for (const arg in obj["ONLOAD"]) {
+        for (const arg of Object.keys(obj["ONLOAD"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
         }
     }
 
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
-        for (const arg in obj["ONSTART"]) {
+        for (const arg of Object.keys(obj["ONSTART"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const onStartCode = obj["ONSTART"][arg];
                 const registryName = `onstart_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -730,7 +643,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
 
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
-        for (const arg in obj["ONSTOP"]) {
+        for (const arg of Object.keys(obj["ONSTOP"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const onStopCode = obj["ONSTOP"][arg];
                 const registryName = `onstop_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -920,36 +834,59 @@ const updatePluginObj = (activity, obj) => {
         return;
     }
 
-    for (const name in obj["PALETTEPLUGINS"]) {
-        activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
+    if ("PALETTEPLUGINS" in obj) {
+        for (const name of Object.keys(obj["PALETTEPLUGINS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
+        }
     }
 
-    for (const name in obj["PALETTEFILLCOLORS"]) {
-        activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
+    if ("PALETTEFILLCOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTEFILLCOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
+        }
     }
 
-    for (const name in obj["PALETTESTROKECOLORS"]) {
-        activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
+    if ("PALETTESTROKECOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTESTROKECOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
+        }
     }
 
-    for (const name in obj["PALETTEHIGHLIGHTCOLORS"]) {
-        activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] = obj["PALETTEHIGHLIGHTCOLORS"][name];
+    if ("PALETTEHIGHLIGHTCOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTEHIGHLIGHTCOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] =
+                obj["PALETTEHIGHLIGHTCOLORS"][name];
+        }
     }
 
-    for (const flow in obj["FLOWPLUGINS"]) {
-        activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
+    if ("FLOWPLUGINS" in obj) {
+        for (const flow of Object.keys(obj["FLOWPLUGINS"])) {
+            if (isUnsafeObjectKey(flow)) continue;
+            activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
+        }
     }
 
-    for (const arg in obj["ARGPLUGINS"]) {
-        activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
+    if ("ARGPLUGINS" in obj) {
+        for (const arg of Object.keys(obj["ARGPLUGINS"])) {
+            if (isUnsafeObjectKey(arg)) continue;
+            activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
+        }
     }
 
-    for (const block in obj["BLOCKPLUGINS"]) {
-        activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
+    if ("BLOCKPLUGINS" in obj) {
+        for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
+            if (isUnsafeObjectKey(block)) continue;
+            activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
+        }
     }
 
     if ("MACROPLUGINS" in obj) {
-        for (const macro in obj["MACROPLUGINS"]) {
+        for (const macro of Object.keys(obj["MACROPLUGINS"])) {
+            if (isUnsafeObjectKey(macro)) continue;
             activity.pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
         }
     }
@@ -965,16 +902,25 @@ const updatePluginObj = (activity, obj) => {
         activity.pluginObjs["IMAGES"] = obj["IMAGES"];
     }
 
-    for (const name in obj["ONLOAD"]) {
-        activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
+    if ("ONLOAD" in obj) {
+        for (const name of Object.keys(obj["ONLOAD"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
+        }
     }
 
-    for (const name in obj["ONSTART"]) {
-        activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
+    if ("ONSTART" in obj) {
+        for (const name of Object.keys(obj["ONSTART"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
+        }
     }
 
-    for (const name in obj["ONSTOP"]) {
-        activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
+    if ("ONSTOP" in obj) {
+        for (const name of Object.keys(obj["ONSTOP"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
+        }
     }
 };
 
@@ -1005,7 +951,8 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
             const obj = JSON.parse(macroData);
             palettes.add("myblocks", "black", "#a0a0a0");
 
-            for (const name in obj) {
+            for (const name of Object.keys(obj)) {
+                if (isUnsafeObjectKey(name)) continue;
                 // console.debug("adding " + name + " to macroDict");
                 macroDict[name] = obj[name];
                 blocks.addToMyPalette(name, macroDict[name]);
@@ -1036,17 +983,86 @@ let prepareMacroExports = (name, stack, macroDict) => {
 };
 
 // Camera functionality module
-// Encapsulates camera-related operations for video/image capture
+// Encapsulates camera-related operations for video/image capture.
+// All interval/listener lifecycle state lives here (not in doUseCamera's
+// closures) so that repeated doUseCamera(...) calls can never accumulate
+// more than one active interval or one active canplay listener.
 const CameraManager = {
     isSetup: false,
     canPlayHandler: null,
     intervalId: null,
+    // Tracks the exact element a listener was attached to, so cleanup always
+    // targets the right node even if #camVideo is ever replaced in the DOM.
+    listenerVideoElement: null,
 
     /**
-     * Resets the camera setup state
+     * Starts the capture interval if one isn't already running. Idempotent:
+     * if a capture interval is already active, this is a no-op that returns
+     * the existing interval id, rather than clearing and restarting it.
+     *
+     * This matters when doUseCamera is invoked rapidly and repeatedly (e.g.
+     * from inside a "forever" loop): clearing and restarting the interval on
+     * every call would cancel it before it ever gets a chance to fire,
+     * meaning draw() would never run and no frame would ever be captured.
+     * @param {function} draw - callback invoked on each tick
+     * @param {number} periodMs - interval period in milliseconds
+     * @returns {number} the active interval id
+     */
+    startCapture(draw, periodMs = 100) {
+        if (this.intervalId !== null) {
+            return this.intervalId;
+        }
+        this.intervalId = window.setInterval(draw, periodMs);
+        return this.intervalId;
+    },
+
+    /**
+     * Stops the capture interval if one is running. Safe to call when no
+     * interval is active (idempotent).
+     */
+    stopCapture() {
+        if (this.intervalId !== null) {
+            window.clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
+    },
+
+    /**
+     * Attaches a canplay handler to a video element, first removing any
+     * previously attached handler (from this element or a prior one).
+     * Idempotent: calling this repeatedly never leaves more than one
+     * listener registered.
+     * @param {HTMLVideoElement} video
+     * @param {function} handler
+     */
+    setCanplayListener(video, handler) {
+        this.clearCanplayListener();
+        video.addEventListener("canplay", handler, false);
+        this.canPlayHandler = handler;
+        this.listenerVideoElement = video;
+    },
+
+    /**
+     * Removes the currently tracked canplay handler from the element it was
+     * actually attached to. Safe to call when no listener is active.
+     */
+    clearCanplayListener() {
+        if (this.canPlayHandler && this.listenerVideoElement) {
+            this.listenerVideoElement.removeEventListener("canplay", this.canPlayHandler, false);
+        }
+        this.canPlayHandler = null;
+        this.listenerVideoElement = null;
+    },
+
+    /**
+     * Resets the camera setup state and tears down any active interval or
+     * listener. Called on doStopVideoCam so a Stop always returns to a
+     * clean slate before the next Camera/Video block run.
      */
     reset() {
         this.isSetup = false;
+        this.stopCapture();
+        this.clearCanplayListener();
     }
 };
 
@@ -1082,6 +1098,15 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         turtles.getTurtle(turtle).doShowImage(args[0], data);
     }
 
+    function startCaptureOrDraw() {
+        if (isVideo) {
+            cameraID = CameraManager.startCapture(draw, 100);
+            setCameraID(cameraID);
+        } else {
+            draw();
+        }
+    }
+
     if (!CameraManager.isSetup) {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             errorMsg("Your browser does not support the webcam");
@@ -1103,21 +1128,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     } else {
         streaming = true;
         video.play();
-        if (isVideo) {
-            if (CameraManager.intervalId !== null) {
-                window.clearInterval(CameraManager.intervalId);
-                CameraManager.intervalId = null;
-            }
-            cameraID = window.setInterval(draw, 100);
-            CameraManager.intervalId = cameraID;
-            setCameraID(cameraID);
-        } else {
-            draw();
-        }
-    }
-
-    if (CameraManager.canPlayHandler) {
-        video.removeEventListener("canplay", CameraManager.canPlayHandler, false);
+        startCaptureOrDraw();
     }
 
     function handleCanPlay() {
@@ -1128,24 +1139,11 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
             canvas.setAttribute("width", w);
             canvas.setAttribute("height", h);
             streaming = true;
-
-            if (isVideo) {
-                if (CameraManager.intervalId !== null) {
-                    window.clearInterval(CameraManager.intervalId);
-                    CameraManager.intervalId = null;
-                }
-                cameraID = window.setInterval(draw, 100);
-                CameraManager.intervalId = cameraID;
-                setCameraID(cameraID);
-            } else {
-                draw();
-            }
+            startCaptureOrDraw();
         }
     }
 
-    CameraManager.canPlayHandler = handleCanPlay;
-
-    video.addEventListener("canplay", CameraManager.canPlayHandler, false);
+    CameraManager.setCanplayListener(video, handleCanPlay);
 };
 
 /**
@@ -1353,6 +1351,7 @@ if (typeof module !== "undefined" && module.exports) {
         ...UtilsLogic,
         ...DomHelpers,
         ...BrowserUtils,
+        ...HttpUtils,
         extractProjectDataFromHTML,
         _,
         format,
@@ -1360,15 +1359,16 @@ if (typeof module !== "undefined" && module.exports) {
         closeBlkWidgets,
         importMembers,
         changeImage,
-        httpGet,
-        httpPost,
-        HttpRequest,
         getTextWidth,
         doSVG,
         isSVGEmpty,
         prepareMacroExports,
         processPluginData,
         processMacroData,
-        announceToScreenReader
+        updatePluginObj,
+        announceToScreenReader,
+        doUseCamera,
+        doStopVideoCam,
+        CameraManager
     };
 }

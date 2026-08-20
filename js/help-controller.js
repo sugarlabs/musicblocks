@@ -370,7 +370,9 @@ class HelpController {
                     const paletteName = obj[1];
                     const protoName = obj[2];
 
-                    if (that.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+                    if (
+                        Object.prototype.hasOwnProperty.call(that.blocks.protoBlockDict, protoName)
+                    ) {
                         that.palettes.dict[paletteName].makeBlockFromSearch(
                             protoblk,
                             protoName,

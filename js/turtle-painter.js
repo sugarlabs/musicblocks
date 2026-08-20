@@ -17,7 +17,7 @@
 
 /*
    global _, getMunsellColor, getcolor, hex2rgb, STROKECOLORS, FILLCOLORS,
-   TURTLESVG, WRAP
+   TURTLESVG, WRAP, clampNumber
  */
 
 /*
@@ -775,13 +775,9 @@ class Painter {
      * @private
      */
     _processColor() {
-        if (this._canvasColor[0] === "#") {
-            this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
-        }
-
-        const subrgb = this._canvasColor.substr(0, this._canvasColor.length - 2);
-        this.turtle.ctx.strokeStyle = subrgb + this._canvasAlpha + ")";
-        this.turtle.ctx.fillStyle = subrgb + this._canvasAlpha + ")";
+        const color = hex2rgb(this._canvasColor, this._canvasAlpha);
+        this.turtle.ctx.strokeStyle = color;
+        this.turtle.ctx.fillStyle = color;
     }
 
     /**
@@ -1400,10 +1396,7 @@ class Painter {
         this._fillState = false;
         this._hollowState = false;
 
-        this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
-        if (this._canvasColor[0] === "#") {
-            this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
-        }
+        this._canvasColor = hex2rgb(getMunsellColor(this.color, this.value, this.chroma));
 
         this._svgOutput = "";
         this._svgPath = false;
@@ -1466,8 +1459,8 @@ class Painter {
         // Clamp scroll position to stay within buffer canvas bounds
         const maxScrollX = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
         const maxScrollY = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
-        turtles.gx = Math.max(0, Math.min(turtles.gx, maxScrollX));
-        turtles.gy = Math.max(0, Math.min(turtles.gy, maxScrollY));
+        turtles.gx = clampNumber(turtles.gx, 0, maxScrollX);
+        turtles.gy = clampNumber(turtles.gy, 0, maxScrollY);
 
         const newImgData = turtles.c1ctx.getImageData(
             turtles.gx,

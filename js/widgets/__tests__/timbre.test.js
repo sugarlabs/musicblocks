@@ -614,5 +614,418 @@ describe("TimbreWidget", () => {
             expect(timbre.activity.blocks.blockList[2].value).toBe("12");
             expect(timbre.activity.blocks.blockList[3].value).toBe("7");
         });
+
+        test("updates envelope parameter when wrapperEnv range changes", () => {
+            timbre.isActive["envelope"] = true;
+            jest.spyOn(timbre, "_update").mockImplementation();
+            jest.spyOn(timbre, "_playNote").mockImplementation();
+            jest.spyOn(timbre.activity.logo.synth, "createSynth").mockImplementation();
+
+            timbre._envelope(false);
+
+            const changeEvent = new jsdomDocument.defaultView.Event("change", { bubbles: true });
+            const envSlider = jsdomDocument.getElementById("myRange0");
+            envSlider.value = "50";
+
+            envSlider.dispatchEvent(changeEvent);
+
+            expect(timbre.synthVals.envelope.attack).toBe(0.5);
+            expect(timbre._update).toHaveBeenCalled();
+            expect(timbre.activity.logo.synth.createSynth).toHaveBeenCalled();
+            expect(timbre._playNote).toHaveBeenCalledWith("G4", 1 / 8);
+        });
+    });
+
+    describe("init / toolbar buttons", () => {
+        let originalWidgetWindows;
+        let mockWidgetWindow;
+        let addButtonCalls;
+        let mockActivity;
+
+        const freshButton = () => ({ style: {}, onclick: null, id: "" });
+        const getButton = icon => addButtonCalls.find(call => call.icon === icon).btn;
+
+        beforeEach(() => {
+            addButtonCalls = [];
+            mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn(icon => {
+                    const btn = freshButton();
+                    addButtonCalls.push({ icon, btn });
+                    return btn;
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    style: {}
+                }),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn(),
+                onclose: null
+            };
+
+            originalWidgetWindows = window.widgetWindows;
+            window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue(mockWidgetWindow)
+            };
+
+            mockActivity = {
+                errorMsg: jest.fn(),
+                textMsg: jest.fn(),
+                hideMsgs: jest.fn()
+            };
+
+            jest.spyOn(timbre, "_play").mockImplementation();
+            jest.spyOn(timbre, "_save").mockImplementation();
+            jest.spyOn(timbre, "_synth").mockImplementation();
+            jest.spyOn(timbre, "_effects").mockImplementation();
+            jest.spyOn(timbre, "_addFilter").mockImplementation();
+            jest.spyOn(timbre, "_undo").mockImplementation();
+            jest.spyOn(timbre, "_clearWidgetTimers").mockImplementation(() => 0);
+            jest.spyOn(timbre, "_cleanupEventListeners").mockImplementation();
+        });
+
+        afterEach(() => {
+            window.widgetWindows = originalWidgetWindows;
+        });
+
+        test("creates the widget window and wires onclose cleanup", () => {
+            timbre.init(mockActivity);
+
+            expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
+                timbre,
+                "timbre",
+                "timbre",
+                true
+            );
+            expect(mockWidgetWindow.clear).toHaveBeenCalled();
+            expect(mockWidgetWindow.show).toHaveBeenCalled();
+            expect(timbre.activity).toBe(mockActivity);
+            expect(timbre._playing).toBe(false);
+            expect(timbre._delta).toBe(0);
+
+            mockWidgetWindow.onclose();
+
+            expect(timbre._playing).toBe(false);
+            expect(timbre._clearWidgetTimers).toHaveBeenCalled();
+            expect(timbre._cleanupEventListeners).toHaveBeenCalled();
+            expect(mockActivity.hideMsgs).toHaveBeenCalled();
+            expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+        });
+
+        test("creates all toolbar buttons in order and finalizes the window", () => {
+            timbre.init(mockActivity);
+
+            expect(addButtonCalls.map(call => call.icon)).toEqual([
+                "play-button.svg",
+                "export-chunk.svg",
+                "synth.svg",
+                "oscillator.svg",
+                "envelope.svg",
+                "effects.svg",
+                "filter.svg",
+                "filter+.svg",
+                "restore-button.svg"
+            ]);
+            expect(mockActivity.textMsg).toHaveBeenCalled();
+            expect(mockWidgetWindow.sendToCenter).toHaveBeenCalled();
+        });
+
+        test("play button triggers _play", () => {
+            timbre.init(mockActivity);
+            getButton("play-button.svg").onclick();
+            expect(timbre._play).toHaveBeenCalled();
+        });
+
+        test("save button triggers _save", () => {
+            timbre.init(mockActivity);
+            getButton("export-chunk.svg").onclick();
+            expect(timbre._save).toHaveBeenCalled();
+        });
+
+        test("synth button activates the synth panel when no oscillator exists", () => {
+            timbre.init(mockActivity);
+            getButton("synth.svg").onclick();
+
+            expect(timbre.isActive["synth"]).toBe(true);
+            expect(timbre._synth).toHaveBeenCalled();
+            expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("synth button reports an error when an oscillator already exists", () => {
+            timbre.osc.push(1);
+            timbre.init(mockActivity);
+            getButton("synth.svg").onclick();
+
+            expect(timbre._synth).not.toHaveBeenCalled();
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Unable to use synth due to existing oscillator.",
+                3000
+            );
+        });
+
+        test("effects button activates the effects panel", () => {
+            timbre.init(mockActivity);
+            getButton("effects.svg").onclick();
+
+            expect(timbre.isActive["effects"]).toBe(true);
+            expect(timbre._effects).toHaveBeenCalled();
+        });
+
+        test("undo button triggers _undo", () => {
+            timbre.init(mockActivity);
+            getButton("restore-button.svg").onclick();
+            expect(timbre._undo).toHaveBeenCalled();
+        });
+
+        test("add-filter button only triggers _addFilter when the filter panel is active", () => {
+            timbre.init(mockActivity);
+            const addFilterButton = getButton("filter+.svg");
+
+            addFilterButton.onclick();
+            expect(timbre._addFilter).not.toHaveBeenCalled();
+
+            timbre.isActive["filter"] = true;
+            addFilterButton.onclick();
+            expect(timbre._addFilter).toHaveBeenCalled();
+        });
+    });
+
+    describe("Effects and Envelope Event Listeners (Coverage)", () => {
+        let mockDocument;
+        let mockDocById;
+        let mockDocByName;
+
+        const createBlock = (name, connections, value) => ({
+            name,
+            connections,
+            value,
+            text: { text: value === undefined ? "" : value.toString() },
+            updateCache: jest.fn(),
+            isClampBlock: jest.fn(() => false)
+        });
+
+        beforeEach(() => {
+            mockDocument = global.document;
+            mockDocById = global.docById;
+            mockDocByName = global.docByName;
+
+            global.document = jsdomDocument;
+            global.docById = id => jsdomDocument.getElementById(id);
+            global.docByName = name => jsdomDocument.getElementsByName(name);
+            jsdomDocument.body.textContent = "";
+
+            const blocks = {
+                blockList: [createBlock("settimbre", [null, null, null])],
+                clampBlocksToCheck: [],
+                findBottomBlock: jest.fn(() => null),
+                adjustDocks: jest.fn(),
+                adjustExpandableClampBlock: jest.fn(),
+                sendStackToTrash: jest.fn(),
+                loadNewBlocks: jest.fn(blockObjs => {
+                    const blockOffset = blocks.blockList.length;
+                    for (const blockObj of blockObjs) {
+                        const blockName = Array.isArray(blockObj[1]) ? blockObj[1][0] : blockObj[1];
+                        const value = Array.isArray(blockObj[1]) ? blockObj[1][1].value : undefined;
+                        const connections = blockObj[4].map(connection =>
+                            connection === null ? null : connection + blockOffset
+                        );
+                        blocks.blockList.push(createBlock(blockName, connections, value));
+                    }
+                })
+            };
+
+            timbre.activity = {
+                blocks,
+                logo: { synth: { createSynth: jest.fn() } },
+                refreshCanvas: jest.fn(),
+                saveLocally: jest.fn()
+            };
+            timbre.timbreTableDiv = jsdomDocument.createElement("div");
+            timbre.timbreTableDiv.id = "timbreTable";
+            jsdomDocument.body.appendChild(timbre.timbreTableDiv);
+
+            timbre.blockNo = 0;
+            timbre._update = jest.fn();
+            timbre._playNote = jest.fn();
+            timbre.clampConnection = jest.fn();
+            timbre.clampConnectionVspace = jest.fn();
+            timbre.instrumentName = "custom";
+            global.instrumentsEffects[0]["custom"] = {};
+
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jsdomDocument.body.textContent = "";
+            global.document = mockDocument;
+            global.docById = mockDocById;
+            global.docByName = mockDocByName;
+            jest.useRealTimers();
+        });
+
+        const triggerChange = (id, value) => {
+            const el = jsdomDocument.getElementById(id);
+            if (el) {
+                el.value = value;
+                el.dispatchEvent(new jsdomDocument.defaultView.Event("change", { bubbles: true }));
+            }
+        };
+
+        const selectEffect = async name => {
+            const r = jsdomDocument.querySelector('input[value="' + name + '"]');
+            if (r) {
+                r.checked = true;
+                const promise = r.onclick({ target: r });
+                jest.runAllTimers();
+                await promise;
+            }
+        };
+
+        test("should update Tremolo params", async () => {
+            timbre._effects();
+            await selectEffect("Tremolo");
+            triggerChange("myRangeFx0", "45");
+            expect(global.instrumentsEffects[0]["custom"]["tremoloFrequency"]).toBe(45);
+            triggerChange("myRangeFx1", "55");
+            expect(global.instrumentsEffects[0]["custom"]["tremoloDepth"]).toBe(0.55);
+        });
+
+        test("should not throw TypeError if instrumentsEffects gets reset during effect change", async () => {
+            timbre._effects();
+            await selectEffect("Tremolo");
+
+            // Simulate Logo engine resetting global state
+            global.instrumentsEffects[0]["custom"] = undefined;
+
+            // This should not throw a TypeError and should recreate the object
+            expect(() => {
+                triggerChange("myRangeFx0", "45");
+            }).not.toThrow();
+
+            expect(global.instrumentsEffects[0]["custom"]).toBeDefined();
+            expect(global.instrumentsEffects[0]["custom"]["tremoloFrequency"]).toBe(45);
+        });
+
+        test("should update Vibrato params", async () => {
+            timbre._effects();
+            await selectEffect("Vibrato");
+            triggerChange("myRangeFx0", "30");
+            expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.25);
+        });
+
+        test("should not throw TypeError if instrumentsEffects gets reset during Vibrato effect change", async () => {
+            timbre._effects();
+            await selectEffect("Vibrato");
+            global.instrumentsEffects[0]["custom"] = undefined;
+            expect(() => {
+                triggerChange("myRangeFx0", "30");
+            }).not.toThrow();
+            expect(global.instrumentsEffects[0]["custom"]).toBeDefined();
+            expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.25);
+        });
+
+        test("should update Chorus params", async () => {
+            timbre._effects();
+            await selectEffect("Chorus");
+            triggerChange("myRangeFx0", "20");
+            expect(global.instrumentsEffects[0]["custom"]["chorusRate"]).toBe(20);
+            triggerChange("myRangeFx1", "10");
+            expect(global.instrumentsEffects[0]["custom"]["delayTime"]).toBe(10);
+            triggerChange("myRangeFx2", "50");
+            expect(global.instrumentsEffects[0]["custom"]["chorusDepth"]).toBe(0.5);
+        });
+
+        test("should not throw TypeError if instrumentsEffects gets reset during Chorus effect change", async () => {
+            timbre._effects();
+            await selectEffect("Chorus");
+            global.instrumentsEffects[0]["custom"] = undefined;
+            expect(() => {
+                triggerChange("myRangeFx0", "20");
+            }).not.toThrow();
+            expect(global.instrumentsEffects[0]["custom"]).toBeDefined();
+            expect(global.instrumentsEffects[0]["custom"]["chorusRate"]).toBe(20);
+        });
+
+        test("should update Phaser params", async () => {
+            timbre._effects();
+            await selectEffect("Phaser");
+            triggerChange("myRangeFx0", "12");
+            expect(global.instrumentsEffects[0]["custom"]["rate"]).toBe(12);
+            triggerChange("myRangeFx1", "3");
+            expect(global.instrumentsEffects[0]["custom"]["octaves"]).toBe(3);
+            triggerChange("myRangeFx2", "400");
+            expect(global.instrumentsEffects[0]["custom"]["baseFrequency"]).toBe(400);
+        });
+
+        test("should not throw TypeError if instrumentsEffects gets reset during Phaser effect change", async () => {
+            timbre._effects();
+            await selectEffect("Phaser");
+            global.instrumentsEffects[0]["custom"] = undefined;
+            expect(() => {
+                triggerChange("myRangeFx0", "12");
+            }).not.toThrow();
+            expect(global.instrumentsEffects[0]["custom"]).toBeDefined();
+            expect(global.instrumentsEffects[0]["custom"]["rate"]).toBe(12);
+        });
+
+        test("should reuse existing Tremolo params", async () => {
+            timbre.tremoloEffect.push(1);
+            timbre.tremoloParams.push(15);
+            timbre.tremoloParams.push(0.2);
+            timbre._effects();
+            await selectEffect("Tremolo");
+            triggerChange("myRangeFx0", "16");
+            expect(global.instrumentsEffects[0]["custom"]["tremoloFrequency"]).toBe(16);
+        });
+
+        test("should reuse existing Chorus params", async () => {
+            timbre.chorusEffect.push(1);
+            timbre.chorusParams.push(5);
+            timbre.chorusParams.push(5);
+            timbre.chorusParams.push(50);
+            timbre._effects();
+            await selectEffect("Chorus");
+            triggerChange("myRangeFx1", "6");
+            expect(global.instrumentsEffects[0]["custom"]["delayTime"]).toBe(6);
+        });
+
+        test("should reuse existing Phaser params", async () => {
+            timbre.phaserEffect.push(1);
+            timbre.phaserParams.push(10);
+            timbre.phaserParams.push(2);
+            timbre.phaserParams.push(200);
+            timbre._effects();
+            await selectEffect("Phaser");
+            triggerChange("myRangeFx2", "250");
+            expect(global.instrumentsEffects[0]["custom"]["baseFrequency"]).toBe(250);
+        });
+
+        test("should update Distortion params", async () => {
+            timbre._effects();
+            await selectEffect("Distortion");
+            triggerChange("myRangeFx0", "75");
+            expect(global.instrumentsEffects[0]["custom"]["distortionAmount"]).toBe(0.75);
+        });
+
+        test("should not throw TypeError if instrumentsEffects gets reset during Distortion effect change", async () => {
+            timbre._effects();
+            await selectEffect("Distortion");
+            global.instrumentsEffects[0]["custom"] = undefined;
+            expect(() => {
+                triggerChange("myRangeFx0", "75");
+            }).not.toThrow();
+            expect(global.instrumentsEffects[0]["custom"]).toBeDefined();
+            expect(global.instrumentsEffects[0]["custom"]["distortionAmount"]).toBe(0.75);
+        });
+
+        test("should update Envelope params", async () => {
+            timbre._envelope();
+            // envelope uses a different delay? actually _envelope has NO delay execution!
+            triggerChange("myRange0", "15");
+            expect(timbre.synthVals["envelope"]["attack"]).toBe(0.15);
+            triggerChange("myRange3", "25");
+            expect(timbre.synthVals["envelope"]["release"]).toBe(0.25);
+        });
     });
 });

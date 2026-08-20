@@ -10,7 +10,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global DOMParser, XMLSerializer, _, INLINECOLLAPSIBLES, EXPANDBUTTON, COLLAPSEBUTTON, TURTLESVG, FILLCOLORS, STROKECOLORS */
+/* global DOMParser, XMLSerializer, _, EXPANDBUTTON, COLLAPSEBUTTON, TURTLESVG, FILLCOLORS, STROKECOLORS */
 
 const extractSVGInner = svgString => {
     const parser = new DOMParser();
@@ -119,7 +119,7 @@ const printBlockSVG = activity => {
 
         if (activity.blocks.blockList[i].isCollapsible()) {
             let y;
-            if (INLINECOLLAPSIBLES.includes(activity.blocks.blockList[i].name)) {
+            if (activity.blocks.blockList[i].isInlineCollapsible()) {
                 y = activity.blocks.blockList[i].container.y + 4;
             } else {
                 y = activity.blocks.blockList[i].container.y + 12;

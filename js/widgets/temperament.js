@@ -23,8 +23,8 @@
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
    isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch
+   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
+   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber
  */
 
 /* exported TemperamentWidget */
@@ -53,10 +53,12 @@ function TemperamentWidget() {
     const ICONSIZE = 32;
 
     /**
-     * Reference to the temperament table div.
+     * Reference to the temperament table div. Created in init() since it
+     * is not needed (and should not be attached to the DOM) until the
+     * widget is actually opened.
      * @type {HTMLElement}
      */
-    const temperamentTableDiv = document.createElement("div");
+    let temperamentTableDiv;
 
     /**
      * Reference to the temperament cell.
@@ -137,6 +139,60 @@ function TemperamentWidget() {
      * @type {boolean}
      */
     this.playbackForward = true;
+
+    /** Converts a ratio to cents relative to the tonic (1200 cents = 1 octave). */
+    const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
+
+    /** Recomputes a frequencies array from ratios and a tonic frequency, each entry to 2dp. */
+    const computeFrequencies = (ratios, baseFrequency, count) => {
+        const frequencies = [];
+        for (let i = 0; i <= count; i++) {
+            frequencies[i] = (ratios[i] * baseFrequency).toFixed(2);
+        }
+        return frequencies;
+    };
+
+    /** Sets a wheelnav nav item's fill/hover/path/selected color attributes to one color. */
+    const setNavItemColor = (navObj, index, color) => {
+        navObj.navItems[index].fillAttr = color;
+        navObj.navItems[index].sliceHoverAttr.fill = color;
+        navObj.navItems[index].slicePathAttr.fill = color;
+        navObj.navItems[index].sliceSelectedAttr.fill = color;
+    };
+
+    /** Builds the "preview"/"done" button pair shown while editing a temperament. */
+    const addPreviewDoneButtonPair = (divAppend, container, marginLeft, preview) => {
+        divAppend.id = "divAppend";
+        divAppend.textContent = "";
+        const previewDiv = document.createElement("div");
+        previewDiv.id = "preview";
+        previewDiv.style.cssFloat = "left";
+        previewDiv.textContent = preview ? _("back") : _("preview");
+        const doneDiv = document.createElement("div");
+        doneDiv.id = "done_";
+        doneDiv.style.cssFloat = "right";
+        doneDiv.textContent = _("done");
+        divAppend.appendChild(previewDiv);
+        divAppend.appendChild(doneDiv);
+        divAppend.style.textAlign = "center";
+        divAppend.style.marginLeft = marginLeft;
+        divAppend.style.height = "32px";
+        divAppend.style.marginTop = "40px";
+        divAppend.style.overflow = "auto";
+        container.append(divAppend);
+
+        const divAppend1 = docById("preview");
+        divAppend1.style.height = "30px";
+        divAppend1.style.marginLeft = "3px";
+        divAppend1.style.backgroundColor = platformColor.selectorBackground;
+        divAppend1.style.width = "215px";
+
+        const divAppend2 = docById("done_");
+        divAppend2.style.height = "30px";
+        divAppend2.style.marginRight = "3px";
+        divAppend2.style.backgroundColor = platformColor.selectorBackground;
+        divAppend2.style.width = "205px";
+    };
 
     /**
      * Adds a button to the widget.
@@ -280,7 +336,7 @@ function TemperamentWidget() {
                     "20 20px Impact, Charcoal, sans-serif";
                 this.notesCircle.navItems[i].titleSelectedAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
-                angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
+                angle[i] = ratioToWheelAngle(ratios[i], this.powerBase);
                 if (i !== 0) {
                     if (i === pitchNumber - 1) {
                         angleDiff[i - 1] = angle[0] + 360 - angle[i];
@@ -509,7 +565,7 @@ function TemperamentWidget() {
                     }
                 }
                 if (noteDefined === false) {
-                    const cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+                    const cents = ratioToCents(this.ratios[i], this.powerBase);
                     const centsDiff = [];
                     const centsDiff1 = [];
                     for (let j = 0; j < this.cents.length; j++) {
@@ -549,10 +605,19 @@ function TemperamentWidget() {
                     docById("noteInfo").remove();
                 };
 
-                if (docById("edit") !== null) {
-                    docById("edit").addEventListener("click", function (e) {
+                if (this._editBtn && this._editClickHandler) {
+                    this._editBtn.removeEventListener("click", this._editClickHandler);
+                    this._editBtn = null;
+                    this._editClickHandler = null;
+                }
+
+                const editBtn = docById("edit");
+                if (editBtn !== null) {
+                    this._editBtn = editBtn;
+                    this._editClickHandler = function (e) {
                         that.editFrequency(e);
-                    });
+                    };
+                    this._editBtn.addEventListener("click", this._editClickHandler);
                 }
             }
         }
@@ -666,7 +731,7 @@ function TemperamentWidget() {
             const max = parseFloat(sliderEl.getAttribute("max"));
             // Clamp the resulting frequency to the slider's allowed range so
             // user cannot move the pitch outside the neighbour boundaries.
-            const frequency = Math.min(Math.max(centsToFreq(cents), min), max);
+            const frequency = clampNumber(centsToFreq(cents), min, max);
             sliderEl.value = frequency;
             applyFrequency(frequency);
         };
@@ -676,11 +741,7 @@ function TemperamentWidget() {
             that.typeOfEdit = "nonequal";
             that.createMainWheel();
             const frequency1 = that.frequencies[0];
-            that.frequencies = [];
-            for (let j = 0; j < that.ratios.length; j++) {
-                that.frequencies[j] = that.ratios[j] * frequency1;
-                that.frequencies[j] = that.frequencies[j].toFixed(2);
-            }
+            that.frequencies = computeFrequencies(that.ratios, frequency1, that.ratios.length - 1);
             that.checkTemperament(that.ratios);
             docById("noteInfo").remove();
         };
@@ -714,6 +775,15 @@ function TemperamentWidget() {
         return baseFreq * Math.pow(2, cents / 1200);
     };
 
+    /** Hides and removes a wheelnav wheel if its container div is present in the DOM. */
+    const removeWheelIfPresent = (divId, wheel) => {
+        const el = docById(divId);
+        if (el !== null) {
+            el.style.display = "none";
+            wheel.removeWheel();
+        }
+    };
+
     /**
      * Switches to displaying the graph of notes on the temperament widget.
      * @returns {void}
@@ -722,10 +792,7 @@ function TemperamentWidget() {
         this.circleIsVisible = true;
         this.toggleNotesButton();
         temperamentTableDiv.textContent = "";
-        if (docById("wheelDiv2") !== null) {
-            docById("wheelDiv2").style.display = "none";
-            this.notesCircle.removeWheel();
-        }
+        removeWheelIfPresent("wheelDiv2", this.notesCircle);
 
         const notesGraph = document.createElement("table");
         notesGraph.id = "notesGraph";
@@ -923,10 +990,7 @@ function TemperamentWidget() {
         this._logo.synth.setMasterVolume(0);
         this._logo.synth.stop();
         const that = this;
-        if (docById("wheelDiv2") !== null) {
-            docById("wheelDiv2").style.display = "none";
-            this.notesCircle.removeWheel();
-        }
+        removeWheelIfPresent("wheelDiv2", this.notesCircle);
         temperamentTableDiv.textContent = "";
         const editOctaveTable = document.createElement("table");
         editOctaveTable.id = "editOctave";
@@ -940,10 +1004,16 @@ function TemperamentWidget() {
 
         const editMenus = [_("equal"), _("ratios"), _("arbitrary"), _("octave space")];
 
+        const menuItems = [];
         for (let i = 0; i < editMenus.length; i++) {
             const td = document.createElement("td");
-            td.id = "editMenus";
+            td.className = "editMenus";
             td.textContent = editMenus[i];
+            td.style.background = platformColor.selectorBackground;
+            td.style.height = 30 + "px";
+            td.style.textAlign = "center";
+            td.style.fontWeight = "bold";
+            menuItems.push(td);
             editOctaveTr.appendChild(td);
         }
 
@@ -953,13 +1023,6 @@ function TemperamentWidget() {
         userEditTd.id = "userEdit";
         userEditTr.appendChild(userEditTd);
         editOctaveTbody.appendChild(userEditTr);
-        const menuItems = document.querySelectorAll("#editMenus");
-        for (let i = 0; i < editMenus.length; i++) {
-            menuItems[i].style.background = platformColor.selectorBackground;
-            menuItems[i].style.height = 30 + "px";
-            menuItems[i].style.textAlign = "center";
-            menuItems[i].style.fontWeight = "bold";
-        }
 
         menuItems[0].style.background = platformColor.selectorBackground || "#c8C8C8";
         that.equalEdit();
@@ -995,6 +1058,14 @@ function TemperamentWidget() {
             menuItems[3].style.background = platformColor.selectorBackground || "#c8C8C8";
             that.octaveSpaceEdit();
         };
+    };
+
+    /** Recolors a preview wheelnav wheel's slices back to the default background. */
+    const paintPreviewWheelColors = (navObj, pitchNumber) => {
+        for (let i = 0; i < pitchNumber; i++) {
+            setNavItemColor(navObj, i, platformColor.selectorBackground || "#e0e0e0");
+        }
+        navObj.refreshWheel();
     };
 
     /**
@@ -1039,37 +1110,7 @@ function TemperamentWidget() {
         const divAppend = document.createElement("div");
 
         function addDivision(preview) {
-            // Add Buttons
-            divAppend.id = "divAppend";
-            divAppend.textContent = "";
-            const previewDiv = document.createElement("div");
-            previewDiv.id = "preview";
-            previewDiv.style.cssFloat = "left";
-            previewDiv.textContent = preview ? _("back") : _("preview");
-            const doneDiv = document.createElement("div");
-            doneDiv.id = "done_";
-            doneDiv.style.cssFloat = "right";
-            doneDiv.textContent = _("done");
-            divAppend.appendChild(previewDiv);
-            divAppend.appendChild(doneDiv);
-            divAppend.style.textAlign = "center";
-            divAppend.style.marginLeft = "-80px";
-            divAppend.style.height = "32px";
-            divAppend.style.marginTop = "40px";
-            divAppend.style.overflow = "auto";
-            equalEdit.append(divAppend);
-
-            const divAppend1 = docById("preview");
-            divAppend1.style.height = "30px";
-            divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
-            divAppend1.style.width = "215px";
-
-            const divAppend2 = docById("done_");
-            divAppend2.style.height = "30px";
-            divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
-            divAppend2.style.width = "205px";
+            addPreviewDoneButtonPair(divAppend, equalEdit, "-80px", preview);
         }
 
         addDivision(false);
@@ -1153,11 +1194,7 @@ function TemperamentWidget() {
                 // Go to main "Circle of Notes"
                 this.ratios = this.tempRatios.slice();
                 const frequency = this.frequencies[0];
-                this.frequencies = [];
-                for (let i = 0; i <= pitchNumber; i++) {
-                    this.frequencies[i] = this.ratios[i] * frequency;
-                    this.frequencies[i] = this.frequencies[i].toFixed(2);
-                }
+                this.frequencies = computeFrequencies(this.ratios, frequency, pitchNumber);
 
                 this.pitchNumber = pitchNumber;
                 this.checkTemperament(compareRatios);
@@ -1170,17 +1207,7 @@ function TemperamentWidget() {
                 wheelDiv2.className = "wheelNav";
                 docById("userEdit").appendChild(wheelDiv2);
                 this.createMainWheel(this.tempRatios, pitchNumber);
-                for (let i = 0; i < pitchNumber; i++) {
-                    this.notesCircle.navItems[i].fillAttr =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    this.notesCircle.navItems[i].slicePathAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                }
-                this.notesCircle.refreshWheel();
+                paintPreviewWheelColors(this.notesCircle, pitchNumber);
                 docById("userEdit").style.paddingLeft = "0px";
                 addDivision(true);
                 divAppend.style.marginTop = docById("wheelDiv2").style.height;
@@ -1189,11 +1216,7 @@ function TemperamentWidget() {
                 //make temperary
                 const ratios = this.tempRatios.slice();
                 const frequency = this.frequencies[0];
-                this.eqTempHzs = [];
-                for (let i = 0; i <= pitchNumber; i++) {
-                    this.eqTempHzs[i] = ratios[i] * frequency;
-                    this.eqTempHzs[i] = this.eqTempHzs[i].toFixed(2);
-                }
+                this.eqTempHzs = computeFrequencies(ratios, frequency, pitchNumber);
                 this.eqTempPitchNumber = pitchNumber;
                 this.checkTemperament(compareRatios);
 
@@ -1201,11 +1224,7 @@ function TemperamentWidget() {
                     //Go to main Circle of Notes
                     that.ratios = that.tempRatios.slice();
                     const frequency = that.frequencies[0];
-                    that.frequencies = [];
-                    for (let i = 0; i <= pitchNumber; i++) {
-                        that.frequencies[i] = that.ratios[i] * frequency;
-                        that.frequencies[i] = that.frequencies[i].toFixed(2);
-                    }
+                    that.frequencies = computeFrequencies(that.ratios, frequency, pitchNumber);
 
                     that.pitchNumber = pitchNumber;
                     that.eqTempPitchNumber = null;
@@ -1261,36 +1280,7 @@ function TemperamentWidget() {
         const divAppend = document.createElement("div");
 
         function addButtons(preview) {
-            divAppend.id = "divAppend";
-            divAppend.textContent = "";
-            const previewDiv = document.createElement("div");
-            previewDiv.id = "preview";
-            previewDiv.style.cssFloat = "left";
-            previewDiv.textContent = preview ? _("back") : _("preview");
-            const doneDiv = document.createElement("div");
-            doneDiv.id = "done_";
-            doneDiv.style.cssFloat = "right";
-            doneDiv.textContent = _("done");
-            divAppend.appendChild(previewDiv);
-            divAppend.appendChild(doneDiv);
-            divAppend.style.textAlign = "center";
-            divAppend.style.marginLeft = "-100px";
-            divAppend.style.height = "32px";
-            divAppend.style.marginTop = "40px";
-            divAppend.style.overflow = "auto";
-            ratioEdit.append(divAppend);
-
-            const divAppend1 = docById("preview");
-            divAppend1.style.height = "30px";
-            divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
-            divAppend1.style.width = "215px";
-
-            const divAppend2 = docById("done_");
-            divAppend2.style.height = "30px";
-            divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
-            divAppend2.style.width = "205px";
+            addPreviewDoneButtonPair(divAppend, ratioEdit, "-100px", preview);
         }
 
         addButtons(false);
@@ -1364,11 +1354,7 @@ function TemperamentWidget() {
                 that.typeOfEdit = "nonequal";
                 that.pitchNumber = that.ratios.length - 1;
                 const frequency1 = that.frequencies[0];
-                that.frequencies = [];
-                for (let i = 0; i <= that.pitchNumber; i++) {
-                    that.frequencies[i] = that.ratios[i] * frequency1;
-                    that.frequencies[i] = that.frequencies[i].toFixed(2);
-                }
+                that.frequencies = computeFrequencies(that.ratios, frequency1, that.pitchNumber);
 
                 for (let i = 0; i < that.ratios.length; i++) {
                     compareRatios[i] = that.ratios[i];
@@ -1385,17 +1371,7 @@ function TemperamentWidget() {
                 wheelDiv2.className = "wheelNav";
                 docById("userEdit").appendChild(wheelDiv2);
                 that.createMainWheel(that.tempRatios, pitchNumber);
-                for (let i = 0; i < pitchNumber; i++) {
-                    that.notesCircle.navItems[i].fillAttr =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    that.notesCircle.navItems[i].sliceHoverAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    that.notesCircle.navItems[i].slicePathAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    that.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                }
-                that.notesCircle.refreshWheel();
+                paintPreviewWheelColors(that.notesCircle, pitchNumber);
                 docById("userEdit").style.paddingLeft = "0px";
                 addButtons(true);
                 divAppend.style.marginTop = docById("wheelDiv2").style.height;
@@ -1406,11 +1382,7 @@ function TemperamentWidget() {
                 that.typeOfEdit = "nonequal";
                 that.NEqTempPitchNumber = ratios.length - 1;
                 const frequency1 = that.frequencies[0];
-                that.NEqTempHzs = [];
-                for (let i = 0; i <= that.NEqTempPitchNumber; i++) {
-                    that.NEqTempHzs[i] = ratios[i] * frequency1;
-                    that.NEqTempHzs[i] = that.NEqTempHzs[i].toFixed(2);
-                }
+                that.NEqTempHzs = computeFrequencies(ratios, frequency1, that.NEqTempPitchNumber);
 
                 for (let i = 0; i < ratios.length; i++) {
                     compareRatios[i] = ratios[i];
@@ -1423,11 +1395,11 @@ function TemperamentWidget() {
                     that.ratios = that.tempRatios.slice();
                     that.pitchNumber = that.ratios.length - 1;
                     const frequency1 = that.frequencies[0];
-                    that.frequencies = [];
-                    for (let i = 0; i <= that.pitchNumber; i++) {
-                        that.frequencies[i] = that.ratios[i] * frequency1;
-                        that.frequencies[i] = that.frequencies[i].toFixed(2);
-                    }
+                    that.frequencies = computeFrequencies(
+                        that.ratios,
+                        frequency1,
+                        that.pitchNumber
+                    );
 
                     for (let i = 0; i < that.ratios.length; i++) {
                         compareRatios[i] = that.ratios[i];
@@ -1511,7 +1483,7 @@ function TemperamentWidget() {
                 this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 this.wheel1.navItems[i].titleSelectedAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
-                angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
+                angle[i] = ratioToWheelAngle(ratios[i], this.powerBase);
                 if (i !== 0) {
                     if (i === this.pitchNumber - 1) {
                         angleDiff[i - 1] = angle[0] + 360 - angle[i];
@@ -1613,7 +1585,7 @@ function TemperamentWidget() {
                     minutes.push("|");
                 }
                 //Change angles of outer circle
-                angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
+                angle[i] = ratioToWheelAngle(ratios[i], this.powerBase);
                 if (i !== 0) {
                     if (i === pitchNumber - 1) {
                         angleDiff1[i - 1] = angle[0] + 360 - angle[i];
@@ -1668,11 +1640,7 @@ function TemperamentWidget() {
             that.pitchNumber = that.ratios.length - 1;
             const compareRatios = [];
             const frequency1 = that.frequencies[0];
-            that.frequencies = [];
-            for (let i = 0; i < that.ratios.length; i++) {
-                that.frequencies[i] = that.ratios[i] * frequency1;
-                that.frequencies[i] = that.frequencies[i].toFixed(2);
-            }
+            that.frequencies = computeFrequencies(that.ratios, frequency1, that.ratios.length - 1);
 
             for (let i = 0; i < that.ratios.length; i++) {
                 compareRatios[i] = that.ratios[i];
@@ -1694,11 +1662,7 @@ function TemperamentWidget() {
      */
     this.arbitraryEditSlider = function (event, angle, ratios, pitchNumber) {
         const frequency = this.frequencies[0];
-        const frequencies = [];
-        for (let j = 0; j <= pitchNumber; j++) {
-            frequencies[j] = ratios[j] * frequency;
-            frequencies[j] = frequencies[j].toFixed(2);
-        }
+        const frequencies = computeFrequencies(ratios, frequency, pitchNumber);
         for (let i = 0; i < pitchNumber; i++) {
             if (event.target.parentNode.id === "wheelnav-wheelDiv3-title-" + i) {
                 const that = this;
@@ -1966,7 +1930,8 @@ function TemperamentWidget() {
                 startPitchParsed[0],
                 startPitchParsed[1],
                 0,
-                "C Major"
+                "C Major",
+                this.inTemperament
             );
 
             let addOctave = "";
@@ -2252,9 +2217,7 @@ function TemperamentWidget() {
         }
 
         // Ensure per-note playback uses the currently selected temperament mapping.
-        this._logo.synth.inTemperament = this.inTemperament;
-        this._logo._userTemperament = this.inTemperament;
-        this._logo.synth.changeInTemperament = true;
+        this._logo.setUserTemperament(this.inTemperament);
 
         if (docById("wheelDiv4") === null) {
             if (this.editMode === "equal" && this.eqTempHzs && this.eqTempHzs.length) {
@@ -2304,20 +2267,25 @@ function TemperamentWidget() {
         this._playing = !this._playing;
         this._logo.resetSynth(0);
 
+        /** Replaces a button cell's contents with a single icon/label pair. */
+        const setPlayButtonIcon = (cell, icon, label) => {
+            cell.textContent = "\u00A0\u00A0";
+            const img = document.createElement("img");
+            img.src = `header-icons/${icon}`;
+            img.title = label;
+            img.alt = label;
+            img.setAttribute("height", ICONSIZE);
+            img.setAttribute("width", ICONSIZE);
+            img.setAttribute("vertical-align", "middle");
+            img.setAttribute("align-content", "center");
+            cell.appendChild(img);
+            cell.appendChild(document.createTextNode("\u00A0\u00A0"));
+        };
+
         const cell = this.playButton;
         if (this._playing) {
             this._logo.synth.setMasterVolume(PREVIEWVOLUME);
-            cell.textContent = "\u00A0\u00A0";
-            const stopImg = document.createElement("img");
-            stopImg.src = "header-icons/stop-button.svg";
-            stopImg.title = _("Stop");
-            stopImg.alt = _("Stop");
-            stopImg.setAttribute("height", ICONSIZE);
-            stopImg.setAttribute("width", ICONSIZE);
-            stopImg.setAttribute("vertical-align", "middle");
-            stopImg.setAttribute("align-content", "center");
-            cell.appendChild(stopImg);
-            cell.appendChild(document.createTextNode("\u00A0\u00A0"));
+            setPlayButtonIcon(cell, "stop-button.svg", _("Stop"));
         } else {
             if (this._playTimeout) {
                 clearTimeout(this._playTimeout);
@@ -2325,23 +2293,19 @@ function TemperamentWidget() {
             }
             this._logo.synth.setMasterVolume(0);
             this._logo.synth.stop();
-            cell.textContent = "\u00A0\u00A0";
-            const playImg = document.createElement("img");
-            playImg.src = "header-icons/play-button.svg";
-            playImg.title = _("Play");
-            playImg.alt = _("Play");
-            playImg.setAttribute("height", ICONSIZE);
-            playImg.setAttribute("width", ICONSIZE);
-            playImg.setAttribute("vertical-align", "middle");
-            playImg.setAttribute("align-content", "center");
-            cell.appendChild(playImg);
-            cell.appendChild(document.createTextNode("\u00A0\u00A0"));
+            setPlayButtonIcon(cell, "play-button.svg", _("Play"));
         }
 
         const startingPitch = this._logo.synth.startingPitch;
         const startPitchParsed = parseNoteString(startingPitch);
         const octave = startPitchParsed[1] - 1;
-        const startPitch = pitchToFrequency(startPitchParsed[0], octave, 0, "C Major");
+        const startPitch = pitchToFrequency(
+            startPitchParsed[0],
+            octave,
+            0,
+            "C Major",
+            this._logo.synth.inTemperament
+        );
 
         const that = this;
         let pitchNumber = this.pitchNumber;
@@ -2381,124 +2345,102 @@ function TemperamentWidget() {
             if (that.circleIsVisible === false && docById("wheelDiv4") === null) {
                 if (pitchNumber > 1) {
                     if (i === pitchNumber && that._playing) {
-                        that.notesCircle.navItems[0].fillAttr =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[0].slicePathAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
+                        setNavItemColor(
+                            that.notesCircle,
+                            0,
+                            platformColor.selectorBackgroundHOFF || "#808080"
+                        );
                     } else if (that._playing) {
-                        that.notesCircle.navItems[i].fillAttr =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[i].sliceHoverAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[i].slicePathAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
+                        setNavItemColor(
+                            that.notesCircle,
+                            i,
+                            platformColor.selectorBackgroundHOFF || "#808080"
+                        );
                     }
 
                     if (that.playbackForward === false && i < pitchNumber) {
                         if (i === pitchNumber - 1) {
-                            that.notesCircle.navItems[0].fillAttr =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
+                            setNavItemColor(
+                                that.notesCircle,
+                                0,
+                                platformColor.selectorBackground || "#c8C8C8"
+                            );
                         } else {
-                            that.notesCircle.navItems[i + 1].fillAttr =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i + 1].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i + 1].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i + 1].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
+                            setNavItemColor(
+                                that.notesCircle,
+                                i + 1,
+                                platformColor.selectorBackground || "#c8C8C8"
+                            );
                         }
                     } else {
                         if (i !== 0) {
-                            that.notesCircle.navItems[i - 1].fillAttr =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
+                            setNavItemColor(
+                                that.notesCircle,
+                                i - 1,
+                                platformColor.selectorBackground || "#c8C8C8"
+                            );
                         }
                     }
 
                     that.notesCircle.refreshWheel();
                 }
             } else if (that.circleIsVisible === true && docById("wheelDiv4") === null) {
-                docById("pitchNumber_" + i).style.background = platformColor.labelColor;
+                const pitchElI = docById("pitchNumber_" + i);
+                if (pitchElI) {
+                    pitchElI.style.background = platformColor.labelColor;
+                }
                 if (that.playbackForward === false && i < pitchNumber) {
                     const j = i + 1;
-                    docById("pitchNumber_" + j).style.background = platformColor.selectorBackground;
+                    const pitchElJ = docById("pitchNumber_" + j);
+                    if (pitchElJ) {
+                        pitchElJ.style.background = platformColor.selectorBackground;
+                    }
                 } else {
                     if (i !== 0) {
                         const j = i - 1;
-                        docById("pitchNumber_" + j).style.background =
-                            platformColor.selectorBackground;
+                        const pitchElJ = docById("pitchNumber_" + j);
+                        if (pitchElJ) {
+                            pitchElJ.style.background = platformColor.selectorBackground;
+                        }
                     }
                 }
             } else if (docById("wheelDiv4") !== null) {
                 if (pitchNumber > 1) {
                     if (i === pitchNumber) {
-                        that.wheel1.navItems[0].fillAttr =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[0].sliceHoverAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[0].slicePathAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[0].sliceSelectedAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
+                        setNavItemColor(
+                            that.wheel1,
+                            0,
+                            platformColor.selectorBackgroundHOFF || "#808080"
+                        );
                     } else {
-                        that.wheel1.navItems[i].fillAttr =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[i].sliceHoverAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[i].slicePathAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[i].sliceSelectedAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
+                        setNavItemColor(
+                            that.wheel1,
+                            i,
+                            platformColor.selectorBackgroundHOFF || "#808080"
+                        );
                     }
 
                     if (that.playbackForward === false && i < pitchNumber) {
                         if (i === pitchNumber - 1) {
-                            that.wheel1.navItems[0].fillAttr =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[0].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[0].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[0].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
+                            setNavItemColor(
+                                that.wheel1,
+                                0,
+                                platformColor.selectorBackground || "#e0e0e0"
+                            );
                         } else {
-                            that.wheel1.navItems[i + 1].fillAttr =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i + 1].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i + 1].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i + 1].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
+                            setNavItemColor(
+                                that.wheel1,
+                                i + 1,
+                                platformColor.selectorBackground || "#e0e0e0"
+                            );
                         }
                     } else {
                         if (i !== 0) {
-                            that.wheel1.navItems[i - 1].fillAttr =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i - 1].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
+                            setNavItemColor(
+                                that.wheel1,
+                                i - 1,
+                                platformColor.selectorBackground || "#e0e0e0"
+                            );
                         }
                     }
 
@@ -2523,31 +2465,18 @@ function TemperamentWidget() {
                 that.inbetween = true;
             }
             if (!that.playbackForward && i === -1) {
-                cell.textContent = "\u00A0\u00A0";
-                const playImg = document.createElement("img");
-                playImg.src = "header-icons/play-button.svg";
-                playImg.title = _("Play");
-                playImg.alt = _("Play");
-                playImg.setAttribute("height", ICONSIZE);
-                playImg.setAttribute("width", ICONSIZE);
-                playImg.setAttribute("vertical-align", "middle");
-                playImg.setAttribute("align-content", "center");
-                cell.appendChild(playImg);
-                cell.appendChild(document.createTextNode("\u00A0\u00A0"));
+                setPlayButtonIcon(cell, "play-button.svg", _("Play"));
                 that._playing = false;
                 that.playbackForward = true;
                 that.inbetween = false;
                 that._playTimeout = setTimeout(
                     function () {
                         if (pitchNumber > 1 && that.notesCircle && that.notesCircle.navItems) {
-                            that.notesCircle.navItems[0].fillAttr =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
+                            setNavItemColor(
+                                that.notesCircle,
+                                0,
+                                platformColor.selectorBackground || "#c8C8C8"
+                            );
                             that.notesCircle.refreshWheel();
                         }
                     },
@@ -2567,7 +2496,9 @@ function TemperamentWidget() {
             if (this.circleIsVisible) {
                 for (let i = 0; i <= this.pitchNumber; i++) {
                     const pitchElement = docById("pitchNumber_" + i);
-                    pitchElement.style.background = platformColor.selectorBackground;
+                    if (pitchElement) {
+                        pitchElement.style.background = platformColor.selectorBackground;
+                    }
                 }
             }
 
@@ -2586,6 +2517,8 @@ function TemperamentWidget() {
 
         const w = window.innerWidth;
         this._cellScale = w / 1200;
+
+        temperamentTableDiv = document.createElement("div");
 
         const widgetWindow = window.widgetWindows.windowFor(this, "temperament");
         this.widgetWindow = widgetWindow;
@@ -2606,18 +2539,15 @@ function TemperamentWidget() {
             that._playing = false;
             that._logo.synth.stop();
             that._logo.synth.setMasterVolume(last(Singer.masterVolume));
-            if (docById("wheelDiv2") !== null) {
-                docById("wheelDiv2").style.display = "none";
-                that.notesCircle.removeWheel();
+            if (that._editBtn && that._editClickHandler) {
+                that._editBtn.removeEventListener("click", that._editClickHandler);
+                that._editBtn = null;
+                that._editClickHandler = null;
             }
-            if (docById("wheelDiv3") !== null) {
-                docById("wheelDiv3").style.display = "none";
-                that.wheel.removeWheel();
-            }
-            if (docById("wheelDiv4") !== null) {
-                docById("wheelDiv4").style.display = "none";
-                that.wheel1.removeWheel();
-            }
+
+            removeWheelIfPresent("wheelDiv2", that.notesCircle);
+            removeWheelIfPresent("wheelDiv3", that.wheel);
+            removeWheelIfPresent("wheelDiv4", that.wheel1);
 
             this.destroy();
         };
@@ -2703,7 +2633,7 @@ function TemperamentWidget() {
                         this.inTemperament
                     )
                     .toFixed(2);
-                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+                this.cents[i] = ratioToCents(this.ratios[i], this.powerBase);
                 this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
             } else {
                 if (isCustomTemperament(this.inTemperament)) {
@@ -2742,7 +2672,7 @@ function TemperamentWidget() {
                 str[i] = note[i] + str[i][1];
                 this.intervals[i] = t.interval[i];
                 this.ratios[i] = getTemperamentRatio(t[this.intervals[i]]);
-                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+                this.cents[i] = ratioToCents(this.ratios[i], this.powerBase);
                 if (i === 0) {
                     this.frequencies[i] = this._logo.synth
                         ._getFrequency(str[i], true, this.inTemperament)

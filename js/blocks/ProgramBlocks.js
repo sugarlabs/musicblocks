@@ -1140,6 +1140,7 @@ function setupProgramBlocks(activity) {
          */
         constructor() {
             super("makeblock");
+            this.setCapability("argumentLike");
             this.setPalette("program", activity);
             this.setHelpString([
                 _("The Make block block creates a new block."),

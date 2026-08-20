@@ -21,6 +21,8 @@
  */
 
 global._ = msg => msg;
+global.getCurrentEDO = () => 12;
+global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
 
 const mockOscillator = {
     toDestination: jest.fn().mockReturnThis(),
@@ -105,7 +107,11 @@ describe("PitchSlider Widget", () => {
         global.document.removeEventListener = jest.fn();
 
         activityMock = {
-            logo: {},
+            logo: {
+                synth: {
+                    inTemperament: "equal"
+                }
+            },
             textMsg: jest.fn(),
             refreshCanvas: jest.fn(),
             blocks: {
@@ -124,10 +130,6 @@ describe("PitchSlider Widget", () => {
     describe("Static Properties", () => {
         test("ICONSIZE is 32", () => {
             expect(PitchSlider.ICONSIZE).toBe(32);
-        });
-
-        test("SEMITONE is correct", () => {
-            expect(PitchSlider.SEMITONE).toBeCloseTo(1.059463, 6);
         });
     });
 
@@ -241,12 +243,12 @@ describe("PitchSlider Widget", () => {
             expect(slider.widgetWindow.addRangeSlider).toHaveBeenCalledTimes(2);
         });
 
-        test("creates up/down/save buttons for each frequency", () => {
+        test("creates up/down/save/reset buttons for each frequency", () => {
             slider.frequencies = [440, 880];
             slider.init(activityMock);
 
-            // 3 buttons per frequency = 6 buttons total
-            expect(slider.widgetWindow.addButton).toHaveBeenCalledTimes(6);
+            // 4 buttons per frequency = 8 buttons total
+            expect(slider.widgetWindow.addButton).toHaveBeenCalledTimes(8);
         });
 
         test("each slider has correct min/max range", () => {
@@ -338,7 +340,7 @@ describe("PitchSlider Widget", () => {
             const event = { key: "ArrowUp", preventDefault: jest.fn(), stopPropagation: jest.fn() };
             keyHandler(event);
 
-            const expected = 440 * PitchSlider.SEMITONE;
+            const expected = 440 * Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
         });
 
@@ -350,7 +352,7 @@ describe("PitchSlider Widget", () => {
             };
             keyHandler(event);
 
-            const expected = 440 * PitchSlider.SEMITONE;
+            const expected = 440 * Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
         });
 
@@ -362,7 +364,7 @@ describe("PitchSlider Widget", () => {
             };
             keyHandler(event);
 
-            const expected = 440 / PitchSlider.SEMITONE;
+            const expected = 440 / Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
         });
 
@@ -374,7 +376,7 @@ describe("PitchSlider Widget", () => {
             };
             keyHandler(event);
 
-            const expected = 440 / PitchSlider.SEMITONE;
+            const expected = 440 / Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
         });
 
@@ -425,7 +427,7 @@ describe("PitchSlider Widget", () => {
             const event = { key: "ArrowUp", preventDefault: jest.fn(), stopPropagation: jest.fn() };
             keyHandler(event);
 
-            const expected = 440 * PitchSlider.SEMITONE;
+            const expected = 440 * Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
         });
     });
@@ -477,7 +479,7 @@ describe("PitchSlider Widget", () => {
             const upBtn = slider.widgetWindow.getButtons().find(b => b.tip === "Move up");
             upBtn.onclick();
 
-            const expected = 440 * PitchSlider.SEMITONE;
+            const expected = 440 * Math.pow(2, 1 / 12);
             expect(parseFloat(rangeSlider.value)).toBeCloseTo(expected, 2);
         });
 
@@ -500,7 +502,7 @@ describe("PitchSlider Widget", () => {
             const downBtn = slider.widgetWindow.getButtons().find(b => b.tip === "Move down");
             downBtn.onclick();
 
-            const expected = 440 / PitchSlider.SEMITONE;
+            const expected = 440 / Math.pow(2, 1 / 12);
             expect(parseFloat(rangeSlider.value)).toBeCloseTo(expected, 2);
         });
 
@@ -512,6 +514,23 @@ describe("PitchSlider Widget", () => {
             saveBtn.onclick();
 
             expect(saveSpy).toHaveBeenCalledWith(500);
+        });
+
+        test("Reset frequency button restores initial frequency value and plays preview", () => {
+            slider.frequencies = [440];
+            slider.init(activityMock);
+
+            // Change frequency via slider to 600
+            const rangeSlider = slider.sliders[0];
+            rangeSlider.value = "600";
+            slider.frequencies[0] = 600;
+
+            const resetBtn = slider.widgetWindow.getButtons().find(b => b.tip === "Reset");
+            resetBtn.onclick();
+
+            expect(parseFloat(rangeSlider.value)).toBe(440);
+            expect(slider.frequencies[0]).toBe(440);
+            expect(mockOscillator.triggerAttackRelease).toHaveBeenCalledWith(440, "4n");
         });
 
         test("slider registers mousedown event listener", () => {
@@ -627,6 +646,35 @@ describe("PitchSlider Widget", () => {
             expect(stack[1][4]).toEqual([0]);
             // Hertz block: [0, freq, hidden] - connects to note, frequency, hidden
             expect(stack[2][4]).toEqual([0, 3, 4]);
+        });
+    });
+
+    describe("Frequency Stepping (_stepFrequency)", () => {
+        const semitone = Math.pow(2, 1 / 12);
+
+        test("steps up by semitone ratio", () => {
+            const result = slider._stepFrequency(440, "up", semitone, 220, 880);
+            expect(result).toBeCloseTo(440 * semitone, 2);
+        });
+
+        test("steps down by semitone ratio", () => {
+            const result = slider._stepFrequency(440, "down", semitone, 220, 880);
+            expect(result).toBeCloseTo(440 / semitone, 2);
+        });
+
+        test("clamps upper bound to max", () => {
+            const result = slider._stepFrequency(870, "up", semitone, 220, 880);
+            expect(result).toBe(880);
+        });
+
+        test("clamps lower bound to min", () => {
+            const result = slider._stepFrequency(225, "down", semitone, 220, 880);
+            expect(result).toBe(220);
+        });
+
+        test("parses numeric string inputs correctly", () => {
+            const result = slider._stepFrequency("440", "up", semitone, 220, 880);
+            expect(result).toBeCloseTo(440 * semitone, 2);
         });
     });
 });

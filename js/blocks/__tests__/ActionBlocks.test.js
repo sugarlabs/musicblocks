@@ -42,6 +42,15 @@ class BaseBlock {
         this.size = 1;
         this.lang = "en";
         this.hidden = false;
+        this.capabilities = {};
+    }
+
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+    }
+
+    getCapability(name) {
+        return this.capabilities[name];
     }
 
     setPalette(palette) {

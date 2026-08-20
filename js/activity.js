@@ -47,7 +47,7 @@ try {
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
+   JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
@@ -73,8 +73,14 @@ try {
  */
 const LEADING = 0;
 const BLOCKSCALES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
-const _THIS_IS_MUSIC_BLOCKS_ = true;
-const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+const _THIS_IS_MUSIC_BLOCKS_ =
+    typeof window !== "undefined" && typeof window._THIS_IS_MUSIC_BLOCKS_ !== "undefined"
+        ? window._THIS_IS_MUSIC_BLOCKS_
+        : true;
+const _THIS_IS_TURTLE_BLOCKS_ =
+    typeof window !== "undefined" && typeof window._THIS_IS_TURTLE_BLOCKS_ !== "undefined"
+        ? window._THIS_IS_TURTLE_BLOCKS_
+        : !_THIS_IS_MUSIC_BLOCKS_;
 
 // Responsive breakpoint constants
 const RESPONSIVE_BREAKPOINT_TABLET = 768;
@@ -96,6 +102,7 @@ let MYDEFINES = [
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
     "utils/utils-logic",
+    "utils/http-utils",
     "utils/utils",
     "utils/retryWithBackoff",
     "utils/error-handler",
@@ -122,6 +129,7 @@ let MYDEFINES = [
     "activity/basicblocks",
     "activity/blockfactory",
     "activity/piemenus",
+    "activity/piemenu-block-context",
     "activity/planetInterface",
     "activity/rubrics",
     "activity/macros",
@@ -144,7 +152,7 @@ let MYDEFINES = [
     "activity/block-scale-controller",
     "activity/context-menu-controller",
     "search-ui",
-    "keyboard-controller",
+    "activity/keyboard-controller",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -188,6 +196,8 @@ let MYDEFINES = [
     "widgets/widgetWindows"
 ];
 
+// Optional widget implementations are loaded by WidgetBlocks on first use.
+
 /**
  * Dynamically load one or more RequireJS modules on demand.
  * Returns a Promise that resolves once all modules are loaded.
@@ -208,35 +218,6 @@ function lazyLoad(modulePaths) {
             resolve();
         });
     });
-}
-
-if (_THIS_IS_MUSIC_BLOCKS_) {
-    const MUSICBLOCKS_EXTRAS = [
-        "widgets/modewidget",
-        "widgets/meterwidget",
-        "widgets/PhraseMakerUtils",
-        "widgets/PhraseMakerGrid",
-        "widgets/PhraseMakerUI",
-        "widgets/PhraseMakerAudio",
-        "widgets/phrasemaker",
-        "widgets/arpeggio",
-        "widgets/aiwidget",
-        "widgets/aidebugger",
-        "widgets/pitchdrummatrix",
-        "widgets/rhythmruler",
-        "widgets/pitchstaircase",
-        "widgets/temperament",
-        "widgets/tempo",
-        "widgets/pitchslider",
-        "widgets/musickeyboard",
-        "widgets/timbre",
-        "widgets/oscilloscope",
-        "widgets/tuner",
-        "widgets/sampler",
-        "widgets/reflection",
-        "widgets/legobricks"
-    ];
-    MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
 
 // Module-scoped singleton reference to the active Activity instance.
@@ -653,7 +634,8 @@ class Activity {
         // Context menu / helpful wheel / bottom toolbar functionality has been
         // extracted to ContextMenuController (js/context-menu-controller.js).
         // setupContextMenuController() installs the delegation stubs below:
-        // setHelpfulSearchDiv, _displayHelpfulSearchDiv, _hideHelpfulSearchWidget,
+        // closeHelpfulWheel, setHelpfulSearchDiv, _displayHelpfulSearchDiv,
+        // _hideHelpfulSearchWidget,
         // doContextMenus, displayHelpfulWheel, setupPaletteMenu, makeButton,
         // loadButtonDragHandler, openAuxMenu, _showHideAuxMenu, showHideAuxMenu,
         // hideAuxMenu, deltaY.
@@ -838,10 +820,7 @@ class Activity {
                     table.remove();
                 }
 
-                // Cache DOM element reference for performance
-                const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-                if (helpfulWheelDiv.style.display !== "none") {
-                    helpfulWheelDiv.style.display = "none";
+                if (this.closeHelpfulWheel()) {
                     this.__tick();
                 }
 
@@ -1039,11 +1018,7 @@ class Activity {
         const setScroller = activity => {
             activity._setScroller();
             activity._setupBlocksContainerEvents();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-            }
+            activity.closeHelpfulWheel();
         };
         // Exposed so ContextMenuController (activity/context-menu-controller.js) can
         // reference it from the helpfulWheelItems registry it builds.
@@ -1196,21 +1171,29 @@ class Activity {
              * Handles touch start event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener(
-                "touchstart",
-                event => {
-                    if (event.touches.length === 2) {
-                        for (let i = 0; i < 2; i++) {
-                            initialTouches[i][0] = event.touches[i].clientY;
-                            initialTouches[i][1] = event.touches[i].clientX;
-                        }
-                        const dx = event.touches[0].clientX - event.touches[1].clientX;
-                        const dy = event.touches[0].clientY - event.touches[1].clientY;
-                        initialPinchDistance = Math.hypot(dx, dy);
+            const __touchStartHandler = event => {
+                if (event.touches.length === 2) {
+                    for (let i = 0; i < 2; i++) {
+                        initialTouches[i][0] = event.touches[i].clientY;
+                        initialTouches[i][1] = event.touches[i].clientX;
                     }
-                },
-                { passive: true }
-            );
+                    const dx = event.touches[0].clientX - event.touches[1].clientX;
+                    const dy = event.touches[0].clientY - event.touches[1].clientY;
+                    initialPinchDistance = Math.hypot(dx, dy);
+                }
+            };
+
+            // Remove previous touchstart event listener if it exists
+            if (this._touchStartHandler) {
+                this.removeEventListener(myCanvas, "touchstart", this._touchStartHandler, {
+                    passive: true
+                });
+            }
+
+            // Store the handler reference for future cleanup
+            this._touchStartHandler = __touchStartHandler;
+
+            this.addEventListener(myCanvas, "touchstart", __touchStartHandler, { passive: true });
 
             myCanvas.style.touchAction = "none";
 
@@ -1218,76 +1201,94 @@ class Activity {
              * Handles touch move event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener(
-                "touchmove",
-                event => {
-                    if (event.touches.length === 2) {
-                        event.preventDefault();
-                        const dx = event.touches[0].clientX - event.touches[1].clientX;
-                        const dy = event.touches[0].clientY - event.touches[1].clientY;
-                        const currentPinchDistance = Math.hypot(dx, dy);
+            const __touchMoveHandler = event => {
+                if (event.touches.length === 2) {
+                    event.preventDefault();
+                    const dx = event.touches[0].clientX - event.touches[1].clientX;
+                    const dy = event.touches[0].clientY - event.touches[1].clientY;
+                    const currentPinchDistance = Math.hypot(dx, dy);
 
-                        if (initialPinchDistance !== null && !that.resizeDebounce) {
-                            const pinchDelta = currentPinchDistance - initialPinchDistance;
-                            if (Math.abs(pinchDelta) > 20) {
-                                if (pinchDelta > 0) {
-                                    that.doLargerBlocks();
-                                } else {
-                                    that.doSmallerBlocks();
-                                }
-                                initialPinchDistance = currentPinchDistance;
+                    if (initialPinchDistance !== null && !that.resizeDebounce) {
+                        const pinchDelta = currentPinchDistance - initialPinchDistance;
+                        if (Math.abs(pinchDelta) > 20) {
+                            if (pinchDelta > 0) {
+                                that.doLargerBlocks();
+                            } else {
+                                that.doSmallerBlocks();
                             }
+                            initialPinchDistance = currentPinchDistance;
                         }
-
-                        let totalDeltaY = 0;
-                        let totalDeltaX = 0;
-                        let count = 0;
-
-                        for (let i = 0; i < 2; i++) {
-                            const touchY = event.touches[i].clientY;
-                            const touchX = event.touches[i].clientX;
-
-                            if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                                totalDeltaY += touchY - initialTouches[i][0];
-                                totalDeltaX += touchX - initialTouches[i][1];
-                                count++;
-                            }
-
-                            initialTouches[i][0] = touchY;
-                            initialTouches[i][1] = touchX;
-                        }
-
-                        if (count > 0) {
-                            const avgDeltaY = totalDeltaY / count;
-                            const avgDeltaX = totalDeltaX / count;
-
-                            if (avgDeltaY !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.y -= avgDeltaY;
-                            }
-
-                            if (that.scrollBlockContainer && avgDeltaX !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.x -= avgDeltaX;
-                            }
-                        }
-
-                        that.refreshCanvas();
                     }
-                },
-                { passive: false }
-            );
+
+                    let totalDeltaY = 0;
+                    let totalDeltaX = 0;
+                    let count = 0;
+
+                    for (let i = 0; i < 2; i++) {
+                        const touchY = event.touches[i].clientY;
+                        const touchX = event.touches[i].clientX;
+
+                        if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
+                            totalDeltaY += touchY - initialTouches[i][0];
+                            totalDeltaX += touchX - initialTouches[i][1];
+                            count++;
+                        }
+
+                        initialTouches[i][0] = touchY;
+                        initialTouches[i][1] = touchX;
+                    }
+
+                    if (count > 0) {
+                        const avgDeltaY = totalDeltaY / count;
+                        const avgDeltaX = totalDeltaX / count;
+
+                        if (avgDeltaY !== 0) {
+                            closeAnyOpenMenusAndLabels();
+                            that.blocksContainer.y -= avgDeltaY;
+                        }
+
+                        if (that.scrollBlockContainer && avgDeltaX !== 0) {
+                            closeAnyOpenMenusAndLabels();
+                            that.blocksContainer.x -= avgDeltaX;
+                        }
+                    }
+
+                    that.refreshCanvas();
+                }
+            };
+
+            // Remove previous touchmove event listener if it exists
+            if (this._touchMoveHandler) {
+                this.removeEventListener(myCanvas, "touchmove", this._touchMoveHandler, {
+                    passive: false
+                });
+            }
+
+            // Store the handler reference for future cleanup
+            this._touchMoveHandler = __touchMoveHandler;
+
+            this.addEventListener(myCanvas, "touchmove", __touchMoveHandler, { passive: false });
 
             /**
              * Handles touch end event on the canvas.
              */
-            myCanvas.addEventListener("touchend", () => {
+            const __touchEndHandler = () => {
                 for (let i = 0; i < 2; i++) {
                     initialTouches[i][0] = null;
                     initialTouches[i][1] = null;
                 }
                 initialPinchDistance = null;
-            });
+            };
+
+            // Remove previous touchend event listener if it exists
+            if (this._touchEndHandler) {
+                this.removeEventListener(myCanvas, "touchend", this._touchEndHandler);
+            }
+
+            // Store the handler reference for future cleanup
+            this._touchEndHandler = __touchEndHandler;
+
+            this.addEventListener(myCanvas, "touchend", __touchEndHandler);
 
             /**
              * Handles wheel event on the canvas.
@@ -1486,118 +1487,6 @@ class Activity {
             }
 
             return bitmap;
-        };
-
-        /**
-         * Creates and renders a message container.
-         * @param {string} fillColor - The fill color of the message container.
-         * @param {string} strokeColor - The stroke color of the message container.
-         * @param {function} callback - The callback function assigned to the message container.
-         * @param {number} y - The position on the canvas.
-
-
-        /**
-         * Initialize an idle watcher that throttles the application's framerate
-         * when the application is inactive and no music is playing.
-         * This significantly reduces CPU usage and improves battery life.
-         *
-         * Listeners and intervals are properly cleaned up via stopIdleWatcher()
-         * to prevent accumulation on re-initialization.
-         */
-        this._initIdleWatcher = () => {
-            // Ensure any prior idle watcher is cleaned up before reinitializing
-            this._stopIdleWatcher();
-
-            const IDLE_THRESHOLD = 5000; // 5 seconds
-            const ACTIVE_RESET_INTERVAL = 500;
-            const ACTIVE_FPS = 60;
-            const IDLE_FPS = 1;
-            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
-
-            if (this._idleWatcherResetHandler) {
-                idleEvents.forEach(eventType => {
-                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
-                });
-            }
-
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-                this._idleWatcherIntervalId = null;
-            }
-
-            let lastActivity = Date.now();
-            let lastIdleReset = lastActivity;
-            this.isAppIdle = false;
-
-            // Prevent duplicate intervals
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-            }
-
-            // Wake up function - restores full framerate
-            // Stored as instance property for cleanup
-            this._resetIdleTimer = () => {
-                const now = Date.now();
-                if (!this.isAppIdle && now - lastIdleReset < ACTIVE_RESET_INTERVAL) {
-                    return;
-                }
-
-                lastActivity = now;
-                lastIdleReset = now;
-                if (this.isAppIdle) {
-                    this.isAppIdle = false;
-                    createjs.Ticker.framerate = ACTIVE_FPS;
-                    // Force immediate redraw for responsiveness
-                    this.stageDirty = true;
-                }
-            };
-
-            // Track user activity using managed addEventListener for proper cleanup
-            this.addEventListener(window, "mousemove", this._resetIdleTimer);
-            this.addEventListener(window, "mousedown", this._resetIdleTimer);
-            this.addEventListener(window, "keydown", this._resetIdleTimer);
-            this.addEventListener(window, "touchstart", this._resetIdleTimer);
-            this.addEventListener(window, "wheel", this._resetIdleTimer, { passive: true });
-
-            // Periodic check for idle state - store interval ID for cleanup
-            this._idleWatcherInterval = setInterval(() => {
-                // Check if music/code is playing
-                const isMusicPlaying = this.logo?._alreadyRunning || false;
-
-                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
-                    if (!this.isAppIdle) {
-                        this.isAppIdle = true;
-                        createjs.Ticker.framerate = IDLE_FPS;
-                        debugLog("⚡ Idle mode: Throttling to 1 FPS to save battery");
-                    }
-                } else if (this.isAppIdle && isMusicPlaying) {
-                    // Music started playing - wake up immediately
-                    this._resetIdleTimer();
-                }
-            }, 1000);
-        };
-
-        /**
-         * Stop the idle watcher and clean up its listeners and interval.
-         * Called during Activity lifecycle teardown to prevent listener/interval accumulation.
-         * It is safe to call this method even if the idle watcher was never started.
-         */
-        this._stopIdleWatcher = () => {
-            // Clear the periodic interval
-            if (typeof this._idleWatcherInterval !== "undefined") {
-                clearInterval(this._idleWatcherInterval);
-                this._idleWatcherInterval = undefined;
-            }
-
-            // Remove event listeners if they were registered
-            if (typeof this._resetIdleTimer === "function") {
-                this.removeEventListener(window, "mousemove", this._resetIdleTimer);
-                this.removeEventListener(window, "mousedown", this._resetIdleTimer);
-                this.removeEventListener(window, "keydown", this._resetIdleTimer);
-                this.removeEventListener(window, "touchstart", this._resetIdleTimer);
-                this.removeEventListener(window, "wheel", this._resetIdleTimer);
-                this._resetIdleTimer = undefined;
-            }
         };
 
         /*
@@ -2012,7 +1901,7 @@ class Activity {
             this._handleOrientationChangeResizeCanvas
         );
 
-        // Sets up TrashController (js/trash-controller.js), which owns restoring
+        // Sets up TrashController (js/activity/trash-controller.js), which owns restoring
         // blocks from the trash (individually, in bulk, or the most recent one),
         // rendering the trash panel, and the restoreIcon click handling.
         // this.restoreTrash, this.restoreTrashPop, this._restoreTrashById,
@@ -2305,11 +2194,7 @@ class Activity {
          */
         const chooseKeyMenu = that => {
             piemenuKey(that);
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-            }
+            that.closeHelpfulWheel();
         };
         // Exposed so ContextMenuController (activity/context-menu-controller.js) can
         // reference it from the helpfulWheelItems registry it builds.
@@ -2642,8 +2527,6 @@ class Activity {
             // Initialize Ticker with optimal framerate
             createjs.Ticker.framerate = 60;
 
-            // ===== Idle Ticker Optimization =====
-            // Throttle rendering when user is inactive and no music is playing
             this._initIdleWatcher();
 
             // Named event handlers for proper cleanup
@@ -2851,9 +2734,6 @@ class Activity {
             this.allFilesChooser.addEventListener("click", event => {
                 event.currentTarget.value = "";
             });
-
-            // Enable touch interactions if supported on the current device.
-            createjs.Touch.enable(this.stage, false, true);
 
             // Keep tracking the mouse even when it leaves the canvas.
             this.stage.mouseMoveOutside = true;

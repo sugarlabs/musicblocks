@@ -66,8 +66,11 @@ global._ = jest.fn(str => str);
 global.last = jest.fn(arr => (arr && arr.length > 0 ? arr[arr.length - 1] : null));
 global.delayExecution = jest.fn().mockResolvedValue(null);
 global.getTextWidth = jest.fn().mockReturnValue(100);
-global.base64Encode = jest.fn(str => str);
-global.retryWithBackoff = jest.fn(({ onSuccess }) => onSuccess());
+global.retryWithBackoff = jest.fn(async ({ check, onSuccess }) => {
+    const res = check ? check() : true;
+    if (onSuccess) await onSuccess(res);
+    return res;
+});
 
 // Mock window/global helpers
 global.window = {
@@ -82,8 +85,7 @@ global.document = {
 // Mock Constants
 global.STANDARDBLOCKHEIGHT = 20;
 global.DEFAULTBLOCKSCALE = 1.0;
-global.COLLAPSIBLES = ["repeat", "forever", "if"];
-global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
+
 global.platformColor = {
     paletteLabelBackground: "#ffffff",
     paletteLabelSelected: "#0000ff",
@@ -160,21 +162,21 @@ describe("Block Foundation", () => {
         });
 
         it("isCollapsible() should return true for collapsible blocks", () => {
-            mockProtoBlock.name = "start";
+            mockProtoBlock.capabilities.collapsible = true;
             const block = new Block(mockProtoBlock, mockBlocks);
             expect(block.isCollapsible()).toBe(true);
 
-            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities.collapsible = false;
             const block2 = new Block(mockProtoBlock, mockBlocks);
             expect(block2.isCollapsible()).toBe(false);
         });
 
         it("isInlineCollapsible() should return true for inline collapsible blocks", () => {
-            mockProtoBlock.name = "newnote";
+            mockProtoBlock.capabilities.inlineCollapsible = true;
             const block = new Block(mockProtoBlock, mockBlocks);
             expect(block.isInlineCollapsible()).toBe(true);
 
-            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities.inlineCollapsible = false;
             const block2 = new Block(mockProtoBlock, mockBlocks);
             expect(block2.isInlineCollapsible()).toBe(false);
         });
@@ -242,6 +244,21 @@ describe("Block Foundation", () => {
             expect(block.isNoteContainer()).toBe(false);
         });
 
+        it("isSoundSpecifier() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.soundSpecifier = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isSoundSpecifier()).toBe(true);
+        });
+
+        it("isSoundSpecifier() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isSoundSpecifier()).toBe(false);
+        });
+
         it("hasValueDrivenLabel() should return true from capability metadata", () => {
             mockProtoBlock.capabilities.valueDrivenLabel = true;
 
@@ -263,6 +280,67 @@ describe("Block Foundation", () => {
 
             const block = new Block(mockProtoBlock, mockBlocks);
             expect(block.hasValueDrivenLabel()).toBe(false);
+        });
+
+        it("hasWideLabel() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.wideLabel = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasWideLabel()).toBe(true);
+        });
+
+        it("hasWideLabel() should respect explicit false metadata", () => {
+            mockProtoBlock.name = "drumname";
+            mockProtoBlock.capabilities.wideLabel = false;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasWideLabel()).toBe(false);
+        });
+
+        it("hasWideLabel() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasWideLabel()).toBe(false);
+        });
+
+        describe("isArgumentLikeBlock()", () => {
+            it("should return true for a normal value block (style 'value' / isArgBlock())", () => {
+                mockProtoBlock.name = "number";
+                mockProtoBlock.style = "value";
+                mockProtoBlock.capabilities = Object.create(null);
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(true);
+            });
+
+            it("should return false for a normal command block", () => {
+                mockProtoBlock.name = "forward";
+                mockProtoBlock.style = "command";
+                mockProtoBlock.capabilities = Object.create(null);
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(false);
+            });
+
+            it("should return true for doArg block which has argumentLike capability", () => {
+                mockProtoBlock.name = "doArg";
+                mockProtoBlock.style = "flow";
+                mockProtoBlock.capabilities = { argumentLike: true };
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(true);
+            });
+
+            it("should return true for makeblock block which has argumentLike capability", () => {
+                mockProtoBlock.name = "makeblock";
+                mockProtoBlock.style = "left";
+                mockProtoBlock.capabilities = { argumentLike: true };
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(true);
+            });
         });
 
         describe("discreteChoice capability and _usePiemenu()", () => {
@@ -689,6 +767,69 @@ describe("Block Foundation", () => {
             b.disconnectedHighlightBitmap = null;
             b.show();
             expect(b.container.visible).toBe(true);
+        });
+    });
+
+    describe("Cache Management (_createCache & updateCache)", () => {
+        it("_createCache should query container bounds, cache container, and call callback", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            const mockBounds = { x: 10, y: 20, width: 200, height: 100 };
+            block.container = {
+                getBounds: jest.fn().mockReturnValue(mockBounds),
+                cache: jest.fn()
+            };
+            const callback = jest.fn();
+            const args = ["arg1", "arg2"];
+
+            await block._createCache(callback, args);
+
+            expect(block.bounds).toEqual(mockBounds);
+            expect(block.container.cache).toHaveBeenCalledWith(10, 20, 200, 100);
+            expect(callback).toHaveBeenCalledWith(block, args);
+        });
+
+        it("_createCache should trigger regenerateArtwork on retry callback", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.regenerateArtwork = jest.fn();
+
+            // Mock retryWithBackoff to invoke onRetry
+            global.retryWithBackoff.mockImplementationOnce(async ({ onRetry, onSuccess }) => {
+                if (onRetry) onRetry();
+                if (onSuccess) await onSuccess({ x: 0, y: 0, width: 50, height: 50 });
+            });
+
+            block.container = {
+                getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 50, height: 50 }),
+                cache: jest.fn()
+            };
+
+            await block._createCache(jest.fn(), []);
+
+            expect(block.regenerateArtwork).toHaveBeenCalledWith(true, []);
+        });
+
+        it("updateCache should resolve immediately if container has no bitmapCache", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.container = { bitmapCache: null };
+
+            const result = await block.updateCache();
+
+            expect(result).toBeUndefined();
+            expect(global.retryWithBackoff).not.toHaveBeenCalled();
+        });
+
+        it("updateCache should update container cache and refresh canvas on success", async () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.bounds = { x: 0, y: 0, width: 100, height: 50 };
+            block.container = {
+                bitmapCache: {},
+                updateCache: jest.fn()
+            };
+
+            await block.updateCache();
+
+            expect(block.container.updateCache).toHaveBeenCalled();
+            expect(mockBlocks.activity.refreshCanvas).toHaveBeenCalled();
         });
     });
 });

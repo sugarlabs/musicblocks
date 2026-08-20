@@ -263,6 +263,7 @@ class Logo {
         this.runningMxml = false;
         this.runningMIDI = false;
         this._checkingCompletionState = false;
+        this._exportNotationFinished = false;
         this.recording = false;
 
         // Buffer for recording musical output (Issue #2330)
@@ -276,6 +277,7 @@ class Logo {
         };
 
         this.temperamentSelected = [];
+        this._userTemperament = "equal";
         this.customTemperamentDefined = false;
         this.specialArgs = [];
 
@@ -305,6 +307,7 @@ class Logo {
 
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
+        this._EXPORT_YIELD_AFTER_SYNC_RUNS = 100; // Sync yield threshold during exports.
         this._iterationBudget = this._MAX_ITERATIONS + 1;
         this._MAX_ITERATIONS = 1000000;
 
@@ -367,6 +370,9 @@ class Logo {
                     }
                 };
             }
+        }
+        if (this.synth) {
+            this.synth._timerManager = this._timerManager;
         }
 
         this._graphicsScheduler = new EmbeddedGraphicsScheduler(this);
@@ -1134,6 +1140,17 @@ class Logo {
 
     // ========= Behavior =========================================================================
 
+    resetTemperament() {
+        this.synth.changeInTemperament = false;
+        this.synth.inTemperament = this._userTemperament || "equal";
+    }
+
+    setUserTemperament(temperament) {
+        this._userTemperament = temperament;
+        this.synth.inTemperament = temperament;
+        this.synth.changeInTemperament = true;
+    }
+
     /**
      * Initialises a turtle.
      *
@@ -1152,11 +1169,7 @@ class Logo {
         this.notation.pickupPoint[turtle] = null;
         this.notation.pickupPOW2[turtle] = false;
 
-        this.turtles
-            .ithTurtle(turtle)
-            .initTurtle(
-                this.runningLilypond || this.runningAbc || this.runningMxml || this.runningMIDI
-            );
+        this.turtles.ithTurtle(turtle).initTurtle(this._exportingNotation);
     }
 
     /**
@@ -1189,8 +1202,14 @@ class Logo {
                 tur.singer.killAllVoices();
             }
 
+            // One bad instrument must not abort the rest of the teardown below,
+            // which is what disposes instruments and resets _synthsInitialized.
             for (const instrumentName in this.deps.instruments[turtle]) {
-                this.synth.stopSound(turtle, instrumentName);
+                try {
+                    this.synth.stopSound(turtle, instrumentName);
+                } catch (e) {
+                    console.debug("Error stopping instrument " + instrumentName + ":", e);
+                }
             }
             const comp = this.turtles.getTurtle(turtle).companionTurtle;
             if (comp) {
@@ -1420,11 +1439,11 @@ class Logo {
 
         this.deps.Singer.masterBPM = TARGETBPM;
         this.deps.Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
-        this.synth.changeInTemperament = false;
-        this.synth.inTemperament = this._userTemperament || "equal";
+        this.resetTemperament();
         this.deps.Singer.clearPitchToFrequencyCache();
 
         this._checkingCompletionState = false;
+        this._exportNotationFinished = false;
 
         for (const turtle of this.turtles.turtleList) {
             turtle.embeddedGraphicsFinished = true;
@@ -1680,6 +1699,11 @@ class Logo {
         this.deps.refreshCanvas();
     }
 
+    // True while headlessly exporting notation.
+    get _exportingNotation() {
+        return this.runningLilypond || this.runningAbc || this.runningMxml || this.runningMIDI;
+    }
+
     /**
      * Schedules execution of block `blk` after the turtle's current delay.
      *
@@ -1705,6 +1729,22 @@ class Logo {
         if (blk == null) return;
 
         this.receivedArg = receivedArg;
+
+        // Synchronous fast path for notation exports; yield every 100 transitions.
+        if (logo._exportingNotation) {
+            logo._syncCounter++;
+            if (logo._syncCounter >= logo._EXPORT_YIELD_AFTER_SYNC_RUNS) {
+                logo._syncCounter = 0;
+                logo._timerManager.setGuardedTimeout(
+                    () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg),
+                    0,
+                    () => logo.stopTurtle
+                );
+            } else {
+                logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
+            }
+            return;
+        }
 
         // Reset async yield counters – execution will go through
         // setTimeout below, giving the event loop a chance to breathe.
@@ -1826,6 +1866,7 @@ class Logo {
             logo._iterationBudget = logo._MAX_ITERATIONS + 1;
             if (profilingEnabled) {
                 Logo._recordBlockTiming(logo, blk, profilingStart);
+                performanceTracker.exitBlock();
             }
             return;
         }
@@ -2162,8 +2203,9 @@ class Logo {
             if (logo.turtleDelay !== 0) {
                 let updatedParameterBlocks = false;
                 for (const pblk in tur.parameterQueue) {
-                    logo.blocks.updateParameterBlock(logo, turtle, tur.parameterQueue[pblk]);
-                    updatedParameterBlocks = true;
+                    if (logo.blocks.updateParameterBlock(logo, turtle, tur.parameterQueue[pblk])) {
+                        updatedParameterBlocks = true;
+                    }
                 }
 
                 if (updatedParameterBlocks) {
@@ -2249,6 +2291,10 @@ class Logo {
             // ensured that the turtle is really finished running
             // yet. Hence the timeout.
             const __checkCompletionState = () => {
+                if (logo._exportNotationFinished) {
+                    return;
+                }
+
                 if (
                     !logo.turtles.running() &&
                     queueStart === 0 &&
@@ -2264,6 +2310,7 @@ class Logo {
                     }
 
                     if (logo.runningLilypond) {
+                        logo._exportNotationFinished = true;
                         try {
                             if (logo.collectingStats) {
                                 logo.projectStats = logo.deps.utils.getStatsFromNotation(
@@ -2284,6 +2331,7 @@ class Logo {
                             document.body.style.cursor = "default";
                         }
                     } else if (logo.runningAbc) {
+                        logo._exportNotationFinished = true;
                         try {
                             logo.deps.save.afterSaveAbc();
                         } catch (e) {
@@ -2296,9 +2344,11 @@ class Logo {
                             document.body.style.cursor = "default";
                         }
                     } else if (logo.runningMxml) {
+                        logo._exportNotationFinished = true;
                         logo.deps.save.afterSaveMxml();
                         logo.runningMxml = false;
                     } else if (logo.runningMIDI) {
+                        logo._exportNotationFinished = true;
                         logo.deps.save.afterSaveMIDI();
                         logo.runningMIDI = false;
                     } else if (tur.singer.suppressOutput) {

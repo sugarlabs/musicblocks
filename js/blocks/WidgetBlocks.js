@@ -86,6 +86,18 @@ function setupWidgetBlocks(activity) {
     }
 
     /**
+     * Use a widget's declared dependencies when its constructor is already
+     * available, otherwise fall back to the module ids needed to load it.
+     *
+     * @param {Function|null} widget - The loaded widget constructor, if any.
+     * @param {string[]} fallback - AMD module ids for the widget.
+     * @returns {string[]} Module ids to pass to the lazy loader.
+     */
+    function _getWidgetDependencies(widget, fallback) {
+        return widget && Array.isArray(widget.dependencies) ? widget.dependencies : fallback;
+    }
+
+    /**
      * Ensures that a widget is loaded and initialized before executing block logic.
      * If the widget is missing, it initiates a lazy load and returns an interruption signal.
      *
@@ -112,6 +124,46 @@ function setupWidgetBlocks(activity) {
             return [null, 0, true]; // Still loading, continue to interrupt
         }
         return null;
+    }
+
+    /**
+     * Deferred widget loader for construction inside a turtle listener rather
+     * than directly in flow(). Unlike _ensureWidget, there is no "loading"
+     * guard or interruption signal: listener bodies already run once, after
+     * the interpreter has moved on, so there is nothing for an interruption
+     * to interrupt. Shares the same (logo, widgetKey, modules, factory, ...)
+     * argument shape as _ensureWidget so the two loading paths read the same
+     * way at the call site.
+     *
+     * @param {object} logo - The logo object.
+     * @param {string} widgetKey - The key for the widget in the logo object.
+     * @param {string[]} modules - The modules to require.
+     * @param {Function} factory - Builds the widget instance.
+     * @param {Function} [onReady] - Optional callback run after assignment.
+     */
+    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
+        _lazyRequire(modules, function () {
+            logo[widgetKey] = factory();
+            onReady?.();
+        });
+    }
+
+    function _hasValidMeterWidgetInput(logo) {
+        const blockList = activity.blocks.blockList;
+        const meterBlock = blockList[logo._meterBlock];
+        const meterConnections = meterBlock?.connections;
+        const beatCountBlock = blockList[meterConnections?.[1]];
+        const beatValueBlock = blockList[meterConnections?.[2]];
+        const beatValueConnections = beatValueBlock?.connections;
+        const numeratorBlock = blockList[beatValueConnections?.[1]];
+        const denominatorBlock = blockList[beatValueConnections?.[2]];
+
+        return (
+            meterBlock &&
+            typeof beatCountBlock?.value === "number" &&
+            typeof numeratorBlock?.value === "number" &&
+            typeof denominatorBlock?.value === "number"
+        );
     }
 
     /**
@@ -293,6 +345,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("temperament");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.setHelpString([
                 _("The Temperament tool is used to define custom tuning."),
@@ -330,7 +383,10 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "temperament",
-                TemperamentWidget.dependencies,
+                _getWidgetDependencies(
+                    typeof TemperamentWidget !== "undefined" ? TemperamentWidget : null,
+                    ["widgets/temperament"]
+                ),
                 () => new TemperamentWidget(),
                 turtle,
                 blk,
@@ -340,6 +396,8 @@ function setupWidgetBlocks(activity) {
 
             logo.insideTemperament = true;
             logo.temperament.inTemperament = args[0];
+            logo.synth.changeInTemperament = true;
+            logo.synth.temperamentChanged(args[0], logo.synth.startingPitch);
             const scale = [];
 
             if (
@@ -416,7 +474,10 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "sample",
-                SampleWidget.dependencies,
+                _getWidgetDependencies(typeof SampleWidget !== "undefined" ? SampleWidget : null, [
+                    "widgets/tuner",
+                    "widgets/sampler"
+                ]),
                 () => new SampleWidget(),
                 turtle,
                 blk,
@@ -449,6 +510,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("timbre");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.setHelpString();
 
@@ -506,7 +568,9 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "timbre",
-                TimbreWidget.dependencies,
+                _getWidgetDependencies(typeof TimbreWidget !== "undefined" ? TimbreWidget : null, [
+                    "widgets/timbre"
+                ]),
                 () => new TimbreWidget(),
                 turtle,
                 blk,
@@ -610,15 +674,29 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             logo.insideMeterWidget = true;
+            logo._meterBlock = null;
 
             const listenerName = "_meterwidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(MeterWidget.dependencies, function () {
-                    logo.meterWidget = new MeterWidget(activity, blk);
+                if (!_hasValidMeterWidgetInput(logo)) {
                     logo.insideMeterWidget = false;
-                });
+                    return;
+                }
+
+                _lazyLoadWidget(
+                    logo,
+                    "meterWidget",
+                    _getWidgetDependencies(
+                        typeof MeterWidget !== "undefined" ? MeterWidget : null,
+                        ["widgets/meterwidget"]
+                    ),
+                    () => new MeterWidget(activity, blk),
+                    () => {
+                        logo.insideMeterWidget = false;
+                    }
+                );
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -687,10 +765,18 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(Oscilloscope.dependencies, function () {
-                    logo.Oscilloscope = new Oscilloscope(activity);
-                    logo.inOscilloscope = false;
-                });
+                _lazyLoadWidget(
+                    logo,
+                    "Oscilloscope",
+                    _getWidgetDependencies(
+                        typeof Oscilloscope !== "undefined" ? Oscilloscope : null,
+                        ["widgets/oscilloscope"]
+                    ),
+                    () => new Oscilloscope(activity),
+                    () => {
+                        logo.inOscilloscope = false;
+                    }
+                );
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -709,6 +795,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("modewidget");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -746,10 +833,17 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(ModeWidget.dependencies, function () {
-                    logo.modeWidget = new ModeWidget(activity);
-                    logo.insideModeWidget = false;
-                });
+                _lazyLoadWidget(
+                    logo,
+                    "modeWidget",
+                    _getWidgetDependencies(typeof ModeWidget !== "undefined" ? ModeWidget : null, [
+                        "widgets/modewidget"
+                    ]),
+                    () => new ModeWidget(activity),
+                    () => {
+                        logo.insideModeWidget = false;
+                    }
+                );
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -768,6 +862,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("tempo");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -805,7 +900,9 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "tempo",
-                Tempo.dependencies,
+                _getWidgetDependencies(typeof Tempo !== "undefined" ? Tempo : null, [
+                    "widgets/tempo"
+                ]),
                 () => new Tempo(),
                 turtle,
                 blk,
@@ -882,7 +979,9 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "arpeggio",
-                Arpeggio.dependencies,
+                _getWidgetDependencies(typeof Arpeggio !== "undefined" ? Arpeggio : null, [
+                    "widgets/arpeggio"
+                ]),
                 () => new Arpeggio(),
                 turtle,
                 blk,
@@ -923,6 +1022,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("pitchdrummatrix");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.setHelpString([
                 _("The Pitch drum matrix is used to map pitches to drum sounds."),
@@ -964,7 +1064,10 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "pitchDrumMatrix",
-                PitchDrumMatrix.dependencies,
+                _getWidgetDependencies(
+                    typeof PitchDrumMatrix !== "undefined" ? PitchDrumMatrix : null,
+                    ["widgets/pitchdrummatrix"]
+                ),
                 () => new PitchDrumMatrix(),
                 turtle,
                 blk,
@@ -1015,6 +1118,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("pitchslider");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
             this.setHelpString([
@@ -1045,7 +1149,9 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "pitchSlider",
-                PitchSlider.dependencies,
+                _getWidgetDependencies(typeof PitchSlider !== "undefined" ? PitchSlider : null, [
+                    "widgets/pitchslider"
+                ]),
                 () => new PitchSlider(),
                 turtle,
                 blk,
@@ -1163,6 +1269,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("musickeyboard");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1204,7 +1311,10 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "musicKeyboard",
-                MusicKeyboard.dependencies,
+                _getWidgetDependencies(
+                    typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
+                    ["widgets/musickeyboard"]
+                ),
                 () => new MusicKeyboard(activity),
                 turtle,
                 blk,
@@ -1242,6 +1352,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("pitchstaircase");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1276,7 +1387,10 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "pitchStaircase",
-                PitchStaircase.dependencies,
+                _getWidgetDependencies(
+                    typeof PitchStaircase !== "undefined" ? PitchStaircase : null,
+                    ["widgets/pitchstaircase"]
+                ),
                 () => new PitchStaircase(),
                 turtle,
                 blk,
@@ -1345,6 +1459,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("rhythmruler2");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
 
             this.setHelpString([
@@ -1391,7 +1506,9 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "rhythmRuler",
-                RhythmRuler.dependencies,
+                _getWidgetDependencies(typeof RhythmRuler !== "undefined" ? RhythmRuler : null, [
+                    "widgets/rhythmruler"
+                ]),
                 () => new RhythmRuler(),
                 turtle,
                 blk,
@@ -1496,6 +1613,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("matrix");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1599,7 +1717,13 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "phraseMaker",
-                PhraseMaker.dependencies,
+                _getWidgetDependencies(typeof PhraseMaker !== "undefined" ? PhraseMaker : null, [
+                    "widgets/PhraseMakerUtils",
+                    "widgets/PhraseMakerGrid",
+                    "widgets/PhraseMakerUI",
+                    "widgets/PhraseMakerAudio",
+                    "widgets/phrasemaker"
+                ]),
                 () => {
                     // Create explicit dependency object for PhraseMaker
                     const phraseMakerDeps = {
@@ -1722,6 +1846,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("status");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1847,12 +1972,6 @@ function setupWidgetBlocks(activity) {
             };
 
             const structuralFields = collectStatusFields();
-            if (!logo.statusMatrix.isOpen || logo.statusFields.length === 0) {
-                logo.statusFields = structuralFields.slice();
-            }
-
-            dedupeStatusFields();
-            logo.statusMatrix.init(activity);
             logo.statusFields = []; // Clear for the actual interpreter run
 
             logo.inStatusMatrix = true;
@@ -1923,7 +2042,9 @@ function setupWidgetBlocks(activity) {
                 const interruption = _ensureWidget(
                     logo,
                     "aiMusic",
-                    AIWidget.dependencies,
+                    _getWidgetDependencies(typeof AIWidget !== "undefined" ? AIWidget : null, [
+                        "widgets/aiwidget"
+                    ]),
                     () => new AIWidget(),
                     turtle,
                     blk,
@@ -1974,7 +2095,10 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "reflection",
-                ReflectionMatrix.dependencies,
+                _getWidgetDependencies(
+                    typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
+                    ["widgets/reflection"]
+                ),
                 () => new ReflectionMatrix(),
                 turtle,
                 blk,
@@ -1982,7 +2106,6 @@ function setupWidgetBlocks(activity) {
             );
             if (interruption) return interruption;
 
-            logo.reflection.init(activity);
             logo.statusFields = [];
 
             logo.inReflectionMatrix = true;
@@ -2059,7 +2182,9 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "legoWidget",
-                LegoWidget.dependencies,
+                _getWidgetDependencies(typeof LegoWidget !== "undefined" ? LegoWidget : null, [
+                    "widgets/legobricks"
+                ]),
                 () => new LegoWidget(),
                 turtle,
                 blk,
@@ -2129,7 +2254,10 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "aiDebugger",
-                AIDebuggerWidget.dependencies,
+                _getWidgetDependencies(
+                    typeof AIDebuggerWidget !== "undefined" ? AIDebuggerWidget : null,
+                    ["widgets/aidebugger"]
+                ),
                 () => new AIDebuggerWidget(),
                 turtle,
                 blk,

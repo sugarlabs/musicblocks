@@ -1422,3 +1422,145 @@ describe("LegoWidget — _addColorSegment", () => {
         expect(legoWidget.colorData[0].colorSegments[0].timestamp).toBe(12345);
     });
 });
+
+describe("LegoWidget — _createWidgetWindow", () => {
+    let legoWidget;
+    let mockWindow;
+    let originalWidgetWindows;
+
+    beforeEach(() => {
+        legoWidget = new LegoWidget();
+        mockWindow = {
+            clear: jest.fn(),
+            show: jest.fn(),
+            destroy: jest.fn()
+        };
+        originalWidgetWindows = window.widgetWindows;
+        window.widgetWindows = {
+            windowFor: jest.fn(() => mockWindow)
+        };
+
+        legoWidget._stopPlayback = jest.fn();
+        legoWidget._stopWebcam = jest.fn();
+        legoWidget._deactivateEyeDropper = jest.fn();
+        legoWidget._cleanupDragListeners = jest.fn();
+        legoWidget._scale = jest.fn();
+    });
+
+    afterEach(() => {
+        window.widgetWindows = originalWidgetWindows;
+    });
+
+    it("should look up, clear, and show the widget window", () => {
+        const widgetWindow = legoWidget._createWidgetWindow();
+
+        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(legoWidget, "LEGO BRICKS");
+        expect(widgetWindow).toBe(mockWindow);
+        expect(legoWidget.widgetWindow).toBe(mockWindow);
+        expect(mockWindow.clear).toHaveBeenCalled();
+        expect(mockWindow.show).toHaveBeenCalled();
+    });
+
+    it("should wire onclose to clean up playback, webcam, eye dropper, and drag listeners", () => {
+        const widgetWindow = legoWidget._createWidgetWindow();
+        legoWidget.imageWrapper = document.createElement("div");
+        legoWidget.webcamVideo = document.createElement("video");
+        legoWidget.running = true;
+
+        widgetWindow.onclose();
+
+        expect(legoWidget._stopPlayback).toHaveBeenCalled();
+        expect(legoWidget._stopWebcam).toHaveBeenCalled();
+        expect(legoWidget._deactivateEyeDropper).toHaveBeenCalled();
+        expect(legoWidget._cleanupDragListeners).toHaveBeenCalled();
+        expect(legoWidget.imageWrapper).toBeNull();
+        expect(legoWidget.webcamVideo).toBeNull();
+        expect(legoWidget.running).toBe(false);
+        expect(mockWindow.destroy).toHaveBeenCalled();
+    });
+
+    it("should wire onmaximize to call _scale", () => {
+        const widgetWindow = legoWidget._createWidgetWindow();
+
+        widgetWindow.onmaximize();
+
+        expect(legoWidget._scale).toHaveBeenCalled();
+    });
+});
+
+describe("LegoWidget — _createToolbarButtons", () => {
+    let legoWidget;
+    let mockWidgetWindow;
+
+    beforeEach(() => {
+        global._ = val => val;
+        legoWidget = new LegoWidget();
+        mockWidgetWindow = {
+            addButton: jest.fn(() => {
+                const imgEl = { src: "" };
+                return { querySelector: jest.fn(() => imgEl) };
+            })
+        };
+
+        legoWidget._playPhrase = jest.fn();
+        legoWidget._stopPlayback = jest.fn();
+        legoWidget._savePhrase = jest.fn();
+        legoWidget._exportPhrase = jest.fn();
+        legoWidget._uploadImage = jest.fn();
+        legoWidget._startWebcam = jest.fn();
+        legoWidget._clearPhrase = jest.fn();
+
+        legoWidget._createToolbarButtons(mockWidgetWindow);
+    });
+
+    afterEach(() => {
+        delete global._;
+    });
+
+    it("should create all six toolbar buttons with the expected icons and labels", () => {
+        expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(6);
+        expect(mockWidgetWindow.addButton).toHaveBeenCalledWith("play-button.svg", 32, "Play");
+        expect(mockWidgetWindow.addButton).toHaveBeenCalledWith("save-button.svg", 32, "Save");
+        expect(mockWidgetWindow.addButton).toHaveBeenCalledWith("export-button.svg", 32, "Export");
+        expect(mockWidgetWindow.addButton).toHaveBeenCalledWith(
+            "upload-button.svg",
+            32,
+            "Upload Image"
+        );
+        expect(mockWidgetWindow.addButton).toHaveBeenCalledWith("webcam-button.svg", 32, "Webcam");
+        expect(mockWidgetWindow.addButton).toHaveBeenCalledWith("clear-button.svg", 32, "Clear");
+    });
+
+    it("should start playback and swap the icon to stop when play is clicked while idle", () => {
+        legoWidget.isPlaying = false;
+
+        legoWidget.playButton.onclick();
+
+        expect(legoWidget._playPhrase).toHaveBeenCalled();
+        expect(legoWidget._stopPlayback).not.toHaveBeenCalled();
+        expect(legoWidget.playButton.querySelector("img").src).toBe("header-icons/stop-button.svg");
+    });
+
+    it("should stop playback when play is clicked while already playing", () => {
+        legoWidget.isPlaying = true;
+
+        legoWidget.playButton.onclick();
+
+        expect(legoWidget._stopPlayback).toHaveBeenCalled();
+        expect(legoWidget._playPhrase).not.toHaveBeenCalled();
+    });
+
+    it("should delegate save, export, upload, webcam, and clear buttons to their handlers", () => {
+        legoWidget.saveButton.onclick();
+        legoWidget.exportButton.onclick();
+        legoWidget.uploadButton.onclick();
+        legoWidget.webcamButton.onclick();
+        legoWidget.clearButton.onclick();
+
+        expect(legoWidget._savePhrase).toHaveBeenCalled();
+        expect(legoWidget._exportPhrase).toHaveBeenCalled();
+        expect(legoWidget._uploadImage).toHaveBeenCalled();
+        expect(legoWidget._startWebcam).toHaveBeenCalled();
+        expect(legoWidget._clearPhrase).toHaveBeenCalled();
+    });
+});

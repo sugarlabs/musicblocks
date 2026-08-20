@@ -58,10 +58,7 @@ class TrashController {
             return;
         }
 
-        // Cache DOM element reference for performance
-        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-        if (helpfulWheelDiv.style.display !== "none") {
-            helpfulWheelDiv.style.display = "none";
+        if (activity.closeHelpfulWheel()) {
             activity.__tick();
         }
     }
@@ -78,10 +75,7 @@ class TrashController {
         this.restoreTrashById(activity.blocks.trashStacks[activity.blocks.trashStacks.length - 1]);
         activity.textMsg(_("Item restored from the trash."), 3000);
 
-        // Cache DOM element reference for performance
-        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-        if (helpfulWheelDiv.style.display !== "none") {
-            helpfulWheelDiv.style.display = "none";
+        if (activity.closeHelpfulWheel()) {
             activity.__tick();
         }
     }
@@ -159,7 +153,8 @@ class TrashController {
             }
         } else if (restoredBlock.name === "action") {
             const actionArg = activity.blocks.blockList[restoredBlock.connections[1]];
-            if (actionArg !== null) {
+            // eslint-disable-next-line eqeqeq
+            if (actionArg != null) {
                 let label;
                 const oldName = actionArg.value;
                 restoredBlock.trash = true;

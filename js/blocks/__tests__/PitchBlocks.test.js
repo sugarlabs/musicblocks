@@ -38,6 +38,7 @@ describe("setupPitchBlocks", () => {
             this.connections = [null, null, null, null, null];
             this.value = null;
             this.capabilities = Object.create(null);
+            this._macroFunc = null;
         }
         setPalette() {
             return this;
@@ -54,7 +55,8 @@ describe("setupPitchBlocks", () => {
         setup() {
             return this;
         }
-        makeMacro() {
+        makeMacro(fn) {
+            this._macroFunc = fn;
             return this;
         }
         setCapability(name, value = true) {
@@ -763,6 +765,17 @@ describe("setupPitchBlocks", () => {
         });
     });
 
+    describe("CustomPitchBlock macro", () => {
+        it("CustomPitchBlock macro creates a 'custompitch' block (not 'pitch')", () => {
+            const cpBlock = createdBlocks["custompitch"];
+            if (!cpBlock || !cpBlock._macroFunc) return;
+            const macro = cpBlock._macroFunc(0, 0);
+            expect(macro[0][1]).toBe("custompitch");
+            expect(macro[1][1][0]).toBe("customNote");
+            expect(macro[2][1][0]).toBe("number");
+        });
+    });
+
     describe("Existence", () => {
         const blocks = [
             "rest",
@@ -840,6 +853,15 @@ describe("setupPitchBlocks", () => {
 
         it("does not mark pitchnumber as a value-driven label block", () => {
             expect(createdBlocks["pitchnumber"].getCapability("valueDrivenLabel")).toBeUndefined();
+        });
+
+        it("marks accidentalname and outputtools as wideLabel", () => {
+            expect(createdBlocks["accidentalname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["outputtools"].getCapability("wideLabel")).toBe(true);
+        });
+
+        it("does not mark solfege as wideLabel", () => {
+            expect(createdBlocks["solfege"].getCapability("wideLabel")).toBeUndefined();
         });
     });
 

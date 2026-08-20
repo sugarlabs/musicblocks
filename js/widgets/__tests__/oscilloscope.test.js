@@ -442,6 +442,30 @@ describe("Oscilloscope", () => {
             expect(osc.pitchAnalysers).toEqual({});
         });
 
+        test("disposes Tone.Analyser nodes in pitchAnalysers on close", () => {
+            const osc = createOscilloscope();
+            const dispose0 = jest.fn();
+            const dispose1 = jest.fn();
+            osc.pitchAnalysers = {
+                0: { dispose: dispose0 },
+                1: { dispose: dispose1 }
+            };
+
+            osc.close();
+
+            expect(dispose0).toHaveBeenCalled();
+            expect(dispose1).toHaveBeenCalled();
+            expect(osc.pitchAnalysers).toEqual({});
+        });
+
+        test("skips non-disposable pitchAnalyser entries on close", () => {
+            const osc = createOscilloscope();
+            osc.pitchAnalysers = { 0: {}, 1: null, 2: undefined };
+
+            expect(() => osc.close()).not.toThrow();
+            expect(osc.pitchAnalysers).toEqual({});
+        });
+
         test("calls widgetWindow.destroy", () => {
             const osc = createOscilloscope();
 

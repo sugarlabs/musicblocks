@@ -1946,12 +1946,8 @@ class Palette {
         const __myCallback = newBlock => {
             // Move the drag group under the cursor.
             this.activity.blocks.findDragGroup(newBlock);
-            for (const i in this.activity.blocks.dragGroup) {
-                this.activity.blocks.moveBlockRelative(
-                    this.activity.blocks.dragGroup[i],
-                    saveX,
-                    saveY
-                );
+            for (const blockId of this.activity.blocks.dragGroup) {
+                this.activity.blocks.moveBlockRelative(blockId, saveX, saveY);
             }
             // Dock with other blocks if needed
             this.activity.blocks.blockMoved(newBlock);

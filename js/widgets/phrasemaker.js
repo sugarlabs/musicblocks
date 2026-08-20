@@ -261,7 +261,6 @@ class PhraseMaker {
         this._blockMap = {};
 
         this.blockNo = null;
-        this.notesBlockMap = [];
         this._blockMapHelper = [];
         this.columnBlocksMap = [];
 
@@ -1195,7 +1194,7 @@ class PhraseMaker {
         if (this.isInitial) {
             activity.textMsg(this._("Click on the table to add notes."), 3000);
             this.widgetWindow.sendToCenter();
-            this.inInitial = false;
+            this.isInitial = false;
         }
     }
 
@@ -3501,37 +3500,45 @@ class PhraseMaker {
      * @private
      */
     _addRhythmBlock(value, times) {
-        let RHYTHMOBJ = [];
-        value = this._deps.toFraction(value);
-        const topOfClamp = this.activity.blocks.blockList[this.blockNo].connections[1];
-        const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
-        if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
-            RHYTHMOBJ = [
-                [0, ["rhythm2", {}], 0, 0, [null, 1, 2, 5]],
-                [1, ["number", { value: times }], 0, 0, [0]],
-                [2, ["divide", {}], 0, 0, [0, 3, 4]],
-                [3, ["number", { value: value[1] }], 0, 0, [2]],
-                [4, ["number", { value: value[0] }], 0, 0, [2]],
-                [5, ["vspace", {}], 0, 0, [0, null]]
-            ];
-        } else {
-            RHYTHMOBJ = [
-                [0, "vspace", 0, 0, [null, 1]],
-                [1, ["rhythm2", {}], 0, 0, [0, 2, 3, 6]],
-                [2, ["number", { value: times }], 0, 0, [1]],
-                [3, ["divide", {}], 0, 0, [1, 4, 5]],
-                [4, ["number", { value: value[1] }], 0, 0, [3]],
-                [5, ["number", { value: value[0] }], 0, 0, [3]],
-                [6, ["vspace", {}], 0, 0, [1, null]]
-            ];
-        }
-        this.activity.blocks.loadNewBlocks(RHYTHMOBJ);
-        if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
-            setTimeout(() => this.blockConnection(6, bottomOfClamp), 500);
-        } else {
-            setTimeout(() => this.blockConnection(7, bottomOfClamp), 500);
-        }
-        this.activity.refreshCanvas();
+        return new Promise(resolve => {
+            let RHYTHMOBJ = [];
+            value = this._deps.toFraction(value);
+            const topOfClamp = this.activity.blocks.blockList[this.blockNo].connections[1];
+            const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
+            if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
+                RHYTHMOBJ = [
+                    [0, ["rhythm2", {}], 0, 0, [null, 1, 2, 5]],
+                    [1, ["number", { value: times }], 0, 0, [0]],
+                    [2, ["divide", {}], 0, 0, [0, 3, 4]],
+                    [3, ["number", { value: value[1] }], 0, 0, [2]],
+                    [4, ["number", { value: value[0] }], 0, 0, [2]],
+                    [5, ["vspace", {}], 0, 0, [0, null]]
+                ];
+            } else {
+                RHYTHMOBJ = [
+                    [0, "vspace", 0, 0, [null, 1]],
+                    [1, ["rhythm2", {}], 0, 0, [0, 2, 3, 6]],
+                    [2, ["number", { value: times }], 0, 0, [1]],
+                    [3, ["divide", {}], 0, 0, [1, 4, 5]],
+                    [4, ["number", { value: value[1] }], 0, 0, [3]],
+                    [5, ["number", { value: value[0] }], 0, 0, [3]],
+                    [6, ["vspace", {}], 0, 0, [1, null]]
+                ];
+            }
+            this.activity.blocks.loadNewBlocks(RHYTHMOBJ);
+            if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
+                setTimeout(() => {
+                    this.blockConnection(6, bottomOfClamp);
+                    resolve();
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    this.blockConnection(7, bottomOfClamp);
+                    resolve();
+                }, 500);
+            }
+            this.activity.refreshCanvas();
+        });
     }
 
     /**
@@ -3614,7 +3621,7 @@ class PhraseMaker {
      * This method updates, adds, or deletes rhythm notes blocks as necessary to match the adjusted notes.
      * @private
      */
-    _readjustNotesBlocks() {
+    async _readjustNotesBlocks() {
         let notesBlockMap = this._mapNotesBlocks("rhythm2");
         const adjustedNotes = this.recalculateBlocks();
 
@@ -3631,11 +3638,12 @@ class PhraseMaker {
         }
 
         for (let i = 0; i < n; i++) {
-            this._addRhythmBlock(
+            await this._addRhythmBlock(
                 adjustedNotes[notesBlockMap.length + i][0],
                 adjustedNotes[notesBlockMap.length + i][1]
             );
         }
+
         for (let i = n; i < 0; i++) {
             this._deleteRhythmBlock(notesBlockMap[notesBlockMap.length + i]);
         }
@@ -3695,7 +3703,7 @@ class PhraseMaker {
      * @param {number} notesToAdd - The number of notes to add to the divided section.
      * @private
      */
-    _addNotes(noteToDivide, notesToAdd) {
+    async _addNotes(noteToDivide, notesToAdd) {
         noteToDivide = parseInt(noteToDivide, 10);
         this._blockMapHelper = [];
         for (let i = 0; i <= noteToDivide; i++) {
@@ -3709,7 +3717,7 @@ class PhraseMaker {
                 .slice(0, noteToDivide + i + 1)
                 .concat(this.activity.logo.tupletRhythms.slice(noteToDivide + i));
         }
-        this._readjustNotesBlocks();
+        await this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid.call(this);
     }
@@ -3719,7 +3727,7 @@ class PhraseMaker {
      * @param {number} noteToDivide - The index of the note to delete.
      * @private
      */
-    _deleteNotes(noteToDivide) {
+    async _deleteNotes(noteToDivide) {
         if (this.activity.logo.tupletRhythms.length === 1) {
             return;
         }
@@ -3734,7 +3742,7 @@ class PhraseMaker {
         this.activity.logo.tupletRhythms = this.activity.logo.tupletRhythms
             .slice(0, noteToDivide)
             .concat(this.activity.logo.tupletRhythms.slice(noteToDivide + 1));
-        this._readjustNotesBlocks();
+        await this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid.call(this);
     }
@@ -3745,7 +3753,7 @@ class PhraseMaker {
      * @param {number} divideNoteBy - The factor to divide the note by.
      * @private
      */
-    _divideNotes(noteToDivide, divideNoteBy) {
+    async _divideNotes(noteToDivide, divideNoteBy) {
         noteToDivide = parseInt(noteToDivide, 10);
         this._blockMapHelper = [];
         for (let i = 0; i < noteToDivide; i++) {
@@ -3777,7 +3785,7 @@ class PhraseMaker {
             j++;
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
-        this._readjustNotesBlocks();
+        await this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid.call(this);
     }
@@ -3788,7 +3796,7 @@ class PhraseMaker {
      * @param {Object} mouseUpCell - The ending cell of the selection.
      * @private
      */
-    _tieNotes(mouseDownCell, mouseUpCell) {
+    async _tieNotes(mouseDownCell, mouseUpCell) {
         let downCellId = null;
         let upCellId = null;
         if (mouseDownCell.id < mouseUpCell.id) {
@@ -3830,7 +3838,7 @@ class PhraseMaker {
             ])
             .concat(this.activity.logo.tupletRhythms.slice(parseInt(upCellId, 10) + 1));
 
-        this._readjustNotesBlocks();
+        await this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid.call(this);
     }
@@ -4639,6 +4647,25 @@ class PhraseMaker {
     }
 
     /**
+     * Computes the lastConnection value for a pitch/drum/graphics block being
+     * pushed inside _save()'s note loop: null if it is the final block in the
+     * note (and lyrics are off), otherwise thisBlock + offset.
+     * @param {Array} note - the note entry currently being processed.
+     * @param {number} j - index into note[0] for the current pitch/drum entry.
+     * @param {number} thisBlock - the block index the connection is relative to.
+     * @param {number} offset - block-index offset to the next sibling block.
+     * @returns {number|null}
+     * @private
+     */
+    _computeLastConnection(note, j, thisBlock, offset) {
+        // The last connection in last pitch block is null.
+        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
+            return null;
+        }
+        return thisBlock + offset;
+    }
+
+    /**
      * Saves the current matrix state as an action stack consisting of note and pitch blocks.
      * @private
      */
@@ -4779,12 +4806,7 @@ class PhraseMaker {
 
                     if (obj === null) {
                         // add a hertz block
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 2;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 2);
 
                         newStack.push([
                             thisBlock,
@@ -4804,12 +4826,7 @@ class PhraseMaker {
                         previousBlock = thisBlock - 2;
                     } else if (drumName !== null) {
                         // add a playdrum block
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 2;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 2);
 
                         newStack.push([
                             thisBlock,
@@ -4829,12 +4846,7 @@ class PhraseMaker {
                         previousBlock = thisBlock - 2;
                     } else if (note[0][j].slice(0, 4) === "http") {
                         // add a playdrum block with URL
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 2;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 2);
 
                         newStack.push([
                             thisBlock,
@@ -4854,12 +4866,7 @@ class PhraseMaker {
                         previousBlock = thisBlock - 2;
                     } else if (obj.length > 2) {
                         // add a 2-arg graphics block
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 3;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 3);
 
                         newStack.push([
                             thisBlock,
@@ -4886,12 +4893,7 @@ class PhraseMaker {
                         previousBlock = thisBlock - 3;
                     } else if (obj.length > 1) {
                         // add a 1-arg graphics block
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 2;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 2);
 
                         newStack.push([
                             thisBlock,
@@ -4911,12 +4913,7 @@ class PhraseMaker {
                         previousBlock = thisBlock - 2;
                     } else {
                         // add a pitch block
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 3;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 3);
 
                         if (note[0][j][1] === "♯") {
                             if (
