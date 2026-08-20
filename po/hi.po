@@ -11982,3 +11982,441 @@ msgstr "नीचा"
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""
 
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Collapse Lesson Plans"
+msgstr "पाठ योजनाएँ छोटी करें"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Collapse Explorer Journal"
+msgstr "अन्वेषक डायरी छोटी करें"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Expand Lesson Plans"
+msgstr "पाठ योजनाएँ खोलें"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Expand Explorer Journal"
+msgstr "अन्वेषक डायरी खोलें"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Practice Lessons Not Ready"
+msgstr "अभ्यास पाठ तैयार नहीं हैं"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The lesson file could not be loaded. Please check js/practiceLessons/practiceLessons.json."
+msgstr "पाठ फ़ाइल लोड नहीं हो सकी। कृपया js/practiceLessons/practiceLessons.json जाँचें।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Practice"
+msgstr "अभ्यास"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Level"
+msgstr "स्तर"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Back"
+msgstr "वापस"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Check My Work"
+msgstr "मेरा काम जाँचें"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Quest Rewards"
+msgstr "खोज के इनाम"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Discoveries"
+msgstr "खोजें"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The lesson song shines, and the island answers."
+msgstr "पाठ का गीत चमकता है, और द्वीप जवाब देता है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Melody Fragment restored. Captain's Journal Page found."
+msgstr "धुन का टुकड़ा वापस मिला। कैप्टन की डायरी का पन्ना मिला।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The bridge song is still shining."
+msgstr "पुल का गीत अब भी चमक रहा है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Discovery Already Saved"
+msgstr "खोज पहले ही सहेजी जा चुकी है"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Lyra has this mark in her map. Keep exploring the island for another secret."
+msgstr "लायरा के नक्शे में यह निशान पहले से है। कोई और राज़ पाने के लिए द्वीप पर खोज जारी रखो।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Hidden Discovery"
+msgstr "छिपी खोज"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The Bridge Is Still Sleeping"
+msgstr "पुल अब भी सो रहा है"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Beat hears a few echoes, but the stone tablet is waiting for A A B A. Try the bridge song again, then press Check My Work."
+msgstr "बीट को कुछ गूँजें सुनाई देती हैं, पर पत्थर की पट्टिका A A B A का इंतज़ार कर रही है। पुल का गीत दोबारा आज़माओ, फिर मेरा काम जाँचें दबाओ।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Discovery badge"
+msgstr "खोज का बैज"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Explorer Journal"
+msgstr "अन्वेषक डायरी"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "My Explorer Book"
+msgstr "मेरी अन्वेषक किताब"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Memories from every island you have helped wake up."
+msgstr "उन सब द्वीपों की यादें जिन्हें जगाने में तुमने मदद की।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Island Pages"
+msgstr "द्वीपों के पन्ने"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "My Notes"
+msgstr "मेरे नोट"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Save your own ideas, drawings-in-words, or music thoughts here."
+msgstr "अपने विचार, शब्दों से बने चित्र या संगीत की बातें यहाँ सहेजो।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add new note"
+msgstr "नया नोट जोड़ो"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "+ New Note"
+msgstr "+ नया नोट"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Page"
+msgstr "पन्ना"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Notes"
+msgstr "नोट"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Entries"
+msgstr "प्रविष्टियाँ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "New Note"
+msgstr "नया नोट"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Title"
+msgstr "शीर्षक"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Give your note a name..."
+msgstr "अपने नोट को कोई नाम दो..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "First thought"
+msgstr "पहला विचार"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Write anything you want to remember..."
+msgstr "जो कुछ याद रखना चाहो, वह लिखो..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Save Note"
+msgstr "नोट सहेजो"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Blank Page Waiting"
+msgstr "खाली पन्ना इंतज़ार कर रहा है"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add a title or a thought first, or come back when you are ready."
+msgstr "पहले कोई शीर्षक या विचार जोड़ो, या तैयार होने पर वापस आओ।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Saved"
+msgstr "नोट सहेजा गया"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your personal note is tucked safely in My Notes."
+msgstr "तुम्हारा निजी नोट मेरे नोट में सुरक्षित रख दिया गया है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add another thought"
+msgstr "एक और विचार जोड़ो"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Write more here..."
+msgstr "यहाँ और लिखो..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add Entry"
+msgstr "प्रविष्टि जोड़ो"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Delete Note"
+msgstr "नोट मिटाओ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Removed"
+msgstr "नोट हटा दिया गया"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That personal note has been cleared from your book."
+msgstr "वह निजी नोट तुम्हारी किताब से हटा दिया गया है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Entry Added"
+msgstr "प्रविष्टि जोड़ी गई"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Another thought has been added to your note."
+msgstr "तुम्हारे नोट में एक और विचार जुड़ गया है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Entry Removed"
+msgstr "प्रविष्टि हटाई गई"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That entry has been removed from your note."
+msgstr "वह प्रविष्टि तुम्हारे नोट से हटा दी गई है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Things I learned"
+msgstr "मैंने क्या सीखा"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add a new memory"
+msgstr "नई याद जोड़ो"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Today I discovered..."
+msgstr "आज मैंने खोजा..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add Note"
+msgstr "नोट जोड़ो"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Added"
+msgstr "नोट जोड़ा गया"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "A new memory has been tucked into this page."
+msgstr "इस पन्ने में एक नई याद रख दी गई है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That memory has been removed from this page."
+msgstr "वह याद इस पन्ने से हटा दी गई है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Updated"
+msgstr "नोट अपडेट हुआ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your Explorer Book remembers the new version."
+msgstr "तुम्हारी अन्वेषक किताब को नया रूप याद है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Title Updated"
+msgstr "शीर्षक अपडेट हुआ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your note title has been saved."
+msgstr "तुम्हारे नोट का शीर्षक सहेज लिया गया है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That memory has been removed."
+msgstr "वह याद हटा दी गई है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Write a small memory first, or come back when you are ready."
+msgstr "पहले कोई छोटी-सी याद लिखो, या तैयार होने पर वापस आओ।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "No notes yet"
+msgstr "अभी कोई नोट नहीं"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "This page is ready whenever you want to write."
+msgstr "जब भी तुम लिखना चाहो, यह पन्ना तैयार है।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your book is waiting"
+msgstr "तुम्हारी किताब इंतज़ार कर रही है"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Complete a practice level and Captain Cadence will share the first page."
+msgstr "कोई अभ्यास स्तर पूरा करो और कैप्टन कैडेंस पहला पन्ना देंगे।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Close Explorer Journal prompt"
+msgstr "अन्वेषक डायरी का संदेश बंद करो"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Captain's Journal"
+msgstr "कैप्टन की डायरी"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Every explorer notices something different. Before you sail onward, save one tiny memory from today."
+msgstr "हर अन्वेषक कुछ अलग देखता है। आगे बढ़ने से पहले आज की एक छोटी-सी याद सहेज लो।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "What surprised you today?"
+msgstr "आज तुम्हें क्या हैरान कर गया?"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "I discovered..."
+msgstr "मैंने खोजा..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Skip"
+msgstr "छोड़ो"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Explorer Book Updated"
+msgstr "अन्वेषक किताब अपडेट हुई"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Captain Cadence saves your page. You can edit it later from Help > Explorer Journal."
+msgstr "कैप्टन कैडेंस तुम्हारा पन्ना सहेज लेते हैं। इसे बाद में सहायता > अन्वेषक डायरी से बदल सकते हो।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Page Saved For Later"
+msgstr "पन्ना बाद के लिए सहेजा गया"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The Explorer Book keeps a blank page ready whenever you want to write."
+msgstr "अन्वेषक किताब में एक खाली पन्ना हमेशा तैयार रहता है, जब भी तुम लिखना चाहो।"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Saved in your journal"
+msgstr "तुम्हारी डायरी में सहेजा गया"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Untitled Note"
+msgstr "बिना शीर्षक का नोट"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "My thought"
+msgstr "मेरा विचार"
+
+#: js/toolbar.js
+msgid "Practice levels"
+msgstr "अभ्यास स्तर"
+
+#: js/widgets/help.js
+msgid "Try this"
+msgstr "यह आज़माओ"
+
+#: js/widgets/help.js
+msgid "What does this mean in music?"
+msgstr "संगीत में इसका क्या मतलब है?"
+
+#: js/widgets/help.js
+msgid "What it means in music"
+msgstr "संगीत में इसका मतलब"
+
+#: js/widgets/help.js
+msgid "How do I do it?"
+msgstr "इसे कैसे करूँ?"
+
+#: js/blocks/PitchBlocks.js
+msgid "Changing the octave number keeps the pitch name but makes the note sound higher or lower."
+msgstr "ऑक्टेव की संख्या बदलने पर नोट का नाम वही रहता है, पर आवाज़ ऊँची या नीची हो जाती है।"
+
+#: js/blocks/ActionBlocks.js
+msgid "You can rename an Action block to give a music chunk a helpful name."
+msgstr "तुम किसी क्रिया ब्लॉक का नाम बदलकर संगीत के किसी टुकड़े को कोई काम का नाम दे सकते हो।"

@@ -12107,3 +12107,441 @@ msgstr "低"
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr "<a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">シュガー・ラボ "
 
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Collapse Lesson Plans"
+msgstr "レッスンプランをたたむ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Collapse Explorer Journal"
+msgstr "たんけん日記をたたむ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Expand Lesson Plans"
+msgstr "レッスンプランをひらく"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Expand Explorer Journal"
+msgstr "たんけん日記をひらく"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Practice Lessons Not Ready"
+msgstr "れんしゅうレッスンのじゅんびができていません"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The lesson file could not be loaded. Please check js/practiceLessons/practiceLessons.json."
+msgstr "レッスンのファイルを読みこめませんでした。js/practiceLessons/practiceLessons.json をたしかめてください。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Practice"
+msgstr "れんしゅう"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Level"
+msgstr "レベル"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Back"
+msgstr "もどる"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Check My Work"
+msgstr "できたかチェック"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Quest Rewards"
+msgstr "ぼうけんのごほうび"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Discoveries"
+msgstr "はっけん"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The lesson song shines, and the island answers."
+msgstr "レッスンの歌がかがやき、島がこたえます。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Melody Fragment restored. Captain's Journal Page found."
+msgstr "メロディのかけらを取りもどしました。船長の日記のページを見つけました。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The bridge song is still shining."
+msgstr "橋の歌はまだかがやいています。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Discovery Already Saved"
+msgstr "はっけんはもう保存ずみです"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Lyra has this mark in her map. Keep exploring the island for another secret."
+msgstr "ライラの地図にはもうこのしるしがあります。べつのひみつをさがして、島をたんけんしつづけましょう。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Hidden Discovery"
+msgstr "かくれた発見"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The Bridge Is Still Sleeping"
+msgstr "橋はまだねむっています"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Beat hears a few echoes, but the stone tablet is waiting for A A B A. Try the bridge song again, then press Check My Work."
+msgstr "ビートにはこだまが少し聞こえますが、石のいたは A A B A を待っています。もう一度橋の歌をためして、できたかチェックをおしてください。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Discovery badge"
+msgstr "はっけんバッジ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Explorer Journal"
+msgstr "たんけん日記"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "My Explorer Book"
+msgstr "わたしのたんけんノート"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Memories from every island you have helped wake up."
+msgstr "きみが目ざめさせた島じまの思い出です。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Island Pages"
+msgstr "島のページ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "My Notes"
+msgstr "わたしのメモ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Save your own ideas, drawings-in-words, or music thoughts here."
+msgstr "じぶんのアイデアや、ことばでかいた絵、音楽について思ったことをここに残しましょう。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add new note"
+msgstr "新しいメモをくわえる"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "+ New Note"
+msgstr "+ 新しいメモ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Page"
+msgstr "ページ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Notes"
+msgstr "メモ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Entries"
+msgstr "書きこみ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "New Note"
+msgstr "新しいメモ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Title"
+msgstr "タイトル"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Give your note a name..."
+msgstr "メモに名前をつけよう..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "First thought"
+msgstr "さいしょに思ったこと"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Write anything you want to remember..."
+msgstr "おぼえておきたいことを何でも書こう..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Save Note"
+msgstr "メモを保存する"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Blank Page Waiting"
+msgstr "白いページが待っています"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add a title or a thought first, or come back when you are ready."
+msgstr "さきにタイトルか思ったことを書くか、じゅんびができたらもどってきてね。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Saved"
+msgstr "メモを保存しました"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your personal note is tucked safely in My Notes."
+msgstr "きみのメモは「わたしのメモ」にしまわれました。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add another thought"
+msgstr "べつの思いつきをくわえる"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Write more here..."
+msgstr "ここにもっと書こう..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add Entry"
+msgstr "書きこみをくわえる"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Delete Note"
+msgstr "メモをけす"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Removed"
+msgstr "メモをけしました"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That personal note has been cleared from your book."
+msgstr "そのメモはノートからけしました。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Entry Added"
+msgstr "書きこみをくわえました"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Another thought has been added to your note."
+msgstr "メモにべつの思いつきがくわわりました。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Entry Removed"
+msgstr "書きこみをけしました"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That entry has been removed from your note."
+msgstr "その書きこみはメモからけしました。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Things I learned"
+msgstr "おぼえたこと"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add a new memory"
+msgstr "新しい思い出をくわえる"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Today I discovered..."
+msgstr "きょう見つけたのは..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Add Note"
+msgstr "メモをくわえる"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Added"
+msgstr "メモをくわえました"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "A new memory has been tucked into this page."
+msgstr "このページに新しい思い出をしまいました。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That memory has been removed from this page."
+msgstr "その思い出はこのページからけしました。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Note Updated"
+msgstr "メモを書きかえました"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your Explorer Book remembers the new version."
+msgstr "たんけんノートは新しいほうをおぼえています。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Title Updated"
+msgstr "タイトルを書きかえました"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your note title has been saved."
+msgstr "メモのタイトルを保存しました。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "That memory has been removed."
+msgstr "その思い出をけしました。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Write a small memory first, or come back when you are ready."
+msgstr "さきに小さな思い出を書くか、じゅんびができたらもどってきてね。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "No notes yet"
+msgstr "まだメモはありません"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "This page is ready whenever you want to write."
+msgstr "書きたくなったら、いつでもこのページが待っています。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Your book is waiting"
+msgstr "ノートが待っています"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Complete a practice level and Captain Cadence will share the first page."
+msgstr "れんしゅうのレベルをクリアすると、ケイデンス船長が最初のページをくれます。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Close Explorer Journal prompt"
+msgstr "たんけん日記のメッセージをとじる"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Captain's Journal"
+msgstr "船長の日記"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Every explorer notices something different. Before you sail onward, save one tiny memory from today."
+msgstr "たんけん家はそれぞれちがうことに気づきます。つぎへ出発する前に、きょうの小さな思い出をひとつ残しましょう。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "What surprised you today?"
+msgstr "きょう、おどろいたことは何ですか。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "I discovered..."
+msgstr "見つけたのは..."
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Skip"
+msgstr "スキップ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Explorer Book Updated"
+msgstr "たんけんノートを書きかえました"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Captain Cadence saves your page. You can edit it later from Help > Explorer Journal."
+msgstr "ケイデンス船長がページを保存しました。あとから ヘルプ > たんけん日記 で書きかえられます。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Page Saved For Later"
+msgstr "ページはあとのために残しました"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "The Explorer Book keeps a blank page ready whenever you want to write."
+msgstr "たんけんノートは、書きたくなったときのために白いページをいつも用意しています。"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Saved in your journal"
+msgstr "日記に保存ずみ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "Untitled Note"
+msgstr "名前のないメモ"
+
+#: js/practiceLessons/practiceUI.js
+#: js/practiceLessons/practiceManager.js
+msgid "My thought"
+msgstr "思ったこと"
+
+#: js/toolbar.js
+msgid "Practice levels"
+msgstr "れんしゅうレベル"
+
+#: js/widgets/help.js
+msgid "Try this"
+msgstr "やってみよう"
+
+#: js/widgets/help.js
+msgid "What does this mean in music?"
+msgstr "音楽ではどんな意味?"
+
+#: js/widgets/help.js
+msgid "What it means in music"
+msgstr "音楽での意味"
+
+#: js/widgets/help.js
+msgid "How do I do it?"
+msgstr "どうやってやるの?"
+
+#: js/blocks/PitchBlocks.js
+msgid "Changing the octave number keeps the pitch name but makes the note sound higher or lower."
+msgstr "オクターヴの数字を変えても音の名前はそのままですが、音は高くなったり低くなったりします。"
+
+#: js/blocks/ActionBlocks.js
+msgid "You can rename an Action block to give a music chunk a helpful name."
+msgstr "アクションブロックの名前を変えると、音楽のかたまりにわかりやすい名前をつけられます。"

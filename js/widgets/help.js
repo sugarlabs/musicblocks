@@ -262,22 +262,6 @@ class HelpWidget {
             if (this.activity.blocks.activeBlock.name !== null) {
                 const name = this.activity.blocks.blockList[this.activity.blocks.activeBlock].name;
 
-                const advIcon = `<a class="tooltipped"
-                        data-toggle="tooltip"
-                        title="This block is only available in advance mode"
-                        data-position="bottom">
-                      <i id="advIconText" class="material-icons md-48">star</i>
-                     </a>
-                    `;
-
-                const findIcon = `<a class="tooltipped"
-                        data-toggle="tooltip"
-                        title="Show Palette containing the block"
-                        data-position="bottom">
-                      <i style="margin-right: 10px" id="findIcon" class="material-icons md-48">search</i>
-                    </a>
-                    `;
-
                 // Create a new container which conatains all the icons. IT will be appnded to the helpBodyDiv
                 const iconsContainer = document.createElement("div");
                 iconsContainer.classList.add("icon-container");
@@ -363,8 +347,6 @@ class HelpWidget {
                     });
                     bodyFragment.append(messageParagraph);
 
-                    const loadButtonHTML =
-                        '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
                     const loadButton = document.createElement("i");
                     loadButton.id = "loadButton";
                     loadButton.className = "material-icons md-48";
