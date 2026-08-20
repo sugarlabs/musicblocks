@@ -286,6 +286,8 @@ class WidgetWindow {
 
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
+            this._maxminButton = maxminButton;
+            maxminButton.title = _("Maximize window");
             maxminButton.setAttribute("role", "button");
             maxminButton.setAttribute("aria-label", _("Maximize window"));
             maxminButton.setAttribute("tabindex", "0");
@@ -581,6 +583,9 @@ class WidgetWindow {
      */
     _restore() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+        if (this._maxminButton) {
+            this._maxminButton.title = _("Maximize window");
+        }
         this._maximized = false;
 
         if (this._savedPos) {
@@ -601,6 +606,9 @@ class WidgetWindow {
      */
     _maximize() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
+        if (this._maxminButton) {
+            this._maxminButton.title = _("Restore");
+        }
         this._maximized = true;
         this.unroll();
         this.takeFocus();

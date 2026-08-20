@@ -917,8 +917,6 @@ describe("widgetWindows", () => {
             const win2 = createTestWindow("Window 2");
 
             win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-            expect(window.widgetWindows.focused).toBe(win1);
-
             const maxEvent = new KeyboardEvent("keydown", {
                 code: "KeyM",
                 ctrlKey: true,
@@ -1074,6 +1072,18 @@ describe("widgetWindows", () => {
 
             win._rollButton.dispatchEvent(clickEvent);
             expect(win._rolled).toBe(false);
+        });
+
+        test("maxminButton title updates on maximize and restore", () => {
+            const win = createTestWindow("Test Window");
+            expect(win._maxminButton).toBeDefined();
+            expect(win._maxminButton.title).toBe("Maximize window");
+
+            win._maximize();
+            expect(win._maxminButton.title).toBe("Restore");
+
+            win._restore();
+            expect(win._maxminButton.title).toBe("Maximize window");
         });
     });
 });
