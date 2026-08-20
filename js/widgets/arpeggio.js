@@ -112,6 +112,14 @@ class Arpeggio {
             this._clear();
         };
 
+        widgetWindow.addButton("up.svg", Arpeggio.ICONSIZE, _("Move up")).onclick = () => {
+            this._shiftOctave(-1);
+        };
+
+        widgetWindow.addButton("down.svg", Arpeggio.ICONSIZE, _("Move down")).onclick = () => {
+            this._shiftOctave(1);
+        };
+
         this.arpeggioDiv = document.createElement("div");
         widgetWindow.getWidgetBody().append(this.arpeggioDiv);
         widgetWindow.getWidgetBody().style.height = "400px";
@@ -684,6 +692,51 @@ class Arpeggio {
             cell = row.cells[i];
             if (cell.style.backgroundColor === "black") {
                 this.__playCell(rowi, i, cell, playNote);
+            }
+        }
+    }
+
+    /**
+     * Shifts active matrix nodes up or down by the specified row delta.
+     * @private
+     * @param {number} deltaRow - Row index delta
+     * @returns {void}
+     */
+    _shiftOctave(deltaRow) {
+        if (!this._blockMap || this._blockMap.length === 0) return;
+
+        const updatedMap = [];
+        for (let i = 0; i < this._blockMap.length; i++) {
+            const obj = this._blockMap[i];
+            if (obj && obj[0] !== -1) {
+                const oldRow = this._rowBlocks.indexOf(obj[0]);
+                const oldCol = this._colBlocks.indexOf(obj[1]);
+                if (oldRow >= 0 && oldCol >= 0) {
+                    const table = docById("arpeggioCellTable" + oldRow);
+                    if (table && table.rows && table.rows[0] && table.rows[0].cells[oldCol]) {
+                        table.rows[0].cells[oldCol].style.backgroundColor =
+                            this._getBackgroundColor(oldRow);
+                    }
+                }
+
+                const numRows = this._rowBlocks.length;
+                const newRowIndex = (oldRow + deltaRow + numRows) % numRows;
+                const newHalfStep = this._rowBlocks[newRowIndex];
+                updatedMap.push([newHalfStep, obj[1]]);
+            }
+        }
+
+        this._blockMap = updatedMap;
+
+        for (let i = 0; i < this._blockMap.length; i++) {
+            const [halfStep, timeStep] = this._blockMap[i];
+            const row = this._rowBlocks.indexOf(halfStep);
+            const col = this._colBlocks.indexOf(timeStep);
+            if (row >= 0 && col >= 0) {
+                const table = docById("arpeggioCellTable" + row);
+                if (table && table.rows && table.rows[0] && table.rows[0].cells[col]) {
+                    table.rows[0].cells[col].style.backgroundColor = "black";
+                }
             }
         }
     }

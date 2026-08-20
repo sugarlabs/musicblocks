@@ -730,5 +730,27 @@ describe("Arpeggio Widget", () => {
             expect(arpeggio._playTimeout).toBeNull();
             expect(activityMock.logo.synth.stop).toHaveBeenCalled();
         });
+
+        test("handles Move up and Move down toolbar buttons to shift octave", () => {
+            arpeggio.addNode(1, 1);
+            expect(arpeggio._blockMap).toContainEqual([1, 1]);
+
+            const buttons = mockWidgetWindow.addButton.mock.results.map(r => r.value);
+            const moveUpBtn = buttons.find(b => b && b.title === "Move up");
+            const moveDownBtn = buttons.find(b => b && b.title === "Move down");
+
+            expect(moveUpBtn).toBeDefined();
+            expect(moveDownBtn).toBeDefined();
+
+            if (moveUpBtn && moveUpBtn.onclick) {
+                moveUpBtn.onclick();
+                expect(arpeggio._blockMap).toContainEqual([0, 1]);
+            }
+
+            if (moveDownBtn && moveDownBtn.onclick) {
+                moveDownBtn.onclick();
+                expect(arpeggio._blockMap).toContainEqual([1, 1]);
+            }
+        });
     });
 });
