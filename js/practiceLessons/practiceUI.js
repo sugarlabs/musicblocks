@@ -1,6 +1,16 @@
 /* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator, loadPracticeLessons */
 /* exported PracticeUI, ExplorerJournalUI */
 
+// Criteria that mean the level itself is finished, as opposed to a hidden discovery.
+const COMPLETION_CRITERIA = [
+    "completePattern",
+    "completeRhythmWorkflow",
+    "completePhraseWorkflow",
+    "completeBasicShapeSet",
+    "completeAnimatedPolyrhythm",
+    "completeCircularRhythmRing"
+];
+
 const PracticeUI = {
     badgeCheckTimer: null,
     noticeTimer: null,
@@ -339,7 +349,8 @@ const PracticeUI = {
             3: "rhythm_maker_level3.tb",
             4: "phrase_maker_level4.tb",
             5: "geometry_rhythm_level5.tb",
-            6: "animated_polyrhythms_level6.tb"
+            6: "animated_polyrhythms_level6.tb",
+            7: "circular_rhythm_level7.tb"
         };
 
         const file = projectFiles[level];
@@ -441,17 +452,7 @@ const PracticeUI = {
                 this.showBadgeMessage(newBadges);
                 this.updateBadgeStatus(problem);
             } else {
-                if (problem.expected?.boxShapeAutomation) {
-                    const debug = PracticeValidator.getBoxShapeAutomationDebug();
-                    console.debug("Level 6 validation debug", debug);
-                    this.showQuestNotice(
-                        "Not complete yet",
-                        "Beat is still listening for the missing notes. Use one Start block with store in box1, an outer repeat, an inner repeat box1 that draws the shape, and add 1 to box1 after the shape.",
-                        "hint"
-                    );
-                } else {
-                    this.showIncompleteMessage(problem);
-                }
+                this.showIncompleteMessage(problem);
             }
         };
 
@@ -577,13 +578,7 @@ const PracticeUI = {
 
     showSuccessMessage(problem, newBadges, newBigBadges) {
         const completionBadge = problem.badges?.find(badge =>
-            [
-                "completePattern",
-                "completeRhythmWorkflow",
-                "completePhraseWorkflow",
-                "completeBasicShapeSet",
-                "completeAnimatedPolyrhythm"
-            ].includes(badge.criterion)
+            COMPLETION_CRITERIA.includes(badge.criterion)
         );
         const messages = [
             completionBadge?.message || "The lesson song shines, and the island answers.",
@@ -675,14 +670,7 @@ const PracticeUI = {
 
         this.badgeCheckTimer = setInterval(() => {
             const hiddenBadges = PracticeValidator.assessBadges(problem).filter(
-                badge =>
-                    ![
-                        "completePattern",
-                        "completeRhythmWorkflow",
-                        "completePhraseWorkflow",
-                        "completeBasicShapeSet",
-                        "completeAnimatedPolyrhythm"
-                    ].includes(badge.criterion)
+                badge => !COMPLETION_CRITERIA.includes(badge.criterion)
             );
             const newBadges = PracticeManager.awardLevelBadges(problem, hiddenBadges);
 
