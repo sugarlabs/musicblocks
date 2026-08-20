@@ -2585,6 +2585,47 @@ function TemperamentWidget() {
             that._save();
         };
 
+        widgetWindow.addButton("save-to-file-button.svg", ICONSIZE, _("Export")).onclick =
+            function () {
+                if (
+                    that.activity.save &&
+                    typeof that.activity.save.exportTemperamentJSON === "function"
+                ) {
+                    that.activity.save.exportTemperamentJSON();
+                } else {
+                    that.activity.errorMsg(
+                        _("Cannot export temperament: save interface not available."),
+                        4000
+                    );
+                }
+            };
+
+        widgetWindow.addButton("open-button.svg", ICONSIZE, _("Import")).onclick = function () {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = ".json,.scl";
+            input.onchange = function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const sclReader = new FileReader();
+                sclReader.onload = function (ev) {
+                    const ext = file.name.split(".").pop().toLowerCase();
+                    if (ext === "scl") {
+                        that.activity.save.importSCL(ev.target.result);
+                    } else if (
+                        that.activity.save &&
+                        typeof that.activity.save.importTemperamentJSON === "function"
+                    ) {
+                        that.activity.save.importTemperamentJSON(ev.target.result);
+                    }
+                    that.inTemperament = that._logo.synth.inTemperament;
+                    that._circleOfNotes();
+                };
+                sclReader.readAsText(file);
+            };
+            input.click();
+        };
+
         const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
 
         let t = getTemperament(this.inTemperament);

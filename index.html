@@ -115,7 +115,6 @@
      loader.js and activity.js read those globals. -->
         <script src="js/releaseconfig.js"></script>
 
-
         <script src="dist/vendor.min.js"></script>
         <link
             rel="preload"
@@ -391,7 +390,7 @@
                             class="file"
                             type="file"
                             id="myOpenFile"
-                            accept=".ta, .tb, .html,.mid,.midi"
+                            accept=".ta, .tb, .html,.mid,.midi,.json,.scl"
                             tabindex="-1"
                         />
                         <input
@@ -915,6 +914,9 @@
                         <li><a id="save-mxml" role="button" tabindex="0"></a></li>
                         <li><a id="save-blockartwork-svg" role="button" tabindex="0"></a></li>
                         <li><a id="save-blockartwork-png" role="button" tabindex="0"></a></li>
+                        <li class="divider"></li>
+                        <li><a id="save-temperament-json" role="button" tabindex="0"></a></li>
+                        <li><a id="save-temperament-scl" role="button" tabindex="0"></a></li>
                     </ul>
 
                     <ul id="recorddropdown" class="dropdown-content">

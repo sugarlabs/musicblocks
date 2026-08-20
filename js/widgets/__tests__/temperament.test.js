@@ -1283,7 +1283,7 @@ describe("TemperamentWidget basic tests", () => {
             widget._playTimeout = setTimeout(() => {}, 1000);
             widget.playButton = createMockElement("play");
 
-            const noteCell = mockWidgetWindow.addButton.mock.results[2].value;
+            const noteCell = mockWidgetWindow.addButton.mock.results[4].value;
             expect(noteCell.onclick).toBeDefined();
 
             // Toggle noteCell twice to cover both circleIsVisible branches

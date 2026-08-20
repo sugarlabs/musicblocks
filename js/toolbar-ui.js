@@ -173,6 +173,8 @@ class ToolbarUI {
                 ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
                 ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
+                ["save-temperament-json", _("Save temperament as JSON"), "innerHTML"],
+                ["save-temperament-scl", _("Save temperament as Scala (.scl)"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
                 ["enUS", "English (United States)", "innerHTML"],
                 ["enUK", "English (United Kingdom)", "innerHTML"],
@@ -1015,6 +1017,15 @@ class ToolbarUI {
                     const saveMXML = docById("save-mxml");
                     saveMXML.onclick = () => {
                         mxml_onclick(this.activity);
+                    };
+
+                    const exportTemperamentJSON = docById("save-temperament-json");
+                    exportTemperamentJSON.onclick = () => {
+                        this.activity.save.exportTemperamentJSON();
+                    };
+                    const exportTemperamentSCL = docById("save-temperament-scl");
+                    exportTemperamentSCL.onclick = () => {
+                        this.activity.save.exportSCL();
                     };
                 }
                 const saveArtworkSVG = docById("save-blockartwork-svg");
