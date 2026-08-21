@@ -146,10 +146,15 @@ describe("OrnamentActions", () => {
         });
 
         test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
+            const originalMusicBlocks = global.MusicBlocks;
             delete global.MusicBlocks;
-            expect(() => Singer.OrnamentActions.setStaccato(2, 0, undefined)).not.toThrow();
-            expect(dispatchCalls.length).toBe(0);
-            expect(mouseMB.listeners.length).toBe(0);
+            try {
+                expect(() => Singer.OrnamentActions.setStaccato(2, 0, undefined)).not.toThrow();
+                expect(dispatchCalls.length).toBe(0);
+                expect(mouseMB.listeners.length).toBe(0);
+            } finally {
+                global.MusicBlocks = originalMusicBlocks;
+            }
         });
     });
 
@@ -260,10 +265,15 @@ describe("OrnamentActions", () => {
         });
 
         test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
+            const originalMusicBlocks = global.MusicBlocks;
             delete global.MusicBlocks;
-            expect(() => Singer.OrnamentActions.setSlur(2, 0, undefined)).not.toThrow();
-            expect(dispatchCalls.length).toBe(0);
-            expect(mouseMB.listeners.length).toBe(0);
+            try {
+                expect(() => Singer.OrnamentActions.setSlur(2, 0, undefined)).not.toThrow();
+                expect(dispatchCalls.length).toBe(0);
+                expect(mouseMB.listeners.length).toBe(0);
+            } finally {
+                global.MusicBlocks = originalMusicBlocks;
+            }
         });
     });
 
@@ -334,10 +344,15 @@ describe("OrnamentActions", () => {
         );
 
         test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
+            const originalMusicBlocks = global.MusicBlocks;
             delete global.MusicBlocks;
-            expect(() => Singer.OrnamentActions.doNeighbor(3, 4, 0, undefined)).not.toThrow();
-            expect(dispatchCalls.length).toBe(0);
-            expect(mouseMB.listeners.length).toBe(0);
+            try {
+                expect(() => Singer.OrnamentActions.doNeighbor(3, 4, 0, undefined)).not.toThrow();
+                expect(dispatchCalls.length).toBe(0);
+                expect(mouseMB.listeners.length).toBe(0);
+            } finally {
+                global.MusicBlocks = originalMusicBlocks;
+            }
         });
     });
 });
