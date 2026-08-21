@@ -450,6 +450,15 @@ describe("Block Foundation", () => {
                 const mockBoundary = { offScreen: jest.fn().mockReturnValue(true) };
                 expect(block.offScreen(mockBoundary)).toBe(false);
             });
+
+            it("should return false, not throw, when not trashed and container is null", () => {
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.container = null;
+                block.trash = false;
+                const mockBoundary = { offScreen: jest.fn().mockReturnValue(true) };
+                expect(() => block.offScreen(mockBoundary)).not.toThrow();
+                expect(block.offScreen(mockBoundary)).toBe(false);
+            });
         });
     });
 
@@ -463,6 +472,11 @@ describe("Block Foundation", () => {
         });
 
         describe("highlight()", () => {
+            it("should not throw when container is null", () => {
+                block.container = null;
+                expect(() => block.highlight()).not.toThrow();
+            });
+
             it("should set highlightBitmap to visible and bitmap to hidden", () => {
                 block.highlight();
                 expect(block.highlightBitmap.visible).toBe(true);
@@ -479,6 +493,11 @@ describe("Block Foundation", () => {
         });
 
         describe("unhighlight()", () => {
+            it("should not throw when container is null", () => {
+                block.container = null;
+                expect(() => block.unhighlight()).not.toThrow();
+            });
+
             it("should set bitmap to visible and highlightBitmap to hidden", () => {
                 block.highlight(); // start highlighted
                 block.unhighlight();
