@@ -157,27 +157,47 @@ describe("piemenuBlockContext", () => {
         expect(wheel.navItems[3].setTooltip).toHaveBeenCalledWith("Close");
         expect(wheel.navItems[4].setTooltip).not.toHaveBeenCalled();
         expect(wheel.navItems[0].selected).toBe(false);
+        expect(wheel.clickModeRotate).toBe(false);
+        expect(document.body.removeEventListener).not.toHaveBeenCalled();
     });
 
-    test("adds a save-stack menu item only for save-eligible block types", () => {
+    test("computes exact left/top pixel offsets from block position, canvas offset, and stage scale", () => {
         const block = makeBlock();
-        block.name = "action";
-        block.blocks.blockList["top-id"].name = "action";
+        block.blocks.blockList["active-id"].container = { x: 10, y: 20 };
+        block.activity.canvas = { offsetLeft: 100, offsetTop: 50 };
+        block.activity.blocksContainer = { x: 5, y: 3 };
+        block.activity.getStageScale = jest.fn(() => 2);
 
         piemenuBlockContext(block);
 
-        const wheel = global.wheelnav.mock.instances[0];
-        expect(wheel.initWheel).toHaveBeenCalledWith(
-            expect.arrayContaining(["imgsrc:header-icons/save-blocks-button.svg"])
-        );
-        expect(wheel.navItems[4].setTooltip).toHaveBeenCalledWith("Save stack");
-
-        wheel.navItems[4].navigateFunction();
-
-        expect(block.blocks.activeBlock).toBe(block.blockIndex);
-        expect(block.blocks.prepareStackForCopy).toHaveBeenCalled();
-        expect(block.blocks.saveStack).toHaveBeenCalled();
+        const wheelDiv = getDomElement("contextWheelDiv");
+        expect(wheelDiv.style.left).toBe("36px");
+        expect(wheelDiv.style.top).toBe("-42px");
     });
+
+    test.each(["customsample", "temperament1", "definemode", "show", "turtleshell", "action"])(
+        "adds a save-stack menu item for save-eligible block type '%s'",
+        name => {
+            const block = makeBlock();
+            block.name = name;
+            block.blocks.blockList["top-id"].name = name;
+
+            piemenuBlockContext(block);
+
+            const wheel = global.wheelnav.mock.instances[0];
+            expect(wheel.initWheel).toHaveBeenCalledWith(
+                expect.arrayContaining(["imgsrc:header-icons/save-blocks-button.svg"])
+            );
+            expect(wheel.navItems[4].setTooltip).toHaveBeenCalledWith("Save stack");
+            expect(typeof wheel.navItems[4].navigateFunction).toBe("function");
+
+            wheel.navItems[4].navigateFunction();
+
+            expect(block.blocks.activeBlock).toBe(block.blockIndex);
+            expect(block.blocks.prepareStackForCopy).toHaveBeenCalled();
+            expect(block.blocks.saveStack).toHaveBeenCalled();
+        }
+    );
 
     test("does not add a save-stack menu item for ordinary block types", () => {
         const block = makeBlock();
@@ -188,6 +208,7 @@ describe("piemenuBlockContext", () => {
         expect(wheel.initWheel).toHaveBeenCalledWith(
             expect.not.arrayContaining(["imgsrc:header-icons/save-blocks-button.svg"])
         );
+        expect(wheel.navItems[4].navigateFunction).toBeUndefined();
     });
 
     test("adds a help menu item that opens HelpWidget directly when already loaded", () => {
@@ -198,6 +219,9 @@ describe("piemenuBlockContext", () => {
         piemenuBlockContext(block);
 
         const wheel = global.wheelnav.mock.instances[0];
+        expect(wheel.initWheel).toHaveBeenCalledWith(
+            expect.arrayContaining(["imgsrc:header-icons/help-button.svg"])
+        );
         expect(wheel.navItems[4].setTooltip).toHaveBeenCalledWith("Help");
 
         wheel.navItems[4].navigateFunction();
@@ -218,7 +242,11 @@ describe("piemenuBlockContext", () => {
     test("duplicate pastes the stack and increments the paste offset on repeated use", () => {
         const block = makeBlock();
         const dxHistory = [];
-        block.blocks.pasteStack = jest.fn(() => dxHistory.push(block.blocks.pasteDx));
+        const dyHistory = [];
+        block.blocks.pasteStack = jest.fn(() => {
+            dxHistory.push(block.blocks.pasteDx);
+            dyHistory.push(block.blocks.pasteDy);
+        });
 
         piemenuBlockContext(block);
         const wheel = global.wheelnav.mock.instances[0];
@@ -228,6 +256,24 @@ describe("piemenuBlockContext", () => {
 
         expect(block.blocks.prepareStackForCopy).toHaveBeenCalledTimes(2);
         expect(dxHistory).toEqual([0, 21]);
+        expect(dyHistory).toEqual([0, 21]);
+    });
+
+    test("duplicate re-enables the 'Paste previous stack' helper item and rebinds its handler", () => {
+        const block = makeBlock();
+        const matchingItem = { label: "Paste previous stack", display: false, fn: null };
+        const otherItem = { label: "Something else", display: false, fn: null };
+        block.activity.helpfulWheelItems = [matchingItem, otherItem];
+
+        piemenuBlockContext(block);
+        const wheel = global.wheelnav.mock.instances[0];
+
+        wheel.navItems[0].navigateFunction();
+
+        expect(matchingItem.display).toBe(true);
+        expect(typeof matchingItem.fn).toBe("function");
+        expect(otherItem.display).toBe(false);
+        expect(otherItem.fn).toBeNull();
     });
 
     test("duplicate shows an error instead of pasting when the stack is a customsample", () => {
@@ -239,7 +285,9 @@ describe("piemenuBlockContext", () => {
 
         wheel.navItems[0].navigateFunction();
 
-        expect(block.activity.errorMsg).toHaveBeenCalled();
+        expect(block.activity.errorMsg).toHaveBeenCalledWith(
+            "In order to copy a sample, you must reload the widget, import the sample again, and export it."
+        );
         expect(block.blocks.pasteStack).not.toHaveBeenCalled();
     });
 
@@ -268,7 +316,10 @@ describe("piemenuBlockContext", () => {
         expect(block.blocks.extract).toHaveBeenCalled();
         expect(block.blocks.sendStackToTrash).toHaveBeenCalled();
         expect(getDomElement("contextWheelDiv").style.display).toBe("none");
-        expect(block.activity.textMsg).toHaveBeenCalled();
+        expect(block.activity.textMsg).toHaveBeenCalledWith(
+            "You can restore deleted blocks from the trash with the Restore From Trash button.",
+            3000
+        );
     });
 
     test("close hides the wheel", () => {
