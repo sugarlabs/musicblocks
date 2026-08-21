@@ -2649,6 +2649,21 @@ function Synth() {
      */
     this.startRecording = async () => {
         await Tone.start();
+
+        if (this.mic) {
+            this.mic.close();
+            if (typeof this.mic.dispose === "function") {
+                this.mic.dispose();
+            }
+            this.mic = null;
+        }
+        if (this.recorder) {
+            if (typeof this.recorder.dispose === "function") {
+                this.recorder.dispose();
+            }
+            this.recorder = null;
+        }
+
         this.mic = new Tone.UserMedia();
         this.recorder = new Tone.Recorder();
         await this.mic
@@ -2706,10 +2721,21 @@ function Synth() {
      * @memberof Synth
      */
     this.stopRecording = async () => {
+        if (!this.recorder || !this.mic) {
+            return null;
+        }
         _disposeRecordingPlayer();
         _revokeRecordingURL();
         this.recording = await this.recorder.stop();
         this.mic.close();
+        if (typeof this.mic.dispose === "function") {
+            this.mic.dispose();
+        }
+        this.mic = null;
+        if (typeof this.recorder.dispose === "function") {
+            this.recorder.dispose();
+        }
+        this.recorder = null;
         this.audioURL = URL.createObjectURL(this.recording);
         return this.audioURL;
     };
