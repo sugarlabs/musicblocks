@@ -930,5 +930,150 @@ describe("widgetWindows", () => {
             expect(win1.isMaximized()).toBe(true);
             expect(win2.isMaximized()).toBe(false);
         });
+
+        test("ignores shortcuts when focus is inside an input, textarea, or contenteditable element", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const input = document.createElement("input");
+            const textarea = document.createElement("textarea");
+            const contentEditable = document.createElement("div");
+            contentEditable.contentEditable = "true";
+
+            document.body.append(input, textarea, contentEditable);
+
+            [input, textarea, contentEditable].forEach(element => {
+                element.focus();
+                const event = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+                window.dispatchEvent(event);
+            });
+
+            expect(win.onclose).not.toHaveBeenCalled();
+
+            input.remove();
+            textarea.remove();
+            contentEditable.remove();
+        });
+
+        test("ignores shortcuts when event has repeat flag", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const event = new KeyboardEvent("keydown", {
+                key: "Escape",
+                repeat: true,
+                bubbles: true
+            });
+            window.dispatchEvent(event);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("window dragging and mouse handlers", () => {
+        test("sets and clears draggingWindow on mouse move and mouse up", () => {
+            const win = createTestWindow("Drag Window");
+            win._docMouseMoveHandler = jest.fn();
+            win._dragTopHandler = jest.fn();
+            window.widgetWindows.draggingWindow = win;
+
+            const moveEvent = new MouseEvent("mousemove", { clientX: 100, clientY: 150 });
+            document.dispatchEvent(moveEvent);
+            expect(win._docMouseMoveHandler).toHaveBeenCalledWith(moveEvent);
+
+            const upEvent = new MouseEvent("mouseup");
+            document.dispatchEvent(upEvent);
+            expect(win._dragTopHandler).toHaveBeenCalledWith(upEvent);
+            expect(window.widgetWindows.draggingWindow).toBeNull();
+        });
+    });
+
+    describe("window visibility and management helpers", () => {
+        test("hideAllWindows hides all frames and resets focused", () => {
+            const win1 = createTestWindow("Win 1");
+            const win2 = createTestWindow("Win 2");
+            window.widgetWindows.focused = win1;
+
+            window.widgetWindows.hideAllWindows();
+
+            expect(win1._frame.style.display).toBe("none");
+            expect(win2._frame.style.display).toBe("none");
+            expect(window.widgetWindows.focused).toBeNull();
+        });
+
+        test("hideWindow hides specific window and resets focus if focused", () => {
+            const win = createTestWindow("Target Win");
+            window.widgetWindows.focused = win;
+
+            window.widgetWindows.hideWindow(win._key);
+
+            expect(win._frame.style.display).toBe("none");
+            expect(window.widgetWindows.focused).toBeNull();
+        });
+
+        test("closeWindow calls close on the named window", () => {
+            const win = createTestWindow("Close Target");
+            win.close = jest.fn();
+
+            window.widgetWindows.closeWindow(win._key);
+
+            expect(win.close).toHaveBeenCalledTimes(1);
+        });
+
+        test("showWindows restores display block on all open windows", () => {
+            const win1 = createTestWindow("Show 1");
+            const win2 = createTestWindow("Show 2");
+            win1._frame.style.display = "none";
+            win2._frame.style.display = "none";
+
+            window.widgetWindows.showWindows();
+
+            expect(win1._frame.style.display).toBe("block");
+            expect(win2._frame.style.display).toBe("block");
+        });
+
+        test("clear calls onclose on the named window", () => {
+            const win = createTestWindow("Clear Target");
+            win.onclose = jest.fn();
+
+            window.widgetWindows.clear(win._key);
+
+            expect(win.onclose).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("locale configuration and additional widget controls", () => {
+        test("configures column layout when language is Japanese", () => {
+            window.localStorage.languagePreference = "ja";
+            const win = createTestWindow("Japanese Widget");
+
+            expect(win._body.style.flexDirection).toBe("column");
+            expect(win._toolbar.style.display).toBe("flex");
+            window.localStorage.languagePreference = "en";
+        });
+
+        test("addRangeSlider creates configured range input element", () => {
+            const win = createTestWindow();
+            const slider = win.addRangeSlider(50, null, 0, 100, "custom-slider");
+
+            expect(slider.type).toBe("range");
+            expect(slider.value).toBe("50");
+            expect(slider.min).toBe("0");
+            expect(slider.max).toBe("100");
+            expect(slider.className).toBe("custom-slider");
+        });
+
+        test("rollup button click toggles rollup and unroll state", () => {
+            const win = createTestWindow();
+            const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
+
+            win._rollButton.dispatchEvent(clickEvent);
+            expect(win._rolled).toBe(true);
+
+            win._rollButton.dispatchEvent(clickEvent);
+            expect(win._rolled).toBe(false);
+        });
     });
 });
