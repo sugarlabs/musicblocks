@@ -628,6 +628,22 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
     });
 
+    test("setScalarInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setScalarInterval(2, 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_interval_0");
+    });
+
+    test("setScalarInterval MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.setScalarInterval(2, 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_interval_0");
+    });
+
     test("setChordInterval push + pop", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
@@ -641,6 +657,12 @@ describe("setupIntervalsActions", () => {
         Singer.IntervalsActions.setChordInterval(null, 0, "blk");
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
         expect(turtle.singer.chordIntervals).toContainEqual([1, 0]);
+    });
+
+    test("setChordInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setChordInterval([1, 0], 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_chord_interval_0");
     });
 
     test("setChordInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -676,6 +698,12 @@ describe("setupIntervalsActions", () => {
         expect(turtle.singer.semitoneIntervals.length).toBe(1);
     });
 
+    test("setSemitoneInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setSemitoneInterval(2, 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_semitone_interval_0");
+    });
+
     test("setSemitoneInterval MusicBlocks.isRun adds to mouse listeners", () => {
         const mockMouse = { MB: { listeners: [] } };
         global.MusicBlocks.isRun = true;
@@ -700,6 +728,12 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
         // Default value of 1 should be used
         expect(turtle.singer.ratioIntervals).toContain(1);
+    });
+
+    test("setRatioInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setRatioInterval(1.5, 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_ratio_interval_0");
     });
 
     test("setRatioInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -759,6 +793,30 @@ describe("setupIntervalsActions", () => {
         expect(MUSICALMODES.pentatonic).toBeDefined();
     });
 
+    test("defineMode MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_definemode_0");
+    });
+
+    test("defineMode flags EDOBOUNDEXCEEDED when more pitch numbers than the temperament length are defined", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+
+        // 13 in-range (0-11) pitch numbers for a default 12-EDO temperament
+        // exceeds temperamentLength even though none of them are individually out of bounds.
+        turtle.singer.defineMode.push(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0);
+        listener();
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+    });
+
     test("setTemperament state changes", () => {
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
         expect(logo.synth.inTemperament).toBe("equal");
@@ -769,6 +827,12 @@ describe("setupIntervalsActions", () => {
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
         Singer.IntervalsActions.setTemperament("pythagorean", "C", 4);
         expect(logo.synth.changeInTemperament).toBe(true);
+    });
+
+    test("setTemperament rebuilds the custom mode when the EDO changes", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(19).fill(1));
     });
 
     describe("getTemperamentLength", () => {
