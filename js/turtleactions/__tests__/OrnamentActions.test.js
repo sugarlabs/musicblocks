@@ -104,6 +104,14 @@ describe("OrnamentActions", () => {
                 expectMouseListener: false,
                 isRun: true,
                 nullMouse: true
+            },
+            {
+                desc: "block defined but not in blockList",
+                blk: 99,
+                expectDispatch: false,
+                expectMouseListener: true,
+                isRun: true,
+                nullMouse: false
             }
         ];
 
@@ -130,8 +138,18 @@ describe("OrnamentActions", () => {
                 const initialStaccato = [...turtle.singer.staccato];
                 Singer.OrnamentActions.setStaccato(val, 0, 1);
                 expect(errorMsgCalls.length).toBeGreaterThan(0);
+                expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                    "Staccato value must be non-zero."
+                );
                 expect(turtle.singer.staccato).toEqual(initialStaccato);
             });
+        });
+
+        test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
+            delete global.MusicBlocks;
+            expect(() => Singer.OrnamentActions.setStaccato(2, 0, undefined)).not.toThrow();
+            expect(dispatchCalls.length).toBe(0);
+            expect(mouseMB.listeners.length).toBe(0);
         });
     });
 
@@ -186,6 +204,16 @@ describe("OrnamentActions", () => {
                 nullMouse: false,
                 justCounting: true,
                 expectBeginSlur: false
+            },
+            {
+                desc: "block defined but not in blockList",
+                blk: 99,
+                expectDispatch: false,
+                expectMouseListener: true,
+                isRun: true,
+                nullMouse: false,
+                justCounting: false,
+                expectBeginSlur: true
             }
         ];
 
@@ -224,8 +252,18 @@ describe("OrnamentActions", () => {
                 const initialStaccato = [...turtle.singer.staccato];
                 Singer.OrnamentActions.setSlur(val, 0, 1);
                 expect(errorMsgCalls.length).toBeGreaterThan(0);
+                expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                    "Slur value must be non-zero."
+                );
                 expect(turtle.singer.staccato).toEqual(initialStaccato);
             });
+        });
+
+        test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
+            delete global.MusicBlocks;
+            expect(() => Singer.OrnamentActions.setSlur(2, 0, undefined)).not.toThrow();
+            expect(dispatchCalls.length).toBe(0);
+            expect(mouseMB.listeners.length).toBe(0);
         });
     });
 
@@ -262,6 +300,14 @@ describe("OrnamentActions", () => {
                 expectMouseListener: false,
                 isRun: true,
                 nullMouse: true
+            },
+            {
+                desc: "block defined but not in blockList",
+                blk: 99,
+                expectDispatch: false,
+                expectMouseListener: true,
+                isRun: true,
+                nullMouse: false
             }
         ];
 
@@ -286,5 +332,12 @@ describe("OrnamentActions", () => {
                 });
             }
         );
+
+        test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
+            delete global.MusicBlocks;
+            expect(() => Singer.OrnamentActions.doNeighbor(3, 4, 0, undefined)).not.toThrow();
+            expect(dispatchCalls.length).toBe(0);
+            expect(mouseMB.listeners.length).toBe(0);
+        });
     });
 });
