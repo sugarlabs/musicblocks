@@ -896,6 +896,37 @@ describe("BlockDragController", () => {
             debugSpy.mockRestore();
         });
 
+        it("_calculateDragGroup guards against an out-of-range connection index", () => {
+            // A stray connection pointing past the end of blockList (e.g.
+            // from corrupted or maliciously crafted project data) used to
+            // reach myBlock.connections on undefined instead of being caught
+            // by the null check. blockList is padded with filler entries so
+            // the unrelated loop-counter guard (dragLoopCounter >
+            // blockList.length) has enough budget to not trip first.
+            const blockList = [
+                makeFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, 99999]
+                }),
+                null,
+                null,
+                null,
+                null
+            ];
+            const blocks = makeBlocks(blockList);
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+            expect(() => blocks.findDragGroup(0)).not.toThrow();
+            expect(blocks.dragGroup).toEqual([0]);
+
+            debugSpy.mockRestore();
+        });
+
         it("_calculateDragGroup stops recursing once the loop counter exceeds the block list length", () => {
             const blockList = [
                 { connections: [null, 0] } // a block that "connects to itself" so recursion never bottoms out
@@ -930,6 +961,20 @@ describe("BlockDragController", () => {
             expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining("null block."));
 
             await expect(blocks.blockMoved(0)).resolves.toBeUndefined();
+            expect(debugSpy).toHaveBeenCalledWith(
+                expect.stringContaining("null block found in blockMoved")
+            );
+
+            debugSpy.mockRestore();
+        });
+
+        it("blockMoved guards against an out-of-range thisBlock index", async () => {
+            // thisBlock past the end of blockList used to reach
+            // myBlock.connections on undefined instead of being caught here.
+            const blocks = makeBlocks([null]);
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+            await expect(blocks.blockMoved(99)).resolves.toBeUndefined();
             expect(debugSpy).toHaveBeenCalledWith(
                 expect.stringContaining("null block found in blockMoved")
             );
