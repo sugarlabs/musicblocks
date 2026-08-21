@@ -1451,15 +1451,26 @@ describe("Plugin and Macro Utilities", () => {
 
         it("filters out unsafe keys to prevent prototype pollution", () => {
             const unsafeData = {
-                PALETTEPLUGINS: {
-                    __proto__: "malicious",
-                    constructor: "malicious",
-                    safeKey: "valid"
-                }
+                PALETTEPLUGINS: JSON.parse(`{
+                    "__proto__": "malicious",
+                    "constructor": "malicious",
+                    "safeKey": "valid"
+                }`)
             };
             updatePluginObj(mockActivity, unsafeData);
             expect(mockActivity.pluginObjs.PALETTEPLUGINS.safeKey).toBe("valid");
-            expect(mockActivity.pluginObjs.PALETTEPLUGINS.__proto__).not.toBe("malicious");
+            expect(
+                Object.prototype.hasOwnProperty.call(
+                    mockActivity.pluginObjs.PALETTEPLUGINS,
+                    "__proto__"
+                )
+            ).toBe(false);
+            expect(
+                Object.prototype.hasOwnProperty.call(
+                    mockActivity.pluginObjs.PALETTEPLUGINS,
+                    "constructor"
+                )
+            ).toBe(false);
         });
     });
 
