@@ -26,6 +26,7 @@ class StatsWindow {
     constructor(activity) {
         this.activity = activity;
         this.isOpen = true;
+        this._inFlight = false;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "stats", "stats");
         this.widgetWindow.clear();
@@ -35,6 +36,7 @@ class StatsWindow {
         };
         this.widgetWindow.onclose = () => {
             this.isOpen = false;
+            this._inFlight = false;
             this.activity.blocks.showBlocks();
             this.widgetWindow.destroy();
             this.activity.logo.statsWindow = null;
@@ -76,6 +78,10 @@ class StatsWindow {
      * @returns {void}
      */
     refresh() {
+        if (this._inFlight) {
+            return;
+        }
+        this._inFlight = true;
         this.widgetWindow.getWidgetBody().replaceChildren();
         if (typeof window.Chart !== "undefined") {
             this.doAnalytics();
@@ -85,6 +91,7 @@ class StatsWindow {
                     this.doAnalytics();
                 })
                 .catch(err => {
+                    this._inFlight = false;
                     console.error("Failed to load Chart.js:", err);
                 });
         }
@@ -139,6 +146,7 @@ class StatsWindow {
             this.activity.blocks.hideBlocks();
             this.activity.showBlocksAfterRun = false;
             document.body.style.cursor = "default";
+            this._inFlight = false;
         };
         const options = getChartOptions(__callback);
         myRadarChart = new window.Chart(ctx).Radar(data, options);
