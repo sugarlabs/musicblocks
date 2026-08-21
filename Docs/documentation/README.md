@@ -296,7 +296,7 @@ available:
 - **Home**: Centers the workspace view on the initial starting point.
 - **Close**: Exits the contextual menu.
 - **Search for Blocks**: Opens a search bar to locate specific blocks
-    within the workspace.
+    within the workspace. Includes an interactive clear (×) button to instantly wipe search queries.
 - **Collapse**: Collapses all blocks to their minimal state.
 - **Clean**: Organizes and tidies up the workspace by aligning blocks
     systematically.
