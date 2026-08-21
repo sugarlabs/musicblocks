@@ -279,4 +279,14 @@ describe("StatsWindow", () => {
         expect(body.textContent).not.toContain("stale-data");
         expect(global.analyzeProject).toHaveBeenCalledTimes(1);
     });
+
+    test("guards against in-flight rapid double-clicks while refresh is running", () => {
+        const sw = new StatsWindow(activity);
+        global.analyzeProject.mockClear();
+
+        sw._inFlight = true;
+        sw.refresh();
+
+        expect(global.analyzeProject).not.toHaveBeenCalled();
+    });
 });
