@@ -313,7 +313,8 @@ class SelectionController {
             // set selection mode to false
             activity.blocks.setSelectionToActivity(false);
             activity.refreshCanvas();
-            activity.closeHelpfulWheel();
+            // Cache DOM element reference for performance
+            document.getElementById("helpfulWheelDiv").style.display = "none";
         }
     }
 
@@ -354,7 +355,8 @@ class SelectionController {
             this.unhighlightSelectedBlocks(false, false);
             activity.blocks.setSelectedBlocks(this.selectedBlocks);
             activity.refreshCanvas();
-            activity.closeHelpfulWheel();
+            // Cache DOM element reference for performance
+            document.getElementById("helpfulWheelDiv").style.display = "none";
         }
     }
 
@@ -365,7 +367,7 @@ class SelectionController {
         this.isSelecting
             ? activity.textMsg(_("Select is enabled."))
             : activity.textMsg(_("Select is disabled."));
-        activity.closeHelpfulWheel();
+        document.getElementById("helpfulWheelDiv").style.display = "none";
     }
 }
 

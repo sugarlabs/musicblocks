@@ -41,7 +41,7 @@
         CAMERAVALUE, VIDEOVALUE
    - js/block.js
         Block
-   - js/activity/block-drag-controller.js
+   - js/block-drag-controller.js
         setupBlockDragController
    - js/connection-validator.js
         ConnectionValidator
@@ -168,7 +168,7 @@ class Blocks {
         this._deferCheckBounds = false;
 
         /** We keep a dictionary for the proto blocks, */
-        this.protoBlockDict = Object.create(null);
+        this.protoBlockDict = {};
         /** and a list of the blocks we create. */
         this.blockList = [];
 
@@ -1376,24 +1376,19 @@ class Blocks {
                 cblk = this.blockList[parentblk].connections[2];
                 if (cblk === null) {
                     /**
-                     * Restore the octave (number) placeholder for the pitch block's
-                     * second argument slot. Capture the future block index now so the
-                     * postProcess closure references the correct entry even when the
-                     * name-slot restoration below also appends a block.
+                     * Adjust Docks
+                     * @param - args - arguments
+                     * @public
+                     * @returns {void}
                      */
-                    const octaveBlkIdx = this.blockList.length;
                     const postProcess = args => {
                         const parentblk = args[0];
                         const oldBlock = args[1];
-                        const blk = args[2];
+                        const blk = this.blockList.length - 1;
 
                         this.blockList[parentblk].connections[2] = blk;
 
-                        // Use the removed block's value only when it is a number;
-                        // if a name block was placed in the octave slot fall back
-                        // to the default octave of 4.
-                        const rawOctave = this.blockList[oldBlock].value;
-                        const octave = typeof rawOctave === "number" ? rawOctave : 4;
+                        const octave = this.blockList[oldBlock].value;
                         this.blockList[blk].value = octave;
 
                         this.blockList[blk].text.text = octave.toString();
@@ -1407,24 +1402,23 @@ class Blocks {
 
                     this._makeNewBlockWithConnections("number", 0, [parentblk], postProcess, [
                         parentblk,
-                        oldBlock,
-                        octaveBlkIdx
+                        oldBlock
                     ]);
                 }
 
                 const oblk = this.blockList[parentblk].connections[1];
                 if (oblk === null) {
                     /**
-                     * Restore the name (solfege/notename/etc.) placeholder for the
-                     * pitch block's first argument slot. Capture the future block index
-                     * now so the postProcess closure is immune to the list growing
-                     * further before execution.
+                     * Adjust Docks
+                     * @param - args - arguments
+                     * @public
+                     * @returns {void}
                      */
-                    const nameBlkIdx = this.blockList.length;
                     const postProcess = args => {
                         const parentblk = args[0];
                         const value = args[1];
-                        const blk = args[2];
+
+                        const blk = this.blockList.length - 1;
 
                         this.blockList[parentblk].connections[1] = blk;
 
@@ -1449,10 +1443,6 @@ class Blocks {
                         this.adjustDocks(parentblk, true);
                     };
 
-                    // When the removed block was itself in the name slot, mirror its
-                    // type in the replacement placeholder (e.g. notename → notename,
-                    // eastindiansolfege → eastindiansolfege). When the block came from
-                    // the octave slot (a number), fall back to the default "solfege".
                     let newBlockName = "solfege";
                     let newBlockValue = "sol";
                     switch (this.blockList[oldBlock].name) {
@@ -1474,8 +1464,7 @@ class Blocks {
 
                     this._makeNewBlockWithConnections(newBlockName, 0, [parentblk], postProcess, [
                         parentblk,
-                        newBlockValue,
-                        nameBlkIdx
+                        newBlockValue
                     ]);
                 }
             } else if (this.blockList[parentblk].name === "storein") {
@@ -4564,7 +4553,7 @@ class Blocks {
                     this.selectedBlocksObj[0][3] =
                         helpfulWheelDiv.offsetTop + 130 - this.activity.blocksContainer.y;
 
-                    this.activity.closeHelpfulWheel();
+                    helpfulWheelDiv.style.display = "none";
                 } else {
                     this.selectedBlocksObj[0][2] =
                         175 - this.activity.blocksContainer.x + this.pasteDx;
@@ -6769,10 +6758,7 @@ class Blocks {
             }
             this.activity.refreshCanvas();
             this.activity.trashcan.stopHighlightAnimation();
-            const hideContents = document.getElementById("hideContents");
-            if (hideContents && typeof hideContents.click === "function") {
-                hideContents.click();
-            }
+            document.getElementById("hideContents").click();
         };
 
         /***

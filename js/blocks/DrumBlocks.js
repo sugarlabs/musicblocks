@@ -561,10 +561,6 @@ function setupDrumBlocks(activity) {
 
             /**
              * Handle different contexts for playing the drum.
-             *
-             * Widget contexts (matrix / keyboard) only register the drum.
-             * All other runtime contexts play it: inside a Note block, or
-             * stand-alone under Start (DrumActions treats that as a 1/4 note).
              */
             if (logo.inPitchDrumMatrix) {
                 // Handle Pitch Drum Matrix context
@@ -596,8 +592,8 @@ function setupDrumBlocks(activity) {
                 // Handle other contexts
                 Singer.DrumActions.playDrum(args[0], turtle, blk);
             } else {
-                // Runtime playback: in-note or stand-alone under Start / flow
-                Singer.DrumActions.playDrum(args[0], turtle, blk);
+                console.debug("PLAY DRUM ERROR: missing context");
+                return;
             }
 
             /**

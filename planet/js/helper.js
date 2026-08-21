@@ -92,37 +92,19 @@ function toggleExpandable(id, c) {
     el.className = el.className === `${c} open` ? c : `${c} open`;
 }
 
-const outsideClickListeners = new WeakMap();
-
 function hideOnClickOutside(eles, other) {
-    const validEles = (Array.isArray(eles) ? eles : [eles]).filter(Boolean);
-    if (validEles.length === 0) return;
-
-    const anchor = validEles[0];
-
-    if (anchor && outsideClickListeners.has(anchor)) {
-        const prevListener = outsideClickListeners.get(anchor);
-        document.removeEventListener("click", prevListener);
-        outsideClickListeners.delete(anchor);
-    }
-
     // if click not in id, hide
     const outsideClickListener = event => {
-        const path = event.path || (event.composedPath && event.composedPath()) || [];
+        const path =
+            event.path ||
+            (event.composedPath && event.composedPath()) ||
+            event.composedPath(event.target);
         let ok = false;
 
-        for (let i = 0; i < validEles.length; i++) {
-            if (path.includes(validEles[i])) {
-                ok = true;
-                break;
-            }
-        }
+        for (let i = 0; i < eles.length; i++) if (path.includes(eles[i])) ok = true;
 
         if (ok === false) {
-            const otherEl = document.getElementById(other);
-            if (otherEl) {
-                otherEl.style.display = "none";
-            }
+            document.getElementById(other).style.display = "none";
 
             removeClickListener();
         }
@@ -130,14 +112,7 @@ function hideOnClickOutside(eles, other) {
 
     const removeClickListener = () => {
         document.removeEventListener("click", outsideClickListener);
-        if (anchor) {
-            outsideClickListeners.delete(anchor);
-        }
     };
-
-    if (anchor) {
-        outsideClickListeners.set(anchor, outsideClickListener);
-    }
 
     document.addEventListener("click", outsideClickListener);
 }

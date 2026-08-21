@@ -50,13 +50,7 @@ function makeActivity() {
         getStageScale: jest.fn(() => 1),
         addEventListener: jest.fn(),
         removeEventListener: jest.fn(),
-        __tick: jest.fn(),
-        closeHelpfulWheel: jest.fn(() => {
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            const wasOpen = Boolean(helpfulWheelDiv && helpfulWheelDiv.style.display !== "none");
-            if (wasOpen) helpfulWheelDiv.style.display = "none";
-            return wasOpen;
-        })
+        __tick: jest.fn()
     };
 }
 

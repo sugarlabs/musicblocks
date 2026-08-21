@@ -76,17 +76,17 @@ function docBySelector(selector) {
  */
 function hideDOMLabel() {
     const textLabel = docById("textLabel");
-    if (textLabel && textLabel.style) {
+    if (textLabel !== null) {
         textLabel.style.display = "none";
     }
 
     const numberLabel = docById("numberLabel");
-    if (numberLabel && numberLabel.style) {
+    if (numberLabel !== null) {
         numberLabel.style.display = "none";
     }
 
     const piemenu = docById("wheelDiv");
-    if (piemenu && piemenu.style) {
+    if (piemenu !== null) {
         piemenu.style.display = "none";
     }
 }
@@ -112,14 +112,8 @@ function displayMsg(/*blocks, text*/) {
  * @returns {void}
  */
 function closeWidgets() {
-    if (
-        window.widgetWindows &&
-        window.widgetWindows.openWindows &&
-        typeof window.widgetWindows.closeWindow === "function"
-    ) {
-        const names = Object.keys(window.widgetWindows.openWindows);
-        names.forEach(name => window.widgetWindows.closeWindow(name));
-    }
+    const names = Object.keys(window.widgetWindows.openWindows);
+    names.forEach(name => window.widgetWindows.closeWindow(name));
 }
 
 var DomHelpers = {

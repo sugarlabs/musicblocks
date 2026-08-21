@@ -58,7 +58,10 @@ class TrashController {
             return;
         }
 
-        if (activity.closeHelpfulWheel()) {
+        // Cache DOM element reference for performance
+        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+        if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
+            helpfulWheelDiv.style.display = "none";
             activity.__tick();
         }
     }
@@ -75,7 +78,10 @@ class TrashController {
         this.restoreTrashById(activity.blocks.trashStacks[activity.blocks.trashStacks.length - 1]);
         activity.textMsg(_("Item restored from the trash."), 3000);
 
-        if (activity.closeHelpfulWheel()) {
+        // Cache DOM element reference for performance
+        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+        if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
+            helpfulWheelDiv.style.display = "none";
             activity.__tick();
         }
     }

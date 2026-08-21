@@ -3065,7 +3065,12 @@ class Block {
          * @param {Event} event - The click event.
          */
         this.container.on("click", event => {
-            that.activity.closeHelpfulWheel();
+            if (
+                _getStatic("helpfulWheelDiv") &&
+                _getStatic("helpfulWheelDiv").style.display !== "none"
+            ) {
+                _getStatic("helpfulWheelDiv").style.display = "none";
+            }
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
                 if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {

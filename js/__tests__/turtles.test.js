@@ -91,13 +91,6 @@ function mixinPrototypes(turtles) {
     }
 }
 
-function closeHelpfulWheel() {
-    const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-    const wasOpen = Boolean(helpfulWheelDiv && helpfulWheelDiv.style.display !== "none");
-    if (wasOpen) helpfulWheelDiv.style.display = "none";
-    return wasOpen;
-}
-
 describe("Turtles Class", () => {
     let activityMock;
     let turtles;
@@ -109,8 +102,7 @@ describe("Turtles Class", () => {
             turtleContainer: new createjs.Container(),
             hideAuxMenu: jest.fn(),
             hideGrids: jest.fn(),
-            _doCartesianPolar: jest.fn(),
-            closeHelpfulWheel
+            _doCartesianPolar: jest.fn()
         };
 
         turtles = new Turtles(activityMock);
@@ -176,8 +168,7 @@ describe("markAllAsStopped", () => {
             turtleContainer: new createjs.Container(),
             hideAuxMenu: jest.fn(),
             hideGrids: jest.fn(),
-            _doCartesianPolar: jest.fn(),
-            closeHelpfulWheel
+            _doCartesianPolar: jest.fn()
         };
 
         turtles = new Turtles(activityMock);
@@ -243,8 +234,7 @@ describe("Coordinate Conversion", () => {
             canvas: { width: 1200, height: 900, style: {} },
             hideAuxMenu: jest.fn(),
             hideGrids: jest.fn(),
-            _doCartesianPolar: jest.fn(),
-            closeHelpfulWheel
+            _doCartesianPolar: jest.fn()
         };
 
         turtles = new Turtles(activityMock);
@@ -395,8 +385,7 @@ describe("setBackgroundColor", () => {
             canvas: { width: 1200, height: 900, style: {} },
             hideAuxMenu: jest.fn(),
             hideGrids: jest.fn(),
-            _doCartesianPolar: jest.fn(),
-            closeHelpfulWheel
+            _doCartesianPolar: jest.fn()
         };
 
         turtles = new Turtles(activityMock);
@@ -460,8 +449,7 @@ describe("doScale", () => {
             canvas: { width: 1200, height: 900, style: {} },
             hideAuxMenu: jest.fn(),
             hideGrids: jest.fn(),
-            _doCartesianPolar: jest.fn(),
-            closeHelpfulWheel
+            _doCartesianPolar: jest.fn()
         };
 
         turtles = new Turtles(activityMock);
@@ -512,8 +500,7 @@ describe("setStageScale", () => {
             canvas: { width: 1200, height: 900, style: {} },
             hideAuxMenu: jest.fn(),
             hideGrids: jest.fn(),
-            _doCartesianPolar: jest.fn(),
-            closeHelpfulWheel
+            _doCartesianPolar: jest.fn()
         };
 
         turtles = new Turtles(activityMock);
@@ -591,8 +578,7 @@ describe("aux toolbar collapse and expand", () => {
                 { label: "Grid", display: true }
             ],
             __tick: jest.fn(),
-            _doCartesianPolar: jest.fn(),
-            closeHelpfulWheel
+            _doCartesianPolar: jest.fn()
         };
 
         document.body.innerHTML = `
@@ -696,8 +682,7 @@ describe("TurtlesModel doGrid initialization order", () => {
             canvas: {},
             hideAuxMenu: jest.fn(),
             hideGrids: jest.fn(),
-            _doCartesianPolar: jest.fn(),
-            closeHelpfulWheel
+            _doCartesianPolar: jest.fn()
         };
     }
 

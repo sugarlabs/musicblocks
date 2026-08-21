@@ -3990,7 +3990,9 @@ const piemenuGrid = activity => {
         hidePiemenu(activity);
     };
 
-    activity.closeHelpfulWheel();
+    if (docById("helpfulWheelDiv").style.display !== "none") {
+        docById("helpfulWheelDiv").style.display = "none";
+    }
 
     const hidePiemenu = activity => {
         docById("wheelDivptm").style.display = "none";

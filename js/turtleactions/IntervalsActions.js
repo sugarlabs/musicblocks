@@ -351,15 +351,9 @@ function setupIntervalsActions(activity) {
                     }
                 }
 
-                if (blk !== undefined && blk in activity.blocks.blockList) {
-                    const cblk = activity.blocks.blockList[blk].connections[1];
-                    if (
-                        cblk !== undefined &&
-                        cblk in activity.blocks.blockList &&
-                        activity.blocks.blockList[cblk].name === "text"
-                    ) {
-                        activity.blocks.updateBlockText(cblk);
-                    }
+                const cblk = activity.blocks.blockList[blk].connections[1];
+                if (activity.blocks.blockList[cblk].name === "text") {
+                    activity.blocks.updateBlockText(cblk);
                 }
 
                 tur.singer.inDefineMode = false;

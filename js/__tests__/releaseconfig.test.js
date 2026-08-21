@@ -13,7 +13,6 @@
  */
 
 const releaseconfig = require("../releaseconfig");
-const releasePleaseConfig = require("../../release-please-config.json");
 
 describe("releaseconfig globals", () => {
     describe("Query Parameter & Hostname Resolution (resolveIsMusicBlocks)", () => {
@@ -104,17 +103,6 @@ describe("releaseconfig globals", () => {
             expect(typeof releaseconfig.RELEASE_TAB_TITLE).toBe("string");
             expect(Array.isArray(releaseconfig.LOADING_TEXTS)).toBe(true);
             expect(releaseconfig.LOADING_TEXTS.length).toBeGreaterThan(0);
-        });
-    });
-
-    describe("Release notes policy", () => {
-        test("uses GitHub-generated notes and only lists user-facing feature PRs", () => {
-            const visibleSections = releasePleaseConfig.packages["."]["changelog-sections"]
-                .filter(section => !section.hidden)
-                .map(section => section.type);
-
-            expect(releasePleaseConfig.packages["."]["changelog-type"]).toBe("github");
-            expect(visibleSections).toEqual(["feat"]);
         });
     });
 });

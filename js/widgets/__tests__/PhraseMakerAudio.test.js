@@ -452,11 +452,12 @@ describe("PhraseMakerAudio", () => {
         test("highlights lyrics if enabled", () => {
             mockPM.lyricsON = true;
             mockPM._lyrics = ["Hello"];
-            mockPM.activity.textMsg = jest.fn();
+            global.activity = { textMsg: jest.fn() };
 
             PhraseMakerAudio.__playNote(mockPM, 0, 0);
 
-            expect(mockPM.activity.textMsg).toHaveBeenCalledWith("Hello", 3000);
+            expect(global.activity.textMsg).toHaveBeenCalledWith("Hello", 3000);
+            delete global.activity;
         });
 
         test("advances colIndex for single span cells", () => {

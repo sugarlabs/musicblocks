@@ -35,7 +35,10 @@ class WorkspaceLayoutController {
     findBlocks() {
         const activity = this.activity;
         this._findBlocks();
-        if (activity.closeHelpfulWheel()) {
+        // Lookup the element once before checking its visibility.
+        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+        if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
+            helpfulWheelDiv.style.display = "none";
             activity.__tick();
         }
     }

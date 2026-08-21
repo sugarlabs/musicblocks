@@ -129,7 +129,6 @@ class ToolbarUI {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
-                ["recordDropdownArrow", _("Record options")],
                 ["Full screen", _("Enter Fullscreen")],
                 ["FullScreen", _("Enter Fullscreen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
@@ -206,7 +205,6 @@ class ToolbarUI {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
-                _("Record options"),
                 _("Enter Fullscreen"),
                 _("Enter Fullscreen"),
                 _("Toggle Fullscreen"),
@@ -264,7 +262,6 @@ class ToolbarUI {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
-                ["recordDropdownArrow", _("Record options")],
                 ["Full screen", _("Enter Fullscreen")],
                 ["FullScreen", _("Enter Fullscreen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
@@ -335,7 +332,6 @@ class ToolbarUI {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
-                _("Record options"),
                 _("Enter Fullscreen"),
                 _("Enter Fullscreen"),
                 _("Toggle Fullscreen"),
@@ -399,12 +395,6 @@ class ToolbarUI {
             } else {
                 if (elem !== undefined && elem !== null) {
                     elem.setAttribute("data-tooltip", trans);
-                    // Screen readers don't read data-tooltip (a
-                    // Materialize-only visual affordance), so mirror the
-                    // same translated string as aria-label. This keeps the
-                    // accessible name correctly localized on every language
-                    // change, same as the visual tooltip.
-                    elem.setAttribute("aria-label", trans);
                 }
             }
         }
@@ -802,7 +792,6 @@ class ToolbarUI {
         let wrapButtonTooltipData = _("Turtle Wrap Off");
 
         wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
-        wrapIcon.setAttribute("aria-label", wrapButtonTooltipData);
         $j(".tooltipped").tooltip({
             html: true,
             delay: 100
@@ -833,7 +822,6 @@ class ToolbarUI {
             }
 
             wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
-            wrapIcon.setAttribute("aria-label", wrapButtonTooltipData);
             $j(".tooltipped").tooltip({
                 html: true,
                 delay: 100
@@ -881,7 +869,9 @@ class ToolbarUI {
             delay: 100
         });
 
-        activity.closeHelpfulWheel();
+        if (docById("helpfulWheelDiv").style.display !== "none") {
+            docById("helpfulWheelDiv").style.display = "none";
+        }
     }
 
     /**

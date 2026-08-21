@@ -274,7 +274,7 @@ class SearchUI {
         activity.helpfulSearchWidget.idInput_custom = "";
         activity.helpfulSearchWidget.value = null;
         activity.helpfulSearchWidget.style.visibility = "visible";
-        activity.closeHelpfulWheel();
+        document.getElementById("helpfulWheelDiv").style.display = "none";
     }
 
     /**
@@ -406,7 +406,10 @@ class SearchUI {
      * Hides the helpfulWheelDiv and removes helpfulSearchDiv from the DOM.
      */
     removeHelpfulSearchDiv() {
-        this.activity.closeHelpfulWheel();
+        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+        if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
+            helpfulWheelDiv.style.display = "none";
+        }
         if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
             this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
             this.helpfulSearchDiv = null;

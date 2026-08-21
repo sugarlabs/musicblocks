@@ -24,7 +24,6 @@ class GlobalPlanet {
     constructor(Planet) {
         this.Planet = Planet;
         this.ProjectViewer = null;
-        this.listenerRefs = [];
 
         this.offlineHTML = `<div class= "container center-align">
                             ${_(
@@ -502,26 +501,8 @@ class GlobalPlanet {
         );
     }
 
-    destroy() {
-        this.listenerRefs.forEach(({ el, type, bound }) => {
-            el.removeEventListener(type, bound);
-        });
-        this.listenerRefs = [];
-        if (this.ProjectViewer) {
-            this.ProjectViewer.destroy();
-        }
-    }
-
     init() {
         const Planet = this.Planet;
-
-        const register = (elemId, type, handler) => {
-            const el = document.getElementById(elemId);
-            if (!el) return;
-            const bound = handler.bind(this);
-            el.addEventListener(type, bound);
-            this.listenerRefs.push({ el, type, bound });
-        };
 
         if (!Planet.ConnectedToServer) {
             document.getElementById("globaltitle").textContent = _("Cannot connect to server");
@@ -583,45 +564,45 @@ class GlobalPlanet {
 
             this.initTagList();
 
-            register("load-more-projects", "click", function (evt) {
+            document.getElementById("load-more-projects").addEventListener("click", evt => {
                 if (this.loadButtonShown) {
                     this.loadMoreProjects();
                 }
             });
 
-            register("global-search", "keydown", function (evt) {
+            document.getElementById("global-search").addEventListener("keydown", evt => {
                 if (evt.key === "Enter") {
                     this.searchString = document.getElementById("global-search").value;
                     this.search();
                 }
             });
 
-            register("global-search-2", "keydown", function (evt) {
+            document.getElementById("global-search-2").addEventListener("keydown", evt => {
                 if (evt.key === "Enter") {
                     this.searchString = document.getElementById("global-search-2").value;
                     this.search();
                 }
             });
 
-            register("search-close", "click", function (evt) {
+            document.getElementById("search-close").addEventListener("click", evt => {
                 document.getElementById("global-search").value = "";
                 this.searchString = "";
                 document.getElementById("search-close").style.display = "none";
                 this.search();
             });
 
-            register("search-close-2", "click", function (evt) {
+            document.getElementById("search-close-2").addEventListener("click", evt => {
                 document.getElementById("global-search-2").value = "";
                 this.searchString = "";
                 document.getElementById("search-close-2").style.display = "none";
                 this.search();
             });
 
-            register("global-tab", "click", function (evt) {
+            document.getElementById("global-tab").addEventListener("click", evt => {
                 document.getElementById("searchcontainer-one").style.display = "block";
             });
 
-            register("local-tab", "click", function (evt) {
+            document.getElementById("local-tab").addEventListener("click", evt => {
                 document.getElementById("searchcontainer-one").style.display = "none";
                 // document.getElementById("two_header").style.display = "none";
             });

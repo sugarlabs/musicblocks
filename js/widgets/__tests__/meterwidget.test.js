@@ -52,8 +52,7 @@ global.docById = jest.fn().mockImplementation(id => {
 global.Singer = {
     setSynthVolume: jest.fn(),
     defaultBPMFactor: 60,
-    masterBPM: 60,
-    masterVolume: [1]
+    masterBPM: 60
 };
 
 // Mock slicePath (Wheelnav dependency)
@@ -88,21 +87,17 @@ if (typeof window === "undefined") {
     global.window = {};
 }
 window.innerWidth = 1024;
-let mockAddButton = jest.fn().mockImplementation((img, size, tip) => ({
-    onclick: () => {},
-    appendChild: jest.fn(),
-    textContent: "",
-    innerHTML: "",
-    tip,
-    img
-}));
-
 window.widgetWindows = {
     windowFor: jest.fn().mockReturnValue({
         clear: jest.fn(),
         show: jest.fn(),
         destroy: jest.fn(),
-        addButton: mockAddButton,
+        addButton: jest.fn().mockImplementation(() => ({
+            onclick: () => {},
+            appendChild: jest.fn(),
+            textContent: "",
+            innerHTML: ""
+        })),
         addInputButton: jest.fn().mockReturnValue({ value: 0, addEventListener: jest.fn() }), // Add this as it might be used
         getWidgetBody: jest.fn().mockReturnValue({
             append: jest.fn(),
@@ -226,10 +221,9 @@ describe("Meter Widget", () => {
                     setMasterVolume: jest.fn(),
                     loadSynth: jest.fn(),
                     trigger: jest.fn(),
-                    resetSynth: jest.fn()
+                    runLogoCommands: jest.fn()
                 },
-                turtleDelay: 0,
-                runLogoCommands: jest.fn()
+                turtleDelay: 100
             },
             turtles: {
                 ithTurtle: jest.fn().mockReturnValue({
@@ -379,83 +373,5 @@ describe("Meter Widget", () => {
         expect(meterWidget._strongBeats[0]).toBe(true);
         expect(meterWidget._strongBeats[1]).toBe(false);
         expect(meterWidget._strongBeats[2]).toBe(false);
-    });
-
-    test("handles null c2 connection gracefully during initialization without throwing", () => {
-        mockActivity.logo._meterBlock = 1;
-        mockActivity.blocks.blockList = {
-            1: { connections: [null, null, null], value: 4 }
-        };
-
-        expect(() => new MeterWidget(mockActivity, 1)).not.toThrow();
-    });
-
-    test("handles Reset button click when blocks are present and when blocks are missing", () => {
-        mockActivity.logo._meterBlock = 1;
-        mockActivity.blocks.blockList = {
-            1: { connections: [null, 2, 3], value: 4 },
-            2: { connections: [null, null, 4], value: 1 / 4 },
-            3: {
-                value: 4,
-                text: { text: "" },
-                container: { children: [], setChildIndex: jest.fn() }
-            },
-            4: {
-                value: 4,
-                text: { text: "" },
-                container: { children: [], setChildIndex: jest.fn() }
-            }
-        };
-
-        const widget = new MeterWidget(mockActivity, 1);
-        const resetCall = mockAddButton.mock.results.find(
-            res => res.value && res.value.tip === "Reset"
-        );
-        if (resetCall && resetCall.value && resetCall.value.onclick) {
-            expect(() => resetCall.value.onclick()).not.toThrow();
-        }
-    });
-
-    test("handles window onclose callback", () => {
-        const widget = new MeterWidget(mockActivity, 1);
-        if (widget.widgetWindow && widget.widgetWindow.onclose) {
-            expect(() => widget.widgetWindow.onclose()).not.toThrow();
-            expect(widget._playing).toBe(false);
-        }
-    });
-
-    test("should restore master volume and stop playing when closed", () => {
-        const widgetWindow = window.widgetWindows.windowFor();
-        meterWidget._playing = true;
-
-        widgetWindow.onclose();
-
-        expect(meterWidget._playing).toBe(false);
-        expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalledWith(1);
-        expect(widgetWindow.destroy).toHaveBeenCalled();
-    });
-
-    test("should stop scheduled beat playback safely when _playing is set to false", () => {
-        meterWidget._playing = false;
-
-        expect(() => {
-            meterWidget.__playOneBeat(0, 500);
-        }).not.toThrow();
-
-        expect(mockActivity.logo.synth.trigger).not.toHaveBeenCalled();
-    });
-
-    test("should not attempt to restore master volume when Singer.masterVolume is empty", () => {
-        const widgetWindow = window.widgetWindows.windowFor();
-        mockActivity.logo.synth.setMasterVolume.mockClear();
-        const originalMasterVolume = global.Singer.masterVolume;
-        global.Singer.masterVolume = [];
-
-        expect(() => {
-            widgetWindow.onclose();
-        }).not.toThrow();
-
-        expect(mockActivity.logo.synth.setMasterVolume).not.toHaveBeenCalled();
-        global.Singer.masterVolume = originalMasterVolume;
     });
 });

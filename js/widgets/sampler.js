@@ -15,12 +15,12 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor, TunerDisplay, TunerUtils
+   instruments, slicePath, platformColor
 */
 
 /* exported SampleWidget */
 /** AMD module dependencies for lazy loading. */
-SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
+SampleWidget.dependencies = ["widgets/sampler"];
 
 /**
  * Represents a Sample Widget.

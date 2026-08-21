@@ -104,7 +104,6 @@ Use conventional-style prefixes:
 
 - `fix:` — bug fix
 - `feat:` — new feature
-- `i18n:` — internationalization / localization
 - `docs:` — documentation only
 - `style:` — formatting, no code change
 - `refactor:` — code restructuring without behavior change

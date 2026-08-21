@@ -34,13 +34,6 @@ if (typeof global.TextEncoder === "undefined") {
     global.TextEncoder = TextEncoder;
 }
 
-if (typeof global.window === "undefined") {
-    global.window = {};
-}
-if (typeof global.window.btoa === "undefined") {
-    global.window.btoa = str => Buffer.from(String(str), "binary").toString("base64");
-}
-
 // Set up globals needed by musicutils.js
 global.INVALIDPITCH = "Not a valid pitch name";
 global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
@@ -138,18 +131,16 @@ const mockContext = {
     restore: jest.fn()
 };
 
-if (typeof HTMLCanvasElement !== "undefined") {
-    Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
-        configurable: true,
-        writable: true,
-        value: jest.fn(type => {
-            // Return null for non-2d contexts
-            if (type !== "2d") return null;
+Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
+    configurable: true,
+    writable: true,
+    value: jest.fn(type => {
+        // Return null for non-2d contexts
+        if (type !== "2d") return null;
 
-            return mockContext;
-        })
-    });
-}
+        return mockContext;
+    })
+});
 
 // Minimal globals (ONLY safe defaults)
 global.requestAnimationFrame = cb => setTimeout(cb, 0);

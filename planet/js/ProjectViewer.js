@@ -35,7 +35,6 @@ class ProjectViewer {
         this.ReportDescriptionError = _("Report description required");
         this.ReportDescriptionTooLongError = _("Report description too long");
         this.id = null;
-        this.listenerRefs = [];
     }
 
     open(id) {
@@ -188,28 +187,29 @@ class ProjectViewer {
     }
 
     init() {
-        const register = (elemId, type, handler) => {
-            const el = document.getElementById(elemId);
-            if (!el) return;
-            const bound = handler.bind(this);
-            el.addEventListener(type, bound);
-            this.listenerRefs.push({ el, type, bound });
-        };
-
-        register("projectviewer-download-file", "click", this.download);
-        register("projectviewer-open-mb", "click", this.openProject);
-        register("projectviewer-merge-mb", "click", this.mergeProject);
-        register("projectviewer-report-project", "click", this.openReporter);
-        register("projectviewer-report-submit", "click", this.submitReporter);
-        register("projectviewer-report-close", "click", this.closeReporter);
-    }
-
-    destroy() {
-        if (!this.listenerRefs) return;
-        this.listenerRefs.forEach(({ el, type, bound }) => {
-            el.removeEventListener(type, bound);
+        document.getElementById("projectviewer-download-file").addEventListener("click", evt => {
+            this.download();
         });
-        this.listenerRefs = [];
+
+        document.getElementById("projectviewer-open-mb").addEventListener("click", evt => {
+            this.openProject();
+        });
+
+        document.getElementById("projectviewer-merge-mb").addEventListener("click", evt => {
+            this.mergeProject();
+        });
+
+        document.getElementById("projectviewer-report-project").addEventListener("click", evt => {
+            this.openReporter();
+        });
+
+        document.getElementById("projectviewer-report-submit").addEventListener("click", evt => {
+            this.submitReporter();
+        });
+
+        document.getElementById("projectviewer-report-close").addEventListener("click", evt => {
+            this.closeReporter();
+        });
     }
 }
 
