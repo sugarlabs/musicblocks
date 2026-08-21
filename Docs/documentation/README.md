@@ -881,7 +881,7 @@ The *Open palette* block opens a specific palette in the UI.
 [Back to Table of Contents](#table-of-contents)
 
 Project statistics are available from a button on the secondary
-toolbar in advanced mode.
+toolbar in advanced mode. Click the Refresh (`reload.svg`) button on the Statistics widget window toolbar to update project analytics and the 2D radar chart in real time.
 
 ![Stats](./stats.svg "Stats Details")
 
