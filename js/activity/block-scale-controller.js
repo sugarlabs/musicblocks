@@ -84,10 +84,7 @@ class BlockScaleController {
      */
     _hideHelpfulWheelIfVisible() {
         const activity = this.activity;
-        // Cache DOM element reference for performance
-        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-        if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
-            helpfulWheelDiv.style.display = "none";
+        if (activity.closeHelpfulWheel()) {
             activity.__tick();
         }
     }

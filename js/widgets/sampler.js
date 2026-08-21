@@ -15,12 +15,12 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor
+   instruments, slicePath, platformColor, TunerDisplay, TunerUtils
 */
 
 /* exported SampleWidget */
 /** AMD module dependencies for lazy loading. */
-SampleWidget.dependencies = ["widgets/sampler"];
+SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
 
 /**
  * Represents a Sample Widget.
@@ -544,7 +544,23 @@ function SampleWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
+            // Dispose Tone.Analyser nodes to free Web Audio resources
+            for (const key in this.pitchAnalysers) {
+                if (
+                    this.pitchAnalysers[key] &&
+                    typeof this.pitchAnalysers[key].dispose === "function"
+                ) {
+                    this.pitchAnalysers[key].dispose();
+                }
+            }
             this.pitchAnalysers = {};
+
+            // Remove any dangling file chooser listener
+            const fileChooser = docById("myOpenAll");
+            if (fileChooser && this._fileChangeHandler) {
+                fileChooser.removeEventListener("change", this._fileChangeHandler);
+                this._fileChangeHandler = null;
+            }
 
             if (this._dropZone) {
                 this._dropZone.removeEventListener("dragover", this._dragOverHandler);
@@ -588,14 +604,20 @@ function SampleWidget() {
                 stopTuner();
                 const fileChooser = docById("myOpenAll");
 
-                const __readerAction = function (event) {
+                // Remove any previously attached listener to prevent duplicates
+                if (that._fileChangeHandler) {
+                    fileChooser.removeEventListener("change", that._fileChangeHandler);
+                }
+
+                that._fileChangeHandler = function (event) {
                     window.scroll(0, 0);
                     const sampleFile = fileChooser.files[0];
                     that.handleFiles(sampleFile);
-                    fileChooser.removeEventListener("change", __readerAction);
+                    fileChooser.removeEventListener("change", that._fileChangeHandler);
+                    that._fileChangeHandler = null;
                 };
 
-                fileChooser.addEventListener("change", __readerAction, false);
+                fileChooser.addEventListener("change", that._fileChangeHandler, false);
                 fileChooser.focus();
                 fileChooser.click();
                 window.scroll(0, 0);

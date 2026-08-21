@@ -440,13 +440,13 @@ function setupPitchActions(activity) {
                 switch (accidental) {
                     case _("sharp"):
                         value = 1;
-                        return;
+                        break;
                     case _("flat"):
                         value = -1;
-                        return;
+                        break;
                     default:
                         value = 0;
-                        return;
+                        break;
                 }
             } else {
                 value = ACCIDENTALVALUES[i];
@@ -458,7 +458,7 @@ function setupPitchActions(activity) {
             const listenerName = "_accidental_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -488,7 +488,7 @@ function setupPitchActions(activity) {
             const listenerName = "_scalar_transposition_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -519,7 +519,7 @@ function setupPitchActions(activity) {
             const listenerName = "_transposition_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -548,7 +548,7 @@ function setupPitchActions(activity) {
             const listenerName = "_transposition_ratio_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -608,7 +608,7 @@ function setupPitchActions(activity) {
             const listenerName = "_invert_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -755,11 +755,11 @@ function setupPitchActions(activity) {
                     };
 
                     if (delta > 0) {
-                        while (delta > 0) {
+                        while (delta > 0 && i < 100) {
                             _calculate("up");
                         }
                     } else {
-                        while (delta < 0) {
+                        while (delta < 0 && i < 100) {
                             _calculate("down");
                         }
                     }

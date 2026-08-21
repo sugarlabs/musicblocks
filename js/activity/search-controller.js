@@ -300,6 +300,13 @@ class SearchController {
                 }
             });
 
+            // Anchor the dropdown to the search input now that the widget
+            // exists — see window.fixSearchAutocompletePosition in
+            // js/utils/jquery-setup.js (issue #8069).
+            if (typeof window.fixSearchAutocompletePosition === "function") {
+                window.fixSearchAutocompletePosition();
+            }
+
             const instance = $search.autocomplete("instance");
             if (instance) {
                 instance._renderItem = (ul, item) => {
@@ -611,10 +618,7 @@ class SearchController {
      * Hides and removes the helpfulSearchDiv from the DOM.
      */
     _hideHelpfulSearchWidget() {
-        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-        if (helpfulWheelDiv.style.display !== "none") {
-            helpfulWheelDiv.style.display = "none";
-        }
+        this.activity.closeHelpfulWheel();
         if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
             this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
         }
@@ -640,7 +644,7 @@ class SearchController {
         if (this.helpfulSearchDiv.style.display === "block") {
             activity.helpfulSearchWidget.value = null;
             activity.helpfulSearchWidget.style.visibility = "visible";
-            document.getElementById("helpfulWheelDiv").style.display = "none";
+            activity.closeHelpfulWheel();
             this.searchBlockPosition = [100, 100];
             this.prepSearchWidget();
             const that = this;

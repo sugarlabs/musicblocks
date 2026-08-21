@@ -79,6 +79,13 @@ jobs:
                 displayName: 'Chore / Refactor',
                 pattern: /-\s*\[x\]\s*Chore/i,
               },
+              {
+                label: 'i18n',
+                color: '0D9488',
+                description: 'Internationalization and localization changes',
+                displayName: 'i18n',
+                pattern: /-\s*\[x\]\s*i18n/i,
+              },
             ];
 
             const checkedCategories = categories.filter(cat => cat.pattern.test(prBody));
@@ -105,6 +112,7 @@ jobs:
                 '| Tests | Adds or updates test coverage |',
                 '| Documentation | Updates to docs, comments, or README |',
                 '| CI/CD | Changes to CI/CD workflows and automation |',
+                '| i18n | Internationalization and localization changes |',
                 '',
                 'Example: Change `- [ ] Bug Fix` to `- [x] Bug Fix`',
                 '',

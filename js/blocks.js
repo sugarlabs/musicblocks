@@ -18,7 +18,7 @@
     DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
     DEFAULTVOICE, NATURAL, NUMBERBLOCKDEFAULT,
     STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
-    WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
+    WESTERN2EISOLFEGENAMES, addTemperamentToDictionary,
    Block, closeBlkWidgets, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
@@ -41,11 +41,11 @@
         CAMERAVALUE, VIDEOVALUE
    - js/block.js
         Block
-   - js/block-drag-controller.js
+   - js/activity/block-drag-controller.js
         setupBlockDragController
    - js/connection-validator.js
         ConnectionValidator
-   - js/piemenus.js
+   - js/piemenu-block-context.js
         piemenuBlockContext
    - js/protoblocks.js
         ProtoBlock
@@ -168,7 +168,7 @@ class Blocks {
         this._deferCheckBounds = false;
 
         /** We keep a dictionary for the proto blocks, */
-        this.protoBlockDict = {};
+        this.protoBlockDict = Object.create(null);
         /** and a list of the blocks we create. */
         this.blockList = [];
 
@@ -471,7 +471,12 @@ class Blocks {
             if (this.activeBlock !== null) {
                 /** Don't extract silence blocks. */
                 if (this.blockList[this.activeBlock].name !== "rest2") {
+                    const thisBlock = this.activeBlock;
+
+                    const parentExpandableBlk = this.insideExpandableBlock(thisBlock);
                     this._extractBlock(this.activeBlock, true);
+
+                    this.addDefaultBlock(parentExpandableBlk, thisBlock);
                 }
             }
         };
@@ -538,6 +543,9 @@ class Blocks {
                         this.adjustExpandableClampBlock();
                     }
                 }
+                if (adjustDock) {
+                    this.adjustDocks(blk, true);
+                }
             } else {
                 if (firstConnection !== null) {
                     connectionIdx = this.blockList[firstConnection].connections.indexOf(blk);
@@ -568,8 +576,9 @@ class Blocks {
         };
 
         /**
-         * Toggle state of collapsible blocks, except for note blocks,
-         * which are handled separately.
+         * Toggle state of collapsible blocks, except for inline-collapsible
+         * blocks (e.g. note, interval, osctime, definemode), which are
+         * handled separately.
          * @public
          * @returns {void}
          */
@@ -577,7 +586,7 @@ class Blocks {
             let allCollapsed = true;
             let someCollapsed = false;
             for (const myBlock of this.blockList) {
-                if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                if (!myBlock || myBlock.isInlineCollapsible()) {
                     continue;
                 }
 
@@ -596,7 +605,7 @@ class Blocks {
                  * If any blocks are collapsed, collapse them all.
                  */
                 for (const myBlock of this.blockList) {
-                    if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                    if (!myBlock || myBlock.isInlineCollapsible()) {
                         continue;
                     }
 
@@ -607,7 +616,7 @@ class Blocks {
             } else {
                 /** If no blocks are collapsed, collapse them all. */
                 for (const myBlock of this.blockList) {
-                    if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                    if (!myBlock || myBlock.isInlineCollapsible()) {
                         continue;
                     }
 
@@ -755,8 +764,8 @@ class Blocks {
         this._getBlockSize = blk => {
             const myBlock = this.blockList[blk];
             if (myBlock === undefined) return 0;
-            /** Special case for collapsed note blocks. */
-            if (["newnote", "interval", "osctime"].includes(myBlock.name) && myBlock.collapsed) {
+            /** Special case for collapsed inline-collapsible blocks. */
+            if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
                 return 1;
             }
 
@@ -1020,13 +1029,10 @@ class Blocks {
                 size = myBlock.size;
             }
 
-            /** If the note value block is collapsed, spoof size. */
+            /** If the inline-collapsible block is collapsed, spoof size. */
             if (this.blocksToCollapse.indexOf(blk) !== -1) {
                 size = 1;
-            } else if (
-                ["newnote", "interval", "osctime"].includes(myBlock.name) &&
-                myBlock.collapsed
-            ) {
+            } else if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
                 size = 1;
             }
 
@@ -1370,19 +1376,24 @@ class Blocks {
                 cblk = this.blockList[parentblk].connections[2];
                 if (cblk === null) {
                     /**
-                     * Adjust Docks
-                     * @param - args - arguments
-                     * @public
-                     * @returns {void}
+                     * Restore the octave (number) placeholder for the pitch block's
+                     * second argument slot. Capture the future block index now so the
+                     * postProcess closure references the correct entry even when the
+                     * name-slot restoration below also appends a block.
                      */
+                    const octaveBlkIdx = this.blockList.length;
                     const postProcess = args => {
                         const parentblk = args[0];
                         const oldBlock = args[1];
-                        const blk = this.blockList.length - 1;
+                        const blk = args[2];
 
                         this.blockList[parentblk].connections[2] = blk;
 
-                        const octave = this.blockList[oldBlock].value;
+                        // Use the removed block's value only when it is a number;
+                        // if a name block was placed in the octave slot fall back
+                        // to the default octave of 4.
+                        const rawOctave = this.blockList[oldBlock].value;
+                        const octave = typeof rawOctave === "number" ? rawOctave : 4;
                         this.blockList[blk].value = octave;
 
                         this.blockList[blk].text.text = octave.toString();
@@ -1396,23 +1407,24 @@ class Blocks {
 
                     this._makeNewBlockWithConnections("number", 0, [parentblk], postProcess, [
                         parentblk,
-                        oldBlock
+                        oldBlock,
+                        octaveBlkIdx
                     ]);
                 }
 
                 const oblk = this.blockList[parentblk].connections[1];
                 if (oblk === null) {
                     /**
-                     * Adjust Docks
-                     * @param - args - arguments
-                     * @public
-                     * @returns {void}
+                     * Restore the name (solfege/notename/etc.) placeholder for the
+                     * pitch block's first argument slot. Capture the future block index
+                     * now so the postProcess closure is immune to the list growing
+                     * further before execution.
                      */
+                    const nameBlkIdx = this.blockList.length;
                     const postProcess = args => {
                         const parentblk = args[0];
                         const value = args[1];
-
-                        const blk = this.blockList.length - 1;
+                        const blk = args[2];
 
                         this.blockList[parentblk].connections[1] = blk;
 
@@ -1437,6 +1449,10 @@ class Blocks {
                         this.adjustDocks(parentblk, true);
                     };
 
+                    // When the removed block was itself in the name slot, mirror its
+                    // type in the replacement placeholder (e.g. notename → notename,
+                    // eastindiansolfege → eastindiansolfege). When the block came from
+                    // the octave slot (a number), fall back to the default "solfege".
                     let newBlockName = "solfege";
                     let newBlockValue = "sol";
                     switch (this.blockList[oldBlock].name) {
@@ -1458,7 +1474,8 @@ class Blocks {
 
                     this._makeNewBlockWithConnections(newBlockName, 0, [parentblk], postProcess, [
                         parentblk,
-                        newBlockValue
+                        newBlockValue,
+                        nameBlkIdx
                     ]);
                 }
             } else if (this.blockList[parentblk].name === "storein") {
@@ -2071,7 +2088,7 @@ class Blocks {
                     break;
             }
 
-            if (!WIDENAMES.includes(myBlock.name) && label.length > maxLength) {
+            if (!myBlock.hasWideLabel() && label.length > maxLength) {
                 label = label.substr(0, maxLength - 1) + "...";
             }
 
@@ -2997,7 +3014,7 @@ class Blocks {
                             that.blockList[b].value = v;
                             let l = _(value.toString());
                             if (
-                                !WIDENAMES.includes(that.blockList[b].name) &&
+                                !that.blockList[b].hasWideLabel() &&
                                 getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
                             ) {
                                 l = l.substr(0, STRINGLEN) + "...";
@@ -3024,7 +3041,7 @@ class Blocks {
                         that.blockList[b].value = v;
                         let l = _(v.toString());
                         if (
-                            !WIDENAMES.includes(that.blockList[b].name) &&
+                            !that.blockList[b].hasWideLabel() &&
                             getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
                         ) {
                             l = l.substr(0, STRINGLEN) + "...";
@@ -4547,7 +4564,7 @@ class Blocks {
                     this.selectedBlocksObj[0][3] =
                         helpfulWheelDiv.offsetTop + 130 - this.activity.blocksContainer.y;
 
-                    helpfulWheelDiv.style.display = "none";
+                    this.activity.closeHelpfulWheel();
                 } else {
                     this.selectedBlocksObj[0][2] =
                         175 - this.activity.blocksContainer.x + this.pasteDx;
@@ -4840,7 +4857,7 @@ class Blocks {
 
                 /** Don't make duplicate action names. */
                 /** Add a palette entry for any new storein blocks. */
-                const stringValues = {}; /** label: [blocks with that label] */
+                const stringValues = Object.create(null); /** label: [blocks with that label] */
                 const actionNames = {}; /** action block: label block */
                 const storeinNames = {}; /** storein block: label block */
                 const doNames = {}; /** do block: label block, nameddo block value */
@@ -6752,7 +6769,10 @@ class Blocks {
             }
             this.activity.refreshCanvas();
             this.activity.trashcan.stopHighlightAnimation();
-            document.getElementById("hideContents").click();
+            const hideContents = document.getElementById("hideContents");
+            if (hideContents && typeof hideContents.click === "function") {
+                hideContents.click();
+            }
         };
 
         /***
@@ -6782,12 +6802,14 @@ class Blocks {
          * @param logo
          * @param turtle
          * @param blk
-         * @returns {void}
+         * @returns {boolean} Whether the displayed parameter value changed.
          */
         this.updateParameterBlock = (logo, turtle, blk) => {
             const name = this.blockList[blk].name;
 
             if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
+                const text = this.blockList[blk].text;
+                const previousText = text.text;
                 let value = 0;
 
                 if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
@@ -6802,32 +6824,39 @@ class Blocks {
                             name
                         );
                     } else {
-                        return;
+                        return false;
                     }
                 }
 
                 // Comprehensive safety check for all value types
                 if (value === null || value === undefined) {
-                    this.blockList[blk].text.text = "";
+                    text.text = "";
                 } else if (typeof value === "string") {
                     if (value.length > 6) {
                         value = value.substr(0, 5) + "...";
                     }
-                    this.blockList[blk].text.text = value;
+                    text.text = value;
                 } else if (name === "divide") {
-                    this.blockList[blk].text.text = mixedNumber(value);
+                    text.text = mixedNumber(value);
                 } else {
                     // Safe toString conversion
                     try {
-                        this.blockList[blk].text.text = value.toString();
+                        text.text = value.toString();
                     } catch (error) {
                         console.warn("Error converting value to string:", value, error);
-                        this.blockList[blk].text.text = "";
+                        text.text = "";
                     }
                 }
 
+                if (text.text === previousText) {
+                    return false;
+                }
+
                 this.blockList[blk].container.updateCache();
+                return true;
             }
+
+            return false;
         };
 
         /**

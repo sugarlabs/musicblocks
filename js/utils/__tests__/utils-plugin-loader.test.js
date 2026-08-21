@@ -160,3 +160,137 @@ describe("processPluginData script cleanup", () => {
         debugSpy.mockRestore();
     });
 });
+
+describe("processPluginData - prototype pollution guard", () => {
+    let processPluginData;
+
+    beforeEach(() => {
+        jest.resetModules();
+        global._ = msg => msg;
+        global.PALETTEICONS = {};
+        global.PALETTEFILLCOLORS = {};
+        global.PALETTESTROKECOLORS = {};
+        global.PALETTEHIGHLIGHTCOLORS = {};
+        global.HIGHLIGHTSTROKECOLORS = {};
+        global.MULTIPALETTES = [[], [], []];
+        global.platformColor = { paletteColors: {} };
+        ({ processPluginData } = require("../utils.js"));
+    });
+
+    it("skips __proto__ and constructor keys in every plugin-data section", async () => {
+        const activity = createActivity();
+
+        const unsafe = '{"__proto__": {"polluted": true}, "constructor": {"polluted": true}}';
+        const maliciousData = `{
+            "PALETTEPLUGINS": ${unsafe}, "IMAGES": ${unsafe}, "FLOWPLUGINS": ${unsafe},
+            "ARGPLUGINS": ${unsafe}, "MACROPLUGINS": ${unsafe}, "SETTERPLUGINS": ${unsafe},
+            "BLOCKPLUGINS": ${unsafe}, "PARAMETERPLUGINS": ${unsafe}, "ONLOAD": ${unsafe},
+            "ONSTART": ${unsafe}, "ONSTOP": ${unsafe}
+        }`;
+
+        await processPluginData(activity, maliciousData, "plugins/test.json");
+
+        expect(Object.prototype.polluted).toBeUndefined();
+        expect({}.polluted).toBeUndefined();
+
+        const targets = [
+            PALETTEICONS,
+            activity.pluginsImages,
+            activity.logo.evalFlowDict,
+            activity.logo.evalArgDict,
+            activity.palettes.pluginMacros,
+            activity.logo.evalSetterDict,
+            activity.logo.evalParameterDict,
+            activity.logo.evalOnStartList,
+            activity.logo.evalOnStopList
+        ];
+        for (const dict of targets) {
+            expect(Object.prototype.hasOwnProperty.call(dict, "__proto__")).toBe(false);
+            expect(Object.prototype.hasOwnProperty.call(dict, "constructor")).toBe(false);
+        }
+    });
+});
+
+describe("updatePluginObj - prototype pollution guard", () => {
+    let updatePluginObj;
+
+    beforeEach(() => {
+        jest.resetModules();
+        global._ = msg => msg;
+        ({ updatePluginObj } = require("../utils.js"));
+    });
+
+    it("skips __proto__ and constructor keys when merging into activity.pluginObjs", () => {
+        const activity = {
+            pluginObjs: {
+                PALETTEPLUGINS: {},
+                PALETTEFILLCOLORS: {},
+                PALETTESTROKECOLORS: {},
+                PALETTEHIGHLIGHTCOLORS: {},
+                FLOWPLUGINS: {},
+                ARGPLUGINS: {},
+                BLOCKPLUGINS: {},
+                MACROPLUGINS: {},
+                ONLOAD: {},
+                ONSTART: {},
+                ONSTOP: {}
+            }
+        };
+
+        const unsafe = '{"__proto__": {"polluted": true}, "constructor": {"polluted": true}}';
+        const maliciousObj = JSON.parse(`{
+            "PALETTEPLUGINS": ${unsafe}, "PALETTEFILLCOLORS": ${unsafe},
+            "PALETTESTROKECOLORS": ${unsafe}, "PALETTEHIGHLIGHTCOLORS": ${unsafe},
+            "FLOWPLUGINS": ${unsafe}, "ARGPLUGINS": ${unsafe}, "BLOCKPLUGINS": ${unsafe},
+            "MACROPLUGINS": ${unsafe}, "ONLOAD": ${unsafe}, "ONSTART": ${unsafe},
+            "ONSTOP": ${unsafe}
+        }`);
+
+        updatePluginObj(activity, maliciousObj);
+
+        expect(Object.prototype.polluted).toBeUndefined();
+        expect({}.polluted).toBeUndefined();
+
+        for (const section of Object.keys(activity.pluginObjs)) {
+            expect(
+                Object.prototype.hasOwnProperty.call(activity.pluginObjs[section], "__proto__")
+            ).toBe(false);
+            expect(
+                Object.prototype.hasOwnProperty.call(activity.pluginObjs[section], "constructor")
+            ).toBe(false);
+        }
+    });
+
+    it("does not throw when a plugin is missing optional sections", () => {
+        const activity = {
+            pluginObjs: {
+                PALETTEPLUGINS: {},
+                PALETTEFILLCOLORS: {},
+                PALETTESTROKECOLORS: {},
+                PALETTEHIGHLIGHTCOLORS: {},
+                FLOWPLUGINS: {},
+                ARGPLUGINS: {},
+                BLOCKPLUGINS: {},
+                MACROPLUGINS: {},
+                ONLOAD: {},
+                ONSTART: {},
+                ONSTOP: {}
+            }
+        };
+
+        // Shape of plugins/maths.json: no FLOWPLUGINS, ONLOAD, ONSTART, ONSTOP.
+        const mathsLike = JSON.parse(
+            '{"PALETTEPLUGINS":{"maths":{"name":"maths"}},"ARGPLUGINS":{"a":"code"},"BLOCKPLUGINS":{"b":"code"}}'
+        );
+        expect(() => updatePluginObj(activity, mathsLike)).not.toThrow();
+
+        // Shape of plugins/accelerometer.json: no PALETTEPLUGINS at all.
+        const accelerometerLike = JSON.parse(
+            '{"GLOBALS":"var x=1;","ARGPLUGINS":{"a":"code"},"BLOCKPLUGINS":{"b":"code"}}'
+        );
+        expect(() => updatePluginObj(activity, accelerometerLike)).not.toThrow();
+
+        expect(activity.pluginObjs["PALETTEPLUGINS"]["maths"]).toEqual({ name: "maths" });
+        expect(activity.pluginObjs["ARGPLUGINS"]["a"]).toBe("code");
+    });
+});

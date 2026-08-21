@@ -2023,6 +2023,30 @@ describe("Logo runFromBlockNow", () => {
         expect(logo.statusMatrix.updateAll).toHaveBeenCalled();
         expect(mockActivity.blocks.updateParameterBlock).toHaveBeenCalledWith(logo, 0, 10);
     });
+
+    test("refreshes slow execution only when a parameter display changes", () => {
+        timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(() => 32);
+        logo.blockList = [
+            {
+                ...makeFlowBlock("print"),
+                connections: [null, 1]
+            },
+            makeFlowBlock()
+        ];
+        turtle0.parameterQueue = [10];
+        logo.turtleDelay = 10;
+
+        mockActivity.blocks.updateParameterBlock.mockReturnValue(false);
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+        expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
+
+        mockActivity.blocks.updateParameterBlock.mockClear();
+        mockActivity.blocks.updateParameterBlock.mockReturnValue(true);
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(mockActivity.blocks.updateParameterBlock).toHaveBeenCalledWith(logo, 0, 10);
+        expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(1);
+    });
 });
 
 // ─── Logo clearTurtleRun ──────────────────────────────────────────────────────

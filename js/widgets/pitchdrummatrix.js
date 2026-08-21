@@ -101,6 +101,9 @@ class PitchDrumMatrix {
         // These arrays get created each time the matrix is built.
         this._rowBlocks = []; // pitch-block number
         this._colBlocks = []; // drum-block number
+        this._pdmCellTables = []; // cached pdmCellTable elements
+        this._pdmTable = null; // cached pdmTable element
+        this._pdmDrumTable = null; // cached pdmDrumTable element
 
         // This array is preserved between sessions.
         // We populate the blockMap whenever a node is selected and
@@ -222,7 +225,9 @@ class PitchDrumMatrix {
 
         // Each row in the pdm table contains a note label in the
         // first column and a table of buttons in the second column.
-        const pdmTable = docById("pdmTable");
+        this._pdmTable = docById("pdmTable");
+        const pdmTable = this._pdmTable;
+        this._pdmCellTables = [];
 
         let j = 0;
         let drumName;
@@ -273,10 +278,9 @@ class PitchDrumMatrix {
             const tbl = document.createElement("table");
             tbl.setAttribute("cellpadding", "0px");
             tbl.id = "pdmCellTable" + j;
-            const tr = document.createElement("tr");
-            tbl.appendChild(tr);
             pdmCell.appendChild(tbl);
-            pdmCellTable = docById("pdmCellTable" + j);
+            pdmCellTable = tbl;
+            this._pdmCellTables.push(pdmCellTable);
 
             // We'll use this element to put the clickable notes for this row.
             pdmRow = pdmCellTable.insertRow();
@@ -339,6 +343,7 @@ class PitchDrumMatrix {
         const pTbl = document.createElement("table");
         pTbl.setAttribute("cellpadding", "0px");
         pTbl.id = "pdmDrumTable";
+        this._pdmDrumTable = pTbl;
         const pTr = document.createElement("tr");
         pTbl.appendChild(pTr);
         pdmCell.appendChild(pTbl);
@@ -466,12 +471,12 @@ class PitchDrumMatrix {
      */
     _addDrum(drumIdx) {
         const drumname = this.drums[drumIdx];
-        const pdmTable = docById("pdmTable");
+        const pdmTable = this._pdmTable;
         let table;
         let row;
         let cell;
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
-            table = docById("pdmCellTable" + i);
+            table = this._pdmCellTables[i];
             row = table.rows[0];
             cell = row.insertCell();
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
@@ -497,7 +502,7 @@ class PitchDrumMatrix {
             cell.setAttribute("id", i + "," + drumIdx); // row,column
         }
 
-        const drumTable = docById("pdmDrumTable");
+        const drumTable = this._pdmDrumTable;
         row = drumTable.rows[0];
         cell = row.insertCell();
         cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
@@ -536,15 +541,15 @@ class PitchDrumMatrix {
      * @returns {void}
      */
     makeClickable() {
-        const pdmTable = docById("pdmTable");
-        const drumTable = docById("pdmDrumTable");
+        const pdmTable = this._pdmTable;
+        const drumTable = this._pdmDrumTable;
         let table;
         let cellRow;
         let drumRow;
         let drumCell;
         let cell;
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
-            table = docById("pdmCellTable" + i);
+            table = this._pdmCellTables[i];
             cellRow = table.rows[0];
 
             for (let j = 0; j < cellRow.cells.length; j++) {
@@ -592,7 +597,7 @@ class PitchDrumMatrix {
 
                 // If we found a match, mark this cell and add this
                 // note to the play list.
-                table = docById("pdmCellTable" + row);
+                table = this._pdmCellTables[row];
                 cellRow = table.rows[0];
 
                 cell = cellRow.cells[col];
@@ -603,6 +608,32 @@ class PitchDrumMatrix {
                 }
             }
         }
+    }
+
+    /**
+     * Updates the play button icon to show "Play" or "Stop".
+     *
+     * @private
+     * @param {"play"|"stop"} state - Which icon to show.
+     * @returns {void}
+     */
+    _setPlayButtonIcon(state) {
+        const icon = this.playButton;
+        const isStop = state === "stop";
+        const src = isStop ? "header-icons/stop-button.svg" : "header-icons/play-button.svg";
+        const label = isStop ? _("Stop") : _("Play");
+
+        icon.textContent = "\u00A0\u00A0";
+        const img = document.createElement("img");
+        img.src = src;
+        img.title = label;
+        img.alt = label;
+        img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
+        img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
+        img.setAttribute("vertical-align", "middle");
+        img.setAttribute("align-content", "center");
+        icon.appendChild(img);
+        icon.appendChild(document.createTextNode("\u00A0\u00A0"));
     }
 
     /**
@@ -640,31 +671,10 @@ class PitchDrumMatrix {
      */
     _playAll() {
         // Play all of the pitch/drum combinations in the matrix.
-        const icon = this.playButton;
         if (this._playing) {
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/stop-button.svg";
-            img.title = _("Stop");
-            img.alt = _("Stop");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+            this._setPlayButtonIcon("stop");
         } else {
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/play-button.svg";
-            img.title = _("Play");
-            img.alt = _("Play");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+            this._setPlayButtonIcon("play");
             this._playing = false;
             return;
         }
@@ -673,12 +683,12 @@ class PitchDrumMatrix {
         const pairs = [];
 
         // For each row (pitch), look for a drum.
-        const pdmTable = docById("pdmTable");
+        const pdmTable = this._pdmTable;
         let table;
         let row;
         let cell;
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
-            table = docById("pdmCellTable" + i);
+            table = this._pdmCellTables[i];
             row = table.rows[0];
             let j;
             for (j = 0; j < row.cells.length; j++) {
@@ -710,33 +720,13 @@ class PitchDrumMatrix {
                     return;
                 }
                 this._playing = false;
-                icon.textContent = "\u00A0\u00A0";
-                const img = document.createElement("img");
-                img.src = "header-icons/play-button.svg";
-                img.title = _("Play");
-                img.alt = _("Play");
-                img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-                img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-                img.setAttribute("vertical-align", "middle");
-                img.setAttribute("align-content", "center");
-                icon.appendChild(img);
-                icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+                this._setPlayButtonIcon("play");
             }, pairs.length * 1000);
         } else {
             if (!this.widgetWindow._maximized) {
                 this.activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
             }
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/play-button.svg";
-            img.title = _("Play");
-            img.alt = _("Play");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+            this._setPlayButtonIcon("play");
         }
     }
 
@@ -754,15 +744,15 @@ class PitchDrumMatrix {
         }
 
         // Find the drum cell
-        let pdmTable = docById("pdmTable");
-        const drumTable = docById("pdmDrumTable");
+        let pdmTable = this._pdmTable;
+        const drumTable = this._pdmDrumTable;
         let row = drumTable.rows[0];
         // const drumCell = row.cells[i];
-        const table = docById("pdmCellTable" + i);
+        const table = this._pdmCellTables[i];
         row = table.rows[0];
         const cell = row.cells[i];
 
-        pdmTable = docById("pdmTable");
+        pdmTable = this._pdmTable;
         const pdmTableRow = pdmTable.rows[i];
         const pitchCell = pdmTableRow.cells[0];
         pitchCell.style.backgroundColor = platformColor.selectorBackground;
@@ -804,9 +794,9 @@ class PitchDrumMatrix {
         const rowi = Number(rowIndex);
 
         // Find the drum cell
-        const drumTable = docById("pdmDrumTable");
+        const drumTable = this._pdmDrumTable;
         let row = drumTable.rows[0];
-        let table = docById("pdmCellTable" + rowi);
+        let table = this._pdmCellTables[rowi];
         row = table.rows[0];
 
         // For the moment, we can only have one drum per pitch, so
@@ -842,7 +832,7 @@ class PitchDrumMatrix {
             this.removeNode(pitchBlock, drumBlock);
         }
 
-        table = docById("pdmCellTable" + rowi);
+        table = this._pdmCellTables[rowi];
         row = table.rows[0];
         for (let i = 0; i < row.cells.length; i++) {
             cell = row.cells[i];
@@ -863,12 +853,12 @@ class PitchDrumMatrix {
      * @returns {void}
      */
     _setPairCell(rowIndex, colIndex, cell, playNote) {
-        const pdmTable = docById("pdmTable");
+        const pdmTable = this._pdmTable;
         let row = pdmTable.rows[rowIndex];
         const noteArg = row.cells[0].dataset.noteArg;
         const octave = parseInt(row.cells[0].dataset.octave, 10);
 
-        const drumTable = docById("pdmDrumTable");
+        const drumTable = this._pdmDrumTable;
         row = drumTable.rows[0];
         const drumImg = row.cells[colIndex].querySelector("img");
         const drumName = getDrumSynthName(drumImg ? drumImg.title : "");
@@ -909,12 +899,12 @@ class PitchDrumMatrix {
      */
     _clear() {
         // "Unclick" every entry in the matrix.
-        const pdmTable = docById("pdmTable");
+        const pdmTable = this._pdmTable;
         let table;
         let row;
         let cell;
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
-            table = docById("pdmCellTable" + i);
+            table = this._pdmCellTables[i];
             row = table.rows[0];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
@@ -943,16 +933,15 @@ class PitchDrumMatrix {
         this.activity.refreshCanvas();
 
         const pairs = [];
-
-        const pdmTable = docById("pdmTable");
-        const drumTable = docById("pdmDrumTable");
+        const pdmTable = this._pdmTable;
+        const drumTable = this._pdmDrumTable;
 
         // For each row (pitch), look for a drum.
         let table;
         let row;
         let cell;
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
-            table = docById("pdmCellTable" + i);
+            table = this._pdmCellTables[i];
             row = table.rows[0];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];

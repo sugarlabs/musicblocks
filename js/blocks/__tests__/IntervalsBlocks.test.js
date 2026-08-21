@@ -204,6 +204,33 @@ describe("setupIntervalsBlocks", () => {
         });
     });
 
+    describe("inlineCollapsible capability", () => {
+        it("interval declares collapsible and inlineCollapsible", () => {
+            expect(createdBlocks.interval.getCapability("collapsible")).toBe(true);
+            expect(createdBlocks.interval.getCapability("inlineCollapsible")).toBe(true);
+        });
+
+        // definemode was historically in INLINECOLLAPSIBLES and already declares
+        // inlineCollapsible; size/toggle paths must treat it like other inline blocks.
+        it("definemode declares collapsible and inlineCollapsible", () => {
+            expect(createdBlocks.definemode.getCapability("collapsible")).toBe(true);
+            expect(createdBlocks.definemode.getCapability("inlineCollapsible")).toBe(true);
+        });
+    });
+
+    describe("wideLabel capability", () => {
+        it("marks temperament/mode/chord/interval name blocks as wideLabel", () => {
+            expect(createdBlocks["temperamentname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["modename"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["chordname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["intervalname"].getCapability("wideLabel")).toBe(true);
+        });
+
+        it("does not mark intervalnumber as wideLabel", () => {
+            expect(createdBlocks["intervalnumber"].getCapability("wideLabel")).toBeUndefined();
+        });
+    });
+
     describe("Setup", () => {
         it("registers interval blocks", () => {
             expect(Object.keys(createdBlocks).length).toBeGreaterThan(0);
@@ -841,7 +868,7 @@ describe("setupIntervalsBlocks", () => {
             expect(activity.blocks.blockList.hidden1.connections[1]).toBeNull();
         });
 
-        it("listener restores disconnected links", async () => {
+        it("listener restores disconnected links synchronously without polling", () => {
             activity.blocks.blockList.blkArp = { name: "arpeggio", connections: [null] };
             activity.blocks.blockList.child1 = {
                 name: "note",
@@ -860,12 +887,32 @@ describe("setupIntervalsBlocks", () => {
             const listener =
                 logo.setTurtleListener.mock.calls[logo.setTurtleListener.mock.calls.length - 1][2];
 
-            await listener();
+            jest.useFakeTimers();
+            expect(listener()).toBeUndefined();
+            expect(jest.getTimerCount()).toBe(0);
+            jest.useRealTimers();
 
             expect(activity.blocks.blockList.child1.connections[2]).toBe("child2");
             expect(activity.blocks.blockList.child2.connections[0]).toBe("child1");
             expect(turtleState.singer.duplicateFactor).toBe(1);
             expect(turtleState.singer.inDuplicate).toBe(false);
+            expect(logo.connectionStoreLock).toBe(false);
+        });
+
+        it("listener releases lock when restoration throws", () => {
+            activity.blocks.blockList.blkArp = { name: "arpeggio", connections: [null] };
+            activity.blocks.blockList.child1 = {
+                name: "note",
+                connections: ["blkArp", null, null]
+            };
+            activity.blocks.findBottomBlock = jest.fn(() => "child1");
+
+            createdBlocks.arpeggio.flow(["major", "child1"], logo, turtleIndex, "blkArp", "arg");
+            logo.connectionStore[0].blkArp = [["missing", 0, null]];
+            const listener =
+                logo.setTurtleListener.mock.calls[logo.setTurtleListener.mock.calls.length - 1][2];
+
+            expect(() => listener()).toThrow();
             expect(logo.connectionStoreLock).toBe(false);
         });
     });

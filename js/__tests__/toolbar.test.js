@@ -103,14 +103,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(102);
+        expect(global._).toHaveBeenCalledTimes(104); // was 102, +2 for recordDropdownArrow
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(84);
+        expect(global._).toHaveBeenCalledTimes(86); // was 84, +2 for recordDropdownArrow
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -448,7 +448,12 @@ describe("Toolbar Class", () => {
                 { label: "Turtle Wrap Off", display: false },
                 { label: "Turtle Wrap On", display: true }
             ],
-            textMsg: jest.fn()
+            textMsg: jest.fn(),
+            closeHelpfulWheel: jest.fn(() => {
+                const wasOpen = helpfulWheelDiv.style.display !== "none";
+                if (wasOpen) helpfulWheelDiv.style.display = "none";
+                return wasOpen;
+            })
         };
 
         const wrapIcon = {

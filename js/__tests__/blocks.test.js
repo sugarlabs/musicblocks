@@ -78,7 +78,8 @@ global.ConnectionValidator = require("../connection-validator");
 
 // Use the real BlockDragController so drag-group and dock-snapping
 // behavior stays accurate rather than silently becoming a no-op.
-global.setupBlockDragController = require("../block-drag-controller").setupBlockDragController;
+global.setupBlockDragController =
+    require("../activity/block-drag-controller").setupBlockDragController;
 
 // Mock Constants
 global.DEFAULTBLOCKSCALE = 1.0;
@@ -100,7 +101,6 @@ global.NUMBERBLOCKDEFAULT = 0;
 global.STRINGLEN = 30;
 global.TEXTWIDTH = 100;
 global.WESTERN2EISOLFEGENAMES = {};
-global.WIDENAMES = [];
 global.BACKWARDCOMPATIBILITYDICT = {};
 global.DEFAULTCHORD = [];
 
@@ -378,6 +378,34 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("Parameter Block Cache Updates", () => {
+        it("only rebuilds the cache when the displayed value changes", () => {
+            const blocks = new Blocks(mockActivity);
+            const updateParameter = jest.fn(() => 0);
+            const updateCache = jest.fn();
+            const parameterBlock = {
+                name: "heading",
+                protoblock: { parameter: true, updateParameter },
+                text: { text: "heading" },
+                container: { updateCache }
+            };
+            blocks.blockList = [parameterBlock];
+
+            expect(blocks.updateParameterBlock({}, 0, 0)).toBe(true);
+            expect(parameterBlock.text.text).toBe("0");
+            expect(updateCache).toHaveBeenCalledTimes(1);
+
+            expect(blocks.updateParameterBlock({}, 0, 0)).toBe(false);
+            expect(updateCache).toHaveBeenCalledTimes(1);
+
+            updateParameter.mockReturnValue(10);
+
+            expect(blocks.updateParameterBlock({}, 0, 0)).toBe(true);
+            expect(parameterBlock.text.text).toBe("10");
+            expect(updateCache).toHaveBeenCalledTimes(2);
+        });
+    });
+
     describe("Sparse Array Safety", () => {
         it("should not throw TypeError in findStacks when blockList is sparse", () => {
             const blocks = new Blocks(mockActivity);
@@ -629,6 +657,42 @@ describe("Blocks Foundation", () => {
             // Flag should be true during processing (before cleanupAfterLoad resets it)
             expect(flagDuringLoad).toBe(true);
         });
+
+        it("loads a text block valued '__proto__' without throwing", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {
+                text: { style: "value", hasCapability: () => false }
+            };
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._processOneBlock = jest.fn();
+            blocks.customTemperamentDefined = true;
+
+            // Legacy (pre-value-object) text block shape, still accepted for
+            // backward compatibility and reachable via pasted project JSON.
+            const blockObjs = [[0, ["text", "__proto__"], 0, 0, [null]]];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+        });
+
+        it.each(["toString", "constructor", "hasOwnProperty", "valueOf", "__proto__"])(
+            "loads a block named '%s' without throwing",
+            reservedName => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.newStorein2Block = jest.fn();
+                blocks.newNamedboxBlock = jest.fn();
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks.customTemperamentDefined = true;
+                blocks._makeNewBlockWithConnections = jest.fn();
+
+                const blockObjs = [[0, reservedName, 0, 0, [null, null, null]]];
+
+                expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            }
+        );
 
         it("resets _suppressRefresh on circular connection early return", () => {
             const blocks = new Blocks(mockActivity);
@@ -919,6 +983,41 @@ describe("Blocks Foundation", () => {
         let mockActivity;
         let blocks;
 
+        /**
+         * Build a block stand-in whose isCollapsible / isInlineCollapsible
+         * derive from a capabilities map (same contract as Block / ProtoBlock),
+         * rather than hard-coding isInlineCollapsible: () => true.
+         */
+        const makeCapabilityBlock = ({ name, capabilities = [], ...rest }) => {
+            const caps = Object.create(null);
+            for (const capability of capabilities) {
+                caps[capability] = true;
+            }
+
+            return {
+                name,
+                trash: false,
+                collapsed: false,
+                capabilities: caps,
+                hasCapability(capability) {
+                    return Object.prototype.hasOwnProperty.call(this.capabilities, capability)
+                        ? this.capabilities[capability]
+                        : false;
+                },
+                isCollapsible() {
+                    return this.hasCapability("collapsible");
+                },
+                isInlineCollapsible() {
+                    return this.hasCapability("inlineCollapsible");
+                },
+                isClampBlock() {
+                    return false;
+                },
+                connections: [null],
+                ...rest
+            };
+        };
+
         beforeEach(() => {
             mockActivity = {
                 storage: {},
@@ -940,48 +1039,129 @@ describe("Blocks Foundation", () => {
             blocks = new Blocks(mockActivity);
         });
 
-        it("toggleCollapsibles toggles standard collapsible blocks and definemode, but excludes newnote", () => {
-            const mockStartBlock = {
+        it("toggleCollapsibles toggles standard collapsible blocks but excludes inlineCollapsible ones", () => {
+            const startBlock = makeCapabilityBlock({
                 name: "start",
-                trash: false,
-                collapsed: false,
-                isCollapsible: () => true,
-                isInlineCollapsible: () => false,
+                capabilities: ["collapsible"],
                 collapseToggle: jest.fn(function () {
                     this.collapsed = !this.collapsed;
                 })
-            };
+            });
 
-            const mockDefinemodeBlock = {
-                name: "definemode",
-                trash: false,
-                collapsed: false,
-                isCollapsible: () => true,
-                isInlineCollapsible: () => true,
-                collapseToggle: jest.fn(function () {
-                    this.collapsed = !this.collapsed;
+            // newnote / interval / osctime: same exclude behavior as the old name list.
+            // definemode: intentionally excluded too — it declares inlineCollapsible and
+            // was part of historical INLINECOLLAPSIBLES; completing the capability migration.
+            const inlineBlocks = ["newnote", "interval", "osctime", "definemode"].map(name =>
+                makeCapabilityBlock({
+                    name,
+                    capabilities: ["collapsible", "inlineCollapsible"],
+                    collapseToggle: jest.fn(function () {
+                        this.collapsed = !this.collapsed;
+                    })
                 })
-            };
+            );
 
-            const mockNewNoteBlock = {
-                name: "newnote",
-                trash: false,
-                collapsed: false,
-                isCollapsible: () => true,
-                isInlineCollapsible: () => true,
-                collapseToggle: jest.fn(function () {
-                    this.collapsed = !this.collapsed;
-                })
-            };
+            blocks.blockList = [startBlock, ...inlineBlocks];
 
-            blocks.blockList = [mockStartBlock, mockDefinemodeBlock, mockNewNoteBlock];
-
-            // Trigger toggleCollapsibles (all are currently uncollapsed, so it should collapse start and definemode, but skip newnote)
             blocks.toggleCollapsibles();
 
-            expect(mockStartBlock.collapseToggle).toHaveBeenCalled();
-            expect(mockDefinemodeBlock.collapseToggle).toHaveBeenCalled();
-            expect(mockNewNoteBlock.collapseToggle).not.toHaveBeenCalled();
+            expect(startBlock.collapseToggle).toHaveBeenCalled();
+            for (const inlineBlock of inlineBlocks) {
+                expect(inlineBlock.collapseToggle).not.toHaveBeenCalled();
+            }
+        });
+
+        it("_getBlockSize spoofs size 1 for collapsed inlineCollapsible blocks including definemode", () => {
+            blocks.blockList = [
+                makeCapabilityBlock({
+                    name: "newnote",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "interval",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "osctime",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                // Intentional: definemode joins compact-size path via inlineCollapsible.
+                makeCapabilityBlock({
+                    name: "definemode",
+                    size: 5,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "start",
+                    size: 3,
+                    collapsed: true,
+                    capabilities: ["collapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "newnote",
+                    size: 4,
+                    collapsed: false,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                })
+            ];
+
+            expect(blocks._getBlockSize(0)).toBe(1);
+            expect(blocks._getBlockSize(1)).toBe(1);
+            expect(blocks._getBlockSize(2)).toBe(1);
+            expect(blocks._getBlockSize(3)).toBe(1);
+            expect(blocks._getBlockSize(4)).toBe(3);
+            expect(blocks._getBlockSize(5)).toBe(4);
+        });
+
+        it("_getStackSize spoofs size 1 for collapsed inlineCollapsible blocks including definemode", () => {
+            blocks.blocksToCollapse = [];
+            blocks._sizeCounter = 0;
+            blocks.blockList = [
+                makeCapabilityBlock({
+                    name: "newnote",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "interval",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "osctime",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                // Intentional: definemode stack size spoofs like other inline collapsibles.
+                makeCapabilityBlock({
+                    name: "definemode",
+                    size: 5,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "start",
+                    size: 3,
+                    collapsed: true,
+                    capabilities: ["collapsible"]
+                })
+            ];
+
+            expect(blocks._getStackSize(0)).toBe(1);
+            expect(blocks._getStackSize(1)).toBe(1);
+            expect(blocks._getStackSize(2)).toBe(1);
+            expect(blocks._getStackSize(3)).toBe(1);
+            expect(blocks._getStackSize(4)).toBe(3);
         });
 
         it("_processOneBlock correctly uses ProtoBlock capability metadata to initialize collapsed state on load", () => {
@@ -1086,6 +1266,119 @@ describe("Blocks Foundation", () => {
             blocks._deletePitchBlocks(1);
 
             expect(blocks._extractBlock).toHaveBeenCalledWith(1, false);
+        });
+    });
+
+    describe("wideLabel Capability Migration", () => {
+        let blocks;
+
+        beforeEach(() => {
+            blocks = new Blocks({});
+        });
+
+        it("updateBlockText skips truncation for wideLabel blocks", () => {
+            const longLabel = "x".repeat(40);
+            const wideBlock = {
+                name: "drumname",
+                value: longLabel,
+                hasWideLabel: () => true,
+                text: { text: "" },
+                container: {
+                    children: { length: 1 },
+                    setChildIndex: jest.fn(),
+                    updateCache: jest.fn()
+                },
+                loadComplete: true
+            };
+            const normalBlock = {
+                name: "text",
+                value: longLabel,
+                hasWideLabel: () => false,
+                text: { text: "" },
+                container: {
+                    children: { length: 1 },
+                    setChildIndex: jest.fn(),
+                    updateCache: jest.fn()
+                },
+                loadComplete: true
+            };
+
+            blocks.blockList = [wideBlock, normalBlock];
+            blocks.updateBlockText(0);
+            blocks.updateBlockText(1);
+
+            expect(wideBlock.text.text).toBe(longLabel);
+            expect(normalBlock.text.text.endsWith("...")).toBe(true);
+            expect(normalBlock.text.text.length).toBeLessThan(longLabel.length);
+        });
+    });
+
+    describe("sendStackToTrash DOM safety", () => {
+        it("should safely complete sendStackToTrash when #hideContents element is missing from DOM", () => {
+            const mockActivity = {
+                palettes: { dict: {} },
+                refreshCanvas: jest.fn(),
+                trashcan: { stopHighlightAnimation: jest.fn() }
+            };
+            const blocksInstance = new Blocks(mockActivity);
+
+            const mockBlock = {
+                blockIndex: 1,
+                connections: [null],
+                container: { uncache: jest.fn() },
+                protoblock: { style: "normal", parameter: false, staticLabels: ["test"] },
+                hide: jest.fn()
+            };
+
+            blocksInstance.blockList[1] = mockBlock;
+            blocksInstance.captureStackPreview = jest.fn().mockReturnValue(null);
+            blocksInstance._cleanupStacks = jest.fn();
+
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue(null);
+
+            try {
+                expect(() => blocksInstance.sendStackToTrash(mockBlock)).not.toThrow();
+            } finally {
+                document.getElementById = originalGetElementById;
+            }
+        });
+
+        it("should click #hideContents when it exists in DOM", () => {
+            const mockActivity = {
+                palettes: { dict: {} },
+                refreshCanvas: jest.fn(),
+                trashcan: { stopHighlightAnimation: jest.fn() }
+            };
+            const blocksInstance = new Blocks(mockActivity);
+
+            const mockBlock = {
+                blockIndex: 1,
+                connections: [null],
+                container: { uncache: jest.fn() },
+                protoblock: { style: "normal", parameter: false, staticLabels: ["test"] },
+                hide: jest.fn()
+            };
+
+            blocksInstance.blockList[1] = mockBlock;
+            blocksInstance.captureStackPreview = jest.fn().mockReturnValue(null);
+            blocksInstance._cleanupStacks = jest.fn();
+
+            const mockClick = jest.fn();
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockImplementation(id => {
+                if (id === "hideContents") {
+                    return { click: mockClick };
+                }
+                return null;
+            });
+
+            try {
+                blocksInstance.sendStackToTrash(mockBlock);
+                expect(mockClick).toHaveBeenCalled();
+            } finally {
+                document.getElementById = originalGetElementById;
+            }
         });
     });
 });

@@ -129,6 +129,12 @@ function makeActivity() {
         copyMultipleBlocks: jest.fn(),
         textMsg: jest.fn(),
         __tick: jest.fn(),
+        closeHelpfulWheel: jest.fn(() => {
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            const wasOpen = Boolean(helpfulWheelDiv && helpfulWheelDiv.style.display !== "none");
+            if (wasOpen) helpfulWheelDiv.style.display = "none";
+            return wasOpen;
+        }),
         _allClear: jest.fn(),
         turtles: {
             collapse: jest.fn(),
@@ -228,6 +234,7 @@ describe("ContextMenuController", () => {
                 "showHideAuxMenu",
                 "hideAuxMenu",
                 "deltaY",
+                "closeHelpfulWheel",
                 "setHelpfulSearchDiv",
                 "_displayHelpfulSearchDiv",
                 "_hideHelpfulSearchWidget"
@@ -395,6 +402,55 @@ describe("ContextMenuController", () => {
                 document,
                 "click",
                 expect.any(Function)
+            );
+        });
+
+        test("removes the tracked listener when an internal action closes the wheel", () => {
+            controller.displayHelpfulWheel(rightClick);
+            const closeListener = activity.addEventListener.mock.calls.find(
+                call => call[0] === document && call[1] === "click"
+            )[2];
+
+            controller.closeHelpfulWheel();
+
+            expect(activity.removeEventListener).toHaveBeenCalledWith(
+                document,
+                "click",
+                closeListener
+            );
+            expect(mockElement.style.display).toBe("none");
+        });
+
+        test("keeps one listener across repeated wheel openings", () => {
+            controller.displayHelpfulWheel(rightClick);
+            controller.displayHelpfulWheel(rightClick);
+
+            const clickListeners = activity.addEventListener.mock.calls.filter(
+                call => call[0] === document && call[1] === "click"
+            );
+            expect(clickListeners).toHaveLength(2);
+            expect(activity.removeEventListener).toHaveBeenCalledWith(
+                document,
+                "click",
+                clickListeners[0][2]
+            );
+        });
+
+        test("removes the listener when a wheel action closes through the activity API", () => {
+            const activityWithDelegation = makeActivity();
+            const delegatedController = setupContextMenuController(activityWithDelegation);
+            delegatedController.setupPaletteMenu();
+            delegatedController.displayHelpfulWheel(rightClick);
+            const closeListener = activityWithDelegation.addEventListener.mock.calls.find(
+                call => call[0] === document && call[1] === "click"
+            )[2];
+
+            delegatedController.changeBlockVisibility(activityWithDelegation);
+
+            expect(activityWithDelegation.removeEventListener).toHaveBeenCalledWith(
+                document,
+                "click",
+                closeListener
             );
         });
     });

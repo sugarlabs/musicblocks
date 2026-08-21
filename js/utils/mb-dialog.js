@@ -9,6 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/* global clampNumber */
+
 /**
  * mb-dialog.js
  *
@@ -227,8 +229,8 @@
                 const y = clientY - dragDy;
                 const maxLeft = Math.max(window.innerWidth - frame.offsetWidth, 8);
                 const maxTop = Math.max(window.innerHeight - frame.offsetHeight, 64);
-                frame.style.left = `${Math.min(Math.max(x, 8), maxLeft)}px`;
-                frame.style.top = `${Math.min(Math.max(y, 64), maxTop)}px`;
+                frame.style.left = `${clampNumber(x, 8, maxLeft)}px`;
+                frame.style.top = `${clampNumber(y, 64, maxTop)}px`;
                 dragRafId = null;
             });
         };

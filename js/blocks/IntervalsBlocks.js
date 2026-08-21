@@ -94,6 +94,7 @@ function setupIntervalsBlocks(activity) {
             super("temperamentname", _("temperament name"));
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, extra width, and form the block with specific parameters
             this.setPalette("tone", activity);
@@ -121,6 +122,7 @@ function setupIntervalsBlocks(activity) {
             super("modename");
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);
@@ -144,6 +146,7 @@ function setupIntervalsBlocks(activity) {
             super("chordname");
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);
@@ -248,6 +251,7 @@ function setupIntervalsBlocks(activity) {
             super("intervalname");
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);
@@ -814,44 +818,12 @@ function setupIntervalsBlocks(activity) {
 
             tur.singer.inDuplicate = true;
 
-            /**
-             * Acquires the connectionStoreLock with proper waiting.
-             * Uses a polling mechanism to wait for the lock to be released.
-             * @param {number} maxRetries - Maximum number of retry attempts
-             * @param {number} retryInterval - Milliseconds between retries
-             * @returns {Promise<boolean>} - Resolves to true when lock is acquired
-             */
-            const __acquireLock = (maxRetries = 100, retryInterval = 10) => {
-                return new Promise(resolve => {
-                    let retries = 0;
-                    const tryAcquire = () => {
-                        if (!logo.connectionStoreLock) {
-                            logo.connectionStoreLock = true;
-                            resolve(true);
-                        } else if (retries < maxRetries) {
-                            retries++;
-                            setTimeout(tryAcquire, retryInterval);
-                        } else {
-                            // Force acquire after max retries to prevent deadlock
-                            ErrorHandler.warn(
-                                "connectionStoreLock: Max retries reached, forcing lock acquisition",
-                                { operation: "acquireLock" }
-                            );
-                            logo.connectionStoreLock = true;
-                            resolve(true);
-                        }
-                    };
-                    tryAcquire();
-                });
-            };
-
-            const __listener = async event => {
+            const __listener = event => {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
                 tur.singer.arpeggio = [];
 
-                // Acquire lock with proper waiting
-                await __acquireLock();
+                logo.connectionStoreLock = true;
 
                 try {
                     // The last turtle should restore the broken connections.
@@ -874,16 +846,6 @@ function setupIntervalsBlocks(activity) {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
-            // Acquire lock for the main flow
-            // JavaScript is single-threaded, so if the lock is held here it means
-            // a previous critical section did not release it (likely due to an error).
-            // We warn and force-acquire since no spin-wait can help in a single thread.
-            if (logo.connectionStoreLock) {
-                ErrorHandler.warn(
-                    "connectionStoreLock: Lock already held in ArpeggioBlock flow, forcing acquisition",
-                    { operation: "arpeggioLock" }
-                );
-            }
             logo.connectionStoreLock = true;
 
             try {

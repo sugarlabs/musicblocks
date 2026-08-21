@@ -17,6 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.clampNumber = require("../../utils/utils-logic").clampNumber;
 const setupVolumeActions = require("../VolumeActions");
 
 describe("setupVolumeActions", () => {
@@ -460,6 +461,14 @@ describe("setupVolumeActions", () => {
             Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 0, "testBlock");
 
             expect(synthVolumeSpy).not.toHaveBeenCalled();
+        });
+
+        it("should clamp synth volume between 0 and 100", () => {
+            Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 150, 0, "testBlock");
+            expect(last(targetTurtle.singer.synthVolume[DEFAULTVOICE])).toBe(100);
+
+            Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, -20, 0, "testBlock");
+            expect(last(targetTurtle.singer.synthVolume[DEFAULTVOICE])).toBe(0);
         });
 
         it("should trigger tone when firstConnection and lastConnection are null", () => {

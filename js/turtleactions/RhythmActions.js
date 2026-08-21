@@ -47,12 +47,9 @@ function setupRhythmActions(activity) {
          * @param {String} blkName - note block type name
          * @param {Object} turtle - Turtle object
          * @param {Object} blk - corresponding Block object index in blocks.blockList or custom block number
-         * @param {Function} _enqueue - callback, no longer invoked by playNote. The note clamp's
-         *     child flow is queued by the interpreter from the flow block's `[childFlow, 1]` return
-         *     value (runFromBlockNow step 3); kept for signature compatibility.
          * @returns {void}
          */
-        static playNote(value, blkName, turtle, blk, _enqueue) {
+        static playNote(value, blkName, turtle, blk) {
             /**
              * The interpreter queues the child flow of the note clamp from the flow block's
              * `[childFlow, 1]` return value and, once all of the children are run, triggers a
@@ -132,7 +129,7 @@ function setupRhythmActions(activity) {
             const listenerName = "_playnote_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -145,10 +142,10 @@ function setupRhythmActions(activity) {
                 if (tur.singer.inNoteBlock.length > 0) {
                     if (tur.singer.inNeighbor.length > 0) {
                         tur.singer.neighborArgBeat.push(
-                            tur.singer.beatFactor * (1 / tur.singer.neighborNoteValue)
+                            tur.singer.beatFactor * (1 / last(tur.singer.neighborNoteValue))
                         );
 
-                        const nextBeat = 1 / noteBeatValue - 2 * tur.singer.neighborNoteValue;
+                        const nextBeat = 1 / noteBeatValue - 2 * last(tur.singer.neighborNoteValue);
                         if (nextBeat <= 0 || !isFinite(nextBeat)) {
                             activity.errorMsg(
                                 _(
@@ -240,7 +237,7 @@ function setupRhythmActions(activity) {
                 activity.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
                 value = 0;
             } else {
-                tur.singer.dotCount += 1 / value;
+                tur.singer.dotCount += -1 / value;
             }
 
             const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
@@ -249,7 +246,7 @@ function setupRhythmActions(activity) {
             const listenerName = "_dot_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -257,7 +254,7 @@ function setupRhythmActions(activity) {
             const __listener = () => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
-                tur.singer.dotCount -= value >= 0 ? value : 1 / value;
+                tur.singer.dotCount -= value >= 0 ? value : -1 / value;
                 const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor /= newDotFactor;
             };
@@ -286,7 +283,7 @@ function setupRhythmActions(activity) {
             const listenerName = "_tie_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -393,12 +390,16 @@ function setupRhythmActions(activity) {
         static multiplyNoteValue(factor, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            if (typeof factor !== "number" || isNaN(factor) || factor === 0) {
+                return;
+            }
+
             tur.singer.beatFactor /= factor;
 
             const listenerName = "_multiplybeat_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -425,6 +426,12 @@ function setupRhythmActions(activity) {
             if (tur.singer.suppressOutput) {
                 activity.logo.notation.notationSwing(turtle);
             } else {
+                if (typeof swingValue !== "number" || isNaN(swingValue) || swingValue === 0) {
+                    return;
+                }
+                if (typeof noteValue !== "number" || isNaN(noteValue) || noteValue === 0) {
+                    return;
+                }
                 tur.singer.swing.push(1 / swingValue);
                 tur.singer.swingTarget.push(1 / noteValue);
             }
@@ -434,7 +441,7 @@ function setupRhythmActions(activity) {
             const listenerName = "_swing_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }

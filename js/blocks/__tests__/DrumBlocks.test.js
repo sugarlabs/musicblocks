@@ -591,6 +591,12 @@ describe("real DrumBlocks instances - direct method coverage", () => {
         global.ValueBlock = origValueBlock;
     });
 
+    test("name selector blocks declare the wideLabel capability", () => {
+        expect(instances["noisename"].getCapability("wideLabel")).toBe(true);
+        expect(instances["drumname"].getCapability("wideLabel")).toBe(true);
+        expect(instances["effectsname"].getCapability("wideLabel")).toBe(true);
+    });
+
     test("real PlayNoiseBlock flow() calls errorMsg for invalid args", () => {
         instances["playnoise"].flow([], {}, 0, "blk1");
         expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
@@ -649,6 +655,31 @@ describe("real DrumBlocks instances - direct method coverage", () => {
         };
         instances["playdrum"].flow(["snare"], logo, 0, "blk1");
         expect(global.Singer.DrumActions.playDrum).toHaveBeenCalledWith("snare", 0, "blk1");
+    });
+
+    test("real PlayDrumBlock flow() plays stand-alone drum under Start (not in note)", () => {
+        // Connected under Start: parent connection set, not inside a Note block.
+        activity.turtles.ithTurtle = jest.fn(() => ({
+            singer: {
+                drumStyle: [],
+                inNoteBlock: [],
+                noteBeatValues: {},
+                beatFactor: 1,
+                pushedNote: false
+            }
+        }));
+        activity.blocks.blockList["blk1"].connections = ["startBlk", "drumnameBlk", null];
+        const logo = {
+            inPitchDrumMatrix: false,
+            inMatrix: false,
+            inMusicKeyboard: false,
+            drumBlocks: [],
+            pitchDrumMatrix: { drums: [], addColBlock: jest.fn() },
+            phraseMaker: { rowLabels: [], rowArgs: [], addRowBlock: jest.fn() },
+            musicKeyboard: { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() }
+        };
+        instances["playdrum"].flow(["kick drum"], logo, 0, "blk1");
+        expect(global.Singer.DrumActions.playDrum).toHaveBeenCalledWith("kick drum", 0, "blk1");
     });
 
     test("real PlayDrumBlock flow() pushes to pitchDrumMatrix", () => {

@@ -312,6 +312,38 @@ describe("Arpeggio Widget", () => {
             expect(arpeggio._playing).toBe(false);
         });
 
+        test("play button uses a C4 sixteenth-note fallback when notesToPlay is empty", () => {
+            const cell = document.getElementById("2,0");
+            arpeggio.notesToPlay = [];
+            cell.onclick({ target: cell });
+            activityMock.logo.synth.trigger.mockClear();
+            global.getNote.mockClear();
+
+            arpeggio.playButton.onclick();
+
+            expect(arpeggio._playing).toBe(true);
+            expect(global.getNote).toHaveBeenCalledWith(
+                "C",
+                4,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
+            expect(activityMock.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                expect.anything(),
+                1 / 16,
+                DEFAULTVOICE,
+                null,
+                null,
+                null
+            );
+            arpeggio.playButton.onclick();
+            expect(arpeggio._playing).toBe(false);
+        });
+
         test("clear button unclicks all cells", () => {
             const cell = document.getElementById("2,1");
             cell.onclick({ target: cell });
@@ -572,16 +604,13 @@ describe("Arpeggio Widget", () => {
         });
 
         test("defaults to C4 when notesToPlay is empty", () => {
-            // The notesToPlay.length === 0 guard sets letter="C", octave=4
-            // getNote is called with those values before the crash at notesToPlay[0][1]
+            // The notesToPlay.length === 0 guard should provide a complete fallback note.
             arpeggio.notesToPlay = [];
             const cell = document.createElement("td");
 
-            try {
+            expect(() => {
                 arpeggio.__playCell(3, 0, cell, true);
-            } catch (_) {
-                // notesToPlay[0][1] read for duration crashes after getNote succeeds
-            }
+            }).not.toThrow();
 
             expect(global.getNote).toHaveBeenCalledWith(
                 "C",
@@ -591,6 +620,15 @@ describe("Arpeggio Widget", () => {
                 false,
                 null,
                 expect.anything()
+            );
+            expect(activityMock.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                expect.anything(),
+                1 / 16,
+                DEFAULTVOICE,
+                null,
+                null,
+                null
             );
         });
     });
@@ -691,6 +729,28 @@ describe("Arpeggio Widget", () => {
             expect(arpeggio._playing).toBe(false);
             expect(arpeggio._playTimeout).toBeNull();
             expect(activityMock.logo.synth.stop).toHaveBeenCalled();
+        });
+
+        test("handles Move up and Move down toolbar buttons to shift octave", () => {
+            arpeggio.addNode(1, 1);
+            expect(arpeggio._blockMap).toContainEqual([1, 1]);
+
+            const buttons = mockWidgetWindow.addButton.mock.results.map(r => r.value);
+            const moveUpBtn = buttons.find(b => b && b.title === "Move up");
+            const moveDownBtn = buttons.find(b => b && b.title === "Move down");
+
+            expect(moveUpBtn).toBeDefined();
+            expect(moveDownBtn).toBeDefined();
+
+            if (moveUpBtn && moveUpBtn.onclick) {
+                moveUpBtn.onclick();
+                expect(arpeggio._blockMap).toContainEqual([0, 1]);
+            }
+
+            if (moveDownBtn && moveDownBtn.onclick) {
+                moveDownBtn.onclick();
+                expect(arpeggio._blockMap).toContainEqual([1, 1]);
+            }
         });
     });
 });

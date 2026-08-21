@@ -20,7 +20,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const fs = require("fs");
+const path = require("path");
+
 const { setupActivityIdleWatcher } = require("../idle-watcher");
+
+const activitySource = fs.readFileSync(path.resolve(__dirname, "..", "..", "activity.js"), "utf8");
 
 describe("setupActivityIdleWatcher", () => {
     let mockActivity;
@@ -63,12 +68,23 @@ describe("setupActivityIdleWatcher", () => {
         delete global.ErrorHandler;
     });
 
+    describe("ownership", () => {
+        it("keeps the shadowing idle watcher methods out of activity.js", () => {
+            expect(activitySource).not.toMatch(/this\._initIdleWatcher\s*=\s*\(\)\s*=>/);
+            expect(activitySource).not.toMatch(/this\._stopIdleWatcher\s*=\s*\(\)\s*=>/);
+            expect(activitySource).not.toMatch(/this\._resetIdleTimer\s*=\s*\(\)\s*=>/);
+        });
+    });
+
     describe("_initIdleWatcher", () => {
         it("initializes state variables correctly", () => {
             setupActivityIdleWatcher(mockActivity);
             expect(mockActivity.isAppIdle).toBe(false);
             expect(mockActivity._idleWatcherInterval).toBeUndefined();
             expect(mockActivity._autoSaveInterval).toBeNull();
+            expect(typeof mockActivity._initIdleWatcher).toBe("function");
+            expect(typeof mockActivity._stopIdleWatcher).toBe("function");
+            expect(typeof mockActivity._resetIdleTimer).toBe("undefined");
         });
 
         it("adds event listeners on init", () => {
@@ -136,8 +152,9 @@ describe("setupActivityIdleWatcher", () => {
             expect(mockActivity.stageDirty).toBe(true);
         });
 
-        it("does not idle if music is playing", () => {
+        it("does not idle if turtles.running reports active playback", () => {
             setupActivityIdleWatcher(mockActivity);
+            mockActivity.logo._alreadyRunning = true;
             mockActivity.turtles.running.mockReturnValue(true);
             mockActivity._initIdleWatcher();
 
@@ -145,6 +162,18 @@ describe("setupActivityIdleWatcher", () => {
 
             expect(mockActivity.isAppIdle).toBe(false);
             expect(global.createjs.Ticker.framerate).toBe(60);
+        });
+
+        it("ignores logo._alreadyRunning for idle detection", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.logo._alreadyRunning = true;
+            mockActivity.turtles.running.mockReturnValue(false);
+            mockActivity._initIdleWatcher();
+
+            jest.advanceTimersByTime(6000);
+
+            expect(mockActivity.isAppIdle).toBe(true);
+            expect(global.createjs.Ticker.framerate).toBe(1);
         });
 
         it("wakes up if music starts playing while idle", () => {
@@ -164,6 +193,22 @@ describe("setupActivityIdleWatcher", () => {
             expect(mockActivity.isAppIdle).toBe(false);
             expect(global.createjs.Ticker.framerate).toBe(60);
             expect(mockActivity.stageDirty).toBe(true);
+        });
+
+        it("throttles rapid reset events for 500ms before accepting another wakeup", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity._initIdleWatcher();
+
+            jest.advanceTimersByTime(600);
+            mockActivity._resetIdleTimer();
+
+            jest.advanceTimersByTime(400);
+            mockActivity._resetIdleTimer();
+
+            jest.advanceTimersByTime(5001);
+
+            expect(mockActivity.isAppIdle).toBe(true);
+            expect(global.createjs.Ticker.framerate).toBe(1);
         });
 
         it("does not accumulate listeners or intervals when called twice", () => {

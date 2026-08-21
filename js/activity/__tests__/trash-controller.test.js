@@ -74,7 +74,13 @@ function makeActivity() {
         refreshCanvas: jest.fn(),
         textMsg: jest.fn(),
         cellSize: 10,
-        __tick: jest.fn()
+        __tick: jest.fn(),
+        closeHelpfulWheel: jest.fn(() => {
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            const wasOpen = Boolean(helpfulWheelDiv && helpfulWheelDiv.style.display !== "none");
+            if (wasOpen) helpfulWheelDiv.style.display = "none";
+            return wasOpen;
+        })
     };
 
     return activity;
@@ -277,6 +283,16 @@ describe("TrashController.restoreTrashById", () => {
         expect(actionArg.value).toBe("action2");
         expect(activity.blocks.newNameddoBlock).toHaveBeenCalledWith("action2", false, false);
         expect(activity.palettes.updatePalettes).toHaveBeenCalledWith("action");
+    });
+
+    test("restores a trashed action block with no argument block without throwing", () => {
+        const activity = makeActivity();
+        const block = makeBlock({ name: "action", connections: [null, null] });
+        activity.blocks.blockList.blk1 = block;
+        activity.blocks.trashStacks = ["blk1"];
+
+        const controller = new TrashController(activity);
+        expect(() => controller.restoreTrashById("blk1")).not.toThrow();
     });
 });
 

@@ -97,7 +97,14 @@ function doBrowserCheck() {
  */
 function canvasPixelRatio() {
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const context = document.querySelector("#myCanvas").getContext("2d");
+    const canvas = document.querySelector("#myCanvas");
+    if (!canvas) {
+        return devicePixelRatio;
+    }
+    const context = canvas.getContext("2d");
+    if (!context) {
+        return devicePixelRatio;
+    }
     const backingStoreRatio =
         context.webkitBackingStorePixelRatio ||
         context.mozBackingStorePixelRatio ||

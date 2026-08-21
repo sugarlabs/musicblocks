@@ -22,12 +22,22 @@ const {
 } = DomHelpers;
 
 describe("DOM query helpers", () => {
+    let spyGetById;
+    let spyGetByClass;
+    let spyGetByTag;
+    let spyGetByName;
+    let spyQuerySelector;
+
     beforeEach(() => {
-        document.getElementById = jest.fn(() => null);
-        document.getElementsByClassName = jest.fn(() => []);
-        document.getElementsByTagName = jest.fn(() => []);
-        document.getElementsByName = jest.fn(() => []);
-        document.querySelector = jest.fn(() => null);
+        spyGetById = jest.spyOn(document, "getElementById").mockImplementation(() => null);
+        spyGetByClass = jest.spyOn(document, "getElementsByClassName").mockImplementation(() => []);
+        spyGetByTag = jest.spyOn(document, "getElementsByTagName").mockImplementation(() => []);
+        spyGetByName = jest.spyOn(document, "getElementsByName").mockImplementation(() => []);
+        spyQuerySelector = jest.spyOn(document, "querySelector").mockImplementation(() => null);
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     it("docById delegates to getElementById and returns its result", () => {
@@ -71,11 +81,15 @@ describe("DOM query helpers", () => {
 });
 
 describe("hideDOMLabel()", () => {
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
     it("hides textLabel, numberLabel, and wheelDiv when they exist", () => {
         const textLabel = { style: { display: "block" } };
         const numberLabel = { style: { display: "block" } };
         const piemenu = { style: { display: "block" } };
-        document.getElementById = jest.fn(id => {
+        jest.spyOn(document, "getElementById").mockImplementation(id => {
             if (id === "textLabel") return textLabel;
             if (id === "numberLabel") return numberLabel;
             if (id === "wheelDiv") return piemenu;
@@ -88,7 +102,7 @@ describe("hideDOMLabel()", () => {
     });
 
     it("does not throw when elements are missing", () => {
-        document.getElementById = jest.fn(() => null);
+        jest.spyOn(document, "getElementById").mockImplementation(() => null);
         expect(() => hideDOMLabel()).not.toThrow();
     });
 });
@@ -117,6 +131,130 @@ describe("closeWidgets()", () => {
     it("does not throw when openWindows is empty", () => {
         window.widgetWindows.openWindows = {};
         expect(() => closeWidgets()).not.toThrow();
+    });
+});
+
+describe("hideDOMLabel() — partial DOM element existence & real DOM interactions", () => {
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    it("hides only textLabel when textLabel is the only element present", () => {
+        const textLabel = { style: { display: "block" } };
+        jest.spyOn(document, "getElementById").mockImplementation(id =>
+            id === "textLabel" ? textLabel : null
+        );
+
+        hideDOMLabel();
+
+        expect(textLabel.style.display).toBe("none");
+    });
+
+    it("hides only numberLabel when numberLabel is the only element present", () => {
+        const numberLabel = { style: { display: "block" } };
+        jest.spyOn(document, "getElementById").mockImplementation(id =>
+            id === "numberLabel" ? numberLabel : null
+        );
+
+        hideDOMLabel();
+
+        expect(numberLabel.style.display).toBe("none");
+    });
+
+    it("hides only wheelDiv when wheelDiv is the only element present", () => {
+        const piemenu = { style: { display: "block" } };
+        jest.spyOn(document, "getElementById").mockImplementation(id =>
+            id === "wheelDiv" ? piemenu : null
+        );
+
+        hideDOMLabel();
+
+        expect(piemenu.style.display).toBe("none");
+    });
+
+    it("works with real JSDOM HTML elements", () => {
+        document.body.innerHTML = `
+            <div id="textLabel" style="display: block;"></div>
+            <div id="numberLabel" style="display: inline;"></div>
+            <div id="wheelDiv" style="display: flex;"></div>
+        `;
+
+        hideDOMLabel();
+
+        expect(document.getElementById("textLabel").style.display).toBe("none");
+        expect(document.getElementById("numberLabel").style.display).toBe("none");
+        expect(document.getElementById("wheelDiv").style.display).toBe("none");
+    });
+});
+
+describe("DOM query helpers — real JSDOM element selection", () => {
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="header" class="active title" name="header-name">Header</div>
+            <span class="active" name="span-name">Span 1</span>
+            <span class="active" name="span-name">Span 2</span>
+        `;
+    });
+
+    it("docById retrieves actual DOM element by ID", () => {
+        const header = docById("header");
+        expect(header).not.toBeNull();
+        expect(header.textContent).toBe("Header");
+    });
+
+    it("docByClass retrieves elements matching class name", () => {
+        const activeElems = docByClass("active");
+        expect(activeElems.length).toBe(3);
+    });
+
+    it("docByTagName retrieves elements by tag name", () => {
+        const spans = docByTagName("span");
+        expect(spans.length).toBe(2);
+    });
+
+    it("docByName retrieves elements matching name attribute", () => {
+        const namedElems = docByName("span-name");
+        expect(namedElems.length).toBe(2);
+    });
+
+    it("docBySelector retrieves element by query selector", () => {
+        const firstActiveSpan = docBySelector("span.active");
+        expect(firstActiveSpan).not.toBeNull();
+        expect(firstActiveSpan.textContent).toBe("Span 1");
+    });
+});
+
+describe("closeWidgets() — edge cases", () => {
+    it("handles multiple widgets and verifies each closeWindow invocation", () => {
+        const closeWindowMock = jest.fn();
+        window.widgetWindows = {
+            openWindows: {
+                tempo: {},
+                volume: {},
+                pitch: {}
+            },
+            closeWindow: closeWindowMock
+        };
+
+        closeWidgets();
+
+        expect(closeWindowMock).toHaveBeenCalledTimes(3);
+        expect(closeWindowMock).toHaveBeenNthCalledWith(1, "tempo");
+        expect(closeWindowMock).toHaveBeenNthCalledWith(2, "volume");
+        expect(closeWindowMock).toHaveBeenNthCalledWith(3, "pitch");
+    });
+});
+
+describe("DomHelpers module structure", () => {
+    it("exports expected helper methods in object", () => {
+        expect(DomHelpers).toHaveProperty("docByClass");
+        expect(DomHelpers).toHaveProperty("docByTagName");
+        expect(DomHelpers).toHaveProperty("docById");
+        expect(DomHelpers).toHaveProperty("docByName");
+        expect(DomHelpers).toHaveProperty("docBySelector");
+        expect(DomHelpers).toHaveProperty("hideDOMLabel");
+        expect(DomHelpers).toHaveProperty("displayMsg");
+        expect(DomHelpers).toHaveProperty("closeWidgets");
     });
 });
 

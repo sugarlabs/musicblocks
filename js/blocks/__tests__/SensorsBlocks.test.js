@@ -112,6 +112,8 @@ global.toFixed2 = function (value) {
     return Number(value).toFixed(2);
 };
 
+global.isValidHex = require("../../utils/utils-logic.js").isValidHex;
+global.hexToRGB = require("../../utils/utils-logic.js").hexToRGB;
 global.hex2rgb = function (hex) {
     // Dummy conversion: simply return a fixed rgb string.
     return "rgb(100,150,200)";

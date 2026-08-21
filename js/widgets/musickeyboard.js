@@ -259,6 +259,12 @@ function MusicKeyboard(activity) {
     this.instrumentMapper = {};
 
     /**
+     * Mapping between note names with octaves and keyboard element IDs.
+     * @type {Object}
+     */
+    this.noteToKeyMap = {};
+
+    /**
      * Flag to track first note while using metronome.
      * @type {boolean}
      */
@@ -1883,6 +1889,12 @@ function MusicKeyboard(activity) {
         return exitWheel;
     };
 
+    this._configureExitWheel = exitWheel => {
+        if (typeof window.configureExitWheel === "function") {
+            window.configureExitWheel(exitWheel);
+        }
+    };
+
     /**
      * Creates a pie submenu based on the cell's attributes.
      * @param {string} cellId - The ID of the cell triggering the submenu.
@@ -1972,6 +1984,7 @@ function MusicKeyboard(activity) {
             this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
             this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
         }
+        this._configureExitWheel(this._exitWheel);
 
         docById("wheelDivptm").style.position = "absolute";
         docById("wheelDivptm").style.height = "250px";
@@ -2226,6 +2239,7 @@ function MusicKeyboard(activity) {
             this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
             this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
         }
+        this._configureExitWheel(this._exitWheel);
 
         const x = docById("addnotes").getBoundingClientRect().x;
         const y = docById("addnotes").getBoundingClientRect().y;
@@ -2378,10 +2392,18 @@ function MusicKeyboard(activity) {
                     this._createTable();
                     const n = this.layout.length;
                     const key = this.layout[n - 1];
-                    this.getElement[key.noteName.toString() + key.noteOctave.toString()] =
-                        key.objId;
-                    this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] =
-                        key.objId; //convet solfege to alphabetic.
+                    if (!this.noteToKeyMap) {
+                        this.noteToKeyMap = {};
+                    }
+                    if (key) {
+                        this.noteToKeyMap[key.noteName.toString() + key.noteOctave.toString()] =
+                            key.objId;
+                        if (FIXEDSOLFEGE1 && FIXEDSOLFEGE1[key.noteName.toString()]) {
+                            this.noteToKeyMap[
+                                FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave
+                            ] = key.objId; //convet solfege to alphabetic.
+                        }
+                    }
                 }, 500);
             } else {
                 debugLog("Could not find anywhere to insert new block.");
@@ -2637,6 +2659,7 @@ function MusicKeyboard(activity) {
             this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
             this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
         }
+        this._configureExitWheel(this._exitWheel);
 
         const octaveLabels = [
             "8",
@@ -3565,13 +3588,18 @@ function MusicKeyboard(activity) {
         let duration = 0;
         let startTime = 0;
 
-        this.getElement = {};
+        this.noteToKeyMap = {};
 
         for (let idx = 0; idx < this.layout.length; idx++) {
             const key = this.layout[idx];
-            this.getElement[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
-            this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] =
-                key.objId; //convet solfege to alphabetic.
+            if (key) {
+                this.noteToKeyMap[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
+                if (FIXEDSOLFEGE1 && FIXEDSOLFEGE1[key.noteName.toString()]) {
+                    this.noteToKeyMap[
+                        FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave
+                    ] = key.objId; //convet solfege to alphabetic.
+                }
+            }
         }
 
         /**
@@ -3660,7 +3688,7 @@ function MusicKeyboard(activity) {
             const pitch2 = pitchOctave[1];
             const octave = pitchOctave[2];
             const key =
-                this.getElement[pitch1 + "" + octave] || this.getElement[pitch2 + "" + octave];
+                this.noteToKeyMap[pitch1 + "" + octave] || this.noteToKeyMap[pitch2 + "" + octave];
             if (event.data[0] === 144 && event.data[2] !== 0) {
                 __startNote(event, docById(key));
             } else {

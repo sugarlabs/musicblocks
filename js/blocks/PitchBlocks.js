@@ -425,6 +425,7 @@ function setupPitchBlocks(activity) {
             super("outputtools", _("pitch converter"));
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.extraWidth = 50;
@@ -883,6 +884,7 @@ function setupPitchBlocks(activity) {
             super("accidentalname", _("accidental selector"));
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _(
