@@ -39,7 +39,7 @@ try {
    setupHelpController,
    setupBlockScaleController,
    setupContextMenuController,
-   setupActivityAbcParser, setupActivityIdleWatcher,
+   setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -458,6 +458,9 @@ class Activity {
         } catch (e) {
             ErrorHandler.recoverable(e, { operation: "loadKeySignatureEnv" });
         }
+
+        this.sessionStorageManager =
+            typeof SessionStorageManager !== "undefined" ? new SessionStorageManager() : null;
 
         setupActivityIdleWatcher(this);
         setupProjectManager(this);
@@ -2469,6 +2472,54 @@ class Activity {
                 "activity.domReady.start",
                 "activity.domReady.end"
             );
+        };
+
+        this._handleBeforeUnload = () => {
+            // Save synchronously to SESSION* keys so manual reload/F5
+            // still has recoverable data even if async saves are cut short.
+            if (!this._isHardReloading) {
+                if (typeof this.__saveLocally === "function") {
+                    this.__saveLocally();
+                }
+                if (
+                    typeof this.saveLocally === "function" &&
+                    this.saveLocally !== this.__saveLocally
+                ) {
+                    this.saveLocally();
+                }
+            }
+            this._stopRenderLoop();
+            if (typeof this._stopAutoSave === "function") {
+                this._stopAutoSave();
+            }
+        };
+
+        this.saveSessionAsync = async () => {
+            // First, trigger __saveLocally for the image thumb and fallback.
+            // If the payload is huge, it will quota exceed but fail silently, which is fine!
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            // Second, save the massive payload safely to IndexedDB.
+            if (this.sessionStorageManager) {
+                const data = this.prepareExport();
+                let p = this.storage.currentProject;
+                if (!p) return;
+
+                // We use the same timestamp that __saveLocally just wrote,
+                // or generate a new one if it failed.
+                let timestampStr = this.storage["SESSION_TIMESTAMP" + p];
+                let timestamp = timestampStr ? parseInt(timestampStr, 10) : Date.now();
+
+                try {
+                    await this.sessionStorageManager.saveSession("SESSION" + p, data, timestamp);
+                    if (!timestampStr) {
+                        this.storage["SESSION_TIMESTAMP" + p] = timestamp.toString();
+                    }
+                } catch (e) {
+                    console.error("Failed to save session to IndexedDB:", e);
+                }
+            }
         };
 
         this.__saveLocally = (...args) => this.projectManager.saveLocally(...args);

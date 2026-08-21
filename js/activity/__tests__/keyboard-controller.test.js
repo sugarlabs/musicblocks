@@ -69,7 +69,7 @@ beforeEach(() => {
 // Activity mock
 // ---------------------------------------------------------------------------
 
-const makeActivity = () => ({
+const makeActivity = (overrides = {}) => ({
     keyboardEnableFlag: true,
     currentKeyCode: 0,
     currentKey: "",
@@ -125,7 +125,8 @@ const makeActivity = () => ({
     _doFastButton: jest.fn(),
     _doHardStopButton: jest.fn(),
     _saveHelpBlocks: jest.fn(),
-    workspaceLayoutController: { _findBlocks: jest.fn() }
+    workspaceLayoutController: { _findBlocks: jest.fn() },
+    ...overrides
 });
 
 const makeEvent = (overrides = {}) => ({
@@ -552,6 +553,52 @@ describe("KeyboardController", () => {
             expect(() => {
                 controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
             }).not.toThrow();
+        });
+    });
+
+    describe("hard refresh (Ctrl+Shift+R / Cmd+Shift+R)", () => {
+        it("clears indexedDB and storage keys on Ctrl+Shift+R", () => {
+            let thenCallback;
+            const activity = makeActivity({
+                sessionStorageManager: {
+                    clearAllSessions: jest.fn().mockReturnValue({
+                        then: cb => {
+                            thenCallback = cb;
+                            return { catch: jest.fn() };
+                        }
+                    })
+                },
+                storage: {
+                    currentProject: "TestProject",
+                    removeItem: jest.fn()
+                }
+            });
+            const controller = createController(activity);
+
+            const event = makeEvent({
+                ctrlKey: true,
+                shiftKey: true,
+                key: "r"
+            });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(event.stopPropagation).toHaveBeenCalled();
+            expect(activity._isHardReloading).toBe(true);
+            expect(activity.sessionStorageManager.clearAllSessions).toHaveBeenCalled();
+
+            try {
+                thenCallback();
+            } catch (e) {
+                // JSDOM navigation error expected
+            }
+
+            expect(activity.storage.removeItem).toHaveBeenCalledWith("SESSIONTestProject");
+            expect(activity.storage.removeItem).toHaveBeenCalledWith(
+                "SESSION_TIMESTAMPTestProject"
+            );
+            expect(activity.storage.removeItem).toHaveBeenCalledWith("mbGitRepoName");
         });
     });
 });

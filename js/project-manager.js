@@ -187,17 +187,70 @@ class ProjectManager {
         that.sessionData = null;
         const currentProject = that.storage.currentProject;
         const sessionKey = currentProject !== undefined ? "SESSION" + currentProject : null;
+        const sessionTimestampKey =
+            currentProject !== undefined ? "SESSION_TIMESTAMP" + currentProject : null;
+
+        let idbPayload = null;
+        if (that.sessionStorageManager && sessionKey) {
+            try {
+                idbPayload = await that.sessionStorageManager.loadSession(sessionKey);
+            } catch (e) {
+                console.error("Failed to load session from IndexedDB:", e);
+            }
+        }
 
         if (that.planet) {
             that.sessionData = await that.planet.openCurrentProject();
             if (!that.sessionData) {
                 if (currentProject !== undefined) {
-                    that.sessionData = that.storage[sessionKey];
+                    let localData = that.storage[sessionKey];
+                    let localTimestampStr = that.storage[sessionTimestampKey];
+                    let localTimestamp = localTimestampStr ? parseInt(localTimestampStr, 10) : 0;
+
+                    if (idbPayload && idbPayload.data) {
+                        if (!localData || idbPayload.timestamp >= localTimestamp) {
+                            that.sessionData = idbPayload.data;
+                        } else {
+                            that.sessionData = localData;
+                        }
+                    } else {
+                        that.sessionData = localData;
+                    }
                 }
+            }
+            // Fix #1+#4: Restore Git state keys if repo data exists in Planet storage
+            try {
+                const repoData =
+                    that.planet.getCurrentGitRepoData && that.planet.getCurrentGitRepoData();
+                if (repoData && repoData.repoName) {
+                    that.storage.mbGitRepoName = repoData.repoName;
+                    that.storage.mbGitHashedKey = repoData.hashedKey || "";
+                    that.storage.mbGitCurrentProjectId = repoData.projectId || "";
+                    if (repoData.displayName) {
+                        that.storage.mbGitDisplayName = repoData.displayName;
+                    }
+                }
+            } catch (gitRestoreErr) {
+                console.warn(
+                    "[ProjectManager] Could not restore git session state:",
+                    gitRestoreErr
+                );
             }
         } else {
             if (sessionKey !== null) {
-                that.sessionData = that.storage[sessionKey];
+                let localData = that.storage[sessionKey];
+                let localTimestampStr = that.storage[sessionTimestampKey];
+                let localTimestamp = localTimestampStr ? parseInt(localTimestampStr, 10) : 0;
+
+                if (idbPayload && idbPayload.data) {
+                    if (!localData || idbPayload.timestamp >= localTimestamp) {
+                        that.sessionData = idbPayload.data;
+                    } else {
+                        that.sessionData = localData;
+                    }
+                } else {
+                    that.sessionData = localData;
+                }
             }
         }
 
@@ -610,7 +663,11 @@ class ProjectManager {
         try {
             p = activity.storage.currentProject;
             activity.storage["SESSION" + p] = data;
+            activity.storage["SESSION_TIMESTAMP" + p] = Date.now().toString();
         } catch (e) {
+            // If it hits QuotaExceededError, it fails gracefully because saveSessionAsync
+            // (IndexedDB) handles large payloads.
+            console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
         }
 
