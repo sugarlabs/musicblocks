@@ -628,6 +628,28 @@ describe("PitchStaircase Widget", () => {
             expect(psc._undo).toHaveBeenCalledTimes(3);
         });
 
+        test("clears _scaleStepTimeout and _scaleHighlightTimeout set by _playNext when closing widget or stopping scale", () => {
+            jest.useFakeTimers();
+            psc._isPlayingScale = true;
+            // Populate _scaleStepTimeout and _scaleHighlightTimeout dynamically via _playNext
+            psc._playNext(-1, 1);
+
+            expect(psc._scaleStepTimeout).not.toBeNull();
+            expect(psc._scaleHighlightTimeout).not.toBeNull();
+
+            const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+
+            widgetWindow.onclose();
+
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.anything());
+            expect(psc._scaleStepTimeout).toBeNull();
+            expect(psc._scaleHighlightTimeout).toBeNull();
+            expect(psc.closed).toBe(true);
+
+            clearTimeoutSpy.mockRestore();
+            jest.useRealTimers();
+        });
+
         test("Save button saves once and holds a debounce lock", () => {
             jest.useFakeTimers();
             psc._save = jest.fn();
