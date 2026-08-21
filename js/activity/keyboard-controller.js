@@ -132,6 +132,17 @@ class KeyboardController {
         // const BACKSPACE = 8;
         const TAB = 9;
         if (event.keyCode === TAB) {
+            // FocusCycleManager owns Tab navigation when it is active. The
+            // legacy body/canvas guard would otherwise swallow the first Tab
+            // after toolbar Escape blurs the active control.
+            if (
+                typeof window !== "undefined" &&
+                window._focusCycleManager &&
+                window._focusCycleManager._initialized
+            ) {
+                return;
+            }
+
             const active = document.activeElement;
             const isCanvasOrBody =
                 active === document.body ||

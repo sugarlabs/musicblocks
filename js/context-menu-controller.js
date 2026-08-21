@@ -12,7 +12,7 @@
 /* global _, wheelnav, slicePath, platformColor, base64Encode, GOHOMEFADEDBUTTON,
    SHOWBLOCKSBUTTON, COLLAPSEBLOCKSBUTTON, SMALLERBUTTON, BIGGERBUTTON, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, COLLAPSEBUTTON, EXPANDBUTTON, piemenuGrid, LEADING,
-   _THIS_IS_MUSIC_BLOCKS_ */
+   _THIS_IS_MUSIC_BLOCKS_, makeKeyboardAccessible */
 
 /* exported setupContextMenuController, ContextMenuController */
 
@@ -479,6 +479,25 @@ class ContextMenuController {
         container.setAttribute("class", "tooltipped");
         container.setAttribute("data-tooltip", label);
         container.setAttribute("data-position", "top");
+        makeKeyboardAccessible(container, label);
+        if (typeof container.addEventListener === "function") {
+            container.addEventListener("keydown", event => {
+                const isEscape =
+                    event.key === "Escape" || event.key === "Esc" || event.keyCode === 27;
+                if (!isEscape) return;
+
+                event.preventDefault();
+                event.stopPropagation();
+                if (
+                    typeof window !== "undefined" &&
+                    window._focusCycleManager &&
+                    typeof window._focusCycleManager.exitKeyboardNavigation === "function"
+                ) {
+                    window._focusCycleManager.exitKeyboardNavigation();
+                }
+                container.blur?.();
+            });
+        }
         window.jQuery(".tooltipped").tooltip({
             html: true,
             delay: 100
@@ -527,6 +546,13 @@ class ContextMenuController {
      */
     loadButtonDragHandler(container, actionClick, arg) {
         const activity = this.activity;
+        makeKeyboardAccessible(
+            container,
+            typeof container.getAttribute === "function"
+                ? container.getAttribute("data-tooltip")
+                : undefined,
+            () => actionClick(arg)
+        );
         container.onmousedown = () => {
             if (!activity.loading) {
                 document.body.style.cursor = "default";
