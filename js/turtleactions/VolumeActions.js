@@ -57,6 +57,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static doCrescendo(type, value, turtle, blk) {
+            value = clampNumber(value, 0, 100);
             const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.crescendoDelta.push(type === "crescendo" ? value : -value);
@@ -273,6 +274,7 @@ function setupVolumeActions(activity) {
                 }
             }
 
+            volume = clampNumber(volume, 0, 100);
             tur.singer.synthVolume[synth].push(volume);
             if (!tur.singer.suppressOutput) {
                 Singer.setSynthVolume(activity.logo, turtle, synth, volume);

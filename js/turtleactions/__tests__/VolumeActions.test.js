@@ -463,6 +463,14 @@ describe("setupVolumeActions", () => {
             expect(synthVolumeSpy).not.toHaveBeenCalled();
         });
 
+        it("should clamp synth volume between 0 and 100", () => {
+            Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 150, 0, "testBlock");
+            expect(last(targetTurtle.singer.synthVolume[DEFAULTVOICE])).toBe(100);
+
+            Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, -20, 0, "testBlock");
+            expect(last(targetTurtle.singer.synthVolume[DEFAULTVOICE])).toBe(0);
+        });
+
         it("should trigger tone when firstConnection and lastConnection are null", () => {
             Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 0, null);
 
