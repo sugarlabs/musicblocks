@@ -152,6 +152,13 @@ describe("setupDictActions", () => {
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
             expect(pitchNumber).toBe(60);
             expect(activity.errorMsg).toHaveBeenCalledWith(INVALIDPITCH, 1);
+            expect(pitchToNumber).toHaveBeenCalledWith("G", 4, "C");
+        });
+
+        it("should subtract pitchNumberOffset from the computed pitch number", () => {
+            targetTurtle.singer.pitchNumberOffset = 15;
+            const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number");
+            expect(pitchNumber).toBe(60 - 15);
         });
 
         it("should return undefined for an unsupported key", () => {
