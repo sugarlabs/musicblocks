@@ -273,6 +273,10 @@ msgstr "じっこう"
 msgid "Stop"
 msgstr "ていし"
 
+#: js/SaveInterface.js:96
+msgid "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
+msgstr "このプロジェクトを じっこうするには、ブラウザーでミュージック・ブロックスを ひらき、このファイルを ブラウザー・ウィンドウにド ラッグ・アンド・ドロップします。"
+
 #: js/keyboard-controller.js:213
 #: js/keyboard-controller.js:243
 msgid "Paste"
@@ -1009,7 +1013,7 @@ msgstr "プラグインをよみこむ"
 
 #: js/turtledefs.js:577
 msgid "Load a selected plugin."
-msgstr "せんたくしたぷらぐいんをよみこみます。"
+msgstr "せんたくしたプラグインをよみこみます。"
 
 #: js/turtledefs.js:581
 #: js/toolbar-ui.js:149
@@ -1515,6 +1519,229 @@ msgstr "Lilypondがくふの フォーマットで ほぞん"
 msgid "Mr. Mouse"
 msgstr "ミスター・マウス"
 
+#: js/activity.js:2014 js/activity.js:2092
+msgid "Save recording"
+msgstr "ろくおんをほぞんする"
+
+#: js/activity.js:2021 js/activity.js:2071
+msgid "File save canceled"
+msgstr "ファイルのほぞんがきゃんせるされました"
+
+#: js/activity.js:2042 js/activity.js:2052
+msgid "Recorded file is empty. File not saved."
+msgstr "ろくおんされたファイルはそらです。ファイルがほぞんされていません。"
+
+#: js/activity.js:2069 js/activity.js:2099
+msgid "Enter file name"
+msgstr "ファイルめいをにゅうりょくしてください"
+
+#: js/activity.js:2082
+msgid "Saved! Check your Downloads folder."
+msgstr "ほぞんしました！ダウンロードふぉるだーをかくにんしてください。"
+
+#: js/activity.js:2089
+msgid "Recording stopped. File saved."
+msgstr "ろくおんがていしされました。ファイルがほぞんされました。"
+
+#: js/activity.js:2094
+msgid "recording"
+msgstr "ろくおんちゅう"
+
+#: js/activity.js:2131
+msgid "Recording started. Click stop to finish."
+msgstr "ろくおんがかいしされました。しゅうりょうするには「ていし」をクリックします。"
+
+#: js/activity.js:2211
+msgid "Recording failed: %s"
+msgstr "ろくおんにしっぱいしました: %s"
+
+#: js/activity.js:2412
+msgid "Horizontal scrolling enabled."
+msgstr "すいへいスクロールがゆうこうになりました。"
+
+#: js/activity.js:2421
+msgid "Horizontal scrolling disabled."
+msgstr "すいへいスクロールがむこうになっています。"
+
+#: js/activity.js:2432
+msgid "Catching mice"
+msgstr "ネズミを つかまえているよ"
+
+#: js/activity.js:2433
+msgid "Cleaning the instruments"
+msgstr "がっきの おていれを しているよ"
+
+#: js/activity.js:2434
+msgid "Testing key pieces"
+msgstr "キーボードの おとを たしかめているよ"
+
+#: js/activity.js:2435
+msgid "Sight-reading"
+msgstr "がくふを よみこんでいるよ"
+
+#: js/activity.js:2436
+msgid "Combining math and music"
+msgstr "おんがくと さんすうを くっつけているよ"
+
+#: js/activity.js:2437
+msgid "Generating more blocks"
+msgstr "ブロックを たくさん つくっているよ"
+
+#: js/activity.js:2438
+msgid "Do Re Mi Fa Sol La Ti Do"
+msgstr "ド　レ　ミ　ファ　ソ　ラ　シ　ド"
+
+#: js/activity.js:2439
+msgid "Tuning string instruments"
+msgstr "げんがっきの チューニングを しているよ"
+
+#: js/activity.js:2440
+msgid "Pressing random keys"
+msgstr "キーボードで おんがくを つくっているよ"
+
+#: js/activity.js:2662
+msgid "plugins will be removed upon restart."
+msgstr "プラグインは さいせいするときえるよ"
+
+#: js/activity.js:2671
+msgid "show Cartesian"
+msgstr "ほうがん（ざひょう）を ひょうじ"
+
+#. TRANS: a numeric mapping of the notes in an octave based on the musical
+#. mode
+#: js/activity.js:3331 js/palette.js:1258 js/blocks/RhythmBlocks.js:925
+#: js/blocks/PitchBlocks.js:462 js/blocks/PitchBlocks.js:1831
+msgid "scale degree"
+msgstr "おんど"
+
+#: js/activity.js:3334 js/palette.js:1267
+msgid "voice name"
+msgstr "おんめい"
+
+#: js/activity.js:3337 js/palette.js:1264
+msgid "invert mode"
+msgstr "ちょうを はんてん させる"
+
+#: js/activity.js:3340
+msgid "output tools"
+msgstr "しゅつりょくつーる"
+
+#: js/activity.js:3343
+msgid "custom note"
+msgstr "カスタムピッチ"
+
+#: js/activity.js:3346
+msgid "accidental name"
+msgstr "ぐうぜんのなまえ"
+
+#: js/activity.js:3349 js/blocks/PitchBlocks.js:895
+msgid "east indian solfege"
+msgstr "ひがしいんどのそるふぇーじゅ"
+
+#: js/activity.js:3352 js/blocks/PitchBlocks.js:909
+msgid "note name"
+msgstr "おんめい"
+
+#: js/activity.js:3355 js/blocks/IntervalsBlocks.js:94
+msgid "temperament name"
+msgstr "きしつめい"
+
+#: js/activity.js:3358 js/palette.js:1261
+msgid "mode name"
+msgstr "おんかい名"
+
+#: js/activity.js:3361
+msgid "chord name"
+msgstr "chord name"
+
+#: js/activity.js:3364 js/palette.js:1284
+msgid "interval name"
+msgstr "おんていめい"
+
+#: js/activity.js:3367
+msgid "filter type"
+msgstr "ふぃるたーのしゅるい"
+
+#: js/activity.js:3370
+msgid "oscillator type"
+msgstr "はっしんきのしゅるい"
+
+#: js/activity.js:3373 js/blocks.js:2685 js/blocks.js:2693
+msgid "audio file"
+msgstr "オーディオファイル"
+
+#: js/activity.js:3376 js/blocks/DrumBlocks.js:32
+msgid "noise name"
+msgstr "のいずめい"
+
+#: js/activity.js:3379 js/blocks/DrumBlocks.js:75
+msgid "drum name"
+msgstr "ドラムめい"
+
+#: js/activity.js:3382 js/blocks/DrumBlocks.js:119
+msgid "effects name"
+msgstr "えふぇくとめい"
+
+#: js/activity.js:3385
+msgid "wrap mode"
+msgstr "らっぷモード"
+
+#: js/activity.js:3388
+msgid "load file"
+msgstr "ロード ファイル "
+
+#: js/activity.js:3717 js/activity.js:7467
+msgid "This block is deprecated."
+msgstr "この ブロックは もう ありません。"
+
+#: js/activity.js:3719 js/activity.js:7469
+msgid "Block cannot be found."
+msgstr "ブロックが みつかりません。"
+
+#: js/activity.js:3867
+msgid "Saving block artwork"
+msgstr "ブロックの アートを ほぞんちゅう"
+
+#: js/activity.js:3875
+msgid "Erase"
+msgstr "けす"
+
+#: js/activity.js:3919 js/activity.js:3949
+msgid "Paste"
+msgstr "はりつけ"
+
+#: js/activity.js:3923
+msgid "Save block help"
+msgstr "ブロックの ヘルプを ほぞん"
+
+#: js/activity.js:3995
+msgid "Jumping to the bottom of the page."
+msgstr "がめんのしたにジャンプしています"
+
+#: js/activity.js:4001
+msgid "Scrolling up."
+msgstr "うえにスクロールしています"
+
+#: js/activity.js:4006
+msgid "Scrolling down."
+msgstr "したにスクロールしています"
+
+#: js/activity.js:4011
+msgid "Extracting block"
+msgstr "ブロックを取り出しています"
+
+#: js/activity.js:4019
+msgid "Moving block up."
+msgstr "ブロックをうえにうごかしています"
+
+#: js/activity.js:4040
+msgid "Moving block down."
+msgstr "ブロックをしたにうごかしています"
+
+#: js/activity.js:4062
+msgid "Moving block left."
+msgstr "ブロックをひだりにうごかしています"
+
 #: js/SaveInterface.js:871
 #: js/SaveInterface.js:930
 #: js/logo.js:2319
@@ -1543,8 +1770,33 @@ msgstr "ごみはこはそらです。"
 #: js/trash-controller.js:79
 #: js/trash-controller.js:215
 msgid "Item restored from the trash."
-msgstr "ごみはこからあいてむをふくげんしました。"
+msgstr "ごみはこから アイテムを ふくげんしました。"
 
+#: js/activity.js:4724
+msgid "Restore last item"
+msgstr "さきの アイテムを ふくげん"
+
+#: js/activity.js:4725
+msgid "Restore all items"
+msgstr "すべての アイテムを ふくげん"
+
+#: js/activity.js:5393
+msgid "Click the run button to run the project."
+msgstr "プロジェクトを さいせいするため、さいせいの ボタンを クリックして ください。"
+
+#: js/activity.js:6009
+msgid "Loading Complete!"
+msgstr "よみこみかんりょう！"
+
+#: js/activity.js:7068
+msgid "Enter the name of a built-in plugin, or leave blank to upload a plugin file:"
+msgstr "くみこみプラグインのなまえをにゅうりょくするか、くうはくのままにしてプラグイン ファイルをプラグインします。"
+
+#: js/activity.js:7080
+msgid "Invalid plugin name. Only alphanumeric characters, hyphens, and underscores are allowed."
+msgstr "プラグインめいがむこうです。えいすうじ、はいふん、あんだーすこあのみがしようできます。"
+
+#: js/activity.js:7538
 #: js/help-controller.js:92
 msgid "Windows/Linux"
 msgstr "Windows/Linux"
@@ -1726,7 +1978,7 @@ msgstr "キーボードのショートカット"
 
 #: js/help-controller.js:284
 msgid "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
-msgstr "ショートカットはじょうきょうにいぞんします。いちぶのきのうは、かんれんするぱねる、ツール、またはモードがアクティブなばあいにのみきのうします。 Windows/Linux および Mac のどうとうのものをいっしょにしめします。"
+msgstr "ショートカットは じょうきょうに いぞんします。いちぶのきのうは、かんれんする パネル、ツール、または モードが アクティブな ばあいに のみきのうします。 Windows/Linux および Mac のどうとうの ものを いっしょに しめします。"
 
 #: js/lilypond.js:619
 #: js/lilypond.js:909
@@ -2037,11 +2289,11 @@ msgstr "がめんの きょうかいを むしする"
 
 #: js/trash-controller.js:286
 msgid "Restore last item"
-msgstr "さいごのあいてむをふくげん"
+msgstr "さきの アイテムを ふくげん"
 
 #: js/trash-controller.js:287
 msgid "Restore all items"
-msgstr "すべてのあいてむをふくげん"
+msgstr "すべての アイテムを ふくげん"
 
 #: js/turtle-singer.js:1576
 #.TRANS: partials are weighted components in a harmonic series
@@ -2227,6 +2479,16 @@ msgstr "うえ"
 msgid "Silence block cannot be removed."
 msgstr "「きゅうふ」は とりだすことが できません。"
 
+#: js/block.js:4191 js/blocks.js:2813 js/blocks.js:3432 js/palette.js:1287
+#: js/blocks/BooleanBlocks.js:77 js/blocks/BooleanBlocks.js:166
+#: js/blocks/BooleanBlocks.js:250 js/blocks/BooleanBlocks.js:334
+#: js/blocks/BooleanBlocks.js:432 js/blocks/BooleanBlocks.js:537
+#: js/blocks/BooleanBlocks.js:637 js/blocks/BooleanBlocks.js:737
+#: js/blocks/BooleanBlocks.js:841 js/blocks/BooleanBlocks.js:942
+#: js/blocks/BooleanBlocks.js:1026 js/blocks/SensorsBlocks.js:852
+msgid "true"
+msgstr "じつ"
+
 #: js/block.js:3314
 msgid "picked up"
 msgstr ""
@@ -2251,7 +2513,7 @@ msgstr "さくじょされたブロックは「ごみはこからふくげん」
 #: js/blocks/BooleanBlocks.js:843
 #: js/blocks/BooleanBlocks.js:944
 msgid "false"
-msgstr "偽"
+msgstr "にせ（ぎ）"
 
 #: js/block.js:4233
 #: js/block.js:4237
@@ -2337,7 +2599,7 @@ msgstr "すうじは さいだい １０けた までです。"
 
 #: js/loader.js:536
 msgid "Failed to load EaselJS. Please refresh the page."
-msgstr "EaselJS のろーどにしっぱいしました。ページをこうしんしてください。"
+msgstr "EaselJS のロードにしっぱいしました。ページをこうしんしてください。"
 
 #: js/loader.js:558
 msgid "Failed to load Music Blocks. Please refresh the page."
@@ -2355,7 +2617,7 @@ msgstr "ファイルを えらんで ください。"
 
 #: js/logo.js:1854
 msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
-msgstr "むげんるーぷがけんしゅつされました。ぶらうざのふりーずをふせぐためにじっこうがていしされました。"
+msgstr "むげんループが けんしゅつ されました。ブラウザーの フレーズを ふせぐために じっこうが ていしされました。"
 
 #: js/logo.js:2037
 #: js/blocks/MediaBlocks.js:338
@@ -3636,11 +3898,11 @@ msgstr "たいこ"
 
 #: js/utils/synthutils.js:2260
 msgid "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
-msgstr "⚠⚠ さうんどはむこうになっています。。。ぶらうざのせってい (さいとせってい > さうんど) をかくにんして、ミュージック・ブロックスのおんせいをきょかしてください。"
+msgstr "⚠⚠ おんせいは ブロックされています。。。ブラウザーの せってい (サイトの せってい > おんせい) をかくにんして、ミュージック・ブロックスの おんせいを きょかして ください。"
 
 #: js/utils/synthutils.js:3787
 msgid "Cents Adjustment"
-msgstr "せんとちょうせい"
+msgstr "セント ちょうせい"
 
 #: js/utils/synthutils.js:3816
 #: js/widgets/sampler.js:1925
@@ -3654,15 +3916,15 @@ msgstr "せきゅりてぃけいこく"
 
 #: js/utils/utils.js:476
 msgid "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
-msgstr "このぷらぐいんには、ぶらうざでじっこうされるコードがふくまれています。くみこみのぷらぐいん でぃれくとりからろーどされていないため、あんぜんでないコードがふくまれているかのうせいがあります。"
+msgstr "このプラグインには、ブラウザーで じっこうされるコードが ふくまれています。くみこみの プラグイン でぃれくとりからロードされていないため、あんぜんでないコードが ふくまれているかの うせいがあります。"
 
 #: js/utils/utils.js:480
 msgid "Do you want to allow this plugin to run?"
-msgstr "このぷらぐいんのじっこうをきょかしますか?"
+msgstr "このプラグインのじっこうをきょかしますか?"
 
 #: js/utils/utils.js:482
 msgid "Source: %s"
-msgstr "そーす: %s"
+msgstr "ソース: %s"
 
 #: js/utils/utils.js:482
 #: js/blocks/ExtrasBlocks.js:696
@@ -3794,6 +4056,10 @@ msgstr "ヒープを ぎゃくに する"
 msgid "The Index-heap block returns a value in the heap at a specified location."
 msgstr "「ヒープに ばんごうを ふる」ブロックはしていされたいちのヒープのあたいをかえします。"
 
+#: js/blocks/ActionBlocks.js:1308
+msgid "The Action block is used to group together blocks so that they can be used more than once."
+msgstr "「アクション」ブロックは、ふくすうのブロックをグループかしてふくすうかいしようできるようにするためにしようされます。"
+
 #: js/blocks/HeapBlocks.js:443
 #.TRANS: retrieve a value from the heap at index position in the heap
 msgid "index heap"
@@ -3833,6 +4099,217 @@ msgstr "インデックス"
 #: js/blocks/BoxesBlocks.js:599
 msgid "value1"
 msgstr "すうち"
+
+#: js/blocks/BooleanBlocks.js:217
+msgid "The Or block is the logical or operator."
+msgstr "「または」ブロックはろんりわ「OR」えんざんしです。"
+
+#: js/blocks/BooleanBlocks.js:235
+msgid "or"
+msgstr "または"
+
+#: js/blocks/BooleanBlocks.js:301
+msgid "The XOR block is the logical XOR operator."
+msgstr "「XOR」ブロックははいたてきろんりわ「XOR」えんざんしです。"
+
+#: js/blocks/BooleanBlocks.js:319
+msgid "xor"
+msgstr "XOR"
+
+#: js/blocks/BooleanBlocks.js:391
+msgid "The Greater-than block returns True if the top number is greater than the bottom number."
+msgstr "「＞」ブロックは、うえの すうちが したの すうちより おおきいばあいに 「じつ」を かえします。"
+
+#: js/blocks/BooleanBlocks.js:496
+msgid "The Less-than block returns True if the top number is less than the bottom number."
+msgstr "「＜」ブロックは、うえの すうちが したの すうちより ちいさい ばあいに 「じつ」を かえします。"
+
+#: js/blocks/BooleanBlocks.js:596
+msgid "The Less-than-or-equal-to block returns True if the top number is less than or equal to the bottom number."
+msgstr "「≦」ブロックは、うえの すうちが したの すうちいかの ばあいに  「じつ」を かえします。"
+
+#: js/blocks/BooleanBlocks.js:696
+msgid "The Greater-than-or-equal-to block returns True if the top number is greater than or equal to the bottom number."
+msgstr "「≥」ブロックは、うえの すうちが したの すうち いじょう であるばあいに 「じつ」を かえします。"
+
+#: js/blocks/BooleanBlocks.js:802
+msgid "The Equal block returns True if the two numbers are equal."
+msgstr "<h2>しんぎブロック（ひとしい）</h2><br>２つの すうちを くらべて、 おなじ すうちで あるかどうか はんてい する。 「＝」は、 ２つの すうちが おなじ であれば 「しん（しん）」、 おなじ でなければ 「にせ（ぎ）」 という けっかになる。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
+
+#: js/blocks/BooleanBlocks.js:901
+msgid "The Not-equal-to block returns True if the two numbers are not equal to each other."
+msgstr "「≠」ブロックは 2つの すうじが ひとしくない ばあいに「じつ」を かえします。"
+
+#: js/blocks/BooleanBlocks.js:1001
+msgid "The Boolean block is used to specify true or false."
+msgstr "「くらべる」ブロックは「じつ」または「にせ（ぎ）」を していする ために つかわれます。"
+
+#: js/blocks/BoxesBlocks.js:53 js/blocks/BoxesBlocks.js:59
+msgid "The Add-to block is used to add to the value stored in a box."
+msgstr "<h2>かずのはこ（あたいをかえる）</h2><br>してい した はこに、 すきな すうちを たす。"
+
+#: js/blocks/BoxesBlocks.js:61
+msgid "It can also be used with other blocks such as Color and Pen size."
+msgstr "<br><br> マイナスの すうちを つかうと ひきざん になる。"
+
+#: js/blocks/BoxesBlocks.js:73
+msgid "add"
+msgstr "たす"
+
+#: js/blocks/BoxesBlocks.js:75 js/widgets/temperament.js:1001
+msgid "to"
+msgstr "はこへ"
+
+#: js/blocks/BoxesBlocks.js:75 js/blocks/BoxesBlocks.js:598
+#: js/blocks/HeapBlocks.js:544
+msgid "value1"
+msgstr "すうち"
+
+#: js/blocks/BoxesBlocks.js:118
+msgid "Block does not support incrementing."
+msgstr "このブロックは、ぞうしょくの サポートが ありません"
+
+#: js/blocks/BoxesBlocks.js:152
+msgid "The Add-1-to block adds one to the value stored in a box."
+msgstr "<h2>かずのはこ（あたいをかえる）</h2><br> してい した はこに、 １を たす。"
+
+#: js/blocks/BoxesBlocks.js:163
+msgid "add 1 to"
+msgstr "はこに １を たす"
+
+#: js/blocks/BoxesBlocks.js:211
+msgid "The Subtract-1-from block subtracts one from the value stored in a box."
+msgstr "「〜から１ひく」ブロックはぼっくすにほぞんされたあたいから1をひきます。"
+
+#: js/blocks/BoxesBlocks.js:222
+msgid "subtract 1 from"
+msgstr "〜から１ひく"
+
+#: js/blocks/BoxesBlocks.js:270 js/blocks/BoxesBlocks.js:387
+msgid "The Box block returns the value stored in a box."
+msgstr "<h2>すうちブロック</h2><br>すうちブロック として、 はこの すうちを つかう。"
+
+#: js/blocks/BoxesBlocks.js:503 js/blocks/BoxesBlocks.js:579
+msgid "The Store in block will store a value in a box."
+msgstr "<h2>かずのはこ（あたいをいれる）</h2><br>してい した はこに、 してい した すうちを いれる。"
+
+#: js/blocks/BoxesBlocks.js:598 js/blocks/EnsembleBlocks.js:408
+#: js/blocks/EnsembleBlocks.js:419
+msgid "name1"
+msgstr "はこへ"
+
+#: js/blocks/BoxesBlocks.js:655
+msgid "The Box2 block returns the value stored in Box2."
+msgstr "「はこ2」ブロックは「はこ2」にほぞんされたあたいをかえします。"
+
+#: js/blocks/BoxesBlocks.js:706
+msgid "The Store in Box2 block is used to store a value in Box2."
+msgstr "「はこ２に すうちを いれる」ブロックはあたいを「はこ2」にほぞんするためにつかわれます。"
+
+#: js/blocks/BoxesBlocks.js:718
+msgid "store in box2"
+msgstr "はこ２に すうちを いれる"
+
+#: js/blocks/BoxesBlocks.js:764
+msgid "The Box1 block returns the value stored in Box1."
+msgstr "「はこ1」ブロックは「はこ1」にほぞんされたあたいをかえします。"
+
+#: js/blocks/BoxesBlocks.js:815
+msgid "The Store in Box1 block is used to store a value in Box1."
+msgstr "「はこ１に すうちを いれる」ブロックはあたいをBox1にほぞんするためにつかわれます。"
+
+#: js/blocks/BoxesBlocks.js:829
+msgid "store in box1"
+msgstr "はこ１に すうちを いれる"
+
+#: js/blocks/DictBlocks.js:62
+msgid "The Show-dictionary block displays the contents of the dictionary at the top of the screen."
+msgstr "「じしょを あらわす」ブロックは、がめんのじょうぶにじしょのないようをひょうじします。"
+
+#: js/blocks/DictBlocks.js:77
+msgid "show dictionary"
+msgstr "じしょを あらわす"
+
+#: js/blocks/DictBlocks.js:80 js/blocks/DictBlocks.js:145
+#: js/blocks/DictBlocks.js:216 js/blocks/DictBlocks.js:290
+#: js/blocks/ProgramBlocks.js:400 js/blocks/ProgramBlocks.js:506
+#: js/blocks/ProgramBlocks.js:670
+msgid "My Dictionary"
+msgstr "わたしの じしょ"
+
+#: js/blocks/DictBlocks.js:129
+msgid "The Dictionary block returns a dictionary."
+msgstr "「じしょ」ブロックはじしょをかえします。"
+
+#: js/blocks/DictBlocks.js:197 js/blocks/DictBlocks.js:339
+msgid "The Get-dict block returns a value in the dictionary for a specified key."
+msgstr "Get-dictブロックはしていされたキーのじしょのあたいをかえします。"
+
+#. TRANS: retrieve a value from the dictionary with a given key
+#: js/blocks/DictBlocks.js:212 js/blocks/DictBlocks.js:354
+msgid "get value"
+msgstr "あたいを あらわす"
+
+#: js/blocks/DictBlocks.js:215 js/blocks/DictBlocks.js:216
+#: js/blocks/DictBlocks.js:289 js/blocks/DictBlocks.js:290
+#: js/blocks/DictBlocks.js:357 js/blocks/DictBlocks.js:430
+#: js/blocks/DictBlocks.js:431
+msgid "key2"
+msgstr "キーワード"
+
+#. TRANS: key, e.g., C in C Major
+#: js/blocks/DictBlocks.js:215 js/blocks/DictBlocks.js:216
+#: js/blocks/DictBlocks.js:289 js/blocks/DictBlocks.js:290
+#: js/blocks/DictBlocks.js:357 js/blocks/DictBlocks.js:430
+#: js/blocks/DictBlocks.js:431 js/blocks/IntervalsBlocks.js:1504
+msgid "key"
+msgstr "ちょう"
+
+#: js/blocks/DictBlocks.js:271 js/blocks/DictBlocks.js:411
+msgid "The Set-dict block sets a value in the dictionary for a specified key."
+msgstr "Set-dictブロックはしていされたキーにじしょのあたいをせっていします。"
+
+#. TRANS: set a value in the dictionary for a given key
+#: js/blocks/DictBlocks.js:286 js/blocks/DictBlocks.js:427
+msgid "set value"
+msgstr "あたいを せってい"
+
+#: js/blocks/DrumBlocks.js:59
+msgid "The Noise name block is used to select a noise synthesizer."
+msgstr "「ノイズめい」ブロックはのいずシンセサイザーをせんたくするためにつかわれます。"
+
+#: js/blocks/DrumBlocks.js:102
+msgid "The Drum name block is used to select a drum."
+msgstr "<h2>ドラムブロック</h2><br>ドラムの しゅるいを かえるときに つかう。 クリックで、 いろいろな ドラムの おとを えらぶことが できる。"
+
+#: js/blocks/DrumBlocks.js:146
+msgid "The Effects name block is used to select a sound effect."
+msgstr "<h2>こうかおんブロック</h2><br>こうかおんの しゅるいを かえるときに つかう。 クリックで、 いろいろな おもしろい おとを えらぶことが できる。"
+
+#: js/blocks/DrumBlocks.js:163
+msgid "noise"
+msgstr "ノイズ"
+
+#: js/blocks/DrumBlocks.js:177
+msgid "The Play noise block will generate white, pink, or brown noise."
+msgstr "「ノイズさいせい」ブロックはほわいとのいず、ぴんくのいず、またはぶらうんのいずをせいせいします。"
+
+#: js/blocks/DrumBlocks.js:332
+msgid "Replace every instance of a pitch with a drum sound."
+msgstr "すべてのピッチをドラムおとにおきかえます。"
+
+#. TRANS: map a pitch to a drum sound
+#: js/blocks/DrumBlocks.js:343
+msgid "map pitch to drum"
+msgstr "ドラムを おんぷに かえる"
+
+#: js/blocks/DrumBlocks.js:397 js/blocks/DrumBlocks.js:406
+msgid "The Set drum block will select a drum sound to replace the pitch of any contained notes."
+msgstr "「ドラムをせってい」ブロックは、ふくまれているおんぷの ピッチを おきかえるドラムの おとを せんたくします。"
+
+#: js/blocks/DrumBlocks.js:410
+msgid "In the example above, a kick drum sound will be played instead of sol."
+msgstr "例の画像に<em>ソル</em>の代わりに<em>キックドラム</em>が鳴らします。"
 
 #: js/blocks/HeapBlocks.js:619
 msgid "The Pop block removes the value at the top of the heap."
@@ -4155,7 +4632,7 @@ msgstr "タートルまのビートかずをどうきさせるブロックです
 
 #: js/blocks/EnsembleBlocks.js:911
 msgid "The Found mouse block will return true if the specified mouse can be found."
-msgstr "していされたネズミがみつかったばあいにtrueをかえします。"
+msgstr "していされた ネズミが みつかった ばあいに「じつ」を かえします。"
 
 #: js/blocks/EnsembleBlocks.js:919
 msgid "found mouse"
@@ -4163,7 +4640,7 @@ msgstr "ネズミを みつけた"
 
 #: js/blocks/EnsembleBlocks.js:929
 msgid "The Found turtle block will return true if the specified turtle can be found."
-msgstr "していされたタートルがみつかったばあいにtrueをかえします。"
+msgstr "していされた タートルが みつかった ばあいに 「じつ」を かえします。"
 
 #: js/blocks/EnsembleBlocks.js:937
 msgid "found turtle"
@@ -4311,11 +4788,11 @@ msgstr "スイッチ"
 
 #: js/blocks/FlowBlocks.js:638
 msgid "The Stop block will stop a loop"
-msgstr "Stopブロックはるーぷをていしします。"
+msgstr "「ていし」ブロックは ループを ていし します。"
 
 #: js/blocks/FlowBlocks.js:640
 msgid "Forever, Repeat, While, or Until."
-msgstr "Forever、Repeat、While、またはUntil。"
+msgstr "「ずっとくりかえす」、「くりかえす」、「のあいだに」、または「までに」。"
 
 #: js/blocks/FlowBlocks.js:697
 msgid "The Waitfor block will wait until the condition is true."
@@ -4522,6 +4999,10 @@ msgstr "「さいせい された ぜんおんぷの かず」ブロックはえ
 #.TRANS: number of notes that have been played
 msgid "notes played"
 msgstr "ぜんたいの はくの かず"
+
+#: js/blocks/GraphicsBlocks.js:588
+msgid "The Arc block moves the turtle in an arc."
+msgstr "「えんを えがいて いどう」ブロックは タートルを こを えがいて うごかします。"
 
 #: js/blocks/MeterBlocks.js:688
 msgid "The No clock block decouples the notes from the master clock."
@@ -5109,6 +5590,10 @@ msgstr "むこうな URL"
 msgid "The Calculate block returns a value calculated by an action."
 msgstr "「けいさん する」ブロックはでけいさんされたあたいをかえします。"
 
+#: js/blocks/GraphicsBlocks.js:1200
+msgid "The Wrap block enables or disables screen wrapping for the graphics actions within it."
+msgstr "「まきつける」ブロックは、そのなかの グラフィックスの がめんラッピングを ゆうこう または むこうに します。"
+
 #: js/blocks/ActionBlocks.js:248
 #: js/blocks/ActionBlocks.js:538
 #: js/blocks/ActionBlocks.js:730
@@ -5352,6 +5837,10 @@ msgstr "SVGフォーマットでほぞん"
 msgid "no background"
 msgstr "バックグラウンドなし"
 
+#: js/blocks/HeapBlocks.js:254
+msgid "The Heap-empty? block returns true if the heap is empty."
+msgstr "「ヒープは から ですか？」ブロックは ヒープが そらの ばあいに「じつ」を かえします。"
+
 #: js/blocks/ExtrasBlocks.js:220
 msgid "The No background block eliminates the background from the saved SVG output."
 msgstr "「バックグラウンドなし」ブロックはほぞんされたSVGしゅつりょくのはいけいをさくじょします。"
@@ -5541,7 +6030,7 @@ msgstr "周波数"
 #: js/blocks/MediaBlocks.js:775
 #: plugins/rodi.rtp:193
 msgid "duration (MS)"
-msgstr "けいぞくじかん（みりびょう）"
+msgstr "けいぞくじかん（ミリびょう）"
 
 #: js/blocks/MediaBlocks.js:811
 #.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
@@ -5550,7 +6039,7 @@ msgstr "おんぷの たかさを しゅうはすう ひょうじへ"
 
 #: js/blocks/MediaBlocks.js:819
 msgid "The To frequency block converts a pitch name and octave to Hertz."
-msgstr "「おんぷの たかさを しゅうはすう ひょうじへ」ブロックはおんめいとオクターブをヘルツにへんかんします。"
+msgstr "「おんぷの たかさを しゅうはすう ひょうじへ」ブロックはおんめいとオクターヴをヘルツにへんかんします。"
 
 #: js/blocks/MediaBlocks.js:829
 #: js/blocks/PitchBlocks.js:695
@@ -5678,7 +6167,7 @@ msgstr "<h2>すうちブロック（けいさん）</h2><br>２つの すうち�
 
 #: js/blocks/NumberBlocks.js:814
 msgid "The One-of block returns one of two choices."
-msgstr "<h2>特殊ブロック（ランダム）</h2><br>つないだ ２つの ブロックのうち、 1つだけを ランダムに えらぶ。 「すうち」「アクションめい」など、 さまざまな ブロックを つなぐことが できる。<br><br>★ランダムとは<br>サイコロの め のように、 なにが でるか わからない すうちのこと。ランダム（random）は にほんごで 「らんすう」「でたらめな」という いみ。 ランダムを つかうと、 じっこうの たびに えんそうじゅんじょが かわる きょくなどを つくることが できる。"
+msgstr "<h2>「どちらか ランダム」ブロック</h2><br>つないだ ２つの ブロックのうち、 1つだけを ランダムに えらぶ。 「すうち」「アクションめい」など、 さまざまな ブロックを つなぐことが できる。<br><br>★ランダムとは<br>サイコロの め のように、 なにが でるか わからない すうちのこと。ランダム（random）は にほんごで 「らんすう」「でたらめな」という いみ。 ランダムを つかうと、 じっこうの たびに えんそうじゅんじょが かわる きょくなどを つくることが できる。"
 
 #: js/blocks/NumberBlocks.js:821
 #: js/blocks/PitchBlocks.js:653
@@ -5695,7 +6184,7 @@ msgstr "それか"
 
 #: js/blocks/NumberBlocks.js:878
 msgid "The Random block returns a random number."
-msgstr "<h2>すうちブロック（ランダム）</h2><br>してい した さいしょうち から さいだいち までの はんいで、 ランダムな すうちに なる。<br><br>★ランダムとは<br>サイコロの め のように、 なにが でるか わからない すうちのこと。ランダム（random）は にほんごで 「らんすう」「でたらめな」という いみ。 ランダムを つかうと、 じっこうの たびに えんそうじゅんじょが かわる きょくなどを つくることが できる。"
+msgstr "<h2>「ランダム」ブロック</h2><br>してい した さいしょうち から さいだいち までの はんいで、 ランダムな すうちに なる。<br><br>★ランダムとは<br>サイコロの め のように、 なにが でるか わからない すうちのこと。ランダム（random）は にほんごで 「らんすう」「でたらめな」という いみ。 ランダムを つかうと、 じっこうの たびに えんそうじゅんじょが かわる きょくなどを つくることが できる。"
 
 #: js/blocks/NumberBlocks.js:885
 msgid "random"
@@ -5965,6 +6454,18 @@ msgstr "じしょを ロードする"
 msgid "file"
 msgstr "ファイル"
 
+#: js/blocks/ToneBlocks.js:488
+msgid "Tremolo makes the sound pulse louder and quieter."
+msgstr "トレモロを しようすると、おとが パルスの ように おおきく なったり、ちーさく なったり します。"
+
+#: js/blocks/ToneBlocks.js:490
+msgid "The rate (first argument) controls how fast the sound pulses (cycles per second)."
+msgstr "レート (さいしょの ひきすう) は、おとの パルスそくど (1 びょうあたりの サイクルかず) をせいぎょ します。"
+
+#: js/blocks/ToneBlocks.js:494
+msgid "The depth (second argument) controls the strength of the pulsing effect (0-100%)."
+msgstr "ふかさ (2 ばんめの ひきすう)は、パルスこうかの つよさを せいぎょ します (0 ～ 100%)。"
+
 #: js/blocks/ProgramBlocks.js:448
 msgid "The file you selected does not contain a valid dictionary."
 msgstr "せんたくしたファイルにはゆうこうなじしょがふくまれていません。"
@@ -6012,6 +6513,18 @@ msgstr "じしょを せってい"
 msgid "The Open palette block opens a palette."
 msgstr "「パレットを ひらきます」ブロックはパレットをひらきます。"
 
+#: js/blocks/ToneBlocks.js:630
+msgid "The rate (first argument) controls the speed of the chorus modulation (cycles per second)."
+msgstr "レート (さいしょの ひきすう) は、コーラスへんちょうの そくど (1 びょう あたりの サイクルかず)を せいぎょ します。"
+
+#: js/blocks/ToneBlocks.js:634
+msgid "The delay (second argument) sets the time delay between chorus voices (milliseconds)."
+msgstr "ディレイ(だい 2ひきすう) は、コーラス・ボイスまの ちえんじかん (ミリびょう)を せっていします。"
+
+#: js/blocks/ToneBlocks.js:638
+msgid "The depth (third argument) controls the amount of chorus effect (0-100%)."
+msgstr "ふかさ (3 ばんめのひきすう) は、コーラス・エフェクターのりょう (0 ～ 100%) をせいぎょします。"
+
 #: js/blocks/ProgramBlocks.js:741
 msgid "open palette"
 msgstr "パレットを ひらきます"
@@ -6043,6 +6556,10 @@ msgstr "ブロックの ばんごう"
 msgid "The Run block block runs a block. It accepts two types of arguments: block number or block name."
 msgstr "「ブロックをさいせい」ブロックはブロックをじっこうします。ブロックばんごうまたはブロックめいの 2 しゅるいのひきすうをうけいれます。"
 
+#: js/blocks/ToneBlocks.js:703
+msgid "The rate (second argument) controls the speed of the pitch variation (cycles per second)."
+msgstr "レート (2 ばんめの ひきすう) は、ピッチへんかの そくど (1 びょうあたりの サイクルかず)を せいぎょします。"
+
 #: js/blocks/ProgramBlocks.js:949
 #.TRANS: Run program beginning at this block.
 msgid "run block"
@@ -6068,6 +6585,10 @@ msgstr "接続のばんごう"
 #: js/blocks/ProgramBlocks.js:1146
 msgid "The Make block block creates a new block."
 msgstr "「ブロックを つくる」ブロックはあたらしいブロックをさくせいします。"
+
+#: js/blocks/ToneBlocks.js:871
+msgid "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
+msgstr "ねいろひょうじゅんをせっていすると、デフォルトのねいろがでんしシンセからせんたくしたねいろにへんこうされます。"
 
 #: js/blocks/ProgramBlocks.js:1158
 #.TRANS: Create a new block
@@ -6111,6 +6632,14 @@ msgstr "けいこく: ブロックひきすうのかたがしょりされませ�
 msgid "The Open project block is used to open a project from a web page."
 msgstr "「プロジェクトを ひらく」ブロックはウェブページからプロジェクトをひらくためにつかわれます。"
 
+#: js/blocks/VolumeBlocks.js:35
+msgid "synth volume"
+msgstr "シンセの おんりょう"
+
+#: js/blocks/VolumeBlocks.js:39
+msgid "The Synth volume block returns the current volume of the current synthesizer."
+msgstr "「シンセの おんりょう」ブロックは げんざいの シンセサイザーの おんりょうを かえします。"
+
 #: js/blocks/ProgramBlocks.js:1430
 msgid "open project"
 msgstr "プロジェクトを ひらく"
@@ -6129,6 +6658,14 @@ msgstr "ミュージック・ブロックス プロジェクトのりんくの�
 msgid "Please allow popups for this site"
 msgstr "このさいとのぽっぷあっぷをきょかしてください"
 
+#: js/blocks/VolumeBlocks.js:355 js/blocks/VolumeBlocks.js:525
+msgid "set synth volume"
+msgstr "シンセの おんりょうを せってい"
+
+#: js/blocks/VolumeBlocks.js:362 js/blocks/VolumeBlocks.js:546
+msgid "synth"
+msgstr "シンセ"
+
 #: js/blocks/WidgetBlocks.js:149
 #: js/widgets/timbre.js:905
 #.TRANS: sound envelope (ADSR)
@@ -6145,6 +6682,10 @@ msgstr "アタック"
 msgid "decay"
 msgstr "ディケイ"
 
+#: js/blocks/VolumeBlocks.js:440
+msgid "Synth not found"
+msgstr "シンセ(がっき)が みつかりません"
+
 #: js/blocks/WidgetBlocks.js:161
 #.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
 msgid "sustain"
@@ -6154,6 +6695,10 @@ msgstr "サステイン"
 #.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
 msgid "release"
 msgstr "リリース"
+
+#: js/blocks/VolumeBlocks.js:531
+msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
+msgstr "「シンセの おんりょうを せってい」ブロックは、ギター、バイオリン、スネア・ドラムなどのとくていのシンセサイザーのおんりょうをへんこうします。"
 
 #: js/blocks/WidgetBlocks.js:181
 msgid "Attack value should be from 0 to 100."
@@ -6170,6 +6715,10 @@ msgstr "サステイン あたいには 0 いじょう 100いかの すうじを
 #: js/blocks/WidgetBlocks.js:190
 msgid "Release value should be from 0-100."
 msgstr "リリース あたいには 0 いじょう100いかの すうじを いれて ください。"
+
+#: js/blocks/VolumeBlocks.js:604
+msgid "The Set Panning block sets the panning for all synthesizers."
+msgstr "「ステレオをせってい」ブロックはすべてのシンセのパンをせっていします。"
 
 #: js/blocks/WidgetBlocks.js:208
 msgid "You are adding multiple envelope blocks."
@@ -6379,6 +6928,10 @@ msgstr "<h2>ドラムブロック</h2><br>ドラムの しゅるいを かえる
 #: js/blocks/DrumBlocks.js:125
 msgid "effects name"
 msgstr "えふぇくとめい"
+
+#: js/blocks/MeterBlocks.js:975
+msgid "The Master beats per minute block sets the number of 1/4 notes per minute for every voice."
+msgstr "「ぜんたいの スピードを きめる」ブロックは、かくおんせいの 1 ふんあたりの 1/4 おんぷのかずをせっていします。"
 
 #: js/blocks/DrumBlocks.js:155
 msgid "The Effects name block is used to select a sound effect."
@@ -6593,6 +7146,47 @@ msgstr "おんりつのながさ"
 msgid "The Temperament length block returns the number of pitches in the current temperament system. For example, 12 for standard equal temperament or 31 for a 31-tone temperament."
 msgstr "「おんりつのながさ」ブロックは、げんざいのおんりつしすてむにおけるピッチのかずをかえします。たとえば、ひょうじゅんへいきんりつのばあいは「12」、31おんりつのばあいは「31」です。"
 
+#: js/blocks/OrnamentBlocks.js:32
+msgid "staccato factor"
+msgstr "スタッカートの ながさ ファクター"
+
+#: js/blocks/OrnamentBlocks.js:108
+msgid "slur factor"
+msgstr "スラーの ながさ ファクター"
+
+#. TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of
+#. C
+#: js/blocks/OrnamentBlocks.js:217 js/blocks/OrnamentBlocks.js:309
+msgid "neighbor"
+msgstr "おとを くわえる"
+
+#: js/blocks/OrnamentBlocks.js:293
+msgid "The Neighbor block rapidly switches between neighboring pitches."
+msgstr "<h2>おとを くわえる ブロック</h2><br>２つの おなじたかさの おとの あいだに、 おとを １つ いれることが できる。<br>ずのれいでは、 ソとソの あいだに ラが はいり、 「ソ、ラ、ソ」 と すばやく えんそうされる。<br><br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。たとえば、「ド」 を はじまりのおと に したときの 「ド、レ、ミ、ファ、ソ、ラ、シ、ド」、 「ソ」 を はじまりのおと に したときの 「ソ、ラ、シ、ド、レ、ミ、（♯ファ）、ソ」 の こと。"
+
+#: js/blocks/OrnamentBlocks.js:364
+msgid "glide"
+msgstr "グリッサンド"
+
+#: js/blocks/OrnamentBlocks.js:472 js/blocks/OrnamentBlocks.js:636
+msgid "slur"
+msgstr "スラー"
+
+#. TRANS: play each note sharply detached from the others
+#: js/blocks/OrnamentBlocks.js:551 js/blocks/OrnamentBlocks.js:703
+msgid "staccato"
+msgstr "スタッカート"
+
+#: js/blocks/OrnamentBlocks.js:619
+msgid "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
+msgstr "「スラー」ブロックは、していされたおんぷのながさをぜんぶくみあわせてながくします。"
+
+#: js/blocks/OrnamentBlocks.js:685
+msgid "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
+msgstr "「スタッカート」ブロックは、していされたおんぷのながさをいじしながら、じっさいのおんぷのながさをたんしゅくします。"
+
+#. TRANS: musical transposition (adjustment of pitch up or down)
+#: js/blocks/PitchBlocks.js:141
 #: js/blocks/PitchBlocks.js:143
 #.TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
@@ -6723,7 +7317,7 @@ msgstr "音高の数字を初期化"
 
 #: js/blocks/PitchBlocks.js:682
 msgid "The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."
-msgstr "ピッチばんごうをピッチとオクターブにまっぴんぐするためのおふせっとをせっていするためにつかわれるブロックです。"
+msgstr "ピッチばんごうをピッチとオクターヴにまっぴんぐするためのおふせっとをせっていするためにつかわれるブロックです。"
 
 #: js/blocks/PitchBlocks.js:721
 #.TRANS: convert piano key number (1-88) to pitch
@@ -6741,7 +7335,7 @@ msgstr "すうちをオクターヴひょうきへ"
 
 #: js/blocks/PitchBlocks.js:758
 msgid "The Number to octave block will convert a pitch number to an octave."
-msgstr "「すうちをオクターヴひょうきへ」ブロックはピッチばんごうをオクターブにへんかんします。"
+msgstr "「すうちをオクターヴひょうきへ」ブロックはピッチばんごうをオクターヴにへんかんします。"
 
 #: js/blocks/PitchBlocks.js:767
 msgid "y to pitch"
@@ -6810,12 +7404,12 @@ msgstr "登録"
 
 #: js/blocks/PitchBlocks.js:1092
 msgid "The Register block provides an easy way to modify the register (octave) of the notes that follow it."
-msgstr "「Register」ブロックはのちにつづくおんぷのオクターブ（れじすたー）をかんたんにへんこうするほうほうをていきょうします。"
+msgstr "「Register」ブロックはのちにつづくおんぷのオクターヴ（れじすたー）をかんたんにへんこうするほうほうをていきょうします。"
 
 #: js/blocks/PitchBlocks.js:1115
 #.TRANS: cents are units used to specify the ratio between pitches. There are 100 cents between successive notes.
 msgid "50 cents"
-msgstr "50せんと"
+msgstr "50セント"
 
 #: js/blocks/PitchBlocks.js:1146
 msgid "The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps."
@@ -6922,7 +7516,7 @@ msgstr "「ピッチど」はモードのはんおんたんいのおんこうぱ
 
 #: js/blocks/PitchBlocks.js:1783
 msgid "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
-msgstr "1からはじまり、おんかいのわくぐみにかんけいなく（つまりオクターブがつねに8おととはかぎらない）"
+msgstr "1からはじまり、おんかいのわくぐみにかんけいなく（つまりオクターヴがつねに8おととはかぎらない）"
 
 #: js/blocks/PitchBlocks.js:1827
 msgid "Nth Modal Pitch takes a number as an input as the nth degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
@@ -6938,7 +7532,7 @@ msgstr "すけーるでぃぐりーはおんがくでいっぱんてきなひょ
 
 #: js/blocks/PitchBlocks.js:1878
 msgid "Scale Degree 1 is always the first pitch in a given scale, regardless of octave."
-msgstr "すけーるでぃぐりー1は、オクターブにかんけいなくつねにあたえられたすけーるのさいしょのおとです。"
+msgstr "すけーるでぃぐりー1は、オクターヴにかんけいなくつねにあたえられたすけーるのさいしょのおとです。"
 
 #: js/blocks/PitchBlocks.js:1902
 #.TRANS: step some number of notes in current musical scale
@@ -7132,6 +7726,14 @@ msgstr "でぃれい(だい 2 ひきすう) は、こーらすぼいすまのち
 #: js/blocks/ToneBlocks.js:642
 msgid "The depth (third argument) controls the amount of chorus effect (0-100%)."
 msgstr "ふかさ (3 ばんめのひきすう) は、こーらす・えふぇくたーのりょう (0 ～ 100%) をせいぎょします。"
+
+#: js/blocks/ProgramBlocks.js:1521
+msgid "Only Music Blocks project links are allowed (same site, musicblocks.sugarlabs.org, musicblocks.net)."
+msgstr "ミュージック・ブロックス プロジェクトの リンクのみが きょかされます (おなじサイト、musicblocks.sugarlabs.org、musicblocks.net)。"
+
+#: js/blocks/ProgramBlocks.js:1531
+msgid "Please allow popups for this site"
+msgstr "このサイトの ポップアップを きょかしてください"
 
 #: js/blocks/ToneBlocks.js:650
 #.TRANS: musical effect to simulate a choral sound
@@ -7530,6 +8132,10 @@ msgstr "<h2>「まえへ すすむ」ブロック</h2><br>してい した す�
 msgid "The Forward block moves the turtle forward."
 msgstr "<h2>「まえへ すすむ」ブロック</h2><br>していしたすうちふん、タートルをまえにすすめる。"
 
+#: js/blocks/WidgetBlocks.js:1963
+msgid "reflection"
+msgstr "ふりかえり"
+
 #: js/blocks/GraphicsBlocks.js:1203
 #: js/blocks/GraphicsBlocks.js:1221
 msgid "wrap"
@@ -7677,12 +8283,151 @@ msgstr "ばいおんが ０いじょう である ひつようが あります�
 #: js/turtleactions/ToneActions.js:459
 #: js/widgets/timbre.js:851
 msgid "Unable to use synth due to existing oscillator."
-msgstr "きぞんのおしれーたーがあるためしんせはしようできません。"
+msgstr "きぞんのおしれーたーがあるためシンセはしようできません。"
 
 #: js/turtleactions/ToneActions.js:391
 #: js/turtleactions/ToneActions.js:430
 msgid "The input cannot be negative."
 msgstr "マイナスの すうちを いれることは できません。"
+
+#: js/turtleactions/VolumeActions.js:260
+msgid "Synth not found: %s"
+msgstr "シンセが　みつかりません: %s"
+
+#: js/turtleactions/DictActions.js:75 js/turtleactions/DictActions.js:142
+#: js/turtleactions/DictActions.js:172
+msgid "font"
+msgstr "フォント"
+
+#: js/turtleactions/DictActions.js:257
+msgid "Dictionary with this name does not exist"
+msgstr "このなまえの じしょは ほぞんしません。"
+
+#: js/turtleactions/DictActions.js:260
+msgid "Key with this name does not exist in %s"
+msgstr "このなまえのキー（ちょう）は %s にそんざいしません"
+
+#: js/widgets/aiwidget.js:133 js/widgets/aiwidget.js:134
+#: js/widgets/sampler.js:231 js/widgets/sampler.js:232 js/widgets/tempo.js:90
+#: js/widgets/tempo.js:107 js/widgets/tempo.js:108
+#: js/widgets/rhythmruler.js:842 js/widgets/rhythmruler.js:843
+#: js/widgets/rhythmruler.js:2078 js/widgets/rhythmruler.js:2079
+msgid "Pause"
+msgstr "いちじ ていし"
+
+#: js/widgets/aiwidget.js:177 js/widgets/sampler.js:275
+msgid "Warning: Sample is bigger than 1MB."
+msgstr "ワーニング： サンプルは １MB より おおきいです。"
+
+#: js/widgets/aiwidget.js:645
+msgid "New start block generated."
+msgstr "あたらしい「スタート」ブロックがせいせいされました。"
+
+#: js/widgets/aiwidget.js:647
+msgid "MIDI loading. This may take some time depending upon the number of notes in the track"
+msgstr "「MIDI]を よみこみちゅうです。おんぷの かずと トラックの かずによって じかんが かかるかもしれません。"
+
+#: js/widgets/aiwidget.js:656 js/widgets/sampler.js:300
+msgid "Upload failed: Sample is not a .wav file."
+msgstr "プラグインできませんでした： さんぷるは .wavファイルでは ありません。"
+
+#: js/widgets/aiwidget.js:787
+msgid "Generate blocks"
+msgstr "ブロックをせいせいする"
+
+#: js/widgets/aiwidget.js:799
+msgid "Set API Key"
+msgstr "APIキーのせってい"
+
+#: js/widgets/aiwidget.js:802
+msgid "Enter your Groq API Key: %s"
+msgstr "Groq API キーをにゅうりょくしてください: %s"
+
+#: js/widgets/aiwidget.js:870
+msgid "Synth error: %s"
+msgstr "シンセのエラー: %s"
+
+#: js/widgets/aiwidget.js:873
+msgid "Audio not supported in this browser."
+msgstr "このブラウザーでは おんせいが サポート されていません。"
+
+#: js/widgets/aiwidget.js:1103
+msgid "Please set your Groq API Key using the settings button (wrench icon) first."
+msgstr "まず せっていボタン (レンチ・アイコン) をしようして Groq API キーを せっていしてください。"
+
+#: js/widgets/meterwidget.js:195 js/widgets/meterwidget.js:196
+#: js/widgets/modewidget.js:142 js/widgets/modewidget.js:143
+#: js/widgets/modewidget.js:648 js/widgets/modewidget.js:649
+#: js/widgets/modewidget.js:710 js/widgets/modewidget.js:711
+#: js/widgets/rhythmruler.js:633 js/widgets/rhythmruler.js:2000
+#: js/widgets/rhythmruler.js:2001 js/widgets/rhythmruler.js:2025
+#: js/widgets/rhythmruler.js:2026 js/widgets/temperament.js:2584
+msgid "Play all"
+msgstr "すべてさいせい"
+
+#: js/widgets/meterwidget.js:283 js/widgets/sampler.js:1371
+msgid "Reset"
+msgstr "リセット"
+
+#: js/widgets/meterwidget.js:309
+msgid "Click in the circle to select strong beats for the meter."
+msgstr "クリックで つよい はくの いちを えらべます。"
+
+#: js/widgets/oscilloscope.js:78
+msgid "Zoom In"
+msgstr "ズームイン"
+
+#: js/widgets/oscilloscope.js:86
+msgid "Zoom Out"
+msgstr "ズームアウト"
+
+#: js/widgets/sampler.js:284
+msgid "Recording started"
+msgstr "ろくおんかいし"
+
+#: js/widgets/sampler.js:292
+msgid "Recording complete"
+msgstr "ろくおんかんりょう"
+
+#: js/widgets/sampler.js:343
+msgid "A new sample block was generated."
+msgstr "あたらしい 「ねいろサンプル」 ブロックが つくりました"
+
+#: js/widgets/sampler.js:384
+msgid "Warning: Your sample cannot be loaded because it is >1MB."
+msgstr "ワーニング：ねいろサンプルは > 1MB であるため よみこむことが できません。"
+
+#: js/widgets/sampler.js:544
+msgid "Upload sample"
+msgstr "ねいろ サンプルを アップロード"
+
+#: js/widgets/sampler.js:593
+msgid "Save sample"
+msgstr "ねいろ サンプルを ほぞん"
+
+#: js/widgets/sampler.js:606
+msgid "Toggle Mic"
+msgstr "マイクの きりかえ"
+
+#: js/widgets/sampler.js:608
+msgid "Playback"
+msgstr "さいせい"
+
+#: js/widgets/sampler.js:610
+msgid "Prompt"
+msgstr "ぷろんぷと"
+
+#: js/widgets/sampler.js:615
+msgid "Trim"
+msgstr "とりむ"
+
+#: js/widgets/sampler.js:713
+msgid "Generating audio... (It may take up to 1 minute)"
+msgstr "あたらしいおんせいをせいせいしています... (さいだい 1 わかかるばあいがあります)"
+
+#: js/widgets/sampler.js:716
+msgid "Generating audio..."
+msgstr "あたらしいおんせいをせいせいしています..."
 
 #: js/turtleactions/RhythmActions.js:151
 msgid "Neighbor note value is too large for the current note duration."
@@ -7719,6 +8464,10 @@ msgstr "ウィンドウをとじる"
 #: js/widgets/widgetWindows.js:267
 msgid "Minimize"
 msgstr "さいしょうかする"
+
+#: js/widgets/sampler.js:1199
+msgid "Cents adjustment"
+msgstr "セントちょうせい"
 
 #: js/widgets/widgetWindows.js:269
 msgid "Roll up window"
@@ -7809,6 +8558,10 @@ msgstr "えくすぽーとするかいわはありません。"
 msgid "Debugger error: Could not retrieve project data for export."
 msgstr "デバッガー エラー: えくすぽーとするプロジェクト データをしゅとくできませんでした。"
 
+#: js/widgets/help.js:65
+msgid "Start by dragging a block from the left panel and connect it to the Start block."
+msgstr "はじめに ひだりがわの パネルから ブロックを ドラッグして、それを「スタート」ブロックに せつぞくします。"
+
 #: js/widgets/aidebugger.js:818
 msgid "Chat exported successfully."
 msgstr "ちゃっとはせいじょうにえくすぽーとされました。"
@@ -7840,6 +8593,10 @@ msgstr "ワーニング： サンプルは １MB より おおきいです。"
 msgid "New start block generated."
 msgstr "あたらしい「スタート」ブロックがせいせいされました。"
 
+#: js/widgets/help.js:336 js/widgets/help.js:871
+msgid "Load this block"
+msgstr "このブロックをロードします"
+
 #: js/widgets/aiwidget.js:651
 msgid "MIDI loading. This may take some time depending upon the number of notes in the track"
 msgstr "「MIDI]を よみこみちゅうです。おんぷの かずと トラックの かずによって じかんが かかるかもしれません。"
@@ -7865,6 +8622,10 @@ msgstr "Groq API キーをにゅうりょくしてください: %s"
 msgid "Synth error: %s"
 msgstr "しんせのエラー: %s"
 
+#: js/widgets/jseditor.js:984
+msgid "JavaScript block conversion is unavailable because its configuration file failed to load."
+msgstr "JavaScript ブロックへんかんは、こうせいファイルのロードにしっぱいしたためしようできません。"
+
 #: js/widgets/aiwidget.js:878
 msgid "Audio not supported in this browser."
 msgstr "このぶらうざではおんせいがさぽーとされていません。"
@@ -7880,11 +8641,11 @@ msgstr "エクスポート"
 
 #: js/widgets/legobricks.js:363
 msgid "Upload Image"
-msgstr "がぞうをあっぷろーどする"
+msgstr "がぞうをプラグインする"
 
 #: js/widgets/legobricks.js:369
 msgid "Webcam"
-msgstr "うぇぶかめら"
+msgstr "ウェブカメラ"
 
 #: js/widgets/legobricks.js:409
 msgid "LEGO Bricks - Phrase Maker with %s pitch rows (sorted by frequency, Instrument)"
@@ -7916,7 +8677,7 @@ msgstr "ふれーずをくりあしました"
 
 #: js/widgets/legobricks.js:1269
 msgid "Image uploaded successfully"
-msgstr "がぞうがせいじょうにあっぷろーどされました"
+msgstr "がぞうがせいじょうにプラグインされました"
 
 #: js/widgets/legobricks.js:1323
 msgid "Photo captured"
@@ -7924,11 +8685,11 @@ msgstr ""
 
 #: js/widgets/legobricks.js:1328
 msgid "Webcam started"
-msgstr "うぇぶかめらがかいしされました"
+msgstr "ウェブカメラが かいし されました"
 
 #: js/widgets/legobricks.js:1331
 msgid "Webcam access denied: %s"
-msgstr "うぇぶかめらへのあくせすがきょひされました: %s"
+msgstr "ウェブカメラへ のアクセスが きょひ されました: %s"
 
 #: js/widgets/legobricks.js:1388
 msgid "Eye dropper active - hover over image to preview colors, click to select background color."
@@ -8068,15 +8829,23 @@ msgstr "まとめ"
 
 #: js/widgets/reflection.js:160
 msgid "Talk with Rohan"
-msgstr "ろはんさんとはなす"
+msgstr "ロハンさんと はなす"
 
 #: js/widgets/reflection.js:167
 msgid "Talk with Alan"
-msgstr "あらんさんとはなす"
+msgstr "アランさんと はなす"
 
 #: js/widgets/reflection.js:174
 msgid "Talk with Beethoven"
-msgstr "べーとーゔぇんさんとのはなす"
+msgstr "ベートーヴェンさんと はなす"
+
+#: js/widgets/reflection.js:178
+msgid "Refresh"
+msgstr "リフレッシュ"
+
+#: js/widgets/reflection.js:228
+msgid "Reflect on your project."
+msgstr "じぶんの プロジェクトを ふりかえって ください。"
 
 #: js/widgets/reflection.js:181
 msgid "Refresh"
@@ -8239,6 +9008,10 @@ msgstr "MIDIデバイスがみつかりました。"
 msgid "No MIDI device found."
 msgstr "MIDIデバイスがみつかりません。"
 
+#: js/widgets/rhythmruler.js:759
+msgid "Circular view"
+msgstr "えんけいビュー"
+
 #: js/widgets/musickeyboard.js:3702
 msgid "Failed to get MIDI access in browser."
 msgstr "ブラウザはMIDIのアクセスができませんでした。"
@@ -8274,7 +9047,7 @@ msgstr "へんしゅうする"
 
 #: js/widgets/temperament.js:657
 msgid "cents"
-msgstr "せんと"
+msgstr "セント"
 
 #: js/widgets/temperament.js:793
 #: js/widgets/temperament.js:798
@@ -8316,7 +9089,7 @@ msgstr ""
 
 #: js/widgets/temperament.js:1832
 msgid "The octave ratio has changed. This changes temperament significantly."
-msgstr "オクターブひがかわりました。これによりちょうりつがおおきくかわります。"
+msgstr "オクターヴひがかわりました。これによりちょうりつがおおきくかわります。"
 
 #: js/widgets/temperament.js:1876
 msgid "Invalid temperament: %s. Skipping to next temperament."
@@ -8398,6 +9171,10 @@ msgstr "おんせいのせいせいにしっぱいしました。"
 #: js/widgets/sampler.js:822
 msgid "An error occurred."
 msgstr "エラーがはっせいしました。"
+
+#: js/widgets/aidebugger.js:641
+msgid "Debugger error: Could not load project data."
+msgstr "デバッガー エラー: プロジェクト データをロードできませんでした。"
 
 #: js/widgets/sampler.js:920
 #: js/widgets/sampler.js:2232
@@ -8486,7 +9263,7 @@ msgstr "ミュージック・ブロックスで ひらきます"
 
 #: planet/js/GlobalCard.js:64
 msgid "Share project"
-msgstr "プロジェクトをしぇあする"
+msgstr "プロジェクトを シェアする"
 
 #: planet/js/GlobalCard.js:70
 msgid "Share"
@@ -8494,7 +9271,7 @@ msgstr "シェア"
 
 #: planet/js/GlobalCard.js:72
 msgid "Copy link to clipboard"
-msgstr "りんくをクリップボードにコピー"
+msgstr "リンクを クリップボードに コピー"
 
 #: planet/js/GlobalCard.js:76
 msgid "Flags"
@@ -8585,6 +9362,30 @@ msgstr "みじかいコード"
 #: planet/js/LocalCard.js:36
 msgid "View published project"
 msgstr "こうかい された プロジェクトを みる"
+
+#: planet/js/GlobalCard.js:77
+msgid "Run project on startup."
+msgstr "きどうじに プロジェクトを じっこうします。"
+
+#: planet/js/GlobalCard.js:80
+msgid "Show code blocks on startup."
+msgstr "きどうじに コード・ブロックを ひょうじします。"
+
+#: planet/js/GlobalCard.js:83
+msgid "Collapse code blocks on startup."
+msgstr "きどうじに コード・ブロックを おりたたむ。"
+
+#: planet/js/GlobalCard.js:90
+msgid "Advanced Options"
+msgstr "しょうさい オプション"
+
+#: planet/js/GlobalCard.js:238
+msgid "Link copied to clipboard!"
+msgstr "リンクが クリップボードに コピーされました!"
+
+#: planet/js/GlobalCard.js:245
+msgid "Failed to copy link to clipboard"
+msgstr "リンクを クリップボードに コピーできませんでした"
 
 #: planet/js/LocalCard.js:44
 #: planet/js/StringHelper.js:37
