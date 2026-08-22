@@ -632,7 +632,7 @@ class Activity {
         };
 
         // Context menu / helpful wheel / bottom toolbar functionality has been
-        // extracted to ContextMenuController (js/context-menu-controller.js).
+        // extracted to ContextMenuController (js/activity/context-menu-controller.js).
         // setupContextMenuController() installs the delegation stubs below:
         // closeHelpfulWheel, setHelpfulSearchDiv, _displayHelpfulSearchDiv,
         // _hideHelpfulSearchWidget,
