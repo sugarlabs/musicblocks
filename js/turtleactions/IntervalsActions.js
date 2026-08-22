@@ -58,8 +58,12 @@ function setupIntervalsActions(activity) {
          */
         static GetModename(mode) {
             let modename = "major";
+            if (typeof mode !== "string") {
+                return modename;
+            }
+            const lowercaseMode = mode.toLowerCase();
             for (const _mode in MUSICALMODES) {
-                if (_mode === mode || _(_mode) === mode) {
+                if (_mode.toLowerCase() === lowercaseMode || _(_mode) === mode) {
                     modename = _mode;
                     break;
                 }

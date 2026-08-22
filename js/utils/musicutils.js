@@ -61,8 +61,15 @@ const _b64Cache = new Map();
     INTERVALVALUES, MUSICALMODES, getIntervalRatio, frequencyToPitch, NOTESTEP,
    GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
    SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
-   INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition,
-   scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern
+    INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition,
+    scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern,
+    MODEPIEMENU_SLOT_COUNT, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
+    MODEPIEMENU_NAME_TITLE_RADIUS, MODEPIEMENU_FONT_FAMILY,
+    MODEPIEMENU_GROUP_FONT_RATIO, MODEPIEMENU_NAME_FONT_MIN_RATIO,
+    MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
+    getModeLabel, getModeNameFromLabel, getModeSliceColors,
+    updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
+    configureWheel
 */
 
 /**
@@ -1815,7 +1822,224 @@ const MODE_PIE_MENUS = {
         " ",
         " "
     ],
-    "12": ["chromatic", " ", " ", " ", " ", " ", "custom", " ", " ", " ", " ", " "]
+    "12": ["chromatic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+    "custom": [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+};
+
+/**
+ * Fixed slot count shared by every mode pie menu ring. Both the workspace
+ * piemenu (piemenus.js) and the mode widget piemenu (modewidget.js) lay the
+ * mode names out on this many slots.
+ * @constant {number}
+ */
+const MODEPIEMENU_SLOT_COUNT = 12;
+
+/**
+ * Ring geometry shared by the mode-selection pie menus so the group and name
+ * rings render with identical proportions in both contexts.
+ */
+const MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
+const MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
+
+/**
+ * Mid-radius of the mode-name ring (0.3-0.85), used to size each label to its
+ * own slice arc.
+ * @constant {number}
+ */
+const MODEPIEMENU_NAME_TITLE_RADIUS = 0.575;
+
+/**
+ * Font family and relative group-ring font size shared by both mode pie menus.
+ * Font px is computed as GROUP_FONT_RATIO * wheelRadius so the same wheel
+ * renders identically regardless of the paper resolution.
+ */
+const MODEPIEMENU_FONT_FAMILY = "sans-serif";
+const MODEPIEMENU_GROUP_FONT_RATIO = 0.08;
+
+/**
+ * Min/max per-slice font sizes for the mode-name ring, as a fraction of the
+ * wheel radius. Kept proportional so both contexts clamp identically.
+ */
+const MODEPIEMENU_NAME_FONT_MIN_RATIO = 0.06;
+const MODEPIEMENU_NAME_FONT_MAX_RATIO = 0.12;
+
+/**
+ * Reads the custom modes saved by the mode widget from local storage.
+ * Corrupt or non-array data yields an empty list.
+ * @returns {Array} Entries that look like custom modes ({name} is a string)
+ */
+const getSavedCustomModes = () => {
+    try {
+        const customModes = JSON.parse(localStorage.getItem("customModes") || "[]");
+        return Array.isArray(customModes)
+            ? customModes.filter(m => m && typeof m.name === "string")
+            : [];
+    } catch (e) {
+        return [];
+    }
+};
+
+/**
+ * Builds the fixed 12-slot list of mode names shown for a pie menu group.
+ * Built-in groups come straight from MODE_PIE_MENUS; the "custom" group is
+ * padded with blanks. Callers may pass custom names already carrying their own
+ * sentinels (the widget prepends "+").
+ * @param {string} grp The mode group key
+ * @param {Array} [customModeNames] Custom mode names (only used for "custom")
+ * @returns {Array} A fixed-length list of mode names
+ */
+const getModeNamesForGroup = (grp, customModeNames = []) => {
+    if (grp !== "custom") {
+        return MODE_PIE_MENUS[grp].slice();
+    }
+    const names = customModeNames.slice(0, MODEPIEMENU_SLOT_COUNT);
+    while (names.length < MODEPIEMENU_SLOT_COUNT) {
+        names.push(" ");
+    }
+    return names;
+};
+
+/**
+ * Returns the display label for a mode name, translating the major/ionian and
+ * minor/aeolian pairs and leaving blank slots blank.
+ * @param {string} modename
+ * @returns {string}
+ */
+const getModeLabel = modename => {
+    switch (modename) {
+        case "ionian":
+        case "major":
+            return `${_("major")} / ${_("ionian")}`;
+        case "aeolian":
+        case "minor":
+            return `${_("minor")} / ${_("aeolian")}`;
+        default:
+            return modename === " " ? " " : _(modename);
+    }
+};
+
+/**
+ * Inverse of getModeLabel: resolves a displayed label back to its internal
+ * mode name. Falls back to the label itself when nothing matches.
+ * @param {string} label
+ * @param {Array} modes The mode names for the current group
+ * @returns {string}
+ */
+const getModeNameFromLabel = (label, modes) => {
+    if (label === `${_("major")} / ${_("ionian")}`) {
+        return "major";
+    }
+    if (label === `${_("minor")} / ${_("aeolian")}`) {
+        return "aeolian";
+    }
+    for (const m of modes) {
+        if (_(m) === label) {
+            return m;
+        }
+    }
+    return label;
+};
+
+/**
+ * Builds the per-slice colors for a mode-name ring: blank slots get the
+ * "empty" color, real modes the "filled" color.
+ * @param {Array} modes
+ * @param {Object} colors { emptyColor, filledColor }
+ * @returns {Array}
+ */
+const getModeSliceColors = (modes, colors) =>
+    modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
+
+/**
+ * Re-renders an existing mode-name wheel in place: updates every per-state
+ * title copy and the slice fill attributes, then refreshes the wheel.
+ * @param {Object} wheel wheelnav instance
+ * @param {Array} labels Display labels
+ * @param {Array} colors Per-slice colors
+ * @returns {void}
+ */
+const updateModeWheelItems = (wheel, labels, colors) => {
+    for (let i = 0; i < wheel.navItems.length; i++) {
+        const item = wheel.navItems[i];
+        item.title = labels[i];
+        item.basicNavTitleMax.title = labels[i];
+        item.basicNavTitleMin.title = labels[i];
+        item.hoverNavTitleMax.title = labels[i];
+        item.hoverNavTitleMin.title = labels[i];
+        item.selectedNavTitleMax.title = labels[i];
+        item.selectedNavTitleMin.title = labels[i];
+        item.initNavTitle.title = labels[i];
+        item.fillAttr = colors[i];
+        item.sliceHoverAttr.fill = colors[i];
+        item.slicePathAttr.fill = colors[i];
+        item.sliceSelectedAttr.fill = colors[i];
+    }
+    wheel.refreshWheel();
+};
+
+/**
+ * Shared title font for the mode-group ring, scaled to the wheel radius so it
+ * renders at the same relative size regardless of paper resolution.
+ * @param {number} wheelRadius
+ * @returns {string}
+ */
+const getModeGroupTitleFont = wheelRadius =>
+    `100 ${Math.round(MODEPIEMENU_GROUP_FONT_RATIO * wheelRadius)}px ${MODEPIEMENU_FONT_FAMILY}`;
+
+/**
+ * Sizes a mode-name label to fit its own slice arc on the shared name ring.
+ * The min/max clamps scale with the wheel radius so the same ring renders
+ * identically on any paper resolution.
+ * @param {number} wheelRadius
+ * @param {number} sliceCount
+ * @param {number} labelLen
+ * @returns {string}
+ */
+const getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
+    const arcPx = (2 * Math.PI * MODEPIEMENU_NAME_TITLE_RADIUS * wheelRadius) / sliceCount;
+    const size = Math.floor((arcPx * 0.85) / (labelLen * 0.6));
+    const minSize = Math.round(MODEPIEMENU_NAME_FONT_MIN_RATIO * wheelRadius);
+    const maxSize = Math.round(MODEPIEMENU_NAME_FONT_MAX_RATIO * wheelRadius);
+    const clamped = Math.min(maxSize, Math.max(minSize, size));
+    return `100 ${clamped}px ${MODEPIEMENU_FONT_FAMILY}`;
+};
+
+/**
+ * Applies the shared donut-slice configuration to a wheelnav instance:
+ * colors, radii, -90° start angle, zero animation, and optional selection
+ * paths, title rotation, and title font.
+ * @param {Object} wheel - The wheelnav instance to configure.
+ * @param {Object} opts - Configuration options.
+ * @param {Array} opts.colors - Slice colors.
+ * @param {number} opts.minRadius - Min radius percent (0-1).
+ * @param {number} opts.maxRadius - Max radius percent (0-1).
+ * @param {boolean} [opts.clickModeRotate] - Whether clicks rotate the wheel.
+ * @param {boolean} [opts.selectionPaths] - Whether to sync selected/init paths.
+ * @param {number} [opts.titleRotateAngle] - Title rotation angle.
+ * @param {string} [opts.titleFont] - Title font CSS string.
+ * @returns {void}
+ */
+const configureWheel = (wheel, opts) => {
+    wheel.colors = opts.colors;
+    wheel.slicePathFunction = slicePath().DonutSlice;
+    wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    wheel.slicePathCustom.minRadiusPercent = opts.minRadius;
+    wheel.slicePathCustom.maxRadiusPercent = opts.maxRadius;
+    if (opts.clickModeRotate !== undefined) {
+        wheel.clickModeRotate = opts.clickModeRotate;
+    }
+    if (opts.selectionPaths) {
+        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+        wheel.sliceInitPathCustom = wheel.slicePathCustom;
+    }
+    wheel.navAngle = -90;
+    wheel.animatetime = 0;
+    if (opts.titleRotateAngle !== undefined) {
+        wheel.titleRotateAngle = opts.titleRotateAngle;
+    }
+    if (opts.titleFont !== undefined) {
+        wheel.titleFont = opts.titleFont;
+    }
 };
 
 // The table contains the intervals that define the modes.
@@ -3219,8 +3443,9 @@ const getModeNumbers = name => {
         return m;
     };
 
+    const lowercaseName = name.toLowerCase();
     for (const mode in MUSICALMODES) {
-        if (mode === name.toLowerCase()) {
+        if (mode.toLowerCase() === lowercaseName) {
             return __convert(MUSICALMODES[mode]);
         }
     }
@@ -3823,12 +4048,23 @@ const keySignatureToMode = keySignature => {
 
     if (mode === "") {
         mode = "major";
-    } else {
-        mode = mode.toLowerCase();
     }
 
-    if (mode in MUSICALMODES) {
-        return [key, mode];
+    // Resolve the mode name case-insensitively. Built-in modes are registered
+    // lowercase, but user-defined modes keep their original casing (e.g.
+    // "MyMode"), so lowercasing the incoming name would fail the lookup.
+    let modeKey = mode;
+    if (!(modeKey in MUSICALMODES)) {
+        for (const m in MUSICALMODES) {
+            if (m.toLowerCase() === mode.toLowerCase()) {
+                modeKey = m;
+                break;
+            }
+        }
+    }
+
+    if (modeKey in MUSICALMODES) {
+        return [key, modeKey];
     } else {
         console.debug("Invalid mode name: " + mode + " reverting to major.");
         return [key, "major"];
@@ -7950,6 +8186,23 @@ if (typeof module !== "undefined" && module.exports) {
         EQUIVALENTACCIDENTALS,
         INTERVALVALUES,
         FIXEDSOLFEGE,
-        FIXEDSOLFEGE1
+        FIXEDSOLFEGE1,
+        MODEPIEMENU_SLOT_COUNT,
+        MODEPIEMENU_GROUP_RING,
+        MODEPIEMENU_NAME_RING,
+        MODEPIEMENU_NAME_TITLE_RADIUS,
+        MODEPIEMENU_FONT_FAMILY,
+        MODEPIEMENU_GROUP_FONT_RATIO,
+        MODEPIEMENU_NAME_FONT_MIN_RATIO,
+        MODEPIEMENU_NAME_FONT_MAX_RATIO,
+        getSavedCustomModes,
+        getModeNamesForGroup,
+        getModeLabel,
+        getModeNameFromLabel,
+        getModeSliceColors,
+        updateModeWheelItems,
+        getModeGroupTitleFont,
+        getModeSliceFont,
+        configureWheel
     };
 }
