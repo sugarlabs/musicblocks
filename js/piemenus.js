@@ -22,7 +22,7 @@
    FIXEDSOLFEGE, NOTENAMES, numberToPitch,
     nthDegreeToPitch, SOLFEGENAMES, buildScale, getCurrentEDO, generateNoteNames,
     _THIS_IS_TURTLE_BLOCKS_,
-    CHORDNAMES, Synth, Tone, activity
+    CHORDNAMES, Synth, Tone, activity, announceToScreenReader
 */
 
 /*
@@ -36,7 +36,7 @@
         nthDegreeToPitch, SOLFEGENAMES, buildScale
 
      - js/utils/utils.js
-        _, last, docById
+        _, last, docById, announceToScreenReader
      - js/turtle-singer.js
         Singer
      - js/utils/munsell.js
@@ -813,6 +813,11 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         null,
                         false
                     );
+                    // Trigger note with proper error handling
+                    // Announce the previewed note to screen readers (screen
+                    // reader only, no visual message). Naturally throttled by
+                    // _triggerLock, so rapid wheel navigation doesn't spam.
+                    announceToScreenReader(_("played") + " " + obj[0] + obj[1]);
                 } catch (e) {
                     console.error("Synth trigger error:", e);
                 }
