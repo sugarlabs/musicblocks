@@ -2521,7 +2521,7 @@ class Activity {
             this.setupWindowBlurHandler(doHardStopButton);
 
             this.stage = new createjs.Stage(this.canvas);
-            createjs.Touch.enable(this.stage);
+            createjs.Touch.enable(this.stage, false, true);
             this._startRenderLoop();
 
             // Initialize Ticker with optimal framerate
