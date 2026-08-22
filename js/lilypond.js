@@ -676,7 +676,7 @@ const saveLilypondOutput = function (activity) {
         "% You can change the MIDI instruments below to anything on this list:\n% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n";
 
     let c = 0;
-    const occupiedShortNames = [];
+    const occupiedShortNames = new Set();
     for (const t in activity.logo.notation.notationStaging) {
         let tNumber = t;
         if (typeof t === "string") {
@@ -793,7 +793,7 @@ const saveLilypondOutput = function (activity) {
                 // letters.
                 if (instrumentName.length === 1) {
                     shortInstrumentName = instrumentName;
-                    occupiedShortNames[t] = shortInstrumentName;
+                    occupiedShortNames.add(shortInstrumentName);
                 } else if (n === -1) {
                     // no space in instrument name
                     for (let p = 2; p < instrumentName.length; p++) {
@@ -803,10 +803,10 @@ const saveLilypondOutput = function (activity) {
                             final = final + instrumentName.charAt(p - 1);
                         }
 
-                        if (!occupiedShortNames.includes(final)) {
+                        if (!occupiedShortNames.has(final)) {
                             // not found in array so unique shortname
                             shortInstrumentName = final;
-                            occupiedShortNames[t] = shortInstrumentName;
+                            occupiedShortNames.add(shortInstrumentName);
                             break;
                         }
                     }
@@ -818,28 +818,28 @@ const saveLilypondOutput = function (activity) {
                     part2 = secondPart.charAt(0);
                     final = part1 + part2;
 
-                    if (!occupiedShortNames.includes(final)) {
+                    if (!occupiedShortNames.has(final)) {
                         // found unique shortname
                         shortInstrumentName = final;
-                        occupiedShortNames[t] = shortInstrumentName;
+                        occupiedShortNames.add(shortInstrumentName);
                         done = 1;
                     } else if (done !== 1) {
                         final = "";
                         for (let q = 1; q < instrumentName.length; q++) {
                             part2 = part2 + secondPart.charAt(q);
                             final = part1 + part2;
-                            if (!occupiedShortNames.includes(final)) {
+                            if (!occupiedShortNames.has(final)) {
                                 // found unique shortname
                                 shortInstrumentName = final;
-                                occupiedShortNames[t] = shortInstrumentName;
+                                occupiedShortNames.add(shortInstrumentName);
                                 break;
                             } else {
                                 part1 = part1 + firstPart.charAt(q);
                                 final = part1 + part2;
-                                if (!occupiedShortNames.includes(final)) {
+                                if (!occupiedShortNames.has(final)) {
                                     // found unique shortname
                                     shortInstrumentName = final;
-                                    occupiedShortNames[t] = shortInstrumentName;
+                                    occupiedShortNames.add(shortInstrumentName);
                                     break;
                                 }
                             }
