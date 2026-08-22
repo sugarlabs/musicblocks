@@ -33,7 +33,8 @@ const {
     deepClone,
     isSafeUrl,
     isUnsafeObjectKey,
-    isValidHex
+    isValidHex,
+    toArray
 } = require("../utils-logic.js");
 
 describe("Utility Logic Functions", () => {
@@ -251,6 +252,26 @@ describe("Utility Logic Functions", () => {
             expect(clampNumber("invalid", 0, 10)).toBe(0);
             expect(clampNumber(NaN, 0, 10, 5)).toBe(5);
             expect(clampNumber(null, 0, 10)).toBe(0);
+        });
+    });
+
+    describe("toArray()", () => {
+        it("returns the original array if input is already an array", () => {
+            const arr = [1, 2, 3];
+            expect(toArray(arr)).toBe(arr);
+            expect(toArray([])).toEqual([]);
+        });
+
+        it("wraps single non-array values in an array", () => {
+            expect(toArray(42)).toEqual([42]);
+            expect(toArray("hello")).toEqual(["hello"]);
+            expect(toArray(true)).toEqual([true]);
+            expect(toArray({ key: "val" })).toEqual([{ key: "val" }]);
+        });
+
+        it("returns an empty array for null or undefined", () => {
+            expect(toArray(null)).toEqual([]);
+            expect(toArray(undefined)).toEqual([]);
         });
     });
 
