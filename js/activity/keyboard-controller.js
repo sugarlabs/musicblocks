@@ -68,6 +68,60 @@ class KeyboardController {
     __keyPressed(event) {
         const activity = this.activity;
 
+        // Intercept Ctrl+Shift+R / Cmd+Shift+R to clear IndexedDB + session storage
+        // before browser reload to prevent reloading stale sessions.
+        if (
+            (event.ctrlKey || event.metaKey) &&
+            event.shiftKey &&
+            (event.key === "r" || event.key === "R" || event.keyCode === 82)
+        ) {
+            console.warn(
+                "Hard Refresh requested: Clearing session data from indexedDB and localStorage"
+            );
+            activity._isHardReloading = true;
+            event.preventDefault();
+            event.stopPropagation();
+
+            const clearAndReload = () => {
+                if (activity.storage && activity.storage.currentProject) {
+                    const p = activity.storage.currentProject;
+                    if (typeof activity.storage.removeItem === "function") {
+                        activity.storage.removeItem("SESSION" + p);
+                        activity.storage.removeItem("SESSION_TIMESTAMP" + p);
+                        activity.storage.removeItem("SESSIONIMAGE" + p);
+                    } else {
+                        delete activity.storage["SESSION" + p];
+                        delete activity.storage["SESSION_TIMESTAMP" + p];
+                        delete activity.storage["SESSIONIMAGE" + p];
+                    }
+                }
+                // Also clear git session state so fresh clone / reload doesn't reuse old draft ID
+                if (activity.storage && typeof activity.storage.removeItem === "function") {
+                    activity.storage.removeItem("mbGitRepoName");
+                    activity.storage.removeItem("mbGitHashedKey");
+                    activity.storage.removeItem("mbGitLastSavedHash");
+                    activity.storage.removeItem("mbGitCurrentSha");
+                    activity.storage.removeItem("mbGitCurrentDraftId");
+                    activity.storage.removeItem("mbGitCurrentProjectId");
+                    activity.storage.removeItem("mbGitDisplayName");
+                }
+                window.location.reload(true);
+            };
+
+            if (activity.sessionStorageManager) {
+                activity.sessionStorageManager
+                    .clearAllSessions()
+                    .then(clearAndReload)
+                    .catch(err => {
+                        console.error("Failed to clear indexedDB during hard reload:", err);
+                        clearAndReload();
+                    });
+            } else {
+                clearAndReload();
+            }
+            return;
+        }
+
         // First, check if the pitch slider is open
         if (this._isWidgetOpen("slider")) {
             // If the event is an arrow key, let the PitchSlider handle it
