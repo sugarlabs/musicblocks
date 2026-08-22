@@ -240,6 +240,10 @@ class StatusMatrix {
      * @returns {void}
      */
     updateAll() {
+        if (!this.isOpen || !this._statusTable) {
+            return;
+        }
+
         // Update status of all of the voices in the matrix.
         this.activity.logo.updatingStatusMatrix = true;
 
