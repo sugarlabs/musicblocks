@@ -26,6 +26,8 @@ global.NANERRORMSG = "NaN error";
 global.NOINPUTERRORMSG = "No input error";
 global._THIS_IS_MUSIC_BLOCKS_ = false;
 global.toFixed2 = jest.fn(n => n);
+global.MusicBlocks = { isRun: false };
+global.Mouse = { getMouseFromTurtle: jest.fn(() => null) };
 
 /* Base block mocks */
 global.ValueBlock = class {
@@ -394,6 +396,248 @@ describe("GraphicsBlocks", () => {
             const block = new activity.blocks.setxy();
             block.flow([0, 0], logo, turtle, 1);
             expect(turtleObj.painter.doSetXY).toHaveBeenCalledWith(0, 0);
+        });
+    });
+
+    // ── Forward & Back Out of Bounds & Error Handling ──────
+    describe("Forward & Back Out of Bounds & Error Handling", () => {
+        test("ForwardBlock reports error when distance > 5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.forward();
+            block.flow([6000], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalled();
+        });
+        test("ForwardBlock reports NaN error on string argument", () => {
+            const block = new activity.blocks.forward();
+            block.flow(["far"], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+        });
+        test("BackBlock reports error when distance < -5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.back();
+            block.flow([-6000], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalled();
+        });
+        test("BackBlock reports NaN error on string argument", () => {
+            const block = new activity.blocks.back();
+            block.flow(["backwards"], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+        });
+    });
+
+    // ── SuppressOutput Behavior ────────────────────────
+    describe("SuppressOutput Behavior (Pen State Isolation)", () => {
+        test("ForwardBlock suppresses output by lifting pen temporarily during execution", () => {
+            turtleObj.singer.suppressOutput = true;
+            turtleObj.painter.penState = true;
+            let penStateDuringCall;
+            turtleObj.painter.doForward = jest.fn(() => {
+                penStateDuringCall = turtleObj.painter.penState;
+            });
+            const block = new activity.blocks.forward();
+            block.flow([50], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(50);
+            expect(penStateDuringCall).toBe(false);
+            expect(turtleObj.painter.penState).toBe(true);
+        });
+        test("ScrollXYBlock suppresses output by lifting pen temporarily during execution", () => {
+            turtleObj.singer.suppressOutput = true;
+            turtleObj.painter.penState = true;
+            let penStateDuringCall;
+            turtleObj.painter.doScrollXY = jest.fn(() => {
+                penStateDuringCall = turtleObj.painter.penState;
+            });
+            const block = new activity.blocks.scrollxy();
+            block.flow([10, 20], logo, turtle, 1);
+            expect(turtleObj.painter.doScrollXY).toHaveBeenCalledWith(10, 20);
+            expect(penStateDuringCall).toBe(false);
+            expect(turtleObj.painter.penState).toBe(true);
+        });
+        test("ClearBlock suppresses output by moving turtle without painting during execution", () => {
+            turtleObj.singer.suppressOutput = true;
+            turtleObj.painter.penState = true;
+            let penStateDuringCall;
+            turtleObj.painter.doSetXY = jest.fn(() => {
+                penStateDuringCall = turtleObj.painter.penState;
+            });
+            const block = new activity.blocks.clear();
+            block.flow([], logo, turtle, 1);
+            expect(turtleObj.painter.doSetXY).toHaveBeenCalledWith(0, 0);
+            expect(turtleObj.painter.doSetHeading).toHaveBeenCalledWith(0);
+            expect(penStateDuringCall).toBe(false);
+            expect(turtleObj.painter.penState).toBe(true);
+        });
+    });
+
+    // ── EmbeddedGraphics in NoteBlocks ─────────
+    describe("EmbeddedGraphics in NoteBlocks", () => {
+        test("ForwardBlock pushes block ID to embeddedGraphics when in note block", () => {
+            turtleObj.singer.inNoteBlock = [0];
+            turtleObj.singer.embeddedGraphics = [[]];
+            const block = new activity.blocks.forward();
+            block.flow([100], logo, turtle, 42);
+            expect(turtleObj.singer.embeddedGraphics[0]).toContain(42);
+        });
+        test("RightBlock pushes block ID to embeddedGraphics when in note block", () => {
+            turtleObj.singer.inNoteBlock = [0];
+            turtleObj.singer.embeddedGraphics = [[]];
+            const block = new activity.blocks.right();
+            block.flow([90], logo, turtle, 99);
+            expect(turtleObj.singer.embeddedGraphics[0]).toContain(99);
+        });
+    });
+
+    // ── Matrix / PhraseMaker Integration ──────────────
+    describe("Matrix / PhraseMaker Integration", () => {
+        test("ForwardBlock records row block and args when logo.inMatrix is true", () => {
+            logo.inMatrix = true;
+            activity.blocks.blockList = { 1: { name: "forward" } };
+            const block = new activity.blocks.forward();
+            block.flow([50], logo, turtle, 1);
+            expect(logo.phraseMaker.addRowBlock).toHaveBeenCalledWith(1);
+            expect(logo.phraseMaker.rowLabels).toContain("forward");
+            expect(logo.phraseMaker.rowArgs).toContain(50);
+        });
+        test("SetXYBlock records row block and args when logo.inMatrix is true", () => {
+            logo.inMatrix = true;
+            activity.blocks.blockList = { 2: { name: "setxy" } };
+            const block = new activity.blocks.setxy();
+            block.flow([10, 20], logo, turtle, 2);
+            expect(logo.phraseMaker.addRowBlock).toHaveBeenCalledWith(2);
+            expect(logo.phraseMaker.rowLabels).toContain("setxy");
+            expect(logo.phraseMaker.rowArgs).toContainEqual([10, 20]);
+        });
+        test("ArcBlock records row block and args when logo.inMatrix is true", () => {
+            logo.inMatrix = true;
+            activity.blocks.blockList = { 3: { name: "arc" } };
+            const block = new activity.blocks.arc();
+            block.flow([90, 100], logo, turtle, 3);
+            expect(logo.phraseMaker.addRowBlock).toHaveBeenCalledWith(3);
+            expect(logo.phraseMaker.rowLabels).toContain("arc");
+            expect(logo.phraseMaker.rowArgs).toContainEqual([90, 100]);
+        });
+    });
+
+    // ── WrapBlock (wrap) Extended ──────────────────────
+    describe("WrapBlock (wrap) Extended", () => {
+        test("WrapBlock enables wrap mode when args[0] is 'on'", () => {
+            activity.blocks.blockList[10] = { name: "wrap" };
+            const block = new activity.blocks.wrap();
+            block.flow(["on", 2], logo, turtle, 10);
+            expect(turtleObj.painter.wrap).toBe(true);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(10, turtle, "_wrap_" + turtle);
+        });
+        test("WrapBlock disables wrap mode when args[0] is 'off'", () => {
+            const block = new activity.blocks.wrap();
+            block.flow(["off", 2], logo, turtle, 10);
+            expect(turtleObj.painter.wrap).toBe(false);
+        });
+        test("WrapBlock reports error when args[0] is null", () => {
+            const block = new activity.blocks.wrap();
+            block.flow([null, 2], logo, turtle, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+        });
+        test("WrapBlock returns undefined when args[1] is missing", () => {
+            const block = new activity.blocks.wrap();
+            const res = block.flow(["on"], logo, turtle, 10);
+            expect(res).toBeUndefined();
+        });
+    });
+
+    // ── StatusMatrix Connection Tests ────────────────
+    describe("StatusMatrix & Print Connection Behavior", () => {
+        test("HeadingBlock pushes statusField when parent is print in status matrix", () => {
+            logo.inStatusMatrix = true;
+            activity.blocks.blockList = {
+                0: { connections: [1] },
+                1: { name: "print" }
+            };
+            const block = new activity.blocks.heading();
+            block.arg(logo, turtle, 0);
+            expect(logo.statusFields).toContainEqual([0, "heading"]);
+        });
+
+        test("XBlock pushes statusField when parent is print in status matrix", () => {
+            logo.inStatusMatrix = true;
+            activity.blocks.blockList = {
+                0: { connections: [1] },
+                1: { name: "print" }
+            };
+            const block = new activity.blocks.x();
+            block.arg(logo, turtle, 0);
+            expect(logo.statusFields).toContainEqual([0, "x"]);
+        });
+
+        test("YBlock pushes statusField when parent is print in status matrix", () => {
+            logo.inStatusMatrix = true;
+            activity.blocks.blockList = {
+                0: { connections: [1] },
+                1: { name: "print" }
+            };
+            const block = new activity.blocks.y();
+            block.arg(logo, turtle, 0);
+            expect(logo.statusFields).toContainEqual([0, "y"]);
+        });
+    });
+
+    // ── Help String Context Tests ────────────────────
+    describe("Help String Terminology Contexts", () => {
+        test("HeadingBlock asserts mouse vs turtle terminology based on _THIS_IS_MUSIC_BLOCKS_", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            const mouseBlock = new activity.blocks.heading();
+            expect(mouseBlock.setHelpString).toHaveBeenCalledWith([
+                "The Heading block returns the orientation of the mouse.",
+                "documentation",
+                ""
+            ]);
+
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+            const turtleBlock = new activity.blocks.heading();
+            expect(turtleBlock.setHelpString).toHaveBeenCalledWith([
+                "The Heading block returns the orientation of the turtle.",
+                "documentation",
+                ""
+            ]);
+        });
+
+        test("XBlock asserts mouse vs turtle terminology based on _THIS_IS_MUSIC_BLOCKS_", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            const mouseBlock = new activity.blocks.x();
+            expect(mouseBlock.setHelpString).toHaveBeenCalledWith([
+                "The X block returns the horizontal position of the mouse.",
+                "documentation",
+                null,
+                "xyhelp"
+            ]);
+
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+            const turtleBlock = new activity.blocks.x();
+            expect(turtleBlock.setHelpString).toHaveBeenCalledWith([
+                "The X block returns the horizontal position of the turtle.",
+                "documentation",
+                null,
+                "xyhelp"
+            ]);
+        });
+
+        test("YBlock asserts mouse vs turtle terminology based on _THIS_IS_MUSIC_BLOCKS_", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            const mouseBlock = new activity.blocks.y();
+            expect(mouseBlock.setHelpString).toHaveBeenCalledWith([
+                "The Y block returns the vertical position of the mouse.",
+                "documentation",
+                null,
+                "xyhelp"
+            ]);
+
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+            const turtleBlock = new activity.blocks.y();
+            expect(turtleBlock.setHelpString).toHaveBeenCalledWith([
+                "The Y block returns the vertical position of the turtle.",
+                "documentation",
+                null,
+                "xyhelp"
+            ]);
         });
     });
 });
