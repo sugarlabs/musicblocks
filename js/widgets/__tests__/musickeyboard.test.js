@@ -169,8 +169,60 @@ describe("MusicKeyboard add-row submenu", () => {
         expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
         expect(loadNewBlocks).toHaveBeenCalledWith([
             [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
+            [1, ["solfege", { value: "do" }], 0, 0, [0]],
+            [2, ["number", { value: 4 }], 0, 0, [0]]
+        ]);
+    });
+
+    test("adds next sequential pitch when layout contains existing pitch rows and inherits octave", () => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            }
+        });
+
+        keyboard.layout = [
+            { noteName: "do", noteOctave: 5, blockNumber: 100001 },
+            { noteName: "hertz", noteOctave: 440, blockNumber: 100002 }
+        ];
+
+        keyboard._createAddRowPieSubmenu();
+
+        expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
+        // After 'do', next pitch in chromatic solfege is 'do♯', and octave 5 is inherited from previous pitch
+        expect(loadNewBlocks).toHaveBeenCalledWith([
+            [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
             [1, ["solfege", { value: "do♯" }], 0, 0, [0]],
-            [2, ["number", { value: 392 }], 0, 0, [0]]
+            [2, ["number", { value: 5 }], 0, 0, [0]]
+        ]);
+    });
+
+    test("increments octave when rolling over from the last pitch label", () => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            }
+        });
+
+        // 'ti' is the 12th / last pitch label in default solfege scale
+        keyboard.layout = [{ noteName: "ti", noteOctave: 4, blockNumber: 100001 }];
+
+        keyboard._createAddRowPieSubmenu();
+
+        expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
+        // When rolling over after 'ti', next is 'do' and octave increments from 4 to 5
+        expect(loadNewBlocks).toHaveBeenCalledWith([
+            [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
+            [1, ["solfege", { value: "do" }], 0, 0, [0]],
+            [2, ["number", { value: 5 }], 0, 0, [0]]
         ]);
     });
 

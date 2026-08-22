@@ -134,10 +134,60 @@ const {
     processMacroData,
     hideDOMLabel,
     displayMsg,
-    _,
+    makeKeyboardAccessible,
     CameraManager,
-    announceToScreenReader
+    announceToScreenReader,
+    _
 } = require("../utils.js");
+
+describe("makeKeyboardAccessible()", () => {
+    test("adds button semantics and activates on Enter and Space", () => {
+        const element = {
+            id: "tempoButton",
+            setAttribute: jest.fn(),
+            getAttribute: jest.fn(() => ""),
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            click: jest.fn()
+        };
+
+        makeKeyboardAccessible(element, "Tempo");
+
+        expect(element.setAttribute).toHaveBeenCalledWith("role", "button");
+        expect(element.setAttribute).toHaveBeenCalledWith("tabindex", "0");
+        expect(element.setAttribute).toHaveBeenCalledWith("aria-label", "Tempo");
+
+        const handler = element.addEventListener.mock.calls[0][1];
+        const event = {
+            key: " ",
+            preventDefault: jest.fn(),
+            stopPropagation: jest.fn()
+        };
+        handler(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(event.stopPropagation).toHaveBeenCalled();
+        expect(element.click).toHaveBeenCalled();
+    });
+
+    test("replaces an existing keyboard listener when reused", () => {
+        const element = {
+            id: "button",
+            setAttribute: jest.fn(),
+            getAttribute: jest.fn(() => ""),
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            click: jest.fn()
+        };
+
+        makeKeyboardAccessible(element, "Button");
+        const firstHandler = element.addEventListener.mock.calls[0][1];
+        makeKeyboardAccessible(element, "Button");
+
+        expect(element.removeEventListener).toHaveBeenCalledWith("keydown", firstHandler);
+        expect(element.addEventListener).toHaveBeenCalledTimes(2);
+    });
+});
 
 describe("Utility Functions (logic-only)", () => {
     describe("toTitleCase()", () => {

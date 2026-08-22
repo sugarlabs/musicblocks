@@ -599,13 +599,24 @@ describe("setupIntervalsActions", () => {
 
     test("setKey updates keySignature", () => {
         Singer.IntervalsActions.setKey("C", "major", 0);
-        expect(turtle.singer.keySignature).toContain("C");
-        expect(logo.notation.notationKey).toHaveBeenCalled();
+        expect(getNote).toHaveBeenCalledWith(
+            "C",
+            4,
+            0,
+            "C major",
+            false,
+            null,
+            activity.errorMsg,
+            null
+        );
+        expect(turtle.singer.keySignature).toBe("C major");
+        expect(logo.notation.notationKey).toHaveBeenCalledWith(0, "C", "major");
     });
 
     test("getCurrentKey / Mode / Length", () => {
-        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("C");
-        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("major");
+        turtle.singer.keySignature = "Db dorian";
+        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("Db");
+        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("dorian");
         expect(Singer.IntervalsActions.getModeLength(0)).toBe(7);
     });
 
@@ -617,8 +628,9 @@ describe("setupIntervalsActions", () => {
     test("setScalarInterval push + pop", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
-        Singer.IntervalsActions.setScalarInterval(2, 0, "blk");
-        expect(turtle.singer.intervals.length).toBe(1);
+        Singer.IntervalsActions.setScalarInterval(2.5, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.intervals).toEqual([2]);
         listener();
         expect(turtle.singer.intervals.length).toBe(0);
     });
@@ -626,21 +638,100 @@ describe("setupIntervalsActions", () => {
     test("setScalarInterval error on null", () => {
         Singer.IntervalsActions.setScalarInterval(null, 0, "blk");
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval treats a non-number argument as invalid input", () => {
+        Singer.IntervalsActions.setScalarInterval("two", 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval rounds a negative value up with Math.ceil", () => {
+        Singer.IntervalsActions.setScalarInterval(-2.5, 0, "blk");
+        expect(turtle.singer.intervals).toEqual([-2]);
+    });
+
+    test("setScalarInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setScalarInterval(2, 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_interval_0");
+    });
+
+    test("setScalarInterval does not dispatch when blk is not registered", () => {
+        Singer.IntervalsActions.setScalarInterval(2, 0, "unregistered_blk");
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setScalarInterval does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        activity.blocks.blockList["undefined"] = {};
+        Singer.IntervalsActions.setScalarInterval(2, 0, undefined);
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setScalarInterval does not throw when MusicBlocks is entirely undefined", () => {
+        delete global.MusicBlocks;
+        expect(() => Singer.IntervalsActions.setScalarInterval(2, 0, undefined)).not.toThrow();
+    });
+
+    test("setScalarInterval does not push a mouse listener when no mouse is found", () => {
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+        expect(() => Singer.IntervalsActions.setScalarInterval(2, 0, undefined)).not.toThrow();
+    });
+
+    test("setScalarInterval MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.setScalarInterval(2, 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_interval_0");
     });
 
     test("setChordInterval push + pop", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
         Singer.IntervalsActions.setChordInterval([1, 0], 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
         expect(turtle.singer.chordIntervals.length).toBe(1);
         listener();
         expect(turtle.singer.chordIntervals.length).toBe(0);
+    });
+
+    test("setChordInterval does not dispatch when blk is not registered", () => {
+        Singer.IntervalsActions.setChordInterval([1, 0], 0, "unregistered_blk");
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setChordInterval does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        activity.blocks.blockList["undefined"] = {};
+        Singer.IntervalsActions.setChordInterval([1, 0], 0, undefined);
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setChordInterval does not throw when MusicBlocks is entirely undefined", () => {
+        delete global.MusicBlocks;
+        expect(() => Singer.IntervalsActions.setChordInterval([1, 0], 0, undefined)).not.toThrow();
+    });
+
+    test("setChordInterval does not push a mouse listener when no mouse is found", () => {
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+        expect(() => Singer.IntervalsActions.setChordInterval([1, 0], 0, undefined)).not.toThrow();
     });
 
     test("setChordInterval error on null", () => {
         Singer.IntervalsActions.setChordInterval(null, 0, "blk");
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
         expect(turtle.singer.chordIntervals).toContainEqual([1, 0]);
+    });
+
+    test("setChordInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setChordInterval([1, 0], 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_chord_interval_0");
     });
 
     test("setChordInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -661,8 +752,9 @@ describe("setupIntervalsActions", () => {
     test("setSemitoneInterval push + pop", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
-        Singer.IntervalsActions.setSemitoneInterval(2, 0, "blk");
-        expect(turtle.singer.semitoneIntervals.length).toBe(1);
+        Singer.IntervalsActions.setSemitoneInterval(2.5, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.semitoneIntervals).toEqual([[2, 1]]);
         listener();
         expect(turtle.singer.semitoneIntervals.length).toBe(0);
     });
@@ -674,6 +766,45 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
         // Default value of 1 should be used
         expect(turtle.singer.semitoneIntervals.length).toBe(1);
+    });
+
+    test("setSemitoneInterval treats a non-number argument as invalid input", () => {
+        Singer.IntervalsActions.setSemitoneInterval("two", 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        expect(turtle.singer.semitoneIntervals).toEqual([[1, 1]]);
+    });
+
+    test("setSemitoneInterval rounds a negative value up with Math.ceil", () => {
+        Singer.IntervalsActions.setSemitoneInterval(-2.5, 0, "blk");
+        expect(turtle.singer.semitoneIntervals).toEqual([[-2, 1]]);
+    });
+
+    test("setSemitoneInterval does not dispatch when blk is not registered", () => {
+        Singer.IntervalsActions.setSemitoneInterval(2, 0, "unregistered_blk");
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setSemitoneInterval does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        activity.blocks.blockList["undefined"] = {};
+        Singer.IntervalsActions.setSemitoneInterval(2, 0, undefined);
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setSemitoneInterval does not throw when MusicBlocks is entirely undefined", () => {
+        delete global.MusicBlocks;
+        expect(() => Singer.IntervalsActions.setSemitoneInterval(2, 0, undefined)).not.toThrow();
+    });
+
+    test("setSemitoneInterval does not push a mouse listener when no mouse is found", () => {
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+        expect(() => Singer.IntervalsActions.setSemitoneInterval(2, 0, undefined)).not.toThrow();
+    });
+
+    test("setSemitoneInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setSemitoneInterval(2, 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_semitone_interval_0");
     });
 
     test("setSemitoneInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -690,9 +821,32 @@ describe("setupIntervalsActions", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
         Singer.IntervalsActions.setRatioInterval(1.5, 0, "blk");
-        expect(turtle.singer.ratioIntervals.length).toBe(1);
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.ratioIntervals).toEqual([1.5]);
         listener();
         expect(turtle.singer.ratioIntervals.length).toBe(0);
+    });
+
+    test("setRatioInterval does not dispatch when blk is not registered", () => {
+        Singer.IntervalsActions.setRatioInterval(1.5, 0, "unregistered_blk");
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setRatioInterval does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        activity.blocks.blockList["undefined"] = {};
+        Singer.IntervalsActions.setRatioInterval(1.5, 0, undefined);
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setRatioInterval does not throw when MusicBlocks is entirely undefined", () => {
+        delete global.MusicBlocks;
+        expect(() => Singer.IntervalsActions.setRatioInterval(1.5, 0, undefined)).not.toThrow();
+    });
+
+    test("setRatioInterval does not push a mouse listener when no mouse is found", () => {
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+        expect(() => Singer.IntervalsActions.setRatioInterval(1.5, 0, undefined)).not.toThrow();
     });
 
     test("setRatioInterval error on null", () => {
@@ -700,6 +854,18 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
         // Default value of 1 should be used
         expect(turtle.singer.ratioIntervals).toContain(1);
+    });
+
+    test("setRatioInterval treats a non-number argument as invalid input", () => {
+        Singer.IntervalsActions.setRatioInterval("two", 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        expect(turtle.singer.ratioIntervals).toContain(1);
+    });
+
+    test("setRatioInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setRatioInterval(1.5, 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_ratio_interval_0");
     });
 
     test("setRatioInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -724,7 +890,114 @@ describe("setupIntervalsActions", () => {
         turtle.singer.defineMode.push(0, 4, 7);
         listener();
 
-        expect(MUSICALMODES.custom).toBeDefined();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(MUSICALMODES.custom).toEqual([4, 3, 5]);
+    });
+
+    test("defineMode does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        activity.blocks.blockList["undefined"] = {};
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("defineMode does not throw when MusicBlocks is entirely undefined", () => {
+        delete global.MusicBlocks;
+        expect(() => Singer.IntervalsActions.defineMode("custom", 0, undefined)).not.toThrow();
+    });
+
+    test("defineMode does not push a mouse listener when no mouse is found", () => {
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+        expect(() => Singer.IntervalsActions.defineMode("custom", 0, undefined)).not.toThrow();
+    });
+
+    test("defineMode excludes negative pitch numbers and flags EDOBOUNDEXCEEDED", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(-5, 3);
+        listener();
+        expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+    });
+
+    test("defineMode raises no errors when every pitch number is already valid and unique", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(0, 3, 5);
+        listener();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(MUSICALMODES.custom).toEqual([3, 2, 7]);
+    });
+
+    test("defineMode does not flag overflow when the pitch count exactly equals the temperament length", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+        listener();
+        expect(activity.errorMsg).not.toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+    });
+
+    test("defineMode keeps a leading duplicate zero's step as 0, not wrapped to the temperament length", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(0, 0, 5);
+        listener();
+        expect(MUSICALMODES.custom).toEqual([0, 7]);
+    });
+
+    test("defineMode listener does not update block text when there is no connected child block", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        activity.blocks.blockList.blk = { connections: [null] };
+        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+        turtle.singer.defineMode.push(0, 4, 7);
+        expect(() => listener()).not.toThrow();
+        expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
+    });
+
+    test("defineMode listener does not update block text when the connected block is not a text block", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        activity.blocks.blockList.blk = { connections: [null, "other1"] };
+        activity.blocks.blockList.other1 = { name: "" };
+        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+        turtle.singer.defineMode.push(0, 4, 7);
+        listener();
+        expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
+    });
+
+    test("defineMode listener does not update block text when blk is not registered", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, "unregistered_blk");
+        turtle.singer.defineMode.push(0, 4, 7);
+        listener();
+        expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
+    });
+
+    test("defineMode listener does not update block text when there is no connection array to read", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        activity.blocks.blockList.blk = { connections: [null] };
+        activity.blocks.blockList["undefined"] = { name: "text" };
+        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+        turtle.singer.defineMode.push(0, 4, 7);
+        listener();
+        expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
+    });
+
+    test("defineMode listener does not update block text when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        activity.blocks.blockList["undefined"] = { connections: [null, "text1"] };
+        activity.blocks.blockList.text1 = { name: "text" };
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(0, 4, 7);
+        listener();
+        expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
     });
 
     test("defineMode error paths", () => {
@@ -735,6 +1008,7 @@ describe("setupIntervalsActions", () => {
         activity.blocks.blockList.text1 = { name: "text" };
 
         Singer.IntervalsActions.defineMode(null, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "blk");
 
         turtle.singer.defineMode.push(4);
         turtle.singer.defineMode.push(12);
@@ -742,7 +1016,42 @@ describe("setupIntervalsActions", () => {
 
         listener();
 
-        expect(activity.errorMsg).toHaveBeenCalled();
+        expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+        // A null mode name still falls back to the "custom" key, not an empty string.
+        expect(MUSICALMODES.custom).toEqual([4, 0]);
+    });
+
+    test("defineMode sets dispatch, resets turtle state, and lowercases the mode name", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.defineMode("Custom", 0, "blk");
+
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_definemode_0");
+        expect(turtle.singer.inDefineMode).toBe(true);
+        expect(turtle.singer.defineMode).toEqual([]);
+    });
+
+    test("defineMode does not dispatch when blk is not registered", () => {
+        Singer.IntervalsActions.defineMode("custom", 0, "unregistered_blk");
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("defineMode listener normalizes pitch numbers, auto-adds missing 0, skips duplicates, and updates the linked text block", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        activity.blocks.blockList.blk = { connections: [null, "text1"] };
+        activity.blocks.blockList.text1 = { name: "text" };
+
+        Singer.IntervalsActions.defineMode("Custom", 0, "blk");
+
+        turtle.singer.defineMode.push(9, 7, 4, 7);
+        listener();
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(_("Adding missing pitch number 0."));
+        expect(activity.errorMsg).toHaveBeenCalledWith(_("Ignoring duplicate pitch numbers."));
+        expect(MUSICALMODES.custom).toEqual([4, 3, 0, 3]);
+        expect(activity.blocks.updateBlockText).toHaveBeenCalledWith("text1");
+        expect(turtle.singer.inDefineMode).toBe(false);
     });
 
     test("defineMode does not crash when blk is undefined (JS-Export path)", () => {
@@ -759,6 +1068,30 @@ describe("setupIntervalsActions", () => {
         expect(MUSICALMODES.pentatonic).toBeDefined();
     });
 
+    test("defineMode MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_definemode_0");
+    });
+
+    test("defineMode flags EDOBOUNDEXCEEDED when more pitch numbers than the temperament length are defined", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+
+        // 13 in-range (0-11) pitch numbers for a default 12-EDO temperament
+        // exceeds temperamentLength even though none of them are individually out of bounds.
+        turtle.singer.defineMode.push(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0);
+        listener();
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+    });
+
     test("setTemperament state changes", () => {
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
         expect(logo.synth.inTemperament).toBe("equal");
@@ -769,6 +1102,33 @@ describe("setupIntervalsActions", () => {
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
         Singer.IntervalsActions.setTemperament("pythagorean", "C", 4);
         expect(logo.synth.changeInTemperament).toBe(true);
+    });
+
+    test("setTemperament does not flag a change on the very first call when the temperament is unset", () => {
+        Singer.IntervalsActions.setTemperament(undefined, "C", 4);
+        expect(logo.synth.changeInTemperament).toBe(false);
+    });
+
+    test("setTemperament flags a change once a real temperament follows unset entries", () => {
+        Singer.IntervalsActions.setTemperament(undefined, "C", 4);
+        Singer.IntervalsActions.setTemperament(undefined, "C", 4);
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        expect(logo.synth.changeInTemperament).toBe(true);
+    });
+
+    test("setTemperament rebuilds the custom mode when the EDO changes", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(19).fill(1));
+    });
+
+    test("setTemperament leaves the custom mode untouched when the EDO is unchanged", () => {
+        global.getCurrentEDO = jest.fn(() => 12);
+        // A sentinel value distinct from what a rebuild would produce (Array(12).fill(1))
+        // so an unwanted rebuild is observable.
+        MUSICALMODES.custom = new Array(12).fill(9);
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(12).fill(9));
     });
 
     describe("getTemperamentLength", () => {

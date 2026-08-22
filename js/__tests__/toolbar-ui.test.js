@@ -13,6 +13,7 @@
 
 const { platformColor } = require("../utils/platformstyle");
 global.platformColor = platformColor;
+global.makeKeyboardAccessible = require("../utils/dom-helpers").makeKeyboardAccessible;
 
 jest.mock("../utils/platformstyle", () => ({
     platformColor: { stopIconColor: "#ea174c" }
@@ -53,6 +54,8 @@ const createMockElement = id => ({
     appendChild: jest.fn(),
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
+    querySelectorAll: jest.fn(() => []),
+    contains: jest.fn(() => false),
     click: jest.fn(),
     focus: jest.fn()
 });
@@ -231,5 +234,45 @@ describe("FocusCycleManager - dispose", () => {
         expect(events).toContain("keydown");
         expect(events).toContain("mousedown");
         expect(events).toContain("focusin");
+    });
+});
+
+describe("ToolbarUI keyboard activation", () => {
+    test("activates the button that received focus instead of the first button", () => {
+        const toolbarElement = document.createElement("div");
+        toolbarElement.id = "toolbars";
+        const playButton = document.createElement("a");
+        playButton.id = "play";
+        const newFileButton = document.createElement("a");
+        newFileButton.id = "newFile";
+        toolbarElement.append(playButton, newFileButton);
+        document.body.appendChild(toolbarElement);
+
+        const auxToolbar = document.createElement("div");
+        auxToolbar.id = "aux-toolbar";
+        auxToolbar.style.display = "none";
+        document.body.appendChild(auxToolbar);
+
+        const elements = {
+            "toolbars": toolbarElement,
+            "aux-toolbar": auxToolbar,
+            "play": playButton,
+            "newFile": newFileButton
+        };
+        document.getElementById = jest.fn(id => elements[id] || null);
+        global.docById = id => document.getElementById(id);
+
+        playButton.onclick = jest.fn();
+        newFileButton.onclick = jest.fn();
+
+        const toolbar = new ToolbarUI();
+        toolbar.setupKeyboardNavigation();
+        newFileButton.focus();
+        newFileButton.dispatchEvent(
+            new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })
+        );
+
+        expect(newFileButton.onclick).toHaveBeenCalled();
+        expect(playButton.onclick).not.toHaveBeenCalled();
     });
 });

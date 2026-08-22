@@ -125,7 +125,7 @@ class BlockDragController {
 
         const myBlock = blocks.blockList[blk];
         /** If this happens, something is really broken. */
-        if (myBlock === null) {
+        if (myBlock === null || myBlock === undefined) {
             console.debug("null block encountered... this is bad. " + blk);
             return;
         }
@@ -290,7 +290,7 @@ class BlockDragController {
         blocks._checkTwoArgBlocks = [];
         const checkArgBlocks = [];
         const myBlock = blocks.blockList[thisBlock];
-        if (myBlock === null) {
+        if (myBlock === null || myBlock === undefined) {
             console.debug("null block found in blockMoved method: " + thisBlock);
             return;
         }
