@@ -16,7 +16,7 @@
 /**
  * FocusCycleManager
  * ==================
- * Cycles focus between Workspace → Toolbar → Palette on Tab / Shift+Tab.
+ * Cycles focus between Workspace → Toolbar → Palette → canvas controls on Tab / Shift+Tab.
  *
  * Design rules:
  *  1. KEYBOARD ONLY – all zone logic is gated behind `_keyboardMode`.
@@ -27,7 +27,6 @@
  */
 class FocusCycleManager {
     constructor() {
-        this._zones = ["workspace", "toolbar", "palette"];
         this._currentZone = null;
         this._keyboardMode = false; // true only while Tab-navigating
         this._lastFocusedButton = null; // last toolbar button focused by keyboard
@@ -144,6 +143,22 @@ class FocusCycleManager {
             this._isWithin(ws.overlay, target) ||
             this._isWithin(ws.canvas, target)
         );
+    }
+
+    _controlElements() {
+        return Array.from(
+            document.querySelectorAll(
+                "#buttoncontainerBOTTOM .tooltipped, #buttoncontainerTOP .tooltipped"
+            )
+        );
+    }
+
+    _availableZones() {
+        const zones = ["workspace", "toolbar", "palette"];
+        if (this._controlElements().some(control => this._visible(control))) {
+            zones.push("controls");
+        }
+        return zones;
     }
 
     _clearToolbarFocus() {
@@ -302,18 +317,19 @@ class FocusCycleManager {
             this._currentZone = detected ?? "workspace";
         }
 
-        const idx = this._zones.indexOf(this._currentZone);
+        const zones = this._availableZones();
+        const idx = zones.indexOf(this._currentZone);
         const nextIdx =
             idx === -1
                 ? 1 // safety fallback → toolbar
                 : reverse
-                  ? (idx - 1 + this._zones.length) % this._zones.length
-                  : (idx + 1) % this._zones.length;
+                  ? (idx - 1 + zones.length) % zones.length
+                  : (idx + 1) % zones.length;
 
         // Clean up the zone we are leaving.
         this._leaveZone(this._currentZone);
 
-        const next = this._zones[nextIdx];
+        const next = zones[nextIdx];
         this._currentZone = next;
         this._enterZone(next);
     }
@@ -324,6 +340,7 @@ class FocusCycleManager {
         const palette = document.getElementById("palette");
         if (toolbars && toolbars.contains(el)) return "toolbar";
         if (palette && palette.contains(el)) return "palette";
+        if (this._controlElements().includes(el)) return "controls";
         if (["canvasHolder", "canvas", "canvasContainer"].includes(el.id)) return "workspace";
         return null;
     }
@@ -445,6 +462,14 @@ class FocusCycleManager {
             }
             this._announce("Palette active");
         }
+
+        if (zone === "controls") {
+            const controls = this._controlElements().filter(control => this._visible(control));
+            if (controls.length === 0) return;
+
+            controls[0].focus({ preventScroll: true });
+            this._announce("Canvas controls active");
+        }
     }
 
     // ------------------------------------------------------------------
@@ -464,6 +489,17 @@ class FocusCycleManager {
 
     _clearAllRings() {
         ["workspace", "toolbar", "palette"].forEach(z => this._clearRingForZone(z));
+    }
+
+    /**
+     * Leaves keyboard navigation without disposing the manager.
+     * Used when Escape deliberately returns focus to the page.
+     */
+    exitKeyboardNavigation() {
+        this._keyboardMode = false;
+        this._currentZone = null;
+        this._lastFocusedButton = null;
+        this._clearAllRings();
     }
 
     _visible(el) {

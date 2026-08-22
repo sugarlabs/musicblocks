@@ -22,7 +22,7 @@
    setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
    FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
    jQuery, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
-   EXPANDBUTTON, MBOUNDARY
+   EXPANDBUTTON, MBOUNDARY, makeKeyboardAccessible
  */
 
 /* exported Turtles */
@@ -893,6 +893,25 @@ Turtles.TurtlesView = class {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", object.label);
             container.setAttribute("data-position", "bottom");
+            makeKeyboardAccessible(container, object.label || object.name || "Canvas button");
+            if (typeof container.addEventListener === "function") {
+                container.addEventListener("keydown", event => {
+                    const isEscape =
+                        event.key === "Escape" || event.key === "Esc" || event.keyCode === 27;
+                    if (!isEscape) return;
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (
+                        typeof window !== "undefined" &&
+                        window._focusCycleManager &&
+                        typeof window._focusCycleManager.exitKeyboardNavigation === "function"
+                    ) {
+                        window._focusCycleManager.exitKeyboardNavigation();
+                    }
+                    container.blur?.();
+                });
+            }
             window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
