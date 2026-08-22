@@ -183,11 +183,16 @@ describe("recorder", () => {
     });
 
     describe("recording flow (createRecorder → stopHandler → saveFile)", () => {
+        let mockTrack;
         let mockStream;
         let lastRecorderInstance;
 
         beforeEach(() => {
-            mockStream = { oninactive: null };
+            mockTrack = { stop: jest.fn() };
+            mockStream = {
+                oninactive: null,
+                getTracks: jest.fn(() => [mockTrack])
+            };
 
             if (!global.navigator) {
                 global.navigator = {};
@@ -262,6 +267,7 @@ describe("recorder", () => {
             stopHandler();
 
             expect(mockStart.classList.remove).toHaveBeenCalledWith("recording");
+            expect(mockTrack.stop).toHaveBeenCalled();
         });
     });
 
