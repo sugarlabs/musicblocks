@@ -252,4 +252,25 @@ describe("StatsWindow", () => {
         expect(html).toContain("rests used: 4");
         expect(html).toContain("ornaments used: 1");
     });
+
+    test("displayInfo does not throw and shows N/A when no notes were played", () => {
+        const sw = new StatsWindow(activity);
+
+        expect(() =>
+            sw.displayInfo({
+                duples: 0,
+                triplets: 0,
+                quintuplets: 0,
+                pitchNames: new Set(),
+                numberOfNotes: 0,
+                rests: 0,
+                ornaments: 0
+            })
+        ).not.toThrow();
+
+        const html = sw.jsonObject.innerHTML;
+        expect(html).toContain("lowest note: N/A");
+        expect(html).toContain("highest note: N/A");
+        expect(html).toContain("number of notes: 0");
+    });
 });

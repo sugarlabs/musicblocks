@@ -131,16 +131,22 @@ class StatsWindow {
      * @returns {void}
      */
     displayInfo(stats) {
-        const lowHertz = stats["lowestNote"][2] + 0.5;
-        const highHertz = stats["highestNote"][2] + 0.5;
+        const lowestNote = stats["lowestNote"];
+        const highestNote = stats["highestNote"];
+        const lowestNoteLabel = lowestNote
+            ? `${lowestNote[0]},${(lowestNote[2] + 0.5).toFixed(0)}Hz`
+            : "N/A";
+        const highestNoteLabel = highestNote
+            ? `${highestNote[0]},${(highestNote[2] + 0.5).toFixed(0)}Hz`
+            : "N/A";
         const items = [
             ["duples", stats["duples"]],
             ["triplets", stats["triplets"]],
             ["quintuplets", stats["quintuplets"]],
             ["pitch names", Array.from(stats["pitchNames"]).join(", ")],
             ["number of notes", stats["numberOfNotes"]],
-            ["lowest note", `${stats["lowestNote"][0]},${lowHertz.toFixed(0)}Hz`],
-            ["highest note", `${stats["highestNote"][0]},${highHertz.toFixed(0)}Hz`],
+            ["lowest note", lowestNoteLabel],
+            ["highest note", highestNoteLabel],
             ["rests used", stats["rests"]],
             ["ornaments used", stats["ornaments"]]
         ];
