@@ -1403,5 +1403,61 @@ describe("Blocks Foundation", () => {
                 document.getElementById = originalGetElementById;
             }
         });
+
+        it("disposeBlock should call dispose on target block and remove it from blockList and blockArt", () => {
+            const mockActivity = { palettes: { dict: {} }, refreshCanvas: jest.fn() };
+            const blocksInstance = new Blocks(mockActivity);
+            const mockDispose = jest.fn();
+            blocksInstance.blockList[1] = { dispose: mockDispose };
+            blocksInstance.blockArt[1] = "<svg></svg>";
+            blocksInstance.blockCollapseArt[1] = "<svg></svg>";
+
+            blocksInstance.disposeBlock(1);
+
+            expect(mockDispose).toHaveBeenCalled();
+            expect(blocksInstance.blockList[1]).toBeNull();
+            expect(blocksInstance.blockArt[1]).toBeUndefined();
+            expect(blocksInstance.blockCollapseArt[1]).toBeUndefined();
+        });
+
+        it("sendStackToTrash should evict and dispose blocks when trashStacks exceeds MAX_TRASH_UNDO", () => {
+            const mockActivity = {
+                palettes: { dict: {} },
+                refreshCanvas: jest.fn(),
+                trashcan: { stopHighlightAnimation: jest.fn() }
+            };
+            const blocksInstance = new Blocks(mockActivity);
+            blocksInstance.captureStackPreview = jest.fn().mockReturnValue("preview-url");
+            blocksInstance._cleanupStacks = jest.fn();
+
+            for (let i = 0; i < 100; i++) {
+                blocksInstance.trashStacks.push(i);
+                blocksInstance.trashPreviews[i] = "preview";
+            }
+
+            const mockDispose = jest.fn();
+            const mockBlock = {
+                blockIndex: 100,
+                connections: [null],
+                container: { uncache: jest.fn() },
+                protoblock: { style: "normal", parameter: false, staticLabels: ["test"] },
+                hide: jest.fn(),
+                dispose: mockDispose
+            };
+            blocksInstance.blockList[100] = mockBlock;
+
+            // block 0 was the oldest trashed stack
+            blocksInstance.blockList[0] = {
+                blockIndex: 0,
+                connections: [null],
+                dispose: jest.fn()
+            };
+
+            blocksInstance.sendStackToTrash(mockBlock);
+
+            expect(blocksInstance.trashStacks.length).toBe(100);
+            expect(blocksInstance.trashPreviews[0]).toBeUndefined();
+            expect(blocksInstance.blockList[0]).toBeNull();
+        });
     });
 });

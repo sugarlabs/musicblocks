@@ -832,4 +832,51 @@ describe("Block Foundation", () => {
             expect(mockBlocks.activity.refreshCanvas).toHaveBeenCalled();
         });
     });
+
+    describe("dispose()", () => {
+        it("should clean up connections, DOM nodes, containers, bitmaps, and parent pointers", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 1;
+            const connectedBlock = {
+                connections: [1, null]
+            };
+            mockBlocks.blockList = [null, block, connectedBlock];
+            block.connections = [2];
+
+            const mockContainer = {
+                removeAllEventListeners: jest.fn(),
+                removeAllChildren: jest.fn(),
+                uncache: jest.fn()
+            };
+            block.container = mockContainer;
+
+            const dummyLabel = document.createElement("div");
+            document.body.appendChild(dummyLabel);
+            block.label = dummyLabel;
+
+            const dummyLabelAttr = document.createElement("div");
+            document.body.appendChild(dummyLabelAttr);
+            block.labelattr = dummyLabelAttr;
+
+            block.bitmap = {};
+            block.highlightBitmap = {};
+
+            block.dispose();
+
+            expect(connectedBlock.connections[0]).toBeNull();
+            expect(block.connections).toEqual([]);
+            expect(mockContainer.removeAllEventListeners).toHaveBeenCalled();
+            expect(mockContainer.removeAllChildren).toHaveBeenCalled();
+            expect(mockContainer.uncache).toHaveBeenCalled();
+            expect(block.container).toBeNull();
+            expect(block.label).toBeNull();
+            expect(block.labelattr).toBeNull();
+            expect(dummyLabel.parentNode).toBeNull();
+            expect(dummyLabelAttr.parentNode).toBeNull();
+            expect(block.bitmap).toBeNull();
+            expect(block.blocks).toBeNull();
+            expect(block.activity).toBeNull();
+            expect(block.protoblock).toBeNull();
+        });
+    });
 });
