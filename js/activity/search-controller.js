@@ -220,6 +220,7 @@ class SearchController {
                 activity.searchWidget.style.left = searchPos.x + "px";
                 activity.searchWidget.style.top = searchPos.y + "px";
                 this._addSearchDragHandle();
+                this._addSearchClearButton();
             }
 
             this.searchBlockPosition = [100, 100];
@@ -515,6 +516,7 @@ class SearchController {
         const rect = activity.searchWidget.getBoundingClientRect();
         handle.style.left = rect.left + 4 + "px";
         handle.style.top = rect.top + (rect.height - 38) / 2 + "px";
+        this._positionSearchClearButton();
     }
 
     /**
@@ -523,6 +525,91 @@ class SearchController {
     _hideSearchDragHandle() {
         const handle = document.getElementById("searchDragHandle");
         if (handle) handle.style.display = "none";
+        this._hideSearchClearButton();
+    }
+
+    /**
+     * Adds an interactive clear button (×) to the classic search widget (#search).
+     */
+    _addSearchClearButton() {
+        const activity = this.activity;
+        let btn = this.classicSearchClearBtn || document.getElementById("classicSearchClearBtn");
+        if (!btn) {
+            btn = document.createElement("button");
+            btn.id = "classicSearchClearBtn";
+            btn.textContent = "×";
+            btn.title = _("Clear text");
+            btn.style.cssText =
+                "position:fixed;z-index:1002;background:rgba(140,140,140,0.7);border:none;border-radius:50%;width:18px;height:18px;font-size:12px;cursor:pointer;color:white;line-height:18px;text-align:center;display:none;";
+            if (document.body) {
+                document.body.appendChild(btn);
+            }
+            this.classicSearchClearBtn = btn;
+
+            const updateDisplay = () => {
+                if (
+                    activity.searchWidget &&
+                    activity.searchWidget.value &&
+                    activity.searchWidget.value.length > 0
+                ) {
+                    btn.style.display = "block";
+                    this._positionSearchClearButton();
+                } else {
+                    btn.style.display = "none";
+                }
+            };
+
+            btn.addEventListener("mousedown", e => {
+                e.stopPropagation();
+                e.preventDefault();
+                if (activity.searchWidget) {
+                    activity.searchWidget.value = "";
+                    activity.searchWidget.idInput_custom = "";
+                    btn.style.display = "none";
+                    activity.searchWidget.focus();
+                    const $j = window.jQuery;
+                    if ($j && $j("#search").data("ui-autocomplete")) {
+                        $j("#search").autocomplete("search", "");
+                    }
+                }
+            });
+
+            if (activity.searchWidget) {
+                activity.addEventListener(activity.searchWidget, "input", updateDisplay);
+            }
+        }
+
+        if (
+            activity.searchWidget &&
+            activity.searchWidget.value &&
+            activity.searchWidget.value.length > 0
+        ) {
+            btn.style.display = "block";
+            this._positionSearchClearButton();
+        } else {
+            btn.style.display = "none";
+        }
+    }
+
+    /**
+     * Positions the classic clear button inside the right edge of #search.
+     */
+    _positionSearchClearButton() {
+        const activity = this.activity;
+        const btn = this.classicSearchClearBtn || document.getElementById("classicSearchClearBtn");
+        if (!btn || !activity.searchWidget) return;
+        if (typeof activity.searchWidget.getBoundingClientRect !== "function") return;
+        const rect = activity.searchWidget.getBoundingClientRect();
+        btn.style.left = rect.right - 26 + "px";
+        btn.style.top = rect.top + (rect.height - 18) / 2 + "px";
+    }
+
+    /**
+     * Hides the classic search clear button.
+     */
+    _hideSearchClearButton() {
+        const btn = this.classicSearchClearBtn || document.getElementById("classicSearchClearBtn");
+        if (btn) btn.style.display = "none";
     }
 
     /**
@@ -552,8 +639,21 @@ class SearchController {
             "background:rgba(80,80,80,0.6);border:none;border-radius:50%;width:22px;height:22px;font-size:14px;cursor:pointer;color:white;line-height:22px;text-align:center;";
 
         closeButtonDiv.appendChild(closeButton);
-
         this.helpfulSearchDiv.appendChild(closeButtonDiv);
+
+        const clearInputDiv = document.createElement("div");
+        clearInputDiv.style.cssText =
+            "position: absolute; top: 50%; right: 38px; transform: translateY(-50%); cursor: pointer;";
+
+        const clearInputButton = document.createElement("button");
+        clearInputButton.textContent = "×";
+        clearInputButton.id = "clearInputButton";
+        clearInputButton.title = _("Clear text");
+        clearInputButton.style.cssText =
+            "background:rgba(140,140,140,0.7);border:none;border-radius:50%;width:18px;height:18px;font-size:12px;cursor:pointer;color:white;line-height:18px;text-align:center;display:none;";
+
+        clearInputDiv.appendChild(clearInputButton);
+        this.helpfulSearchDiv.appendChild(clearInputDiv);
 
         const dragHandle = document.createElement("div");
         dragHandle.style.cssText =
@@ -581,9 +681,50 @@ class SearchController {
 
         const modeButton = document.getElementById("begIconText");
         activity.addEventListener(closeButton, "click", this._hideHelpfulSearchWidget.bind(this));
-        activity.addEventListener(modeButton, "click", this._hideHelpfulSearchWidget.bind(this));
+        if (modeButton) {
+            activity.addEventListener(
+                modeButton,
+                "click",
+                this._hideHelpfulSearchWidget.bind(this)
+            );
+        }
 
-        this.helpfulSearchDiv.appendChild(activity.helpfulSearchWidget);
+        const updateClearBtn = () => {
+            if (
+                activity.helpfulSearchWidget &&
+                activity.helpfulSearchWidget.value &&
+                activity.helpfulSearchWidget.value.length > 0
+            ) {
+                clearInputButton.style.display = "block";
+            } else {
+                clearInputButton.style.display = "none";
+            }
+        };
+
+        if (activity.helpfulSearchWidget) {
+            activity.addEventListener(activity.helpfulSearchWidget, "input", updateClearBtn);
+        }
+        activity.addEventListener(clearInputButton, "click", e => {
+            e.stopPropagation();
+            if (activity.helpfulSearchWidget) {
+                activity.helpfulSearchWidget.value = "";
+                activity.helpfulSearchWidget.idInput_custom = "";
+                updateClearBtn();
+                activity.helpfulSearchWidget.focus();
+                const $j = window.jQuery;
+                if ($j && $j("#helpfulSearch").data("ui-autocomplete")) {
+                    $j("#helpfulSearch").autocomplete("search", "");
+                }
+            }
+        });
+
+        if (activity.helpfulSearchWidget) {
+            try {
+                this.helpfulSearchDiv.appendChild(activity.helpfulSearchWidget);
+            } catch {
+                // Non-DOM test mocks may be passed in unit tests
+            }
+        }
     }
 
     /**

@@ -82,6 +82,9 @@ function makeActivity(protoBlocks = {}) {
                 // store so tests can trigger it
                 target._mousedownHandler = handler;
             }
+            if (target && typeof target.addEventListener === "function") {
+                target.addEventListener(event, handler);
+            }
         }),
         removeEventListener: jest.fn(),
         errorMsg: jest.fn(),
@@ -913,5 +916,59 @@ describe("SearchController._hideHelpfulSearchWidget", () => {
         sc._hideHelpfulSearchWidget();
 
         expect(removeChild).toHaveBeenCalledWith(sc.helpfulSearchDiv);
+    });
+
+    test("creates clearInputButton in setHelpfulSearchDiv and clears search input on click", () => {
+        const activity = makeActivity();
+        activity.helpfulSearchWidget = document.createElement("input");
+        activity.helpfulSearchWidget.value = "tempo";
+        activity.helpfulSearchWidget.idInput_custom = "tempo";
+        setupSearchController(activity);
+        const sc = activity.searchController;
+
+        sc.setHelpfulSearchDiv();
+
+        const clearBtn = sc.helpfulSearchDiv.querySelector("#clearInputButton");
+        expect(clearBtn).not.toBeNull();
+
+        const clickEvent = new MouseEvent("click", { bubbles: true });
+        clearBtn.dispatchEvent(clickEvent);
+
+        expect(activity.helpfulSearchWidget.value).toBe("");
+        expect(activity.helpfulSearchWidget.idInput_custom).toBe("");
+        expect(clearBtn.style.display).toBe("none");
+    });
+
+    test("creates classicSearchClearBtn and clears main search input on mousedown", () => {
+        const activity = makeActivity();
+        activity.searchWidget = document.createElement("input");
+        activity.searchWidget.id = "search";
+        document.body.appendChild(activity.searchWidget);
+        activity.searchWidget.value = "pitch";
+        activity.searchWidget.idInput_custom = "pitch";
+        activity.searchWidget.getBoundingClientRect = jest.fn(() => ({
+            left: 100,
+            right: 300,
+            top: 50,
+            height: 30
+        }));
+        setupSearchController(activity);
+        const sc = activity.searchController;
+
+        sc._addSearchClearButton();
+
+        const classicBtn = sc.classicSearchClearBtn;
+        expect(classicBtn).not.toBeUndefined();
+        expect(classicBtn.style.display).toBe("block");
+
+        const downEvent = new MouseEvent("mousedown", { bubbles: true });
+        classicBtn.dispatchEvent(downEvent);
+
+        expect(activity.searchWidget.value).toBe("");
+        expect(activity.searchWidget.idInput_custom).toBe("");
+        expect(classicBtn.style.display).toBe("none");
+
+        activity.searchWidget.remove();
+        if (classicBtn) classicBtn.remove();
     });
 });
