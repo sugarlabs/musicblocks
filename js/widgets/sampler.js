@@ -678,6 +678,17 @@ function SampleWidget() {
 
         this._promptBtn.onclick = () => {
             stopTuner();
+            const aiSampleEndpoint =
+                typeof window.AI_SAMPLE_ENDPOINT === "string"
+                    ? window.AI_SAMPLE_ENDPOINT.trim().replace(/\/$/, "")
+                    : "";
+            if (!aiSampleEndpoint) {
+                activity.errorMsg(_("AI sample generation is not available."));
+                return;
+            }
+            if (aiSampleEndpoint.startsWith("http://")) {
+                console.warn("AI sample endpoint is using HTTP instead of HTTPS.");
+            }
             if (this.is_recording) {
                 this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
@@ -789,7 +800,7 @@ function SampleWidget() {
                 setPromptBtnState(submit, true);
                 const prompt = textArea.value;
                 const encodedPrompt = encodeURIComponent(prompt);
-                const url = `http://13.61.94.100:8000/generate?prompt=${encodedPrompt}`;
+                const url = `${aiSampleEndpoint}/generate?prompt=${encodedPrompt}`;
 
                 let blinkInterval;
 
@@ -834,7 +845,7 @@ function SampleWidget() {
                     that.audioPreview = null;
                 }
 
-                const audioURL = `http://13.61.94.100:8000/preview`;
+                const audioURL = `${aiSampleEndpoint}/preview`;
                 const newAudio = new Audio(audioURL);
                 that.audioPreview = newAudio;
                 newAudio.play();
@@ -850,7 +861,7 @@ function SampleWidget() {
             stylePromptBtn(save, "Save");
             setPromptBtnState(save, true);
             save.onclick = function () {
-                const audioURL = `http://13.61.94.100:8000/save`;
+                const audioURL = `${aiSampleEndpoint}/save`;
                 const link = document.createElement("a");
                 link.href = audioURL;
                 link.download = "output.wav";
@@ -2208,7 +2219,7 @@ function SampleWidget() {
             this.pitchDetectionAnimationId = requestAnimationFrame(updatePitch);
         } catch (err) {
             console.error(`${err.name}: ${err.message}`);
-            alert(_("Microphone access failed: %s").replace(/%s/g, err.message));
+            this.activity.errorMsg(_("Microphone access failed: %s").replace(/%s/g, err.message));
             // Clean up any partially initialized resources
             this.stopPitchDetection();
         }
