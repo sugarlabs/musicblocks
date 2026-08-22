@@ -1799,5 +1799,18 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Save temperament as JSON": "Save temperament as JSON",
+  "Save temperament as Scala (.scl)": "Save temperament as Scala (.scl)",
+  "No active temperament to export.": "No active temperament to export.",
+  "Invalid temperament JSON: not valid JSON.": "Invalid temperament JSON: not valid JSON.",
+  "Invalid temperament JSON: missing name or ratios array.": "Invalid temperament JSON: missing name or ratios array.",
+  "Temperament '%s' imported.": "Temperament '%s' imported.",
+  "Invalid .scl file: bad note count.": "Invalid .scl file: bad note count.",
+  "Invalid .scl file: bad cents value.": "Invalid .scl file: bad cents value.",
+  "Invalid .scl file: negative or zero ratio.": "Invalid .scl file: negative or zero ratio.",
+  "Invalid .scl file: bad ratio.": "Invalid .scl file: bad ratio.",
+  "Invalid .scl file: missing note count.": "Invalid .scl file: missing note count.",
+  "Invalid .scl file: expected %s pitches, found %s.": "Invalid .scl file: expected %s pitches, found %s.",
+  "Scala scale '%s' imported.": "Scala scale '%s' imported."
 }

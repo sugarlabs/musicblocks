@@ -62,8 +62,9 @@ const _b64Cache = new Map();
    GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
    SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
    INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition,
-   scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern
-*/
+    scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern,
+    ratioToSCLCents, SCLCentsToRatio
+ */
 
 /**
  * Normalize Unicode accidental symbols in a note string to ASCII equivalents.
@@ -3606,6 +3607,25 @@ const getTemperamentCents = value => {
     }
     return 0;
 };
+
+/**
+ * Convert a frequency ratio to Scala (.scl) cents.
+ * One octave (ratio 2/1) equals 1200 cents. Used to serialize a
+ * Music Blocks temperament to the Scala scale-file format.
+ * @function
+ * @param {number} ratio - The frequency ratio (must be > 0).
+ * @returns {number} The cents value (e.g. 2 -> 1200).
+ */
+const ratioToSCLCents = ratio => 1200 * Math.log2(ratio);
+
+/**
+ * Convert a Scala (.scl) cents value back to a frequency ratio.
+ * Inverse of {@link ratioToSCLCents}: cents 1200 -> ratio 2.
+ * @function
+ * @param {number} cents - The cents value.
+ * @returns {number} The frequency ratio.
+ */
+const SCLCentsToRatio = cents => Math.pow(2, cents / 1200);
 
 /**
  * Get the name of a temperament based on its identifier.
@@ -7900,6 +7920,8 @@ if (typeof module !== "undefined" && module.exports) {
         getTemperamentRatio,
         getTemperamentCents,
         getTemperamentName,
+        ratioToSCLCents,
+        SCLCentsToRatio,
         getCurrentEDO,
         noteToObj,
         frequencyToPitch,

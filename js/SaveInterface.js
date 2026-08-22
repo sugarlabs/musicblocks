@@ -15,7 +15,10 @@
    TITLESTRING, GUIDEURL, docById, docByClass, doSVG,
    fileExt, ABCHEADER, LILYPONDHEADER, platform, saveAbcOutput,
    saveLilypondOutput, saveMxmlOutput, getMidiInstrument, getMidiDrum,
-   Midi, activity, normalizeNoteAccidentals
+   Midi, activity, normalizeNoteAccidentals,
+    getTemperament, addTemperamentToDictionary, updateTemperaments,
+    ratioToSCLCents, SCLCentsToRatio, parseNoteString
+
  */
 
 /**
@@ -290,6 +293,270 @@ class SaveInterface {
         if (typeof URL.revokeObjectURL === "function") {
             URL.revokeObjectURL(dataurl);
         }
+    }
+
+    /**
+     * Export the active temperament as a Music Blocks JSON definition.
+     *
+     * The JSON payload carries the full temperament definition: frequency
+     * ratios, interval names, pitch count, reference pitch, and metadata so
+     * that it can be re-imported exactly (see importTemperamentJSON).
+     *
+     * @returns {void}
+     * @memberof SaveInterface
+     */
+    exportTemperamentJSON() {
+        const tName = this.activity.logo.synth.inTemperament;
+        const t = getTemperament(tName);
+        if (!t) {
+            this.activity.errorMsg(_("No active temperament to export."), 4000);
+            return;
+        }
+
+        const data = {
+            format: "musicblocks-temperament",
+            version: 1,
+            name: tName,
+            pitchCount: t.pitchNumber,
+            isEDO: t.isEDO,
+            octaveRatio: t.octaveRatio,
+            generator: t.generator,
+            referencePitch: this.activity.logo.synth.startingPitch,
+            ratios: t.ratios,
+            noteLabels: t.noteLabels,
+            intervals: t.interval
+        };
+
+        const url =
+            "data:application/json;charset=utf-8," +
+            encodeURIComponent(JSON.stringify(data, null, 2));
+        this.downloadURL(tName + ".temperament.json", url);
+    }
+
+    /**
+     * Register an imported temperament in the live dictionaries and activate it.
+     *
+     * Shared by importTemperamentJSON and importSCL so both paths make the
+     * temperament immediately usable (visible in the pitch palette, selectable
+     * by the temperamentname block, and set as the active temperament).
+     *
+     * @param {string} name - Unique temperament name to register under.
+     * @param {Object} definition - The {pitchNumber, "0": [...], ...} entry.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @private
+     */
+    _activateImportedTemperament(name, definition) {
+        addTemperamentToDictionary(name, definition);
+        updateTemperaments();
+        this.activity.logo.customTemperamentDefined = true;
+        if (
+            this.activity.blocks.protoBlockDict &&
+            this.activity.blocks.protoBlockDict["custompitch"]
+        ) {
+            this.activity.blocks.protoBlockDict["custompitch"].hidden = false;
+        }
+        this.activity.logo.synth.inTemperament = name;
+        this.activity.blocks.palettes.updatePalettes("pitch");
+    }
+
+    /**
+     * Build a temperament dictionary entry from a ratio list and register it.
+     *
+     * Centralizes the per-degree entry shape `[ratio, noteLabel, octave]` so the
+     * octave computation (`startOctave + floor(log2(ratio))`) stays identical
+     * across every import path. Returns the (uniquified) registered name.
+     *
+     * @param {string} rawName - Desired name (uniquified via findUniqueTemperamentName).
+     * @param {number[]} ratios - Frequency ratios, degree 0 first (usually 1/1).
+     * @param {string[]|null} noteLabels - Optional labels; missing slots become "?".
+     * @param {string} [referencePitch] - Note name used to derive the base octave.
+     * @returns {string} The registered temperament name.
+     * @memberof SaveInterface
+     * @private
+     */
+    _registerTemperament(rawName, ratios, noteLabels, referencePitch) {
+        const name = this.activity.blocks.findUniqueTemperamentName(rawName);
+        const startParsed = parseNoteString(
+            referencePitch || this.activity.logo.synth.startingPitch
+        );
+        const startOctave = startParsed[1];
+        const definition = { pitchNumber: ratios.length };
+        for (let i = 0; i < ratios.length; i++) {
+            const ratio = ratios[i];
+            definition["" + i] = [
+                ratio,
+                noteLabels && noteLabels[i] ? noteLabels[i] : "?",
+                startOctave + Math.floor(Math.log2(ratio))
+            ];
+        }
+        this._activateImportedTemperament(name, definition);
+        return name;
+    }
+
+    /**
+     * Import a Music Blocks temperament JSON definition.
+     *
+     * Validates the structure, then immediately registers the temperament in
+     * the dropdown via addTemperamentToDictionary + updateTemperaments so the
+     * canvas blocks referencing it resolve again after a page reload.
+     *
+     * @param {string} jsonString - Raw JSON text of the temperament definition.
+     * @returns {void}
+     * @memberof SaveInterface
+     */
+    importTemperamentJSON(jsonString) {
+        let data;
+        try {
+            data = JSON.parse(jsonString);
+        } catch (e) {
+            this.activity.errorMsg(_("Invalid temperament JSON: not valid JSON."), 4000);
+            return;
+        }
+
+        if (
+            !data ||
+            typeof data.name !== "string" ||
+            !Array.isArray(data.ratios) ||
+            data.ratios.length === 0
+        ) {
+            this.activity.errorMsg(
+                _("Invalid temperament JSON: missing name or ratios array."),
+                4000
+            );
+            return;
+        }
+
+        const customName = this._registerTemperament(
+            data.name,
+            data.ratios,
+            data.noteLabels,
+            data.referencePitch
+        );
+        this.activity.textMsg(_("Temperament '%s' imported.").replace(/%s/g, customName), 3000);
+    }
+
+    /**
+     * Export the active temperament to a Scala (.scl) scale file.
+     *
+     * The Scala format omits the implicit 1/1 (degree 0); we therefore serialize
+     * ratios[1..n] as cents. See https://www.huygens-fokker.org/scala/scl_format.html
+     *
+     * @returns {void}
+     * @memberof SaveInterface
+     */
+    exportSCL() {
+        const tName = this.activity.logo.synth.inTemperament;
+        const t = getTemperament(tName);
+        if (!t) {
+            this.activity.errorMsg(_("No active temperament to export."), 4000);
+            return;
+        }
+
+        let out = "! " + tName + ".scl\n";
+        out += "!\n";
+        // Scala note count = number of explicit degrees, excluding the
+        // implicit 1/1 (ratios[0]) and the implicit octave.
+        out += t.ratios.length - 1 + " notes\n";
+        out += "!\n";
+
+        // Skip ratios[0] (implicit 1/1) — Scala files omit degree 0.
+        for (let i = 1; i < t.ratios.length; i++) {
+            const cents = ratioToSCLCents(t.ratios[i]);
+            out += cents.toFixed(5) + "\n";
+        }
+
+        const url = "data:text/plain;charset=utf-8," + encodeURIComponent(out);
+        this.downloadURL(tName + ".scl", url);
+    }
+
+    /**
+     * Import a Scala (.scl) scale file as a Music Blocks temperament.
+     *
+     * Parsing rules (per the Scala spec):
+     *   - A pitch line containing a period ('.') is a cents value.
+     *   - Otherwise it is a ratio, written as "n/d" or "n" (== n/1).
+     *   - Cents values are converted to ratios via 2^(cents/1200).
+     *   - The implicit 1/1 (degree 0) is prepended after parsing.
+     *
+     * @param {string} text - Raw text content of the .scl file.
+     * @returns {void}
+     * @memberof SaveInterface
+     */
+    importSCL(text) {
+        const lines = text.split(/\r?\n/);
+        const pitches = [];
+        let count = -1; // -1 = note count not yet read
+
+        for (const rawLine of lines) {
+            const line = rawLine.trim();
+            if (line === "") continue;
+
+            if (line.startsWith("!")) continue;
+
+            if (count < 0) {
+                // First non-comment, non-empty line = note count.
+                count = parseInt(line, 10);
+                if (isNaN(count) || count < 0) {
+                    this.activity.errorMsg(_("Invalid .scl file: bad note count."), 4000);
+                    return;
+                }
+                continue;
+            }
+
+            // Pitch line.
+            if (line.indexOf(".") !== -1) {
+                // Cents format.
+                const cents = parseFloat(line);
+                if (isNaN(cents)) {
+                    this.activity.errorMsg(_("Invalid .scl file: bad cents value."), 4000);
+                    return;
+                }
+                const ratio = SCLCentsToRatio(cents);
+                pitches.push(ratio);
+            } else {
+                // Ratio format: "n/d" or "n" (== n/1).
+                const slash = line.indexOf("/");
+                let ratio;
+                if (slash === -1) {
+                    ratio = parseFloat(line);
+                } else {
+                    const num = parseInt(line.slice(0, slash), 10);
+                    const den = parseInt(line.slice(slash + 1), 10);
+                    if (den <= 0 || num <= 0) {
+                        this.activity.errorMsg(
+                            _("Invalid .scl file: negative or zero ratio."),
+                            4000
+                        );
+                        return;
+                    }
+                    ratio = num / den;
+                }
+                if (isNaN(ratio) || ratio <= 0) {
+                    this.activity.errorMsg(_("Invalid .scl file: bad ratio."), 4000);
+                    return;
+                }
+                pitches.push(ratio);
+            }
+        }
+
+        if (count < 0) {
+            this.activity.errorMsg(_("Invalid .scl file: missing note count."), 4000);
+            return;
+        }
+
+        if (pitches.length !== count) {
+            const msg = _("Invalid .scl file: expected %s pitches, found %s.")
+                .replace("%s", count)
+                .replace("%s", pitches.length);
+            this.activity.errorMsg(msg, 4000);
+            return;
+        }
+
+        // Prepend the implicit 1/1 degree 0.
+        const ratios = [1].concat(pitches);
+        const customName = this._registerTemperament("sclImport", ratios, null);
+        this.activity.textMsg(_("Scala scale '%s' imported.").replace(/%s/g, customName), 3000);
     }
 
     /**

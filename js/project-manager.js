@@ -749,6 +749,68 @@ class ProjectManager {
     // File chooser and drag-and-drop handlers
     // -----------------------------------------------------------------------
 
+    /**
+     * Route a Music Blocks temperament JSON file to the temperament importer.
+     *
+     * Shared by the file-chooser and drag-and-drop handlers so both paths
+     * detect the `musicblocks-temperament` format and delegate to
+     * SaveInterface.importTemperamentJSON, then clean up the loading state.
+     *
+     * @param {string} rawData - Raw text content of the .json file.
+     * @returns {boolean} true if the file was a temperament and handled.
+     * @memberof ProjectManager
+     * @private
+     */
+    _tryImportTemperamentJSON(rawData) {
+        const that = this.activity;
+        let obj;
+        try {
+            obj = JSON.parse(rawData);
+        } catch (e) {
+            return false;
+        }
+        if (!obj || obj.format !== "musicblocks-temperament") {
+            return false;
+        }
+        if (that.save && typeof that.save.importTemperamentJSON === "function") {
+            that.save.importTemperamentJSON(rawData);
+        } else {
+            that.errorMsg(_("Cannot import temperament: save interface not available."));
+        }
+        that.loading = false;
+        document.body.style.cursor = "default";
+        this.stopLoadAnimation();
+        return true;
+    }
+
+    /**
+     * Read a Scala (.scl) scale file and route it to the temperament importer.
+     *
+     * Scala files are not project files, so they are read with a dedicated
+     * FileReader and never passed to the project loader.
+     *
+     * @param {File} file - The selected .scl file.
+     * @returns {void}
+     * @memberof ProjectManager
+     * @private
+     */
+    _importSCLFile(file) {
+        const that = this.activity;
+        const pm = this;
+        const sclReader = new FileReader();
+        sclReader.onload = () => {
+            if (that.save && typeof that.save.importSCL === "function") {
+                that.save.importSCL(sclReader.result);
+            } else {
+                that.errorMsg(_("Cannot import temperament: save interface not available."));
+            }
+            that.loading = false;
+            document.body.style.cursor = "default";
+            pm.stopLoadAnimation();
+        };
+        sclReader.readAsText(file);
+    }
+
     _setupFileHandlers() {
         const that = this.activity;
         const pm = this;
@@ -793,6 +855,15 @@ class ProjectManager {
                                 } else {
                                     obj = JSON.parse(cleanData);
                                 }
+
+                                // Route Music Blocks temperament files to the
+                                // temperament importer instead of the project loader.
+                                // Without this, loadNewBlocks() receives non-block
+                                // data and hangs / never finishes loading.
+                                if (this._tryImportTemperamentJSON(rawData)) {
+                                    return;
+                                }
+
                                 for (const name in that.palettes.dict) {
                                     that.palettes.dict[name].hideMenu(true);
                                 }
@@ -863,6 +934,10 @@ class ProjectManager {
                     const isMidi = extension === "mid" || extension === "midi";
                     if (isMidi) {
                         midiReader.readAsArrayBuffer(file);
+                    } else if (extension === "scl") {
+                        // Route Scala (.scl) scale files to the temperament importer
+                        // so they are not treated as (and fail to parse as) projects.
+                        this._importSCLFile(file);
                     } else {
                         reader.readAsText(file);
                     }
@@ -907,6 +982,13 @@ class ProjectManager {
                             } else {
                                 obj = JSON.parse(cleanData);
                             }
+
+                            // Route Music Blocks temperament files to the
+                            // temperament importer instead of the project loader.
+                            if (this._tryImportTemperamentJSON(rawData)) {
+                                return;
+                            }
+
                             for (const name in that.blocks.palettes.dict) {
                                 that.palettes.dict[name].hideMenu(true);
                             }
@@ -987,6 +1069,15 @@ class ProjectManager {
                     abcReader.readAsText(files[0]);
                     return;
                 }
+
+                if (extension === "scl") {
+                    // Route Scala (.scl) scale files to the temperament importer
+                    // so they are not treated as (and fail to parse as) projects.
+                    this._importSCLFile(files[0]);
+                    window.scroll(0, 0);
+                    return;
+                }
+
                 reader.readAsText(files[0]);
                 window.scroll(0, 0);
             }

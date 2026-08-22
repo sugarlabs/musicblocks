@@ -104,7 +104,7 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(104); // was 102, +2 for recordDropdownArrow
+        expect(global._).toHaveBeenCalledTimes(106); // was 102, +2 recordDropdownArrow, +2 temperament save labels
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
@@ -373,15 +373,14 @@ describe("Toolbar Class", () => {
     });
 
     test("renderLoadIcon sets onclick and updates tooltip", () => {
-        const loadIcon = {
-            setAttribute: jest.fn(),
-            onclick: null
+        const elements = {
+            load: { setAttribute: jest.fn(), onclick: null, click: jest.fn() }
         };
-        global.docById.mockReturnValue(loadIcon);
+        global.docById = jest.fn(id => elements[id] || { onclick: null, click: jest.fn() });
         const mockOnClick = jest.fn();
         toolbar.renderLoadIcon(mockOnClick);
-        expect(loadIcon.onclick).toBeInstanceOf(Function);
-        loadIcon.onclick();
+        expect(elements["load"].onclick).toBeInstanceOf(Function);
+        elements["load"].onclick();
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
     });
 

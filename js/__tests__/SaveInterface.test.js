@@ -1340,3 +1340,181 @@ describe("MXML Methods", () => {
         );
     });
 });
+
+describe("Temperament export/import (Goal 6)", () => {
+    let instance;
+    let activity;
+    let mockGetTemperament;
+    let mockAddTemperamentToDictionary;
+    let mockUpdateTemperaments;
+    let mockFindUniqueTemperamentName;
+    let mockUpdatePalettes;
+    let mockErrorMsg;
+    let mockTextMsg;
+
+    const mockTemperament = {
+        pitchNumber: 3,
+        isEDO: false,
+        octaveRatio: 2,
+        generator: 1.5,
+        ratios: [1, 1.5, 1.8],
+        noteLabels: ["1/1", "3/2", "9/5"],
+        interval: []
+    };
+
+    beforeEach(() => {
+        mockGetTemperament = jest.fn(() => mockTemperament);
+        mockAddTemperamentToDictionary = jest.fn();
+        mockUpdateTemperaments = jest.fn();
+        mockFindUniqueTemperamentName = jest.fn(name => name);
+        mockUpdatePalettes = jest.fn();
+        mockErrorMsg = jest.fn();
+        mockTextMsg = jest.fn();
+
+        global.getTemperament = mockGetTemperament;
+        global.addTemperamentToDictionary = mockAddTemperamentToDictionary;
+        global.updateTemperaments = mockUpdateTemperaments;
+        global.ratioToSCLCents = cents => 1200 * Math.log2(cents);
+        global.SCLCentsToRatio = cents => Math.pow(2, cents / 1200);
+        global.parseNoteString = note => {
+            const match = String(note).match(/^(.+?)(-?\d+)$/);
+            if (match) {
+                return [match[1], Number(match[2])];
+            }
+            return [String(note), NaN];
+        };
+
+        activity = {
+            logo: {
+                synth: {
+                    inTemperament: "testTemperament",
+                    startingPitch: 440
+                }
+            },
+            blocks: {
+                findUniqueTemperamentName: mockFindUniqueTemperamentName,
+                palettes: {
+                    updatePalettes: mockUpdatePalettes
+                }
+            },
+            errorMsg: mockErrorMsg,
+            textMsg: mockTextMsg
+        };
+
+        instance = new SaveInterface(activity);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
+    });
+
+    describe("exportTemperamentJSON", () => {
+        it("downloads a JSON payload with the full definition", () => {
+            const spy = jest.spyOn(instance, "downloadURL");
+            instance.exportTemperamentJSON();
+
+            expect(spy).toHaveBeenCalledTimes(1);
+            const [filename, dataurl] = spy.mock.calls[0];
+            expect(filename).toBe("testTemperament.temperament.json");
+            expect(dataurl).toMatch(/^data:application\/json;charset=utf-8,/);
+
+            const json = JSON.parse(decodeURIComponent(dataurl.split(",")[1]));
+            expect(json.format).toBe("musicblocks-temperament");
+            expect(json.name).toBe("testTemperament");
+            expect(json.ratios).toEqual([1, 1.5, 1.8]);
+            expect(json.pitchCount).toBe(3);
+            expect(json.referencePitch).toBe(440);
+        });
+    });
+
+    describe("importTemperamentJSON", () => {
+        it("rejects invalid or incomplete JSON", () => {
+            instance.importTemperamentJSON("{ not valid");
+            expect(mockErrorMsg).toHaveBeenCalledWith(
+                "Invalid temperament JSON: not valid JSON.",
+                4000
+            );
+            mockErrorMsg.mockClear();
+
+            instance.importTemperamentJSON(JSON.stringify({ name: "x" }));
+            instance.importTemperamentJSON(JSON.stringify({ ratios: [] }));
+            expect(mockErrorMsg).toHaveBeenCalled();
+            expect(mockAddTemperamentToDictionary).not.toHaveBeenCalled();
+        });
+
+        it("registers the temperament and refreshes the UI", () => {
+            instance.importTemperamentJSON(
+                JSON.stringify({
+                    name: "myTemperament",
+                    ratios: [1, 1.5, 1.8],
+                    noteLabels: ["1/1", "3/2", "9/5"]
+                })
+            );
+
+            expect(mockFindUniqueTemperamentName).toHaveBeenCalledWith("myTemperament");
+            expect(mockAddTemperamentToDictionary).toHaveBeenCalledTimes(1);
+            const [name, def] = mockAddTemperamentToDictionary.mock.calls[0];
+            expect(name).toBe("myTemperament");
+            expect(def.pitchNumber).toBe(3);
+            expect(mockUpdateTemperaments).toHaveBeenCalled();
+            expect(mockUpdatePalettes).toHaveBeenCalledWith("pitch");
+            expect(mockTextMsg).toHaveBeenCalled();
+        });
+    });
+
+    describe("exportSCL", () => {
+        it("errors when there is no active temperament", () => {
+            mockGetTemperament.mockReturnValue(null);
+            instance.exportSCL();
+            expect(mockErrorMsg).toHaveBeenCalledWith("No active temperament to export.", 4000);
+        });
+
+        it("serializes ratios as cents, omitting the implicit 1/1", () => {
+            const spy = jest.spyOn(instance, "downloadURL");
+            instance.exportSCL();
+
+            const [filename, dataurl] = spy.mock.calls[0];
+            expect(filename).toBe("testTemperament.scl");
+            const text = decodeURIComponent(dataurl.split(",")[1]);
+            // count = ratios.length - 1 = 2 (degrees), 1/1 omitted
+            expect(text).toContain("2 notes");
+            expect(text).not.toContain("0.00000"); // 1/1 would be 0 cents
+            expect(text).toContain(ratioToSCLCents(1.5).toFixed(5));
+            expect(text).toContain(ratioToSCLCents(1.8).toFixed(5));
+        });
+    });
+
+    describe("importSCL", () => {
+        it("parses ratio and cents pitches and prepends the implicit 1/1", () => {
+            // 3/2 (ratio) and 701.955 cents (~3/2) as two degrees
+            const scl = "! test\n!\n2 notes\n!\n3/2\n701.955\n";
+            instance.importSCL(scl);
+
+            expect(mockAddTemperamentToDictionary).toHaveBeenCalledTimes(1);
+            const def = mockAddTemperamentToDictionary.mock.calls[0][1];
+            expect(def[0][0]).toBe(1); // implicit 1/1 prepended
+            expect(def[1][0]).toBeCloseTo(1.5, 9);
+            expect(def[2][0]).toBeCloseTo(1.5, 3);
+            expect(def.pitchNumber).toBe(3);
+        });
+
+        it("rejects malformed .scl input without registering", () => {
+            const cases = [
+                ["! t\n!\nnotanumber\n!\n", "Invalid .scl file: bad note count."],
+                ["! t\n!\n1 notes\n!\n0/1\n", "Invalid .scl file: negative or zero ratio."],
+                [
+                    "! t\n!\n3 notes\n!\n3/2\n9/5\n",
+                    "Invalid .scl file: expected 3 pitches, found 2."
+                ]
+            ];
+            for (const [scl, msg] of cases) {
+                mockErrorMsg.mockClear();
+                mockAddTemperamentToDictionary.mockClear();
+                instance.importSCL(scl);
+                expect(mockErrorMsg).toHaveBeenCalledWith(msg, 4000);
+                expect(mockAddTemperamentToDictionary).not.toHaveBeenCalled();
+            }
+        });
+    });
+});

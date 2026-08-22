@@ -88,6 +88,8 @@ const {
     getTemperamentName,
     getTemperamentCents,
     getTemperamentRatio,
+    ratioToSCLCents,
+    SCLCentsToRatio,
     noteToObj,
     frequencyToPitch,
     getArticulation,
@@ -982,6 +984,28 @@ describe("cents calculations", () => {
         it("returns 1 for invalid input", () => {
             expect(getTemperamentRatio(null)).toBe(1);
             expect(getTemperamentRatio(undefined)).toBe(1);
+        });
+    });
+
+    describe("SCL cents conversion", () => {
+        it("ratioToSCLCents converts octave ratio to 1200 cents", () => {
+            expect(ratioToSCLCents(2)).toBe(1200);
+        });
+
+        it("ratioToSCLCents converts 3/2 to ~701.955 cents", () => {
+            expect(ratioToSCLCents(3 / 2)).toBeCloseTo(701.955, 3);
+        });
+
+        it("SCLCentsToRatio inverts ratioToSCLCents", () => {
+            expect(SCLCentsToRatio(1200)).toBeCloseTo(2, 6);
+            expect(SCLCentsToRatio(0)).toBeCloseTo(1, 6);
+            // 700 cents is the equal-tempered fifth, not exactly 3/2
+            expect(SCLCentsToRatio(700)).toBeCloseTo(1.4983070768766815, 6);
+        });
+
+        it("ratio/cents round-trips for arbitrary ratios", () => {
+            const r = 1.4983070768766815;
+            expect(SCLCentsToRatio(ratioToSCLCents(r))).toBeCloseTo(r, 9);
         });
     });
 
