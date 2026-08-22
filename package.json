@@ -1,6 +1,6 @@
 {
     "name": "musicblocks",
-    "version": "3.7.1",
+    "version": "3.8.0",
     "main": "electron-main.js",
     "description": "A musical microworld",
     "repository": {
