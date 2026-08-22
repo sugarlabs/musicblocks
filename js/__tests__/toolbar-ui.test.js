@@ -213,6 +213,27 @@ describe("ToolbarUI - Visual Helpers", () => {
         expect(mockStopBtn.style.color).toBe("white");
         jest.useRealTimers();
     });
+
+    test("renderNewProjectIcon marks the modal container with dialog semantics when shown", () => {
+        // A prior test in this file overrides document.getElementById with a
+        // mock; restore the real jsdom implementation for this test since we
+        // need genuine DOM elements and attributes.
+        delete global.document.getElementById;
+
+        document.body.innerHTML =
+            '<div id="modal-container" style="display: none;"></div>' +
+            '<ul id="newdropdown"></ul>';
+
+        global._ = jest.fn(x => x);
+
+        toolbar.renderNewProjectIcon(jest.fn());
+
+        const modalContainer = document.getElementById("modal-container");
+        expect(modalContainer.getAttribute("role")).toBe("dialog");
+        expect(modalContainer.getAttribute("aria-modal")).toBe("true");
+        expect(modalContainer.getAttribute("aria-label")).toBe("New project confirmation");
+        expect(modalContainer.style.display).toBe("flex");
+    });
 });
 
 describe("FocusCycleManager - dispose", () => {

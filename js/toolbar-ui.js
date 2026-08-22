@@ -633,6 +633,13 @@ class ToolbarUI {
         // Make modal container focusable
         modalContainer.setAttribute("tabindex", "-1");
 
+        // Screen reader semantics: identify this as a modal dialog with an
+        // accessible name, matching the pattern used by the other modals
+        // in the app (clear-workspace confirmation, LilyPond save dialog).
+        modalContainer.setAttribute("role", "dialog");
+        modalContainer.setAttribute("aria-modal", "true");
+        modalContainer.setAttribute("aria-label", _("New project confirmation"));
+
         // Setup keyboard navigation for modal
         const modalButtons = [confirmationButton, cancelButton];
         let currentModalFocusIndex = 0;
