@@ -6711,8 +6711,10 @@ class Blocks {
                     delete this.blockCollapseArt[blk];
                 }
 
-                const title = this.blockList[blk].protoblock.staticLabels[0];
-                closeBlkWidgets(_(title));
+                const title = this.blockList[blk].protoblock.staticLabels
+                    ? this.blockList[blk].protoblock.staticLabels[0]
+                    : this.blockList[blk].name;
+                if (title) closeBlkWidgets(_(title));
                 this.activity.refreshCanvas();
             }
 

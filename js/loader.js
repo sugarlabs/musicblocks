@@ -14,7 +14,7 @@
 // Localization helper for early bootstrap
 const t_ = typeof _ === "function" ? _ : s => s;
 
-const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7";
+const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix8";
 
 // The function normalizeLanguageCode() is declared as a side effect of
 // loading js/utils/language-utils.js as a <script> tag in index.html; classic

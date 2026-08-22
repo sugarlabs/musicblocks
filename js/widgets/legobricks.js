@@ -130,7 +130,6 @@ function LegoWidget() {
     this._dragUpHandler = null;
 
     // Pitch block handling properties (similar to PhraseMaker)
-    this.blockNo = null;
     this.rowLabels = [];
     this.rowArgs = [];
     this._rowBlocks = [];
