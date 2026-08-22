@@ -9,9 +9,23 @@
  * (at your option) any later version.
  */
 
-const { piemenuPitches, piemenuKey, piemenuNumber } = require("../piemenus");
+const { piemenuPitches, piemenuIntervals, piemenuKey, piemenuNumber } = require("../piemenus");
 
 // Mock Globals
+global.INTERVALS = [
+    ["perfect", "perfect", [1, 4, 5, 8]],
+    ["minor", "minor", [2, 3, 6, 7]]
+];
+global.INTERVALVALUES = {
+    "perfect 1": [0, 1],
+    "perfect 4": [0, 4],
+    "minor 2": [0, 2],
+    "minor 3": [0, 3]
+};
+global.DEFAULTVOLUME = 0.5;
+global.SHARP = "#";
+global.FLAT = "b";
+global.Singer = { setSynthVolume: jest.fn() };
 global.docById = jest.fn().mockReturnValue({
     style: { display: "", opacity: "" },
     addEventListener: jest.fn(),
@@ -31,16 +45,27 @@ global.window = {
 global.wheelnav = jest.fn().mockImplementation(function (div) {
     const mockWheel = this;
     this.id = div;
-    this.navItems = Array.from({ length: 30 }, () => ({
-        title: "",
-        enabled: true,
-        navItem: { hide: jest.fn(), show: jest.fn() },
-        sliceSelectedAttr: {},
-        sliceHoverAttr: {},
-        titleSelectedAttr: {},
-        titleHoverAttr: {},
-        titleAttr: {}
-    }));
+    this.navItems = Array.from({ length: 40 }, () => {
+        const mockNode = { style: { pointerEvents: "auto" } };
+        const mockSet = {
+            hide: jest.fn(),
+            show: jest.fn(),
+            forEach: jest.fn(fn => {
+                fn({ node: mockNode });
+            }),
+            node: mockNode
+        };
+        return {
+            title: "",
+            enabled: true,
+            navItem: mockSet,
+            sliceSelectedAttr: {},
+            sliceHoverAttr: {},
+            titleSelectedAttr: {},
+            titleHoverAttr: {},
+            titleAttr: {}
+        };
+    });
     this.selectedNavItemIndex = 0;
     this.colors = [];
     this.raphael = { canvas: {} };
@@ -329,6 +354,100 @@ describe("piemenus behavioral tests", () => {
         expect(mockNavigate).toHaveBeenCalled();
 
         jest.useRealTimers();
+    });
+
+    describe("piemenuIntervals tests", () => {
+        let mockBlock;
+
+        beforeEach(() => {
+            mockBlock = {
+                blocks: {
+                    stageClick: false,
+                    blockScale: 1,
+                    turtles: { _canvas: { width: 800, height: 600 } }
+                },
+                container: { x: 10, y: 10, setChildIndex: jest.fn(), children: [] },
+                activity: {
+                    canvas: { offsetLeft: 0, offsetTop: 0 },
+                    blocksContainer: { x: 0, y: 0 },
+                    getStageScale: () => 1,
+                    turtles: { ithTurtle: () => ({ singer: { instrumentNames: ["sine"] } }) },
+                    logo: {
+                        synth: {
+                            createDefaultSynth: jest.fn(),
+                            loadSynth: jest.fn(),
+                            setMasterVolume: jest.fn(),
+                            trigger: jest.fn()
+                        }
+                    }
+                },
+                text: { text: "" },
+                updateCache: jest.fn()
+            };
+        });
+
+        test("shows valid tabs and hides inactive tabs based on activeTabs for perfect interval", () => {
+            piemenuIntervals(mockBlock, "perfect 4");
+
+            // Reset mock counts from initialization
+            for (let k = 0; k < 8; k++) {
+                mockBlock._intervalWheel.navItems[k].navItem.show.mockClear();
+                mockBlock._intervalWheel.navItems[k].navItem.hide.mockClear();
+            }
+
+            // Manually trigger the navigateFunction on the first interval (perfect)
+            mockBlock._intervalNameWheel.navItems[0].navigateFunction();
+
+            // The perfect interval has active tabs [1, 4, 5, 8]
+            // We expect tabs 1, 4, 5, 8 (indices 0, 3, 4, 7) to be shown and tabs 2, 3, 6, 7 (indices 1, 2, 5, 6) to be hidden.
+            expect(mockBlock._intervalWheel.navItems[0].navItem.show).toHaveBeenCalled(); // tab 1
+            expect(mockBlock._intervalWheel.navItems[1].navItem.hide).toHaveBeenCalled(); // tab 2
+            expect(mockBlock._intervalWheel.navItems[2].navItem.hide).toHaveBeenCalled(); // tab 3
+            expect(mockBlock._intervalWheel.navItems[3].navItem.show).toHaveBeenCalled(); // tab 4
+            expect(mockBlock._intervalWheel.navItems[4].navItem.show).toHaveBeenCalled(); // tab 5
+            expect(mockBlock._intervalWheel.navItems[5].navItem.hide).toHaveBeenCalled(); // tab 6
+            expect(mockBlock._intervalWheel.navItems[6].navItem.hide).toHaveBeenCalled(); // tab 7
+            expect(mockBlock._intervalWheel.navItems[7].navItem.show).toHaveBeenCalled(); // tab 8
+        });
+
+        test("shows valid tabs and hides inactive tabs based on activeTabs for minor interval", () => {
+            piemenuIntervals(mockBlock, "minor 3");
+
+            // Reset mock counts from initialization
+            for (let k = 8; k < 16; k++) {
+                mockBlock._intervalWheel.navItems[k].navItem.show.mockClear();
+                mockBlock._intervalWheel.navItems[k].navItem.hide.mockClear();
+            }
+
+            // Manually trigger the navigateFunction on the second interval (minor)
+            // Assuming "minor" is at index 1 based on INTERVALS setup
+            mockBlock._intervalNameWheel.navItems[1].navigateFunction();
+
+            // The minor interval (index 1) has active tabs [2, 3, 6, 7]
+            // We expect tabs 2, 3, 6, 7 (indices 9, 10, 13, 14) to be shown and tabs 1, 4, 5, 8 (indices 8, 11, 12, 15) to be hidden.
+            expect(mockBlock._intervalWheel.navItems[8].navItem.hide).toHaveBeenCalled(); // tab 1
+            expect(mockBlock._intervalWheel.navItems[9].navItem.show).toHaveBeenCalled(); // tab 2
+            expect(mockBlock._intervalWheel.navItems[10].navItem.show).toHaveBeenCalled(); // tab 3
+            expect(mockBlock._intervalWheel.navItems[11].navItem.hide).toHaveBeenCalled(); // tab 4
+            expect(mockBlock._intervalWheel.navItems[12].navItem.hide).toHaveBeenCalled(); // tab 5
+            expect(mockBlock._intervalWheel.navItems[13].navItem.show).toHaveBeenCalled(); // tab 6
+            expect(mockBlock._intervalWheel.navItems[14].navItem.show).toHaveBeenCalled(); // tab 7
+            expect(mockBlock._intervalWheel.navItems[15].navItem.hide).toHaveBeenCalled(); // tab 8
+        });
+
+        test("selection change with invalid interval value does not throw", () => {
+            piemenuIntervals(mockBlock, "perfect 4");
+
+            // Simulate selecting an invalid interval like "perfect 2"
+            mockBlock._intervalNameWheel.selectedNavItemIndex = 0; // "perfect"
+            mockBlock._intervalWheel.selectedNavItemIndex = 1; // "2"
+            mockBlock._intervalWheel.navItems[1].title = "2";
+
+            // Trigger navigateFunction for index 1
+            expect(() => {
+                mockBlock._intervalWheel.navItems[1].navigateFunction();
+            }).not.toThrow();
+        });
     });
 
     test("outside click ignores interactive targets (labelDiv, movable, slices)", () => {

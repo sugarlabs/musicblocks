@@ -3338,14 +3338,11 @@ const piemenuIntervals = (block, selectedInterval) => {
 
     let isInitialized = false;
     // Add function to each main menu for show/hide sub menus
-    // TODO: Add all tabs to each interval
     const __setupAction = (i, activeTabs) => {
         that._intervalNameWheel.navItems[i].navigateFunction = () => {
             for (let l = 0; l < labels.length; l++) {
                 for (let j = 0; j < 8; j++) {
-                    if (l !== i) {
-                        that._intervalWheel.navItems[l * 8 + j].navItem.hide();
-                    } else if (!activeTabs.includes(j + 1)) {
+                    if (l !== i || !activeTabs.includes(j + 1)) {
                         that._intervalWheel.navItems[l * 8 + j].navItem.hide();
                     } else {
                         that._intervalWheel.navItems[l * 8 + j].navItem.show();
@@ -3385,9 +3382,9 @@ const piemenuIntervals = (block, selectedInterval) => {
 
     const j = Number(obj[1]);
     if (INTERVALS[i][2].includes(j)) {
-        block._intervalWheel.navigateWheel(j - 1);
+        block._intervalWheel.navigateWheel(i * 8 + j - 1);
     } else {
-        block._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
+        block._intervalWheel.navigateWheel(i * 8 + INTERVALS[i][2][0] - 1);
     }
     isInitialized = true;
 
@@ -3402,6 +3399,9 @@ const piemenuIntervals = (block, selectedInterval) => {
         const number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
 
         that.value = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] + " " + number;
+        if (!INTERVALVALUES[that.value]) {
+            return;
+        }
         if (label === "perfect 1") {
             that.text.text = _("unison");
         } else {
@@ -4499,5 +4499,5 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches, piemenuKey, piemenuNumber };
+    module.exports = { piemenuPitches, piemenuIntervals, piemenuKey, piemenuNumber };
 }
