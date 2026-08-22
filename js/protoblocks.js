@@ -2157,5 +2157,19 @@ class StackClampBlock extends BaseBlock {
 }
 
 if (typeof module !== "undefined" && module.exports) {
+    // Attached as static properties (not a replacement export) so existing consumers that do
+    // `const ProtoBlock = require("./protoblocks")` are unaffected. This only exposes the
+    // concrete block classes to CommonJS/Jest, which otherwise only see them as bare globals
+    // supplied by the production script-concatenation build - it changes nothing at runtime in
+    // that build.
+    ProtoBlock.BaseBlock = BaseBlock;
+    ProtoBlock.ValueBlock = ValueBlock;
+    ProtoBlock.BooleanBlock = BooleanBlock;
+    ProtoBlock.BooleanSensorBlock = BooleanSensorBlock;
+    ProtoBlock.FlowBlock = FlowBlock;
+    ProtoBlock.LeftBlock = LeftBlock;
+    ProtoBlock.FlowClampBlock = FlowClampBlock;
+    ProtoBlock.StackClampBlock = StackClampBlock;
+
     module.exports = ProtoBlock;
 }

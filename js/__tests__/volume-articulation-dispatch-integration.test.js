@@ -18,32 +18,47 @@
  */
 
 /**
- * Integration test for the Logo interpreter's end-of-clamp dispatch mechanism
- * (`setDispatchBlock`/`setTurtleListener`/`tur.endOfClampSignals`, js/logo.js) driving the real
- * `Singer.VolumeActions.setRelativeVolume` (js/turtleactions/VolumeActions.js) - extending the
- * pattern `noteclamp-beat-doublequeue.test.js` (drum dispatch) and
- * `pitch-note-dispatch-integration.test.js` (pitch dispatch) already use.
+ * Integration test: the real, registered `ArticulationBlock` (js/blocks/VolumeBlocks.js) is
+ * dispatched through the real `Logo.runFromBlockNow` (js/logo.js), which invokes the real
+ * `Singer.VolumeActions.setRelativeVolume` (js/turtleactions/VolumeActions.js), which relies on
+ * the real end-of-clamp dispatch machinery (`setDispatchBlock`/`setTurtleListener`/
+ * `tur.endOfClampSignals`, js/logo.js) to revert the volume when the clamp closes.
  *
- * Scope: this covers the Logo-dispatch <-> VolumeActions seam, not ArticulationBlock's own
- * palette registration. `Logo.runFromBlockNow` and `setRelativeVolume` run for real and
- * unmocked - entering the clamp pushes a boosted volume, and the clamp's real end-of-clamp
- * signal pops it back off on exit. The "articulation" block below is a minimal stand-in shaped
- * like the real block (js/blocks/VolumeBlocks.js): its `flow()` is copied verbatim from
- * `ArticulationBlock.flow`, not obtained from a live registered protoblock, because the concrete
- * classes it extends (`FlowClampBlock`/`FlowBlock`, js/protoblocks.js) only exist as bare
- * globals in the production script-concatenation build - reaching them from Jest would mean
- * either evaluating `protoblocks.js`'s source at runtime or driving the full canvas/DOM-heavy
- * `Blocks.makeBlock`/`Block` path (js/blocks.js, js/block.js), both disproportionate to this one
- * behavior. Consequently, a regression in `ArticulationBlock.flow` itself would not fail this
- * test; a regression in `setRelativeVolume` or in the Logo dispatch machinery around it would
- * (verified by deliberately breaking each and confirming the test fails).
+ * Real: `ArticulationBlock`'s registration and its own `flow()` (js/blocks/VolumeBlocks.js),
+ * `Logo.runFromBlockNow`, `Singer.VolumeActions.setRelativeVolume`, the end-of-clamp dispatch.
+ * Synthetic: the `vspace`/`hidden`/`number` block objects and the turtle/activity fixtures -
+ * plain data, not registered protoblocks, needed only to give the real articulation clamp
+ * something to run inside of and a place to signal to when it closes.
  *
- * The real "vspace" spacer block inside the clamp captures the boosted volume synchronously,
- * since `runFromBlockNow` runs fully synchronously and the clamp has already reverted by the
- * time it returns.
+ * `js/blocks/VolumeBlocks.js` is written to run against `FlowBlock`/`FlowClampBlock`/
+ * `LeftBlock`/`ValueBlock` as bare globals (the shape the production script-concatenation build
+ * provides). `js/protoblocks.js` exposes those concrete classes as static properties on its
+ * `ProtoBlock` export for exactly this purpose, so they can be required directly instead of
+ * reimplemented or parsed out of the source file.
+ *
+ * The "vspace" block inside the clamp is a synchronous checkpoint: `runFromBlockNow` runs fully
+ * synchronously, so by the time it returns the clamp has already closed and reverted the
+ * volume - reading it there would only ever see the reverted value, never the boosted one.
  */
 
-// Setup global mocks BEFORE requiring the module (mirror of noteclamp-beat-doublequeue.test.js).
+global.createjs = {
+    Container: function () {
+        return { addChild: () => {}, getBounds: () => ({ width: 10 }) };
+    },
+    Text: function () {
+        return {};
+    }
+};
+global.DEFAULTBLOCKSCALE = 1.0;
+global.STANDARDBLOCKHEIGHT = 20;
+
+const ProtoBlock = require("../protoblocks");
+global.BaseBlock = ProtoBlock.BaseBlock;
+global.ValueBlock = ProtoBlock.ValueBlock;
+global.FlowBlock = ProtoBlock.FlowBlock;
+global.LeftBlock = ProtoBlock.LeftBlock;
+global.FlowClampBlock = ProtoBlock.FlowClampBlock;
+
 global._ = str => str;
 global.Notation = jest.fn().mockImplementation(() => ({
     notationBeginArticulation: jest.fn(),
@@ -58,6 +73,9 @@ global.Singer = {
     defaultBPMFactor: 1
 };
 global.DEFAULTVOICE = "electronic synth";
+global.DEFAULTDRUM = "kick";
+global.VOICENAMES = {};
+global.DRUMNAMES = {};
 global.last = arr => arr[arr.length - 1];
 global.clampNumber = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -76,9 +94,14 @@ Object.assign(global, logoconstants);
 const { Logo } = require("../logo");
 
 // Singer.VolumeActions is attached to the module-level `Singer` mock above, exactly as
-// production code does via `Singer.VolumeActions = class {...}` (js/turtleactions/VolumeActions.js).
-// No production code is mocked: setRelativeVolume runs for real.
+// production code does via `Singer.VolumeActions = class {...}`. No production code is mocked:
+// setRelativeVolume runs for real.
 const setupVolumeActions = require("../turtleactions/VolumeActions");
+
+// Registers the real ArticulationBlock (and its Volume-palette siblings) into
+// activity.blocks.protoBlockDict via BaseBlock.setup() (js/protoblocks.js) - the same
+// registration path the real block palette relies on.
+const { setupVolumeBlocks } = require("../blocks/VolumeBlocks");
 
 function createTurtle() {
     return {
@@ -109,8 +132,13 @@ function createTurtle() {
 
 function createActivity(turtle) {
     return {
+        beginnerMode: false,
+        palettes: {
+            dict: { volume: { add: jest.fn() } }
+        },
         blocks: {
             blockList: [],
+            protoBlockDict: {},
             sameGeneration: jest.fn(() => false)
         },
         turtles: {
@@ -133,6 +161,7 @@ function createActivity(turtle) {
     };
 }
 
+// Plain data blocks (not registered protoblocks) for the clamp's synthetic surroundings.
 function makeFlowBlock(name, connections, flow, dockTypes, args) {
     return {
         name,
@@ -147,14 +176,13 @@ function makeFlowBlock(name, connections, flow, dockTypes, args) {
     };
 }
 
-describe("Logo end-of-clamp dispatch drives the real Singer.VolumeActions.setRelativeVolume", () => {
+describe("the real ArticulationBlock dispatches through Logo into real Singer.VolumeActions", () => {
     let logo;
     let turtle;
     let activity;
     let duringClampVolume;
 
     beforeEach(() => {
-        jest.clearAllMocks();
         global.document.body.style.cursor = "default";
         turtle = createTurtle();
         activity = createActivity(turtle);
@@ -163,40 +191,27 @@ describe("Logo end-of-clamp dispatch drives the real Singer.VolumeActions.setRel
         duringClampVolume = null;
 
         setupVolumeActions(activity);
+        setupVolumeBlocks(activity);
+        const articulationProto = activity.blocks.protoBlockDict.articulation;
 
-        // articulation (0): connections [prev, value, clampEntry, hidden] - the connections
-        // shape produced when the "set relative volume" block is dragged from the Volume
-        // palette (see ArticulationBlock's own makeMacro, js/blocks/VolumeBlocks.js).
-        // value (1):        number 25 (a +25% relative volume change, the block's own default)
-        // vspace (2):       clamp content - see the checkpoint comment below
-        // hidden (3):       connections [prev, null] (end-of-clamp signal target)
+        // articulation (0): connections [prev, value, clampEntry, hidden] - real, registered
+        // protoblock (real dockTypes/args from formBlock(), real flow()).
+        // value (1):  synthetic number 25 (a +25% relative volume change)
+        // vspace (2): synthetic clamp content - the checkpoint described in the file header
+        // hidden (3): synthetic end-of-clamp signal target
         const hidden = makeFlowBlock("hidden", [0, null], null);
         const vspace = makeFlowBlock("vspace", [0, null], (args, l, t) => {
-            // Checkpoint: reads the volume while the clamp is still open. runFromBlockNow is
-            // synchronous, so by the time it returns below the clamp has already closed and
-            // reverted the volume - this is the only point where the boosted value is visible.
             const tur = activity.turtles.ithTurtle(t);
             duringClampVolume = [...tur.singer.synthVolume[DEFAULTVOICE]];
             return null;
         });
-        const articulation = makeFlowBlock(
-            "articulation",
-            [null, 1, 2, 3],
-            (args, l, t, blk) => {
-                // Copied verbatim from ArticulationBlock.flow (js/blocks/VolumeBlocks.js) -
-                // see the file-level comment above for why this isn't a live protoblock.
-                if (args[1] === undefined) return;
-                let arg = args[0];
-                if (arg === null || typeof arg !== "number") {
-                    activity.errorMsg(NOINPUTERRORMSG, blk);
-                    arg = 0;
-                }
-                Singer.VolumeActions.setRelativeVolume(arg, t, blk);
-                return [args[1], 1];
-            },
-            [null, "numberin", "in", "in"],
-            3
-        );
+        const articulation = {
+            name: "articulation",
+            connections: [null, 1, 2, 3],
+            protoblock: articulationProto,
+            isValueBlock: () => false,
+            isArgBlock: () => false
+        };
         const value = {
             name: "number",
             value: 25,
@@ -217,8 +232,8 @@ describe("Logo end-of-clamp dispatch drives the real Singer.VolumeActions.setRel
         // While the clamp is open, a +25% relative volume was pushed on top of the base 60.
         expect(duringClampVolume).toEqual([60, 75]);
 
-        // Once the clamp's real end-of-clamp signal (setDispatchBlock/endOfClampSignals) fires
-        // the reverting listener, the boosted value is popped and the base volume remains.
+        // Once the clamp's real end-of-clamp signal fires the reverting listener, the boosted
+        // value is popped and the base volume remains.
         expect(turtle.singer.synthVolume[DEFAULTVOICE]).toEqual([60]);
     });
 });
