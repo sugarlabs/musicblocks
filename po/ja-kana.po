@@ -1741,6 +1741,7 @@ msgstr "ブロックをしたにうごかしています"
 #: js/activity.js:4062
 msgid "Moving block left."
 msgstr "ブロックをひだりにうごかしています"
+
 #: js/SaveInterface.js:871
 #: js/SaveInterface.js:930
 #: js/logo.js:2319
@@ -4309,6 +4310,7 @@ msgstr "「ドラムをせってい」ブロックは、ふくまれているお
 #: js/blocks/DrumBlocks.js:410
 msgid "In the example above, a kick drum sound will be played instead of sol."
 msgstr "例の画像に<em>ソル</em>の代わりに<em>キックドラム</em>が鳴らします。"
+
 #: js/blocks/HeapBlocks.js:619
 msgid "The Pop block removes the value at the top of the heap."
 msgstr "「ポップ」ブロックはヒープのせんとうのあたいをさくじょします。"
@@ -6463,6 +6465,7 @@ msgstr "レート (さいしょの ひきすう) は、おとの パルスそく
 #: js/blocks/ToneBlocks.js:494
 msgid "The depth (second argument) controls the strength of the pulsing effect (0-100%)."
 msgstr "ふかさ (2 ばんめの ひきすう)は、パルスこうかの つよさを せいぎょ します (0 ～ 100%)。"
+
 #: js/blocks/ProgramBlocks.js:448
 msgid "The file you selected does not contain a valid dictionary."
 msgstr "せんたくしたファイルにはゆうこうなじしょがふくまれていません。"
