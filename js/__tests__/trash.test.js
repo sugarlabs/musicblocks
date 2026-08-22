@@ -110,14 +110,24 @@ describe("Trashcan Class", () => {
         expect(trashcan.shouldResize(100, 100)).toBe(false);
     });
 
-    it("should resize and debounce the event listener", () => {
+    it("registers one debounced resize listener", () => {
         const addEventListenerSpy = jest
             .spyOn(window, "addEventListener")
             .mockImplementation(() => {});
-        trashcan.resizeEvent(1);
+        const testTrashcan = new Trashcan(mockActivity);
         const resizeFn = addEventListenerSpy.mock.calls[0][1];
-        resizeFn(); // simulate resize
+        testTrashcan.resizeEvent(2);
+        testTrashcan.resizeEvent(1);
+
+        expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
+
+        const updateContainerPositionSpy = jest.spyOn(testTrashcan, "updateContainerPosition");
+        resizeFn();
         jest.advanceTimersByTime(300);
+        expect(updateContainerPositionSpy).toHaveBeenCalledTimes(1);
+
+        updateContainerPositionSpy.mockRestore();
+        addEventListenerSpy.mockRestore();
     });
 
     it("should hide the trashcan using animation", () => {
