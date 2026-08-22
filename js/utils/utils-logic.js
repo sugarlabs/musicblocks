@@ -21,7 +21,7 @@
    deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, isUnsafeObjectKey, last,
    mixedNumber, nearestBeat, oneHundredToFraction, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, unescapeHTML, escapeHTML,
-   rationalToFraction, GCD, LCD, resolveObject, clampNumber, isValidHex
+   rationalToFraction, GCD, LCD, resolveObject, clampNumber, isValidHex, safeNumber
 */
 
 /**
@@ -558,6 +558,25 @@ var clampNumber = (val, min, max, fallback = min) => {
 };
 
 /**
+ * Safely parses a value into a finite number with a fallback value.
+ * @param {*} val - Value to parse into a number
+ * @param {number} [fallback=0] - Fallback numeric value if val is not finite or is NaN
+ * @returns {number} The parsed finite number or fallback value
+ */
+var safeNumber = (val, fallback = 0) => {
+    if (typeof val === "number" && Number.isFinite(val)) {
+        return val;
+    }
+    if (typeof val === "string" && val.trim() !== "") {
+        const parsed = Number(val);
+        if (Number.isFinite(parsed)) {
+            return parsed;
+        }
+    }
+    return typeof fallback === "number" && Number.isFinite(fallback) ? fallback : 0;
+};
+
+/**
  * Converts RGB values to a hexadecimal color code.
  */
 var rgbToHex = (r, g, b) => {
@@ -677,7 +696,8 @@ var UtilsLogic = {
     hex2rgb,
     resolveObject,
     clampNumber,
-    isValidHex
+    isValidHex,
+    safeNumber
 };
 
 if (typeof module !== "undefined" && module.exports) {
