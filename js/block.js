@@ -480,7 +480,11 @@ class Block {
      * @returns {boolean} - Returns true if the block is off-screen, otherwise false.
      */
     offScreen(boundary) {
-        return !this.trash && boundary.offScreen(this.container.x, this.container.y);
+        return (
+            !this.trash &&
+            !!this.container &&
+            boundary.offScreen(this.container.x, this.container.y)
+        );
     }
 
     /**
@@ -554,6 +558,10 @@ class Block {
      */
     highlight() {
         if (this.trash) {
+            return;
+        }
+
+        if (!this.container) {
             return;
         }
 
@@ -651,6 +659,10 @@ class Block {
      */
     unhighlight() {
         if (this.trash) {
+            return;
+        }
+
+        if (!this.container) {
             return;
         }
 
