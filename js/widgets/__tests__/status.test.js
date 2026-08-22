@@ -329,6 +329,24 @@ describe("StatusMatrix Widget", () => {
             expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
         });
 
+        test("does not update after the widget closes", () => {
+            statusMatrix.widgetWindow.onclose();
+
+            statusMatrix.updateAll();
+
+            expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        test("does not update without a status table", () => {
+            statusMatrix._statusTable = null;
+
+            statusMatrix.updateAll();
+
+            expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
         test("calls parseArg for each status field", () => {
             statusMatrix.updateAll();
             expect(mockActivity.logo.parseArg).toHaveBeenCalled();
