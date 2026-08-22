@@ -2066,8 +2066,8 @@ describe("Logo clearTurtleRun", () => {
 
     afterEach(() => jest.restoreAllMocks());
 
-    test("clears timeout and resumes execution", () => {
-        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => {});
+    test("cancels the managed timeout and resumes execution", () => {
+        const clearTimeoutSpy = jest.spyOn(logo.timerManager, "clearTimeout").mockReturnValue(true);
         turtle0.delayTimeout = 123;
         turtle0.delayParameters = { blk: 4, flow: 1, arg: ["p"] };
 
@@ -2075,6 +2075,23 @@ describe("Logo clearTurtleRun", () => {
 
         expect(clearTimeoutSpy).toHaveBeenCalledWith(123);
         expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 4, 1, ["p"]);
+    });
+
+    test("removes a cancelled delay timeout from the managed timer set", () => {
+        const pendingCallback = jest.fn();
+        turtle0.delayTimeout = logo.timerManager.setGuardedTimeout(
+            pendingCallback,
+            60000,
+            () => false
+        );
+        turtle0.delayParameters = { blk: 4, flow: 1, arg: ["p"] };
+
+        expect(logo.timerManager.activeTimeoutCount).toBe(1);
+
+        logo.clearTurtleRun(0);
+
+        expect(logo.timerManager.activeTimeoutCount).toBe(0);
+        expect(logo.timerManager.getStats().cancelled).toBe(1);
     });
 
     describe("with Transport", () => {
