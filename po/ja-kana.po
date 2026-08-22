@@ -1770,15 +1770,15 @@ msgstr "ごみはこはそらです。"
 #: js/trash-controller.js:79
 #: js/trash-controller.js:215
 msgid "Item restored from the trash."
-msgstr "ごみはこからあいてむをふくげんしました。"
+msgstr "ごみはこから アイテムを ふくげんしました。"
 
 #: js/activity.js:4724
 msgid "Restore last item"
-msgstr "さいごのあいてむをふくげん"
+msgstr "さきの アイテムを ふくげん"
 
 #: js/activity.js:4725
 msgid "Restore all items"
-msgstr "すべてのあいてむをふくげん"
+msgstr "すべての アイテムを ふくげん"
 
 #: js/activity.js:5393
 msgid "Click the run button to run the project."
@@ -2289,11 +2289,11 @@ msgstr "がめんの きょうかいを むしする"
 
 #: js/trash-controller.js:286
 msgid "Restore last item"
-msgstr "さいごのあいてむをふくげん"
+msgstr "さきの アイテムを ふくげん"
 
 #: js/trash-controller.js:287
 msgid "Restore all items"
-msgstr "すべてのあいてむをふくげん"
+msgstr "すべての アイテムを ふくげん"
 
 #: js/turtle-singer.js:1576
 #.TRANS: partials are weighted components in a harmonic series

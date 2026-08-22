@@ -1943,7 +1943,7 @@ msgstr "ゴミ箱からアイテムを復元しました。"
 
 #: js/activity.js:4724
 msgid "Restore last item"
-msgstr "最後のアイテムを復元"
+msgstr "先のアイテムを復元"
 
 #: js/activity.js:4725
 msgid "Restore all items"
@@ -5894,7 +5894,7 @@ msgstr "画面の境界を無視する"
 
 #: js/trash-controller.js:286
 msgid "Restore last item"
-msgstr "最後のアイテムを復元"
+msgstr "先のアイテムを復元"
 
 #: js/trash-controller.js:287
 msgid "Restore all items"
