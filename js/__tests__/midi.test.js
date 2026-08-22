@@ -201,4 +201,51 @@ describe("transcribeMidi", () => {
         const restBlocks = loadedBlocks.filter(block => block[1] === "rest2");
         expect(restBlocks.length).toBeGreaterThan(0);
     });
+
+    it("should generate reciprocal block connections", async () => {
+        // blocks.js adjustDocks() requires connections to be mutual: if A points
+        // at B, B must point back at A. It logs "Did not find match" and stops
+        // docking the stack when they are not.
+        await transcribeMidi(mockMidi);
+        expect(loadNewBlocksSpy).toHaveBeenCalled();
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        const blocksById = new Map(loadedBlocks.map(block => [block[0], block]));
+
+        const oneSided = [];
+        loadedBlocks.forEach(([id, name, , , connections]) => {
+            connections.forEach((target, dock) => {
+                if (target === null || target === undefined) return;
+                const other = blocksById.get(target);
+                expect(other).toBeDefined();
+                if (!other[4].includes(id)) {
+                    oneSided.push(
+                        `block ${id} ${JSON.stringify(name)} dock ${dock} -> ${target} ` +
+                            `${JSON.stringify(other[1])}, which does not point back`
+                    );
+                }
+            });
+        });
+
+        expect(oneSided).toEqual([]);
+    });
+
+    it("should terminate the pitch chain of each note with null", async () => {
+        // The last pitch of a note has no following pitch, so its 4th connection
+        // must be null rather than the note's trailing hidden block.
+        await transcribeMidi(mockMidi);
+        expect(loadNewBlocksSpy).toHaveBeenCalled();
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        const blocksById = new Map(loadedBlocks.map(block => [block[0], block]));
+
+        const pitchBlocks = loadedBlocks.filter(block => block[1] === "pitch");
+        expect(pitchBlocks.length).toBeGreaterThan(0);
+
+        pitchBlocks.forEach(block => {
+            const next = block[4][3];
+            if (next !== null) {
+                // only another pitch of the same note may follow
+                expect(blocksById.get(next)[1]).toBe("pitch");
+            }
+        });
+    });
 });

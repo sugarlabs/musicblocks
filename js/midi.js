@@ -182,13 +182,13 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
             offset += 100;
         };
         //Using for loop for finding the shortest note value
-        for (const j in sched) {
-            const dur = sched[j].end - sched[j].start;
+        for (const entry of sched) {
+            const dur = entry.end - entry.start;
             const temp = getClosestStandardNoteValue((dur * 3) / 8);
             shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
         }
 
-        for (const i in sched) {
+        for (let i = 0; i < sched.length; i++) {
             if (stopProcessing) break; // Exit inner loop if flag is set
             const { notes, start, end } = sched[i];
             const duration = end - start;
@@ -216,7 +216,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                     );
                     x += 2;
                 } else {
-                    for (const na in notes) {
+                    for (let na = 0; na < notes.length; na++) {
                         const name = notes[na];
                         const first = na === 0;
                         const last = na === notes.length - 1;
