@@ -191,7 +191,11 @@ class Oscilloscope {
                 this.pitchAnalysers[key] &&
                 typeof this.pitchAnalysers[key].dispose === "function"
             ) {
-                this.pitchAnalysers[key].dispose();
+                try {
+                    this.pitchAnalysers[key].dispose();
+                } catch (e) {
+                    console.debug("Error disposing pitch analyser:", e);
+                }
             }
         }
 
