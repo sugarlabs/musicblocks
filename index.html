@@ -306,6 +306,9 @@
                 <div class="canvasHolder" id="canvasHolder">
                     <div
                         id="clear-modal-container"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Clear workspace confirmation"
                         style="
                             display: none;
                             z-index: 999;
@@ -488,7 +491,14 @@
                     </div>
                 </footer>
 
-                <dialog id="lilypondModal" class="modal" tabindex="-1">
+                <dialog
+                    id="lilypondModal"
+                    class="modal"
+                    tabindex="-1"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Save LilyPond score"
+                >
                     <!-- Modal content for Lilypond save dialog -->
                     <div class="modal-content" tabindex="-1">
                         <span class="close">&times;</span>
