@@ -30,15 +30,12 @@
  * plain data, not registered protoblocks, needed only to give the real articulation clamp
  * something to run inside of and a place to signal to when it closes.
  *
- * `js/blocks/VolumeBlocks.js` is written to run against `FlowBlock`/`FlowClampBlock`/
- * `LeftBlock`/`ValueBlock` as bare globals (the shape the production script-concatenation build
- * provides). `js/protoblocks.js` exposes those concrete classes as static properties on its
- * `ProtoBlock` export for exactly this purpose, so they can be required directly instead of
- * reimplemented or parsed out of the source file.
+ * `js/blocks/VolumeBlocks.js` needs `FlowBlock`/`FlowClampBlock`/`LeftBlock`/`ValueBlock` as
+ * bare globals; `js/protoblocks.js` exports them as static properties on `ProtoBlock` for this
+ * (see that file for why this small export exists).
  *
- * The "vspace" block inside the clamp is a synchronous checkpoint: `runFromBlockNow` runs fully
- * synchronously, so by the time it returns the clamp has already closed and reverted the
- * volume - reading it there would only ever see the reverted value, never the boosted one.
+ * `runFromBlockNow` executes the clamp synchronously, so the "vspace" block inside it captures
+ * the temporary boosted volume before the end-of-clamp cleanup runs and reverts it.
  */
 
 global.createjs = {
@@ -181,6 +178,7 @@ describe("the real ArticulationBlock dispatches through Logo into real Singer.Vo
     let turtle;
     let activity;
     let duringClampVolume;
+    let duringClampSignalCount;
 
     beforeEach(() => {
         global.document.body.style.cursor = "default";
@@ -189,6 +187,7 @@ describe("the real ArticulationBlock dispatches through Logo into real Singer.Vo
         logo = new Logo(activity);
         activity.logo = logo;
         duringClampVolume = null;
+        duringClampSignalCount = null;
 
         setupVolumeActions(activity);
         setupVolumeBlocks(activity);
@@ -203,6 +202,9 @@ describe("the real ArticulationBlock dispatches through Logo into real Singer.Vo
         const vspace = makeFlowBlock("vspace", [0, null], (args, l, t) => {
             const tur = activity.turtles.ithTurtle(t);
             duringClampVolume = [...tur.singer.synthVolume[DEFAULTVOICE]];
+            // hidden is block index 3: confirms setDispatchBlock already registered the
+            // reverting listener against it before the clamp body (this block) even runs.
+            duringClampSignalCount = (tur.endOfClampSignals[3] || []).length;
             return null;
         });
         const articulation = {
@@ -229,11 +231,14 @@ describe("the real ArticulationBlock dispatches through Logo into real Singer.Vo
     test("boosts the synth volume for the clamp's duration and reverts it once the clamp ends", () => {
         logo.runFromBlockNow(logo, 0, 0, 1, null);
 
-        // While the clamp is open, a +25% relative volume was pushed on top of the base 60.
+        // While the clamp is open, a +25% relative volume was pushed on top of the base 60,
+        // and the reverting listener was already registered against the end-of-clamp signal.
         expect(duringClampVolume).toEqual([60, 75]);
+        expect(duringClampSignalCount).toBe(1);
 
         // Once the clamp's real end-of-clamp signal fires the reverting listener, the boosted
-        // value is popped and the base volume remains.
+        // value is popped, the base volume remains, and the signal itself is consumed.
         expect(turtle.singer.synthVolume[DEFAULTVOICE]).toEqual([60]);
+        expect(turtle.endOfClampSignals[3]).toEqual([]);
     });
 });
