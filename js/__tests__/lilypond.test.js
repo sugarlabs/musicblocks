@@ -643,4 +643,43 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain('shortInstrumentName = "Tro"');
         expect(result).toContain('shortInstrumentName = "Tri"');
     });
+
+    test("should handle single character instrument names", () => {
+        activity.turtles.turtleList = {
+            0: { name: "A" },
+            1: { name: "B" }
+        };
+        activity.logo.notation.notationStaging = {
+            0: ["note"],
+            1: ["note"]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('shortInstrumentName = "A"');
+        expect(result).toContain('shortInstrumentName = "B"');
+    });
+
+    test("should handle instrument names with underscore and resolve collisions", () => {
+        activity.turtles.turtleList = {
+            0: { name: "violin_one" },
+            1: { name: "viola_one" },
+            2: { name: "v_one" },
+            3: { name: "flute_two" },
+            4: { name: "aa_bb" },
+            5: { name: "aa_b" }
+        };
+        activity.logo.notation.notationStaging = {
+            0: ["note"],
+            1: ["note"],
+            2: ["note"],
+            3: ["note"],
+            4: ["note"],
+            5: ["note"]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('shortInstrumentName = "vo"');
+        expect(result).toContain('shortInstrumentName = "von"');
+        expect(result).toContain('shortInstrumentName = "ft"');
+        expect(result).toContain('shortInstrumentName = "ab"');
+        expect(result).toContain('shortInstrumentName = "aab"');
+    });
 });
