@@ -3377,9 +3377,9 @@ const piemenuIntervals = (block, selectedInterval) => {
 
     const j = Number(obj[1]);
     if (INTERVALS[i][2].includes(j)) {
-        block._intervalWheel.navigateWheel(j - 1);
+        block._intervalWheel.navigateWheel(i * 8 + j - 1);
     } else {
-        block._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
+        block._intervalWheel.navigateWheel(i * 8 + INTERVALS[i][2][0] - 1);
     }
     isInitialized = true;
 
