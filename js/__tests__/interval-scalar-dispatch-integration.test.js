@@ -39,22 +39,16 @@
  * test; a regression in `setScalarInterval` or in the Logo dispatch machinery around it would
  * (verified by deliberately breaking each and confirming the test fails).
  *
- * The real "vspace" spacer block inside the clamp captures the pushed interval synchronously,
- * since `runFromBlockNow` runs fully synchronously and the clamp has already reverted by the
- * time it returns.
+ * A synthetic clamp-body checkpoint block (not a real "vspace" block, just shaped like one)
+ * captures the pushed interval synchronously, since `runFromBlockNow` runs fully synchronously
+ * and the clamp has already reverted by the time it returns.
  */
 
 // Setup global mocks BEFORE requiring the module (mirror of noteclamp-beat-doublequeue.test.js).
 global._ = str => str;
 global.Notation = jest.fn().mockImplementation(() => ({}));
 global.Synth = jest.fn().mockImplementation(() => ({}));
-global.Singer = {
-    processNote: jest.fn(),
-    setSynthVolume: jest.fn(),
-    setMasterVolume: jest.fn(),
-    masterBPM: 90,
-    defaultBPMFactor: 1
-};
+global.Singer = {};
 global.last = arr => arr[arr.length - 1];
 
 jest.mock("tone", () => ({
@@ -78,7 +72,6 @@ const { setupIntervalsActions } = require("../turtleactions/IntervalsActions");
 
 function createTurtle() {
     return {
-        id: 0,
         singer: {
             inNoteBlock: [],
             inDuplicate: false,
@@ -90,15 +83,8 @@ function createTurtle() {
         painter: { closeSVG: jest.fn() },
         queue: [],
         parentFlowQueue: [],
-        unhighlightQueue: [],
-        parameterQueue: [],
         listeners: {},
-        endOfClampSignals: {},
-        waitTime: 0,
-        doWait: jest.fn(),
-        container: { x: 0, y: 0 },
-        running: false,
-        inTrash: false
+        endOfClampSignals: {}
     };
 }
 
@@ -123,7 +109,6 @@ function createActivity(turtle) {
                 }
             })
         },
-        errorMsg: jest.fn(),
         onStopTurtle: jest.fn()
     };
 }
@@ -201,7 +186,7 @@ describe("Logo end-of-clamp dispatch drives the real Singer.IntervalsActions.set
         activity.blocks.blockList = blocks;
     });
 
-    test("pushes a scalar interval for the clamp's duration and pops it once the clamp ends", () => {
+    test("pushes a scalar interval during the clamp and restores the stack after dispatch cleanup", () => {
         logo.runFromBlockNow(logo, 0, 0, 1, null);
 
         // While the clamp is open, the "+5" scalar interval was pushed onto the interval stack.
