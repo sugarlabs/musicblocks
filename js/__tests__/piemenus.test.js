@@ -349,64 +349,53 @@ describe("piemenus behavioral tests", () => {
             };
         });
 
-        test("sets enabled property and pointerEvents on navItems based on activeTabs for perfect interval", () => {
+        test("shows valid tabs and hides inactive tabs based on activeTabs for perfect interval", () => {
             piemenuIntervals(mockBlock, "perfect 4");
+
+            // Reset mock counts from initialization
+            for (let k = 0; k < 8; k++) {
+                mockBlock._intervalWheel.navItems[k].navItem.show.mockClear();
+                mockBlock._intervalWheel.navItems[k].navItem.hide.mockClear();
+            }
 
             // Manually trigger the navigateFunction on the first interval (perfect)
             mockBlock._intervalNameWheel.navItems[0].navigateFunction();
 
             // The perfect interval has active tabs [1, 4, 5, 8]
-            // We expect the first 8 navItems in _intervalWheel to be show()n
-            // and enabled / pointerEvents configured correctly.
-            // j = 0 -> tab 1 (enabled = true, pointerEvents = "auto")
-            // j = 1 -> tab 2 (enabled = false, pointerEvents = "none")
-            expect(mockBlock._intervalWheel.navItems[0].navItem.show).toHaveBeenCalled();
-            expect(mockBlock._intervalWheel.navItems[0].enabled).toBe(true);
-            expect(mockBlock._intervalWheel.navItems[0].navItem.node.style.pointerEvents).toBe(
-                "auto"
-            );
-
-            expect(mockBlock._intervalWheel.navItems[1].navItem.show).toHaveBeenCalled(); // inactive tab is not hidden
-            expect(mockBlock._intervalWheel.navItems[1].enabled).toBe(false);
-            expect(mockBlock._intervalWheel.navItems[1].navItem.node.style.pointerEvents).toBe(
-                "none"
-            );
-
-            expect(mockBlock._intervalWheel.navItems[3].navItem.show).toHaveBeenCalled();
-            expect(mockBlock._intervalWheel.navItems[3].enabled).toBe(true); // tab 4
-            expect(mockBlock._intervalWheel.navItems[3].navItem.node.style.pointerEvents).toBe(
-                "auto"
-            );
+            // We expect tabs 1, 4, 5, 8 (indices 0, 3, 4, 7) to be shown and tabs 2, 3, 6, 7 (indices 1, 2, 5, 6) to be hidden.
+            expect(mockBlock._intervalWheel.navItems[0].navItem.show).toHaveBeenCalled(); // tab 1
+            expect(mockBlock._intervalWheel.navItems[1].navItem.hide).toHaveBeenCalled(); // tab 2
+            expect(mockBlock._intervalWheel.navItems[2].navItem.hide).toHaveBeenCalled(); // tab 3
+            expect(mockBlock._intervalWheel.navItems[3].navItem.show).toHaveBeenCalled(); // tab 4
+            expect(mockBlock._intervalWheel.navItems[4].navItem.show).toHaveBeenCalled(); // tab 5
+            expect(mockBlock._intervalWheel.navItems[5].navItem.hide).toHaveBeenCalled(); // tab 6
+            expect(mockBlock._intervalWheel.navItems[6].navItem.hide).toHaveBeenCalled(); // tab 7
+            expect(mockBlock._intervalWheel.navItems[7].navItem.show).toHaveBeenCalled(); // tab 8
         });
 
-        test("sets enabled property and pointerEvents on navItems based on activeTabs for minor interval", () => {
+        test("shows valid tabs and hides inactive tabs based on activeTabs for minor interval", () => {
             piemenuIntervals(mockBlock, "minor 3");
+
+            // Reset mock counts from initialization
+            for (let k = 8; k < 16; k++) {
+                mockBlock._intervalWheel.navItems[k].navItem.show.mockClear();
+                mockBlock._intervalWheel.navItems[k].navItem.hide.mockClear();
+            }
 
             // Manually trigger the navigateFunction on the second interval (minor)
             // Assuming "minor" is at index 1 based on INTERVALS setup
             mockBlock._intervalNameWheel.navItems[1].navigateFunction();
 
             // The minor interval (index 1) has active tabs [2, 3, 6, 7]
-            // We expect navItems 8-15 (l=1 * 8 + j) to be show()n
-            // j = 0 -> tab 1 (enabled = false, pointerEvents = "none")
-            // j = 1 -> tab 2 (enabled = true, pointerEvents = "auto")
-            expect(mockBlock._intervalWheel.navItems[8].navItem.show).toHaveBeenCalled();
-            expect(mockBlock._intervalWheel.navItems[8].enabled).toBe(false);
-            expect(mockBlock._intervalWheel.navItems[8].navItem.node.style.pointerEvents).toBe(
-                "none"
-            );
-
-            expect(mockBlock._intervalWheel.navItems[9].navItem.show).toHaveBeenCalled();
-            expect(mockBlock._intervalWheel.navItems[9].enabled).toBe(true); // tab 2
-            expect(mockBlock._intervalWheel.navItems[9].navItem.node.style.pointerEvents).toBe(
-                "auto"
-            );
-
-            expect(mockBlock._intervalWheel.navItems[10].navItem.show).toHaveBeenCalled();
-            expect(mockBlock._intervalWheel.navItems[10].enabled).toBe(true); // tab 3
-            expect(mockBlock._intervalWheel.navItems[10].navItem.node.style.pointerEvents).toBe(
-                "auto"
-            );
+            // We expect tabs 2, 3, 6, 7 (indices 9, 10, 13, 14) to be shown and tabs 1, 4, 5, 8 (indices 8, 11, 12, 15) to be hidden.
+            expect(mockBlock._intervalWheel.navItems[8].navItem.hide).toHaveBeenCalled(); // tab 1
+            expect(mockBlock._intervalWheel.navItems[9].navItem.show).toHaveBeenCalled(); // tab 2
+            expect(mockBlock._intervalWheel.navItems[10].navItem.show).toHaveBeenCalled(); // tab 3
+            expect(mockBlock._intervalWheel.navItems[11].navItem.hide).toHaveBeenCalled(); // tab 4
+            expect(mockBlock._intervalWheel.navItems[12].navItem.hide).toHaveBeenCalled(); // tab 5
+            expect(mockBlock._intervalWheel.navItems[13].navItem.show).toHaveBeenCalled(); // tab 6
+            expect(mockBlock._intervalWheel.navItems[14].navItem.show).toHaveBeenCalled(); // tab 7
+            expect(mockBlock._intervalWheel.navItems[15].navItem.hide).toHaveBeenCalled(); // tab 8
         });
 
         test("selection change with invalid interval value does not throw", () => {
