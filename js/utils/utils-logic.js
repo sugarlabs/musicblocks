@@ -21,7 +21,7 @@
    deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, isUnsafeObjectKey, last,
    mixedNumber, nearestBeat, oneHundredToFraction, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, unescapeHTML, escapeHTML,
-   rationalToFraction, GCD, LCD, resolveObject, clampNumber, isValidHex
+   rationalToFraction, GCD, LCD, resolveObject, clampNumber, isValidHex, formatSeconds
 */
 
 /**
@@ -558,6 +558,29 @@ var clampNumber = (val, min, max, fallback = min) => {
 };
 
 /**
+ * Formats a duration in seconds into a standardized digital time display string (MM:SS or HH:MM:SS).
+ * @param {number|string} seconds - Duration in seconds
+ * @returns {string} Formatted duration string e.g. "02:05" or "01:01:05", defaulting to "00:00" for invalid inputs
+ */
+var formatSeconds = seconds => {
+    if (seconds === null || seconds === undefined) return "00:00";
+    const num = Number(seconds);
+    if (!Number.isFinite(num) || num < 0) return "00:00";
+
+    const totalSecs = Math.floor(num);
+    const hours = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+
+    const pad = n => String(n).padStart(2, "0");
+
+    if (hours > 0) {
+        return `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+    }
+    return `${pad(mins)}:${pad(secs)}`;
+};
+
+/**
  * Converts RGB values to a hexadecimal color code.
  */
 var rgbToHex = (r, g, b) => {
@@ -677,7 +700,8 @@ var UtilsLogic = {
     hex2rgb,
     resolveObject,
     clampNumber,
-    isValidHex
+    isValidHex,
+    formatSeconds
 };
 
 if (typeof module !== "undefined" && module.exports) {
