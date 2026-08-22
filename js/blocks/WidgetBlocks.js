@@ -112,11 +112,16 @@ function setupWidgetBlocks(activity) {
      */
     function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
         if (logo[widgetKey] === null || logo[widgetKey] === undefined) {
-            logo[widgetKey] = initFn();
-            if (typeof logo.runFromBlockNow === "function") {
-                logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
-            }
-            return null;
+            logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
+            _lazyRequire(modules, () => {
+                logo[widgetKey] = initFn();
+                if (typeof logo.runFromBlockNow === "function") {
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
+                }
+            });
+            return [null, 0, true];
+        } else if (logo[widgetKey] === "loading") {
+            return [null, 0, true]; // Still loading, continue to interrupt
         }
         return null;
     }
