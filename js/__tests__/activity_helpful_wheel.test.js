@@ -47,7 +47,7 @@ const loadActivityClass = () => {
     // activity.js so setupContextMenuController() resolves for real inside
     // this sandbox, sharing the same mocked globals (wheelnav, base64Encode,
     // the button icon constants, etc.) already defined below.
-    const controllerPath = path.resolve(__dirname, "../context-menu-controller.js");
+    const controllerPath = path.resolve(__dirname, "../activity/context-menu-controller.js");
     let controllerCode = fs.readFileSync(controllerPath, "utf8");
     const controllerSplitPoint = controllerCode.indexOf("if (typeof define");
     if (controllerSplitPoint !== -1) {
