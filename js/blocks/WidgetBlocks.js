@@ -1720,8 +1720,6 @@ function setupWidgetBlocks(activity) {
          * @param {any} receivedArg - The argument received from the previous block.
          */
         flow(args, logo, turtle, blk, receivedArg) {
-            logo.inMatrix = true;
-
             const interruption = _ensureWidget(
                 logo,
                 "phraseMaker",
@@ -1776,6 +1774,12 @@ function setupWidgetBlocks(activity) {
                 receivedArg
             );
             if (interruption) return interruption;
+
+            // Only mark collection mode once the widget is really available.
+            // Setting the flag before the lazy-load finished let concurrently
+            // playing stacks call into the "loading" placeholder and crash;
+            // see the note-collection branches in turtle-singer.js.
+            logo.inMatrix = true;
 
             logo.phraseMaker.blockNo = blk;
 
@@ -2185,8 +2189,6 @@ function setupWidgetBlocks(activity) {
          * @returns {number[]} - The output values.
          */
         flow(args, logo, turtle, blk, receivedArg) {
-            logo.inLegoWidget = true;
-
             const interruption = _ensureWidget(
                 logo,
                 "legoWidget",
@@ -2199,6 +2201,10 @@ function setupWidgetBlocks(activity) {
                 receivedArg
             );
             if (interruption) return interruption;
+
+            // Same ordering as the matrix flow above: the flag must not be
+            // raised while logo.legoWidget is still the "loading" placeholder.
+            logo.inLegoWidget = true;
 
             logo.legoWidget.blockNo = blk;
 
