@@ -2713,6 +2713,26 @@ class Activity {
             // Load any plugins saved in local storage.
             await this.pluginController.loadStoredPlugins();
 
+            // Migrate old single-custommode key to the new customModes array
+            // format so existing users don't lose saved modes on upgrade.
+            try {
+                const oldData = localStorage.getItem("custommode");
+                if (oldData && !localStorage.getItem("customModes")) {
+                    const parsed = JSON.parse(oldData);
+                    const src = Array.isArray(parsed) ? parsed : Object.values(parsed);
+                    const pattern = src.map(v => {
+                        const n = Number(v);
+                        return !isNaN(n) && n > 0 ? n : 1;
+                    });
+                    localStorage.setItem(
+                        "customModes",
+                        JSON.stringify([{ name: "custom", pattern }])
+                    );
+                }
+            } catch (_) {
+                // Corrupt old data — ignore, will start fresh.
+            }
+
             // Load custom modes saved in local storage so they survive a reload.
             try {
                 const savedModes = JSON.parse(localStorage.getItem("customModes") || "[]");

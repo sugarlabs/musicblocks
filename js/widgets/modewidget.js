@@ -43,6 +43,8 @@ class ModeWidget {
     static ROTATESPEED = 125;
     static RESET_NOTES_DELAY = 500;
     static WHEELSIZE = 400;
+    static MIN_EDO = 5;
+    static MAX_EDO = 55;
     static MAX_TITLE_FONT_SIZE = 48;
     static MIN_TITLE_FONT_SIZE = 10;
     static TITLE_FONT_SCALE = 580;
@@ -298,7 +300,12 @@ class ModeWidget {
     _wireEdoSelect(select) {
         select.addEventListener("change", () => {
             const newEDO = parseInt(select.value, 10);
-            if (isNaN(newEDO) || newEDO < 5 || newEDO > 55 || newEDO === this._activeEDO) {
+            if (
+                isNaN(newEDO) ||
+                newEDO < ModeWidget.MIN_EDO ||
+                newEDO > ModeWidget.MAX_EDO ||
+                newEDO === this._activeEDO
+            ) {
                 return;
             }
 
@@ -1154,6 +1161,30 @@ class ModeWidget {
 
     // ── Save / export ─────────────────────────────────────────────
 
+    /**
+     * Register a dynamic equal-temperament entry for an EDO that has no
+     * built-in TEMPERAMENT entry, so getCurrentEDO() returns the correct
+     * pitch count during playback.
+     * @param {number} edo - Equal divisions of the octave
+     * @returns {string} The temperament key (e.g. "equal41")
+     */
+    _ensureTempKey(edo) {
+        const key = "equal" + edo;
+        if (!TEMPERAMENT[key]) {
+            TEMPERAMENT[key] = {
+                isEDO: true,
+                edo,
+                name: edo + "-EDO Equal",
+                description: edo + " Equal Divisions of the Octave",
+                ratios: Array.from({ length: edo + 1 }, (_, i) => Math.pow(2, i / edo)),
+                octaveRatio: 2,
+                generator: null,
+                pitchNumber: edo
+            };
+        }
+        return key;
+    }
+
     _temperamentKeyForEDO(edo) {
         const map = {
             5: "equal5",
@@ -1167,8 +1198,7 @@ class ModeWidget {
         if (map[edo]) {
             return map[edo];
         }
-        const option = this._edoOptions().find(o => o.value === edo);
-        return option ? option.temperamentKey : "equal";
+        return this._ensureTempKey(edo);
     }
 
     _pitchNameAndOctave(j) {
