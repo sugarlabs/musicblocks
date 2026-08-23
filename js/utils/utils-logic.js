@@ -21,7 +21,7 @@
    deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, isUnsafeObjectKey, last,
    mixedNumber, nearestBeat, oneHundredToFraction, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, unescapeHTML, escapeHTML,
-   rationalToFraction, GCD, LCD, resolveObject, clampNumber, isValidHex, safeNumber
+   rationalToFraction, GCD, LCD, resolveObject, clampNumber, isValidHex, safeNumber, toArray
 */
 
 /**
@@ -577,6 +577,17 @@ var safeNumber = (val, fallback = 0) => {
 };
 
 /**
+ * Safely converts a single value, array, or nullish input into an array.
+ * @param {*} val - Value to convert
+ * @returns {Array} An array containing the value, the original array if already an array, or an empty array for null/undefined
+ */
+var toArray = val => {
+    if (val === null || val === undefined) return [];
+    if (Array.isArray(val)) return val;
+    return [val];
+};
+
+/**
  * Converts RGB values to a hexadecimal color code.
  */
 var rgbToHex = (r, g, b) => {
@@ -697,7 +708,8 @@ var UtilsLogic = {
     resolveObject,
     clampNumber,
     isValidHex,
-    safeNumber
+    safeNumber,
+    toArray
 };
 
 if (typeof module !== "undefined" && module.exports) {
