@@ -1213,4 +1213,87 @@ describe("MusicKeyboard core logic", () => {
             expect(img.alt).toBe("Play");
         });
     });
+
+    describe("Web MIDI cleanup on widget close", () => {
+        test("resets onmidimessage handlers on all connected MIDI inputs when widgetWindow.onclose is called", () => {
+            const mockInput1 = { onmidimessage: jest.fn() };
+            const mockInput2 = { onmidimessage: jest.fn() };
+            const mockMidiAccess = {
+                inputs: [mockInput1, mockInput2]
+            };
+
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                addButton: jest.fn().mockReturnValue({ onclick: null, setAttribute: jest.fn() }),
+                addInputButton: jest.fn().mockReturnValue({
+                    addEventListener: jest.fn(),
+                    classList: { add: jest.fn() }
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    style: {}
+                })
+            };
+
+            const origWidgetWindows = global.window.widgetWindows;
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue(mockWidgetWindow)
+            };
+
+            try {
+                const mockActivity = {
+                    turtles: {
+                        ithTurtle: jest.fn().mockReturnValue({
+                            singer: { bpm: [90] }
+                        })
+                    },
+                    logo: { synth: { stopSound: jest.fn() } }
+                };
+
+                const keyboard = new MusicKeyboard(mockActivity);
+                keyboard._createWidgetWindow();
+
+                keyboard.midiAccess = mockMidiAccess;
+                keyboard.midiON = true;
+
+                // Trigger actual onclose handler registered on widgetWindow
+                mockWidgetWindow.onclose();
+
+                expect(mockInput1.onmidimessage).toBeNull();
+                expect(mockInput2.onmidimessage).toBeNull();
+                expect(keyboard.midiON).toBe(false);
+                expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+            } finally {
+                global.window.widgetWindows = origWidgetWindows;
+            }
+        });
+
+        test("doMIDI stores midiAccess reference when requestMIDIAccess succeeds", async () => {
+            const mockInput = { onmidimessage: null };
+            const mockMidiAccess = {
+                inputs: new Map([["1", mockInput]])
+            };
+
+            const origRequestMIDIAccess = global.navigator.requestMIDIAccess;
+            global.navigator.requestMIDIAccess = jest.fn().mockResolvedValue(mockMidiAccess);
+
+            try {
+                const keyboard = new MusicKeyboard({
+                    textMsg: jest.fn()
+                });
+                keyboard.midiButton = { style: {} };
+
+                keyboard.doMIDI();
+
+                await Promise.resolve();
+
+                expect(keyboard.midiAccess).toBe(mockMidiAccess);
+                expect(mockInput.onmidimessage).toBeDefined();
+            } finally {
+                global.navigator.requestMIDIAccess = origRequestMIDIAccess;
+            }
+        });
+    });
 });
