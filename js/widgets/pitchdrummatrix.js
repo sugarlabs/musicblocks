@@ -630,8 +630,7 @@ class PitchDrumMatrix {
         img.alt = label;
         img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
         img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-        img.setAttribute("vertical-align", "middle");
-        img.setAttribute("align-content", "center");
+        img.style.verticalAlign = "middle";
         icon.appendChild(img);
         icon.appendChild(document.createTextNode("\u00A0\u00A0"));
     }
