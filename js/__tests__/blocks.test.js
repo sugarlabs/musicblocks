@@ -65,6 +65,7 @@ global.createjs = {
 // Mock DOM/Common utils
 global.docById = jest.fn();
 global._ = jest.fn(str => str);
+global.announceToScreenReader = jest.fn();
 global.last = jest.fn(arr => (arr && arr.length > 0 ? arr[arr.length - 1] : null));
 global.delayExecution = jest.fn().mockResolvedValue(null);
 global.getTextWidth = jest.fn().mockReturnValue(100);

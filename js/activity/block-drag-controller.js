@@ -29,7 +29,7 @@
    instance directly. No global classification lists are consulted here.
 */
 /* global DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _,
-   MINIMUMDOCKDISTANCE, LONGSTACK */
+   MINIMUMDOCKDISTANCE, LONGSTACK, announceToScreenReader */
 
 /* exported setupBlockDragController, BlockDragController */
 
@@ -535,6 +535,21 @@ class BlockDragController {
             }
 
             /** We found a match. */
+            // Announce the connection to screen readers (screen reader only,
+            // no visual message), mirroring the "picked up" drag announcement.
+            const movedLabel =
+                (myBlock.protoblock &&
+                    myBlock.protoblock.staticLabels &&
+                    myBlock.protoblock.staticLabels[0]) ||
+                myBlock.name;
+            const targetLabel =
+                (blocks.blockList[newBlock].protoblock &&
+                    blocks.blockList[newBlock].protoblock.staticLabels &&
+                    blocks.blockList[newBlock].protoblock.staticLabels[0]) ||
+                blocks.blockList[newBlock].name;
+            announceToScreenReader(
+                _("connected") + " " + movedLabel + " " + _("to") + " " + targetLabel
+            );
             myBlock.connections[0] = newBlock;
             const connection = blocks.blockList[newBlock].connections[newConnection];
             let bottom;
