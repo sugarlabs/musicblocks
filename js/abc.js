@@ -99,16 +99,22 @@ const processABCNotes = function (logo, turtle) {
             note = note.replace(new RegExp(symbol, "g"), replacement);
         }
 
-        // Handle octave notation
-        for (const [octave, notation] of Object.entries(OCTAVE_NOTATION_MAP)) {
+        // Handle octave notation. Check two-digit octaves first
+        // so that octave 10 is not mistaken for octave 1.
+        let matchedOctave = 4;
+        const octaves = Object.keys(OCTAVE_NOTATION_MAP).sort((a, b) => b - a);
+        for (const octave of octaves) {
             if (note.includes(octave)) {
-                note = note.replace(new RegExp(octave, "g"), notation);
-                break; // Only one octave notation should apply
+                note = note.replace(new RegExp(octave, "g"), OCTAVE_NOTATION_MAP[octave]);
+                matchedOctave = Number(octave);
+                break;
             }
         }
 
-        // Convert case based on octave
-        return note.includes("'") || note === "" ? note.toLowerCase() : note.toUpperCase();
+        // Convert case based on octave. ABC uses uppercase
+        // letters for octaves 1-4 and lowercase letters for
+        // octaves 5 and above.
+        return matchedOctave >= 5 ? note.toLowerCase() : note.toUpperCase();
     };
 
     let counter = 0;
