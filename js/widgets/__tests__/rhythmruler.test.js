@@ -1026,3 +1026,111 @@ describe("RhythmRuler _get_save_lock", () => {
         expect(rhythmRuler._get_save_lock()).toBe(true);
     });
 });
+
+describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
+    let rhythmRuler;
+
+    beforeEach(() => {
+        rhythmRuler = new RhythmRuler();
+        rhythmRuler.activity = {
+            blocks: {
+                blockList: {}
+            },
+            palettes: {
+                dict: {
+                    main: { hideMenu: jest.fn() }
+                }
+            },
+            refreshCanvas: jest.fn()
+        };
+        rhythmRuler._rulers = [{}];
+        rhythmRuler.Rulers = [[[4, 4, 4, 4]]];
+    });
+
+    it("returns 'snare drum' when Drums is undefined", () => {
+        rhythmRuler.Drums = undefined;
+        expect(rhythmRuler._getDrumName(0)).toBe("snare drum");
+    });
+
+    it("returns 'snare drum' when Drums array entry is undefined", () => {
+        rhythmRuler.Drums = [];
+        expect(rhythmRuler._getDrumName(0)).toBe("snare drum");
+    });
+
+    it("returns 'snare drum' when Drums array entry is null", () => {
+        rhythmRuler.Drums = [null];
+        expect(rhythmRuler._getDrumName(0)).toBe("snare drum");
+    });
+
+    it("returns 'snare drum' when drum block is missing from blockList", () => {
+        rhythmRuler.Drums = [99];
+        expect(rhythmRuler._getDrumName(0)).toBe("snare drum");
+    });
+
+    it("returns 'snare drum' when drum block has missing/null connections", () => {
+        rhythmRuler.Drums = [1];
+        rhythmRuler.activity.blocks.blockList = {
+            1: { connections: [null, null] }
+        };
+        expect(rhythmRuler._getDrumName(0)).toBe("snare drum");
+    });
+
+    it("returns 'snare drum' when connected block is missing or lacks a valid string value", () => {
+        rhythmRuler.Drums = [1];
+        rhythmRuler.activity.blocks.blockList = {
+            1: { connections: [null, 2] },
+            2: { value: 123 }
+        };
+        expect(rhythmRuler._getDrumName(0)).toBe("snare drum");
+    });
+
+    it("returns connected drum name when drum block and value are valid", () => {
+        rhythmRuler.Drums = [1];
+        rhythmRuler.activity.blocks.blockList = {
+            1: { connections: [null, 2] },
+            2: { value: "bass drum" }
+        };
+        expect(rhythmRuler._getDrumName(0)).toBe("bass drum");
+    });
+
+    it("executes _saveMachine safely with null drum", () => {
+        global.DRUMNAMES = [["snare-drum", "snare drum"]];
+        rhythmRuler.Drums = [null];
+        rhythmRuler._saveDrumMachine = jest.fn();
+        expect(() => rhythmRuler._saveMachine(0)).not.toThrow();
+    });
+
+    it("executes _saveMachine safely with valid drum block", () => {
+        global.DRUMNAMES = [["snare-drum", "snare drum"]];
+        rhythmRuler.Drums = [1];
+        rhythmRuler.activity.blocks.blockList = {
+            1: { connections: [null, 2] },
+            2: { value: "snare drum" }
+        };
+        rhythmRuler._saveDrumMachine = jest.fn();
+        rhythmRuler._saveMachine(0);
+        expect(rhythmRuler._saveDrumMachine).toHaveBeenCalledWith(0, "snare drum", false);
+    });
+
+    it("executes _saveMachine safely with missing drum connections", () => {
+        global.DRUMNAMES = [["snare-drum", "snare drum"]];
+        rhythmRuler.Drums = [1];
+        rhythmRuler.activity.blocks.blockList = {
+            1: { connections: [null, null] }
+        };
+        rhythmRuler._saveDrumMachine = jest.fn();
+        rhythmRuler._saveMachine(0);
+        expect(rhythmRuler._saveDrumMachine).toHaveBeenCalledWith(0, "snare drum", false);
+    });
+
+    it("executes _saveVoiceMachine safely with missing drum connections", () => {
+        jest.useFakeTimers();
+        rhythmRuler.Drums = [1];
+        rhythmRuler.activity.blocks.blockList = {
+            1: { connections: [null, null] }
+        };
+        expect(() => rhythmRuler._saveVoiceMachine(0, "voice")).not.toThrow();
+        jest.advanceTimersByTime(100);
+        jest.useRealTimers();
+    });
+});
