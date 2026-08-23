@@ -34,7 +34,8 @@ const {
     isSafeUrl,
     isUnsafeObjectKey,
     isValidHex,
-    safeNumber
+    safeNumber,
+    toArray
 } = require("../utils-logic.js");
 
 describe("Utility Logic Functions", () => {
@@ -276,6 +277,26 @@ describe("Utility Logic Functions", () => {
             expect(safeNumber(null, 7)).toBe(7);
             expect(safeNumber(undefined, 0)).toBe(0);
             expect(safeNumber({}, 0)).toBe(0);
+        });
+    });
+
+    describe("toArray()", () => {
+        it("returns the original array if input is already an array", () => {
+            const arr = [1, 2, 3];
+            expect(toArray(arr)).toBe(arr);
+            expect(toArray([])).toEqual([]);
+        });
+
+        it("wraps single non-array values in an array", () => {
+            expect(toArray(42)).toEqual([42]);
+            expect(toArray("hello")).toEqual(["hello"]);
+            expect(toArray(true)).toEqual([true]);
+            expect(toArray({ key: "val" })).toEqual([{ key: "val" }]);
+        });
+
+        it("returns an empty array for null or undefined", () => {
+            expect(toArray(null)).toEqual([]);
+            expect(toArray(undefined)).toEqual([]);
         });
     });
 
