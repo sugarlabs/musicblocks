@@ -341,8 +341,8 @@ class StatusMatrix {
 
                 this.activity.logo.inStatusMatrix = saveStatus;
 
-                cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
-                if (cell !== null) {
+                cell = this._statusTable.rows?.[i + 1]?.cells?.[activeTurtles + 1];
+                if (cell !== null && cell !== undefined) {
                     cell.textContent = value === "__INVALID_INPUT__" ? "" : value;
                 }
                 i++;
@@ -385,8 +385,8 @@ class StatusMatrix {
                     note += obj[1] + "/" + obj[0];
                 }
 
-                cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
-                if (cell !== null) {
+                cell = this._statusTable.rows?.[i + 1]?.cells?.[activeTurtles + 1];
+                if (cell !== null && cell !== undefined) {
                     cell.textContent = note.replace(/#/g, "♯").replace(/b/g, "♭");
                 }
             }
