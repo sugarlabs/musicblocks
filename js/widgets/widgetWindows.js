@@ -202,6 +202,8 @@ class WidgetWindow {
     _createUIelements() {
         const windows = docById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
+        this._frame.setAttribute("role", "dialog");
+        this._frame.setAttribute("aria-label", _(this._title));
         this._overlayframe = this._create("div", "windowFrame", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._drag.style.display = "flex";
@@ -513,6 +515,7 @@ class WidgetWindow {
     updateTitle(title) {
         const wftTitle = docById(this._key + "WidgetID");
         wftTitle.textContent = title;
+        this._frame.setAttribute("aria-label", title);
     }
 
     /**
