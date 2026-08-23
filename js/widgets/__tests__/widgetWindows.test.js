@@ -615,6 +615,24 @@ describe("widgetWindows", () => {
 
             expect(titleEl.innerHTML).toBe("New Title");
         });
+
+        test("keeps the frame's aria-label in sync with the new title", () => {
+            const win = createTestWindow("Old Title");
+
+            win.updateTitle("New Title");
+
+            expect(win._frame.getAttribute("aria-label")).toBe("New Title");
+        });
+    });
+
+    describe("frame accessibility", () => {
+        test("gives the window frame a dialog role and an accessible name", () => {
+            const win = createTestWindow("My Widget");
+
+            expect(win._frame.getAttribute("role")).toBe("dialog");
+            expect(win._frame.getAttribute("aria-label")).toBe("My Widget");
+            expect(win._frame.getAttribute("aria-modal")).toBeNull();
+        });
     });
 
     describe("takeFocus", () => {
