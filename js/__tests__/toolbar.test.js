@@ -188,7 +188,10 @@ describe("Toolbar Class", () => {
                 onmouseenter: null,
                 onmouseleave: null,
                 onclick: null,
-                style: {}
+                style: {},
+                setAttribute: jest.fn(),
+                addEventListener: jest.fn(),
+                click: jest.fn()
             }
         };
 
@@ -223,6 +226,18 @@ describe("Toolbar Class", () => {
 
         elements["mb-logo"].onclick();
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
+        expect(elements["mb-logo"].setAttribute).toHaveBeenCalledWith("role", "button");
+        expect(elements["mb-logo"].setAttribute).toHaveBeenCalledWith("tabindex", "0");
+        expect(elements["mb-logo"].addEventListener).toHaveBeenCalledWith(
+            "keydown",
+            expect.any(Function)
+        );
+
+        const logoKeydownHandler = elements["mb-logo"].addEventListener.mock.calls[0][1];
+        const enterEvent = { key: "Enter", preventDefault: jest.fn() };
+        logoKeydownHandler(enterEvent);
+        expect(enterEvent.preventDefault).toHaveBeenCalled();
+        expect(elements["mb-logo"].click).toHaveBeenCalled();
 
         // Japanese language
         toolbar.language = "ja";
