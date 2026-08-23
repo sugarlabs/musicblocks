@@ -204,7 +204,6 @@
     border: none;
     padding: 0;
     align-items: center;
-    flex-direction: row-reverse;
     flex-shrink: 0;
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     min-width: auto;
@@ -317,7 +316,6 @@
     border: none;
     padding: 0;
     align-items: center;
-    flex-direction: row-reverse;
     flex-shrink: 0;
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     min-width: auto;
@@ -398,7 +396,6 @@
     border: none;
     padding: 0;
     align-items: center;
-    flex-direction: row-reverse;
     flex-shrink: 0;
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.16), 0px 1px 7px 0px rgba(0, 0, 0, 0.12);
     min-width: auto;
