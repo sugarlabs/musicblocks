@@ -27,6 +27,7 @@ global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
 const mockOscillator = {
     toDestination: jest.fn().mockReturnThis(),
     triggerRelease: jest.fn(),
+    dispose: jest.fn(),
     triggerAttack: jest.fn(),
     triggerAttackRelease: jest.fn(),
     frequency: {
@@ -283,6 +284,11 @@ describe("PitchSlider Widget", () => {
         test("releases all oscillators", () => {
             slider.widgetWindow.onclose();
             expect(mockOscillator.triggerRelease).toHaveBeenCalled();
+        });
+
+        test("disposes all oscillators", () => {
+            slider.widgetWindow.onclose();
+            expect(mockOscillator.dispose).toHaveBeenCalled();
         });
 
         test("sets isActive to false", () => {
