@@ -2111,6 +2111,36 @@ class RhythmRuler {
     }
 
     /**
+     * Safely retrieves the drum/voice name for a given ruler index.
+     * @private
+     * @param {number} selectedRuler
+     * @returns {string}
+     */
+    _getDrumName(selectedRuler) {
+        if (
+            this.Drums === undefined ||
+            this.Drums === null ||
+            this.Drums[selectedRuler] === null ||
+            this.Drums[selectedRuler] === undefined
+        ) {
+            return "snare drum";
+        }
+        const drumBlock = this.activity?.blocks?.blockList?.[this.Drums[selectedRuler]];
+        if (!drumBlock || !drumBlock.connections) {
+            return "snare drum";
+        }
+        const connectedId = drumBlock.connections[1];
+        if (connectedId === null || connectedId === undefined) {
+            return "snare drum";
+        }
+        const connectedBlock = this.activity?.blocks?.blockList?.[connectedId];
+        if (!connectedBlock || typeof connectedBlock.value !== "string") {
+            return "snare drum";
+        }
+        return connectedBlock.value;
+    }
+
+    /**
      * Executes a loop iteration for playback.
      * @private
      * @param {number} noteTime - The duration of the note in milliseconds.
@@ -2135,13 +2165,7 @@ class RhythmRuler {
         const noteValue = noteValues[colIndex];
 
         noteTime = Math.abs(1 / noteValue);
-        let drum;
-        if (this.Drums[rulerNo] === null) {
-            drum = "snare drum";
-        } else {
-            const drumblockno = this.activity.blocks.blockList[this.Drums[rulerNo]].connections[1];
-            drum = this.activity.blocks.blockList[drumblockno].value;
-        }
+        let drum = this._getDrumName(rulerNo);
 
         let foundDrum = false;
         // Convert i18n drum name to English.
@@ -2251,12 +2275,7 @@ class RhythmRuler {
             if (this.Drums[selectedRuler] === null) {
                 stack_value = _("snare drum") + " " + _("rhythm");
             } else {
-                stack_value =
-                    this.activity.blocks.blockList[
-                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
-                    ].value.split(" ")[0] +
-                    " " +
-                    _("rhythm");
+                stack_value = this._getDrumName(selectedRuler).split(" ")[0] + " " + _("rhythm");
             }
             const delta = selectedRuler * 42;
             const newStack = [
@@ -2327,12 +2346,7 @@ class RhythmRuler {
             if (this.Drums[selectedRuler] === null) {
                 stack_value = _("rhythm");
             } else {
-                stack_value =
-                    this.activity.blocks.blockList[
-                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
-                    ].value.split(" ")[0] +
-                    " " +
-                    _("rhythm");
+                stack_value = this._getDrumName(selectedRuler).split(" ")[0] + " " + _("rhythm");
             }
             const delta = selectedRuler * 42;
             const newStack = [
@@ -2457,14 +2471,7 @@ class RhythmRuler {
      */
     _saveMachine(selectedRuler) {
         // We are either saving a drum machine or a voice machine.
-        let drum;
-        if (this.Drums[selectedRuler] === null) {
-            drum = "snare drum";
-        } else {
-            const drumBlockNo =
-                this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1];
-            drum = this.activity.blocks.blockList[drumBlockNo].value;
-        }
+        const drum = this._getDrumName(selectedRuler);
 
         for (let d = 0; d < DRUMNAMES.length; d++) {
             if (DRUMNAMES[d][1] === drum) {
@@ -2513,12 +2520,7 @@ class RhythmRuler {
             if (this.Drums[selectedRuler] === null) {
                 action_name = _("snare drum") + " " + _("action");
             } else {
-                action_name =
-                    this.activity.blocks.blockList[
-                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
-                    ].value.split(" ")[0] +
-                    " " +
-                    _("action");
+                action_name = this._getDrumName(selectedRuler).split(" ")[0] + " " + _("action");
             }
 
             const newStack = [
@@ -2705,12 +2707,7 @@ class RhythmRuler {
             if (this.Drums[selectedRuler] === null) {
                 action_name = _("guitar") + " " + _("action");
             } else {
-                action_name =
-                    this.activity.blocks.blockList[
-                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
-                    ].value.split(" ")[0] +
-                    "_" +
-                    _("action");
+                action_name = this._getDrumName(selectedRuler).split(" ")[0] + "_" + _("action");
             }
 
             const newStack = [
