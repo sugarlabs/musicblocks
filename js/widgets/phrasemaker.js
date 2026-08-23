@@ -4108,7 +4108,7 @@ class PhraseMaker {
                 this.newNoteValue = String(value);
                 this.docById("wheelnav-_exitWheel-title-1").children[0].textContent =
                     this.newNoteValue;
-                this._updateTupletValue(this, noteToDivide, tupletValue, this.newNoteValue);
+                this._updateTupletValue(noteToDivide, tupletValue, this.newNoteValue);
             };
 
             this._menuWheel.navItems[3].navigateFunction = () => {
@@ -4116,7 +4116,7 @@ class PhraseMaker {
                     this.newNoteValue = String(parseInt(this.newNoteValue, 10) - 1);
                     this.docById("wheelnav-_exitWheel-title-1").children[0].textContent =
                         this.newNoteValue;
-                    this._updateTupletValue(this, noteToDivide, tupletValue, this.newNoteValue);
+                    this._updateTupletValue(noteToDivide, tupletValue, this.newNoteValue);
                 }
             };
 
