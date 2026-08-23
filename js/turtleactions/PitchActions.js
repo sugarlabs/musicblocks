@@ -127,7 +127,7 @@ function setupPitchActions(activity) {
                     10
                 );
             }
-            if (tur.singer.inverted) {
+            if (tur.singer.invertList.length > 0) {
                 // If the last note is inverted then inverting it
                 // again to get the original note
                 const delta_temp = Singer.calculateInvert(
@@ -613,12 +613,7 @@ function setupPitchActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = () => {
-                tur.singer.invertList.pop();
-                // Only clear `inverted` once no ancestor Invert block is still
-                // open — a nested Invert closing must not stomp on an outer one.
-                tur.singer.inverted = tur.singer.invertList.length > 0;
-            };
+            const __listener = () => tur.singer.invertList.pop();
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
