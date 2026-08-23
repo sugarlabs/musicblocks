@@ -615,7 +615,9 @@ function setupPitchActions(activity) {
 
             const __listener = () => {
                 tur.singer.invertList.pop();
-                tur.singer.inverted = false;
+                // Only clear `inverted` once no ancestor Invert block is still
+                // open — a nested Invert closing must not stomp on an outer one.
+                tur.singer.inverted = tur.singer.invertList.length > 0;
             };
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
