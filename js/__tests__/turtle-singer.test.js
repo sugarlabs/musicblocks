@@ -171,6 +171,187 @@ describe("Singer Class", () => {
     });
 });
 
+describe("Singer.playGlideBuffer", () => {
+    let activity;
+    let turtle;
+
+    beforeEach(() => {
+        turtle = {
+            singer: {
+                glideStartTime: 10,
+                glideBuffer: []
+            }
+        };
+        activity = {
+            stageDirty: false,
+            turtles: { ithTurtle: jest.fn().mockReturnValue(turtle) },
+            logo: { synth: { trigger: jest.fn() } }
+        };
+    });
+
+    test("preserves note order, offsets, effects, filters, and portamento", () => {
+        const effects = { doPortamento: true, portamento: 0.125 };
+        const filters = [{ filterFrequency: 440 }];
+        turtle.singer.glideBuffer = [
+            {
+                target: "piano",
+                note: "C4",
+                duration: 0.5,
+                time: 10,
+                future: 0,
+                paramsEffects: effects,
+                filters: filters
+            },
+            {
+                target: "piano",
+                note: "E4",
+                duration: 0.5,
+                time: 10.5,
+                future: 0,
+                paramsEffects: effects,
+                filters: filters
+            },
+            {
+                target: "piano",
+                note: "G4",
+                duration: 0.5,
+                time: 11,
+                future: 0.25,
+                paramsEffects: effects,
+                filters: filters
+            }
+        ];
+        turtle.singer.turtleTime = 11.5;
+
+        Singer.playGlideBuffer(activity, 3);
+
+        expect(activity.logo.synth.trigger).toHaveBeenNthCalledWith(
+            1,
+            3,
+            "C4",
+            1.5,
+            "piano",
+            effects,
+            filters,
+            false,
+            0
+        );
+        expect(activity.logo.synth.trigger).toHaveBeenNthCalledWith(
+            2,
+            3,
+            "E4",
+            0.5,
+            "piano",
+            effects,
+            filters,
+            true,
+            0.5
+        );
+        expect(activity.logo.synth.trigger).toHaveBeenNthCalledWith(
+            3,
+            3,
+            "G4",
+            0.5,
+            "piano",
+            effects,
+            filters,
+            true,
+            1.25
+        );
+        expect(turtle.singer.glideBuffer).toEqual([]);
+        expect(activity.stageDirty).toBe(true);
+    });
+
+    test("waits for the first attack before sending setNote pitch changes", async () => {
+        let resolveFirstTrigger;
+        const firstTrigger = new Promise(resolve => {
+            resolveFirstTrigger = resolve;
+        });
+        activity.logo.synth.trigger.mockImplementation((...args) => {
+            if (args[6] === false) return firstTrigger;
+            return undefined;
+        });
+        turtle.singer.glideBuffer = [
+            {
+                target: "piano",
+                note: "C4",
+                duration: 0.5,
+                time: 10,
+                future: 0,
+                paramsEffects: { doPortamento: true },
+                filters: null
+            },
+            {
+                target: "piano",
+                note: "E4",
+                duration: 0.5,
+                time: 10.5,
+                future: 0,
+                paramsEffects: { doPortamento: true },
+                filters: null
+            }
+        ];
+
+        const playback = Singer.playGlideBuffer(activity, 0);
+        await Promise.resolve();
+        expect(activity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+
+        resolveFirstTrigger();
+        await playback;
+        expect(activity.logo.synth.trigger).toHaveBeenCalledTimes(2);
+        expect(activity.logo.synth.trigger.mock.calls[1][6]).toBe(true);
+        expect(turtle.singer.glideBuffer).toEqual([]);
+    });
+
+    test("uses same real synth API for voice playback", () => {
+        turtle.singer.glideBuffer = [
+            {
+                target: "vocal",
+                note: "C4",
+                duration: 1,
+                time: 10,
+                future: 0,
+                paramsEffects: { doPortamento: true, portamento: 1 / 16 },
+                filters: null
+            }
+        ];
+
+        Singer.playGlideBuffer(activity, 2);
+
+        expect(activity.logo.synth.trigger).toHaveBeenCalledWith(
+            2,
+            "C4",
+            1,
+            "vocal",
+            { doPortamento: true, portamento: 1 / 16 },
+            null,
+            false,
+            0
+        );
+    });
+
+    test("resets the buffer when triggering throws", async () => {
+        activity.logo.synth.trigger.mockImplementation(() => {
+            throw new Error("synth failure");
+        });
+        turtle.singer.glideBuffer = [
+            {
+                target: "piano",
+                note: "C4",
+                duration: 1,
+                time: 10,
+                future: 0,
+                paramsEffects: null,
+                filters: null
+            }
+        ];
+
+        await expect(Singer.playGlideBuffer(activity, 0)).rejects.toThrow("synth failure");
+        expect(turtle.singer.glideBuffer).toEqual([]);
+        expect(activity.stageDirty).toBe(true);
+    });
+});
+
 describe("State initialization — note parameters", () => {
     let singer;
 
@@ -968,6 +1149,53 @@ describe("processNote regression behavior", () => {
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
         expect(callback).toHaveBeenCalledTimes(1);
         expect(singer.bpm).toEqual(beforeBpm);
+    });
+
+    test("buffers a glide note without waiting twice or dropping its audio event", () => {
+        global.parseNoteString = jest.fn().mockReturnValue(["C", 4]);
+        global.normalizeNoteAccidentals = jest.fn(note => note);
+        global.getOctaveRatio = jest.fn().mockReturnValue(2);
+        global.rationalToFraction = jest.fn().mockReturnValue([1, 1]);
+        global.MIN_HIGHLIGHT_DURATION_MS = 50;
+        Object.assign(activityMock.logo.synth, {
+            inTemperament: "equal",
+            changeInTemperament: false,
+            getFrequency: jest.fn().mockReturnValue([440]),
+            getCustomFrequency: jest.fn(),
+            startingPitch: "C4",
+            trigger: jest.fn(),
+            start: jest.fn()
+        });
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.logo.firstNoteAudioTime = null;
+        activityMock.blocks.visible = false;
+
+        Object.assign(turtleMock, {
+            blink: jest.fn(),
+            doWait: jest.fn()
+        });
+        Object.assign(singer, {
+            bpm: [120],
+            inGlide: true,
+            glideStartTime: 0,
+            inNoteBlock: [0],
+            whichNoteToCount: 1,
+            instrumentNames: ["piano"],
+            notePitches: { 0: ["C"] },
+            noteOctaves: { 0: [4] },
+            noteCents: { 0: [0] },
+            noteHertz: { 0: [0] },
+            noteDrums: { 0: [] },
+            oscList: { 0: [] }
+        });
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(activityMock.logo.synth.trigger).not.toHaveBeenCalled();
+        expect(singer.glideBuffer).toHaveLength(1);
+        expect(singer.glideBuffer[0].note).toBe("C4");
+        expect(singer.turtleTime).toBeGreaterThan(0);
+        expect(turtleMock.doWait).not.toHaveBeenCalled();
     });
 
     test("should NOT schedule unhighlight timer under current test conditions (diagnostic)", () => {
