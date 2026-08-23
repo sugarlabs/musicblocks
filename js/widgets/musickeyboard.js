@@ -791,8 +791,19 @@ function MusicKeyboard(activity) {
             this._stopOrCloseClicked = true;
             this.playingNow = false;
 
+            // Clear any active Web MIDI input handlers to prevent background notes & audio leaks
+            if (this.midiAccess && this.midiAccess.inputs) {
+                this.midiAccess.inputs.forEach(input => {
+                    input.onmidimessage = null;
+                });
+            }
+            this.midiON = false;
+
             selectedNotes = [];
-            docById("wheelDivptm").style.display = "none";
+            const wheelDiv = docById("wheelDivptm");
+            if (wheelDiv && wheelDiv.style) {
+                wheelDiv.style.display = "none";
+            }
             if (this._menuWheel) this._menuWheel.removeWheel();
             if (this._pitchWheel) this._pitchWheel.removeWheel();
             if (this._tabsWheel) this._tabsWheel.removeWheel();
@@ -3702,6 +3713,7 @@ function MusicKeyboard(activity) {
          * @memberof MusicKeyboard
          */
         const onMIDISuccess = midiAccess => {
+            this.midiAccess = midiAccess;
             // re-init widget
             if (this.midiON) {
                 this.midiButton.style.background = "#00FF00";
