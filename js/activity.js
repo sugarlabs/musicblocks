@@ -2008,7 +2008,7 @@ class Activity {
 
             if (addStartBlock) {
                 this.blocks.loadNewBlocks(DATAOBJS);
-                this._allClear(false);
+                this._allClear(false, true);
             } else if (!doNotSave) {
                 // Overwrite session data too.
                 this.saveLocally();
