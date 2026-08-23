@@ -1365,6 +1365,9 @@ function LegoWidget() {
      * @returns {void}
      */
     this._activateEyeDropper = function () {
+        // Clean up any existing listeners and tooltip to prevent duplicate event listener accumulation
+        this._deactivateEyeDropper();
+
         // Change cursor to crosshair for eye dropper mode
         if (this.imageDisplayArea) {
             this.imageDisplayArea.style.cursor = "crosshair";
