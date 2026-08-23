@@ -1994,8 +1994,6 @@ class Singer {
                     if (!tur.singer.suppressOutput) {
                         tur.doWait(Math.max(bpmFactor / duration - turtleLag, 0));
                     }
-                    // Clear the list when the last note is played.
-                    tur.singer.delayedNotes = [];
                 } else {
                     // Notes within Notes need to be played in the "future".
                     noteInNote = true;
@@ -2010,6 +2008,14 @@ class Singer {
                         }
                     }
                 }
+            }
+            // Clear the delayed-notes list once the outermost note in this group has
+            // finished, regardless of its own duration. The first note of a Tie pair
+            // has duration 0 (its time is deferred to the second tied note), but any
+            // nested notes it contained may still have pushed onto delayedNotes, and
+            // those entries must not leak into the next, unrelated note group.
+            if (tur.singer.inNoteBlock.length === 1) {
+                tur.singer.delayedNotes = [];
             }
             let forceSilence = false;
             if (tur.singer.skipFactor > 1) {
