@@ -486,6 +486,15 @@ class ToolbarUI {
         logoIcon.onclick = () => {
             onclick(this.activity);
         };
+
+        logoIcon.setAttribute("role", "button");
+        logoIcon.setAttribute("tabindex", "0");
+        logoIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                logoIcon.click();
+            }
+        });
     }
 
     /**
