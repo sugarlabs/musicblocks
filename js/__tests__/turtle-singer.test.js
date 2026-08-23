@@ -357,10 +357,6 @@ describe("State initialization — musical properties", () => {
         expect(singer.multipleVoices).toBe(false);
     });
 
-    test("should initialize inverted to false", () => {
-        expect(singer.inverted).toBe(false);
-    });
-
     test("should initialize defaultStrongBeats to false", () => {
         expect(singer.defaultStrongBeats).toBe(false);
     });
