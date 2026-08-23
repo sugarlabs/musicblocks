@@ -1222,7 +1222,8 @@ let closeBlkWidgets = name => {
         "rhythm maker": "rhythm maker",
         "oscilloscope": "oscilloscope",
         "temperament": "temperament",
-        "meter": "meter"
+        "meter": "meter",
+        "LEGO Bricks": "LEGO BRICKS"
     };
 
     for (const origKey in KEY_MAPPING) {
@@ -1245,7 +1246,11 @@ let closeBlkWidgets = name => {
     const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
         const titleEl = widgetTitle[i];
-        if (titleEl.innerHTML === name || titleEl.id === `${searchKey}WidgetID`) {
+        if (
+            titleEl.innerHTML === name ||
+            titleEl.innerHTML === searchKey ||
+            titleEl.id === `${searchKey}WidgetID`
+        ) {
             const winKey =
                 titleEl.id && typeof titleEl.id === "string"
                     ? titleEl.id.replace("WidgetID", "")
