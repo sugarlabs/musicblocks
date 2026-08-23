@@ -78,7 +78,7 @@ var fileExt = file => {
         return "";
     }
 
-    return parts.pop();
+    return parts.pop().toLowerCase();
 };
 
 /**

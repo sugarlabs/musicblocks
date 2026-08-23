@@ -158,6 +158,11 @@ describe("download", () => {
         expect(mockDownloadURL).toHaveBeenCalledWith("My Project.xml", "data");
     });
 
+    it("should not append an extension when its case differs", () => {
+        instance.download("html", "data", "lesson.HTML");
+        expect(mockDownloadURL).toHaveBeenCalledWith("lesson.HTML", "data");
+    });
+
     it("should handle null data safely in download", () => {
         const other = new SaveInterface({
             PlanetInterface: { getCurrentProjectName: () => "Test" }
