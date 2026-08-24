@@ -380,6 +380,15 @@ describe("Toolbar Class", () => {
         expect(messageElement.id).toBe("confirmation-message");
         expect(confirmButton.textContent).toBe("Confirm");
         expect(confirmButton.id).toBe("new-project");
+        expect(confirmButton.getAttribute("role")).toBe("button");
+        expect(confirmButton.getAttribute("aria-label")).toBe("Confirm");
+        expect(confirmButton.getAttribute("aria-describedby")).toBe("confirmation-message");
+
+        const cancelButton = buttonListItem.children[1];
+        expect(cancelButton.textContent).toBe("Cancel");
+        expect(cancelButton.getAttribute("role")).toBe("button");
+        expect(cancelButton.getAttribute("aria-label")).toBe("Cancel");
+        expect(cancelButton.getAttribute("aria-describedby")).toBe("confirmation-message");
 
         confirmButton.onclick();
 
