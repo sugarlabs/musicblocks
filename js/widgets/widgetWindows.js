@@ -24,6 +24,80 @@ window.widgetWindows = {
     draggingWindow: null,
     _shortcutsInitialized: false,
     _globalListenersInitialized: false,
+
+    // NOTE: This mapping only works for widgets that never set their own
+    // `blockNo` property (e.g. ModeWidget). window.widgetWindows.windowFor()
+    // keys a widget's window by `widget.blockNo` if that property is set to
+    // anything other than undefined (including null) — otherwise it falls
+    // back to the `saveAs` or `title` argument. Widgets like PhraseMaker set
+    // `this.blockNo` in their constructor, so they are keyed by blockNo, not
+    // by name, and will NOT be found via this KEY_MAPPING lookup. Adding such
+    // widgets here would silently do nothing. Before adding a new entry,
+    // verify the target widget's windowFor() call and confirm it does not
+    // rely on blockNo for its window key.
+    KEY_MAPPING: {
+        "pitch-drum mapper": "pitch drum",
+        "custom mode": "custom mode",
+        "tempo": "tempo",
+        "arpeggio": "arpeggio",
+        "timbre": "timbre",
+        "sampler": "sampler",
+        "rhythm maker": "rhythm maker",
+        "oscilloscope": "oscilloscope",
+        "temperament": "temperament",
+        "meter": "meter",
+        "LEGO Bricks": "LEGO BRICKS"
+    },
+
+    /**
+     * Closes a specific widget by its name.
+     *
+     * @param {string} name - The name of the widget to be closed.
+     * @returns {void}
+     */
+    closeBlkWidgets(name) {
+        let searchKey = name;
+
+        for (const origKey in window.widgetWindows.KEY_MAPPING) {
+            const translated = typeof _ === "function" ? _(origKey) : origKey;
+            if (name === translated) {
+                searchKey = window.widgetWindows.KEY_MAPPING[origKey];
+                break;
+            }
+        }
+
+        if (
+            window.widgetWindows &&
+            window.widgetWindows.openWindows &&
+            window.widgetWindows.openWindows[searchKey]
+        ) {
+            window.widgetWindows.closeWindow(searchKey);
+            return;
+        }
+
+        const widgetTitle = document.getElementsByClassName("wftTitle");
+        for (let i = 0; i < widgetTitle.length; i++) {
+            const titleEl = widgetTitle[i];
+            if (
+                titleEl.innerHTML === name ||
+                titleEl.innerHTML === searchKey ||
+                titleEl.id === `${searchKey}WidgetID`
+            ) {
+                const winKey =
+                    titleEl.id && typeof titleEl.id === "string"
+                        ? titleEl.id.replace("WidgetID", "")
+                        : searchKey;
+                if (
+                    window.widgetWindows &&
+                    typeof window.widgetWindows.closeWindow === "function"
+                ) {
+                    window.widgetWindows.closeWindow(winKey);
+                }
+                break;
+            }
+        }
+    },
+
     _handleGlobalKeyDown(e) {
         const focused = window.widgetWindows.focused;
         if (!focused || e.repeat) return; // Guard against no focus or rapid-fire repeat
