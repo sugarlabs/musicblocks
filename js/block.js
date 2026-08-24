@@ -3160,9 +3160,11 @@ class Block {
 
                         setTimeout(() => {
                             that.activity.logo.runLogoCommands(topBlock);
+                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                         }, 250);
                     } else {
                         that.activity.logo.runLogoCommands(topBlock);
+                        that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                     }
 
                     return;
@@ -3216,9 +3218,11 @@ class Block {
 
                             setTimeout(() => {
                                 that.activity.logo.runLogoCommands(topBlk);
+                                that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                             }, 250);
                         } else {
                             that.activity.logo.runLogoCommands(topBlk);
+                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                         }
                     }
                 }
@@ -3234,9 +3238,11 @@ class Block {
 
                         setTimeout(() => {
                             that.activity.logo.runLogoCommands(topBlk);
+                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                         }, 250);
                     } else {
                         that.activity.logo.runLogoCommands(topBlk);
+                        that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                     }
                 }
             }
