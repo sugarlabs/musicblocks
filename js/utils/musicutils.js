@@ -79,7 +79,9 @@ const _b64Cache = new Map();
  */
 function normalizeNoteAccidentals(note) {
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
-    return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+    // Strip microtonal ^ / v prefixes (temperament widget cents display)
+    // so the base note can be resolved, e.g. "^C" → "C", "vvD♭" → "D♭".
+    return note.replace(/^[v^]+/, "").replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 }
 
 /**
@@ -3966,11 +3968,9 @@ const frequencyToPitch = (hz, temperament) => {
  *     or the full string unchanged if no recognised prefix is found.
  */
 const getArticulation = note => {
-    // Match solfege names (longest first to avoid "sol" being shadowed by
-    // a later "la" replacement) or a single letter note name, anchored at
-    // the very start of the string.  Everything after the prefix is the
-    // articulation we want.
-    const match = note.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
+    // Strip microtonal ^ / v prefixes before matching so "^C" etc. resolve.
+    const stripped = note.replace(/^[v^]+/, "");
+    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
     return match ? match[1] : note;
 };
 

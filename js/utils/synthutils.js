@@ -1870,17 +1870,17 @@ function Synth() {
                 notes = this._getFrequency(notes, this.changeInTemperament);
                 if (notes === undefined) {
                     if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
-                        notes =
-                            notes1.substring(0, 1) +
-                            "" +
-                            "bb" +
-                            notes1.substring(notes1.length - 1, notes1.length);
+                        notes = notes1.substring(0, 1) + "bb" + notes1.substring(notes1.length - 1);
                     } else if (notes1.substring(1, notes1.length - 1) === DOUBLESHARP) {
-                        notes =
-                            notes1.substring(0, 1) +
-                            "" +
-                            "x" +
-                            notes1.substring(notes1.length - 1, notes1.length);
+                        notes = notes1.substring(0, 1) + "x" + notes1.substring(notes1.length - 1);
+                    } else if (
+                        typeof notes1 === "string" &&
+                        (notes1.includes("^") || notes1.includes("v"))
+                    ) {
+                        // Microtonal prefix from temperament widget — strip and
+                        // re-resolve as base note so Tone.js receives a valid name.
+                        const base = notes1.replace(/^(\^+|v+)/, "");
+                        notes = this._getFrequency(base, this.changeInTemperament) ?? base;
                     } else {
                         notes = notes1;
                     }

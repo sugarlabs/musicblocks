@@ -79,11 +79,8 @@ function setupIntervalsActions(activity) {
          * @returns {Number}
          */
         static getTemperamentLength() {
-            const currentTemperament = activity.logo.synth.inTemperament;
-            if (!currentTemperament) {
-                return 12; // Default fallback for tests/uninitialized state
-            }
-            return TEMPERAMENT[currentTemperament]["pitchNumber"];
+            const t = TEMPERAMENT[activity.logo.synth.inTemperament];
+            return t?.pitchNumber ?? 12;
         }
 
         /**
