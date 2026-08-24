@@ -114,6 +114,22 @@ describe("ToolbarController.runFast", () => {
         expect(activity.logo.runLogoCommands).toHaveBeenCalledWith(null, env);
         jest.useRealTimers();
     });
+
+    test("clears the canvas before the delayed restart when currentDelay is 0", () => {
+        jest.useFakeTimers();
+        const painter = { doClear: jest.fn() };
+        activity.turtles.turtleList = [{ painter }];
+        activity.turtles.running.mockReturnValue(true);
+        controller.runFast({ run: true }, 0);
+
+        // Stop no longer wipes the canvas, so the restart has to do it itself.
+        expect(painter.doClear).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(500);
+
+        expect(painter.doClear).toHaveBeenCalledWith(true, true, true);
+        jest.useRealTimers();
+    });
 });
 
 describe("ToolbarController.runSlow", () => {

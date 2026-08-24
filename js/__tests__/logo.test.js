@@ -969,6 +969,15 @@ describe("Logo doStopTurtles", () => {
         expect(logo.safePluginExecute).toHaveBeenNthCalledWith(2, "code-second", logo);
     });
 
+    test("preserves the drawing on explicit Stop (#8154 follow-up)", () => {
+        logo.doStopTurtles();
+
+        // Stopping a run must not wipe the canvas: the artwork drawn so far
+        // stays on screen, and the next Run clears it via
+        // ToolbarController._clearAllTurtles().
+        expect(turtle.painter.doClear).not.toHaveBeenCalled();
+    });
+
     test("clears delayTimeout for turtles with a pending timer", () => {
         const TIMER_ID = 456;
         const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => {});
