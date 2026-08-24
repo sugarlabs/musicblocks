@@ -21,34 +21,26 @@
  * Integration test for the Logo interpreter's argument-evaluation/dispatch path
  * (`runFromBlockNow`/`parseArg`, js/logo.js) driving the real
  * `Singer.ToneActions.setTimbre` (js/turtleactions/ToneActions.js) - extending the pattern
- * `noteclamp-beat-doublequeue.test.js` (drum dispatch), `pitch-note-dispatch-integration.test.js`
- * (pitch dispatch), and `meter-signature-dispatch-integration.test.js` (meter dispatch) already
- * use.
+ * `noteclamp-beat-doublequeue.test.js`, `pitch-note-dispatch-integration.test.js`, and
+ * `meter-signature-dispatch-integration.test.js` already use.
  *
- * Scope: this covers the Logo-dispatch <-> ToneActions seam, not SetTimbreBlock's own palette
- * registration (that is already covered, with setTimbre mocked, by
- * js/blocks/__tests__/ToneBlocks.test.js). `Logo.runFromBlockNow` and `setTimbre` run for real
- * and unmocked - the "settimbre" block below is a minimal stand-in shaped like the real block
- * (js/blocks/ToneBlocks.js, SetTimbreBlock.flow), not obtained from a live registered
- * protoblock, for the same reason given in meter-signature-dispatch-integration.test.js: the
- * concrete FlowClampBlock class it extends (js/protoblocks.js) only exists as a bare global in
- * the production script-concatenation build, so reaching it from Jest would mean either
- * evaluating protoblocks.js's source at runtime or driving the full canvas/DOM-heavy
- * Blocks.makeBlock/Block path (js/blocks.js, js/block.js), both disproportionate to this one
- * behavior. Consequently, a regression in SetTimbreBlock.flow itself would not fail this test; a
- * regression in setTimbre or in the Logo dispatch/argument-evaluation machinery around it would
- * (verified by deliberately breaking each and confirming the test fails).
+ * Scope: the Logo-dispatch <-> ToneActions seam only, not SetTimbreBlock's own palette
+ * registration (already covered, with setTimbre mocked, by js/blocks/__tests__/ToneBlocks.test.js).
+ * `Logo.runFromBlockNow` and `setTimbre` run for real; the "settimbre" block below is a minimal
+ * stand-in copied from SetTimbreBlock.flow (js/blocks/ToneBlocks.js), not a live protoblock - see
+ * meter-signature-dispatch-integration.test.js for why (protoblocks.js/blocks.js are
+ * DOM/canvas-heavy and disproportionate to this one behavior). LIMITATION: because the flow body
+ * is copied rather than exercised from the real block class, a regression in
+ * SetTimbreBlock.flow itself (as opposed to setTimbre or the Logo dispatch machinery around it)
+ * would not be caught here - see the inline comment at the copy site below.
  *
- * Unlike setMeter (a synchronous write with no clamp), setTimbre is a clamp-body action: it
- * pushes the resolved synth onto tur.singer.instrumentNames *before* the clamp's contained
- * blocks run, registers an end-of-clamp listener via the real `setDispatchBlock`/
- * `setTurtleListener`, and only pops instrumentNames back off once the real Logo interpreter
- * fires that listener at the clamp's "hidden" block - the same push-before/pop-after dispatch
- * shape doVibrato/doChorus/doPhaser/doTremolo/doDistortion/doHarmonic share in ToneActions.js.
- * That push/pop pair, observed from a block placed *inside* the clamp (proving it runs between
- * the real push and the real pop, driven only by the real interpreter reaching the clamp's end)
- * rather than by calling setTimbre directly, is the deterministic, timing-independent observable
- * this test asserts on - no Tone.js audio scheduling or playback is involved or awaited.
+ * Unlike setMeter (a synchronous write, no clamp), setTimbre is a clamp-body action: it pushes
+ * the resolved synth onto tur.singer.instrumentNames and sets tur.inSetTimbre *before* the
+ * clamp's contained blocks run, and only pops/resets them once the real interpreter fires the
+ * end-of-clamp listener at the clamp's "hidden" block (the same shape doVibrato/doChorus/
+ * doPhaser/doTremolo/doDistortion/doHarmonic share). A "probe" block placed *inside* the clamp
+ * snapshots that state mid-lifecycle - the deterministic, timing-independent observable this test
+ * asserts on; no Tone.js scheduling or playback is involved or awaited.
  */
 
 // Setup global mocks BEFORE requiring the module (mirror of meter-signature-dispatch-integration.test.js).
@@ -57,16 +49,15 @@ global.Notation = jest.fn().mockImplementation(() => ({}));
 global.Synth = jest.fn().mockImplementation(() => ({}));
 global.Singer = {};
 global.last = arr => arr[arr.length - 1];
-global.NOINPUTERRORMSG = "You need to provide a value.";
 global.VOICENAMES = {
     Piano: ["piano", "grand-piano"]
 };
 global.CUSTOMSAMPLES = {};
 global.DEFAULTVOICE = "default-voice";
-global.MusicBlocks = { isRun: false };
-global.Mouse = {
-    getMouseFromTurtle: jest.fn(() => ({ MB: { listeners: [] } }))
-};
+
+// setTimbre's fallback dispatch path (via a global MusicBlocks/Mouse, used only when blk isn't a
+// registered block) is unreachable here: blk 0 is always present in activity.blocks.blockList
+// below, so MusicBlocks/Mouse are intentionally left undefined rather than mocked unused.
 
 jest.mock("tone", () => ({
     UserMedia: jest.fn().mockImplementation(() => ({
@@ -186,11 +177,10 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
         // hidden (3):     connections [prev, null] (end of clamp) - reaching this block is what
         //                 fires setTimbre's real dispatch listener.
         const hidden = makeFlowBlock("hidden", [0, null], null);
-        const probe = makeFlowBlock("probe", [0, null], (args, l, t) => {
+        const probe = makeFlowBlock("probe", [0, null], () => {
             probeCallCount++;
-            const tur = activity.turtles.ithTurtle(t);
-            instrumentNamesDuringClamp = [...tur.singer.instrumentNames];
-            inSetTimbreDuringClamp = tur.inSetTimbre;
+            instrumentNamesDuringClamp = [...turtle.singer.instrumentNames];
+            inSetTimbreDuringClamp = turtle.inSetTimbre;
             return null;
         });
         const settimbre = makeFlowBlock(
@@ -199,7 +189,11 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
             (args, l, t, blk) => {
                 // Copied verbatim from SetTimbreBlock.flow (js/blocks/ToneBlocks.js), minus the
                 // inRhythmRuler/inSample branches - see the file-level comment above for why this
-                // isn't a live protoblock.
+                // isn't a live protoblock. LIMITATION: because it's a copy, a regression in the
+                // real SetTimbreBlock.flow (e.g. a bad edit to this branching) would not fail
+                // this test - only ToneBlocks.test.js (mocked setTimbre) guards that class
+                // directly. activity.errorMsg is intentionally left unmocked below: neither test
+                // input ("piano"/"kazoo") is null, so this branch never runs.
                 if (args[0] === null) {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
                 } else {
@@ -250,8 +244,16 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
 
         logo.runFromBlockNow(logo, 0, 0, 1, null);
 
+        expect(probeCallCount).toBe(1);
+
+        // Same push-before/pop-after clamp lifecycle as the known-voice case above, just with
+        // "kazoo" falling through VOICENAMES unresolved to become its own synth name.
         expect(instrumentNamesDuringClamp).toEqual(["kazoo"]);
+        expect(inSetTimbreDuringClamp).toBe(true);
+
         expect(turtle.singer.instrumentNames).toEqual([]);
+        expect(turtle.inSetTimbre).toBe(false);
+
         expect(logo.synth.loadSynth).toHaveBeenCalledWith(0, "kazoo");
     });
 });
