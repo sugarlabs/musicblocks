@@ -9,17 +9,13 @@ reviews:
         drafts: false
     sequence_diagrams: true
     path_filters:
-        # Exclude third-party libraries and dependencies
         - "!**/node_modules/**"
         - "!**/bower_components/**"
         - "!**/lib/**"
-        # Exclude build output and testing directories
         - "!**/dist/**"
         - "!**/coverage/**"
-        # Exclude translation/localization files
         - "!**/po/**"
         - "!**/locales/**"
-        # Exclude assets, fonts, sounds, and media
         - "!**/sounds/**"
         - "!**/images/**"
         - "!**/screenshots/**"
@@ -30,13 +26,16 @@ reviews:
         - "!**/*.mp4"
         - "!**/*.webm"
         - "!**/*.ico"
-        # Exclude lock files
         - "!package-lock.json"
     custom_checks:
+
+        # Check if PR description matches the code changes
         - name: "PR Description Mismatch"
           mode: "warning"
           instructions: |
               Pass/fail criteria: The PR description must accurately match and describe the actual code changes introduced in the pull request. If there is a clear mismatch or the description is unrelated to the changes, fail and flag the mismatch.
+        
+        # Check for PR with multiple issues tagged
         - name: "Unrelated Multiple Issues Linked"
           mode: "warning"
           instructions: |
