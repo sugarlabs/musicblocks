@@ -111,7 +111,6 @@ const {
     format,
     delayExecution,
     closeWidgets,
-    closeBlkWidgets,
     resolveObject,
     importMembers,
     changeImage,
@@ -542,67 +541,6 @@ describe("Utility Functions (logic-only)", () => {
         it("does not throw when openWindows is empty", () => {
             window.widgetWindows.openWindows = {};
             expect(() => closeWidgets()).not.toThrow();
-        });
-    });
-    describe("closeBlkWidgets()", () => {
-        beforeEach(() => {
-            window.widgetWindows = {
-                hideAllWindows: jest.fn(),
-                hideWindow: jest.fn(),
-                closeWindow: jest.fn(),
-                openWindows: {}
-            };
-        });
-
-        it("closes matching widget by name", () => {
-            const mockElement = { innerHTML: "TestWidget" };
-
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
-
-            closeBlkWidgets("TestWidget");
-
-            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("TestWidget");
-        });
-
-        it("closes widget directly using key lookup from openWindows", () => {
-            window.widgetWindows.openWindows = {
-                "custom mode": { close: jest.fn() }
-            };
-
-            closeBlkWidgets("custom mode");
-
-            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
-        });
-
-        it("closes widget using mapped key", () => {
-            window.widgetWindows.openWindows = {
-                "pitch drum": { close: jest.fn() }
-            };
-
-            closeBlkWidgets("pitch-drum mapper");
-
-            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
-        });
-
-        it("closes widget by matching element ID when display title changes", () => {
-            const mockElement = {
-                innerHTML: "C MAJOR",
-                id: "custom modeWidgetID"
-            };
-
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
-
-            closeBlkWidgets("custom mode");
-
-            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
-        });
-
-        it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [{ innerHTML: "OtherWidget" }]);
-
-            closeBlkWidgets("TestWidget");
-
-            expect(window.widgetWindows.closeWindow).not.toHaveBeenCalled();
         });
     });
     describe("resolveObject()", () => {

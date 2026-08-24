@@ -19,7 +19,7 @@
     DEFAULTVOICE, NATURAL, NUMBERBLOCKDEFAULT,
     STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
     WESTERN2EISOLFEGENAMES, addTemperamentToDictionary,
-   Block, closeBlkWidgets, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
+   Block, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
@@ -52,7 +52,7 @@
    - js/utils/mathutils.js
         MathUtility
    - js/utils/utils.js
-        _, last, closeBlkWidgets, mixedNumber, prepareMacroExports,
+        _, last, mixedNumber, prepareMacroExports,
         getTextWidth, delayExecution, deepClone
    - js/utils/musicutils.js
         addTemperamentToDictionary,
@@ -6744,7 +6744,9 @@ class Blocks {
                 const title = this.blockList[blk].protoblock.staticLabels
                     ? this.blockList[blk].protoblock.staticLabels[0]
                     : this.blockList[blk].name;
-                if (title) closeBlkWidgets(_(title));
+                if (title && window.widgetWindows && window.widgetWindows.closeBlkWidgets) {
+                    window.widgetWindows.closeBlkWidgets(_(title));
+                }
                 this.activity.refreshCanvas();
             }
 

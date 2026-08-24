@@ -94,8 +94,8 @@ imported in `js/activity.js`.
     }
     ```
 
-6. **Map the widget in `utils.js` for cleanup**
-   To ensure your widget window automatically closes when its parent block is trashed, you must register its name in the `KEY_MAPPING` object inside the `closeBlkWidgets` function in `js/utils/utils.js`.
+6. **Map the widget in `widgetWindows.js` for cleanup**
+   To ensure your widget window automatically closes when its parent block is trashed, you must register its name in the `KEY_MAPPING` object inside `js/widgets/widgetWindows.js`.
 
     ```javascript
     const KEY_MAPPING = {
