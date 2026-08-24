@@ -25,7 +25,9 @@ function TunerDisplay(canvas, width, height) {
         padding: "4px",
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
     });
-    canvas.parentElement.appendChild(this.modeContainer);
+    if (canvas && canvas.parentElement) {
+        canvas.parentElement.appendChild(this.modeContainer);
+    }
 
     // Create mode buttons wrapper
     const buttonsWrapper = document.createElement("div");
@@ -99,16 +101,41 @@ function TunerDisplay(canvas, width, height) {
  * Updates the styles of mode toggle buttons based on current mode
  */
 TunerDisplay.prototype.updateButtonStyles = function () {
+    const chromaticImg =
+        this.chromaticButton && this.chromaticButton.querySelector
+            ? this.chromaticButton.querySelector("img")
+            : null;
+    const targetImg =
+        this.targetPitchButton && this.targetPitchButton.querySelector
+            ? this.targetPitchButton.querySelector("img")
+            : null;
+
     if (this.chromaticMode) {
-        this.chromaticButton.style.backgroundColor = platformColor.selectorBackground;
-        this.chromaticButton.querySelector("img").style.filter = "brightness(0) invert(1)";
-        this.targetPitchButton.style.backgroundColor = "transparent";
-        this.targetPitchButton.querySelector("img").style.filter = "none";
+        if (this.chromaticButton && this.chromaticButton.style) {
+            this.chromaticButton.style.backgroundColor = platformColor.selectorBackground;
+        }
+        if (chromaticImg && chromaticImg.style) {
+            chromaticImg.style.filter = "brightness(0) invert(1)";
+        }
+        if (this.targetPitchButton && this.targetPitchButton.style) {
+            this.targetPitchButton.style.backgroundColor = "transparent";
+        }
+        if (targetImg && targetImg.style) {
+            targetImg.style.filter = "none";
+        }
     } else {
-        this.targetPitchButton.style.backgroundColor = platformColor.selectorBackground;
-        this.targetPitchButton.querySelector("img").style.filter = "brightness(0) invert(1)";
-        this.chromaticButton.style.backgroundColor = "transparent";
-        this.chromaticButton.querySelector("img").style.filter = "none";
+        if (this.targetPitchButton && this.targetPitchButton.style) {
+            this.targetPitchButton.style.backgroundColor = platformColor.selectorBackground;
+        }
+        if (targetImg && targetImg.style) {
+            targetImg.style.filter = "brightness(0) invert(1)";
+        }
+        if (this.chromaticButton && this.chromaticButton.style) {
+            this.chromaticButton.style.backgroundColor = "transparent";
+        }
+        if (chromaticImg && chromaticImg.style) {
+            chromaticImg.style.filter = "none";
+        }
     }
 };
 
@@ -188,7 +215,17 @@ const TunerUtils = {
         const A4 = 440;
         const C0 = A4 * Math.pow(2, -4.75);
         const currentEDO = edo || 12;
-        const noteNames = generateNoteNames(currentEDO);
+        let noteNames;
+        if (typeof generateNoteNames === "function") {
+            noteNames = generateNoteNames(currentEDO);
+        } else if (
+            typeof window !== "undefined" &&
+            typeof window.generateNoteNames === "function"
+        ) {
+            noteNames = window.generateNoteNames(currentEDO);
+        } else {
+            noteNames = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+        }
 
         if (frequency < C0) {
             return ["C", 0, C0];
@@ -199,7 +236,7 @@ const TunerUtils = {
         const steppedN = ((h % currentEDO) + currentEDO) % currentEDO;
         const cents = Math.round(1200 * Math.log2(frequency / (C0 * Math.pow(2, h / currentEDO))));
 
-        return [noteNames[steppedN], cents, frequency];
+        return [noteNames[steppedN % noteNames.length], cents, frequency];
     },
 
     /**

@@ -648,5 +648,39 @@ describe("Tuner Widget", () => {
                 expect(updateSpy).toHaveBeenCalled();
             });
         });
+
+        describe("Safety & Fallbacks", () => {
+            test("frequencyToPitch falls back to standard note names when generateNoteNames is undefined", () => {
+                const savedGen = global.generateNoteNames;
+                delete global.generateNoteNames;
+                try {
+                    const pitchInfo = TunerUtils.frequencyToPitch(440, 12);
+                    expect(pitchInfo[0]).toBe("A");
+                    expect(pitchInfo[2]).toBe(440);
+                } finally {
+                    global.generateNoteNames = savedGen;
+                }
+            });
+
+            test("updateButtonStyles handles missing img or button element safely without throwing", () => {
+                const mockCanvas = document.createElement("canvas");
+                mockCanvas.parentElement = { appendChild: jest.fn() };
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.chromaticButton = {
+                    querySelector: jest.fn().mockReturnValue(null),
+                    style: {}
+                };
+                display.targetPitchButton = {
+                    querySelector: jest.fn().mockReturnValue(null),
+                    style: {}
+                };
+
+                expect(() => display.updateButtonStyles()).not.toThrow();
+
+                display.chromaticMode = false;
+                expect(() => display.updateButtonStyles()).not.toThrow();
+            });
+        });
     });
 });
