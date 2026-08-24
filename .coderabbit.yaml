@@ -1,13 +1,20 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 language: "en-US"
+
 reviews:
     profile: "chill"
     high_level_summary: true
     collapse_walkthrough: false
+    request_changes_workflow: false
+    review_status: true
+    sequence_diagrams: true
+
     auto_review:
         enabled: true
         drafts: false
-    sequence_diagrams: true
+        base_branches:
+            - "master"
+
     path_filters:
         - "!**/node_modules/**"
         - "!**/bower_components/**"
@@ -25,20 +32,84 @@ reviews:
         - "!**/*.jpeg"
         - "!**/*.mp4"
         - "!**/*.webm"
-        - "!**/*.ico"
         - "!package-lock.json"
-    custom_checks:
 
-        # Check if PR description matches the code changes
-        - name: "PR Description Mismatch"
-          mode: "warning"
+    path_instructions:
+        - path: "js/**/*.js"
           instructions: |
-              Pass/fail criteria: The PR description must accurately match and describe the actual code changes introduced in the pull request. If there is a clear mismatch or the description is unrelated to the changes, fail and flag the mismatch.
-        
-        # Check for PR with multiple issues tagged
-        - name: "Unrelated Multiple Issues Linked"
-          mode: "warning"
+              Focus on correctness and reliability over style:
+              - Async flow & scheduling: Ensure Tone.js scheduling, promises, and callbacks do not race or deadlock.
+              - Cleanup: Verify event listeners and timers are properly cleaned up to prevent memory leaks across play/stop cycles.
+              - State safety: Guard against unsafe mutations to shared global/singleton state (globalActivity, Blocks, Turtles, Singer).
+              - Security: Prefer textContent or escapeHTML() for DOM insertions over un-sanitized innerHTML.
+
+        - path: "js/**/__tests__/**/*.js"
           instructions: |
-              Pass/fail criteria: If the pull request references/links to more than one issue, verify whether those issues are closely related to each other. If the linked issues are unrelated, suggest splitting the PR into separate pull requests for each individual issue.
+              Focus on test quality:
+              - Assertions must verify observable outcomes, not just function execution without throwing.
+              - Ensure mocks reflect realistic return structures.
+              - Flag missing edge-case coverage for empty inputs, boundary values, and error paths.
+
+        - path: "cypress/**/*.js"
+          instructions: |
+              Focus on E2E stability:
+              - Ensure DOM selectors are resilient to minor structural changes.
+              - Flag fixed timing waits (e.g., cy.wait(ms)) in favor of dynamic assertions or cy.intercept.
+
+        - path: ".github/workflows/**/*.{yml,yaml}"
+          instructions: |
+              Focus on workflow security and correctness:
+              - Quote shell variables to prevent word splitting and injection.
+              - Ensure secrets are never echoed to logs.
+              - Prefer SHA-pinned or specific version tags for GitHub Actions.
+              - Check workflow scripts for portability issues across different environments and line-ending formats.
+
+    pre_merge_checks:
+        title:
+            mode: "warning"
+            requirements: "Title must follow Conventional Commits format with a valid lowercase type and no trailing period."
+
+        description:
+            mode: "warning"
+            requirements: "Description must follow the repository's PR template and include the required sections."
+
+        custom_checks:
+            - name: "Issue Implementation Alignment"
+              mode: "warning"
+              instructions: |
+                  Pass: Code changes fulfill the linked issue's core requirements and align with the PR description.
+                  Fail: Key issue requirements are omitted or major unrelated functional changes are introduced.
+                  Inconclusive: No issue is linked or the issue description lacks sufficient detail.
+
+            - name: "PR Description vs Code Changes"
+              mode: "warning"
+              instructions: |
+                  Pass: The PR description accurately reflects the code changes in the diff.
+                  Fail: The description contradicts the diff or leaves core functional changes unexplained.
+                  Inconclusive: The description is brief but not inaccurate.
+
+            - name: "Multiple Issues Linked"
+              mode: "warning"
+              instructions: |
+                  Pass: The PR references multiple closely related issues fixed together.
+                  Fail: The PR references multiple functionally unrelated issues that should be split into separate PRs.
+                  Inconclusive: Only one issue or no issue is linked.
+
+    tools:
+        eslint:
+            enabled: true
+        markdownlint:
+            enabled: true
+        yamllint:
+            enabled: true
+        actionlint:
+            enabled: true
+        gitleaks:
+            enabled: true
+        github-checks:
+            enabled: true
+        semgrep:
+            enabled: true
+
 chat:
     auto_reply: true
