@@ -3539,7 +3539,7 @@ const piemenuModes = (block, selectedMode) => {
         clickModeRotate: false,
         selectionPaths: true
     });
-    block._exitWheel.initWheel(["×", "▶"]); // imgsrc:header-icons/play-button.svg']);
+    block._exitWheel.initWheel(["×", "▶"]);
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
@@ -3619,10 +3619,7 @@ const piemenuModes = (block, selectedMode) => {
 
         that._modeNameWheel.colors = colors;
         that._modeNameWheel.titleRotateAngle = 0;
-        const labels = new Array();
-        for (let i = 0; i < modes.length; i++) {
-            labels.push(getModeLabel(modes[i]));
-        }
+        const labels = modes.map(getModeLabel);
 
         that._modeNameWheel.animatetime = 0;
         if (newWheel) {
@@ -3805,26 +3802,16 @@ const piemenuModes = (block, selectedMode) => {
         that._modeWheel.navItems[i].navigateFunction = __playNote;
     }
 
-    // navigate to a specific starting point
-    let foundMode = false;
+    // Navigate to a specific starting point.
     let matchedGroup = "";
     for (const group in MODE_PIE_MENUS) {
-        let j;
-        for (j = 0; j < MODE_PIE_MENUS[group].length; j++) {
-            const modename = MODE_PIE_MENUS[group][j];
-            if (modename === selectedMode) {
-                break;
-            }
-        }
-
-        if (j < MODE_PIE_MENUS[group].length) {
-            foundMode = true;
+        if (MODE_PIE_MENUS[group].includes(selectedMode)) {
             matchedGroup = group;
             break;
         }
     }
 
-    if (!foundMode && savedCustomModes.some(m => m.name === selectedMode)) {
+    if (matchedGroup === "" && savedCustomModes.some(m => m.name === selectedMode)) {
         matchedGroup = "custom";
     }
 

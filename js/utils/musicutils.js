@@ -3788,6 +3788,35 @@ const isCustomTemperament = temperament => {
 };
 
 /**
+ * Detect whether a temperament carries usable per-pitch ratio data.
+ *
+ * Two storage formats exist:
+ *  - EDO/derived temperaments expose a `ratios` array.
+ *  - The temperament editor saves custom temperaments with per-pitch numeric
+ *    keys such as `"0": [ratio, note, octave]` (and no `ratios` array).
+ *
+ * The scalar-step code previously only checked the `ratios` array, so
+ * editor-saved custom temperaments (which hold the ratios in numeric keys)
+ * were wrongly treated as "no ratios" and stepped by a raw offset instead of
+ * following the mode pattern. That produced degenerate playback for custom
+ * EDO temperaments with a saved mode.
+ * @function
+ * @param {string} temperament - The temperament key.
+ * @returns {boolean} True if per-pitch ratio data is available.
+ */
+const temperamentHasRatios = temperament => {
+    const t = getTemperament(temperament);
+    if (!t || typeof t !== "object") {
+        return false;
+    }
+    if (Array.isArray(t.ratios) && t.ratios.length > 0) {
+        return true;
+    }
+    // Editor-saved custom temperaments store ratios in numeric pitch keys.
+    return Boolean(t["0"] && Array.isArray(t["0"]) && typeof t["0"][0] === "number");
+};
+
+/**
  * Check if a temperament is a true equal division of the octave (EDO).
  * True EDOs have uniform step sizes; non-equal temperaments (JI, meantone,
  * Pythagorean) have unequal intervals despite having a pitch count.
@@ -3800,6 +3829,47 @@ const isTrueEDO = temperament => {
         return false;
     }
     return temperament.startsWith("equal");
+};
+
+/**
+ * Detect whether a temperament is an equal division of the octave regardless of
+ * how it was registered. Unlike `isTrueEDO` (which only matches names starting
+ * with "equal") this also catches user-defined equal temperaments that the
+ * temperament editor saved under arbitrary keys such as "custom" or "custom1".
+ *
+ * A temperament is treated as equally tempered when:
+ *  - it explicitly flags `isEDO`, or
+ *  - its numeric pitch entries are arrays whose ratios match 2^(i / pitchNumber)
+ *    within tolerance (the editor stores ratios inside the numeric keys, not in a
+ *    `ratios` array).
+ *
+ * @function
+ * @param {string} temperament - The temperament key.
+ * @returns {boolean} True if the temperament is an equal division of the octave.
+ */
+const isEquallyTempered = temperament => {
+    const t = getTemperament(temperament);
+    if (!t || typeof t !== "object") {
+        return false;
+    }
+    if (t.isEDO) {
+        return true;
+    }
+    const n = t.pitchNumber;
+    if (!Number.isInteger(n) || n < 2) {
+        return false;
+    }
+    for (let i = 0; i < n; i++) {
+        const entry = t["" + i];
+        if (!Array.isArray(entry) || typeof entry[0] !== "number") {
+            return false;
+        }
+        const expected = Math.pow(2, i / n);
+        if (Math.abs(entry[0] - expected) > 1e-4) {
+            return false;
+        }
+    }
+    return true;
 };
 
 /**
@@ -3971,7 +4041,7 @@ const getArticulation = note => {
     // Strip microtonal ^ / v prefixes before matching so "^C" etc. resolve.
     const stripped = note.replace(/^[v^]+/, "");
     const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
-    return match ? match[1] : note;
+    return match ? match[1] : stripped;
 };
 
 /**
@@ -5645,7 +5715,10 @@ function getNote(
     let note;
     let articulation;
 
-    if (temperament in PreDefinedTemperaments) {
+    if (
+        temperament in PreDefinedTemperaments ||
+        (isCustomTemperament(temperament) && isEquallyTempered(temperament))
+    ) {
         // Check for double flat or double sharp. Since bb and x behave
         // funny with string operations, we jump through some hoops.
         articulation = getArticulation(noteArg);
@@ -6273,7 +6346,12 @@ const getModePattern = (mode, edo = 12) => {
         return new Array(edo).fill(1);
     }
     if (mode in MUSICALMODES) {
-        return scalePatternToEDO(MUSICALMODES[mode], edo);
+        const pattern = MUSICALMODES[mode];
+        // Only 12-summing patterns are 12-EDO semitone modes that scalePatternToEDO
+        // can rescale; any other total (e.g. a 7-note 41-EDO mode sums to 41) is
+        // native to a non-12 EDO and must be returned as-is or playback corrupts.
+        const isSemitonePattern = pattern.reduce((a, b) => a + b, 0) === 12;
+        return isSemitonePattern ? scalePatternToEDO(pattern, edo) : pattern.slice();
     }
     return scalePatternToEDO(MUSICALMODES.major, edo);
 };
@@ -6469,7 +6547,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     }
     if (isCustomTemperament(temperament)) {
         const t = getTemperament(temperament);
-        if (!t || !t.ratios) {
+        if (!t || !temperamentHasRatios(temperament)) {
             // Scalar = Semitone for custom Temperament with no ratios.
             return transposition;
         }
@@ -8132,7 +8210,9 @@ if (typeof module !== "undefined" && module.exports) {
         getVoiceIcon,
         getVoiceSynthName,
         isCustomTemperament,
+        temperamentHasRatios,
         isTrueEDO,
+        isEquallyTempered,
         getTemperamentRatio,
         getTemperamentCents,
         getTemperamentName,
@@ -8187,14 +8267,8 @@ if (typeof module !== "undefined" && module.exports) {
         INTERVALVALUES,
         FIXEDSOLFEGE,
         FIXEDSOLFEGE1,
-        MODEPIEMENU_SLOT_COUNT,
         MODEPIEMENU_GROUP_RING,
         MODEPIEMENU_NAME_RING,
-        MODEPIEMENU_NAME_TITLE_RADIUS,
-        MODEPIEMENU_FONT_FAMILY,
-        MODEPIEMENU_GROUP_FONT_RATIO,
-        MODEPIEMENU_NAME_FONT_MIN_RATIO,
-        MODEPIEMENU_NAME_FONT_MAX_RATIO,
         getSavedCustomModes,
         getModeNamesForGroup,
         getModeLabel,

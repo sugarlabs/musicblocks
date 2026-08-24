@@ -13,7 +13,7 @@
 /* global
 
    docById, _, platformColor, keySignatureToMode, MUSICALMODES,
-   getNote, DEFAULTVOICE, last, NOTESTABLE, slicePath, wheelnav,
+   getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
    normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
    numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
    getSavedCustomModes, getModeNamesForGroup, getModeLabel, getModeNameFromLabel,
@@ -1577,13 +1577,7 @@ class ModeWidget {
             // Navigate to currently-selected mode if present. This fires the
             // slice's navigateFunction (which would select+close), so suppress
             // it: this call is only meant to highlight the current mode.
-            let idx = 0;
-            for (let i = 0; i < modes.length; i++) {
-                if (modes[i] === this._selectedModeName) {
-                    idx = i;
-                    break;
-                }
-            }
+            const idx = modes.indexOf(this._selectedModeName);
             this._suppressModeSelect = true;
             this._modeNameWheel.navigateWheel(idx);
             this._suppressModeSelect = false;
