@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+reviews:
+    profile: "chill"
+    high_level_summary: true
+    collapse_walkthrough: false
+    auto_review:
+        enabled: true
+        drafts: false
+    sequence_diagrams: true
+    path_filters:
+        # Exclude third-party libraries and dependencies
+        - "!**/node_modules/**"
+        - "!**/bower_components/**"
+        - "!**/lib/**"
+        # Exclude build output and testing directories
+        - "!**/dist/**"
+        - "!**/coverage/**"
+        # Exclude translation/localization files
+        - "!**/po/**"
+        - "!**/locales/**"
+        # Exclude assets, fonts, sounds, and media
+        - "!**/sounds/**"
+        - "!**/images/**"
+        - "!**/screenshots/**"
+        - "!**/fonts/**"
+        - "!**/*.png"
+        - "!**/*.jpg"
+        - "!**/*.jpeg"
+        - "!**/*.mp4"
+        - "!**/*.webm"
+        - "!**/*.ico"
+        # Exclude lock files
+        - "!package-lock.json"
+chat:
+    auto_reply: true
