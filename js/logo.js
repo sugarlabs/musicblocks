@@ -1052,7 +1052,7 @@ class Logo {
         const tur = this.turtles.ithTurtle(turtle);
 
         if (tur.delayTimeout !== null) {
-            clearTimeout(tur.delayTimeout);
+            this._timerManager.clearTimeout(tur.delayTimeout);
             tur.delayTimeout = null;
             this.runFromBlockNow(
                 this,
