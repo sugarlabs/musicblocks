@@ -32,5 +32,14 @@ reviews:
         - "!**/*.ico"
         # Exclude lock files
         - "!package-lock.json"
+    custom_checks:
+        - name: "PR Description Mismatch"
+          mode: "warning"
+          instructions: |
+              Pass/fail criteria: The PR description must accurately match and describe the actual code changes introduced in the pull request. If there is a clear mismatch or the description is unrelated to the changes, fail and flag the mismatch.
+        - name: "Unrelated Multiple Issues Linked"
+          mode: "warning"
+          instructions: |
+              Pass/fail criteria: If the pull request references/links to more than one issue, verify whether those issues are closely related to each other. If the linked issues are unrelated, suggest splitting the PR into separate pull requests for each individual issue.
 chat:
     auto_reply: true
