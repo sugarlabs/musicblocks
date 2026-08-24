@@ -594,6 +594,9 @@ class Block {
             if (typeof this.container.uncache === "function") {
                 this.container.uncache();
             }
+            if (this.container.parent && typeof this.container.parent.removeChild === "function") {
+                this.container.parent.removeChild(this.container);
+            }
             this.container = null;
         }
 
