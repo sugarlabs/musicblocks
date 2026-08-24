@@ -1,0 +1,149 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+
+tone_instructions: "Music Blocks is a Sugar Labs project used by students learning to code through music; many contributors are newcomers. Be encouraging, explain the why, and skip nitpicks ESLint already flags."
+
+reviews:
+  profile: "chill"                 # balanced feedback, not nitpicky
+  request_changes_workflow: false  # comment-only, never blocks a merge
+  high_level_summary: true
+  poem: false
+  review_status: true
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches: ["master"]
+    ignore_title_keywords:
+      - "wip"
+      - "draft"
+
+  path_filters:
+    - "!dist/**"
+    - "!build/**"
+    - "!node_modules/**"
+    - "!**/*.min.js"
+
+  path_instructions:
+    - path: "js/**/*.js"
+      instructions: |
+        Core runtime code (block execution, turtle graphics, synth playback).
+        Flag likely race conditions around async Tone.js/audio calls and
+        rapid project-switch or play/stop sequences — this codebase has
+        shipped real crashes from exactly that pattern. Confirm added event
+        listeners are removed (removeEventListener/dispose) to avoid leaks.
+
+    - path: "**/*.test.js"
+      instructions: |
+        Confirm the test actually asserts behavior rather than just invoking
+        a function. Call out missing edge cases (empty state, rapid
+        re-triggering, cross-browser listener fallbacks) ahead of style nits.
+
+    - path: "js/project-manager.js"
+      instructions: |
+        Handles serialization/export and holds state shared across the app.
+        Flag any function that mutates module-level or singleton state
+        directly instead of working on a local copy — this has caused bugs
+        here before.
+
+    - path: ".github/workflows/**"
+      instructions: |
+        CI/workflow changes. Check regex and shell patterns for
+        platform-specific edge cases (e.g. CRLF vs LF line endings) before
+        approving.
+
+  pre_merge_checks:
+    title:
+      mode: "warning"
+      requirements: "Concise and descriptive, matching the current PR template's format."
+    description:
+      mode: "warning"
+      
+      custom_checks:
+      - name: "Music Blocks PR Description Alignment"
+        mode: "warning"
+        instructions: |
+          Check pull requests that do not reference a GitHub issue.
+
+          Compare the PR title and description with the actual code diff.
+
+          PASS when:
+          - The PR clearly explains the purpose of the changes.
+          - The description accurately represents the implementation.
+          - Changed files are relevant to the stated purpose.
+          - No clearly unrelated functional changes are introduced.
+
+          FAIL when:
+          - The PR description materially misrepresents the implementation.
+          - Important functional changes are not described.
+          - Clearly unrelated functional changes are included.
+
+          INCONCLUSIVE when there is not enough information to determine
+          whether the description matches the implementation.
+
+          Do not fail necessary tests, documentation, formatting,
+          refactoring, or supporting changes.
+
+      - name: "Music Blocks Multiple Issue Relationship"
+        mode: "warning"
+        instructions: |
+          Check pull requests that reference multiple GitHub issues.
+
+          Determine whether the linked issues are sufficiently related
+          to be addressed by one pull request.
+
+          PASS when the issues describe the same feature, bug,
+          improvement, dependency, or closely related implementation work.
+
+          FAIL when the issues represent independent or unrelated work.
+
+          When failing, recommend splitting the pull request and explain
+          which issues appear unrelated.
+
+          INCONCLUSIVE when the issue descriptions do not provide enough
+          information to determine their relationship.
+
+      - name: "Music Blocks Issue Implementation Alignment"
+        mode: "warning"
+        instructions: |
+          Compare the linked GitHub issue, PR description, and actual
+          code changes.
+
+          PASS when:
+          - The implementation addresses the issue requirements.
+          - The PR description accurately explains the implementation.
+          - The actual code changes materially solve the reported problem
+            or implement the requested feature.
+          - No clearly unrelated functional changes are introduced.
+
+          FAIL when:
+          - The implementation does not address the linked issue.
+          - The PR description and implementation materially differ.
+          - Important explicit requirements from the issue are not addressed.
+          - Clearly unrelated functional changes are included.
+
+          INCONCLUSIVE when the issue or PR does not provide enough
+          information to determine implementation alignment.
+
+          Do not fail necessary tests, documentation, refactoring,
+          formatting, or supporting changes.
+  tools:
+    eslint:
+      enabled: true
+    markdownlint:
+      enabled: true
+    actionlint:
+      enabled: true
+    gitleaks:
+      enabled: true
+
+chat:
+  auto_reply: true
+  art: false
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "REVIEW_GUIDELINES.md"
+      
