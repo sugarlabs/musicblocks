@@ -2296,15 +2296,15 @@ function setupWidgetBlocks(activity) {
         new OscilloscopeWidgetBlock().setup(activity);
         new PitchSliderBlock().setup(activity);
         new ArpeggioMatrixBlock().setup(activity);
-        new ChromaticBlock().setup(activity);  // Chromatic music keyboard
+        new ChromaticBlock().setup(activity); // Chromatic music keyboard
         new MusicKeyboard2Block().setup(activity); // Default music keyboard
         new MusicKeyboardBlock().setup(activity);
         new PitchStaircaseBlock().setup(activity);
-        new RhythmRuler3Block().setup(activity);  // Rhythmruler for beg. mode
-        new RhythmRuler2Block().setup(activity);  // Rhythmruler for adv. mode
-        new MatrixGMajorBlock().setup(activity);  // Phrasemaker in G
-        new MatrixCMajorBlock().setup(activity);  // Phrasemaker in C
-        new MatrixBlock().setup(activity);  // Phrasemaker default
+        new RhythmRuler3Block().setup(activity); // Rhythmruler for beg. mode
+        new RhythmRuler2Block().setup(activity); // Rhythmruler for adv. mode
+        new MatrixGMajorBlock().setup(activity); // Phrasemaker in G
+        new MatrixCMajorBlock().setup(activity); // Phrasemaker in C
+        new MatrixBlock().setup(activity); // Phrasemaker default
     }
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
