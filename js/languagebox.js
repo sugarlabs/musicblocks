@@ -17,6 +17,22 @@
 
 /* exported LanguageBox */
 
+const getLanguageBoxLocalStorageItemSafely = key => {
+    try {
+        return localStorage.getItem(key);
+    } catch (e) {
+        return null;
+    }
+};
+
+const setLanguageBoxLocalStorageItemSafely = (key, value) => {
+    try {
+        localStorage.setItem(key, value);
+    } catch (e) {
+        console.warn(`Could not save ${key}:`, e);
+    }
+};
+
 class LanguageBox {
     /**
      * @constructor
@@ -316,16 +332,12 @@ class LanguageBox {
             gug: "Actualice su navegador para cambiar su preferencia de idioma.",
             ur: "اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
         };
-        if (localStorage.getItem("languagePreference") === this._language) {
+        if (getLanguageBoxLocalStorageItemSafely("languagePreference") === this._language) {
             if (this._language.includes("ja")) {
                 this._language = this._language.split("-")[0];
             }
 
-            try {
-                localStorage.setItem("languagePreference", this._language);
-            } catch (e) {
-                console.warn("Could not save language preference:", e);
-            }
+            setLanguageBoxLocalStorageItemSafely("languagePreference", this._language);
             this.activity.textMsg(_("Music Blocks is already set to this language."));
         } else {
             this.activity.storage.languagePreference = this._language;
