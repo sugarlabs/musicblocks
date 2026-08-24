@@ -2281,30 +2281,30 @@ function setupWidgetBlocks(activity) {
     new AIDebugger().setup(activity);
     // Set up blocks if this is Music Blocks environment
     if (_THIS_IS_MUSIC_BLOCKS_) {
-        new EnvelopeBlock().setup(activity);
-        new FilterBlock().setup(activity);
-        new TemperamentBlock().setup(activity);
-        new TimbreBlock().setup(activity);
-        new MeterWidgetBlock().setup(activity);
-        new ModeWidgetBlock().setup(activity);
-        new TempoBlock().setup(activity);
-        new SamplerBlock().setup(activity);
-        new ArpeggioMatrixBlock().setup(activity);
-        new PitchDrumMatrixBlock().setup(activity);
-        new OscilloscopeWidgetBlock().setup(activity);
-        new PitchSliderBlock().setup(activity);
-        new ChromaticBlock().setup(activity);
         new LegoBricksBlock().setup(activity);
         new AIMusicBlocks().setup(activity);
+        new EnvelopeBlock().setup(activity);
+        new FilterBlock().setup(activity);
         new ReflectionBlock().setup(activity);
-        new MusicKeyboard2Block().setup(activity);
+        new TimbreBlock().setup(activity);
+        new TemperamentBlock().setup(activity);
+        new ModeWidgetBlock().setup(activity);
+        new SamplerBlock().setup(activity);
+        new PitchDrumMatrixBlock().setup(activity);
+        new MeterWidgetBlock().setup(activity);
+        new TempoBlock().setup(activity);
+        new OscilloscopeWidgetBlock().setup(activity);
+        new PitchSliderBlock().setup(activity);
+        new ArpeggioMatrixBlock().setup(activity);
+        new ChromaticBlock().setup(activity);  // Chromatic music keyboard
+        new MusicKeyboard2Block().setup(activity); // Default music keyboard
         new MusicKeyboardBlock().setup(activity);
         new PitchStaircaseBlock().setup(activity);
-        new RhythmRuler3Block().setup(activity);
-        new RhythmRuler2Block().setup(activity);
-        new MatrixGMajorBlock().setup(activity);
-        new MatrixCMajorBlock().setup(activity);
-        new MatrixBlock().setup(activity);
+        new RhythmRuler3Block().setup(activity);  // Rhythmruler for beg. mode
+        new RhythmRuler2Block().setup(activity);  // Rhythmruler for adv. mode
+        new MatrixGMajorBlock().setup(activity);  // Phrasemaker in G
+        new MatrixCMajorBlock().setup(activity);  // Phrasemaker in C
+        new MatrixBlock().setup(activity);  // Phrasemaker default
     }
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
