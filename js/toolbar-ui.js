@@ -623,11 +623,19 @@ class ToolbarUI {
         confirmationButton.classList.add("confirm-button");
         confirmationButton.id = "new-project";
         confirmationButton.setAttribute("tabindex", "0"); // Make focusable
+        confirmationButton.setAttribute("role", "button");
+        confirmationButton.setAttribute("aria-label", _("Confirm"));
+        // The label alone ("Confirm") doesn't say what's being confirmed;
+        // point screen readers at the actual question being asked.
+        confirmationButton.setAttribute("aria-describedby", "confirmation-message");
         confirmationButton.textContent = _("Confirm");
 
         const cancelButton = document.createElement("div");
         cancelButton.classList.add("cancel-button");
         cancelButton.id = "cancel-project";
+        cancelButton.setAttribute("role", "button");
+        cancelButton.setAttribute("aria-label", _("Cancel"));
+        cancelButton.setAttribute("aria-describedby", "confirmation-message");
         cancelButton.textContent = _("Cancel");
 
         buttonRowLi.appendChild(confirmationButton);
