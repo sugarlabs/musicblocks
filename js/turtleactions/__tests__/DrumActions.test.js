@@ -294,6 +294,74 @@ describe("setupDrumActions", () => {
         });
     });
 
+    describe("setDrum: pitchDrumTable scoping (issue #8199)", () => {
+        beforeEach(() => {
+            targetTurtle.singer.drumStyle = [];
+            activity.logo.setTurtleListener.mockClear();
+        });
+
+        it("preserves a pre-existing mapping (e.g. from Map Pitch to Drum) across an unrelated Set Drum block", () => {
+            targetTurtle.singer.pitchDrumTable = { C4: "drum2" };
+
+            Singer.DrumActions.setDrum("d1", 0, 1);
+            const closeListener = activity.logo.setTurtleListener.mock.calls[0][2];
+            closeListener();
+
+            expect(targetTurtle.singer.pitchDrumTable).toEqual({ C4: "drum2" });
+        });
+
+        it("still discards entries the clamp itself added, once it closes", () => {
+            targetTurtle.singer.pitchDrumTable = { C4: "drum2" };
+
+            Singer.DrumActions.setDrum("d1", 0, 1);
+            // A note played inside the clamp records itself into pitchDrumTable,
+            // exactly as js/turtle-singer.js:1150-1153 does for a real pitch.
+            targetTurtle.singer.pitchDrumTable.D4 = "drum1";
+
+            const closeListener = activity.logo.setTurtleListener.mock.calls[0][2];
+            closeListener();
+
+            // D4 (added inside the clamp) is gone; C4 (pre-existing) survives.
+            expect(targetTurtle.singer.pitchDrumTable).toEqual({ C4: "drum2" });
+        });
+
+        it("restores a pre-existing mapping's original drum if the clamp overwrote it", () => {
+            targetTurtle.singer.pitchDrumTable = { C4: "drum2" };
+
+            Singer.DrumActions.setDrum("d1", 0, 1);
+            // The same pitch (C4) is played again inside this clamp, overwriting
+            // the earlier mapping for the duration of the clamp.
+            targetTurtle.singer.pitchDrumTable.C4 = "drum1";
+
+            const closeListener = activity.logo.setTurtleListener.mock.calls[0][2];
+            closeListener();
+
+            expect(targetTurtle.singer.pitchDrumTable).toEqual({ C4: "drum2" });
+        });
+
+        it("nested Set Drum blocks each discard only what they themselves added", () => {
+            targetTurtle.singer.pitchDrumTable = { preexisting: "drum2" };
+
+            Singer.DrumActions.setDrum("d1", 0, 1); // outer clamp opens
+            const outerClose = activity.logo.setTurtleListener.mock.calls[0][2];
+            targetTurtle.singer.pitchDrumTable.fromOuter = "drum1";
+
+            activity.logo.setTurtleListener.mockClear();
+            Singer.DrumActions.setDrum("d2", 0, 1); // inner clamp opens
+            const innerClose = activity.logo.setTurtleListener.mock.calls[0][2];
+            targetTurtle.singer.pitchDrumTable.fromInner = "drum2";
+
+            innerClose();
+            expect(targetTurtle.singer.pitchDrumTable).toEqual({
+                preexisting: "drum2",
+                fromOuter: "drum1"
+            });
+
+            outerClose();
+            expect(targetTurtle.singer.pitchDrumTable).toEqual({ preexisting: "drum2" });
+        });
+    });
+
     describe("playNoise", () => {
         it("should play noise in a note block", () => {
             targetTurtle.singer.inNoteBlock.push(2);
