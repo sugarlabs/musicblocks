@@ -41,6 +41,15 @@
  * doPhaser/doTremolo/doDistortion/doHarmonic share). A "probe" block placed *inside* the clamp
  * snapshots that state mid-lifecycle - the deterministic, timing-independent observable this test
  * asserts on; no Tone.js scheduling or playback is involved or awaited.
+ *
+ * VOICENAMES below is the real production table (js/utils/synthutils.js), not a fixture -
+ * required directly, the same way pitch-note-dispatch-integration.test.js pulls in real
+ * musicutils.js. Note its limits: with `_()` mocked to the identity function (no real i18n
+ * bootstrap), every entry's translated display name equals its synth key, so a recognized voice
+ * resolves to *the same string it was given*, not a distinct one - this test can only prove
+ * setTimbre consults the real table's membership, not that it transforms the name. The
+ * custom-sample case below exercises setTimbre's one translation-independent, genuinely
+ * transformative branch instead.
  */
 
 // Setup global mocks BEFORE requiring the module (mirror of meter-signature-dispatch-integration.test.js).
@@ -49,9 +58,9 @@ global.Notation = jest.fn().mockImplementation(() => ({}));
 global.Synth = jest.fn().mockImplementation(() => ({}));
 global.Singer = {};
 global.last = arr => arr[arr.length - 1];
-global.VOICENAMES = {
-    Piano: ["piano", "grand-piano"]
-};
+// The real production voice table (js/utils/synthutils.js) - see the file-level comment above.
+// synthutils.js's own Synth class is never instantiated here; only VOICENAMES is read.
+global.VOICENAMES = require("../utils/synthutils").VOICENAMES;
 global.CUSTOMSAMPLES = {};
 global.DEFAULTVOICE = "default-voice";
 
@@ -167,9 +176,9 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
         // settimbre (0): connections [prev, voiceArg, clampEntry, next] - the connections shape
         // produced when the "settimbre" block is dragged from the Tone palette (see
         // SetTimbreBlock's own makeMacro, js/blocks/ToneBlocks.js).
-        // voice (1):     voicename value "piano" (resolves through the real VOICENAMES lookup
-        //                 to synth "grand-piano", proving this reaches the real mapping in
-        //                 setTimbre rather than a hardcoded pass-through).
+        // voice (1):     voicename value "cello", a real entry in the production VOICENAMES
+        //                 table required above (its friendly name and synth key are both
+        //                 "cello" - see the file-level comment on why that's expected).
         // probe (2):      synthetic leaf block standing in for "whatever block(s) the user placed
         //                 inside the settimbre clamp" - it does not exist as a real MB block; it
         //                 only reads turtle-singer state so the push (already applied by the time
@@ -192,8 +201,8 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
                 // isn't a live protoblock. LIMITATION: because it's a copy, a regression in the
                 // real SetTimbreBlock.flow (e.g. a bad edit to this branching) would not fail
                 // this test - only ToneBlocks.test.js (mocked setTimbre) guards that class
-                // directly. activity.errorMsg is intentionally left unmocked below: neither test
-                // input ("piano"/"kazoo") is null, so this branch never runs.
+                // directly. activity.errorMsg is intentionally left unmocked below: none of this
+                // suite's voice inputs are null, so this branch never runs.
                 if (args[0] === null) {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
                 } else {
@@ -206,7 +215,7 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
         );
         const voice = {
             name: "voicename",
-            value: "piano",
+            value: "cello",
             connections: [],
             protoblock: { parameter: false, dockTypes: ["anyout"] },
             isValueBlock: () => true,
@@ -218,14 +227,17 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
         activity.blocks.blockList = blocks;
     });
 
-    test("pushes the real resolved synth and inSetTimbre flag before the clamp body runs, and pops them after", () => {
+    test("pushes the real-VOICENAMES-recognized synth and inSetTimbre flag before the clamp body runs, and pops them after", () => {
         logo.runFromBlockNow(logo, 0, 0, 1, null);
 
         expect(probeCallCount).toBe(1);
 
-        // While the clamp body ran, the real setTimbre had already resolved "piano" through the
-        // real VOICENAMES table to "grand-piano" and pushed it/flagged inSetTimbre.
-        expect(instrumentNamesDuringClamp).toEqual(["grand-piano"]);
+        // While the clamp body ran, the real setTimbre had already matched "cello" against the
+        // real production VOICENAMES table and pushed it/flagged inSetTimbre. (The resolved
+        // value equals the input here - see the file-level comment on why - so this proves table
+        // membership and dispatch timing, not a name transformation; the custom-sample test below
+        // covers a case that does transform.)
+        expect(instrumentNamesDuringClamp).toEqual(["cello"]);
         expect(inSetTimbreDuringClamp).toBe(true);
 
         // The real Logo interpreter reached the clamp's "hidden" block and fired setTimbre's
@@ -235,19 +247,19 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
         expect(turtle.inSetTimbre).toBe(false);
 
         // The audio-loading boundary was reached with the same resolved synth name.
-        expect(logo.synth.loadSynth).toHaveBeenCalledWith(0, "grand-piano");
+        expect(logo.synth.loadSynth).toHaveBeenCalledWith(0, "cello");
     });
 
-    test("an unknown voice name falls through to itself as the synth, still driven end-to-end by dispatch", () => {
+    test("a voice name absent from the real VOICENAMES table falls through to itself as the synth, still driven end-to-end by dispatch", () => {
         const blocks = activity.blocks.blockList;
-        blocks[1].value = "kazoo";
+        blocks[1].value = "kazoo"; // confirmed absent from synthutils.js's real VOICENAMES table
 
         logo.runFromBlockNow(logo, 0, 0, 1, null);
 
         expect(probeCallCount).toBe(1);
 
-        // Same push-before/pop-after clamp lifecycle as the known-voice case above, just with
-        // "kazoo" falling through VOICENAMES unresolved to become its own synth name.
+        // Same push-before/pop-after clamp lifecycle as the recognized-voice case above, just
+        // with "kazoo" - genuinely not present in the real table - falling through unresolved.
         expect(instrumentNamesDuringClamp).toEqual(["kazoo"]);
         expect(inSetTimbreDuringClamp).toBe(true);
 
@@ -255,5 +267,28 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
         expect(turtle.inSetTimbre).toBe(false);
 
         expect(logo.synth.loadSynth).toHaveBeenCalledWith(0, "kazoo");
+    });
+
+    test("a custom-sample instrument is transformed into a distinct synth name, independent of VOICENAMES", () => {
+        // setTimbre's one branch that actually changes the input string rather than passing it
+        // through: an object instrument (the shape a custom-sample voicename block produces,
+        // [name, data, pitch, octave]) is never matched by the string-keyed VOICENAMES loop, so
+        // it falls into the "customsample_" + name branch instead - real, non-trivial logic this
+        // test can exercise without depending on a translated VOICENAMES entry.
+        const blocks = activity.blocks.blockList;
+        blocks[1].value = ["mysample", "data:audio/wav;base64,AAAA", "sol", 4];
+
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        expect(probeCallCount).toBe(1);
+        expect(instrumentNamesDuringClamp).toEqual(["customsample_mysample"]);
+        expect(CUSTOMSAMPLES["customsample_mysample"]).toEqual([
+            "data:audio/wav;base64,AAAA",
+            "sol",
+            4
+        ]);
+
+        expect(turtle.singer.instrumentNames).toEqual([]);
+        expect(logo.synth.loadSynth).toHaveBeenCalledWith(0, "customsample_mysample");
     });
 });
