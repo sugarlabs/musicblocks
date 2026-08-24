@@ -107,7 +107,8 @@ global.DEFAULTCHORD = [];
 
 // Mock helper functions
 global.addTemperamentToDictionary = jest.fn();
-global.closeBlkWidgets = jest.fn();
+window.widgetWindows = window.widgetWindows || {};
+window.widgetWindows.closeBlkWidgets = jest.fn();
 global.deleteTemperamentFromList = jest.fn();
 global.getDrumSynthName = jest.fn();
 global.getNoiseName = jest.fn();
