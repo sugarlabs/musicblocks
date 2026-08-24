@@ -99,13 +99,11 @@ const processABCNotes = function (logo, turtle) {
             note = note.replace(new RegExp(symbol, "g"), replacement);
         }
 
-        // Handle octave notation. Check two-digit octaves first
-        // so that octave 10 is not mistaken for octave 1.
+        // Handle octave notation
         let matchedOctave = 4;
-        const octaves = Object.keys(OCTAVE_NOTATION_MAP).sort((a, b) => b - a);
-        for (const octave of octaves) {
+        for (const [octave, notation] of Object.entries(OCTAVE_NOTATION_MAP)) {
             if (note.includes(octave)) {
-                note = note.replace(new RegExp(octave, "g"), OCTAVE_NOTATION_MAP[octave]);
+                note = note.replace(new RegExp(octave, "g"), notation);
                 matchedOctave = Number(octave);
                 break;
             }

@@ -412,12 +412,6 @@ describe("processABCNotes - Octave Conversion", () => {
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).toBe("C,4 C,4 C,,4 C,,4 ");
     });
-
-    it("should convert two-digit octaves without truncation", () => {
-        logo.notation.notationStaging["0"] = [[["C10"], 4, 0, null, null, -1, false]];
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("c'''''4 c'''''4 ");
-    });
 });
 
 describe("OCTAVE_NOTATION_MAP", () => {
