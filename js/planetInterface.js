@@ -388,22 +388,19 @@ class PlanetInterface {
          */
         this.init = async () => {
             this.iframe = document.getElementById("planet-iframe");
-            try {
-                await this.iframe.contentWindow.makePlanet(
-                    _THIS_IS_MUSIC_BLOCKS_,
-                    this.activity.storage,
-                    window._
-                );
-                this.planet = this.iframe.contentWindow.p;
-                this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
-                this.planet.setPlanetClose(this.closePlanet.bind(this));
-                this.planet.setLoadNewProject(this.newProject.bind(this));
-                this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
-                this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
-            } catch (e) {
-                console.error(e);
-                this.planet = null;
-            }
+            this.planet = null;
+            window.Converter = undefined;
+            await this.iframe.contentWindow.makePlanet(
+                _THIS_IS_MUSIC_BLOCKS_,
+                this.activity.storage,
+                window._
+            );
+            this.planet = this.iframe.contentWindow.p;
+            this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
+            this.planet.setPlanetClose(this.closePlanet.bind(this));
+            this.planet.setLoadNewProject(this.newProject.bind(this));
+            this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
+            this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
 
             window.Converter = this.planet ? this.planet.Converter : undefined;
             this.mainCanvas = this.activity.canvas;

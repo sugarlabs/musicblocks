@@ -497,18 +497,14 @@ describe("PlanetInterface", () => {
         expect(consoleSpy).toHaveBeenCalledWith(mockError);
         consoleSpy.mockRestore();
     });
-    it("init catches initialization errors, logs them, and sets planet to null", async () => {
-        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    it("init propagates initialization errors to the activity", async () => {
         const iframe = document.getElementById("planet-iframe");
         iframe.contentWindow.makePlanet = jest
             .fn()
             .mockRejectedValue(new Error("Failed to make planet"));
-        await expect(planetInterface.init()).resolves.toBeUndefined();
-        expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
-        expect(consoleSpy.mock.calls[0][0].message).toBe("Failed to make planet");
+        await expect(planetInterface.init()).rejects.toThrow("Failed to make planet");
         expect(planetInterface.planet).toBeNull();
         expect(window.Converter).toBeUndefined();
-        consoleSpy.mockRestore();
     });
 
     it("project getters return safe defaults when Planet storage is unavailable", () => {
