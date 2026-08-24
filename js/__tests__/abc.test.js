@@ -371,6 +371,49 @@ describe("processABCNotes - Tuplet Handling", () => {
     });
 });
 
+describe("processABCNotes - Octave Conversion", () => {
+    let logo;
+    beforeEach(() => {
+        logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: [] } } };
+    });
+
+    it("should keep octave 4 notes uppercase", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C4"], 4, 0, null, null, -1, false],
+            [["B4"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("C4 C4 B4 B4 ");
+    });
+
+    it("should write octave 5 notes in lowercase without octave marks", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C5"], 4, 0, null, null, -1, false],
+            [["B5"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("c4 c4 b4 b4 ");
+    });
+
+    it("should mark octaves above 5 with apostrophes and lowercase letters", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C6"], 4, 0, null, null, -1, false],
+            [["C7"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("c'4 c'4 c''4 c''4 ");
+    });
+
+    it("should mark octaves below 4 with commas and uppercase letters", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C3"], 4, 0, null, null, -1, false],
+            [["C2"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("C,4 C,4 C,,4 C,,4 ");
+    });
+});
+
 describe("OCTAVE_NOTATION_MAP", () => {
     it("should correctly map octaves to ABC notation", () => {
         expect(OCTAVE_NOTATION_MAP[10]).toBe("'''''");
