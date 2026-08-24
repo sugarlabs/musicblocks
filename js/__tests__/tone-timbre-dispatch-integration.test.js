@@ -158,6 +158,9 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
     beforeEach(() => {
         jest.clearAllMocks();
         global.document.body.style.cursor = "default";
+        // CUSTOMSAMPLES is a mutable global setTimbre writes into (the custom-sample test below) -
+        // reset it here so no test's outcome depends on suite/declaration order.
+        global.CUSTOMSAMPLES = {};
         turtle = createTurtle();
         activity = createActivity(turtle);
         logo = new Logo(activity);
