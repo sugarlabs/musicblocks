@@ -1273,12 +1273,6 @@ class Logo {
             this.safePluginExecute(this.evalOnStopList[arg], this);
         }
 
-        // Clear canvas on explicit Stop only — natural completion
-        // preserves drawings for SVG/PNG export.
-        for (const turtle of this.turtles.turtleList) {
-            turtle.painter.doClear(true, true, true);
-        }
-
         // Recorder stop is Stop-only — natural completion must not
         // interrupt an in-progress WAV recording.
         if (this.synth.recorder && this.synth.recorder.state === "recording")
