@@ -993,7 +993,7 @@ table {
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: transparent;
     width: 680px;
 }
 

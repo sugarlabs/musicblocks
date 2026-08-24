@@ -58,8 +58,12 @@ function setupIntervalsActions(activity) {
          */
         static GetModename(mode) {
             let modename = "major";
+            if (typeof mode !== "string") {
+                return modename;
+            }
+            const lowercaseMode = mode.toLowerCase();
             for (const _mode in MUSICALMODES) {
-                if (_mode === mode || _(_mode) === mode) {
+                if (_mode.toLowerCase() === lowercaseMode || _(_mode) === mode) {
                     modename = _mode;
                     break;
                 }
@@ -75,11 +79,8 @@ function setupIntervalsActions(activity) {
          * @returns {Number}
          */
         static getTemperamentLength() {
-            const currentTemperament = activity.logo.synth.inTemperament;
-            if (!currentTemperament) {
-                return 12; // Default fallback for tests/uninitialized state
-            }
-            return TEMPERAMENT[currentTemperament]["pitchNumber"];
+            const t = TEMPERAMENT[activity.logo.synth.inTemperament];
+            return t?.pitchNumber ?? 12;
         }
 
         /**

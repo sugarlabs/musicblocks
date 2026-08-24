@@ -113,7 +113,7 @@ function setupWidgetBlocks(activity) {
     function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
         if (logo[widgetKey] === null || logo[widgetKey] === undefined) {
             logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
-            _lazyRequire(modules, function () {
+            _lazyRequire(modules, () => {
                 logo[widgetKey] = initFn();
                 if (typeof logo.runFromBlockNow === "function") {
                     logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
@@ -142,7 +142,7 @@ function setupWidgetBlocks(activity) {
      * @param {Function} [onReady] - Optional callback run after assignment.
      */
     function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
-        _lazyRequire(modules, function () {
+        _lazyRequire(modules, () => {
             logo[widgetKey] = factory();
             onReady?.();
         });
@@ -832,17 +832,25 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_modewidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            const resetFlag = () => {
+                logo.insideModeWidget = false;
+            };
+
             const __listener = () => {
+                // Re-show an already-open widget instead of building a second
+                // instance (duplicate toolbar buttons, overwritten handlers).
+                if (logo.modeWidget && logo.modeWidget !== "loading") {
+                    logo.modeWidget.widgetWindow.show();
+                    resetFlag();
+                    return;
+                }
                 _lazyLoadWidget(
                     logo,
                     "modeWidget",
                     _getWidgetDependencies(typeof ModeWidget !== "undefined" ? ModeWidget : null, [
                         "widgets/modewidget"
                     ]),
-                    () => new ModeWidget(activity),
-                    () => {
-                        logo.insideModeWidget = false;
-                    }
+                    () => new ModeWidget(activity)
                 );
             };
 
