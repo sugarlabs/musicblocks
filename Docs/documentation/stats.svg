@@ -11,14 +11,15 @@
     <style>
       .window-frame { fill: #d4d4d4; stroke: #505050; stroke-width: 2; }
       .window-header { fill: #b8b8b8; stroke: #505050; stroke-width: 1.5; }
-      .header-title { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-size: 20px; fill: #404040; font-weight: 600; letter-spacing: 2px; }
-      .header-btn { fill: #999999; stroke: #404040; stroke-width: 1.5; cursor: pointer; }
-      .header-btn-text { font-family: sans-serif; font-size: 16px; fill: #ffffff; font-weight: bold; }
+      .header-title { font-family: sans-serif; font-size: 20px; fill: #404040; font-weight: 600; letter-spacing: 2px; }
+      .header-btn { fill: #808080; stroke: #404040; stroke-width: 1.5; cursor: pointer; }
       .toolbar-box { fill: #80c0ff; stroke: #3080d0; stroke-width: 1.5; }
-      .stats-text { font-family: 'Courier New', Courier, monospace, sans-serif; font-size: 19px; fill: #111111; line-height: 1.4; }
-      .chart-axis { stroke: #aaaaaa; stroke-width: 1; stroke-dasharray: 3,3; }
-      .chart-grid { stroke: #cccccc; stroke-width: 1; fill: none; }
-      .chart-poly { fill: rgba(100, 160, 240, 0.35); stroke: #2070d0; stroke-width: 2.5; }
+      .stats-text { font-family: sans-serif; font-size: 17px; fill: #000000; line-height: 1.4; }
+      .chart-spoke { stroke: #999999; stroke-width: 4; stroke-linecap: round; }
+      .chart-grid { stroke: #b8b8b8; stroke-width: 1.2; fill: none; }
+      .chart-data-line { stroke: #ffffff; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+      .chart-marker { fill: #ffffff; stroke: #ffffff; stroke-width: 2; }
+      .chart-label { font-family: sans-serif; font-size: 13px; fill: #666666; font-weight: 500; }
     </style>
   </defs>
 
@@ -32,7 +33,6 @@
     
     <!-- Window Top Header Bar -->
     <rect class="window-header" x="0" y="0" width="658" height="38" rx="4" ry="4" />
-    <rect class="window-header" x="0" y="20" width="658" height="18" />
 
     <!-- Window Title -->
     <text x="329" y="26" class="header-title" text-anchor="middle">STATS</text>
@@ -53,7 +53,7 @@
     <!-- Window Body Area -->
     <g transform="translate(0, 38)">
       
-      <!-- Toolbar Button Area (NEW Refresh Button reload.svg) -->
+      <!-- Toolbar Button Area (Refresh Button reload.svg) -->
       <g transform="translate(10, 10)">
         <rect class="toolbar-box" x="0" y="0" width="48" height="48" rx="4" />
         <!-- Refresh Icon reload.svg -->
@@ -65,44 +65,57 @@
 
       <!-- Statistical Data Text List -->
       <g transform="translate(80, 20)">
-        <text class="stats-text" x="0" y="20">• duples: 1</text>
+        <text class="stats-text" x="0" y="20">• duples: 0</text>
         <text class="stats-text" x="0" y="44">• triplets: 0</text>
         <text class="stats-text" x="0" y="68">• quintuplets: 0</text>
-        <text class="stats-text" x="0" y="92">• pitch names: G, E</text>
-        <text class="stats-text" x="0" y="116">• number of notes: 3</text>
-        <text class="stats-text" x="0" y="140">• lowest note: E4, 330Hz</text>
+        <text class="stats-text" x="0" y="92">• pitch names: G</text>
+        <text class="stats-text" x="0" y="116">• number of notes: 1</text>
+        <text class="stats-text" x="0" y="140">• lowest note: G4, 392Hz</text>
         <text class="stats-text" x="0" y="164">• highest note: G4, 392Hz</text>
         <text class="stats-text" x="0" y="188">• rests used: 0</text>
         <text class="stats-text" x="0" y="212">• ornaments used: 0</text>
       </g>
 
-      <!-- 2D Radar Chart Visualization -->
-      <g transform="translate(329, 360)">
-        <!-- Outer Concentric Polygon Rings -->
-        <polygon class="chart-grid" points="0,-100 70.7,-70.7 100,0 70.7,70.7 0,100 -70.7,70.7 -100,0 -70.7,-70.7" />
-        <polygon class="chart-grid" points="0,-70 49.5,-49.5 70,0 49.5,49.5 0,70 -49.5,49.5 -70,0 -49.5,-49.5" />
-        <polygon class="chart-grid" points="0,-40 28.3,-28.3 40,0 28.3,28.3 0,40 -28.3,28.3 -40,0 -28.3,-28.3" />
+      <!-- 2D Radar Chart Visualization (Matching Widget Output) -->
+      <g transform="translate(420, 240)">
+        <!-- Outer Concentric Polygon Rings (11-gon) -->
+        <polygon class="chart-grid" points="0,-100 54.1,-84.1 91.0,-41.5 99.0,14.2 75.6,65.5 28.2,95.9 -28.2,95.9 -75.6,65.5 -99.0,14.2 -91.0,-41.5 -54.1,-84.1" />
+        <polygon class="chart-grid" points="0,-75 40.5,-63.1 68.2,-31.1 74.2,10.7 56.7,49.1 21.1,71.9 -21.1,71.9 -56.7,49.1 -74.2,10.7 -68.2,-31.1 -40.5,-63.1" />
+        <polygon class="chart-grid" points="0,-50 27.0,-42.1 45.5,-20.8 49.5,7.1 37.8,32.7 14.1,48.0 -14.1,48.0 -37.8,32.7 -49.5,7.1 -45.5,-20.8 -27.0,-42.1" />
+        <polygon class="chart-grid" points="0,-25 13.5,-21.0 22.7,-10.4 24.7,3.6 18.9,16.4 7.0,24.0 -7.0,24.0 -18.9,16.4 -24.7,3.6 -22.7,-10.4 -13.5,-21.0" />
 
-        <!-- Axis Lines -->
-        <line class="chart-axis" x1="0" y1="-110" x2="0" y2="110" />
-        <line class="chart-axis" x1="-110" y1="0" x2="110" y2="0" />
-        <line class="chart-axis" x1="-77.8" y1="-77.8" x2="77.8" y2="77.8" />
-        <line class="chart-axis" x1="-77.8" y1="77.8" x2="77.8" y2="-77.8" />
+        <!-- 11 Thick Radial Spokes -->
+        <line class="chart-spoke" x1="0" y1="0" x2="0" y2="-100" />
+        <line class="chart-spoke" x1="0" y1="0" x2="54.1" y2="-84.1" />
+        <line class="chart-spoke" x1="0" y1="0" x2="91.0" y2="-41.5" />
+        <line class="chart-spoke" x1="0" y1="0" x2="99.0" y2="14.2" />
+        <line class="chart-spoke" x1="0" y1="0" x2="75.6" y2="65.5" />
+        <line class="chart-spoke" x1="0" y1="0" x2="28.2" y2="95.9" />
+        <line class="chart-spoke" x1="0" y1="0" x2="-28.2" y2="95.9" />
+        <line class="chart-spoke" x1="0" y1="0" x2="-75.6" y2="65.5" />
+        <line class="chart-spoke" x1="0" y1="0" x2="-99.0" y2="14.2" />
+        <line class="chart-spoke" x1="0" y1="0" x2="-91.0" y2="-41.5" />
+        <line class="chart-spoke" x1="0" y1="0" x2="-54.1" y2="-84.1" />
 
-        <!-- Filled Data Polygon -->
-        <polygon class="chart-poly" points="0,-75 50,-35 85,0 45,55 0,60 -60,40 -70,0 -50,-50" />
+        <!-- Data Value Line & Markers (Single Pitch Value active) -->
+        <line class="chart-data-line" x1="0" y1="0" x2="40.5" y2="-63.1" />
+        <circle class="chart-marker" cx="0" cy="0" r="9" />
+        <circle class="chart-marker" cx="40.5" cy="-63.1" r="9" />
+        <circle cx="40.5" cy="-63.1" r="5" fill="#999999" />
 
-        <!-- Axis Labels -->
-        <text font-family="sans-serif" font-size="11" fill="#666666" text-anchor="middle" x="0" y="-115">rhythm</text>
-        <text font-family="sans-serif" font-size="11" fill="#666666" text-anchor="start" x="85" y="-80">pitch</text>
-        <text font-family="sans-serif" font-size="11" fill="#666666" text-anchor="start" x="115" y="4">tone</text>
-        <text font-family="sans-serif" font-size="11" fill="#666666" text-anchor="start" x="85" y="88">mouse</text>
-        <text font-family="sans-serif" font-size="11" fill="#666666" text-anchor="middle" x="0" y="125">pen</text>
-        <text font-family="sans-serif" font-size="11" fill="#666666" text-anchor="end" x="-85" y="88">number</text>
-        <text font-family="sans-serif" font-size="11" fill="#666666" text-anchor="end" x="-115" y="4">flow</text>
-        <text font-family="sans-serif" font-size="11" fill="#666666" text-anchor="end" x="-85" y="-80">action</text>
+        <!-- 11 Axis Labels (matching PALLABELS) -->
+        <text class="chart-label" text-anchor="middle" x="0" y="-115">rhythm</text>
+        <text class="chart-label" text-anchor="start" x="64" y="-95">pitch</text>
+        <text class="chart-label" text-anchor="start" x="104" y="-45">tone</text>
+        <text class="chart-label" text-anchor="start" x="112" y="18">mouse</text>
+        <text class="chart-label" text-anchor="start" x="86" y="75">pen</text>
+        <text class="chart-label" text-anchor="middle" x="32" y="115">number</text>
+        <text class="chart-label" text-anchor="middle" x="-32" y="115">flow</text>
+        <text class="chart-label" text-anchor="end" x="-86" y="75">action</text>
+        <text class="chart-label" text-anchor="end" x="-112" y="18">sensors</text>
+        <text class="chart-label" text-anchor="end" x="-104" y="-45">media</text>
+        <text class="chart-label" text-anchor="end" x="-64" y="-95">mice</text>
       </g>
-
     </g>
   </g>
 </svg>
