@@ -284,6 +284,32 @@ function setupVolumeActions(activity) {
                     }, 250);
                 }
             }
+
+            const listenerName = "_setsynthvolume_" + turtle + "_" + synth + "_" + blk;
+
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) {
+                    mouse.MB.listeners.push(listenerName);
+                }
+            }
+
+            const __listener = () => {
+                tur.singer.synthVolume[synth].pop();
+
+                if (!tur.singer.suppressOutput) {
+                    Singer.setSynthVolume(
+                        activity.logo,
+                        turtle,
+                        synth,
+                        last(tur.singer.synthVolume[synth])
+                    );
+                }
+            };
+
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**
