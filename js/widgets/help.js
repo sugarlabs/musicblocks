@@ -93,7 +93,8 @@ class HelpWidget {
         });
 
         // Position center
-        setTimeout(this.widgetWindow.sendToCenter, 50);
+        // Read widgetWindow when the timer fires: the block-help path replaces it first.
+        setTimeout(() => this.widgetWindow.sendToCenter(), 50);
     }
 
     /**

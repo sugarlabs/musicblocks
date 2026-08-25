@@ -466,7 +466,8 @@
     transform: rotate(12deg);
 }
 
-.petal-song-map {
+.petal-song-map,
+.beat-map {
     display: flex;
     flex-direction: column;
     gap: 7px;
@@ -1010,7 +1011,8 @@
     transform: translateX(-50%) rotate(-4deg);
 }
 
-.petal-song-map span {
+.petal-song-map span,
+.beat-map span {
     position: relative;
     min-height: 34px;
     display: flex;
@@ -1026,7 +1028,8 @@
     text-align: center;
 }
 
-.petal-song-map span:nth-child(2n) {
+.petal-song-map span:nth-child(2n),
+.beat-map span:nth-child(2n) {
     background: #eef7d2;
     border-color: #b7d17c;
     color: #3f5f21;
@@ -2008,6 +2011,82 @@
     border: 2px solid #d0d7de;
     margin: 12px 0;
     background: white;
+}
+
+/* CSS-only lighthouse metronome keeps Level 9 asset-free like the other scenes. */
+.metronome-scene {
+    position: relative;
+    min-height: 128px;
+    margin: 2px 0 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #1b4965;
+    background: linear-gradient(#12314a 0 58%, #14496b 59% 100%);
+}
+
+.metronome-beam {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translateX(-50%);
+    border-left: 56px solid transparent;
+    border-right: 56px solid transparent;
+    border-bottom: 46px solid rgba(255, 209, 102, 0.3);
+}
+
+.metronome-body {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    width: 72px;
+    height: 82px;
+    transform: translateX(-50%);
+    border: 3px solid #1b4965;
+    border-radius: 26px 26px 6px 6px;
+    background: linear-gradient(#fdfefe 0 46%, #e63946 47% 100%);
+}
+
+.metronome-arm {
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    width: 4px;
+    height: 60px;
+    border-radius: 2px;
+    background: #1b4965;
+    transform-origin: bottom center;
+    transform: rotate(-16deg);
+}
+
+.metronome-weight {
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    width: 20px;
+    height: 10px;
+    margin-left: -10px;
+    border-radius: 2px;
+    background: #ffd166;
+    border: 2px solid #1b4965;
+}
+
+.metronome-tick {
+    position: absolute;
+    bottom: 34px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.metronome-tick-left {
+    left: 28px;
+}
+
+.metronome-tick-right {
+    right: 28px;
 }
 
 /* === CHECK BUTTON === */

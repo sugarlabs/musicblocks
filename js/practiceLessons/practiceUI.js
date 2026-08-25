@@ -9,7 +9,8 @@ const COMPLETION_CRITERIA = [
     "completeBasicShapeSet",
     "completeAnimatedPolyrhythm",
     "completeCircularRhythmRing",
-    "completeTwinkleForm"
+    "completeTwinkleForm",
+    "completeMetronome"
 ];
 
 const PracticeUI = {
@@ -370,7 +371,8 @@ const PracticeUI = {
             5: "geometry_rhythm_level5.tb",
             6: "animated_polyrhythms_level6.tb",
             7: "circular_rhythm_level7.tb",
-            8: "twinkle_phrase_maker_level8.tb"
+            8: "twinkle_phrase_maker_level8.tb",
+            9: "metronome_level9.tb"
         };
 
         const file = projectFiles[level];
@@ -512,13 +514,24 @@ const PracticeUI = {
         this.startBadgeMonitor(problem);
     },
 
+    // help.js is loaded on demand, so it is absent until the Help menu has been opened once.
+    ensureHelpWidget() {
+        if (typeof HelpWidget !== "undefined") return Promise.resolve();
+        if (typeof window.require !== "function" || !window.define?.amd) return Promise.resolve();
+
+        // Resolve on failure too, so a card that cannot load still falls back to a notice.
+        return new Promise(resolve => window.require(["widgets/help"], resolve, resolve));
+    },
+
     attachSecretHelpCards(problem, container) {
         container.querySelectorAll("[data-secret-help]").forEach(button => {
-            button.onclick = () => {
+            button.onclick = async () => {
                 const card = problem.secretHelpCards?.[button.dataset.secretHelp];
                 if (!card) return;
 
                 const activity = this.getActivity();
+                await this.ensureHelpWidget();
+
                 if (typeof HelpWidget === "undefined" || !activity) {
                     this.showQuestNotice(
                         card.title,

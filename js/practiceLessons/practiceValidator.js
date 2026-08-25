@@ -57,6 +57,10 @@ const PracticeValidator = {
             return this.validateRhythmMakerWorkflow();
         }
 
+        if (problem?.expected?.metronomeWorkflow) {
+            return this.validateMetronome();
+        }
+
         if (!problem?.expected?.pattern) return false;
 
         return this.validatePattern(problem.expected.pattern);
@@ -199,6 +203,22 @@ const PracticeValidator = {
                 return this.hasConnectedBlockNamed(["namedbox", "box", "box1", "box2"]);
             case "completeTwinkleForm":
                 return this.validateTwinklePhraseMaker();
+            case "completeMetronome":
+                return this.validateMetronome();
+            case "swungThePendulum":
+                return this.hasConnectedBlockNamed(["setheading"]);
+            case "changedTempo":
+                return this.hasConnectedBlockNamed([
+                    "setmasterbpm",
+                    "setmasterbpm2",
+                    "setbpm",
+                    "setbpm2",
+                    "setbpm3"
+                ]);
+            case "setTheMeter":
+                return this.hasConnectedBlockNamed(["meter"]);
+            case "paintedTheBeat":
+                return this.hasConnectedBlockNamed(["beatvalue"]);
             case "addedHarmonyVoice":
                 return this.countStartBlocks() >= 2;
             default:
@@ -393,6 +413,48 @@ const PracticeValidator = {
 
             return this.actionContainsBlockNamed(block, blockList, ["playdrum"]);
         });
+    },
+
+    // A metronome is a loop that keeps repeating, holding at least two different drum sounds.
+    validateMetronome() {
+        return (
+            this.hasLoopWithBlockInside(["playdrum", "setdrum"]) &&
+            new Set(this.getPlayedDrumNames()).size >= 2
+        );
+    },
+
+    // Unlike hasLoopContainingBlockNamed this descends into clamps, so a drum inside a note counts.
+    hasLoopWithBlockInside(names) {
+        const blockList = this.getBlockList();
+        const blockNames = new Set(names);
+
+        return Object.values(blockList).some(block => {
+            if (!block || block.trash) return false;
+
+            const bodyConnection = LOOP_BODY_CONNECTION.get(block.name);
+            if (bodyConnection === undefined) return false;
+
+            return this.argTreeContainsNamed(
+                block.connections?.[bodyConnection],
+                blockList,
+                blockNames
+            );
+        });
+    },
+
+    getPlayedDrumNames() {
+        const blockList = this.getBlockList();
+
+        return Object.values(blockList)
+            .filter(
+                block =>
+                    block && !block.trash && (block.name === "playdrum" || block.name === "setdrum")
+            )
+            .map(block => {
+                const drumBlock = blockList[block.connections?.[1]];
+                return drumBlock?.value || drumBlock?.privateData || "";
+            })
+            .filter(Boolean);
     },
 
     validateAnimatedPolyrhythm() {

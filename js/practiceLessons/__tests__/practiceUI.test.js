@@ -34,9 +34,16 @@ const makeProblem = (level, overrides = {}) => ({
     level,
     island: "echo_island",
     title: `Lesson ${level}`,
-    description: `<p>body ${level}</p>`,
+    description:
+        `<p>body ${level}</p>` +
+        '<button type="button" data-secret-help="swingPendulum">Swing the pendulum</button>' +
+        '<button type="button" data-secret-help="makeLonger">Make it longer</button>',
     journal: { title: `Page ${level}`, island: "Echo Island", learned: ["Patterns"] },
     rewards: [`Fragment #${level}`],
+    secretHelpCards: {
+        swingPendulum: { title: "Swing the pendulum", type: "block", blockName: "setheading" },
+        makeLonger: { title: "Make it longer", description: "Add another chunk." }
+    },
     badges: [
         {
             id: `done_${level}`,
@@ -1094,5 +1101,80 @@ describe("ExplorerJournalUI panel lifecycle", () => {
         await ExplorerJournalUI.open();
 
         expect(document.getElementById("explorer-journal-panel").style.right).not.toBe("");
+    });
+});
+
+describe("PracticeUI extra action help cards", () => {
+    beforeEach(() => {
+        stubActivity({});
+        // renderLevel loads the starter project; the card path does not care about the result.
+        global.fetch = jest.fn(() => new Promise(() => {}));
+    });
+
+    const clickCard = async key => {
+        const container = mountPracticeContent();
+        PracticeUI.renderLevel(1);
+        await container.querySelector(`[data-secret-help="${key}"]`).onclick();
+        return container;
+    };
+
+    afterEach(() => {
+        delete global.HelpWidget;
+        delete global.define;
+        delete global.require;
+        delete global.fetch;
+    });
+
+    test("loads the lazy help widget before opening a block card", async () => {
+        delete global.HelpWidget;
+        global.define = Object.assign(jest.fn(), { amd: true });
+        global.require = jest.fn((deps, callback) => {
+            global.HelpWidget = { showBlockHelp: jest.fn(), showCard: jest.fn() };
+            callback();
+        });
+
+        await clickCard("swingPendulum");
+
+        expect(global.require).toHaveBeenCalledWith(
+            ["widgets/help"],
+            expect.any(Function),
+            expect.any(Function)
+        );
+        expect(global.HelpWidget.showBlockHelp).toHaveBeenCalledWith(
+            expect.anything(),
+            "setheading"
+        );
+    });
+
+    test("does not reload the help widget once it is already there", async () => {
+        global.HelpWidget = { showBlockHelp: jest.fn(), showCard: jest.fn() };
+        global.define = Object.assign(jest.fn(), { amd: true });
+        global.require = jest.fn();
+
+        await clickCard("swingPendulum");
+
+        expect(global.require).not.toHaveBeenCalled();
+        expect(global.HelpWidget.showBlockHelp).toHaveBeenCalled();
+    });
+
+    test("opens a written card through the help widget rather than a notice", async () => {
+        global.HelpWidget = { showBlockHelp: jest.fn(), showCard: jest.fn() };
+
+        await clickCard("makeLonger");
+
+        expect(global.HelpWidget.showCard).toHaveBeenCalled();
+        expect(document.getElementById("practice-quest-notice")).toBeNull();
+    });
+
+    test("falls back to a notice only when the help widget cannot be loaded", async () => {
+        delete global.HelpWidget;
+        global.define = Object.assign(jest.fn(), { amd: true });
+        global.require = jest.fn((deps, callback) => callback());
+
+        await clickCard("swingPendulum");
+
+        expect(document.getElementById("practice-quest-notice").textContent).toContain(
+            "Swing the pendulum"
+        );
     });
 });
