@@ -467,8 +467,8 @@
 }
 
 .petal-song-map {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 7px;
     margin: 8px 0;
 }
@@ -1030,11 +1030,6 @@
     background: #eef7d2;
     border-color: #b7d17c;
     color: #3f5f21;
-    transform: translateY(5px);
-}
-
-.petal-song-map span:nth-child(7) {
-    grid-column: 2 / span 2;
 }
 
 .sound-chip-row,
