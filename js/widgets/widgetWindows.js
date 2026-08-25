@@ -805,6 +805,11 @@ class WidgetWindow {
     clear() {
         this._widget.replaceChildren();
         this._toolbar.replaceChildren();
+        // The toolbar buttons have just been removed from the DOM, so drop the
+        // references too. Widgets re-add their buttons after clear(), and
+        // modifyButton() addresses them by index — leaving the old entries in
+        // place would push every index past the detached ones.
+        this._buttons = [];
         return this;
     }
 

@@ -336,6 +336,28 @@ describe("widgetWindows", () => {
 
             expect(win._buttons).toHaveLength(3);
         });
+
+        test("modifyButton still addresses the live buttons after a re-init", () => {
+            // A widget that re-initialises on an already open window (see
+            // Blocks.reInitWidget) calls clear() and then re-adds its buttons.
+            const win = createTestWindow();
+            win.clear();
+            win.addButton("play-button.svg", 24, "Play");
+            win.addButton("erase-button.svg", 24, "Clear");
+
+            win.clear();
+            win.addButton("play-button.svg", 24, "Play");
+            win.addButton("erase-button.svg", 24, "Clear");
+
+            expect(win._buttons).toHaveLength(2);
+
+            const target = win.modifyButton(0, "stop-button.svg", 24, "Stop");
+
+            expect(win._toolbar.contains(target)).toBe(true);
+            expect(win._toolbar.querySelector("img").getAttribute("src")).toBe(
+                "header-icons/stop-button.svg"
+            );
+        });
     });
 
     describe("addDivider", () => {
