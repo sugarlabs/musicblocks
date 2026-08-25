@@ -1144,6 +1144,7 @@ function TemperamentWidget() {
         const table = document.createElement("table");
         table.style.width = "100%";
         table.style.borderCollapse = "collapse";
+        table.style.fontSize = "12px";
         tableDiv.appendChild(table);
 
         const thead = document.createElement("tr");
@@ -1152,25 +1153,29 @@ function TemperamentWidget() {
             const th = document.createElement("th");
             th.textContent = h;
             th.style.border = "1px solid #333";
-            th.style.padding = "4px 8px";
+            th.style.padding = "6px 8px";
             th.style.textAlign = "center";
+            th.style.backgroundColor = "#2a2a3e";
+            th.style.color = "#ccc";
+            th.style.fontWeight = "bold";
             thead.appendChild(th);
         }
         table.appendChild(thead);
 
-        for (let i = 0; i < this.pitchNumber; i++) {
+        for (let i = 0; i < that.pitchNumber; i++) {
             const tr = document.createElement("tr");
-            const cents = this.cents[i];
+            const cents = that.cents[i];
             const dev = cents - Math.round(cents / 100) * 100;
+            const bgColor = i % 2 === 0 ? "#1a1a2e" : "#22223a";
 
             const tdName = document.createElement("td");
-            tdName.textContent = this.notes[i][0] + this.notes[i][1];
+            tdName.textContent = that.notes[i][0] + that.notes[i][1];
 
             const tdStep = document.createElement("td");
             tdStep.textContent = i;
 
             const tdFreq = document.createElement("td");
-            tdFreq.textContent = this.frequencies[i];
+            tdFreq.textContent = that.frequencies[i];
 
             const tdCents = document.createElement("td");
             tdCents.textContent = (dev >= 0 ? "+" : "") + dev.toFixed(1);
@@ -1183,12 +1188,13 @@ function TemperamentWidget() {
             }
 
             const tdRatio = document.createElement("td");
-            tdRatio.textContent = this.ratios[i].toFixed(4);
+            tdRatio.textContent = that.ratios[i].toFixed(4);
 
             for (const td of [tdName, tdStep, tdFreq, tdCents, tdRatio]) {
                 td.style.border = "1px solid #333";
-                td.style.padding = "4px 8px";
+                td.style.padding = "6px 8px";
                 td.style.textAlign = "center";
+                td.style.backgroundColor = bgColor;
                 tr.appendChild(td);
             }
             table.appendChild(tr);
