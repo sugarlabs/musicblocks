@@ -989,11 +989,15 @@ function TemperamentWidget() {
         temperamentTableDiv.style.fontFamily = "sans-serif";
         temperamentTableDiv.style.padding = "8px";
 
-        const canvasSize = 400;
+        const bodyWidth = temperamentTableDiv.parentElement
+            ? temperamentTableDiv.parentElement.clientWidth - 16
+            : 384;
+        const canvasSize = Math.min(Math.max(bodyWidth, 280), 500);
         const canvas = document.createElement("canvas");
         canvas.width = canvasSize;
         canvas.height = canvasSize;
-        canvas.style.maxWidth = "100%";
+        canvas.style.width = "100%";
+        canvas.style.maxWidth = canvasSize + "px";
         canvas.style.display = "block";
         canvas.style.margin = "0 auto";
         temperamentTableDiv.appendChild(canvas);
