@@ -1078,6 +1078,35 @@ function TemperamentWidget() {
         ctx.textBaseline = "middle";
         ctx.fillText(this.inTemperament + " vs 12-EDO", cx, cy);
 
+        const legendX = canvasSize - 10;
+        const legendY = canvasSize - 10;
+        const legendItems = [
+            [_("matched"), "#4caf50", true],
+            [_("sharp"), "#ff9800", false],
+            [_("flat"), "#f44336", false]
+        ];
+        ctx.textAlign = "right";
+        ctx.textBaseline = "bottom";
+        ctx.font = "10px sans-serif";
+
+        for (let li = 0; li < legendItems.length; li++) {
+            const ly = legendY - (legendItems.length - 1 - li) * 14;
+            const lx = legendX;
+
+            ctx.beginPath();
+            ctx.setLineDash(legendItems[li][2] ? [3, 2] : []);
+            ctx.moveTo(lx - 50, ly - 3);
+            ctx.lineTo(lx - 35, ly - 3);
+            ctx.strokeStyle = legendItems[li][1];
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.lineWidth = 1;
+
+            ctx.fillStyle = "#aaa";
+            ctx.fillText(legendItems[li][0], lx, ly);
+        }
+
         const tableDiv = document.createElement("div");
         tableDiv.style.maxHeight = "200px";
         tableDiv.style.overflowY = "auto";
