@@ -577,5 +577,31 @@ describe("ModeWidget", () => {
 
             expect(modeWidget._selectedModeName).toBe("major");
         });
+
+        test("falls back to the first slice on a group without the current mode", () => {
+            // wheelnav's navigateWheel() reads navItems[index] without a bounds
+            // check, so a -1 from indexOf() throws and leaves the widget half
+            // open. Group "5" holds no "major", which is the default mode, so
+            // the highlight has to land on slice 0.
+            modeWidget._piemenuModes();
+            switchGroup(modeWidget, "5");
+
+            const titles = modeWidget._modeNameWheel.navItems.map(item => item.title);
+            expect(titles).not.toContain("major");
+            expect(modeWidget._modeNameWheel.navigateWheel).toHaveBeenLastCalledWith(0);
+        });
+
+        test("leaves mode selection enabled even if the highlight throws", () => {
+            // The real wheelnav throws out of navigateWheel() on a bad index,
+            // where this mock returns quietly. A throw must not strand
+            // _suppressModeSelect, because that swallows every later click.
+            modeWidget._piemenuModes();
+            modeWidget._modeNameWheel.navigateWheel.mockImplementationOnce(() => {
+                throw new TypeError("Cannot read properties of undefined");
+            });
+
+            expect(() => switchGroup(modeWidget, "5")).toThrow(TypeError);
+            expect(modeWidget._suppressModeSelect).toBe(false);
+        });
     });
 });
