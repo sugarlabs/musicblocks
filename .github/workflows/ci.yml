@@ -154,7 +154,7 @@ jobs:
               run: npm run build --if-present
 
     # ----------------------------------------------------------------------
-    # Jest unit tests + coverage threshold + Codecov upload
+    # Jest unit tests + coverage + Codecov upload
     # ----------------------------------------------------------------------
     test:
         name: Jest tests & coverage
