@@ -10,14 +10,19 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 // Shared vm sandbox for loading the real, unmodified js/activity.js into a
-// Jest test without a browser. Every field here stubs a dependency that
-// sits outside whatever seam a given test is exercising (Turtles, Blocks,
-// Logo, the setupXController functions, etc.) so that just constructing
-// Activity doesn't require real DOM/audio/canvas machinery Jest can't
-// provide. Callers layer test-specific `overrides` on top (e.g. mocking or
-// deliberately NOT mocking setupProjectManager) and may supply `prependCode`
-// to run more real, unmodified source (such as project-manager.js) in the
-// same vm context before activity.js runs.
+// Jest test without a browser. This intentionally stubs only what the
+// Activity constructor itself touches directly (the setupXController
+// functions it calls in sequence, hideDOMLabel, ErrorHandler, PluginDialog,
+// performance) - verified empirically by trimming the sandbox until
+// construction stopped succeeding. Activity's heavier dependencies (Turtles,
+// Blocks, Logo, etc.) are never referenced during construction itself: they
+// are wired up later by setupDependencies(), which only runs from the
+// domReady bootstrap callback below - and since this sandbox's `define` is a
+// no-op, that callback is never invoked. Callers layer test-specific
+// `overrides` on top (e.g. mocking or deliberately NOT mocking
+// setupProjectManager) and may supply `prependCode` to run more real,
+// unmodified source (such as project-manager.js) in the same vm context
+// before activity.js runs.
 
 const fs = require("fs");
 const path = require("path");
@@ -35,31 +40,8 @@ const createBaseSandbox = () => ({
     require: () => {},
     setTimeout,
     setInterval,
-    createjs: {
-        DOMElement: class {
-            constructor() {}
-        }
-    },
-    jQuery: {
-        browser: { mozilla: false }
-    },
-    Turtles: class {},
-    Palettes: class {},
-    Blocks: class {},
-    Logo: class {},
-    LanguageBox: class {},
-    ThemeBox: class {},
-    SaveInterface: class {},
-    StatsWindow: class {},
-    Trashcan: class {},
-    PasteBox: class {},
-    HelpWidget: class {},
     PluginDialog: class {
         constructor() {}
-    },
-    GIFAnimator: class {},
-    i18next: {
-        changeLanguage: jest.fn()
     },
     ErrorHandler: {
         capture: jest.fn(),
@@ -115,15 +97,7 @@ const createBaseSandbox = () => ({
     hideDOMLabel: jest.fn(),
     setupActivityRecorder: jest.fn(),
     setupActivityAbcParser: jest.fn(),
-    AlertController: {
-        MSG_TIMEOUT: 60000,
-        ERROR_MSG_TIMEOUT: 15000
-    },
-    performance: global.performance || { now: () => Date.now() },
-    platformColor: { stopIconcolor: "red" },
-    globalActivity: null,
-    LEADING: 0,
-    MYDEFINES: []
+    performance: global.performance || { now: () => Date.now() }
 });
 
 /**
@@ -156,4 +130,27 @@ const loadActivitySandbox = ({ overrides = {}, prependCode = "" } = {}) => {
     return sandbox;
 };
 
-module.exports = { loadActivitySandbox };
+const PROJECT_MANAGER_PATH = path.resolve(__dirname, "../../project-manager.js");
+
+// project-manager.js only exposes its module-local `setupProjectManager`
+// onto `window` inside its AMD branch (what RequireJS triggers in the
+// browser). Appending these assignments is the vm-sandbox equivalent of
+// that - pulling `setupProjectManager`/`ProjectManager` onto the shared
+// context the same way `this.activity = activity;` does for activity.js
+// above - so activity.js's constructor calls the real setupProjectManager
+// instead of the default mocked one above.
+const REAL_PROJECT_MANAGER_CODE =
+    fs.readFileSync(PROJECT_MANAGER_PATH, "utf8") +
+    "\nthis.setupProjectManager = setupProjectManager;\nthis.ProjectManager = ProjectManager;";
+
+/**
+ * Loads real, unmodified activity.js AND project-manager.js into one vm
+ * context, so activity.js's constructor wires up a real ProjectManager
+ * instead of the default sandbox's mocked one. `overrides` covers the
+ * handful of extra globals project-manager.js's methods read at call time
+ * (e.g. `pubsub`, `DATAOBJS`) on top of the base Activity stub set.
+ */
+const loadActivityWithRealProjectManager = (overrides = {}) =>
+    loadActivitySandbox({ overrides, prependCode: REAL_PROJECT_MANAGER_CODE });
+
+module.exports = { loadActivitySandbox, loadActivityWithRealProjectManager };

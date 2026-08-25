@@ -16,29 +16,19 @@
 // for Activity. Neither proves that constructing a real Activity produces a
 // real, correctly-wired ProjectManager that reads back real Activity state.
 // It reuses the shared vm sandbox from helpers/activity-vm-sandbox.js (the
-// same one activity_toolbar_integration.test.js uses) so this doesn't
-// duplicate that dependency scaffold - the only thing overridden here is
-// letting the real project-manager.js source run instead of the shared
-// sandbox's default mocked setupProjectManager.
+// same one activity_toolbar_integration.test.js uses), asking it to load
+// the real project-manager.js instead of the shared sandbox's default
+// mocked setupProjectManager.
 
-const fs = require("fs");
-const path = require("path");
-const { loadActivitySandbox } = require("./helpers/activity-vm-sandbox");
-
-const PROJECT_MANAGER_CODE =
-    fs.readFileSync(path.resolve(__dirname, "../project-manager.js"), "utf8") +
-    "\nthis.setupProjectManager = setupProjectManager;\nthis.ProjectManager = ProjectManager;";
+const { loadActivityWithRealProjectManager } = require("./helpers/activity-vm-sandbox");
 
 const loadRealActivityAndProjectManager = () => {
-    const sandbox = loadActivitySandbox({
+    const sandbox = loadActivityWithRealProjectManager({
         // Real project-manager.js's methods read these globals at call time
         // only; not needed just to load the module.
-        overrides: {
-            pubsub: { off: jest.fn() },
-            DATAOBJS: [{ name: "start" }],
-            _THIS_IS_MUSIC_BLOCKS_: true
-        },
-        prependCode: PROJECT_MANAGER_CODE
+        pubsub: { off: jest.fn() },
+        DATAOBJS: [{ name: "start" }],
+        _THIS_IS_MUSIC_BLOCKS_: true
     });
     return { activity: sandbox.activity, ProjectManager: sandbox.ProjectManager };
 };
@@ -72,8 +62,17 @@ describe("Activity <-> ProjectManager integration", () => {
                     name: "note",
                     trash: false,
                     value: null,
-                    container: { x: 0, y: 0 },
-                    connections: [null],
+                    container: { x: 100, y: 200 },
+                    connections: [null, null],
+                    isValueBlock: () => false
+                },
+                {
+                    name: "pitch",
+                    trash: false,
+                    value: null,
+                    container: { x: 150, y: 250 },
+                    // Connects back to the first block by its blockList index (0).
+                    connections: [0, null],
                     isValueBlock: () => false
                 }
             ]
@@ -85,9 +84,13 @@ describe("Activity <-> ProjectManager integration", () => {
 
         const parsed = JSON.parse(activity.projectManager.prepareExport());
 
-        // Read: the exported block count came from the real
-        // activity.blocks.blockList, not a mock's static shape.
-        expect(parsed).toHaveLength(1);
+        // Read: name, position, and the resolved connection index all came
+        // from the real activity.blocks.blockList graph, not a mock's
+        // static shape - ProjectManager had to walk that real array to
+        // resolve block 0's exported index into this "pitch" entry's
+        // connection.
+        expect(parsed).toHaveLength(2);
+        expect(parsed[1]).toEqual([1, "pitch", 150, 250, [0, null]]);
         // Mutate: the call went through to the same real Activity instance,
         // not a detached copy.
         expect(activity.hasMatrixDataBlock).toBe(false);
