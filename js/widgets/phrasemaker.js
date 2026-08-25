@@ -618,7 +618,10 @@ class PhraseMaker {
             this.activity.logo.synth.stop();
             this._stopOrCloseClicked = true;
             this.activity.hideMsgs();
-            this.docById("wheelDivptm").style.display = "none";
+            const wheelDiv = this.docById("wheelDivptm");
+            if (wheelDiv && wheelDiv.style) {
+                wheelDiv.style.display = "none";
+            }
             widgetWindow.destroy();
         };
 

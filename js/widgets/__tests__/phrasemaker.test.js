@@ -1822,6 +1822,54 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker._noteStored[0]).toBe("snare drum");
         });
     });
+
+    describe("widgetWindow.onclose wheelDivptm safety", () => {
+        test("onclose executes cleanly and sets wheelDivptm display to none when present or safely skips when missing", () => {
+            const mockWidgetWindow = {
+                destroy: jest.fn()
+            };
+            phraseMaker.widgetWindow = mockWidgetWindow;
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                hideMsgs: jest.fn()
+            };
+            phraseMaker._rowMap = [0, 1];
+            phraseMaker._instrumentName = "synth";
+
+            const onclose = () => {
+                phraseMaker._rowOffset = [];
+                for (let i = 0; i < phraseMaker._rowMap.length; i++) {
+                    phraseMaker._rowMap[i] = i;
+                }
+
+                phraseMaker.activity.logo.synth.stopSound(0, phraseMaker._instrumentName);
+                phraseMaker.activity.logo.synth.stop();
+                phraseMaker._stopOrCloseClicked = true;
+                phraseMaker.activity.hideMsgs();
+                const wheelDiv = phraseMaker.docById("wheelDivptm");
+                if (wheelDiv && wheelDiv.style) {
+                    wheelDiv.style.display = "none";
+                }
+                phraseMaker.widgetWindow.destroy();
+            };
+
+            // Test when wheelDivptm is null
+            phraseMaker.docById = jest.fn().mockReturnValue(null);
+            expect(() => onclose()).not.toThrow();
+            expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+
+            // Test when wheelDivptm is present
+            const mockWheelDiv = { style: { display: "block" } };
+            phraseMaker.docById = jest.fn().mockReturnValue(mockWheelDiv);
+            onclose();
+            expect(mockWheelDiv.style.display).toBe("none");
+        });
+    });
 });
 
 describe("PhraseMaker.dependencies", () => {
