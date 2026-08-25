@@ -196,3 +196,566 @@ describe("PracticeValidator geometry levels", () => {
         expect(PracticeValidator.hasBadgeEvidence({}, "createdExtraPolyrhythmDivisor")).toBe(true);
     });
 });
+
+const useBlocks = blockList => {
+    window.ActivityContext = { getActivity: () => ({ blocks: { blockList } }) };
+};
+
+const chunkFlow = (names, firstId = "c0") => {
+    const blocks = {
+        start: { name: "start", trash: false, connections: [null, firstId, null] }
+    };
+
+    names.forEach((name, index) => {
+        blocks[`c${index}`] = {
+            name: "nameddo",
+            value: name,
+            trash: false,
+            connections: [
+                index === 0 ? "start" : `c${index - 1}`,
+                index === names.length - 1 ? null : `c${index + 1}`
+            ]
+        };
+    });
+
+    return blocks;
+};
+
+const actionNamed = (id, label) => ({
+    [id]: { name: "action", trash: false, connections: [null, `${id}-label`, null] },
+    [`${id}-label`]: { name: "text", value: label, trash: false, connections: [id] }
+});
+
+const pitchAtOctave = (id, octave) => ({
+    [id]: { name: "pitch", trash: false, connections: [null, `${id}-solfege`, `${id}-octave`] },
+    [`${id}-solfege`]: { name: "solfege", value: "do", trash: false, connections: [id] },
+    [`${id}-octave`]: { name: "number", value: octave, trash: false, connections: [id] }
+});
+
+describe("PracticeValidator.getBlockList", () => {
+    test("returns nothing when Music Blocks has not started", () => {
+        delete window.ActivityContext;
+
+        expect(PracticeValidator.getBlockList()).toEqual({});
+        expect(PracticeValidator.getCurrentSequence()).toEqual([]);
+    });
+
+    test("returns nothing when the activity context throws", () => {
+        window.ActivityContext = {
+            getActivity: () => {
+                throw new Error("not ready");
+            }
+        };
+
+        expect(PracticeValidator.getBlockList()).toEqual({});
+    });
+});
+
+describe("PracticeValidator.getCurrentSequence", () => {
+    test("is empty when there is no start block to read from", () => {
+        useBlocks({ lonely: { name: "nameddo", value: "A", trash: false, connections: [null] } });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual([]);
+    });
+
+    test("reads the chunks under start in order", () => {
+        useBlocks(chunkFlow(["A", "A", "B", "A"]));
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual(["A", "A", "B", "A"]);
+    });
+
+    test("expands a repeat into the sequence it plays", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", "count", "c0", null] },
+            count: { name: "number", value: 3, trash: false, connections: ["rep"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", "c1"] },
+            c1: { name: "nameddo", value: "B", trash: false, connections: ["c0", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual(["A", "B", "A", "B", "A", "B"]);
+    });
+
+    test("treats a repeat with no count as playing once", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", null, "c0", null] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["rep", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual(["A"]);
+    });
+
+    test("sees through the hidden blocks Music Blocks inserts inside clamps", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "hide", null] },
+            hide: { name: "hidden", trash: false, connections: ["start", "c0"] },
+            c0: { name: "nameddo", value: "A", trash: false, connections: ["hide", null] }
+        });
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual(["A"]);
+    });
+
+    test("stops at a chunk that has been thrown away", () => {
+        const blocks = chunkFlow(["A", "B"]);
+        blocks.c1.trash = true;
+        useBlocks(blocks);
+
+        expect(PracticeValidator.getCurrentSequence()).toEqual(["A"]);
+    });
+});
+
+describe("PracticeValidator.matchesPattern", () => {
+    test("accepts the exact sequence", () => {
+        expect(PracticeValidator.matchesPattern(["A", "A", "B"], ["A", "A", "B"])).toBe(true);
+    });
+
+    test("accepts chunks the learner renamed, as long as the shape holds", () => {
+        expect(
+            PracticeValidator.matchesPattern(
+                ["Verse", "Verse", "Chorus", "Verse"],
+                ["A", "A", "B", "A"]
+            )
+        ).toBe(true);
+    });
+
+    test("rejects a renaming that collapses two different chunks into one", () => {
+        expect(PracticeValidator.matchesPattern(["A", "A", "A", "A"], ["A", "A", "B", "A"])).toBe(
+            false
+        );
+    });
+
+    test("rejects one chunk used under two different names", () => {
+        expect(PracticeValidator.matchesPattern(["X", "Y", "B", "X"], ["A", "A", "B", "A"])).toBe(
+            false
+        );
+    });
+
+    test("rejects a sequence of the wrong length", () => {
+        expect(PracticeValidator.matchesPattern(["A", "A"], ["A", "A", "B"])).toBe(false);
+    });
+
+    test("rejects a sequence with a gap in it", () => {
+        expect(PracticeValidator.matchesPattern([undefined, "A"], ["A", "B"])).toBe(false);
+    });
+});
+
+describe("PracticeValidator.validate", () => {
+    test("fails a lesson that declares nothing to check", () => {
+        useBlocks({});
+
+        expect(PracticeValidator.validate({})).toBe(false);
+        expect(PracticeValidator.validate(null)).toBe(false);
+    });
+
+    test("checks the chunk pattern when that is all the lesson asks for", () => {
+        useBlocks(chunkFlow(["A", "A", "B", "A"]));
+
+        expect(PracticeValidator.validate({ expected: { pattern: ["A", "A", "B", "A"] } })).toBe(
+            true
+        );
+        expect(PracticeValidator.validate({ expected: { pattern: ["A", "B"] } })).toBe(false);
+    });
+});
+
+describe("PracticeValidator chunk renaming", () => {
+    test("is not evidence when the lesson lists no original names", () => {
+        useBlocks(actionNamed("a1", "Verse"));
+
+        expect(PracticeValidator.hasRenamedChunks(undefined)).toBe(false);
+    });
+
+    test("is not evidence while the starter names are untouched", () => {
+        useBlocks({ ...actionNamed("a1", "A"), ...actionNamed("a2", "B") });
+
+        expect(PracticeValidator.hasRenamedChunks(["A", "B"])).toBe(false);
+    });
+
+    test("is evidence once a chunk carries a name of the learner's own", () => {
+        useBlocks({ ...actionNamed("a1", "A"), ...actionNamed("a2", "Chorus") });
+
+        expect(PracticeValidator.hasRenamedChunks(["A", "B"])).toBe(true);
+    });
+
+    test("ignores an action that has been thrown away", () => {
+        const blocks = actionNamed("a1", "Chorus");
+        blocks.a1.trash = true;
+        useBlocks(blocks);
+
+        expect(PracticeValidator.hasRenamedChunks(["A"])).toBe(false);
+    });
+});
+
+describe("PracticeValidator pitch octaves", () => {
+    test("reads every pitch octave in ascending order", () => {
+        useBlocks({ ...pitchAtOctave("p1", 5), ...pitchAtOctave("p2", 3) });
+
+        expect(PracticeValidator.getPitchOctaves()).toEqual([3, 5]);
+    });
+
+    test("is not evidence while the octaves match the starter project", () => {
+        useBlocks({ ...pitchAtOctave("p1", 4), ...pitchAtOctave("p2", 4) });
+
+        expect(PracticeValidator.hasChangedPitchOctave([4, 4])).toBe(false);
+    });
+
+    test("is evidence once an octave has been moved", () => {
+        useBlocks({ ...pitchAtOctave("p1", 4), ...pitchAtOctave("p2", 6) });
+
+        expect(PracticeValidator.hasChangedPitchOctave([4, 4])).toBe(true);
+    });
+
+    test("without a baseline, anything other than octave four counts", () => {
+        useBlocks(pitchAtOctave("p1", 5));
+
+        expect(PracticeValidator.hasChangedPitchOctave()).toBe(true);
+    });
+
+    test("without a baseline, octave four alone does not count", () => {
+        useBlocks(pitchAtOctave("p1", 4));
+
+        expect(PracticeValidator.hasChangedPitchOctave()).toBe(false);
+    });
+});
+
+describe("PracticeValidator block presence", () => {
+    test("finds a block that is merely sitting on the canvas", () => {
+        useBlocks({ loose: { name: "repeat", trash: false, connections: [null, null] } });
+
+        expect(PracticeValidator.hasBlockNamed(["repeat"])).toBe(true);
+    });
+
+    test("does not count a loose block as connected", () => {
+        useBlocks({ loose: { name: "repeat", trash: false, connections: [null, null] } });
+
+        expect(PracticeValidator.hasConnectedBlockNamed(["repeat"])).toBe(false);
+    });
+
+    test("counts a block once it is attached to a stack", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", null, null, null] }
+        });
+
+        expect(PracticeValidator.hasConnectedBlockNamed(["repeat"])).toBe(true);
+    });
+
+    test("counts the mice on the canvas", () => {
+        useBlocks({
+            s1: { name: "start", trash: false, connections: [] },
+            s2: { name: "start", trash: false, connections: [] },
+            s3: { name: "start", trash: true, connections: [] }
+        });
+
+        expect(PracticeValidator.countStartBlocks()).toBe(2);
+    });
+});
+
+describe("PracticeValidator variations", () => {
+    test("is not evidence without a baseline pattern", () => {
+        useBlocks(chunkFlow(["A"]));
+
+        expect(PracticeValidator.hasCreatedVariation(undefined)).toBe(false);
+    });
+
+    test("is not evidence while the song is still the required length", () => {
+        useBlocks(chunkFlow(["A", "B"]));
+
+        expect(PracticeValidator.hasCreatedVariation(["A", "B"])).toBe(false);
+    });
+
+    test("is evidence once the learner extends the song beyond the lesson", () => {
+        useBlocks(chunkFlow(["A", "B", "B"]));
+
+        expect(PracticeValidator.hasCreatedVariation(["A", "B"])).toBe(true);
+    });
+});
+
+describe("PracticeValidator stored values", () => {
+    test("spots a value toggled with one minus", () => {
+        useBlocks({
+            s: { name: "storein", trash: false, connections: [null, "name", "calc", null] },
+            name: { name: "text", value: "flip", trash: false, connections: ["s"] },
+            calc: { name: "minus", trash: false, connections: ["s", "one", "box"] },
+            one: { name: "number", value: 1, trash: false, connections: ["calc"] },
+            box: { name: "namedbox", trash: false, connections: ["calc"] }
+        });
+
+        expect(PracticeValidator.hasToggleStore()).toBe(true);
+    });
+
+    test("reads the value slot of the second store block shape", () => {
+        useBlocks({
+            s: { name: "storein2", trash: false, connections: [null, "calc", null] },
+            calc: { name: "minus", trash: false, connections: ["s", "one", "box"] },
+            one: { name: "number", value: 1, trash: false, connections: ["calc"] },
+            box: { name: "namedbox", trash: false, connections: ["calc"] }
+        });
+
+        expect(PracticeValidator.hasToggleStore()).toBe(true);
+    });
+
+    test("a plain store is not a toggle", () => {
+        useBlocks({
+            s: { name: "storein", trash: false, connections: [null, "name", "one", null] },
+            name: { name: "text", value: "count", trash: false, connections: ["s"] },
+            one: { name: "number", value: 1, trash: false, connections: ["s"] }
+        });
+
+        expect(PracticeValidator.hasToggleStore()).toBe(false);
+    });
+});
+
+describe("PracticeValidator.assessBadges", () => {
+    test("returns nothing for a lesson that defines no badges", () => {
+        useBlocks({});
+
+        expect(PracticeValidator.assessBadges({})).toEqual([]);
+        expect(PracticeValidator.assessBadges({ badges: "nope" })).toEqual([]);
+    });
+
+    test("keeps only the badges the canvas can currently prove", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "rep", null] },
+            rep: { name: "repeat", trash: false, connections: ["start", null, null, null] }
+        });
+
+        const badges = PracticeValidator.assessBadges({
+            badges: [
+                { id: "loop", criterion: "usedRepeatLoop" },
+                { id: "drum", criterion: "playedRingDrum" }
+            ]
+        });
+
+        expect(badges.map(badge => badge.id)).toEqual(["loop"]);
+    });
+
+    test("a criterion nobody implemented can never be earned", () => {
+        useBlocks({});
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "notARealCriterion")).toBe(false);
+    });
+});
+
+// An action block holds its label in connection 1 and the first block of its body in connection 2.
+const actionWithBody = (id, label, bodyFirstId, bodyBlocks) => ({
+    [id]: { name: "action", trash: false, connections: [null, `${id}-label`, bodyFirstId, null] },
+    [`${id}-label`]: { name: "text", value: label, trash: false, connections: [id] },
+    ...bodyBlocks
+});
+
+describe("PracticeValidator rhythm maker workflow", () => {
+    const rhythmAction = actionWithBody("act", "drumbeat", "body", {
+        body: { name: "rhythm2", trash: false, connections: ["act", "n1", "n2", null] },
+        n1: { name: "number", value: 4, trash: false, connections: ["body"] },
+        n2: { name: "number", value: 4, trash: false, connections: ["body"] }
+    });
+
+    test("passes once the exported rhythm action is played from start", () => {
+        useBlocks({ ...rhythmAction, ...chunkFlow(["drumbeat"]) });
+
+        expect(PracticeValidator.validate({ expected: { rhythmMakerWorkflow: true } })).toBe(true);
+    });
+
+    test("fails while the rhythm action is never played", () => {
+        useBlocks(rhythmAction);
+
+        expect(PracticeValidator.validate({ expected: { rhythmMakerWorkflow: true } })).toBe(false);
+    });
+
+    test("fails when start plays an action that holds no rhythm", () => {
+        useBlocks({
+            ...actionWithBody("act", "drumbeat", "body", {
+                body: { name: "playdrum", trash: false, connections: ["act", null, null] }
+            }),
+            ...chunkFlow(["drumbeat"])
+        });
+
+        expect(PracticeValidator.validate({ expected: { rhythmMakerWorkflow: true } })).toBe(false);
+    });
+
+    test("accepts a tuplet as a rhythm too", () => {
+        useBlocks({
+            ...actionWithBody("act", "drumbeat", "body", {
+                body: { name: "stuplet", trash: false, connections: ["act", null, null, null] }
+            }),
+            ...chunkFlow(["drumbeat"])
+        });
+
+        expect(PracticeValidator.validateRhythmMakerWorkflow()).toBe(true);
+    });
+});
+
+describe("PracticeValidator circular rhythm ring", () => {
+    const ringBlocks = () => ({
+        // A broadcast whose name is calculated rather than typed.
+        "send": { name: "dispatch", trash: false, connections: [null, "name-calc", null] },
+        "name-calc": { name: "plus", trash: false, connections: ["send", "txt", "num"] },
+        "txt": { name: "text", value: "drum", trash: false, connections: ["name-calc"] },
+        "num": { name: "number", value: 1, trash: false, connections: ["name-calc"] },
+        // A loop that draws the ring.
+        "rep": { name: "repeat", trash: false, connections: [null, "count", "arc", null] },
+        "count": { name: "number", value: 12, trash: false, connections: ["rep"] },
+        "arc": { name: "arc", trash: false, connections: ["rep", null, null, null] },
+        // Wrap-around maths, attached to something.
+        "modulo": { name: "mod", trash: false, connections: ["rep", null, null] },
+        // A mouse that listens and moves.
+        ...actionWithBody("listener", "ring", "listen-blk", {
+            "listen-blk": { name: "listen", trash: false, connections: ["listener", null, "move"] },
+            "move": { name: "setxy", trash: false, connections: ["listen-blk", null, null, null] }
+        })
+    });
+
+    test("passes when the broadcast, the arc loop, the wrap maths, and the listener all exist", () => {
+        useBlocks(ringBlocks());
+
+        expect(PracticeValidator.validate({ expected: { circularRhythmRing: true } })).toBe(true);
+    });
+
+    test("fails when the broadcast name is not built from a calculation", () => {
+        const blocks = ringBlocks();
+        blocks["name-calc"].name = "text";
+
+        useBlocks(blocks);
+
+        expect(PracticeValidator.validateCircularRhythmRing()).toBe(false);
+    });
+
+    test("fails when nothing draws the ring", () => {
+        const blocks = ringBlocks();
+        delete blocks.arc;
+
+        useBlocks(blocks);
+
+        expect(PracticeValidator.validateCircularRhythmRing()).toBe(false);
+    });
+
+    test("fails when the listener never moves the mouse", () => {
+        const blocks = ringBlocks();
+        blocks.move.name = "print";
+
+        useBlocks(blocks);
+
+        expect(PracticeValidator.validateCircularRhythmRing()).toBe(false);
+    });
+});
+
+describe("PracticeValidator animated polyrhythm", () => {
+    test("needs the avatar as well as the two rhythms", () => {
+        useBlocks({
+            ...makeRhythmBlock("duplet", 2),
+            ...makeRhythmBlock("triplet", 3),
+            start: { name: "start", trash: false, connections: [null, "every", null] },
+            every: { name: "everybeatdo", trash: false, connections: ["start", null, null] }
+        });
+
+        expect(PracticeValidator.validate({ expected: { animatedPolyrhythm: true } })).toBe(false);
+    });
+
+    test("needs both rhythms, not just one", () => {
+        useBlocks({
+            ...makeRhythmBlock("duplet", 2),
+            start: { name: "start", trash: false, connections: [null, "every", null] },
+            every: { name: "everybeatdo", trash: false, connections: ["start", null, "shell"] },
+            shell: { name: "turtleshell", trash: false, connections: ["every", null, null, null] }
+        });
+
+        expect(PracticeValidator.validate({ expected: { animatedPolyrhythm: true } })).toBe(false);
+    });
+});
+
+describe("PracticeValidator drum choices", () => {
+    const withDrum = drum => ({
+        sd: { name: "setdrum", trash: false, connections: [null, "name", null, null] },
+        name: { name: "drumname", value: drum, trash: false, connections: ["sd"] }
+    });
+
+    test("reads back the drums that were chosen", () => {
+        useBlocks(withDrum("snare drum"));
+
+        expect(PracticeValidator.getSetDrumNames()).toContain("snare drum");
+    });
+
+    test("the starter drum on its own is not a discovery", () => {
+        useBlocks(withDrum("snare drum"));
+
+        expect(PracticeValidator.hasChangedDrumSound()).toBe(false);
+    });
+
+    test("picking a different drum is a discovery", () => {
+        useBlocks(withDrum("cow bell"));
+
+        expect(PracticeValidator.hasChangedDrumSound()).toBe(true);
+    });
+});
+
+describe("PracticeValidator badge criteria that look for one block", () => {
+    // Each criterion is satisfied by a single block attached to something.
+    const CRITERIA = [
+        ["usedRepeatLoop", "repeat"],
+        ["usedTranspose", "settransposition"],
+        ["usedGeometryDivision", "divide"],
+        ["usedBoxVariable", "storein"],
+        ["readBoxValue", "namedbox"],
+        ["changedShapeColor", "setcolor"],
+        ["usedAvatarAnimation", "turtleshell"],
+        ["usedEveryNoteAction", "everybeatdo"],
+        ["usedNoteValueMotion", "turtlenote"],
+        ["createdPitchPolyrhythm", "pitch"],
+        ["changedAnimationTurn", "right"],
+        ["playedRingDrum", "playdrum"]
+    ];
+
+    test.each(CRITERIA)("%s is proved by a connected %s block", (criterion, blockName) => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "target", null] },
+            target: { name: blockName, trash: false, connections: ["start", null, null] }
+        });
+
+        expect(PracticeValidator.hasBadgeEvidence({}, criterion)).toBe(true);
+    });
+
+    test.each(CRITERIA)("%s is not proved by a loose %s block", (criterion, blockName) => {
+        useBlocks({ target: { name: blockName, trash: false, connections: [null, null, null] } });
+
+        expect(PracticeValidator.hasBadgeEvidence({}, criterion)).toBe(false);
+    });
+
+    test("builtMouseRing needs four mice", () => {
+        const mice = count =>
+            Object.fromEntries(
+                Array.from({ length: count }, (unused, index) => [
+                    `s${index}`,
+                    { name: "start", trash: false, connections: [] }
+                ])
+            );
+
+        useBlocks(mice(3));
+        expect(PracticeValidator.hasBadgeEvidence({}, "builtMouseRing")).toBe(false);
+
+        useBlocks(mice(4));
+        expect(PracticeValidator.hasBadgeEvidence({}, "builtMouseRing")).toBe(true);
+    });
+
+    test("addedHarmonyVoice needs a second mouse", () => {
+        useBlocks({ s0: { name: "start", trash: false, connections: [] } });
+        expect(PracticeValidator.hasBadgeEvidence({}, "addedHarmonyVoice")).toBe(false);
+
+        useBlocks({
+            s0: { name: "start", trash: false, connections: [] },
+            s1: { name: "start", trash: false, connections: [] }
+        });
+        expect(PracticeValidator.hasBadgeEvidence({}, "addedHarmonyVoice")).toBe(true);
+    });
+
+    test("completePattern defers to the lesson's own pattern check", () => {
+        useBlocks(chunkFlow(["A", "B"]));
+
+        expect(
+            PracticeValidator.hasBadgeEvidence(
+                { expected: { pattern: ["A", "B"] } },
+                "completePattern"
+            )
+        ).toBe(true);
+    });
+});
