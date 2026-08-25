@@ -9,126 +9,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-const fs = require("fs");
-const path = require("path");
-const vm = require("vm");
+const { loadActivitySandbox } = require("./helpers/activity-vm-sandbox");
 
-const loadActivityClass = () => {
-    const activityPath = path.resolve(__dirname, "../activity.js");
-    let code = fs.readFileSync(activityPath, "utf8");
-
-    const splitPoint = code.indexOf("const activity = new Activity();");
-    if (splitPoint !== -1) {
-        code = code.substring(0, splitPoint);
-    }
-
-    code += "\nthis.Activity = Activity;";
-
-    const sandbox = {
-        window: global.window,
-        document: global.document,
-        console: global.console,
-        navigator: global.navigator,
-        _: key => key,
-        define: () => {},
-        require: () => {},
-        setTimeout,
-        setInterval,
-        createjs: {
-            DOMElement: class {
-                constructor() {}
-            }
-        },
-        jQuery: {
-            browser: { mozilla: false }
-        },
-        Turtles: class {},
-        Palettes: class {},
-        Blocks: class {},
-        Logo: class {},
-        LanguageBox: class {},
-        ThemeBox: class {},
-        SaveInterface: class {},
-        StatsWindow: class {},
-        Trashcan: class {},
-        PasteBox: class {},
-        HelpWidget: class {},
-        PluginDialog: class {
-            constructor() {}
-        },
-        GIFAnimator: class {},
-        i18next: {
-            changeLanguage: jest.fn()
-        },
-        ErrorHandler: {
-            capture: jest.fn(),
-            recoverable: jest.fn()
-        },
-        setupActivityIdleWatcher: jest.fn(),
-        setupProjectManager: jest.fn(activity => {
-            activity.projectManager = {
-                doLoadAnimation: jest.fn(),
-                stopLoadAnimation: jest.fn(),
-                prepareExport: jest.fn(),
-                runProject: jest.fn(),
-                getClosestStandardNoteValue: jest.fn(),
-                _loadProject: jest.fn(),
-                loadStartWrapper: jest.fn(),
-                showContents: jest.fn(),
-                justLoadStart: jest.fn(),
-                saveLocally: jest.fn(),
-                newProject: jest.fn(),
-                doLoad: jest.fn(),
-                doMergeLoad: jest.fn(),
-                start: jest.fn()
-            };
-        }),
-        setupKeyboardController: jest.fn(activity => {
-            activity.keyboardController = {
-                getCurrentKeyCode: jest.fn(),
-                clearCurrentKeyCode: jest.fn(),
-                __keyPressed: jest.fn(),
-                dispose: jest.fn()
-            };
-        }),
-        setupPluginController: jest.fn(),
-        setupToolbarController: jest.fn(),
-        setupAlertController: jest.fn(),
-        setupAlertRenderer: jest.fn(),
-        setupPaletteLoader: jest.fn(),
-        setupSearchUI: jest.fn(() => ({
-            createSearchUI: jest.fn(),
-            show: jest.fn(),
-            hide: jest.fn(),
-            focusInput: jest.fn(),
-            updateQuery: jest.fn(),
-            helpfulSearchDiv: null
-        })),
-        setupSearchController: jest.fn(),
-        setupWorkspaceLayoutController: jest.fn(),
-        setupSelectionController: jest.fn(),
-        setupTrashController: jest.fn(),
-        setupHelpController: jest.fn(),
-        setupBlockScaleController: jest.fn(),
-        setupContextMenuController: jest.fn(),
-        hideDOMLabel: jest.fn(),
-        setupActivityRecorder: jest.fn(),
-        setupActivityAbcParser: jest.fn(),
-        AlertController: {
-            MSG_TIMEOUT: 60000,
-            ERROR_MSG_TIMEOUT: 15000
-        },
-        performance: global.performance || { now: () => Date.now() },
-        platformColor: { stopIconcolor: "red" },
-        globalActivity: null,
-        LEADING: 0,
-        MYDEFINES: []
-    };
-
-    vm.createContext(sandbox);
-    vm.runInContext(code, sandbox);
-    return sandbox.Activity;
-};
+// This test only exercises Activity's own toolbar-delegation methods, so
+// setupProjectManager stays mocked (the shared helper's default) rather than
+// wiring in the real ProjectManager - that real wiring is covered by
+// activity-projectmanager-integration.test.js.
+const loadActivityClass = () => loadActivitySandbox().Activity;
 
 describe("Activity Toolbar Integration", () => {
     let Activity;
