@@ -2004,9 +2004,6 @@ function setupPitchBlocks(activity) {
                     }
 
                     scaledegree = Number(scaledegree.replace(attr, ""));
-                    if (attr !== NATURAL) {
-                        note += attr;
-                    }
 
                     const obj = keySignatureToMode(tur.singer.keySignature);
 
@@ -2033,6 +2030,10 @@ function setupPitchBlocks(activity) {
                         tur.singer.movable,
                         null
                     );
+                    if (attr !== NATURAL) {
+                        note += attr;
+                    }
+
                     let semitones = ref;
 
                     semitones += NOTESFLAT.includes(note)
