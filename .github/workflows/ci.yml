@@ -175,9 +175,9 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            # Coverage thresholds are enforced inside Jest (coverageThreshold in
-            # your Jest config), so this step fails the job if coverage drops
-            # below the configured minimums.
+            # Generates coverage/coverage-summary.json, used by the coverage-delta
+            # job below to enforce no regression vs. the base branch. This step
+            # itself no longer enforces a static coverage threshold.
             - name: Run Jest with coverage
               run: npm test -- --coverage --ci
                

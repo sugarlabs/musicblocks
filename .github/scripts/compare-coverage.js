@@ -36,6 +36,7 @@ function main() {
     if (!basePath || !prPath) {
         console.error("Usage: node compare-coverage.js <base-summary.json> <pr-summary.json>");
         process.exit(2);
+        return;
     }
 
     const base = readTotal(basePath);
@@ -86,4 +87,8 @@ function main() {
     }
 }
 
-main();
+module.exports = { readTotal, arrow, main };
+
+if (require.main === module) {
+    main();
+}

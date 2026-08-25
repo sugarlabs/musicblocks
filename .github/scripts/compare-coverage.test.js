@@ -1,3 +1,4 @@
+const { readTotal, arrow, main } = require("./compare-coverage");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -133,4 +134,88 @@ describe("compare-coverage.js", () => {
         expect(result.status).toBe(2);
         expect(result.stderr).toContain("Usage:");
     });
+});
+
+describe("main (in-process)", () => {
+    let tmpDir, exitSpy, logSpy, errorSpy, originalArgv, originalStepSummary;
+
+    beforeEach(() => {
+        tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "cov-inproc-"));
+        originalArgv = process.argv;
+        originalStepSummary = process.env.GITHUB_STEP_SUMMARY;
+        exitSpy = jest.spyOn(process, "exit").mockImplementation(() => {});
+        logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+        errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        process.argv = originalArgv;
+        originalStepSummary === undefined
+            ? delete process.env.GITHUB_STEP_SUMMARY
+            : (process.env.GITHUB_STEP_SUMMARY = originalStepSummary);
+        jest.restoreAllMocks();
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    test("passes when coverage increases (direct call)", () => {
+        const base = writeSummary(tmpDir, "base.json", {
+            statements: 80,
+            branches: 70,
+            functions: 75,
+            lines: 80
+        });
+        const pr = writeSummary(tmpDir, "pr.json", {
+            statements: 85,
+            branches: 75,
+            functions: 80,
+            lines: 85
+        });
+        process.argv = ["node", "compare-coverage.js", base, pr];
+        main();
+        expect(exitSpy).not.toHaveBeenCalledWith(1);
+        expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("No coverage regressions"));
+    });
+
+    test("returns usage error when arguments are missing (direct call)", () => {
+        process.argv = ["node", "compare-coverage.js"];
+        main();
+        expect(exitSpy).toHaveBeenCalledWith(2);
+    });
+
+    test("writes to GITHUB_STEP_SUMMARY when set", () => {
+        const base = writeSummary(tmpDir, "base.json", {
+            statements: 80,
+            branches: 70,
+            functions: 75,
+            lines: 80
+        });
+        const pr = writeSummary(tmpDir, "pr.json", {
+            statements: 85,
+            branches: 75,
+            functions: 80,
+            lines: 85
+        });
+        const summaryFile = path.join(tmpDir, "step-summary.md");
+        fs.writeFileSync(summaryFile, "");
+        process.env.GITHUB_STEP_SUMMARY = summaryFile;
+        process.argv = ["node", "compare-coverage.js", base, pr];
+        main();
+        expect(fs.readFileSync(summaryFile, "utf8")).toContain("Coverage delta vs. base branch");
+    });
+});
+
+describe("readTotal", () => {
+    test("throws when the file has no total key", () => {
+        const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "cov-readtotal-"));
+        const badFile = path.join(tmpDir, "bad.json");
+        fs.writeFileSync(badFile, JSON.stringify({ notTotal: {} }));
+        expect(() => readTotal(badFile)).toThrow(/has no "total" key/);
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+});
+
+describe("arrow", () => {
+    test("up when delta exceeds epsilon", () => expect(arrow(0.02)).toBe("⬆️"));
+    test("down when delta is below negative epsilon", () => expect(arrow(-0.02)).toBe("⬇️"));
+    test("flat within epsilon", () => expect(arrow(0.005)).toBe("➡️"));
 });
