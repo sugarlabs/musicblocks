@@ -11,7 +11,7 @@
 
 /*
   global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  makeKeyboardAccessible, RECORDBUTTON, saveButton, saveButtonAdvanced
+  makeKeyboardAccessible, saveButton, saveButtonAdvanced
 */
 
 /* exported ToolbarUI */
