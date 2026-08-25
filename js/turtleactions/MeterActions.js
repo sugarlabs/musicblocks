@@ -128,24 +128,7 @@ function setupMeterActions(activity) {
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
-            tur.singer.bpm.push(_bpm);
-
-            const listenerName = "_setbpm_" + turtle + "_" + blk;
-
-            if (blk !== undefined && blk in activity.blocks.blockList) {
-                activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
-                const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null) {
-                    mouse.MB.listeners.push(listenerName);
-                }
-            }
-
-            const __listener = () => {
-                tur.singer.bpm.pop();
-            };
-
-            activity.logo.setTurtleListener(turtle, listenerName, __listener);
+            tur.singer.bpm[tur.singer.bpm.length - 1] = _bpm;
         }
 
         static setMasterBPM(bpm, beatValue, blk) {
