@@ -9078,6 +9078,10 @@ msgid "Check My Work"
 msgstr "Comprobar mi trabajo"
 
 #: js/practiceLessons/practiceUI.js
+msgid "Next Lesson"
+msgstr "Siguiente lección"
+
+#: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
 msgid "Quest Rewards"
 msgstr "Recompensas de la misión"

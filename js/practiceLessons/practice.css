@@ -2034,6 +2034,35 @@
     background: linear-gradient(135deg, #1e88e5, #1565c0);
 }
 
+/* === NEXT LESSON BUTTON === */
+#next-level {
+    width: 100%;
+    padding: 10px 14px;
+    margin-top: 8px;
+    border-radius: 18px;
+    border: none;
+    background: linear-gradient(135deg, #ffa726, #fb8c00);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+#next-level:hover {
+    background: linear-gradient(135deg, #fb8c00, #ef6c00);
+}
+
+#next-level small {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
 /* === SUCCESS MESSAGE === */
 .success {
     margin-top: 10px;
