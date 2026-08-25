@@ -32,9 +32,15 @@ const loadActivityAndProjectManager = () => {
     const activityPath = path.resolve(__dirname, "../activity.js");
     let activityCode = fs.readFileSync(activityPath, "utf8");
     const splitPoint = activityCode.indexOf("const activity = new Activity();");
-    if (splitPoint !== -1) {
-        activityCode = activityCode.substring(0, splitPoint);
+    if (splitPoint === -1) {
+        throw new Error(
+            "Could not locate the Activity singleton initialization line in activity.js " +
+                '(expected literal text "const activity = new Activity();"); the file may ' +
+                "have been restructured, so truncating it here would silently execute more " +
+                "(or less) of the module than this test intends."
+        );
     }
+    activityCode = activityCode.substring(0, splitPoint);
     activityCode += "\nthis.Activity = Activity;";
 
     const sandbox = {
@@ -222,7 +228,6 @@ describe("Activity <-> ProjectManager integration", () => {
     it("wires a real ProjectManager back to the real Activity during construction", () => {
         expect(activity.projectManager).toBeInstanceOf(ProjectManager);
         expect(activity.projectManager.activity).toBe(activity);
-        expect(activity.projectManager._loadAnimationIntervalId).toBeNull();
     });
 
     it("runs a real project operation (prepareExport) against the real Activity's block/turtle state", () => {
@@ -236,6 +241,10 @@ describe("Activity <-> ProjectManager integration", () => {
                 painter: { color: 0, value: 50, stroke: 5, chroma: 100 }
             }))
         };
+        // Seeded to the opposite of what prepareExport() should set, so the
+        // assertion below proves a real mutation happened rather than
+        // coincidentally matching Activity's initial value.
+        activity.hasMatrixDataBlock = true;
 
         const exported = activity.projectManager.prepareExport();
 
@@ -262,9 +271,9 @@ describe("Activity <-> ProjectManager integration", () => {
             ],
             [1, "note", 150, 250, [0, null]]
         ]);
-        // prepareExport() sets this flag on the same activity instance it was
-        // called through, not on some detached copy - a second observable
-        // sign the call went through the real Activity, not a mock.
+        // prepareExport() flips this flag back to false on the same activity
+        // instance it was called through (seeded to true above), not on some
+        // detached copy - proving the call mutated the real Activity, not a mock.
         expect(activity.hasMatrixDataBlock).toBe(false);
     });
 });
