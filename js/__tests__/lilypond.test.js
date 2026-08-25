@@ -147,6 +147,20 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "\\tuplet Infinity/1 { g' 0} ");
     });
 
+    test("should process staccato on a note inside a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, [3, 2], 0, -1, true]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\staccato ");
+    });
+
+    test("should not add staccato to a tuplet chord when staccato flag is false", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C4", "D4", "E4", "F4", "G4", "A4", "B4"], 4, 0, [3, 2], 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("\\staccato");
+    });
+
     test("should process a markup command correctly", () => {
         logo.notation.notationStaging[turtle] = ["markup", "Test Markup"];
         processLilypondNotes(lilypond, logo, turtle);
