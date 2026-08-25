@@ -662,8 +662,8 @@ class Palettes {
             element.style.transition = "transform 0.3s ease";
 
             element.innerHTML = `<div style="height:fit-content">
-                    <table width="${1.5 * this.cellSize}" bgcolor="white">
-                        <thead>
+                    <table width="${1.5 * this.cellSize}" bgcolor="white" role="presentation">
+                        <thead role="presentation">
                             <tr role="tablist" aria-label="${_("Palette Categories")}"></tr>
                         </thead>
                     </table>
