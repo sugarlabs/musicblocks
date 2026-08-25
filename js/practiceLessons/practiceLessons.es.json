@@ -29,6 +29,11 @@
             "label": "Guardián del Faro del Pulso",
             "shortLabel": "Guardián",
             "message": "Insignia grande desbloqueada: Guardián del Faro del Pulso. El faro gira en su tiempo justo y todas las islas pueden encontrar el camino a casa."
+        },
+        "singing_stones": {
+            "label": "Guardián de las Piedras Cantoras",
+            "shortLabel": "Piedras",
+            "message": "Insignia grande desbloqueada: Guardián de las Piedras Cantoras. Toda la orilla responde a tu mano y el último trozo de la Gran Melodía vuelve a casa."
         }
     },
     "problems": {
@@ -675,6 +680,66 @@
             "incomplete": {
                 "title": "La lámpara sigue dormida",
                 "message": "Choon oye un solo tambor girando una y otra vez, pero un metrónomo necesita dos sonidos distintos para hacer tic y tac. Añade otro tambor con valor de nota dentro del bloque Por siempre y dale otro tambor; después pulsa Comprobar mi trabajo."
+            }
+        },
+        "10": {
+            "title": "Las Piedras Cantoras",
+            "description": "\n      <section class=\"story-card\">\n        <p>En la última orilla hay una fila de piedras altas clavadas en la arena. Lyra toca una y no pasa nada. &quot;No están rotas&quot;, dice Choon. &quot;Están esperando. Una piedra así solo canta cuando alguien la toca, y alguien tiene que decirle qué cantar.&quot;</p>\n        <div class=\"piano-scene\" aria-label=\"Fila de piedras cantoras en silencio\">\n          <span class=\"piano-key piano-key-1\"></span>\n          <span class=\"piano-key piano-key-2\"></span>\n          <span class=\"piano-key piano-key-3\"></span>\n          <span class=\"piano-key piano-key-4\"></span>\n          <span class=\"piano-hand\"></span>\n        </div>\n        <p>En un piano de verdad la tecla empuja un martillo, el martillo golpea una cuerda y la cuerda canta. Aquí el <b>clic</b> es el martillo, y la nota que elijas es la cuerda.</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Dos piedras, dos voces</h4>\n        <div class=\"beat-map\" aria-label=\"Fila de piedras cantoras en silencio\">\n          <span>Tecla 1 - sol (ya construida para ti)</span>\n          <span>Tecla 2 - una nota tuya</span>\n        </div>\n        <p>Una piedra ya funciona. Su ratón escucha con <b>al hacer clic hacer</b>, y la <b>acción</b> correspondiente toca sol. Copia los bloques <b>Iniciar</b> y <b>acción</b> para construir una <b>segunda tecla</b> con su propia nota, pulsa <b>Reproducir</b> y luego haz clic en tus piedras.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Voces ocultas</h4>\n        <p>Cuando dos piedras te respondan, prueba una idea nueva. Cada una esconde una insignia.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"nameKeys\">Nombra tus teclas</button>\n          <button type=\"button\" data-secret-help=\"spreadKeys\">Separa las teclas</button>\n          <button type=\"button\" data-secret-help=\"addDrum\">Añade un tambor</button>\n          <button type=\"button\" data-secret-help=\"addAvatar\">Añade un avatar</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Piedras Cantoras",
+                "island": "Piedras Cantoras",
+                "completeTitle": "Las piedras responden a tu mano",
+                "learned": ["Eventos de clic", "Acciones", "Interactividad"]
+            },
+            "rewards": [
+                "Fragmento de Melodía #10",
+                "Página del Diario del Capitán #10",
+                "Pista del tesoro: una piedra solo responde a la mano que la toca."
+            ],
+            "badges": {
+                "stone_singer": {
+                    "label": "Cantante de Piedra",
+                    "shortLabel": "Piedras",
+                    "message": "Tocas la primera piedra y canta, y la segunda responde con otra voz. La orilla vuelve a tener un piano."
+                },
+                "key_namer": {
+                    "label": "Bautizador de Teclas",
+                    "shortLabel": "Nombres",
+                    "message": "Descubrimiento oculto: Bautizador de Teclas. Ahora cada piedra sabe su propio nombre, así que Lyra puede llamar a cualquiera."
+                },
+                "key_spacer": {
+                    "label": "Separador de Teclas",
+                    "shortLabel": "Espacio",
+                    "message": "Descubrimiento oculto: Separador de Teclas. Las piedras se reparten por la arena, así tu mano nunca toca dos a la vez."
+                },
+                "drum_key": {
+                    "label": "Tecla de Tambor",
+                    "shortLabel": "Tambor",
+                    "message": "Descubrimiento oculto: Tecla de Tambor. Una piedra responde con un tambor debajo de su nota y la arena tiembla un poco."
+                },
+                "avatar_key": {
+                    "label": "Rostro de la Piedra",
+                    "shortLabel": "Rostro",
+                    "message": "Descubrimiento oculto: Rostro de la Piedra. Cada tecla lleva su propia cara y la orilla te devuelve la mirada."
+                }
+            },
+            "secretHelpCards": {
+                "nameKeys": {
+                    "title": "Nombra tus teclas"
+                },
+                "spreadKeys": {
+                    "title": "Separa las teclas"
+                },
+                "addDrum": {
+                    "title": "Añade un tambor"
+                },
+                "addAvatar": {
+                    "title": "Añade un avatar"
+                }
+            },
+            "incomplete": {
+                "title": "Las piedras siguen calladas",
+                "message": "Choon oye una piedra responder a tu mano, pero un piano necesita más de una tecla. Copia los bloques Iniciar y acción para construir una segunda tecla con su propia nota, después pulsa Comprobar mi trabajo."
             }
         }
     }

@@ -2089,6 +2089,59 @@
     right: 28px;
 }
 
+/* CSS-only singing stones keep Level 10 asset-free like the other scenes. */
+.piano-scene {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 10px;
+    min-height: 128px;
+    margin: 2px 0 12px;
+    padding-bottom: 22px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #b08968;
+    background: linear-gradient(#cfe8f5 0 58%, #e8d5b7 59% 100%);
+}
+
+.piano-key {
+    width: 26px;
+    border-radius: 6px 6px 3px 3px;
+    border: 2px solid #6d6875;
+    background: linear-gradient(#fdfefe, #d8e2dc);
+    box-shadow: 0 3px 0 rgba(109, 104, 117, 0.35);
+}
+
+.piano-key-1 {
+    height: 58px;
+}
+
+.piano-key-2 {
+    height: 74px;
+}
+
+.piano-key-3 {
+    height: 66px;
+}
+
+.piano-key-4 {
+    height: 50px;
+}
+
+.piano-hand {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    border: 2px solid #6d6875;
+    background: #ffd166;
+}
+
 /* === CHECK BUTTON === */
 #check-level {
     width: 100%;

@@ -10,7 +10,8 @@ const COMPLETION_CRITERIA = [
     "completeAnimatedPolyrhythm",
     "completeCircularRhythmRing",
     "completeTwinkleForm",
-    "completeMetronome"
+    "completeMetronome",
+    "completePianoKeys"
 ];
 
 const PracticeUI = {
@@ -372,7 +373,8 @@ const PracticeUI = {
             6: "animated_polyrhythms_level6.tb",
             7: "circular_rhythm_level7.tb",
             8: "twinkle_phrase_maker_level8.tb",
-            9: "metronome_level9.tb"
+            9: "metronome_level9.tb",
+            10: "piano_level10.tb"
         };
 
         const file = projectFiles[level];

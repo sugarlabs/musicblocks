@@ -29,6 +29,11 @@
             "label": "パルスとうだいの まもりて",
             "shortLabel": "まもりて",
             "message": "ビッグバッジ かいほう: パルスとうだいの まもりて。とうだいが ぴったりの じかんで まわり、すべてのしまが いえへの みちを みつけられる。"
+        },
+        "singing_stones": {
+            "label": "うたういしの まもりて",
+            "shortLabel": "いし",
+            "message": "ビッグバッジ かいほう: うたういしの まもりて。はまべ ぜんたいが きみの てに こたえ、グランドメロディの さいごの かけらが かえってくる。"
         }
     },
     "problems": {
@@ -671,6 +676,66 @@
             "incomplete": {
                 "title": "ランプは まだ ねている",
                 "message": "チューンには ドラムが ひとつだけ まわって きこえる。メトロノームには チクとタクの ふたつの ちがう おとが ひつよう。ずっとブロックの なかに もうひとつ ノートバリュードラムを いれて、ちがう ドラムに してから できたかチェックを おそう。"
+            }
+        },
+        "10": {
+            "title": "うたういし",
+            "description": "\n      <section class=\"story-card\">\n        <p>さいごの はまべに、すなに たった たかい いしが ならんでいる。ライラが ひとつ さわっても なにも おこらない。&quot;こわれては いないよ&quot; と チューン。&quot;まっているんだ。この いしは だれかが さわったときだけ うたう。そして なにを うたうか だれかが おしえないと いけない。&quot;</p>\n        <div class=\"piano-scene\" aria-label=\"しずかな うたういしの ならび\">\n          <span class=\"piano-key piano-key-1\"></span>\n          <span class=\"piano-key piano-key-2\"></span>\n          <span class=\"piano-key piano-key-3\"></span>\n          <span class=\"piano-key piano-key-4\"></span>\n          <span class=\"piano-hand\"></span>\n        </div>\n        <p>ほんものの ピアノでは、けんばんが ハンマーを おし、ハンマーが げんを たたき、げんが うたう。ここでは <b>クリック</b> が ハンマーで、きみが えらぶ おとが げんだ。</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>ふたつの いし、ふたつの こえ</h4>\n        <div class=\"beat-map\" aria-label=\"しずかな うたういしの ならび\">\n          <span>キー 1 - ソル (もう つくってある)</span>\n          <span>キー 2 - きみの すきな おと</span>\n        </div>\n        <p>いしは ひとつ すでに うごく。マウスが <b>クリックしたら する</b> で きいていて、あう <b>アクション</b> が ソルを ならす。<b>スタート</b> と <b>アクション</b> ブロックを コピーして、じぶんの おとの <b>ふたつめの キー</b> を つくろう。<b>さいせい</b> を おして、いしを クリックしてみよう。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>かくれたこえ</h4>\n        <p>ふたつの いしが こたえたら、あたらしい アイデアを ためそう。どれにも バッジが かくれている。</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"nameKeys\">キーに なまえを つける</button>\n          <button type=\"button\" data-secret-help=\"spreadKeys\">キーを はなして おく</button>\n          <button type=\"button\" data-secret-help=\"addDrum\">ドラムを たす</button>\n          <button type=\"button\" data-secret-help=\"addAvatar\">アバターを たす</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "うたういし",
+                "island": "うたういし",
+                "completeTitle": "いしが きみのてに こたえた",
+                "learned": ["クリックイベント", "アクション", "インタラクション"]
+            },
+            "rewards": [
+                "メロディのかけら #10",
+                "キャプテンのにっき #10",
+                "たからのてがかり: いしは さわった てにだけ こたえる。"
+            ],
+            "badges": {
+                "stone_singer": {
+                    "label": "いしのうたいて",
+                    "shortLabel": "いし",
+                    "message": "さいしょの いしに さわると うたい、つぎの いしが ちがう こえで こたえる。はまべに また ピアノが もどった。"
+                },
+                "key_namer": {
+                    "label": "キーのなづけびと",
+                    "shortLabel": "なまえ",
+                    "message": "かくれたはっけん: キーのなづけびと。どの いしも じぶんの なまえを もったので、ライラは どれでも よべる。"
+                },
+                "key_spacer": {
+                    "label": "キーをはなすひと",
+                    "shortLabel": "あいだ",
+                    "message": "かくれたはっけん: キーをはなすひと。いしが すなの うえで はなれて たち、てが ふたつ いちどに あたらない。"
+                },
+                "drum_key": {
+                    "label": "ドラムキー",
+                    "shortLabel": "ドラム",
+                    "message": "かくれたはっけん: ドラムキー。いしが おとの したで ドラムを ならし、すなが すこし ゆれる。"
+                },
+                "avatar_key": {
+                    "label": "いしのかお",
+                    "shortLabel": "かお",
+                    "message": "かくれたはっけん: いしのかお。キーごとに じぶんの かおが あり、はまべが きみを みかえす。"
+                }
+            },
+            "secretHelpCards": {
+                "nameKeys": {
+                    "title": "キーに なまえを つける"
+                },
+                "spreadKeys": {
+                    "title": "キーを はなして おく"
+                },
+                "addDrum": {
+                    "title": "ドラムを たす"
+                },
+                "addAvatar": {
+                    "title": "アバターを たす"
+                }
+            },
+            "incomplete": {
+                "title": "いしは まだ しずか",
+                "message": "チューンには いしが ひとつだけ こたえるのが きこえる。ピアノには キーが ふたつ いじょう ひつよう。スタートと アクションを コピーして、じぶんの おとの ふたつめの キーを つくってから、できたかチェックを おそう。"
             }
         }
     }

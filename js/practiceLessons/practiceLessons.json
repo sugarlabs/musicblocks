@@ -38,6 +38,13 @@
                 "shortLabel": "Keeper",
                 "iconKey": "island",
                 "message": "Big Badge unlocked: Pulse Lighthouse Keeper. The beacon turns in perfect time, and every island can find its way home again."
+            },
+            "singing_stones": {
+                "id": "singing_stones_keeper",
+                "label": "Singing Stones Keeper",
+                "shortLabel": "Stones",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Singing Stones Keeper. The whole shore answers your touch, and the last of the Grand Melody comes home."
             }
         }
     },
@@ -1013,6 +1020,95 @@
             "incomplete": {
                 "title": "The Lamp Still Sleeps",
                 "message": "Choon hears one drum going round and round, but a metronome needs two different sounds to tick and tock. Add another note value drum inside the Forever block and give it a different drum, then press Check My Work."
+            }
+        },
+        {
+            "level": 10,
+            "island": "singing_stones",
+            "title": "The Singing Stones",
+            "journal": {
+                "title": "Singing Stones",
+                "island": "Singing Stones",
+                "completeTitle": "The Stones Answer Your Hand",
+                "learned": ["Click Events", "Actions", "Interactivity"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          On the last shore, a row of tall stones stands in the sand. Lyra taps\n          one and nothing happens. \"They are not broken,\" says Choon. \"They are\n          waiting. A stone like this only sings when someone touches it, and\n          somebody has to tell it what to sing.\"\n        </p>\n        <div class=\"piano-scene\" aria-label=\"Row of silent singing stones\">\n          <span class=\"piano-key piano-key-1\"></span>\n          <span class=\"piano-key piano-key-2\"></span>\n          <span class=\"piano-key piano-key-3\"></span>\n          <span class=\"piano-key piano-key-4\"></span>\n          <span class=\"piano-hand\"></span>\n        </div>\n        <p>\n          On a real piano a key pushes a hammer, the hammer strikes a string,\n          and the string sings. Here a <b>click</b> is the hammer, and the note\n          you choose is the string.\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Two Stones, Two Voices</h4>\n        <div class=\"beat-map\" aria-label=\"The keys of your piano\">\n          <span>Key 1 - sol (already built for you)</span>\n          <span>Key 2 - a note of your own</span>\n        </div>\n        <p>\n          One stone already works. Its mouse listens with\n          <b>on click do</b>, and the matching <b>action</b> plays sol. Copy the\n          <b>Start</b> and <b>action</b> blocks to build a <b>second key</b>\n          with its own note, press <b>Play</b>, then click your stones.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Voices</h4>\n        <p>\n          Once two stones answer you, try one new idea. Each one hides a badge.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"nameKeys\">Name your keys</button>\n          <button type=\"button\" data-secret-help=\"spreadKeys\">Spread the keys</button>\n          <button type=\"button\" data-secret-help=\"addDrum\">Add a drum</button>\n          <button type=\"button\" data-secret-help=\"addAvatar\">Add an avatar</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "nameKeys": {
+                    "title": "Name your keys",
+                    "type": "block",
+                    "blockName": "setturtlename2"
+                },
+                "spreadKeys": {
+                    "title": "Spread the keys",
+                    "type": "block",
+                    "blockName": "setxy"
+                },
+                "addDrum": {
+                    "title": "Add a drum",
+                    "type": "block",
+                    "blockName": "playdrum"
+                },
+                "addAvatar": {
+                    "title": "Add an avatar",
+                    "type": "block",
+                    "blockName": "turtleshell"
+                }
+            },
+            "expected": {
+                "pianoKeysWorkflow": true
+            },
+            "rewards": [
+                "Melody Fragment #10",
+                "Captain's Journal Page #10",
+                "Treasure Clue: A stone answers only the hand that touches it."
+            ],
+            "badges": [
+                {
+                    "id": "stone_singer",
+                    "label": "Stone Singer",
+                    "shortLabel": "Stones",
+                    "iconKey": "sound",
+                    "criterion": "completePianoKeys",
+                    "message": "You touch the first stone and it sings, then the second answers in a different voice. The shore has a piano again."
+                },
+                {
+                    "id": "key_namer",
+                    "label": "Key Namer",
+                    "shortLabel": "Names",
+                    "iconKey": "name",
+                    "criterion": "namedTheKeys",
+                    "message": "Hidden Discovery: Key Namer. Every stone knows its own name now, so Lyra can call any of them."
+                },
+                {
+                    "id": "key_spacer",
+                    "label": "Key Spacer",
+                    "shortLabel": "Space",
+                    "iconKey": "motion",
+                    "criterion": "spacedTheKeys",
+                    "message": "Hidden Discovery: Key Spacer. The stones stand apart along the sand, so your hand never hits two at once."
+                },
+                {
+                    "id": "drum_key",
+                    "label": "Drum Key",
+                    "shortLabel": "Drum",
+                    "iconKey": "drum",
+                    "criterion": "playedRingDrum",
+                    "message": "Hidden Discovery: Drum Key. A stone answers with a drum beneath its note, and the sand shakes a little."
+                },
+                {
+                    "id": "avatar_key",
+                    "label": "Face of the Stone",
+                    "shortLabel": "Face",
+                    "iconKey": "avatar",
+                    "criterion": "usedAvatarAnimation",
+                    "message": "Hidden Discovery: Face of the Stone. Each key wears a face of its own, and the shore looks back at you."
+                }
+            ],
+            "bigBadgeId": "singing_stones",
+            "incomplete": {
+                "title": "The Stones Stay Quiet",
+                "message": "Choon hears one stone answer your hand, but a piano needs more than one key. Copy the Start and action blocks to build a second key with its own note, then press Check My Work."
             }
         }
     ]
