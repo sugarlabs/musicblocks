@@ -1002,6 +1002,50 @@ function TemperamentWidget() {
         canvas.style.margin = "0 auto";
         temperamentTableDiv.appendChild(canvas);
 
+        canvas.tabIndex = 0;
+        canvas.setAttribute("role", "img");
+        canvas.setAttribute("aria-label", _("Temperament visualizer circle"));
+
+        let focusedDot = -1;
+
+        canvas.onkeydown = function (e) {
+            if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                e.preventDefault();
+                focusedDot = (focusedDot + 1) % that.pitchNumber;
+                that._logo.synth.trigger(
+                    0,
+                    that.frequencies[focusedDot],
+                    1 / 4,
+                    "electronic synth",
+                    null,
+                    null
+                );
+            } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                e.preventDefault();
+                focusedDot = (focusedDot - 1 + that.pitchNumber) % that.pitchNumber;
+                that._logo.synth.trigger(
+                    0,
+                    that.frequencies[focusedDot],
+                    1 / 4,
+                    "electronic synth",
+                    null,
+                    null
+                );
+            } else if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (focusedDot >= 0) {
+                    that._logo.synth.trigger(
+                        0,
+                        that.frequencies[focusedDot],
+                        1 / 4,
+                        "electronic synth",
+                        null,
+                        null
+                    );
+                }
+            }
+        };
+
         const ctx = canvas.getContext("2d");
         const cx = canvasSize / 2;
         const cy = canvasSize / 2;
