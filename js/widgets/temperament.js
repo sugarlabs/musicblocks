@@ -1141,6 +1141,41 @@ function TemperamentWidget() {
             canvas.style.cursor = onDot ? "pointer" : "default";
         };
 
+        canvas.ontouchstart = function (e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (touch.clientX - rect.left) * scaleX;
+            const y = (touch.clientY - rect.top) * scaleY;
+
+            let nearest = null;
+            let nearestDist = Infinity;
+            for (let i = 0; i < that.pitchNumber; i++) {
+                const cents = that.cents[i];
+                const angleDeg = 270 + cents * 0.3;
+                const dotA = (angleDeg * Math.PI) / 180;
+                const dx = cx + innerR * Math.cos(dotA);
+                const dy = cy + innerR * Math.sin(dotA);
+                const dist = Math.hypot(dx - x, dy - y);
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearest = i;
+                }
+            }
+            if (nearest !== null && nearestDist <= dotR + 16) {
+                that._logo.synth.trigger(
+                    0,
+                    that.frequencies[nearest],
+                    1 / 4,
+                    "electronic synth",
+                    null,
+                    null
+                );
+            }
+        };
+
         const table = document.createElement("table");
         table.style.width = "100%";
         table.style.borderCollapse = "collapse";
