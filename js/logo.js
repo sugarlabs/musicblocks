@@ -596,6 +596,10 @@ class Logo {
      * @returns {void}
      */
     initMediaDevices() {
+        if (this.mic && typeof this.mic.close === "function") {
+            this.mic.close();
+        }
+
         let mic = new this.deps.Tone.UserMedia();
         try {
             mic.open();

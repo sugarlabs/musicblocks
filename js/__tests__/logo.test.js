@@ -2669,6 +2669,34 @@ describe("Logo initMediaDevices", () => {
         );
         expect(logo.mic).toBeNull();
     });
+
+    test("closes the previous mic stream instead of dropping the reference", () => {
+        const firstClose = jest.fn();
+        logo.deps.Tone = {
+            UserMedia: jest.fn(() => ({ open: jest.fn(), close: firstClose }))
+        };
+
+        // Simulate a loudness/pitchness block being created a second time
+        // (e.g. a second such block in the same project, or the project
+        // being reloaded) while the first mic stream is still open.
+        logo.initMediaDevices();
+        expect(firstClose).not.toHaveBeenCalled();
+
+        logo.deps.Tone = {
+            UserMedia: jest.fn(() => ({ open: jest.fn(), close: jest.fn() }))
+        };
+        logo.initMediaDevices();
+
+        expect(firstClose).toHaveBeenCalledTimes(1);
+    });
+
+    test("does not throw when the previous mic has no close method", () => {
+        logo.deps.Tone = { UserMedia: jest.fn(() => ({ open: jest.fn() })) };
+        logo.initMediaDevices();
+
+        logo.deps.Tone = { UserMedia: jest.fn(() => ({ open: jest.fn() })) };
+        expect(() => logo.initMediaDevices()).not.toThrow();
+    });
 });
 
 describe("Logo processShow", () => {
