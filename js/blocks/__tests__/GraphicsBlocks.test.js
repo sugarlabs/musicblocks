@@ -425,6 +425,65 @@ describe("GraphicsBlocks", () => {
         });
     });
 
+    // ── ArcBlock Out of Bounds & Error Handling ────────
+    describe("ArcBlock Out of Bounds & Error Handling", () => {
+        test("ArcBlock reports error when angle > 5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow([6000, 100], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalled();
+            expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock reports error when angle < -5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow([-6000, 100], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalled();
+            expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock reports error for a very large angle that would otherwise loop unbounded", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow([9000000, 100], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock reports error when angle > 20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.arc();
+            block.flow([25000, 100], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+            expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock still reports error when radius is out of bounds and angle is in range", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow([90, 6000], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalled();
+            expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock allows an in-range angle up to the wrap-off boundary", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow([5000, 100], logo, turtle, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(5000, 100);
+        });
+        test("ArcBlock allows a large angle within bounds when wrap is on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.arc();
+            block.flow([15000, 100], logo, turtle, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(15000, 100);
+        });
+    });
+
     // ── SuppressOutput Behavior ────────────────────────
     describe("SuppressOutput Behavior (Pen State Isolation)", () => {
         test("ForwardBlock suppresses output by lifting pen temporarily during execution", () => {
