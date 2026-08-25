@@ -1115,6 +1115,28 @@ function TemperamentWidget() {
             }
         };
 
+        canvas.onmousemove = function (e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+
+            let onDot = false;
+            for (let i = 0; i < that.pitchNumber; i++) {
+                const cents = that.cents[i];
+                const angleDeg = 270 + cents * 0.3;
+                const dotA = (angleDeg * Math.PI) / 180;
+                const dx = cx + innerR * Math.cos(dotA);
+                const dy = cy + innerR * Math.sin(dotA);
+                if (Math.hypot(dx - x, dy - y) <= dotR + 8) {
+                    onDot = true;
+                    break;
+                }
+            }
+            canvas.style.cursor = onDot ? "pointer" : "default";
+        };
+
         const table = document.createElement("table");
         table.style.width = "100%";
         table.style.borderCollapse = "collapse";
