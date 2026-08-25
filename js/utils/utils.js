@@ -1307,3 +1307,14 @@ if (typeof module !== "undefined" && module.exports) {
         CameraManager
     };
 }
+
+// In the browser (and not under test, where dom-helpers.js's equivalent
+// guard already explains why this is conditional), explicitly attach this
+// to `window` rather than relying on it being reachable as a bare
+// identifier from other classic <script>-loaded files. That reachability
+// is real but load-order-dependent and not guaranteed -- callers in newer
+// or differently-ordered files have hit `ReferenceError: announceToScreenReader
+// is not defined` despite the function existing here.
+if (typeof window !== "undefined" && (typeof module === "undefined" || !module.exports)) {
+    window.announceToScreenReader = announceToScreenReader;
+}
