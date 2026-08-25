@@ -46,6 +46,12 @@ You can run it from
 8. [Program Palette](#8-program-palette)
 9. [Stats](#9-stats)
 10. [Planet View](#10-planet-view)
+11. [Practice Lessons](#11-practice-lessons)
+    1. [Opening the Lessons Panel](#1-opening-the-lessons-panel)
+    2. [Working Through a Lesson](#2-working-through-a-lesson)
+    3. [Badges and Rewards](#3-badges-and-rewards)
+    4. [Where Progress Is Saved](#4-where-progress-is-saved)
+12. [Explorer Journal](#12-explorer-journal)
 
 ## <a>1. Getting Started</a>
 
@@ -909,5 +915,101 @@ can download.
 ![Planet](./planet-3.png)
 
 ![Planet](./planet-4.png)
+
+[Back to Table of Contents](#table-of-contents)
+
+## 11. Practice Lessons
+
+[Back to Table of Contents](#table-of-contents)
+
+Practice Lessons is a guided track that teaches Music Blocks through a story.
+Lyra the explorer and Choon the music robot are searching for the Grand Melody, a song whose pieces have scattered across a chain of islands.
+Each lesson is one puzzle, and solving it restores another fragment of the song.
+
+The lessons are grouped into islands, currently Echo Island, the Harmony Geometry Reef, Broadcast Bay, and Starlight Summit.
+Finishing every lesson on an island earns a large island badge.
+
+### 1. Opening the Lessons Panel
+
+Open the **Help** menu on the toolbar and choose **Practice levels**.
+
+The panel appears on the right of the screen.
+Drag it by its blue header to move it, and use the tab on its left edge to collapse it out of the way while you work on the canvas.
+The Explorer Journal can be open at the same time; the two panels sit side by side.
+
+### 2. Working Through a Lesson
+
+The panel opens on the list of lessons.
+Each entry shows its level number and title, and lessons you have already finished are marked as done and carry the badges you earned on them.
+
+Choose a lesson to open it.
+Music Blocks loads that lesson's starter blocks onto the canvas, which **replaces anything already there**, so save your own work first if you want to keep it.
+
+A lesson page has four parts:
+
+| Part | What it is |
+| --- | --- |
+| The story | What is happening on the island, and the picture that goes with it. |
+| The mission | The goal, usually with a map of the chunks or shapes you need to build. |
+| Quest Rewards | The melody fragment, journal page, and treasure clue this lesson gives you. |
+| Discoveries | Every badge in the lesson. Badges you have earned are filled in. |
+
+Build the blocks the mission asks for, press **Play** to hear the result, then press **Check My Work**.
+
+One of three things happens:
+
+-   **The lesson is complete.** A success message appears, the lesson is marked done, and the Explorer Journal offers you a page to write on.
+-   **You found something extra.** If you have not solved the main goal yet but discovered a hidden idea along the way, you are awarded that discovery badge and can keep going.
+-   **Not yet.** A hint appears telling you what is still missing. Nothing is lost, so adjust the blocks and check again.
+
+Some lessons include an extra section of buttons, such as "Hidden Petals", that open short help cards explaining an idea you might try.
+Reading a card does not award anything by itself, but trying the idea on the canvas usually does.
+
+Use **Next Lesson** at the bottom of the page to move straight to the following lesson without going back to the list.
+Because starting a new lesson clears the canvas, Music Blocks asks you to confirm first if you have added blocks of your own.
+**Back** returns to the list of lessons.
+
+### 3. Badges and Rewards
+
+There are three kinds of reward.
+
+**Lesson badges** are earned by completing the goal of a lesson.
+
+**Hidden discovery badges** are earned by experimenting.
+Renaming your chunks, changing an octave, adding a transpose, or building a longer path all count.
+These are awarded automatically while a lesson is open, so you do not need to press **Check My Work** to collect them; keep an eye on the Discoveries card as you play.
+
+**Island badges** are awarded when every lesson on an island has been completed.
+They appear in a row at the top of the lesson list.
+
+### 4. Where Progress Is Saved
+
+Your completed lessons, your badges, and your journal are stored by the browser on the computer you are using.
+They are not tied to an account, so they do not follow you to another browser or another device, and clearing your browser's site data will reset them.
+
+## 12. Explorer Journal
+
+[Back to Table of Contents](#table-of-contents)
+
+The Explorer Journal is Lyra's logbook.
+It keeps a page for every lesson you have finished, and it is also somewhere to write down your own ideas.
+
+Open the **Help** menu and choose **Explorer Journal**.
+
+Until you complete your first lesson the journal is empty.
+After that, a page is added automatically each time you finish a lesson, and the journal opens on an index listing those pages in order.
+
+A lesson page records the name of the lesson, the island it belongs to, and the musical ideas it covered, such as patterns or repeat blocks.
+Below that is space for your own notes.
+
+When you complete a lesson, the journal offers you a page and a question to answer, for example what surprised you today.
+Writing something is optional and the prompt can be skipped; the page is created either way.
+Notes you write can be edited or deleted later from the page.
+
+You can also keep notes that are not attached to any lesson.
+From the journal index, start a new note, give it a title, and write as many entries in it as you like.
+These general notes can be renamed, edited, and deleted, and they are listed alongside your lesson pages.
+
+Like your lesson progress, the journal is stored in your browser.
 
 [Back to Table of Contents](#table-of-contents)
