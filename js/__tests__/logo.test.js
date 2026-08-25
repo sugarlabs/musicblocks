@@ -996,6 +996,20 @@ describe("Logo doStopTurtles", () => {
         expect(clearAllSpy).toHaveBeenCalled();
     });
 
+    test("removes active turtle listeners from stage and clears listeners object on stop", () => {
+        const mockListener = jest.fn();
+        turtle.listeners = { __beat_1_0__: mockListener };
+
+        logo.doStopTurtles();
+
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "__beat_1_0__",
+            mockListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({});
+    });
+
     describe("with Transport and audio streams", () => {
         let turtle0;
         let turtle1;

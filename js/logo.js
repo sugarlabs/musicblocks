@@ -731,6 +731,22 @@ class Logo {
     }
 
     /**
+     * Removes active event listeners from all turtles and clears listener objects.
+     *
+     * @returns {void}
+     */
+    clearTurtleListeners() {
+        for (const turtle of this.turtles.turtleList) {
+            if (turtle && turtle.listeners) {
+                for (const listener in turtle.listeners) {
+                    this.stage.removeEventListener(listener, turtle.listeners[listener], false);
+                }
+                turtle.listeners = {};
+            }
+        }
+    }
+
+    /**
      * Sets a listener to the triggering (dispatch) block (usually the hidden block) for a clamp block.
      *
      * @param blk
@@ -1240,6 +1256,8 @@ class Logo {
         this.synth.disposeAllInstruments();
         this._synthsInitialized = false;
 
+        this.clearTurtleListeners();
+
         // eslint-disable-next-line eqeqeq
         if (this.cameraID != null) {
             this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
@@ -1263,6 +1281,9 @@ class Logo {
                 "ManagedTimer: cancelled " + cancelledTimers + " pending timer(s) on stop"
             );
         }
+
+        // Remove active stage listeners and clear listener objects across all turtles.
+        this.clearTurtleListeners();
 
         // Prevent stale timeout from firing cleanup on next run.
         this._lastNoteTimeout = null;
@@ -1504,13 +1525,7 @@ class Logo {
         this._meterBlock = null;
 
         // Remove any listeners that might be still active.
-        for (const turtle of this.turtles.turtleList) {
-            for (const listener in turtle.listeners) {
-                this.stage.removeEventListener(listener, turtle.listeners[listener], false);
-            }
-
-            turtle.listeners = {};
-        }
+        this.clearTurtleListeners();
 
         // Init the graphic state.
         for (const turtle in this.turtles.turtleList) {
