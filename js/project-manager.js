@@ -354,6 +354,10 @@ class ProjectManager {
             that._doHardStopButton();
         }
 
+        if (typeof that._allClear === "function") {
+            that._allClear(false, true);
+        }
+
         if (
             that.planet !== undefined &&
             that.planet.planet !== null &&

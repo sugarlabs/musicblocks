@@ -939,6 +939,7 @@ describe("newProject / _afterDelete", () => {
         jest.useFakeTimers();
 
         pm._afterDelete();
+        expect(activity._allClear).toHaveBeenCalledWith(false, true);
         jest.advanceTimersByTime(1000);
 
         expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
