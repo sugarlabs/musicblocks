@@ -61,6 +61,10 @@ const PracticeValidator = {
             return this.validateMetronome();
         }
 
+        if (problem?.expected?.pianoKeysWorkflow) {
+            return this.validatePianoKeys();
+        }
+
         if (!problem?.expected?.pattern) return false;
 
         return this.validatePattern(problem.expected.pattern);
@@ -203,6 +207,16 @@ const PracticeValidator = {
                 return this.hasConnectedBlockNamed(["namedbox", "box", "box1", "box2"]);
             case "completeTwinkleForm":
                 return this.validateTwinklePhraseMaker();
+            case "completePianoKeys":
+                return this.validatePianoKeys();
+            case "spacedTheKeys":
+                return this.hasConnectedBlockNamed(["setxy", "setxyturtle"]);
+            case "namedTheKeys":
+                return this.hasConnectedBlockNamed([
+                    "setturtlename",
+                    "setturtlename2",
+                    "turtlename"
+                ]);
             case "completeMetronome":
                 return this.validateMetronome();
             case "swungThePendulum":
@@ -412,6 +426,34 @@ const PracticeValidator = {
             if (!block || block.trash || block.name !== "action") return false;
 
             return this.actionContainsBlockNamed(block, blockList, ["playdrum"]);
+        });
+    },
+
+    // A piano needs more than one key, and a key is a mouse that answers a click by playing a note.
+    validatePianoKeys() {
+        return (
+            this.hasClickListener() && this.countStartBlocks() >= 2 && this.hasActionPlayingANote()
+        );
+    },
+
+    hasClickListener() {
+        const blockList = this.getBlockList();
+        const clickBlock = new Set(["myclick"]);
+
+        return Object.values(blockList).some(block => {
+            if (!block || block.trash || block.name !== "listen") return false;
+
+            return this.argTreeContainsNamed(block.connections?.[1], blockList, clickBlock);
+        });
+    },
+
+    hasActionPlayingANote() {
+        const blockList = this.getBlockList();
+
+        return Object.values(blockList).some(block => {
+            if (!block || block.trash || block.name !== "action") return false;
+
+            return this.actionContainsBlockNamed(block, blockList, ["pitch", "playdrum", "note"]);
         });
     },
 

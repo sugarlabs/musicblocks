@@ -129,6 +129,7 @@ A badge looks like this:
 | `phraseMakerWorkflow` | `validatePhraseMakerLesson(problem)` |
 | `rhythmMakerWorkflow` | `validateRhythmMakerWorkflow()`      |
 | `metronomeWorkflow`   | `validateMetronome()`                |
+| `pianoKeysWorkflow`   | `validatePianoKeys()`                |
 | `pattern`             | `validatePattern()`, the default     |
 
 The order matters: a lesson that sets two of these keys only ever runs the first match.
@@ -164,16 +165,17 @@ These are the criteria `hasBadgeEvidence()` understands.
 
 Completion criteria, which mean the lesson itself is finished:
 
-| Criterion                    | Proves                                                        |
-| ---------------------------- | ------------------------------------------------------------- |
-| `completePattern`            | The chunk sequence matches `expected.pattern`.                |
-| `completeRhythmWorkflow`     | The Rhythm Maker workflow was carried out.                    |
-| `completePhraseWorkflow`     | The Phrase Maker workflow was carried out.                    |
-| `completeBasicShapeSet`      | Triangle, square, and pentagon programs all exist.            |
-| `completeAnimatedPolyrhythm` | Duplet and triplet rhythms with an avatar and a note action.  |
-| `completeCircularRhythmRing` | A conductor plus at least four drum mice, wired by broadcast. |
-| `completeTwinkleForm`        | The Twinkle sections appear in the order A1 A2 B B A1 A2.     |
-| `completeMetronome`          | A loop holds at least two different drum sounds.              |
+| Criterion                    | Proves                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| `completePattern`            | The chunk sequence matches `expected.pattern`.                           |
+| `completeRhythmWorkflow`     | The Rhythm Maker workflow was carried out.                               |
+| `completePhraseWorkflow`     | The Phrase Maker workflow was carried out.                               |
+| `completeBasicShapeSet`      | Triangle, square, and pentagon programs all exist.                       |
+| `completeAnimatedPolyrhythm` | Duplet and triplet rhythms with an avatar and a note action.             |
+| `completeCircularRhythmRing` | A conductor plus at least four drum mice, wired by broadcast.            |
+| `completeTwinkleForm`        | The Twinkle sections appear in the order A1 A2 B B A1 A2.                |
+| `completeMetronome`          | A loop holds at least two different drum sounds.                         |
+| `completePianoKeys`          | Two or more mice answer a click by running an action that makes a sound. |
 
 Hidden discovery criteria, awarded by the background monitor as the learner experiments:
 
@@ -210,6 +212,8 @@ Hidden discovery criteria, awarded by the background monitor as the learner expe
 | `changedTempo`                  | `setmasterbpm`, `setmasterbpm2`, `setbpm`, `setbpm2`, or `setbpm3`.    |
 | `setTheMeter`                   | `meter`.                                                               |
 | `paintedTheBeat`                | `beatvalue`.                                                           |
+| `spacedTheKeys`                 | `setxy` or `setxyturtle`.                                              |
+| `namedTheKeys`                  | `setturtlename`, `setturtlename2`, or `turtlename`.                    |
 
 An unrecognised criterion returns `false`, so a typo shows up as a badge that can never be earned.
 

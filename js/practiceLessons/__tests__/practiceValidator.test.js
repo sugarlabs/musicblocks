@@ -885,3 +885,124 @@ describe("PracticeValidator metronome discoveries", () => {
         });
     });
 });
+
+// A piano key: a mouse with a name whose listen block answers a click.
+const pianoKey = (id, keyName, eventBlock = "myclick") => ({
+    [id]: { name: "start", trash: false, connections: [null, `${id}-name`, null] },
+    [`${id}-name`]: {
+        name: "setturtlename2",
+        trash: false,
+        connections: [id, `${id}-text`, `${id}-listen`]
+    },
+    [`${id}-text`]: { name: "text", value: keyName, trash: false, connections: [`${id}-name`] },
+    [`${id}-listen`]: {
+        name: "listen",
+        trash: false,
+        connections: [`${id}-name`, `${id}-event`, `${id}-do`, null]
+    },
+    [`${id}-event`]: { name: eventBlock, trash: false, connections: [`${id}-listen`] },
+    [`${id}-do`]: { name: "text", value: keyName, trash: false, connections: [`${id}-listen`] }
+});
+
+const noteAction = (id, note, inner = "pitch") => ({
+    [id]: { name: "action", trash: false, connections: [null, `${id}-label`, `${id}-body`, null] },
+    [`${id}-label`]: { name: "text", value: note, trash: false, connections: [id] },
+    [`${id}-body`]: { name: "hidden", trash: false, connections: [id, `${id}-note`] },
+    [`${id}-note`]: {
+        name: "newnote",
+        trash: false,
+        connections: [`${id}-body`, `${id}-div`, `${id}-v`, null]
+    },
+    [`${id}-div`]: { name: "divide", trash: false, connections: [`${id}-note`] },
+    [`${id}-v`]: { name: "vspace", trash: false, connections: [`${id}-note`, `${id}-inner`] },
+    [`${id}-inner`]: {
+        name: inner,
+        trash: false,
+        connections: [`${id}-v`, `${id}-arg`, `${id}-oct`, null]
+    },
+    [`${id}-arg`]: { name: "solfege", value: note, trash: false, connections: [`${id}-inner`] },
+    [`${id}-oct`]: { name: "number", value: 4, trash: false, connections: [`${id}-inner`] }
+});
+
+const piano = (keys, { event = "myclick", inner = "pitch" } = {}) => {
+    const blocks = {};
+    keys.forEach((keyName, index) => {
+        Object.assign(blocks, pianoKey(`k${index}`, keyName, event));
+        Object.assign(blocks, noteAction(`a${index}`, keyName, inner));
+    });
+    return blocks;
+};
+
+describe("PracticeValidator piano keys", () => {
+    test("passes once two mice answer a click by playing a note", () => {
+        useBlocks(piano(["sol", "mi"]));
+
+        expect(PracticeValidator.validate({ expected: { pianoKeysWorkflow: true } })).toBe(true);
+    });
+
+    test("fails on the starter project, which has only one key", () => {
+        useBlocks(piano(["sol"]));
+
+        expect(PracticeValidator.validate({ expected: { pianoKeysWorkflow: true } })).toBe(false);
+    });
+
+    test("fails when nothing listens for a click", () => {
+        useBlocks(piano(["sol", "mi"], { event: "keyboard" }));
+
+        expect(PracticeValidator.validatePianoKeys()).toBe(false);
+    });
+
+    test("fails when the action makes no sound", () => {
+        useBlocks(piano(["sol", "mi"], { inner: "forward" }));
+
+        expect(PracticeValidator.validatePianoKeys()).toBe(false);
+    });
+
+    test("accepts a key that answers with a drum instead of a pitch", () => {
+        useBlocks(piano(["sol", "mi"], { inner: "playdrum" }));
+
+        expect(PracticeValidator.validatePianoKeys()).toBe(true);
+    });
+
+    test("ignores a listen block that has been thrown away", () => {
+        const blocks = piano(["sol", "mi"]);
+        blocks["k0-listen"].trash = true;
+        blocks["k1-listen"].trash = true;
+        useBlocks(blocks);
+
+        expect(PracticeValidator.hasClickListener()).toBe(false);
+    });
+});
+
+describe("PracticeValidator piano discoveries", () => {
+    const connected = name => ({
+        start: { name: "start", trash: false, connections: [null, "target", null] },
+        target: { name, trash: false, connections: ["start", null, null] }
+    });
+
+    test.each([
+        ["spacedTheKeys", "setxy"],
+        ["spacedTheKeys", "setxyturtle"],
+        ["namedTheKeys", "setturtlename2"],
+        ["namedTheKeys", "turtlename"]
+    ])("%s is proved by a connected %s block", (criterion, blockName) => {
+        useBlocks(connected(blockName));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, criterion)).toBe(true);
+    });
+
+    test("the avatar and drum badges reuse the criteria earlier lessons already had", () => {
+        useBlocks(connected("turtleshell"));
+        expect(PracticeValidator.hasBadgeEvidence({}, "usedAvatarAnimation")).toBe(true);
+
+        useBlocks(connected("playdrum"));
+        expect(PracticeValidator.hasBadgeEvidence({}, "playedRingDrum")).toBe(true);
+    });
+
+    test("neither key badge is proved by an empty canvas", () => {
+        useBlocks({});
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "spacedTheKeys")).toBe(false);
+        expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+});
