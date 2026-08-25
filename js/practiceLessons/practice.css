@@ -2164,6 +2164,80 @@
     background: #ffd166;
 }
 
+/* The rhythm a learner reads and copies into Phrase Maker: one box per beat. */
+.rhythm-chart {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #b7d8e8;
+    background: #f3fbff;
+}
+
+.rhythm-chart h5 {
+    margin: 9px 0 5px;
+    color: #1f5f82;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.rhythm-chart h5:first-child {
+    margin-top: 0;
+}
+
+.rhythm-bar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.rhythm-bar span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 3px 2px;
+    border-radius: 6px;
+    border: 2px solid #178995;
+    background: #d6f4f7;
+    color: #0f3d43;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: center;
+}
+
+.rhythm-bar .beat-snap {
+    background: #fff3c4;
+    border-color: #b7791f;
+    color: #6b4b06;
+}
+
+.rhythm-bar .beat-clap {
+    background: #ffe0dc;
+    border-color: #b94b47;
+    color: #7a2723;
+}
+
+/* Two sounds squeezed into one beat, drawn as one box split in half. */
+.rhythm-bar .beat-quick {
+    gap: 3px;
+    padding: 3px;
+}
+
+.rhythm-bar .beat-quick i {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.65);
+    font-size: 9px;
+    font-style: normal;
+    overflow: hidden;
+}
+
 /* === CHECK BUTTON === */
 #check-level {
     width: 100%;
