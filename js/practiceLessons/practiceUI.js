@@ -16,6 +16,7 @@ const PracticeUI = {
     badgeCheckTimer: null,
     noticeTimer: null,
     currentLevel: null,
+    starterBlockCount: null,
     PANEL_WIDTH: 360,
     PANEL_GAP: 16,
     COLLAPSE_TOGGLE_WIDTH: 24,
@@ -288,6 +289,20 @@ const PracticeUI = {
         activity.refreshCanvas();
     },
 
+    countLiveBlocks() {
+        const blockList = this.getActivity()?.blocks?.blockList || {};
+
+        return Object.values(blockList).filter(block => block && !block.trash).length;
+    },
+
+    // A count only catches blocks added on top of the starter set; a child who deletes and
+    // rebuilds back to the same total is not warned.
+    hasExtraBlocks() {
+        if (this.starterBlockCount === null) return false;
+
+        return this.countLiveBlocks() > this.starterBlockCount;
+    },
+
     async ensureLessonData() {
         if (typeof loadPracticeLessons !== "function") return true;
 
@@ -343,6 +358,7 @@ const PracticeUI = {
     },
 
     loadStarterBlocks(level) {
+        this.starterBlockCount = null;
         const activity = this.getActivity();
         if (!activity?.blocks) return;
 
@@ -365,6 +381,7 @@ const PracticeUI = {
             .then(data => {
                 const projectData = JSON.parse(data);
                 this.loadProjectData(activity, projectData);
+                this.starterBlockCount = this.countLiveBlocks();
             })
             .catch(err => {
                 console.error("Failed to load practice project", err);
@@ -407,9 +424,17 @@ const PracticeUI = {
         });
     },
 
+    getNextProblem(level, problems) {
+        const index = problems.findIndex(p => p.level === level);
+        if (index === -1) return null;
+
+        return problems[index + 1] || null;
+    },
+
     renderLevel(level) {
         this.currentLevel = level;
         const problem = PracticeProblems.find(p => p.level === level);
+        const nextProblem = this.getNextProblem(level, PracticeProblems);
         const container = document.getElementById("practice-content");
 
         container.innerHTML = `
@@ -422,6 +447,14 @@ const PracticeUI = {
       <div id="practice-badge-status">${this.renderBadgeStatus(problem)}</div>
 
       <button id="check-level">${_("Check My Work")}</button>
+      ${
+          nextProblem
+              ? `<button id="next-level">
+              <span>${_("Next Lesson")} &rarr;</span>
+              <small>${_("Level")} ${nextProblem.level} · ${nextProblem.title}</small>
+            </button>`
+              : ""
+      }
     `;
 
         this.loadStarterBlocks(level);
@@ -429,6 +462,21 @@ const PracticeUI = {
         document.getElementById("back-to-levels").onclick = () => {
             this.renderLevelMenu();
         };
+
+        const nextButton = document.getElementById("next-level");
+        if (nextButton) {
+            nextButton.onclick = () => {
+                const confirmed =
+                    !this.hasExtraBlocks() ||
+                    confirm(
+                        _(
+                            "Starting the next lesson will clear the blocks on your canvas. Continue?"
+                        )
+                    );
+
+                if (confirmed) this.renderLevel(nextProblem.level);
+            };
+        }
 
         document.getElementById("check-level").onclick = () => {
             const result = PracticeValidator.validate(problem);
@@ -1235,3 +1283,7 @@ const ExplorerJournalUI = {
         return this.escapeHTML(value);
     }
 };
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { PracticeUI, ExplorerJournalUI };
+}

@@ -12034,6 +12034,10 @@ msgid "Check My Work"
 msgstr "मेरा काम जाँचें"
 
 #: js/practiceLessons/practiceUI.js
+msgid "Next Lesson"
+msgstr "अगला पाठ"
+
+#: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
 msgid "Quest Rewards"
 msgstr "खोज के इनाम"

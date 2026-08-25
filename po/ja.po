@@ -12159,6 +12159,10 @@ msgid "Check My Work"
 msgstr "できたかチェック"
 
 #: js/practiceLessons/practiceUI.js
+msgid "Next Lesson"
+msgstr "つぎのレッスン"
+
+#: js/practiceLessons/practiceUI.js
 #: js/practiceLessons/practiceManager.js
 msgid "Quest Rewards"
 msgstr "ぼうけんのごほうび"
