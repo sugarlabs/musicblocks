@@ -106,6 +106,8 @@ describe("setupPitchBlocks", () => {
         global.DOUBLEFLAT = "bb";
         global.DOUBLESHARP = "##";
         global.NATURAL = "n";
+        global.NOTESSHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        global.NOTESFLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
 
         // Test-specific overrides
         global.INTERVALVALUES = { "major third": [0, 0, 1.25], "minor third": [0, 0, 1.2] };
@@ -705,6 +707,36 @@ describe("setupPitchBlocks", () => {
     });
 
     describe("PitchBlock Complex Branches", () => {
+        it("applies the accidental from a scale degree block to the played pitch", () => {
+            const block = createdBlocks["pitch"];
+            activity.blocks.blockList[10].connections[1] = 20;
+            global.scaleDegreeToPitchMapping.mockReturnValue("G");
+
+            activity.blocks.blockList[20] = { name: "scaledegree2", value: "5#" };
+            block.flow(["1", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                "G#",
+                4,
+                0,
+                0,
+                10
+            );
+
+            activity.blocks.blockList[20] = { name: "scaledegree2", value: "5b" };
+            block.flow(["1", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                "Gb",
+                4,
+                0,
+                0,
+                10
+            );
+
+            activity.blocks.blockList[20] = { name: "scaledegree2", value: "5n" };
+            block.flow(["1", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+        });
+
         it("flow", () => {
             const block = createdBlocks["pitch"];
 
