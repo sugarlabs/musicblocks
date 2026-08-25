@@ -1,6 +1,5 @@
 describe("recorder", () => {
     let mockStart;
-    let mockRecInside;
 
     beforeEach(() => {
         jest.useFakeTimers();
@@ -15,17 +14,12 @@ describe("recorder", () => {
             addEventListener: jest.fn(),
             removeEventListener: jest.fn(),
             dispatchEvent: jest.fn(),
-            _recordHandler: null
-        };
-
-        mockRecInside = {
             classList: { add: jest.fn(), remove: jest.fn() },
-            setAttribute: jest.fn()
+            _recordHandler: null
         };
 
         jest.spyOn(document, "getElementById").mockImplementation(id => {
             if (id === "record") return mockStart;
-            if (id === "rec_inside") return mockRecInside;
             return null;
         });
 
@@ -185,6 +179,95 @@ describe("recorder", () => {
             doRecordButton(instance);
 
             expect(mockStart.removeEventListener).toHaveBeenCalledWith("click", oldHandler);
+        });
+    });
+
+    describe("recording flow (createRecorder → stopHandler → saveFile)", () => {
+        let mockTrack;
+        let mockStream;
+        let lastRecorderInstance;
+
+        beforeEach(() => {
+            mockTrack = { stop: jest.fn() };
+            mockStream = {
+                oninactive: null,
+                getTracks: jest.fn(() => [mockTrack])
+            };
+
+            if (!global.navigator) {
+                global.navigator = {};
+            }
+            global.navigator.mediaDevices = {
+                getDisplayMedia: jest.fn(() => Promise.resolve(mockStream))
+            };
+
+            global.localStorage = { getItem: jest.fn(() => null) };
+
+            lastRecorderInstance = null;
+            global.MediaRecorder = class MockMediaRecorderWithChunks {
+                constructor() {
+                    this.state = "inactive";
+                    this.onstop = null;
+                    this.ondataavailable = null;
+                    lastRecorderInstance = this;
+                }
+                start() {
+                    this.state = "recording";
+                }
+                stop() {
+                    this.state = "inactive";
+                    if (this.onstop) this.onstop();
+                }
+            };
+        });
+
+        afterEach(() => {
+            delete global.navigator.mediaDevices;
+            delete global.localStorage;
+        });
+
+        it("adds the recording class once createRecorder starts", async () => {
+            const { doRecordButton, setupActivityRecorder } = require("../recorder");
+            const instance = {
+                textMsg: jest.fn(),
+                canvas: { height: 600 },
+                _onResize: jest.fn(),
+                logo: { synth: { tone: null } }
+            };
+            setupActivityRecorder(instance);
+            doRecordButton(instance);
+
+            const handler = mockStart.addEventListener.mock.calls.find(c => c[0] === "click")[1];
+            await handler();
+
+            expect(mockStart.classList.add).toHaveBeenCalledWith("recording");
+        });
+
+        it("removes the recording class via stopHandler and saveFile", async () => {
+            const { doRecordButton, setupActivityRecorder } = require("../recorder");
+            const instance = {
+                textMsg: jest.fn(),
+                canvas: { height: 600 },
+                _onResize: jest.fn(),
+                logo: { synth: { tone: null } }
+            };
+            setupActivityRecorder(instance);
+            doRecordButton(instance);
+
+            const handler = mockStart.addEventListener.mock.calls.find(c => c[0] === "click")[1];
+            await handler();
+
+            // simulate one real recorded chunk so saveFile takes the normal
+            // save path (window.prompt) rather than the empty-file alert path
+            lastRecorderInstance.ondataavailable({ data: { size: 100 } });
+
+            const stopHandler = mockStart.addEventListener.mock.calls.filter(
+                c => c[0] === "click"
+            )[1][1];
+            stopHandler();
+
+            expect(mockStart.classList.remove).toHaveBeenCalledWith("recording");
+            expect(mockTrack.stop).toHaveBeenCalled();
         });
     });
 
