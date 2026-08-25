@@ -29,6 +29,30 @@ This is a new accessibility feature layered onto the core rendering
 architecture of the app, and it deserves a real design conversation before
 code, not an incremental patch.
 
+## Update: relationship to the CreateJS migration (#6612)
+
+Walter has confirmed the team is very likely to phase out CreateJS
+altogether, replacing canvas-rendered blocks with real DOM objects
+(#6612). If that migration proceeds, it removes the need for the
+mirror-DOM approach described below entirely — real DOM elements just
+need `role`, `aria-label`, and keyboard handling added directly, with no
+parallel hidden layer to build or keep in sync.
+
+Given this, the plan going forward is:
+
+- **Primary path:** accessibility for canvas blocks is delivered as part
+  of the CreateJS → DOM migration itself, with `role`/`aria-label`/focus
+  handling built into each block's DOM representation from the start.
+  A comment has been added to #6612 flagging this as a first-class
+  requirement of that migration, not something to retrofit afterward.
+- **Fallback path:** if the CreateJS migration is delayed, descoped, or
+  doesn't happen, the phased mirror-DOM implementation below remains a
+  valid, independent plan.
+
+No implementation work should start on the mirror-DOM approach until the
+direction on #6612 is clearer, to avoid building something that becomes
+immediately obsolete if the migration lands first.
+
 ## What we're actually dealing with
 
 - `js/block.js` (5,045 lines) — the `Block` class. Each block is an
