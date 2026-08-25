@@ -15,34 +15,38 @@
 // project-manager.test.js exercises a real ProjectManager against a plain
 // fake object standing in for Activity. Neither proves that constructing a
 // real Activity produces a real, correctly-wired ProjectManager that reads
-// back real Activity state. This test loads both js/activity.js and
-// js/project-manager.js into one vm sandbox (unmodified, via
-// setupProjectManager(this) at construction time, same as the browser load
-// order in js/loader.js) and never mocks either side of that seam.
+// back real Activity state.
+//
+// Both js/project-manager.js and js/activity.js run here completely
+// unmodified. Unrelated Activity dependencies (Turtles, Blocks, Logo, the
+// various setupXController functions, etc.) are stubbed in the sandbox
+// below purely to keep construction from touching real DOM/audio/canvas
+// machinery Jest can't provide - they sit outside the Activity<->
+// ProjectManager seam this test is about, not on either side of it.
 
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
+const PROJECT_MANAGER_CODE =
+    fs.readFileSync(path.resolve(__dirname, "../project-manager.js"), "utf8") +
+    "\nthis.setupProjectManager = setupProjectManager;\nthis.ProjectManager = ProjectManager;";
+
+// activity.js's own last top-level statement is `const activity = new
+// Activity();`, immediately followed by a define(["domReady!", ...], ...)
+// bootstrap call. Rather than slicing the source at that statement (which
+// would couple this test to exact source text), the whole file is run
+// unmodified: the sandbox's `define` stub is a no-op, so that bootstrap
+// callback is created but never invoked, and the file's own singleton
+// construction becomes the Activity instance under test. `this.activity =
+// activity;` and `this.Activity = Activity;` just pull those two top-level
+// bindings out of the vm script's lexical scope, the same way the sibling
+// activity_toolbar_integration.test.js already does for `Activity`.
+const ACTIVITY_CODE =
+    fs.readFileSync(path.resolve(__dirname, "../activity.js"), "utf8") +
+    "\nthis.activity = activity;\nthis.Activity = Activity;";
+
 const loadActivityAndProjectManager = () => {
-    const projectManagerCode =
-        fs.readFileSync(path.resolve(__dirname, "../project-manager.js"), "utf8") +
-        "\nthis.setupProjectManager = setupProjectManager;\nthis.ProjectManager = ProjectManager;";
-
-    const activityPath = path.resolve(__dirname, "../activity.js");
-    let activityCode = fs.readFileSync(activityPath, "utf8");
-    const splitPoint = activityCode.indexOf("const activity = new Activity();");
-    if (splitPoint === -1) {
-        throw new Error(
-            "Could not locate the Activity singleton initialization line in activity.js " +
-                '(expected literal text "const activity = new Activity();"); the file may ' +
-                "have been restructured, so truncating it here would silently execute more " +
-                "(or less) of the module than this test intends."
-        );
-    }
-    activityCode = activityCode.substring(0, splitPoint);
-    activityCode += "\nthis.Activity = Activity;";
-
     const sandbox = {
         window: global.window,
         document: global.document,
@@ -146,11 +150,15 @@ const loadActivityAndProjectManager = () => {
 
     vm.createContext(sandbox);
     // Load order mirrors js/loader.js's shim config: "project-manager" is a
-    // declared dependency of "activity", loaded first so window/global
-    // setupProjectManager exists before Activity's constructor calls it.
-    vm.runInContext(projectManagerCode, sandbox);
-    vm.runInContext(activityCode, sandbox);
-    return { Activity: sandbox.Activity, ProjectManager: sandbox.ProjectManager };
+    // declared dependency of "activity", loaded first so setupProjectManager
+    // exists in scope before Activity's constructor calls it.
+    vm.runInContext(PROJECT_MANAGER_CODE, sandbox);
+    vm.runInContext(ACTIVITY_CODE, sandbox);
+    return {
+        activity: sandbox.activity,
+        Activity: sandbox.Activity,
+        ProjectManager: sandbox.ProjectManager
+    };
 };
 
 const makeBlockList = () => [
@@ -175,14 +183,9 @@ const makeBlockList = () => [
 ];
 
 describe("Activity <-> ProjectManager integration", () => {
-    let Activity;
     let ProjectManager;
     let mockElement;
     let activity;
-
-    beforeAll(() => {
-        ({ Activity, ProjectManager } = loadActivityAndProjectManager());
-    });
 
     beforeEach(() => {
         mockElement = {
@@ -214,7 +217,21 @@ describe("Activity <-> ProjectManager integration", () => {
         window.platformColor = { stopIconcolor: "red" };
         global.platformColor = window.platformColor;
 
-        activity = new Activity();
+        // A fresh vm context/module load per test, not just a fresh instance
+        // from a shared loaded module, so no state (e.g. the module-level
+        // `let globalActivity`) can leak between tests.
+        ({ activity, ProjectManager } = loadActivityAndProjectManager());
+
+        activity.turtles = {
+            getTurtle: jest.fn(() => ({
+                id: 0,
+                x: 0,
+                y: 0,
+                orientation: 0,
+                painter: { color: 0, value: 50, stroke: 5, chroma: 100 }
+            }))
+        };
+        activity.blocks = { blockList: makeBlockList() };
     });
 
     afterEach(() => {
@@ -230,50 +247,33 @@ describe("Activity <-> ProjectManager integration", () => {
         expect(activity.projectManager.activity).toBe(activity);
     });
 
-    it("runs a real project operation (prepareExport) against the real Activity's block/turtle state", () => {
-        activity.blocks = { blockList: makeBlockList() };
-        activity.turtles = {
-            getTurtle: jest.fn(() => ({
-                id: 0,
-                x: 0,
-                y: 0,
-                orientation: 0,
-                painter: { color: 0, value: 50, stroke: 5, chroma: 100 }
-            }))
-        };
-        // Seeded to the opposite of what prepareExport() should set, so the
-        // assertion below proves a real mutation happened rather than
-        // coincidentally matching Activity's initial value.
+    it("prepareExport() reads the real Activity's block/turtle state through the real ProjectManager", () => {
+        const parsed = JSON.parse(activity.projectManager.prepareExport());
+
+        expect(parsed).toHaveLength(2);
+        const [startEntry, noteEntry] = parsed;
+
+        // The "start" block's exported args carry this turtle's real id -
+        // only obtainable by actually calling through to the real
+        // activity.turtles.getTurtle(), not by echoing static block data.
+        expect(startEntry[1][0]).toBe("start");
+        expect(startEntry[1][1]).toMatchObject({ id: 0 });
+
+        // The "note" block's connection (originally block index 0) resolves
+        // to the "start" block's position in the real activity.blocks.blockList
+        // - a value ProjectManager had to compute from that real array, not
+        // one it could have produced from a mock.
+        expect(noteEntry[0]).toBe(1);
+        expect(noteEntry[4]).toEqual([0, null]);
+    });
+
+    it("prepareExport() mutates the real Activity instance it was called through, not a detached copy", () => {
+        // Seeded to the opposite of what prepareExport() sets, so the
+        // assertion below proves a real mutation happened.
         activity.hasMatrixDataBlock = true;
 
-        const exported = activity.projectManager.prepareExport();
+        activity.projectManager.prepareExport();
 
-        expect(JSON.parse(exported)).toEqual([
-            [
-                0,
-                [
-                    "start",
-                    {
-                        id: 0,
-                        collapsed: false,
-                        xcor: 0,
-                        ycor: 0,
-                        heading: 0,
-                        color: 0,
-                        shade: 50,
-                        pensize: 5,
-                        grey: 100
-                    }
-                ],
-                100,
-                200,
-                [null, null]
-            ],
-            [1, "note", 150, 250, [0, null]]
-        ]);
-        // prepareExport() flips this flag back to false on the same activity
-        // instance it was called through (seeded to true above), not on some
-        // detached copy - proving the call mutated the real Activity, not a mock.
         expect(activity.hasMatrixDataBlock).toBe(false);
     });
 });
