@@ -926,7 +926,7 @@ Practice Lessons is a guided track that teaches Music Blocks through a story.
 Lyra the explorer and Choon the music robot are searching for the Grand Melody, a song whose pieces have scattered across a chain of islands.
 Each lesson is one puzzle, and solving it restores another fragment of the song.
 
-The lessons are grouped into islands, currently Echo Island, the Harmony Geometry Reef, Broadcast Bay, and Starlight Summit.
+The lessons are grouped into islands, currently Echo Island, the Harmony Geometry Reef, Broadcast Bay, Starlight Summit, and the Pulse Lighthouse.
 Finishing every lesson on an island earns a large island badge.
 
 ### 1. Opening the Lessons Panel

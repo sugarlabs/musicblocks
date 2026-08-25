@@ -128,6 +128,7 @@ A badge looks like this:
 | `basicShapeSet`       | `validateBasicShapeSet()`            |
 | `phraseMakerWorkflow` | `validatePhraseMakerLesson(problem)` |
 | `rhythmMakerWorkflow` | `validateRhythmMakerWorkflow()`      |
+| `metronomeWorkflow`   | `validateMetronome()`                |
 | `pattern`             | `validatePattern()`, the default     |
 
 The order matters: a lesson that sets two of these keys only ever runs the first match.
@@ -144,13 +145,14 @@ This is deliberate, and it is why `renamedChunks` can be a badge rather than a f
 Read the canvas through `this.getBlockList()`, which returns the raw `blockList` keyed by block id, and always skip entries with `block.trash` set.
 Helpers already exist for the common questions:
 
-| Helper                                                          | Answers                                              |
-| --------------------------------------------------------------- | ---------------------------------------------------- |
-| `hasBlockNamed(names)`                                          | Is any of these blocks on the canvas?                |
-| `hasConnectedBlockNamed(names)`                                 | Is any of these blocks actually attached to a stack? |
-| `hasLoopContainingBlockNamed(names)`                            | Is one of these inside a loop?                       |
-| `countStartBlocks()`                                            | How many mice are there?                             |
-| `getPitchOctaves()`, `getRhythmDivisors()`, `getSetDrumNames()` | Read specific arguments back out.                    |
+| Helper                                                          | Answers                                                                |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `hasBlockNamed(names)`                                          | Is any of these blocks on the canvas?                                  |
+| `hasConnectedBlockNamed(names)`                                 | Is any of these blocks actually attached to a stack?                   |
+| `hasLoopContainingBlockNamed(names)`                            | Is one of these inside a loop?                                         |
+| `hasLoopWithBlockInside(names)`                                 | Is one of these anywhere inside a loop, including within a note clamp? |
+| `countStartBlocks()`                                            | How many mice are there?                                               |
+| `getPitchOctaves()`, `getRhythmDivisors()`, `getSetDrumNames()` | Read specific arguments back out.                                      |
 
 Prefer composing those over walking the block list again.
 Add your method, then add a branch to `validate()` keyed on a new `expected` field.
@@ -171,6 +173,7 @@ Completion criteria, which mean the lesson itself is finished:
 | `completeAnimatedPolyrhythm` | Duplet and triplet rhythms with an avatar and a note action.  |
 | `completeCircularRhythmRing` | A conductor plus at least four drum mice, wired by broadcast. |
 | `completeTwinkleForm`        | The Twinkle sections appear in the order A1 A2 B B A1 A2.     |
+| `completeMetronome`          | A loop holds at least two different drum sounds.              |
 
 Hidden discovery criteria, awarded by the background monitor as the learner experiments:
 
@@ -203,6 +206,10 @@ Hidden discovery criteria, awarded by the background monitor as the learner expe
 | `playedRingDrum`                | `playdrum` or `setdrum`.                                               |
 | `builtMouseRing`                | At least four `start` blocks.                                          |
 | `addedHarmonyVoice`             | At least two `start` blocks.                                           |
+| `swungThePendulum`              | `setheading`.                                                          |
+| `changedTempo`                  | `setmasterbpm`, `setmasterbpm2`, `setbpm`, `setbpm2`, or `setbpm3`.    |
+| `setTheMeter`                   | `meter`.                                                               |
+| `paintedTheBeat`                | `beatvalue`.                                                           |
 
 An unrecognised criterion returns `false`, so a typo shows up as a badge that can never be earned.
 

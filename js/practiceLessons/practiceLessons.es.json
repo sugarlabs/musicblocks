@@ -24,6 +24,11 @@
             "label": "Guardián de la Gran Melodía",
             "shortLabel": "Gran Melodía",
             "message": "Insignia Grande desbloqueada: Guardián de la Gran Melodía. La canción que unía todas las islas vuelve a estar completa."
+        },
+        "pulse_lighthouse": {
+            "label": "Guardián del Faro del Pulso",
+            "shortLabel": "Guardián",
+            "message": "Insignia grande desbloqueada: Guardián del Faro del Pulso. El faro gira en su tiempo justo y todas las islas pueden encontrar el camino a casa."
         }
     },
     "problems": {
@@ -606,6 +611,70 @@
             "incomplete": {
                 "title": "Las estrellas siguen apagadas",
                 "message": "Choon oye una parte de la canción de las estrellas. La matriz de tono y tiempo necesita las tres frases guardadas como bloques de acción (Do Do Sol Sol La La Sol, luego Fa Fa Mi Mi Re Re Do, luego Sol Sol Fa Fa Mi Mi Re) y esas acciones apiladas debajo de iniciar como A1 A2 B B A1 A2."
+            }
+        },
+        "9": {
+            "title": "El Faro del Pulso",
+            "description": "\n      <section class=\"story-card\">\n        <p>Más allá de la cumbre el mar se oscurece. Allí se alza un faro con su gran lámpara quieta, porque hace mucho que no está quien contaba sus vueltas. &quot;Todas las islas ponían su reloj con esa luz&quot;, dice Choon. &quot;Dale un latido y despertará.&quot;</p>\n        <div class=\"metronome-scene\" aria-label=\"Faro silencioso con metrónomo\">\n          <div class=\"metronome-beam\"></div>\n          <div class=\"metronome-body\">\n            <span class=\"metronome-arm\"></span>\n            <span class=\"metronome-weight\"></span>\n          </div>\n          <div class=\"metronome-tick metronome-tick-left\"></div>\n          <div class=\"metronome-tick metronome-tick-right\"></div>\n        </div>\n        <p>Lyra se lleva la mano al pecho y siente su propio pulso: uno, dos, uno, dos. &quot;Eso es lo que necesita la lámpara&quot;, dice. &quot;Un pulso que nunca se pierda.&quot;</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Tic y tac</h4>\n        <div class=\"beat-map\" aria-label=\"Faro silencioso con metrónomo\">\n          <span>Tiempo 1 - tambor grave</span>\n          <span>Tiempo 2 - tambor brillante</span>\n        </div>\n        <p>Un bloque <b>Por siempre</b> ya está girando en tu lienzo con un tambor dentro. Añade un segundo <b>tambor con valor de nota</b> y dale un <b>sonido de tambor distinto</b>, para que la lámpara haga tic y tac en vez de repetirse. Pulsa <b>Reproducir</b> y comprueba el faro.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Engranajes ocultos</h4>\n        <p>Cuando la lámpara ya gire, prueba un engranaje nuevo. Cada uno esconde una insignia.</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"swingPendulum\">Balancear el péndulo</button>\n          <button type=\"button\" data-secret-help=\"changeTempo\">Cambiar el tempo</button>\n          <button type=\"button\" data-secret-help=\"setMeter\">Definir el compás</button>\n          <button type=\"button\" data-secret-help=\"colorBeat\">Colorear cada tiempo</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "Faro del Pulso",
+                "island": "Faro del Pulso",
+                "completeTitle": "El faro vuelve a latir",
+                "learned": ["Pulso", "Tiempo", "Compás"]
+            },
+            "rewards": [
+                "Fragmento de Melodía #9",
+                "Página del Diario del Capitán #9",
+                "Pista del tesoro: la luz marca el tiempo para todas las islas a la vez."
+            ],
+            "badges": {
+                "beacon_keeper": {
+                    "label": "Guardián del Faro",
+                    "shortLabel": "Faro",
+                    "message": "Tic, tac. La gran lámpara gira con tu pulso y un haz de luz recorre el agua."
+                },
+                "pendulum_swinger": {
+                    "label": "Balanceador del Péndulo",
+                    "shortLabel": "Vaivén",
+                    "message": "Descubrimiento oculto: Balanceador del Péndulo. Choon se inclina a izquierda y derecha con el pulso, igual que un metrónomo de verdad."
+                },
+                "tempo_master": {
+                    "label": "Maestro del Tempo",
+                    "shortLabel": "Tempo",
+                    "message": "Descubrimiento oculto: Maestro del Tempo. El faro puede correr como un corazón agitado o descansar como uno dormido."
+                },
+                "meter_marker": {
+                    "label": "Marcador de Compás",
+                    "shortLabel": "Compás",
+                    "message": "Descubrimiento oculto: Marcador de Compás. Lyra escribe cuántos tiempos y de qué clase, y la lámpara empieza a contar compases."
+                },
+                "beat_painter": {
+                    "label": "Pintor del Pulso",
+                    "shortLabel": "Color",
+                    "message": "Descubrimiento oculto: Pintor del Pulso. El haz cambia de color en cada tiempo, así puedes ver el pulso además de oírlo."
+                }
+            },
+            "secretHelpCards": {
+                "swingPendulum": {
+                    "title": "Balancear el péndulo"
+                },
+                "changeTempo": {
+                    "title": "Cambiar el tempo"
+                },
+                "setMeter": {
+                    "title": "Definir el compás"
+                },
+                "colorBeat": {
+                    "title": "Colorear cada tiempo",
+                    "heading": "Pinta la luz con la cuenta de tiempos",
+                    "description": "Cuando un bloque Compás está contando, el bloque Cuenta de Tiempos dice en qué tiempo estás. Pon Cuenta de Tiempos dentro de Fijar color y la lámpara cambiará de color en cada tiempo.<br>Multiplícalo primero si los colores se parecen demasiado, porque la escala de color va de 0 a 100.",
+                    "musicHeading": "Por qué importa",
+                    "musicDescription": "Oír el pulso y verlo al mismo tiempo hace mucho más fácil sentir la diferencia entre el pulso y el ritmo."
+                }
+            },
+            "incomplete": {
+                "title": "La lámpara sigue dormida",
+                "message": "Choon oye un solo tambor girando una y otra vez, pero un metrónomo necesita dos sonidos distintos para hacer tic y tac. Añade otro tambor con valor de nota dentro del bloque Por siempre y dale otro tambor; después pulsa Comprobar mi trabajo."
             }
         }
     }

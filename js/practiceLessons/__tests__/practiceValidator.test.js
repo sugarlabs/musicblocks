@@ -759,3 +759,129 @@ describe("PracticeValidator badge criteria that look for one block", () => {
         ).toBe(true);
     });
 });
+
+// Mirrors the note value drum shape Music Blocks builds: newnote { vspace -> playdrum }.
+const drumNote = (id, drum, prev, next) => ({
+    [id]: { name: "newnote", trash: false, connections: [prev, `${id}-div`, `${id}-body`, next] },
+    [`${id}-div`]: { name: "divide", trash: false, connections: [id, `${id}-n1`, `${id}-n4`] },
+    [`${id}-n1`]: { name: "number", value: 1, trash: false, connections: [`${id}-div`] },
+    [`${id}-n4`]: { name: "number", value: 4, trash: false, connections: [`${id}-div`] },
+    [`${id}-body`]: { name: "vspace", trash: false, connections: [id, `${id}-drum`] },
+    [`${id}-drum`]: {
+        name: "playdrum",
+        trash: false,
+        connections: [`${id}-body`, `${id}-name`, null]
+    },
+    [`${id}-name`]: { name: "drumname", value: drum, trash: false, connections: [`${id}-drum`] }
+});
+
+const metronome = (drums, { inLoop = true } = {}) => {
+    const first = "n0";
+    const blocks = inLoop
+        ? {
+              start: { name: "start", trash: false, connections: [null, "loop", null] },
+              loop: { name: "forever", trash: false, connections: ["start", first, null] }
+          }
+        : { start: { name: "start", trash: false, connections: [null, first, null] } };
+
+    drums.forEach((drum, index) => {
+        Object.assign(
+            blocks,
+            drumNote(
+                `n${index}`,
+                drum,
+                index === 0 ? (inLoop ? "loop" : "start") : `n${index - 1}`,
+                index === drums.length - 1 ? null : `n${index + 1}`
+            )
+        );
+    });
+
+    return blocks;
+};
+
+describe("PracticeValidator metronome", () => {
+    test("passes once a loop holds two different drum sounds", () => {
+        useBlocks(metronome(["kick drum", "hi hat"]));
+
+        expect(PracticeValidator.validate({ expected: { metronomeWorkflow: true } })).toBe(true);
+    });
+
+    test("fails on the starter project, which has only one drum", () => {
+        useBlocks(metronome(["snare drum"]));
+
+        expect(PracticeValidator.validate({ expected: { metronomeWorkflow: true } })).toBe(false);
+    });
+
+    test("fails when both drums make the same sound, because that is not a tick and a tock", () => {
+        useBlocks(metronome(["snare drum", "snare drum"]));
+
+        expect(PracticeValidator.validateMetronome()).toBe(false);
+    });
+
+    test("fails when the drums are not inside a loop, so the pulse never repeats", () => {
+        useBlocks(metronome(["kick drum", "hi hat"], { inLoop: false }));
+
+        expect(PracticeValidator.validateMetronome()).toBe(false);
+    });
+
+    test("accepts a repeat loop as well as forever", () => {
+        const blocks = metronome(["kick drum", "hi hat"]);
+        blocks.loop = { name: "repeat", trash: false, connections: ["start", "times", "n0", null] };
+        blocks.times = { name: "number", value: 8, trash: false, connections: ["loop"] };
+        useBlocks(blocks);
+
+        expect(PracticeValidator.validateMetronome()).toBe(true);
+    });
+
+    test("reads drum names from both playdrum and setdrum blocks", () => {
+        useBlocks({
+            ...metronome(["kick drum", "hi hat"]),
+            "sd": { name: "setdrum", trash: false, connections: [null, "sd-name", null, null] },
+            "sd-name": { name: "drumname", value: "cow bell", trash: false, connections: ["sd"] }
+        });
+
+        expect(new Set(PracticeValidator.getPlayedDrumNames())).toEqual(
+            new Set(["kick drum", "hi hat", "cow bell"])
+        );
+    });
+
+    test("ignores a drum that has been thrown away", () => {
+        const blocks = metronome(["kick drum", "hi hat"]);
+        blocks["n1-drum"].trash = true;
+        useBlocks(blocks);
+
+        expect(PracticeValidator.validateMetronome()).toBe(false);
+    });
+});
+
+describe("PracticeValidator metronome discoveries", () => {
+    const connected = name => ({
+        start: { name: "start", trash: false, connections: [null, "target", null] },
+        target: { name, trash: false, connections: ["start", null, null] }
+    });
+
+    test.each([
+        ["swungThePendulum", "setheading"],
+        ["changedTempo", "setmasterbpm2"],
+        ["setTheMeter", "meter"],
+        ["paintedTheBeat", "beatvalue"]
+    ])("%s is proved by a connected %s block", (criterion, blockName) => {
+        useBlocks(connected(blockName));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, criterion)).toBe(true);
+    });
+
+    test("the tempo badge accepts any of the beats per minute blocks", () => {
+        useBlocks(connected("setbpm3"));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "changedTempo")).toBe(true);
+    });
+
+    test("none of them are proved by an empty canvas", () => {
+        useBlocks({});
+
+        ["swungThePendulum", "changedTempo", "setTheMeter", "paintedTheBeat"].forEach(criterion => {
+            expect(PracticeValidator.hasBadgeEvidence({}, criterion)).toBe(false);
+        });
+    });
+});

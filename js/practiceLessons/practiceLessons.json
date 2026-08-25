@@ -31,6 +31,13 @@
                 "shortLabel": "Grand Melody",
                 "iconKey": "island",
                 "message": "Big Badge unlocked: Keeper of the Grand Melody. The song that once joined every island is whole again."
+            },
+            "pulse_lighthouse": {
+                "id": "pulse_lighthouse_keeper",
+                "label": "Pulse Lighthouse Keeper",
+                "shortLabel": "Keeper",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Pulse Lighthouse Keeper. The beacon turns in perfect time, and every island can find its way home again."
             }
         }
     },
@@ -915,6 +922,98 @@
                 }
             ],
             "bigBadgeId": "starlight_summit"
+        },
+        {
+            "level": 9,
+            "island": "pulse_lighthouse",
+            "title": "The Pulse Lighthouse",
+            "journal": {
+                "title": "Pulse Lighthouse",
+                "island": "Pulse Lighthouse",
+                "completeTitle": "The Beacon Beats Again",
+                "learned": ["Pulse", "Beat", "Meter"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          Past the summit the sea turns dark. A lighthouse stands there with its\n          great lamp still, because the keeper who counted its turns is long gone.\n          \"Every island set its clocks by that light,\" says Choon. \"Give it a\n          heartbeat and it will wake.\"\n        </p>\n        <div class=\"metronome-scene\" aria-label=\"Silent lighthouse metronome\">\n          <div class=\"metronome-beam\"></div>\n          <div class=\"metronome-body\">\n            <span class=\"metronome-arm\"></span>\n            <span class=\"metronome-weight\"></span>\n          </div>\n          <div class=\"metronome-tick metronome-tick-left\"></div>\n          <div class=\"metronome-tick metronome-tick-right\"></div>\n        </div>\n        <p>\n          Lyra puts a hand on her chest and feels her own pulse: one, two, one, two.\n          \"That is what the lamp needs,\" she says. \"A beat that never wanders.\"\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Tick and Tock</h4>\n        <div class=\"beat-map\" aria-label=\"Metronome beat pattern\">\n          <span>Beat 1 - low drum</span>\n          <span>Beat 2 - bright drum</span>\n        </div>\n        <p>\n          A <b>Forever</b> block is already turning on your canvas with one drum\n          inside it. Add a second <b>note value drum</b> and give it a\n          <b>different drum sound</b>, so the lamp ticks and tocks instead of\n          repeating itself. Press <b>Play</b>, then check the lighthouse.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Gears</h4>\n        <p>\n          Once the lamp is turning, try one new gear. Each one hides a badge.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"swingPendulum\">Swing the pendulum</button>\n          <button type=\"button\" data-secret-help=\"changeTempo\">Change the tempo</button>\n          <button type=\"button\" data-secret-help=\"setMeter\">Set the meter</button>\n          <button type=\"button\" data-secret-help=\"colorBeat\">Color every beat</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "swingPendulum": {
+                    "title": "Swing the pendulum",
+                    "type": "block",
+                    "blockName": "setheading"
+                },
+                "changeTempo": {
+                    "title": "Change the tempo",
+                    "type": "block",
+                    "blockName": "setmasterbpm2"
+                },
+                "setMeter": {
+                    "title": "Set the meter",
+                    "type": "block",
+                    "blockName": "meter"
+                },
+                "colorBeat": {
+                    "title": "Color every beat",
+                    "heading": "Paint the light with the beat count",
+                    "description": "Once a Meter block is counting, the Beat Count block reports which beat you are on. Drop Beat Count into Set Color and the lamp changes colour on every beat.<br>Multiply it first if the colours look too alike, because the colour scale runs from 0 to 100.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Hearing the beat and seeing it at the same time makes the difference between beat and rhythm much easier to feel.",
+                    "singlePage": true
+                }
+            },
+            "expected": {
+                "metronomeWorkflow": true
+            },
+            "rewards": [
+                "Melody Fragment #9",
+                "Captain's Journal Page #9",
+                "Treasure Clue: The light keeps time for every island at once."
+            ],
+            "badges": [
+                {
+                    "id": "beacon_keeper",
+                    "label": "Beacon Keeper",
+                    "shortLabel": "Beacon",
+                    "iconKey": "beat",
+                    "criterion": "completeMetronome",
+                    "message": "Tick, tock. The great lamp turns with your beat and a beam sweeps out across the water."
+                },
+                {
+                    "id": "pendulum_swinger",
+                    "label": "Pendulum Swinger",
+                    "shortLabel": "Swing",
+                    "iconKey": "spin",
+                    "criterion": "swungThePendulum",
+                    "message": "Hidden Discovery: Pendulum Swinger. Choon leans left and right with the beat, exactly like a real metronome."
+                },
+                {
+                    "id": "tempo_master",
+                    "label": "Tempo Master",
+                    "shortLabel": "Tempo",
+                    "iconKey": "sync",
+                    "criterion": "changedTempo",
+                    "message": "Hidden Discovery: Tempo Master. The beacon can race like a running heart or rest like a sleeping one."
+                },
+                {
+                    "id": "meter_marker",
+                    "label": "Meter Marker",
+                    "shortLabel": "Meter",
+                    "iconKey": "rhythm",
+                    "criterion": "setTheMeter",
+                    "message": "Hidden Discovery: Meter Marker. Lyra writes how many beats and what kind, and the lamp starts counting in measures."
+                },
+                {
+                    "id": "beat_painter",
+                    "label": "Beat Painter",
+                    "shortLabel": "Color",
+                    "iconKey": "color",
+                    "criterion": "paintedTheBeat",
+                    "message": "Hidden Discovery: Beat Painter. The beam changes colour on every beat, so you can see the pulse as well as hear it."
+                }
+            ],
+            "bigBadgeId": "pulse_lighthouse",
+            "incomplete": {
+                "title": "The Lamp Still Sleeps",
+                "message": "Choon hears one drum going round and round, but a metronome needs two different sounds to tick and tock. Add another note value drum inside the Forever block and give it a different drum, then press Check My Work."
+            }
         }
     ]
 }

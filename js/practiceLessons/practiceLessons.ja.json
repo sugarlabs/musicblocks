@@ -24,6 +24,11 @@
             "label": "グランドメロディの守り手",
             "shortLabel": "グランドメロディ",
             "message": "ビッグバッジ獲得: グランドメロディの守り手。すべての島をむすんでいた歌が、またひとつにもどりました。"
+        },
+        "pulse_lighthouse": {
+            "label": "パルスとうだいの まもりて",
+            "shortLabel": "まもりて",
+            "message": "ビッグバッジ かいほう: パルスとうだいの まもりて。とうだいが ぴったりの じかんで まわり、すべてのしまが いえへの みちを みつけられる。"
         }
     },
     "problems": {
@@ -602,6 +607,70 @@
             "incomplete": {
                 "title": "星はまだ暗いままです",
                 "message": "チューンには星の歌の一部が聞こえます。フレーズメーカーで3つのフレーズすべてをアクションブロックとして保存し (Do Do Sol Sol La La Sol、つぎに Fa Fa Mi Mi Re Re Do、つぎに Sol Sol Fa Fa Mi Mi Re)、そのアクションをスタートの下に A1 A2 B B A1 A2 のじゅんばんでかさねてください。"
+            }
+        },
+        "9": {
+            "title": "パルスのとうだい",
+            "description": "\n      <section class=\"story-card\">\n        <p>サミットの むこうで うみが くらくなる。そこには おおきなランプが とまったままの とうだいが たっている。まわるかいすうを かぞえていた まもりてが ずっと まえに いなくなったからだ。&quot;どのしまも あのひかりで とけいを あわせていた&quot; と チューンが いう。&quot;こどうを あげれば めをさますよ。&quot;</p>\n        <div class=\"metronome-scene\" aria-label=\"しずかな とうだいの メトロノーム\">\n          <div class=\"metronome-beam\"></div>\n          <div class=\"metronome-body\">\n            <span class=\"metronome-arm\"></span>\n            <span class=\"metronome-weight\"></span>\n          </div>\n          <div class=\"metronome-tick metronome-tick-left\"></div>\n          <div class=\"metronome-tick metronome-tick-right\"></div>\n        </div>\n        <p>ライラは むねに てをあてて じぶんの みゃくを かんじる。いち、に、いち、に。&quot;ランプに ひつようなのは これ&quot; と ライラ。&quot;ぜったいに ずれない ビート。&quot;</p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>チクとタク</h4>\n        <div class=\"beat-map\" aria-label=\"しずかな とうだいの メトロノーム\">\n          <span>ビート 1 - ひくいドラム</span>\n          <span>ビート 2 - あかるいドラム</span>\n        </div>\n        <p>キャンバスには すでに <b>ずっと</b> ブロックが まわっていて、なかに ドラムが ひとつ ある。もうひとつ <b>ノートバリュードラム</b> を いれて、<b>ちがう ドラムのおと</b> に しよう。そうすれば ランプは おなじおとを くりかえさず チクタクする。<b>さいせい</b> を おして、とうだいを チェックしよう。</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>かくれたはぐるま</h4>\n        <p>ランプが まわりだしたら、あたらしい はぐるまを ためしてみよう。どれにも バッジが かくれている。</p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"swingPendulum\">ふりこを ふる</button>\n          <button type=\"button\" data-secret-help=\"changeTempo\">テンポを かえる</button>\n          <button type=\"button\" data-secret-help=\"setMeter\">ひょうしを きめる</button>\n          <button type=\"button\" data-secret-help=\"colorBeat\">ビートで いろをかえる</button>\n        </div>\n      </section>\n    ",
+            "journal": {
+                "title": "パルスのとうだい",
+                "island": "パルスのとうだい",
+                "completeTitle": "とうだいが またうごきだした",
+                "learned": ["みゃく", "ビート", "ひょうし"]
+            },
+            "rewards": [
+                "メロディのかけら #9",
+                "キャプテンのにっき #9",
+                "たからのてがかり: このひかりは すべてのしまの じかんを まもっている。"
+            ],
+            "badges": {
+                "beacon_keeper": {
+                    "label": "とうだいのまもりて",
+                    "shortLabel": "とうだい",
+                    "message": "チクタク。おおきなランプが きみのビートで まわり、ひかりが うみを てらす。"
+                },
+                "pendulum_swinger": {
+                    "label": "ふりこスイング",
+                    "shortLabel": "スイング",
+                    "message": "かくれたはっけん: ふりこスイング。チューンが ほんものの メトロノームみたいに ひだり みぎと かたむく。"
+                },
+                "tempo_master": {
+                    "label": "テンポマスター",
+                    "shortLabel": "テンポ",
+                    "message": "かくれたはっけん: テンポマスター。とうだいは はしるこころのように はやくも、ねむるこころのように ゆっくりも うごく。"
+                },
+                "meter_marker": {
+                    "label": "ひょうしマーカー",
+                    "shortLabel": "ひょうし",
+                    "message": "かくれたはっけん: ひょうしマーカー。いくつ、どんな おとかを かくと、ランプが しょうせつを かぞえはじめる。"
+                },
+                "beat_painter": {
+                    "label": "ビートペインター",
+                    "shortLabel": "いろ",
+                    "message": "かくれたはっけん: ビートペインター。ビートごとに ひかりの いろが かわるので、みゃくを きくだけでなく みることも できる。"
+                }
+            },
+            "secretHelpCards": {
+                "swingPendulum": {
+                    "title": "ふりこを ふる"
+                },
+                "changeTempo": {
+                    "title": "テンポを かえる"
+                },
+                "setMeter": {
+                    "title": "ひょうしを きめる"
+                },
+                "colorBeat": {
+                    "title": "ビートで いろをかえる",
+                    "heading": "ビートのかずで ひかりを ぬる",
+                    "description": "ひょうしブロックが かぞえていると、ビートカウントブロックが いま なんビートめかを おしえてくれる。ビートカウントを いろをセットに いれると、ビートごとに ランプの いろが かわる。<br>いろが にすぎるときは さきに かけざんしよう。いろの めもりは 0 から 100 まで。",
+                    "musicHeading": "たいせつなわけ",
+                    "musicDescription": "ビートを きくと どうじに みることで、ビートと リズムの ちがいが ずっと かんじやすくなる。"
+                }
+            },
+            "incomplete": {
+                "title": "ランプは まだ ねている",
+                "message": "チューンには ドラムが ひとつだけ まわって きこえる。メトロノームには チクとタクの ふたつの ちがう おとが ひつよう。ずっとブロックの なかに もうひとつ ノートバリュードラムを いれて、ちがう ドラムに してから できたかチェックを おそう。"
             }
         }
     }
