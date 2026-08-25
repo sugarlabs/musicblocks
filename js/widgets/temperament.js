@@ -978,6 +978,198 @@ function TemperamentWidget() {
     };
 
     /**
+     * Draws the visualizer view: 12-EDO reference ring with colored spokes
+     * connecting to the active temperament's pitches, plus a scrollable table.
+     * @returns {void}
+     */
+    this._visualizerView = function () {
+        temperamentTableDiv.textContent = "";
+        temperamentTableDiv.style.backgroundColor = "#1a1a2e";
+        temperamentTableDiv.style.color = "#e0e0e0";
+        temperamentTableDiv.style.fontFamily = "sans-serif";
+        temperamentTableDiv.style.padding = "8px";
+
+        const canvasSize = 400;
+        const canvas = document.createElement("canvas");
+        canvas.width = canvasSize;
+        canvas.height = canvasSize;
+        canvas.style.maxWidth = "100%";
+        canvas.style.display = "block";
+        canvas.style.margin = "0 auto";
+        temperamentTableDiv.appendChild(canvas);
+
+        const ctx = canvas.getContext("2d");
+        const cx = canvasSize / 2;
+        const cy = canvasSize / 2;
+        const outerR = 170;
+        const innerR = 120;
+        const dotR = 6;
+
+        const equal = getTemperament("equal");
+        const labels = equal.noteLabels;
+        ctx.lineWidth = 1;
+        ctx.font = "12px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        for (let k = 0; k < 12; k++) {
+            const a = ((270 + k * 30) * Math.PI) / 180;
+            const x1 = cx + (outerR - 10) * Math.cos(a);
+            const y1 = cy + (outerR - 10) * Math.sin(a);
+            const x2 = cx + (outerR + 6) * Math.cos(a);
+            const y2 = cy + (outerR + 6) * Math.sin(a);
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = "#666";
+            ctx.stroke();
+            const lx = cx + (outerR + 18) * Math.cos(a);
+            const ly = cy + (outerR + 18) * Math.sin(a);
+            ctx.fillStyle = "#aaa";
+            ctx.fillText(labels[k], lx, ly);
+        }
+
+        for (let i = 0; i < this.pitchNumber; i++) {
+            const cents = this.cents[i];
+            const angleDeg = 270 + cents * 0.3;
+            let k = Math.round((angleDeg - 270) / 30);
+            k = ((k % 12) + 12) % 12;
+            const dev = cents - k * 100;
+
+            let color;
+            let dashed = false;
+            if (Math.abs(dev) <= 1) {
+                color = "#4caf50";
+                dashed = true;
+            } else if (dev > 1) {
+                color = "#ff9800";
+            } else {
+                color = "#f44336";
+            }
+
+            const dotA = (angleDeg * Math.PI) / 180;
+            const dx = cx + innerR * Math.cos(dotA);
+            const dy = cy + innerR * Math.sin(dotA);
+            const tickA = ((270 + k * 30) * Math.PI) / 180;
+            const tx = cx + outerR * Math.cos(tickA);
+            const ty = cy + outerR * Math.sin(tickA);
+
+            ctx.beginPath();
+            ctx.setLineDash(dashed ? [4, 3] : []);
+            ctx.moveTo(dx, dy);
+            ctx.lineTo(tx, ty);
+            ctx.strokeStyle = color;
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.beginPath();
+            ctx.arc(dx, dy, dotR, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        ctx.fillStyle = "#e0e0e0";
+        ctx.font = "12px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(this.inTemperament + " vs 12-EDO", cx, cy);
+
+        const tableDiv = document.createElement("div");
+        tableDiv.style.maxHeight = "200px";
+        tableDiv.style.overflowY = "auto";
+        tableDiv.style.width = "100%";
+        tableDiv.style.marginTop = "8px";
+        temperamentTableDiv.appendChild(tableDiv);
+
+        const that = this;
+        canvas.onclick = function (e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+
+            let nearest = null;
+            let nearestDist = Infinity;
+            for (let i = 0; i < that.pitchNumber; i++) {
+                const cents = that.cents[i];
+                const angleDeg = 270 + cents * 0.3;
+                const dotA = (angleDeg * Math.PI) / 180;
+                const dx = cx + innerR * Math.cos(dotA);
+                const dy = cy + innerR * Math.sin(dotA);
+                const dist = Math.hypot(dx - x, dy - y);
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearest = i;
+                }
+            }
+            if (nearest !== null && nearestDist <= dotR + 8) {
+                that._logo.synth.trigger(
+                    0,
+                    that.frequencies[nearest],
+                    1 / 4,
+                    "electronic synth",
+                    null,
+                    null
+                );
+            }
+        };
+
+        const table = document.createElement("table");
+        table.style.width = "100%";
+        table.style.borderCollapse = "collapse";
+        tableDiv.appendChild(table);
+
+        const thead = document.createElement("tr");
+        const headers = [_("Pitch"), _("Step"), _("Frequency (Hz)"), _("Cents"), _("Ratio")];
+        for (const h of headers) {
+            const th = document.createElement("th");
+            th.textContent = h;
+            th.style.border = "1px solid #333";
+            th.style.padding = "4px 8px";
+            th.style.textAlign = "center";
+            thead.appendChild(th);
+        }
+        table.appendChild(thead);
+
+        for (let i = 0; i < this.pitchNumber; i++) {
+            const tr = document.createElement("tr");
+            const cents = this.cents[i];
+            const dev = cents - Math.round(cents / 100) * 100;
+
+            const tdName = document.createElement("td");
+            tdName.textContent = this.notes[i][0] + this.notes[i][1];
+
+            const tdStep = document.createElement("td");
+            tdStep.textContent = i;
+
+            const tdFreq = document.createElement("td");
+            tdFreq.textContent = this.frequencies[i];
+
+            const tdCents = document.createElement("td");
+            tdCents.textContent = (dev >= 0 ? "+" : "") + dev.toFixed(1);
+            if (Math.abs(dev) <= 1) {
+                tdCents.style.color = "#4caf50";
+            } else if (dev > 1) {
+                tdCents.style.color = "#ff9800";
+            } else {
+                tdCents.style.color = "#f44336";
+            }
+
+            const tdRatio = document.createElement("td");
+            tdRatio.textContent = this.ratios[i].toFixed(4);
+
+            for (const td of [tdName, tdStep, tdFreq, tdCents, tdRatio]) {
+                td.style.border = "1px solid #333";
+                td.style.padding = "4px 8px";
+                td.style.textAlign = "center";
+                tr.appendChild(td);
+            }
+            table.appendChild(tr);
+        }
+    };
+
+    /**
      * Enters the edit mode for adjusting temperament settings.
      * @returns {void}
      */
@@ -2718,6 +2910,10 @@ function TemperamentWidget() {
 
         widgetWindow.addButton("add2.svg", ICONSIZE, _("Add pitches")).onclick = function () {
             that.edit();
+        };
+
+        widgetWindow.addButton("circle.svg", ICONSIZE, _("Visualizer")).onclick = function () {
+            that._visualizerView();
         };
 
         widgetWindow.sendToCenter();
