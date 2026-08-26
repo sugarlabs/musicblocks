@@ -760,4 +760,22 @@ describe("setupMeterActions", () => {
             expect.any(Function)
         );
     });
+
+    it("should register onStrongBeatDo listener via setTurtleListener and allow stage unbinding", () => {
+        targetTurtle.id = 0;
+        targetTurtle.listeners = {};
+        activity.logo.setTurtleListener = jest.fn((turtle, name, fn) => {
+            targetTurtle.listeners[name] = fn;
+        });
+
+        Singer.MeterActions.onStrongBeatDo(1, "testAction", false, null, 0, 1);
+
+        const eventName = "__beat_1_0__";
+        expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+            0,
+            eventName,
+            expect.any(Function)
+        );
+        expect(targetTurtle.listeners[eventName]).toEqual(expect.any(Function));
+    });
 });
