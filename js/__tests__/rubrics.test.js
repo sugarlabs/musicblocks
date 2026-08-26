@@ -63,6 +63,18 @@ describe("rubrics.js test suite", () => {
             expect(result.length).toBe(PALS.length);
         });
 
+        it("should calculate correct category and palette scores using PALS_INDEX_MAP", () => {
+            const activity = {
+                blocks: {
+                    blockList: [{ name: "forward", connections: ["conn1"] }]
+                }
+            };
+            const result = analyzeProject(activity);
+            const turtlepIndex = PALS_INDEX_MAP.get("turtlep");
+            // TASCORE["forward"] (3) + TASCORE["turtlep"] (5) = 8
+            expect(result[turtlepIndex]).toBe(8);
+        });
+
         it("should ignore blocks in trash", () => {
             const activity = {
                 blocks: {
@@ -84,7 +96,7 @@ describe("rubrics.js test suite", () => {
             });
         });
 
-        it("should warn when pal or TAPAL value is not found in PALS", () => {
+        it("should warn when TAPAL value is not found in PALS_INDEX_MAP in cats loop", () => {
             const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
             const origIndex = PALS_INDEX_MAP.get("numberp");
             PALS_INDEX_MAP.delete("numberp");
@@ -96,9 +108,29 @@ describe("rubrics.js test suite", () => {
             };
             analyzeProject(activity);
 
-            expect(warnSpy).toHaveBeenCalled();
+            expect(warnSpy).toHaveBeenCalledWith(
+                "rubrics: TAPAL value not found in PALS:",
+                "numberp"
+            );
             warnSpy.mockRestore();
             PALS_INDEX_MAP.set("numberp", origIndex);
+        });
+
+        it("should warn when pal is not found in PALS_INDEX_MAP in pals loop", () => {
+            const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+            const origIndex = PALS_INDEX_MAP.get("turtlep");
+            PALS_INDEX_MAP.delete("turtlep");
+
+            const activity = {
+                blocks: {
+                    blockList: [{ name: "forward", connections: ["conn1"] }]
+                }
+            };
+            analyzeProject(activity);
+
+            expect(warnSpy).toHaveBeenCalledWith("rubrics: pal not found in PALS:", "turtlep");
+            warnSpy.mockRestore();
+            PALS_INDEX_MAP.set("turtlep", origIndex);
         });
     });
 
