@@ -23,6 +23,7 @@ const {
     TAPAL,
     TASCORE,
     PALS,
+    PALS_INDEX_MAP,
     PALLABELS,
     analyzeProject,
     scoreToChartData,
@@ -73,6 +74,31 @@ describe("rubrics.js test suite", () => {
             };
             const result = analyzeProject(activity);
             expect(result).toBeInstanceOf(Array);
+        });
+
+        it("should correctly map palettes to their indices in PALS_INDEX_MAP", () => {
+            expect(PALS_INDEX_MAP).toBeInstanceOf(Map);
+            expect(PALS_INDEX_MAP.size).toBe(PALS.length);
+            PALS.forEach((pal, idx) => {
+                expect(PALS_INDEX_MAP.get(pal)).toBe(idx);
+            });
+        });
+
+        it("should warn when pal or TAPAL value is not found in PALS", () => {
+            const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+            const origIndex = PALS_INDEX_MAP.get("numberp");
+            PALS_INDEX_MAP.delete("numberp");
+
+            const activity = {
+                blocks: {
+                    blockList: [{ name: "random", connections: ["conn1"] }]
+                }
+            };
+            analyzeProject(activity);
+
+            expect(warnSpy).toHaveBeenCalled();
+            warnSpy.mockRestore();
+            PALS_INDEX_MAP.set("numberp", origIndex);
         });
     });
 
