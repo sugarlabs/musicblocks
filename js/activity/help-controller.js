@@ -319,6 +319,13 @@ class HelpController {
         });
 
         widgetBody.appendChild(wrapper);
+
+        const stopWidgetWheel = event => {
+            event.stopPropagation();
+        };
+        wrapper.addEventListener("wheel", stopWidgetWheel);
+        wrapper.addEventListener("DOMMouseScroll", stopWidgetWheel);
+
         widgetWindow.sendToCenter();
         requestAnimationFrame(() => widgetWindow.sendToCenter());
     }

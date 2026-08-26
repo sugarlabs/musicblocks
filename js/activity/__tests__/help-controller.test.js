@@ -238,6 +238,78 @@ describe("HelpController.showKeyboardShortcuts", () => {
         const firstRowKey = widgetBody.querySelector(".keyboard-shortcuts-key");
         expect(firstRowKey.textContent).toBe("Windows/Linux: Alt + R\nMac: Option + R");
     });
+
+    describe("with a real WidgetWindow", () => {
+        let realWidgetWindows;
+
+        beforeAll(() => {
+            global.makeKeyboardAccessible =
+                require("../../utils/dom-helpers").makeKeyboardAccessible;
+            global.docById = id => document.getElementById(id);
+
+            if (!document.getElementById("floatingWindows")) {
+                const floatingWindows = document.createElement("div");
+                floatingWindows.id = "floatingWindows";
+                document.body.appendChild(floatingWindows);
+            }
+
+            if (!document.getElementById("myCanvas")) {
+                const canvas = document.createElement("canvas");
+                canvas.id = "myCanvas";
+                document.body.appendChild(canvas);
+            }
+
+            require("../../widgets/widgetWindows.js");
+            realWidgetWindows = window.widgetWindows;
+        });
+
+        beforeEach(() => {
+            window.widgetWindows = realWidgetWindows;
+            window.widgetWindows.openWindows = {};
+            window.widgetWindows._posCache = {};
+            window.widgetWindows.draggingWindow = null;
+            document.getElementById("floatingWindows").replaceChildren();
+        });
+
+        test("wheel over the shortcuts panel is not consumed by the widget body", () => {
+            const activity = makeActivity();
+            const controller = new HelpController(activity);
+
+            controller.showKeyboardShortcuts();
+
+            const win = window.widgetWindows.openWindows["keyboard-shortcuts"];
+            const widgetBody = win.getWidgetBody();
+            const panel = widgetBody.querySelector(".keyboard-shortcuts-panel");
+            const row = panel.querySelector(".keyboard-shortcuts-row");
+
+            widgetBody.scrollTop = 0;
+
+            const wheelEvent = new window.WheelEvent("wheel", {
+                deltaY: 40,
+                deltaX: 0,
+                bubbles: true,
+                cancelable: true
+            });
+            row.dispatchEvent(wheelEvent);
+
+            expect(wheelEvent.defaultPrevented).toBe(false);
+            expect(widgetBody.scrollTop).toBe(0);
+
+            const mouseDown = new window.MouseEvent("mousedown", {
+                bubbles: true,
+                cancelable: true
+            });
+            const mouseMove = new window.MouseEvent("mousemove", {
+                bubbles: true,
+                cancelable: true
+            });
+            panel.dispatchEvent(mouseDown);
+            panel.dispatchEvent(mouseMove);
+
+            expect(mouseDown.defaultPrevented).toBe(false);
+            expect(mouseMove.defaultPrevented).toBe(false);
+        });
+    });
 });
 
 describe("HelpController.toggleJSEditor", () => {
