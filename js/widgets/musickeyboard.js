@@ -927,6 +927,25 @@ function MusicKeyboard(activity) {
          */
         this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, _("Metronome"));
 
+        // Turn off metronome
+        this.stopMetronome = () => {
+            this.tickButton.style.removeProperty("background");
+            if (this.tick && this.loopTick) {
+                this.loopTick.stop();
+            }
+            this.tick = false;
+            this.firstNote = false;
+            this.metronomeON = false;
+            const countdownContainer = docById("countdownContainer");
+            if (countdownContainer) {
+                countdownContainer.remove();
+            }
+            if (this.metronomeInterval) {
+                clearInterval(this.metronomeInterval);
+                this.metronomeInterval = null;
+            }
+        };
+
         this.tickButton.onclick = () => {
             if (this.metronomeInterval || this.metronomeON) {
                 this.stopMetronome();
