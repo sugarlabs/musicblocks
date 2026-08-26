@@ -47,11 +47,12 @@
  * Upper bound (in scalar steps) on the value accepted by setScalarInterval().
  * GetNotesForInterval() derives an octave count as `Math.floor(intervals[0] / 7)`,
  * which GetIntervalNumber() then walks with a `while (octave > 0)` loop that runs
- * once per octave; this cap keeps that loop to a few hundred iterations (over 140
- * octaves - generous for any legitimate use) regardless of how large a value the
- * block argument supplies.
+ * once per octave. 9 octaves of 7 diatonic steps each matches the existing octave
+ * range convention used elsewhere for pitch (see PitchBlocks.js's "Octave must be
+ * an integer in [0, 9]"), so a scalar interval outside +-63 already corresponds to
+ * an octave shift no Pitch block could represent, rather than an arbitrary cap.
  */
-const MAX_SCALAR_INTERVAL = 1000;
+const MAX_SCALAR_INTERVAL = 63;
 
 /**
  * Sets up all the methods related to different actions for each block in Intervals palette.
@@ -396,7 +397,7 @@ function setupIntervalsActions(activity) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 1;
             } else if (Math.abs(arg) > MAX_SCALAR_INTERVAL) {
-                activity.errorMsg(_("Scalar interval must be within -1000 to 1000."), blk);
+                activity.errorMsg(_("Scalar interval must be within -63 to 63."), blk);
                 arg = 1;
             }
 
