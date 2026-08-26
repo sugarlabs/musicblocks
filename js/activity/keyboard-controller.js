@@ -192,6 +192,19 @@ class KeyboardController {
                 break;
             }
         }
+        // Alt+S (Option+S) must be able to stop a running program even
+        // though `disableKeys` is true whenever activity.turtles.running()
+        // is true — otherwise the one time a user needs Stop, the shortcut
+        // is unreachable. This mirrors how RETURN/SPACE below check
+        // turtles.running() as an independent branch before consulting
+        // disableKeys, rather than folding "running" into the same gate
+        // as unrelated UI-blocking states (modals, search, paste box).
+        if (event.altKey && event.keyCode === 83 && activity.turtles.running()) {
+            activity.textMsg("Alt-S " + _("Stop"));
+            activity.logo.doStopTurtles();
+            activity.currentKeyCode = event.keyCode;
+            return;
+        }
         if (
             (event.altKey && !disableKeys) ||
             event.keyCode === 13 ||
