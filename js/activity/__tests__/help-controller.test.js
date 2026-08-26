@@ -343,6 +343,24 @@ describe("HelpController.showKeyboardShortcuts", () => {
             expect(mouseDown.defaultPrevented).toBe(false);
             expect(mouseMove.defaultPrevented).toBe(false);
         });
+
+        test("removes panel wheel listeners and discards the window DOM on close", () => {
+            const activity = makeActivity();
+            const controller = new HelpController(activity);
+
+            controller.showKeyboardShortcuts();
+
+            const win = window.widgetWindows.openWindows["keyboard-shortcuts"];
+            const panel = win.getWidgetBody().querySelector(".keyboard-shortcuts-panel");
+            const removeSpy = jest.spyOn(panel, "removeEventListener");
+
+            win.onclose();
+
+            expect(removeSpy).toHaveBeenCalledWith("wheel", expect.any(Function));
+            expect(removeSpy).toHaveBeenCalledWith("DOMMouseScroll", expect.any(Function));
+            expect(document.body.contains(panel)).toBe(false);
+            expect(document.getElementById("floatingWindows").contains(win._frame)).toBe(false);
+        });
     });
 });
 

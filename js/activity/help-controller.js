@@ -326,6 +326,14 @@ class HelpController {
         wrapper.addEventListener("wheel", stopWidgetWheel);
         wrapper.addEventListener("DOMMouseScroll", stopWidgetWheel);
 
+        widgetWindow.onclose = () => {
+            wrapper.removeEventListener("wheel", stopWidgetWheel);
+            wrapper.removeEventListener("DOMMouseScroll", stopWidgetWheel);
+            if (typeof widgetWindow.destroy === "function") {
+                widgetWindow.destroy();
+            }
+        };
+
         widgetWindow.sendToCenter();
         requestAnimationFrame(() => widgetWindow.sendToCenter());
     }
