@@ -71,6 +71,15 @@ describe("processABCNotes - Basic Note Processing", () => {
         expect(logo.notationNotes["0"]).toBe("G^4 G^4 F4 F4 G^2 G^8 ");
     });
 
+    it("should handle octaves 5 and above correctly (lowercase and proper octave markers)", () => {
+        logo.notation.notationStaging["0"] = [
+            [["G5"], 4, 0, null, null, -1, false],
+            [["C8"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("g4 g4 c'''4 c'''4 ");
+    });
+
     it("should insert a newline after every 8 notes", () => {
         const notes = [];
         // Add 9 notes
