@@ -377,6 +377,35 @@ describe("ModeWidget", () => {
         expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
     });
 
+    test("non-EDO labeled temperament plays the octave an octave up", () => {
+        const labels = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        const savedTemperament = global.TEMPERAMENT;
+        const savedSpy = global.pitchToFrequency;
+        global.TEMPERAMENT = {
+            testNonEDO: {
+                isEDO: false,
+                noteLabels: labels,
+                ratios: labels.map((_, i) => Math.pow(2, i / 12))
+            }
+        };
+        modeWidget._activeTemperamentKey = "testNonEDO";
+        modeWidget._activeEDO = labels.length;
+        const spy = jest.spyOn(global, "pitchToFrequency");
+
+        // Within-octave degree stays at octave 4.
+        modeWidget._triggerNote(1, labels.length);
+        expect(spy).toHaveBeenLastCalledWith(labels[1], 4, 0, ["C"], "testNonEDO");
+
+        // The octave note (index === n) wraps to the root label but must
+        // sound an octave higher (octave 5), not the starting note.
+        modeWidget._triggerNote(labels.length, labels.length);
+        expect(spy).toHaveBeenLastCalledWith(labels[0], 5, 0, ["C"], "testNonEDO");
+
+        spy.mockRestore();
+        global.pitchToFrequency = savedSpy;
+        global.TEMPERAMENT = savedTemperament;
+    });
+
     test("should initialize a custom mode with only the root selected", () => {
         modeWidget._resetToCustom();
 

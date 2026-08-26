@@ -1064,14 +1064,12 @@ class ModeWidget {
 
         if (labels && labels[note % labels.length]) {
             // Non-EDO temperament: resolve the exact ratio by asking for the
-            // labeled pitch at zero cents.
-            const freq = pitchToFrequency(
-                labels[note % labels.length],
-                4,
-                0,
-                ks,
-                this._activeTemperamentKey
-            );
+            // labeled pitch. The octave note wraps to the root label, so bump
+            // the octave by how many times we've crossed the label count.
+            // ponytail: assumes labels.length === _activeEDO (pitch count).
+            const idx = note % labels.length;
+            const octave = 4 + Math.floor(note / labels.length);
+            const freq = pitchToFrequency(labels[idx], octave, 0, ks, this._activeTemperamentKey);
             this.logo.synth.trigger(0, freq, this._noteValue, DEFAULTVOICE, null, null);
             return;
         }
