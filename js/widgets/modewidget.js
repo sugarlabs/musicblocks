@@ -1087,12 +1087,16 @@ class ModeWidget {
                 null
             );
         } else {
+            // Use the active temperament directly: _temperamentKeyForEDO maps a
+            // non-EDO pitch count to an EQUAL temperament (19 -> equal19), which
+            // would play the wrong tuning. ponytail: _activeTemperamentKey always
+            // holds the real temperament (equal or ratio-based).
             const freq = pitchToFrequency(
                 this._pitch,
                 4,
                 Math.round(note * (1200 / edo)),
                 ks,
-                this._temperamentKeyForEDO(edo)
+                this._activeTemperamentKey
             );
             this.logo.synth.trigger(0, freq, this._noteValue, DEFAULTVOICE, null, null);
         }
@@ -1292,13 +1296,7 @@ class ModeWidget {
             // Movable-do solfege relative to the key signature (matches playback).
             return [NOTESTABLE[(j + 1) % 12], 4];
         }
-        const [name, octave] = numberToPitch(
-            j,
-            this._temperamentKeyForEDO(this._activeEDO),
-            "A",
-            0,
-            this.activity
-        );
+        const [name, octave] = numberToPitch(j, this._activeTemperamentKey, "A", 0, this.activity);
         // numberToPitch can return [undefined, NaN] when the temperament's
         // per-note data is incomplete (e.g. the built-in "custom" entry or a
         // saved custom temperament without octave digits). Fall back to the

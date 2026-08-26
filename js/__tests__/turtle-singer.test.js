@@ -61,6 +61,12 @@ global.parseNoteString = mockGlobals.parseNoteString;
 global.getCachedPitchToFrequency = mockGlobals.getCachedPitchToFrequency;
 global.normalizeNoteAccidentals = mockGlobals.normalizeNoteAccidentals;
 global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
+
+// addScalarTransposition's non-EDO branch looks up the mode's native EDO via
+// these musicutils globals; provide them so the real function can run.
+const musicUtils = require("../utils/musicutils");
+global.keySignatureToMode = musicUtils.keySignatureToMode;
+global.getSavedCustomModes = musicUtils.getSavedCustomModes;
 global.last = jest.fn(array => array[array.length - 1]);
 global.deepClone = value => {
     if (typeof structuredClone === "function") {

@@ -26,6 +26,7 @@
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
    SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO,
+   keySignatureToMode, getSavedCustomModes,
    clampNumber
  */
 
@@ -366,26 +367,34 @@ class Singer {
                 );
             }
         } else {
-            // Non-EDO ratio temperament: measure the distance to the NEXT
-            // DEGREE each iteration. The 12-name space is used because
-            // non-EDO ratio tables are keyed by 12-EDO note names.
+            // Non-EDO ratio temperament: step by actual scale degrees. Build the
+            // scale at the mode's own EDO (a saved custom mode carries its native
+            // EDO; built-ins fall back to the temperament's pitch count) so the
+            // step reflects the real degree spacing, then normalize to a semitone
+            // offset that getNote remaps onto the temperament's ratios.
+            const modeName = keySignatureToMode(tur.singer.keySignature)[1];
+            const custom = getSavedCustomModes().find(m => m.name === modeName);
+            const modeEdo = (custom && custom.edo) || edo;
             for (let i = 0; i < Math.abs(steps); i++) {
-                const stepSemis =
+                const stepCount =
                     steps > 0
                         ? getStepSizeUp(
                               tur.singer.keySignature,
                               noteObj[0],
                               undefined,
                               temperament,
-                              12
+                              modeEdo
                           )
                         : getStepSizeDown(
                               tur.singer.keySignature,
                               noteObj[0],
                               undefined,
                               temperament,
-                              12
+                              modeEdo
                           );
+                // getStepSizeUp returns EDO-step counts off 12-EDO; normalize to
+                // a semitone offset (isAlreadyEdoSteps=false) so getNote remaps it.
+                const stepSemis = (stepCount * 12) / modeEdo;
                 noteObj = getNote(
                     noteObj[0],
                     noteObj[1],

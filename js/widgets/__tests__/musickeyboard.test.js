@@ -943,7 +943,7 @@ describe("MusicKeyboard core logic", () => {
         global.noteToFrequency = jest.fn(name => ({ do4: 261, sol4: 392 })[name] ?? 0);
         global.last = array => array[array.length - 1];
         global.EIGHTHNOTEWIDTH = 24;
-        global.docById = jest.fn(() => ({ getAttribute: () => "0.5" }));
+        global.docById = jest.fn(() => ({ getAttribute: () => "0.5", remove: jest.fn() }));
         global.beginnerMode = "false";
     });
 
