@@ -21,11 +21,12 @@
    DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, deepClone, frequencyToPitch, last,
     pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
     getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
-    temperamentHasRatios,
+    temperamentHasRatios, isEquallyTempered,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO, isTrueEDO,
+   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO,
+   keySignatureToMode, getSavedCustomModes,
    clampNumber
  */
 
@@ -37,7 +38,7 @@
         frequencyToPitch, pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1,
         SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament, getOctaveRatio,
-        getCurrentEDO
+        getCurrentEDO, isEquallyTempered
     js/utils/utils.js
         rationalSum, _, rationalToFraction
     js/utils/synthutils.js
@@ -326,12 +327,13 @@ class Singer {
             temperament
         );
 
-        // Custom temperaments without ratio data step by a raw semitone offset;
-        // everything else steps by mode-resolved EDO steps.
+        // Equal temperaments step by resolved EDO degrees; customs without
+        // ratios step by raw semitone offsets. Everything with real ratios
+        // (just intonation, meantone, ...) walks the mode's actual scale
+        // degrees one at a time.
         const useEdoSteps =
-            isTrueEDO(temperament) ||
-            !isCustomTemperament(temperament) ||
-            temperamentHasRatios(temperament);
+            isEquallyTempered(temperament) ||
+            (isCustomTemperament(temperament) && !temperamentHasRatios(temperament));
 
         if (useEdoSteps) {
             for (let i = 0; i < Math.abs(steps); i++) {
@@ -365,23 +367,47 @@ class Singer {
                 );
             }
         } else {
-            // Custom temperament without ratio data: no per-degree scale lookup
-            // is possible, so treat the step count as a raw semitone offset and
-            // let getNote rescale it.
-            noteObj = getNote(
-                noteObj[0],
-                noteObj[1],
-                steps > 0
-                    ? getStepSizeUp(tur.singer.keySignature, noteObj[0], steps, temperament, edo)
-                    : getStepSizeDown(tur.singer.keySignature, noteObj[0], steps, temperament, edo),
-                tur.singer.keySignature,
-                tur.singer.movable,
-                null,
-                activity.errorMsg,
-                temperament,
-                false, // isAlreadyEdoSteps — steps is raw semitone offset
-                false // allow octave wrap
-            );
+            // Non-EDO ratio temperament: step by actual scale degrees. Build the
+            // scale at the mode's own EDO (a saved custom mode carries its native
+            // EDO; built-ins fall back to the temperament's pitch count) so the
+            // step reflects the real degree spacing, then normalize to a semitone
+            // offset that getNote remaps onto the temperament's ratios.
+            const modeName = keySignatureToMode(tur.singer.keySignature)[1];
+            const custom = getSavedCustomModes().find(m => m.name === modeName);
+            const modeEdo = (custom && custom.edo) || edo;
+            for (let i = 0; i < Math.abs(steps); i++) {
+                const stepCount =
+                    steps > 0
+                        ? getStepSizeUp(
+                              tur.singer.keySignature,
+                              noteObj[0],
+                              undefined,
+                              temperament,
+                              modeEdo
+                          )
+                        : getStepSizeDown(
+                              tur.singer.keySignature,
+                              noteObj[0],
+                              undefined,
+                              temperament,
+                              modeEdo
+                          );
+                // getStepSizeUp returns EDO-step counts off 12-EDO; normalize to
+                // a semitone offset (isAlreadyEdoSteps=false) so getNote remaps it.
+                const stepSemis = (stepCount * 12) / modeEdo;
+                noteObj = getNote(
+                    noteObj[0],
+                    noteObj[1],
+                    stepSemis,
+                    tur.singer.keySignature,
+                    tur.singer.movable,
+                    null,
+                    activity.errorMsg,
+                    temperament,
+                    false, // isAlreadyEdoSteps — stepSemis is a raw semitone offset
+                    false // allow octave wrap
+                );
+            }
         }
 
         return noteObj;

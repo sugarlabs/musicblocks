@@ -125,6 +125,8 @@ const {
     PITCH_COLLECTIONS_EDO_OVERRIDES,
     getModePattern,
     generateNoteNames,
+    isNonEDO,
+    getNonEDOModeSteps,
     getSavedCustomModes,
     getModeNamesForGroup,
     getModeLabel,
@@ -1783,6 +1785,19 @@ describe("scalePatternToEDO", () => {
     it("clamps steps to a minimum of 1 for small EDOs", () => {
         expect(scalePatternToEDO(major, 5)).toEqual([1, 1, 1, 1, 1, 1, 1]);
     });
+
+    it("scales a 19-summing pattern down to 12 (mismatched-request direction)", () => {
+        // A native 19-EDO pattern asked for at EDO 12 must compress, not pass through.
+        const nineteen = [4, 3, 2, 3, 4, 3]; // hypothetical 19-EDO major, sums to 19
+        const out = scalePatternToEDO(nineteen, 12);
+        expect(out.reduce((a, b) => a + b, 0)).toBeLessThanOrEqual(12 + out.length);
+        expect(out.every(s => s >= 1)).toBe(true);
+    });
+
+    it("returns the pattern unchanged when its sum equals the requested EDO", () => {
+        const p = [3, 3, 3, 3, 3, 3, 3]; // sums to 21
+        expect(scalePatternToEDO(p, 21)).toEqual(p);
+    });
 });
 
 describe("getModePattern", () => {
@@ -1801,6 +1816,17 @@ describe("getModePattern", () => {
 
     it("keeps the 12-EDO pattern identical", () => {
         expect(getModePattern("major", 12)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    it("rescales a native 19-EDO custom mode requested at EDO 12", () => {
+        MUSICALMODES._nineteenNative = [4, 3, 2, 3, 4, 3]; // sums to 19
+        try {
+            const out = getModePattern("_nineteenNative", 12);
+            expect(out).not.toEqual(MUSICALMODES._nineteenNative);
+            expect(out.every(s => s >= 1)).toBe(true);
+        } finally {
+            delete MUSICALMODES._nineteenNative;
+        }
     });
 });
 
@@ -3897,6 +3923,33 @@ describe("mode pie menu shared helpers", () => {
             expect(getSavedCustomModes()).toEqual([]);
             localStorage.setItem("customModes", JSON.stringify({ name: "not an array" }));
             expect(getSavedCustomModes()).toEqual([]);
+        });
+    });
+});
+
+describe("non-EDO temperament helpers", () => {
+    describe("isNonEDO", () => {
+        it("is true for just intonation (ratios, unequal)", () => {
+            expect(isNonEDO("just intonation")).toBe(true);
+        });
+        it("is false for equal temperament", () => {
+            expect(isNonEDO("equal")).toBe(false);
+        });
+        it("is false for unknown or missing temperaments", () => {
+            expect(isNonEDO("not-a-temperament")).toBe(false);
+            expect(isNonEDO(undefined)).toBe(false);
+        });
+    });
+
+    describe("getNonEDOModeSteps", () => {
+        it("derives meantone-like integer steps from ratios for major", () => {
+            // 5-limit JI major: cumulative semitones 0,2,4,5,7,9,11 map onto
+            // the 12-entry ratio table at indices 0,2,4,5,7,9,11.
+            const steps = getNonEDOModeSteps("major", "just intonation");
+            expect(steps).toEqual([2, 2, 1, 2, 2, 2, 1]);
+        });
+        it("returns null for a temperament without usable ratios", () => {
+            expect(getNonEDOModeSteps("major", "_no_ratios")).toBeNull();
         });
     });
 });

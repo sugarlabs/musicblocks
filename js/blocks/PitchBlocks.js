@@ -18,7 +18,7 @@
      DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
     NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
     YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
-    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
+    nthDegreeToPitch, getCurrentEDO, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
      NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
      INTERVALVALUES, CENTSSYMBOL
   */
@@ -2073,11 +2073,14 @@ function setupPitchBlocks(activity) {
                 arg0 = Number(arg0);
 
                 // We interpret numbers two different ways:
-                //  (1) a positive integer between 1 and 12 is taken to be a movable solfege, e.g. 1 : do, 2 : re ...
+                //  (1) a positive integer between 1 and currentEDO is taken to be
+                //      a movable solfege, e.g. 1 : do, 2 : re ...
                 //  (2) if frequency is input, ignore octave (arg1)
                 // Negative numbers will throw an error.
 
-                if (arg0 <= 12) {
+                const currentEDO = getCurrentEDO(logo.synth.inTemperament);
+
+                if (arg0 <= currentEDO) {
                     // movable solfege
                     if (arg0 < 1) {
                         activity.errorMsg(INVALIDPITCH, blk);
@@ -2086,7 +2089,8 @@ function setupPitchBlocks(activity) {
 
                     const [noteName, offset] = nthDegreeToPitch(
                         tur.singer.keySignature,
-                        Math.round(arg0)
+                        Math.round(arg0),
+                        currentEDO
                     );
                     note = noteName;
                     octave =
