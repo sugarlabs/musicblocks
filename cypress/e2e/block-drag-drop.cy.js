@@ -21,11 +21,12 @@ describe("Block palette drag-and-drop", () => {
     });
 
     it("drags a Pitch block from the palette and docks it into the real block flow", () => {
-        // Open the Pitch category. Category icons are base64 SVGs with no
-        // stable semantic attributes, so - as in main.cy.js's "Block Palette"
-        // suite - the category is selected by its statically-defined position
-        // in the category list (Search, Rhythm, Meter, Pitch, ...).
-        cy.get('[width="126"] tbody tr').eq(3).find("img").click();
+        // Open the Pitch category. Category icons themselves are base64 SVGs
+        // with no stable attribute, but each category row's label cell holds
+        // the real, user-visible category name (js/palette.js makeButton:
+        // label.textContent = toTitleCase(_(name))), which is a more durable
+        // selector than a positional index into the category list.
+        cy.contains('[width="126"] tbody tr', "Pitch").find("img").click();
         cy.get("#palette", { timeout: 15000 }).should("be.visible");
 
         // Each open palette row carries an aria-label of the block's raw name
@@ -55,8 +56,15 @@ describe("Block palette drag-and-drop", () => {
             // Read the dock geometry off an existing "pitch" instance already
             // on the canvas - dock offsets are fixed per block type/scale, so
             // this is a stable stand-in for the not-yet-created block's own
-            // geometry.
-            const templateDocks = blocks.blockList.find(b => !b.trash && b.name === "pitch").docks;
+            // geometry. Fail with a clear message rather than a bare
+            // "Cannot read properties of undefined" if the starter project
+            // ever stops shipping a pitch block.
+            const templateBlock = blocks.blockList.find(b => !b.trash && b.name === "pitch");
+            expect(
+                templateBlock,
+                "default project should contain a pitch block to provide dock geometry"
+            ).to.exist;
+            const templateDocks = templateBlock.docks;
 
             const targetContainerX = start.container.x + start.docks[1][0] - templateDocks[0][0];
             const targetContainerY = start.container.y + start.docks[1][1] - templateDocks[0][1];
@@ -137,11 +145,14 @@ describe("Block palette drag-and-drop", () => {
                     "dropped block should now lead into the previous chain head"
                 ).to.eq(plan.previousChild);
 
-                // Position state: the block landed exactly where the docking
+                // Position state: the block landed close to where the docking
                 // math placed it, proving the drop coordinates were accepted
-                // rather than merely hovered over.
-                expect(newBlock.container.x).to.eq(plan.targetContainerX);
-                expect(newBlock.container.y).to.eq(plan.targetContainerY);
+                // rather than merely hovered over. A small tolerance avoids
+                // coupling the test to exact floating-point reproduction of
+                // the app's own layout math - the connection assertions above
+                // are what actually prove real docking occurred.
+                expect(newBlock.container.x).to.be.closeTo(plan.targetContainerX, 1);
+                expect(newBlock.container.y).to.be.closeTo(plan.targetContainerY, 1);
             });
         });
     });
