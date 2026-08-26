@@ -2056,7 +2056,8 @@ describe("Palettes Class", () => {
             };
             const tr = {
                 children: MULTIPALETTES.map(() => ({
-                    children: [{ src: "" }, { style: { background: "" } }]
+                    children: [{ src: "" }, { style: { background: "" } }],
+                    setAttribute: jest.fn()
                 }))
             };
 
@@ -2068,6 +2069,8 @@ describe("Palettes Class", () => {
             expect(tr.children[0].children[1].style.background).toBe(
                 platformColor.paletteLabelBackground
             );
+            expect(tr.children[1].setAttribute).toHaveBeenCalledWith("aria-selected", "true");
+            expect(tr.children[0].setAttribute).toHaveBeenCalledWith("aria-selected", "false");
         });
     });
 
