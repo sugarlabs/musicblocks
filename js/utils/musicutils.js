@@ -69,6 +69,7 @@ const _b64Cache = new Map();
     MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
     getModeLabel, getModeNameFromLabel, getModeSliceColors,
     updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
+    isNonEDO, getNonEDOModeSteps,
     configureWheel
 */
 
@@ -3873,6 +3874,85 @@ const isEquallyTempered = temperament => {
 };
 
 /**
+ * True when the temperament is tuned by ratios and is NOT an equal division
+ * of the octave.
+ * @function
+ * @param {string} temperament - temperament key in TEMPERAMENT
+ * @returns {boolean}
+ */
+const isNonEDO = temperament => {
+    const t = getTemperament(temperament);
+    if (!t) {
+        return false;
+    }
+    return temperamentHasRatios(temperament) && !isEquallyTempered(temperament);
+};
+
+/**
+ * Integer step pattern for a mode under a non-EDO temperament: each
+ * cumulative semitone offset of the 12-EDO mode pattern is mapped to the
+ * index of the nearest ratio, then positions are differenced. This gives
+ * the builder wheel unequal-temperament geometry (e.g. meantone major is
+ * not the proportional rescale of 12-EDO semitones).
+ * @function
+ * @param {string} mode - mode name in MUSICALMODES
+ * @param {string} temperament - temperament key in TEMPERAMENT
+ * @returns {Array|null} step counts, or null when impossible
+ */
+const getNonEDOModeSteps = (mode, temperament) => {
+    const pattern = MUSICALMODES[mode];
+    const t = getTemperament(temperament);
+    if (!pattern || !t || !Array.isArray(t.ratios) || t.ratios.length === 0) {
+        return null;
+    }
+    const n = t.pitchNumber || t.ratios.length;
+    const positions = [0];
+    let cum = 0;
+    for (let k = 0; k < pattern.length - 1; k++) {
+        cum += pattern[k];
+        const target = Math.pow(2, cum / 12);
+        let best = 0;
+        let bestDiff = Infinity;
+        for (let r = 1; r < n; r++) {
+            const ratio = Number(t.ratios[r]);
+            if (!isFinite(ratio) || ratio <= 0) {
+                continue;
+            }
+            const diff = Math.abs(Math.log2(ratio / target));
+            if (diff < bestDiff) {
+                bestDiff = diff;
+                best = r;
+            }
+        }
+        // Keep positions monotonically increasing; if the nearest ratio
+        // falls at or before the previous degree, bump forward by 1 to
+        // avoid collapsing two degrees onto the same pitch. This can
+        // produce a step of 1 that doesn't correspond to a real ratio
+        // interval — acceptable for typical ratio tables (12+ entries)
+        // where this path is rarely hit.
+        if (best <= positions[positions.length - 1]) {
+            best = positions[positions.length - 1] + 1;
+        }
+        if (best >= n) {
+            return null;
+        }
+        positions.push(best);
+    }
+    const steps = [];
+    for (let p = 1; p < positions.length; p++) {
+        steps.push(positions[p] - positions[p - 1]);
+    }
+    // Close back to the octave: the ratios table holds no octave entry, so
+    // the final mode step spans from the last mapped degree to pitchNumber.
+    const last = positions[positions.length - 1];
+    if (last >= n) {
+        return null;
+    }
+    steps.push(n - last);
+    return steps;
+};
+
+/**
  * Extract ratio from a temperament interval value.
  * Handles both legacy numeric format and new {ratio, cents} object format.
  * @function
@@ -6278,28 +6358,29 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
 }
 
 /**
- * Convert a 12-EDO semitone step pattern to steps in the given EDO.
+ * Convert a step pattern from its native EDO to steps in the given EDO.
  *
  * Uses cumulative positions (not per-interval rounding) so the total interval
  * sum is preserved as closely as possible. Each step is at least 1 so stepping
- * never gets stuck on a repeated note. For 12-EDO this is the identity.
+ * never gets stuck on a repeated note. When the pattern's steps already sum to
+ * the requested EDO this is the identity.
  * @function
- * @param {Array} pattern - The 12-EDO step pattern (e.g. major [2, 2, 1, 2, 2, 2, 1]).
+ * @param {Array} pattern - The source step pattern (e.g. major [2, 2, 1, 2, 2, 2, 1]).
  * @param {number} edo - Number of steps per octave.
  * @returns {Array} The converted step pattern in the target EDO.
  */
 const scalePatternToEDO = (pattern, edo) => {
-    if (edo === 12) {
+    const srcSum = pattern.reduce((a, b) => a + b, 0);
+    if (srcSum === edo) {
         return pattern.slice();
     }
-
     const result = [];
-    let cumSemitones = 0;
-    let cumEdoPos = 0;
+    let cumSrc = 0;
+    let cumDst = 0;
     for (let i = 0; i < pattern.length; i++) {
-        cumSemitones += pattern[i];
-        const newCumEdoPos = Math.round((cumSemitones * edo) / 12);
-        let step = newCumEdoPos - cumEdoPos;
+        cumSrc += pattern[i];
+        const newCumPos = Math.round((cumSrc * edo) / srcSum);
+        let step = newCumPos - cumDst;
         // When EDO < scale degrees (e.g. 5-EDO major), cumulative rounding
         // can produce 0-length intervals. Ensure minimum step of 1 so that
         // stepping never gets stuck on a repeated note.
@@ -6307,7 +6388,7 @@ const scalePatternToEDO = (pattern, edo) => {
             step = 1;
         }
         result.push(step);
-        cumEdoPos += step;
+        cumDst += step;
     }
     return result;
 };
@@ -6347,11 +6428,15 @@ const getModePattern = (mode, edo = 12) => {
     }
     if (mode in MUSICALMODES) {
         const pattern = MUSICALMODES[mode];
-        // Only 12-summing patterns are 12-EDO semitone modes that scalePatternToEDO
-        // can rescale; any other total (e.g. a 7-note 41-EDO mode sums to 41) is
-        // native to a non-12 EDO and must be returned as-is or playback corrupts.
-        const isSemitonePattern = pattern.reduce((a, b) => a + b, 0) === 12;
-        return isSemitonePattern ? scalePatternToEDO(pattern, edo) : pattern.slice();
+        // Return a stored pattern as-is only when it is native to the requested
+        // EDO (its steps sum to the EDO). Anything else — including a native
+        // 19-EDO custom mode resolved in a 12-EDO project context — is rescaled
+        // proportionally so downstream per-degree stepping stays inside the octave.
+        const sum = pattern.reduce((a, b) => a + b, 0);
+        if (sum === edo) {
+            return pattern.slice();
+        }
+        return scalePatternToEDO(pattern, edo);
     }
     return scalePatternToEDO(MUSICALMODES.major, edo);
 };
@@ -8277,6 +8362,8 @@ if (typeof module !== "undefined" && module.exports) {
         updateModeWheelItems,
         getModeGroupTitleFont,
         getModeSliceFont,
+        isNonEDO,
+        getNonEDOModeSteps,
         configureWheel
     };
 }

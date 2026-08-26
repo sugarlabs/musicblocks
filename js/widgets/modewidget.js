@@ -19,7 +19,8 @@
    getSavedCustomModes, getModeNamesForGroup, getModeLabel, getModeNameFromLabel,
    getModeSliceColors, updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
    configureWheel, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
-   scalePatternToEDO
+   scalePatternToEDO, isNonEDO, getNonEDOModeSteps, isEquallyTempered,
+   configureExitWheel, piemenuModes
  */
 
 /*
@@ -79,9 +80,9 @@ class ModeWidget {
         // mapped to their pitch count by getCurrentEDO. The widget operates on
         // that count, and changing the tuning below replaces the temperament.
         this._activeEDO = getCurrentEDO(this.logo.synth.inTemperament);
+        this._activeTemperamentKey = this.logo.synth.inTemperament;
         this._selectedModeName = "major";
         this._modePiemenuOpen = false;
-        this._suppressModeSelect = false;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "custom mode");
         this.widgetWindow.clear();
@@ -100,18 +101,11 @@ class ModeWidget {
         const meterWheelDiv = document.createElement("div");
         meterWheelDiv.id = "modeWidgetWheelDiv";
 
-        // The mode-selection piemenu renders on its own div/paper so it never
-        // shares an SVG with the note-edit wheel (which would block its clicks).
-        const modePiemenuDiv = document.createElement("div");
-        modePiemenuDiv.id = "modePiemenuDiv";
-        modePiemenuDiv.style.display = "none";
-
         const modeTable = document.createElement("table");
         modeTable.id = "modeTable";
 
-        this.modeTableDiv.replaceChildren(meterWheelDiv, modePiemenuDiv, modeTable);
+        this.modeTableDiv.replaceChildren(meterWheelDiv, modeTable);
         this._meterWheelDiv = meterWheelDiv;
-        this._modePiemenuDiv = modePiemenuDiv;
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
         this.widgetWindow.onclose = () => {
@@ -268,16 +262,31 @@ class ModeWidget {
         ];
 
         const options = builtInTemperaments.map(t => ({
-            value: t.edo,
+            value: t.key,
             label: t.label,
-            temperamentKey: t.key
+            temperamentKey: t.key,
+            edo: t.edo
         }));
+
+        // Add non-EDO temperaments (ratios-based: JI, Pythagorean, meantone variants)
+        for (const key of Object.keys(TEMPERAMENT)) {
+            if (TEMPERAMENT[key].isEDO === false) {
+                const t = TEMPERAMENT[key];
+                options.push({
+                    value: key,
+                    label: t.name || key,
+                    temperamentKey: key,
+                    edo: t.pitchNumber || t.edo || 12
+                });
+            }
+        }
 
         if (!options.some(o => o.temperamentKey === inTemperament)) {
             options.unshift({
-                value: this._activeEDO,
+                value: inTemperament,
                 label: this._activeEDO + "-EDO",
-                temperamentKey: inTemperament
+                temperamentKey: inTemperament,
+                edo: this._activeEDO
             });
         }
 
@@ -285,13 +294,13 @@ class ModeWidget {
     }
 
     _initEdoSelect(select) {
-        const inEDO = this._activeEDO;
         const inTemperament = this.logo.synth.inTemperament;
         for (const o of this._edoOptions()) {
             const opt = document.createElement("option");
-            opt.value = o.value;
+            opt.value = o.temperamentKey;
+            opt.setAttribute("data-edo", o.edo);
             opt.textContent = o.label;
-            if (o.value === inEDO || o.temperamentKey === inTemperament) {
+            if (o.temperamentKey === inTemperament) {
                 opt.selected = true;
             }
             select.appendChild(opt);
@@ -299,40 +308,68 @@ class ModeWidget {
     }
     _wireEdoSelect(select) {
         select.addEventListener("change", () => {
-            const newEDO = parseInt(select.value, 10);
-            if (
-                isNaN(newEDO) ||
-                newEDO < ModeWidget.MIN_EDO ||
-                newEDO > ModeWidget.MAX_EDO ||
-                newEDO === this._activeEDO
-            ) {
+            const key = select.value;
+            if (!key || key === this._activeTemperamentKey) {
+                return;
+            }
+            const newEDO = getCurrentEDO(key);
+            if (isNaN(newEDO) || newEDO < ModeWidget.MIN_EDO || newEDO > ModeWidget.MAX_EDO) {
                 return;
             }
 
-            // Warn (but don't block) before replacing a non-EDO temperament
-            // with the equal-tempered equivalent of the chosen EDO.
-            if (TEMPERAMENT[this.logo.synth.inTemperament]?.isEDO === false) {
+            if (!isEquallyTempered(this._activeTemperamentKey)) {
                 this.textMsg(_("Switching tuning replaces the current non-EDO temperament."), 3000);
             }
 
-            // Close any open mode piemenu; it will be rebuilt on reopen.
             this._closeModePiemenu();
 
-            // Cache outgoing state so round-trip preserves intermediate edits
-            this._cacheState(this._activeEDO);
+            const bothEqual =
+                isEquallyTempered(this._activeTemperamentKey) && isEquallyTempered(key);
+            const oldEDO = getCurrentEDO(this._activeTemperamentKey);
 
-            // Capture old EDO before it gets overwritten by _rebuildWheel
-            const oldEDO = this._activeEDO;
+            if (bothEqual) {
+                this._cacheState(oldEDO);
+            }
 
-            // Determine new notes: use cached state if available, otherwise translate
-            if (this._edoNoteCache[newEDO] !== undefined) {
-                this._restoreState(newEDO);
-            } else {
-                this._translateNotesToEDO(newEDO);
+            this.logo.synth.inTemperament = key;
+            this._activeTemperamentKey = key;
+            this._activeEDO = newEDO;
+
+            if (bothEqual) {
+                if (this._edoNoteCache[newEDO] !== undefined) {
+                    this._restoreState(newEDO);
+                } else {
+                    this._translateNotesToEDO(newEDO);
+                }
             }
 
             this._rebuildWheel(newEDO);
-            this.textMsg(_(`Switched to ${newEDO}-EDO tuning.`), 3000);
+            const tName = TEMPERAMENT[key]?.name || key;
+            this.textMsg(
+                _(
+                    isEquallyTempered(key)
+                        ? `Switched to ${newEDO}-EDO tuning.`
+                        : `Switched to ${tName}.`
+                ),
+                3000
+            );
+
+            // When switching to a non-EDO temperament, reapply the current
+            // mode so notes are correctly selected in the new tuning.
+            // Built-in modes (major, dorian, ...) exist across all temperaments.
+            if (!isEquallyTempered(key)) {
+                const mode = MUSICALMODES[this._selectedModeName];
+                if (mode) {
+                    const pattern = this._modeStepPattern(this._selectedModeName, null);
+                    this._applyModePattern(pattern);
+                } else {
+                    this._selectedModeName = DEFAULTMODE;
+                    const defMode = MUSICALMODES[DEFAULTMODE];
+                    if (defMode) {
+                        this._applyModePattern(this._modeStepPattern(DEFAULTMODE, null));
+                    }
+                }
+            }
 
             // Preserve the current mode name across EDO switches.
             // _setModeName() does a reverse-lookup from the note pattern,
@@ -350,7 +387,7 @@ class ModeWidget {
             // Only warn when going to a lesser EDO, where notes can be dropped
             // by the rounding in _translateNotesToEDO. Lesser→greater only adds
             // steps, so no message is needed.
-            if (oldEDO > newEDO) {
+            if (bothEqual && oldEDO > newEDO) {
                 this.textMsg(
                     _(
                         `Mode remapped from ${oldEDO}-EDO to ${newEDO}-EDO. Some notes may have changed.`
@@ -364,7 +401,13 @@ class ModeWidget {
         this._cancelAnimations();
         this._activeEDO = edoCount;
         this._undoStack = []; // Clear stale undo entries from old EDO
-        this.logo.synth.inTemperament = this._temperamentKeyForEDO(edoCount);
+        // Only map EDO to a built-in temperament key when the active
+        // temperament is equally tempered; non-equal temperaments (just
+        // intonation, meantone, ...) keep their own key even though their
+        // pitch count collides with an equal EDO.
+        if (isEquallyTempered(this._activeTemperamentKey)) {
+            this.logo.synth.inTemperament = this._temperamentKeyForEDO(edoCount);
+        }
         this._piemenuMode();
     }
 
@@ -588,7 +631,7 @@ class ModeWidget {
 
         // Modes: open piemenu instead of a <select> dropdown
         const modeBtn = iconButton("pie-chart.svg", _("Switch mode"), () => {
-            this._piemenuModes();
+            this._onModePieButtonClick();
         });
         modeBtn.id = "modeSelectBtn";
 
@@ -673,11 +716,9 @@ class ModeWidget {
         widgetBody.children[0].style.flexDirection = "column";
         widgetBody.children[0].style.alignItems = "center";
 
-        // When the mode piemenu is open, scale its SVG; otherwise scale
-        // the note-wheel SVG.  getElementsByTagName("svg")[0] always
-        // returns the meterWheelDiv SVG (first in DOM order) even when
-        // the mode piemenu is the visible one.
-        const svgContainer = this._modePiemenuOpen ? this._modePiemenuDiv : this._meterWheelDiv;
+        // When the mode piemenu is open, scale the global wheelDiv SVG;
+        // otherwise scale the note-wheel SVG.
+        const svgContainer = this._modePiemenuOpen ? docById("wheelDiv") : this._meterWheelDiv;
         const svg = svgContainer.querySelector("svg");
         if (!svg) {
             return;
@@ -688,6 +729,30 @@ class ModeWidget {
         this._setTimeout(() => {
             svg.style.pointerEvents = "auto";
         }, 100);
+    }
+
+    // ── Mode step resolver (Task 4) ───────────────────────────────
+
+    /**
+     * Single source of truth for wheel geometry: which integer step pattern
+     * represents `modeName` on this widget right now. Custom modes win
+     * (as-authored), then ratio-derived steps under a non-EDO temperament,
+     * then the standard EDO-rescaled pattern.
+     * @param {String} modeName - mode name in MUSICALMODES
+     * @param {Array} nativePattern - as-authored pattern for saved custom modes
+     * @returns {Array} integer step counts
+     */
+    _modeStepPattern(modeName, nativePattern) {
+        if (Array.isArray(nativePattern)) {
+            return nativePattern;
+        }
+        if (isNonEDO(this._activeTemperamentKey)) {
+            const steps = getNonEDOModeSteps(modeName, this._activeTemperamentKey);
+            if (steps) {
+                return steps;
+            }
+        }
+        return getModePattern(modeName, this._activeEDO);
     }
 
     // ── Mode display ──────────────────────────────────────────────
@@ -708,7 +773,7 @@ class ModeWidget {
             this._loadMode(currentModeName[1], currentMode, null);
         } else {
             this._applyModePattern(
-                nativeEDO ? currentMode : getModePattern(currentModeName[1], this._activeEDO)
+                nativeEDO ? currentMode : this._modeStepPattern(currentModeName[1], null)
             );
             this._setModeName();
         }
@@ -742,9 +807,11 @@ class ModeWidget {
                 3000
             );
         }
-        // Built-in mode patterns are 12-EDO intervals; scale them to the
-        // active EDO. Custom modes carry EDO-specific patterns already.
-        const pattern = nativeEDO ? mode : getModePattern(modeName, this._activeEDO);
+        // Built-in mode patterns are resolved via _modeStepPattern so
+        // non-EDO temperaments use ratio-derived steps. Custom modes carry
+        // EDO-specific patterns already, so use the passed mode directly.
+        const isCustom = !MUSICALMODES[modeName];
+        const pattern = isCustom ? mode : nativeEDO ? mode : this._modeStepPattern(modeName, null);
         this._applyModePattern(pattern);
         // Cache the incoming state so switching away and back preserves it.
         if (nativeEDO) {
@@ -989,6 +1056,26 @@ class ModeWidget {
 
     _triggerNote(note, edo) {
         const ks = this.turtles.ithTurtle(0).singer.keySignature;
+        const t = TEMPERAMENT[this._activeTemperamentKey];
+        const labels =
+            t && Array.isArray(t.noteLabels) && !isEquallyTempered(this._activeTemperamentKey)
+                ? t.noteLabels
+                : null;
+
+        if (labels && labels[note % labels.length]) {
+            // Non-EDO temperament: resolve the exact ratio by asking for the
+            // labeled pitch at zero cents.
+            const freq = pitchToFrequency(
+                labels[note % labels.length],
+                4,
+                0,
+                ks,
+                this._activeTemperamentKey
+            );
+            this.logo.synth.trigger(0, freq, this._noteValue, DEFAULTVOICE, null, null);
+            return;
+        }
+
         if (edo === 12) {
             const noteToPlay = getNote(this._pitch, 4, note, ks, false, null, this.errorMsg);
             this.logo.synth.trigger(
@@ -1000,11 +1087,10 @@ class ModeWidget {
                 null
             );
         } else {
-            // note is a slice index = number of EDO steps above the root.
             const freq = pitchToFrequency(
                 this._pitch,
                 4,
-                note * 100,
+                Math.round(note * (1200 / edo)),
                 ks,
                 this._temperamentKeyForEDO(edo)
             );
@@ -1089,7 +1175,7 @@ class ModeWidget {
                 if (customNames.has(mode)) {
                     continue;
                 }
-                const pattern = getModePattern(mode, this._activeEDO);
+                const pattern = this._modeStepPattern(mode, null);
                 if (JSON.stringify(pattern) === currentMode) {
                     matchedMode = mode;
                     break;
@@ -1429,194 +1515,121 @@ class ModeWidget {
         }
     }
 
+    _onModePieButtonClick() {
+        if (this._modePiemenuOpen) {
+            this._closeModePiemenu();
+            return;
+        }
+        this._piemenuModes();
+    }
+
     /**
-     * Builds a piemenu for mode selection with an outer ring of mode groups
-     * and an inner ring of mode names. Custom saved modes appear in the
-     * "custom" group. Reuses patterns from piemenuModes in piemenus.js.
+     * Opens the standard mode piemenu (same as the modeName block piemenu)
+     * via piemenus.js piemenuModes on the global wheelDiv. The intercept
+     * on block.__selectionChanged applies the selected mode to the scalar
+     * builder via _loadMode.
      * @returns {void}
      */
     _piemenuModes() {
         if (this._modePiemenuOpen) return;
         this._modePiemenuOpen = true;
 
-        const savedCustomModes = getSavedCustomModes();
-
-        // Swap the note-edit wheel for the mode-selection piemenu. The piemenu
-        // renders on its own div/paper, so the two never overlap or intercept
-        // each other's clicks. The root constructor clears any stale SVGs.
+        // Hide the note wheel while the mode piemenu is visible.
         this._meterWheelDiv.style.display = "none";
-        this._modePiemenuDiv.style.display = "";
 
-        this._modePieWheel = new wheelnav(
-            "modePiemenuDiv",
-            null,
-            ModeWidget.WHEELSIZE,
-            ModeWidget.WHEELSIZE
-        );
-        this._modeNameWheel = null; // Built on first group selection.
+        const widget = this;
+        const mockBlock = {
+            value: this._selectedModeName,
+            text: { text: "" },
+            container: {
+                x: 200,
+                y: 200,
+                setChildIndex: () => {},
+                children: { length: 1 }
+            },
+            updateCache: () => {},
+            blocks: {
+                stageClick: false,
+                blockScale: 1,
+                turtles: this.turtles,
+                blockList: {}
+            },
+            activity: this.activity,
+            connections: [null]
+        };
+        this._mockBlock = mockBlock;
 
-        // All groups appear, including "custom": it always offers "+" to
-        // create a new custom mode, even when none are saved yet.
-        const groupLabels = Object.keys(MODE_PIE_MENUS);
+        // Delegate to the standard piemenuModes.
+        piemenuModes(mockBlock, this._selectedModeName);
 
-        // Outer ring: group wheel
-        this._modeGroupWheel = new wheelnav("_modeGroupWheel", this._modePieWheel.raphael);
-        // Fixed readable size on the 400px paper; the wheelnav default (48px)
-        // overflows every slice and a computed size is too small.
-        configureWheel(this._modeGroupWheel, {
-            colors: platformColor.modeGroupWheelcolors,
-            minRadius: MODEPIEMENU_GROUP_RING.minRadius,
-            maxRadius: MODEPIEMENU_GROUP_RING.maxRadius,
-            titleFont: getModeGroupTitleFont(ModeWidget.WHEELSIZE / 2)
-        });
-        this._modeGroupWheel.createWheel(groupLabels);
-
-        // Inner ring: mode-name wheel (rebuilt on group selection). Reopen on
-        // the group the user last visited.
-        let currentGroup = groupLabels.includes(this._modeGroupName)
-            ? this._modeGroupName
-            : groupLabels[0];
-
-        const __modesForGroup = grp =>
-            getModeNamesForGroup(grp, ["+", ...savedCustomModes.map(m => m.name)]);
-
-        const __buildModeNameWheel = grp => {
-            currentGroup = grp;
-            this._modeGroupName = grp;
-            const modes = __modesForGroup(grp);
-
-            // All groups share the fixed 12-slot layout, so the wheel is created
-            // once per open and updated in place on group switches. Never call
-            // removeWheel() on it: every wheel shares the root's paper, and
-            // removeWheel() detaches the whole SVG from the DOM.
-            const newWheel = this._modeNameWheel === null;
-
-            // Build per-slice colors and (possibly translated) labels.
-            // Declared before the configureWheel call below so the
-            // reference in the options object is not in the temporal dead zone.
-            const colors = getModeSliceColors(modes, {
-                emptyColor: platformColor.modePieMenusIfColorPush,
-                filledColor: platformColor.modePieMenusElseColorPush
-            });
-            const labels = modes.map(modename => getModeLabel(modename));
-
-            if (newWheel) {
-                this._modeNameWheel = new wheelnav("_modeNameWheel", this._modePieWheel.raphael);
-                this._modeNameWheel.keynavigateEnabled = false;
-                configureWheel(this._modeNameWheel, {
-                    colors,
-                    minRadius: MODEPIEMENU_NAME_RING.minRadius,
-                    maxRadius: MODEPIEMENU_NAME_RING.maxRadius,
-                    selectionPaths: true,
-                    titleRotateAngle: 0
-                });
+        // piemenuModes wires block.__selectionChanged; override it AFTER
+        // so our intercept runs on mode selection. The original updates
+        // block.value/text, which we then read to apply the mode.
+        const __origSelectionChanged = mockBlock.__selectionChanged;
+        mockBlock.__selectionChanged = () => {
+            if (typeof __origSelectionChanged === "function") {
+                __origSelectionChanged();
             }
-
-            if (newWheel) {
-                this._modeNameWheel.createWheel(labels);
-            } else {
-                updateModeWheelItems(this._modeNameWheel, labels, colors);
+            const modeName = mockBlock.value;
+            if (modeName) {
+                widget._selectedModeName = modeName;
+                // Built-in modes are in MUSICALMODES; custom modes carry
+                // their own EDO-specific pattern in localStorage.
+                const mode = MUSICALMODES[modeName];
+                const custom = getSavedCustomModes().find(m => m.name === modeName);
+                const pattern = mode || (custom && custom.pattern);
+                if (pattern) {
+                    widget._closeModePiemenu();
+                    widget._loadMode(modeName, pattern, widget._edoSelect);
+                }
             }
-
-            // Size each label to fit its own slice arc; the 12 slots are fixed,
-            // so short names render large and only long ones shrink. Applied
-            // post-createWheel via the per-item title attributes.
-            for (let i = 0; i < this._modeNameWheel.navItems.length; i++) {
-                const font = getModeSliceFont(
-                    ModeWidget.WHEELSIZE / 2,
-                    modes.length,
-                    labels[i].length
-                );
-                const item = this._modeNameWheel.navItems[i];
-                item.titleAttr.font = font;
-                item.titleHoverAttr.font = font;
-                item.titleSelectedAttr.font = font;
-            }
-
-            // Set up action for each mode slice
-            for (let i = 0; i < modes.length; i++) {
-                this._modeNameWheel.navItems[i].navigateFunction = () => {
-                    const title =
-                        this._modeNameWheel.navItems[this._modeNameWheel.selectedNavItemIndex]
-                            .title;
-                    if (title === " ") return;
-
-                    // Suppress programmatic navigation: wheelnav fires
-                    // navigateFunction() on every navigateWheel() call, including
-                    // the init highlight and group switches below. Those must only
-                    // highlight, never select/close. Real user clicks are unaffected.
-                    if (this._suppressModeSelect) {
-                        return;
-                    }
-
-                    // "+" is the create-new-mode sentinel (slice 0 of the
-                    // custom group): close the piemenu and blank the note wheel
-                    // so the user can define a fresh mode by clicking notes.
-                    if (currentGroup === "custom" && title === _("+")) {
-                        this._selectedModeName = DEFAULTMODE;
-                        this._closeModePiemenu();
-                        this._resetToCustom();
-                        return;
-                    }
-
-                    // Strip translation wrapper for major/minor
-                    const modeName = getModeNameFromLabel(title, __modesForGroup(currentGroup));
-
-                    this._selectedModeName = modeName;
-                    const mode = MUSICALMODES[modeName];
-                    if (mode) {
-                        // Close piemenu FIRST so the note wheel is visible for any wheel
-                        // rebuild triggered by _loadMode() → _rebuildWheel() → _piemenuMode()
-                        this._closeModePiemenu();
-
-                        this._loadMode(modeName, mode, this._edoSelect);
-                    }
-                };
-            }
-
-            // Navigate to currently-selected mode if present. This fires the
-            // slice's navigateFunction (which would select+close), so suppress
-            // it: this call is only meant to highlight the current mode.
-            const idx = modes.indexOf(this._selectedModeName);
-            this._suppressModeSelect = true;
-            this._modeNameWheel.navigateWheel(idx);
-            this._suppressModeSelect = false;
         };
 
-        // Wire group wheel slices → __buildModeNameWheel
-        for (let i = 0; i < this._modeGroupWheel.navItems.length; i++) {
-            this._modeGroupWheel.navItems[i].navigateFunction = () => {
-                const selectedGroup =
-                    this._modeGroupWheel.navItems[this._modeGroupWheel.selectedNavItemIndex].title;
-                __buildModeNameWheel(selectedGroup);
-            };
+        // Position wheelDiv over the ModeWidget.
+        const wheelDiv = docById("wheelDiv");
+        if (wheelDiv && this.widgetWindow && this.widgetWindow._frame) {
+            const wRect = this.widgetWindow._frame.getBoundingClientRect();
+            const pieRadius = 600;
+            wheelDiv.style.left =
+                Math.max(0, Math.round(wRect.left + wRect.width / 2 - pieRadius)) + "px";
+            wheelDiv.style.top =
+                Math.max(0, Math.round(wRect.top + wRect.height / 2 - pieRadius)) + "px";
         }
 
-        // Highlight the last-visited group and build its mode wheel; the group
-        // navigateFunction above triggers the name-wheel build.
-        this._modeGroupWheel.navigateWheel(groupLabels.indexOf(currentGroup));
+        // Override × exit to also restore the note wheel.
+        if (mockBlock._exitWheel && mockBlock._exitWheel.navItems[0]) {
+            const origExit = mockBlock._exitWheel.navItems[0].navigateFunction;
+            mockBlock._exitWheel.navItems[0].navigateFunction = () => {
+                if (origExit) origExit();
+                widget._meterWheelDiv.style.display = "";
+                widget._modePiemenuOpen = false;
+                widget._mockBlock = null;
+            };
+        }
     }
 
     /**
      * Closes the mode piemenu and restores the note-edit wheel.
-     * Properly destroys wheelnav instances so their SVGs leave the DOM.
      * @returns {void}
      */
     _closeModePiemenu() {
-        this._modePiemenuDiv.style.display = "none";
-        this._meterWheelDiv.style.display = "";
-
-        // All three wheels share the root's paper, so removing the root
-        // removes the whole SVG, including the child wheels.
-        if (this._modePieWheel) {
-            this._modePieWheel.removeWheel();
+        if (this._mockBlock) {
+            if (this._mockBlock._modeNameWheel) {
+                this._mockBlock._modeNameWheel.removeWheel();
+            }
+            if (this._mockBlock._modeWheel) {
+                this._mockBlock._modeWheel.removeWheel();
+            }
         }
 
-        this._modePieWheel = null;
-        this._modeGroupWheel = null;
-        this._modeNameWheel = null;
+        const wheelDiv = docById("wheelDiv");
+        if (wheelDiv) {
+            wheelDiv.style.display = "none";
+        }
+
+        this._meterWheelDiv.style.display = "";
         this._modePiemenuOpen = false;
-        this._suppressModeSelect = false;
+        this._mockBlock = null;
     }
 }
 

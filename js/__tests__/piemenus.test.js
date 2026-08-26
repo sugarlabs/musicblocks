@@ -177,6 +177,15 @@ global.DEFAULTVOICE = "sine";
 global.PREVIEWVOLUME = 0.5;
 global.getNote = jest.fn().mockReturnValue(["C", 4]);
 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]);
+global.isNonEDO = jest.fn().mockReturnValue(false);
+global.getNonEDOModeSteps = jest.fn().mockReturnValue(null);
+global.pitchToFrequency = jest.fn().mockReturnValue(440);
+global.TEMPERAMENT = {
+    equal: {
+        pitchNumber: 12,
+        noteLabels: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    }
+};
 
 global.DEFAULTVOLUME = 0.5;
 global.Singer = { setSynthVolume: jest.fn() };
