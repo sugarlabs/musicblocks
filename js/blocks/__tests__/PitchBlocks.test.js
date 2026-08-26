@@ -112,6 +112,7 @@ describe("setupPitchBlocks", () => {
         // Test-specific overrides
         global.INTERVALVALUES = { "major third": [0, 0, 1.25], "minor third": [0, 0, 1.2] };
         global.NOTESTEP = { C: 1, D: 3, E: 5, F: 6, G: 8, A: 10, B: 12 };
+        global.getCurrentEDO = jest.fn(() => 12);
         global.SOLFEGECONVERSIONTABLE = {
             C: "do",
             D: "re",
@@ -782,6 +783,23 @@ describe("setupPitchBlocks", () => {
             if (cpBlock instanceof DummyFlowBlock) return;
             cpBlock.flow(["D(+25" + CENTSSYMBOL + ")", 2], logo, 0, 10);
             expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("D", 2, 25, 0, 10);
+        });
+
+        it("pitch numbers >12 are scale degrees (not Hz) when EDO >12", () => {
+            const block = createdBlocks["pitch"];
+            global.getCurrentEDO.mockReturnValue(19);
+            global.nthDegreeToPitch.mockReturnValue(["C", 0]);
+
+            // Pitch number 13 should be treated as a scale degree, not Hz
+            block.flow([13, 4], logo, 0, 10);
+            expect(global.nthDegreeToPitch).toHaveBeenCalledWith("C", 13, 19);
+
+            // Pitch number 19 (the octave) should also be a scale degree
+            block.flow([19, 4], logo, 0, 10);
+            expect(global.nthDegreeToPitch).toHaveBeenCalledWith("C", 19, 19);
+
+            // Restore default
+            global.getCurrentEDO.mockReturnValue(12);
         });
     });
 
