@@ -11,9 +11,8 @@
 
 /*
    global
-
-   _, GlobalTag, GlobalCard, jQuery, currentUserScrollPos:true,
-   maxScrollPos:true, ProjectViewer, debounce
+_, GlobalTag, GlobalCard, jQuery, currentUserScrollPos:true,
+   maxScrollPos:true, ProjectViewer
 */
 /*
    exported
@@ -25,6 +24,7 @@ class GlobalPlanet {
     constructor(Planet) {
         this.Planet = Planet;
         this.ProjectViewer = null;
+        this.listenerRefs = [];
 
         this.offlineHTML = `<div class= "container center-align">
                             ${_(
@@ -502,8 +502,26 @@ class GlobalPlanet {
         );
     }
 
+    destroy() {
+        this.listenerRefs.forEach(({ el, type, bound }) => {
+            el.removeEventListener(type, bound);
+        });
+        this.listenerRefs = [];
+        if (this.ProjectViewer) {
+            this.ProjectViewer.destroy();
+        }
+    }
+
     init() {
         const Planet = this.Planet;
+
+        const register = (elemId, type, handler) => {
+            const el = document.getElementById(elemId);
+            if (!el) return;
+            const bound = handler.bind(this);
+            el.addEventListener(type, bound);
+            this.listenerRefs.push({ el, type, bound });
+        };
 
         if (!Planet.ConnectedToServer) {
             document.getElementById("globaltitle").textContent = _("Cannot connect to server");
@@ -565,65 +583,57 @@ class GlobalPlanet {
 
             this.initTagList();
 
-            document.getElementById("load-more-projects").addEventListener("click", evt => {
+            register("load-more-projects", "click", function (evt) {
                 if (this.loadButtonShown) {
                     this.loadMoreProjects();
                 }
             });
 
-            const debouncedfunction = debounce(this.search.bind(this), 250);
-
-            document.getElementById("global-search").addEventListener("input", evt => {
-                this.searchString = document.getElementById("global-search").value;
-                debouncedfunction();
+            register("global-search", "keydown", function (evt) {
+                if (evt.key === "Enter") {
+                    this.searchString = document.getElementById("global-search").value;
+                    this.search();
+                }
             });
 
-            document.getElementById("global-search-2").addEventListener("input", evt => {
-                this.searchString = document.getElementById("global-search-2").value;
-                debouncedfunction();
+            register("global-search-2", "keydown", function (evt) {
+                if (evt.key === "Enter") {
+                    this.searchString = document.getElementById("global-search-2").value;
+                    this.search();
+                }
             });
 
-            document.getElementById("search-close").addEventListener("click", evt => {
+            register("search-close", "click", function (evt) {
                 document.getElementById("global-search").value = "";
                 this.searchString = "";
                 document.getElementById("search-close").style.display = "none";
-                debouncedfunction();
+                this.search();
             });
 
-            document.getElementById("search-close-2").addEventListener("click", evt => {
+            register("search-close-2", "click", function (evt) {
                 document.getElementById("global-search-2").value = "";
                 this.searchString = "";
                 document.getElementById("search-close-2").style.display = "none";
-                debouncedfunction();
+                this.search();
             });
 
-            document.getElementById("global-tab").addEventListener("click", evt => {
+            register("global-tab", "click", function (evt) {
                 document.getElementById("searchcontainer-one").style.display = "block";
             });
 
-            document.getElementById("local-tab").addEventListener("click", evt => {
+            register("local-tab", "click", function (evt) {
                 document.getElementById("searchcontainer-one").style.display = "none";
                 // document.getElementById("two_header").style.display = "none";
             });
 
-            document.body.onscroll = () => {
-                const currentUserScrollPos =
-                    window.pageYOffset || document.documentElement.scrollTop;
-
-                const maxScrollPos = Math.max(
-                    document.body.scrollHeight,
-                    document.body.offsetHeight,
-                    document.documentElement.clientHeight,
-                    document.documentElement.scrollHeight,
-                    document.documentElement.offsetHeight
-                );
-
-                if ((currentUserScrollPos / maxScrollPos) * 100 >= 75 && this.loadButtonShown)
-                    this.loadMoreProjects();
-            };
-
+            // Infinite scroll disabled - server overload prevention
+            document.body.onscroll = null;
             this.ProjectViewer = new ProjectViewer(Planet);
             this.ProjectViewer.init();
         }
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { GlobalPlanet };
 }

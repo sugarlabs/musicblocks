@@ -25,6 +25,7 @@ global._THIS_IS_TURTLE_BLOCKS_ = false;
 global.DEFAULTDRUM = "drum";
 
 const { setupRhythmBlockPaletteBlocks } = require("../RhythmBlockPaletteBlocks");
+const ManagedTimer = require("../../utils/ManagedTimer");
 
 class DummyFlowBlock {
     constructor(name, displayName) {
@@ -140,6 +141,7 @@ describe("setupRhythmBlockPaletteBlocks", () => {
         DummyFlowBlock.createdBlocks = {};
         dummyActivity.errorMsg.mockClear();
         dummyActivity.textMsg.mockClear();
+        Singer.processNote.mockClear();
         dummyActivity.blocks.blockList = {};
         dummyActivity.turtles.turtleObjs = {};
         activity = dummyActivity;
@@ -164,6 +166,25 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             rhythmBlock.flow([4, 0.25], logo, turtleIndex, "blkRhythm");
             expect(logo.phraseMaker.addColBlock).toHaveBeenCalledWith("blkRhythm", 4);
             expect(Singer.processNote).toHaveBeenCalledTimes(4);
+        });
+
+        it("cancels scheduled notes when Logo stops", () => {
+            jest.useFakeTimers();
+
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            logo._timerManager = new ManagedTimer();
+            logo.stopTurtle = false;
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            rhythmBlock.flow([4, 0.25], logo, turtleIndex, "blkRhythm");
+            expect(logo._timerManager.activeTimeoutCount).toBe(4);
+
+            logo.stopTurtle = true;
+            logo._timerManager.clearAll();
+            jest.runAllTimers();
+
+            expect(Singer.processNote).not.toHaveBeenCalled();
+            jest.useRealTimers();
         });
     });
 
@@ -274,6 +295,22 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             expect(logo.setDispatchBlock).toHaveBeenCalled();
             expect(logo.setTurtleListener).toHaveBeenCalled();
             expect(ret).toEqual([4, 1]);
+        });
+        it("should not throw ReferenceError for totalBeats when the dispatch listener runs", () => {
+            logo.inMatrix = false;
+            logo.tupletRhythms = [["notes", 0, 4, 4]];
+            logo.tupletParams = [[1, 1]];
+            const turtle = activity.turtles.ithTurtle(turtleIndex);
+            turtle.singer.beatFactor = 1;
+            activity.blocks.blockList["blkTuplet4"] = { name: "tuplet4" };
+
+            const tuplet4Block = DummyFlowBlock.createdBlocks["tuplet4"];
+            tuplet4Block.flow([2, 4, 88], logo, turtleIndex, "blkTuplet4");
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            expect(() => listener()).not.toThrow();
+            expect(turtle.doWait).toHaveBeenCalled();
         });
     });
 

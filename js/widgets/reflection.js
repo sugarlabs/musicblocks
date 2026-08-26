@@ -11,12 +11,17 @@
 
 /* This widget provides a chat interface for users to interact with AI mentors for project reflection and analysis.*/
 
+/* global _, escapeHTML, isSafeUrl, DOMPurify */
+
 /**
  * Represents Reflection Widget.
  * @constructor
  */
 
 class ReflectionMatrix {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/reflection"];
+
     static BUTTONDIVWIDTH = 535;
     static OUTERWINDOWWIDTH = "858px";
     static OUTERWINDOWHEIGHT = "550px";
@@ -91,18 +96,6 @@ class ReflectionMatrix {
          * @type {boolean}
          */
         this.isProcessingPendingMessage = false;
-    }
-
-    sanitizeLinks(html) {
-        return html.replace(/<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi, (match, quote, url) => {
-            const unsafeSchemes = /^(javascript|data|vbscript):/i;
-
-            if (unsafeSchemes.test(url.trim())) {
-                return match.replace(url, "#");
-            }
-
-            return match;
-        });
     }
 
     /**
@@ -343,10 +336,8 @@ class ReflectionMatrix {
         const botReply = document.createElement("div");
 
         if (md) {
-            const safeText = escapeHTML(reply.response);
-            let html = this.mdToHTML(safeText);
-            html = this.sanitizeLinks(html);
-            botReply.innerHTML = html;
+            let html = this.mdToHTML(reply.response);
+            botReply.innerHTML = DOMPurify.sanitize(html);
         } else {
             botReply.innerText = reply.response;
         }
@@ -384,7 +375,7 @@ class ReflectionMatrix {
 
             if (reply.error) {
                 this.hideTypingIndicator();
-                this.activity.errorMsg(_("Failed to send message"), 3000);
+                this.activity.errorMsg(_("Failed to send message."), 3000);
                 continue;
             }
 
@@ -579,8 +570,13 @@ class ReflectionMatrix {
         this.hideTypingIndicator();
         if (data) {
             this.botReplyDiv(data, false, true);
+            // Expected errors in data.error:
+            // 1. Server-side errors returned by the API (e.g., 500s or rate limits).
+            // 2. Network failures caught by generateAnalysis().
+            if (!data.error) {
+                await this.saveReport(data);
+            }
         }
-        await this.saveReport(data);
     }
 
     /**
@@ -627,7 +623,7 @@ class ReflectionMatrix {
 
         if (reply.error) {
             this.hideTypingIndicator();
-            this.activity.errorMsg(_("Failed to send message"), 3000);
+            this.activity.errorMsg(_("Failed to send message."), 3000);
             return;
         }
 
@@ -656,7 +652,7 @@ class ReflectionMatrix {
      * @returns {void}
      */
     renderChatHistory() {
-        this.chatLog.innerHTML = "";
+        this.chatLog.textContent = "";
 
         this.chatHistory.forEach(msg => {
             const messageContainer = document.createElement("div");
@@ -747,19 +743,57 @@ class ReflectionMatrix {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlString, "text/html");
 
-        // Sanitize links
-        const links = doc.getElementsByTagName("a");
-        for (let i = 0; i < links.length; i++) {
-            const link = links[i];
-            const href = link.getAttribute("href");
+        // Sanitize all elements
+        const elements = doc.body.querySelectorAll("*");
+        for (const el of elements) {
+            const tagName = el.tagName.toLowerCase();
 
-            // If no href, or it's unsafe, remove the attribute
-            if (!href || this.isUnsafeUrl(href)) {
-                link.removeAttribute("href");
-            } else {
-                // Enforce security attributes for external links
-                link.setAttribute("target", "_blank");
-                link.setAttribute("rel", "noopener noreferrer");
+            // Remove forbidden tags that can execute code or change page behavior
+            const forbiddenTags = ["script", "iframe", "object", "embed", "base", "form"];
+            if (forbiddenTags.includes(tagName)) {
+                el.remove();
+                continue;
+            }
+
+            const attrs = el.attributes;
+
+            for (let i = attrs.length - 1; i >= 0; i--) {
+                const attrName = attrs[i].name.toLowerCase();
+                const attrValue = attrs[i].value;
+
+                // Remove all event handlers
+                if (attrName.startsWith("on")) {
+                    el.removeAttribute(attrName);
+                    continue;
+                }
+
+                // Sanitize URL attributes (href, src)
+                if (attrName === "href" || attrName === "src") {
+                    if (!isSafeUrl(attrValue)) {
+                        el.removeAttribute(attrName);
+                    } else if (tagName === "a" && attrName === "href") {
+                        // Enforce security attributes for external links
+                        el.setAttribute("target", "_blank");
+                        el.setAttribute("rel", "noopener noreferrer");
+                    }
+                    continue;
+                }
+
+                // Sanitize style attribute
+                if (attrName === "style") {
+                    // Check for dangerous keywords in style properties
+                    const dangerousStyleKeywords = ["javascript:", "url(", "expression", "eval"];
+                    if (dangerousStyleKeywords.some(kw => attrValue.toLowerCase().includes(kw))) {
+                        el.removeAttribute(attrName);
+                    }
+                    continue;
+                }
+
+                // Remove other potentially dangerous attributes (like action, formaction, etc.)
+                const sensitiveAttrs = ["action", "formaction", "data", "codebase"];
+                if (sensitiveAttrs.includes(attrName)) {
+                    el.removeAttribute(attrName);
+                }
             }
         }
 
@@ -767,18 +801,12 @@ class ReflectionMatrix {
     }
 
     /**
-     * Checks if a URL is unsafe (javascript:, data:, vbscript:).
+     * Checks if a URL is unsafe.
      * @param {string} url - The URL to check.
      * @returns {boolean} - True if unsafe, false otherwise.
      */
     isUnsafeUrl(url) {
-        const trimmed = url.trim().toLowerCase();
-        const unsafeSchemes = ["javascript:", "data:", "vbscript:"];
-        // Check if it starts with any unsafe scheme
-        // Note: DOMParser handles HTML entity decoding, so we check the raw attribute safely here
-        // But for extra safety against control characters, we rely on the fact that
-        // we are operating on the parsed DOM attribute.
-        return unsafeSchemes.some(scheme => trimmed.replace(/\s+/g, "").startsWith(scheme));
+        return !isSafeUrl(url);
     }
 
     /**

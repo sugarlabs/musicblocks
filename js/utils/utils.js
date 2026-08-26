@@ -26,20 +26,38 @@
         MULTIPALETTES
     - js/utils/platformstyle.js
         platformColor
+    - js/utils/utils-logic.js
+        resolveObject, isUnsafeObjectKey
+    - js/utils/browser-utils.js
+        canvasPixelRatio, doBrowserCheck, fnBrowserDetect, windowHeight, windowWidth
 */
 
-/* exported
+if (typeof module !== "undefined" && module.exports) {
+    var UtilsLogic =
+        (typeof window !== "undefined" && window.UtilsLogic) ||
+        (typeof require !== "undefined" ? require("./utils-logic") : {});
+    var { resolveObject, isUnsafeObjectKey } = UtilsLogic;
 
-   canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
-   deepClone, delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
-   docBySelector, docByTagName, doPublish, doStopVideoCam, doSVG,
-   doUseCamera, fileBasename, fileExt, format, getTextWidth, hex2rgb,
-   hexToRGB, hideDOMLabel, httpGet, httpPost, HttpRequest,
-   importMembers, isSVGEmpty, last, mixedNumber, nearestBeat,
-   oneHundredToFraction, prepareMacroExports, preparePluginExports,
-   processMacroData, processRawPluginData, rationalSum, rgbToHex,
-   safeSVG, safeJSONParse, toFixed2, toTitleCase, windowHeight, windowWidth,
-    fnBrowserDetect, waitForReadiness, isSafeUrl, unescapeHTML
+    var DomHelpers =
+        (typeof window !== "undefined" && window.DomHelpers) ||
+        (typeof require !== "undefined" ? require("./dom-helpers") : {});
+
+    var BrowserUtils =
+        (typeof window !== "undefined" && window.BrowserUtils) ||
+        (typeof require !== "undefined" ? require("./browser-utils") : {});
+
+    var HttpUtils =
+        (typeof window !== "undefined" && window.HttpUtils) ||
+        (typeof require !== "undefined" ? require("./http-utils") : {});
+}
+
+/* exported
+   announceToScreenReader, changeImage,
+   delayExecution,
+   doPublish, doStopVideoCam, doSVG,
+   doUseCamera, format, getTextWidth,
+   importMembers, isSVGEmpty, prepareMacroExports, preparePluginExports,
+   processMacroData, processPluginData, processRawPluginData, waitForReadiness
 */
 
 /**
@@ -50,38 +68,21 @@
  * @param {string} to - The new base64-encoded SVG data URI.
  */
 const changeImage = (imgElement, from, to) => {
-    const oldSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(from));
+    if (!to) return;
+
     const newSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(to));
-    if (imgElement.src === oldSrc) {
+
+    if (imgElement.src !== newSrc) {
         imgElement.src = newSrc;
     }
 };
 
-/**
- * Safely parses a JSON string, wrapping the operation in a try/catch block
- * to prevent the application from crashing on malformed JSON payload data (e.g. from localStorage).
- *
- * @function
- * @param {string} data - The JSON string to parse
- * @param {*} fallback - The fallback value to return if JSON.parse throws an error. Defaults to null.
- * @returns {*} The successfully parsed Object/Array, or the fallback value upon failure.
- */
-const safeJSONParse = (data, fallback = null) => {
-    if (typeof data !== "string" || !data) return fallback;
-    try {
-        return JSON.parse(data);
-    } catch (e) {
-        console.warn("Failed to safely parse JSON:", e);
-        return fallback;
-    }
-};
-
-if (typeof module !== "undefined" && module.exports) {
-    module.exports.safeJSONParse = safeJSONParse;
-}
-if (typeof window !== "undefined") {
-    window.safeJSONParse = safeJSONParse;
-}
+// Pure logic functions (safeJSONParse, last, deepClone, fileExt, fileBasename,
+// toTitleCase, escapeHTML, unescapeHTML, isSafeUrl, safeSVG, toFixed2,
+// rationalToFraction, GCD, LCD, mixedNumber, rationalSum, nearestBeat,
+// oneHundredToFraction, rgbToHex, hexToRGB, hex2rgb, resolveObject)
+// have been moved to js/utils/utils-logic.js.
+// They are loaded as a RequireJS dependency and assigned to window globals.
 
 /**
  * Enhanced _() method to handle case variations for translations
@@ -178,202 +179,6 @@ let format = (str, data) => {
 };
 
 /**
- * Detects the current browser name.
- * @function
- * @returns {string} The name of the detected browser.
- */
-function fnBrowserDetect() {
-    const userAgent = navigator.userAgent;
-    let browserName;
-
-    if (userAgent.match(/chrome|chromium|crios/i)) {
-        browserName = "chrome";
-    } else if (userAgent.match(/firefox|fxios/i)) {
-        browserName = "firefox";
-    } else if (userAgent.match(/safari/i)) {
-        browserName = "safari";
-    } else if (userAgent.match(/opr\//i)) {
-        browserName = "opera";
-    } else if (userAgent.match(/edg/i)) {
-        browserName = "edge";
-    } else {
-        browserName = "No browser detection";
-    }
-    return browserName;
-}
-
-/**
- * Returns the pixel ratio of the canvas for high-resolution displays.
- * @function
- * @returns {number} The canvas pixel ratio.
- */
-function canvasPixelRatio() {
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    const context = document.querySelector("#myCanvas").getContext("2d");
-    const backingStoreRatio =
-        context.webkitBackingStorePixelRatio ||
-        context.mozBackingStorePixelRatio ||
-        context.msBackingStorePixelRatio ||
-        context.oBackingStorePixelRatio ||
-        context.backingStorePixelRatio ||
-        1;
-    return devicePixelRatio / backingStoreRatio;
-}
-
-/**
- * Returns the height of the window, accounting for Android-specific behavior.
- * @function
- * @returns {number} The window height.
- */
-function windowHeight() {
-    const onAndroid = /Android/i.test(navigator.userAgent);
-    if (onAndroid) {
-        return window.outerHeight;
-    } else {
-        return window.innerHeight;
-    }
-}
-
-/**
- * Returns the width of the window, accounting for Android-specific behavior.
- * @function
- * @returns {number} The window width.
- */
-function windowWidth() {
-    const onAndroid = /Android/i.test(navigator.userAgent);
-    if (onAndroid) {
-        return window.outerWidth;
-    } else {
-        return window.innerWidth;
-    }
-}
-
-/**
- * Performs an HTTP GET request to retrieve data from the server.
- * Uses async fetch to avoid blocking the UI during network requests.
- * @param {string|null} projectName - The name of the project (or null for the base URL).
- * @throws {Error} Throws an error if the HTTP status code is greater than 299.
- * @returns {Promise<string>} A promise that resolves to the response text from the server.
- */
-let httpGet = async projectName => {
-    const url = projectName === null ? window.server : window.server + projectName;
-    const response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "x-api-key": window.MB_PROJECT_API_KEY || ""
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error("Error from server");
-    }
-
-    return response.text();
-};
-
-/**
- * Performs an HTTP POST request to send data to the server.
- * Uses async fetch to avoid blocking the UI during network requests.
- * @param {string} projectName - The name of the project.
- * @param {string} data - The data to be sent in the POST request.
- * @returns {Promise<string>} A promise that resolves to the response text from the server.
- */
-let httpPost = async (projectName, data) => {
-    const response = await fetch(window.server + projectName, {
-        method: "POST",
-        headers: {
-            "x-api-key": window.MB_PROJECT_API_KEY || ""
-        },
-        body: data
-    });
-
-    if (!response.ok) {
-        throw new Error("Error from server");
-    }
-
-    return response.text();
-};
-
-/**
- * Constructor function for making an HTTP request.
- * @constructor
- * @param {string} url - The URL to make the HTTP request to.
- * @param {function} loadCallback - The callback function to handle the loaded response.
- * @param {function} [userCallback] - An optional user-defined callback function.
- */
-function HttpRequest(url, loadCallback, userCallback) {
-    // userCallback is an optional callback-handler.
-    const req = (this.request = new XMLHttpRequest());
-    this.handler = loadCallback;
-    this.url = url;
-    this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
-    this.userCallback = userCallback;
-
-    const objref = this;
-    try {
-        req.open("GET", url);
-
-        req.onreadystatechange = () => {
-            objref.handler();
-        };
-
-        req.send("");
-    } catch (e) {
-        if (self.console) {
-            console.debug("Failed to load resource from " + url + ": Network error.");
-
-            console.debug(e);
-        }
-
-        if (typeof userCallback === "function") {
-            userCallback(false, "network error");
-        }
-
-        this.request = this.handler = this.userCallback = null;
-    }
-}
-
-/**
- * Checks the browser type and version.
- * Sets properties in the jQuery.browser object based on the user agent.
- * @function
- */
-function doBrowserCheck() {
-    jQuery.uaMatch = ua => {
-        ua = ua.toLowerCase();
-
-        const match =
-            /(chrome)[ /]([\w.]+)/.exec(ua) ||
-            /(webkit)[ /]([\w.]+)/.exec(ua) ||
-            /(opera)(?:.*version|)[ /]([\w.]+)/.exec(ua) ||
-            /(msie) ([\w.]+)/.exec(ua) ||
-            (ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua)) ||
-            [];
-
-        return {
-            browser: match[1] || "",
-            version: match[2] || "0"
-        };
-    };
-
-    const matched = jQuery.uaMatch(navigator.userAgent);
-    const browser = {};
-
-    if (matched.browser) {
-        browser[matched.browser] = true;
-        browser.version = matched.version;
-    }
-
-    if (browser.chrome) {
-        browser.webkit = true;
-    } else if (browser.webkit) {
-        browser.safari = true;
-    }
-
-    jQuery.browser = browser;
-}
-
-/**
  * Wait for critical dependencies to be ready before calling callback.
  * Uses polling with exponential backoff and maximum timeout.
  * This replaces the arbitrary 5-second delay for Firefox with actual readiness checks.
@@ -435,129 +240,10 @@ function waitForReadiness(callback, options = {}) {
     requestAnimationFrame(check);
 }
 
-// Check for Internet Explorer
+// docByClass(), docByTagName(), docById(), docByName(), docBySelector()
+// moved to js/utils/dom-helpers.js
 
-window.addEventListener("load", () => {
-    const userAgent = window.navigator.userAgent;
-    // For IE 10 or older
-    const MSIE = userAgent.indexOf("MSIE ");
-    let DetectVersionOfIE;
-    if (MSIE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(MSIE + 5, userAgent.indexOf(".", MSIE)),
-            10
-        );
-    }
-
-    // For IE 11
-    const IETrident = userAgent.indexOf("Trident/");
-    if (IETrident > 0) {
-        const IERv = userAgent.indexOf("rv:");
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IERv + 3, userAgent.indexOf(".", IERv)),
-            10
-        );
-    }
-
-    // For IE 12
-    const IEEDGE = userAgent.indexOf("Edge/");
-    if (IEEDGE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IEEDGE + 5, userAgent.indexOf(".", IEEDGE)),
-            10
-        );
-    }
-
-    if (typeof DetectVersionOfIE !== "undefined") {
-        document.body.innerHTML = "<div style='margin: 200px;'>";
-        document.body.innerHTML +=
-            "<h1 style='font-size: 100px; font-family: Arial; text-align: center; color: #F00;'>Music Blocks</h1>";
-        document.body.innerHTML +=
-            "<h3 style='font-size: 40px; font-family: Arial; text-align: center;'>Music Blocks will not work in Internet Explorer, you can use:</h3>";
-        document.body.innerHTML +=
-            "<div style='width: 550px; margin: 0 auto;'><a href='https://www.chromium.org/getting-involved/download-chromium' style='float: left; display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chromium</a>";
-        document.body.innerHTML +=
-            "<a href='https://www.google.com/chrome/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chrome</a>";
-        document.body.innerHTML +=
-            "<a href='https://support.apple.com/downloads/safari' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Safari</a>";
-        document.body.innerHTML +=
-            "<a href='https://www.mozilla.org/en-US/firefox/new/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Firefox</a>";
-        document.body.innerHTML += "</div></div>";
-    }
-});
-
-/**
- * Retrieves a collection of elements by class name.
- * @param {string} classname - The class name to search for.
- * @returns {HTMLCollectionOf<Element>} A collection of elements with the specified class name.
- */
-function docByClass(classname) {
-    return document.getElementsByClassName(classname);
-}
-
-/**
- * Retrieves a collection of elements by tag name.
- * @param {string} tag - The tag name to search for.
- * @returns {NodeList} A collection of elements with the specified tag name.
- */
-function docByTagName(tag) {
-    return document.getElementsByTagName(tag);
-}
-
-/**
- * Retrieves an element by its ID.
- * @param {string} id - The ID of the element to retrieve.
- * @returns {HTMLElement|null} The element with the specified ID, or null if not found.
- */
-function docById(id) {
-    return document.getElementById(id);
-}
-
-/**
- * Retrieves a collection of elements by name.
- * @param {string} name - The name attribute value to search for.
- * @returns {NodeListOf<Element>} A collection of elements with the specified name attribute.
- */
-function docByName(name) {
-    return document.getElementsByName(name);
-}
-
-/**
- * Retrieves the first element that matches a specified CSS selector.
- * @param {string} selector - A CSS selector string.
- * @returns {Element|null} The first element that matches the selector, or null if not found.
- */
-function docBySelector(selector) {
-    return document.querySelector(selector);
-}
-
-/**
- * Returns the last element of an array.
- * @param {Array} myList - The array from which to get the last element.
- * @returns {*} The last element of the array, or null if the array is empty.
- */
-let last = myList => {
-    const i = myList.length;
-    if (i === 0) {
-        return null;
-    } else {
-        return myList[i - 1];
-    }
-};
-
-/**
- * Creates a deep clone of a value. Uses structuredClone when available
- * (modern browsers) for better performance, falling back to
- * JSON.parse(JSON.stringify()) for compatibility with test environments.
- * @param {*} value - The value to deep clone.
- * @returns {*} A deep clone of the value.
- */
-let deepClone = value => {
-    if (typeof structuredClone === "function") {
-        return structuredClone(value);
-    }
-    return JSON.parse(JSON.stringify(value));
-};
+// last() and deepClone() moved to js/utils/utils-logic.js
 
 /**
  * Gets the width of a text string given a specific font.
@@ -628,129 +314,34 @@ let isSVGEmpty = turtles => {
     return true;
 };
 
+// fileExt(), fileBasename(), toTitleCase(), escapeHTML(), unescapeHTML(),
+// isSafeUrl() moved to js/utils/utils-logic.js
 /**
- * Gets the file extension from a file path.
- * @param {string} file - The file path or name.
- * @returns {string} The file extension.
+ * Extracts Music Blocks project JSON string from an HTML file's
+ * <div class="code"> element.
+ *
+ * Returns null if the expected structure is not found or if the
+ * captured group is empty.
+ *
+ * @param {string} cleanData - HTML file content (newlines already cleaned).
+ * @returns {string|null} Extracted project JSON string, or null.
  */
-let fileExt = file => {
-    if (file === null) {
-        return "";
-    }
+function extractProjectDataFromHTML(cleanData) {
+    let matchResult;
 
-    const parts = file.split(".");
-    if (parts.length === 1 || (parts[0] === "" && parts.length === 2)) {
-        return "";
-    }
-
-    return parts.pop();
-};
-
-/**
- * Gets the basename of a file path (excluding the extension).
- * @param {string} file - The file path or name.
- * @returns {string} The basename.
- */
-let fileBasename = file => {
-    const parts = file.split(".");
-    if (parts.length === 1) {
-        return parts[0];
-    } else if (parts[0] === "" && parts.length === 2) {
-        return file;
+    if (cleanData.includes('id="codeBlock"')) {
+        matchResult = cleanData.match('<div class="code" id="codeBlock">([\\s\\S]*?)</div>');
     } else {
-        parts.pop(); // throw away suffix
-        return parts.join(".");
+        matchResult = cleanData.match('<div class="code">([\\s\\S]*?)</div>');
     }
-};
 
-/**
- * Converts the first character of a string to uppercase.
- * @param {string} str - The input string.
- * @returns {string} The string with the first character in uppercase.
- */
-function toTitleCase(str) {
-    if (typeof str !== "string") return;
-    if (str.length === 0) return "";
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-if (typeof module !== "undefined" && module.exports) {
-    module.exports.toTitleCase = toTitleCase;
-}
-if (typeof window !== "undefined") {
-    window.toTitleCase = toTitleCase;
-}
-
-/**
- * Escapes HTML special characters to prevent XSS when injecting
- * user-provided values into HTML.
- * @param {string} str - The string to escape.
- * @returns {string} The escaped string safe for HTML insertion.
- */
-function escapeHTML(str) {
-    const escapeMap = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-    };
-    return String(str).replace(/[&<>"']/g, char => escapeMap[char]);
-}
-
-if (typeof module !== "undefined" && module.exports) {
-    module.exports.escapeHTML = escapeHTML;
-}
-if (typeof window !== "undefined") {
-    window.escapeHTML = escapeHTML;
-}
-
-/**
- * Reverses HTML entity escaping produced by escapeHTML().
- * Used when loading project data that was escaped for safe HTML embedding.
- * @param {string} str - The HTML-escaped string to unescape.
- * @returns {string} The unescaped string with original characters restored.
- */
-function unescapeHTML(str) {
-    const unescapeMap = {
-        "&amp;": "&",
-        "&lt;": "<",
-        "&gt;": ">",
-        "&quot;": '"',
-        "&#039;": "'"
-    };
-    return String(str).replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, match => unescapeMap[match]);
-}
-
-if (typeof module !== "undefined" && module.exports) {
-    module.exports.unescapeHTML = unescapeHTML;
-}
-if (typeof window !== "undefined") {
-    window.unescapeHTML = unescapeHTML;
-}
-
-/**
- * Validates that a URL string uses a safe protocol (http or https).
- * Uses the URL API for robust parsing instead of fragile regex patterns.
- * This prevents open redirect attacks via javascript:, data:, vbscript:,
- * or other dangerous URI schemes.
- * @param {string} urlString - The URL string to validate.
- * @returns {boolean} True if the URL uses http: or https: protocol.
- */
-function isSafeUrl(urlString) {
-    try {
-        const parsed = new URL(urlString);
-        return parsed.protocol === "http:" || parsed.protocol === "https:";
-    } catch (e) {
-        return false;
+    // matchResult[1] checked for truthiness (not just null)
+    // to also catch empty project-data divs.
+    if (!matchResult || !matchResult[1]) {
+        return null;
     }
-}
 
-if (typeof module !== "undefined" && module.exports) {
-    module.exports.isSafeUrl = isSafeUrl;
-}
-if (typeof window !== "undefined") {
-    window.isSafeUrl = isSafeUrl;
+    return matchResult[1];
 }
 
 /**
@@ -791,8 +382,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
                 "\n\n" +
                 _("Do you want to allow this plugin to run?") +
                 "\n\n" +
-                _("Source: ") +
-                (pluginSource || _("unknown"))
+                _("Source: %s").replace(/%s/g, pluginSource || _("unknown"))
         );
 
         if (!userConfirmed) {
@@ -814,6 +404,12 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
             return;
         }
 
+        // Fix for Chrome CSP which blocks Function("return this")() typically found in webpack bundles
+        code = code.replace(
+            /(?:new\s+)?Function\s*\(\s*['"]return this['"]\s*\)\s*\(\)/g,
+            "window"
+        );
+
         // We wrap the code in a closure that provides activity and globalActivity.
         // We'll execute these after the Blob script is loaded and populates the registry.
         pendingSafeEvals.push({ code, label });
@@ -834,7 +430,8 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     let newPalette = false,
         paletteName = null;
     if ("PALETTEPLUGINS" in obj) {
-        for (const name in obj["PALETTEPLUGINS"]) {
+        for (const name of Object.keys(obj["PALETTEPLUGINS"])) {
+            if (isUnsafeObjectKey(name)) continue;
             paletteName = name;
             PALETTEICONS[name] = obj["PALETTEPLUGINS"][name];
             let fillColor = "#ff0066";
@@ -902,7 +499,8 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
 
     // Define the image blocks
     if ("IMAGES" in obj) {
-        for (const blkName in obj["IMAGES"]) {
+        for (const blkName of Object.keys(obj["IMAGES"])) {
+            if (isUnsafeObjectKey(blkName)) continue;
             activity.pluginsImages[blkName] = obj["IMAGES"][blkName];
         }
     }
@@ -910,7 +508,8 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     // Populate the flow-block dictionary, i.e., the code that is
     // compiled into a function for hot-path execution.
     if ("FLOWPLUGINS" in obj) {
-        for (const flow in obj["FLOWPLUGINS"]) {
+        for (const flow of Object.keys(obj["FLOWPLUGINS"])) {
+            if (isUnsafeObjectKey(flow)) continue;
             // Pre-compile trusted plugins for performance.
             // UNTRUSTED plugins (if any made it past confirmation) are stored as strings
             // and handled via whitelist in safePluginExecute.
@@ -931,7 +530,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, rec
 
     // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
-        for (const arg in obj["ARGPLUGINS"]) {
+        for (const arg of Object.keys(obj["ARGPLUGINS"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const argCode = obj["ARGPLUGINS"][arg];
                 const registryName = `arg_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -950,7 +550,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
     // Populate the macro dictionary, i.e., the code that is
     // eval'd by this block.
     if ("MACROPLUGINS" in obj) {
-        for (const macro in obj["MACROPLUGINS"]) {
+        for (const macro of Object.keys(obj["MACROPLUGINS"])) {
+            if (isUnsafeObjectKey(macro)) continue;
             try {
                 activity.palettes.pluginMacros[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
@@ -963,7 +564,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
 
     // Populate the setter dictionary
     if ("SETTERPLUGINS" in obj) {
-        for (const setter in obj["SETTERPLUGINS"]) {
+        for (const setter of Object.keys(obj["SETTERPLUGINS"])) {
+            if (isUnsafeObjectKey(setter)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const setterCode = obj["SETTERPLUGINS"][setter];
                 const registryName = `setter_${setter}_${Math.random().toString(36).substr(2, 9)}`;
@@ -980,13 +582,9 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     }
 
     // Create the plugin protoblocks.
-    // FIXME: On Chrome, plugins are broken (They still work on Firefox):
-    // EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self' blob: filesystem: chrome-extension-resource:".
-    // Maybe:
-    // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
-
     if ("BLOCKPLUGINS" in obj) {
-        for (const block in obj["BLOCKPLUGINS"]) {
+        for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
+            if (isUnsafeObjectKey(block)) continue;
             console.debug("adding plugin block " + block);
             safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
@@ -998,10 +596,13 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     }
 
     if ("PARAMETERPLUGINS" in obj) {
-        for (const parameter in obj["PARAMETERPLUGINS"]) {
+        for (const parameter of Object.keys(obj["PARAMETERPLUGINS"])) {
+            if (isUnsafeObjectKey(parameter)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const paramCode = obj["PARAMETERPLUGINS"][parameter];
-                const registryName = `param_${parameter}_${Math.random().toString(36).substr(2, 9)}`;
+                const registryName = `param_${parameter}_${Math.random()
+                    .toString(36)
+                    .substr(2, 9)}`;
                 blobScriptContent += `
 window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
     ${paramCode}
@@ -1016,14 +617,16 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
 
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
-        for (const arg in obj["ONLOAD"]) {
+        for (const arg of Object.keys(obj["ONLOAD"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
         }
     }
 
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
-        for (const arg in obj["ONSTART"]) {
+        for (const arg of Object.keys(obj["ONSTART"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const onStartCode = obj["ONSTART"][arg];
                 const registryName = `onstart_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -1041,7 +644,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
 
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
-        for (const arg in obj["ONSTOP"]) {
+        for (const arg of Object.keys(obj["ONSTOP"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const onStopCode = obj["ONSTOP"][arg];
                 const registryName = `onstop_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -1074,10 +678,12 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
         await new Promise((resolve, reject) => {
             script.onload = () => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 resolve();
             };
             script.onerror = e => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 console.error("Failed to load CSP Blob script for plugins", e);
                 reject(e);
             };
@@ -1108,7 +714,9 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
     // Finally, execute safeEvals by creating new Blob scripts for each setup logic block.
     // This is because even setup logic can be blocked by CSP if it contains unsafe-eval.
     for (const item of pendingSafeEvals) {
-        const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random().toString(36).substr(2, 9)}`;
+        const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random()
+            .toString(36)
+            .substr(2, 9)}`;
         const setupScript = `
 window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivity) {
     ${item.code}
@@ -1129,10 +737,16 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                     delete window.__mb_plugin_registry[registryName];
                 }
                 URL.revokeObjectURL(sUrl);
+                if (sScript.parentNode) {
+                    sScript.parentNode.removeChild(sScript);
+                }
                 resolve();
             };
             sScript.onerror = () => {
                 URL.revokeObjectURL(sUrl);
+                if (sScript.parentNode) {
+                    sScript.parentNode.removeChild(sScript);
+                }
                 resolve(); // Still resolve to let others run
             };
             document.head.appendChild(sScript);
@@ -1221,36 +835,59 @@ const updatePluginObj = (activity, obj) => {
         return;
     }
 
-    for (const name in obj["PALETTEPLUGINS"]) {
-        activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
+    if ("PALETTEPLUGINS" in obj) {
+        for (const name of Object.keys(obj["PALETTEPLUGINS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
+        }
     }
 
-    for (const name in obj["PALETTEFILLCOLORS"]) {
-        activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
+    if ("PALETTEFILLCOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTEFILLCOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
+        }
     }
 
-    for (const name in obj["PALETTESTROKECOLORS"]) {
-        activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
+    if ("PALETTESTROKECOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTESTROKECOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
+        }
     }
 
-    for (const name in obj["PALETTEHIGHLIGHTCOLORS"]) {
-        activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] = obj["PALETTEHIGHLIGHTCOLORS"][name];
+    if ("PALETTEHIGHLIGHTCOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTEHIGHLIGHTCOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] =
+                obj["PALETTEHIGHLIGHTCOLORS"][name];
+        }
     }
 
-    for (const flow in obj["FLOWPLUGINS"]) {
-        activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
+    if ("FLOWPLUGINS" in obj) {
+        for (const flow of Object.keys(obj["FLOWPLUGINS"])) {
+            if (isUnsafeObjectKey(flow)) continue;
+            activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
+        }
     }
 
-    for (const arg in obj["ARGPLUGINS"]) {
-        activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
+    if ("ARGPLUGINS" in obj) {
+        for (const arg of Object.keys(obj["ARGPLUGINS"])) {
+            if (isUnsafeObjectKey(arg)) continue;
+            activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
+        }
     }
 
-    for (const block in obj["BLOCKPLUGINS"]) {
-        activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
+    if ("BLOCKPLUGINS" in obj) {
+        for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
+            if (isUnsafeObjectKey(block)) continue;
+            activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
+        }
     }
 
     if ("MACROPLUGINS" in obj) {
-        for (const macro in obj["MACROPLUGINS"]) {
+        for (const macro of Object.keys(obj["MACROPLUGINS"])) {
+            if (isUnsafeObjectKey(macro)) continue;
             activity.pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
         }
     }
@@ -1266,16 +903,25 @@ const updatePluginObj = (activity, obj) => {
         activity.pluginObjs["IMAGES"] = obj["IMAGES"];
     }
 
-    for (const name in obj["ONLOAD"]) {
-        activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
+    if ("ONLOAD" in obj) {
+        for (const name of Object.keys(obj["ONLOAD"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
+        }
     }
 
-    for (const name in obj["ONSTART"]) {
-        activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
+    if ("ONSTART" in obj) {
+        for (const name of Object.keys(obj["ONSTART"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
+        }
     }
 
-    for (const name in obj["ONSTOP"]) {
-        activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
+    if ("ONSTOP" in obj) {
+        for (const name of Object.keys(obj["ONSTOP"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
+        }
     }
 };
 
@@ -1306,7 +952,8 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
             const obj = JSON.parse(macroData);
             palettes.add("myblocks", "black", "#a0a0a0");
 
-            for (const name in obj) {
+            for (const name of Object.keys(obj)) {
+                if (isUnsafeObjectKey(name)) continue;
                 // console.debug("adding " + name + " to macroDict");
                 macroDict[name] = obj[name];
                 blocks.addToMyPalette(name, macroDict[name]);
@@ -1337,17 +984,86 @@ let prepareMacroExports = (name, stack, macroDict) => {
 };
 
 // Camera functionality module
-// Encapsulates camera-related operations for video/image capture
+// Encapsulates camera-related operations for video/image capture.
+// All interval/listener lifecycle state lives here (not in doUseCamera's
+// closures) so that repeated doUseCamera(...) calls can never accumulate
+// more than one active interval or one active canplay listener.
 const CameraManager = {
     isSetup: false,
     canPlayHandler: null,
     intervalId: null,
+    // Tracks the exact element a listener was attached to, so cleanup always
+    // targets the right node even if #camVideo is ever replaced in the DOM.
+    listenerVideoElement: null,
 
     /**
-     * Resets the camera setup state
+     * Starts the capture interval if one isn't already running. Idempotent:
+     * if a capture interval is already active, this is a no-op that returns
+     * the existing interval id, rather than clearing and restarting it.
+     *
+     * This matters when doUseCamera is invoked rapidly and repeatedly (e.g.
+     * from inside a "forever" loop): clearing and restarting the interval on
+     * every call would cancel it before it ever gets a chance to fire,
+     * meaning draw() would never run and no frame would ever be captured.
+     * @param {function} draw - callback invoked on each tick
+     * @param {number} periodMs - interval period in milliseconds
+     * @returns {number} the active interval id
+     */
+    startCapture(draw, periodMs = 100) {
+        if (this.intervalId !== null) {
+            return this.intervalId;
+        }
+        this.intervalId = window.setInterval(draw, periodMs);
+        return this.intervalId;
+    },
+
+    /**
+     * Stops the capture interval if one is running. Safe to call when no
+     * interval is active (idempotent).
+     */
+    stopCapture() {
+        if (this.intervalId !== null) {
+            window.clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
+    },
+
+    /**
+     * Attaches a canplay handler to a video element, first removing any
+     * previously attached handler (from this element or a prior one).
+     * Idempotent: calling this repeatedly never leaves more than one
+     * listener registered.
+     * @param {HTMLVideoElement} video
+     * @param {function} handler
+     */
+    setCanplayListener(video, handler) {
+        this.clearCanplayListener();
+        video.addEventListener("canplay", handler, false);
+        this.canPlayHandler = handler;
+        this.listenerVideoElement = video;
+    },
+
+    /**
+     * Removes the currently tracked canplay handler from the element it was
+     * actually attached to. Safe to call when no listener is active.
+     */
+    clearCanplayListener() {
+        if (this.canPlayHandler && this.listenerVideoElement) {
+            this.listenerVideoElement.removeEventListener("canplay", this.canPlayHandler, false);
+        }
+        this.canPlayHandler = null;
+        this.listenerVideoElement = null;
+    },
+
+    /**
+     * Resets the camera setup state and tears down any active interval or
+     * listener. Called on doStopVideoCam so a Stop always returns to a
+     * clean slate before the next Camera/Video block run.
      */
     reset() {
         this.isSetup = false;
+        this.stopCapture();
+        this.clearCanplayListener();
     }
 };
 
@@ -1383,6 +1099,15 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         turtles.getTurtle(turtle).doShowImage(args[0], data);
     }
 
+    function startCaptureOrDraw() {
+        if (isVideo) {
+            cameraID = CameraManager.startCapture(draw, 100);
+            setCameraID(cameraID);
+        } else {
+            draw();
+        }
+    }
+
     if (!CameraManager.isSetup) {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             errorMsg("Your browser does not support the webcam");
@@ -1404,21 +1129,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     } else {
         streaming = true;
         video.play();
-        if (isVideo) {
-            if (CameraManager.intervalId !== null) {
-                window.clearInterval(CameraManager.intervalId);
-                CameraManager.intervalId = null;
-            }
-            cameraID = window.setInterval(draw, 100);
-            CameraManager.intervalId = cameraID;
-            setCameraID(cameraID);
-        } else {
-            draw();
-        }
-    }
-
-    if (CameraManager.canPlayHandler) {
-        video.removeEventListener("canplay", CameraManager.canPlayHandler, false);
+        startCaptureOrDraw();
     }
 
     function handleCanPlay() {
@@ -1429,24 +1140,11 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
             canvas.setAttribute("width", w);
             canvas.setAttribute("height", h);
             streaming = true;
-
-            if (isVideo) {
-                if (CameraManager.intervalId !== null) {
-                    window.clearInterval(CameraManager.intervalId);
-                    CameraManager.intervalId = null;
-                }
-                cameraID = window.setInterval(draw, 100);
-                CameraManager.intervalId = cameraID;
-                setCameraID(cameraID);
-            } else {
-                draw();
-            }
+            startCaptureOrDraw();
         }
     }
 
-    CameraManager.canPlayHandler = handleCanPlay;
-
-    video.addEventListener("canplay", CameraManager.canPlayHandler, false);
+    CameraManager.setCanplayListener(video, handleCanPlay);
 };
 
 /**
@@ -1472,477 +1170,13 @@ function doStopVideoCam(cameraID, setCameraID) {
     CameraManager.reset();
 }
 
-/**
- * Hides certain DOM elements related to labels.
- */
-function hideDOMLabel() {
-    const textLabel = docById("textLabel");
-    if (textLabel !== null) {
-        textLabel.style.display = "none";
-    }
+// hideDOMLabel() and displayMsg() moved to js/utils/dom-helpers.js
 
-    const numberLabel = docById("numberLabel");
-    if (numberLabel !== null) {
-        numberLabel.style.display = "none";
-    }
+// safeSVG() and toFixed2() moved to js/utils/utils-logic.js
 
-    const piemenu = docById("wheelDiv");
-    if (piemenu !== null) {
-        piemenu.style.display = "none";
-    }
-}
-
-/**
- * Displays a message (currently unused).
- * @returns {undefined}
- */
-function displayMsg(/*blocks, text*/) {
-    /*
-    let msgContainer = blocks.msgText.parent;
-    msgContainer.visible = true;
-    blocks.msgText.text = text;
-    msgContainer.updateCache();
-    blocks.stage.setChildIndex(msgContainer, blocks.stage.getNumChildren() - 1);
-    */
-    return;
-}
-
-/**
- * Escapes HTML entities in a given string to make it safe for SVG.
- * @param {string} label - The string to escape.
- * @returns {string} The escaped string.
- */
-function safeSVG(label) {
-    if (typeof label === "string") {
-        return label.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    } else {
-        return label;
-    }
-}
-
-/**
- * Formats a number to fixed two precision.
- * @param {number} d - The number to format.
- * @returns {string} The formatted number.
- */
-function toFixed2(d) {
-    // Return number as fixed 2 precision
-    if (typeof d === "number") {
-        const floor = Math.floor(d);
-        if (d !== floor) {
-            return d.toFixed(2).toString();
-        } else {
-            return d.toString();
-        }
-    } else {
-        return d;
-    }
-}
-
-/**
- * Converts a floating-point number to its approximate fractional representation.
- * @param {number} d - The input number.
- * @returns {Array} An array representing the fraction in the form [numerator, denominator].
- */
-function rationalToFraction(d) {
-    /*
-    Convert float to its approximate fractional representation. '''
-
-    This code was translated to JavaScript from the answers at
-    http://stackoverflow.com/questions/95727/how-to-convert-floats-to-human-\
-readable-fractions/681534#681534
-
-    For example:
-    >>> 3./5
-    0.59999999999999998
-
-    >>> rationalToFraction(3./5)
-    "3/5"
-
-    */
-    if (d === 0 || isNaN(d) || !isFinite(d)) {
-        return [0, 1];
-    }
-
-    let invert;
-    if (d > 1) {
-        invert = true;
-        d = 1 / d;
-    } else {
-        invert = false;
-    }
-
-    let df = 1.0;
-    let top = 1;
-    let iterations = 0;
-    const maxIterations = 10000;
-    let bot = 1;
-
-    while (Math.abs(df - d) > 0.00000001 && iterations < maxIterations) {
-        if (df < d) {
-            top += 1;
-        } else {
-            bot += 1;
-            top = Math.round(d * bot);
-        }
-
-        df = top / bot;
-        iterations++;
-    }
-
-    if (iterations === maxIterations) {
-        //console.warn("rationalToFraction: Reached iteration limit");
-        return [top, bot];
-    }
-
-    if (bot === 0 || top === 0) {
-        return [0, 1];
-    }
-
-    if (invert) {
-        return [bot, top];
-    } else {
-        return [top, bot];
-    }
-}
-
-/**
- * Calculates the greatest common divisor (GCD) of two numbers.
- * @param {number} a - The first number.
- * @param {number} b - The second number.
- * @returns {number} The GCD of the two numbers.
- */
-function GCD(a, b) {
-    a = Math.abs(a);
-    b = Math.abs(b);
-
-    while (b) {
-        const n = b;
-        b = a % b;
-        a = n;
-    }
-
-    return a;
-}
-
-/**
- * Converts a number to a mixed fraction string.
- * @param {number} d - The input number.
- * @returns {string} The mixed fraction string.
- */
-let mixedNumber = d => {
-    // Return number as a mixed fraction string, e.g., "2 1/4"
-
-    if (typeof d === "number") {
-        const floor = Math.floor(d);
-        if (d > floor) {
-            const obj = rationalToFraction(d - floor);
-            if (floor === 0) {
-                return obj[0] + "/" + obj[1];
-            } else {
-                if (obj[0] === 1 && obj[1] === 1) {
-                    return floor + 1;
-                } else {
-                    if (obj[1] > 99) {
-                        return d.toFixed(2);
-                    } else {
-                        return floor + " " + obj[0] + "/" + obj[1];
-                    }
-                }
-            }
-        } else {
-            return d.toString() + "/1";
-        }
-    } else {
-        return d;
-    }
-};
-
-/**
- * Calculates the least common denominator (LCD) of two numbers.
- * @param {number} a - The first number.
- * @param {number} b - The second number.
- * @returns {number} The LCD of the two numbers.
- */
-const LCD = (a, b) => {
-    return Math.abs((a * b) / GCD(a, b));
-};
-
-/**
- * Adds two rational numbers represented as arrays [numerator, denominator].
- *
- * This helper is used internally where rational arithmetic is required
- * to avoid floating-point precision issues (e.g., turtle singer logic).
- *
- * @param {Array} a - The first rational number.
- * @param {Array} b - The second rational number.
- * @returns {Array} The sum of the two rational numbers in the form [numerator, denominator].
- */
-let rationalSum = (a, b) => {
-    if (
-        !Array.isArray(a) ||
-        a.length < 2 ||
-        !Array.isArray(b) ||
-        b.length < 2 ||
-        typeof a[0] !== "number" ||
-        typeof a[1] !== "number" ||
-        typeof b[0] !== "number" ||
-        typeof b[1] !== "number" ||
-        a[1] === 0 ||
-        b[1] === 0
-    ) {
-        console.warn("Invalid input passed to rationalSum:", a, b);
-        return [0, 1];
-    }
-
-    // Make sure a and b components are integers.
-    let obja0, objb0, obja1, objb1;
-    if (Math.floor(a[0]) !== a[0]) {
-        obja0 = rationalToFraction(a[0]);
-    } else {
-        obja0 = [a[0], 1];
-    }
-
-    if (Math.floor(b[0]) !== b[0]) {
-        objb0 = rationalToFraction(b[0]);
-    } else {
-        objb0 = [b[0], 1];
-    }
-
-    if (Math.floor(a[1]) !== a[1]) {
-        obja1 = rationalToFraction(a[1]);
-    } else {
-        obja1 = [a[1], 1];
-    }
-
-    if (Math.floor(b[1]) !== b[1]) {
-        objb1 = rationalToFraction(b[1]);
-    } else {
-        objb1 = [b[1], 1];
-    }
-    // Use local variables to avoid mutating the caller's arrays
-    const a0 = obja0[0] * obja1[1];
-    const a1 = obja0[1] * obja1[0];
-    const b0 = objb0[0] * objb1[1];
-    const b1 = objb0[1] * objb1[0];
-
-    // Find the least common denomenator
-    const lcd = LCD(a1, b1);
-    return [(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd];
-};
-
-/**
- * Finds the nearest beat for a given fraction.
- * @param {number} d - The numerator of the fraction.
- * @param {number} b - The denominator of the fraction.
- * @returns {Array} An array representing the nearest beat in the form [numerator, denominator].
- */
-let nearestBeat = (d, b) => {
-    // Find the closest beat for a given fraction.
-
-    let sum = 1 / (2 * b);
-    let count = 0;
-    const dd = d / 100;
-    while (dd > sum) {
-        sum += 1 / b;
-        count += 1;
-    }
-
-    return [count, b];
-};
-
-/**
- * Generates simple fractions based on a scale of 1-100.
- * @param {number} d - The input number.
- * @returns {Array} An array representing the fraction in the form [numerator, denominator].
- */
-let oneHundredToFraction = d => {
-    // Generate some simple fractions based on a scale of 1-100
-
-    if (d < 1) {
-        return [1, 64];
-    } else if (d > 99) {
-        return [1, 1];
-    }
-
-    switch (Math.floor(d)) {
-        case 1:
-            return [1, 64];
-        case 2:
-            return [1, 48];
-        case 3:
-        case 4:
-        case 5:
-            return [1, 32];
-        case 6:
-        case 7:
-        case 8:
-            return [1, 16];
-        case 9:
-        case 10:
-        case 11:
-            return [1, 12];
-        case 12:
-        case 13:
-        case 14:
-            return [1, 8];
-        case 15:
-        case 16:
-        case 17:
-            return [1, 6];
-        case 18:
-        case 19:
-            return [3, 16];
-        case 20:
-        case 21:
-        case 22:
-            return [1, 5];
-        case 23:
-        case 24:
-        case 25:
-        case 26:
-        case 27:
-        case 28:
-        case 29:
-            return [1, 4];
-        case 30:
-        case 31:
-            return [5, 16];
-        case 32:
-        case 33:
-        case 34:
-        case 35:
-            return [1, 3];
-        case 36:
-        case 37:
-        case 38:
-        case 39:
-            return [3, 8];
-        case 40:
-        case 41:
-            return [2, 5];
-        case 42:
-        case 43:
-        case 44:
-            return [7, 16];
-        case 45:
-        case 46:
-        case 47:
-            return [15, 32];
-        case 48:
-        case 49:
-        case 50:
-        case 51:
-        case 52:
-            return [1, 2];
-        case 53:
-        case 54:
-            return [17, 32];
-        case 56:
-        case 57:
-        case 58:
-            return [9, 16];
-        case 59:
-        case 60:
-        case 61:
-            return [3, 5];
-        case 62:
-        case 63:
-        case 64:
-        case 65:
-            return [5, 8];
-        case 66:
-        case 67:
-            return [2, 3];
-        case 68:
-        case 69:
-        case 70:
-            return [11, 16];
-        case 71:
-        case 72:
-        case 73:
-        case 74:
-            return [23, 32];
-        case 75:
-        case 76:
-        case 77:
-        case 78:
-        case 79:
-        case 80:
-            return [3, 4];
-        case 81:
-        case 82:
-            return [13, 16];
-        case 83:
-        case 84:
-        case 85:
-        case 86:
-            return [5, 6];
-        case 87:
-        case 88:
-        case 89:
-        case 90:
-            return [7, 8];
-        case 91:
-        case 92:
-            return [11, 12];
-        case 93:
-        case 94:
-        case 95:
-            return [15, 16];
-        case 96:
-        case 98:
-            return [31, 32];
-        case 99:
-            return [63, 64];
-        default:
-            return [d, 100];
-    }
-};
-
-/**
- * Converts RGB values to a hexadecimal color code.
- *
- * @param {number} r - Red value (0-255).
- * @param {number} g - Green value (0-255).
- * @param {number} b - Blue value (0-255).
- * @returns {string} Hexadecimal color code.
- */
-let rgbToHex = (r, g, b) => {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-};
-
-/**
- * Converts a hexadecimal color code to RGB values.
- *
- * @param {string} hex - Hexadecimal color code.
- * @returns {Object} Object with RGB values {r, g, b} or null if invalid hex code.
- */
-let hexToRGB = hex => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-        ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
-        : null;
-};
-
-/**
- * Converts a hexcode to RGBA format.
- *
- * @param {number} hex - Hexadecimal color code.
- * @returns {string} RGBA color value with alpha set to 1.
- */
-let hex2rgb = hex => {
-    const bigint = parseInt(hex, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-
-    return "rgba(" + r + "," + g + "," + b + ",1)";
-};
+// rationalToFraction(), GCD(), mixedNumber(), LCD(), rationalSum(),
+// nearestBeat(), oneHundredToFraction(), rgbToHex(), hexToRGB(),
+// hex2rgb() moved to js/utils/utils-logic.js
 
 /**
  * Delays execution using a promise.
@@ -1958,56 +1192,9 @@ let delayExecution = duration => {
     });
 };
 
-/**
- * Closes all widgets in the window.
- *
- * @returns {void}
- */
-function closeWidgets() {
-    window.widgetWindows.hideAllWindows();
-}
+// closeWidgets() moved to js/utils/dom-helpers.js
 
-/**
- * Closes a specific widget by its name.
- *
- * @param {string} name - The name of the widget to be closed.
- * @returns {void}
- */
-let closeBlkWidgets = name => {
-    const widgetTitle = document.getElementsByClassName("wftTitle");
-    for (let i = 0; i < widgetTitle.length; i++) {
-        if (widgetTitle[i].innerHTML === name) {
-            window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
-            break;
-        }
-    }
-};
-
-/**
- * Safely resolves a dot-notation string path to an object property globally.
- * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
- * @returns {Object|undefined} The resolved object or undefined.
- */
-const resolveObject = path => {
-    if (!path || typeof path !== "string") return undefined;
-
-    // Support both browser and Node.js environments
-    const globalObj = typeof window !== "undefined" ? window : global;
-
-    try {
-        const result = path.split(".").reduce((obj, prop) => {
-            if (obj === null || obj === undefined) {
-                return undefined;
-            }
-            return obj[prop];
-        }, globalObj);
-
-        return result;
-    } catch (e) {
-        console.warn("Failed to resolve object path: " + path, e);
-        return undefined;
-    }
-};
+// resolveObject() moved to js/utils/utils-logic.js
 
 /**
  * Imports methods and variables of model and view objects to the controller object.
@@ -2018,6 +1205,25 @@ const resolveObject = path => {
  * @param {*[]} viewArgs - Constructor arguments for the view.
  * @returns {void}
  */
+/**
+ * Announces a message to screen readers via a shared aria-live region.
+ * Creates the region lazily on first use and reuses it for all subsequent calls.
+ * @param {string} msg - The message to announce.
+ */
+const announceToScreenReader = msg => {
+    let region = document.getElementById("mbA11yLiveRegion");
+    if (!region) {
+        region = document.createElement("div");
+        region.id = "mbA11yLiveRegion";
+        region.setAttribute("role", "status");
+        region.setAttribute("aria-live", "polite");
+        region.setAttribute("aria-atomic", "true");
+        region.style.cssText =
+            "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+        document.body.appendChild(region);
+    }
+    region.textContent = msg;
+};
 let importMembers = (obj, className, modelArgs, viewArgs) => {
     /**
      * Adds methods and variables of one class to another class's instance.
@@ -2078,27 +1284,37 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
+        ...UtilsLogic,
+        ...DomHelpers,
+        ...BrowserUtils,
+        ...HttpUtils,
+        extractProjectDataFromHTML,
         _,
-        last,
-        fileExt,
-        fileBasename,
-        toTitleCase,
-        safeSVG,
-        toFixed2,
-        mixedNumber,
-        nearestBeat,
-        oneHundredToFraction,
-        rationalToFraction,
-        rationalSum,
-        rgbToHex,
-        hexToRGB,
-        hex2rgb,
         format,
         delayExecution,
-        closeWidgets,
-        closeBlkWidgets,
-        resolveObject,
         importMembers,
-        escapeHTML
+        changeImage,
+        getTextWidth,
+        doSVG,
+        isSVGEmpty,
+        prepareMacroExports,
+        processPluginData,
+        processMacroData,
+        updatePluginObj,
+        announceToScreenReader,
+        doUseCamera,
+        doStopVideoCam,
+        CameraManager
     };
+}
+
+// In the browser (and not under test, where dom-helpers.js's equivalent
+// guard already explains why this is conditional), explicitly attach this
+// to `window` rather than relying on it being reachable as a bare
+// identifier from other classic <script>-loaded files. That reachability
+// is real but load-order-dependent and not guaranteed -- callers in newer
+// or differently-ordered files have hit `ReferenceError: announceToScreenReader
+// is not defined` despite the function existing here.
+if (typeof window !== "undefined" && (typeof module === "undefined" || !module.exports)) {
+    window.announceToScreenReader = announceToScreenReader;
 }

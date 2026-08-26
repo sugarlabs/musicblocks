@@ -14,7 +14,7 @@
 // scratch. -- Walter Bender, October 2014.
 
 /*
-   globals _, docById, platformColor, doSVG, createjs, _THIS_IS_MUSIC_BLOCKS_
+   globals _, docById, platformColor, doSVG, createjs, _THIS_IS_MUSIC_BLOCKS_, pubsub
  */
 
 /*
@@ -75,7 +75,8 @@ class PlanetInterface {
             document.querySelector("#theme-color").content = platformColor.header;
             this.activity.stage.enableDOMEvents(true);
             window.scroll(0, 0);
-            docById("buttoncontainerBOTTOM").style.display = "block";
+            const buttonContainerBottom = docById("buttoncontainerBOTTOM");
+            if (buttonContainerBottom) buttonContainerBottom.style.display = "block";
             docById("buttoncontainerTOP").style.display = "block";
         };
 
@@ -155,20 +156,16 @@ class PlanetInterface {
             this.activity.loading = true;
             document.body.style.cursor = "wait";
             this.activity.doLoadAnimation();
-            this.activity._allClear(false);
+            this.activity._allClear(false, true);
 
             // First, hide the palettes as they will need updating.
             this.activity.blocks.palettes._hideMenus(true);
 
             const __afterLoad = () => {
-                document.removeEventListener("finishedLoading", __afterLoad);
+                pubsub.off("finishedLoading", __afterLoad);
             };
 
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __afterLoad);
-            } else {
-                document.attachEvent("finishedLoading", __afterLoad);
-            }
+            pubsub.on("finishedLoading", __afterLoad);
 
             try {
                 const obj = JSON.parse(data);
@@ -199,7 +196,7 @@ class PlanetInterface {
         this.newProject = () => {
             this.closePlanet();
             this.initialiseNewProject();
-            this.activity._loadStart();
+            this.activity.justLoadStart();
             this.saveLocally();
         };
 
@@ -410,6 +407,56 @@ class PlanetInterface {
 
             window.Converter = this.planet ? this.planet.Converter : undefined;
             this.mainCanvas = this.activity.canvas;
+
+            // Push theme colors and block display-name map to the iframe
+            // via postMessage so it never needs window.parent access.
+            this._pushPlatformColor();
+            this._pushBlockDisplayNames();
+        };
+
+        /**
+         * Sends platformColor to the Planet iframe via postMessage.
+         */
+        this._pushPlatformColor = () => {
+            if (!this.iframe || !this.iframe.contentWindow) return;
+            try {
+                this.iframe.contentWindow.postMessage(
+                    {
+                        type: "MB_PLATFORM_COLOR",
+                        payload: typeof platformColor !== "undefined" ? platformColor : null
+                    },
+                    "*"
+                );
+            } catch (e) {
+                console.debug("Could not push platformColor to Planet iframe:", e);
+            }
+        };
+
+        /**
+         * Builds a proto-name → display-name map from the palettes and
+         * sends it to the Planet iframe so Publisher.parseProject() can
+         * resolve human-friendly names without reaching into the parent.
+         */
+        this._pushBlockDisplayNames = () => {
+            if (!this.iframe || !this.iframe.contentWindow) return;
+            try {
+                const palettes = this.activity.blocks.palettes;
+                const nameMap = {};
+                for (const palette in palettes.dict) {
+                    for (const blk in palettes.dict[palette].protoList) {
+                        const proto = palettes.dict[palette].protoList[blk];
+                        if (proto.name && proto.staticLabels && proto.staticLabels[0]) {
+                            nameMap[proto.name] = proto.staticLabels[0];
+                        }
+                    }
+                }
+                this.iframe.contentWindow.postMessage(
+                    { type: "MB_BLOCK_NAMES", payload: nameMap },
+                    "*"
+                );
+            } catch (e) {
+                console.debug("Could not push block names to Planet iframe:", e);
+            }
         };
     }
 }

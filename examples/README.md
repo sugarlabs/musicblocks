@@ -54,6 +54,10 @@
 
 | Example | Description |
 | --- | --- |
+| polyrhythm-drums.html | Polyphonic drum rhythms with graphics |
+
+| Example | Description |
+| --- | --- |
 | rhythm-test.html | Variations of rhythm |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
@@ -358,6 +362,10 @@
 | --- | --- |
 | Minuet-in-Reverse | From Haydn's Symphony 47 |
 | In-C.html | In C is a musical piece composed by Terry Riley in 1964 for an indefinite number of performers. |
+| zelda.html | The theme music from Zelda |
+
+| Example | Description |
+| --- | --- |
 | One-of-This-That-Total-Freestyle.html | How many different ways can we utilize "One of This, One of That" for Music? This project explores many possibilities |
 | 5-Limit-Lattice.html | An initial attempt to make an interactive version of https://en.wikipedia.org/wiki/Five-limit_tuning -- It demonstrates how certain chords are tuned to different versions of the (nearly) same pitch. |
 | harmonics-single-string.html | A fun demo of the different harmonics of a stringed instrument. |
@@ -421,3 +429,4 @@ Music Blocks has handy widgets for various musical concepts to create musical co
 | Example | Description |
 | --- | --- |
 | test-suite.html | Smoke test for many Music Blocks functions. |
+| test-EDO-chromatic-scales.html | Test of chromatic mode across different EDOs |

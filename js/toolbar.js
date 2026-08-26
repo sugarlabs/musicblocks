@@ -9,12 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*
-  global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  RECORDBUTTON, saveButton, saveButtonAdvanced, ActivityContext
-*/
-
 /* exported Toolbar */
+
 
 let WRAP = true;
 const $j = window.jQuery;
@@ -2755,4 +2751,16 @@ class FocusCycleManager {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Toolbar;
     module.exports.FocusCycleManager = FocusCycleManager;
+
+// Thin compatibility shim to keep the "activity/toolbar" module path working.
+// Explicitly depends on activity/toolbar-ui to ensure correct load ordering via RequireJS.
+if (typeof define === "function" && define.amd) {
+    define(["activity/toolbar-ui"], function (ToolbarUI) {
+        window.Toolbar = ToolbarUI;
+        return ToolbarUI;
+    });
+} else if (typeof module !== "undefined" && module.exports) {
+    const ToolbarUI = require("./toolbar-ui");
+    module.exports = ToolbarUI;
+    module.exports.FocusCycleManager = ToolbarUI.FocusCycleManager;
 }

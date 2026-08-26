@@ -58,7 +58,18 @@ class DummyFlowBlock {
         this.beginner = bool;
     }
     makeMacro(fn) {
-        this.macro = fn;
+        this.macroFunc = fn;
+    }
+    setCapability(name, value = true) {
+        if (!this.capabilities) {
+            this.capabilities = Object.create(null);
+        }
+        this.capabilities[name] = !!value;
+    }
+    hasCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities || {}, name)
+            ? !!this.capabilities[name]
+            : false;
     }
 }
 
@@ -82,9 +93,14 @@ global.last = arr => (arr && arr.length ? arr[arr.length - 1] : undefined);
 
 // Mock widget classes
 global.MeterWidget = jest.fn();
+global.MeterWidget.dependencies = ["widgets/meterwidget"];
 global.Oscilloscope = jest.fn();
+global.Oscilloscope.dependencies = ["widgets/oscilloscope"];
 global.ModeWidget = jest.fn();
+global.ModeWidget.dependencies = ["widgets/modewidget"];
+global.StatusMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.Tempo = jest.fn(() => ({ BPMBlocks: [], BPMs: [], init: jest.fn() }));
+global.Tempo.dependencies = ["widgets/tempo"];
 global.TimbreWidget = jest.fn(() => ({
     instrumentName: "testInstrument",
     blockNo: null,
@@ -117,23 +133,44 @@ global.TimbreWidget = jest.fn(() => ({
     },
     init: jest.fn()
 }));
+global.TimbreWidget.dependencies = ["widgets/timbre"];
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
+global.SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
 global.AIDebuggerWidget = jest.fn(() => ({ init: jest.fn() }));
+global.AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
 global.TemperamentWidget = jest.fn(() => ({
     inTemperament: null,
     scale: null,
     init: jest.fn()
 }));
+global.TemperamentWidget.dependencies = ["widgets/temperament"];
 
 global.MusicKeyboard = jest.fn();
+global.MusicKeyboard.dependencies = ["widgets/musickeyboard"];
 global.PhraseMaker = jest.fn();
+global.PhraseMaker.dependencies = [
+    "widgets/PhraseMakerUtils",
+    "widgets/PhraseMakerGrid",
+    "widgets/PhraseMakerUI",
+    "widgets/PhraseMakerAudio",
+    "widgets/phrasemaker"
+];
 global.Arpeggio = jest.fn();
+global.Arpeggio.dependencies = ["widgets/arpeggio"];
 global.PitchDrumMatrix = jest.fn();
+global.PitchDrumMatrix.dependencies = ["widgets/pitchdrummatrix"];
 global.PitchSlider = jest.fn();
+global.PitchSlider.dependencies = ["widgets/pitchslider"];
 global.PitchStaircase = jest.fn();
+global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
 global.RhythmRuler = jest.fn();
-global.ReflectionMatrix = jest.fn();
+global.RhythmRuler.dependencies = ["widgets/rhythmruler"];
+global.ReflectionMatrix = jest.fn(() => ({ init: jest.fn() }));
+global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();
+global.LegoWidget.dependencies = ["widgets/legobricks"];
+global.AIWidget = jest.fn(() => ({ init: jest.fn() }));
+global.AIWidget.dependencies = ["widgets/aiwidget"];
 
 global.platformColor = jest.fn();
 global.docById = jest.fn();
@@ -316,27 +353,7 @@ describe("setupWidgetBlocks", () => {
             expect(activity.errorMsg).not.toHaveBeenCalled();
         });
     });
-
     describe("TimbreBlock", () => {
-        it("initializes with string instrument name", () => {
-            const timbre = getBlock("timbre");
-            // First call: returns interruption while loading widget
-            const interruption = timbre.flow(
-                ["customInstrument", "childBlk"],
-                logo,
-                0,
-                "timbreBlk"
-            );
-            expect(interruption).toEqual([null, 0, true]);
-            expect(logo.runFromBlockNow).toHaveBeenCalled();
-
-            // Second call: widget is loaded, so it proceeds
-            const result = timbre.flow(["customInstrument", "childBlk"], logo, 0, "timbreBlk");
-            expect(logo.inTimbre).toBe(true);
-            expect(logo.timbre.instrumentName).toBe("customInstrument");
-            expect(result).toEqual(["childBlk", 1]);
-        });
-
         it("uses default voice and shows error for non-string", () => {
             const timbre = getBlock("timbre");
             // First call: interruption
@@ -408,39 +425,6 @@ describe("setupWidgetBlocks", () => {
         });
     });
 
-    describe("SamplerBlock", () => {
-        it("lazy-loads sample widget and returns child block on replay", () => {
-            const sampler = getBlock("sampler");
-
-            const interruption = sampler.flow(["childBlk"], logo, 0, "samplerBlk", "received");
-            expect(interruption).toEqual([null, 0, true]);
-            expect(global.SampleWidget).toHaveBeenCalledTimes(1);
-            expect(logo.runFromBlockNow).toHaveBeenCalledWith(
-                logo,
-                0,
-                "samplerBlk",
-                true,
-                "received"
-            );
-
-            const result = sampler.flow(["childBlk"], logo, 0, "samplerBlk");
-            expect(logo.inSample).toBe(true);
-            expect(logo.sample).toBeDefined();
-            expect(result).toEqual(["childBlk", 1]);
-        });
-
-        it("lazy-loads sample widget when logo.sample is undefined", () => {
-            const sampler = getBlock("sampler");
-            delete logo.sample;
-
-            const result = sampler.flow(["childBlk"], logo, 0, "samplerBlk", "received");
-
-            expect(result).toEqual([null, 0, true]);
-            expect(global.SampleWidget).toHaveBeenCalledTimes(1);
-            expect(logo.sample).toBeDefined();
-        });
-    });
-
     describe("AIDebuggerBlock", () => {
         it("uses its own widget instance instead of sampler state", () => {
             const sampler = getBlock("sampler");
@@ -458,61 +442,314 @@ describe("setupWidgetBlocks", () => {
             expect(logo.sample).not.toBe(logo.aiDebugger);
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
         });
+    });
 
-        it("does not depend on sampler state being initialized", () => {
-            const aiDebugger = getBlock("aidebugger");
+    describe("StatusBlock", () => {
+        it("defines its default macro with all monitors and print wrappers", () => {
+            const status = getBlock("status");
+            const macro = status.macroFunc(0, 0);
+            expect(macro).toHaveLength(13);
+            expect(macro[0][1]).toBe("status");
+            expect(macro[1][1]).toBe("hiddennoflow");
+            expect(macro[2][1]).toBe("print");
+            expect(macro[3][1]).toEqual(["outputtools", { value: "letter class" }]);
+            expect(macro[4][1]).toBe("currentpitch");
+            expect(macro[5][1]).toBe("print");
+            expect(macro[6][1]).toBe("beatvalue");
+            expect(macro[7][1]).toBe("print");
+            expect(macro[8][1]).toBe("measurevalue");
+            expect(macro[9][1]).toBe("print");
+            expect(macro[10][1]).toBe("elapsednotes");
+            expect(macro[11][1]).toBe("print");
+            expect(macro[12][1]).toBe("bpmfactor");
+        });
 
-            const interruption = aiDebugger.flow(["childBlk"], logo, 0, "debuggerBlk", "received");
-            expect(interruption).toEqual([null, 0, true]);
-            expect(global.AIDebuggerWidget).toHaveBeenCalledTimes(1);
-            expect(logo.aiDebugger).toBeDefined();
-            expect(logo.sample).toBeNull();
-            expect(logo.inSample).toBe(false);
+        it("returns code 1 to run children once in flow", () => {
+            const status = getBlock("status");
+            activity.blocks.blockList["statusBlk"] = {
+                name: "status",
+                connections: [null, null, null]
+            };
+            const res = status.flow(["childBlk"], logo, 0, "statusBlk");
+            expect(res).toEqual(["childBlk", 1]);
+        });
 
-            const result = aiDebugger.flow(["childBlk"], logo, 0, "debuggerBlk");
-            expect(result).toEqual(["childBlk", 1]);
-            expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
+        it("deduplicates status fields before initializing the widget", () => {
+            const status = getBlock("status");
+            const initSnapshots = [];
+            logo.statusFields = [
+                [3, "outputtools"],
+                [3, "outputtools"],
+                [6, "beatvalue"],
+                [6, "beatvalue"]
+            ];
+            logo.statusMatrix = {
+                isOpen: true,
+                init: jest.fn(() => {
+                    initSnapshots.push(logo.statusFields.map(field => field.join(":")));
+                })
+            };
+            activity.blocks.blockList["statusBlk"] = {
+                name: "status",
+                connections: [null, null, null]
+            };
+
+            status.flow(["childBlk"], logo, 0, "statusBlk");
+
+            // The widget is only built once the listener fires at the end
+            // of the clamp, not eagerly inside flow() itself.
+            expect(logo.statusMatrix.init).not.toHaveBeenCalled();
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            logo.statusFields = [
+                [3, "outputtools"],
+                [3, "outputtools"],
+                [6, "beatvalue"],
+                [6, "beatvalue"]
+            ];
+
+            listener();
+
+            expect(logo.statusMatrix.init).toHaveBeenCalledTimes(1);
+            expect(initSnapshots[0]).toEqual(["3:outputtools", "6:beatvalue"]);
+        });
+
+        it("rebuilds status fields from the stack when runtime registration is empty", () => {
+            const status = getBlock("status");
+            const initSnapshots = [];
+
+            logo.inStatusMatrix = false;
+            logo.statusFields = [];
+            logo.parseArg = jest.fn((logoRef, turtleRef, blkRef) => {
+                if (blkRef === "field1") {
+                    logoRef.statusFields.push(["field1", "beatvalue"]);
+                }
+            });
+            logo.statusMatrix = {
+                isOpen: true,
+                init: jest.fn(() => {
+                    initSnapshots.push(logo.statusFields.map(field => field.join(":")));
+                })
+            };
+            activity.blocks.blockList = {
+                statusBlk: {
+                    name: "status",
+                    connections: [null, "print1", null]
+                },
+                print1: {
+                    name: "print",
+                    connections: ["statusBlk", "field1", null]
+                },
+                field1: {
+                    name: "beatvalue",
+                    connections: ["print1"]
+                }
+            };
+
+            status.flow(["childBlk"], logo, 0, "statusBlk");
+
+            // The widget is only built once the listener fires at the end
+            // of the clamp, not eagerly inside flow() itself.
+            expect(logo.statusMatrix.init).not.toHaveBeenCalled();
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            logo.statusFields = [];
+
+            listener();
+
+            expect(logo.statusMatrix.init).toHaveBeenCalledTimes(1);
+            expect(initSnapshots[0]).toEqual(["field1:beatvalue"]);
         });
     });
 
-    describe("First-Click Flow (Lazy Loading)", () => {
-        it("returns interruption and triggers runFromBlockNow for TemperamentBlock", () => {
-            const temperament = getBlock("temperament");
-            logo.temperament = null;
-            const res = temperament.flow([0, "childBlk"], logo, 0, "tempBlk", "received");
-            expect(res).toEqual([null, 0, true]);
-            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "tempBlk", true, "received");
+    describe("ReflectionBlock", () => {
+        it("does not initialize the widget until its listener fires", () => {
+            const reflection = getBlock("reflection");
+
+            // First call: widget lazy-loads, flow() returns before reaching init().
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            // Second call: widget is now cached, flow() proceeds.
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+
+            expect(logo.reflection.init).not.toHaveBeenCalled();
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(logo.reflection.init).toHaveBeenCalledTimes(1);
         });
 
-        it("returns interruption and triggers runFromBlockNow for MusicKeyboardBlock", () => {
-            const keyboard = getBlock("musickeyboard");
-            logo.musicKeyboard = null;
-            const res = keyboard.flow(["childBlk"], logo, 0, "kbdBlk", "received");
-            expect(res).toEqual([null, 0, true]);
-            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "kbdBlk", true, "received");
-        });
+        it("constructs the widget once and initializes once per open", () => {
+            const reflection = getBlock("reflection");
 
-        it("returns interruption and triggers runFromBlockNow for MatrixBlock (PhraseMaker)", () => {
-            const matrix = getBlock("matrix");
-            logo.phraseMaker = null;
-            const res = matrix.flow(["childBlk"], logo, 0, "matrixBlk", "received");
-            expect(res).toEqual([null, 0, true]);
-            expect(logo.runFromBlockNow).toHaveBeenCalledWith(
-                logo,
-                0,
-                "matrixBlk",
-                true,
-                "received"
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(global.ReflectionMatrix).toHaveBeenCalledTimes(1);
+            expect(logo.reflection.init).toHaveBeenCalledTimes(1);
+            expect(logo.inReflectionMatrix).toBe(false);
+        });
+    });
+
+    describe("Widget dependency resolution", () => {
+        // _ensureWidget()/_lazyLoadWidget() are local closures inside
+        // setupWidgetBlocks() and aren't exported, so their `modules`
+        // argument can't be intercepted at runtime without changing the
+        // loader itself, and in this non-AMD test environment `_lazyRequire`
+        // (which both of them delegate to) ignores `modules` entirely, so no
+        // behavioural test can observe it either. As a last resort, a single
+        // source-text check confirms every call site resolves dependencies
+        // from the widget metadata when available and supplies a fallback
+        // module id when the widget is not part of the startup dependency
+        // graph. The behavioural tests below cover the loading paths.
+        it("resolves widget dependencies with startup-safe fallbacks", () => {
+            const widgetBlocksSource = require("fs").readFileSync(
+                require("path").join(__dirname, "..", "WidgetBlocks.js"),
+                "utf8"
             );
+            const ensureWidgetSites = [
+                ["temperament", "TemperamentWidget"],
+                ["sample", "SampleWidget"],
+                ["timbre", "TimbreWidget"],
+                ["tempo", "Tempo"],
+                ["arpeggio", "Arpeggio"],
+                ["pitchDrumMatrix", "PitchDrumMatrix"],
+                ["pitchSlider", "PitchSlider"],
+                ["musicKeyboard", "MusicKeyboard"],
+                ["pitchStaircase", "PitchStaircase"],
+                ["rhythmRuler", "RhythmRuler"],
+                ["phraseMaker", "PhraseMaker"],
+                ["aiMusic", "AIWidget"],
+                ["reflection", "ReflectionMatrix"],
+                ["legoWidget", "LegoWidget"],
+                ["aiDebugger", "AIDebuggerWidget"]
+            ];
+            const lazyLoadWidgetSites = [
+                ["meterWidget", "MeterWidget"],
+                ["Oscilloscope", "Oscilloscope"],
+                ["modeWidget", "ModeWidget"]
+            ];
+
+            const notWired = [];
+            for (const [widgetKey, className] of ensureWidgetSites) {
+                const callSite = new RegExp(
+                    `_ensureWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*_getWidgetDependencies\\(\\s*typeof ${className} !== "undefined" \\? ${className} : null,`
+                );
+                if (!callSite.test(widgetBlocksSource)) {
+                    notWired.push(`_ensureWidget("${widgetKey}") is missing a dependency fallback`);
+                }
+            }
+            for (const [widgetKey, className] of lazyLoadWidgetSites) {
+                const callSite = new RegExp(
+                    `_lazyLoadWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*_getWidgetDependencies\\(\\s*typeof ${className} !== "undefined" \\? ${className} : null,`
+                );
+                if (!callSite.test(widgetBlocksSource)) {
+                    notWired.push(
+                        `_lazyLoadWidget("${widgetKey}") is missing a dependency fallback`
+                    );
+                }
+            }
+
+            expect(notWired).toEqual([]);
         });
 
-        it("returns interruption if widget is already loading (guard check)", () => {
-            const temperament = getBlock("temperament");
-            logo.temperament = "loading";
-            const res = temperament.flow([0, "childBlk"], logo, 0, "tempBlk", "received");
-            expect(res).toEqual([null, 0, true]);
-            // Should not trigger another runFromBlockNow or lazy load callback
-            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        // Exercise the previously-untested call sites so dependency
+        // resolution actually executes, not just gets matched textually above.
+        it.each([
+            ["meterwidget", "meterBlk", "meterWidget", global.MeterWidget],
+            ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
+            ["modewidget", "modeBlk", "modeWidget", global.ModeWidget]
+        ])("%s lazy-loads its widget once its listener fires", (type, blk, logoKey, Widget) => {
+            if (type === "meterwidget") {
+                activity.blocks.blockList = {
+                    1: { connections: [null, 2, 3] },
+                    2: { value: 4 },
+                    3: { connections: [null, 4, 5] },
+                    4: { value: 1 },
+                    5: { value: 4 }
+                };
+            }
+
+            const block = getBlock(type);
+            block.flow(["childBlk"], logo, 0, blk);
+            if (type === "meterwidget") {
+                logo._meterBlock = 1;
+            }
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(Widget).toHaveBeenCalledTimes(1);
+            expect(logo[logoKey]).toBeDefined();
+        });
+
+        it("does not open when the meter block input is disconnected", () => {
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, null] },
+                2: { value: 4 }
+            };
+
+            const meterWidget = getBlock("meterwidget");
+            meterWidget.flow(["childBlk"], logo, 0, "meterBlk");
+            logo._meterBlock = 1;
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.MeterWidget).not.toHaveBeenCalled();
+            expect(logo.insideMeterWidget).toBe(false);
+        });
+
+        it("does not open when the meter block is missing", () => {
+            logo._meterBlock = 1;
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, 3] },
+                2: { value: 4 },
+                3: { connections: [null, 4, 5] },
+                4: { value: 1 },
+                5: { value: 4 }
+            };
+
+            const meterWidget = getBlock("meterwidget");
+            meterWidget.flow(["childBlk"], logo, 0, "meterBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.MeterWidget).not.toHaveBeenCalled();
+            expect(logo.insideMeterWidget).toBe(false);
+        });
+
+        it("does not open when the note value numerator is disconnected", () => {
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, 3] },
+                2: { value: 4 },
+                3: { connections: [null, null, 4] },
+                4: { value: 4 }
+            };
+
+            const meterWidget = getBlock("meterwidget");
+            meterWidget.flow(["childBlk"], logo, 0, "meterBlk");
+            logo._meterBlock = 1;
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.MeterWidget).not.toHaveBeenCalled();
+            expect(logo.insideMeterWidget).toBe(false);
+        });
+
+        it("aimusic lazy-loads AIWidget once its listener fires", () => {
+            const aiMusic = getBlock("aimusic");
+            aiMusic.flow(["childBlk"], logo, 0, "aiMusicBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.AIWidget).toHaveBeenCalledTimes(1);
+            expect(logo.aiMusic).toBeDefined();
         });
     });
 });

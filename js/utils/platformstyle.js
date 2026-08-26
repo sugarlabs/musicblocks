@@ -245,7 +245,7 @@ const platformThemes = {
         },
 
         disconnected: "#C4C4C4", // disconnected block color
-        header: platform.FF ? "#4DA6FF" : "#4DA6FF",
+        header: "#4DA6FF",
         aux: "#1A8CFF",
         sub: "#8CC6FF",
         doHeaderShadow: !platform.FF,
@@ -538,7 +538,8 @@ if (platformThemes[activeTheme]) {
     window.platformColor = platformThemes["light"];
 }
 
-document.querySelector("meta[name=theme-color]").content = platformColor.header;
+const _themeMeta = document.querySelector("meta[name=theme-color]");
+if (_themeMeta) _themeMeta.content = platformColor.header;
 
 /**
  * @public

@@ -19,12 +19,6 @@
  */
 
 global._ = s => s;
-global.DOUBLEFLAT = "bb";
-global.FLAT = "b";
-global.NATURAL = "n";
-global.SHARP = "#";
-global.DOUBLESHARP = "x";
-
 global.instruments = [{}];
 global.TunerUtils = {
     calculatePlaybackRate: jest.fn(),
@@ -85,6 +79,12 @@ global.TunerDisplay = class {
 
 const { SampleWidget, PitchSmoother } = require("../sampler.js");
 
+describe("SampleWidget.dependencies", () => {
+    test("includes the tuner module used by the sampler", () => {
+        expect(SampleWidget.dependencies).toEqual(["widgets/tuner", "widgets/sampler"]);
+    });
+});
+
 describe("Sampler Widget", () => {
     beforeAll(() => {
         if (!HTMLCanvasElement.prototype.getContext) {
@@ -105,6 +105,12 @@ describe("Sampler Widget", () => {
         jest.clearAllMocks();
         global.instruments = [{}];
         global.CUSTOMSAMPLES = [];
+        global.SHARP = "#";
+        global.FLAT = "b";
+        global.DOUBLESHARP = "x";
+        global.DOUBLEFLAT = "bb";
+        global.NATURAL = "n";
+
         document.body.innerHTML = `
             <div id="wheelDiv"></div>
             <div id="wheelDivptm"></div>
@@ -749,6 +755,39 @@ describe("Sampler Widget", () => {
             jest.useRealTimers();
         });
 
+        test("onclose stops an active recording and releases the mic", () => {
+            widget.init(mockActivity, 1);
+
+            widget.is_recording = true;
+
+            widgetWindow.onclose();
+
+            expect(mockActivity.logo.synth.stopRecording).toHaveBeenCalled();
+            expect(widget.is_recording).toBe(false);
+        });
+
+        test("onclose stops the tuner and releases the mic", async () => {
+            widget.init(mockActivity, 1);
+
+            await widget._tunerBtn.onclick();
+
+            widgetWindow.onclose();
+
+            expect(mockActivity.logo.synth.stopTuner).toHaveBeenCalled();
+
+            await widget._tunerBtn.onclick();
+            expect(mockActivity.logo.synth.startTuner).toHaveBeenCalledTimes(2);
+        });
+
+        test("onclose does not call stopRecording/stopTuner when neither is active", () => {
+            widget.init(mockActivity, 1);
+
+            widgetWindow.onclose();
+
+            expect(mockActivity.logo.synth.stopRecording).not.toHaveBeenCalled();
+            expect(mockActivity.logo.synth.stopTuner).not.toHaveBeenCalled();
+        });
+
         test("prompt UI handles submit, preview, and save", async () => {
             widget.init(mockActivity, 1);
             widget._promptBtn.onclick();
@@ -888,8 +927,8 @@ describe("Sampler Widget", () => {
             widget.is_recording = true;
             widget.running = true;
             widget.pitchAnalysers = {
-                0: { getValue: jest.fn(() => [0, 0.5, -0.5]) },
-                1: { getValue: jest.fn(() => [0, 0.5, -0.5]) }
+                0: { getValue: jest.fn(() => [0, 0.5, -0.5]), dispose: jest.fn() },
+                1: { getValue: jest.fn(() => [0, 0.5, -0.5]), dispose: jest.fn() }
             };
             global.TunerUtils.frequencyToPitch.mockReturnValue(["A4", 0]);
             global.detectPitch = jest.fn(() => 440);
@@ -925,8 +964,8 @@ describe("Sampler Widget", () => {
             widget.drawVisualIDs = {};
             widget.running = true;
             widget.pitchAnalysers = {
-                0: { getValue: jest.fn(() => [0.1, -0.1]) },
-                1: { getValue: jest.fn(() => [0.2, -0.2]) }
+                0: { getValue: jest.fn(() => [0.1, -0.1]), dispose: jest.fn() },
+                1: { getValue: jest.fn(() => [0.2, -0.2]), dispose: jest.fn() }
             };
             widget.tunerDisplay = new global.TunerDisplay(
                 document.createElement("canvas"),

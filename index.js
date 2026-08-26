@@ -1,6 +1,7 @@
 const express = require("express");
 const compression = require("compression");
 const path = require("path");
+const pkg = require("./package.json");
 
 const app = express();
 
@@ -18,6 +19,16 @@ app.get("/env.js", (req, res) => {
         `window.MB_ENV=${JSON.stringify(process.env.NODE_ENV || "development")};` +
             `window.MB_IS_DEV=${JSON.stringify(isDev)};`
     );
+});
+
+app.get("/healthz", (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    res.json({
+        status: "ok",
+        version: pkg.version,
+        env: process.env.NODE_ENV || "development",
+        uptime: process.uptime()
+    });
 });
 
 // Enable compression for all responses
@@ -86,7 +97,43 @@ app.use(
 
 const HOST = process.env.HOST || "127.0.0.1";
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, HOST, () => {
-    console.log(`Music Blocks running at http://${HOST}:${PORT}/`);
-    console.log("Compression enabled");
-});
+let server;
+let shuttingDown = false;
+
+function listen() {
+    server = app.listen(PORT, HOST, () => {
+        console.log(`Music Blocks running at http://${HOST}:${PORT}/`);
+        console.log("Compression enabled");
+    });
+}
+
+function shutdown(exitCode = 0) {
+    if (shuttingDown) return;
+    shuttingDown = true;
+
+    if (server) {
+        console.log("Shutting down server...");
+        if (typeof server.closeIdleConnections === "function") {
+            server.closeIdleConnections();
+        }
+        server.close(() => {
+            console.log("Server closed");
+            process.exit(exitCode);
+        });
+        setTimeout(() => {
+            console.error("Forcing shutdown after timeout");
+            process.exit(exitCode);
+        }, 10000).unref();
+    } else {
+        process.exit(exitCode);
+    }
+}
+
+if (require.main === module) {
+    listen();
+
+    process.on("SIGTERM", () => shutdown(0));
+    process.on("SIGINT", () => shutdown(0));
+}
+
+module.exports = app;

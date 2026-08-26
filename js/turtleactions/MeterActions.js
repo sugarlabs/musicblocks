@@ -113,13 +113,7 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
                 activity.errorMsg(
-                    obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute must be greater than") +
-                        " " +
-                        target,
+                    `${obj[0]}/${obj[1]} ${_("beats per minute must be greater than %s").replace(/%s/g, target)}`,
                     blk
                 );
                 _bpm = 30;
@@ -127,15 +121,7 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
                 activity.errorMsg(
-                    _("maximum") +
-                        " " +
-                        obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute is") +
-                        " " +
-                        target,
+                    `${_("maximum")} ${obj[0]}/${obj[1]} ${_("beats per minute is %s").replace(/%s/g, target)}`,
                     blk
                 );
                 _bpm = 1000;
@@ -151,13 +137,7 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
                 activity.errorMsg(
-                    obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute must be greater than") +
-                        " " +
-                        target,
+                    `${obj[0]}/${obj[1]} ${_("beats per minute must be greater than %s").replace(/%s/g, target)}`,
                     blk
                 );
                 Singer.masterBPM = 30;
@@ -165,15 +145,7 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
                 activity.errorMsg(
-                    _("maximum") +
-                        " " +
-                        obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute is") +
-                        " " +
-                        target,
+                    `${_("maximum")} ${obj[0]}/${obj[1]} ${_("beats per minute is %s").replace(/%s/g, target)}`,
                     blk
                 );
                 Singer.masterBPM = 1000;
@@ -249,15 +221,37 @@ function setupMeterActions(activity) {
             // Consider meter when calculating duration.
             duration = (duration * 4) / turOrg.singer.noteValuePerBeat;
 
-            // Clear any existing interval and set a new one
+            // Clear any existing interval and set a new one.
+            // Always null tur.interval after cancellation to prevent
+            // stale ID no-op on the next Play.
             if (tur.interval !== undefined) {
-                clearInterval(tur.interval);
+                if (
+                    activity.logo._timerManager !== undefined &&
+                    activity.logo._timerManager.clearInterval(tur.interval)
+                ) {
+                    // cleared by ManagedTimer
+                } else {
+                    clearInterval(tur.interval);
+                }
+
+                tur.interval = undefined;
             }
             activity.stage.dispatchEvent(eventName);
-            tur.interval = setInterval(
-                () => activity.stage.dispatchEvent(eventName),
-                duration * 1000
-            );
+            // Use ManagedTimer.setGuardedInterval instead of raw setInterval
+            // so doStopTurtles clearAll() cancels this interval in one sweep.
+            // The aborted() predicate auto-destructs the interval on Stop.
+            if (activity.logo._timerManager !== undefined) {
+                tur.interval = activity.logo._timerManager.setGuardedInterval(
+                    () => activity.stage.dispatchEvent(eventName),
+                    duration * 1000,
+                    () => activity.logo.stopTurtle
+                );
+            } else {
+                tur.interval = setInterval(
+                    () => activity.stage.dispatchEvent(eventName),
+                    duration * 1000
+                );
+            }
         }
 
         static onStrongBeatDo(beat, action, isflow, receivedArg, turtle, blk) {
@@ -309,7 +303,7 @@ function setupMeterActions(activity) {
             const listenerName = "_drift_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }

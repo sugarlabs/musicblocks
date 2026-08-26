@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global _, docById, ManagedTimer */
+/* global _, docById, ManagedTimer, makeKeyboardAccessible */
 
 /*
 Globals location
@@ -24,6 +24,80 @@ window.widgetWindows = {
     draggingWindow: null,
     _shortcutsInitialized: false,
     _globalListenersInitialized: false,
+
+    // NOTE: This mapping only works for widgets that never set their own
+    // `blockNo` property (e.g. ModeWidget). window.widgetWindows.windowFor()
+    // keys a widget's window by `widget.blockNo` if that property is set to
+    // anything other than undefined (including null) — otherwise it falls
+    // back to the `saveAs` or `title` argument. Widgets like PhraseMaker set
+    // `this.blockNo` in their constructor, so they are keyed by blockNo, not
+    // by name, and will NOT be found via this KEY_MAPPING lookup. Adding such
+    // widgets here would silently do nothing. Before adding a new entry,
+    // verify the target widget's windowFor() call and confirm it does not
+    // rely on blockNo for its window key.
+    KEY_MAPPING: {
+        "pitch-drum mapper": "pitch drum",
+        "custom mode": "custom mode",
+        "tempo": "tempo",
+        "arpeggio": "arpeggio",
+        "timbre": "timbre",
+        "sampler": "sampler",
+        "rhythm maker": "rhythm maker",
+        "oscilloscope": "oscilloscope",
+        "temperament": "temperament",
+        "meter": "meter",
+        "LEGO Bricks": "LEGO BRICKS"
+    },
+
+    /**
+     * Closes a specific widget by its name.
+     *
+     * @param {string} name - The name of the widget to be closed.
+     * @returns {void}
+     */
+    closeBlkWidgets(name) {
+        let searchKey = name;
+
+        for (const origKey in window.widgetWindows.KEY_MAPPING) {
+            const translated = typeof _ === "function" ? _(origKey) : origKey;
+            if (name === translated) {
+                searchKey = window.widgetWindows.KEY_MAPPING[origKey];
+                break;
+            }
+        }
+
+        if (
+            window.widgetWindows &&
+            window.widgetWindows.openWindows &&
+            window.widgetWindows.openWindows[searchKey]
+        ) {
+            window.widgetWindows.closeWindow(searchKey);
+            return;
+        }
+
+        const widgetTitle = document.getElementsByClassName("wftTitle");
+        for (let i = 0; i < widgetTitle.length; i++) {
+            const titleEl = widgetTitle[i];
+            if (
+                titleEl.innerHTML === name ||
+                titleEl.innerHTML === searchKey ||
+                titleEl.id === `${searchKey}WidgetID`
+            ) {
+                const winKey =
+                    titleEl.id && typeof titleEl.id === "string"
+                        ? titleEl.id.replace("WidgetID", "")
+                        : searchKey;
+                if (
+                    window.widgetWindows &&
+                    typeof window.widgetWindows.closeWindow === "function"
+                ) {
+                    window.widgetWindows.closeWindow(winKey);
+                }
+                break;
+            }
+        }
+    },
+
     _handleGlobalKeyDown(e) {
         const focused = window.widgetWindows.focused;
         if (!focused || e.repeat) return; // Guard against no focus or rapid-fire repeat
@@ -95,32 +169,33 @@ window.widgetWindows = {
                 e.target.closest(".dropdown-content") ||
                 e.target.closest(".dropdown-trigger"));
 
+        if (isToolbarInteraction) {
+            return;
+        }
+
         const windows = Object.values(this.openWindows).filter(win => win !== undefined);
-        let focusedAny = false;
+        let clickedWindow = null;
 
         for (let i = 0; i < windows.length; i++) {
             const win = windows[i];
-            if (
-                e.target === win._frame ||
-                win._frame.contains(e.target) ||
-                win._fullscreenEnabled ||
-                isToolbarInteraction
-            ) {
-                // Focus this window
+            if (win._frame && (e.target === win._frame || win._frame.contains(e.target))) {
+                clickedWindow = win;
+                break;
+            }
+        }
+
+        for (let i = 0; i < windows.length; i++) {
+            const win = windows[i];
+            if (win === clickedWindow) {
                 win._frame.style.opacity = "1";
                 win._frame.style.zIndex = "10000";
-                this.focused = win;
-                focusedAny = true;
             } else {
-                // Dim other windows
-                win._frame.style.opacity = ".7";
+                win._frame.style.opacity = "0.7";
                 win._frame.style.zIndex = "0";
             }
         }
 
-        if (!focusedAny) {
-            this.focused = null;
-        }
+        this.focused = clickedWindow;
     }
 };
 
@@ -201,6 +276,8 @@ class WidgetWindow {
     _createUIelements() {
         const windows = docById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
+        this._frame.setAttribute("role", "dialog");
+        this._frame.setAttribute("aria-label", _(this._title));
         this._overlayframe = this._create("div", "windowFrame", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._drag.style.display = "flex";
@@ -232,7 +309,7 @@ class WidgetWindow {
         this._nonclose.style.width = "100%";
 
         const titleEl = this._create("div", "wftTitle", this._nonclose);
-        titleEl.innerHTML = "";
+        titleEl.replaceChildren();
         titleEl.textContent = _(this._title);
         titleEl.id = `${this._key}WidgetID`;
 
@@ -285,6 +362,8 @@ class WidgetWindow {
 
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
+            this._maxminButton = maxminButton;
+            maxminButton.title = _("Maximize window");
             maxminButton.setAttribute("role", "button");
             maxminButton.setAttribute("aria-label", _("Maximize window"));
             maxminButton.setAttribute("tabindex", "0");
@@ -419,7 +498,7 @@ class WidgetWindow {
      */
     addInputButton(initial, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
-        el.innerHTML = "";
+        el.replaceChildren();
         const input = document.createElement("input");
         input.value = initial; // Safe - DOM API escapes automatically
         el.insertAdjacentElement("afterbegin", input);
@@ -490,6 +569,7 @@ class WidgetWindow {
         img.height = iconSize;
         img.width = iconSize;
         this._buttons[index].replaceChildren(img);
+        this._buttons[index].setAttribute("aria-label", label);
         return this._buttons[index];
     }
 
@@ -509,6 +589,7 @@ class WidgetWindow {
     updateTitle(title) {
         const wftTitle = docById(this._key + "WidgetID");
         wftTitle.textContent = title;
+        this._frame.setAttribute("aria-label", title);
     }
 
     /**
@@ -546,6 +627,7 @@ class WidgetWindow {
         img.height = iconSize;
         img.width = iconSize;
         el.replaceChildren(img);
+        makeKeyboardAccessible(el, label);
         this._buttons.push(el);
         return el;
     }
@@ -580,6 +662,9 @@ class WidgetWindow {
      */
     _restore() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+        if (this._maxminButton) {
+            this._maxminButton.title = _("Maximize window");
+        }
         this._maximized = false;
 
         if (this._savedPos) {
@@ -600,6 +685,9 @@ class WidgetWindow {
      */
     _maximize() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
+        if (this._maxminButton) {
+            this._maxminButton.title = _("Restore");
+        }
         this._maximized = true;
         this.unroll();
         this.takeFocus();
@@ -715,8 +803,13 @@ class WidgetWindow {
      * @return {WidgetWindow} this
      */
     clear() {
-        this._widget.innerHTML = "";
-        this._toolbar.innerHTML = "";
+        this._widget.replaceChildren();
+        this._toolbar.replaceChildren();
+        // The toolbar buttons have just been removed from the DOM, so drop the
+        // references too. Widgets re-add their buttons after clear(), and
+        // modifyButton() addresses them by index — leaving the old entries in
+        // place would push every index past the detached ones.
+        this._buttons = [];
         return this;
     }
 
@@ -727,7 +820,7 @@ class WidgetWindow {
      * Clears the widget window not the toolbar
      */
     clearScreen() {
-        this._widget.innerHTML = "";
+        this._widget.replaceChildren();
         return this;
     }
 
@@ -816,6 +909,18 @@ window.widgetWindows.hideWindow = name => {
     win._frame.style.display = "none";
     if (window.widgetWindows.focused === win) {
         window.widgetWindows.focused = null;
+    }
+};
+
+/**
+ * @public
+ * @param {string} name
+ */
+window.widgetWindows.closeWindow = name => {
+    const win = window.widgetWindows.openWindows[name];
+    if (!win) return;
+    if (typeof win.close === "function") {
+        win.close();
     }
 };
 

@@ -130,11 +130,11 @@ class MathUtility {
     static doMod(a, b) {
         if (typeof a === "number" && typeof b === "number") {
             if (Number(b) === 0) {
-                throw new Error("Division by zero");
+                throw new Error("DivByZeroError");
             }
             return Number(a) % Number(b);
         } else {
-            throw new Error("Invalid number input");
+            throw new Error("NanError");
         }
     }
 
@@ -254,7 +254,7 @@ class MathUtility {
                 return 0;
             }
 
-            return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+            return Math.hypot(x1 - x2, y1 - y2);
         } else {
             throw new Error("NanError");
         }
@@ -318,14 +318,10 @@ class MathUtility {
      * @static
      * @param {*} a
      * @returns {number} - Integer value of a.
-     * @throws {string} NAN error if the argument is not valid.
      */
     static doInt(a) {
-        try {
-            return Math.floor(Number(a) + 0.5);
-        } catch (e) {
-            throw new Error("NanError");
-        }
+        const n = Number(a);
+        return Number.isNaN(n) ? NaN : Math.floor(n + 0.5);
     }
 }
 // Ensure mathutils.js exports the MathUtility class

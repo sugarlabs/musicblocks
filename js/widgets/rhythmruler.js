@@ -20,7 +20,7 @@
    TONEBPM, Singer, _, delayExecution, deepClone, docById, ManagedTimer,
    calcNoteValueToDisplay, platformColor, beginnerMode, last,
    EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES,
-   VOICENAMES, EFFECTSNAMES
+   VOICENAMES, EFFECTSNAMES, clampNumber
 */
 /*
     Globals location
@@ -64,6 +64,9 @@
  * @requires EFFECTSNAMES
  */
 class RhythmRuler {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/rhythmruler"];
+
     /**
      * Height of the RhythmRuler widget.
      * @type {number}
@@ -458,17 +461,37 @@ class RhythmRuler {
     }
 
     /**
-     * Initializes the temperament widget.
-     * @param {Activity} activity The activity instance associated with the widget.
+     * Replaces a button/cell's contents with a single header-icon <img>.
+     * Centralizes the icon markup shared by the toolbar and per-ruler play buttons.
+     * @private
+     * @param {HTMLElement} container - Element whose children are replaced with the icon.
+     * @param {string} iconFile - Filename under header-icons/ (e.g. "play-button.svg").
+     * @param {string} title - Used for both the title attribute and alt text.
+     * @param {boolean} [verticalAlign=true] - Whether to set style.verticalAlign = "middle".
+     * @returns {HTMLImageElement} The created image element.
+     */
+    _setButtonIcon(container, iconFile, title, verticalAlign = true) {
+        container.replaceChildren();
+        const img = document.createElement("img");
+        img.src = "header-icons/" + iconFile;
+        img.title = title;
+        img.alt = title;
+        img.height = RhythmRuler.ICONSIZE;
+        img.width = RhythmRuler.ICONSIZE;
+        if (verticalAlign) {
+            img.style.verticalAlign = "middle";
+        }
+        container.appendChild(img);
+        return img;
+    }
+
+    /**
+     * Resets playback/sync state and ensures at least one (default) drum/ruler
+     * exists. Called at the start of init().
+     * @private
      * @returns {void}
      */
-    init(activity) {
-        /**
-         * The activity instance associated with the widget.
-         * @type {Activity}
-         */
-        this.activity = activity;
-
+    _resetPlaybackState() {
         /**
          * Factor used in BPM calculations.
          * @type {number}
@@ -547,7 +570,16 @@ class RhythmRuler {
          * @private
          */
         this._cellScale = 1.0;
+    }
 
+    /**
+     * Creates the widget window, wires its close/maximize handlers, and adds
+     * the toolbar buttons (play all, save rhythms, save drum machine, dissect
+     * number input, undo, tap, clear, circular view toggle).
+     * @private
+     * @returns {WidgetWindow} The created widget window.
+     */
+    _createWidgetWindow() {
         /**
          * Size of the icons.
          * @type {number}
@@ -580,41 +612,14 @@ class RhythmRuler {
                 this.__pause();
             }
             this._clearWidgetTimers();
-            // Save the new dissect history.
-            const dissectHistory = [];
-            const drums = [];
-            for (let i = 0; i < this.Rulers.length; i++) {
-                if (this.Drums[i] === null) {
-                    continue;
-                }
-
-                const history = [];
-                for (let j = 0; j < this.Rulers[i][1].length; j++) {
-                    history.push(this.Rulers[i][1][j]);
-                }
-
-                this._dissectNumber.classList.add("hasKeyboard");
-                dissectHistory.push([history, this.Drums[i]]);
-                drums.push(this.Drums[i]);
-            }
-
-            // Look for any old entries that we may have missed.
-            // Use Set for O(1) lookup instead of Array.includes() O(n)
-            const drumsSet = new Set(drums);
-            for (let i = 0; i < this._dissectHistory.length; i++) {
-                const drum = this._dissectHistory[i][1];
-                if (!drumsSet.has(drum)) {
-                    const history = deepClone(this._dissectHistory[i][0]);
-                    dissectHistory.push([history, drum]);
-                }
-            }
-
-            this._dissectHistory = deepClone(dissectHistory);
+            this.saveDissectHistory();
 
             this._playing = false;
             this._playingOne = false;
             this._playingAll = false;
             this.activity.hideMsgs();
+            this._circularCanvas = null;
+            this._circularView = false;
 
             this.widgetWindow.destroy();
         };
@@ -703,10 +708,10 @@ class RhythmRuler {
             if (event.keyCode === 13 || event.key === "Enter") {
                 event.preventDefault();
                 event.stopPropagation();
-                const inputValue = parseInt(this._dissectNumber.value);
+                const inputValue = parseInt(this._dissectNumber.value, 10);
                 if (!isNaN(inputValue) && inputValue > 0) {
                     // Validate the input value - allow any number from 2 to 128
-                    const validatedValue = Math.min(Math.max(inputValue, 2), 128);
+                    const validatedValue = clampNumber(inputValue, 2, 128);
                     this._dissectNumber.value = validatedValue;
                 }
                 this._dissectNumber.blur();
@@ -762,6 +767,18 @@ class RhythmRuler {
             this._toggleCircularView();
         };
 
+        return widgetWindow;
+    }
+
+    /**
+     * Builds the <table> of rhythm rulers: one row per drum, each with a
+     * play button in the first column and that drum's ruler cells (one per
+     * note-value division) in the second.
+     * @private
+     * @param {WidgetWindow} widgetWindow - The widget window created by _createWidgetWindow().
+     * @returns {void}
+     */
+    _buildRulerTable(widgetWindow) {
         /**
          * Represents the table containing the rhythm rulers.
          * The table has an outer div for vertical scrolling and an inner div for horizontal scrolling.
@@ -793,27 +810,14 @@ class RhythmRuler {
                 }
             } else {
                 const drumcell = rhythmRulerTableRow.insertCell();
-                drumcell.innerHTML = `<img 
-                        src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
-                        height="${iconSize}" 
-                        width="${iconSize}" 
-                    />`;
+                this._setButtonIcon(drumcell, "play-button.svg", _("Play"), false);
                 drumcell.className = "headcol"; // Position fixed when scrolling horizontally
                 drumcell.style.cursor = "pointer";
                 drumcell.onclick = (id => {
                     return () => {
                         if (this._playing) {
                             if (this._rulerPlaying === id) {
-                                drumcell.innerHTML = `<img 
-                                        src="header-icons/play-button.svg" 
-                                        title="${_("Play")}" 
-                                        alt="${_("Play")}" 
-                                        height="${iconSize}" 
-                                        width="${iconSize}" 
-                                        vertical-align="middle"
-                                    >`;
+                                this._setButtonIcon(drumcell, "play-button.svg", _("Play"));
                                 this._playing = false;
                                 this._playingOne = false;
                                 this._playingAll = false;
@@ -834,14 +838,7 @@ class RhythmRuler {
                             this._cellCounter = 0;
                             this._startingTime = null;
                             this._rulerPlaying = id;
-                            drumcell.innerHTML = `<img 
-                                    src="header-icons/pause-button.svg" 
-                                    title="${_("Pause")}" 
-                                    alt="${_("Pause")}" 
-                                    height="${iconSize}" 
-                                    width="${iconSize}" 
-                                    vertical-align="middle"
-                                >`;
+                            this._setButtonIcon(drumcell, "pause-button.svg", _("Pause"));
                             this._elapsedTimes[id] = 0;
                             this._offsets[id] = 0;
                             this._playOne();
@@ -852,9 +849,11 @@ class RhythmRuler {
 
             const rulerCell = rhythmRulerTableRow.insertCell();
             // Create individual rulers as tables.
-            rulerCell.innerHTML = `<table id="rulerCellTable${i}"></table>`;
+            rulerCell.replaceChildren();
+            const rulerCellTable = document.createElement("table");
+            rulerCellTable.id = "rulerCellTable" + i;
+            rulerCell.appendChild(rulerCellTable);
 
-            const rulerCellTable = docById("rulerCellTable" + i);
             rulerCellTable.style.textAlign = "center";
             rulerCellTable.style.border = "0px";
             rulerCellTable.style.borderCollapse = "collapse";
@@ -904,8 +903,16 @@ class RhythmRuler {
             rhythmRulerTableRow.cells[0].style.maxHeight = rulerRow.offsetHeight + "px";
             rhythmRulerTableRow.cells[0].style.verticalAlign = "middle";
         }
+    }
 
-        // Restore dissect history.
+    /**
+     * Replays the saved dissect history onto the freshly built ruler cells
+     * (rests, dissects, divisions and ties), so a widget rebuilt by init()
+     * restores the edits made in a previous session.
+     * @private
+     * @returns {void}
+     */
+    _restoreDissectHistory() {
         let cell;
         for (let drum = 0; drum < this.Drums.length; drum++) {
             if (drum === null) {
@@ -969,6 +976,25 @@ class RhythmRuler {
                 }
             }
         }
+    }
+
+    /**
+     * Initializes the rhythm ruler widget.
+     * @param {Activity} activity The activity instance associated with the widget.
+     * @returns {void}
+     */
+    init(activity) {
+        /**
+         * The activity instance associated with the widget.
+         * @type {Activity}
+         */
+        this.activity = activity;
+
+        this._resetPlaybackState();
+
+        const widgetWindow = this._createWidgetWindow();
+        this._buildRulerTable(widgetWindow);
+        this._restoreDissectHistory();
 
         activity.textMsg(_("Click on the ruler to divide it."), 3000);
     }
@@ -1138,14 +1164,7 @@ class RhythmRuler {
                     this._tapMode = false;
                     this._tapTimes = [];
                     this._tapEndTime = null;
-                    this._tapButton.innerHTML = `<img 
-                            src="header-icons/tap-button.svg" 
-                            title="${_("tap a rhythm")}" 
-                            alt="${_("tap a rhythm")}" 
-                            height="${RhythmRuler.ICONSIZE}" 
-                            width="${RhythmRuler.ICONSIZE}" 
-                            vertical-align="middle"
-                        >`;
+                    this._setButtonIcon(this._tapButton, "tap-button.svg", _("tap a rhythm"));
                     return;
                 }
 
@@ -1238,7 +1257,10 @@ class RhythmRuler {
             }, tick);
         };
 
-        this._tapCell.innerHTML = "<div class='progressBar'></div>";
+        this._tapCell.replaceChildren();
+        const progressDiv = document.createElement("div");
+        progressDiv.className = "progressBar";
+        this._tapCell.appendChild(progressDiv);
         this._progressBar = this._tapCell.querySelector(".progressBar");
         // Progress once per 8th note.
         __move(interval / 8, 100 / 8);
@@ -1259,7 +1281,7 @@ class RhythmRuler {
 
         this._rulerSelected = cell.parentNode.getAttribute("data-row");
         if (this._progressBar) this._progressBar.remove();
-        this._tapCell.innerHTML = "";
+        this._tapCell.textContent = "";
 
         const d = new Date();
         this._tapTimes.push(d.getTime());
@@ -1342,15 +1364,7 @@ class RhythmRuler {
         this._tapTimes = [];
         this._tapCell = null;
         this._tapEndTime = null;
-        // let iconSize = RhythmRuler.ICONSIZE;
-        this._tapButton.innerHTML = `<img 
-                src="header-icons/tap-button.svg" 
-                title="${_("tap a rhythm")}" 
-                alt="${_("tap a rhythm")}" 
-                height="${RhythmRuler.ICONSIZE}" 
-                width="${RhythmRuler.ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        this._setButtonIcon(this._tapButton, "tap-button.svg", _("tap a rhythm"));
     }
 
     /**
@@ -1962,15 +1976,7 @@ class RhythmRuler {
      */
     _tap() {
         this._tapMode = true;
-        const iconSize = RhythmRuler.ICONSIZE;
-        this._tapButton.innerHTML = `<img 
-                src="header-icons/tap-active-button.svg" 
-                title="${_("tap a rhythm")}" 
-                alt="${_("tap a rhythm")}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle"
-            >`;
+        this._setButtonIcon(this._tapButton, "tap-active-button.svg", _("tap a rhythm"));
     }
 
     /**
@@ -1986,14 +1992,7 @@ class RhythmRuler {
         this._playingOne = false;
         this._rulerPlaying = -1;
         this._startingTime = null;
-        this._playAllCell.innerHTML = `<img 
-                src="header-icons/play-button.svg" 
-                title="${_("Play all")}" 
-                alt="${_("Play all")}" 
-                height="${RhythmRuler.ICONSIZE}" 
-                width="${RhythmRuler.ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        this._setButtonIcon(this._playAllCell, "play-button.svg", _("Play all"));
         for (let r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
             while (this.Rulers[r][1].length > 0) {
@@ -2010,14 +2009,7 @@ class RhythmRuler {
      * @returns {void}
      */
     __pause() {
-        this._playAllCell.innerHTML = `<img 
-                src="header-icons/play-button.svg" 
-                title="${_("Play all")}" 
-                alt="${_("Play all")}" 
-                height="${RhythmRuler.ICONSIZE}" 
-                width="${RhythmRuler.ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        this._setButtonIcon(this._playAllCell, "play-button.svg", _("Play all"));
         this._playing = false;
         this._playingAll = false;
         this._playingOne = false;
@@ -2062,14 +2054,7 @@ class RhythmRuler {
      */
     __resume() {
         this._clearWidgetTimers();
-        this._playAllCell.innerHTML = `<img 
-                src="header-icons/pause-button.svg" 
-                title="${_("Pause")}" 
-                alt="${_("Pause")}" 
-                height="${RhythmRuler.ICONSIZE}" 
-                width="${RhythmRuler.ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        this._setButtonIcon(this._playAllCell, "pause-button.svg", _("Pause"));
         this.activity.logo.turtleDelay = 0;
         this._playingAll = true;
         this._playing = true;
@@ -2126,6 +2111,36 @@ class RhythmRuler {
     }
 
     /**
+     * Safely retrieves the drum/voice name for a given ruler index.
+     * @private
+     * @param {number} selectedRuler
+     * @returns {string}
+     */
+    _getDrumName(selectedRuler) {
+        if (
+            this.Drums === undefined ||
+            this.Drums === null ||
+            this.Drums[selectedRuler] === null ||
+            this.Drums[selectedRuler] === undefined
+        ) {
+            return "snare drum";
+        }
+        const drumBlock = this.activity?.blocks?.blockList?.[this.Drums[selectedRuler]];
+        if (!drumBlock || !drumBlock.connections) {
+            return "snare drum";
+        }
+        const connectedId = drumBlock.connections[1];
+        if (connectedId === null || connectedId === undefined) {
+            return "snare drum";
+        }
+        const connectedBlock = this.activity?.blocks?.blockList?.[connectedId];
+        if (!connectedBlock || typeof connectedBlock.value !== "string") {
+            return "snare drum";
+        }
+        return connectedBlock.value;
+    }
+
+    /**
      * Executes a loop iteration for playback.
      * @private
      * @param {number} noteTime - The duration of the note in milliseconds.
@@ -2150,13 +2165,7 @@ class RhythmRuler {
         const noteValue = noteValues[colIndex];
 
         noteTime = Math.abs(1 / noteValue);
-        let drum;
-        if (this.Drums[rulerNo] === null) {
-            drum = "snare drum";
-        } else {
-            const drumblockno = this.activity.blocks.blockList[this.Drums[rulerNo]].connections[1];
-            drum = this.activity.blocks.blockList[drumblockno].value;
-        }
+        let drum = this._getDrumName(rulerNo);
 
         let foundDrum = false;
         // Convert i18n drum name to English.
@@ -2266,12 +2275,7 @@ class RhythmRuler {
             if (this.Drums[selectedRuler] === null) {
                 stack_value = _("snare drum") + " " + _("rhythm");
             } else {
-                stack_value =
-                    this.activity.blocks.blockList[
-                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
-                    ].value.split(" ")[0] +
-                    " " +
-                    _("rhythm");
+                stack_value = this._getDrumName(selectedRuler).split(" ")[0] + " " + _("rhythm");
             }
             const delta = selectedRuler * 42;
             const newStack = [
@@ -2342,12 +2346,7 @@ class RhythmRuler {
             if (this.Drums[selectedRuler] === null) {
                 stack_value = _("rhythm");
             } else {
-                stack_value =
-                    this.activity.blocks.blockList[
-                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
-                    ].value.split(" ")[0] +
-                    " " +
-                    _("rhythm");
+                stack_value = this._getDrumName(selectedRuler).split(" ")[0] + " " + _("rhythm");
             }
             const delta = selectedRuler * 42;
             const newStack = [
@@ -2472,14 +2471,7 @@ class RhythmRuler {
      */
     _saveMachine(selectedRuler) {
         // We are either saving a drum machine or a voice machine.
-        let drum;
-        if (this.Drums[selectedRuler] === null) {
-            drum = "snare drum";
-        } else {
-            const drumBlockNo =
-                this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1];
-            drum = this.activity.blocks.blockList[drumBlockNo].value;
-        }
+        const drum = this._getDrumName(selectedRuler);
 
         for (let d = 0; d < DRUMNAMES.length; d++) {
             if (DRUMNAMES[d][1] === drum) {
@@ -2528,12 +2520,7 @@ class RhythmRuler {
             if (this.Drums[selectedRuler] === null) {
                 action_name = _("snare drum") + " " + _("action");
             } else {
-                action_name =
-                    this.activity.blocks.blockList[
-                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
-                    ].value.split(" ")[0] +
-                    " " +
-                    _("action");
+                action_name = this._getDrumName(selectedRuler).split(" ")[0] + " " + _("action");
             }
 
             const newStack = [
@@ -2720,12 +2707,7 @@ class RhythmRuler {
             if (this.Drums[selectedRuler] === null) {
                 action_name = _("guitar") + " " + _("action");
             } else {
-                action_name =
-                    this.activity.blocks.blockList[
-                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
-                    ].value.split(" ")[0] +
-                    "_" +
-                    _("action");
+                action_name = this._getDrumName(selectedRuler).split(" ")[0] + "_" + _("action");
             }
 
             const newStack = [
@@ -3086,6 +3068,28 @@ class RhythmRuler {
     }
 
     /**
+     * Computes the concentric-ring layout shared by _drawCircularView() and
+     * _hitTestCircular(), so the two stay in sync by construction.
+     * @private
+     * @param {number} size - The (square) canvas size in pixels.
+     * @param {number} rulerCount - Number of rulers (rings) to lay out.
+     * @returns {{innerHoleRadius: number, outerLimit: number, ringGap: number, ringThickness: number}}
+     */
+    _getRingGeometry(size, rulerCount) {
+        // Leave a hole in the center and space for labels.
+        const innerHoleRadius = size * 0.1;
+        const outerLimit = size * 0.47;
+        const ringGap = 2;
+        const totalRingSpace = outerLimit - innerHoleRadius;
+        const ringThickness =
+            rulerCount > 0
+                ? (totalRingSpace - ringGap * (rulerCount - 1)) / rulerCount
+                : totalRingSpace;
+
+        return { innerHoleRadius, outerLimit, ringGap, ringThickness };
+    }
+
+    /**
      * Draws the circular (donut/pie) view on the canvas.
      * Each ruler is a concentric ring. Each note value is an arc slice
      * whose angle is proportional to its duration.
@@ -3115,15 +3119,10 @@ class RhythmRuler {
         const centerY = size / 2;
         const rulerCount = this.Rulers.length;
 
-        // Ring geometry: leave a hole in the center and space for labels.
-        const innerHoleRadius = size * 0.1;
-        const outerLimit = size * 0.47;
-        const ringGap = 2;
-        const totalRingSpace = outerLimit - innerHoleRadius;
-        const ringThickness =
-            rulerCount > 0
-                ? (totalRingSpace - ringGap * (rulerCount - 1)) / rulerCount
-                : totalRingSpace;
+        const { innerHoleRadius, outerLimit, ringGap, ringThickness } = this._getRingGeometry(
+            size,
+            rulerCount
+        );
 
         const colors = [platformColor.selectorBackground, platformColor.selectorSelected];
 
@@ -3257,15 +3256,8 @@ class RhythmRuler {
         if (angle < 0) angle += 2 * Math.PI;
 
         const size = canvas.width;
-        const innerHoleRadius = size * 0.1;
-        const outerLimit = size * 0.47;
         const rulerCount = this.Rulers.length;
-        const ringGap = 2;
-        const totalRingSpace = outerLimit - innerHoleRadius;
-        const ringThickness =
-            rulerCount > 0
-                ? (totalRingSpace - ringGap * (rulerCount - 1)) / rulerCount
-                : totalRingSpace;
+        const { innerHoleRadius, ringGap, ringThickness } = this._getRingGeometry(size, rulerCount);
 
         // Find which ring (ruler) the pointer is in.
         let hitRuler = -1;

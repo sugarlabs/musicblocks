@@ -59,6 +59,7 @@ class DummyValueBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
         this.extraWidth = 0;
+        this.capabilities = Object.create(null);
     }
     setPalette(palette, activity) {
         return this;
@@ -79,6 +80,15 @@ class DummyValueBlock {
     }
     setup(activity) {
         return this;
+    }
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    }
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
     arg(logo, turtle, blk) {
         return global.activity.blocks.blockList[blk].value;
@@ -126,7 +136,7 @@ global.NANERRORMSG = "Not a number";
 
 global.toFixed2 = val => Number(val).toFixed(2);
 
-global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val);
+global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val, 10);
 global.pitchToFrequency = (note, octave, cents, keySig) => 440;
 global.doStopVideoCam = jest.fn();
 
@@ -480,6 +490,10 @@ describe("setupMediaBlocks", () => {
     });
 
     describe("TextBlock", () => {
+        it("declares the valueDrivenLabel capability", () => {
+            expect(createdBlocks["text"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
         it("should return its value from blockList", () => {
             activity.blocks.blockList[620] = { value: "hello world" };
             const textBlock = createdBlocks["text"];

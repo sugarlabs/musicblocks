@@ -103,6 +103,8 @@ function setupToneBlocks(activity) {
          */
         constructor() {
             super("filtertype");
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({ outType: "textout" });
@@ -122,6 +124,8 @@ function setupToneBlocks(activity) {
          */
         constructor() {
             super("oscillatortype");
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({ outType: "textout" });
@@ -919,11 +923,14 @@ function setupToneBlocks(activity) {
          */
         constructor() {
             super("voicename", _("set instrument"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Set instrument block selects a voice for the synthesizer,") +
-                    " " +
-                    _("eg guitar piano violin or cello."),
+                _(
+                    "The Set instrument block selects a voice for the synthesizer, eg guitar piano violin or cello."
+                ),
                 "documentation",
                 ""
             ]);
@@ -955,9 +962,9 @@ function setupToneBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Set instrument block selects a voice for the synthesizer,") +
-                        " " +
-                        _("eg guitar piano violin or cello."),
+                    _(
+                        "The Set instrument block selects a voice for the synthesizer, eg guitar piano violin or cello."
+                    ),
                     "documentation",
                     null,
                     "settimbrehelp"

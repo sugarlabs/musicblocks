@@ -96,13 +96,11 @@ describe("loader.js coverage", () => {
         expect(mockRequireJSConfig).toHaveBeenCalledWith(
             expect.objectContaining({
                 baseUrl: "./",
+                waitSeconds: 0,
                 paths: expect.any(Object),
                 shim: expect.objectContaining({
                     "tweenjs.min": expect.objectContaining({
                         deps: ["easeljs.min"]
-                    }),
-                    "preloadjs.min": expect.objectContaining({
-                        deps: ["easeljs.min", "tweenjs.min"]
                     })
                 })
             })
@@ -141,6 +139,28 @@ describe("loader.js coverage", () => {
         expect(mockRequireJS).toHaveBeenCalledWith(
             ["activity/activity"],
             expect.any(Function),
+            expect.any(Function)
+        );
+    });
+
+    test("Maps enUS to the en locale file", async () => {
+        global.window.localStorage.languagePreference = "enUS";
+
+        await loadScript();
+
+        expect(mockI18next.init).toHaveBeenCalledWith(
+            expect.objectContaining({ lng: "en" }),
+            expect.any(Function)
+        );
+    });
+
+    test("Maps enUK to the en_GB locale file", async () => {
+        global.window.localStorage.languagePreference = "enUK";
+
+        await loadScript();
+
+        expect(mockI18next.init).toHaveBeenCalledWith(
+            expect.objectContaining({ lng: "en_GB" }),
             expect.any(Function)
         );
     });

@@ -39,6 +39,8 @@ class Sampler {
         this.triggerRelease = jest.fn().mockReturnThis();
         this.triggerAttackRelease = jest.fn().mockReturnThis();
         this.chain = jest.fn().mockReturnThis();
+        this.playbackRate = { value: 1 };
+        this.loaded = true;
     }
 }
 
@@ -52,6 +54,17 @@ class Player {
         this.stop = jest.fn().mockReturnThis();
         this.dispose = jest.fn().mockReturnThis();
         this.triggerAttackRelease = jest.fn().mockReturnThis();
+        this.volume = {
+            value: 0,
+            cancelScheduledValues: jest.fn().mockReturnThis(),
+            setValueAtTime: jest.fn().mockReturnThis(),
+            linearRampToValueAtTime: jest.fn().mockReturnThis(),
+            rampTo: jest.fn().mockImplementation(val => {
+                this.volume.value = val;
+            })
+        };
+        this.playbackRate = { value: 1 };
+        this.loaded = true;
     }
 }
 
@@ -119,9 +132,23 @@ class PolySynth {
     constructor(synth, count) {
         this.synth = synth;
         this.count = count;
-        this.triggerAttack = jest.fn().mockReturnThis();
-        this.start = jest.fn().mockReturnThis();
-        this.triggerAttackRelease = jest.fn().mockReturnThis();
+        // Mirrors Tone.js: dispose() flips `disposed`, and triggering a disposed
+        // node throws "Synth was already disposed". Without this the mock silently
+        // tolerates use-after-dispose and such bugs pass unnoticed.
+        this.disposed = false;
+        this.dispose = jest.fn().mockImplementation(() => {
+            this.disposed = true;
+            return this;
+        });
+        const assertLive = () => {
+            if (this.disposed) {
+                throw new Error("Synth was already disposed");
+            }
+        };
+        this.triggerAttack = jest.fn().mockImplementation(assertLive);
+        this.start = jest.fn().mockImplementation(assertLive);
+        this.triggerRelease = jest.fn().mockImplementation(assertLive);
+        this.triggerAttackRelease = jest.fn().mockImplementation(assertLive);
         this.volume = {
             value: 0,
             cancelScheduledValues: jest.fn().mockReturnThis(),
@@ -144,17 +171,68 @@ class PolySynth {
 }
 
 class context {
+    static state = "running";
     static resume() {}
 }
 
 class Transport {
+    static _state = "started";
     static start() {}
     static stop() {}
+    static schedule() {}
+    static cancel() {}
+    static clear() {}
+    static getSecondsAtTime() {
+        return 0;
+    }
+    static _seconds = 0;
+    static get seconds() {
+        return Transport._seconds;
+    }
+    static set seconds(value) {
+        Transport._seconds = value;
+    }
+    static get state() {
+        return Transport._state;
+    }
+    static set state(v) {
+        Transport._state = v;
+    }
 }
 
 class ToneAudioBuffer {
     static async loaded() {
         return this;
+    }
+}
+
+class UserMedia {
+    constructor() {
+        this.connect = jest.fn().mockReturnThis();
+        this.disconnect = jest.fn().mockReturnThis();
+        this.open = jest.fn().mockResolvedValue();
+        this.close = jest.fn();
+        this.dispose = jest.fn();
+    }
+}
+
+class Recorder {
+    constructor() {
+        this.start = jest.fn().mockResolvedValue();
+        this.stop = jest.fn().mockResolvedValue(new Blob());
+        this.connect = jest.fn().mockReturnThis();
+        this.dispose = jest.fn();
+    }
+}
+
+class Analyser {
+    constructor(type, size) {
+        this.type = type;
+        this.size = size;
+        this.getValue = jest.fn().mockReturnValue(new Float32Array(128));
+        this.connect = jest.fn().mockReturnThis();
+        this.disconnect = jest.fn();
+        this.dispose = jest.fn();
     }
 }
 
@@ -171,6 +249,9 @@ const Tone = {
     FMSynth,
     Transport,
     ToneAudioBuffer,
+    UserMedia,
+    Recorder,
+    Analyser,
     Frequency: jest.fn(() => {
         return {
             toFrequency: jest.fn().mockReturnThis()
