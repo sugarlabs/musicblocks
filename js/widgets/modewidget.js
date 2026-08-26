@@ -16,11 +16,10 @@
    getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
    normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
    numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
-   getSavedCustomModes, getModeNamesForGroup, getModeLabel, getModeNameFromLabel,
+   getSavedCustomModes, getModeNamesForGroup, getModeLabel,
    getModeSliceColors, updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
    configureWheel, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
-   scalePatternToEDO, isNonEDO, getNonEDOModeSteps, isEquallyTempered,
-   configureExitWheel, piemenuModes
+    scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes
  */
 
 /*
@@ -1056,21 +1055,10 @@ class ModeWidget {
 
     _triggerNote(note, edo) {
         const ks = this.turtles.ithTurtle(0).singer.keySignature;
-        const t = TEMPERAMENT[this._activeTemperamentKey];
-        const labels =
-            t && Array.isArray(t.noteLabels) && !isEquallyTempered(this._activeTemperamentKey)
-                ? t.noteLabels
-                : null;
 
-        if (labels && labels[note % labels.length]) {
-            // Non-EDO temperament: resolve the exact ratio by asking for the
-            // labeled pitch. The octave note wraps to the root label, so bump
-            // the octave by how many times we've crossed the label count.
-            // ponytail: assumes labels.length === _activeEDO (pitch count).
-            const idx = note % labels.length;
-            const octave = 4 + Math.floor(note / labels.length);
-            const freq = pitchToFrequency(labels[idx], octave, 0, ks, this._activeTemperamentKey);
-            this.logo.synth.trigger(0, freq, this._noteValue, DEFAULTVOICE, null, null);
+        const result = getNonEDOFrequency(note, 4, this._activeTemperamentKey, ks);
+        if (result) {
+            this.logo.synth.trigger(0, result.freq, this._noteValue, DEFAULTVOICE, null, null);
             return;
         }
 

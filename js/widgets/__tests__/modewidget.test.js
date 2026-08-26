@@ -99,6 +99,7 @@ const {
     scalePatternToEDO,
     isNonEDO,
     getNonEDOModeSteps,
+    getNonEDOFrequency,
     isEquallyTempered,
     pitchToFrequency
 } = require("../../utils/musicutils.js");
@@ -117,6 +118,7 @@ global.configureExitWheel = jest.fn();
 global.scalePatternToEDO = scalePatternToEDO;
 global.isNonEDO = isNonEDO;
 global.getNonEDOModeSteps = getNonEDOModeSteps;
+global.getNonEDOFrequency = getNonEDOFrequency;
 global.isEquallyTempered = isEquallyTempered;
 global.pitchToFrequency = pitchToFrequency || jest.fn().mockReturnValue(440);
 global.generateNoteNames =

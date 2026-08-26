@@ -69,7 +69,7 @@ const _b64Cache = new Map();
     MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
     getModeLabel, getModeNameFromLabel, getModeSliceColors,
     updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
-    isNonEDO, getNonEDOModeSteps,
+    isNonEDO, getNonEDOModeSteps, getNonEDOFrequency,
     configureWheel
 */
 
@@ -3950,6 +3950,32 @@ const getNonEDOModeSteps = (mode, temperament) => {
     }
     steps.push(n - last);
     return steps;
+};
+
+/**
+ * Compute the frequency and pitch info for a note degree under a non-EDO
+ * temperament (ratio-based: just intonation, meantone, etc.). Returns null
+ * when the temperament is equally tempered or has no note labels.
+ * @function
+ * @param {number} note - degree index (0 = root, n = octave)
+ * @param {number} baseOctave - starting octave
+ * @param {string} temperamentKey - key in TEMPERAMENT
+ * @param {string} keySignature - key signature for pitch spelling
+ * @returns {{ freq: number, noteName: string, octave: number } | null}
+ */
+const getNonEDOFrequency = (note, baseOctave, temperamentKey, keySignature) => {
+    const t = global.TEMPERAMENT && global.TEMPERAMENT[temperamentKey];
+    const labels =
+        t && Array.isArray(t.noteLabels) && !global.isEquallyTempered(temperamentKey)
+            ? t.noteLabels
+            : null;
+    if (!labels || !labels[note % labels.length]) {
+        return null;
+    }
+    const idx = note % labels.length;
+    const octave = baseOctave + Math.floor(note / labels.length);
+    const freq = global.pitchToFrequency(labels[idx], octave, 0, keySignature, temperamentKey);
+    return { freq, noteName: labels[idx], octave };
 };
 
 /**
@@ -8364,6 +8390,7 @@ if (typeof module !== "undefined" && module.exports) {
         getModeSliceFont,
         isNonEDO,
         getNonEDOModeSteps,
+        getNonEDOFrequency,
         configureWheel
     };
 }

@@ -28,7 +28,6 @@ const Singer = require("../turtle-singer");
 const mockGlobals = {
     getNote: jest.fn().mockReturnValue(["C", 4]),
     isCustomTemperament: jest.fn(),
-    isTrueEDO: jest.fn().mockReturnValue(true),
     isEquallyTempered: jest.fn().mockReturnValue(true),
     temperamentHasRatios: jest.fn().mockReturnValue(false),
     getStepSizeUp: jest.fn().mockReturnValue(1),
@@ -47,7 +46,6 @@ const mockGlobals = {
 
 global.getNote = mockGlobals.getNote;
 global.isCustomTemperament = mockGlobals.isCustomTemperament;
-global.isTrueEDO = mockGlobals.isTrueEDO;
 global.isEquallyTempered = mockGlobals.isEquallyTempered;
 global.temperamentHasRatios = mockGlobals.temperamentHasRatios;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;

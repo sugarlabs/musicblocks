@@ -22,7 +22,7 @@
    MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
    getMunsellColor, COLORS40, frequencyToPitch, pitchToFrequency,
-   TEMPERAMENT, isNonEDO, getNonEDOModeSteps, instruments,
+   TEMPERAMENT, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, numberToPitch,
     nthDegreeToPitch, SOLFEGENAMES, buildScale, getCurrentEDO, generateNoteNames,
@@ -3718,17 +3718,16 @@ const piemenuModes = (block, selectedMode) => {
         that.activity.logo.synth.setVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
 
         if (nonEDO) {
-            const t = TEMPERAMENT[inTemperament];
-            const labels = t && Array.isArray(t.noteLabels) ? t.noteLabels : null;
-            if (labels && labels[(i + o) % labels.length]) {
-                const freq = pitchToFrequency(
-                    labels[(i + o) % labels.length],
-                    4 + Math.floor((i + o) / labels.length),
+            const result = getNonEDOFrequency(i + o, 4, inTemperament, key + " chromatic");
+            if (result) {
+                that.activity.logo.synth.trigger(
                     0,
-                    key + " chromatic",
-                    inTemperament
+                    [result.freq],
+                    1 / 12,
+                    DEFAULTVOICE,
+                    null,
+                    null
                 );
-                that.activity.logo.synth.trigger(0, [freq], 1 / 12, DEFAULTVOICE, null, null);
                 return;
             }
         }
