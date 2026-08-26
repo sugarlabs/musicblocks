@@ -652,6 +652,39 @@ describe("setupIntervalsActions", () => {
         expect(turtle.singer.intervals).toEqual([-2]);
     });
 
+    test("setScalarInterval rejects a value far past the bound instead of pushing it unbounded", () => {
+        Singer.IntervalsActions.setScalarInterval(999999999, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -1000 to 1000.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval rejects a large negative value past the bound", () => {
+        Singer.IntervalsActions.setScalarInterval(-999999999, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -1000 to 1000.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval rejects a value just past the bound", () => {
+        Singer.IntervalsActions.setScalarInterval(1001, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -1000 to 1000.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval accepts a value exactly at the bound", () => {
+        Singer.IntervalsActions.setScalarInterval(1000, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.intervals).toEqual([1000]);
+    });
+
     test("setScalarInterval dispatches to setDispatchBlock when blk is registered", () => {
         activity.blocks.blockList.blk = {};
         Singer.IntervalsActions.setScalarInterval(2, 0, "blk");

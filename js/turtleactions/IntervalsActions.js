@@ -44,6 +44,16 @@
 /* exported setupIntervalsActions*/
 
 /**
+ * Upper bound (in scalar steps) on the value accepted by setScalarInterval().
+ * GetNotesForInterval() derives an octave count as `Math.floor(intervals[0] / 7)`,
+ * which GetIntervalNumber() then walks with a `while (octave > 0)` loop that runs
+ * once per octave; this cap keeps that loop to a few hundred iterations (over 140
+ * octaves - generous for any legitimate use) regardless of how large a value the
+ * block argument supplies.
+ */
+const MAX_SCALAR_INTERVAL = 1000;
+
+/**
  * Sets up all the methods related to different actions for each block in Intervals palette.
  * @returns {void}
  */
@@ -384,6 +394,9 @@ function setupIntervalsActions(activity) {
             let arg = value;
             if (arg === null || typeof arg !== "number") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
+                arg = 1;
+            } else if (Math.abs(arg) > MAX_SCALAR_INTERVAL) {
+                activity.errorMsg(_("Scalar interval must be within -1000 to 1000."), blk);
                 arg = 1;
             }
 
