@@ -22,7 +22,18 @@
 
 const { setupRhythmBlocks } = jest.requireActual("../RhythmBlocks");
 
+// Use the real BlockDragController so the Blocks constructor can attach
+// drag delegation methods (blocks.js calls setupBlockDragController(this)).
+global.setupBlockDragController =
+    require("../../activity/block-drag-controller").setupBlockDragController;
+
+const Blocks = jest.requireActual("../../blocks");
+
 global._ = s => s;
+global.NOINPUTERRORMSG = "NO_INPUT";
+global.DEFAULTDRUM = "kick";
+global.DEFAULTBLOCKSCALE = 1.0;
+global.last = arr => (arr && arr.length > 0 ? arr[arr.length - 1] : null);
 global.NOINPUTERRORMSG = "NO_INPUT";
 global.DEFAULTDRUM = "kick";
 global.mixedNumber = jest.fn(val => val);
@@ -50,10 +61,21 @@ global.Queue = class Queue {
 class BaseBlock {
     constructor(name) {
         this.name = name;
+        this.capabilities = Object.create(null);
         this.dockTypes = [null];
         this.size = 1;
         this.lang = "en";
         this.hidden = false;
+    }
+
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+    }
+
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
 
     setPalette(palette) {
@@ -113,6 +135,57 @@ global.BaseBlock = BaseBlock;
 global.FlowBlock = FlowBlock;
 global.FlowClampBlock = FlowClampBlock;
 global.ValueBlock = ValueBlock;
+
+const createBlocksHarness = () => {
+    const blocks = new Blocks({
+        storage: {},
+        trashcan: {},
+        turtles: {},
+        boundary: {},
+        macroDict: {},
+        palettes: {
+            dict: {}
+        },
+        logo: {
+            synth: {
+                loadSynth: jest.fn()
+            }
+        },
+        blocksContainer: { x: 0, y: 0 },
+        canvas: { width: 800, height: 600 },
+        refreshCanvas: jest.fn(),
+        errorMsg: jest.fn(),
+        setSelectionMode: jest.fn(),
+        stopLoadAnimation: jest.fn(),
+        setHomeContainers: jest.fn(),
+        __tick: jest.fn()
+    });
+    blocks.activity = {
+        errorMsg: jest.fn(),
+        palettes: {
+            dict: {}
+        }
+    };
+    blocks.blockList = [];
+    blocks._blockInStack = jest.fn().mockReturnValue(false);
+    blocks.makeBlock = jest.fn((name, value) => {
+        const index = blocks.blockList.length;
+        blocks.blockList.push({
+            name,
+            value,
+            connections: [null, null, null],
+            hide: jest.fn(),
+            trash: false,
+            isNoteContainer: jest.fn().mockReturnValue(false),
+            isExpandableBlock: jest.fn().mockReturnValue(false),
+            isArgFlowClampBlock: jest.fn().mockReturnValue(false),
+            isLeftClampBlock: jest.fn().mockReturnValue(false)
+        });
+        return index;
+    });
+
+    return blocks;
+};
 
 describe("RhythmBlocks", () => {
     let activity;
@@ -251,8 +324,7 @@ describe("RhythmBlocks", () => {
                 200,
                 "osctime",
                 0,
-                5,
-                expect.any(Function)
+                5
             );
         });
 
@@ -525,15 +597,14 @@ describe("RhythmBlocks", () => {
     });
 
     describe("OscTimeBlock", () => {
-        test("flow calls playNote with callback that queues block", () => {
+        test("flow calls playNote", () => {
             const block = getBlock("osctime");
             block.flow([0.25, 1], logo, 0, 5, null);
             expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
                 0.25,
                 "osctime",
                 0,
-                5,
-                expect.any(Function)
+                5
             );
         });
 
@@ -544,8 +615,7 @@ describe("RhythmBlocks", () => {
                 0.25,
                 "osctime",
                 0,
-                5,
-                expect.any(Function)
+                5
             );
         });
     });
@@ -621,13 +691,7 @@ describe("RhythmBlocks", () => {
         test("flow calls playNote with correct value", () => {
             const block = getBlock("note");
             block.flow([0.5, 1], logo, 0, 5, null);
-            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
-                0.5,
-                "note",
-                0,
-                5,
-                expect.any(Function)
-            );
+            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(0.5, "note", 0, 5);
         });
     });
 
@@ -663,29 +727,11 @@ describe("RhythmBlocks", () => {
             turtle.singer.inNoteBlock = [];
             const block = getBlock("newnote");
             block.flow([0.5, 1], logo, 0, 5, null);
-            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
-                0.5,
-                "newnote",
-                0,
-                5,
-                expect.any(Function)
-            );
+            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(0.5, "newnote", 0, 5);
         });
     });
 
     describe("Callback and listener body coverage", () => {
-        test("OscTimeBlock callback pushes to queue", () => {
-            let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation((v, t, turtle, blk, cb) => {
-                capturedCallback = cb;
-            });
-            const block = getBlock("osctime");
-            block.flow([0.25, 1], logo, 0, 5, null);
-            capturedCallback();
-            expect(turtle.parentFlowQueue).toContain(5);
-            expect(turtle.queue.length).toBe(1);
-        });
-
         test("NewSwingBlock listener fires and pops swing when not suppressed", () => {
             let capturedListener;
             logo.setTurtleListener.mockImplementation((t, name, fn) => {
@@ -724,31 +770,6 @@ describe("RhythmBlocks", () => {
             expect(turtle.singer.skipFactor).toBe(0);
         });
 
-        test("NoteBlock callback pushes to queue", () => {
-            let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation((v, t, turtle, blk, cb) => {
-                capturedCallback = cb;
-            });
-            const block = getBlock("note");
-            block.flow([0.5, 1], logo, 0, 5, null);
-            capturedCallback();
-            expect(turtle.parentFlowQueue).toContain(5);
-            expect(turtle.queue.length).toBe(1);
-        });
-
-        test("NewNoteBlock callback pushes to queue", () => {
-            let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation((v, t, turtle, blk, cb) => {
-                capturedCallback = cb;
-            });
-            turtle.singer.inNoteBlock = [];
-            const block = getBlock("newnote");
-            block.flow([0.5, 1], logo, 0, 5, null);
-            capturedCallback();
-            expect(turtle.parentFlowQueue).toContain(5);
-            expect(turtle.queue.length).toBe(1);
-        });
-
         test("RhythmicDotBlock flow and listener update beatFactor", () => {
             let capturedListener;
             logo.setTurtleListener.mockImplementation((t, name, fn) => {
@@ -763,30 +784,10 @@ describe("RhythmBlocks", () => {
             capturedListener({});
             expect(turtle.singer.dotCount).toBeDefined();
         });
-
         test("RhythmicDotBlock calls errorMsg when arg is null", () => {
             const block = getBlock("rhythmicdot");
             block.flow([null, 1], logo, 0, 5);
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
-        });
-    });
-
-    // ── NoteBlock callback (lines 193-197) ──────────────────────────────
-    describe("NoteBlock callback queue path", () => {
-        test("callback pushes queue block to turtle", () => {
-            const block = getBlock("osctime");
-            let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation(
-                (val, type, turtle, blk, cb) => {
-                    capturedCallback = cb;
-                }
-            );
-            block.flow([200, true], logo, 0, 5, "receivedArg");
-            expect(capturedCallback).toBeDefined();
-            capturedCallback();
-            expect(turtle.parentFlowQueue).toContain(5);
-            expect(turtle.queue.length).toBe(1);
-            expect(turtle.queue[0].child).toBe(true);
         });
     });
 
@@ -852,6 +853,149 @@ describe("RhythmBlocks", () => {
             listener({});
             expect(turtle.singer.swing.length).toBe(1);
             expect(turtle.singer.swingTarget.length).toBe(1);
+        });
+    });
+
+    describe("noteContainer capability", () => {
+        test("newnote declares noteContainer capability", () => {
+            expect(getBlock("newnote").getCapability("noteContainer")).toBe(true);
+        });
+
+        test("osctime declares noteContainer capability", () => {
+            expect(getBlock("osctime").getCapability("noteContainer")).toBe(true);
+        });
+    });
+
+    describe("inlineCollapsible capability", () => {
+        test("newnote declares collapsible and inlineCollapsible", () => {
+            expect(getBlock("newnote").getCapability("collapsible")).toBe(true);
+            expect(getBlock("newnote").getCapability("inlineCollapsible")).toBe(true);
+        });
+
+        test("osctime declares collapsible and inlineCollapsible", () => {
+            expect(getBlock("osctime").getCapability("collapsible")).toBe(true);
+            expect(getBlock("osctime").getCapability("inlineCollapsible")).toBe(true);
+        });
+    });
+
+    describe("Blocks note-container migration", () => {
+        test("addDefaultBlock() adds vspace and rest2 inside a note container", () => {
+            const blocks = createBlocksHarness();
+            blocks.blockList[0] = {
+                name: "newnote",
+                connections: [null, null, null],
+                isNoteContainer: jest.fn().mockReturnValue(true)
+            };
+
+            blocks.addDefaultBlock(0, 1, false);
+
+            expect(blocks.blockList[0].connections[2]).toBe(1);
+            expect(blocks.blockList[1].name).toBe("vspace");
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[1].connections[1]).toBe(2);
+            expect(blocks.blockList[2].name).toBe("rest2");
+            expect(blocks.blockList[2].connections[0]).toBe(1);
+            expect(blocks.blockList[2].connections[1]).toBeNull();
+        });
+
+        test("deletePreviousDefault() keeps pitch cleanup inside a note container", () => {
+            const blocks = createBlocksHarness();
+            blocks._blockInStack.mockReturnValue(true);
+            blocks.blockList[0] = {
+                name: "rest2",
+                connections: [1, null],
+                hide: jest.fn(),
+                trash: false,
+                isNoteContainer: jest.fn().mockReturnValue(false)
+            };
+            blocks.blockList[1] = {
+                name: "newnote",
+                connections: [null, null, null],
+                hide: jest.fn(),
+                trash: false,
+                isNoteContainer: jest.fn().mockReturnValue(true)
+            };
+
+            expect(blocks.deletePreviousDefault(0)).toBe(1);
+        });
+
+        test("deletePreviousDefault() stops when the next ancestor is a note container", () => {
+            const blocks = createBlocksHarness();
+            blocks._blockInStack.mockReturnValue(false);
+            blocks.blockList[0] = {
+                name: "vspace",
+                connections: [1],
+                hide: jest.fn(),
+                trash: false,
+                isNoteContainer: jest.fn().mockReturnValue(false)
+            };
+            blocks.blockList[1] = {
+                name: "newnote",
+                connections: [null, null, null],
+                hide: jest.fn(),
+                trash: false,
+                isNoteContainer: jest.fn().mockReturnValue(true)
+            };
+
+            expect(blocks.deletePreviousDefault(0)).toBe(1);
+        });
+
+        test("_insideNoteBlock() returns the note container ancestor", () => {
+            const blocks = createBlocksHarness();
+            blocks.blockList[0] = {
+                connections: [1],
+                isNoteContainer: jest.fn().mockReturnValue(false)
+            };
+            blocks.blockList[1] = {
+                connections: [null, 2, 3],
+                isExpandableBlock: jest.fn().mockReturnValue(true),
+                isArgFlowClampBlock: jest.fn().mockReturnValue(false),
+                isLeftClampBlock: jest.fn().mockReturnValue(false),
+                isNoteContainer: jest.fn().mockReturnValue(true)
+            };
+
+            expect(blocks._insideNoteBlock(0)).toBe(1);
+        });
+
+        test("_insideNoteBlock() returns null for a non-container expandable ancestor", () => {
+            const blocks = createBlocksHarness();
+            blocks.blockList[0] = {
+                connections: [1],
+                isNoteContainer: jest.fn().mockReturnValue(false)
+            };
+            blocks.blockList[1] = {
+                connections: [null, 2, 3],
+                isExpandableBlock: jest.fn().mockReturnValue(true),
+                isArgFlowClampBlock: jest.fn().mockReturnValue(false),
+                isLeftClampBlock: jest.fn().mockReturnValue(false),
+                isNoteContainer: jest.fn().mockReturnValue(false)
+            };
+
+            expect(blocks._insideNoteBlock(0)).toBeNull();
+        });
+
+        test("_insideNoteBlock() recurses through a non-expandable ancestor", () => {
+            const blocks = createBlocksHarness();
+            blocks.blockList[0] = {
+                connections: [1],
+                isNoteContainer: jest.fn().mockReturnValue(false)
+            };
+            blocks.blockList[1] = {
+                connections: [2],
+                isExpandableBlock: jest.fn().mockReturnValue(false),
+                isArgFlowClampBlock: jest.fn().mockReturnValue(false),
+                isLeftClampBlock: jest.fn().mockReturnValue(false),
+                isNoteContainer: jest.fn().mockReturnValue(false)
+            };
+            blocks.blockList[2] = {
+                connections: [null, 3, 4],
+                isExpandableBlock: jest.fn().mockReturnValue(true),
+                isArgFlowClampBlock: jest.fn().mockReturnValue(false),
+                isLeftClampBlock: jest.fn().mockReturnValue(false),
+                isNoteContainer: jest.fn().mockReturnValue(true)
+            };
+
+            expect(blocks._insideNoteBlock(0)).toBe(2);
         });
     });
 });

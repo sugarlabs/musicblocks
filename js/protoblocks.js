@@ -81,6 +81,8 @@ class ProtoBlock {
         this.textWidth = 0;
         this.labelOffset = 0;
         this.beginnerModeBlock = false;
+        // Capability metadata is additive and starts empty.
+        this.capabilities = Object.create(null);
     }
 
     /**
@@ -96,6 +98,55 @@ class ProtoBlock {
         const b = c.getBounds();
         this.textWidth = b.width;
         this.extraWidth += Math.max(b.width - 30, 0);
+    }
+
+    /**
+     * Sets a single capability flag on the protoblock.
+     * @param {string} name - Capability name.
+     * @param {boolean} [value=true] - Capability value.
+     * @returns {void}
+     */
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+    }
+
+    /**
+     * Merges capability flags into the protoblock.
+     * @param {Object} capabilities - Capability flags to merge.
+     * @returns {void}
+     */
+    setCapabilities(capabilities) {
+        if (!capabilities) {
+            return;
+        }
+
+        for (const name in capabilities) {
+            if (Object.prototype.hasOwnProperty.call(capabilities, name)) {
+                this.setCapability(name, capabilities[name]);
+            }
+        }
+    }
+
+    /**
+     * Reads a capability flag from the protoblock.
+     * @param {string} name - Capability name.
+     * @returns {boolean} - True if the capability is enabled.
+     */
+    hasCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? !!this.capabilities[name]
+            : false;
+    }
+
+    /**
+     * Returns the raw capability value from the protoblock.
+     * @param {string} name - Capability name.
+     * @returns {*} - Stored capability value, if any.
+     */
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
 
     // What follows are the initializations for different block
@@ -1630,6 +1681,7 @@ class BaseBlock extends ProtoBlock {
         this._style.defaults ||= [];
         this._style.flows ||= {};
         this._style.flows.labels ||= [];
+        this._style.capabilities ||= {};
 
         if (this._style.args > 1) {
             this.expandable = true;
@@ -1663,6 +1715,8 @@ class BaseBlock extends ProtoBlock {
             this.size++;
             this.image = this._style.image;
         }
+
+        this.setCapabilities(this._style.capabilities);
 
         this.staticLabels = [this._style.name || ""];
         this.dockTypes = [];
@@ -2103,5 +2157,26 @@ class StackClampBlock extends BaseBlock {
 }
 
 if (typeof module !== "undefined" && module.exports) {
+    // These classes only exist as bare globals in the production script-concatenation build,
+    // which is how js/blocks/*.js consume them (e.g. `class ArticulationBlock extends
+    // FlowClampBlock`). That makes them unreachable from a Jest/CommonJS test in any lightweight
+    // way: reading protoblocks.js's own source at runtime to recover them is brittle (couples a
+    // test to this file's internal layout), and going through the full `Blocks`/`Block`
+    // construction path (js/blocks.js, js/block.js) to get a registered protoblock pulls in
+    // unrelated canvas/image-loading/drag-state machinery. Exposing them here - as static
+    // properties on the already-exported class, not a replacement of it, so every existing
+    // `const ProtoBlock = require("./protoblocks")` consumer (e.g. protoblocks.test.js) is
+    // unaffected - lets a test register and exercise a real, production block (e.g.
+    // js/__tests__/volume-articulation-dispatch-integration.test.js) without duplicating its
+    // flow() logic. Invisible to the browser build, which never reads module.exports.
+    ProtoBlock.BaseBlock = BaseBlock;
+    ProtoBlock.ValueBlock = ValueBlock;
+    ProtoBlock.BooleanBlock = BooleanBlock;
+    ProtoBlock.BooleanSensorBlock = BooleanSensorBlock;
+    ProtoBlock.FlowBlock = FlowBlock;
+    ProtoBlock.LeftBlock = LeftBlock;
+    ProtoBlock.FlowClampBlock = FlowClampBlock;
+    ProtoBlock.StackClampBlock = StackClampBlock;
+
     module.exports = ProtoBlock;
 }

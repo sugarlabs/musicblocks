@@ -14,14 +14,6 @@
 // which is a vast improvement over the Munsell Perl module
 // written by Walter Bender and Jon Orwant back in the day.
 
-/* global createjs */
-
-/*
-   Global locations
-    js/loader.js
-        createjs
- */
-
 /* exported getMunsellColor, getcolor, searchColors, COLORS40 */
 
 /**
@@ -6729,7 +6721,7 @@ const MUNSELL = [
  * @param {string} hex1 - The first hex color value.
  * @param {string} hex2 - The second hex color value.
  * @param {number} p - The interpolation parameter (between 0 and 1).
- * @returns {string} The interpolated hex color value.
+ * @returns {string} The interpolated color as a CSS rgba() string (e.g., "rgba(255, 0, 0, 1)").
  */
 const interpColor = (hex1, hex2, p) => {
     if (hex1 === undefined && hex2 === undefined) {
@@ -6756,7 +6748,7 @@ const interpColor = (hex1, hex2, p) => {
         const ng = Math.floor(g1 * p + g2 * (1 - p));
         const nb = Math.floor(b1 * p + b2 * (1 - p));
 
-        return createjs.Graphics.getRGB(nr, ng, nb, 1.0);
+        return `rgba(${nr}, ${ng}, ${nb}, 1)`;
     }
 };
 

@@ -91,11 +91,118 @@ class StringHelper {
             const elem = document.getElementById(obj[0]);
 
             if (elem) {
-                if (this.strings[i].length === 3) elem.setAttribute(obj[2], obj[1]);
-                else elem.innerHTML += obj[1];
+                if (this.strings[i].length === 3) {
+                    elem.setAttribute(obj[2], obj[1]);
+                } else if (HTML_ALLOWED_IDS.has(obj[0])) {
+                    elem.innerHTML = elem.innerHTML + sanitizeAllowedHTML(obj[1]);
+                } else {
+                    elem.textContent = (elem.textContent || "") + obj[1];
+                }
             }
         }
     }
+}
+
+// SECURITY: Only allow IDs here when the localized string intentionally
+// contains HTML and has been reviewed for safe rendering.
+const HTML_ALLOWED_IDS = new Set([
+    "deleter-confirm",
+    "deleter-paragraph",
+    "projectviewer-report-conduct"
+]);
+
+const HTML_ALLOWED_TAGS = new Set(["A", "BR", "EM", "I", "SPAN", "STRONG"]);
+
+const HTML_ALLOWED_ATTRIBUTES = {
+    A: new Set(["href"]),
+    SPAN: new Set(["id"])
+};
+
+function isSafeUrl(urlString) {
+    if (!urlString || typeof urlString !== "string") return false;
+
+    try {
+        let decodedUrl = urlString.trim();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(decodedUrl, "text/html");
+        decodedUrl = (doc.body.textContent || "").trim();
+
+        // eslint-disable-next-line no-control-regex
+        decodedUrl = decodedUrl.replace(/[\u0000-\u0020\u007F]/g, "");
+
+        const parsed = new URL(decodedUrl);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch (e) {
+        return false;
+    }
+}
+
+function sanitizeAllowedHTML(htmlString) {
+    const input = document.createElement("template");
+    input.innerHTML = htmlString;
+
+    const output = document.createElement("template");
+
+    const appendSanitizedNode = (sourceNode, targetParent) => {
+        if (sourceNode.nodeType === Node.TEXT_NODE) {
+            targetParent.appendChild(document.createTextNode(sourceNode.textContent || ""));
+            return;
+        }
+
+        if (sourceNode.nodeType !== Node.ELEMENT_NODE) {
+            return;
+        }
+
+        const tagName = sourceNode.tagName.toUpperCase();
+
+        if (!HTML_ALLOWED_TAGS.has(tagName)) {
+            for (const child of Array.from(sourceNode.childNodes)) {
+                appendSanitizedNode(child, targetParent);
+            }
+            return;
+        }
+
+        const cleanElement = document.createElement(tagName.toLowerCase());
+
+        for (const attr of Array.from(sourceNode.attributes)) {
+            const attrName = attr.name.toLowerCase();
+            const attrValue = attr.value;
+            const allowedAttributes = HTML_ALLOWED_ATTRIBUTES[tagName] || new Set();
+
+            if (attrName.startsWith("on") || !allowedAttributes.has(attrName)) {
+                continue;
+            }
+
+            if (tagName === "SPAN" && attrName === "id") {
+                if (attrValue !== "deleter-title" && attrValue !== "deleter-name") {
+                    continue;
+                }
+            }
+
+            if (tagName === "A" && attrName === "href") {
+                if (!isSafeUrl(attrValue)) {
+                    continue;
+                }
+
+                cleanElement.setAttribute("target", "_blank");
+                cleanElement.setAttribute("rel", "noopener noreferrer");
+            }
+
+            cleanElement.setAttribute(attr.name, attrValue);
+        }
+
+        for (const child of Array.from(sourceNode.childNodes)) {
+            appendSanitizedNode(child, cleanElement);
+        }
+
+        targetParent.appendChild(cleanElement);
+    };
+
+    for (const child of Array.from(input.content.childNodes)) {
+        appendSanitizedNode(child, output.content);
+    }
+
+    return output.innerHTML;
 }
 
 if (typeof module !== "undefined" && module.exports) {

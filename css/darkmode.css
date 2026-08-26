@@ -31,6 +31,11 @@ body.highcontrast {
     text-shadow: none !important;
 }
 
+/* Ensure record button turns red during recording in high contrast mode */
+.highcontrast #record.recording .dot {
+    color: #ff0000 !important;
+}
+
 /* High contrast hover box outlines */
 .highcontrast .tooltip,
 .highcontrast .hover-box {
@@ -107,4 +112,18 @@ body.highcontrast {
     background-color: rgba(255, 255, 255, 0.855);
     border-radius: 3px;
     padding: 2px;
+}
+
+/* Fix search autocomplete dropdown text in dark mode */
+body.dark #ui-id-1 .ui-menu-item-wrapper,
+body.dark #ui-id-1 a {
+    color: var(--color-text-primary) !important;
+}
+
+body.dark #ui-id-1 {
+    background-color: var(--color-bg-primary) !important;
+}
+
+body.dark #ui-id-1 .ui-menu-item {
+    background-color: var(--color-bg-primary) !important;
 }

@@ -18,7 +18,7 @@
 
 /*
    global Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
-   Tone, instruments, DEFAULTVOLUME, DEFAULTVOICE
+   Tone, instruments, DEFAULTVOLUME, DEFAULTVOICE, clampNumber
 */
 
 /*
@@ -57,6 +57,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static doCrescendo(type, value, turtle, blk) {
+            value = clampNumber(value, 0, 100);
             const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.crescendoDelta.push(type === "crescendo" ? value : -value);
@@ -76,7 +77,7 @@ function setupVolumeActions(activity) {
             const listenerName = "_crescendo_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -116,7 +117,7 @@ function setupVolumeActions(activity) {
 
             for (const synth of synthList) {
                 let newVolume = (last(tur.singer.synthVolume[synth]) * (100 + volume)) / 100;
-                newVolume = Math.max(Math.min(newVolume, 100), -100);
+                newVolume = clampNumber(newVolume, -100, 100);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     tur.singer.synthVolume[synth] = [newVolume];
@@ -136,7 +137,7 @@ function setupVolumeActions(activity) {
             const listenerName = "_articulation_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -169,7 +170,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setMasterVolume(volume, turtle, blk) {
-            volume = Math.max(Math.min(volume, 100), 0);
+            volume = clampNumber(volume, 0, 100);
 
             if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
 
@@ -193,7 +194,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setPanning(value, turtle) {
-            value = Math.max(Math.min(value, 100), -100) / 100;
+            value = clampNumber(value, -100, 100) / 100;
 
             const tur = activity.turtles.ithTurtle(turtle);
             if (!tur.singer.panner) {
@@ -257,7 +258,7 @@ function setupVolumeActions(activity) {
             }
 
             if (synth === null) {
-                activity.errorMsg(_("Synth not found") + ": " + synthname);
+                activity.errorMsg(`${_("Synth not found: %s").replace(/%s/g, synthname)}`);
                 synth = DEFAULTVOICE;
             }
 
@@ -273,6 +274,7 @@ function setupVolumeActions(activity) {
                 }
             }
 
+            volume = clampNumber(volume, 0, 100);
             tur.singer.synthVolume[synth].push(volume);
             if (!tur.singer.suppressOutput) {
                 Singer.setSynthVolume(activity.logo, turtle, synth, volume);

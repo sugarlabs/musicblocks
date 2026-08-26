@@ -2187,7 +2187,7 @@ the clamp. Every column has a slider that can be used to move up or
 down in frequency, continuously or in intervals of 1/12th of the
 starting frequency. The mouse is used to move the frequency up and
 down continuously. Buttons are used for intervals. Arrow keys can also
-be used to move up and down, or between columns.
+be used to move up and down, or between columns. There is a save button to export a note block, and a reset button to restore the initial starting pitch.
 
 ![widget](./pitchslider0a.svg "Pitch Slider Block")
 
@@ -2477,6 +2477,8 @@ rows that represent notes in the current mode are highlighted.
 
 The horizonal axis is time and the verical axis is half-step offsets
 from the base note.
+
+The toolbar on the left includes buttons to play the sequence, save the pattern to a custom chord block, clear the grid, and move (shift) the active note pattern up or down by an octave.
 
 The sequence in the pattern above is ```do mi sol do do mi do sol mi
 do do sol```.

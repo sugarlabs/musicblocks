@@ -79,11 +79,12 @@ function toggleSearch(on) {
 function toggleText(id, a, b) {
     const el = document.getElementById(id);
 
-    const prevHTML = el.innerHTML;
-    const updatedHTML = prevHTML.includes(a) ? prevHTML.replace(a, b) : prevHTML.replace(b, a);
+    const currentText = el.textContent || "";
+    const updatedText = currentText.includes(a)
+        ? currentText.replace(a, b)
+        : currentText.replace(b, a);
 
-    el.innerHTML = "";
-    el.insertAdjacentHTML("afterbegin", updatedHTML);
+    el.textContent = updatedText;
 }
 
 function toggleExpandable(id, c) {
@@ -91,19 +92,37 @@ function toggleExpandable(id, c) {
     el.className = el.className === `${c} open` ? c : `${c} open`;
 }
 
+const outsideClickListeners = new WeakMap();
+
 function hideOnClickOutside(eles, other) {
+    const validEles = (Array.isArray(eles) ? eles : [eles]).filter(Boolean);
+    if (validEles.length === 0) return;
+
+    const anchor = validEles[0];
+
+    if (anchor && outsideClickListeners.has(anchor)) {
+        const prevListener = outsideClickListeners.get(anchor);
+        document.removeEventListener("click", prevListener);
+        outsideClickListeners.delete(anchor);
+    }
+
     // if click not in id, hide
     const outsideClickListener = event => {
-        const path =
-            event.path ||
-            (event.composedPath && event.composedPath()) ||
-            event.composedPath(event.target);
+        const path = event.path || (event.composedPath && event.composedPath()) || [];
         let ok = false;
 
-        for (let i = 0; i < eles.length; i++) if (path.includes(eles[i])) ok = true;
+        for (let i = 0; i < validEles.length; i++) {
+            if (path.includes(validEles[i])) {
+                ok = true;
+                break;
+            }
+        }
 
         if (ok === false) {
-            document.getElementById(other).style.display = "none";
+            const otherEl = document.getElementById(other);
+            if (otherEl) {
+                otherEl.style.display = "none";
+            }
 
             removeClickListener();
         }
@@ -111,7 +130,14 @@ function hideOnClickOutside(eles, other) {
 
     const removeClickListener = () => {
         document.removeEventListener("click", outsideClickListener);
+        if (anchor) {
+            outsideClickListeners.delete(anchor);
+        }
     };
+
+    if (anchor) {
+        outsideClickListeners.set(anchor, outsideClickListener);
+    }
 
     document.addEventListener("click", outsideClickListener);
 }
@@ -151,3 +177,15 @@ $(document).ready(() => {
         toggleText("view-more-chips", showMore, showLess);
     });
 });
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        debounce,
+        getCookie,
+        setCookie,
+        toggleText,
+        toggleExpandable,
+        hideOnClickOutside,
+        updateCheckboxes
+    };
+}

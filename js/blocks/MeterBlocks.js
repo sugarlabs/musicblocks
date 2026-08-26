@@ -62,7 +62,7 @@ function setupMeterBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -134,7 +134,7 @@ function setupMeterBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -230,7 +230,7 @@ function setupMeterBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -290,7 +290,7 @@ function setupMeterBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -371,7 +371,7 @@ function setupMeterBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -561,7 +561,7 @@ function setupMeterBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -656,7 +656,7 @@ function setupMeterBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -1211,7 +1211,7 @@ function setupMeterBlocks(activity) {
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (args.length === 3 && typeof args[0] === "number" && typeof args[1] == "number") {
+            if (args.length === 3 && typeof args[0] === "number" && typeof args[1] === "number") {
                 let bpm = (args[0] * args[1]) / 0.25;
                 if (args[0] < 30) {
                     activity.errorMsg(_("Beats per minute must be > 30."));

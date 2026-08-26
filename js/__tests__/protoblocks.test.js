@@ -55,6 +55,7 @@ describe("ProtoBlock", () => {
         expect(block.expandable).toBe(false);
         expect(block.args).toBe(0);
         expect(block.defaults).toEqual([]);
+        expect(block.capabilities).toEqual({});
     });
 
     test("adjustWidthToLabel should set textWidth and extraWidth", () => {
@@ -105,5 +106,18 @@ describe("ProtoBlock", () => {
         block.parameterBlock();
         expect(block.dockTypes).toContain("numberout");
         expect(block.parameter).toBe(true);
+    });
+
+    test("capability helpers should store and read flags", () => {
+        block.setCapability("collapsible");
+        block.setCapabilities({
+            specialInput: true,
+            noHit: false
+        });
+
+        expect(block.hasCapability("collapsible")).toBe(true);
+        expect(block.getCapability("specialInput")).toBe(true);
+        expect(block.hasCapability("noHit")).toBe(false);
+        expect(block.getCapability("missing")).toBeUndefined();
     });
 });

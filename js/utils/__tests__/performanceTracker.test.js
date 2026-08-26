@@ -247,5 +247,122 @@ describe("performanceTracker", () => {
             global.performance = originalPerf;
         });
     });
-    describe("memory tracking", () => {});
+    describe("memory tracking", () => {
+        let originalGlobalPerformance;
+        let originalWindowPerformance;
+
+        beforeEach(() => {
+            originalGlobalPerformance = global.performance;
+            if (typeof window !== "undefined") {
+                originalWindowPerformance = window.performance;
+            }
+        });
+
+        afterEach(() => {
+            global.performance = originalGlobalPerformance;
+            if (typeof window !== "undefined") {
+                window.performance = originalWindowPerformance;
+            }
+        });
+
+        const setMockPerformance = mockPerf => {
+            global.performance = mockPerf;
+            if (typeof window !== "undefined") {
+                try {
+                    delete window.performance;
+                    window.performance = mockPerf;
+                } catch (e) {
+                    Object.defineProperty(window, "performance", {
+                        value: mockPerf,
+                        configurable: true,
+                        writable: true
+                    });
+                }
+            }
+        };
+
+        test("computes memoryDelta when performance.memory is available", () => {
+            let memoryUsage = 1000000;
+            const mockPerf = {
+                now: () => Date.now(),
+                memory: {
+                    get usedJSHeapSize() {
+                        return memoryUsage;
+                    }
+                }
+            };
+            setMockPerformance(mockPerf);
+
+            performanceTracker.enable();
+            performanceTracker.startRun();
+            memoryUsage = 1500000;
+            performanceTracker.endRun();
+
+            expect(performanceTracker.getStats().memoryDelta).toBe(500000);
+        });
+
+        test("handles negative memoryDelta when memory is freed by GC", () => {
+            let memoryUsage = 2000000;
+            const mockPerf = {
+                now: () => Date.now(),
+                memory: {
+                    get usedJSHeapSize() {
+                        return memoryUsage;
+                    }
+                }
+            };
+            setMockPerformance(mockPerf);
+
+            performanceTracker.enable();
+            performanceTracker.startRun();
+            memoryUsage = 1200000;
+            performanceTracker.endRun();
+
+            expect(performanceTracker.getStats().memoryDelta).toBe(-800000);
+        });
+
+        test("returns null memoryDelta if performance.memory getter throws error", () => {
+            const mockPerf = {
+                now: () => Date.now(),
+                get memory() {
+                    throw new Error("Access denied");
+                }
+            };
+            setMockPerformance(mockPerf);
+
+            performanceTracker.enable();
+            performanceTracker.startRun();
+            performanceTracker.endRun();
+
+            expect(performanceTracker.getStats().memoryDelta).toBeNull();
+        });
+
+        test("logStats displays formatted memory byte count when memory tracking is supported", () => {
+            const gcSpy = jest.spyOn(console, "groupCollapsed").mockImplementation(() => {});
+            const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+            jest.spyOn(console, "groupEnd").mockImplementation(() => {});
+
+            let memoryUsage = 100000;
+            const mockPerf = {
+                now: () => Date.now(),
+                memory: {
+                    get usedJSHeapSize() {
+                        return memoryUsage;
+                    }
+                }
+            };
+            setMockPerformance(mockPerf);
+
+            performanceTracker.enable();
+            performanceTracker.startRun();
+            memoryUsage = 624288;
+            performanceTracker.endRun();
+            performanceTracker.logStats();
+
+            expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("524288 bytes"));
+
+            gcSpy.mockRestore();
+            logSpy.mockRestore();
+        });
+    });
 });

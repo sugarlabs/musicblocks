@@ -22,7 +22,7 @@
    setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
    FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
    jQuery, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
-   EXPANDBUTTON, MBOUNDARY
+   EXPANDBUTTON, MBOUNDARY, makeKeyboardAccessible
  */
 
 /* exported Turtles */
@@ -606,10 +606,20 @@ Turtles.TurtlesModel = class {
      * (excluding turtles in the trash and companion turtles)
      */
     turtleCount() {
-        let count = 0;
         const totalTurtles = this.getTurtleCount();
+        const firstClaimer = new Int32Array(totalTurtles).fill(-1);
+
         for (let t = 0; t < totalTurtles; t++) {
-            if (this.companionTurtle(t) === t && !this.getTurtle(t).inTrash) {
+            const c = this.getTurtle(t).companionTurtle;
+            if (c !== undefined && firstClaimer[c] === -1) {
+                firstClaimer[c] = t;
+            }
+        }
+
+        let count = 0;
+        for (let t = 0; t < totalTurtles; t++) {
+            const comp = firstClaimer[t] !== -1 ? firstClaimer[t] : t;
+            if (comp === t && !this.getTurtle(t).inTrash) {
                 count += 1;
             }
         }
@@ -883,6 +893,25 @@ Turtles.TurtlesView = class {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", object.label);
             container.setAttribute("data-position", "bottom");
+            makeKeyboardAccessible(container, object.label || object.name || "Canvas button");
+            if (typeof container.addEventListener === "function") {
+                container.addEventListener("keydown", event => {
+                    const isEscape =
+                        event.key === "Escape" || event.key === "Esc" || event.keyCode === 27;
+                    if (!isEscape) return;
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (
+                        typeof window !== "undefined" &&
+                        window._focusCycleManager &&
+                        typeof window._focusCycleManager.exitKeyboardNavigation === "function"
+                    ) {
+                        window._focusCycleManager.exitKeyboardNavigation();
+                    }
+                    container.blur?.();
+                });
+            }
             window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
@@ -1029,8 +1058,8 @@ Turtles.TurtlesView = class {
                 if (auxToolbar.style.display === "block") {
                     const menuIcon = docById("menu");
                     auxToolbar.style.display = "none";
-                    menuIcon.innerHTML = "menu";
-                    docById("toggleAuxBtn").className -= "blue darken-1";
+                    menuIcon.textContent = "menu";
+                    docById("toggleAuxBtn").classList.remove("blue", "darken-1");
                 }
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
@@ -1052,8 +1081,8 @@ Turtles.TurtlesView = class {
             if (auxToolbar.style.display === "block") {
                 const menuIcon = docById("menu");
                 auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
+                menuIcon.textContent = "menu";
+                docById("toggleAuxBtn").classList.remove("blue", "darken-1");
             }
 
             this._expandButton.style.visibility = "visible";
@@ -1070,8 +1099,7 @@ Turtles.TurtlesView = class {
             });
             __collapse();
 
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.activity.closeHelpfulWheel()) {
                 this.activity.__tick();
             }
         };
@@ -1105,8 +1133,8 @@ Turtles.TurtlesView = class {
             if (auxToolbar.style.display === "block") {
                 const menuIcon = docById("menu");
                 auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
+                menuIcon.textContent = "menu";
+                docById("toggleAuxBtn").classList.remove("blue", "darken-1");
             }
             this.hideMenu();
             this.setStageScale(1.0);
@@ -1160,8 +1188,7 @@ Turtles.TurtlesView = class {
             this.masterStage.removeChild(turtlesStage);
             this.masterStage.addChildAt(turtlesStage, 0);
 
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.activity.closeHelpfulWheel()) {
                 this.activity.__tick();
             }
         };

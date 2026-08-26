@@ -24,6 +24,17 @@ global.platformColor = {
     selectorBackground: "#8bc34a"
 };
 
+global.generateNoteNames = edo => {
+    if (edo === 12) {
+        return ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    }
+    const names = [];
+    for (let i = 0; i < edo; i++) {
+        names.push("N" + i);
+    }
+    return names;
+};
+
 const createMockElement = tagName => ({
     style: {},
     appendChild: jest.fn(),

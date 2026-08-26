@@ -100,8 +100,13 @@ class Planet {
         const existing = document.getElementById("new-project-confirmation");
         if (existing) existing.remove();
 
-        // Use platformColor from the parent window for theme-aware colors
-        const colors = window.parent.platformColor;
+        // Request platformColor from the parent window via postMessage
+        // instead of directly accessing window.parent.platformColor.
+        const colors = window._mbPlatformColor || {
+            header: "#8bc34a",
+            aux: "#f0f4c3",
+            background: "#ffffff"
+        };
 
         // Overlay to block interaction behind the modal
         const overlay = document.createElement("div");
@@ -242,6 +247,7 @@ class Planet {
         this.SaveInterface.init();
         this.LocalPlanet = new LocalPlanet(this);
         this.LocalPlanet.init();
+        if (this.GlobalPlanet) this.GlobalPlanet.destroy();
         this.GlobalPlanet = new GlobalPlanet(this);
         this.GlobalPlanet.init();
     }
@@ -258,3 +264,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 });
+
+/* istanbul ignore next */
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { Planet };
+}

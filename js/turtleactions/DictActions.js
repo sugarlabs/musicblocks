@@ -91,7 +91,7 @@ function setupDictActions(activity) {
                 if (targetTur.singer.lastNotePlayed !== null) {
                     const len = targetTur.singer.lastNotePlayed[0].length;
                     const pitch = targetTur.singer.lastNotePlayed[0].slice(0, len - 1);
-                    const octave = parseInt(targetTur.singer.lastNotePlayed[0].slice(len - 1));
+                    const octave = parseInt(targetTur.singer.lastNotePlayed[0].slice(len - 1), 10);
 
                     obj = [pitch, octave];
                 } else if (targetTur.singer.notePitches.length > 0) {
@@ -237,7 +237,6 @@ function setupDictActions(activity) {
                 activity.logo.turtleDicts[turtle][dict] = {};
             }
             activity.logo.turtleDicts[turtle][dict][key] = value;
-            console.log(activity.logo.turtleDicts[turtle]);
         }
 
         /**
@@ -251,11 +250,14 @@ function setupDictActions(activity) {
          * @returns {String|Number}
          */
         static getValue(dict, key, turtle, blk) {
+            if (!(turtle in activity.logo.turtleDicts)) {
+                activity.logo.turtleDicts[turtle] = {};
+            }
             if (!(dict in activity.logo.turtleDicts[turtle])) {
                 const msg = _("Dictionary with this name does not exist");
                 return msg;
             } else if (!(key in activity.logo.turtleDicts[turtle][dict])) {
-                const msg = _("Key with this name does not exist in ") + dict;
+                const msg = _("Key with this name does not exist in %s").replace(/%s/g, dict);
                 return msg;
             }
 

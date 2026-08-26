@@ -13,7 +13,7 @@
 // from given frequency to nextoctave frequency(two times the given frequency)
 // in continuous manner.
 
-/* global _, Tone */
+/* global _, Tone, getCurrentEDO, clampNumber */
 
 /*
    Global locations
@@ -23,9 +23,10 @@
 
 /* exported PitchSlider */
 class PitchSlider {
-    static ICONSIZE = 32;
-    static SEMITONE = Math.pow(2, 1 / 12);
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/pitchslider"];
 
+    static ICONSIZE = 32;
     /**
      * @constructor
      */
@@ -43,8 +44,11 @@ class PitchSlider {
      */
     init(activity) {
         this.activity = activity;
+        const edo = getCurrentEDO(activity.logo.synth.inTemperament);
+        const semitone = Math.pow(2, 1 / edo);
         if (window.widgetWindows.openWindows["slider"]) return;
         if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
+        this.initialFrequencies = [...this.frequencies];
 
         const oscillators = [];
         for (let i = 0; i < this.frequencies.length; i++) {
@@ -61,7 +65,10 @@ class PitchSlider {
 
         this.widgetWindow.onclose = () => {
             document.removeEventListener("keydown", keyHandler, true);
-            for (const osc of oscillators) osc.triggerRelease();
+            for (const osc of oscillators) {
+                osc.triggerRelease();
+                osc.dispose();
+            }
             this.isActive = false;
             activity.logo.pitchSlider = null;
             this.widgetWindow.destroy();
@@ -89,10 +96,16 @@ class PitchSlider {
 
                     if (event.key === "ArrowUp" || event.key === "ArrowRight") {
                         // Move up by a semitone
-                        slider.value = Math.min(currentValue * PitchSlider.SEMITONE, max);
+                        slider.value = this._stepFrequency(currentValue, "up", semitone, min, max);
                     } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
                         // Move down by a semitone
-                        slider.value = Math.max(currentValue / PitchSlider.SEMITONE, min);
+                        slider.value = this._stepFrequency(
+                            currentValue,
+                            "down",
+                            semitone,
+                            min,
+                            max
+                        );
                     }
 
                     const inputEvent = new Event("input", { bubbles: true });
@@ -132,7 +145,7 @@ class PitchSlider {
             const freqLabel = document.createElement("div");
             freqLabel.className = "wfbtItem";
             toolBarDiv.appendChild(freqLabel);
-            freqLabel.innerHTML = `<label>${parseFloat(this.frequencies[id].toFixed(2))}</label>`;
+            freqLabel.textContent = parseFloat(this.frequencies[id].toFixed(2));
 
             this.sliders[id] = slider;
             const changeFreq = () => {
@@ -141,7 +154,7 @@ class PitchSlider {
                     this.frequencies[id],
                     Tone.now() + 0.05
                 );
-                freqLabel.innerHTML = `<label>${parseFloat(this.frequencies[id].toFixed(2))}</label>`;
+                freqLabel.textContent = parseFloat(this.frequencies[id].toFixed(2));
             };
 
             slider.oninput = () => {
@@ -159,7 +172,7 @@ class PitchSlider {
                 _("Move up"),
                 toolBarDiv
             ).onclick = () => {
-                slider.value = Math.min(parseFloat(slider.value) * PitchSlider.SEMITONE, max);
+                slider.value = this._stepFrequency(slider.value, "up", semitone, min, max);
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
@@ -170,7 +183,7 @@ class PitchSlider {
                 _("Move down"),
                 toolBarDiv
             ).onclick = () => {
-                slider.value = Math.max(parseFloat(slider.value) / PitchSlider.SEMITONE, min);
+                slider.value = this._stepFrequency(slider.value, "down", semitone, min, max);
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
@@ -183,6 +196,21 @@ class PitchSlider {
             ).onclick = () => {
                 this._save(this.frequencies[id]);
             };
+
+            this.widgetWindow.addButton(
+                "reload.svg",
+                PitchSlider.ICONSIZE,
+                _("Reset"),
+                toolBarDiv
+            ).onclick = () => {
+                const initialFreq =
+                    this.initialFrequencies && this.initialFrequencies[id] !== undefined
+                        ? this.initialFrequencies[id]
+                        : 392;
+                slider.value = initialFreq;
+                changeFreq();
+                oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
+            };
         };
 
         for (const id in this.frequencies) {
@@ -191,7 +219,24 @@ class PitchSlider {
 
         activity.textMsg(_("Use the up/down buttons or arrow keys to change pitch."), 3000);
         activity.textMsg(_("Click on the slider to create a note block."), 3000);
-        setTimeout(this.widgetWindow.sendToCenter, 0);
+        window.requestAnimationFrame(() => this.widgetWindow.sendToCenter());
+    }
+
+    /**
+     * Calculates semitone frequency step with bounds clamping.
+     *
+     * @private
+     * @param {number|string} currentValue
+     * @param {string} direction - "up" or "down"
+     * @param {number} semitone
+     * @param {number} min
+     * @param {number} max
+     * @returns {number} Clamped frequency value
+     */
+    _stepFrequency(currentValue, direction, semitone, min, max) {
+        const val = parseFloat(currentValue);
+        const target = direction === "up" ? val * semitone : val / semitone;
+        return clampNumber(target, min, max);
     }
 
     /**

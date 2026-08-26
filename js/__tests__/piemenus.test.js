@@ -9,13 +9,7 @@
  * (at your option) any later version.
  */
 
-const fs = require("fs");
-const path = require("path");
-
-const { piemenuPitches } = require("../piemenus");
-
-const piemenusPath = path.join(__dirname, "..", "piemenus.js");
-let piemenusContent;
+const { piemenuPitches, piemenuKey, piemenuNumber, piemenuModes } = require("../piemenus");
 
 // Mock Globals
 global.docById = jest.fn().mockReturnValue({
@@ -25,7 +19,9 @@ global.docById = jest.fn().mockReturnValue({
     getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
 });
 global.document = {
-    getElementById: global.docById
+    getElementById: global.docById,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn()
 };
 global.window = {
     innerWidth: 1024,
@@ -34,23 +30,38 @@ global.window = {
 };
 global.wheelnav = jest.fn().mockImplementation(function (div) {
     const mockWheel = this;
-    this.navItems = Array.from({ length: 20 }, () => ({
+    this.id = div;
+    this.wheelRadius = 600;
+    const navItemTemplate = () => ({
         title: "",
         enabled: true,
         navItem: { hide: jest.fn(), show: jest.fn() },
+        fillAttr: "",
+        titleAttr: {},
+        titleHoverAttr: {},
+        titleSelectedAttr: {},
         sliceSelectedAttr: {},
         sliceHoverAttr: {},
-        titleSelectedAttr: {},
-        titleHoverAttr: {}
-    }));
+        slicePathAttr: {},
+        basicNavTitleMax: {},
+        basicNavTitleMin: {},
+        hoverNavTitleMax: {},
+        hoverNavTitleMin: {},
+        selectedNavTitleMax: {},
+        selectedNavTitleMin: {},
+        initNavTitle: {}
+    });
+    this.navItems = Array.from({ length: 30 }, navItemTemplate);
     this.selectedNavItemIndex = 0;
     this.colors = [];
     this.raphael = { canvas: {} };
     this.on = jest.fn();
     this.createWheel = jest.fn(labels => {
         if (labels) {
-            labels.forEach((l, i) => {
-                if (this.navItems[i]) this.navItems[i].title = l;
+            this.navItems = labels.map((l, i) => {
+                const item = navItemTemplate();
+                item.title = l;
+                return item;
             });
         }
     });
@@ -74,22 +85,84 @@ global.platformColor = {
     exitWheelcolors: ["#00ff00"],
     accidentalsWheelcolors: ["#0000ff"],
     octavesWheelcolors: ["#ffff00"],
-    accidentalsWheelcolorspush: "#cccccc"
+    accidentalsWheelcolorspush: "#cccccc",
+    modeWheelcolors: ["#111111"],
+    modeGroupWheelcolors: ["#222222"],
+    modePieMenusIfColorPush: "#333333",
+    modePieMenusElseColorPush: "#444444",
+    textColor: "#ffffff"
 };
 global._ = jest.fn(s => s);
-global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
-global.SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
-global.FIXEDSOLFEGE = { do: "C", re: "D", mi: "E", fa: "F", sol: "G", la: "A", ti: "B" };
-global.SHARP = "♯";
-global.FLAT = "♭";
-global.NATURAL = "♮";
-global.DOUBLESHARP = "𝄪";
-global.DOUBLEFLAT = "𝄫";
-global.EQUIVALENTACCIDENTALS = { F: "E♯", C: "B♯", B: "C♭", E: "F♭", G: "F𝄪", D: "C𝄪", A: "G𝄪" };
+global.announceToScreenReader = jest.fn();
 global.Tone = {
     start: jest.fn().mockResolvedValue(),
     context: { state: "running" }
 };
+global.last = arr => arr[arr.length - 1];
+global.MUSICALMODES = {
+    ionian: [2, 2, 1, 2, 2, 2, 1],
+    major: [2, 2, 1, 2, 2, 2, 1],
+    aeolian: [2, 1, 2, 2, 1, 2, 2],
+    minor: [2, 1, 2, 2, 1, 2, 2],
+    dorian: [2, 1, 2, 2, 2, 1, 2]
+};
+global.MODE_PIE_MENUS = {
+    5: ["minor pentatonic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+    7: ["ionian", " ", "dorian", " ", " ", " ", " ", " ", " ", "aeolian", " ", " "],
+    custom: [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+};
+global.getCurrentEDO = jest.fn().mockReturnValue(12);
+global.DEFAULTVOLUME = 0.5;
+global.SHARP = "♯";
+global.FLAT = "♭";
+global.MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
+global.MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
+global.getSavedCustomModes = () => [];
+global.getModeNamesForGroup = (grp, customModeNames = []) => {
+    if (grp !== "custom") {
+        return MODE_PIE_MENUS[grp];
+    }
+    const names = customModeNames.slice(0, 12);
+    while (names.length < 12) {
+        names.push(" ");
+    }
+    return names;
+};
+global.getModeLabel = modename => {
+    switch (modename) {
+        case "ionian":
+        case "major":
+            return "major / ionian";
+        case "aeolian":
+        case "minor":
+            return "minor / aeolian";
+        default:
+            return modename === " " ? " " : modename;
+    }
+};
+global.getModeNameFromLabel = (label, modes) => {
+    if (label === "major / ionian") {
+        return "major";
+    }
+    if (label === "minor / aeolian") {
+        return "aeolian";
+    }
+    return label;
+};
+global.getModeSliceColors = (modes, colors) =>
+    modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
+global.updateModeWheelItems = jest.fn();
+global.getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
+global.getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
+    const arcPx = (2 * Math.PI * 0.575 * wheelRadius) / sliceCount;
+    const size = Math.floor((arcPx * 0.85) / (labelLen * 0.6));
+    const minSize = Math.round(0.06 * wheelRadius);
+    const maxSize = Math.round(0.12 * wheelRadius);
+    const clamped = Math.min(maxSize, Math.max(minSize, size));
+    return `100 ${clamped}px sans-serif`;
+};
+global.configureWheel = jest.fn();
+
 global.Synth = jest.fn().mockImplementation(() => ({
     newTone: jest.fn(),
     tone: {},
@@ -105,12 +178,13 @@ global.PREVIEWVOLUME = 0.5;
 global.getNote = jest.fn().mockReturnValue(["C", 4]);
 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]);
 
+global.DEFAULTVOLUME = 0.5;
+global.Singer = { setSynthVolume: jest.fn() };
+global.SHARP = "♯";
+global.FLAT = "♭";
+
 describe("piemenus behavioral tests", () => {
     let mockBlock;
-
-    beforeAll(() => {
-        piemenusContent = fs.readFileSync(piemenusPath, "utf8");
-    });
 
     beforeEach(() => {
         mockBlock = {
@@ -199,12 +273,330 @@ describe("piemenus behavioral tests", () => {
         // Octave 4 -> 3.
         expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
     });
+    test("announces the previewed note to screen readers on pitch navigation", async () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
 
-    describe("Block Help Menu", () => {
-        it("should load help before opening the aux pie menu help widget", () => {
-            expect(piemenusContent).toMatch(
-                /if \(typeof HelpWidget === "undefined"\)\s*\{\s*if \(typeof require !== "undefined"\)\s*\{\s*require\(\["widgets\/help"\], function \(\) \{\s*new HelpWidget\(that, true\);/
-            );
+        mockBlock.blocks.blockList["mock-id"].name = "pitch";
+
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "B", "");
+
+        const navigateFunc = mockBlock._pitchWheel.navItems[0].navigateFunction;
+        mockBlock._pitchWheel.selectedNavItemIndex = 0;
+        mockBlock._pitchWheel.navItems[0].title = "C";
+
+        await navigateFunc();
+
+        expect(global.announceToScreenReader).toHaveBeenCalledWith(expect.stringContaining("C"));
+    });
+
+    test("does not announce when the trigger is locked (rapid navigation)", async () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        mockBlock.blocks.blockList["mock-id"].name = "pitch";
+
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "B", "");
+
+        const navigateFunc = mockBlock._pitchWheel.navItems[0].navigateFunction;
+        mockBlock._pitchWheel.selectedNavItemIndex = 0;
+        mockBlock._pitchWheel.navItems[0].title = "C";
+
+        mockBlock._triggerLock = true;
+        global.announceToScreenReader.mockClear();
+
+        await navigateFunc();
+
+        expect(global.announceToScreenReader).not.toHaveBeenCalled();
+    });
+
+    describe("Phrase Maker refresh on pitch change", () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        beforeEach(() => {
+            // hasOctaveWheel requires the parent block to be a "pitch"-family wrapper.
+            mockBlock.blocks.blockList["mock-id"].name = "pitch";
         });
+
+        test("notifies an open Phrase Maker when the exit wheel commits a new pitch", () => {
+            const refreshRowForBlock = jest.fn();
+            mockBlock.activity.logo.phraseMaker = { refreshRowForBlock };
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+            // Select G (index 4), natural accidental, octave 5.
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._accidentalsWheel.navItems[2].title = "♮";
+            mockBlock._octavesWheel.selectedNavItemIndex = 3;
+
+            mockBlock._exitWheel.navItems[0].navigateFunction();
+
+            expect(refreshRowForBlock).toHaveBeenCalledWith("mock-id", "G", "♮", 5);
+        });
+
+        test("does not throw and does not touch unrelated widgets when no Phrase Maker is open", () => {
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._octavesWheel.selectedNavItemIndex = 3;
+
+            expect(() => mockBlock._exitWheel.navItems[0].navigateFunction()).not.toThrow();
+        });
+
+        test("does not notify Phrase Maker for a scaledegree2 block", () => {
+            mockBlock.name = "scaledegree2";
+            const refreshRowForBlock = jest.fn();
+            mockBlock.activity.logo.phraseMaker = { refreshRowForBlock };
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._octavesWheel.selectedNavItemIndex = 3;
+
+            mockBlock._exitWheel.navItems[0].navigateFunction();
+
+            expect(refreshRowForBlock).not.toHaveBeenCalled();
+        });
+    });
+
+    test("outside click closure registers mousedown listener and handles outside clicks", () => {
+        jest.useFakeTimers();
+
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") {
+                mousedownHandler = handler;
+            }
+        });
+
+        // Set mock return for docById("wheelDiv") so that showWheelDiv/hideWheelDiv work
+        const mockWheelDiv = {
+            style: { display: "" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+        global.docById.mockImplementation(id => {
+            if (id === "wheelDiv") {
+                return mockWheelDiv;
+            }
+            return {
+                style: { display: "" },
+                contains: jest.fn().mockReturnValue(false)
+            };
+        });
+
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+        // Advance timers by 50ms to trigger the event listener registration
+        jest.advanceTimersByTime(50);
+
+        expect(global.document.addEventListener).toHaveBeenCalledWith(
+            "mousedown",
+            expect.any(Function)
+        );
+        expect(mousedownHandler).toBeInstanceOf(Function);
+
+        // Mock exit wheel navigateFunction
+        const mockNavigate = jest.fn();
+        mockBlock._exitWheel.navItems[0].navigateFunction = mockNavigate;
+
+        // Trigger outside click (interactive elements return false)
+        const mockEvent = { target: { style: { cursor: "default" } } };
+        mousedownHandler(mockEvent);
+
+        expect(mockNavigate).toHaveBeenCalled();
+
+        jest.useRealTimers();
+    });
+
+    test("outside click ignores interactive targets (labelDiv, movable, slices)", () => {
+        jest.useFakeTimers();
+
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") {
+                mousedownHandler = handler;
+            }
+        });
+
+        const mockLabelDiv = { contains: jest.fn(t => t.id === "input-label") };
+        const mockMovable = { contains: jest.fn(t => t.id === "movable-btn") };
+        const mockChooseKeyDiv = {
+            style: { display: "block" },
+            contains: jest.fn(t => t.id === "wheel-slice")
+        };
+        const mockWheelDiv = {
+            style: { display: "none" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+
+        global.docById.mockImplementation(id => {
+            if (id === "labelDiv") return mockLabelDiv;
+            if (id === "movable") return mockMovable;
+            if (id === "chooseKeyDiv") return mockChooseKeyDiv;
+            if (id === "wheelDiv") return mockWheelDiv;
+            return { style: { display: "none" }, contains: jest.fn().mockReturnValue(false) };
+        });
+
+        const mockExit = {
+            navItems: [
+                {
+                    navigateFunction: jest.fn(),
+                    selected: false,
+                    hovered: false,
+                    enabled: true
+                },
+                { enabled: false }
+            ],
+            selectedNavItemIndex: 0,
+            refreshWheel: jest.fn(),
+            raphael: { canvas: true }
+        };
+
+        window.configureExitWheel(mockExit);
+        jest.advanceTimersByTime(50);
+
+        expect(mousedownHandler).toBeInstanceOf(Function);
+
+        // Click inside labelDiv -> should not trigger exit
+        mousedownHandler({ target: { id: "input-label", tagName: "DIV" } });
+        expect(mockExit.navItems[0].navigateFunction).not.toHaveBeenCalled();
+
+        // Click inside movable -> should not trigger exit
+        mousedownHandler({ target: { id: "movable-btn", tagName: "INPUT" } });
+        expect(mockExit.navItems[0].navigateFunction).not.toHaveBeenCalled();
+
+        // Click inside slice element -> should not trigger exit
+        mousedownHandler({ target: { id: "wheel-slice", tagName: "path" } });
+        expect(mockExit.navItems[0].navigateFunction).not.toHaveBeenCalled();
+
+        // Click outside on background -> should trigger exit
+        mousedownHandler({ target: { id: "stage-bg", tagName: "CANVAS" } });
+        expect(mockExit.navItems[0].navigateFunction).toHaveBeenCalledTimes(1);
+
+        jest.useRealTimers();
+    });
+
+    test("fallback outside click hides all visible containers when activeExitWheel is not provided", () => {
+        jest.useFakeTimers();
+
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") {
+                mousedownHandler = handler;
+            }
+        });
+        global.document.removeEventListener = jest.fn();
+
+        const mockWheelDiv = {
+            style: { display: "" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+        const mockChooseKeyDiv = {
+            style: { display: "block" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+        const mockMovable = {
+            style: { display: "block" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+
+        global.docById.mockImplementation(id => {
+            if (id === "wheelDiv") return mockWheelDiv;
+            if (id === "chooseKeyDiv") return mockChooseKeyDiv;
+            if (id === "movable") return mockMovable;
+            return { style: { display: "none" }, contains: jest.fn().mockReturnValue(false) };
+        });
+
+        // Trigger showWheelDiv to register handler
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+        jest.advanceTimersByTime(50);
+
+        // Remove activeExitWheel navigateFunction to test fallback branch
+        mockBlock._exitWheel.navItems[0].navigateFunction = null;
+
+        mousedownHandler({ target: { id: "bg", tagName: "BODY" } });
+
+        expect(mockWheelDiv.style.display).toBe("none");
+        expect(mockChooseKeyDiv.style.display).toBe("none");
+        expect(mockMovable.style.display).toBe("none");
+        expect(global.document.removeEventListener).toHaveBeenCalledWith(
+            "mousedown",
+            mousedownHandler
+        );
+
+        jest.useRealTimers();
+    });
+
+    describe("piemenuModes behavioral tests", () => {
+        test("selecting a mode slice assigns the internal mode name to the block", () => {
+            piemenuModes(mockBlock, "ionian");
+
+            // Initial highlight (index 0 = ionian) already fires the selection
+            // handler; navigate to the dorian slice (index 2) explicitly.
+            mockBlock._modeNameWheel.selectedNavItemIndex = 2;
+            mockBlock._modeNameWheel.navItems[2].navigateFunction();
+
+            expect(mockBlock.value).toBe("dorian");
+            expect(mockBlock.text.text).toBe("dorian");
+        });
+    });
+});
+
+describe("piemenuKey behavioral tests", () => {
+    let mockActivity;
+
+    beforeEach(() => {
+        mockActivity = {
+            blocks: {
+                blockList: { length: 2 },
+                findStacks: jest.fn(),
+                stackList: [],
+                _makeNewBlockWithConnections: jest.fn(),
+                adjustExpandableClampBlock: jest.fn()
+            },
+            logo: {
+                blocks: {
+                    blockList: { length: 2 }
+                },
+                synth: new global.Synth()
+            },
+            KeySignatureEnv: ["C", "major", false],
+            storage: {},
+            textMsg: jest.fn(),
+            turtles: { ithTurtle: jest.fn().mockReturnValue({ singer: { instrumentNames: [] } }) }
+        };
+        global.event = { clientX: 100, clientY: 100 };
+        jest.clearAllMocks();
+    });
+
+    test("generates setkey blocks correctly when exiting and no setkey exists", () => {
+        // Prepare blockList to trigger the for...of loops
+        mockActivity.blocks.blockList = {
+            0: { name: "start", connections: [null, 1] },
+            1: { name: "action", connections: [0] },
+            length: 2
+        };
+        // The start block is at index 0
+        mockActivity.blocks.stackList = [0];
+
+        piemenuKey(mockActivity);
+
+        // Find the exitWheel instance created in piemenuKey
+        const exitWheel = global.wheelnav.mock.instances.find(w => w.id === "exitWheel");
+        expect(exitWheel).toBeDefined();
+
+        // Trigger __exitMenu which calls __generateSetKeyBlocks
+        exitWheel.navItems[0].navigateFunction();
+
+        // Verify that blocks were created
+        expect(mockActivity.blocks._makeNewBlockWithConnections).toHaveBeenCalled();
     });
 });

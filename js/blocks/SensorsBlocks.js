@@ -13,7 +13,7 @@
    global
 
    _, FlowBlock, NOINPUTERRORMSG, ValueBlock, docById, toFixed2,
-   LeftBlock, BooleanSensorBlock, NANERRORMSG, hex2rgb, searchColors,
+   LeftBlock, BooleanSensorBlock, NANERRORMSG, hex2rgb, hexToRGB, isValidHex, searchColors,
    Tone, platformColor, _THIS_IS_MUSIC_BLOCKS_
  */
 
@@ -79,9 +79,17 @@ function setupSensorsBlocks(activity) {
             tur.doWait(120);
 
             // Display the input form.
-            docById("labelDiv").innerHTML =
-                '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
-            const inputElem = docById("textLabel");
+            const inputElem = document.createElement("input");
+            inputElem.id = "textLabel";
+            inputElem.className = "input";
+            inputElem.type = "text";
+            inputElem.value = "";
+            inputElem.style.position = "absolute";
+            inputElem.style.webkitUserSelect = "text";
+            inputElem.style.mozUserSelect = "text";
+            inputElem.style.msUserSelect = "text";
+
+            docById("labelDiv").replaceChildren(inputElem);
             const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk !== null) {
                 inputElem.placeholder = activity.blocks.blockList[cblk].value;
@@ -544,13 +552,13 @@ function setupSensorsBlocks(activity) {
             let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
 
             // Handle hex and rgb color formats
-            if (colorString.includes("#")) {
-                colorString = hex2rgb(colorString.split("#")[1]);
+            if (isValidHex(colorString)) {
+                colorString = hex2rgb(colorString);
             }
 
             const obj = colorString.split("(")[1].split(",");
             const component = Number(obj[this.colorIndex]);
-            return parseInt(component / 2.55);
+            return parseInt(component / 2.55, 10);
         }
     }
 
@@ -664,10 +672,23 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The background color index.
          */
         getBackgroundColor() {
-            const [r, g, b] = platformColor.background
-                .match(/\(([^)]+)\)/)[1]
-                .split(/,\s*/)
-                .map(Number);
+            let r;
+            let g;
+            let b;
+            const background = platformColor.background;
+
+            if (isValidHex(background)) {
+                const rgb = hexToRGB(background);
+                r = rgb.r;
+                g = rgb.g;
+                b = rgb.b;
+            } else {
+                [r, g, b] = background
+                    .match(/\(([^)]+)\)/)[1]
+                    .split(/,\s*/)
+                    .map(Number);
+            }
+
             return searchColors(r, g, b);
         }
 
