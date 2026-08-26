@@ -403,6 +403,33 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("Stack Copying", () => {
+        it("disconnects a copied nested stack from parents outside the copy", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            const makeBlock = (name, connections) => ({
+                name,
+                connections,
+                isValueBlock: jest.fn().mockReturnValue(false)
+            });
+            blocks.blockList = [
+                makeBlock("start", [null, 1, null]),
+                makeBlock("forward", [0, 2]),
+                makeBlock("right", [1, null])
+            ];
+            blocks.selectedStack = 1;
+
+            const copiedBlocks = blocks._copyBlocksToObj(false);
+
+            expect(copiedBlocks).toEqual([
+                [0, "forward", 75, 75, [null, 1]],
+                [1, "right", 0, 0, [0, null]]
+            ]);
+            expect(copiedBlocks.flatMap(block => block[4])).not.toContain(undefined);
+        });
+    });
+
     describe("Parameter Block Cache Updates", () => {
         it("only rebuilds the cache when the displayed value changes", () => {
             const blocks = new Blocks(mockActivity);
