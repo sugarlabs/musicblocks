@@ -11,7 +11,7 @@
 
 /*
   global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  makeKeyboardAccessible, RECORDBUTTON, saveButton, saveButtonAdvanced
+  makeKeyboardAccessible, saveButton, saveButtonAdvanced
 */
 
 /* exported ToolbarUI */
@@ -486,6 +486,15 @@ class ToolbarUI {
         logoIcon.onclick = () => {
             onclick(this.activity);
         };
+
+        logoIcon.setAttribute("role", "button");
+        logoIcon.setAttribute("tabindex", "0");
+        logoIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                logoIcon.click();
+            }
+        });
     }
 
     /**
@@ -539,7 +548,7 @@ class ToolbarUI {
             saveButtonAdvanced.disabled = true;
             saveButton.className = "grey-text inactiveLink";
             saveButtonAdvanced.className = "grey-text inactiveLink";
-            recordButton.className = "grey-text inactiveLink";
+            recordButton.classList.add("grey-text", "inactiveLink");
             isPlayIconRunning = true;
             play_button_debounce_timeout = setTimeout(function () {
                 handleClick();
@@ -577,7 +586,7 @@ class ToolbarUI {
             saveButtonAdvanced.disabled = false;
             saveButton.className = "";
             saveButtonAdvanced.className = "";
-            recordButton.className = "";
+            recordButton.classList.remove("grey-text", "inactiveLink");
         };
     }
 
@@ -614,11 +623,19 @@ class ToolbarUI {
         confirmationButton.classList.add("confirm-button");
         confirmationButton.id = "new-project";
         confirmationButton.setAttribute("tabindex", "0"); // Make focusable
+        confirmationButton.setAttribute("role", "button");
+        confirmationButton.setAttribute("aria-label", _("Confirm"));
+        // The label alone ("Confirm") doesn't say what's being confirmed;
+        // point screen readers at the actual question being asked.
+        confirmationButton.setAttribute("aria-describedby", "confirmation-message");
         confirmationButton.textContent = _("Confirm");
 
         const cancelButton = document.createElement("div");
         cancelButton.classList.add("cancel-button");
         cancelButton.id = "cancel-project";
+        cancelButton.setAttribute("role", "button");
+        cancelButton.setAttribute("aria-label", _("Cancel"));
+        cancelButton.setAttribute("aria-describedby", "confirmation-message");
         cancelButton.textContent = _("Cancel");
 
         buttonRowLi.appendChild(confirmationButton);
@@ -632,6 +649,13 @@ class ToolbarUI {
 
         // Make modal container focusable
         modalContainer.setAttribute("tabindex", "-1");
+
+        // Screen reader semantics: identify this as a modal dialog with an
+        // accessible name, matching the pattern used by the other modals
+        // in the app (clear-workspace confirmation, LilyPond save dialog).
+        modalContainer.setAttribute("role", "dialog");
+        modalContainer.setAttribute("aria-modal", "true");
+        modalContainer.setAttribute("aria-label", _("New project confirmation"));
 
         // Setup keyboard navigation for modal
         const modalButtons = [confirmationButton, cancelButton];
@@ -1059,7 +1083,6 @@ class ToolbarUI {
             Record.classList.remove("hide");
             Record.style.display = "block";
         }
-        Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
 
         // Remove any existing onclick handler
         Record.onclick = null;

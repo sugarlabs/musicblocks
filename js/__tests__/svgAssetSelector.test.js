@@ -120,4 +120,94 @@ describe("svgAssetSelector", () => {
         expect(tabBuiltIn.classList.contains("active")).toBe(true);
         expect(gridContainer.style.display).toBe("");
     });
+
+    it("should prevent duplicate overlays when called twice", async () => {
+        openSvgAssetSelector(jest.fn(), jest.fn());
+        await new Promise(process.nextTick);
+
+        expect(document.querySelectorAll("#svgAssetSelectorOverlay").length).toBe(1);
+
+        openSvgAssetSelector(jest.fn(), jest.fn());
+        await new Promise(process.nextTick);
+
+        expect(document.querySelectorAll("#svgAssetSelectorOverlay").length).toBe(1);
+    });
+
+    it("should select item on grid click and enable apply button", async () => {
+        openSvgAssetSelector(jest.fn(), jest.fn());
+        await new Promise(process.nextTick);
+
+        const items = document.querySelectorAll(".svg-asset-item");
+        const applyBtn = document.querySelector(".svg-apply-btn");
+
+        expect(applyBtn.disabled).toBe(true);
+
+        items[0].click();
+        expect(items[0].classList.contains("selected")).toBe(true);
+        expect(applyBtn.disabled).toBe(false);
+
+        // Click second item
+        items[1].click();
+        expect(items[0].classList.contains("selected")).toBe(false);
+        expect(items[1].classList.contains("selected")).toBe(true);
+    });
+
+    it("should close modal when close button, cancel button, or overlay background is clicked", async () => {
+        const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+        // 1. Close button
+        openSvgAssetSelector(jest.fn(), jest.fn());
+        await new Promise(process.nextTick);
+
+        const closeBtn = document.querySelector(".svg-selector-close");
+        closeBtn.click();
+        await delay(300);
+
+        expect(document.getElementById("svgAssetSelectorOverlay")).toBeNull();
+
+        // 2. Cancel button
+        openSvgAssetSelector(jest.fn(), jest.fn());
+        await new Promise(process.nextTick);
+
+        const cancelBtn = document.querySelector(".svg-cancel-btn");
+        cancelBtn.click();
+        await delay(300);
+
+        expect(document.getElementById("svgAssetSelectorOverlay")).toBeNull();
+
+        // 3. Overlay background click
+        openSvgAssetSelector(jest.fn(), jest.fn());
+        await new Promise(process.nextTick);
+
+        const overlay = document.getElementById("svgAssetSelectorOverlay");
+        overlay.click();
+        await delay(300);
+
+        expect(document.getElementById("svgAssetSelectorOverlay")).toBeNull();
+    });
+
+    it("should invoke onUploadFromDevice when upload button is clicked inside upload panel", async () => {
+        const onUpload = jest.fn();
+        openSvgAssetSelector(jest.fn(), onUpload);
+        await new Promise(process.nextTick);
+
+        const tabUpload = document.getElementById("svgTabUpload");
+        tabUpload.click();
+
+        const uploadBtn = document.querySelector(".svg-upload-btn");
+        uploadBtn.click();
+
+        expect(onUpload).toHaveBeenCalled();
+    });
+
+    it("should handle image onError gracefully", async () => {
+        openSvgAssetSelector(jest.fn(), jest.fn());
+        await new Promise(process.nextTick);
+
+        const img = document.querySelector(".svg-asset-item img");
+        expect(img).not.toBeNull();
+
+        img.onerror();
+        expect(img.style.display).toBe("none");
+    });
 });

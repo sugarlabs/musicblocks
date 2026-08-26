@@ -132,6 +132,13 @@ function setupDrumActions(activity) {
 
             tur.singer.drumStyle.push(drumname);
 
+            // pitchDrumTable is shared with the Map Pitch to Drum block, whose
+            // mappings are meant to persist for the whole piece. Snapshot it so
+            // the close listener can undo only what this clamp itself did to
+            // it (see the closing listener below), instead of wiping every
+            // mapping that happens to exist when this clamp closes.
+            const pitchDrumTableSnapshot = { ...tur.singer.pitchDrumTable };
+
             const listenerName = "_setdrum_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
@@ -142,7 +149,12 @@ function setupDrumActions(activity) {
 
             const __listener = () => {
                 tur.singer.drumStyle.pop();
-                tur.singer.pitchDrumTable = {};
+                // Restore pitchDrumTable to what it was before this clamp
+                // opened: entries this clamp added are discarded (so a note
+                // played right after the clamp doesn't inherit its drum, per
+                // #1381), and any entry this clamp overwrote is restored,
+                // without touching mappings that predate the clamp.
+                tur.singer.pitchDrumTable = pitchDrumTableSnapshot;
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);

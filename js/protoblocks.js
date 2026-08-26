@@ -2157,5 +2157,26 @@ class StackClampBlock extends BaseBlock {
 }
 
 if (typeof module !== "undefined" && module.exports) {
+    // These classes only exist as bare globals in the production script-concatenation build,
+    // which is how js/blocks/*.js consume them (e.g. `class ArticulationBlock extends
+    // FlowClampBlock`). That makes them unreachable from a Jest/CommonJS test in any lightweight
+    // way: reading protoblocks.js's own source at runtime to recover them is brittle (couples a
+    // test to this file's internal layout), and going through the full `Blocks`/`Block`
+    // construction path (js/blocks.js, js/block.js) to get a registered protoblock pulls in
+    // unrelated canvas/image-loading/drag-state machinery. Exposing them here - as static
+    // properties on the already-exported class, not a replacement of it, so every existing
+    // `const ProtoBlock = require("./protoblocks")` consumer (e.g. protoblocks.test.js) is
+    // unaffected - lets a test register and exercise a real, production block (e.g.
+    // js/__tests__/volume-articulation-dispatch-integration.test.js) without duplicating its
+    // flow() logic. Invisible to the browser build, which never reads module.exports.
+    ProtoBlock.BaseBlock = BaseBlock;
+    ProtoBlock.ValueBlock = ValueBlock;
+    ProtoBlock.BooleanBlock = BooleanBlock;
+    ProtoBlock.BooleanSensorBlock = BooleanSensorBlock;
+    ProtoBlock.FlowBlock = FlowBlock;
+    ProtoBlock.LeftBlock = LeftBlock;
+    ProtoBlock.FlowClampBlock = FlowClampBlock;
+    ProtoBlock.StackClampBlock = StackClampBlock;
+
     module.exports = ProtoBlock;
 }

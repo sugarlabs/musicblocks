@@ -12,6 +12,7 @@ const musicutils = require("../../utils/musicutils.js");
 Object.assign(global, musicutils);
 global.debugLog = jest.fn();
 
+const ManagedTimer = require("../../utils/ManagedTimer");
 const MusicKeyboard = require("../musickeyboard.js");
 
 describe("MusicKeyboard document key handler lifecycle", () => {
@@ -942,7 +943,7 @@ describe("MusicKeyboard core logic", () => {
         global.noteToFrequency = jest.fn(name => ({ do4: 261, sol4: 392 })[name] ?? 0);
         global.last = array => array[array.length - 1];
         global.EIGHTHNOTEWIDTH = 24;
-        global.docById = jest.fn(() => ({ getAttribute: () => "0.5" }));
+        global.docById = jest.fn(() => ({ getAttribute: () => "0.5", remove: jest.fn() }));
         global.beginnerMode = "false";
     });
 
@@ -1212,5 +1213,179 @@ describe("MusicKeyboard core logic", () => {
             expect(img.title).toBe("Play");
             expect(img.alt).toBe("Play");
         });
+    });
+
+    describe("Web MIDI cleanup on widget close", () => {
+        test("resets onmidimessage handlers on all connected MIDI inputs when widgetWindow.onclose is called", () => {
+            const mockInput1 = { onmidimessage: jest.fn() };
+            const mockInput2 = { onmidimessage: jest.fn() };
+            const mockMidiAccess = {
+                inputs: [mockInput1, mockInput2]
+            };
+
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                addButton: jest.fn().mockReturnValue({ onclick: null, setAttribute: jest.fn() }),
+                addInputButton: jest.fn().mockReturnValue({
+                    addEventListener: jest.fn(),
+                    classList: { add: jest.fn() }
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    style: {}
+                })
+            };
+
+            const origWidgetWindows = global.window.widgetWindows;
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue(mockWidgetWindow)
+            };
+
+            try {
+                const mockActivity = {
+                    turtles: {
+                        ithTurtle: jest.fn().mockReturnValue({
+                            singer: { bpm: [90] }
+                        })
+                    },
+                    logo: { synth: { stopSound: jest.fn() } }
+                };
+
+                const keyboard = new MusicKeyboard(mockActivity);
+                keyboard._createWidgetWindow();
+
+                keyboard.midiAccess = mockMidiAccess;
+                keyboard.midiON = true;
+
+                // Trigger actual onclose handler registered on widgetWindow
+                mockWidgetWindow.onclose();
+
+                expect(mockInput1.onmidimessage).toBeNull();
+                expect(mockInput2.onmidimessage).toBeNull();
+                expect(keyboard.midiON).toBe(false);
+                expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+            } finally {
+                global.window.widgetWindows = origWidgetWindows;
+            }
+        });
+
+        test("doMIDI stores midiAccess reference when requestMIDIAccess succeeds", async () => {
+            const mockInput = { onmidimessage: null };
+            const mockMidiAccess = {
+                inputs: new Map([["1", mockInput]])
+            };
+
+            const origRequestMIDIAccess = global.navigator.requestMIDIAccess;
+            global.navigator.requestMIDIAccess = jest.fn().mockResolvedValue(mockMidiAccess);
+
+            try {
+                const keyboard = new MusicKeyboard({
+                    textMsg: jest.fn()
+                });
+                keyboard.midiButton = { style: {} };
+
+                keyboard.doMIDI();
+
+                await Promise.resolve();
+
+                expect(keyboard.midiAccess).toBe(mockMidiAccess);
+                expect(mockInput.onmidimessage).toBeDefined();
+            } finally {
+                global.navigator.requestMIDIAccess = origRequestMIDIAccess;
+            }
+        });
+    });
+});
+
+describe("MusicKeyboard widget timer lifecycle", () => {
+    let originalManagedTimer;
+    let originalDocById;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        originalManagedTimer = global.ManagedTimer;
+        originalDocById = global.docById;
+        global.ManagedTimer = ManagedTimer;
+        global.docById = jest.fn(() => null);
+    });
+
+    afterEach(() => {
+        if (originalManagedTimer === undefined) {
+            delete global.ManagedTimer;
+        } else {
+            global.ManagedTimer = originalManagedTimer;
+        }
+
+        if (originalDocById === undefined) {
+            delete global.docById;
+        } else {
+            global.docById = originalDocById;
+        }
+
+        jest.useRealTimers();
+    });
+
+    test("tracks widget intervals through ManagedTimer", () => {
+        const keyboard = new MusicKeyboard({});
+        const callback = jest.fn();
+
+        const id = keyboard._setWidgetInterval(callback, 1000);
+
+        expect(keyboard._timerManager).toBeInstanceOf(ManagedTimer);
+        expect(keyboard._timerManager.activeIntervalCount).toBe(1);
+
+        jest.advanceTimersByTime(1000);
+        expect(callback).toHaveBeenCalledTimes(1);
+
+        expect(keyboard._clearWidgetInterval(id)).toBe(true);
+        expect(keyboard._timerManager.activeIntervalCount).toBe(0);
+    });
+
+    test("stopMetronome clears the managed interval and audio loop", () => {
+        const countdownContainer = { remove: jest.fn() };
+        global.docById.mockImplementation(id =>
+            id === "countdownContainer" ? countdownContainer : null
+        );
+
+        const keyboard = new MusicKeyboard({});
+        const intervalCallback = jest.fn();
+        keyboard.tickButton = { style: { removeProperty: jest.fn() } };
+        keyboard.tick = true;
+        keyboard.firstNote = true;
+        keyboard.metronomeON = true;
+        keyboard.loopTick = { stop: jest.fn() };
+        keyboard.metronomeInterval = keyboard._setWidgetInterval(intervalCallback, 1000);
+
+        keyboard.stopMetronome();
+        jest.advanceTimersByTime(1000);
+
+        expect(keyboard.tickButton.style.removeProperty).toHaveBeenCalledWith("background");
+        expect(keyboard.loopTick.stop).toHaveBeenCalledTimes(1);
+        expect(countdownContainer.remove).toHaveBeenCalledTimes(1);
+        expect(intervalCallback).not.toHaveBeenCalled();
+        expect(keyboard.tick).toBe(false);
+        expect(keyboard.firstNote).toBe(false);
+        expect(keyboard.metronomeON).toBe(false);
+        expect(keyboard.metronomeInterval).toBeNull();
+        expect(keyboard._timerManager.activeIntervalCount).toBe(0);
+    });
+
+    test("clearWidgetTimers cancels outstanding managed timers", () => {
+        const keyboard = new MusicKeyboard({});
+        const firstCallback = jest.fn();
+        const secondCallback = jest.fn();
+
+        keyboard._setWidgetInterval(firstCallback, 1000);
+        keyboard._setWidgetInterval(secondCallback, 1000);
+
+        expect(keyboard._timerManager.activeIntervalCount).toBe(2);
+        expect(keyboard._clearWidgetTimers()).toBe(2);
+
+        jest.advanceTimersByTime(1000);
+        expect(firstCallback).not.toHaveBeenCalled();
+        expect(secondCallback).not.toHaveBeenCalled();
+        expect(keyboard._timerManager.activeIntervalCount).toBe(0);
     });
 });

@@ -692,7 +692,7 @@ function Synth() {
         // and never use noteFrequencies, so skip building the table.
         // This also avoids crashing on microtonal interval names (e.g. "mid 2")
         // that exist in the temperament definition but not in INTERVALVALUES.
-        if (t && t.isEDO) {
+        if (t && (t.isEDO || isEquallyTempered(temperament))) {
             this.changeInTemperament = false;
             return;
         }
@@ -809,7 +809,7 @@ function Synth() {
         }
 
         const t = getTemperament(this.inTemperament);
-        if (t && t.isEDO) {
+        if (t && (t.isEDO || isEquallyTempered(this.inTemperament))) {
             if (typeof notes === "string") {
                 const parsed = parseNoteString(notes);
                 return pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament);
@@ -1870,17 +1870,9 @@ function Synth() {
                 notes = this._getFrequency(notes, this.changeInTemperament);
                 if (notes === undefined) {
                     if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
-                        notes =
-                            notes1.substring(0, 1) +
-                            "" +
-                            "bb" +
-                            notes1.substring(notes1.length - 1, notes1.length);
+                        notes = notes1.substring(0, 1) + "bb" + notes1.substring(notes1.length - 1);
                     } else if (notes1.substring(1, notes1.length - 1) === DOUBLESHARP) {
-                        notes =
-                            notes1.substring(0, 1) +
-                            "" +
-                            "x" +
-                            notes1.substring(notes1.length - 1, notes1.length);
+                        notes = notes1.substring(0, 1) + "x" + notes1.substring(notes1.length - 1);
                     } else {
                         notes = notes1;
                     }

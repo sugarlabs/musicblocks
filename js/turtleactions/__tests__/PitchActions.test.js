@@ -159,7 +159,7 @@ describe("Tests for Singer.PitchActions setup", () => {
 
         test("inverted path", () => {
             turtle.singer.lastNotePlayed = ["A4", 4];
-            turtle.singer.inverted = true;
+            turtle.singer.invertList = [["C", 4, "even"]];
             // delta_temp=3 makes transposition_temp = 2*3 = 6, distinguishable from 2/3.
             jest.spyOn(Singer, "calculateInvert").mockReturnValue(3);
             const spy = jest.spyOn(global, "getNote");
@@ -168,6 +168,48 @@ describe("Tests for Singer.PitchActions setup", () => {
             // inverted branch actually runs.
             expect(spy.mock.calls[0][2]).toBe(6);
             spy.mockRestore();
+        });
+
+        // Regression coverage for #8189: closing a nested Invert block used to
+        // unconditionally clear a separate `tur.singer.inverted` cache flag, even
+        // while an outer Invert block was still open, causing stepPitch to skip
+        // un-inverting when it shouldn't. That cache flag has since been removed
+        // entirely — stepPitch now reads `invertList.length` directly — so these
+        // tests assert the observable behavior stays correct across nesting.
+        test("nested Invert: stepPitch still un-inverts after an inner Invert closes while an outer one remains open", () => {
+            const callbacks = [];
+            activity.logo.setTurtleListener = (_t, _n, cb) => callbacks.push(cb);
+
+            Singer.PitchActions.invert("C", 4, "even", 0, "outerBlk");
+            Singer.PitchActions.invert("C", 4, "even", 0, "innerBlk");
+            expect(turtle.singer.invertList).toHaveLength(2);
+
+            callbacks[1](); // inner Invert block's clamp closes
+            expect(turtle.singer.invertList).toHaveLength(1); // outer still open
+
+            turtle.singer.lastNotePlayed = ["A4", 4];
+            Singer.calculateInvert.mockClear();
+            Singer.PitchActions.stepPitch(3, 0, blkId);
+
+            expect(Singer.calculateInvert).toHaveBeenCalled();
+        });
+
+        test("nested Invert: stepPitch stops un-inverting once every Invert block has closed", () => {
+            const callbacks = [];
+            activity.logo.setTurtleListener = (_t, _n, cb) => callbacks.push(cb);
+
+            Singer.PitchActions.invert("C", 4, "even", 0, "outerBlk");
+            Singer.PitchActions.invert("C", 4, "even", 0, "innerBlk");
+
+            callbacks[1](); // inner closes
+            callbacks[0](); // outer closes
+            expect(turtle.singer.invertList).toHaveLength(0);
+
+            turtle.singer.lastNotePlayed = ["A4", 4];
+            Singer.calculateInvert.mockClear();
+            Singer.PitchActions.stepPitch(3, 0, blkId);
+
+            expect(Singer.calculateInvert).not.toHaveBeenCalled();
         });
 
         test("reset-to-default guard only fires when inMatrix, inMusicKeyboard, and inNoteBlock are all clear", () => {
@@ -1126,12 +1168,10 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(turtle.singer.transpositionRatios).toHaveLength(0);
         });
 
-        test("invert listener callback pops & clears inverted flag", () => {
+        test("invert listener callback pops the pushed entry off invertList", () => {
             turtle.singer.invertList = [];
-            turtle.singer.inverted = true;
             Singer.PitchActions.invert("C", 4, "even", 0, blkId);
             expect(turtle.singer.invertList).toHaveLength(0);
-            expect(turtle.singer.inverted).toBe(false);
         });
 
         test("setAccidental blockList listener callback reverses delta", () => {

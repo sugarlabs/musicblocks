@@ -336,6 +336,28 @@ describe("widgetWindows", () => {
 
             expect(win._buttons).toHaveLength(3);
         });
+
+        test("modifyButton still addresses the live buttons after a re-init", () => {
+            // A widget that re-initialises on an already open window (see
+            // Blocks.reInitWidget) calls clear() and then re-adds its buttons.
+            const win = createTestWindow();
+            win.clear();
+            win.addButton("play-button.svg", 24, "Play");
+            win.addButton("erase-button.svg", 24, "Clear");
+
+            win.clear();
+            win.addButton("play-button.svg", 24, "Play");
+            win.addButton("erase-button.svg", 24, "Clear");
+
+            expect(win._buttons).toHaveLength(2);
+
+            const target = win.modifyButton(0, "stop-button.svg", 24, "Stop");
+
+            expect(win._toolbar.contains(target)).toBe(true);
+            expect(win._toolbar.querySelector("img").getAttribute("src")).toBe(
+                "header-icons/stop-button.svg"
+            );
+        });
     });
 
     describe("addDivider", () => {
@@ -614,6 +636,24 @@ describe("widgetWindows", () => {
             win.updateTitle("New Title");
 
             expect(titleEl.innerHTML).toBe("New Title");
+        });
+
+        test("keeps the frame's aria-label in sync with the new title", () => {
+            const win = createTestWindow("Old Title");
+
+            win.updateTitle("New Title");
+
+            expect(win._frame.getAttribute("aria-label")).toBe("New Title");
+        });
+    });
+
+    describe("frame accessibility", () => {
+        test("gives the window frame a dialog role and an accessible name", () => {
+            const win = createTestWindow("My Widget");
+
+            expect(win._frame.getAttribute("role")).toBe("dialog");
+            expect(win._frame.getAttribute("aria-label")).toBe("My Widget");
+            expect(win._frame.getAttribute("aria-modal")).toBeNull();
         });
     });
 
@@ -1108,6 +1148,66 @@ describe("widgetWindows", () => {
 
             win._restore();
             expect(win._maxminButton.title).toBe("Maximize window");
+        });
+    });
+
+    describe("closeBlkWidgets()", () => {
+        beforeEach(() => {
+            window.widgetWindows.openWindows = {};
+            window.widgetWindows.closeWindow = jest.fn();
+            window.widgetWindows.hideAllWindows = jest.fn();
+            window.widgetWindows.hideWindow = jest.fn();
+        });
+
+        it("closes matching widget by name", () => {
+            const mockElement = { innerHTML: "TestWidget" };
+
+            document.getElementsByClassName = jest.fn(() => [mockElement]);
+
+            window.widgetWindows.closeBlkWidgets("TestWidget");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("TestWidget");
+        });
+
+        it("closes widget directly using key lookup from openWindows", () => {
+            window.widgetWindows.openWindows = {
+                "custom mode": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("custom mode");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
+        });
+
+        it("closes widget using mapped key", () => {
+            window.widgetWindows.openWindows = {
+                "pitch drum": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("pitch-drum mapper");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
+        });
+
+        it("closes widget by matching element ID when display title changes", () => {
+            const mockElement = {
+                innerHTML: "C MAJOR",
+                id: "custom modeWidgetID"
+            };
+
+            document.getElementsByClassName = jest.fn(() => [mockElement]);
+
+            window.widgetWindows.closeBlkWidgets("custom mode");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
+        });
+
+        it("does nothing if no match found", () => {
+            document.getElementsByClassName = jest.fn(() => [{ innerHTML: "OtherWidget" }]);
+
+            window.widgetWindows.closeBlkWidgets("TestWidget");
+
+            expect(window.widgetWindows.closeWindow).not.toHaveBeenCalled();
         });
     });
 });

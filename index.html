@@ -20,15 +20,6 @@
         <!-- Stylesheets -->
         <link
             rel="preload"
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            as="style"
-            onload="
-                this.onload = null;
-                this.rel = 'stylesheet';
-            "
-        />
-        <link
-            rel="preload"
             href="fonts/material-icons.css"
             as="style"
             onload="
@@ -133,8 +124,6 @@
         <script src="js/utils/jquery-setup.js" defer></script>
         <script src="js/utils/abcLoader.js" defer></script>
         <script src="lib/midi.js" defer></script>
-        <script src="lib/jquery.ruler.js" defer></script>
-        <script src="lib/modernizr-2.6.2.min.js" defer></script>
         <script src="lib/raphael.min.js" defer></script>
         <script src="lib/wheelnav.js" defer></script>
         <script src="lib/codejar/codejar.min.js" defer></script>
@@ -317,6 +306,9 @@
                 <div class="canvasHolder" id="canvasHolder">
                     <div
                         id="clear-modal-container"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Clear workspace confirmation"
                         style="
                             display: none;
                             z-index: 999;
@@ -499,7 +491,14 @@
                     </div>
                 </footer>
 
-                <dialog id="lilypondModal" class="modal" tabindex="-1">
+                <dialog
+                    id="lilypondModal"
+                    class="modal"
+                    tabindex="-1"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Save LilyPond score"
+                >
                     <!-- Modal content for Lilypond save dialog -->
                     <div class="modal-content" tabindex="-1">
                         <span class="close">&times;</span>
@@ -559,7 +558,13 @@
                                         data-tooltip="Record"
                                         role="button"
                                         tabindex="0"
-                                    ></a>
+                                        aria-label="Record"
+                                        ><i class="material-icons main ring" aria-hidden="true"
+                                            >radio_button_unchecked</i
+                                        ><i class="material-icons main dot" aria-hidden="true"
+                                            >fiber_manual_record</i
+                                        ></a
+                                    >
                                     <a
                                         id="recordDropdownArrow"
                                         class="left dropdown-trigger"

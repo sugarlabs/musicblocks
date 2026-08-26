@@ -14,7 +14,7 @@
 // Localization helper for early bootstrap
 const t_ = typeof _ === "function" ? _ : s => s;
 
-const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7";
+const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix8";
 
 // The function normalizeLanguageCode() is declared as a side effect of
 // loading js/utils/language-utils.js as a <script> tag in index.html; classic
@@ -212,9 +212,6 @@ requirejs.config({
         "jquery-ui": {
             deps: ["jquery"]
         },
-        "abc": {
-            exports: "ABCJS"
-        },
         "libgif": {
             exports: "SuperGif"
         },
@@ -253,6 +250,7 @@ requirejs.config({
         "activity/block-drag-controller": "js/activity/block-drag-controller",
         "activity/trash-controller": "js/activity/trash-controller",
         "activity/help-controller": "js/activity/help-controller",
+        "activity/context-menu-controller": "js/activity/context-menu-controller",
         "search-ui": "js/search-ui",
         "project-manager": "js/project-manager",
         "activity/keyboard-controller": "js/activity/keyboard-controller",
@@ -274,7 +272,6 @@ requirejs.config({
         "jquery": "lib/jquery-3.7.1.min",
         "jquery-ui": "lib/jquery-ui",
         "materialize": "lib/materialize.min",
-        "abc": "lib/abc.min",
         "libgif": "https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif",
         "Tone": "lib/Tone",
         "highlight": "//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min",
@@ -512,7 +509,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 { name: "jquery", export: () => window.jQuery },
                 { name: "jquery-ui", export: () => window.jQuery.ui },
                 { name: "materialize", export: () => window.Materialize || window.M },
-                { name: "abc", export: () => window.ABCJS },
                 { name: "Tone", export: () => window.Tone },
                 { name: "howler", export: () => window.Howl }
             ];

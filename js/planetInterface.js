@@ -156,7 +156,7 @@ class PlanetInterface {
             this.activity.loading = true;
             document.body.style.cursor = "wait";
             this.activity.doLoadAnimation();
-            this.activity._allClear(false);
+            this.activity._allClear(false, true);
 
             // First, hide the palettes as they will need updating.
             this.activity.blocks.palettes._hideMenus(true);

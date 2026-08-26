@@ -448,8 +448,29 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     line-height: 30px;
 }
 
-.blink {
+#record {
+    position: relative;
+}
+
+#record .dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+}
+
+#record.recording .dot {
+    color: red;
     animation: blink-animation 1.5s infinite;
+}
+
+@media (max-width: 690px) {
+    #record .ring,
+    #record .dot {
+        font-size: 26px;
+        margin: 0;
+        width: auto;
+    }
 }
 
 @keyframes blink-animation {
@@ -993,7 +1014,7 @@ table {
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: transparent;
     width: 680px;
 }
 

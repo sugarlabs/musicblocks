@@ -429,6 +429,9 @@ describe("FlowBlocks integration", () => {
         logo.firstNoteTime = null;
         block.flow([true], logo, 0, blk);
         expect(logo.firstNoteTime).not.toBeNull();
+        expect(Number.isFinite(turtle.singer.turtleTime)).toBe(true);
+        expect(turtle.singer.turtleTime).toBeGreaterThanOrEqual(0);
+        expect(turtle.singer.previousTurtleTime).toBe(turtle.singer.turtleTime);
         // One requeued entry should remain for this block
         const remaining = turtle.queue.filter(q => q.parentBlk === blk);
         expect(remaining).toHaveLength(1);

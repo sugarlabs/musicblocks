@@ -26,12 +26,17 @@ class StatsWindow {
     constructor(activity) {
         this.activity = activity;
         this.isOpen = true;
+        this._inFlight = false;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "stats", "stats");
         this.widgetWindow.clear();
         this.widgetWindow.show();
+        this.widgetWindow.addButton("reload.svg", 32, _("Refresh")).onclick = () => {
+            this.refresh();
+        };
         this.widgetWindow.onclose = () => {
             this.isOpen = false;
+            this._inFlight = false;
             this.activity.blocks.showBlocks();
             this.widgetWindow.destroy();
             this.activity.logo.statsWindow = null;
@@ -65,6 +70,31 @@ class StatsWindow {
             this.doAnalytics();
         };
         this.widgetWindow.sendToCenter();
+    }
+
+    /**
+     * Re-runs analytics and updates the chart display.
+     * @public
+     * @returns {void}
+     */
+    refresh() {
+        if (this._inFlight) {
+            return;
+        }
+        this._inFlight = true;
+        this.widgetWindow.getWidgetBody().replaceChildren();
+        if (typeof window.Chart !== "undefined") {
+            this.doAnalytics();
+        } else {
+            this._ensureChartLoaded()
+                .then(() => {
+                    this.doAnalytics();
+                })
+                .catch(err => {
+                    this._inFlight = false;
+                    console.error("Failed to load Chart.js:", err);
+                });
+        }
     }
 
     /**
@@ -116,6 +146,7 @@ class StatsWindow {
             this.activity.blocks.hideBlocks();
             this.activity.showBlocksAfterRun = false;
             document.body.style.cursor = "default";
+            this._inFlight = false;
         };
         const options = getChartOptions(__callback);
         myRadarChart = new window.Chart(ctx).Radar(data, options);
@@ -131,16 +162,22 @@ class StatsWindow {
      * @returns {void}
      */
     displayInfo(stats) {
-        const lowHertz = stats["lowestNote"][2] + 0.5;
-        const highHertz = stats["highestNote"][2] + 0.5;
+        const lowestNote = stats["lowestNote"];
+        const highestNote = stats["highestNote"];
+        const lowestNoteLabel = lowestNote
+            ? `${lowestNote[0]},${(lowestNote[2] + 0.5).toFixed(0)}Hz`
+            : "N/A";
+        const highestNoteLabel = highestNote
+            ? `${highestNote[0]},${(highestNote[2] + 0.5).toFixed(0)}Hz`
+            : "N/A";
         const items = [
             ["duples", stats["duples"]],
             ["triplets", stats["triplets"]],
             ["quintuplets", stats["quintuplets"]],
             ["pitch names", Array.from(stats["pitchNames"]).join(", ")],
             ["number of notes", stats["numberOfNotes"]],
-            ["lowest note", `${stats["lowestNote"][0]},${lowHertz.toFixed(0)}Hz`],
-            ["highest note", `${stats["highestNote"][0]},${highHertz.toFixed(0)}Hz`],
+            ["lowest note", lowestNoteLabel],
+            ["highest note", highestNoteLabel],
             ["rests used", stats["rests"]],
             ["ornaments used", stats["ornaments"]]
         ];

@@ -40,6 +40,13 @@
     --color-notification-bg: #1d4ed8;
     --color-notification-text: #ffffff;
 
+    /* Widget window title bar (mobile breakpoints only, dist/css/windows.css).
+       Kept as a dedicated token rather than reusing --color-brand-primary,
+       since that token's dark-theme value (#60a5fa) fails contrast with
+       white text (~2.54:1); this value is verified at 4.60:1. */
+    --color-widget-titlebar-bg: #1976d2;
+    --color-widget-titlebar-text: #ffffff;
+
     /* =========================================================================
      Spacing (Base 4px scale)
      ========================================================================= */
@@ -115,6 +122,8 @@ body.dark {
     --color-brand-primary-hover: #3b82f6;
     --color-notification-bg: #1d4ed8;
     --color-notification-text: #ffffff;
+    --color-widget-titlebar-bg: #1976d2;
+    --color-widget-titlebar-text: #ffffff;
     --color-brand-secondary: #a78bfa;
 
     --color-selector-bg: #64b5f6;
@@ -153,6 +162,8 @@ body.highcontrast {
     --color-brand-primary-hover: #ffffff;
     --color-notification-bg: #0000ff;
     --color-notification-text: #ffffff;
+    --color-widget-titlebar-bg: #0000ff;
+    --color-widget-titlebar-text: #ffffff;
     --color-brand-secondary: #00ffff;
 
     --color-selector-bg: #00ffff;

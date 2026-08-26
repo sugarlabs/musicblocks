@@ -188,7 +188,10 @@ describe("Toolbar Class", () => {
                 onmouseenter: null,
                 onmouseleave: null,
                 onclick: null,
-                style: {}
+                style: {},
+                setAttribute: jest.fn(),
+                addEventListener: jest.fn(),
+                click: jest.fn()
             }
         };
 
@@ -223,6 +226,18 @@ describe("Toolbar Class", () => {
 
         elements["mb-logo"].onclick();
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
+        expect(elements["mb-logo"].setAttribute).toHaveBeenCalledWith("role", "button");
+        expect(elements["mb-logo"].setAttribute).toHaveBeenCalledWith("tabindex", "0");
+        expect(elements["mb-logo"].addEventListener).toHaveBeenCalledWith(
+            "keydown",
+            expect.any(Function)
+        );
+
+        const logoKeydownHandler = elements["mb-logo"].addEventListener.mock.calls[0][1];
+        const enterEvent = { key: "Enter", preventDefault: jest.fn() };
+        logoKeydownHandler(enterEvent);
+        expect(enterEvent.preventDefault).toHaveBeenCalled();
+        expect(elements["mb-logo"].click).toHaveBeenCalled();
 
         // Japanese language
         toolbar.language = "ja";
@@ -249,6 +264,7 @@ describe("Toolbar Class", () => {
             },
             record: {
                 className: "",
+                classList: { add: jest.fn(), remove: jest.fn() },
                 setAttribute: jest.fn()
             }
         };
@@ -272,7 +288,7 @@ describe("Toolbar Class", () => {
         expect(elements.stop.style.color).toBe(toolbar.stopIconColorWhenPlaying);
         expect(global.saveButtonAdvanced.disabled).toBe(true);
         expect(global.saveButton.className).toBe("grey-text inactiveLink");
-        expect(elements.record.className).toBe("grey-text inactiveLink");
+        expect(elements.record.classList.add).toHaveBeenCalledWith("grey-text", "inactiveLink");
         expect(elements.stop.removeEventListener).toHaveBeenCalledWith(
             "click",
             expect.any(Function)
@@ -294,7 +310,10 @@ describe("Toolbar Class", () => {
             setAttribute: jest.fn(),
             addEventListener: jest.fn()
         };
-        const recordButton = { className: "recording" };
+        const recordButton = {
+            className: "recording",
+            classList: { add: jest.fn(), remove: jest.fn() }
+        };
 
         global.docById.mockImplementation(id =>
             id === "stop"
@@ -315,7 +334,7 @@ describe("Toolbar Class", () => {
         expect(global.saveButtonAdvanced.disabled).toBe(false);
         expect(global.saveButton.className).toBe("");
         expect(global.saveButtonAdvanced.className).toBe("");
-        expect(recordButton.className).toBe("");
+        expect(recordButton.classList.remove).toHaveBeenCalledWith("grey-text", "inactiveLink");
     });
 
     test("renderNewProjectIcon displays modal and handles confirmation", () => {
@@ -365,6 +384,15 @@ describe("Toolbar Class", () => {
         expect(messageElement.id).toBe("confirmation-message");
         expect(confirmButton.textContent).toBe("Confirm");
         expect(confirmButton.id).toBe("new-project");
+        expect(confirmButton.getAttribute("role")).toBe("button");
+        expect(confirmButton.getAttribute("aria-label")).toBe("Confirm");
+        expect(confirmButton.getAttribute("aria-describedby")).toBe("confirmation-message");
+
+        const cancelButton = buttonListItem.children[1];
+        expect(cancelButton.textContent).toBe("Cancel");
+        expect(cancelButton.getAttribute("role")).toBe("button");
+        expect(cancelButton.getAttribute("aria-label")).toBe("Cancel");
+        expect(cancelButton.getAttribute("aria-describedby")).toBe("confirmation-message");
 
         confirmButton.onclick();
 
@@ -590,10 +618,7 @@ describe("Toolbar Class", () => {
     test("updateRecordButton hides record button", () => {
         const recordButton = {
             classList: { add: jest.fn() },
-            style: { display: "" },
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn()
+            style: { display: "" }
         };
         global.docById.mockReturnValue(recordButton);
         global.fnBrowserDetect = jest.fn(() => "firefox");
@@ -603,14 +628,9 @@ describe("Toolbar Class", () => {
     });
 
     test("updateRecordButton keeps only one outside-click listener and dispose removes it", () => {
-        global.RECORDBUTTON = "fiber_manual_record";
-
         const recordButton = {
             classList: { add: jest.fn(), remove: jest.fn() },
             style: { display: "" },
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn(),
             onclick: null
         };
 

@@ -113,7 +113,7 @@ function setupWidgetBlocks(activity) {
     function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
         if (logo[widgetKey] === null || logo[widgetKey] === undefined) {
             logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
-            _lazyRequire(modules, function () {
+            _lazyRequire(modules, () => {
                 logo[widgetKey] = initFn();
                 if (typeof logo.runFromBlockNow === "function") {
                     logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
@@ -142,7 +142,7 @@ function setupWidgetBlocks(activity) {
      * @param {Function} [onReady] - Optional callback run after assignment.
      */
     function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
-        _lazyRequire(modules, function () {
+        _lazyRequire(modules, () => {
             logo[widgetKey] = factory();
             onReady?.();
         });
@@ -832,17 +832,25 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_modewidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            const resetFlag = () => {
+                logo.insideModeWidget = false;
+            };
+
             const __listener = () => {
+                // Re-show an already-open widget instead of building a second
+                // instance (duplicate toolbar buttons, overwritten handlers).
+                if (logo.modeWidget && logo.modeWidget !== "loading") {
+                    logo.modeWidget.widgetWindow.show();
+                    resetFlag();
+                    return;
+                }
                 _lazyLoadWidget(
                     logo,
                     "modeWidget",
                     _getWidgetDependencies(typeof ModeWidget !== "undefined" ? ModeWidget : null, [
                         "widgets/modewidget"
                     ]),
-                    () => new ModeWidget(activity),
-                    () => {
-                        logo.insideModeWidget = false;
-                    }
+                    () => new ModeWidget(activity)
                 );
             };
 
@@ -1712,8 +1720,6 @@ function setupWidgetBlocks(activity) {
          * @param {any} receivedArg - The argument received from the previous block.
          */
         flow(args, logo, turtle, blk, receivedArg) {
-            logo.inMatrix = true;
-
             const interruption = _ensureWidget(
                 logo,
                 "phraseMaker",
@@ -1768,6 +1774,12 @@ function setupWidgetBlocks(activity) {
                 receivedArg
             );
             if (interruption) return interruption;
+
+            // Only mark collection mode once the widget is really available.
+            // Setting the flag before the lazy-load finished let concurrently
+            // playing stacks call into the "loading" placeholder and crash;
+            // see the note-collection branches in turtle-singer.js.
+            logo.inMatrix = true;
 
             logo.phraseMaker.blockNo = blk;
 
@@ -2177,8 +2189,6 @@ function setupWidgetBlocks(activity) {
          * @returns {number[]} - The output values.
          */
         flow(args, logo, turtle, blk, receivedArg) {
-            logo.inLegoWidget = true;
-
             const interruption = _ensureWidget(
                 logo,
                 "legoWidget",
@@ -2191,6 +2201,10 @@ function setupWidgetBlocks(activity) {
                 receivedArg
             );
             if (interruption) return interruption;
+
+            // Same ordering as the matrix flow above: the flag must not be
+            // raised while logo.legoWidget is still the "loading" placeholder.
+            logo.inLegoWidget = true;
 
             logo.legoWidget.blockNo = blk;
 

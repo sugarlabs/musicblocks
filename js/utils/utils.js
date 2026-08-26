@@ -52,7 +52,7 @@ if (typeof module !== "undefined" && module.exports) {
 }
 
 /* exported
-   announceToScreenReader, changeImage, closeBlkWidgets,
+   announceToScreenReader, changeImage,
    delayExecution,
    doPublish, doStopVideoCam, doSVG,
    doUseCamera, format, getTextWidth,
@@ -404,6 +404,12 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
             return;
         }
 
+        // Fix for Chrome CSP which blocks Function("return this")() typically found in webpack bundles
+        code = code.replace(
+            /(?:new\s+)?Function\s*\(\s*['"]return this['"]\s*\)\s*\(\)/g,
+            "window"
+        );
+
         // We wrap the code in a closure that provides activity and globalActivity.
         // We'll execute these after the Blob script is loaded and populates the registry.
         pendingSafeEvals.push({ code, label });
@@ -576,11 +582,6 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     }
 
     // Create the plugin protoblocks.
-    // FIXME: On Chrome, plugins are broken (They still work on Firefox):
-    // EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self' blob: filesystem: chrome-extension-resource:".
-    // Maybe:
-    // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
-
     if ("BLOCKPLUGINS" in obj) {
         for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
             if (isUnsafeObjectKey(block)) continue;
@@ -1193,71 +1194,6 @@ let delayExecution = duration => {
 
 // closeWidgets() moved to js/utils/dom-helpers.js
 
-/**
- * Closes a specific widget by its name.
- *
- * @param {string} name - The name of the widget to be closed.
- * @returns {void}
- */
-let closeBlkWidgets = name => {
-    let searchKey = name;
-
-    // NOTE: This mapping only works for widgets that never set their own
-    // `blockNo` property (e.g. ModeWidget). window.widgetWindows.windowFor()
-    // keys a widget's window by `widget.blockNo` if that property is set to
-    // anything other than undefined (including null) — otherwise it falls
-    // back to the `saveAs` or `title` argument. Widgets like PhraseMaker set
-    // `this.blockNo` in their constructor, so they are keyed by blockNo, not
-    // by name, and will NOT be found via this KEY_MAPPING lookup. Adding such
-    // widgets here would silently do nothing. Before adding a new entry,
-    // verify the target widget's windowFor() call and confirm it does not
-    // rely on blockNo for its window key.
-    const KEY_MAPPING = {
-        "pitch-drum mapper": "pitch drum",
-        "custom mode": "custom mode",
-        "tempo": "tempo",
-        "arpeggio": "arpeggio",
-        "timbre": "timbre",
-        "sampler": "sampler",
-        "rhythm maker": "rhythm maker",
-        "oscilloscope": "oscilloscope",
-        "temperament": "temperament",
-        "meter": "meter"
-    };
-
-    for (const origKey in KEY_MAPPING) {
-        const translated = typeof _ === "function" ? _(origKey) : origKey;
-        if (name === translated) {
-            searchKey = KEY_MAPPING[origKey];
-            break;
-        }
-    }
-
-    if (
-        window.widgetWindows &&
-        window.widgetWindows.openWindows &&
-        window.widgetWindows.openWindows[searchKey]
-    ) {
-        window.widgetWindows.closeWindow(searchKey);
-        return;
-    }
-
-    const widgetTitle = document.getElementsByClassName("wftTitle");
-    for (let i = 0; i < widgetTitle.length; i++) {
-        const titleEl = widgetTitle[i];
-        if (titleEl.innerHTML === name || titleEl.id === `${searchKey}WidgetID`) {
-            const winKey =
-                titleEl.id && typeof titleEl.id === "string"
-                    ? titleEl.id.replace("WidgetID", "")
-                    : searchKey;
-            if (window.widgetWindows && typeof window.widgetWindows.closeWindow === "function") {
-                window.widgetWindows.closeWindow(winKey);
-            }
-            break;
-        }
-    }
-};
-
 // resolveObject() moved to js/utils/utils-logic.js
 
 /**
@@ -1356,7 +1292,6 @@ if (typeof module !== "undefined" && module.exports) {
         _,
         format,
         delayExecution,
-        closeBlkWidgets,
         importMembers,
         changeImage,
         getTextWidth,
@@ -1371,4 +1306,15 @@ if (typeof module !== "undefined" && module.exports) {
         doStopVideoCam,
         CameraManager
     };
+}
+
+// In the browser (and not under test, where dom-helpers.js's equivalent
+// guard already explains why this is conditional), explicitly attach this
+// to `window` rather than relying on it being reachable as a bare
+// identifier from other classic <script>-loaded files. That reachability
+// is real but load-order-dependent and not guaranteed -- callers in newer
+// or differently-ordered files have hit `ReferenceError: announceToScreenReader
+// is not defined` despite the function existing here.
+if (typeof window !== "undefined" && (typeof module === "undefined" || !module.exports)) {
+    window.announceToScreenReader = announceToScreenReader;
 }
