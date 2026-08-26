@@ -9,7 +9,7 @@ describe("Block palette drag-and-drop", () => {
         // known default starter project.
         cy.visit("http://127.0.0.1:3000");
         cy.clearLocalStorage();
-        cy.visit("http://127.0.0.1:3000");
+        cy.reload();
         cy.waitForAppReady();
 
         cy.get("body").then($body => {
@@ -38,33 +38,31 @@ describe("Block palette drag-and-drop", () => {
             .should("be.visible");
 
         // Compute the drop target from real application state rather than a
-        // guessed pixel position: the default starter project already has a
-        // "start" hat block whose first child is a "settimbre" block
-        // (js/blocks/PitchBlocks.js's PitchBlock extends FlowBlock, so a
-        // dropped pitch block can dock directly into that same flow slot).
-        // blockMoved (js/activity/block-drag-controller.js) looks for a
-        // compatible dock near (container.x + docks[0][x], container.y +
-        // docks[0][y]) of the DRAGGED block, so the container position we
-        // need to land on is start's child-dock position offset backward by
-        // the dragged block's own top-dock offset.
+        // guessed pixel position: pitch blocks can dock straight beneath the
+        // canvas's "start" hat block, at start's child-dock position offset
+        // backward by the dragged block's own top-dock offset (blockMoved in
+        // js/activity/block-drag-controller.js matches on that offset point).
         cy.window().then(win => {
-            const blocks = win.ActivityContext.getActivity().blocks;
+            const activity = win.ActivityContext.getActivity();
+            const blocks = activity.blocks;
             const startBlk = blocks.blockList.findIndex(b => !b.trash && b.name === "start");
             const start = blocks.blockList[startBlk];
             const previousChild = start.connections[1];
 
-            // Read the dock geometry off an existing "pitch" instance already
-            // on the canvas - dock offsets are fixed per block type/scale, so
-            // this is a stable stand-in for the not-yet-created block's own
-            // geometry. Fail with a clear message rather than a bare
-            // "Cannot read properties of undefined" if the starter project
-            // ever stops shipping a pitch block.
-            const templateBlock = blocks.blockList.find(b => !b.trash && b.name === "pitch");
+            // Read the dragged block's own dock geometry from the Pitch
+            // palette's protoblock model (js/palette.js PaletteModel.update /
+            // makeBlockInfo, which renders each entry's SVG - and its docks -
+            // at the same DEFAULTBLOCKSCALE used for real blocks) rather than
+            // from a block already sitting on the canvas, so this doesn't
+            // depend on the starter project's contents.
+            const pitchModelEntry = activity.palettes.dict["pitch"].model.blocks.find(
+                b => b.blkname === "pitch"
+            );
             expect(
-                templateBlock,
-                "default project should contain a pitch block to provide dock geometry"
+                pitchModelEntry,
+                "Pitch palette model should have a 'pitch' block entry to provide dock geometry"
             ).to.exist;
-            const templateDocks = templateBlock.docks;
+            const templateDocks = pitchModelEntry.docks;
 
             const targetContainerX = start.container.x + start.docks[1][0] - templateDocks[0][0];
             const targetContainerY = start.container.y + start.docks[1][1] - templateDocks[0][1];
