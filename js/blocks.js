@@ -74,6 +74,15 @@
  * @returns {void}
  */
 
+/**
+ * Maximum number of highlight state changes retained per block while the batched
+ * highlight queue is being drained. One state is applied per animation frame, so a
+ * cap of 2 means a block is never more than a single frame behind the run queue,
+ * while still guaranteeing that a highlight requested during a frame is rendered
+ * for at least one frame before it is unhighlighted.
+ */
+const MAXPENDINGHIGHLIGHTS = 2;
+
 class Blocks {
     constructor(activityOrDeps) {
         // Build dependencies container
@@ -199,6 +208,13 @@ class Blocks {
 
         /** Which block, if any, is highlighted? */
         this.highlightedBlock = null;
+
+        /** Pending highlight states per block, keyed by block number. Each entry is an
+         * alternating queue of desired states (true = highlighted) that have not been
+         * rendered yet. */
+        this._highlightQueue = new Map();
+        /** Is a flush of the highlight queue already scheduled for the next frame? */
+        this._highlightScheduled = false;
         /** Which block, if any, is active? */
         this.activeBlock = null;
         /** Are the blocks visible? */
@@ -2497,7 +2513,7 @@ class Blocks {
             }
 
             if (thisBlock !== null) {
-                this.blockList[thisBlock].unhighlight();
+                this._queueHighlightState(thisBlock, false);
             }
 
             if (this.highlightedBlock === thisBlock) {
@@ -2518,11 +2534,97 @@ class Blocks {
             }
 
             if (blk !== null) {
-                if (unhighlight) {
+                // Re-highlighting the block that is already highlighted would queue a
+                // redundant off/on pair, so only clear a *different* block.
+                if (unhighlight && this.highlightedBlock !== blk) {
                     this.unhighlight(null);
                 }
-                this.blockList[blk].highlight();
+
+                this._queueHighlightState(blk, true);
                 this.highlightedBlock = blk;
+            }
+        };
+
+        /**
+         * Record the desired highlight state of a block, to be written to the DOM on a
+         * later animation frame.
+         *
+         * Repeated requests for the state a block is already heading to collapse into
+         * one, but a highlight that is superseded within the same frame is still
+         * rendered for one frame rather than being dropped. No state is remembered
+         * once the queue drains, so nothing here can go stale against the artwork.
+         * @private
+         * @param - blk - block number
+         * @param - state - true to highlight, false to unhighlight
+         * @returns {void}
+         */
+        this._queueHighlightState = (blk, state) => {
+            let pending = this._highlightQueue.get(blk);
+            if (pending === undefined) {
+                pending = [];
+                this._highlightQueue.set(blk, pending);
+            }
+
+            if (pending.length > 0 && pending[pending.length - 1] === state) {
+                // Already heading to this state on an upcoming frame.
+                return;
+            }
+
+            pending.push(state);
+
+            // Drop whole on/off pairs out of the middle so the backlog stays bounded
+            // without changing which state the block ends up in.
+            while (pending.length > MAXPENDINGHIGHLIGHTS) {
+                pending.splice(1, 2);
+            }
+
+            this._scheduleHighlightFlush();
+        };
+
+        /**
+         * Schedule a flush of the highlight queue on the next animation frame.
+         * @private
+         * @returns {void}
+         */
+        this._scheduleHighlightFlush = () => {
+            if (this._highlightScheduled) {
+                return;
+            }
+
+            this._highlightScheduled = true;
+            requestAnimationFrame(() => {
+                this._flushHighlightQueue();
+            });
+        };
+
+        /**
+         * Apply one pending highlight state per block, batching all of the frame's DOM
+         * writes together. Blocks with states still pending are flushed on the
+         * following frame.
+         * @private
+         * @returns {void}
+         */
+        this._flushHighlightQueue = () => {
+            this._highlightScheduled = false;
+
+            for (const [blk, pending] of this._highlightQueue) {
+                const state = pending.shift();
+                const block = this.blockList[blk];
+                if (block !== undefined && !block.trash) {
+                    if (state) {
+                        block.highlight();
+                    } else {
+                        block.unhighlight();
+                    }
+                }
+
+                if (pending.length === 0) {
+                    this._highlightQueue.delete(blk);
+                }
+            }
+
+            if (this._highlightQueue.size > 0) {
+                this._scheduleHighlightFlush();
             }
         };
 

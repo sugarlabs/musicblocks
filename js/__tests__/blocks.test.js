@@ -14,7 +14,7 @@
  * This file establishes the mocking infrastructure for the 7,500-line blocks.js.
  */
 
-/* global jest, describe, it, expect, beforeEach, beforeAll, afterAll */
+/* global jest, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll */
 
 const Blocks = require("../blocks");
 
@@ -1460,6 +1460,178 @@ describe("Blocks Foundation", () => {
             expect(blocksInstance.trashStacks.length).toBe(100);
             expect(blocksInstance.trashPreviews[0]).toBeUndefined();
             expect(blocksInstance.blockList[0]).toBeNull();
+        });
+    });
+
+    describe("Batched block highlighting", () => {
+        let blocks;
+        let frames;
+        let realRequestAnimationFrame;
+
+        /** Run every callback queued for the next frame. */
+        function tick() {
+            const pending = frames;
+            frames = [];
+            for (const callback of pending) {
+                callback();
+            }
+        }
+
+        /** Run frames until the highlight queue drains, with a guard against a stuck queue. */
+        function drain() {
+            let guard = 0;
+            while (frames.length > 0) {
+                if (++guard > 50) {
+                    throw new Error("highlight queue never drained");
+                }
+                tick();
+            }
+        }
+
+        /**
+         * A stand-in for a Block that records the order in which highlight and
+         * unhighlight reached its artwork, so a test can assert that no state in a
+         * transition was skipped.
+         */
+        function makeHighlightableBlock() {
+            const rendered = [];
+            return {
+                trash: false,
+                rendered,
+                highlight: jest.fn(() => rendered.push(true)),
+                unhighlight: jest.fn(() => rendered.push(false))
+            };
+        }
+
+        beforeEach(() => {
+            frames = [];
+            realRequestAnimationFrame = global.requestAnimationFrame;
+            global.requestAnimationFrame = callback => {
+                frames.push(callback);
+                return frames.length;
+            };
+
+            blocks = new Blocks(mockActivity);
+            blocks.visible = true;
+            blocks.blockList = [
+                makeHighlightableBlock(),
+                makeHighlightableBlock(),
+                makeHighlightableBlock()
+            ];
+        });
+
+        afterEach(() => {
+            global.requestAnimationFrame = realRequestAnimationFrame;
+        });
+
+        it("defers artwork updates to an animation frame rather than writing synchronously", () => {
+            blocks.highlight(0, false);
+
+            expect(blocks.blockList[0].highlight).not.toHaveBeenCalled();
+            expect(blocks.highlightedBlock).toBe(0);
+
+            tick();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+        });
+
+        it("batches every block queued during a frame into a single flush", () => {
+            blocks.highlight(0, false);
+            blocks.highlight(1, false);
+            blocks.highlight(2, false);
+
+            expect(frames.length).toBe(1);
+
+            tick();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[1].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[2].highlight).toHaveBeenCalledTimes(1);
+        });
+
+        it("collapses repeated requests for the state a block is already heading to", () => {
+            blocks.highlight(0, false);
+            blocks.highlight(0, false);
+            blocks.highlight(0, false);
+
+            drain();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+        });
+
+        it("still renders a highlight that is unhighlighted within the same frame", () => {
+            // At full playback speed a block is highlighted and unhighlighted between two
+            // frames. The highlight must survive rather than being coalesced away.
+            blocks.highlight(0, false);
+            blocks.unhighlight(0);
+
+            tick();
+
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+
+            drain();
+
+            expect(blocks.blockList[0].unhighlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].rendered).toEqual([true, false]);
+        });
+
+        it("keeps the backlog bounded when a block flashes repeatedly in one frame", () => {
+            for (let i = 0; i < 20; i++) {
+                blocks.highlight(0, false);
+                blocks.unhighlight(0);
+            }
+
+            // A bounded queue means the block never falls more than one frame behind.
+            expect(blocks._highlightQueue.get(0).length).toBeLessThanOrEqual(2);
+
+            drain();
+
+            // The block still visibly flashes, and ends up unhighlighted as requested.
+            expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[0].unhighlight).toHaveBeenCalledTimes(1);
+        });
+
+        it("does not queue a redundant off/on pair when re-highlighting the same block", () => {
+            blocks.highlight(0, true);
+            drain();
+
+            blocks.highlight(0, true);
+            drain();
+
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+        });
+
+        it("unhighlights the previously highlighted block when moving to a new one", () => {
+            blocks.highlight(0, true);
+            drain();
+
+            blocks.highlight(1, true);
+            drain();
+
+            expect(blocks.blockList[0].unhighlight).toHaveBeenCalledTimes(1);
+            expect(blocks.blockList[1].highlight).toHaveBeenCalledTimes(1);
+            expect(blocks.highlightedBlock).toBe(1);
+        });
+
+        it("skips blocks that were trashed before the queue was flushed", () => {
+            blocks.highlight(0, false);
+            blocks.blockList[0].trash = true;
+
+            drain();
+
+            expect(blocks.blockList[0].highlight).not.toHaveBeenCalled();
+        });
+
+        it("queues nothing while the blocks are hidden", () => {
+            blocks.visible = false;
+
+            blocks.highlight(0, false);
+            blocks.unhighlight(0);
+
+            expect(frames.length).toBe(0);
+            expect(blocks._highlightQueue.size).toBe(0);
         });
     });
 });
