@@ -87,6 +87,13 @@ body.highcontrast {
     background-color: var(--bg) !important;
 }
 
+/* Fix white table header strip in floating widgets during dark mode while preserving table body colors */
+.dark #floatingWindows table thead tr:first-child td,
+.dark #floatingWindows table thead tr:first-child th {
+    background-color: var(--bg) !important;
+    color: var(--fg) !important;
+}
+
 /* Trash view colors for dark mode */
 .dark .trash-view {
     background-color: #2d2d2d;
