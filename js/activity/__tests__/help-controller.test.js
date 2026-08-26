@@ -241,8 +241,17 @@ describe("HelpController.showKeyboardShortcuts", () => {
 
     describe("with a real WidgetWindow", () => {
         let realWidgetWindows;
+        let originalDocById;
+        let originalMakeKeyboardAccessible;
+        let originalWidgetWindows;
+        let createdFloatingWindows = false;
+        let createdCanvas = false;
 
         beforeAll(() => {
+            originalDocById = global.docById;
+            originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+            originalWidgetWindows = window.widgetWindows;
+
             global.makeKeyboardAccessible =
                 require("../../utils/dom-helpers").makeKeyboardAccessible;
             global.docById = id => document.getElementById(id);
@@ -251,16 +260,41 @@ describe("HelpController.showKeyboardShortcuts", () => {
                 const floatingWindows = document.createElement("div");
                 floatingWindows.id = "floatingWindows";
                 document.body.appendChild(floatingWindows);
+                createdFloatingWindows = true;
             }
 
             if (!document.getElementById("myCanvas")) {
                 const canvas = document.createElement("canvas");
                 canvas.id = "myCanvas";
                 document.body.appendChild(canvas);
+                createdCanvas = true;
             }
 
             require("../../widgets/widgetWindows.js");
             realWidgetWindows = window.widgetWindows;
+        });
+
+        afterAll(() => {
+            if (originalDocById === undefined) {
+                delete global.docById;
+            } else {
+                global.docById = originalDocById;
+            }
+
+            if (originalMakeKeyboardAccessible === undefined) {
+                delete global.makeKeyboardAccessible;
+            } else {
+                global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+            }
+
+            window.widgetWindows = originalWidgetWindows;
+
+            if (createdFloatingWindows) {
+                document.getElementById("floatingWindows")?.remove();
+            }
+            if (createdCanvas) {
+                document.getElementById("myCanvas")?.remove();
+            }
         });
 
         beforeEach(() => {
