@@ -155,19 +155,19 @@ class StatusMatrix {
                         label = _("beats per minute2");
                     } else {
                         label =
-                            this.activity.blocks.blockList[statusField[0]].protoblock
-                                .staticLabels[0];
+                            this.activity.blocks.blockList[statusField[0]]?.protoblock
+                                ?.staticLabels?.[0] || "";
                     }
                     break;
                 case "outputtools":
-                    label = this.activity.blocks.blockList[statusField[0]].privateData;
+                    label = this.activity.blocks.blockList[statusField[0]]?.privateData;
                     if (typeof label === "object" && label !== null && label.value) {
                         label = label.value;
                     }
                     if (label === null || label === undefined) {
                         label =
-                            this.activity.blocks.blockList[statusField[0]].protoblock
-                                .staticLabels[0];
+                            this.activity.blocks.blockList[statusField[0]]?.protoblock
+                                ?.staticLabels?.[0] || "";
                     }
                     label = _(label);
                     break;

@@ -837,5 +837,16 @@ describe("StatusMatrix Widget", () => {
             statusMatrix.updateAll();
             expect(statusMatrix._statusTable).toBeDefined();
         });
+
+        test("safely handles bpm, bpmfactor, and outputtools status fields when block or protoblock is missing", () => {
+            mockActivity.logo.statusFields = [
+                [999, "bpm"],
+                [998, "bpmfactor"],
+                [997, "outputtools"]
+            ];
+            mockActivity.blocks.blockList = {};
+
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+        });
     });
 });
