@@ -223,6 +223,8 @@ describe("Activity Toolbar Integration", () => {
             style: { visibility: "hidden" }
         };
 
+        activity.textMsg = jest.fn();
+
         global.window.widgetWindows = {
             isOpen: jest.fn(() => false),
             openWindows: {}
@@ -300,6 +302,20 @@ describe("Activity Toolbar Integration", () => {
             activity.onStopTurtle();
 
             expect(activity.toolbar.resetStop).toHaveBeenCalled();
+        });
+
+        test("announces program stopped to screen readers", () => {
+            activity.onStopTurtle();
+
+            expect(activity.textMsg).toHaveBeenCalledWith("Program stopped.");
+        });
+    });
+
+    describe("onRunTurtle", () => {
+        test("announces program running to screen readers", () => {
+            activity.onRunTurtle();
+
+            expect(activity.textMsg).toHaveBeenCalledWith("Program running.");
         });
     });
 });
