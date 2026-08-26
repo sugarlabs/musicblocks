@@ -202,6 +202,40 @@ describe("Viewport Culling", () => {
         expect(blocks.blockList[2]._viewportVisible).toBe(false);
     });
 
+    it("should refresh a stale highlight cache when a block re-enters the viewport", () => {
+        let cachedHighlightVisible = true;
+        const block = {
+            trash: false,
+            container: {
+                x: 900,
+                y: 100,
+                updateCache: jest.fn(() => {
+                    cachedHighlightVisible = block.highlightVisible;
+                })
+            },
+            width: 50,
+            height: 30,
+            _viewportVisible: false,
+            highlightVisible: true,
+            unhighlight() {
+                this.highlightVisible = false;
+                if (this._viewportVisible !== false) {
+                    this.container.updateCache();
+                }
+            }
+        };
+        blocks.blockList = [block];
+
+        block.unhighlight();
+        expect(cachedHighlightVisible).toBe(true);
+
+        block.container.x = 100;
+        blocks._updateViewportCulling();
+
+        expect(block.container.updateCache).toHaveBeenCalledTimes(1);
+        expect(cachedHighlightVisible).toBe(false);
+    });
+
     it("should skip trashed blocks without modifying their visibility", () => {
         blocks.blockList = [
             {

@@ -506,6 +506,22 @@ describe("Block Foundation", () => {
             });
         });
 
+        describe("unhighlightSelectedBlocks()", () => {
+            it("should include the disconnected state in the normal unhighlight cache update", () => {
+                block.disconnectedBitmap = new global.createjs.Bitmap();
+                block.disconnectedBitmap.visible = false;
+                block.connections = [null];
+                block.isArgBlock = jest.fn().mockReturnValue(true);
+                mockBlocks.unhighlight = jest.fn(() => block.unhighlight());
+
+                block.unhighlightSelectedBlocks(0, true);
+
+                expect(block.disconnectedBitmap.visible).toBe(true);
+                expect(mockBlocks.unhighlight).toHaveBeenCalledWith(0, true);
+                expect(block.container.updateCache).toHaveBeenCalledTimes(1);
+            });
+        });
+
         describe("regenerateArtwork()", () => {
             it("should remove old bitmaps and call generateArtwork", () => {
                 block.bitmap = new global.createjs.Bitmap();

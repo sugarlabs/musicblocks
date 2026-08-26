@@ -806,11 +806,10 @@ class Block {
 
     unhighlightSelectedBlocks(blk, selection) {
         if (selection) {
-            this.blocks.unhighlight(blk, true);
             if (!this.collapsed) {
                 this.disconnectedBitmap.visible = true;
             }
-            this.container.updateCache();
+            this.blocks.unhighlight(blk, true);
         }
     }
 
