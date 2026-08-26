@@ -5359,7 +5359,12 @@ class Blocks {
                     }
                     bIndex = chunkEnd;
                     if (bIndex < totalBlocks) {
-                        window.requestAnimationFrame(processChunk);
+                        // requestAnimationFrame does not reliably fire in a hidden or
+                        // backgrounded window (e.g. headless/CI browser runs), which
+                        // silently stalls loading after the first chunk. setTimeout(0)
+                        // still yields to the main thread but keeps running regardless
+                        // of tab visibility.
+                        setTimeout(processChunk, 0);
                     }
                 };
 
