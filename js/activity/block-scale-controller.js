@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global changeImage, BLOCKSCALES, DEFAULTBLOCKSCALE, SMALLERBUTTON, SMALLERDISABLEBUTTON,
+/* global changeImage, BLOCKSCALES, SMALLERBUTTON, SMALLERDISABLEBUTTON,
    BIGGERBUTTON, BIGGERDISABLEBUTTON */
 
 /* exported setupBlockScaleController, BlockScaleController */
@@ -96,7 +96,7 @@ class BlockScaleController {
      */
     async setSmallerLargerStatus() {
         const activity = this.activity;
-        if (BLOCKSCALES[activity.blockscale] < DEFAULTBLOCKSCALE) {
+        if (activity.blockscale <= 0) {
             await changeImage(
                 activity.smallerContainer.children[0],
                 SMALLERBUTTON,
