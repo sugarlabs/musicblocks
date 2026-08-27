@@ -62,6 +62,7 @@ function parseArgs(argv) {
         } else if (arg.startsWith("--check=")) {
             check = true;
             expected = arg.slice("--check=".length);
+            if (expected === "") throw new Error("--check= requires a path");
         } else if (arg === "--help" || arg === "-h") {
             process.stdout.write(USAGE + "\n");
             process.exit(0);

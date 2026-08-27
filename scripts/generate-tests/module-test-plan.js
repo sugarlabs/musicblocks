@@ -790,7 +790,9 @@ function dedupeExports(entries) {
     const seen = new Set();
     const result = [];
     for (const entry of entries) {
-        const id = `${entry.name} ${entry.kind}`;
+        // A structured key so name and kind can never run together into an
+        // ambiguous string (e.g. name "a b" vs kind "b value").
+        const id = JSON.stringify([entry.name, entry.kind]);
         if (seen.has(id)) continue;
         seen.add(id);
         result.push(entry);

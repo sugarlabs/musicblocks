@@ -167,6 +167,34 @@ describe("extract-module: class-module fixture", () => {
     });
 });
 
+describe("extract-module: export de-duplication", () => {
+    const plan = extractModule(
+        [
+            "const cfg = { a: 1 };",
+            "function fn() {}",
+            "exports.thing = fn;", // { thing, function }
+            "exports.thing = cfg;", // { thing, object } - different kind, kept
+            "exports.dup = fn;",
+            "exports.dup = fn;" // { dup, function } twice - collapsed
+        ].join("\n"),
+        "dedupe.js"
+    );
+
+    it("keys de-duplication on both name and kind", () => {
+        const thing = plan.exports.filter(e => e.name === "thing");
+        expect(thing.map(e => e.kind).sort()).toEqual(["function", "object"]);
+    });
+
+    it("collapses entries that match on name and kind", () => {
+        expect(plan.exports.filter(e => e.name === "dup")).toHaveLength(1);
+    });
+
+    it("emits no control characters in the plan JSON", () => {
+        // eslint-disable-next-line no-control-regex
+        expect(/[\u0000-\u0008\u000e-\u001f]/.test(stringifyPlan(plan))).toBe(false);
+    });
+});
+
 describe("extract-module: real repository modules", () => {
     it("plans js/utils/language-utils.js without expanding nested data maps", () => {
         const plan = extractFile("js/utils/language-utils.js");
