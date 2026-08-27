@@ -2452,6 +2452,7 @@ class Activity {
                     ErrorHandler.warn("Could not load built-in plugin: " + name, {
                         operation: "loadPlugin"
                     });
+                    that.textMsg(_("Could not load plugin: ") + name, 5000);
                 }
             });
         };
