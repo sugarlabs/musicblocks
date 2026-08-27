@@ -40,10 +40,9 @@ describe("MusicBlocks Application", () => {
                 const audioContext = win.Tone.context;
                 cy.wrap(audioContext.state).should("eq", "running");
             });
-            // Play routes through the Tone.Transport wrapper in js/utils/synthutils.js
-            // (js/logo.js calls this.synth.transport.start()), so the transport clock
-            // must actually be started -- not just the audio context resumed. This is
-            // the Tone.js scheduling API Music Blocks playback depends on.
+            // Assert the underlying Tone.Transport clock actually started, not only that
+            // the audio context was resumed -- Tone.Transport is the scheduling API
+            // js/logo.js drives playback with (via the wrapper in js/utils/synthutils.js).
             cy.window().should(win => {
                 expect(win.Tone.Transport.state).to.eq("started");
             });
@@ -215,8 +214,9 @@ describe("MusicBlocks Application", () => {
                 expect(ctx.state).to.eq("running");
             });
 
-            // js/logo.js starts the Tone.Transport clock on run; the wrapper in
-            // js/utils/synthutils.js is the only path to it.
+            // Play also starts the underlying Tone.Transport clock, not only the
+            // audio context (js/logo.js runs playback through the transport wrapper
+            // in js/utils/synthutils.js).
             cy.window().should(win => {
                 expect(win.Tone.Transport.state).to.eq("started");
             });
@@ -228,10 +228,9 @@ describe("MusicBlocks Application", () => {
                 expect(ctx.state === "suspended" || ctx.state === "running").to.be.true;
             });
 
-            // Stop cancels scheduled transport events, rewinds the clock and stops it
-            // (js/logo.js _cleanupAfterCompletion -> transport.cancel()/seconds = 0 then
-            // synth.stop() -> transport.stop()), so the transport must no longer
-            // report "started".
+            // After Stop the Tone.Transport clock is no longer running: js/logo.js
+            // cancels its scheduled events, rewinds it and calls synth.stop() ->
+            // transport.stop().
             cy.window().should(win => {
                 expect(win.Tone.Transport.state).to.not.eq("started");
             });
