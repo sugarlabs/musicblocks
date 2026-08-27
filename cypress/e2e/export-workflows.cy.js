@@ -1,4 +1,88 @@
-/* global cy, beforeEach, describe, it */
+/* global cy, beforeEach, describe, it, expect */
+
+// Parses Note On events out of a Standard MIDI File's binary content (as
+// returned by cy.readFile(path, "binary")). This walks real SMF chunk/event
+// structure - variable-length delta-times, MIDI running status, and
+// meta/sysex event skipping - rather than searching for a byte pattern, so
+// it can't be fooled by an incidental byte sequence elsewhere in the file.
+// Verified against @tonejs/midi's own decode of export-note-minimal.tb's
+// MIDI export (both agree the fixture's "sol"/octave-4 note is note 67).
+const extractMidiNoteOns = binary => {
+    const bytes = [];
+    for (let i = 0; i < binary.length; i++) bytes.push(binary.charCodeAt(i) & 0xff);
+
+    const readVarLen = pos => {
+        let value = 0;
+        let p = pos;
+        for (;;) {
+            const b = bytes[p++];
+            value = (value << 7) | (b & 0x7f);
+            if ((b & 0x80) === 0) break;
+        }
+        return [value, p];
+    };
+
+    const noteOns = [];
+    let pos = 14; // skip the MThd header chunk (4-byte id + 4-byte length + 6 bytes of data)
+    while (pos < bytes.length) {
+        const chunkId = String.fromCharCode(
+            bytes[pos],
+            bytes[pos + 1],
+            bytes[pos + 2],
+            bytes[pos + 3]
+        );
+        if (chunkId !== "MTrk") break;
+
+        const trackLength =
+            ((bytes[pos + 4] << 24) |
+                (bytes[pos + 5] << 16) |
+                (bytes[pos + 6] << 8) |
+                bytes[pos + 7]) >>>
+            0;
+        let p = pos + 8;
+        const trackEnd = p + trackLength;
+        let runningStatus = null;
+
+        while (p < trackEnd) {
+            let delta;
+            [delta, p] = readVarLen(p);
+
+            let statusByte = bytes[p];
+            if (statusByte & 0x80) {
+                runningStatus = statusByte;
+                p++;
+            } else {
+                statusByte = runningStatus;
+            }
+            const type = statusByte & 0xf0;
+
+            if (statusByte === 0xff) {
+                p++; // meta event type byte
+                let len;
+                [len, p] = readVarLen(p);
+                p += len;
+            } else if (statusByte === 0xf0 || statusByte === 0xf7) {
+                let len;
+                [len, p] = readVarLen(p);
+                p += len;
+            } else if (type === 0x90 || type === 0x80) {
+                const note = bytes[p++];
+                const velocity = bytes[p++];
+                if (type === 0x90 && velocity > 0) {
+                    noteOns.push(note);
+                }
+            } else if (type === 0xa0 || type === 0xb0 || type === 0xe0) {
+                p += 2;
+            } else if (type === 0xc0 || type === 0xd0) {
+                p += 1;
+            } else {
+                break; // unrecognized status - stop parsing this track defensively
+            }
+        }
+        pos = trackEnd;
+    }
+    return noteOns;
+};
 
 const loadFixtureProject = fixtureName => {
     cy.get("#load").click();
@@ -73,7 +157,16 @@ describe("Export workflows", () => {
                 cy.readFile(`cypress/downloads/${filename}`, "binary", { timeout: 30000 }).then(
                     content => {
                         expect(content.slice(0, 4)).to.equal("MThd");
-                        expect(content.length).to.be.greaterThan(20);
+
+                        // export-note-minimal.tb's only note is a "sol"
+                        // (G) pitch block at octave 4 - MIDI note 67 in
+                        // scientific pitch notation - so beyond a valid
+                        // header, the file must actually contain that
+                        // note's Note On event, proving the loaded note
+                        // was exported and not just a structurally valid
+                        // but musically empty MIDI file.
+                        const noteOns = extractMidiNoteOns(content);
+                        expect(noteOns).to.include(67);
                     }
                 );
             });
@@ -106,6 +199,13 @@ describe("Export workflows", () => {
                 cy.readFile(`cypress/downloads/${filename}`, { timeout: 30000 }).then(content => {
                     expect(content).to.contain('\\version "2.18.2"');
                     expect(content).to.contain("Made with LilyPond and Music Blocks");
+
+                    // export-note-minimal.tb's only note - "sol" (G) at
+                    // octave 4, a quarter note - renders in LilyPond
+                    // pitch/duration notation as g'4, so this proves the
+                    // composition itself was transcribed, not just that a
+                    // file with the expected header was written.
+                    expect(content).to.contain("g'4");
                 });
             });
     });
