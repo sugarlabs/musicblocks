@@ -94,25 +94,28 @@ body.highcontrast {
     color: var(--fg) !important;
 }
 
-/* Trash view colors for dark mode */
+/* Trash view colors for dark mode consuming design system tokens */
 .dark .trash-view {
-    background-color: #2d2d2d;
-    color: #e8e8e8;
-    border: 2px solid #4a9eff;
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary) !important;
+    border: 2px solid var(--color-border-primary) !important;
 }
 
 .dark .button-container {
-    background: #022363;
-    border-bottom: 1px solid #444444;
+    background-color: var(--color-bg-tertiary) !important;
+    border-bottom: 1px solid var(--color-border-primary) !important;
 }
 
 .dark .trash-item.hover {
-    background-color: #444444;
+    background-color: var(--color-brand-primary-hover) !important;
+    color: var(--color-text-inverse) !important;
 }
 
 .dark .trash-item.selected {
-    background-color: #555555;
+    background-color: var(--color-brand-primary) !important;
+    color: var(--color-text-inverse) !important;
 }
+
 
 /* Improve block icon visibility in dark mode */
 .dark .trash-item-icon {
