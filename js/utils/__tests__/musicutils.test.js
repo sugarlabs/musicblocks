@@ -17,6 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
 const { TextEncoder } = require("util");
 global.TextEncoder = TextEncoder;
 global._ = jest.fn(str => str);
@@ -140,6 +143,25 @@ const DOUBLESHARP = "\ud834\udd2a";
 const DOUBLEFLAT = "\ud834\udd2b";
 
 describe("musicutils", () => {
+    describe("getNonEDOFrequency browser runtime", () => {
+        it("returns a ratio-temperament preview frequency without Node global", () => {
+            const source = fs.readFileSync(path.join(__dirname, "..", "musicutils.js"), "utf8");
+            const sandbox = {
+                TextEncoder,
+                _: value => value,
+                localStorage: { getItem: () => null },
+                window: { btoa: value => Buffer.from(value, "binary").toString("base64") }
+            };
+
+            vm.createContext(sandbox);
+            vm.runInContext(source, sandbox);
+
+            expect(
+                vm.runInContext("getNonEDOFrequency(0, 4, 'just intonation', 'C major')", sandbox)
+            ).toEqual({ freq: 264, noteName: "C", octave: 4 });
+        });
+    });
+
     describe("musicutils core constants", () => {
         const last = arr => arr[arr.length - 1];
 
