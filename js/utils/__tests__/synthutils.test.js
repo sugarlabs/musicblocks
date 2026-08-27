@@ -1084,6 +1084,93 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
+    // The `transport` wrapper (js/utils/synthutils.js) is the single seam through which
+    // js/logo.js schedules and reads Music Blocks playback time, so that Tone.js stays a
+    // swappable implementation detail. Its scheduling methods -- schedule/clear/cancel and
+    // the seconds accessors/getSecondsAtTime -- are exactly the Tone.Transport surface the
+    // interpreter depends on (js/logo.js runFromBlockNow / _dispatchTurtleSignals /
+    // clearTurtleRun), so a change in that Tone.js API must fail here.
+    describe("Transport wrapper scheduling delegation", () => {
+        afterEach(() => {
+            global.Tone = require("./tonemock.js");
+            Tone.context.state = "running";
+            Tone.Transport.state = "started";
+        });
+
+        test("schedule delegates callback and time to Tone.Transport.schedule and returns its id", () => {
+            const scheduleSpy = jest.spyOn(Tone.Transport, "schedule").mockReturnValue(42);
+            const callback = jest.fn();
+
+            const id = transport.schedule(callback, 1.5);
+
+            expect(scheduleSpy).toHaveBeenCalledWith(callback, 1.5);
+            expect(id).toBe(42);
+
+            scheduleSpy.mockRestore();
+        });
+
+        test("schedule returns null when Tone.Transport has no schedule method", () => {
+            const realSchedule = Tone.Transport.schedule;
+            Tone.Transport.schedule = undefined;
+
+            expect(transport.schedule(jest.fn(), 0)).toBeNull();
+
+            Tone.Transport.schedule = realSchedule;
+        });
+
+        test("cancel and clear delegate to the matching Tone.Transport methods", () => {
+            const cancelSpy = jest.spyOn(Tone.Transport, "cancel");
+            const clearSpy = jest.spyOn(Tone.Transport, "clear");
+
+            transport.cancel();
+            transport.clear(7);
+
+            expect(cancelSpy).toHaveBeenCalledTimes(1);
+            expect(clearSpy).toHaveBeenCalledWith(7);
+
+            cancelSpy.mockRestore();
+            clearSpy.mockRestore();
+        });
+
+        test("seconds getter reads Tone.Transport.seconds and the setter writes it", () => {
+            Tone.Transport.seconds = 3;
+            expect(transport.seconds).toBe(3);
+
+            transport.seconds = 9.25;
+            expect(Tone.Transport.seconds).toBe(9.25);
+        });
+
+        test("getSecondsAtTime delegates, and falls back to seconds when the method is absent", () => {
+            const atTimeSpy = jest.spyOn(Tone.Transport, "getSecondsAtTime").mockReturnValue(5.5);
+            expect(transport.getSecondsAtTime(0.1)).toBe(5.5);
+            expect(atTimeSpy).toHaveBeenCalledWith(0.1);
+            atTimeSpy.mockRestore();
+
+            const realAtTime = Tone.Transport.getSecondsAtTime;
+            Tone.Transport.getSecondsAtTime = undefined;
+            Tone.Transport.seconds = 2.75;
+            expect(transport.getSecondsAtTime(0.1)).toBe(2.75);
+            Tone.Transport.getSecondsAtTime = realAtTime;
+        });
+
+        test("every method is a safe no-op when Tone is unavailable", () => {
+            global.Tone = undefined;
+
+            expect(transport.isAvailable).toBeFalsy();
+            expect(transport.isClockRunning).toBe(false);
+            expect(transport.schedule(jest.fn(), 0)).toBeNull();
+            expect(transport.seconds).toBe(0);
+            expect(transport.getSecondsAtTime(0)).toBe(0);
+            expect(() => {
+                transport.start();
+                transport.stop();
+                transport.cancel();
+                transport.clear(1);
+                transport.seconds = 4;
+            }).not.toThrow();
+        });
+    });
+
     describe("_createSampleSynth", () => {
         it("creates voice synth correctly", () => {
             loadSamples();
