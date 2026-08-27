@@ -1369,7 +1369,6 @@ describe("CameraManager", () => {
     });
 });
 
-<<<<<<< HEAD
 describe("Plugin and Macro Utilities", () => {
     let mockActivity;
 
