@@ -19,6 +19,7 @@
 
 const { platformColor } = require("../utils/platformstyle");
 global.platformColor = platformColor;
+global.makeKeyboardAccessible = require("../utils/dom-helpers").makeKeyboardAccessible;
 
 jest.mock("../utils/platformstyle", () => ({
     platformColor: { stopIconColor: "#ea174c" }
@@ -187,7 +188,10 @@ describe("Toolbar Class", () => {
                 onmouseenter: null,
                 onmouseleave: null,
                 onclick: null,
-                style: {}
+                style: {},
+                setAttribute: jest.fn(),
+                addEventListener: jest.fn(),
+                click: jest.fn()
             }
         };
 
@@ -222,6 +226,18 @@ describe("Toolbar Class", () => {
 
         elements["mb-logo"].onclick();
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
+        expect(elements["mb-logo"].setAttribute).toHaveBeenCalledWith("role", "button");
+        expect(elements["mb-logo"].setAttribute).toHaveBeenCalledWith("tabindex", "0");
+        expect(elements["mb-logo"].addEventListener).toHaveBeenCalledWith(
+            "keydown",
+            expect.any(Function)
+        );
+
+        const logoKeydownHandler = elements["mb-logo"].addEventListener.mock.calls[0][1];
+        const enterEvent = { key: "Enter", preventDefault: jest.fn() };
+        logoKeydownHandler(enterEvent);
+        expect(enterEvent.preventDefault).toHaveBeenCalled();
+        expect(elements["mb-logo"].click).toHaveBeenCalled();
 
         // Japanese language
         toolbar.language = "ja";
@@ -364,6 +380,15 @@ describe("Toolbar Class", () => {
         expect(messageElement.id).toBe("confirmation-message");
         expect(confirmButton.textContent).toBe("Confirm");
         expect(confirmButton.id).toBe("new-project");
+        expect(confirmButton.getAttribute("role")).toBe("button");
+        expect(confirmButton.getAttribute("aria-label")).toBe("Confirm");
+        expect(confirmButton.getAttribute("aria-describedby")).toBe("confirmation-message");
+
+        const cancelButton = buttonListItem.children[1];
+        expect(cancelButton.textContent).toBe("Cancel");
+        expect(cancelButton.getAttribute("role")).toBe("button");
+        expect(cancelButton.getAttribute("aria-label")).toBe("Cancel");
+        expect(cancelButton.getAttribute("aria-describedby")).toBe("confirmation-message");
 
         confirmButton.onclick();
 

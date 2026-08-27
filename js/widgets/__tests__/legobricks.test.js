@@ -1564,3 +1564,40 @@ describe("LegoWidget — _createToolbarButtons", () => {
         expect(legoWidget._clearPhrase).toHaveBeenCalled();
     });
 });
+
+describe("LegoWidget Eye Dropper Listener Safety", () => {
+    let legoWidget;
+    let mockImageDisplayArea;
+
+    beforeEach(() => {
+        global._ = val => val;
+        legoWidget = new LegoWidget();
+        mockImageDisplayArea = {
+            style: {},
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn()
+        };
+        legoWidget.imageDisplayArea = mockImageDisplayArea;
+        legoWidget.eyeDropperButton = { style: {} };
+        legoWidget._createColorPreviewTooltip = jest.fn();
+        legoWidget._removeColorPreviewTooltip = jest.fn();
+        legoWidget.activity = { textMsg: jest.fn() };
+    });
+
+    afterEach(() => {
+        delete global._;
+    });
+
+    it("should remove existing event listeners before attaching new ones when _activateEyeDropper is called repeatedly", () => {
+        legoWidget._activateEyeDropper();
+
+        expect(mockImageDisplayArea.addEventListener).toHaveBeenCalledTimes(3);
+        expect(mockImageDisplayArea.removeEventListener).toHaveBeenCalledTimes(3);
+
+        // Call again to verify duplicate registration is prevented
+        legoWidget._activateEyeDropper();
+
+        expect(mockImageDisplayArea.removeEventListener).toHaveBeenCalledTimes(6);
+        expect(mockImageDisplayArea.addEventListener).toHaveBeenCalledTimes(6);
+    });
+});

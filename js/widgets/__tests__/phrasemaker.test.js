@@ -965,6 +965,56 @@ describe("PhraseMaker Widget", () => {
 
         phraseMaker._createpiesubmenu(0, 2, "rhythmnote");
     });
+    test.each([
+        ["value option", 1],
+        ["decrease button", 3]
+    ])("tuplet-value %s removes one subdivision", (_, menuIndex) => {
+        const wheelDiv = { style: {} };
+        const exitTitle = { children: [{ textContent: "" }] };
+        phraseMaker.docById = jest.fn(id =>
+            id === "wheelnav-_exitWheel-title-1" ? exitTitle : wheelDiv
+        );
+
+        phraseMaker.wheelnav = jest.fn(() => ({
+            raphael: {},
+            createWheel(labels) {
+                this.navItems = labels.map(() => ({
+                    navigateFunction: null,
+                    navItem: { hide: jest.fn(), show: jest.fn() }
+                }));
+            },
+            navItems: [],
+            slicePathCustom: {},
+            removeWheel: jest.fn()
+        }));
+        phraseMaker.slicePath = jest.fn(() => ({
+            DonutSlice: jest.fn(),
+            DonutSliceCustomization: jest.fn(() => ({}))
+        }));
+        phraseMaker._mapNotesBlocks = jest.fn(() => [0]);
+        phraseMaker._restartGrid = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._update = jest.fn();
+        phraseMaker._colBlocks = [
+            [0, 0],
+            [0, 1],
+            [0, 2]
+        ];
+        phraseMaker._noteValueRow = {
+            cells: [{ getBoundingClientRect: jest.fn(() => ({ x: 0, y: 0 })) }]
+        };
+        phraseMaker.activity = {
+            canvas: { width: 800, height: 600 },
+            getStageScale: jest.fn(() => 1),
+            logo: { tupletRhythms: [["notes", 0, 4, 4, 4]] }
+        };
+
+        phraseMaker._createpiesubmenu(0, 3, "tupletvalue");
+        phraseMaker._menuWheel.selectedNavItemIndex = menuIndex;
+        phraseMaker._menuWheel.navItems[menuIndex].navigateFunction();
+
+        expect(phraseMaker.activity.logo.tupletRhythms[0]).toEqual(["notes", 0, 4, 4]);
+    });
     test("_restartGrid handles default case", () => {
         phraseMaker.init = jest.fn();
         phraseMaker.addNotes = jest.fn();

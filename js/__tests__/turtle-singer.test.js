@@ -20,6 +20,7 @@
 global.DEFAULTVOLUME = 100;
 global.TARGETBPM = 120;
 global.TONEBPM = 60;
+global.MIN_HIGHLIGHT_DURATION_MS = 100;
 global.clampNumber = require("../utils/utils-logic").clampNumber;
 
 const Singer = require("../turtle-singer");
@@ -36,7 +37,10 @@ const mockGlobals = {
     getEdoNoteNamePosition: jest.fn().mockReturnValue(0),
     generateNoteNames: jest
         .fn()
-        .mockReturnValue(["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"])
+        .mockReturnValue(["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]),
+    parseNoteString: jest.fn().mockReturnValue(["C", 4]),
+    getCachedPitchToFrequency: jest.fn().mockReturnValue(440),
+    normalizeNoteAccidentals: jest.fn(note => note)
 };
 
 global.getNote = mockGlobals.getNote;
@@ -49,6 +53,9 @@ global.getTemperament = mockGlobals.getTemperament;
 global.getCurrentEDO = mockGlobals.getCurrentEDO;
 global.getEdoNoteNamePosition = mockGlobals.getEdoNoteNamePosition;
 global.generateNoteNames = mockGlobals.generateNoteNames;
+global.parseNoteString = mockGlobals.parseNoteString;
+global.getCachedPitchToFrequency = mockGlobals.getCachedPitchToFrequency;
+global.normalizeNoteAccidentals = mockGlobals.normalizeNoteAccidentals;
 global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
 global.last = jest.fn(array => array[array.length - 1]);
 global.deepClone = value => {
@@ -348,10 +355,6 @@ describe("State initialization — musical properties", () => {
 
     test("should initialize multipleVoices to false", () => {
         expect(singer.multipleVoices).toBe(false);
-    });
-
-    test("should initialize inverted to false", () => {
-        expect(singer.inverted).toBe(false);
     });
 
     test("should initialize defaultStrongBeats to false", () => {
@@ -992,6 +995,122 @@ describe("processNote regression behavior", () => {
         singer.partials = [[0, 1, 0]];
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
         expect(activityMock.errorMsg).not.toHaveBeenCalled();
+    });
+});
+
+describe("processNote — delayedNotes reset on zero-duration tied notes (#8176)", () => {
+    let turtleMock;
+    let activityMock;
+    let singer;
+
+    // Populates all the per-block maps processNote reads via `saveBlk = last(inNoteBlock)`
+    // when a tie is in progress, so the tie bookkeeping branch has real data to work with.
+    const seedNoteBlockState = (singer, blk) => {
+        singer.notePitches[blk] = ["C"];
+        singer.noteOctaves[blk] = [4];
+        singer.noteCents[blk] = [0];
+        singer.noteHertz[blk] = [0];
+        singer.oscList[blk] = false;
+        singer.noteBeat[blk] = 1;
+        singer.noteBeatValues[blk] = 4;
+        singer.noteDrums[blk] = [];
+        singer.embeddedGraphics[blk] = [];
+    };
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.specialArgs = [];
+        activityMock.logo.synth.getFrequency = jest.fn().mockReturnValue(440);
+        activityMock.logo.synth.getCustomFrequency = jest.fn().mockReturnValue(440);
+        activityMock.logo.synth.start = jest.fn();
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.stage = { update: jest.fn() };
+        turtleMock.doWait = jest.fn();
+        turtleMock.blink = jest.fn();
+        singer = turtleMock.singer;
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("clears delayedNotes when the outermost note of a group is the zero-duration first half of a Tie", () => {
+        const outerBlk = "tieOuterBlk";
+        seedNoteBlockState(singer, outerBlk);
+        singer.suppressOutput = true; // isolate delayedNotes bookkeeping from audio side effects
+
+        singer.tie = true;
+        singer.tieCarryOver = 0; // this call is processing the FIRST note of the tie pair
+        singer.inNoteBlock = [outerBlk]; // outermost note (length === 1)
+
+        // Simulate a nested `newnote` block, inside this same first-tied note, having
+        // already pushed its own entry onto delayedNotes (as RhythmBlocks.js's
+        // NewNoteBlock.flow does whenever inNoteBlock.length > 0), before this note's
+        // own processNote call runs to completion.
+        singer.delayedNotes = [["nestedBlk", 1 / 4]];
+
+        // A tied note's first half has its duration deferred (forced to 0 internally),
+        // but it is still the outermost note in its group.
+        Singer.processNote(activityMock, 4, false, outerBlk, 0, jest.fn());
+
+        expect(singer.delayedNotes).toEqual([]);
+    });
+
+    test("does not leak a tied note's stale delayedNotes entries into a later, unrelated nested note's timing lookup", () => {
+        const tiedOuterBlk = "tieOuterBlk";
+        seedNoteBlockState(singer, tiedOuterBlk);
+        singer.suppressOutput = true; // isolate delayedNotes bookkeeping from audio side effects
+
+        singer.tie = true;
+        singer.tieCarryOver = 0;
+        singer.inNoteBlock = [tiedOuterBlk];
+        singer.delayedNotes = [["nestedBlk", 1 / 4]];
+
+        Singer.processNote(activityMock, 4, false, tiedOuterBlk, 0, jest.fn());
+        singer.tie = false;
+
+        // A nested note in a completely unrelated later group reads delayedNotes to
+        // compute its own "future" timing offset (inNoteBlock.length > 1, so this call
+        // only reads the list, it never clears it). Left with no notePitches entry, so
+        // __playnote() returns immediately and this call exercises only the
+        // delayedNotes read/reset bookkeeping in isolation.
+        const unrelatedOuterBlk = "unrelatedOuterBlk";
+        const unrelatedNestedBlk = "unrelatedNestedBlk";
+        singer.inNoteBlock = [unrelatedOuterBlk, unrelatedNestedBlk];
+
+        Singer.processNote(activityMock, 4, false, unrelatedNestedBlk, 0, jest.fn());
+
+        // The stale entry from the earlier, unrelated tied group must already have
+        // been cleared before this unrelated nested note ever reads the list.
+        expect(singer.delayedNotes).toEqual([]);
+    });
+
+    test("still resets delayedNotes for a normal (non-tied) outermost note with positive duration", () => {
+        // Deliberately leave notePitches[blk] unset: __playnote() returns immediately
+        // for a block with no note data, so this exercises the delayedNotes reset in
+        // isolation without needing to mock the full note-playing pipeline.
+        const blk = "normalBlk";
+        singer.inNoteBlock = [blk];
+        singer.delayedNotes = [["nestedBlk", 1 / 4]];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(singer.delayedNotes).toEqual([]);
+    });
+
+    test("does not clear delayedNotes while still inside a nested note (inNoteBlock.length > 1)", () => {
+        const outerBlk = "outerBlk";
+        const nestedBlk = "nestedBlk";
+        singer.inNoteBlock = [outerBlk, nestedBlk]; // nested: length === 2
+        singer.delayedNotes = [[nestedBlk, 1 / 4]];
+
+        Singer.processNote(activityMock, 4, false, nestedBlk, 0, jest.fn());
+
+        // Nested notes only read/consume delayedNotes to compute their "future" offset;
+        // clearing is reserved for when the outermost note of the group completes.
+        expect(singer.delayedNotes).toEqual([[nestedBlk, 1 / 4]]);
     });
 });
 

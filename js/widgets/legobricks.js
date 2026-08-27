@@ -130,7 +130,6 @@ function LegoWidget() {
     this._dragUpHandler = null;
 
     // Pitch block handling properties (similar to PhraseMaker)
-    this.blockNo = null;
     this.rowLabels = [];
     this.rowArgs = [];
     this._rowBlocks = [];
@@ -1365,6 +1364,9 @@ function LegoWidget() {
      * @returns {void}
      */
     this._activateEyeDropper = function () {
+        // Clean up any existing listeners and tooltip to prevent duplicate event listener accumulation
+        this._deactivateEyeDropper();
+
         // Change cursor to crosshair for eye dropper mode
         if (this.imageDisplayArea) {
             this.imageDisplayArea.style.cursor = "crosshair";

@@ -791,8 +791,19 @@ function MusicKeyboard(activity) {
             this._stopOrCloseClicked = true;
             this.playingNow = false;
 
+            // Clear any active Web MIDI input handlers to prevent background notes & audio leaks
+            if (this.midiAccess && this.midiAccess.inputs) {
+                this.midiAccess.inputs.forEach(input => {
+                    input.onmidimessage = null;
+                });
+            }
+            this.midiON = false;
+
             selectedNotes = [];
-            docById("wheelDivptm").style.display = "none";
+            const wheelDiv = docById("wheelDivptm");
+            if (wheelDiv && wheelDiv.style) {
+                wheelDiv.style.display = "none";
+            }
             if (this._menuWheel) this._menuWheel.removeWheel();
             if (this._pitchWheel) this._pitchWheel.removeWheel();
             if (this._tabsWheel) this._tabsWheel.removeWheel();
@@ -2276,27 +2287,26 @@ function MusicKeyboard(activity) {
             const newBlock = this.activity.blocks.blockList.length;
 
             if (label === "pitch") {
-                let i;
-                for (i = 0; i < pitchLabels.length; i++) {
-                    let lastNote,
-                        c = this.layout.length - 1;
-                    while (c > -1) {
-                        if (this.layout[c].noteName !== "hertz") {
-                            break;
-                        }
-                        c--;
-                    }
+                let i = -1;
+                let lastNote = null,
+                    c = this.layout.length - 1;
+                while (c > -1) {
                     if (this.layout[c] && this.layout[c].noteName !== "hertz") {
                         lastNote = this.layout[c].noteName;
-                    } else {
-                        lastNote = null;
-                    }
-
-                    if (
-                        lastNote !== null &&
-                        (pitchLabels[i].includes(lastNote) || lastNote.includes(pitchLabels[i]))
-                    ) {
                         break;
+                    }
+                    c--;
+                }
+
+                if (lastNote !== null) {
+                    for (let idx = 0; idx < pitchLabels.length; idx++) {
+                        if (
+                            pitchLabels[idx].includes(lastNote) ||
+                            lastNote.includes(pitchLabels[idx])
+                        ) {
+                            i = idx;
+                            break;
+                        }
                     }
                 }
 
@@ -2312,16 +2322,16 @@ function MusicKeyboard(activity) {
                         break;
                     }
                 } while (this.layout.some(note => note.noteName === rLabel));
+
+                rArg = 4;
                 for (let j = this.layout.length; j > 0; j--) {
-                    rArg = this.layout[j - 1].noteOctave;
-                    if (isNaN(rArg)) {
-                        continue;
-                    }
-                    if (rArg > 0 && rArg < 9) {
+                    const oct = Number(this.layout[j - 1].noteOctave);
+                    if (!isNaN(oct) && oct >= 1 && oct <= 8) {
+                        rArg = oct;
                         break;
                     }
                 }
-                if ((i + 1) % pitchLabels.length === 0) {
+                if (lastNote !== null && i === 0 && rArg < 8) {
                     rArg += 1;
                 }
             } else {
@@ -3703,6 +3713,7 @@ function MusicKeyboard(activity) {
          * @memberof MusicKeyboard
          */
         const onMIDISuccess = midiAccess => {
+            this.midiAccess = midiAccess;
             // re-init widget
             if (this.midiON) {
                 this.midiButton.style.background = "#00FF00";

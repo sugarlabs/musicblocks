@@ -548,6 +548,82 @@ class Block {
     }
 
     /**
+     * Clean up and dispose of block resources to prevent memory leaks and circular references
+     * @public
+     * @returns {void}
+     */
+    dispose() {
+        if (
+            Array.isArray(this.connections) &&
+            this.blocks &&
+            Array.isArray(this.blocks.blockList)
+        ) {
+            const thisIdx = this.blockIndex;
+            for (let i = 0; i < this.connections.length; i++) {
+                const connId = this.connections[i];
+                if (connId !== null && connId !== undefined && this.blocks.blockList[connId]) {
+                    const connBlock = this.blocks.blockList[connId];
+                    if (Array.isArray(connBlock.connections)) {
+                        for (let j = 0; j < connBlock.connections.length; j++) {
+                            if (connBlock.connections[j] === thisIdx) {
+                                connBlock.connections[j] = null;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.connections = [];
+
+        if (this.label && this.label.parentNode) {
+            this.label.parentNode.removeChild(this.label);
+        }
+        if (this.labelattr && this.labelattr.parentNode) {
+            this.labelattr.parentNode.removeChild(this.labelattr);
+        }
+        this.label = null;
+        this.labelattr = null;
+
+        if (this.container) {
+            if (typeof this.container.removeAllEventListeners === "function") {
+                this.container.removeAllEventListeners();
+            }
+            if (typeof this.container.removeAllChildren === "function") {
+                this.container.removeAllChildren();
+            }
+            if (typeof this.container.uncache === "function") {
+                this.container.uncache();
+            }
+            if (this.container.parent && typeof this.container.parent.removeChild === "function") {
+                this.container.parent.removeChild(this.container);
+            }
+            this.container = null;
+        }
+
+        this.bitmap = null;
+        this.highlightBitmap = null;
+        this.disconnectedBitmap = null;
+        this.disconnectedHighlightBitmap = null;
+        this.collapseButtonBitmap = null;
+        this.expandButtonBitmap = null;
+        this.collapseBlockBitmap = null;
+        this.highlightCollapseBlockBitmap = null;
+        this.imageBitmap = null;
+
+        this.artwork = null;
+        this.collapseArtwork = null;
+        this.text = null;
+        this.value = null;
+        this.privateData = null;
+        this.postProcessArg = null;
+        this.controller = null;
+
+        this.protoblock = null;
+        this.blocks = null;
+        this.activity = null;
+    }
+
+    /**
      * Show the highlight artwork.
      * @public
      * @returns {void}
@@ -3084,9 +3160,11 @@ class Block {
 
                         setTimeout(() => {
                             that.activity.logo.runLogoCommands(topBlock);
+                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                         }, 250);
                     } else {
                         that.activity.logo.runLogoCommands(topBlock);
+                        that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                     }
 
                     return;
@@ -3140,9 +3218,11 @@ class Block {
 
                             setTimeout(() => {
                                 that.activity.logo.runLogoCommands(topBlk);
+                                that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                             }, 250);
                         } else {
                             that.activity.logo.runLogoCommands(topBlk);
+                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                         }
                     }
                 }
@@ -3158,9 +3238,11 @@ class Block {
 
                         setTimeout(() => {
                             that.activity.logo.runLogoCommands(topBlk);
+                            that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                         }, 250);
                     } else {
                         that.activity.logo.runLogoCommands(topBlk);
+                        that.activity.toolbar.highlightStop(platformColor.stopIconcolor);
                     }
                 }
             }
@@ -3900,7 +3982,7 @@ class Block {
                     if (temperament && typeof temperament === "object") {
                         noteLabels[keys[i]] = temperament;
                     }
-                    if (isCustomTemperament(keys[i])) {
+                    if (isCustomTemperament(keys[i]) && temperament && !temperament.isEDO) {
                         customLabels.push(keys[i]);
                     }
                 }

@@ -329,6 +329,52 @@ describe("StatusMatrix Widget", () => {
             expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
         });
 
+        test("does not throw when a turtle is added after initialization and its column is missing", () => {
+            mockActivity.turtles.turtleList = [
+                { name: "Mouse1", inTrash: false },
+                { name: "Mouse2", inTrash: false }
+            ];
+
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        test("does not throw when a status-field row is missing or out of range", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["x"] }, value: 150 },
+                1: { name: "y", protoblock: { staticLabels: ["y"] }, value: 200 }
+            };
+            mockActivity.logo.statusFields = [
+                [0, "x"],
+                [1, "y"]
+            ];
+            statusMatrix._statusTable.rows = [
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] }
+            ];
+
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        test("does not update after the widget closes", () => {
+            statusMatrix.widgetWindow.onclose();
+
+            statusMatrix.updateAll();
+
+            expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        test("does not update without a status table", () => {
+            statusMatrix._statusTable = null;
+
+            statusMatrix.updateAll();
+
+            expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
         test("calls parseArg for each status field", () => {
             statusMatrix.updateAll();
             expect(mockActivity.logo.parseArg).toHaveBeenCalled();

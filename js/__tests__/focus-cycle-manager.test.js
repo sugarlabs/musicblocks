@@ -186,6 +186,30 @@ describe("FocusCycleManager module", () => {
             manager.dispose();
         });
 
+        test("includes visible canvas controls in the Tab cycle", () => {
+            const controls = document.createElement("div");
+            controls.id = "buttoncontainerBOTTOM";
+            const button = document.createElement("div");
+            button.className = "tooltipped";
+            button.setAttribute("tabindex", "0");
+            Object.defineProperty(button, "offsetWidth", { configurable: true, value: 48 });
+            const focusSpy = jest.spyOn(button, "focus");
+            controls.appendChild(button);
+            document.body.appendChild(controls);
+
+            const manager = new FocusCycleManager();
+            manager.init();
+            manager._currentZone = "palette";
+            manager._keyboardMode = true;
+
+            pressTab(false);
+
+            expect(manager._currentZone).toBe("controls");
+            expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+
+            manager.dispose();
+        });
+
         test("non-Tab keys are ignored", () => {
             const manager = new FocusCycleManager();
             manager.init();
@@ -202,6 +226,21 @@ describe("FocusCycleManager module", () => {
             expect(event.defaultPrevented).toBe(false);
 
             manager.dispose();
+        });
+    });
+
+    describe("keyboard navigation handoff", () => {
+        test("exits keyboard mode without disposing the manager", () => {
+            const manager = new FocusCycleManager();
+            manager._keyboardMode = true;
+            manager._currentZone = "toolbar";
+            manager._lastFocusedButton = document.createElement("button");
+
+            manager.exitKeyboardNavigation();
+
+            expect(manager._keyboardMode).toBe(false);
+            expect(manager._currentZone).toBeNull();
+            expect(manager._lastFocusedButton).toBeNull();
         });
     });
 

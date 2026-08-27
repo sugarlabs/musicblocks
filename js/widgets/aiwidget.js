@@ -117,6 +117,24 @@ function AIWidget() {
     this.pitchAnalysers = {};
 
     /**
+     * Disconnects and disposes the pitch analysers.
+     * @private
+     * @returns {void}
+     */
+    this._disposePitchAnalysers = function () {
+        for (const id in this.pitchAnalysers) {
+            const analyser = this.pitchAnalysers[id];
+            if (analyser) {
+                for (const synth in instruments[0]) {
+                    instruments[0][synth].disconnect(analyser);
+                }
+                analyser.dispose();
+            }
+        }
+        this.pitchAnalysers = {};
+    };
+
+    /**
      * Pauses the sample playback.
      * @returns {void}
      */
@@ -699,18 +717,15 @@ function AIWidget() {
      * @returns {void}
      */
     this.init = function (activity) {
+        this._disposePitchAnalysers();
         this.activity = activity;
         this._directions = [];
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
         this._firstClickTimes = null;
         this.isMoving = false;
-        this.pitchAnalysers = {};
-
         this.activity.logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
         this.reconnectSynthsToAnalyser();
-
-        this.pitchAnalysers = {};
 
         this.running = true;
         if (this.drawVisualIDs) {
@@ -751,16 +766,7 @@ function AIWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
-            for (const id in this.pitchAnalysers) {
-                const analyser = this.pitchAnalysers[id];
-                if (analyser) {
-                    for (const synth in instruments[0]) {
-                        instruments[0][synth].disconnect(analyser);
-                    }
-                    analyser.dispose();
-                }
-            }
-            this.pitchAnalysers = {};
+            this._disposePitchAnalysers();
             widgetWindow.destroy();
         };
 

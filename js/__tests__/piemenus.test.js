@@ -9,7 +9,7 @@
  * (at your option) any later version.
  */
 
-const { piemenuPitches, piemenuKey, piemenuNumber } = require("../piemenus");
+const { piemenuPitches, piemenuKey, piemenuNumber, piemenuModes } = require("../piemenus");
 
 // Mock Globals
 global.docById = jest.fn().mockReturnValue({
@@ -31,24 +31,37 @@ global.window = {
 global.wheelnav = jest.fn().mockImplementation(function (div) {
     const mockWheel = this;
     this.id = div;
-    this.navItems = Array.from({ length: 30 }, () => ({
+    this.wheelRadius = 600;
+    const navItemTemplate = () => ({
         title: "",
         enabled: true,
         navItem: { hide: jest.fn(), show: jest.fn() },
+        fillAttr: "",
+        titleAttr: {},
+        titleHoverAttr: {},
+        titleSelectedAttr: {},
         sliceSelectedAttr: {},
         sliceHoverAttr: {},
-        titleSelectedAttr: {},
-        titleHoverAttr: {},
-        titleAttr: {}
-    }));
+        slicePathAttr: {},
+        basicNavTitleMax: {},
+        basicNavTitleMin: {},
+        hoverNavTitleMax: {},
+        hoverNavTitleMin: {},
+        selectedNavTitleMax: {},
+        selectedNavTitleMin: {},
+        initNavTitle: {}
+    });
+    this.navItems = Array.from({ length: 30 }, navItemTemplate);
     this.selectedNavItemIndex = 0;
     this.colors = [];
     this.raphael = { canvas: {} };
     this.on = jest.fn();
     this.createWheel = jest.fn(labels => {
         if (labels) {
-            labels.forEach((l, i) => {
-                if (this.navItems[i]) this.navItems[i].title = l;
+            this.navItems = labels.map((l, i) => {
+                const item = navItemTemplate();
+                item.title = l;
+                return item;
             });
         }
     });
@@ -72,13 +85,84 @@ global.platformColor = {
     exitWheelcolors: ["#00ff00"],
     accidentalsWheelcolors: ["#0000ff"],
     octavesWheelcolors: ["#ffff00"],
-    accidentalsWheelcolorspush: "#cccccc"
+    accidentalsWheelcolorspush: "#cccccc",
+    modeWheelcolors: ["#111111"],
+    modeGroupWheelcolors: ["#222222"],
+    modePieMenusIfColorPush: "#333333",
+    modePieMenusElseColorPush: "#444444",
+    textColor: "#ffffff"
 };
 global._ = jest.fn(s => s);
+global.announceToScreenReader = jest.fn();
 global.Tone = {
     start: jest.fn().mockResolvedValue(),
     context: { state: "running" }
 };
+global.last = arr => arr[arr.length - 1];
+global.MUSICALMODES = {
+    ionian: [2, 2, 1, 2, 2, 2, 1],
+    major: [2, 2, 1, 2, 2, 2, 1],
+    aeolian: [2, 1, 2, 2, 1, 2, 2],
+    minor: [2, 1, 2, 2, 1, 2, 2],
+    dorian: [2, 1, 2, 2, 2, 1, 2]
+};
+global.MODE_PIE_MENUS = {
+    5: ["minor pentatonic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+    7: ["ionian", " ", "dorian", " ", " ", " ", " ", " ", " ", "aeolian", " ", " "],
+    custom: [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+};
+global.getCurrentEDO = jest.fn().mockReturnValue(12);
+global.DEFAULTVOLUME = 0.5;
+global.SHARP = "♯";
+global.FLAT = "♭";
+global.MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
+global.MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
+global.getSavedCustomModes = () => [];
+global.getModeNamesForGroup = (grp, customModeNames = []) => {
+    if (grp !== "custom") {
+        return MODE_PIE_MENUS[grp];
+    }
+    const names = customModeNames.slice(0, 12);
+    while (names.length < 12) {
+        names.push(" ");
+    }
+    return names;
+};
+global.getModeLabel = modename => {
+    switch (modename) {
+        case "ionian":
+        case "major":
+            return "major / ionian";
+        case "aeolian":
+        case "minor":
+            return "minor / aeolian";
+        default:
+            return modename === " " ? " " : modename;
+    }
+};
+global.getModeNameFromLabel = (label, modes) => {
+    if (label === "major / ionian") {
+        return "major";
+    }
+    if (label === "minor / aeolian") {
+        return "aeolian";
+    }
+    return label;
+};
+global.getModeSliceColors = (modes, colors) =>
+    modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
+global.updateModeWheelItems = jest.fn();
+global.getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
+global.getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
+    const arcPx = (2 * Math.PI * 0.575 * wheelRadius) / sliceCount;
+    const size = Math.floor((arcPx * 0.85) / (labelLen * 0.6));
+    const minSize = Math.round(0.06 * wheelRadius);
+    const maxSize = Math.round(0.12 * wheelRadius);
+    const clamped = Math.min(maxSize, Math.max(minSize, size));
+    return `100 ${clamped}px sans-serif`;
+};
+global.configureWheel = jest.fn();
+
 global.Synth = jest.fn().mockImplementation(() => ({
     newTone: jest.fn(),
     tone: {},
@@ -188,6 +272,42 @@ describe("piemenus behavioral tests", () => {
         // prevPitch+delta = 4+1 = 5. 5 > 4, so deltaOctave = -1.
         // Octave 4 -> 3.
         expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
+    });
+    test("announces the previewed note to screen readers on pitch navigation", async () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        mockBlock.blocks.blockList["mock-id"].name = "pitch";
+
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "B", "");
+
+        const navigateFunc = mockBlock._pitchWheel.navItems[0].navigateFunction;
+        mockBlock._pitchWheel.selectedNavItemIndex = 0;
+        mockBlock._pitchWheel.navItems[0].title = "C";
+
+        await navigateFunc();
+
+        expect(global.announceToScreenReader).toHaveBeenCalledWith(expect.stringContaining("C"));
+    });
+
+    test("does not announce when the trigger is locked (rapid navigation)", async () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        mockBlock.blocks.blockList["mock-id"].name = "pitch";
+
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "B", "");
+
+        const navigateFunc = mockBlock._pitchWheel.navItems[0].navigateFunction;
+        mockBlock._pitchWheel.selectedNavItemIndex = 0;
+        mockBlock._pitchWheel.navItems[0].title = "C";
+
+        mockBlock._triggerLock = true;
+        global.announceToScreenReader.mockClear();
+
+        await navigateFunc();
+
+        expect(global.announceToScreenReader).not.toHaveBeenCalled();
     });
 
     describe("Phrase Maker refresh on pitch change", () => {
@@ -413,6 +533,20 @@ describe("piemenus behavioral tests", () => {
         );
 
         jest.useRealTimers();
+    });
+
+    describe("piemenuModes behavioral tests", () => {
+        test("selecting a mode slice assigns the internal mode name to the block", () => {
+            piemenuModes(mockBlock, "ionian");
+
+            // Initial highlight (index 0 = ionian) already fires the selection
+            // handler; navigate to the dorian slice (index 2) explicitly.
+            mockBlock._modeNameWheel.selectedNavItemIndex = 2;
+            mockBlock._modeNameWheel.navItems[2].navigateFunction();
+
+            expect(mockBlock.value).toBe("dorian");
+            expect(mockBlock.text.text).toBe("dorian");
+        });
     });
 });
 

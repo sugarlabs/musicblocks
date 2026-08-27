@@ -347,6 +347,20 @@ describe("KeyboardController", () => {
         });
     });
 
+    describe("Tab handoff", () => {
+        it("leaves Tab handling to FocusCycleManager when it is active", () => {
+            const activity = makeActivity();
+            const controller = createController(activity);
+            global.window._focusCycleManager = { _initialized: true };
+
+            const event = makeEvent({ keyCode: 9, key: "Tab" });
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            delete global.window._focusCycleManager;
+        });
+    });
+
     describe("copy/paste shortcuts", () => {
         it("Alt+C prepares the active stack for copy", () => {
             const activity = makeActivity();

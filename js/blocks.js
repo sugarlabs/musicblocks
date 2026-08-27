@@ -19,7 +19,7 @@
     DEFAULTVOICE, NATURAL, NUMBERBLOCKDEFAULT,
     STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
     WESTERN2EISOLFEGENAMES, addTemperamentToDictionary,
-   Block, closeBlkWidgets, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
+   Block, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
@@ -52,7 +52,7 @@
    - js/utils/mathutils.js
         MathUtility
    - js/utils/utils.js
-        _, last, closeBlkWidgets, mixedNumber, prepareMacroExports,
+        _, last, mixedNumber, prepareMacroExports,
         getTextWidth, delayExecution, deepClone
    - js/utils/musicutils.js
         addTemperamentToDictionary,
@@ -682,6 +682,11 @@ class Blocks {
 
             const myBlock = this.blockList[blk];
 
+            if (myBlock === null || myBlock === undefined) {
+                console.debug("Something very broken in adjustExpandableClampBlock: " + blk);
+                return;
+            }
+
             if (myBlock.isArgFlowClampBlock() || myBlock.isLeftClampBlock()) {
                 /** Make sure myBlock is a clamp block. */
             } else if (myBlock.isArgBlock() || myBlock.isTwoArgBlock()) {
@@ -981,7 +986,7 @@ class Blocks {
             }
 
             const myBlock = this.blockList[blk];
-            if (myBlock === null) {
+            if (myBlock === null || myBlock === undefined) {
                 console.debug("Something very broken in _getStackSize.");
                 return size;
             }
@@ -6613,6 +6618,29 @@ class Blocks {
         };
 
         /**
+         * Permanently dispose of a block by index, freeing its resources and circular references
+         * @param {number} blkIdx - Index of the block in blockList
+         * @public
+         * @returns {void}
+         */
+        this.disposeBlock = blkIdx => {
+            if (blkIdx === null || blkIdx === undefined || !this.blockList[blkIdx]) {
+                return;
+            }
+            const block = this.blockList[blkIdx];
+            if (typeof block.dispose === "function") {
+                block.dispose();
+            }
+            if (this.blockArt && this.blockArt[blkIdx]) {
+                delete this.blockArt[blkIdx];
+            }
+            if (this.blockCollapseArt && this.blockCollapseArt[blkIdx]) {
+                delete this.blockCollapseArt[blkIdx];
+            }
+            this.blockList[blkIdx] = null;
+        };
+
+        /**
          * Send a stack of blocks to the trash.
          * @param - myBlock
          * @public
@@ -6642,8 +6670,15 @@ class Blocks {
             const MAX_TRASH_UNDO = 100;
             if (this.trashStacks.length > MAX_TRASH_UNDO) {
                 const removed = this.trashStacks.shift();
-                if (removed !== undefined && this.trashPreviews[removed]) {
-                    delete this.trashPreviews[removed];
+                if (removed !== undefined) {
+                    if (this.trashPreviews[removed]) {
+                        delete this.trashPreviews[removed];
+                    }
+                    this.findDragGroup(removed);
+                    const evictedGroup = Array.from(this.dragGroup);
+                    for (let i = 0; i < evictedGroup.length; i++) {
+                        this.disposeBlock(evictedGroup[i]);
+                    }
                 }
             }
 
@@ -6706,8 +6741,12 @@ class Blocks {
                     delete this.blockCollapseArt[blk];
                 }
 
-                const title = this.blockList[blk].protoblock.staticLabels[0];
-                closeBlkWidgets(_(title));
+                const title = this.blockList[blk].protoblock.staticLabels
+                    ? this.blockList[blk].protoblock.staticLabels[0]
+                    : this.blockList[blk].name;
+                if (title && window.widgetWindows && window.widgetWindows.closeBlkWidgets) {
+                    window.widgetWindows.closeBlkWidgets(_(title));
+                }
                 this.activity.refreshCanvas();
             }
 

@@ -19,8 +19,9 @@
    global
 
    DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, deepClone, frequencyToPitch, last,
-   pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
-   getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
+    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
+    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
+    temperamentHasRatios,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
@@ -243,8 +244,6 @@ class Singer {
 
         this.dispatchFactor = 1; // scale factor for turtle graphics embedded in notes
 
-        this.inverted = false; // tracks if the notes being played are inverted
-
         // Voice Manager: Track active audio sources for proper cleanup
         this.activeVoices = new Set();
     }
@@ -327,7 +326,48 @@ class Singer {
             temperament
         );
 
-        if (isCustomTemperament(temperament)) {
+        // Custom temperaments without ratio data step by a raw semitone offset;
+        // everything else steps by mode-resolved EDO steps.
+        const useEdoSteps =
+            isTrueEDO(temperament) ||
+            !isCustomTemperament(temperament) ||
+            temperamentHasRatios(temperament);
+
+        if (useEdoSteps) {
+            for (let i = 0; i < Math.abs(steps); i++) {
+                const stepEdo =
+                    steps > 0
+                        ? getStepSizeUp(
+                              tur.singer.keySignature,
+                              noteObj[0],
+                              undefined,
+                              temperament,
+                              edo
+                          )
+                        : getStepSizeDown(
+                              tur.singer.keySignature,
+                              noteObj[0],
+                              undefined,
+                              temperament,
+                              edo
+                          );
+                noteObj = getNote(
+                    noteObj[0],
+                    noteObj[1],
+                    stepEdo,
+                    tur.singer.keySignature,
+                    tur.singer.movable,
+                    null,
+                    activity.errorMsg,
+                    temperament,
+                    true, // isAlreadyEdoSteps
+                    false // allow octave wrap
+                );
+            }
+        } else {
+            // Custom temperament without ratio data: no per-degree scale lookup
+            // is possible, so treat the step count as a raw semitone offset and
+            // let getNote rescale it.
             noteObj = getNote(
                 noteObj[0],
                 noteObj[1],
@@ -339,76 +379,9 @@ class Singer {
                 null,
                 activity.errorMsg,
                 temperament,
-                false,
-                false // allow octave wrap for scalar traversal
+                false, // isAlreadyEdoSteps — steps is raw semitone offset
+                false // allow octave wrap
             );
-        } else if (!isTrueEDO(temperament)) {
-            const curTemp = temperament;
-            for (let i = 0; i < Math.abs(steps); i++) {
-                const stepEdo =
-                    steps > 0
-                        ? getStepSizeUp(
-                              tur.singer.keySignature,
-                              noteObj[0],
-                              undefined,
-                              curTemp,
-                              edo
-                          )
-                        : getStepSizeDown(
-                              tur.singer.keySignature,
-                              noteObj[0],
-                              undefined,
-                              curTemp,
-                              edo
-                          );
-                noteObj = getNote(
-                    noteObj[0],
-                    noteObj[1],
-                    stepEdo,
-                    tur.singer.keySignature,
-                    tur.singer.movable,
-                    null,
-                    activity.errorMsg,
-                    curTemp,
-                    true, // isAlreadyEdoSteps
-                    false // allow octave wrap
-                );
-            }
-        } else {
-            const curTemp = temperament;
-
-            const curEDO = edo;
-            for (let i = 0; i < Math.abs(steps); i++) {
-                const stepEdo =
-                    steps > 0
-                        ? getStepSizeUp(
-                              tur.singer.keySignature,
-                              noteObj[0],
-                              undefined,
-                              curTemp,
-                              curEDO
-                          )
-                        : getStepSizeDown(
-                              tur.singer.keySignature,
-                              noteObj[0],
-                              undefined,
-                              curTemp,
-                              curEDO
-                          );
-
-                noteObj = getNote(
-                    noteObj[0],
-                    noteObj[1],
-                    stepEdo,
-                    tur.singer.keySignature,
-                    tur.singer.movable,
-                    null,
-                    activity.errorMsg,
-                    curTemp,
-                    true,
-                    false // allow octave wrap
-                );
-            }
         }
 
         return noteObj;
@@ -1070,8 +1043,6 @@ class Singer {
                 }
             }
         } else if (tur.singer.inNoteBlock.length > 0) {
-            // maybe of interest
-            tur.singer.inverted = tur.singer.invertList.length > 0;
             const addPitch = (note, octave, cents, direction) => {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
@@ -1355,7 +1326,6 @@ class Singer {
 
             tur.singer.inNoteBlock.push(blk);
 
-            tur.singer.inverted = tur.singer.invertList.length > 0;
             const addPitch = (note, octave, cents, direction) => {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
@@ -1994,8 +1964,6 @@ class Singer {
                     if (!tur.singer.suppressOutput) {
                         tur.doWait(Math.max(bpmFactor / duration - turtleLag, 0));
                     }
-                    // Clear the list when the last note is played.
-                    tur.singer.delayedNotes = [];
                 } else {
                     // Notes within Notes need to be played in the "future".
                     noteInNote = true;
@@ -2010,6 +1978,14 @@ class Singer {
                         }
                     }
                 }
+            }
+            // Clear the delayed-notes list once the outermost note in this group has
+            // finished, regardless of its own duration. The first note of a Tie pair
+            // has duration 0 (its time is deferred to the second tied note), but any
+            // nested notes it contained may still have pushed onto delayedNotes, and
+            // those entries must not leak into the next, unrelated note group.
+            if (tur.singer.inNoteBlock.length === 1) {
+                tur.singer.delayedNotes = [];
             }
             let forceSilence = false;
             if (tur.singer.skipFactor > 1) {

@@ -11,7 +11,7 @@
 
 /*
   global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  RECORDBUTTON, saveButton, saveButtonAdvanced
+  makeKeyboardAccessible, RECORDBUTTON, saveButton, saveButtonAdvanced
 */
 
 /* exported ToolbarUI */
@@ -486,6 +486,15 @@ class ToolbarUI {
         logoIcon.onclick = () => {
             onclick(this.activity);
         };
+
+        logoIcon.setAttribute("role", "button");
+        logoIcon.setAttribute("tabindex", "0");
+        logoIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                logoIcon.click();
+            }
+        });
     }
 
     /**
@@ -614,11 +623,19 @@ class ToolbarUI {
         confirmationButton.classList.add("confirm-button");
         confirmationButton.id = "new-project";
         confirmationButton.setAttribute("tabindex", "0"); // Make focusable
+        confirmationButton.setAttribute("role", "button");
+        confirmationButton.setAttribute("aria-label", _("Confirm"));
+        // The label alone ("Confirm") doesn't say what's being confirmed;
+        // point screen readers at the actual question being asked.
+        confirmationButton.setAttribute("aria-describedby", "confirmation-message");
         confirmationButton.textContent = _("Confirm");
 
         const cancelButton = document.createElement("div");
         cancelButton.classList.add("cancel-button");
         cancelButton.id = "cancel-project";
+        cancelButton.setAttribute("role", "button");
+        cancelButton.setAttribute("aria-label", _("Cancel"));
+        cancelButton.setAttribute("aria-describedby", "confirmation-message");
         cancelButton.textContent = _("Cancel");
 
         buttonRowLi.appendChild(confirmationButton);
@@ -632,6 +649,13 @@ class ToolbarUI {
 
         // Make modal container focusable
         modalContainer.setAttribute("tabindex", "-1");
+
+        // Screen reader semantics: identify this as a modal dialog with an
+        // accessible name, matching the pattern used by the other modals
+        // in the app (clear-workspace confirmation, LilyPond save dialog).
+        modalContainer.setAttribute("role", "dialog");
+        modalContainer.setAttribute("aria-modal", "true");
+        modalContainer.setAttribute("aria-label", _("New project confirmation"));
 
         // Setup keyboard navigation for modal
         const modalButtons = [confirmationButton, cancelButton];
@@ -1785,8 +1809,9 @@ class ToolbarUI {
         const getNavigableButtons = () => {
             // Main toolbar button selectors
             const mainSelectors =
-                "#play, #stop, #record, #FullScreen, #newFile, #load, " +
-                "#saveButton, #saveButtonAdvanced, #planetIcon, #toggleAuxBtn, #helpIcon";
+                "#play, #stop, #record, #recordDropdownArrow, #FullScreen, #newFile, #load, " +
+                "#saveButton, #saveButtonAdvanced, #planetIcon, #toggleAuxBtn, #helpIcon, " +
+                "#installButton";
 
             // Aux toolbar button selectors
             const auxSelectors =
@@ -1823,10 +1848,20 @@ class ToolbarUI {
             buttons = getNavigableButtons();
 
             // Add click handlers for mouse support - clicking a button sets keyboard focus
-            buttons.allButtons.forEach((btn, index) => {
+            buttons.allButtons.forEach(btn => {
+                makeKeyboardAccessible(btn, undefined, activateFocusedButton);
+
                 // Avoid adding duplicate listeners
                 if (!btn.hasAttribute("data-kb-nav-listener")) {
                     btn.setAttribute("data-kb-nav-listener", "true");
+                    btn.addEventListener("focus", () => {
+                        const focusedIndex = buttons.allButtons.indexOf(btn);
+                        if (focusedIndex < 0) return;
+
+                        currentFocusIndex = focusedIndex;
+                        clearFocus();
+                        btn.classList.add("toolbar-btn-focused");
+                    });
                     btn.addEventListener("click", () => {
                         // Check if this is a mode toggle button
                         const isModeToggle = btn.id === "beginnerMode" || btn.id === "advancedMode";
@@ -1892,11 +1927,35 @@ class ToolbarUI {
             const openDropdowns = document.querySelectorAll(".dropdown-content");
             openDropdowns.forEach(dropdown => {
                 // Materialize dropdowns use 'display: block' when open
-                if (dropdown.style.display === "block") {
+                if (dropdown.style.display === "block" || dropdown.classList.contains("active")) {
                     dropdown.style.display = "none";
                     dropdown.classList.remove("active");
                 }
             });
+        };
+
+        /**
+         * Leaves toolbar keyboard navigation and returns focus to the page.
+         */
+        const leaveKeyboardNavigation = () => {
+            closeAllDropdowns();
+            clearFocus();
+            currentFocusIndex = -1;
+
+            if (
+                window._focusCycleManager &&
+                typeof window._focusCycleManager.exitKeyboardNavigation === "function"
+            ) {
+                window._focusCycleManager.exitKeyboardNavigation();
+            }
+
+            const activeElement = document.activeElement;
+            if (activeElement && typeof activeElement.blur === "function") {
+                activeElement.blur();
+            }
+            if (typeof toolbars.blur === "function") {
+                toolbars.blur();
+            }
         };
 
         /**
@@ -2037,7 +2096,7 @@ class ToolbarUI {
                             const menuItems = Array.from(dropdownMenu.querySelectorAll("li a"));
                             if (menuItems.length > 0) {
                                 // Enable keyboard navigation in dropdown
-                                enableDropdownNavigation(dropdownMenu, menuItems);
+                                enableDropdownNavigation(dropdownMenu, menuItems, button);
                                 // Focus first item
                                 menuItems[0].focus();
                                 menuItems[0].classList.add("dropdown-item-focused");
@@ -2094,7 +2153,7 @@ class ToolbarUI {
         /**
          * Enables keyboard navigation within a dropdown menu
          */
-        const enableDropdownNavigation = (dropdownMenu, menuItems) => {
+        const enableDropdownNavigation = (dropdownMenu, menuItems, triggerButton) => {
             let currentMenuIndex = 0;
 
             // Make all menu items focusable
@@ -2129,6 +2188,7 @@ class ToolbarUI {
                         setMenuFocus((currentMenuIndex - 1 + menuItems.length) % menuItems.length);
                         break;
                     case "Enter":
+                    case " ":
                         e.preventDefault();
                         e.stopPropagation();
                         if (currentMenuIndex >= 0 && currentMenuIndex < menuItems.length) {
@@ -2138,7 +2198,15 @@ class ToolbarUI {
                     case "Escape":
                         e.preventDefault();
                         e.stopPropagation();
-                        // Close dropdown and return focus to toolbar
+                        closeAllDropdowns();
+                        clearMenuFocus();
+                        if (triggerButton) {
+                            const triggerIndex = buttons.allButtons.indexOf(triggerButton);
+                            if (triggerIndex >= 0) {
+                                setFocus(triggerIndex);
+                                break;
+                            }
+                        }
                         toolbars.focus();
                         break;
                 }
@@ -2224,9 +2292,9 @@ class ToolbarUI {
                     break;
 
                 case "Escape":
-                    clearFocus();
-                    currentFocusIndex = -1;
-                    toolbars.blur();
+                    event.preventDefault();
+                    event.stopPropagation();
+                    leaveKeyboardNavigation();
                     break;
             }
         });
@@ -2280,6 +2348,9 @@ class ToolbarUI {
                 // Keep currentFocusIndex for memory
             }
         });
+
+        // Apply semantics and keyboard activation before the first Tab keypress.
+        updateButtonsList();
     }
 
     closeAuxToolbar = onclick => {

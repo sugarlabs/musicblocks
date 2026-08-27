@@ -66,6 +66,9 @@ class ToolbarController {
 
                 const that = this;
                 setTimeout(() => {
+                    // Stop leaves the drawing in place, so clear here the way
+                    // every other Run path does before starting fresh.
+                    that._clearAllTurtles();
                     that.activity.logo.runLogoCommands(null, env);
                 }, 500);
             }

@@ -169,8 +169,60 @@ describe("MusicKeyboard add-row submenu", () => {
         expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
         expect(loadNewBlocks).toHaveBeenCalledWith([
             [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
+            [1, ["solfege", { value: "do" }], 0, 0, [0]],
+            [2, ["number", { value: 4 }], 0, 0, [0]]
+        ]);
+    });
+
+    test("adds next sequential pitch when layout contains existing pitch rows and inherits octave", () => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            }
+        });
+
+        keyboard.layout = [
+            { noteName: "do", noteOctave: 5, blockNumber: 100001 },
+            { noteName: "hertz", noteOctave: 440, blockNumber: 100002 }
+        ];
+
+        keyboard._createAddRowPieSubmenu();
+
+        expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
+        // After 'do', next pitch in chromatic solfege is 'do♯', and octave 5 is inherited from previous pitch
+        expect(loadNewBlocks).toHaveBeenCalledWith([
+            [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
             [1, ["solfege", { value: "do♯" }], 0, 0, [0]],
-            [2, ["number", { value: 392 }], 0, 0, [0]]
+            [2, ["number", { value: 5 }], 0, 0, [0]]
+        ]);
+    });
+
+    test("increments octave when rolling over from the last pitch label", () => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            }
+        });
+
+        // 'ti' is the 12th / last pitch label in default solfege scale
+        keyboard.layout = [{ noteName: "ti", noteOctave: 4, blockNumber: 100001 }];
+
+        keyboard._createAddRowPieSubmenu();
+
+        expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
+        // When rolling over after 'ti', next is 'do' and octave increments from 4 to 5
+        expect(loadNewBlocks).toHaveBeenCalledWith([
+            [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
+            [1, ["solfege", { value: "do" }], 0, 0, [0]],
+            [2, ["number", { value: 5 }], 0, 0, [0]]
         ]);
     });
 
@@ -1159,6 +1211,89 @@ describe("MusicKeyboard core logic", () => {
             expect(img.src).toContain("header-icons/play-button.svg");
             expect(img.title).toBe("Play");
             expect(img.alt).toBe("Play");
+        });
+    });
+
+    describe("Web MIDI cleanup on widget close", () => {
+        test("resets onmidimessage handlers on all connected MIDI inputs when widgetWindow.onclose is called", () => {
+            const mockInput1 = { onmidimessage: jest.fn() };
+            const mockInput2 = { onmidimessage: jest.fn() };
+            const mockMidiAccess = {
+                inputs: [mockInput1, mockInput2]
+            };
+
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                addButton: jest.fn().mockReturnValue({ onclick: null, setAttribute: jest.fn() }),
+                addInputButton: jest.fn().mockReturnValue({
+                    addEventListener: jest.fn(),
+                    classList: { add: jest.fn() }
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    style: {}
+                })
+            };
+
+            const origWidgetWindows = global.window.widgetWindows;
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue(mockWidgetWindow)
+            };
+
+            try {
+                const mockActivity = {
+                    turtles: {
+                        ithTurtle: jest.fn().mockReturnValue({
+                            singer: { bpm: [90] }
+                        })
+                    },
+                    logo: { synth: { stopSound: jest.fn() } }
+                };
+
+                const keyboard = new MusicKeyboard(mockActivity);
+                keyboard._createWidgetWindow();
+
+                keyboard.midiAccess = mockMidiAccess;
+                keyboard.midiON = true;
+
+                // Trigger actual onclose handler registered on widgetWindow
+                mockWidgetWindow.onclose();
+
+                expect(mockInput1.onmidimessage).toBeNull();
+                expect(mockInput2.onmidimessage).toBeNull();
+                expect(keyboard.midiON).toBe(false);
+                expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+            } finally {
+                global.window.widgetWindows = origWidgetWindows;
+            }
+        });
+
+        test("doMIDI stores midiAccess reference when requestMIDIAccess succeeds", async () => {
+            const mockInput = { onmidimessage: null };
+            const mockMidiAccess = {
+                inputs: new Map([["1", mockInput]])
+            };
+
+            const origRequestMIDIAccess = global.navigator.requestMIDIAccess;
+            global.navigator.requestMIDIAccess = jest.fn().mockResolvedValue(mockMidiAccess);
+
+            try {
+                const keyboard = new MusicKeyboard({
+                    textMsg: jest.fn()
+                });
+                keyboard.midiButton = { style: {} };
+
+                keyboard.doMIDI();
+
+                await Promise.resolve();
+
+                expect(keyboard.midiAccess).toBe(mockMidiAccess);
+                expect(mockInput.onmidimessage).toBeDefined();
+            } finally {
+                global.navigator.requestMIDIAccess = origRequestMIDIAccess;
+            }
         });
     });
 });

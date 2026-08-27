@@ -111,7 +111,6 @@ const {
     format,
     delayExecution,
     closeWidgets,
-    closeBlkWidgets,
     resolveObject,
     importMembers,
     changeImage,
@@ -137,10 +136,60 @@ const {
     preparePluginExports,
     hideDOMLabel,
     displayMsg,
-    _,
+    makeKeyboardAccessible,
     CameraManager,
-    announceToScreenReader
+    announceToScreenReader,
+    _
 } = require("../utils.js");
+
+describe("makeKeyboardAccessible()", () => {
+    test("adds button semantics and activates on Enter and Space", () => {
+        const element = {
+            id: "tempoButton",
+            setAttribute: jest.fn(),
+            getAttribute: jest.fn(() => ""),
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            click: jest.fn()
+        };
+
+        makeKeyboardAccessible(element, "Tempo");
+
+        expect(element.setAttribute).toHaveBeenCalledWith("role", "button");
+        expect(element.setAttribute).toHaveBeenCalledWith("tabindex", "0");
+        expect(element.setAttribute).toHaveBeenCalledWith("aria-label", "Tempo");
+
+        const handler = element.addEventListener.mock.calls[0][1];
+        const event = {
+            key: " ",
+            preventDefault: jest.fn(),
+            stopPropagation: jest.fn()
+        };
+        handler(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(event.stopPropagation).toHaveBeenCalled();
+        expect(element.click).toHaveBeenCalled();
+    });
+
+    test("replaces an existing keyboard listener when reused", () => {
+        const element = {
+            id: "button",
+            setAttribute: jest.fn(),
+            getAttribute: jest.fn(() => ""),
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            click: jest.fn()
+        };
+
+        makeKeyboardAccessible(element, "Button");
+        const firstHandler = element.addEventListener.mock.calls[0][1];
+        makeKeyboardAccessible(element, "Button");
+
+        expect(element.removeEventListener).toHaveBeenCalledWith("keydown", firstHandler);
+        expect(element.addEventListener).toHaveBeenCalledTimes(2);
+    });
+});
 
 describe("Utility Functions (logic-only)", () => {
     describe("toTitleCase()", () => {
@@ -495,67 +544,6 @@ describe("Utility Functions (logic-only)", () => {
         it("does not throw when openWindows is empty", () => {
             window.widgetWindows.openWindows = {};
             expect(() => closeWidgets()).not.toThrow();
-        });
-    });
-    describe("closeBlkWidgets()", () => {
-        beforeEach(() => {
-            window.widgetWindows = {
-                hideAllWindows: jest.fn(),
-                hideWindow: jest.fn(),
-                closeWindow: jest.fn(),
-                openWindows: {}
-            };
-        });
-
-        it("closes matching widget by name", () => {
-            const mockElement = { innerHTML: "TestWidget" };
-
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
-
-            closeBlkWidgets("TestWidget");
-
-            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("TestWidget");
-        });
-
-        it("closes widget directly using key lookup from openWindows", () => {
-            window.widgetWindows.openWindows = {
-                "custom mode": { close: jest.fn() }
-            };
-
-            closeBlkWidgets("custom mode");
-
-            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
-        });
-
-        it("closes widget using mapped key", () => {
-            window.widgetWindows.openWindows = {
-                "pitch drum": { close: jest.fn() }
-            };
-
-            closeBlkWidgets("pitch-drum mapper");
-
-            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
-        });
-
-        it("closes widget by matching element ID when display title changes", () => {
-            const mockElement = {
-                innerHTML: "C MAJOR",
-                id: "custom modeWidgetID"
-            };
-
-            document.getElementsByClassName = jest.fn(() => [mockElement]);
-
-            closeBlkWidgets("custom mode");
-
-            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
-        });
-
-        it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [{ innerHTML: "OtherWidget" }]);
-
-            closeBlkWidgets("TestWidget");
-
-            expect(window.widgetWindows.closeWindow).not.toHaveBeenCalled();
         });
     });
     describe("resolveObject()", () => {

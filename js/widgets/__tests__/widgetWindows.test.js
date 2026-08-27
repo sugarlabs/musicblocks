@@ -25,6 +25,7 @@ const path = require("path");
 
 // Set up globals required by widgetWindows.js before importing
 global._ = str => str;
+global.makeKeyboardAccessible = require("../../utils/dom-helpers").makeKeyboardAccessible;
 global.docById = jest.fn(id => document.getElementById(id));
 global.requestAnimationFrame = jest.fn(cb => cb());
 
@@ -281,6 +282,29 @@ describe("widgetWindows", () => {
             expect(img.getAttribute("alt")).toBe("My Label");
         });
 
+        test("makes the button keyboard accessible", () => {
+            const win = createTestWindow();
+            const btn = win.addButton("icon.svg", 24, "My Label");
+
+            expect(btn.getAttribute("role")).toBe("button");
+            expect(btn.getAttribute("tabindex")).toBe("0");
+            expect(btn.getAttribute("aria-label")).toBe("My Label");
+
+            const clickSpy = jest.spyOn(btn, "click");
+            btn.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+            expect(clickSpy).toHaveBeenCalled();
+        });
+
+        test("updates the accessible label when the button changes", () => {
+            const win = createTestWindow();
+            const btn = win.addButton("play.svg", 24, "Play");
+
+            win.modifyButton(0, "stop.svg", 24, "Stop");
+
+            expect(btn.getAttribute("aria-label")).toBe("Stop");
+            expect(btn.querySelector("img").getAttribute("alt")).toBe("Stop");
+        });
+
         test("adds button to _buttons array", () => {
             const win = createTestWindow();
             expect(win._buttons).toHaveLength(0);
@@ -311,6 +335,28 @@ describe("widgetWindows", () => {
             win.addButton("c.svg", 24, "C");
 
             expect(win._buttons).toHaveLength(3);
+        });
+
+        test("modifyButton still addresses the live buttons after a re-init", () => {
+            // A widget that re-initialises on an already open window (see
+            // Blocks.reInitWidget) calls clear() and then re-adds its buttons.
+            const win = createTestWindow();
+            win.clear();
+            win.addButton("play-button.svg", 24, "Play");
+            win.addButton("erase-button.svg", 24, "Clear");
+
+            win.clear();
+            win.addButton("play-button.svg", 24, "Play");
+            win.addButton("erase-button.svg", 24, "Clear");
+
+            expect(win._buttons).toHaveLength(2);
+
+            const target = win.modifyButton(0, "stop-button.svg", 24, "Stop");
+
+            expect(win._toolbar.contains(target)).toBe(true);
+            expect(win._toolbar.querySelector("img").getAttribute("src")).toBe(
+                "header-icons/stop-button.svg"
+            );
         });
     });
 
@@ -590,6 +636,24 @@ describe("widgetWindows", () => {
             win.updateTitle("New Title");
 
             expect(titleEl.innerHTML).toBe("New Title");
+        });
+
+        test("keeps the frame's aria-label in sync with the new title", () => {
+            const win = createTestWindow("Old Title");
+
+            win.updateTitle("New Title");
+
+            expect(win._frame.getAttribute("aria-label")).toBe("New Title");
+        });
+    });
+
+    describe("frame accessibility", () => {
+        test("gives the window frame a dialog role and an accessible name", () => {
+            const win = createTestWindow("My Widget");
+
+            expect(win._frame.getAttribute("role")).toBe("dialog");
+            expect(win._frame.getAttribute("aria-label")).toBe("My Widget");
+            expect(win._frame.getAttribute("aria-modal")).toBeNull();
         });
     });
 
@@ -917,8 +981,6 @@ describe("widgetWindows", () => {
             const win2 = createTestWindow("Window 2");
 
             win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-            expect(window.widgetWindows.focused).toBe(win1);
-
             const maxEvent = new KeyboardEvent("keydown", {
                 code: "KeyM",
                 ctrlKey: true,
@@ -1074,6 +1136,78 @@ describe("widgetWindows", () => {
 
             win._rollButton.dispatchEvent(clickEvent);
             expect(win._rolled).toBe(false);
+        });
+
+        test("maxminButton title updates on maximize and restore", () => {
+            const win = createTestWindow("Test Window");
+            expect(win._maxminButton).toBeDefined();
+            expect(win._maxminButton.title).toBe("Maximize window");
+
+            win._maximize();
+            expect(win._maxminButton.title).toBe("Restore");
+
+            win._restore();
+            expect(win._maxminButton.title).toBe("Maximize window");
+        });
+    });
+
+    describe("closeBlkWidgets()", () => {
+        beforeEach(() => {
+            window.widgetWindows.openWindows = {};
+            window.widgetWindows.closeWindow = jest.fn();
+            window.widgetWindows.hideAllWindows = jest.fn();
+            window.widgetWindows.hideWindow = jest.fn();
+        });
+
+        it("closes matching widget by name", () => {
+            const mockElement = { innerHTML: "TestWidget" };
+
+            document.getElementsByClassName = jest.fn(() => [mockElement]);
+
+            window.widgetWindows.closeBlkWidgets("TestWidget");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("TestWidget");
+        });
+
+        it("closes widget directly using key lookup from openWindows", () => {
+            window.widgetWindows.openWindows = {
+                "custom mode": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("custom mode");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
+        });
+
+        it("closes widget using mapped key", () => {
+            window.widgetWindows.openWindows = {
+                "pitch drum": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("pitch-drum mapper");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
+        });
+
+        it("closes widget by matching element ID when display title changes", () => {
+            const mockElement = {
+                innerHTML: "C MAJOR",
+                id: "custom modeWidgetID"
+            };
+
+            document.getElementsByClassName = jest.fn(() => [mockElement]);
+
+            window.widgetWindows.closeBlkWidgets("custom mode");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
+        });
+
+        it("does nothing if no match found", () => {
+            document.getElementsByClassName = jest.fn(() => [{ innerHTML: "OtherWidget" }]);
+
+            window.widgetWindows.closeBlkWidgets("TestWidget");
+
+            expect(window.widgetWindows.closeWindow).not.toHaveBeenCalled();
         });
     });
 });

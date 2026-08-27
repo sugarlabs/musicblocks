@@ -1478,18 +1478,26 @@ describe("Utility Functions (logic-only)", () => {
                 stop: jest.fn(),
                 dispose: jest.fn()
             };
-            Synth.recorder = {
-                stop: jest.fn().mockResolvedValue("recording-blob")
+            const mockRecorder = {
+                stop: jest.fn().mockResolvedValue("recording-blob"),
+                dispose: jest.fn()
             };
-            Synth.mic = {
-                close: jest.fn()
+            const mockMic = {
+                close: jest.fn(),
+                dispose: jest.fn()
             };
+            Synth.recorder = mockRecorder;
+            Synth.mic = mockMic;
 
             const result = await Synth.stopRecording();
 
             expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:old-recording");
             expect(Synth.player).toBeNull();
-            expect(Synth.mic.close).toHaveBeenCalled();
+            expect(mockMic.close).toHaveBeenCalled();
+            expect(mockMic.dispose).toHaveBeenCalled();
+            expect(Synth.mic).toBeNull();
+            expect(mockRecorder.dispose).toHaveBeenCalled();
+            expect(Synth.recorder).toBeNull();
             expect(global.URL.createObjectURL).toHaveBeenCalledWith("recording-blob");
             expect(result).toBe("blob:recording-url");
         });
@@ -1524,6 +1532,47 @@ describe("Utility Functions (logic-only)", () => {
             expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:recording-url");
             expect(Synth.player).toBeNull();
             expect(Synth.audioURL).toBeNull();
+        });
+
+        it("disposes previous mic and recorder before creating new ones on startRecording", async () => {
+            const oldMic = { close: jest.fn(), dispose: jest.fn() };
+            const oldRecorder = { dispose: jest.fn() };
+            Synth.mic = oldMic;
+            Synth.recorder = oldRecorder;
+
+            await Synth.startRecording();
+
+            expect(oldMic.close).toHaveBeenCalled();
+            expect(oldMic.dispose).toHaveBeenCalled();
+            expect(oldRecorder.dispose).toHaveBeenCalled();
+            expect(Synth.mic).not.toBe(oldMic);
+            expect(Synth.recorder).not.toBe(oldRecorder);
+        });
+
+        it("does not throw when a native MediaRecorder (no dispose) is set as previous recorder", async () => {
+            const oldMic = { close: jest.fn(), dispose: jest.fn() };
+            const nativeRecorder = { stop: jest.fn(), state: "inactive" };
+            Synth.mic = oldMic;
+            Synth.recorder = nativeRecorder;
+
+            await expect(Synth.startRecording()).resolves.not.toThrow();
+            expect(Synth.mic).not.toBe(oldMic);
+            expect(Synth.recorder).not.toBe(nativeRecorder);
+        });
+
+        it("returns null when stopRecording is called without an active recorder", async () => {
+            Synth.mic = null;
+            Synth.recorder = null;
+
+            const result = await Synth.stopRecording();
+            expect(result).toBeNull();
+        });
+
+        it("does not throw when startRecording is called with no previous mic/recorder", async () => {
+            Synth.mic = null;
+            Synth.recorder = null;
+
+            await expect(Synth.startRecording()).resolves.not.toThrow();
         });
     });
 

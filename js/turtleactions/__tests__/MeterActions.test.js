@@ -118,6 +118,28 @@ describe("setupMeterActions", () => {
         expect(targetTurtle.singer.defaultStrongBeats).toBe(false);
     });
 
+    it("should not clear manually-set beats when defaultStrongBeats is false", () => {
+        targetTurtle.singer.beatList = [2, 5];
+        targetTurtle.singer.defaultStrongBeats = false;
+        Singer.MeterActions.setMeter(7, 1 / 4, 0);
+        expect(targetTurtle.singer.beatList).toEqual([2, 5]);
+    });
+
+    describe("time signatures that only partially match a default pattern", () => {
+        test.each([
+            [4, 1 / 8, "4/4 pattern needs noteValuePerBeat===4, not just beatsPerMeasure===4"],
+            [2, 1 / 8, "4/2 pattern needs noteValuePerBeat===4, not just beatsPerMeasure===2"],
+            [3, 1 / 8, "4/3 pattern needs noteValuePerBeat===4, not just beatsPerMeasure===3"],
+            [5, 1 / 8, "8/6 pattern needs beatsPerMeasure===6, not just noteValuePerBeat===8"],
+            [6, 1 / 4, "8/6 pattern needs noteValuePerBeat===8, not just beatsPerMeasure===6"]
+        ])("should not set default strong beats: %s", (beats, noteValue) => {
+            targetTurtle.singer.beatList = [];
+            Singer.MeterActions.setMeter(beats, noteValue, 0);
+            expect(targetTurtle.singer.beatList.length).toBe(0);
+            expect(targetTurtle.singer.defaultStrongBeats).toBe(false);
+        });
+    });
+
     describe("setPickup", () => {
         test.each([
             [2, 0, 2, true],
@@ -135,12 +157,16 @@ describe("setupMeterActions", () => {
         test.each([
             [120, 0.25, [], 120, undefined],
             [10, 0.25, ["1/4 beats per minute must be greater than 30"], 30, 1],
-            [5000, 0.25, ["maximum 1/4 beats per minute is 1000"], 1000, 1]
+            [5000, 0.25, ["maximum 1/4 beats per minute is 1000"], 1000, 1],
+            [30, 0.25, [], 30, undefined],
+            [1000, 0.25, [], 1000, undefined]
         ])("setBPM(%i) should handle %s range", (bpm, factor, errors, expected, errBlk) => {
             activity.errorMsg.mockClear();
             Singer.MeterActions.setBPM(bpm, factor, 0, errBlk);
             if (errors.length) {
                 errors.forEach(msg => expect(activity.errorMsg).toHaveBeenCalledWith(msg, errBlk));
+            } else {
+                expect(activity.errorMsg).not.toHaveBeenCalled();
             }
             expect(targetTurtle.singer.bpm).toContain(expected);
         });
@@ -151,12 +177,16 @@ describe("setupMeterActions", () => {
             [100, [], 100],
             [500, [], 500],
             [10, ["1/4 beats per minute must be greater than 30"], 30],
-            [5000, ["maximum 1/4 beats per minute is 1000"], 1000]
+            [5000, ["maximum 1/4 beats per minute is 1000"], 1000],
+            [30, [], 30],
+            [1000, [], 1000]
         ])("setMasterBPM(%i) should result in masterBPM %i", (bpm, errors, expected) => {
             activity.errorMsg.mockClear();
             Singer.MeterActions.setMasterBPM(bpm, 0.25, 1);
             if (errors.length) {
                 errors.forEach(msg => expect(activity.errorMsg).toHaveBeenCalledWith(msg, 1));
+            } else {
+                expect(activity.errorMsg).not.toHaveBeenCalled();
             }
             expect(Singer.masterBPM).toBe(expected);
             if (!errors.length) expect(Singer.defaultBPMFactor).toBe(TONEBPM / expected);
@@ -201,6 +231,8 @@ describe("setupMeterActions", () => {
         global.setInterval = jest.fn(() => 12345);
 
         Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
+
+        expect(activity.turtles.addTurtle).not.toHaveBeenCalled();
 
         const listenerFunc = activity.logo.setTurtleListener.mock.calls[0][2];
         listenerFunc();
@@ -269,6 +301,117 @@ describe("setupMeterActions", () => {
         expect(setInterval).toHaveBeenCalled();
     });
 
+    it("should not attempt to clear an interval before one has been set", () => {
+        targetTurtle.companionTurtle = 1;
+
+        const companionTurtle = {
+            id: 1,
+            singer: { bpm: [] },
+            queue: [],
+            parentFlowQueue: [],
+            unhighlightQueue: [],
+            parameterQueue: []
+        };
+
+        activity.turtles.ithTurtle.mockImplementation(id => {
+            return id === 0 ? targetTurtle : companionTurtle;
+        });
+
+        global.clearInterval = jest.fn();
+        global.setInterval = jest.fn(() => 1);
+
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
+
+        expect(clearInterval).not.toHaveBeenCalled();
+    });
+
+    it("should reset the companion turtle's queue-related arrays", () => {
+        targetTurtle.companionTurtle = 1;
+
+        const companionTurtle = {
+            id: 1,
+            singer: { bpm: [] },
+            queue: ["stale"],
+            parentFlowQueue: ["stale"],
+            unhighlightQueue: ["stale"],
+            parameterQueue: ["stale"]
+        };
+
+        activity.turtles.ithTurtle.mockImplementation(id => {
+            return id === 0 ? targetTurtle : companionTurtle;
+        });
+
+        global.setInterval = jest.fn(() => 1);
+
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
+
+        expect(companionTurtle.queue).toEqual([]);
+        expect(companionTurtle.parentFlowQueue).toEqual([]);
+        expect(companionTurtle.unhighlightQueue).toEqual([]);
+        expect(companionTurtle.parameterQueue).toEqual([]);
+    });
+
+    it("should use ManagedTimer for both clearing the previous interval and scheduling the next", () => {
+        targetTurtle.companionTurtle = 1;
+        targetTurtle.singer.noteValuePerBeat = 1;
+        targetTurtle.singer.bpm = [];
+        Singer.masterBPM = 60;
+
+        const companionTurtle = {
+            id: 1,
+            interval: 777,
+            singer: { bpm: [] },
+            queue: [],
+            parentFlowQueue: [],
+            unhighlightQueue: [],
+            parameterQueue: []
+        };
+
+        activity.turtles.ithTurtle.mockImplementation(id => {
+            return id === 0 ? targetTurtle : companionTurtle;
+        });
+
+        activity.logo._timerManager = {
+            clearInterval: jest.fn(() => true),
+            setGuardedInterval: jest.fn(() => "guarded-id")
+        };
+        activity.logo.stopTurtle = jest.fn();
+        global.clearInterval = jest.fn();
+
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
+
+        expect(activity.logo._timerManager.clearInterval).toHaveBeenCalledWith(777);
+        expect(clearInterval).not.toHaveBeenCalled();
+
+        expect(activity.logo._timerManager.setGuardedInterval).toHaveBeenCalledWith(
+            expect.any(Function),
+            4000,
+            expect.any(Function)
+        );
+
+        const [tickFn, , abortedFn] = activity.logo._timerManager.setGuardedInterval.mock.calls[0];
+        activity.stage.dispatchEvent.mockClear();
+        tickFn();
+        expect(activity.stage.dispatchEvent).toHaveBeenCalled();
+        expect(abortedFn()).toBe(activity.logo.stopTurtle);
+        expect(companionTurtle.interval).toBe("guarded-id");
+    });
+
+    it("should fall back to masterBPM for the interval duration when no turtle-specific BPM is set", () => {
+        let intervalMs;
+        global.setInterval = jest.fn((cb, ms) => {
+            intervalMs = ms;
+            return 1;
+        });
+        targetTurtle.singer.noteValuePerBeat = 1;
+        targetTurtle.singer.bpm = [];
+        Singer.masterBPM = 60;
+
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
+
+        expect(intervalMs).toBe(4000);
+    });
+
     it("should set a listener for every note", () => {
         Singer.MeterActions.onEveryNoteDo("testAction", false, null, 0, 1);
         expect(activity.logo.setTurtleListener).toHaveBeenCalled();
@@ -314,6 +457,17 @@ describe("setupMeterActions", () => {
         expect(targetTurtle.singer.beatList).not.toContain(5);
     });
 
+    it("should treat a beat equal to beatsPerMeasure as within the measure", () => {
+        targetTurtle.singer.beatsPerMeasure = 4;
+        targetTurtle.singer.factorList = [];
+        targetTurtle.singer.beatList = [];
+
+        Singer.MeterActions.onStrongBeatDo(4, "testAction", false, null, 0, 1);
+
+        expect(targetTurtle.singer.beatList).toContain(4);
+        expect(targetTurtle.singer.factorList).not.toContain(4);
+    });
+
     it("should set up listener for weak beat", () => {
         targetTurtle.id = 0;
         Singer.MeterActions.onWeakBeatDo("testAction", false, null, 0, 1);
@@ -340,6 +494,39 @@ describe("setupMeterActions", () => {
         expect(targetTurtle.singer.drift).toBe(1);
     });
 
+    it("should not decrement drift below zero", () => {
+        targetTurtle.singer.drift = 0;
+
+        Singer.MeterActions.setNoClock(0, 1);
+        expect(targetTurtle.singer.drift).toBe(1);
+
+        const listenerFunc = activity.logo.setTurtleListener.mock.calls[0][2];
+        listenerFunc();
+        expect(targetTurtle.singer.drift).toBe(0);
+
+        listenerFunc();
+        expect(targetTurtle.singer.drift).toBe(0);
+    });
+
+    it("should not dispatch via blk-based listener when blk is not in blockList", () => {
+        activity.logo.setDispatchBlock.mockClear();
+        global.MusicBlocks = { isRun: false };
+
+        Singer.MeterActions.setNoClock(0, 99);
+
+        expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    it("should not access MusicBlocks when it is undefined", () => {
+        delete global.MusicBlocks;
+        activity.logo.setDispatchBlock.mockClear();
+
+        expect(() => Singer.MeterActions.setNoClock(0)).not.toThrow();
+        expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+
+        global.MusicBlocks = { isRun: false };
+    });
+
     it("should handle MusicBlocks.isRun condition", () => {
         global.MusicBlocks = { isRun: true };
         const mockMouse = { MB: { listeners: [] } };
@@ -364,9 +551,9 @@ describe("setupMeterActions", () => {
     });
 
     it("should calculate whole notes played correctly", () => {
-        targetTurtle.singer.notesPlayed = [4, 1];
+        targetTurtle.singer.notesPlayed = [9, 3];
         const wholeNotes = Singer.MeterActions.getWholeNotesPlayed(0);
-        expect(wholeNotes).toBe(4);
+        expect(wholeNotes).toBe(3);
     });
 
     it("should return 0 when notes played is less than pickup", () => {
@@ -401,6 +588,34 @@ describe("setupMeterActions", () => {
 
         const result = Singer.MeterActions.getMeasureCount(0);
         expect(result).toBe(3);
+    });
+
+    it("should not treat notesPlayed exactly equal to pickup as below pickup", () => {
+        targetTurtle.singer.notesPlayed = [1, 1];
+        targetTurtle.singer.pickup = 1;
+        targetTurtle.singer.noteValuePerBeat = 1;
+        targetTurtle.singer.beatsPerMeasure = 4;
+
+        expect(Singer.MeterActions.getBeatCount(0)).toBe(1);
+        expect(Singer.MeterActions.getMeasureCount(0)).toBe(1);
+    });
+
+    it("should use the notesPlayed ratio, not the product, for the pickup guard", () => {
+        targetTurtle.singer.notesPlayed = [3, 2];
+        targetTurtle.singer.pickup = 2;
+
+        expect(Singer.MeterActions.getBeatCount(0)).toBe(0);
+        expect(Singer.MeterActions.getMeasureCount(0)).toBe(0);
+    });
+
+    it("should compute beat/measure counts from the played ratio, not the product, with the correct sign", () => {
+        targetTurtle.singer.notesPlayed = [4, 2];
+        targetTurtle.singer.pickup = 1;
+        targetTurtle.singer.noteValuePerBeat = 5;
+        targetTurtle.singer.beatsPerMeasure = 4;
+
+        expect(Singer.MeterActions.getBeatCount(0)).toBe(2);
+        expect(Singer.MeterActions.getMeasureCount(0)).toBe(2);
     });
 
     test.each([
@@ -527,12 +742,12 @@ describe("setupMeterActions", () => {
             intervalMs = ms;
             return 999;
         });
-        targetTurtle.singer.noteValuePerBeat = 1;
+        targetTurtle.singer.noteValuePerBeat = 4;
         targetTurtle.singer.bpm = [30, 120];
         Singer.masterBPM = 60;
         Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
         expect(last).toHaveBeenCalledWith([30, 120]);
-        expect(intervalMs).toBe(2000);
+        expect(intervalMs).toBe(500);
     });
 
     it("should set listener when Mouse.getMouseFromTurtle returns null", () => {

@@ -14,6 +14,9 @@
 if (typeof global._ !== "function") {
     global._ = s => s;
 }
+if (typeof global.makeKeyboardAccessible !== "function") {
+    global.makeKeyboardAccessible = require("../../utils/dom-helpers").makeKeyboardAccessible;
+}
 if (typeof global.platformColor === "undefined") {
     global.platformColor = { wheelcolors: [] };
 }

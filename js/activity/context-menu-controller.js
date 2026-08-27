@@ -12,9 +12,13 @@
 /* global _, wheelnav, slicePath, platformColor, base64Encode, GOHOMEFADEDBUTTON,
    SHOWBLOCKSBUTTON, COLLAPSEBLOCKSBUTTON, SMALLERBUTTON, BIGGERBUTTON, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, COLLAPSEBUTTON, EXPANDBUTTON, piemenuGrid, LEADING,
-   _THIS_IS_MUSIC_BLOCKS_ */
+   _THIS_IS_MUSIC_BLOCKS_, makeKeyboardAccessible */
 
 /* exported setupContextMenuController, ContextMenuController */
+
+// Intrinsic size of the bottom-right palette button artwork. Used to convert
+// the button's top edge into an offset from the bottom of the viewport.
+const PALETTE_BUTTON_SIZE = 42;
 
 /*
  * Hides the helpful wheel (if currently shown) and ticks the activity so the
@@ -475,6 +479,25 @@ class ContextMenuController {
         container.setAttribute("class", "tooltipped");
         container.setAttribute("data-tooltip", label);
         container.setAttribute("data-position", "top");
+        makeKeyboardAccessible(container, label);
+        if (typeof container.addEventListener === "function") {
+            container.addEventListener("keydown", event => {
+                const isEscape =
+                    event.key === "Escape" || event.key === "Esc" || event.keyCode === 27;
+                if (!isEscape) return;
+
+                event.preventDefault();
+                event.stopPropagation();
+                if (
+                    typeof window !== "undefined" &&
+                    window._focusCycleManager &&
+                    typeof window._focusCycleManager.exitKeyboardNavigation === "function"
+                ) {
+                    window._focusCycleManager.exitKeyboardNavigation();
+                }
+                container.blur?.();
+            });
+        }
         window.jQuery(".tooltipped").tooltip({
             html: true,
             delay: 100
@@ -502,12 +525,15 @@ class ContextMenuController {
         const altText = label ? label.replace(/\s*\[.*\]$/, "") : "Toolbar button";
         img.setAttribute("alt", altText);
 
-        // Batch DOM reads before writes to avoid forced synchronous layout
-        const rightPos = document.body.clientWidth - x;
+        // Anchor to the viewport, not to the document, so the buttons stay
+        // pinned to the bottom-right corner in fullscreen and while scrolling.
+        // x and y are viewport coordinates of the button's top-left corner.
+        const rightPos = window.innerWidth - x;
+        const bottomPos = Math.max(0, window.innerHeight - y - PALETTE_BUTTON_SIZE);
         container.appendChild(img);
         container.setAttribute(
             "style",
-            "position: absolute; right:" + rightPos + "px;  top: " + y + "px;"
+            "position: fixed; right:" + rightPos + "px;  bottom: " + bottomPos + "px;"
         );
         document.getElementById("buttoncontainerBOTTOM").appendChild(container);
         return container;
@@ -520,6 +546,13 @@ class ContextMenuController {
      */
     loadButtonDragHandler(container, actionClick, arg) {
         const activity = this.activity;
+        makeKeyboardAccessible(
+            container,
+            typeof container.getAttribute === "function"
+                ? container.getAttribute("data-tooltip")
+                : undefined,
+            () => actionClick(arg)
+        );
         container.onmousedown = () => {
             if (!activity.loading) {
                 document.body.style.cursor = "default";

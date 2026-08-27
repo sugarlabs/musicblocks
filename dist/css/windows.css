@@ -142,6 +142,11 @@
   background-color: #7bb5ee;
 }
 
+.wfbtItem:focus-visible {
+  outline: 2px solid #005a9c;
+  outline-offset: 2px;
+}
+
 .wfbtItem > input {
   border: none;
   width: 100%;
@@ -195,11 +200,10 @@
 
   #floatingWindows > .windowFrame > .wfTopBar {
     height: 56px;
-    background-color: #2196f3;
+    background-color: var(--color-widget-titlebar-bg);
     border: none;
     padding: 0;
     align-items: center;
-    flex-direction: row-reverse;
     flex-shrink: 0;
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     min-width: auto;
@@ -239,13 +243,24 @@
 
   #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
     flex-grow: 1;
-    color: #fff;
+    color: var(--color-widget-titlebar-text);
     font-size: 1.5em;
     padding: 0 15px;
     text-align: center;
     text-transform: uppercase;
     font-weight: 500;
     letter-spacing: 1.5px;
+  }
+
+  /* The dark-theme rule in themes.css (`.dark ... .wftTitle`) has higher
+     specificity than the plain rule above and would otherwise override
+     it with --color-text-secondary (#d1d5db), which fails contrast
+     against this breakpoint's blue title bar background. Using an
+     extra element selector (body) keeps identical id/class specificity
+     to that rule while adding one more selector segment, so this wins
+     the cascade regardless of stylesheet load order. */
+  body.dark #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+    color: var(--color-widget-titlebar-text);
   }
 
   #floatingWindows > .windowFrame > .wfWinBody {
@@ -297,11 +312,10 @@
 
   #floatingWindows > .windowFrame > .wfTopBar {
     height: 56px;
-    background-color: #2196f3;
+    background-color: var(--color-widget-titlebar-bg);
     border: none;
     padding: 0;
     align-items: center;
-    flex-direction: row-reverse;
     flex-shrink: 0;
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     min-width: auto;
@@ -324,13 +338,18 @@
 
   #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
     flex-grow: 1;
-    color: #fff;
+    color: var(--color-widget-titlebar-text);
     font-size: 1.2em;
     padding: 0 10px;
     text-align: center;
     text-transform: uppercase;
     font-weight: 500;
     letter-spacing: 1px;
+  }
+
+  /* See the 600px breakpoint above for why this override is needed. */
+  body.dark #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+    color: var(--color-widget-titlebar-text);
   }
 
   #floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar {
@@ -373,11 +392,10 @@
 
   #floatingWindows > .windowFrame > .wfTopBar {
     height: 48px;
-    background-color: #2196f3;
+    background-color: var(--color-widget-titlebar-bg);
     border: none;
     padding: 0;
     align-items: center;
-    flex-direction: row-reverse;
     flex-shrink: 0;
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.16), 0px 1px 7px 0px rgba(0, 0, 0, 0.12);
     min-width: auto;
@@ -400,13 +418,18 @@
 
   #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
     flex-grow: 1;
-    color: #fff;
+    color: var(--color-widget-titlebar-text);
     font-size: 1.1em;
     padding: 0 8px;
     text-align: center;
     text-transform: uppercase;
     font-weight: 100;
     letter-spacing: 1px;
+  }
+
+  /* See the 600px breakpoint above for why this override is needed. */
+  body.dark #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+    color: var(--color-widget-titlebar-text);
   }
 
   #floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar {

@@ -14,7 +14,23 @@
 // Localization helper for early bootstrap
 const t_ = typeof _ === "function" ? _ : s => s;
 
-const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7";
+const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix8";
+
+// The function normalizeLanguageCode() is declared as a side effect of
+// loading js/utils/language-utils.js as a <script> tag in index.html; classic
+// (non-module) scripts share one global lexical scope, so it is already
+// visible here without a local declaration of the same name -- redeclaring it
+// with let/const throws "already been declared". Under Jest, loader.js is
+// required directly via CommonJS and no such tag runs, so fall back to
+// requiring the module the same way js/utils/utils.js does. Guard on `module`
+// rather than `require` alone: RequireJS (lib/require.js) also exposes a
+// global `require` in the browser, and calling that synchronously on an
+// unregistered module id throws.
+let resolvedNormalizeLanguageCode =
+    typeof normalizeLanguageCode === "function" ? normalizeLanguageCode : undefined;
+if (!resolvedNormalizeLanguageCode && typeof module !== "undefined" && module.exports) {
+    ({ normalizeLanguageCode: resolvedNormalizeLanguageCode } = require("./utils/language-utils"));
+}
 
 requirejs.config({
     baseUrl: "./",
@@ -196,9 +212,6 @@ requirejs.config({
         "jquery-ui": {
             deps: ["jquery"]
         },
-        "abc": {
-            exports: "ABCJS"
-        },
         "libgif": {
             exports: "SuperGif"
         },
@@ -236,6 +249,8 @@ requirejs.config({
         "activity/block-scale-controller": "js/activity/block-scale-controller",
         "activity/block-drag-controller": "js/activity/block-drag-controller",
         "activity/trash-controller": "js/activity/trash-controller",
+        "activity/help-controller": "js/activity/help-controller",
+        "activity/context-menu-controller": "js/activity/context-menu-controller",
         "search-ui": "js/search-ui",
         "project-manager": "js/project-manager",
         "activity/keyboard-controller": "js/activity/keyboard-controller",
@@ -257,7 +272,6 @@ requirejs.config({
         "jquery": "lib/jquery-3.7.1.min",
         "jquery-ui": "lib/jquery-ui",
         "materialize": "lib/materialize.min",
-        "abc": "lib/abc.min",
         "libgif": "https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif",
         "Tone": "lib/Tone",
         "highlight": "//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min",
@@ -391,6 +405,14 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         });
     }
 
+    // Shared with activity.js so the two never drift apart; see
+    // js/utils/language-utils.js.
+    function toLocaleCode(language) {
+        return typeof resolvedNormalizeLanguageCode === "function"
+            ? resolvedNormalizeLanguageCode(language)
+            : language;
+    }
+
     function resolveInitialLanguage() {
         try {
             const savedLanguage = window.localStorage && window.localStorage.languagePreference;
@@ -405,14 +427,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                     window.localStorage.setItem("kanaPreference", "kanji");
                     return "ja";
                 }
-                // The language menu stores enUS/enUK, but the locale files are en/en_GB.
-                if (savedLanguage === "enUS") {
-                    return "en";
-                }
-                if (savedLanguage === "enUK") {
-                    return "en_GB";
-                }
-                return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
+                return toLocaleCode(savedLanguage);
             }
         } catch (e) {
             // Continue with navigator fallback when storage is unavailable.
@@ -494,7 +509,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 { name: "jquery", export: () => window.jQuery },
                 { name: "jquery-ui", export: () => window.jQuery.ui },
                 { name: "materialize", export: () => window.Materialize || window.M },
-                { name: "abc", export: () => window.ABCJS },
                 { name: "Tone", export: () => window.Tone },
                 { name: "howler", export: () => window.Howl }
             ];

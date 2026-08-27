@@ -596,6 +596,10 @@ class Logo {
      * @returns {void}
      */
     initMediaDevices() {
+        if (this.mic && typeof this.mic.close === "function") {
+            this.mic.close();
+        }
+
         let mic = new this.deps.Tone.UserMedia();
         try {
             mic.open();
@@ -1052,7 +1056,7 @@ class Logo {
         const tur = this.turtles.ithTurtle(turtle);
 
         if (tur.delayTimeout !== null) {
-            clearTimeout(tur.delayTimeout);
+            this._timerManager.clearTimeout(tur.delayTimeout);
             tur.delayTimeout = null;
             this.runFromBlockNow(
                 this,
@@ -1271,12 +1275,6 @@ class Logo {
 
         for (const arg in this.evalOnStopList) {
             this.safePluginExecute(this.evalOnStopList[arg], this);
-        }
-
-        // Clear canvas on explicit Stop only — natural completion
-        // preserves drawings for SVG/PNG export.
-        for (const turtle of this.turtles.turtleList) {
-            turtle.painter.doClear(true, true, true);
         }
 
         // Recorder stop is Stop-only — natural completion must not

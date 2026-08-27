@@ -28,21 +28,40 @@ const Block = require("../block");
 
 // --- MOCK SETUP ---
 
-// Mock CreateJS
+// Mock CreateJS: keep parent/children relationships observable
+// so disposal tests can verify actual unparenting behavior.
 global.createjs = {
-    Container: jest.fn().mockImplementation(() => ({
-        addChild: jest.fn(),
-        removeChild: jest.fn(),
-        removeAllChildren: jest.fn(),
-        setChildIndex: jest.fn(),
-        getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 100, height: 100 }),
-        cache: jest.fn(),
-        updateCache: jest.fn(),
-        uncache: jest.fn(),
-        bitmapCache: { getCacheDataURL: jest.fn().mockReturnValue("cached-data-url") },
-        visible: true,
-        children: []
-    })),
+    Container: jest.fn().mockImplementation(() => {
+        const container = {
+            children: [],
+            parent: null,
+            visible: true,
+            bitmapCache: { getCacheDataURL: jest.fn().mockReturnValue("cached-data-url") },
+            addChild: jest.fn(function (child) {
+                this.children.push(child);
+                child.parent = this;
+                return child;
+            }),
+            removeChild: jest.fn(function (child) {
+                const idx = this.children.indexOf(child);
+                if (idx !== -1) {
+                    this.children.splice(idx, 1);
+                }
+                if (child.parent === this) {
+                    child.parent = null;
+                }
+                return child;
+            }),
+            removeAllChildren: jest.fn(),
+            removeAllEventListeners: jest.fn(),
+            setChildIndex: jest.fn(),
+            getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 100, height: 100 }),
+            cache: jest.fn(),
+            updateCache: jest.fn(),
+            uncache: jest.fn()
+        };
+        return container;
+    }),
     Bitmap: jest.fn().mockImplementation(image => ({
         visible: true,
         scaleX: 1,
@@ -830,6 +849,72 @@ describe("Block Foundation", () => {
 
             expect(block.container.updateCache).toHaveBeenCalled();
             expect(mockBlocks.activity.refreshCanvas).toHaveBeenCalled();
+        });
+    });
+
+    describe("dispose()", () => {
+        it("should clean up connections, DOM nodes, containers, bitmaps, and parent pointers", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 1;
+            const connectedBlock = {
+                connections: [1, null]
+            };
+            mockBlocks.blockList = [null, block, connectedBlock];
+            block.connections = [2];
+
+            const mockContainer = {
+                removeAllEventListeners: jest.fn(),
+                removeAllChildren: jest.fn(),
+                uncache: jest.fn()
+            };
+            block.container = mockContainer;
+
+            const dummyLabel = document.createElement("div");
+            document.body.appendChild(dummyLabel);
+            block.label = dummyLabel;
+
+            const dummyLabelAttr = document.createElement("div");
+            document.body.appendChild(dummyLabelAttr);
+            block.labelattr = dummyLabelAttr;
+
+            block.bitmap = {};
+            block.highlightBitmap = {};
+
+            block.dispose();
+
+            expect(connectedBlock.connections[0]).toBeNull();
+            expect(block.connections).toEqual([]);
+            expect(mockContainer.removeAllEventListeners).toHaveBeenCalled();
+            expect(mockContainer.removeAllChildren).toHaveBeenCalled();
+            expect(mockContainer.uncache).toHaveBeenCalled();
+            expect(block.container).toBeNull();
+            expect(block.label).toBeNull();
+            expect(block.labelattr).toBeNull();
+            expect(dummyLabel.parentNode).toBeNull();
+            expect(dummyLabelAttr.parentNode).toBeNull();
+            expect(block.bitmap).toBeNull();
+            expect(block.blocks).toBeNull();
+            expect(block.activity).toBeNull();
+            expect(block.protoblock).toBeNull();
+        });
+
+        it("should detach the CreateJS container from its parent display list", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            const parent = new global.createjs.Container();
+            const disposedContainer = new global.createjs.Container();
+
+            parent.addChild(disposedContainer);
+            block.container = disposedContainer;
+
+            expect(disposedContainer.parent).toBe(parent);
+            expect(parent.children).toContain(disposedContainer);
+
+            block.dispose();
+
+            expect(parent.children).not.toContain(disposedContainer);
+            expect(parent.children).toHaveLength(0);
+            expect(disposedContainer.parent).toBeNull();
+            expect(block.container).toBeNull();
         });
     });
 });

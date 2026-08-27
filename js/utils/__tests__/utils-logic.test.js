@@ -33,7 +33,10 @@ const {
     deepClone,
     isSafeUrl,
     isUnsafeObjectKey,
-    isValidHex
+    isValidHex,
+    safeNumber,
+    toArray,
+    formatSeconds
 } = require("../utils-logic.js");
 
 describe("Utility Logic Functions", () => {
@@ -251,6 +254,77 @@ describe("Utility Logic Functions", () => {
             expect(clampNumber("invalid", 0, 10)).toBe(0);
             expect(clampNumber(NaN, 0, 10, 5)).toBe(5);
             expect(clampNumber(null, 0, 10)).toBe(0);
+        });
+    });
+
+    describe("safeNumber()", () => {
+        it("returns finite numbers as is", () => {
+            expect(safeNumber(42)).toBe(42);
+            expect(safeNumber(3.14)).toBe(3.14);
+            expect(safeNumber(0)).toBe(0);
+            expect(safeNumber(-10)).toBe(-10);
+        });
+
+        it("parses valid numeric strings", () => {
+            expect(safeNumber("42")).toBe(42);
+            expect(safeNumber("  100  ")).toBe(100);
+            expect(safeNumber("-15.5")).toBe(-15.5);
+        });
+
+        it("returns fallback for non-numeric, NaN, or non-finite inputs", () => {
+            expect(safeNumber("invalid", 10)).toBe(10);
+            expect(safeNumber(NaN, 5)).toBe(5);
+            expect(safeNumber(Infinity, 0)).toBe(0);
+            expect(safeNumber(null, 7)).toBe(7);
+            expect(safeNumber(undefined, 0)).toBe(0);
+            expect(safeNumber({}, 0)).toBe(0);
+        });
+    });
+
+    describe("toArray()", () => {
+        it("returns the original array if input is already an array", () => {
+            const arr = [1, 2, 3];
+            expect(toArray(arr)).toBe(arr);
+            expect(toArray([])).toEqual([]);
+        });
+
+        it("wraps single non-array values in an array", () => {
+            expect(toArray(42)).toEqual([42]);
+            expect(toArray("hello")).toEqual(["hello"]);
+            expect(toArray(true)).toEqual([true]);
+            expect(toArray({ key: "val" })).toEqual([{ key: "val" }]);
+        });
+
+        it("returns an empty array for null or undefined", () => {
+            expect(toArray(null)).toEqual([]);
+            expect(toArray(undefined)).toEqual([]);
+        });
+    });
+
+    describe("formatSeconds()", () => {
+        it("formats seconds into MM:SS format", () => {
+            expect(formatSeconds(0)).toBe("00:00");
+            expect(formatSeconds(5)).toBe("00:05");
+            expect(formatSeconds(65)).toBe("01:05");
+            expect(formatSeconds(125)).toBe("02:05");
+        });
+
+        it("formats large durations into HH:MM:SS format", () => {
+            expect(formatSeconds(3600)).toBe("01:00:00");
+            expect(formatSeconds(3665)).toBe("01:01:05");
+        });
+
+        it("handles numeric string inputs", () => {
+            expect(formatSeconds("125")).toBe("02:05");
+            expect(formatSeconds("65.8")).toBe("01:05");
+        });
+
+        it("returns fallback 00:00 for invalid or negative inputs", () => {
+            expect(formatSeconds(-10)).toBe("00:00");
+            expect(formatSeconds(NaN)).toBe("00:00");
+            expect(formatSeconds(null)).toBe("00:00");
+            expect(formatSeconds(undefined)).toBe("00:00");
+            expect(formatSeconds("invalid")).toBe("00:00");
         });
     });
 

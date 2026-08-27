@@ -712,7 +712,7 @@ function setupFlowBlocks(activity) {
                     logo.firstNoteTime = currentTime;
                 }
 
-                const elapsedTime = (currentTime - this.firstNoteTime) / 1000;
+                const elapsedTime = (currentTime - logo.firstNoteTime) / 1000;
                 tur.singer.turtleTime = elapsedTime;
                 tur.singer.previousTurtleTime = elapsedTime;
             }
