@@ -37,10 +37,17 @@
  *     bound everywhere, so a global shadowed elsewhere may be omitted. The same
  *     name set is used to ignore calls to a locally declared `require`.
  *   - Only the CommonJS (`module.exports = ...`, `exports.x = ...`) and ES module
- *     (`export ...`) patterns that appear in this repository are recognised.
+ *     (`export ...`) patterns that appear in this repository are recognised, and
+ *     only at module scope - an assignment inside a nested function is ignored.
  *     Conditional or computed exports are not resolved.
+ *   - `branches` is a rough syntactic count (`if`, conditional expression, each
+ *     `&&`/`||`/`??`, and each non-default `switch` case), not a cyclomatic
+ *     complexity or branch-coverage figure. `a && b && c` counts as two, and
+ *     loops (`for`, `while`, `do`) are not counted at all.
  *   - Per-function counts (`branches`, `returns`, `throws`) stop at nested
  *     function boundaries; the `totals` block counts the whole file.
+ *   - A JSDoc `target` for a class member is qualified with the class name
+ *     (`Counter.tick`); a bare name is a top-level function, class or variable.
  */
 
 const NODE_META_KEYS = new Set(["type", "start", "end", "loc", "range", "sourceFile"]);
@@ -105,6 +112,34 @@ function walkFunctionBody(fnNode, visit) {
                 if (!item || typeof item.type !== "string") continue;
                 if (FUNCTION_TYPES.has(item.type)) continue;
                 stack.push(item);
+            }
+        }
+    }
+}
+
+/**
+ * Like {@link walk} but treats function nodes as leaves: it visits them but does
+ * not descend into their bodies. Used to keep "what does this module expose"
+ * questions at module scope, ignoring assignments that only run when some inner
+ * function is called.
+ *
+ * @param {object} root - node to start from.
+ * @param {function} visit - callback invoked for every node outside a function body.
+ * @returns {void}
+ */
+function walkModuleScope(root, visit) {
+    const stack = [root];
+    while (stack.length > 0) {
+        const node = stack.pop();
+        if (!node || typeof node.type !== "string") continue;
+        visit(node);
+        if (node !== root && FUNCTION_TYPES.has(node.type)) continue;
+        for (const key of Object.keys(node)) {
+            if (NODE_META_KEYS.has(key)) continue;
+            const child = node[key];
+            const items = Array.isArray(child) ? child : [child];
+            for (const item of items) {
+                if (item && typeof item.type === "string") stack.push(item);
             }
         }
     }
@@ -430,8 +465,10 @@ function collectExports(program, top) {
 
     // CommonJS assignments. These are frequently wrapped in a
     // `if (typeof module !== "undefined" && module.exports) { ... }` guard, so
-    // the whole tree is scanned rather than only top-level statements.
-    walk(program, node => {
+    // the whole module scope is scanned - but not the interior of nested
+    // functions, where such an assignment would only run when that function is
+    // called and does not describe the module's static surface.
+    walkModuleScope(program, node => {
         if (node.type !== "AssignmentExpression" || node.operator !== "=") return;
         const { left, right } = node;
 
@@ -652,23 +689,44 @@ function collectReferencedGlobals(program, bound) {
  */
 function collectJsdoc(program, comments, source) {
     const targets = [];
-    walk(program, node => {
-        let name = null;
+
+    // Recursive descent so that a method's target can be qualified with the name
+    // of the class that contains it (`Counter.constructor`), keeping targets
+    // unambiguous across classes.
+    const visit = (node, className) => {
+        if (!node || typeof node.type !== "string") return;
+
+        const nextClass =
+            (node.type === "ClassDeclaration" || node.type === "ClassExpression") && node.id
+                ? node.id.name
+                : className;
+
         if ((node.type === "FunctionDeclaration" || node.type === "ClassDeclaration") && node.id) {
-            name = node.id.name;
+            targets.push({ start: node.start, name: node.id.name });
         } else if (node.type === "MethodDefinition" && node.key && node.key.type === "Identifier") {
-            name = node.key.name;
+            const member = node.key.name;
+            targets.push({
+                start: node.start,
+                name: className ? `${className}.${member}` : member
+            });
         } else if (
             node.type === "VariableDeclaration" &&
             node.declarations[0] &&
             node.declarations[0].id.type === "Identifier"
         ) {
-            name = node.declarations[0].id.name;
-        } else {
-            return;
+            targets.push({ start: node.start, name: node.declarations[0].id.name });
         }
-        targets.push({ start: node.start, name });
-    });
+
+        for (const key of Object.keys(node)) {
+            if (NODE_META_KEYS.has(key)) continue;
+            const child = node[key];
+            const items = Array.isArray(child) ? child : [child];
+            for (const item of items) {
+                if (item && typeof item.type === "string") visit(item, nextClass);
+            }
+        }
+    };
+    visit(program, null);
     targets.sort((a, b) => a.start - b.start);
 
     const results = [];

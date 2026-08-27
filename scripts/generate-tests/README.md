@@ -47,8 +47,15 @@ node scripts/generate-tests/cli.js path/to/module.js --check path/to/expected.js
 - **referencedGlobals** – identifiers used in a value position that are not bound
   anywhere in the file.
 - **jsdoc** – `/** ... */` blocks that sit directly above a declaration, split
-  into a description and a flat list of `@tag` entries.
+  into a description and a flat list of `@tag` entries. A class member's `target`
+  is qualified with the class name (`Counter.tick`); a bare `target` is a
+  top-level function, class or variable.
 - **totals** – whole-file branch / `return` / `throw` counts.
+
+`branches` (per-function and in `totals`) is a rough syntactic count – `if`,
+conditional expression, each `&&` / `||` / `??`, and each non-default `switch`
+case. It is **not** cyclomatic complexity or branch coverage: `a && b && c`
+counts as two and loops are not counted.
 
 ## Deliberate limitations
 
@@ -60,6 +67,7 @@ node scripts/generate-tests/cli.js path/to/module.js --check path/to/expected.js
   the file is treated as bound everywhere, so a global shadowed elsewhere may be
   omitted. Dependency detection uses the same heuristic to ignore a locally
   declared `require`.
-- Only the CommonJS and ES module patterns that appear in this repository are
-  resolved. Conditional or computed exports are not.
+- CommonJS exports are detected only at module scope (including the usual
+  `if (typeof module !== "undefined" ...)` guard). `module.exports = ...` inside
+  a nested function is ignored. Conditional or computed exports are not resolved.
 - Parse errors are reported with the filename attached and never modify anything.

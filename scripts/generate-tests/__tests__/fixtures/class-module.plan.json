@@ -182,7 +182,7 @@
       "tags": []
     },
     {
-      "target": "constructor",
+      "target": "Base.constructor",
       "description": "",
       "tags": [
         {
@@ -192,7 +192,12 @@
       ]
     },
     {
-      "target": "constructor",
+      "target": "Counter",
+      "description": "A small counter built on top of {@link Base}.",
+      "tags": []
+    },
+    {
+      "target": "Counter.constructor",
       "description": "",
       "tags": [
         {
@@ -210,12 +215,7 @@
       ]
     },
     {
-      "target": "Counter",
-      "description": "A small counter built on top of {@link Base}.",
-      "tags": []
-    },
-    {
-      "target": "fromArray",
+      "target": "Counter.fromArray",
       "description": "",
       "tags": [
         {
@@ -229,7 +229,7 @@
       ]
     },
     {
-      "target": "tick",
+      "target": "Counter.tick",
       "description": "Advances the counter, optionally several times.",
       "tags": [
         {
@@ -243,7 +243,7 @@
       ]
     },
     {
-      "target": "value",
+      "target": "Counter.value",
       "description": "",
       "tags": [
         {
@@ -253,7 +253,7 @@
       ]
     },
     {
-      "target": "value",
+      "target": "Counter.value",
       "description": "",
       "tags": [
         {

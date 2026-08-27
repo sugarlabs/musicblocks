@@ -165,6 +165,44 @@ describe("extract-module: class-module fixture", () => {
     it("has no top-level functions", () => {
         expect(plan.functions).toEqual([]);
     });
+
+    it("qualifies class-member JSDoc targets with the class name", () => {
+        const targets = plan.jsdoc.map(d => d.target);
+        expect(targets).toEqual(expect.arrayContaining(["Base.constructor", "Counter.tick"]));
+        expect(targets).not.toContain("constructor");
+        expect(targets).not.toContain("tick");
+    });
+});
+
+describe("extract-module: export detection stays at module scope", () => {
+    it("ignores module.exports assigned inside a nested function", () => {
+        const plan = extractModule(
+            "function later() {\n    module.exports = { foo };\n}\nfunction foo() {}\n",
+            "later.js"
+        );
+        expect(plan.exports).toEqual([]);
+    });
+
+    it("ignores exports.x assigned inside a nested function", () => {
+        const plan = extractModule(
+            "function configure() {\n    exports.bar = 1;\n}\n",
+            "configure.js"
+        );
+        expect(plan.exports).toEqual([]);
+    });
+
+    it("still resolves the top-level typeof-module guard", () => {
+        const plan = extractModule(
+            [
+                "function helper() {}",
+                'if (typeof module !== "undefined" && module.exports) {',
+                "    module.exports = { helper };",
+                "}"
+            ].join("\n"),
+            "guarded.js"
+        );
+        expect(plan.exports.map(e => e.name)).toEqual(["helper"]);
+    });
 });
 
 describe("extract-module: export de-duplication", () => {
