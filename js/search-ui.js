@@ -240,7 +240,32 @@ class SearchUI {
         const instance = $search.autocomplete("instance");
         if (instance) {
             instance._renderItem = (ul, item) => this._renderMainItem($j, ul, item, dropCb);
+            if (instance.menu && instance.menu.element) {
+                instance.menu.element.on("mousedown mouseup click dblclick pointerdown", event => {
+                    event.stopPropagation();
+                    if (event.type === "mousedown" || event.type === "pointerdown") {
+                        event.preventDefault();
+                        $search.focus();
+                    }
+                });
+            }
+            const origClose = instance.close;
+            instance.close = function (event) {
+                if (event && event.target && window.jQuery) {
+                    const $target = window.jQuery(event.target);
+                    if (
+                        typeof $target.is === "function" &&
+                        ($target.is("#ui-id-1") ||
+                            (typeof $target.closest === "function" &&
+                                $target.closest("#ui-id-1").length > 0))
+                    ) {
+                        return;
+                    }
+                }
+                return origClose.apply(this, arguments);
+            };
         }
+
         $search.data("autocomplete-init", true);
     }
 
