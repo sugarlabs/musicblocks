@@ -928,6 +928,27 @@ describe("TimbreWidget", () => {
             addFilterButton.onclick();
             expect(timbre._addFilter).toHaveBeenCalled();
         });
+
+        test("clampConnection, oscillator, envelope, and filter handlers do not throw when timbre block is disposed", async () => {
+            mockActivity.blocks = {
+                blockList: [],
+                findBottomBlock: jest.fn(() => null)
+            };
+            timbre.init(mockActivity);
+
+            const oscBtn = getButton("oscillator.svg");
+            const envBtn = getButton("envelope.svg");
+            const filBtn = getButton("filter.svg");
+
+            if (oscBtn && oscBtn.onclick) await oscBtn.onclick();
+            if (envBtn && envBtn.onclick) await envBtn.onclick();
+            if (filBtn && filBtn.onclick) await filBtn.onclick();
+
+            const res1 = await timbre.clampConnection(1, 0, null);
+            const res2 = await timbre.clampConnectionVspace(1, 0, null);
+            expect(res1).toBeUndefined();
+            expect(res2).toBeUndefined();
+        });
     });
 
     describe("Effects and Envelope Event Listeners (Coverage)", () => {
