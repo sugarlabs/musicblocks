@@ -56,6 +56,9 @@ class ModeWidget {
         this._deps = deps || {};
 
         this.logo = this._deps.logo || this.activity.logo;
+        // Register this instance so the regular mode pie menu (piemenuModes) can
+        // live-sync the builder view when a mode is picked while the widget is open.
+        this.logo.modeWidget = this;
         this.turtles = this._deps.turtles || this.activity.turtles;
         this.blocks = this._deps.blocks || this.activity.blocks;
         this.hideMsgs = this._deps.hideMsgs || this.activity.hideMsgs.bind(this.activity);
@@ -642,7 +645,8 @@ class ModeWidget {
         tuningGroup.appendChild(tuningIcon);
         tuningGroup.appendChild(edoSelect);
 
-        // Modes: open piemenu instead of a <select> dropdown
+        // Modes: open the regular mode pie menu (the same one used by the
+        // setKey modeName block) so mode selection is consistent everywhere.
         const modeBtn = iconButton("pie-chart.svg", _("Switch mode"), () => {
             this._onModePieButtonClick();
         });
@@ -849,6 +853,25 @@ class ModeWidget {
         this._setModeName();
     }
 
+    /**
+     * Called by the regular mode pie menu (piemenuModes) when a mode is picked
+     * while this widget is open, so the builder view stays in sync with the
+     * selection made in the pie menu.
+     * @param {string} modeName - The selected internal mode name.
+     * @returns {void}
+     */
+    onModePicked(modeName) {
+        if (!modeName || modeName === " ") {
+            return;
+        }
+        this._selectedModeName = modeName;
+        const mode = MUSICALMODES[modeName];
+        if (mode) {
+            this._loadMode(modeName, mode, this._edoSelect);
+        }
+        this._setModeName();
+    }
+
     _applyModePattern(pattern) {
         const n = this._activeEDO;
         this._selectedNotes = this._blankNotes(n);
@@ -910,6 +933,13 @@ class ModeWidget {
 
     // ── Reset ─────────────────────────────────────────────────────
 
+    _resetToCustom() {
+        this._saveState();
+        this._selectedNotes = this._blankNotes(this._activeEDO);
+        this._resetNotes();
+        this._updateModeDisplay("");
+    }
+
     _resetNotes() {
         for (let i = 0; i < this._selectedNotes.length; i++) {
             if (this._selectedNotes[i]) {
@@ -919,18 +949,6 @@ class ModeWidget {
             }
             this._playWheel.navItems[i].navItem.hide();
         }
-    }
-
-    /**
-     * Resets the note wheel to a blank custom mode (only the root note
-     * selected) so the user can define a new mode by clicking notes.
-     * @returns {void}
-     */
-    _resetToCustom() {
-        this._saveState();
-        this._selectedNotes = this._blankNotes(this._activeEDO);
-        this._resetNotes();
-        this._updateModeDisplay("");
     }
 
     // ── Rotate ────────────────────────────────────────────────────
@@ -1436,11 +1454,7 @@ class ModeWidget {
         // rendering with the current EDO count.
         this._clearPieMenu();
 
-        // Only the piemenu open/close methods toggle these divs; a rebuild must
-        // not re-show the note wheel while the mode piemenu is open.
-        if (!this._modePiemenuOpen) {
-            this._meterWheelDiv.style.display = "";
-        }
+        this._meterWheelDiv.style.display = "";
 
         this._modeWheel = new wheelnav(
             "modeWidgetWheelDiv",
