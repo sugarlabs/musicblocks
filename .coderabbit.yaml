@@ -27,11 +27,13 @@ reviews:
         - "!**/images/**"
         - "!**/screenshots/**"
         - "!**/fonts/**"
+        - "!**/header-icons/**"
         - "!**/*.png"
         - "!**/*.jpg"
         - "!**/*.jpeg"
         - "!**/*.mp4"
         - "!**/*.webm"
+        - "!**/*.svg"
         - "!package-lock.json"
 
     path_instructions:
@@ -42,6 +44,13 @@ reviews:
               - Cleanup: Verify event listeners and timers are properly cleaned up to prevent memory leaks across play/stop cycles.
               - State safety: Guard against unsafe mutations to shared global/singleton state (globalActivity, Blocks, Turtles, Singer).
               - Security: Prefer textContent or escapeHTML() for DOM insertions over un-sanitized innerHTML.
+
+        - path: "planet/js/**/*.js"
+          instructions: |
+              Focus on Planet cloud sharing subsystem reliability and security:
+              - Async API & network requests: Ensure fetch/AJAX error handling, timeouts, and state updates are robust.
+              - Data sanitization: Verify project metadata, user input, and DOM insertions are sanitized.
+              - Modularity: Maintain separation between Planet UI components and core Music Blocks execution.
 
         - path: "js/**/__tests__/**/*.js"
           instructions: |
@@ -69,18 +78,10 @@ reviews:
             mode: "warning"
             requirements: "Title must follow Conventional Commits format with a valid lowercase type and no trailing period."
 
-        description:
+        issue_assessment:
             mode: "warning"
-            requirements: "Description must follow the repository's PR template and include the required sections."
 
         custom_checks:
-            - name: "Issue Implementation Alignment"
-              mode: "warning"
-              instructions: |
-                  Pass: Code changes fulfill the linked issue's core requirements and align with the PR description.
-                  Fail: Key issue requirements are omitted or major unrelated functional changes are introduced.
-                  Inconclusive: No issue is linked or the issue description lacks sufficient detail.
-
             - name: "PR Description vs Code Changes"
               mode: "warning"
               instructions: |
