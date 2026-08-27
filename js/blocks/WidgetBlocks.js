@@ -844,6 +844,7 @@ function setupWidgetBlocks(activity) {
                     resetFlag();
                     return;
                 }
+                logo.modeWidget = "loading";
                 _lazyLoadWidget(
                     logo,
                     "modeWidget",

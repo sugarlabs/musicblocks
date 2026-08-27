@@ -1864,4 +1864,16 @@ describe("TemperamentWidget basic tests", () => {
             expect(widget._editClickHandler).toBeNull();
         });
     });
+
+    describe("regression tests for visualizer / reference fixes", () => {
+        test("equal17 exposes keyed interval->ratio properties (regression)", () => {
+            const musicutils = require("../../utils/musicutils");
+            const t = musicutils.getTemperament("equal17");
+            expect(t).toBeTruthy();
+            expect(typeof t["perfect 1"]).toBe("number");
+            expect(t["perfect 1"]).toBeCloseTo(1, 6);
+            expect(t["minor 2"]).toBeCloseTo(Math.pow(2, 1 / 17), 6);
+            expect(t["perfect 8"]).toBeCloseTo(2, 6);
+        });
+    });
 });

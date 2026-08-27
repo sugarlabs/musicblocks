@@ -992,7 +992,202 @@ function TemperamentWidget() {
         const bodyWidth = temperamentTableDiv.parentElement
             ? temperamentTableDiv.parentElement.clientWidth - 16
             : 384;
-        const canvasSize = Math.min(Math.max(bodyWidth, 280), 500);
+        const bodyHeight = temperamentTableDiv.parentElement
+            ? temperamentTableDiv.parentElement.clientHeight
+            : 500;
+        const controlsHeight = 36;
+        const padding = 16;
+        const canvasSize = Math.min(
+            Math.max(bodyWidth, 280),
+            Math.max(bodyHeight - controlsHeight - padding, 200)
+        );
+        const that = this;
+
+        // Clean up menu/close handlers left from a previous render
+        if (that._vizMenu && that._vizMenu.parentNode) {
+            that._vizMenu.parentNode.removeChild(that._vizMenu);
+            that._vizMenu = null;
+        }
+        if (that._vizMenuClose) {
+            document.removeEventListener("mousedown", that._vizMenuClose);
+            that._vizMenuClose = null;
+        }
+        const refKey = that._refTemperament || "equal";
+        const refName = refKey === "equal" || refKey === "12-EDO" ? "12-EDO" : refKey;
+        let highlightDot = -1;
+
+        // Cents of the reference temperament per scale degree (null = 12-EDO)
+        let _refCents = null;
+        let _refPeriod = 0;
+        const _computeRefCents = function () {
+            if (refKey === "equal" || refKey === "12-EDO") {
+                _refCents = null;
+                _refPeriod = 0;
+                return;
+            }
+            const t = getTemperament(refKey);
+            if (!t || !t.interval) {
+                _refCents = null;
+                _refPeriod = 0;
+                return;
+            }
+            _refPeriod = t.pitchNumber || Math.max(0, t.interval.length - 1);
+            _refCents = [];
+            for (let i = 0; i <= that.pitchNumber; i++) {
+                if (i >= t.interval.length) break;
+                _refCents.push(ratioToCents(getTemperamentRatio(t[t.interval[i]]), 2));
+            }
+        };
+        _computeRefCents();
+
+        /** Reference cents for pitch i, cyclically wrapped across octaves. */
+        const _refCentsAt = function (i) {
+            const p = _refPeriod;
+            return _refCents[i % p] + 1200 * Math.floor(i / p);
+        };
+
+        /** Deviation of pitch i from the chosen reference (12-EDO by default). */
+        const _deviation = function (i) {
+            if (_refCents && _refCents.length > 1) {
+                return that.cents[i] - _refCentsAt(i);
+            }
+            return that.cents[i] - Math.round(that.cents[i] / 100) * 100;
+        };
+
+        /** Returns the color for a cents deviation from 12-EDO. */
+        const _devColor = function (dev) {
+            if (Math.abs(dev) <= 1) return "#4caf50";
+            return dev > 1 ? "#ff9800" : "#f44336";
+        };
+
+        /** Converts a mouse/touch event to canvas-space coordinates. */
+        const _canvasCoords = function (e, target) {
+            const rect = target.getBoundingClientRect();
+            return [
+                ((e.clientX - rect.left) * target.width) / rect.width,
+                ((e.clientY - rect.top) * target.height) / rect.height
+            ];
+        };
+
+        const _selectStyle = function (el) {
+            el.style.fontSize = "12px";
+            el.style.padding = "2px 4px";
+            el.style.backgroundColor = "#2a2a3e";
+            el.style.color = "#e0e0e0";
+            el.style.border = "1px solid #555";
+            el.style.borderRadius = "3px";
+        };
+
+        // ── Controls bar: dropdowns + hide-table toggle ──
+        const controlsDiv = document.createElement("div");
+        controlsDiv.style.display = "flex";
+        controlsDiv.style.alignItems = "center";
+        controlsDiv.style.gap = "8px";
+        controlsDiv.style.marginBottom = "8px";
+        controlsDiv.style.flexWrap = "wrap";
+
+        const compareLabel = document.createElement("span");
+        compareLabel.textContent = _("comparing against");
+        compareLabel.style.fontSize = "11px";
+        compareLabel.style.color = "#aaa";
+        controlsDiv.appendChild(compareLabel);
+
+        const compareSelect = document.createElement("select");
+        _selectStyle(compareSelect);
+
+        const temperaments = getTemperamentsList();
+        for (const t of temperaments) {
+            if (isCustomTemperament(t[1])) continue;
+            const opt = document.createElement("option");
+            opt.value = t[1];
+            opt.textContent = t[0];
+            if (t[1] === that.inTemperament) opt.selected = true;
+            compareSelect.appendChild(opt);
+        }
+        controlsDiv.appendChild(compareSelect);
+
+        const refLabel = document.createElement("span");
+        refLabel.textContent = _("reference");
+        refLabel.style.fontSize = "11px";
+        refLabel.style.color = "#aaa";
+        controlsDiv.appendChild(refLabel);
+
+        const refSelect = document.createElement("select");
+        _selectStyle(refSelect);
+
+        for (const t of temperaments) {
+            if (isCustomTemperament(t[1])) continue;
+            const opt = document.createElement("option");
+            opt.value = t[1];
+            opt.textContent = t[0];
+            if (t[1] === (that._refTemperament || "equal")) opt.selected = true;
+            refSelect.appendChild(opt);
+        }
+        controlsDiv.appendChild(refSelect);
+
+        const hideTableBtn = document.createElement("button");
+        hideTableBtn.textContent = _("hide table");
+        hideTableBtn.style.fontSize = "12px";
+        hideTableBtn.style.padding = "2px 8px";
+        hideTableBtn.style.backgroundColor = "#2a2a3e";
+        hideTableBtn.style.color = "#e0e0e0";
+        hideTableBtn.style.border = "1px solid #555";
+        hideTableBtn.style.borderRadius = "3px";
+        hideTableBtn.style.cursor = "pointer";
+        controlsDiv.appendChild(hideTableBtn);
+
+        temperamentTableDiv.appendChild(controlsDiv);
+
+        // ── Operations toolbar (presets + pitch count) ──
+        const opsDiv = document.createElement("div");
+        opsDiv.style.display = "flex";
+        opsDiv.style.flexWrap = "wrap";
+        opsDiv.style.gap = "4px";
+        opsDiv.style.marginBottom = "8px";
+        const _opsBtn = function (label, fn) {
+            const b = document.createElement("button");
+            b.textContent = label;
+            b.style.fontSize = "11px";
+            b.style.padding = "2px 6px";
+            b.style.backgroundColor = "#2a2a3e";
+            b.style.color = "#e0e0e0";
+            b.style.border = "1px solid #555";
+            b.style.borderRadius = "3px";
+            b.style.cursor = "pointer";
+            b.onclick = fn;
+            opsDiv.appendChild(b);
+        };
+        _opsBtn("12", function () {
+            _loadTemperament("equal");
+        });
+        _opsBtn("17", function () {
+            _loadTemperament("equal17");
+        });
+        _opsBtn("19", function () {
+            _loadTemperament("equal19");
+        });
+        _opsBtn("31", function () {
+            _loadTemperament("equal31");
+        });
+        _opsBtn("JI", function () {
+            _loadTemperament("just intonation");
+        });
+        _opsBtn("Pyth", function () {
+            _loadTemperament("Pythagorean");
+        });
+        _opsBtn("+Pitch", function () {
+            _insertPitch(that.pitchNumber, (that.cents[that.pitchNumber - 1] || 0) + 100);
+            _drawCircle();
+            _buildTable();
+        });
+        _opsBtn("-Pitch", function () {
+            _removePitch(that.pitchNumber - 1);
+            _drawCircle();
+            _buildTable();
+        });
+        temperamentTableDiv.appendChild(opsDiv);
+
+        // ── Canvas ──
         const canvas = document.createElement("canvas");
         canvas.width = canvasSize;
         canvas.height = canvasSize;
@@ -1001,6 +1196,46 @@ function TemperamentWidget() {
         canvas.style.display = "block";
         canvas.style.margin = "0 auto";
         temperamentTableDiv.appendChild(canvas);
+
+        // ── Legend (HTML, below canvas — avoids overlapping note labels) ──
+        const legendDiv = document.createElement("div");
+        legendDiv.style.display = "flex";
+        legendDiv.style.justifyContent = "center";
+        legendDiv.style.gap = "10px";
+        legendDiv.style.flexWrap = "wrap";
+        legendDiv.style.marginTop = "4px";
+        legendDiv.style.fontSize = "10px";
+        legendDiv.style.color = "#aaa";
+
+        const _legendItem = function (color, label, isDashed, isDot) {
+            const span = document.createElement("span");
+            span.style.display = "inline-flex";
+            span.style.alignItems = "center";
+            span.style.gap = "3px";
+            const indicator = document.createElement("span");
+            indicator.style.display = "inline-block";
+            if (isDot) {
+                indicator.style.width = "8px";
+                indicator.style.height = "8px";
+                indicator.style.borderRadius = "50%";
+                indicator.style.backgroundColor = color;
+            } else {
+                indicator.style.width = "12px";
+                indicator.style.height = isDashed ? "0" : "2px";
+                indicator.style.borderTop = isDashed ? "2px dashed " + color : "none";
+                if (!isDashed) indicator.style.backgroundColor = color;
+            }
+            span.appendChild(indicator);
+            span.appendChild(document.createTextNode(label));
+            return span;
+        };
+
+        legendDiv.appendChild(_legendItem("#4caf50", _("active temperament"), false, true));
+        legendDiv.appendChild(_legendItem("#aaa", _("12-EDO ref"), false, false));
+        legendDiv.appendChild(_legendItem("#4caf50", _("no deviation"), true, false));
+        legendDiv.appendChild(_legendItem("#ff9800", _("sharp (+cents)"), false, false));
+        legendDiv.appendChild(_legendItem("#f44336", _("flat (-cents)"), false, false));
+        temperamentTableDiv.appendChild(legendDiv);
 
         canvas.tabIndex = 0;
         canvas.setAttribute("role", "img");
@@ -1012,9 +1247,10 @@ function TemperamentWidget() {
             if (e.key === "ArrowRight" || e.key === "ArrowDown") {
                 e.preventDefault();
                 focusedDot = (focusedDot + 1) % that.pitchNumber;
+                that._logo.resetSynth(0);
                 that._logo.synth.trigger(
                     0,
-                    that.frequencies[focusedDot],
+                    Number(that.frequencies[focusedDot]),
                     1 / 4,
                     "electronic synth",
                     null,
@@ -1023,9 +1259,10 @@ function TemperamentWidget() {
             } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
                 e.preventDefault();
                 focusedDot = (focusedDot - 1 + that.pitchNumber) % that.pitchNumber;
+                that._logo.resetSynth(0);
                 that._logo.synth.trigger(
                     0,
-                    that.frequencies[focusedDot],
+                    Number(that.frequencies[focusedDot]),
                     1 / 4,
                     "electronic synth",
                     null,
@@ -1034,9 +1271,10 @@ function TemperamentWidget() {
             } else if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 if (focusedDot >= 0) {
+                    that._logo.resetSynth(0);
                     that._logo.synth.trigger(
                         0,
-                        that.frequencies[focusedDot],
+                        Number(that.frequencies[focusedDot]),
                         1 / 4,
                         "electronic synth",
                         null,
@@ -1049,205 +1287,100 @@ function TemperamentWidget() {
         const ctx = canvas.getContext("2d");
         const cx = canvasSize / 2;
         const cy = canvasSize / 2;
-        const outerR = 170;
-        const innerR = 120;
-        const dotR = 6;
+        const outerR = canvasSize * 0.34;
+        const innerR = canvasSize * 0.24;
+        const dotR = Math.max(4, canvasSize * 0.012);
 
         const equal = getTemperament("equal");
         const labels = equal.noteLabels;
-        ctx.lineWidth = 1;
-        ctx.font = "12px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
 
-        for (let k = 0; k < 12; k++) {
-            const a = ((270 + k * 30) * Math.PI) / 180;
-            const x1 = cx + (outerR - 10) * Math.cos(a);
-            const y1 = cy + (outerR - 10) * Math.sin(a);
-            const x2 = cx + (outerR + 6) * Math.cos(a);
-            const y2 = cy + (outerR + 6) * Math.sin(a);
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.strokeStyle = "#666";
-            ctx.stroke();
-            const lx = cx + (outerR + 18) * Math.cos(a);
-            const ly = cy + (outerR + 18) * Math.sin(a);
-            ctx.fillStyle = "#aaa";
-            ctx.fillText(labels[k], lx, ly);
-        }
+        /** Redraws the reference ring and active dots from current state. */
+        const _drawCircle = function () {
+            ctx.clearRect(0, 0, canvasSize, canvasSize);
+            ctx.lineWidth = 1;
+            ctx.font = "12px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
 
-        for (let i = 0; i < this.pitchNumber; i++) {
-            const cents = this.cents[i];
-            const angleDeg = 270 + cents * 0.3;
-            let k = Math.round((angleDeg - 270) / 30);
-            k = ((k % 12) + 12) % 12;
-            const dev = cents - k * 100;
-
-            let color;
-            let dashed = false;
-            if (Math.abs(dev) <= 1) {
-                color = "#4caf50";
-                dashed = true;
-            } else if (dev > 1) {
-                color = "#ff9800";
-            } else {
-                color = "#f44336";
+            for (let k = 0; k < 12; k++) {
+                const a = ((270 + k * 30) * Math.PI) / 180;
+                const x1 = cx + (outerR - 10) * Math.cos(a);
+                const y1 = cy + (outerR - 10) * Math.sin(a);
+                const x2 = cx + (outerR + 6) * Math.cos(a);
+                const y2 = cy + (outerR + 6) * Math.sin(a);
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = "#666";
+                ctx.stroke();
+                const lx = cx + (outerR + 18) * Math.cos(a);
+                const ly = cy + (outerR + 18) * Math.sin(a);
+                ctx.fillStyle = "#aaa";
+                ctx.fillText(labels[k], lx, ly);
             }
 
-            const dotA = (angleDeg * Math.PI) / 180;
-            const dx = cx + innerR * Math.cos(dotA);
-            const dy = cy + innerR * Math.sin(dotA);
-            const tickA = ((270 + k * 30) * Math.PI) / 180;
-            const tx = cx + outerR * Math.cos(tickA);
-            const ty = cy + outerR * Math.sin(tickA);
+            // Inner dots and spokes for active temperament
+            for (let i = 0; i < that.pitchNumber; i++) {
+                const cents = that.cents[i];
+                const angleDeg = 270 + cents * 0.3;
+                const dev = _deviation(i);
 
-            ctx.beginPath();
-            ctx.setLineDash(dashed ? [4, 3] : []);
-            ctx.moveTo(dx, dy);
-            ctx.lineTo(tx, ty);
-            ctx.strokeStyle = color;
-            ctx.stroke();
-            ctx.setLineDash([]);
+                const dashed = Math.abs(dev) <= 1;
+                const color = _devColor(dev);
 
-            ctx.beginPath();
-            ctx.arc(dx, dy, dotR, 0, 2 * Math.PI);
-            ctx.fillStyle = color;
-            ctx.fill();
-        }
+                const dotA = (angleDeg * Math.PI) / 180;
+                const dx = cx + innerR * Math.cos(dotA);
+                const dy = cy + innerR * Math.sin(dotA);
 
-        ctx.fillStyle = "#e0e0e0";
-        ctx.font = "12px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(this.inTemperament + " vs 12-EDO", cx, cy);
+                let refAngleDeg;
+                if (_refCents && _refCents.length > 1) {
+                    refAngleDeg = 270 + (_refCentsAt(i) % 1200) * 0.3;
+                } else {
+                    let k = Math.round((angleDeg - 270) / 30);
+                    k = ((k % 12) + 12) % 12;
+                    refAngleDeg = 270 + k * 30;
+                }
+                const tickA = (refAngleDeg * Math.PI) / 180;
+                const tx = cx + outerR * Math.cos(tickA);
+                const ty = cy + outerR * Math.sin(tickA);
 
-        const legendX = canvasSize - 10;
-        const legendY = canvasSize - 10;
-        const legendItems = [
-            [_("matched"), "#4caf50", true],
-            [_("sharp"), "#ff9800", false],
-            [_("flat"), "#f44336", false]
-        ];
-        ctx.textAlign = "right";
-        ctx.textBaseline = "bottom";
-        ctx.font = "10px sans-serif";
+                ctx.beginPath();
+                ctx.setLineDash(dashed ? [4, 3] : []);
+                ctx.moveTo(dx, dy);
+                ctx.lineTo(tx, ty);
+                ctx.strokeStyle = color;
+                ctx.stroke();
+                ctx.setLineDash([]);
 
-        for (let li = 0; li < legendItems.length; li++) {
-            const ly = legendY - (legendItems.length - 1 - li) * 14;
-            const lx = legendX;
+                ctx.beginPath();
+                ctx.arc(dx, dy, dotR, 0, 2 * Math.PI);
+                ctx.fillStyle = color;
+                ctx.fill();
 
-            ctx.beginPath();
-            ctx.setLineDash(legendItems[li][2] ? [3, 2] : []);
-            ctx.moveTo(lx - 50, ly - 3);
-            ctx.lineTo(lx - 35, ly - 3);
-            ctx.strokeStyle = legendItems[li][1];
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.lineWidth = 1;
+                if (i === highlightDot) {
+                    ctx.beginPath();
+                    ctx.arc(dx, dy, dotR + 3, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "#fff";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.lineWidth = 1;
+                }
+            }
 
-            ctx.fillStyle = "#aaa";
-            ctx.fillText(legendItems[li][0], lx, ly);
-        }
+            ctx.fillStyle = "#e0e0e0";
+            ctx.font = "12px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(that.inTemperament + " vs " + refName, cx, cy);
+        };
 
+        _drawCircle();
+
+        // ── Table ──
         const tableDiv = document.createElement("div");
-        tableDiv.style.maxHeight = "200px";
-        tableDiv.style.overflowY = "auto";
         tableDiv.style.width = "100%";
         tableDiv.style.marginTop = "8px";
         temperamentTableDiv.appendChild(tableDiv);
-
-        const that = this;
-        canvas.onclick = function (e) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const x = (e.clientX - rect.left) * scaleX;
-            const y = (e.clientY - rect.top) * scaleY;
-
-            let nearest = null;
-            let nearestDist = Infinity;
-            for (let i = 0; i < that.pitchNumber; i++) {
-                const cents = that.cents[i];
-                const angleDeg = 270 + cents * 0.3;
-                const dotA = (angleDeg * Math.PI) / 180;
-                const dx = cx + innerR * Math.cos(dotA);
-                const dy = cy + innerR * Math.sin(dotA);
-                const dist = Math.hypot(dx - x, dy - y);
-                if (dist < nearestDist) {
-                    nearestDist = dist;
-                    nearest = i;
-                }
-            }
-            if (nearest !== null && nearestDist <= dotR + 8) {
-                that._logo.synth.trigger(
-                    0,
-                    that.frequencies[nearest],
-                    1 / 4,
-                    "electronic synth",
-                    null,
-                    null
-                );
-            }
-        };
-
-        canvas.onmousemove = function (e) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const x = (e.clientX - rect.left) * scaleX;
-            const y = (e.clientY - rect.top) * scaleY;
-
-            let onDot = false;
-            for (let i = 0; i < that.pitchNumber; i++) {
-                const cents = that.cents[i];
-                const angleDeg = 270 + cents * 0.3;
-                const dotA = (angleDeg * Math.PI) / 180;
-                const dx = cx + innerR * Math.cos(dotA);
-                const dy = cy + innerR * Math.sin(dotA);
-                if (Math.hypot(dx - x, dy - y) <= dotR + 8) {
-                    onDot = true;
-                    break;
-                }
-            }
-            canvas.style.cursor = onDot ? "pointer" : "default";
-        };
-
-        canvas.ontouchstart = function (e) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const x = (touch.clientX - rect.left) * scaleX;
-            const y = (touch.clientY - rect.top) * scaleY;
-
-            let nearest = null;
-            let nearestDist = Infinity;
-            for (let i = 0; i < that.pitchNumber; i++) {
-                const cents = that.cents[i];
-                const angleDeg = 270 + cents * 0.3;
-                const dotA = (angleDeg * Math.PI) / 180;
-                const dx = cx + innerR * Math.cos(dotA);
-                const dy = cy + innerR * Math.sin(dotA);
-                const dist = Math.hypot(dx - x, dy - y);
-                if (dist < nearestDist) {
-                    nearestDist = dist;
-                    nearest = i;
-                }
-            }
-            if (nearest !== null && nearestDist <= dotR + 16) {
-                that._logo.synth.trigger(
-                    0,
-                    that.frequencies[nearest],
-                    1 / 4,
-                    "electronic synth",
-                    null,
-                    null
-                );
-            }
-        };
 
         const table = document.createElement("table");
         table.style.width = "100%";
@@ -1256,7 +1389,13 @@ function TemperamentWidget() {
         tableDiv.appendChild(table);
 
         const thead = document.createElement("tr");
-        const headers = [_("Pitch"), _("Step"), _("Frequency (Hz)"), _("Cents"), _("Ratio")];
+        const headers = [
+            _("Pitch"),
+            _("Step"),
+            _("Frequency (Hz)"),
+            _("Cents dev. from") + " " + refName,
+            _("Ratio")
+        ];
         for (const h of headers) {
             const th = document.createElement("th");
             th.textContent = h;
@@ -1270,43 +1409,470 @@ function TemperamentWidget() {
         }
         table.appendChild(thead);
 
-        for (let i = 0; i < that.pitchNumber; i++) {
-            const tr = document.createElement("tr");
-            const cents = that.cents[i];
+        const tbody = document.createElement("tbody");
+        table.appendChild(tbody);
+        const rowRefs = [];
+
+        /** Ups-and-downs prefix for a cents value (deviation from 12-EDO). */
+        const _updown = function (cents) {
             const dev = cents - Math.round(cents / 100) * 100;
-            const bgColor = i % 2 === 0 ? "#1a1a2e" : "#22223a";
+            if (dev > 30) return "^^";
+            if (dev > 15) return "^";
+            if (dev < -30) return "vv";
+            if (dev < -15) return "v";
+            return "";
+        };
 
-            const tdName = document.createElement("td");
-            tdName.textContent = that.notes[i][0] + that.notes[i][1];
+        /** (Re)builds the table rows from current state, storing cell refs. */
+        const _buildTable = function () {
+            tbody.textContent = "";
+            rowRefs.length = 0;
+            for (let i = 0; i < that.pitchNumber; i++) {
+                const tr = document.createElement("tr");
+                const bgColor = i % 2 === 0 ? "#1a1a2e" : "#22223a";
+                tr.style.backgroundColor = bgColor;
+                tr.style.cursor = "pointer";
 
-            const tdStep = document.createElement("td");
-            tdStep.textContent = i;
+                const tdName = document.createElement("td");
+                const tdStep = document.createElement("td");
+                const tdFreq = document.createElement("td");
+                const tdCents = document.createElement("td");
+                const tdRatio = document.createElement("td");
 
-            const tdFreq = document.createElement("td");
-            tdFreq.textContent = that.frequencies[i];
+                for (const td of [tdName, tdStep, tdFreq, tdCents, tdRatio]) {
+                    td.style.border = "1px solid #333";
+                    td.style.padding = "6px 8px";
+                    td.style.textAlign = "center";
+                    td.style.backgroundColor = bgColor;
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+                const ref = {
+                    tr: tr,
+                    name: tdName,
+                    step: tdStep,
+                    freq: tdFreq,
+                    cents: tdCents,
+                    ratio: tdRatio
+                };
+                rowRefs.push(ref);
+                const cells = [tdName, tdStep, tdFreq, tdCents, tdRatio];
+                tr.onmouseenter = function () {
+                    for (const td of cells) td.style.backgroundColor = "#33334d";
+                };
+                tr.onmouseleave = function () {
+                    for (const td of cells) td.style.backgroundColor = bgColor;
+                };
+                tr.oncontextmenu = function (e) {
+                    e.preventDefault();
+                    _showMenu(e, i);
+                };
+            }
+            _refreshTable();
+        };
 
-            const tdCents = document.createElement("td");
-            tdCents.textContent = (dev >= 0 ? "+" : "") + dev.toFixed(1);
-            if (Math.abs(dev) <= 1) {
-                tdCents.style.color = "#4caf50";
-            } else if (dev > 1) {
-                tdCents.style.color = "#ff9800";
+        /** Updates all table cell text from current state. */
+        const _refreshTable = function () {
+            for (let i = 0; i < rowRefs.length; i++) {
+                _updateTableRow(i);
+            }
+        };
+
+        /** Updates a single row (used during drag). */
+        const _updateTableRow = function (i) {
+            if (!rowRefs[i]) return;
+            const cents = that.cents[i];
+            const dev = _deviation(i);
+            rowRefs[i].name.textContent = _updown(cents) + that.notes[i][0];
+            rowRefs[i].step.textContent = i;
+            rowRefs[i].freq.textContent = that.frequencies[i];
+            rowRefs[i].cents.textContent = (dev >= 0 ? "+" : "") + dev.toFixed(1);
+            rowRefs[i].cents.style.color = _devColor(dev);
+            rowRefs[i].ratio.textContent = that.ratios[i].toFixed(3);
+        };
+
+        _buildTable();
+
+        const hint = document.createElement("div");
+        hint.textContent = _("scroll for all") + " " + that.pitchNumber + " " + _("pitches");
+        hint.style.textAlign = "center";
+        hint.style.fontSize = "11px";
+        hint.style.color = "#777";
+        hint.style.marginTop = "4px";
+        tableDiv.appendChild(hint);
+
+        // ── Interactivity ──
+        const _applyCents = function (i, cents) {
+            that.cents[i] = cents;
+            that.ratios[i] = Math.pow(2, cents / 1200);
+            that.frequencies[i] = (Number(that.frequencies[0]) * that.ratios[i]).toFixed(2);
+            if (that.ratiosNotesPair[i]) that.ratiosNotesPair[i][0] = that.ratios[i];
+        };
+
+        const _centsFromPointer = function (i, px, py) {
+            const a = ((Math.atan2(py - cy, px - cx) * 180) / Math.PI + 360) % 360;
+            let rawCents = (a - 270) / 0.3;
+            while (rawCents - that.cents[i] > 600) rawCents -= 1200;
+            while (rawCents - that.cents[i] < -600) rawCents += 1200;
+            return rawCents;
+        };
+
+        const _insertPitch = function (index, cents) {
+            that.pitchNumber += 1;
+            that.cents.splice(index, 0, cents);
+            that.ratios.splice(index, 0, Math.pow(2, cents / 1200));
+            that.frequencies.splice(
+                index,
+                0,
+                (Number(that.frequencies[0]) * that.ratios[index]).toFixed(2)
+            );
+            that.notes.splice(index, 0, that.notes[index] ? that.notes[index].slice() : ["C", "4"]);
+            that.intervals.splice(
+                index,
+                0,
+                that.intervals[index] !== undefined ? that.intervals[index] : 0
+            );
+            that.ratiosNotesPair.splice(index, 0, [that.ratios[index], that.notes[index]]);
+        };
+
+        const _removePitch = function (index) {
+            if (that.pitchNumber <= 1) return;
+            that.cents.splice(index, 1);
+            that.ratios.splice(index, 1);
+            that.frequencies.splice(index, 1);
+            that.notes.splice(index, 1);
+            that.intervals.splice(index, 1);
+            that.ratiosNotesPair.splice(index, 1);
+            that.pitchNumber -= 1;
+        };
+
+        const _resetTo12 = function (index) {
+            _applyCents(index, Math.round(that.cents[index] / 100) * 100);
+        };
+
+        const _playNote = function (index) {
+            that._logo.resetSynth(0);
+            that._logo.synth.trigger(
+                0,
+                Number(that.frequencies[index]),
+                1 / 4,
+                "electronic synth",
+                null,
+                null
+            );
+            highlightDot = index;
+            _drawCircle();
+            setTimeout(function () {
+                highlightDot = -1;
+                _drawCircle();
+            }, 200);
+        };
+
+        const _findNearest = function (px, py, maxDist) {
+            let nearest = null;
+            let nearestDist = Infinity;
+            for (let i = 0; i < that.pitchNumber; i++) {
+                const cents = that.cents[i];
+                const angleDeg = 270 + cents * 0.3;
+                const dotA = (angleDeg * Math.PI) / 180;
+                const dx = cx + innerR * Math.cos(dotA);
+                const dy = cy + innerR * Math.sin(dotA);
+                const dist = Math.hypot(dx - px, dy - py);
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearest = i;
+                }
+            }
+            return nearest !== null && nearestDist <= maxDist ? nearest : null;
+        };
+
+        // Loads a temperament key (shared by dropdown + ops toolbar)
+        const _loadTemperament = function (key) {
+            that.inTemperament = key;
+            let t = getTemperament(that.inTemperament);
+            if (!t || !t.pitchNumber) {
+                t = getTemperament("equal");
+                that.inTemperament = "equal";
+            }
+            that.pitchNumber = t.pitchNumber;
+            that.scale = Array.isArray(that.scale)
+                ? that.scale[0] + " " + that.scale[1]
+                : that.scale;
+            that.scaleNotes = buildScale(that.scale);
+            that.scaleNotes = that.scaleNotes[0];
+            that.powerBase = 2;
+
+            const startingPitch = that._logo.synth.startingPitch;
+            that.notes = [];
+            that.frequencies = [];
+            that.cents = [];
+            that.intervals = [];
+            that.ratios = [];
+            that.ratiosNotesPair = [];
+
+            for (let i = 0; i <= that.pitchNumber; i++) {
+                if (isCustomTemperament(that.inTemperament)) {
+                    t = getTemperament("equal");
+                }
+                if (!t || !t.interval || i >= t.interval.length) continue;
+
+                const str_i = getNoteFromInterval(startingPitch, t.interval[i]);
+                that.notes[i] = str_i;
+                let noteName = str_i[0];
+                if (
+                    noteName.substring(1, noteName.length) === FLAT ||
+                    noteName.substring(1, noteName.length) === "b"
+                ) {
+                    noteName = noteName.replace(FLAT, "b");
+                } else if (
+                    noteName.substring(1, noteName.length) === SHARP ||
+                    noteName.substring(1, noteName.length) === "#"
+                ) {
+                    noteName = noteName.replace(SHARP, "#");
+                }
+
+                that.intervals[i] = t.interval[i];
+                that.ratios[i] = getTemperamentRatio(t[that.intervals[i]]);
+                that.cents[i] = ratioToCents(that.ratios[i], that.powerBase);
+                if (i === 0) {
+                    that.frequencies[i] = that._logo.synth
+                        ._getFrequency(noteName + str_i[1], true, that.inTemperament)
+                        .toFixed(2);
+                } else {
+                    that.frequencies[i] = (that.frequencies[0] * that.ratios[i]).toFixed(2);
+                }
+                that.ratiosNotesPair[i] = [that.ratios[i], that.notes[i]];
+            }
+
+            that.visualizerVisible = true;
+            that._visualizerView();
+        };
+
+        let dragIndex = -1;
+        let dragMoved = false;
+        let lockedDrag = false;
+
+        // ── Context menu ──
+        const _removeMenu = function () {
+            if (that._vizMenu && that._vizMenu.parentNode) {
+                that._vizMenu.parentNode.removeChild(that._vizMenu);
+            }
+            that._vizMenu = null;
+            if (that._vizMenuClose) {
+                document.removeEventListener("mousedown", that._vizMenuClose);
+                that._vizMenuClose = null;
+            }
+        };
+
+        const _closeMenu = function (e) {
+            if (that._vizMenu && !that._vizMenu.contains(e.target)) {
+                _removeMenu();
+            }
+        };
+
+        const _showMenu = function (e, index) {
+            e.preventDefault();
+            _removeMenu();
+            const menu = document.createElement("div");
+            menu.style.position = "fixed";
+            menu.style.left = e.clientX + "px";
+            menu.style.top = e.clientY + "px";
+            menu.style.background = "#2a2a3e";
+            menu.style.border = "1px solid #555";
+            menu.style.borderRadius = "4px";
+            menu.style.padding = "6px";
+            menu.style.zIndex = "1000";
+            menu.style.fontSize = "12px";
+            menu.style.color = "#e0e0e0";
+            menu.style.display = "flex";
+            menu.style.flexDirection = "column";
+            menu.style.gap = "4px";
+
+            const centsInput = document.createElement("input");
+            centsInput.type = "number";
+            centsInput.step = "0.1";
+            centsInput.value = that.cents[index].toFixed(1);
+            centsInput.style.width = "80px";
+            centsInput.style.fontSize = "12px";
+
+            const applyBtn = document.createElement("button");
+            applyBtn.textContent = _("Set cents");
+            applyBtn.style.fontSize = "11px";
+            applyBtn.onclick = function (ev) {
+                ev.stopPropagation();
+                const v = parseFloat(centsInput.value);
+                if (!isNaN(v)) {
+                    _applyCents(index, v);
+                    _drawCircle();
+                    _updateTableRow(index);
+                }
+                _removeMenu();
+            };
+            if (_isLocked(index)) {
+                applyBtn.disabled = true;
+                applyBtn.style.opacity = "0.4";
+                centsInput.disabled = true;
+            }
+
+            const mkBtn = function (label, fn) {
+                const b = document.createElement("button");
+                b.textContent = label;
+                b.style.fontSize = "11px";
+                b.style.textAlign = "left";
+                b.onclick = function (ev) {
+                    ev.stopPropagation();
+                    fn();
+                    _drawCircle();
+                    _buildTable();
+                    _removeMenu();
+                };
+                return b;
+            };
+
+            const addBefore = mkBtn(_("Add before"), function () {
+                _insertPitch(index, that.cents[index] - 50);
+            });
+            const addAfter = mkBtn(_("Add after"), function () {
+                _insertPitch(index + 1, that.cents[index] + 50);
+            });
+            const removeBtn = mkBtn(_("Remove"), function () {
+                _removePitch(index);
+            });
+            const resetBtn = mkBtn(_("Reset to 12-EDO"), function () {
+                _resetTo12(index);
+            });
+            if (_isLocked(index)) {
+                resetBtn.disabled = true;
+                resetBtn.style.opacity = "0.4";
+            }
+
+            menu.appendChild(centsInput);
+            menu.appendChild(applyBtn);
+            menu.appendChild(addBefore);
+            menu.appendChild(addAfter);
+            menu.appendChild(removeBtn);
+            menu.appendChild(resetBtn);
+            document.body.appendChild(menu);
+            that._vizMenu = menu;
+            that._vizMenuClose = _closeMenu;
+            setTimeout(function () {
+                document.addEventListener("mousedown", _closeMenu);
+            }, 0);
+        };
+
+        canvas.oncontextmenu = function (e) {
+            const [x, y] = _canvasCoords(e, canvas);
+            const hit = _findNearest(x, y, dotR + 8);
+            if (hit !== null) _showMenu(e, hit);
+        };
+
+        // ── Drag to move (default), click to play ──
+        // The starting pitch (index 0) is locked: dragging it would detune the
+        // tonic and shift the whole scale. (Octave resizing is intentionally not a feature.)
+        const _isLocked = function (i) {
+            return i === 0;
+        };
+
+        const _endDrag = function () {
+            if (dragIndex >= 0) {
+                if (!dragMoved) _playNote(dragIndex);
+                dragIndex = -1;
+                lockedDrag = false;
+                highlightDot = -1;
+                _drawCircle();
+            }
+            window.removeEventListener("mouseup", _endDrag);
+        };
+
+        canvas.onmousedown = function (e) {
+            if (e.button !== 0) return;
+            const [x, y] = _canvasCoords(e, canvas);
+            const hit = _findNearest(x, y, dotR + 8);
+            if (hit !== null) {
+                dragIndex = hit;
+                dragMoved = false;
+                lockedDrag = _isLocked(hit);
+                if (!lockedDrag) {
+                    highlightDot = hit;
+                    _drawCircle();
+                }
+                window.addEventListener("mouseup", _endDrag);
+            }
+        };
+
+        canvas.onmousemove = function (e) {
+            const [x, y] = _canvasCoords(e, canvas);
+            if (dragIndex >= 0 && !lockedDrag) {
+                dragMoved = true;
+                _applyCents(dragIndex, _centsFromPointer(dragIndex, x, y));
+                highlightDot = dragIndex;
+                _drawCircle();
+                _updateTableRow(dragIndex);
             } else {
-                tdCents.style.color = "#f44336";
+                const near = _findNearest(x, y, dotR + 8);
+                canvas.style.cursor =
+                    near === null ? "default" : _isLocked(near) ? "not-allowed" : "pointer";
             }
+        };
 
-            const tdRatio = document.createElement("td");
-            tdRatio.textContent = that.ratios[i].toFixed(4);
+        canvas.onmouseup = _endDrag;
 
-            for (const td of [tdName, tdStep, tdFreq, tdCents, tdRatio]) {
-                td.style.border = "1px solid #333";
-                td.style.padding = "6px 8px";
-                td.style.textAlign = "center";
-                td.style.backgroundColor = bgColor;
-                tr.appendChild(td);
+        canvas.ontouchstart = function (e) {
+            const [x, y] = _canvasCoords(e.touches[0], canvas);
+            const hit = _findNearest(x, y, dotR + 16);
+            if (hit !== null) {
+                dragIndex = hit;
+                dragMoved = false;
+                lockedDrag = _isLocked(hit);
+                if (!lockedDrag) {
+                    highlightDot = hit;
+                    _drawCircle();
+                }
+                e.preventDefault();
             }
-            table.appendChild(tr);
-        }
+        };
+
+        canvas.ontouchmove = function (e) {
+            if (dragIndex < 0 || lockedDrag) return;
+            const [x, y] = _canvasCoords(e.touches[0], canvas);
+            dragMoved = true;
+            _applyCents(dragIndex, _centsFromPointer(dragIndex, x, y));
+            highlightDot = dragIndex;
+            _drawCircle();
+            _updateTableRow(dragIndex);
+            e.preventDefault();
+        };
+
+        canvas.ontouchend = function () {
+            if (dragIndex >= 0) {
+                if (!dragMoved) _playNote(dragIndex);
+                dragIndex = -1;
+                lockedDrag = false;
+                highlightDot = -1;
+                _drawCircle();
+            }
+        };
+
+        // Dropdown: switch active temperament
+        compareSelect.onchange = function () {
+            _loadTemperament(compareSelect.value);
+        };
+
+        // Dropdown: switch reference
+        refSelect.onchange = function () {
+            that._refTemperament = refSelect.value;
+            that._visualizerView();
+        };
+
+        // Hide-table toggle (persist state across redraws)
+        if (that._tableHidden === undefined) that._tableHidden = false;
+        hideTableBtn.textContent = that._tableHidden ? _("show table") : _("hide table");
+        tableDiv.style.display = that._tableHidden ? "none" : "block";
+        hideTableBtn.onclick = function () {
+            that._tableHidden = !that._tableHidden;
+            tableDiv.style.display = that._tableHidden ? "none" : "block";
+            hideTableBtn.textContent = that._tableHidden ? _("show table") : _("hide table");
+        };
     };
 
     /**
@@ -2860,6 +3426,7 @@ function TemperamentWidget() {
         widgetWindow.getWidgetBody().append(temperamentTableDiv);
         widgetWindow.getWidgetBody().style.height = "500px";
         widgetWindow.getWidgetBody().style.width = "500px";
+        widgetWindow.getWidgetBody().style.overflowY = "auto";
 
         const that = this;
 
