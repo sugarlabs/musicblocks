@@ -752,5 +752,17 @@ describe("Arpeggio Widget", () => {
                 expect(arpeggio._blockMap).toContainEqual([1, 1]);
             }
         });
+
+        test("widgetWindow.onclose restores Singer.masterVolume if present", () => {
+            global.Singer = { masterVolume: [0.8] };
+            activityMock.logo.synth.setMasterVolume = jest.fn();
+
+            mockWidgetWindow.onclose();
+
+            expect(activityMock.logo.synth.stop).toHaveBeenCalled();
+            expect(activityMock.logo.synth.setMasterVolume).toHaveBeenCalledWith(0.8);
+            expect(arpeggio._playing).toBe(false);
+            expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+        });
     });
 });
