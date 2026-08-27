@@ -34,7 +34,8 @@
  * Known limitations (documented rather than guessed around):
  *   - `referencedGlobals` is name-based, not scope-accurate. A name that is bound
  *     anywhere in the file (a parameter, a nested declaration) is treated as
- *     bound everywhere, so shadowed globals may be omitted.
+ *     bound everywhere, so a global shadowed elsewhere may be omitted. The same
+ *     name set is used to ignore calls to a locally declared `require`.
  *   - Only the CommonJS (`module.exports = ...`, `exports.x = ...`) and ES module
  *     (`export ...`) patterns that appear in this repository are recognised.
  *     Conditional or computed exports are not resolved.
@@ -497,12 +498,16 @@ function collectExports(program, top) {
  * Collects `require("x")` string arguments and ES `import` sources.
  *
  * @param {object} program - Program node.
+ * @param {Set<string>} boundNames - names bound anywhere in the file; used to
+ *     ignore calls to a locally declared `require`.
  * @returns {string[]}
  */
-function collectDependencies(program) {
+function collectDependencies(program, boundNames) {
     const deps = new Set();
+    const requireIsShadowed = boundNames.has("require");
     walk(program, node => {
         if (
+            !requireIsShadowed &&
             node.type === "CallExpression" &&
             node.callee.type === "Identifier" &&
             node.callee.name === "require" &&
@@ -585,10 +590,10 @@ function collectBoundNames(program) {
  * header).
  *
  * @param {object} program - Program node.
+ * @param {Set<string>} bound - names bound anywhere in the file.
  * @returns {string[]}
  */
-function collectReferencedGlobals(program) {
-    const bound = collectBoundNames(program);
+function collectReferencedGlobals(program, bound) {
     const globals = new Set();
 
     walk(program, (node, parent) => {
@@ -598,7 +603,16 @@ function collectReferencedGlobals(program) {
         // Skip non-value positions.
         if (parent.type === "MemberExpression" && parent.property === node && !parent.computed)
             return;
-        if (parent.type === "Property" && parent.key === node && !parent.computed) return;
+        // A property key (`{ foo: ... }`) is not a reference, but a shorthand
+        // property (`{ foo }`) reuses the same node for key and value and *is*.
+        if (
+            parent.type === "Property" &&
+            parent.key === node &&
+            !parent.computed &&
+            !parent.shorthand
+        ) {
+            return;
+        }
         if (
             (parent.type === "MethodDefinition" || parent.type === "PropertyDefinition") &&
             parent.key === node &&
@@ -714,6 +728,7 @@ function parseJsdoc(raw) {
 function buildTestPlan(ast, options) {
     const { file, source, comments = [] } = options;
     const top = collectTopLevel(ast);
+    const boundNames = collectBoundNames(ast);
 
     const functions = [...top.functions.entries()]
         .map(([name, node]) => describeFunction(name, node))
@@ -754,8 +769,8 @@ function buildTestPlan(ast, options) {
         exports: exportsList,
         functions,
         classes,
-        dependencies: collectDependencies(ast),
-        referencedGlobals: collectReferencedGlobals(ast),
+        dependencies: collectDependencies(ast, boundNames),
+        referencedGlobals: collectReferencedGlobals(ast, boundNames),
         jsdoc: collectJsdoc(ast, comments, source),
         totals: {
             branches: totalBranches,

@@ -76,6 +76,29 @@ describe("extract-module: simple-module fixture", () => {
         expect(plan.referencedGlobals).not.toContain("value"); // a parameter
     });
 
+    it("keeps shorthand object properties as referenced globals", () => {
+        const shorthand = extractModule(
+            "const result = { Tone, helper };\nfunction helper() {}\n",
+            "shorthand.js"
+        );
+        expect(shorthand.referencedGlobals).toContain("Tone");
+        expect(shorthand.referencedGlobals).not.toContain("helper"); // declared below
+        expect(shorthand.referencedGlobals).not.toContain("result");
+    });
+
+    it("does not treat a non-shorthand property key as a reference", () => {
+        const keyed = extractModule("const result = { Tone: 1 };\n", "keyed.js");
+        expect(keyed.referencedGlobals).not.toContain("Tone");
+    });
+
+    it("ignores calls to a locally declared require", () => {
+        const shadowed = extractModule(
+            "function require(x) { return x; }\nrequire('not-a-dependency');\n",
+            "shadowed-require.js"
+        );
+        expect(shadowed.dependencies).toEqual([]);
+    });
+
     it("extracts leading JSDoc blocks and their tags", () => {
         const clampDoc = plan.jsdoc.find(d => d.target === "clamp");
         expect(clampDoc.description).toBe("Clamps a number to a range.");
@@ -270,6 +293,32 @@ describe("cli helpers", () => {
                 "scripts/generate-tests/__tests__/fixtures/simple-module.js",
                 "--check",
                 "scripts/generate-tests/__tests__/fixtures/class-module.plan.json"
+            ])
+        ).toBe(1);
+    });
+
+    it("--check reports a malformed expected plan as a clean failure", () => {
+        const badPlan = path.join(FIXTURES, "__malformed__.plan.json");
+        fs.writeFileSync(badPlan, "{ not valid json");
+        try {
+            expect(
+                cli.main([
+                    "scripts/generate-tests/__tests__/fixtures/simple-module.js",
+                    "--check",
+                    "scripts/generate-tests/__tests__/fixtures/__malformed__.plan.json"
+                ])
+            ).toBe(1);
+        } finally {
+            fs.unlinkSync(badPlan);
+        }
+    });
+
+    it("--check reports a missing expected plan as a clean failure", () => {
+        expect(
+            cli.main([
+                "scripts/generate-tests/__tests__/fixtures/simple-module.js",
+                "--check",
+                "scripts/generate-tests/__tests__/fixtures/__nope__.plan.json"
             ])
         ).toBe(1);
     });

@@ -129,7 +129,15 @@ function main(argv) {
         return 1;
     }
 
-    if (normalise(generated) === normalise(expected)) {
+    let matches;
+    try {
+        matches = normalise(generated) === normalise(expected);
+    } catch (err) {
+        process.stderr.write(`${expectedPath}: invalid expected plan (${err.message})\n`);
+        return 1;
+    }
+
+    if (matches) {
         process.stdout.write(`${args.file}: plan matches ${expectedPath}\n`);
         return 0;
     }
@@ -142,6 +150,7 @@ function main(argv) {
  * @param {string} text - JSON text.
  * @returns {string} canonical form for comparison (tolerant of indentation and
  *     trailing-newline differences).
+ * @throws {SyntaxError} when `text` is not valid JSON.
  */
 function normalise(text) {
     return JSON.stringify(JSON.parse(text));

@@ -54,8 +54,12 @@ node scripts/generate-tests/cli.js path/to/module.js --check path/to/expected.js
 
 - Everything is derived syntactically. The target file is never required,
   imported, executed or written to.
+- Parsing uses the vendored Acorn (8.14.1) with `ecmaVersion: 2020`, matching the
+  rest of the repository. Syntax newer than that is a parse error.
 - `referencedGlobals` is name-based, not scope-accurate: a name bound anywhere in
-  the file is treated as bound everywhere, so a shadowed global may be omitted.
+  the file is treated as bound everywhere, so a global shadowed elsewhere may be
+  omitted. Dependency detection uses the same heuristic to ignore a locally
+  declared `require`.
 - Only the CommonJS and ES module patterns that appear in this repository are
   resolved. Conditional or computed exports are not.
 - Parse errors are reported with the filename attached and never modify anything.
