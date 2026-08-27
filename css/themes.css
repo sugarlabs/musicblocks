@@ -208,6 +208,31 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     background-color: var(--color-bg-primary);
 }
 
+.dark .plugin-modal-select {
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary);
+    border-color: var(--color-border-primary) !important;
+}
+
+.dark .plugin-upload-button {
+    border-color: var(--color-brand-primary);
+    color: var(--color-brand-primary);
+}
+
+.dark .plugin-upload-button:hover {
+    background-color: var(--color-brand-primary);
+    color: var(--color-text-inverse);
+}
+
+.dark .cancel-button {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+}
+
+.dark .cancel-button:hover {
+    background-color: var(--color-border-primary);
+}
+
 .dark #newdropdown {
     border: #000000;
     background-color: var(--color-bg-primary);
@@ -627,6 +652,37 @@ body.highcontrast {
 .highcontrast .modal-message {
     color: var(--color-text-inverse);
     background-color: var(--color-text-inverse);
+}
+
+.highcontrast .plugin-modal-select {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary);
+    border-color: var(--color-border-primary) !important;
+}
+
+.highcontrast .plugin-upload-button {
+    border-color: var(--color-brand-primary);
+    color: var(--color-brand-primary);
+}
+
+.highcontrast .plugin-upload-button:hover {
+    background-color: var(--color-brand-primary);
+    color: var(--color-text-inverse);
+}
+
+.highcontrast .plugin-modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.highcontrast .cancel-button {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 2px solid var(--color-border-primary);
+}
+
+.highcontrast .cancel-button:hover {
+    background-color: var(--color-brand-secondary);
+    color: var(--color-text-inverse);
 }
 
 .highcontrast #newdropdown {

@@ -138,52 +138,68 @@ class PluginController {
      */
     deletePluginFromStorage(paletteName, protoList) {
         const obj = safeJSONParse(this.activity.storage.plugins);
-        if (!obj) return false;
+        if (!obj) {
+            return false;
+        }
+
+        let actuallyDeleted = false;
 
         if (obj["PALETTEPLUGINS"] && paletteName in obj["PALETTEPLUGINS"]) {
             delete obj["PALETTEPLUGINS"][paletteName];
+            actuallyDeleted = true;
         }
         if (obj["PALETTEFILLCOLORS"] && paletteName in obj["PALETTEFILLCOLORS"]) {
             delete obj["PALETTEFILLCOLORS"][paletteName];
+            actuallyDeleted = true;
         }
         if (obj["PALETTESTROKECOLORS"] && paletteName in obj["PALETTESTROKECOLORS"]) {
             delete obj["PALETTESTROKECOLORS"][paletteName];
+            actuallyDeleted = true;
         }
         if (obj["PALETTEHIGHLIGHTCOLORS"] && paletteName in obj["PALETTEHIGHLIGHTCOLORS"]) {
             delete obj["PALETTEHIGHLIGHTCOLORS"][paletteName];
+            actuallyDeleted = true;
         }
 
-        for (let i = 0; i < protoList.length; i++) {
-            const name = protoList[i]["name"];
-            if (obj["FLOWPLUGINS"] && name in obj["FLOWPLUGINS"]) {
-                debugLog("deleting " + name);
-                delete obj["FLOWPLUGINS"][name];
-            }
-            if (obj["BLOCKPLUGINS"] && name in obj["BLOCKPLUGINS"]) {
-                debugLog("deleting " + name);
-                delete obj["BLOCKPLUGINS"][name];
-            }
-            if (obj["ARGPLUGINS"] && name in obj["ARGPLUGINS"]) {
-                debugLog("deleting " + name);
-                delete obj["ARGPLUGINS"][name];
+        if (protoList && Array.isArray(protoList)) {
+            for (let i = 0; i < protoList.length; i++) {
+                const name = protoList[i]["name"];
+                if (obj["FLOWPLUGINS"] && name in obj["FLOWPLUGINS"]) {
+                    delete obj["FLOWPLUGINS"][name];
+                    actuallyDeleted = true;
+                }
+                if (obj["BLOCKPLUGINS"] && name in obj["BLOCKPLUGINS"]) {
+                    delete obj["BLOCKPLUGINS"][name];
+                    actuallyDeleted = true;
+                }
+                if (obj["ARGPLUGINS"] && name in obj["ARGPLUGINS"]) {
+                    delete obj["ARGPLUGINS"][name];
+                    actuallyDeleted = true;
+                }
             }
         }
 
         if (obj["MACROPLUGINS"] && paletteName in obj["MACROPLUGINS"]) {
             delete obj["MACROPLUGINS"][paletteName];
+            actuallyDeleted = true;
         }
         if (obj["ONLOAD"] && paletteName in obj["ONLOAD"]) {
             delete obj["ONLOAD"][paletteName];
+            actuallyDeleted = true;
         }
         if (obj["ONSTART"] && paletteName in obj["ONSTART"]) {
             delete obj["ONSTART"][paletteName];
+            actuallyDeleted = true;
         }
         if (obj["ONSTOP"] && paletteName in obj["ONSTOP"]) {
             delete obj["ONSTOP"][paletteName];
+            actuallyDeleted = true;
         }
 
-        this.activity.storage.plugins = JSON.stringify(obj);
-        return true;
+        if (actuallyDeleted) {
+            this.activity.storage.plugins = JSON.stringify(obj);
+        }
+        return actuallyDeleted;
     }
 }
 
