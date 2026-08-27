@@ -44,36 +44,36 @@
 # test paths do not fall back to Walter or Devin.
 /.github/workflows/ @omsuneri @Ashutoshx7
 /.husky/ @omsuneri @Ashutoshx7
-/cypress/ @omsuneri @Ashutoshx7
-/test/ @omsuneri @Ashutoshx7
-/cypress.config.js @omsuneri @Ashutoshx7
+/cypress/ @omsuneri @Ashutoshx7 @vanshika2720
+/test/ @omsuneri @Ashutoshx7 @vanshika2720
+/cypress.config.js @omsuneri @Ashutoshx7 @vanshika2720
 /jest.config.js @omsuneri @Ashutoshx7
 /eslint.config.mjs @omsuneri @Ashutoshx7
 /commitlint.config.js @omsuneri @Ashutoshx7
 /lighthouserc.js @omsuneri @Ashutoshx7
 /.prettierignore @omsuneri @Ashutoshx7
 /.prettierrc @omsuneri @Ashutoshx7
-/js/__tests__/ @omsuneri @Ashutoshx7
-/js/activity/__tests__/ @omsuneri @Ashutoshx7
-/js/palette/__tests__/ @omsuneri @Ashutoshx7
-/js/utils/__tests__/ @omsuneri @Ashutoshx7
-/js/widgets/__tests__/ @omsuneri @Ashutoshx7
-/js/turtleactions/__tests__/ @omsuneri @Ashutoshx7
+/js/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
+/js/activity/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
+/js/palette/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
+/js/utils/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
+/js/widgets/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
+/js/turtleactions/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
 
 # Planet feature tests that live outside the Planet directory.
 /js/__tests__/planetInterface.test.js @zealot-zew
 /js/__tests__/SaveInterface.test.js @zealot-zew
 
-/js/blocks/__tests__/DrumBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/EnsembleBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/IntervalsBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/MeterBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/OrnamentBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/PitchBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/RhythmBlockPaletteBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/RhythmBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/ToneBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/VolumeBlocks*.test.js @omsuneri @Ashutoshx7
+/js/blocks/__tests__/DrumBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/EnsembleBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/IntervalsBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/MeterBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/OrnamentBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/PitchBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/RhythmBlockPaletteBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/RhythmBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/ToneBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/VolumeBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
 
 # Ownership and governance
 /.github/CODEOWNERS @walterbender @pikurasa
