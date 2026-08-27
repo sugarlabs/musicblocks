@@ -14,16 +14,19 @@ const extractMidiNoteOns = binary => {
     const readVarLen = pos => {
         let value = 0;
         let p = pos;
-        for (;;) {
+        while (p < bytes.length) {
             const b = bytes[p++];
             value = (value << 7) | (b & 0x7f);
-            if ((b & 0x80) === 0) break;
+            if ((b & 0x80) === 0) return [value, p];
         }
-        return [value, p];
+        throw new Error("Invalid MIDI variable-length value");
     };
 
     const noteOns = [];
-    let pos = 14; // skip the MThd header chunk (4-byte id + 4-byte length + 6 bytes of data)
+    // Skip the MThd header chunk using its own declared length (4-byte id +
+    // 4-byte length + N bytes of data) rather than assuming N is always 6.
+    const headerLength = ((bytes[4] << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7]) >>> 0;
+    let pos = 8 + headerLength;
     while (pos < bytes.length) {
         const chunkId = String.fromCharCode(
             bytes[pos],
