@@ -716,7 +716,7 @@ class Block {
         }
 
         if (this._viewportVisible !== false) {
-            this.container.updateCache();
+            this.updateCache();
         }
     }
 
@@ -800,7 +800,7 @@ class Block {
         }
 
         if (this._viewportVisible !== false) {
-            this.container.updateCache();
+            this.updateCache();
         }
     }
 
@@ -810,7 +810,7 @@ class Block {
             if (!this.collapsed) {
                 this.disconnectedBitmap.visible = true;
             }
-            this.container.updateCache();
+            this.updateCache();
         }
     }
 
