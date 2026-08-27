@@ -1299,6 +1299,8 @@ if (typeof module !== "undefined" && module.exports) {
         isSVGEmpty,
         prepareMacroExports,
         processPluginData,
+        processRawPluginData,
+        preparePluginExports,
         processMacroData,
         updatePluginObj,
         announceToScreenReader,
