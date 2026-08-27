@@ -63,7 +63,9 @@ const _b64Cache = new Map();
    SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
     INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition,
     scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern,
+    getNonEDOModeSteps,
     MODEPIEMENU_SLOT_COUNT, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
+    MODEPIEMENU_KEY_RING,
     MODEPIEMENU_NAME_TITLE_RADIUS, MODEPIEMENU_FONT_FAMILY,
     MODEPIEMENU_GROUP_FONT_RATIO, MODEPIEMENU_NAME_FONT_MIN_RATIO,
     MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
@@ -82,7 +84,10 @@ function normalizeNoteAccidentals(note) {
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
     // Strip microtonal ^ / v prefixes (temperament widget cents display)
     // so the base note can be resolved, e.g. "^C" → "C", "vvD♭" → "D♭".
-    return note.replace(/^[v^]+/, "").replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+    // Strip at most two leading microtonal ^ / v prefixes (the temperament
+    // widget uses them for cents display, e.g. "^C" or "vvD♭"). Limiting to
+    // two keeps any accidental real articulation prefix from being removed.
+    return note.replace(/^[v^]{0,2}/, "").replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 }
 
 /**
@@ -1851,6 +1856,7 @@ const MODEPIEMENU_SLOT_COUNT = 12;
  */
 const MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
 const MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
+const MODEPIEMENU_KEY_RING = { minRadius: 0.85, maxRadius: 1.0 };
 
 /**
  * Mid-radius of the mode-name ring (0.3-0.85), used to size each label to its
@@ -1984,6 +1990,18 @@ const updateModeWheelItems = (wheel, labels, colors) => {
         item.sliceHoverAttr.fill = colors[i];
         item.slicePathAttr.fill = colors[i];
         item.sliceSelectedAttr.fill = colors[i];
+        // The visible title text is baked into the Raphael text element at
+        // createWheel() time (wheelnav.js builds navTitle via raphael.text with
+        // the initial label). refreshWheel() only re-applies slice/title
+        // *attributes* (font, fill) through navTitle.attr(titleAttr) — it never
+        // rewrites the text content. Without this, switching the mode group
+        // updates item.title (so data/logic is correct) but the labels the user
+        // actually sees stay frozen on the first group's names. Push the new
+        // label into the text element directly. Guarded so non-text titles
+        // (path/image) and test mocks without navTitle are unaffected.
+        if (item.navTitle && typeof item.navTitle.attr === "function") {
+            item.navTitle.attr({ text: labels[i] });
+        }
     }
     wheel.refreshWheel();
 };
@@ -2547,11 +2565,11 @@ const TEMPERAMENT = {
         ]
     },
     "equal17": {
-        isEDO: true,
-        edo: 17,
-        name: "Equal (17EDO)",
-        description: "17 Equal Divisions of the Octave",
-        ratios: [
+        "isEDO": true,
+        "edo": 17,
+        "name": "Equal (17EDO)",
+        "description": "17 Equal Divisions of the Octave",
+        "ratios": [
             1,
             Math.pow(2, 1 / 17),
             Math.pow(2, 2 / 17),
@@ -2570,9 +2588,27 @@ const TEMPERAMENT = {
             Math.pow(2, 15 / 17),
             Math.pow(2, 16 / 17)
         ],
-        octaveRatio: 2,
-        pitchNumber: 17,
-        interval: [
+        "octaveRatio": 2,
+        "pitchNumber": 17,
+        "perfect 1": Math.pow(2, 0 / 17),
+        "minor 2": Math.pow(2, 1 / 17),
+        "augmented 1": Math.pow(2, 2 / 17),
+        "minor 3": Math.pow(2, 3 / 17),
+        "major 2": Math.pow(2, 4 / 17),
+        "augmented 2": Math.pow(2, 5 / 17),
+        "major 3": Math.pow(2, 6 / 17),
+        "perfect 4": Math.pow(2, 7 / 17),
+        "augmented 4": Math.pow(2, 8 / 17),
+        "diminished 5": Math.pow(2, 9 / 17),
+        "perfect 5": Math.pow(2, 10 / 17),
+        "augmented 5": Math.pow(2, 11 / 17),
+        "minor 6": Math.pow(2, 12 / 17),
+        "major 6": Math.pow(2, 13 / 17),
+        "augmented 6": Math.pow(2, 14 / 17),
+        "minor 7": Math.pow(2, 15 / 17),
+        "major 7": Math.pow(2, 16 / 17),
+        "perfect 8": Math.pow(2, 17 / 17),
+        "interval": [
             "perfect 1",
             "minor 2",
             "augmented 1",
@@ -3856,44 +3892,87 @@ const isTrueEDO = temperament => {
  * @param {string} temperament - The temperament key.
  * @returns {boolean} True if the temperament is an equal division of the octave.
  */
+const _isEquallyTemperedCache = new Map();
+
 const isEquallyTempered = temperament => {
+    if (_isEquallyTemperedCache.has(temperament)) {
+        return _isEquallyTemperedCache.get(temperament);
+    }
+    let result = false;
     const t = getTemperament(temperament);
     if (!t || typeof t !== "object") {
-        return false;
-    }
-    if (t.isEDO) {
-        return true;
-    }
-    const n = t.pitchNumber;
-    if (!Number.isInteger(n) || n < 2) {
-        return false;
-    }
-    for (let i = 0; i < n; i++) {
-        const entry = t["" + i];
-        if (!Array.isArray(entry) || typeof entry[0] !== "number") {
-            return false;
+        result = false;
+    } else if (t.isEDO === true) {
+        // Explicit equal temperament flag always wins.
+        result = true;
+    } else if (t.isEDO === false) {
+        // Explicit non-EDO (JI, meantone, Pythagorean) is never EDO, even when
+        // its intervals approximate an EDO within tolerance.
+        result = false;
+    } else if (t.ratios) {
+        // EDO temperaments commonly expose a `ratios` array; treat presence of a
+        // full ratios array as equally tempered without re-verifying each entry.
+        result = Array.isArray(t.ratios) && t.ratios.length >= 2;
+    } else {
+        // No explicit flag and no ratios array (e.g. editor-saved "custom"
+        // temperaments): detect by verifying the numeric pitch entries match
+        // equal steps. Tolerance is tight (1e-9) so only genuinely equal grids
+        // are classified as EDO.
+        const n = t.pitchNumber;
+        if (Number.isInteger(n) && n >= 2) {
+            result = true;
+            for (let i = 0; i < n; i++) {
+                const entry = t["" + i];
+                if (!Array.isArray(entry) || typeof entry[0] !== "number") {
+                    result = false;
+                    break;
+                }
+                const expected = Math.pow(2, i / n);
+                if (Math.abs(entry[0] - expected) > 1e-9) {
+                    result = false;
+                    break;
+                }
+            }
         }
-        const expected = Math.pow(2, i / n);
-        if (Math.abs(entry[0] - expected) > 1e-4) {
-            return false;
-        }
     }
-    return true;
+    _isEquallyTemperedCache.set(temperament, result);
+    return result;
 };
 
 /**
- * True when the temperament is tuned by ratios and is NOT an equal division
- * of the octave.
+ * Detect a non-equal (just/meantone/Pythagorean) temperament that still carries
+ * usable per-pitch ratio data. Used to route note/scale math down the
+ * ratio-aware (cents-based) path instead of the EDO step path.
+ *
+ *   isNonEDO = temperamentHasRatios(t) && !isEDO && !isEquallyTempered(t)
+ *
+ * An explicit `isEDO === false` always wins (over the 1e-9 equality probe) so a
+ * declared JI/meantone temperament is never mis-classified as EDO.
  * @function
- * @param {string} temperament - temperament key in TEMPERAMENT
+ * @param {string} temperament - The temperament key.
  * @returns {boolean}
  */
 const isNonEDO = temperament => {
     const t = getTemperament(temperament);
-    if (!t) {
+    if (!t || typeof t !== "object") {
         return false;
     }
+    if (t.isEDO === true) {
+        return false;
+    }
+    if (t.isEDO === false) {
+        return temperamentHasRatios(temperament);
+    }
     return temperamentHasRatios(temperament) && !isEquallyTempered(temperament);
+};
+
+/**
+ * Clear cached temperament classifications. Call this whenever a temperament
+ * entry is (re)defined at runtime (editor save, custom-mode load, widget
+ * dynamic registration) so a stale result is not returned for the same key.
+ */
+const clearTemperamentCaches = () => {
+    _isEquallyTemperedCache.clear();
 };
 
 /**
@@ -4157,7 +4236,7 @@ const frequencyToPitch = (hz, temperament) => {
  */
 const getArticulation = note => {
     // Strip microtonal ^ / v prefixes before matching so "^C" etc. resolve.
-    const stripped = note.replace(/^[v^]+/, "");
+    const stripped = note.replace(/^[v^]{0,2}/, "");
     const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
     return match ? match[1] : stripped;
 };
@@ -6445,18 +6524,26 @@ const scalePatternToEDO = (pattern, edo) => {
 const PITCH_COLLECTIONS_EDO_OVERRIDES = {};
 
 /**
- * Get the step pattern for a mode in the given EDO.
+ * Get the step pattern for a mode in the given EDO (or temperament).
  *
  * Lookup order: PITCH_COLLECTIONS_EDO_OVERRIDES[edo][mode] first, then the
  * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom"
  * (chromatic) mode, 12-EDO uses the stored customMode pattern and non-12 EDO
  * returns a full EDO-length step-1 pattern.
+ *
+ * When `temperament` is a non-EDO temperament (JI, meantone, Pythagorean), the
+ * EDO step model does not apply, so the returned array is a list of per-step
+ * CENTS (the actual interval size between consecutive scale degrees derived
+ * from the temperament's ratios). Consumers that render proportional slices or
+ * compute active tabs should use these cents directly.
  * @function
  * @param {string} mode - The mode name (e.g. "major").
  * @param {number} edo - Number of steps per octave.
- * @returns {Array} The step pattern for the mode in the target EDO.
+ * @param {string} [temperament] - Optional temperament key. When non-EDO, the
+ *     result is a cents-based pattern instead of integer steps.
+ * @returns {Array} Integer step pattern (EDO) or cents pattern (non-EDO).
  */
-const getModePattern = (mode, edo = 12) => {
+const getModePattern = (mode, edo = 12, temperament) => {
     const overrides = PITCH_COLLECTIONS_EDO_OVERRIDES[edo];
     if (overrides && Object.prototype.hasOwnProperty.call(overrides, mode)) {
         return overrides[mode].slice();
@@ -6670,15 +6757,6 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     // Returns how many half-steps to the next note in this key.
     if (temperament === undefined) {
         temperament = "equal";
-    }
-    if (isCustomTemperament(temperament)) {
-        const t = getTemperament(temperament);
-        if (!t || !temperamentHasRatios(temperament)) {
-            // Scalar = Semitone for custom Temperament with no ratios.
-            return transposition;
-        }
-        // For custom temperaments with ratios, fall through to ratio-based
-        // step size calculation below.
     }
     let currentEDO = edo;
     if (!currentEDO) {
@@ -8339,6 +8417,8 @@ if (typeof module !== "undefined" && module.exports) {
         temperamentHasRatios,
         isTrueEDO,
         isEquallyTempered,
+        isNonEDO,
+        clearTemperamentCaches,
         getTemperamentRatio,
         getTemperamentCents,
         getTemperamentName,
@@ -8351,6 +8431,7 @@ if (typeof module !== "undefined" && module.exports) {
         scalePatternToEDO,
         PITCH_COLLECTIONS_EDO_OVERRIDES,
         getModePattern,
+        getNonEDOModeSteps,
         modeMapper,
         getSharpFlatPreference,
         getCustomNote,
@@ -8395,6 +8476,7 @@ if (typeof module !== "undefined" && module.exports) {
         FIXEDSOLFEGE1,
         MODEPIEMENU_GROUP_RING,
         MODEPIEMENU_NAME_RING,
+        MODEPIEMENU_KEY_RING,
         getSavedCustomModes,
         getModeNamesForGroup,
         getModeLabel,
@@ -8403,8 +8485,6 @@ if (typeof module !== "undefined" && module.exports) {
         updateModeWheelItems,
         getModeGroupTitleFont,
         getModeSliceFont,
-        isNonEDO,
-        getNonEDOModeSteps,
         getNonEDOFrequency,
         configureWheel
     };

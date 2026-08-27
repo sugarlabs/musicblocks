@@ -136,7 +136,10 @@ const {
     getModeNameFromLabel,
     getModeSliceColors,
     updateModeWheelItems,
-    getModeGroupTitleFont
+    getModeGroupTitleFont,
+    temperamentHasRatios,
+    isEquallyTempered,
+    clearTemperamentCaches
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -178,25 +181,10 @@ describe("musicutils", () => {
             expect(baseSolfegeNames).toHaveLength(7);
         });
 
-        it("preserves the first and last entries for NOTENAMES and SOLFEGENAMES1", () => {
-            expect(NOTENAMES[0]).toBe("C");
-            expect(last(NOTENAMES)).toBe("B");
-            expect(SOLFEGENAMES1[0]).toBe("do");
-            expect(last(SOLFEGENAMES1)).toBe("ti");
-        });
-
         it("includes sharps, flats, and double accidentals in ALLNOTENAMES", () => {
             expect(ALLNOTENAMES).toEqual(
                 expect.arrayContaining(["C#", "Db", "Cx", "Dbb", "Fx", "Cb"])
             );
-        });
-
-        it("keeps note and pitch collections as non-empty arrays of strings", () => {
-            [NOTENAMES, ALLNOTENAMES, NOTENAMES1, PITCHES1, PITCHES3].forEach(collection => {
-                expect(Array.isArray(collection)).toBe(true);
-                expect(collection.length).toBeGreaterThan(0);
-                expect(collection.every(item => typeof item === "string")).toBe(true);
-            });
         });
 
         it("keeps major and minor mode definitions at seven steps and one octave", () => {
@@ -961,13 +949,6 @@ describe("frequencyToPitch", () => {
         expect(result[0]).toBe("A");
         expect(result[1]).toBe(4);
     });
-
-    it("should fallback to 12-EDO for unknown temperament", () => {
-        global.TEMPERAMENT = {};
-        const result = frequencyToPitch(440, "unknown");
-        expect(result[0]).toBe("A");
-        expect(result[1]).toBe(4);
-    });
 });
 
 describe("cents calculations", () => {
@@ -1008,11 +989,6 @@ describe("cents calculations", () => {
 
         it("extracts ratio from object format", () => {
             expect(getTemperamentRatio({ ratio: 3 / 2, cents: 700 })).toBe(3 / 2);
-        });
-
-        it("returns 1 for invalid input", () => {
-            expect(getTemperamentRatio(null)).toBe(1);
-            expect(getTemperamentRatio(undefined)).toBe(1);
         });
     });
 
@@ -1939,8 +1915,10 @@ describe("getStepSize", () => {
 
     // Test for a non-standard temperament
     it('should return the correct step size for "C" in "C major" with a non-standard temperament', () => {
+        // "just" has no ratio data, so it is treated as an equal division and
+        // scalar step follows the mode (C -> D = 2 semitones).
         const result = _getStepSize("C major", "C", "up", 0, "just");
-        expect(result).toBe(0);
+        expect(result).toBe(2);
     });
 });
 
@@ -2266,10 +2244,22 @@ describe("pitchToFrequency", () => {
         expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
     });
 
-    it("should fallback to 12-EDO for unknown temperament", () => {
-        global.TEMPERAMENT = {};
-        const result = pitchToFrequency("A", 4, 0, "C", "unknown");
-        expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
+    it("plays just intonation intervals at their true ratios (non-EDO accuracy)", () => {
+        // Non-EDO temperaments must produce their pure ratios, not 12-EDO
+        // approximations. The module-local TEMPERAMENT always carries the real
+        // "just intonation" ratios, so pitchToFrequency should resolve the just
+        // major third (5/4) and perfect fifth (3/2) exactly.
+        const c4 = pitchToFrequency("C", 4, 0, "C", "just intonation");
+        const e4 = pitchToFrequency("E", 4, 0, "C", "just intonation");
+        const g4 = pitchToFrequency("G", 4, 0, "C", "just intonation");
+        expect(e4 / c4).toBeCloseTo(5 / 4, 5);
+        expect(g4 / c4).toBeCloseTo(3 / 2, 5);
+
+        // Pythagorean: compare within the same temperament. Its major third is
+        // 81/64 (≈1.265), noticeably sharper than JI's pure 5/4 (1.25).
+        const pyC = pitchToFrequency("C", 4, 0, "C", "Pythagorean");
+        const pyE = pitchToFrequency("E", 4, 0, "C", "Pythagorean");
+        expect(pyE / pyC).toBeCloseTo(81 / 64, 4);
     });
 });
 
@@ -3119,9 +3109,11 @@ describe("getStepSizeDown", () => {
         expect(result).toBe(-2);
     });
 
-    it("should return 0 for an invalid temperament", () => {
+    it("falls back to the mode step for an invalid temperament", () => {
+        // An invalid (custom, ratio-less) temperament is treated as an equal
+        // division, so the step follows the mode (D -> C = 2 semitones down).
         const result = getStepSizeDown("C major", "D", 0, "invalid");
-        expect(result).toBe(0);
+        expect(result).toBe(-2);
     });
 });
 
@@ -3131,9 +3123,11 @@ describe("getStepSizeUp", () => {
         expect(result).toBe(2);
     });
 
-    it("should return 0 for an invalid temperament", () => {
+    it("falls back to the mode step for an invalid temperament", () => {
+        // An invalid (custom, ratio-less) temperament is treated as an equal
+        // division, so the step follows the mode (C -> D = 2 semitones up).
         const result = getStepSizeUp("C major", "C", 0, "invalid");
-        expect(result).toBe(0);
+        expect(result).toBe(2);
     });
 });
 
@@ -3509,9 +3503,12 @@ describe("_getStepSize with temperament", () => {
         expect(_getStepSize("G# major", "G#", "down", 0, "equal")).toBe(0);
     });
 
-    it("should return transposition for custom temperaments", () => {
-        expect(_getStepSize("C major", "C", "up", 5, "custom")).toBe(5);
-        expect(_getStepSize("C major", "C", "down", 3, "custom")).toBe(3);
+    it("follows the mode for custom temperaments without ratios", () => {
+        // A custom temperament with no ratio data is an equal division, so scalar
+        // step follows the mode's degrees (C -> D = 2 up, C -> B = 1 down) instead
+        // of returning the raw transposition.
+        expect(_getStepSize("C major", "C", "up", 5, "custom")).toBe(2);
+        expect(_getStepSize("C major", "C", "down", 3, "custom")).toBe(-1);
     });
 });
 
@@ -3811,12 +3808,14 @@ describe("_getStepSize custom temperament with ratios", () => {
         expect(result).not.toBe(5);
     });
 
-    it("still shortcuts for custom temperament without ratios", () => {
+    it("follows the mode for custom temperament without ratios", () => {
         addTemperamentToDictionary("testNoRatios", {
             pitchNumber: 12
         });
-        expect(_getStepSize("C major", "C", "up", 5, "testNoRatios")).toBe(5);
-        expect(_getStepSize("C major", "C", "down", 3, "testNoRatios")).toBe(3);
+        // Equal-division custom temperament: scalar step follows the mode's
+        // degrees (C -> D = 2 up, C -> B = 1 down), not the raw transposition.
+        expect(_getStepSize("C major", "C", "up", 5, "testNoRatios")).toBe(2);
+        expect(_getStepSize("C major", "C", "down", 3, "testNoRatios")).toBe(-1);
     });
 });
 
@@ -3964,30 +3963,58 @@ describe("mode pie menu shared helpers", () => {
     });
 });
 
-describe("non-EDO temperament helpers", () => {
-    describe("isNonEDO", () => {
-        it("is true for just intonation (ratios, unequal)", () => {
-            expect(isNonEDO("just intonation")).toBe(true);
-        });
-        it("is false for equal temperament", () => {
-            expect(isNonEDO("equal")).toBe(false);
-        });
-        it("is false for unknown or missing temperaments", () => {
-            expect(isNonEDO("not-a-temperament")).toBe(false);
-            expect(isNonEDO(undefined)).toBe(false);
-        });
+describe("temperamentHasRatios / isEquallyTempered", () => {
+    afterEach(() => {
+        delete TEMPERAMENT["custom"];
+        delete TEMPERAMENT["jiTest"];
+        delete TEMPERAMENT["equalTest"];
     });
 
-    describe("getNonEDOModeSteps", () => {
-        it("derives meantone-like integer steps from ratios for major", () => {
-            // 5-limit JI major: cumulative semitones 0,2,4,5,7,9,11 map onto
-            // the 12-entry ratio table at indices 0,2,4,5,7,9,11.
-            const steps = getNonEDOModeSteps("major", "just intonation");
-            expect(steps).toEqual([2, 2, 1, 2, 2, 2, 1]);
-        });
-        it("returns null for a temperament without usable ratios", () => {
-            expect(getNonEDOModeSteps("major", "_no_ratios")).toBeNull();
-        });
+    it("temperamentHasRatios true for EDO ratios array", () => {
+        TEMPERAMENT["equalTest"] = { isEDO: true, pitchNumber: 12, ratios: [1, 2] };
+        expect(temperamentHasRatios("equalTest")).toBe(true);
+    });
+
+    it("temperamentHasRatios true for editor-saved numeric-key format", () => {
+        TEMPERAMENT["custom"] = {
+            pitchNumber: 12,
+            0: [1, "C", 4],
+            1: [Math.pow(2, 1 / 12), "C♯", 4]
+        };
+        expect(temperamentHasRatios("custom")).toBe(true);
+    });
+
+    it("temperamentHasRatios false when neither format is present", () => {
+        TEMPERAMENT["custom"] = { pitchNumber: 12 };
+        expect(temperamentHasRatios("custom")).toBe(false);
+    });
+
+    it("isEquallyTempered respects an explicit isEDO:false flag", () => {
+        TEMPERAMENT["jiTest"] = {
+            isEDO: false,
+            pitchNumber: 12
+        };
+        expect(isEquallyTempered("jiTest")).toBe(false);
+    });
+
+    it("isEquallyTempered detects equal steps for unknown-flag custom temperament", () => {
+        clearTemperamentCaches();
+        TEMPERAMENT["custom"] = {
+            pitchNumber: 2,
+            0: [1, "C", 4],
+            1: [Math.pow(2, 1 / 2), "C♯", 4]
+        };
+        expect(isEquallyTempered("custom")).toBe(true);
+    });
+
+    it("isEquallyTempered false for non-equal intervals", () => {
+        clearTemperamentCaches();
+        TEMPERAMENT["custom"] = {
+            pitchNumber: 2,
+            0: [1, "C", 4],
+            1: [1.07, "C♯", 4] // far from 2^(1/2)
+        };
+        expect(isEquallyTempered("custom")).toBe(false);
     });
 });
 

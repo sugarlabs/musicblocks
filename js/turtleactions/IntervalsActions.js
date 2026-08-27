@@ -63,7 +63,10 @@ function setupIntervalsActions(activity) {
             }
             const lowercaseMode = mode.toLowerCase();
             for (const _mode in MUSICALMODES) {
-                if (_mode.toLowerCase() === lowercaseMode || _(_mode) === mode) {
+                if (
+                    _mode.toLowerCase() === lowercaseMode ||
+                    _(_mode).toLowerCase() === mode.toLowerCase()
+                ) {
                     modename = _mode;
                     break;
                 }
