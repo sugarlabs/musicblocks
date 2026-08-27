@@ -397,9 +397,9 @@ describe("Temperament Functions", () => {
 
     describe("deleteTemperamentFromList", () => {
         it("removes an entry from TEMPERAMENT by key", () => {
-            TEMPERAMENT["custom"] = true;
-            deleteTemperamentFromList("custom");
-            expect(TEMPERAMENT["custom"]).toBeUndefined();
+            TEMPERAMENT["tempToDelete"] = true;
+            deleteTemperamentFromList("tempToDelete");
+            expect(TEMPERAMENT["tempToDelete"]).toBeUndefined();
         });
 
         it("does nothing if the key does not exist", () => {
