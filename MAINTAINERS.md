@@ -21,8 +21,8 @@ Changes to this file should follow the role-change process in
 | --- | --- | --- |
 | Music & Pedagogy | [@walterbender](https://github.com/walterbender), [@pikurasa](https://github.com/pikurasa) | Music behavior, notation, examples, and classroom use |
 | UI/UX & Accessibility | [@walterbender](https://github.com/walterbender), [@pikurasa](https://github.com/pikurasa) | Widgets, layout, interaction design, and child-facing usability |
-| Blocks & Runtime | [@ssz2605](https://github.com/ssz2605) | General block definitions and JavaScript export |
-| Tests & CI | [@omsuneri](https://github.com/omsuneri), [@Ashutoshx7](https://github.com/Ashutoshx7) | Shared test infrastructure, CI workflows, and tests without a technical area owner |
+| Blocks & Runtime | [@ssz2605](https://github.com/ssz2605), [@vanshika2720](https://github.com/vanshika2720) | General block definitions, JavaScript export, and activity runtime |
+| Tests & CI | [@omsuneri](https://github.com/omsuneri), [@Ashutoshx7](https://github.com/Ashutoshx7), [@vanshika2720](https://github.com/vanshika2720) | Shared test infrastructure, CI workflows, and test suites |
 | Planet & Project Sharing | [@zealot-zew](https://github.com/zealot-zew) | Planet, publishing, and project-sharing flow |
 
 Music and UI paths request Walter and Devin together. This keeps Devin close to
@@ -36,7 +36,6 @@ project's test practice.
 | Area | GitHub handles |
 | --- | --- |
 | Docs, Lessons & i18n | [@stutijain2006](https://github.com/stutijain2006) |
-| Blocks & Runtime | [@vanshika2720](https://github.com/vanshika2720) |
 
 ## Emeritus
 
