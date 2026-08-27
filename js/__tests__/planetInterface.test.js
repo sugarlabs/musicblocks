@@ -481,6 +481,42 @@ describe("PlanetInterface", () => {
         global._ = saved_;
     });
 
+    it("saveLocally shows the storage warning when the save promise rejects with QuotaExceededError", async () => {
+        const saved_ = global._;
+        global._ = jest.fn(str => str);
+        global.doSVG.mockReturnValue("");
+        mockActivity.prepareExport.mockReturnValue("DATA");
+        const quotaError = Object.assign(new Error("quota"), { name: "QuotaExceededError" });
+        planetInterface.planet = {
+            ProjectStorage: { saveLocally: jest.fn().mockRejectedValue(quotaError) }
+        };
+
+        await planetInterface.saveLocally();
+
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
+        );
+        global._ = saved_;
+    });
+
+    it("saveLocally shows a generic error message when the save promise rejects", async () => {
+        const saved_ = global._;
+        global._ = jest.fn(str => str);
+        global.doSVG.mockReturnValue("");
+        mockActivity.prepareExport.mockReturnValue("DATA");
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        planetInterface.planet = {
+            ProjectStorage: { saveLocally: jest.fn().mockRejectedValue(new Error("boom")) }
+        };
+
+        await planetInterface.saveLocally();
+
+        expect(mockActivity.textMsg).toHaveBeenCalledWith("Could not save your project.");
+        expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+        consoleSpy.mockRestore();
+        global._ = saved_;
+    });
+
     it("saveLocally rethrows unexpected errors and logs them", () => {
         global.doSVG.mockReturnValue("");
         mockActivity.prepareExport.mockReturnValue("DATA");
