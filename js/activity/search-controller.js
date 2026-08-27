@@ -227,29 +227,26 @@ class SearchController {
 
             const that = this;
             const closeListener = e => {
+                const searchEl = document.getElementById("search");
+                const menuEl = document.getElementById("ui-id-1");
+                const dragHandleEl = document.getElementById("searchDragHandle");
+                const paletteRowEl = document.querySelector("#palette tbody tr");
+
                 if (
-                    document.getElementById("search").style.visibility === "visible" &&
-                    (e.target === document.getElementById("search") ||
-                        document.getElementById("search").contains(e.target) ||
-                        e.target === document.getElementById("searchDragHandle"))
+                    (searchEl && (e.target === searchEl || searchEl.contains(e.target))) ||
+                    (dragHandleEl &&
+                        (e.target === dragHandleEl || dragHandleEl.contains(e.target))) ||
+                    (menuEl &&
+                        menuEl.style.display !== "none" &&
+                        (e.target === menuEl || menuEl.contains(e.target))) ||
+                    (paletteRowEl && paletteRowEl.contains(e.target))
                 ) {
-                    //do nothing when clicked in the input field or the drag handle
-                } else if (
-                    document.getElementById("ui-id-1") &&
-                    document.getElementById("ui-id-1").style.display === "block" &&
-                    (e.target === document.getElementById("ui-id-1") ||
-                        document.getElementById("ui-id-1").contains(e.target))
-                ) {
-                    //do nothing when clicked on the menu
-                } else if (
-                    document.querySelector("#palette tbody tr") &&
-                    document.querySelector("#palette tbody tr").contains(e.target)
-                ) {
-                    //do nothing when clicked on the search row
+                    // do nothing when clicked inside search input, menu, drag handle, or palette row
                 } else {
                     that.hideSearchWidget();
                 }
             };
+
             this._searchCloseListener = closeListener;
             activity.addEventListener(document, "mousedown", closeListener);
 

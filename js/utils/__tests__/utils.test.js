@@ -1369,6 +1369,7 @@ describe("CameraManager", () => {
     });
 });
 
+<<<<<<< HEAD
 describe("Plugin and Macro Utilities", () => {
     let mockActivity;
 
@@ -1556,5 +1557,16 @@ describe("SVG Utilities", () => {
             };
             expect(isSVGEmpty(mockTurtles)).toBe(false);
         });
+    });
+});
+
+describe("UtilsLogic re-exports in utils.js", () => {
+    it("exports formatSeconds function from utils-logic", () => {
+        const utils = require("../utils");
+        expect(typeof utils.formatSeconds).toBe("function");
+        expect(utils.formatSeconds(0)).toBe("00:00");
+        expect(utils.formatSeconds(125)).toBe("02:05");
+        expect(utils.formatSeconds(3665)).toBe("01:01:05");
+        expect(utils.formatSeconds(null)).toBe("00:00");
     });
 });

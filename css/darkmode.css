@@ -31,6 +31,11 @@ body.highcontrast {
     text-shadow: none !important;
 }
 
+/* Ensure record button turns red during recording in high contrast mode */
+.highcontrast #record.recording .dot {
+    color: #ff0000 !important;
+}
+
 /* High contrast hover box outlines */
 .highcontrast .tooltip,
 .highcontrast .hover-box {
@@ -82,6 +87,13 @@ body.highcontrast {
     background-color: var(--bg) !important;
 }
 
+/* Fix white table header strip in floating widgets during dark mode while preserving table body colors */
+.dark #floatingWindows table thead tr:first-child td,
+.dark #floatingWindows table thead tr:first-child th {
+    background-color: var(--bg) !important;
+    color: var(--fg) !important;
+}
+
 /* Trash view colors for dark mode */
 .dark .trash-view {
     background-color: #2d2d2d;
@@ -117,8 +129,36 @@ body.dark #ui-id-1 a {
 
 body.dark #ui-id-1 {
     background-color: var(--color-bg-primary) !important;
+    border: 1px solid var(--color-border-primary) !important;
 }
 
 body.dark #ui-id-1 .ui-menu-item {
     background-color: var(--color-bg-primary) !important;
 }
+
+body.dark #ui-id-1 .ui-state-active,
+body.dark #ui-id-1 .ui-menu-item-wrapper.ui-state-active {
+    background-color: var(--color-brand-primary) !important;
+    color: var(--color-text-inverse) !important;
+    border: none !important;
+}
+
+/* Custom Dark Mode Scrollbars for Palette Drawers & Dropdowns */
+body.dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+body.dark ::-webkit-scrollbar-track {
+    background: var(--color-bg-primary) !important;
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+    background: var(--color-border-primary) !important;
+    border-radius: var(--radius-sm);
+}
+
+body.dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary) !important;
+}
+

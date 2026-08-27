@@ -40,6 +40,12 @@ describe("MusicBlocks Application", () => {
                 const audioContext = win.Tone.context;
                 cy.wrap(audioContext.state).should("eq", "running");
             });
+            // Assert the underlying Tone.Transport clock actually started, not only that
+            // the audio context was resumed -- Tone.Transport is the scheduling API
+            // js/logo.js drives playback with (via the wrapper in js/utils/synthutils.js).
+            cy.window().should(win => {
+                expect(win.Tone.Transport.state).to.eq("started");
+            });
         });
 
         it("should have a functional stop button", () => {
@@ -208,11 +214,25 @@ describe("MusicBlocks Application", () => {
                 expect(ctx.state).to.eq("running");
             });
 
+            // Play also starts the underlying Tone.Transport clock, not only the
+            // audio context (js/logo.js runs playback through the transport wrapper
+            // in js/utils/synthutils.js).
+            cy.window().should(win => {
+                expect(win.Tone.Transport.state).to.eq("started");
+            });
+
             cy.get("#stop").click({ force: true });
 
             cy.window().then(win => {
                 const ctx = win.Tone.context;
                 expect(ctx.state === "suspended" || ctx.state === "running").to.be.true;
+            });
+
+            // After Stop the Tone.Transport clock is no longer running: js/logo.js
+            // cancels its scheduled events, rewinds it and calls synth.stop() ->
+            // transport.stop().
+            cy.window().should(win => {
+                expect(win.Tone.Transport.state).to.not.eq("started");
             });
 
             cy.get("#canvas").should("exist").and("be.visible");

@@ -1435,14 +1435,15 @@ class PhraseMaker {
                 setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
                 let i;
                 for (i = 0; i < this.columnBlocksMap.length; i++) {
-                    if (this.columnBlocksMap[i][0] === aboveBlock) {
+                    if (this.columnBlocksMap[i] && this.columnBlocksMap[i][0] === aboveBlock) {
                         break;
                     }
                 }
 
-                this.rowLabels.splice(i + 1, 0, rLabel);
-                this.rowArgs.splice(i + 1, 0, rArg);
-                this._rowBlocks.splice(i + 1, 0, newBlock);
+                const insertIndex = i < this.columnBlocksMap.length ? i + 1 : this.rowLabels.length;
+                this.rowLabels.splice(insertIndex, 0, rLabel);
+                this.rowArgs.splice(insertIndex, 0, rArg);
+                this._rowBlocks.splice(insertIndex, 0, newBlock);
             }
 
             this.sorted = false;
@@ -2683,7 +2684,21 @@ class PhraseMaker {
 
         // Add the rows we skipped when capturing marked columns.
         for (let i = 0; i < rowsWeSkipped.length; i++) {
-            this._markedColsInRow[rowsWeSkipped[i][0]].push(rowsWeSkipped[i][1]);
+            const targetSortableIdx = rowsWeSkipped[i][0];
+            const skippedRowIdx = rowsWeSkipped[i][1];
+            const targetRowIdx = sortableList[targetSortableIdx]?.[3];
+
+            if (
+                targetRowIdx !== undefined &&
+                this._markedColsInRow[skippedRowIdx] &&
+                this._markedColsInRow[targetRowIdx]
+            ) {
+                for (const colIdx of this._markedColsInRow[skippedRowIdx]) {
+                    if (!this._markedColsInRow[targetRowIdx].includes(colIdx)) {
+                        this._markedColsInRow[targetRowIdx].push(colIdx);
+                    }
+                }
+            }
         }
 
         // Add the stuff we didn't sort.
@@ -4377,11 +4392,16 @@ class PhraseMaker {
                 ii = this._rowMapper[i];
                 r = this._sortedRowMap[i];
                 row = this._rows[r];
+                if (!row || !this._markedColsInRow[ii]) {
+                    continue;
+                }
                 for (let j = 0; j < this._markedColsInRow[ii].length; j++) {
                     c = this._markedColsInRow[ii][j];
-                    cell = row.cells[c];
-                    cell.style.backgroundColor = "black";
-                    this._setNoteCell(r, c, cell, false, null);
+                    cell = row.cells?.[c];
+                    if (cell) {
+                        cell.style.backgroundColor = "black";
+                        this._setNoteCell(r, c, cell, false, null);
+                    }
                 }
             }
         } else {

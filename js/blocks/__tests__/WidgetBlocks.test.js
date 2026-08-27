@@ -354,6 +354,25 @@ describe("setupWidgetBlocks", () => {
         });
     });
     describe("TimbreBlock", () => {
+        it("initializes with string instrument name", () => {
+            const timbre = getBlock("timbre");
+            // First call: returns interruption while loading widget
+            const interruption = timbre.flow(
+                ["customInstrument", "childBlk"],
+                logo,
+                0,
+                "timbreBlk"
+            );
+            expect(interruption).toEqual([null, 0, true]);
+            expect(logo.runFromBlockNow).toHaveBeenCalled();
+
+            // Second call: widget is loaded, so it proceeds
+            const result = timbre.flow(["customInstrument", "childBlk"], logo, 0, "timbreBlk");
+            expect(logo.inTimbre).toBe(true);
+            expect(logo.timbre.instrumentName).toBe("customInstrument");
+            expect(result).toEqual(["childBlk", 1]);
+        });
+
         it("uses default voice and shows error for non-string", () => {
             const timbre = getBlock("timbre");
             // First call: interruption
@@ -441,6 +460,25 @@ describe("setupWidgetBlocks", () => {
             expect(logo.aiDebugger).toBeDefined();
             expect(logo.sample).not.toBe(logo.aiDebugger);
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
+        });
+    });
+
+    describe("First-Click Flow (Lazy Loading)", () => {
+        it("returns interruption and triggers runFromBlockNow for TemperamentBlock", () => {
+            const temperament = getBlock("temperament");
+            logo.temperament = null;
+            const res = temperament.flow([0, "childBlk"], logo, 0, "tempBlk", "received");
+            expect(res).toEqual([null, 0, true]);
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "tempBlk", true, "received");
+        });
+
+        it("returns interruption if widget is already loading (guard check)", () => {
+            const temperament = getBlock("temperament");
+            logo.temperament = "loading";
+            const res = temperament.flow([0, "childBlk"], logo, 0, "tempBlk", "received");
+            expect(res).toEqual([null, 0, true]);
+            // Should not trigger another runFromBlockNow or lazy load callback
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
         });
     });
 

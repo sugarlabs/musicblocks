@@ -260,7 +260,10 @@ class TrashController {
         const restoreLastIcon = document.createElement("a");
         restoreLastIcon.id = "restoreLastIcon";
         restoreLastIcon.classList.add("restore-last-icon");
-        restoreLastIcon.innerHTML = '<i class="material-icons md-48">restore_from_trash</i>';
+        const restoreLastIconInner = document.createElement("i");
+        restoreLastIconInner.className = "material-icons md-48";
+        restoreLastIconInner.textContent = "restore_from_trash";
+        restoreLastIcon.appendChild(restoreLastIconInner);
         restoreLastIcon.addEventListener("click", () => {
             this.restoreTrashById(
                 activity.blocks.trashStacks[activity.blocks.trashStacks.length - 1]
@@ -271,7 +274,10 @@ class TrashController {
         const restoreAllIcon = document.createElement("a");
         restoreAllIcon.id = "restoreAllIcon";
         restoreAllIcon.classList.add("restore-all-icon");
-        restoreAllIcon.innerHTML = '<i class="material-icons md-48">delete_sweep</i>';
+        const restoreAllIconInner = document.createElement("i");
+        restoreAllIconInner.className = "material-icons md-48";
+        restoreAllIconInner.textContent = "delete_sweep";
+        restoreAllIcon.appendChild(restoreAllIconInner);
         restoreAllIcon.addEventListener("click", () => {
             while (activity.blocks.trashStacks.length > 0) {
                 this.restoreTrashById(activity.blocks.trashStacks[0]);

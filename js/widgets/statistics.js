@@ -182,6 +182,16 @@ class StatsWindow {
             ["ornaments used", stats["ornaments"]]
         ];
 
+        if (stats["totalSeconds"] !== undefined) {
+            const formatSecs =
+                typeof formatSeconds === "function"
+                    ? formatSeconds
+                    : typeof UtilsLogic !== "undefined" && UtilsLogic.formatSeconds
+                      ? UtilsLogic.formatSeconds
+                      : sec => sec;
+            items.push(["total duration", formatSecs(stats["totalSeconds"])]);
+        }
+
         this.jsonObject.replaceChildren(
             ...items.map(([label, value], index) => {
                 const li = document.createElement("li");

@@ -21,7 +21,8 @@
    getModeGroupTitleFont, getModeSliceFont, configureWheel,
    MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
-   getMunsellColor, COLORS40, frequencyToPitch, instruments,
+   getMunsellColor, COLORS40, frequencyToPitch, pitchToFrequency,
+   TEMPERAMENT, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, numberToPitch,
     nthDegreeToPitch, SOLFEGENAMES, buildScale, getCurrentEDO, generateNoteNames,
@@ -419,7 +420,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
     wheelnav.cssMode = true;
 
-    block._pitchWheel.keynavigateEnabled = false;
+    block._pitchWheel.keynavigateEnabled = true;
 
     block._pitchWheel.colors = platformColor.pitchWheelcolors;
     block._pitchWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1118,7 +1119,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     wheelnav.cssMode = true;
 
-    block._customWheel.keynavigateEnabled = false;
+    block._customWheel.keynavigateEnabled = true;
 
     //Customize slicePaths for proper size
     block._customWheel.colors = platformColor.intervalNameWheelcolors;
@@ -1457,7 +1458,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
     wheelnav.cssMode = true;
 
-    block._pitchWheel.keynavigateEnabled = false;
+    block._pitchWheel.keynavigateEnabled = true;
 
     block._pitchWheel.colors = platformColor.pitchWheelcolors;
     block._pitchWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1715,7 +1716,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
 
     wheelnav.cssMode = true;
 
-    block._accidentalWheel.keynavigateEnabled = false;
+    block._accidentalWheel.keynavigateEnabled = true;
 
     block._accidentalWheel.colors = platformColor.accidentalsWheelcolors;
     block._accidentalWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1883,7 +1884,7 @@ const piemenuNoteValue = (block, noteValue) => {
 
     wheelnav.cssMode = true;
 
-    block._noteValueWheel.keynavigateEnabled = false;
+    block._noteValueWheel.keynavigateEnabled = true;
 
     block._noteValueWheel.colors = platformColor.noteValueWheelcolors;
     block._noteValueWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2103,7 +2104,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     wheelnav.cssMode = true;
 
-    block._numberWheel.keynavigateEnabled = false;
+    block._numberWheel.keynavigateEnabled = true;
 
     block._numberWheel.colors = platformColor.numberWheelcolors;
     block._numberWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2471,7 +2472,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
 
     wheelnav.cssMode = true;
 
-    block._numberWheel.keynavigateEnabled = false;
+    block._numberWheel.keynavigateEnabled = true;
 
     block._numberWheel.colors = [];
     if (mode === "setcolor" || mode === "setturtlecolor") {
@@ -2666,7 +2667,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
 
     wheelnav.cssMode = true;
 
-    block._basicWheel.keynavigateEnabled = false;
+    block._basicWheel.keynavigateEnabled = true;
 
     block._basicWheel.colors = colors;
     block._basicWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2804,7 +2805,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
 
     wheelnav.cssMode = true;
 
-    block._booleanWheel.keynavigateEnabled = false;
+    block._booleanWheel.keynavigateEnabled = true;
 
     block._booleanWheel.colors = platformColor.booleanWheelcolors;
     block._booleanWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2919,7 +2920,7 @@ const piemenuChords = (block, selectedChord) => {
     }
     wheelnav.cssMode = true;
 
-    block._chordWheel.keynavigateEnabled = false;
+    block._chordWheel.keynavigateEnabled = true;
 
     block._chordWheel.colors = platformColor.modeWheelcolors;
     block._chordWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3066,7 +3067,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
 
     wheelnav.cssMode = true;
 
-    block._voiceWheel.keynavigateEnabled = false;
+    block._voiceWheel.keynavigateEnabled = true;
 
     block._voiceWheel.colors = colors;
     block._voiceWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3246,7 +3247,7 @@ const piemenuIntervals = (block, selectedInterval) => {
 
     wheelnav.cssMode = true;
 
-    block._intervalNameWheel.keynavigateEnabled = false;
+    block._intervalNameWheel.keynavigateEnabled = true;
 
     //Customize slicePaths for proper size
     block._intervalNameWheel.colors = platformColor.intervalNameWheelcolors;
@@ -3501,6 +3502,8 @@ const piemenuModes = (block, selectedMode) => {
     block._exitWheel = new wheelnav("_exitWheel", block._modeWheel.raphael);
 
     const currentEDO = getCurrentEDO(block.activity.logo.synth.inTemperament);
+    const inTemperament = block.activity.logo.synth.inTemperament;
+    const nonEDO = isNonEDO(inTemperament);
     const modeWheelLabels = Array.from({ length: currentEDO }, (_, i) => String(i));
 
     configureWheel(block._modeWheel, {
@@ -3578,6 +3581,9 @@ const piemenuModes = (block, selectedMode) => {
         }
     };
 
+    // Expose on block for external interception (e.g. ModeWidget).
+    block.__selectionChanged = __selectionChanged;
+
     // Add function to each main menu for show/hide sub menus
     const __setupAction = (i, activeTabs) => {
         const edoforHide = currentEDO;
@@ -3590,7 +3596,13 @@ const piemenuModes = (block, selectedMode) => {
                 }
             }
 
-            __selectionChanged();
+            // Route through block so external callers (e.g. ModeWidget)
+            // can intercept mode selection.
+            if (typeof block.__selectionChanged === "function") {
+                block.__selectionChanged();
+            } else {
+                __selectionChanged();
+            }
         };
     };
 
@@ -3605,7 +3617,7 @@ const piemenuModes = (block, selectedMode) => {
                 maxRadius: MODEPIEMENU_NAME_RING.maxRadius,
                 selectionPaths: true
             });
-            that._modeNameWheel.keynavigateEnabled = false;
+            that._modeNameWheel.keynavigateEnabled = true;
             newWheel = true;
         }
 
@@ -3648,7 +3660,9 @@ const piemenuModes = (block, selectedMode) => {
             const modename = modes[j];
             const activeTabs = [0];
             if (modename !== " " && MUSICALMODES[modename]) {
-                const mode = MUSICALMODES[modename];
+                const mode =
+                    (nonEDO && getNonEDOModeSteps(modename, inTemperament)) ||
+                    MUSICALMODES[modename];
                 for (let k = 0; k < mode.length; k++) {
                     activeTabs.push(last(activeTabs) + mode[k]);
                 }
@@ -3687,14 +3701,11 @@ const piemenuModes = (block, selectedMode) => {
     };
 
     const __playNote = () => {
+        const i = that._modeWheel.selectedNavItemIndex;
         let o = 0;
         if (octave) {
             o = currentEDO;
         }
-
-        const i = that._modeWheel.selectedNavItemIndex;
-        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null, null, true);
-        obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
         const tur = that.activity.turtles.ithTurtle(0);
 
@@ -3705,6 +3716,25 @@ const piemenuModes = (block, selectedMode) => {
 
         that.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
         that.activity.logo.synth.setVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
+
+        if (nonEDO) {
+            const result = getNonEDOFrequency(i + o, 4, inTemperament, key + " chromatic");
+            if (result) {
+                that.activity.logo.synth.trigger(
+                    0,
+                    [result.freq],
+                    1 / 12,
+                    DEFAULTVOICE,
+                    null,
+                    null
+                );
+                return;
+            }
+        }
+
+        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null, null, true);
+        obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
+
         that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
     };
 
@@ -3902,7 +3932,7 @@ const piemenuGrid = activity => {
     activity.turtles.gridWheel = new wheelnav("wheelDivptm", null, 300, 300);
     activity.turtles._exitWheel = new wheelnav("_exitWheel", activity.turtles.gridWheel.raphael);
 
-    activity.turtles.gridWheel.keynavigateEnabled = false;
+    activity.turtles.gridWheel.keynavigateEnabled = true;
     activity.turtles.gridWheel.slicePathFunction = slicePath().DonutSlice;
     activity.turtles.gridWheel.slicePathCustom = slicePath().DonutSliceCustomization();
     activity.turtles.gridWheel.colors = platformColor.gridWheelcolors.wheel;
@@ -4338,7 +4368,7 @@ const piemenuDissectNumber = widget => {
     wheelLabels.push(null); // spacer
 
     wheelnav.cssMode = true;
-    numberWheel.keynavigateEnabled = false;
+    numberWheel.keynavigateEnabled = true;
     numberWheel.colors = platformColor.numberWheelcolors;
     numberWheel.slicePathFunction = slicePath().DonutSlice;
     numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
