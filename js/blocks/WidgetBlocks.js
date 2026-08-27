@@ -844,15 +844,13 @@ function setupWidgetBlocks(activity) {
                     resetFlag();
                     return;
                 }
-                logo.modeWidget = "loading";
                 _lazyLoadWidget(
                     logo,
                     "modeWidget",
                     _getWidgetDependencies(typeof ModeWidget !== "undefined" ? ModeWidget : null, [
                         "widgets/modewidget"
                     ]),
-                    () => new ModeWidget(activity),
-                    resetFlag
+                    () => new ModeWidget(activity)
                 );
             };
 

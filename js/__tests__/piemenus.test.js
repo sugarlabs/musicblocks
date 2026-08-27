@@ -775,7 +775,7 @@ describe("piemenuKey behavioral tests", () => {
         const exitWheel = global.wheelnav.mock.instances.find(w => w.id === "exitWheel");
         expect(exitWheel).toBeDefined();
 
-        // Trigger __exitMenu which calls syncKeySignatureBlocks
+        // Trigger __exitMenu which calls __generateSetKeyBlocks
         exitWheel.navItems[0].navigateFunction();
 
         // Verify that blocks were created
@@ -818,7 +818,7 @@ describe("piemenuKey behavioral tests", () => {
         const exitWheel = global.wheelnav.mock.instances.find(w => w.id === "exitWheel");
         expect(exitWheel).toBeDefined();
 
-        // __exitMenu → syncKeySignatureBlocks (must take the update branch).
+        // __exitMenu → __generateSetKeyBlocks (must take the update branch).
         exitWheel.navItems[0].navigateFunction();
 
         // Existing block's key/mode children are updated…

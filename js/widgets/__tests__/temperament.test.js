@@ -1876,4 +1876,48 @@ describe("TemperamentWidget basic tests", () => {
             expect(t["perfect 8"]).toBeCloseTo(2, 6);
         });
     });
+
+    describe("temperament visualizer math", () => {
+        const { deviationColor, deviationFrom12EDO } = require("../temperament");
+
+        describe("deviationColor", () => {
+            it("is green within ±1 cent", () => {
+                expect(deviationColor(0)).toBe("#4caf50");
+                expect(deviationColor(1)).toBe("#4caf50");
+                expect(deviationColor(-1)).toBe("#4caf50");
+            });
+            it("is orange when sharp (>1 cent)", () => {
+                expect(deviationColor(2)).toBe("#ff9800");
+                expect(deviationColor(50)).toBe("#ff9800");
+            });
+            it("is red when flat (<-1 cent)", () => {
+                expect(deviationColor(-2)).toBe("#f44336");
+                expect(deviationColor(-50)).toBe("#f44336");
+            });
+        });
+
+        describe("deviationFrom12EDO", () => {
+            it("reports 0 for a pitch exactly on a 12-EDO step", () => {
+                expect(deviationFrom12EDO(0)).toBe(0);
+                expect(deviationFrom12EDO(100)).toBe(0);
+                expect(deviationFrom12EDO(400)).toBe(0);
+                expect(deviationFrom12EDO(1100)).toBe(0);
+            });
+            it("reports +cents for a pitch above the nearest 12-EDO step", () => {
+                expect(deviationFrom12EDO(386)).toBeCloseTo(-14, 1);
+                expect(deviationFrom12EDO(415)).toBeCloseTo(15, 1);
+            });
+            it("snaps to the nearest 12-EDO step", () => {
+                expect(deviationFrom12EDO(50)).toBeCloseTo(-50, 1);
+                expect(deviationFrom12EDO(150)).toBeCloseTo(-50, 1);
+                expect(deviationFrom12EDO(250)).toBeCloseTo(-50, 1);
+            });
+            it("matches the user's scenario: equal19 active, deviation from 12-EDO", () => {
+                expect(deviationFrom12EDO(0)).toBeCloseTo(0, 1);
+                expect(deviationFrom12EDO(1200 / 19)).toBeCloseTo(-36.84, 1);
+                expect(deviationFrom12EDO((2 * 1200) / 19)).toBeCloseTo(26.32, 1);
+                expect(deviationFrom12EDO((3 * 1200) / 19)).toBeCloseTo(-10.53, 1);
+            });
+        });
+    });
 });

@@ -36,6 +36,46 @@ TemperamentWidget.dependencies = ["widgets/temperament"];
  * Represents a widget for managing temperament settings.
  * @constructor
  */
+
+/**
+ * Color for a cents deviation from a reference. Green within ±1 cent,
+ * orange for sharp, red for flat. Exported for unit testing.
+ * @param {number} dev - deviation in cents
+ * @returns {string} CSS color
+ */
+const deviationColor = dev => (Math.abs(dev) <= 1 ? "#4caf50" : dev > 1 ? "#ff9800" : "#f44336");
+
+/**
+ * Deviation of a pitch (in cents) from the nearest 12-EDO step. The
+ * visualizer uses 12-EDO as its fixed reference ring, so a 19-EDO step at
+ * 63¢ shows as -37¢ (below the nearest 12-EDO step of 100¢), and a JI major
+ * third at 386¢ shows as -14¢.
+ * Exported for unit testing.
+ * @param {number} cents - pitch in cents (0..1200)
+ * @returns {number} deviation in cents from the nearest 100¢ step
+ */
+const deviationFrom12EDO = cents => cents - Math.round(cents / 100) * 100;
+
+/**
+ * Reads a user-defined (custom) temperament pitch entry at index i.
+ * Returns {notes, ratios, cents} or null when no stored note data exists.
+ * Shared by the widget constructor and the visualizer loader so the custom
+ * format ([ratio, note, octave]) is parsed in exactly one place.
+ * @param {Object} t temperament object
+ * @param {number} i pitch index
+ * @param {number} powerBase usually 2
+ * @returns {Object|null}
+ */
+const _readCustomPitch = (t, i, powerBase) => {
+    const entry = t["" + i];
+    if (!entry || entry[1] === undefined) return null;
+    return {
+        notes: [entry[1], entry[2]],
+        ratios: entry[0],
+        cents: ratioToCents(entry[0], powerBase)
+    };
+};
+
 function TemperamentWidget() {
     // Constants for button and icon sizes
     const BUTTONDIVWIDTH = 430;
@@ -1012,53 +1052,14 @@ function TemperamentWidget() {
             document.removeEventListener("mousedown", that._vizMenuClose);
             that._vizMenuClose = null;
         }
-        const refKey = that._refTemperament || "equal";
-        const refName = refKey === "equal" || refKey === "12-EDO" ? "12-EDO" : refKey;
+        const refName = "12-EDO";
         let highlightDot = -1;
 
-        // Cents of the reference temperament per scale degree (null = 12-EDO)
-        let _refCents = null;
-        let _refPeriod = 0;
-        const _computeRefCents = function () {
-            if (refKey === "equal" || refKey === "12-EDO") {
-                _refCents = null;
-                _refPeriod = 0;
-                return;
-            }
-            const t = getTemperament(refKey);
-            if (!t || !t.interval) {
-                _refCents = null;
-                _refPeriod = 0;
-                return;
-            }
-            _refPeriod = t.pitchNumber || Math.max(0, t.interval.length - 1);
-            _refCents = [];
-            for (let i = 0; i <= that.pitchNumber; i++) {
-                if (i >= t.interval.length) break;
-                _refCents.push(ratioToCents(getTemperamentRatio(t[t.interval[i]]), 2));
-            }
-        };
-        _computeRefCents();
-
-        /** Reference cents for pitch i, cyclically wrapped across octaves. */
-        const _refCentsAt = function (i) {
-            const p = _refPeriod;
-            return _refCents[i % p] + 1200 * Math.floor(i / p);
-        };
-
-        /** Deviation of pitch i from the chosen reference (12-EDO by default). */
-        const _deviation = function (i) {
-            if (_refCents && _refCents.length > 1) {
-                return that.cents[i] - _refCentsAt(i);
-            }
-            return that.cents[i] - Math.round(that.cents[i] / 100) * 100;
-        };
+        /** Deviation of pitch i from the nearest 12-EDO step (the universal reference). */
+        const _deviation = i => deviationFrom12EDO(that.cents[i]);
 
         /** Returns the color for a cents deviation from 12-EDO. */
-        const _devColor = function (dev) {
-            if (Math.abs(dev) <= 1) return "#4caf50";
-            return dev > 1 ? "#ff9800" : "#f44336";
-        };
+        const _devColor = deviationColor;
 
         /** Converts a mouse/touch event to canvas-space coordinates. */
         const _canvasCoords = function (e, target) {
@@ -1087,7 +1088,7 @@ function TemperamentWidget() {
         controlsDiv.style.flexWrap = "wrap";
 
         const compareLabel = document.createElement("span");
-        compareLabel.textContent = _("comparing against");
+        compareLabel.textContent = _("active temperament");
         compareLabel.style.fontSize = "11px";
         compareLabel.style.color = "#aaa";
         controlsDiv.appendChild(compareLabel);
@@ -1105,36 +1106,6 @@ function TemperamentWidget() {
             compareSelect.appendChild(opt);
         }
         controlsDiv.appendChild(compareSelect);
-
-        const refLabel = document.createElement("span");
-        refLabel.textContent = _("reference");
-        refLabel.style.fontSize = "11px";
-        refLabel.style.color = "#aaa";
-        controlsDiv.appendChild(refLabel);
-
-        const refSelect = document.createElement("select");
-        _selectStyle(refSelect);
-
-        for (const t of temperaments) {
-            if (isCustomTemperament(t[1])) continue;
-            const opt = document.createElement("option");
-            opt.value = t[1];
-            opt.textContent = t[0];
-            if (t[1] === (that._refTemperament || "equal")) opt.selected = true;
-            refSelect.appendChild(opt);
-        }
-        controlsDiv.appendChild(refSelect);
-
-        const hideTableBtn = document.createElement("button");
-        hideTableBtn.textContent = _("hide table");
-        hideTableBtn.style.fontSize = "12px";
-        hideTableBtn.style.padding = "2px 8px";
-        hideTableBtn.style.backgroundColor = "#2a2a3e";
-        hideTableBtn.style.color = "#e0e0e0";
-        hideTableBtn.style.border = "1px solid #555";
-        hideTableBtn.style.borderRadius = "3px";
-        hideTableBtn.style.cursor = "pointer";
-        controlsDiv.appendChild(hideTableBtn);
 
         temperamentTableDiv.appendChild(controlsDiv);
 
@@ -1156,35 +1127,45 @@ function TemperamentWidget() {
             b.style.cursor = "pointer";
             b.onclick = fn;
             opsDiv.appendChild(b);
+            return b;
         };
-        _opsBtn("12", function () {
-            _loadTemperament("equal");
-        });
-        _opsBtn("17", function () {
-            _loadTemperament("equal17");
-        });
-        _opsBtn("19", function () {
-            _loadTemperament("equal19");
-        });
-        _opsBtn("31", function () {
-            _loadTemperament("equal31");
-        });
-        _opsBtn("JI", function () {
-            _loadTemperament("just intonation");
-        });
-        _opsBtn("Pyth", function () {
-            _loadTemperament("Pythagorean");
-        });
-        _opsBtn("+Pitch", function () {
-            _insertPitch(that.pitchNumber, (that.cents[that.pitchNumber - 1] || 0) + 100);
+        const addAfter = _opsBtn(_("Add After"), function () {
+            const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
+            if (s < 0) {
+                _insertPitch(that.pitchNumber, (that.cents[that.pitchNumber - 1] || 0) + 100);
+            } else {
+                _insertPitch(s + 1, that.cents[s] + 50);
+            }
             _drawCircle();
             _buildTable();
         });
-        _opsBtn("-Pitch", function () {
-            _removePitch(that.pitchNumber - 1);
+        addAfter.title = _(
+            "Add a pitch after the selected note (clockwise); appends at the end if none is selected"
+        );
+        const addBefore = _opsBtn(_("Add Before"), function () {
+            const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
+            if (s < 0) {
+                _insertPitch(0, (that.cents[0] || 0) - 50);
+            } else {
+                _insertPitch(s, that.cents[s] - 50);
+            }
             _drawCircle();
             _buildTable();
         });
+        addBefore.title = _(
+            "Add a pitch before the selected note (counterclockwise); prepends at the start if none is selected"
+        );
+        const removeBtn = _opsBtn("Remove", function () {
+            const s =
+                highlightDot >= 0 && highlightDot < that.pitchNumber
+                    ? highlightDot
+                    : that.pitchNumber - 1;
+            _removePitch(s);
+            highlightDot = -1;
+            _drawCircle();
+            _buildTable();
+        });
+        removeBtn.title = _("Remove the selected note (or the last note if none is selected)");
         temperamentTableDiv.appendChild(opsDiv);
 
         // ── Canvas ──
@@ -1231,7 +1212,7 @@ function TemperamentWidget() {
         };
 
         legendDiv.appendChild(_legendItem("#4caf50", _("active temperament"), false, true));
-        legendDiv.appendChild(_legendItem("#aaa", _("12-EDO ref"), false, false));
+        legendDiv.appendChild(_legendItem("#aaa", _("12-EDO reference"), false, false));
         legendDiv.appendChild(_legendItem("#4caf50", _("no deviation"), true, false));
         legendDiv.appendChild(_legendItem("#ff9800", _("sharp (+cents)"), false, false));
         legendDiv.appendChild(_legendItem("#f44336", _("flat (-cents)"), false, false));
@@ -1294,7 +1275,6 @@ function TemperamentWidget() {
         const equal = getTemperament("equal");
         const labels = equal.noteLabels;
 
-        /** Redraws the reference ring and active dots from current state. */
         const _drawCircle = function () {
             ctx.clearRect(0, 0, canvasSize, canvasSize);
             ctx.lineWidth = 1;
@@ -1332,14 +1312,8 @@ function TemperamentWidget() {
                 const dx = cx + innerR * Math.cos(dotA);
                 const dy = cy + innerR * Math.sin(dotA);
 
-                let refAngleDeg;
-                if (_refCents && _refCents.length > 1) {
-                    refAngleDeg = 270 + (_refCentsAt(i) % 1200) * 0.3;
-                } else {
-                    let k = Math.round((angleDeg - 270) / 30);
-                    k = ((k % 12) + 12) % 12;
-                    refAngleDeg = 270 + k * 30;
-                }
+                const k = Math.round(cents / 100) % 12;
+                const refAngleDeg = 270 + ((k + 12) % 12) * 30;
                 const tickA = (refAngleDeg * Math.PI) / 180;
                 const tx = cx + outerR * Math.cos(tickA);
                 const ty = cy + outerR * Math.sin(tickA);
@@ -1358,6 +1332,13 @@ function TemperamentWidget() {
                 ctx.fill();
 
                 if (i === highlightDot) {
+                    // Selected note: bright double ring so the active dot is
+                    // unmistakable (mentor feedback: selection was hard to see).
+                    ctx.beginPath();
+                    ctx.arc(dx, dy, dotR + 7, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "#ffeb3b";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
                     ctx.beginPath();
                     ctx.arc(dx, dy, dotR + 3, 0, 2 * Math.PI);
                     ctx.strokeStyle = "#fff";
@@ -1371,7 +1352,8 @@ function TemperamentWidget() {
             ctx.font = "12px sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText(that.inTemperament + " vs " + refName, cx, cy);
+            ctx.fillText(that.inTemperament + " vs 12-EDO", cx, cy);
+            canvas.offsetWidth;
         };
 
         _drawCircle();
@@ -1393,7 +1375,7 @@ function TemperamentWidget() {
             _("Pitch"),
             _("Step"),
             _("Frequency (Hz)"),
-            _("Cents dev. from") + " " + refName,
+            _("Cents dev. from 12-EDO"),
             _("Ratio")
         ];
         for (const h of headers) {
@@ -1453,7 +1435,8 @@ function TemperamentWidget() {
                     step: tdStep,
                     freq: tdFreq,
                     cents: tdCents,
-                    ratio: tdRatio
+                    ratio: tdRatio,
+                    bgColor: bgColor
                 };
                 rowRefs.push(ref);
                 const cells = [tdName, tdStep, tdFreq, tdCents, tdRatio];
@@ -1461,7 +1444,13 @@ function TemperamentWidget() {
                     for (const td of cells) td.style.backgroundColor = "#33334d";
                 };
                 tr.onmouseleave = function () {
-                    for (const td of cells) td.style.backgroundColor = bgColor;
+                    for (const td of cells)
+                        td.style.backgroundColor = ref.selected ? "#3a3a5e" : bgColor;
+                };
+                tr.onclick = function () {
+                    highlightDot = i;
+                    _drawCircle();
+                    _highlightTableRow(i);
                 };
                 tr.oncontextmenu = function (e) {
                     e.preventDefault();
@@ -1475,6 +1464,18 @@ function TemperamentWidget() {
         const _refreshTable = function () {
             for (let i = 0; i < rowRefs.length; i++) {
                 _updateTableRow(i);
+            }
+        };
+
+        /** Highlights the selected table row. */
+        const _highlightTableRow = function (index) {
+            for (let i = 0; i < rowRefs.length; i++) {
+                const ref = rowRefs[i];
+                ref.selected = i === index;
+                const color = ref.selected ? "#3a3a5e" : ref.bgColor;
+                for (const td of [ref.name, ref.step, ref.freq, ref.cents, ref.ratio]) {
+                    td.style.backgroundColor = color;
+                }
             }
         };
 
@@ -1518,6 +1519,9 @@ function TemperamentWidget() {
         };
 
         const _insertPitch = function (index, cents) {
+            if (!isFinite(cents)) return;
+            if (index < 0) index = 0;
+            if (index > that.pitchNumber) index = that.pitchNumber;
             that.pitchNumber += 1;
             that.cents.splice(index, 0, cents);
             that.ratios.splice(index, 0, Math.pow(2, cents / 1200));
@@ -1526,17 +1530,22 @@ function TemperamentWidget() {
                 0,
                 (Number(that.frequencies[0]) * that.ratios[index]).toFixed(2)
             );
-            that.notes.splice(index, 0, that.notes[index] ? that.notes[index].slice() : ["C", "4"]);
-            that.intervals.splice(
-                index,
-                0,
-                that.intervals[index] !== undefined ? that.intervals[index] : 0
-            );
+            // Copy note data from adjacent pitch (prefer previous, fallback to next)
+            const noteSrc = that.notes[index - 1] || that.notes[index] || ["C", "4"];
+            that.notes.splice(index, 0, noteSrc.slice());
+            const intervalSrc =
+                that.intervals[index - 1] !== undefined
+                    ? that.intervals[index - 1]
+                    : that.intervals[index] !== undefined
+                      ? that.intervals[index]
+                      : 0;
+            that.intervals.splice(index, 0, intervalSrc);
             that.ratiosNotesPair.splice(index, 0, [that.ratios[index], that.notes[index]]);
         };
 
         const _removePitch = function (index) {
             if (that.pitchNumber <= 1) return;
+            if (index < 0 || index >= that.pitchNumber) return;
             that.cents.splice(index, 1);
             that.ratios.splice(index, 1);
             that.frequencies.splice(index, 1);
@@ -1610,8 +1619,30 @@ function TemperamentWidget() {
             that.ratios = [];
             that.ratiosNotesPair = [];
 
-            for (let i = 0; i <= that.pitchNumber; i++) {
+            for (let i = 0; i < that.pitchNumber; i++) {
                 if (isCustomTemperament(that.inTemperament)) {
+                    const pe = _readCustomPitch(t, i, that.powerBase);
+                    if (pe) {
+                        // User-defined temperament: read the stored [ratio, note,
+                        // octave] entries so the visualizer shows the real tuning
+                        // and note names, not 12-EDO.
+                        that.notes[i] = pe.notes;
+                        that.ratios[i] = pe.ratios;
+                        that.cents[i] = pe.cents;
+                        that.frequencies[i] =
+                            i === 0
+                                ? that._logo.synth
+                                      .getCustomFrequency(
+                                          pe.notes[0] + pe.notes[1],
+                                          that.inTemperament
+                                      )
+                                      .toFixed(2)
+                                : (Number(that.frequencies[0]) * pe.ratios).toFixed(2);
+                        that.intervals[i] = pe.ratios;
+                        that.ratiosNotesPair[i] = [pe.ratios, pe.notes];
+                        continue;
+                    }
+                    // No stored note data: fall back to equal temperament display.
                     t = getTemperament("equal");
                 }
                 if (!t || !t.interval || i >= t.interval.length) continue;
@@ -1737,6 +1768,7 @@ function TemperamentWidget() {
             });
             const removeBtn = mkBtn(_("Remove"), function () {
                 _removePitch(index);
+                highlightDot = -1;
             });
             const resetBtn = mkBtn(_("Reset to 12-EDO"), function () {
                 _resetTo12(index);
@@ -1778,7 +1810,6 @@ function TemperamentWidget() {
                 if (!dragMoved) _playNote(dragIndex);
                 dragIndex = -1;
                 lockedDrag = false;
-                highlightDot = -1;
                 _drawCircle();
             }
             window.removeEventListener("mouseup", _endDrag);
@@ -1795,8 +1826,13 @@ function TemperamentWidget() {
                 if (!lockedDrag) {
                     highlightDot = hit;
                     _drawCircle();
+                    _highlightTableRow(hit);
                 }
                 window.addEventListener("mouseup", _endDrag);
+            } else {
+                highlightDot = -1;
+                _drawCircle();
+                _highlightTableRow(-1);
             }
         };
 
@@ -1856,22 +1892,6 @@ function TemperamentWidget() {
         // Dropdown: switch active temperament
         compareSelect.onchange = function () {
             _loadTemperament(compareSelect.value);
-        };
-
-        // Dropdown: switch reference
-        refSelect.onchange = function () {
-            that._refTemperament = refSelect.value;
-            that._visualizerView();
-        };
-
-        // Hide-table toggle (persist state across redraws)
-        if (that._tableHidden === undefined) that._tableHidden = false;
-        hideTableBtn.textContent = that._tableHidden ? _("show table") : _("hide table");
-        tableDiv.style.display = that._tableHidden ? "none" : "block";
-        hideTableBtn.onclick = function () {
-            that._tableHidden = !that._tableHidden;
-            tableDiv.style.display = that._tableHidden ? "none" : "block";
-            hideTableBtn.textContent = that._tableHidden ? _("show table") : _("hide table");
         };
     };
 
@@ -3518,13 +3538,15 @@ function TemperamentWidget() {
                 t["0"][1] !== undefined
             ) {
                 //If temperament selected is custom and it is defined by user.
-                const pitchNumber = i + "";
                 if (i === this.pitchNumber) {
                     this.notes[i] = [t["0"][1], Number(t["0"][2]) + 1];
                     this.ratios[i] = this.powerBase;
                 } else {
-                    this.notes[i] = [t[pitchNumber][1], t[pitchNumber][2]];
-                    this.ratios[i] = t[pitchNumber][0];
+                    const pe = _readCustomPitch(t, i, this.powerBase);
+                    if (pe) {
+                        this.notes[i] = pe.notes;
+                        this.ratios[i] = pe.ratios;
+                    }
                 }
                 this.frequencies[i] = this._logo.synth
                     .getCustomFrequency(
@@ -3629,4 +3651,6 @@ function TemperamentWidget() {
 
 if (typeof module !== "undefined") {
     module.exports = TemperamentWidget;
+    module.exports.deviationColor = deviationColor;
+    module.exports.deviationFrom12EDO = deviationFrom12EDO;
 }

@@ -44,7 +44,7 @@ try {
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
    doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
-    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi, clearTemperamentCaches,
+     getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
    JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
@@ -2724,60 +2724,31 @@ class Activity {
 
             // Migrate old single-custommode key to the new customModes array
             // format so existing users don't lose saved modes on upgrade.
-            // Use the storage wrapper (localStorage in the browser, an object
-            // fallback in restricted/private contexts) so the same code path
-            // works everywhere.
-            const _storeGet = k =>
-                typeof this.storage.getItem === "function"
-                    ? this.storage.getItem(k)
-                    : this.storage[k];
-            const _storeSet = (k, v) => {
-                if (typeof this.storage.setItem === "function") {
-                    this.storage.setItem(k, v);
-                } else {
-                    this.storage[k] = v;
-                }
-            };
             try {
-                const oldData = _storeGet("custommode");
-                let savedModes = [];
-                try {
-                    savedModes = JSON.parse(_storeGet("customModes") || "[]");
-                    if (!Array.isArray(savedModes)) savedModes = [];
-                } catch (e) {
-                    ErrorHandler.recoverable(e, { operation: "loadCustomModes" });
-                    savedModes = [];
+                const oldData = localStorage.getItem("custommode");
+                if (oldData && !localStorage.getItem("customModes")) {
+                    const parsed = JSON.parse(oldData);
+                    const src = Array.isArray(parsed) ? parsed : Object.values(parsed);
+                    const pattern = src.map(v => {
+                        const n = Number(v);
+                        return !isNaN(n) && n > 0 ? n : 1;
+                    });
+                    localStorage.setItem(
+                        "customModes",
+                        JSON.stringify([{ name: "custom", pattern }])
+                    );
                 }
+            } catch (_) {
+                // Corrupt old data — ignore, will start fresh.
+            }
 
-                if (oldData) {
-                    try {
-                        const parsed = JSON.parse(oldData);
-                        const src = Array.isArray(parsed) ? parsed : Object.values(parsed);
-                        const pattern = src.map(v => {
-                            const n = Number(v);
-                            return !isNaN(n) && n > 0 ? n : 1;
-                        });
-                        // Merge additively: only add the legacy single mode if
-                        // a mode with the same name isn't already stored.
-                        if (!savedModes.some(m => m && m.name === "custom")) {
-                            savedModes.push({ name: "custom", pattern });
-                            _storeSet("customModes", JSON.stringify(savedModes));
-                        }
-                    } catch (e) {
-                        // Corrupt old data — report, do not silently drop.
-                        ErrorHandler.recoverable(e, { operation: "migrateCustomMode" });
-                    }
-                }
-
+            // Load custom modes saved in local storage so they survive a reload.
+            try {
+                const savedModes = JSON.parse(localStorage.getItem("customModes") || "[]");
                 for (const mode of savedModes) {
                     if (mode && mode.name && Array.isArray(mode.pattern)) {
                         MUSICALMODES[mode.name] = mode.pattern;
                     }
-                }
-                // Custom modes may have introduced new temperament-backed scales;
-                // drop any stale EDO/non-EDO classification cache.
-                if (typeof clearTemperamentCaches === "function") {
-                    clearTemperamentCaches();
                 }
             } catch (e) {
                 ErrorHandler.recoverable(e, { operation: "loadCustomModes" });

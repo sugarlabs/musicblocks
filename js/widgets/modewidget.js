@@ -58,9 +58,6 @@ class ModeWidget {
         this._deps = deps || {};
 
         this.logo = this._deps.logo || this.activity.logo;
-        // Register this instance so the regular mode pie menu (piemenuModes) can
-        // live-sync the builder view when a mode is picked while the widget is open.
-        this.logo.modeWidget = this;
         this.turtles = this._deps.turtles || this.activity.turtles;
         this.blocks = this._deps.blocks || this.activity.blocks;
         this.hideMsgs = this._deps.hideMsgs || this.activity.hideMsgs.bind(this.activity);
@@ -122,12 +119,8 @@ class ModeWidget {
             this._locked = false;
             this.hideMsgs();
             if (this.logo) {
-                // Release the singleton reference and the in-widget flag so a
-                // later run can open a fresh widget.
+                // Release the in-widget flag so a later run can open a fresh widget.
                 this.logo.insideModeWidget = false;
-                if (this.logo.modeWidget === this) {
-                    this.logo.modeWidget = null;
-                }
             }
             this.widgetWindow.destroy();
         };
@@ -835,18 +828,6 @@ class ModeWidget {
      * @param {string} modeName - The selected internal mode name.
      * @returns {void}
      */
-    onModePicked(modeName) {
-        if (!modeName || modeName === " ") {
-            return;
-        }
-        this._selectedModeName = modeName;
-        const mode = MUSICALMODES[modeName];
-        if (mode) {
-            this._loadMode(modeName, mode, this._edoSelect);
-        }
-        this._setModeName();
-    }
-
     _applyModePattern(pattern) {
         const n = this._activeEDO;
         this._selectedNotes = this._blankNotes(n);
@@ -1410,7 +1391,11 @@ class ModeWidget {
         // rendering with the current EDO count.
         this._clearPieMenu();
 
-        this._meterWheelDiv.style.display = "";
+        // Only the piemenu open/close methods toggle these divs; a rebuild must
+        // not re-show the note wheel while the mode piemenu is open.
+        if (!this._modePiemenuOpen) {
+            this._meterWheelDiv.style.display = "";
+        }
 
         this._modeWheel = new wheelnav(
             "modeWidgetWheelDiv",
