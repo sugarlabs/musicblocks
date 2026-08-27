@@ -245,8 +245,12 @@ class MeterWidget {
         meterTableDiv.appendChild(meterWheelDiv);
 
         // Grab the number of beats and beat value from the meter block.
+        // this._meterBlock is a raw blockList index captured when the widget
+        // was requested; if that block has since been disposed (e.g. evicted
+        // by the trash undo history), blockList[this._meterBlock] is null, so
+        // guard the lookup itself rather than just the index being non-null.
         let v1, c1, c2, c3;
-        if (this._meterBlock !== null) {
+        if (this._meterBlock !== null && this.activity.blocks.blockList[this._meterBlock]) {
             c1 = this.activity.blocks.blockList[this._meterBlock].connections[1];
             v1 = c1 !== null ? this.activity.blocks.blockList[c1].value : 4;
             c2 = this.activity.blocks.blockList[this._meterBlock].connections[2];

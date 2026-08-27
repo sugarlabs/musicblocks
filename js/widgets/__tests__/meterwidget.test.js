@@ -390,6 +390,25 @@ describe("Meter Widget", () => {
         expect(() => new MeterWidget(mockActivity, 1)).not.toThrow();
     });
 
+    test("falls back to defaults instead of throwing when the meter block has been disposed", () => {
+        // Simulates blocks.js's disposeBlock(): blockList[idx] = null, e.g. after
+        // the block was evicted from the trash undo history while this widget
+        // was still open (see issue #8281).
+        mockActivity.logo._meterBlock = 1;
+        mockActivity.blocks.blockList = {
+            1: null
+        };
+
+        expect(() => new MeterWidget(mockActivity, 1)).not.toThrow();
+    });
+
+    test("falls back to defaults when the meter block index is no longer in blockList at all", () => {
+        mockActivity.logo._meterBlock = 1;
+        mockActivity.blocks.blockList = {};
+
+        expect(() => new MeterWidget(mockActivity, 1)).not.toThrow();
+    });
+
     test("handles Reset button click when blocks are present and when blocks are missing", () => {
         mockActivity.logo._meterBlock = 1;
         mockActivity.blocks.blockList = {
