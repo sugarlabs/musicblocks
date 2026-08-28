@@ -1054,6 +1054,9 @@ function TemperamentWidget() {
         }
         const refName = "12-EDO";
         let highlightDot = -1;
+        let flashDot = -1;
+        // Tonic is locked - dragging or deleting it would detune the scale.
+        const _isLocked = i => i === 0;
 
         /** Deviation of pitch i from the nearest 12-EDO step (the universal reference). */
         const _deviation = i => deviationFrom12EDO(that.cents[i]);
@@ -1129,28 +1132,36 @@ function TemperamentWidget() {
             opsDiv.appendChild(b);
             return b;
         };
-        const addAfter = _opsBtn(_("Add After"), function () {
+        const addAfter = _opsBtn("+ after", function () {
             const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
             if (s < 0) {
                 _insertPitch(that.pitchNumber, (that.cents[that.pitchNumber - 1] || 0) + 100);
+                highlightDot = that.pitchNumber - 1;
             } else {
                 _insertPitch(s + 1, that.cents[s] + 50);
+                highlightDot = s + 1;
             }
             _drawCircle();
             _buildTable();
+            _highlightTableRow(highlightDot);
+            _updateRemoveButton();
         });
         addAfter.title = _(
             "Add a pitch after the selected note (clockwise); appends at the end if none is selected"
         );
-        const addBefore = _opsBtn(_("Add Before"), function () {
+        const addBefore = _opsBtn("+ before", function () {
             const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
             if (s < 0) {
                 _insertPitch(0, (that.cents[0] || 0) - 50);
+                highlightDot = 0;
             } else {
                 _insertPitch(s, that.cents[s] - 50);
+                highlightDot = s;
             }
             _drawCircle();
             _buildTable();
+            _highlightTableRow(highlightDot);
+            _updateRemoveButton();
         });
         addBefore.title = _(
             "Add a pitch before the selected note (counterclockwise); prepends at the start if none is selected"
@@ -1160,12 +1171,30 @@ function TemperamentWidget() {
                 highlightDot >= 0 && highlightDot < that.pitchNumber
                     ? highlightDot
                     : that.pitchNumber - 1;
+            const before = that.pitchNumber;
             _removePitch(s);
-            highlightDot = -1;
+            if (that.pitchNumber === before) return;
+            // Keep selection on the neighbor that slides into the gap,
+            // so repeated removes stay in the same musical area.
+            if (that.pitchNumber > 0) {
+                highlightDot = Math.min(s, that.pitchNumber - 1);
+                if (_isLocked(highlightDot)) highlightDot = -1;
+            } else {
+                highlightDot = -1;
+            }
             _drawCircle();
             _buildTable();
+            if (highlightDot >= 0) _highlightTableRow(highlightDot);
+            _updateRemoveButton();
         });
         removeBtn.title = _("Remove the selected note (or the last note if none is selected)");
+        const _updateRemoveButton = () => {
+            const locked = highlightDot >= 0 && _isLocked(highlightDot);
+            removeBtn.disabled = locked;
+            removeBtn.style.opacity = locked ? "0.4" : "1";
+            removeBtn.style.cursor = locked ? "not-allowed" : "pointer";
+        };
+        _updateRemoveButton();
         temperamentTableDiv.appendChild(opsDiv);
 
         // ── Canvas ──
@@ -1331,9 +1360,10 @@ function TemperamentWidget() {
                 ctx.fillStyle = color;
                 ctx.fill();
 
-                if (i === highlightDot) {
-                    // Selected note: bright double ring so the active dot is
-                    // unmistakable (mentor feedback: selection was hard to see).
+                if (i === highlightDot || i === flashDot) {
+                    // Selected note (persistent highlightDot) or transient
+                    // playback flash (flashDot, 200ms) — same yellow double
+                    // ring, but flashDot is cleared without losing selection.
                     ctx.beginPath();
                     ctx.arc(dx, dy, dotR + 7, 0, 2 * Math.PI);
                     ctx.strokeStyle = "#ffeb3b";
@@ -1451,6 +1481,7 @@ function TemperamentWidget() {
                     highlightDot = i;
                     _drawCircle();
                     _highlightTableRow(i);
+                    _updateRemoveButton();
                 };
                 tr.oncontextmenu = function (e) {
                     e.preventDefault();
@@ -1546,6 +1577,7 @@ function TemperamentWidget() {
         const _removePitch = function (index) {
             if (that.pitchNumber <= 1) return;
             if (index < 0 || index >= that.pitchNumber) return;
+            if (_isLocked(index)) return;
             that.cents.splice(index, 1);
             that.ratios.splice(index, 1);
             that.frequencies.splice(index, 1);
@@ -1569,10 +1601,10 @@ function TemperamentWidget() {
                 null,
                 null
             );
-            highlightDot = index;
+            flashDot = index;
             _drawCircle();
             setTimeout(function () {
-                highlightDot = -1;
+                flashDot = -1;
                 _drawCircle();
             }, 200);
         };
@@ -1682,6 +1714,13 @@ function TemperamentWidget() {
         let dragIndex = -1;
         let dragMoved = false;
         let lockedDrag = false;
+        let longPressTimer = null;
+        const _clearLongPress = () => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        };
 
         // ── Context menu ──
         const _removeMenu = function () {
@@ -1755,6 +1794,8 @@ function TemperamentWidget() {
                     fn();
                     _drawCircle();
                     _buildTable();
+                    if (highlightDot >= 0) _highlightTableRow(highlightDot);
+                    _updateRemoveButton();
                     _removeMenu();
                 };
                 return b;
@@ -1762,13 +1803,20 @@ function TemperamentWidget() {
 
             const addBefore = mkBtn(_("Add before"), function () {
                 _insertPitch(index, that.cents[index] - 50);
+                highlightDot = index;
             });
             const addAfter = mkBtn(_("Add after"), function () {
                 _insertPitch(index + 1, that.cents[index] + 50);
+                highlightDot = index + 1;
             });
             const removeBtn = mkBtn(_("Remove"), function () {
                 _removePitch(index);
-                highlightDot = -1;
+                if (that.pitchNumber > 0) {
+                    highlightDot = Math.min(index, that.pitchNumber - 1);
+                    if (_isLocked(highlightDot)) highlightDot = -1;
+                } else {
+                    highlightDot = -1;
+                }
             });
             const resetBtn = mkBtn(_("Reset to 12-EDO"), function () {
                 _resetTo12(index);
@@ -1776,6 +1824,8 @@ function TemperamentWidget() {
             if (_isLocked(index)) {
                 resetBtn.disabled = true;
                 resetBtn.style.opacity = "0.4";
+                removeBtn.disabled = true;
+                removeBtn.style.opacity = "0.4";
             }
 
             menu.appendChild(centsInput);
@@ -1801,10 +1851,6 @@ function TemperamentWidget() {
         // ── Drag to move (default), click to play ──
         // The starting pitch (index 0) is locked: dragging it would detune the
         // tonic and shift the whole scale. (Octave resizing is intentionally not a feature.)
-        const _isLocked = function (i) {
-            return i === 0;
-        };
-
         const _endDrag = function () {
             if (dragIndex >= 0) {
                 if (!dragMoved) _playNote(dragIndex);
@@ -1827,12 +1873,14 @@ function TemperamentWidget() {
                     highlightDot = hit;
                     _drawCircle();
                     _highlightTableRow(hit);
+                    _updateRemoveButton();
                 }
                 window.addEventListener("mouseup", _endDrag);
             } else {
                 highlightDot = -1;
                 _drawCircle();
                 _highlightTableRow(-1);
+                _updateRemoveButton();
             }
         };
 
@@ -1863,12 +1911,28 @@ function TemperamentWidget() {
                 if (!lockedDrag) {
                     highlightDot = hit;
                     _drawCircle();
+                    _highlightTableRow(hit);
+                    _updateRemoveButton();
                 }
+                // Long-press (≈600ms) opens the same context menu as
+                // right-click, without needing a separate toolbar selection.
+                _clearLongPress();
+                const tx = e.touches[0].clientX;
+                const ty = e.touches[0].clientY;
+                longPressTimer = setTimeout(() => {
+                    if (!dragMoved && dragIndex === hit) {
+                        _showMenu({ clientX: tx, clientY: ty, preventDefault: () => {} }, hit);
+                        dragIndex = -1;
+                        lockedDrag = false;
+                    }
+                    longPressTimer = null;
+                }, 600);
                 e.preventDefault();
             }
         };
 
         canvas.ontouchmove = function (e) {
+            _clearLongPress();
             if (dragIndex < 0 || lockedDrag) return;
             const [x, y] = _canvasCoords(e.touches[0], canvas);
             dragMoved = true;
@@ -1880,11 +1944,11 @@ function TemperamentWidget() {
         };
 
         canvas.ontouchend = function () {
+            _clearLongPress();
             if (dragIndex >= 0) {
                 if (!dragMoved) _playNote(dragIndex);
                 dragIndex = -1;
                 lockedDrag = false;
-                highlightDot = -1;
                 _drawCircle();
             }
         };
