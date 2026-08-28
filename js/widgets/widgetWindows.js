@@ -139,17 +139,17 @@ window.widgetWindows = {
     _initGlobalListeners() {
         if (this._globalListenersInitialized) return;
 
-        this._handleGlobalMouseMove = this._handleGlobalMouseMove.bind(this);
-        this._handleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
-        this._handleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
-        this._handleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
+        this._boundHandleGlobalMouseMove = this._handleGlobalMouseMove.bind(this);
+        this._boundHandleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
+        this._boundHandleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
+        this._boundHandleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
 
-        document.addEventListener("mouseup", this._handleGlobalMouseUp, true);
-        document.addEventListener("mousemove", this._handleGlobalMouseMove, true);
-        document.addEventListener("mousedown", this._handleGlobalMouseDown, true);
+        document.addEventListener("mouseup", this._boundHandleGlobalMouseUp, true);
+        document.addEventListener("mousemove", this._boundHandleGlobalMouseMove, true);
+        document.addEventListener("mousedown", this._boundHandleGlobalMouseDown, true);
         // Use capture phase (true) to handle keyboard shortcuts before individual
         // widgets can intercept them via stopPropagation().
-        document.addEventListener("keydown", this._handleGlobalKeyDown, true);
+        document.addEventListener("keydown", this._boundHandleGlobalKeyDown, true);
 
         this._globalListenersInitialized = true;
     },

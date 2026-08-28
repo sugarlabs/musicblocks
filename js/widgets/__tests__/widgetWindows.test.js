@@ -72,6 +72,28 @@ function createTestWindow(title = "Test Title", fullscreen = true) {
 }
 
 beforeEach(() => {
+    if (window.widgetWindows._boundHandleGlobalKeyDown) {
+        document.removeEventListener(
+            "keydown",
+            window.widgetWindows._boundHandleGlobalKeyDown,
+            true
+        );
+        document.removeEventListener(
+            "mouseup",
+            window.widgetWindows._boundHandleGlobalMouseUp,
+            true
+        );
+        document.removeEventListener(
+            "mousemove",
+            window.widgetWindows._boundHandleGlobalMouseMove,
+            true
+        );
+        document.removeEventListener(
+            "mousedown",
+            window.widgetWindows._boundHandleGlobalMouseDown,
+            true
+        );
+    }
     // Clear the floatingWindows container but keep it in DOM
     floatingWindows.innerHTML = "";
     // Reset open windows tracking but preserve functions
@@ -1208,6 +1230,139 @@ describe("widgetWindows", () => {
             window.widgetWindows.closeBlkWidgets("TestWidget");
 
             expect(window.widgetWindows.closeWindow).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("Global Keydown Listeners & Shortcuts", () => {
+        beforeEach(() => {
+            if (window.widgetWindows._handleGlobalKeyDown) {
+                document.removeEventListener(
+                    "keydown",
+                    window.widgetWindows._handleGlobalKeyDown,
+                    true
+                );
+            }
+            window.widgetWindows._globalListenersInitialized = false;
+        });
+
+        test("registers keydown event listener in _initGlobalListeners", () => {
+            const addSpy = jest.spyOn(document, "addEventListener");
+            window.widgetWindows._globalListenersInitialized = false;
+            window.widgetWindows._initGlobalListeners();
+
+            expect(addSpy).toHaveBeenCalledWith("keydown", expect.any(Function), true);
+            addSpy.mockRestore();
+        });
+
+        test("pressing Escape closes the focused window", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            document.dispatchEvent(escapeEvent);
+
+            expect(win.onclose).toHaveBeenCalledTimes(1);
+        });
+
+        test("pressing Cmd/Ctrl+Shift+M toggles maximize on focused window", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win._fullscreenEnabled = true;
+            win._maximize = jest.fn();
+            win.onmaximize = jest.fn();
+            win.takeFocus = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            document.dispatchEvent(maxEvent);
+
+            expect(win._maximize).toHaveBeenCalledTimes(1);
+            expect(win.onmaximize).toHaveBeenCalledTimes(1);
+        });
+
+        test("ignores shortcut when e.repeat is true", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const repeatEvent = new KeyboardEvent("keydown", {
+                key: "Escape",
+                repeat: true,
+                bubbles: true
+            });
+            document.dispatchEvent(repeatEvent);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+        });
+
+        test("ignores shortcut when focus is inside an input, textarea, or contenteditable element", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const inputEl = document.createElement("input");
+            document.body.appendChild(inputEl);
+            inputEl.focus();
+
+            const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            document.dispatchEvent(escapeEvent);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+
+            document.body.removeChild(inputEl);
+        });
+
+        test("does not maximize when _fullscreenEnabled is false", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win._fullscreenEnabled = false;
+            win._maximize = jest.fn();
+            win.onmaximize = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            document.dispatchEvent(maxEvent);
+
+            expect(win._maximize).not.toHaveBeenCalled();
+            expect(win.onmaximize).not.toHaveBeenCalled();
+        });
+
+        test("restores window when Cmd/Ctrl+Shift+M is pressed on maximized window", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win._fullscreenEnabled = true;
+            win._maximized = true;
+            win._restore = jest.fn();
+            win.sendToCenter = jest.fn();
+            win.takeFocus = jest.fn();
+            win.onmaximize = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                metaKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            document.dispatchEvent(maxEvent);
+
+            expect(win._restore).toHaveBeenCalledTimes(1);
+            expect(win.sendToCenter).toHaveBeenCalledTimes(1);
+            expect(win.onmaximize).toHaveBeenCalledTimes(1);
         });
     });
 });
