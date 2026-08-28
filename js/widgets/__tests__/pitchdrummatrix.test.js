@@ -455,6 +455,35 @@ describe("PitchDrumMatrix Widget", () => {
             expect(pdm._setPairCell).toHaveBeenCalled();
         });
 
+        test("should play the next pair after the playback timeout", () => {
+            jest.useFakeTimers();
+            pdm._playing = true;
+
+            const pitchCell0 = { style: {} };
+            const pitchCell1 = { style: {} };
+            pdm._pdmTable = {
+                rows: [{ cells: [pitchCell0] }, { cells: [pitchCell1] }]
+            };
+            pdm._pdmDrumTable = { rows: [{ cells: [] }] };
+            pdm._pdmCellTables = [{ rows: [{ cells: [{}, {}] }] }, { rows: [{ cells: [{}, {}] }] }];
+            pdm._setPairCell = jest.fn();
+
+            pdm._playPitchDrum(0, [
+                [0, 0],
+                [1, 0]
+            ]);
+
+            expect(pdm._setPairCell).toHaveBeenCalledTimes(1);
+            expect(pdm._setPairCell).toHaveBeenCalledWith(0, 0, expect.anything(), true);
+
+            jest.advanceTimersByTime(1000);
+
+            expect(pdm._setPairCell).toHaveBeenCalledTimes(2);
+            expect(pdm._setPairCell).toHaveBeenCalledWith(1, 0, expect.anything(), true);
+
+            jest.useRealTimers();
+        });
+
         test("should not attempt to modify style of rows when playing turns false during timeout", () => {
             jest.useFakeTimers();
             pdm._playing = true;
@@ -679,8 +708,7 @@ describe("PitchDrumMatrix Widget", () => {
     });
 
     describe("_setPairCell delayed drum", () => {
-        test("should not play the delayed drum after the widget is closed", () => {
-            jest.useFakeTimers();
+        const setupPairCell = () => {
             global.normalizeNoteAccidentals = note => note;
             Singer.defaultBPMFactor = 1;
 
@@ -701,6 +729,42 @@ describe("PitchDrumMatrix Widget", () => {
             };
 
             pdm.init(mockActivity);
+            pdm._pdmTable = {
+                rows: [{ cells: [{ dataset: { noteArg: "sol", octave: "4" } }] }]
+            };
+            pdm._pdmDrumTable = {
+                rows: [{ cells: [{ querySelector: () => ({ title: "kick" }) }] }]
+            };
+            return mockActivity;
+        };
+
+        test("should play the delayed drum while the widget is still open", () => {
+            jest.useFakeTimers();
+            const mockActivity = setupPairCell();
+
+            pdm._setPairCell(0, 0, {}, true);
+
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+
+            jest.runAllTimers();
+
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(2);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                0,
+                "C2",
+                0.125,
+                "kick",
+                null,
+                null
+            );
+
+            jest.useRealTimers();
+            delete Singer.defaultBPMFactor;
+        });
+
+        test("should not play the delayed drum after the widget is closed", () => {
+            jest.useFakeTimers();
+            const mockActivity = setupPairCell();
 
             const pendingTimeouts = [];
             pdm.widgetWindow.timerManager = {
@@ -717,13 +781,6 @@ describe("PitchDrumMatrix Widget", () => {
             pdm.widgetWindow.destroy.mockImplementation(() => {
                 pdm.widgetWindow.timerManager.clearAll();
             });
-
-            pdm._pdmTable = {
-                rows: [{ cells: [{ dataset: { noteArg: "sol", octave: "4" } }] }]
-            };
-            pdm._pdmDrumTable = {
-                rows: [{ cells: [{ querySelector: () => ({ title: "kick" }) }] }]
-            };
 
             pdm._setPairCell(0, 0, {}, true);
 
