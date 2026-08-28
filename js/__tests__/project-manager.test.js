@@ -1959,6 +1959,9 @@ describe("_setupFileHandlers inner callbacks", () => {
         activity.fileChooser.files = [{ name: "empty.html" }];
         handlers.change();
 
+        // Advance past the 200ms setTimeout inside reader.onload
+        jest.advanceTimersByTime(200);
+
         expect(global.extractProjectDataFromHTML).toHaveBeenCalledWith(
             "<html>no project data here</html>"
         );
