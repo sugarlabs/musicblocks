@@ -1045,5 +1045,23 @@ describe("PitchStaircase Widget", () => {
             ];
             expect(() => psc._makeStairs()).not.toThrow();
         });
+
+        test("resetDefaults should reset ratio inputs to 3 and 2 while preserving existing stairs", () => {
+            const mockTextMsg = jest.fn();
+            psc.activity = { textMsg: mockTextMsg };
+            psc._musicRatio1 = { value: "7" };
+            psc._musicRatio2 = { value: "9" };
+            psc.Stairs = [
+                ["A", "4", 220.0],
+                ["B", "4", 240.0]
+            ];
+
+            psc.resetDefaults();
+
+            expect(psc._musicRatio1.value).toBe("3");
+            expect(psc._musicRatio2.value).toBe("2");
+            expect(psc.Stairs.length).toBe(2);
+            expect(mockTextMsg).toHaveBeenCalledWith("Reset to default ratios (3/2).", 2000);
+        });
     });
 });

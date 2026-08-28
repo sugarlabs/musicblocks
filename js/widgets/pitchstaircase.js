@@ -872,6 +872,14 @@ class PitchStaircase {
                 while (this._undo());
             };
 
+        widgetWindow.addButton(
+            "reload.svg",
+            PitchStaircase.ICONSIZE,
+            _("Reset to default ratios")
+        ).onclick = () => {
+            this.resetDefaults();
+        };
+
         // The pitch-staircase (psc) table
         this._pscTable = document.createElement("table");
         widgetWindow.getWidgetBody().append(this._pscTable);
@@ -886,6 +894,22 @@ class PitchStaircase {
                 wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
             }
         };
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    resetDefaults() {
+        if (this._musicRatio1) {
+            this._musicRatio1.value = "3";
+        }
+        if (this._musicRatio2) {
+            this._musicRatio2.value = "2";
+        }
+        if (this.activity && typeof this.activity.textMsg === "function") {
+            this.activity.textMsg(_("Reset to default ratios (3/2)."), 2000);
+        }
     }
 
     /**
