@@ -1953,7 +1953,8 @@ describe("_setupFileHandlers inner callbacks", () => {
         const activity = makeActivity();
         const handlers = captureHandlers(activity);
         const pm = new ProjectManager(activity);
-        pm.finishLoading = jest.fn();
+        // Do NOT mock finishLoading — let the real method run so the
+        // call-site in the file-chooser handler is counted as covered.
         pm._setupFileHandlers();
 
         activity.fileChooser.files = [{ name: "empty.html" }];
@@ -1966,6 +1967,96 @@ describe("_setupFileHandlers inner callbacks", () => {
             "<html>no project data here</html>"
         );
         expect(activity.errorMsg).toHaveBeenCalled();
-        expect(pm.finishLoading).toHaveBeenCalled();
+        // Real finishLoading resets loading state
+        expect(activity.loading).toBe(false);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// PART 28 — _setupFileHandlers: drag-and-drop handler (__handleFileSelect)
+// ---------------------------------------------------------------------------
+
+describe("_setupFileHandlers drop handler", () => {
+    let canvasHolder;
+    let dropHandlers;
+    let origFileReader;
+
+    beforeEach(() => {
+        dropHandlers = {};
+        canvasHolder = {
+            addEventListener: jest.fn().mockImplementation((evt, handler) => {
+                dropHandlers[evt] = handler;
+            })
+        };
+        jest.spyOn(document, "getElementById").mockReturnValue(canvasHolder);
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+        document.getElementById.mockRestore();
+        if (origFileReader) {
+            global.FileReader = origFileReader;
+            origFileReader = null;
+        }
+    });
+
+    it("drop handler shows error and calls finishLoading when HTML file lacks project data", () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = "<html>no project data here</html>";
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        global.extractProjectDataFromHTML.mockReturnValueOnce(null);
+
+        const activity = makeActivity();
+        const pm = new ProjectManager(activity);
+        // Capture fileChooser listeners as before, but drop handlers come
+        // from canvasHolder.addEventListener captured in beforeEach.
+        activity.fileChooser.addEventListener = jest.fn();
+        pm._setupFileHandlers();
+
+        const dropEvent = {
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: {
+                files: [{ name: "empty.html" }]
+            }
+        };
+        dropHandlers.drop(dropEvent);
+
+        // Advance past the 200ms setTimeout inside reader.onload
+        jest.advanceTimersByTime(200);
+
+        expect(global.extractProjectDataFromHTML).toHaveBeenCalledWith(
+            "<html>no project data here</html>"
+        );
+        expect(activity.errorMsg).toHaveBeenCalled();
+        // Real finishLoading resets loading state
+        expect(activity.loading).toBe(false);
+    });
+
+    it("dragover handler calls preventDefault and sets dropEffect to copy", () => {
+        const activity = makeActivity();
+        activity.fileChooser.addEventListener = jest.fn();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        const dragEvent = {
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { dropEffect: "" }
+        };
+        dropHandlers.dragover(dragEvent);
+
+        expect(dragEvent.preventDefault).toHaveBeenCalled();
+        expect(dragEvent.dataTransfer.dropEffect).toBe("copy");
     });
 });
