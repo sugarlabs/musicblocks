@@ -18,9 +18,45 @@
    instruments, slicePath, platformColor, TunerDisplay, TunerUtils
 */
 
-/* exported SampleWidget */
+/* exported SampleWidget, resolveBackendURL */
 /** AMD module dependencies for lazy loading. */
 SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
+
+/**
+ * Resolves the AI backend service URL based on global configuration or query parameter overrides.
+ * @param {Location} [loc] Optional location object for testability.
+ * @returns {string}
+ */
+function resolveBackendURL(loc) {
+    if (
+        typeof window !== "undefined" &&
+        typeof window.AI_SAMPLE_ENDPOINT === "string" &&
+        window.AI_SAMPLE_ENDPOINT.trim()
+    ) {
+        return window.AI_SAMPLE_ENDPOINT.trim().replace(/\/+$/, "");
+    }
+
+    try {
+        const location =
+            loc !== undefined ? loc : typeof window !== "undefined" ? window.location : null;
+        if (!location) {
+            return "";
+        }
+
+        const search = location.search || "";
+        const params = new URLSearchParams(search);
+        if (params.has("backend")) {
+            return params.get("backend").replace(/\/+$/, "");
+        }
+        if (params.has("backend_url")) {
+            return params.get("backend_url").replace(/\/+$/, "");
+        }
+
+        return "";
+    } catch (e) {
+        return "";
+    }
+}
 
 /**
  * Represents a Sample Widget.
@@ -678,10 +714,7 @@ function SampleWidget() {
 
         this._promptBtn.onclick = () => {
             stopTuner();
-            const aiSampleEndpoint =
-                typeof window.AI_SAMPLE_ENDPOINT === "string"
-                    ? window.AI_SAMPLE_ENDPOINT.trim().replace(/\/$/, "")
-                    : "";
+            const aiSampleEndpoint = resolveBackendURL();
             if (!aiSampleEndpoint) {
                 activity.errorMsg(_("AI sample generation is not available."));
                 return;
@@ -2367,5 +2400,5 @@ class PitchSmoother {
 }
 
 if (typeof module !== "undefined") {
-    module.exports = { SampleWidget, PitchSmoother };
+    module.exports = { SampleWidget, PitchSmoother, resolveBackendURL };
 }
