@@ -1,0 +1,32 @@
+name: PR dashboard
+
+# Keeps one issue ("Pull request dashboard") up to date with a table of open
+# pull requests grouped by who acts next. The issue is created on the first
+# run. See .github/scripts/pr-dashboard.py for the grouping rules.
+
+on:
+  schedule:
+    - cron: "17 3 * * *" # daily
+  workflow_dispatch:
+    inputs:
+      source_repo:
+        description: Repository to read open PRs from
+        default: sugarlabs/musicblocks
+
+concurrency: pr-dashboard
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: >
+          python3 .github/scripts/pr-dashboard.py
+          --source-repo "${{ inputs.source_repo || github.repository }}"
+          --issue-repo "${{ github.repository }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
