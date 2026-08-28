@@ -272,6 +272,7 @@ describe("save HTML methods", () => {
             }
         };
         instance = new SaveInterface(activity);
+        global.URL.createObjectURL = jest.fn(() => "blob:mock-html");
     });
 
     afterEach(() => {
@@ -479,11 +480,8 @@ describe("save HTML methods", () => {
         instance.saveHTML(activity);
 
         expect(mockPrepareHTML).toHaveBeenCalled();
-        expect(mockDownload).toHaveBeenCalledWith(
-            "html",
-            "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E",
-            null
-        );
+        expect(URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
+        expect(mockDownload).toHaveBeenCalledWith("html", "blob:mock-html", null);
     });
 
     it("should call prepareHTML and download the file with the correct filename", () => {
@@ -504,10 +502,7 @@ describe("save HTML methods", () => {
 
         expect(mockPrepareHTML).toHaveBeenCalled();
         expect(mockGetProjectName).toHaveBeenCalled();
-        expect(mockDownloadURL).toHaveBeenCalledWith(
-            "MockProject.html",
-            "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E"
-        );
+        expect(mockDownloadURL).toHaveBeenCalledWith("MockProject.html", "blob:mock-html");
     });
 
     it("should use the active Planet project name for HTML downloads without a prompt", () => {
@@ -526,7 +521,7 @@ describe("save HTML methods", () => {
 
         expect(activity.save.downloadURL).toHaveBeenCalledWith(
             "Planet Project.html",
-            "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E"
+            "blob:mock-html"
         );
     });
 
@@ -541,10 +536,7 @@ describe("save HTML methods", () => {
         instance.saveHTMLNoPrompt(activity);
         jest.runAllTimers();
 
-        expect(activity.save.downloadURL).toHaveBeenCalledWith(
-            "My_Project.html",
-            expect.any(String)
-        );
+        expect(activity.save.downloadURL).toHaveBeenCalledWith("My_Project.html", "blob:mock-html");
     });
 });
 

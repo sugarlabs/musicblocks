@@ -100,19 +100,18 @@ const processABCNotes = function (logo, turtle) {
         }
 
         // Handle octave notation
-        let matchedOctave = 4;
-        for (const [octave, notation] of Object.entries(OCTAVE_NOTATION_MAP)) {
-            if (note.includes(octave)) {
-                note = note.replace(new RegExp(octave, "g"), notation);
-                matchedOctave = Number(octave);
-                break;
-            }
+        const match = note.match(/\d+$/);
+        const octave = match ? parseInt(match[0], 10) : null;
+        if (octave !== null && OCTAVE_NOTATION_MAP[octave] !== undefined) {
+            note = note.replace(/\d+$/, OCTAVE_NOTATION_MAP[octave]);
         }
 
-        // Convert case based on octave. ABC uses uppercase
-        // letters for octaves 1-4 and lowercase letters for
-        // octaves 5 and above.
-        return matchedOctave >= 5 ? note.toLowerCase() : note.toUpperCase();
+        // Convert case based on octave
+        if (octave !== null) {
+            return octave >= 5 ? note.toLowerCase() : note.toUpperCase();
+        } else {
+            return note.includes("'") || note === "" ? note.toLowerCase() : note.toUpperCase();
+        }
     };
 
     let counter = 0;

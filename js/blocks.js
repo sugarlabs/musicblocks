@@ -4715,10 +4715,14 @@ class Blocks {
             for (let b = 0; b < this.dragGroup.length; b++) {
                 const myBlock = this.blockList[this.dragGroup[b]];
                 for (let c = 0; c < myBlock.connections.length; c++) {
-                    if (myBlock.connections[c] === null) {
+                    const connection = myBlock.connections[c];
+                    if (
+                        connection === null ||
+                        !Object.prototype.hasOwnProperty.call(blockMap, connection)
+                    ) {
                         blockObjs[b][4].push(null);
                     } else {
-                        blockObjs[b][4].push(blockMap[myBlock.connections[c]]);
+                        blockObjs[b][4].push(blockMap[connection]);
                     }
                 }
             }
@@ -5359,7 +5363,12 @@ class Blocks {
                     }
                     bIndex = chunkEnd;
                     if (bIndex < totalBlocks) {
-                        window.requestAnimationFrame(processChunk);
+                        // requestAnimationFrame does not reliably fire in a hidden or
+                        // backgrounded window (e.g. headless/CI browser runs), which
+                        // silently stalls loading after the first chunk. setTimeout(0)
+                        // still yields to the main thread but keeps running regardless
+                        // of tab visibility.
+                        setTimeout(processChunk, 0);
                     }
                 };
 

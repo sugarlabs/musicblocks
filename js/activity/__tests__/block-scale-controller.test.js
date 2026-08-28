@@ -329,9 +329,8 @@ describe("scale limits", () => {
 // ---------------------------------------------------------------------------
 
 describe("setSmallerLargerStatus", () => {
-    test("enables the smaller-blocks icon when scale is below the default", async () => {
-        const belowDefaultIndex = DEFAULT_INDEX - 1;
-        const activity = makeActivity(belowDefaultIndex);
+    test("disables the smaller-blocks icon at the minimum scale", async () => {
+        const activity = makeActivity(0);
         const controller = setupBlockScaleController(activity);
 
         await controller.setSmallerLargerStatus();
@@ -343,8 +342,35 @@ describe("setSmallerLargerStatus", () => {
         );
     });
 
-    test("disables the smaller-blocks icon when scale is at or above the default", async () => {
+    test("enables the smaller-blocks icon below the default scale", async () => {
+        const belowDefaultIndex = DEFAULT_INDEX - 1;
+        const activity = makeActivity(belowDefaultIndex);
+        const controller = setupBlockScaleController(activity);
+
+        await controller.setSmallerLargerStatus();
+
+        expect(global.changeImage).toHaveBeenCalledWith(
+            activity.smallerContainer.children[0],
+            SMALLERDISABLEBUTTON,
+            SMALLERBUTTON
+        );
+    });
+
+    test("enables the smaller-blocks icon at the default scale", async () => {
         const activity = makeActivity(DEFAULT_INDEX);
+        const controller = setupBlockScaleController(activity);
+
+        await controller.setSmallerLargerStatus();
+
+        expect(global.changeImage).toHaveBeenCalledWith(
+            activity.smallerContainer.children[0],
+            SMALLERDISABLEBUTTON,
+            SMALLERBUTTON
+        );
+    });
+
+    test("enables the smaller-blocks icon above the default scale", async () => {
+        const activity = makeActivity(DEFAULT_INDEX + 1);
         const controller = setupBlockScaleController(activity);
 
         await controller.setSmallerLargerStatus();

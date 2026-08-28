@@ -131,6 +131,9 @@ const {
     isSVGEmpty,
     prepareMacroExports,
     processMacroData,
+    updatePluginObj,
+    processRawPluginData,
+    preparePluginExports,
     hideDOMLabel,
     displayMsg,
     makeKeyboardAccessible,
@@ -1363,5 +1366,206 @@ describe("CameraManager", () => {
         CameraManager.reset();
         expect(CameraManager.intervalId).toBeNull();
         expect(CameraManager.isSetup).toBe(false);
+    });
+});
+
+describe("Plugin and Macro Utilities", () => {
+    let mockActivity;
+
+    beforeEach(() => {
+        mockActivity = {
+            pluginObjs: {
+                PALETTEPLUGINS: {},
+                PALETTEFILLCOLORS: {},
+                PALETTESTROKECOLORS: {},
+                PALETTEHIGHLIGHTCOLORS: {},
+                FLOWPLUGINS: {},
+                ARGPLUGINS: {},
+                BLOCKPLUGINS: {},
+                MACROPLUGINS: {},
+                ONLOAD: {},
+                ONSTART: {},
+                ONSTOP: {}
+            },
+            errorMsg: jest.fn()
+        };
+    });
+
+    describe("updatePluginObj()", () => {
+        it("returns early when obj is null", () => {
+            updatePluginObj(mockActivity, null);
+            expect(mockActivity.pluginObjs.PALETTEPLUGINS).toEqual({});
+        });
+
+        it("updates plugin object maps for valid plugin properties", () => {
+            const pluginData = {
+                PALETTEPLUGINS: { testPal: "icon.svg" },
+                PALETTEFILLCOLORS: { testPal: "#ff0000" },
+                PALETTESTROKECOLORS: { testPal: "#00ff00" },
+                PALETTEHIGHLIGHTCOLORS: { testPal: "#0000ff" },
+                FLOWPLUGINS: { customFlow: "flowFunc" },
+                ARGPLUGINS: { customArg: "argFunc" },
+                BLOCKPLUGINS: { customBlock: "blockFunc" },
+                MACROPLUGINS: { customMacro: "macroFunc" },
+                GLOBALS: "var x = 10;",
+                IMAGES: { img1: "data:image/png" },
+                ONLOAD: { loadHook: "onLoadFunc" },
+                ONSTART: { startHook: "onStartFunc" },
+                ONSTOP: { stopHook: "onStopFunc" }
+            };
+
+            updatePluginObj(mockActivity, pluginData);
+
+            expect(mockActivity.pluginObjs.PALETTEPLUGINS.testPal).toBe("icon.svg");
+            expect(mockActivity.pluginObjs.PALETTEFILLCOLORS.testPal).toBe("#ff0000");
+            expect(mockActivity.pluginObjs.PALETTESTROKECOLORS.testPal).toBe("#00ff00");
+            expect(mockActivity.pluginObjs.PALETTEHIGHLIGHTCOLORS.testPal).toBe("#0000ff");
+            expect(mockActivity.pluginObjs.FLOWPLUGINS.customFlow).toBe("flowFunc");
+            expect(mockActivity.pluginObjs.ARGPLUGINS.customArg).toBe("argFunc");
+            expect(mockActivity.pluginObjs.BLOCKPLUGINS.customBlock).toBe("blockFunc");
+            expect(mockActivity.pluginObjs.MACROPLUGINS.customMacro).toBe("macroFunc");
+            expect(mockActivity.pluginObjs.GLOBALS).toBe("var x = 10;");
+            expect(mockActivity.pluginObjs.IMAGES).toEqual({ img1: "data:image/png" });
+            expect(mockActivity.pluginObjs.ONLOAD.loadHook).toBe("onLoadFunc");
+            expect(mockActivity.pluginObjs.ONSTART.startHook).toBe("onStartFunc");
+            expect(mockActivity.pluginObjs.ONSTOP.stopHook).toBe("onStopFunc");
+        });
+
+        it("appends GLOBALS string if GLOBALS already exists", () => {
+            mockActivity.pluginObjs.GLOBALS = "var a = 1;";
+            updatePluginObj(mockActivity, { GLOBALS: "var b = 2;" });
+            expect(mockActivity.pluginObjs.GLOBALS).toBe("var a = 1;var b = 2;");
+        });
+
+        it("filters out unsafe keys to prevent prototype pollution", () => {
+            const unsafeData = {
+                PALETTEPLUGINS: JSON.parse(`{
+                    "__proto__": "malicious",
+                    "constructor": "malicious",
+                    "safeKey": "valid"
+                }`)
+            };
+            updatePluginObj(mockActivity, unsafeData);
+            expect(mockActivity.pluginObjs.PALETTEPLUGINS.safeKey).toBe("valid");
+            expect(
+                Object.prototype.hasOwnProperty.call(
+                    mockActivity.pluginObjs.PALETTEPLUGINS,
+                    "__proto__"
+                )
+            ).toBe(false);
+            expect(
+                Object.prototype.hasOwnProperty.call(
+                    mockActivity.pluginObjs.PALETTEPLUGINS,
+                    "constructor"
+                )
+            ).toBe(false);
+        });
+    });
+
+    describe("processRawPluginData()", () => {
+        it("strips blank lines and comment lines starting with /", async () => {
+            const rawData = '// Comment line\n\n{"PALETTEPLUGINS": {"test": "val"}}';
+            const res = await processRawPluginData(mockActivity, rawData, "plugin.json");
+            expect(res).toBeDefined();
+        });
+
+        it("handles invalid JSON data gracefully", async () => {
+            const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+            const invalidData = "// Comment\n{ invalid json content";
+            const res = await processRawPluginData(mockActivity, invalidData, "plugin.json");
+            expect(res).toBeNull();
+            expect(spy).toHaveBeenCalled();
+            spy.mockRestore();
+        });
+    });
+
+    describe("preparePluginExports()", () => {
+        it("updates plugin object and returns stringified JSON", () => {
+            const pluginData = { PALETTEPLUGINS: { demo: "icon" } };
+            const jsonString = preparePluginExports(mockActivity, pluginData);
+            expect(typeof jsonString).toBe("string");
+            expect(JSON.parse(jsonString).PALETTEPLUGINS.demo).toBe("icon");
+        });
+    });
+
+    describe("processMacroData() and prepareMacroExports()", () => {
+        it("does nothing if macroData is undefined or empty json", () => {
+            const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+            const blocks = { addToMyPalette: jest.fn() };
+            const macroDict = {};
+
+            processMacroData(undefined, palettes, blocks, macroDict);
+            processMacroData("{}", palettes, blocks, macroDict);
+
+            expect(palettes.add).not.toHaveBeenCalled();
+        });
+
+        it("parses valid macro JSON and updates macroDict and palettes/blocks", () => {
+            const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+            const blocks = { addToMyPalette: jest.fn() };
+            const macroDict = {};
+            const validData = JSON.stringify({
+                macro1: { palette: "custom", block: "customBlock" }
+            });
+
+            processMacroData(validData, palettes, blocks, macroDict);
+            expect(macroDict.macro1).toBeDefined();
+            expect(palettes.add).toHaveBeenCalledWith("myblocks", "black", "#a0a0a0");
+            expect(blocks.addToMyPalette).toHaveBeenCalledWith("macro1", macroDict.macro1);
+            expect(palettes.makePalettes).toHaveBeenCalledWith(1);
+        });
+
+        it("handles invalid macro JSON gracefully", () => {
+            const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+            const blocks = { addToMyPalette: jest.fn() };
+            const macroDict = {};
+
+            const spy = jest.spyOn(console, "log").mockImplementation(() => {});
+            processMacroData("invalid json", palettes, blocks, macroDict);
+            expect(spy).toHaveBeenCalledWith("invalid json");
+            spy.mockRestore();
+        });
+
+        it("prepareMacroExports encodes macro dictionary as JSON", () => {
+            const macroDict = {};
+            const stack = { id: 1 };
+            const json = prepareMacroExports("testMacro", stack, macroDict);
+            expect(JSON.parse(json)).toEqual({ testMacro: stack });
+        });
+    });
+});
+
+describe("SVG Utilities", () => {
+    describe("isSVGEmpty()", () => {
+        it("returns true when all turtles have empty SVG output", () => {
+            const mockTurtles = {
+                turtleList: { 0: {} },
+                getTurtle: jest.fn(() => ({
+                    painter: { closeSVG: jest.fn(), svgOutput: "" }
+                }))
+            };
+            expect(isSVGEmpty(mockTurtles)).toBe(true);
+        });
+
+        it("returns false when any turtle has SVG output", () => {
+            const mockTurtles = {
+                turtleList: { 0: {} },
+                getTurtle: jest.fn(() => ({
+                    painter: { closeSVG: jest.fn(), svgOutput: "<path d='M0,0 L10,10'/>" }
+                }))
+            };
+            expect(isSVGEmpty(mockTurtles)).toBe(false);
+        });
+    });
+});
+
+describe("UtilsLogic re-exports in utils.js", () => {
+    it("exports formatSeconds function from utils-logic", () => {
+        const utils = require("../utils");
+        expect(typeof utils.formatSeconds).toBe("function");
+        expect(utils.formatSeconds(0)).toBe("00:00");
+        expect(utils.formatSeconds(125)).toBe("02:05");
+        expect(utils.formatSeconds(3665)).toBe("01:01:05");
+        expect(utils.formatSeconds(null)).toBe("00:00");
     });
 });

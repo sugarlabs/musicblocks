@@ -28,7 +28,8 @@ const Singer = require("../turtle-singer");
 const mockGlobals = {
     getNote: jest.fn().mockReturnValue(["C", 4]),
     isCustomTemperament: jest.fn(),
-    isTrueEDO: jest.fn().mockReturnValue(true),
+    isEquallyTempered: jest.fn().mockReturnValue(true),
+    temperamentHasRatios: jest.fn().mockReturnValue(false),
     getStepSizeUp: jest.fn().mockReturnValue(1),
     numberToPitch: jest.fn().mockReturnValue(["C", 4]),
     pitchToNumber: jest.fn().mockReturnValue(60),
@@ -45,7 +46,8 @@ const mockGlobals = {
 
 global.getNote = mockGlobals.getNote;
 global.isCustomTemperament = mockGlobals.isCustomTemperament;
-global.isTrueEDO = mockGlobals.isTrueEDO;
+global.isEquallyTempered = mockGlobals.isEquallyTempered;
+global.temperamentHasRatios = mockGlobals.temperamentHasRatios;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
@@ -57,6 +59,12 @@ global.parseNoteString = mockGlobals.parseNoteString;
 global.getCachedPitchToFrequency = mockGlobals.getCachedPitchToFrequency;
 global.normalizeNoteAccidentals = mockGlobals.normalizeNoteAccidentals;
 global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
+
+// addScalarTransposition's non-EDO branch looks up the mode's native EDO via
+// these musicutils globals; provide them so the real function can run.
+const musicUtils = require("../utils/musicutils");
+global.keySignatureToMode = musicUtils.keySignatureToMode;
+global.getSavedCustomModes = musicUtils.getSavedCustomModes;
 global.last = jest.fn(array => array[array.length - 1]);
 global.deepClone = value => {
     if (typeof structuredClone === "function") {
@@ -1134,6 +1142,62 @@ describe("scalarDistance edge cases", () => {
     test("should return negative distance when lastNote < firstNote", () => {
         const result = Singer.scalarDistance(logoMock, turtleMock, 65, 60);
         expect(result).toBeLessThanOrEqual(0);
+    });
+});
+
+describe("addScalarTransposition on non-EDO temperaments", () => {
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        savedGlobals = {};
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        activityMock.errorMsg = jest.fn();
+        logoMock = createLogoMock(activityMock);
+        logoMock.synth.inTemperament = "just intonation";
+    });
+
+    afterEach(() => {
+        Object.keys(savedGlobals).forEach(name => {
+            global[name] = savedGlobals[name];
+        });
+    });
+
+    test("walks one scale degree per step via getStepSizeUp/Down", () => {
+        const getStepSizeUp = jest.fn().mockReturnValue(2);
+        const getStepSizeDown = jest.fn().mockReturnValue(-2);
+        const getNote = jest.fn().mockImplementation(note => [note, 4]);
+        [
+            "getStepSizeUp",
+            "getStepSizeDown",
+            "getNote",
+            "isEquallyTempered",
+            "temperamentHasRatios"
+        ].forEach(name => {
+            savedGlobals[name] = global[name];
+        });
+        global.getStepSizeUp = getStepSizeUp;
+        global.getStepSizeDown = getStepSizeDown;
+        global.getNote = getNote;
+        global.isEquallyTempered = jest.fn().mockReturnValue(false);
+        global.temperamentHasRatios = jest.fn().mockReturnValue(true);
+
+        Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 3);
+
+        expect(getStepSizeUp).toHaveBeenCalledTimes(3);
+        // One application per step; slice(1) skips the initial offset-0
+        // normalization getNote call.
+        const loopCalls = getNote.mock.calls.slice(1);
+        expect(loopCalls).toHaveLength(3);
+        // Every application passes the measured semitone distance as a RAW offset,
+        // not pre-scaled EDO steps. In getNote's signature, isAlreadyEdoSteps is
+        // the 9th positional argument (index 8).
+        expect(loopCalls.every(c => c[8] === false)).toBe(true);
+        expect(loopCalls.every(c => c[9] === false)).toBe(true);
     });
 });
 

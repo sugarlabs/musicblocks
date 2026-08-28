@@ -21,7 +21,8 @@
    getModeGroupTitleFont, getModeSliceFont, configureWheel,
    MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
-   getMunsellColor, COLORS40, frequencyToPitch, instruments,
+   getMunsellColor, COLORS40, frequencyToPitch, pitchToFrequency,
+   TEMPERAMENT, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, numberToPitch,
     nthDegreeToPitch, SOLFEGENAMES, buildScale, getCurrentEDO, generateNoteNames,
@@ -3342,14 +3343,11 @@ const piemenuIntervals = (block, selectedInterval) => {
 
     let isInitialized = false;
     // Add function to each main menu for show/hide sub menus
-    // TODO: Add all tabs to each interval
     const __setupAction = (i, activeTabs) => {
         that._intervalNameWheel.navItems[i].navigateFunction = () => {
             for (let l = 0; l < labels.length; l++) {
                 for (let j = 0; j < 8; j++) {
-                    if (l !== i) {
-                        that._intervalWheel.navItems[l * 8 + j].navItem.hide();
-                    } else if (!activeTabs.includes(j + 1)) {
+                    if (l !== i || !activeTabs.includes(j + 1)) {
                         that._intervalWheel.navItems[l * 8 + j].navItem.hide();
                     } else {
                         that._intervalWheel.navItems[l * 8 + j].navItem.show();
@@ -3389,9 +3387,9 @@ const piemenuIntervals = (block, selectedInterval) => {
 
     const j = Number(obj[1]);
     if (INTERVALS[i][2].includes(j)) {
-        block._intervalWheel.navigateWheel(j - 1);
+        block._intervalWheel.navigateWheel(i * 8 + j - 1);
     } else {
-        block._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
+        block._intervalWheel.navigateWheel(i * 8 + INTERVALS[i][2][0] - 1);
     }
     isInitialized = true;
 
@@ -3406,6 +3404,9 @@ const piemenuIntervals = (block, selectedInterval) => {
         const number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
 
         that.value = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] + " " + number;
+        if (!INTERVALVALUES[that.value]) {
+            return;
+        }
         if (label === "perfect 1") {
             that.text.text = _("unison");
         } else {
@@ -3501,6 +3502,8 @@ const piemenuModes = (block, selectedMode) => {
     block._exitWheel = new wheelnav("_exitWheel", block._modeWheel.raphael);
 
     const currentEDO = getCurrentEDO(block.activity.logo.synth.inTemperament);
+    const inTemperament = block.activity.logo.synth.inTemperament;
+    const nonEDO = isNonEDO(inTemperament);
     const modeWheelLabels = Array.from({ length: currentEDO }, (_, i) => String(i));
 
     configureWheel(block._modeWheel, {
@@ -3578,6 +3581,9 @@ const piemenuModes = (block, selectedMode) => {
         }
     };
 
+    // Expose on block for external interception (e.g. ModeWidget).
+    block.__selectionChanged = __selectionChanged;
+
     // Add function to each main menu for show/hide sub menus
     const __setupAction = (i, activeTabs) => {
         const edoforHide = currentEDO;
@@ -3590,7 +3596,13 @@ const piemenuModes = (block, selectedMode) => {
                 }
             }
 
-            __selectionChanged();
+            // Route through block so external callers (e.g. ModeWidget)
+            // can intercept mode selection.
+            if (typeof block.__selectionChanged === "function") {
+                block.__selectionChanged();
+            } else {
+                __selectionChanged();
+            }
         };
     };
 
@@ -3648,7 +3660,9 @@ const piemenuModes = (block, selectedMode) => {
             const modename = modes[j];
             const activeTabs = [0];
             if (modename !== " " && MUSICALMODES[modename]) {
-                const mode = MUSICALMODES[modename];
+                const mode =
+                    (nonEDO && getNonEDOModeSteps(modename, inTemperament)) ||
+                    MUSICALMODES[modename];
                 for (let k = 0; k < mode.length; k++) {
                     activeTabs.push(last(activeTabs) + mode[k]);
                 }
@@ -3687,14 +3701,11 @@ const piemenuModes = (block, selectedMode) => {
     };
 
     const __playNote = () => {
+        const i = that._modeWheel.selectedNavItemIndex;
         let o = 0;
         if (octave) {
             o = currentEDO;
         }
-
-        const i = that._modeWheel.selectedNavItemIndex;
-        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null, null, true);
-        obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
         const tur = that.activity.turtles.ithTurtle(0);
 
@@ -3705,6 +3716,25 @@ const piemenuModes = (block, selectedMode) => {
 
         that.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
         that.activity.logo.synth.setVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
+
+        if (nonEDO) {
+            const result = getNonEDOFrequency(i + o, 4, inTemperament, key + " chromatic");
+            if (result) {
+                that.activity.logo.synth.trigger(
+                    0,
+                    [result.freq],
+                    1 / 12,
+                    DEFAULTVOICE,
+                    null,
+                    null
+                );
+                return;
+            }
+        }
+
+        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null, null, true);
+        obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
+
         that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
     };
 
@@ -4451,5 +4481,5 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches, piemenuKey, piemenuNumber, piemenuModes };
+    module.exports = { piemenuPitches, piemenuIntervals, piemenuKey, piemenuNumber, piemenuModes };
 }

@@ -65,7 +65,8 @@ global.getNote = jest.fn().mockReturnValue(["C", "4"]);
 global.keySignatureToMode = jest.fn().mockReturnValue(["C", "ionian"]);
 global.normalizeNoteAccidentals = jest.fn().mockImplementation(n => n);
 global.MUSICALMODES = {
-    ionian: [2, 2, 1, 2, 2, 2, 1]
+    ionian: [2, 2, 1, 2, 2, 2, 1],
+    minor: [2, 1, 2, 2, 1, 2, 2]
 };
 global.TEMPERAMENT = {
     "equal": { isEDO: true, pitchNumber: 12 },
@@ -74,6 +75,7 @@ global.TEMPERAMENT = {
 global.getCurrentEDO = jest.fn().mockReturnValue(12);
 global.getModePattern = jest.fn().mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
 global.DEFAULTMODE = "major";
+global.piemenuModes = jest.fn();
 
 // Shared mode pie menu helpers, required from musicutils so the smoke tests
 // exercise the real extraction logic (modewidget.js sees them as globals).
@@ -94,7 +96,12 @@ const {
     getModeGroupTitleFont,
     getModeSliceFont,
     configureWheel,
-    scalePatternToEDO
+    scalePatternToEDO,
+    isNonEDO,
+    getNonEDOModeSteps,
+    getNonEDOFrequency,
+    isEquallyTempered,
+    pitchToFrequency
 } = require("../../utils/musicutils.js");
 global.MODEPIEMENU_GROUP_RING = MODEPIEMENU_GROUP_RING;
 global.MODEPIEMENU_NAME_RING = MODEPIEMENU_NAME_RING;
@@ -107,7 +114,31 @@ global.updateModeWheelItems = updateModeWheelItems;
 global.getModeGroupTitleFont = getModeGroupTitleFont;
 global.getModeSliceFont = getModeSliceFont;
 global.configureWheel = configureWheel;
+global.configureExitWheel = jest.fn();
 global.scalePatternToEDO = scalePatternToEDO;
+global.isNonEDO = isNonEDO;
+global.getNonEDOModeSteps = getNonEDOModeSteps;
+global.getNonEDOFrequency = getNonEDOFrequency;
+global.isEquallyTempered = isEquallyTempered;
+global.pitchToFrequency = pitchToFrequency || jest.fn().mockReturnValue(440);
+global.generateNoteNames =
+    global.generateNoteNames ||
+    jest.fn().mockReturnValue(["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]);
+global.numberToPitch = global.numberToPitch || jest.fn().mockReturnValue(["C", 4]);
+global.NOTESTABLE = global.NOTESTABLE || [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B"
+];
 
 // Mock slicePath
 global.slicePath = jest.fn().mockReturnValue({
@@ -150,11 +181,13 @@ global.wheelnav = jest.fn().mockImplementation(() => {
         titleFont: "",
         selectedNavItemIndex: 0,
         createWheel: jest.fn().mockImplementation(function (labels) {
-            this.navItems = labels.map((l, i) => {
-                const item = navItemTemplate();
-                item.title = l;
-                return item;
-            });
+            if (labels) {
+                this.navItems = labels.map((l, i) => {
+                    const item = navItemTemplate();
+                    item.title = l;
+                    return item;
+                });
+            }
         }),
         navigateWheel: jest.fn().mockImplementation(function (index) {
             this.selectedNavItemIndex = index;
@@ -167,7 +200,15 @@ global.wheelnav = jest.fn().mockImplementation(() => {
         }),
         refreshWheel: jest.fn(),
         removeWheel: jest.fn(),
-        initWheel: jest.fn()
+        initWheel: jest.fn().mockImplementation(function (labels) {
+            if (labels) {
+                this.navItems = labels.map(l => {
+                    const item = navItemTemplate();
+                    item.title = l;
+                    return item;
+                });
+            }
+        })
     };
     return mockWheel;
 });
@@ -336,6 +377,35 @@ describe("ModeWidget", () => {
         modeWidget._playNote(0);
 
         expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+    });
+
+    test("non-EDO labeled temperament plays the octave an octave up", () => {
+        const labels = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        const savedTemperament = global.TEMPERAMENT;
+        const savedSpy = global.pitchToFrequency;
+        global.TEMPERAMENT = {
+            testNonEDO: {
+                isEDO: false,
+                noteLabels: labels,
+                ratios: labels.map((_, i) => Math.pow(2, i / 12))
+            }
+        };
+        modeWidget._activeTemperamentKey = "testNonEDO";
+        modeWidget._activeEDO = labels.length;
+        const spy = jest.spyOn(global, "pitchToFrequency");
+
+        // Within-octave degree stays at octave 4.
+        modeWidget._triggerNote(1, labels.length);
+        expect(spy).toHaveBeenLastCalledWith(labels[1], 4, 0, ["C"], "testNonEDO");
+
+        // The octave note (index === n) wraps to the root label but must
+        // sound an octave higher (octave 5), not the starting note.
+        modeWidget._triggerNote(labels.length, labels.length);
+        expect(spy).toHaveBeenLastCalledWith(labels[0], 5, 0, ["C"], "testNonEDO");
+
+        spy.mockRestore();
+        global.pitchToFrequency = savedSpy;
+        global.TEMPERAMENT = savedTemperament;
     });
 
     test("should initialize a custom mode with only the root selected", () => {
@@ -538,44 +608,72 @@ describe("ModeWidget", () => {
     });
 
     describe("_piemenuModes", () => {
-        const switchGroup = (widget, groupTitle) => {
-            const index = widget._modeGroupWheel.navItems.findIndex(
-                item => item.title === groupTitle
-            );
-            widget._modeGroupWheel.selectedNavItemIndex = index;
-            widget._modeGroupWheel.navItems[index].navigateFunction();
-        };
-
-        test("builds the group and mode-name wheels", () => {
-            modeWidget._piemenuModes();
-
-            expect(modeWidget._modePieWheel).toBeDefined();
-            expect(modeWidget._modeGroupWheel).toBeDefined();
-            expect(modeWidget._modeNameWheel).toBeDefined();
-            expect(modeWidget._modeNameWheel.navItems.length).toBe(12);
+        beforeEach(() => {
+            global.piemenuModes.mockClear();
         });
 
-        test("custom group leads with the create-mode sentinel and saved modes", () => {
-            localStorage.setItem(
-                "customModes",
-                JSON.stringify([{ name: "my mode", pattern: [1, 2] }])
-            );
+        test("delegates to piemenuModes with a mock block", () => {
+            modeWidget._selectedModeName = "dorian";
             modeWidget._piemenuModes();
-            switchGroup(modeWidget, "custom");
 
-            const titles = modeWidget._modeNameWheel.navItems.map(item => item.title);
-            expect(titles[0]).toBe("+");
-            expect(titles[1]).toBe("my mode");
+            expect(global.piemenuModes).toHaveBeenCalledTimes(1);
+            const [mockBlock, selectedMode] = global.piemenuModes.mock.calls[0];
+            expect(selectedMode).toBe("dorian");
+            expect(mockBlock.value).toBe("dorian");
+            expect(mockBlock.activity).toBeDefined();
         });
 
-        test("selecting a mode slice resolves the internal mode name", () => {
+        test("sets _modePiemenuOpen to true while open", () => {
             modeWidget._piemenuModes();
-            switchGroup(modeWidget, "7");
+            expect(modeWidget._modePiemenuOpen).toBe(true);
+        });
 
-            modeWidget._modeNameWheel.selectedNavItemIndex = 0;
-            modeWidget._modeNameWheel.navItems[0].navigateFunction();
+        test("intercept applies mode selection via _loadMode", () => {
+            modeWidget._piemenuModes();
+            const mockBlock = modeWidget._mockBlock;
+
+            // Simulate piemenu setting a mode value
+            mockBlock.value = "major";
+            mockBlock.__selectionChanged();
 
             expect(modeWidget._selectedModeName).toBe("major");
+        });
+    });
+
+    describe("_modeStepPattern", () => {
+        test("prefers the native pattern when provided", () => {
+            modeWidget._activeTemperamentKey = "just intonation";
+            expect(modeWidget._modeStepPattern("major", [3, 2, 2, 3])).toEqual([3, 2, 2, 3]);
+        });
+
+        test("uses ratio-derived steps under a non-EDO temperament", () => {
+            modeWidget._activeTemperamentKey = "just intonation";
+            const spy = jest
+                .spyOn(global, "getNonEDOModeSteps")
+                .mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
+            const result = modeWidget._modeStepPattern("major", null);
+            expect(spy).toHaveBeenCalledWith("major", "just intonation");
+            expect(result).toEqual([2, 2, 1, 2, 2, 2, 1]);
+            spy.mockRestore();
+        });
+
+        test("falls back to getModePattern at the active EDO when ratio mapping fails", () => {
+            modeWidget._activeTemperamentKey = "just intonation";
+            modeWidget._activeEDO = 12;
+            const spy = jest.spyOn(global, "getNonEDOModeSteps").mockReturnValue(null);
+            expect(modeWidget._modeStepPattern("dorian", null)).toEqual(
+                global.getModePattern("dorian", 12)
+            );
+            spy.mockRestore();
+        });
+    });
+
+    describe("mode pie menu safety", () => {
+        test("closes when the control-bar button is clicked while open", () => {
+            modeWidget._piemenuModes();
+            expect(modeWidget._modePiemenuOpen).toBe(true);
+            modeWidget._onModePieButtonClick();
+            expect(modeWidget._modePiemenuOpen).toBe(false);
         });
     });
 });

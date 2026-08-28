@@ -746,6 +746,88 @@ describe("SearchUI.setupMainAutocomplete — instance renderItem", () => {
         expect(typeof instance._renderItem).toBe("function");
         delete global.window.jQuery;
     });
+
+    test("attaches menu event handlers to instance.menu.element that call stopPropagation, preventDefault, and re-focus search input", () => {
+        const focusFn = jest.fn();
+        const onFn = jest.fn((evt, cb) => {
+            if (evt === "mousedown mouseup click dblclick pointerdown") {
+                const mockEvt = {
+                    type: "mousedown",
+                    preventDefault: jest.fn(),
+                    stopPropagation: jest.fn()
+                };
+                cb(mockEvt);
+                expect(mockEvt.stopPropagation).toHaveBeenCalled();
+                expect(mockEvt.preventDefault).toHaveBeenCalled();
+                expect(focusFn).toHaveBeenCalled();
+            }
+        });
+        const instance = { _renderItem: null, menu: { element: { on: onFn } } };
+        const $elem = {
+            _initFlag: false,
+            focus: focusFn,
+            data: jest.fn(function (key, val) {
+                if (val !== undefined) this._initFlag = val;
+                return key === "autocomplete-init" ? this._initFlag : undefined;
+            }),
+            autocomplete: jest.fn(function (arg) {
+                if (arg === "instance") return instance;
+            })
+        };
+        global.window.jQuery = jest.fn(() => $elem);
+
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.setupMainAutocomplete(() => [], jest.fn(), jest.fn());
+
+        expect(onFn).toHaveBeenCalledWith(
+            "mousedown mouseup click dblclick pointerdown",
+            expect.any(Function)
+        );
+        delete global.window.jQuery;
+    });
+
+    test("overrides instance.close to ignore close events targeted at #ui-id-1", () => {
+        const origClose = jest.fn();
+        const instance = { _renderItem: null, close: origClose };
+        const $elem = {
+            _initFlag: false,
+            is: jest.fn(() => false),
+            closest: jest.fn(() => ({ length: 0 })),
+            data: jest.fn(function (key, val) {
+                if (val !== undefined) this._initFlag = val;
+                return key === "autocomplete-init" ? this._initFlag : undefined;
+            }),
+            autocomplete: jest.fn(function (arg) {
+                if (arg === "instance") return instance;
+            })
+        };
+
+        const menuTarget = { id: "ui-id-1" };
+        const $targetObj = {
+            is: jest.fn(sel => sel === "#ui-id-1"),
+            closest: jest.fn(() => ({ length: 0 }))
+        };
+        const jQueryMock = jest.fn(selector => {
+            if (selector === menuTarget) return $targetObj;
+            return $elem;
+        });
+        global.window.jQuery = jQueryMock;
+
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.setupMainAutocomplete(() => [], jest.fn(), jest.fn());
+
+        // Call instance.close with an event targeted at #ui-id-1
+        instance.close({ target: menuTarget });
+        expect(origClose).not.toHaveBeenCalled();
+
+        // Call instance.close with an outside event target
+        instance.close({ target: {} });
+        expect(origClose).toHaveBeenCalled();
+
+        delete global.window.jQuery;
+    });
 });
 
 // ---------------------------------------------------------------------------

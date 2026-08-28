@@ -466,6 +466,25 @@ describe("Oscilloscope", () => {
             expect(osc.pitchAnalysers).toEqual({});
         });
 
+        test("skips already-disposed analysers during close", () => {
+            const osc = createOscilloscope();
+            const alreadyDisposed = {
+                dispose: jest.fn(),
+                disposed: true
+            };
+            const stillActive = {
+                dispose: jest.fn(),
+                disposed: false
+            };
+            osc.pitchAnalysers = { 0: alreadyDisposed, 1: stillActive };
+
+            osc.close();
+
+            expect(alreadyDisposed.dispose).not.toHaveBeenCalled();
+            expect(stillActive.dispose).toHaveBeenCalled();
+            expect(osc.pitchAnalysers).toEqual({});
+        });
+
         test("calls widgetWindow.destroy", () => {
             const osc = createOscilloscope();
 

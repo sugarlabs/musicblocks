@@ -15,7 +15,7 @@
    global
 
    docById, platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
-   last, Singer, noteToFrequency, EIGHTHNOTEWIDTH,
+   last, ManagedTimer, Singer, noteToFrequency, EIGHTHNOTEWIDTH,
    MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH, toFraction,
    wheelnav, slicePath, getNote, PREVIEWVOLUME, DEFAULTVOICE,
    PITCHES3, SOLFEGENAMES, SOLFEGECONVERSIONTABLE, NOTESSHARP,
@@ -26,6 +26,8 @@
         slicePath, wheelnav
     - js/utils/utils.js
         _, docById, last, debugLog
+    - js/utils/ManagedTimer.js
+        ManagedTimer
     - js/turtle-singer.js
         Singer
     - js/utils/musicutils.js
@@ -153,6 +155,7 @@ function MusicKeyboard(activity) {
 
     this._savedDocumentOnKeyDown = undefined;
     this._savedDocumentOnKeyUp = undefined;
+    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
 
     /**
      * Flag indicating whether playback is currently active.
@@ -184,6 +187,35 @@ function MusicKeyboard(activity) {
         document.onkeyup = this._savedDocumentOnKeyUp;
         this._savedDocumentOnKeyDown = undefined;
         this._savedDocumentOnKeyUp = undefined;
+    };
+
+    this._setWidgetInterval = function (callback, interval) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setInterval(callback, interval);
+        }
+
+        return setInterval(callback, interval);
+    };
+
+    this._clearWidgetInterval = function (id) {
+        if (id === null || id === undefined || id === false) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearInterval(id)) {
+            return true;
+        }
+
+        clearInterval(id);
+        return true;
+    };
+
+    this._clearWidgetTimers = function () {
+        if (this._timerManager !== null) {
+            return this._timerManager.clearAll();
+        }
+
+        return 0;
     };
 
     /**
@@ -231,7 +263,7 @@ function MusicKeyboard(activity) {
     /** Flag to track if the metronome is on.
      * @type {boolean}
      */
-    this.metronomeInterval = false;
+    this.metronomeInterval = null;
 
     /**
      * Meter arguments.
@@ -269,6 +301,27 @@ function MusicKeyboard(activity) {
      * @type {boolean}
      */
     this.firstNote = false;
+
+    // Turn off metronome and release timer/audio resources owned by it.
+    this.stopMetronome = () => {
+        if (this.tickButton) {
+            this.tickButton.style.removeProperty("background");
+        }
+        if (this.tick && this.loopTick) {
+            this.loopTick.stop();
+        }
+        this.tick = false;
+        this.firstNote = false;
+        this.metronomeON = false;
+        const countdownContainer = docById("countdownContainer");
+        if (countdownContainer) {
+            countdownContainer.remove();
+        }
+        if (this.metronomeInterval) {
+            this._clearWidgetInterval(this.metronomeInterval);
+            this.metronomeInterval = null;
+        }
+    };
 
     /**
      * Array of selected notes.
@@ -760,15 +813,8 @@ function MusicKeyboard(activity) {
                 myNode.replaceChildren();
             }
 
-            // Ensure countdown interval/loop resources are cleaned up on close.
-            if (typeof this.stopMetronome === "function") {
-                this.stopMetronome();
-            } else {
-                this.tick = false;
-                this.firstNote = false;
-                this.metronomeON = false;
-                if (this.loopTick) this.loopTick.stop();
-            }
+            this.stopMetronome();
+            this._clearWidgetTimers();
 
             // Stop any active pointer/keyboard notes
             if (activeKey !== null) {
@@ -881,25 +927,6 @@ function MusicKeyboard(activity) {
          */
         this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, _("Metronome"));
 
-        // Turn off metronome
-        this.stopMetronome = () => {
-            this.tickButton.style.removeProperty("background");
-            if (this.tick && this.loopTick) {
-                this.loopTick.stop();
-            }
-            this.tick = false;
-            this.firstNote = false;
-            this.metronomeON = false;
-            const countdownContainer = docById("countdownContainer");
-            if (countdownContainer) {
-                countdownContainer.remove();
-            }
-            if (this.metronomeInterval) {
-                clearInterval(this.metronomeInterval);
-                this.metronomeInterval = null;
-            }
-        };
-
         this.tickButton.onclick = () => {
             if (this.metronomeInterval || this.metronomeON) {
                 this.stopMetronome();
@@ -920,11 +947,11 @@ function MusicKeyboard(activity) {
 
                 // Start countdown
                 let count = 3;
-                this.metronomeInterval = setInterval(() => {
+                this.metronomeInterval = this._setWidgetInterval(() => {
                     count--;
 
                     if (count === 0) {
-                        clearInterval(this.metronomeInterval);
+                        this._clearWidgetInterval(this.metronomeInterval);
                         this.metronomeInterval = null;
 
                         countdownContainer.remove();

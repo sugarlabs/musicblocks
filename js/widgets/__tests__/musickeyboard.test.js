@@ -943,7 +943,7 @@ describe("MusicKeyboard core logic", () => {
         global.noteToFrequency = jest.fn(name => ({ do4: 261, sol4: 392 })[name] ?? 0);
         global.last = array => array[array.length - 1];
         global.EIGHTHNOTEWIDTH = 24;
-        global.docById = jest.fn(() => ({ getAttribute: () => "0.5" }));
+        global.docById = jest.fn(() => ({ getAttribute: () => "0.5", remove: jest.fn() }));
         global.beginnerMode = "false";
     });
 
@@ -1387,5 +1387,88 @@ describe("MusicKeyboard widget timer lifecycle", () => {
         expect(firstCallback).not.toHaveBeenCalled();
         expect(secondCallback).not.toHaveBeenCalled();
         expect(keyboard._timerManager.activeIntervalCount).toBe(0);
+    });
+});
+
+describe("MusicKeyboard note duration rounding and key handlers", () => {
+    let origBeginnerMode;
+
+    beforeEach(() => {
+        origBeginnerMode = localStorage.beginnerMode;
+    });
+
+    afterEach(() => {
+        if (origBeginnerMode === undefined) {
+            delete localStorage.beginnerMode;
+        } else {
+            localStorage.beginnerMode = origBeginnerMode;
+        }
+    });
+
+    test("rounds raw note durations to 1/16th grid in normal mode", () => {
+        delete localStorage.beginnerMode;
+        const keyboard = new MusicKeyboard({});
+
+        // 0.26s -> 0.25s (nearest 1/16th)
+        expect(keyboard._roundNoteDuration(0.26)).toBe(0.25);
+        // 0.51s -> 0.5s
+        expect(keyboard._roundNoteDuration(0.51)).toBe(0.5);
+        // 0s falls back to 0.125s minimum
+        expect(keyboard._roundNoteDuration(0)).toBe(0.125);
+        // negative durations convert to positive
+        expect(keyboard._roundNoteDuration(-0.5)).toBe(0.5);
+    });
+
+    test("rounds raw note durations to 1/8th grid in beginner mode", () => {
+        localStorage.beginnerMode = "true";
+        const keyboard = new MusicKeyboard({});
+
+        // 0.26s -> 0.25s (nearest 1/8th)
+        expect(keyboard._roundNoteDuration(0.26)).toBe(0.25);
+        // 0.19s -> 0.25s (rounded to 2/8)
+        expect(keyboard._roundNoteDuration(0.19)).toBe(0.25);
+        // 0s falls back to 0.125s minimum
+        expect(keyboard._roundNoteDuration(0)).toBe(0.125);
+    });
+
+    test("caches and restores document key handlers safely", () => {
+        const keyboard = new MusicKeyboard({});
+        const dummyKeyDown = jest.fn();
+        const dummyKeyUp = jest.fn();
+
+        document.onkeydown = dummyKeyDown;
+        document.onkeyup = dummyKeyUp;
+
+        // First cache
+        keyboard._cacheDocumentKeyHandlers();
+        expect(keyboard._savedDocumentOnKeyDown).toBe(dummyKeyDown);
+        expect(keyboard._savedDocumentOnKeyUp).toBe(dummyKeyUp);
+
+        // Re-caching should not overwrite original
+        document.onkeydown = jest.fn();
+        keyboard._cacheDocumentKeyHandlers();
+        expect(keyboard._savedDocumentOnKeyDown).toBe(dummyKeyDown);
+
+        // Restore
+        keyboard._restoreDocumentKeyHandlers();
+        expect(document.onkeydown).toBe(dummyKeyDown);
+        expect(document.onkeyup).toBe(dummyKeyUp);
+        expect(keyboard._savedDocumentOnKeyDown).toBeUndefined();
+        expect(keyboard._savedDocumentOnKeyUp).toBeUndefined();
+    });
+
+    test("handles fallback timer calls when ManagedTimer is null", () => {
+        jest.useFakeTimers();
+        const keyboard = new MusicKeyboard({});
+        keyboard._timerManager = null;
+
+        const callback = jest.fn();
+        const id = keyboard._setWidgetInterval(callback, 500);
+
+        jest.advanceTimersByTime(500);
+        expect(callback).toHaveBeenCalledTimes(1);
+
+        expect(keyboard._clearWidgetInterval(id)).toBe(true);
+        jest.useRealTimers();
     });
 });

@@ -529,6 +529,8 @@ const PALS = [
     "micep"
 ];
 
+const PALS_INDEX_MAP = new Map(PALS.map((pal, idx) => [pal, idx]));
+
 const PALLABELS = [
     _("rhythm"),
     _("pitch"),
@@ -651,8 +653,8 @@ const analyzeProject = activity => {
 
     for (let c = 0; c < cats.length; c++) {
         if (cats[c] in TASCORE) {
-            const idx = PALS.indexOf(TAPAL[cats[c]]);
-            if (idx !== -1) {
+            const idx = PALS_INDEX_MAP.get(TAPAL[cats[c]]);
+            if (idx !== undefined) {
                 scores[idx] += TASCORE[cats[c]];
             } else {
                 console.warn("rubrics: TAPAL value not found in PALS:", TAPAL[cats[c]]);
@@ -662,8 +664,8 @@ const analyzeProject = activity => {
 
     for (let p = 0; p < pals.length; p++) {
         if (pals[p] in TASCORE) {
-            const idx = PALS.indexOf(pals[p]);
-            if (idx !== -1) {
+            const idx = PALS_INDEX_MAP.get(pals[p]);
+            if (idx !== undefined) {
                 scores[idx] += TASCORE[pals[p]];
             } else {
                 console.warn("rubrics: pal not found in PALS:", pals[p]);
@@ -909,6 +911,7 @@ if (typeof module !== "undefined" && module.exports) {
         TAPAL,
         TASCORE,
         PALS,
+        PALS_INDEX_MAP,
         PALLABELS,
         analyzeProject,
         scoreToChartData,

@@ -139,6 +139,17 @@ class Arpeggio {
             }
             this._playing = false;
             this._activity.logo.synth.stop();
+            if (
+                typeof Singer !== "undefined" &&
+                Singer.masterVolume &&
+                Singer.masterVolume.length > 0
+            ) {
+                const vol =
+                    typeof last === "function"
+                        ? last(Singer.masterVolume)
+                        : Singer.masterVolume[Singer.masterVolume.length - 1];
+                this._activity.logo.synth.setMasterVolume(vol);
+            }
 
             arpeggioTableDiv.style.visibility = "hidden";
             this._activity.hideMsgs();

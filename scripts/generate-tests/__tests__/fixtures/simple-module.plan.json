@@ -1,0 +1,193 @@
+{
+  "file": "scripts/generate-tests/__tests__/fixtures/simple-module.js",
+  "sourceType": "script",
+  "exports": [
+    {
+      "name": "clamp",
+      "kind": "function",
+      "params": [
+        "value",
+        "min",
+        "max"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "SimpleModule"
+    },
+    {
+      "name": "normalizePath",
+      "kind": "function",
+      "params": [
+        "...segments"
+      ],
+      "arity": 0,
+      "hasRestParam": true,
+      "via": "SimpleModule"
+    },
+    {
+      "name": "parseFlag",
+      "kind": "function",
+      "params": [
+        "token"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "SimpleModule"
+    },
+    {
+      "name": "required",
+      "kind": "function",
+      "params": [
+        "value",
+        "label"
+      ],
+      "arity": 2,
+      "hasRestParam": false,
+      "via": "SimpleModule"
+    }
+  ],
+  "functions": [
+    {
+      "name": "clamp",
+      "params": [
+        "value",
+        "min",
+        "max"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 4
+    },
+    {
+      "name": "normalizePath",
+      "params": [
+        "...segments"
+      ],
+      "arity": 0,
+      "hasRestParam": true,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 1,
+      "throws": 0,
+      "branches": 0
+    },
+    {
+      "name": "parseFlag",
+      "params": [
+        "token"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 2,
+      "throws": 0,
+      "branches": 3
+    },
+    {
+      "name": "required",
+      "params": [
+        "value",
+        "label"
+      ],
+      "arity": 2,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 1,
+      "throws": 1,
+      "branches": 2
+    }
+  ],
+  "classes": [],
+  "dependencies": [
+    "path"
+  ],
+  "referencedGlobals": [
+    "Error",
+    "Number",
+    "String",
+    "module",
+    "require",
+    "window"
+  ],
+  "jsdoc": [
+    {
+      "target": "clamp",
+      "description": "Clamps a number to a range.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{number} value - the input value."
+        },
+        {
+          "tag": "param",
+          "text": "{number} min - lower bound."
+        },
+        {
+          "tag": "param",
+          "text": "{number} max - upper bound."
+        },
+        {
+          "tag": "returns",
+          "text": "{number} the clamped value."
+        }
+      ]
+    },
+    {
+      "target": "normalizePath",
+      "description": "Joins path segments and lower-cases the result.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{...string} segments - path parts."
+        },
+        {
+          "tag": "returns",
+          "text": "{string} the normalised path."
+        }
+      ]
+    },
+    {
+      "target": "parseFlag",
+      "description": "Parses a boolean-ish string.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{string} token - the text to parse."
+        },
+        {
+          "tag": "returns",
+          "text": "{boolean}"
+        }
+      ]
+    },
+    {
+      "target": "required",
+      "description": "Asserts that a value is present.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{*} value - the value to check."
+        },
+        {
+          "tag": "param",
+          "text": "{string} label - name used in the error message."
+        },
+        {
+          "tag": "returns",
+          "text": "{*} the value, when defined."
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "branches": 12,
+    "returns": 7,
+    "throws": 1
+  }
+}

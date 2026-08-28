@@ -238,6 +238,130 @@ describe("HelpController.showKeyboardShortcuts", () => {
         const firstRowKey = widgetBody.querySelector(".keyboard-shortcuts-key");
         expect(firstRowKey.textContent).toBe("Windows/Linux: Alt + R\nMac: Option + R");
     });
+
+    describe("with a real WidgetWindow", () => {
+        let realWidgetWindows;
+        let originalDocById;
+        let originalMakeKeyboardAccessible;
+        let originalWidgetWindows;
+        let createdFloatingWindows = false;
+        let createdCanvas = false;
+
+        beforeAll(() => {
+            originalDocById = global.docById;
+            originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+            originalWidgetWindows = window.widgetWindows;
+
+            global.makeKeyboardAccessible =
+                require("../../utils/dom-helpers").makeKeyboardAccessible;
+            global.docById = id => document.getElementById(id);
+
+            if (!document.getElementById("floatingWindows")) {
+                const floatingWindows = document.createElement("div");
+                floatingWindows.id = "floatingWindows";
+                document.body.appendChild(floatingWindows);
+                createdFloatingWindows = true;
+            }
+
+            if (!document.getElementById("myCanvas")) {
+                const canvas = document.createElement("canvas");
+                canvas.id = "myCanvas";
+                document.body.appendChild(canvas);
+                createdCanvas = true;
+            }
+
+            require("../../widgets/widgetWindows.js");
+            realWidgetWindows = window.widgetWindows;
+        });
+
+        afterAll(() => {
+            if (originalDocById === undefined) {
+                delete global.docById;
+            } else {
+                global.docById = originalDocById;
+            }
+
+            if (originalMakeKeyboardAccessible === undefined) {
+                delete global.makeKeyboardAccessible;
+            } else {
+                global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+            }
+
+            window.widgetWindows = originalWidgetWindows;
+
+            if (createdFloatingWindows) {
+                document.getElementById("floatingWindows")?.remove();
+            }
+            if (createdCanvas) {
+                document.getElementById("myCanvas")?.remove();
+            }
+        });
+
+        beforeEach(() => {
+            window.widgetWindows = realWidgetWindows;
+            window.widgetWindows.openWindows = {};
+            window.widgetWindows._posCache = {};
+            window.widgetWindows.draggingWindow = null;
+            document.getElementById("floatingWindows").replaceChildren();
+        });
+
+        test("wheel over the shortcuts panel is not consumed by the widget body", () => {
+            const activity = makeActivity();
+            const controller = new HelpController(activity);
+
+            controller.showKeyboardShortcuts();
+
+            const win = window.widgetWindows.openWindows["keyboard-shortcuts"];
+            const widgetBody = win.getWidgetBody();
+            const panel = widgetBody.querySelector(".keyboard-shortcuts-panel");
+            const row = panel.querySelector(".keyboard-shortcuts-row");
+
+            widgetBody.scrollTop = 0;
+
+            const wheelEvent = new window.WheelEvent("wheel", {
+                deltaY: 40,
+                deltaX: 0,
+                bubbles: true,
+                cancelable: true
+            });
+            row.dispatchEvent(wheelEvent);
+
+            expect(wheelEvent.defaultPrevented).toBe(false);
+            expect(widgetBody.scrollTop).toBe(0);
+
+            const mouseDown = new window.MouseEvent("mousedown", {
+                bubbles: true,
+                cancelable: true
+            });
+            const mouseMove = new window.MouseEvent("mousemove", {
+                bubbles: true,
+                cancelable: true
+            });
+            panel.dispatchEvent(mouseDown);
+            panel.dispatchEvent(mouseMove);
+
+            expect(mouseDown.defaultPrevented).toBe(false);
+            expect(mouseMove.defaultPrevented).toBe(false);
+        });
+
+        test("removes panel wheel listeners and discards the window DOM on close", () => {
+            const activity = makeActivity();
+            const controller = new HelpController(activity);
+
+            controller.showKeyboardShortcuts();
+
+            const win = window.widgetWindows.openWindows["keyboard-shortcuts"];
+            const panel = win.getWidgetBody().querySelector(".keyboard-shortcuts-panel");
+            const removeSpy = jest.spyOn(panel, "removeEventListener");
+
+            win.onclose();
+
+            expect(removeSpy).toHaveBeenCalledWith("wheel", expect.any(Function));
+            expect(removeSpy).toHaveBeenCalledWith("DOMMouseScroll", expect.any(Function));
+            expect(document.body.contains(panel)).toBe(false);
+            expect(document.getElementById("floatingWindows").contains(win._frame)).toBe(false);
+        });
+    });
 });
 
 describe("HelpController.toggleJSEditor", () => {

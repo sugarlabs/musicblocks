@@ -64,10 +64,8 @@ describe("setupDictActions", () => {
                 color: "red",
                 value: 10,
                 chroma: 0.5,
-                pensize: 2,
                 stroke: 2,
                 font: "Arial",
-                orientation: 90,
                 turtle: {
                     orientation: 90
                 },

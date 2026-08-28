@@ -1084,6 +1084,109 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
+    // The `transport` wrapper (js/utils/synthutils.js) is the seam js/logo.js goes through
+    // to schedule and read Music Blocks playback time, keeping Tone.js a swappable
+    // implementation detail. Its scheduling methods -- schedule/clear/cancel and the seconds
+    // accessors/getSecondsAtTime -- are exactly the Tone.Transport surface the interpreter
+    // depends on (js/logo.js runFromBlockNow / _dispatchTurtleSignals / clearTurtleRun), so
+    // a change in that Tone.js API must fail here.
+    //
+    // Every test mutates the shared Tone mock (global.Tone / Tone.Transport members). Each
+    // mutation is registered for teardown -- jest.spyOn / jest.replaceProperty for values,
+    // removeToneMember() for the "method missing" guard cases -- and afterEach always puts
+    // the exact originals back, so no test relies on another test's manual cleanup.
+    describe("Transport wrapper scheduling delegation", () => {
+        // [object, key, originalValue] for members blanked to exercise the wrapper's
+        // typeof-guarded branches; jest.replaceProperty refuses to replace functions.
+        const removedToneMembers = [];
+        const removeToneMember = (obj, key) => {
+            removedToneMembers.push([obj, key, obj[key]]);
+            obj[key] = undefined;
+        };
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+            while (removedToneMembers.length) {
+                const [obj, key, value] = removedToneMembers.pop();
+                obj[key] = value;
+            }
+            // This describe block is the only writer of Tone.Transport.seconds; return the
+            // shared mock to its default so a later suite reading it is unaffected.
+            Tone.Transport.seconds = 0;
+        });
+
+        test("schedule delegates callback and time to Tone.Transport.schedule and returns its id", () => {
+            const scheduleSpy = jest.spyOn(Tone.Transport, "schedule").mockReturnValue(42);
+            const callback = jest.fn();
+
+            const id = transport.schedule(callback, 1.5);
+
+            expect(scheduleSpy).toHaveBeenCalledWith(callback, 1.5);
+            expect(id).toBe(42);
+        });
+
+        test("schedule returns null when Tone.Transport has no schedule method", () => {
+            removeToneMember(Tone.Transport, "schedule");
+
+            expect(transport.schedule(jest.fn(), 0)).toBeNull();
+        });
+
+        test("cancel and clear delegate to the matching Tone.Transport methods", () => {
+            const cancelSpy = jest.spyOn(Tone.Transport, "cancel");
+            const clearSpy = jest.spyOn(Tone.Transport, "clear");
+
+            transport.cancel();
+            transport.clear(7);
+
+            expect(cancelSpy).toHaveBeenCalledTimes(1);
+            expect(clearSpy).toHaveBeenCalledWith(7);
+        });
+
+        test("seconds getter reads Tone.Transport.seconds and the setter writes it", () => {
+            Tone.Transport.seconds = 3;
+            expect(transport.seconds).toBe(3);
+
+            transport.seconds = 9.25;
+            expect(Tone.Transport.seconds).toBe(9.25);
+        });
+
+        test("getSecondsAtTime delegates to Tone.Transport.getSecondsAtTime", () => {
+            const atTimeSpy = jest.spyOn(Tone.Transport, "getSecondsAtTime").mockReturnValue(5.5);
+
+            expect(transport.getSecondsAtTime(0.1)).toBe(5.5);
+            expect(atTimeSpy).toHaveBeenCalledWith(0.1);
+        });
+
+        test("getSecondsAtTime falls back to the current seconds when the method is absent", () => {
+            removeToneMember(Tone.Transport, "getSecondsAtTime");
+            Tone.Transport.seconds = 2.75;
+
+            expect(transport.getSecondsAtTime(0.1)).toBe(2.75);
+        });
+
+        test("returns safe defaults when Tone is unavailable", () => {
+            jest.replaceProperty(global, "Tone", undefined);
+
+            expect(transport.isAvailable).toBeFalsy();
+            expect(transport.isClockRunning).toBe(false);
+            expect(transport.schedule(jest.fn(), 0)).toBeNull();
+            expect(transport.seconds).toBe(0);
+            expect(transport.getSecondsAtTime(0)).toBe(0);
+        });
+
+        test("does not throw when a scheduling call is made while Tone is unavailable", () => {
+            jest.replaceProperty(global, "Tone", undefined);
+
+            expect(() => {
+                transport.start();
+                transport.stop();
+                transport.cancel();
+                transport.clear(1);
+                transport.seconds = 4;
+            }).not.toThrow();
+        });
+    });
+
     describe("_createSampleSynth", () => {
         it("creates voice synth correctly", () => {
             loadSamples();

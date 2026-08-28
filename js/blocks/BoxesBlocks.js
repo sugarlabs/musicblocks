@@ -107,8 +107,11 @@ function setupBoxesBlocks(activity) {
                 if (activity.blocks.blockList[cblk].name === "namedbox") {
                     let j = SOLFEGENAMES.indexOf(activity.blocks.blockList[cblk].value);
                     if (j !== -1) {
-                        j = j >= SOLFEGENAMES.length ? 0 : j;
-                        value = SOLFEGENAMES[j + i];
+                        // Use modular arithmetic to correctly wrap solfege values
+                        // in both the increment and decrement directions.
+                        j = (j + i) % SOLFEGENAMES.length;
+                        if (j < 0) j += SOLFEGENAMES.length;
+                        value = SOLFEGENAMES[j];
                     }
                 }
 
