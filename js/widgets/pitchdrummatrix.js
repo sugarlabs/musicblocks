@@ -714,7 +714,7 @@ class PitchDrumMatrix {
             if (ii < pairs.length) {
                 this._playPitchDrum(ii, pairs);
             }
-            setTimeout(() => {
+            this.widgetWindow.timerManager.setTimeout(() => {
                 if (!this._playing) {
                     return;
                 }
@@ -761,12 +761,12 @@ class PitchDrumMatrix {
         }
 
         if (i < pairs.length - 1) {
-            setTimeout(() => {
+            this.widgetWindow.timerManager.setTimeout(() => {
                 const ii = i + 1;
                 this._playPitchDrum(ii, pairs);
             }, 1000);
         } else {
-            setTimeout(() => {
+            this.widgetWindow.timerManager.setTimeout(() => {
                 if (!this._playing) {
                     return;
                 }
@@ -884,7 +884,7 @@ class PitchDrumMatrix {
                 null
             );
 
-            setTimeout(() => {
+            this.widgetWindow.timerManager.setTimeout(() => {
                 this.activity.logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
             }, waitTime);
         }
