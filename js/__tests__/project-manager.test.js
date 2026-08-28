@@ -286,6 +286,27 @@ describe("stopLoadAnimation", () => {
 });
 
 // ---------------------------------------------------------------------------
+// PART 3.5 — finishLoading
+// ---------------------------------------------------------------------------
+
+describe("finishLoading", () => {
+    it("resets loading state, restores cursor, and triggers an update", () => {
+        const activity = makeActivity();
+        const pm = new ProjectManager(activity);
+
+        activity.loading = true;
+        document.body.style.cursor = "wait";
+        activity.update = false;
+
+        pm.finishLoading();
+
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.update).toBe(true);
+    });
+});
+
+// ---------------------------------------------------------------------------
 // PART 4 — showContents
 // ---------------------------------------------------------------------------
 
