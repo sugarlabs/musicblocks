@@ -1934,4 +1934,35 @@ describe("_setupFileHandlers inner callbacks", () => {
         activity.fileChooser.files = [];
         expect(() => handlers.change()).not.toThrow();
     });
+
+    it("change handler shows error and finishes loading when HTML file lacks project data", () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = "<html>no project data here</html>";
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        global.extractProjectDataFromHTML.mockReturnValueOnce(null);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm.finishLoading = jest.fn();
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "empty.html" }];
+        handlers.change();
+
+        expect(global.extractProjectDataFromHTML).toHaveBeenCalledWith(
+            "<html>no project data here</html>"
+        );
+        expect(activity.errorMsg).toHaveBeenCalled();
+        expect(pm.finishLoading).toHaveBeenCalled();
+    });
 });
