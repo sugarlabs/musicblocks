@@ -263,6 +263,10 @@ class Trashcan {
             return false;
         }
 
+        if (y > ty + Trashcan.TRASHHEIGHT) {
+            return false;
+        }
+
         return true;
     }
 }
