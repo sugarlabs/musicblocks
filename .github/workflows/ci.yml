@@ -154,7 +154,7 @@ jobs:
               run: npm run build --if-present
 
     # ----------------------------------------------------------------------
-    # Jest unit tests + coverage threshold + Codecov upload
+    # Jest unit tests + coverage + Codecov upload
     # ----------------------------------------------------------------------
     test:
         name: Jest tests & coverage
@@ -175,16 +175,27 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            # Coverage thresholds are enforced inside Jest (coverageThreshold in
-            # your Jest config), so this step fails the job if coverage drops
-            # below the configured minimums.
+            # Generates coverage/coverage-summary.json, used by the coverage-delta
+            # job below to enforce no regression vs. the base branch. This step
+            # itself no longer enforces a static coverage threshold.
             - name: Run Jest with coverage
               run: npm test -- --coverage --ci
+               
+            # Coverage regressions are enforced by the coverage-delta job below,
+            # which compares this run's coverage-summary.json against the base
+            # branch's instead of a static threshold. Share the summary so that
+            # job doesn't need to re-run Jest against the PR head a second time.
+            - name: Upload PR coverage summary
+              uses: actions/upload-artifact@v4
+              with:
+                  name: pr-coverage-summary
+                  path: coverage/coverage-summary.json
+                  retention-days: 1
 
             # Upload to Codecov for the PR-vs-base coverage diff + status check.
             # NOTE: secrets (CODECOV_TOKEN) are NOT available to pull_request runs
-            # originating from forks. The threshold enforcement above still runs
-            # on every PR; only the upload is skipped on forks. fail_ci_if_error
+            # originating from forks. so this upload is skipped on forks (only the
+            # coverage-delta job's check still runs there). fail_ci_if_error
             # is false so a flaky/absent upload never blocks the PR.
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v5
@@ -193,6 +204,67 @@ jobs:
                   files: ./coverage/lcov.info
                   fail_ci_if_error: false
                   verbose: true
+
+    # ----------------------------------------------------------------------
+    # Coverage delta: fail if this PR's coverage is lower than the base
+    # branch's, instead of a static jest.config.js threshold that needs
+    # manual bumps as coverage improves.
+    #
+    # Reuses the "test" job's coverage-summary.json for the PR head (no
+    # second Jest run there). The base branch's coverage-summary.json is
+    # cached by base commit SHA, so this only costs an extra Jest run the
+    # first time a given base commit (e.g. a master merge) is seen — every
+    # other PR built on top of that same commit hits the cache.
+    # ----------------------------------------------------------------------
+    coverage-delta:
+        name: Coverage delta vs base
+        needs: test
+        if: github.event_name == 'pull_request'
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - name: Checkout PR head
+              uses: actions/checkout@v4
+              with:
+                  # Full history: the cache-miss step below needs to be able to
+                  # `git worktree add` the base branch's commit, not just HEAD.
+                  fetch-depth: 0
+                  ref: ${{ github.event.pull_request.head.sha }}
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: "22"
+                  cache: "npm"
+
+            - name: Download PR coverage summary
+              uses: actions/download-artifact@v4
+              with:
+                  name: pr-coverage-summary
+                  path: pr-coverage
+
+            - name: Restore cached base-branch coverage
+              id: cache-base
+              uses: actions/cache@v4
+              with:
+                  path: base-coverage/coverage-summary.json
+                  key: coverage-base-${{ github.event.pull_request.base.sha }}
+
+            - name: Compute base-branch coverage (cache miss)
+              if: steps.cache-base.outputs.cache-hit != 'true'
+              run: |
+                  git worktree add /tmp/base-checkout ${{ github.event.pull_request.base.sha }}
+                  cd /tmp/base-checkout
+                  npm ci
+                  npx jest --coverage --ci
+                  mkdir -p "$GITHUB_WORKSPACE/base-coverage"
+                  cp coverage/coverage-summary.json "$GITHUB_WORKSPACE/base-coverage/coverage-summary.json"
+
+            - name: Compare PR coverage against base
+              run: >-
+                  node .github/scripts/compare-coverage.js
+                  base-coverage/coverage-summary.json
+                  pr-coverage/coverage-summary.json
 
     # ----------------------------------------------------------------------
     # Cypress end-to-end tests
