@@ -1750,7 +1750,7 @@ class Blocks {
         this.updateBlockPositions = () => {
             this._beginDeferCheckBounds();
             for (const [blk, block] of this.blockList.entries()) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 this._moveBlock(blk, block.container.x, block.container.y);
             }
             this._endDeferCheckBounds();
@@ -1765,7 +1765,7 @@ class Blocks {
             this._adjustTheseStacks = [];
 
             for (const [blk, myBlock] of this.blockList.entries()) {
-                if (myBlock.trash) continue;
+                if (!myBlock || myBlock.trash) continue;
                 if (myBlock.connections[0] === null) {
                     this._adjustTheseStacks.push(blk);
                 }
@@ -1794,7 +1794,7 @@ class Blocks {
 
             let onScreen = true;
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.connections[0] === null) {
                     if (block.offScreen(this.boundary)) {
                         this.activity.setHomeContainers(true);
@@ -2461,7 +2461,7 @@ class Blocks {
          */
         this.changeDisabledStatus = (name, flag) => {
             for (const myBlock of this.blockList) {
-                if (myBlock.trash) continue;
+                if (!myBlock || myBlock.trash) continue;
                 if (myBlock.name === name) {
                     myBlock.protoblock.disabled = flag;
                     myBlock.regenerateArtwork(false);
@@ -2476,7 +2476,7 @@ class Blocks {
          */
         this.unhighlightAll = () => {
             for (const [blk, block] of this.blockList.entries()) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 this.unhighlight(blk);
             }
         };
@@ -2533,6 +2533,7 @@ class Blocks {
          */
         this.hide = () => {
             for (const block of this.blockList) {
+                if (!block) continue;
                 block.hide();
             }
             this.visible = false;
@@ -2545,7 +2546,7 @@ class Blocks {
          */
         this.show = () => {
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 block.show();
             }
             this.visible = true;
@@ -3179,7 +3180,7 @@ class Blocks {
             // Use Set for O(1) lookup instead of Array.includes() O(n)
             const actionNames = new Set();
             for (const block of this.blockList) {
-                if ((block.name === "text" || block.name === "string") && !block.trash) {
+                if (block && (block.name === "text" || block.name === "string") && !block.trash) {
                     const c = block.connections[0];
                     if (
                         c !== null &&
@@ -3213,7 +3214,7 @@ class Blocks {
             // Use Set for O(1) lookup instead of Array.includes() O(n)
             const noteNames = new Set();
             for (const block of this.blockList) {
-                if (block.name === "text" && !block.trash) {
+                if (block && block.name === "text" && !block.trash) {
                     const c = block.connections[0];
                     if (
                         c !== null &&
@@ -3244,7 +3245,7 @@ class Blocks {
             // Use Set for O(1) lookup instead of Array.includes() O(n)
             const temperamentNames = new Set();
             for (const block of this.blockList) {
-                if (block.name === "text" && !block.trash) {
+                if (block && block.name === "text" && !block.trash) {
                     const c = block.connections[0];
                     if (
                         c !== null &&
@@ -3272,7 +3273,7 @@ class Blocks {
          */
         this._findDrumURLs = () => {
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.name === "text" || block.name === "string") {
                     const c = block.connections[0];
                     if (
@@ -3304,7 +3305,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.name === "text") {
                     const c = block.connections[0];
                     if (c !== null && this.blockList[c].name === "box") {
@@ -3346,7 +3347,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.name === "text") {
                     const c = block.connections[0];
                     if (c !== null && this.blockList[c].name === "storein") {
@@ -3401,7 +3402,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.name === "storein2") {
                     if (block.privateData === oldName) {
                         block.privateData = newName;
@@ -3447,7 +3448,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.name === "namedbox") {
                     if (block.privateData === oldName) {
                         block.privateData = newName;
@@ -3499,7 +3500,7 @@ class Blocks {
                 }
 
                 const myBlock = this.blockList[blk];
-                if (myBlock.trash) {
+                if (!myBlock || myBlock.trash) {
                     continue;
                 }
                 const blkParent = this.blockList[myBlock.connections[0]];
@@ -3556,7 +3557,7 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             for (const blk in this.blockList) {
-                if (this.blockList[blk].trash) {
+                if (!this.blockList[blk] || this.blockList[blk].trash) {
                     continue;
                 }
 
@@ -4013,7 +4014,11 @@ class Blocks {
         this.findBlockInstance = blkName => {
             /** Returns true if block of name blkName is loaded. */
             for (const blk in this.blockList) {
-                if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
+                if (
+                    this.blockList[blk] &&
+                    this.blockList[blk].name === blkName &&
+                    !this.blockList[blk].trash
+                ) {
                     return true;
                 }
             }
@@ -4467,7 +4472,7 @@ class Blocks {
 
             const c2v = this.blockList[c2].value;
             for (let i = 0; i < this.blockList.length; i++) {
-                if (this.blockList[i].trash) continue;
+                if (!this.blockList[i] || this.blockList[i].trash) continue;
                 if (["setbpm3", "setmasterbpm2"].includes(this.blockList[i].name)) {
                     const bn = this.blockList[i].connections[1];
                     if (bn === null || this.blockList[bn].name !== "number") {
@@ -4761,7 +4766,11 @@ class Blocks {
          */
         this.findBlockInstance = blkName => {
             for (const blk in this.blockList) {
-                if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
+                if (
+                    this.blockList[blk] &&
+                    this.blockList[blk].name === blkName &&
+                    !this.blockList[blk].trash
+                ) {
                     return true;
                 }
             }
@@ -4839,7 +4848,7 @@ class Blocks {
                 const currentActionNames = [];
                 const currentStoreinNames = [];
                 for (let b = 0; b < this.blockList.length; b++) {
-                    if (this.blockList[b].trash) {
+                    if (!this.blockList[b] || this.blockList[b].trash) {
                         continue;
                     }
 
@@ -6260,7 +6269,11 @@ class Blocks {
                 /** Do a final check on the action and boxes palettes. */
                 let updatePalettes = false;
                 for (const blk in this.blockList) {
-                    if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
+                    if (
+                        this.blockList[blk] &&
+                        !this.blockList[blk].trash &&
+                        this.blockList[blk].name === "action"
+                    ) {
                         const myBlock = this.blockList[blk];
                         const c = myBlock.connections[1];
                         if (
@@ -6288,7 +6301,11 @@ class Blocks {
 
                 updatePalettes = false;
                 for (const blk in this.blockList) {
-                    if (!this.blockList[blk].trash && this.blockList[blk].name === "storein") {
+                    if (
+                        this.blockList[blk] &&
+                        !this.blockList[blk].trash &&
+                        this.blockList[blk].name === "storein"
+                    ) {
                         const myBlock = this.blockList[blk];
                         const c = myBlock.connections[1];
                         if (c !== null && this.blockList[c].value !== _("box")) {
@@ -6445,7 +6462,7 @@ class Blocks {
                 /** Look for any "orphan" action blocks. */
                 for (const blk in this.blockList) {
                     const thisBlock = this.blockList[blk];
-                    if (thisBlock.trash) continue;
+                    if (!thisBlock || thisBlock.trash) continue;
 
                     /** We are only interested in do and nameddo blocks. */
                     if (
@@ -6693,7 +6710,7 @@ class Blocks {
 
             /** Disconnect block. */
             const parentBlock = myBlock.connections[0];
-            if (parentBlock !== null) {
+            if (parentBlock !== null && this.blockList[parentBlock]) {
                 for (const c in this.blockList[parentBlock].connections) {
                     if (this.blockList[parentBlock].connections[c] === thisBlock) {
                         this.blockList[parentBlock].connections[c] = null;
@@ -6830,7 +6847,11 @@ class Blocks {
          */
         this.clearParameterBlocks = () => {
             for (const blk in this.blockList) {
-                if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
+                if (
+                    this.blockList[blk] &&
+                    this.blockList[blk].protoblock.parameter &&
+                    this.blockList[blk].text !== null
+                ) {
                     /** The audiofile block label is handled in block.js */
                     if (this.blockList[blk].name === "audiofile") {
                         continue;
@@ -7027,7 +7048,7 @@ class Blocks {
          */
         this.isCoordinateOnBlock = function (x, y) {
             return this.blockList.some(block => {
-                if (block.trash) return false;
+                if (!block || block.trash) return false;
 
                 const blockX = block.container.x;
                 const blockY = block.container.y;

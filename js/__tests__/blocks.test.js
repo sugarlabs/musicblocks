@@ -495,6 +495,107 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("Null Holes Left By disposeBlock", () => {
+        // disposeBlock writes null into blockList to break circular references when the
+        // trash-undo history is capped, so every full-array scan has to tolerate holes.
+        // Without the guards a single drag-to-trash past the cap left the canvas throwing
+        // "Cannot read properties of null (reading 'trash')" on every subsequent move.
+        const liveBlock = (overrides = {}) => ({
+            trash: false,
+            connections: [null],
+            name: "start",
+            width: 50,
+            height: 20,
+            container: { x: 10, y: 10, visible: true },
+            offScreen: jest.fn().mockReturnValue(false),
+            show: jest.fn(),
+            hide: jest.fn(),
+            ...overrides
+        });
+
+        const withHole = () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [liveBlock(), liveBlock()];
+            blocks.disposeBlock(0);
+            return blocks;
+        };
+
+        it("disposeBlock leaves a null hole in blockList", () => {
+            const blocks = withHole();
+
+            expect(blocks.blockList[0]).toBeNull();
+            expect(blocks.blockList[1]).not.toBeNull();
+        });
+
+        it("checkBounds does not throw when blockList has a null hole", () => {
+            const blocks = withHole();
+            blocks.boundary = { hide: jest.fn(), show: jest.fn() };
+
+            expect(() => blocks.checkBounds()).not.toThrow();
+        });
+
+        it("unhighlightAll does not throw when blockList has a null hole", () => {
+            const blocks = withHole();
+            blocks.unhighlight = jest.fn();
+
+            expect(() => blocks.unhighlightAll()).not.toThrow();
+        });
+
+        it("show does not throw when blockList has a null hole", () => {
+            const blocks = withHole();
+
+            expect(() => blocks.show()).not.toThrow();
+        });
+
+        it("isCoordinateOnBlock does not throw when blockList has a null hole", () => {
+            const blocks = withHole();
+
+            expect(() => blocks.isCoordinateOnBlock(10, 10)).not.toThrow();
+        });
+
+        it("isCoordinateOnBlock still reports a hit on the surviving block", () => {
+            const blocks = withHole();
+
+            expect(blocks.isCoordinateOnBlock(20, 15)).toBe(true);
+        });
+
+        it("hide does not throw when blockList has a null hole", () => {
+            const blocks = withHole();
+
+            expect(() => blocks.hide()).not.toThrow();
+        });
+
+        it("bringToTop does not throw when blockList has a null hole", () => {
+            const blocks = withHole();
+            blocks.raiseStackToTop = jest.fn();
+
+            expect(() => blocks.bringToTop()).not.toThrow();
+        });
+
+        it("changeDisabledStatus does not throw when blockList has a null hole", () => {
+            const blocks = withHole();
+            blocks.blockList[1].protoblock = { disabled: false };
+            blocks.blockList[1].regenerateArtwork = jest.fn();
+
+            expect(() => blocks.changeDisabledStatus("start", true)).not.toThrow();
+            expect(blocks.blockList[1].protoblock.disabled).toBe(true);
+        });
+
+        it("clearParameterBlocks does not throw when blockList has a null hole", () => {
+            const blocks = withHole();
+            blocks.blockList[1].protoblock = { parameter: false };
+            blocks.blockList[1].text = null;
+
+            expect(() => blocks.clearParameterBlocks()).not.toThrow();
+        });
+
+        it("findBlockInstance does not throw when blockList has a null hole", () => {
+            const blocks = withHole();
+
+            expect(() => blocks.findBlockInstance("nosuchblock")).not.toThrow();
+        });
+    });
+
     describe("Stack Cleanup And Dock Adjustment", () => {
         it("should expand clamps once after adjusting all queued docks", () => {
             const blocks = new Blocks(mockActivity);
