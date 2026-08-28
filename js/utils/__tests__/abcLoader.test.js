@@ -123,4 +123,45 @@ describe("ensureABCJS", () => {
         appendChildSpy.mockRestore();
         addEventListenerSpy.mockRestore();
     });
+
+    describe("when RequireJS is present", () => {
+        afterEach(() => {
+            delete window.requirejs;
+        });
+
+        it("should load through RequireJS instead of injecting a script tag", async () => {
+            const abcjs = { parseOnly: jest.fn() };
+            window.requirejs = jest.fn((deps, onLoad) => onLoad(abcjs));
+
+            const appendChildSpy = jest.spyOn(document.head, "appendChild");
+
+            await expect(ensureABCJS()).resolves.toBeUndefined();
+
+            expect(window.requirejs).toHaveBeenCalledWith(
+                ["abcjs"],
+                expect.any(Function),
+                expect.any(Function)
+            );
+            expect(appendChildSpy).not.toHaveBeenCalled();
+
+            appendChildSpy.mockRestore();
+        });
+
+        it("should publish the resolved module as window.ABCJS", async () => {
+            const abcjs = { parseOnly: jest.fn(), renderAbc: jest.fn() };
+            window.requirejs = jest.fn((deps, onLoad) => onLoad(abcjs));
+
+            await ensureABCJS();
+
+            expect(window.ABCJS).toBe(abcjs);
+        });
+
+        it("should reject if RequireJS fails to load the module", async () => {
+            const mockError = new Error('Script error for "abcjs"');
+            window.requirejs = jest.fn((deps, onLoad, onError) => onError(mockError));
+
+            await expect(ensureABCJS()).rejects.toBe(mockError);
+            expect(window.ABCJS).toBeUndefined();
+        });
+    });
 });

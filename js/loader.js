@@ -260,6 +260,7 @@ requirejs.config({
         "prefixfree.min": "lib/prefixfree.min",
         "howler": "lib/howler",
         "Chart": "lib/Chart",
+        "abcjs": "lib/abc.min",
         "samples": "sounds/samples",
         "planet": "js/planet",
         "tonejsMidi": "node_modules/@tonejs/midi/dist/Midi",
