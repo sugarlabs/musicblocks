@@ -205,9 +205,12 @@ describe("overTrashcan edge cases", () => {
         expect(trashcan.overTrashcan(221, 200)).toBe(false);
     });
 
-    it("should return true for a point far below the trashcan (no lower y bound)", () => {
-        // overTrashcan has no lower y bound check
-        expect(trashcan.overTrashcan(150, 10000)).toBe(true);
+    it("should return true for a point exactly at the bottom edge", () => {
+        expect(trashcan.overTrashcan(150, 320)).toBe(true);
+    });
+
+    it("should return false for a point just below the bottom edge", () => {
+        expect(trashcan.overTrashcan(150, 321)).toBe(false);
     });
 
     it("should return true for a point exactly on the left edge", () => {
