@@ -56,6 +56,74 @@ const deviationColor = dev => (Math.abs(dev) <= 1 ? "#4caf50" : dev > 1 ? "#ff98
  */
 const deviationFrom12EDO = cents => cents - Math.round(cents / 100) * 100;
 
+/** Sorted insertion index (lower_bound) for a cents value. Exported for testing. */
+const sortedIndex = (centsArr, centsVal) => {
+    const idx = centsArr.findIndex(c => centsVal < c);
+    return idx === -1 ? centsArr.length : idx;
+};
+
+/** Mid of largest gap (circular 0..1200). Exported for testing. */
+const largestGapMid = centsArr => {
+    if (centsArr.length < 2) return 600;
+    let maxGap = -1;
+    let bestMid = 600;
+    const sorted = [...centsArr].sort((a, b) => a - b);
+    for (let i = 0; i < sorted.length; i++) {
+        const cur = sorted[i];
+        const nxt = sorted[(i + 1) % sorted.length] + (i + 1 >= sorted.length ? 1200 : 0);
+        const gap = nxt - cur;
+        if (gap > maxGap) {
+            maxGap = gap;
+            let mid = (cur + nxt) / 2;
+            if (mid >= 1200) mid -= 1200;
+            let tries = 0;
+            while (centsArr.includes(Math.round(mid)) && tries < 5) {
+                mid = (mid + 1) % 1200;
+                if (mid === 0) mid = 1;
+                tries++;
+            }
+            bestMid = Math.max(1, Math.min(1199, ((mid % 1200) + 1200) % 1200 || 1));
+        }
+    }
+    return bestMid;
+};
+
+/** Tonic lock check with epsilon (guards floating error). Exported for testing. */
+const isLockedCents = cents => Math.abs(cents) < 0.5;
+
+/** Same-node cents: stay within tick's +/-49 window, ±20 from tick, circular-aware.
+/// Wrap only for negative values (tick 0 window), clamp for >=1200 (tick 1200 window).
+/// Falls back to largest gap if window is full. Exported for testing. */
+const sameNodeCents = (centsArr, cur, dir) => {
+    const tick = Math.round(cur / 100) * 100;
+    let c = tick + dir * 20;
+    c = Math.max(tick - 49, Math.min(tick + 49, c));
+    if (c < 0) c += 1200;
+    else if (c >= 1200) c = Math.min(1199, c);
+    c = Math.max(1, Math.min(1199, c));
+    let tries = 0;
+    while (centsArr.includes(Math.round(c)) && tries < 8) {
+        c = tick + dir * (20 + tries + 1);
+        c = Math.max(tick - 49, Math.min(tick + 49, c));
+        if (c < 0) c += 1200;
+        else if (c >= 1200) c = Math.min(1199, c);
+        c = Math.max(1, Math.min(1199, c));
+        tries++;
+    }
+    if (centsArr.includes(Math.round(c))) {
+        // Window full — fall back to largest gap middle, then nudge if still duplicate.
+        let mid = largestGapMid(centsArr);
+        let ftries = 0;
+        while (centsArr.includes(Math.round(mid)) && ftries < 5) {
+            mid = (mid + 1) % 1200;
+            if (mid === 0) mid = 1;
+            ftries++;
+        }
+        c = Math.max(1, Math.min(1199, mid));
+    }
+    return c;
+};
+
 /**
  * Reads a user-defined (custom) temperament pitch entry at index i.
  * Returns {notes, ratios, cents} or null when no stored note data exists.
@@ -1055,14 +1123,21 @@ function TemperamentWidget() {
         const refName = "12-EDO";
         let highlightDot = -1;
         let flashDot = -1;
-        // Tonic is locked - dragging or deleting it would detune the scale.
-        const _isLocked = i => i === 0;
+        const _isLocked = i => isLockedCents(that.cents[i]);
 
         /** Deviation of pitch i from the nearest 12-EDO step (the universal reference). */
         const _deviation = i => deviationFrom12EDO(that.cents[i]);
 
         /** Returns the color for a cents deviation from 12-EDO. */
         const _devColor = deviationColor;
+
+        const _nextCents = idx =>
+            that.cents[(idx + 1) % that.pitchNumber] + (idx + 1 >= that.pitchNumber ? 1200 : 0);
+        const _prevCents = idx =>
+            that.cents[(idx - 1 + that.pitchNumber) % that.pitchNumber] - (idx - 1 < 0 ? 1200 : 0);
+        const _sortedIndex = centsVal => sortedIndex(that.cents, centsVal);
+        const _largestGapMid = () => largestGapMid(that.cents);
+        const _sameNodeCents = (cur, dir) => sameNodeCents(that.cents, cur, dir);
 
         /** Converts a mouse/touch event to canvas-space coordinates. */
         const _canvasCoords = function (e, target) {
@@ -1132,15 +1207,18 @@ function TemperamentWidget() {
             opsDiv.appendChild(b);
             return b;
         };
-        const addAfter = _opsBtn("+ after", function () {
+        const addAfter = _opsBtn("+ After", function () {
             const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
+            let cents, idx;
             if (s < 0) {
-                _insertPitch(that.pitchNumber, (that.cents[that.pitchNumber - 1] || 0) + 100);
-                highlightDot = that.pitchNumber - 1;
+                cents = _largestGapMid();
+                idx = _sortedIndex(cents);
             } else {
-                _insertPitch(s + 1, that.cents[s] + 50);
-                highlightDot = s + 1;
+                cents = _sameNodeCents(that.cents[s], 1);
+                idx = _sortedIndex(cents);
             }
+            _insertPitch(idx, cents);
+            highlightDot = idx;
             _drawCircle();
             _buildTable();
             _highlightTableRow(highlightDot);
@@ -1151,13 +1229,16 @@ function TemperamentWidget() {
         );
         const addBefore = _opsBtn("+ before", function () {
             const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
+            let cents, idx;
             if (s < 0) {
-                _insertPitch(0, (that.cents[0] || 0) - 50);
-                highlightDot = 0;
+                cents = _largestGapMid();
+                idx = _sortedIndex(cents);
             } else {
-                _insertPitch(s, that.cents[s] - 50);
-                highlightDot = s;
+                cents = _sameNodeCents(that.cents[s], -1);
+                idx = _sortedIndex(cents);
             }
+            _insertPitch(idx, cents);
+            highlightDot = idx;
             _drawCircle();
             _buildTable();
             _highlightTableRow(highlightDot);
@@ -1802,12 +1883,16 @@ function TemperamentWidget() {
             };
 
             const addBefore = mkBtn(_("Add before"), function () {
-                _insertPitch(index, that.cents[index] - 50);
-                highlightDot = index;
+                const cents = _sameNodeCents(that.cents[index], -1);
+                const idx = _sortedIndex(cents);
+                _insertPitch(idx, cents);
+                highlightDot = idx;
             });
             const addAfter = mkBtn(_("Add after"), function () {
-                _insertPitch(index + 1, that.cents[index] + 50);
-                highlightDot = index + 1;
+                const cents = _sameNodeCents(that.cents[index], 1);
+                const idx = _sortedIndex(cents);
+                _insertPitch(idx, cents);
+                highlightDot = idx;
             });
             const removeBtn = mkBtn(_("Remove"), function () {
                 _removePitch(index);
@@ -3717,4 +3802,8 @@ if (typeof module !== "undefined") {
     module.exports = TemperamentWidget;
     module.exports.deviationColor = deviationColor;
     module.exports.deviationFrom12EDO = deviationFrom12EDO;
+    module.exports.sortedIndex = sortedIndex;
+    module.exports.largestGapMid = largestGapMid;
+    module.exports.isLockedCents = isLockedCents;
+    module.exports.sameNodeCents = sameNodeCents;
 }
