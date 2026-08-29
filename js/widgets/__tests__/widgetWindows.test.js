@@ -165,11 +165,11 @@ describe("widgetWindows", () => {
             createTestWindow("Window 2");
             createTestWindow("Window 3");
 
-            // mouseup, mousemove, mousedown (each once)
-            const globalMouseListeners = addSpy.mock.calls.filter(call =>
-                ["mouseup", "mousemove", "mousedown"].includes(call[0])
+            // mouseup, mousemove, mousedown, keydown (each once)
+            const globalListeners = addSpy.mock.calls.filter(call =>
+                ["mouseup", "mousemove", "mousedown", "keydown"].includes(call[0])
             );
-            expect(globalMouseListeners).toHaveLength(3);
+            expect(globalListeners).toHaveLength(4);
 
             addSpy.mockRestore();
         });
@@ -970,7 +970,7 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.focused).toBe(win1);
 
             const escEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
-            window.dispatchEvent(escEvent);
+            document.dispatchEvent(escEvent);
 
             expect(closeSpy1).toHaveBeenCalledTimes(1);
             expect(closeSpy2).not.toHaveBeenCalled();
@@ -987,7 +987,7 @@ describe("widgetWindows", () => {
                 shiftKey: true,
                 bubbles: true
             });
-            window.dispatchEvent(maxEvent);
+            document.dispatchEvent(maxEvent);
 
             expect(win1.isMaximized()).toBe(true);
             expect(win2.isMaximized()).toBe(false);
@@ -1008,7 +1008,7 @@ describe("widgetWindows", () => {
             [input, textarea, contentEditable].forEach(element => {
                 element.focus();
                 const event = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
-                window.dispatchEvent(event);
+                document.dispatchEvent(event);
             });
 
             expect(win.onclose).not.toHaveBeenCalled();
@@ -1028,7 +1028,7 @@ describe("widgetWindows", () => {
                 repeat: true,
                 bubbles: true
             });
-            window.dispatchEvent(event);
+            document.dispatchEvent(event);
 
             expect(win.onclose).not.toHaveBeenCalled();
         });
