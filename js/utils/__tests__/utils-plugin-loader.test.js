@@ -132,15 +132,17 @@ describe("processPluginData script cleanup", () => {
             return script;
         });
 
-        await processPluginData(
-            createActivity(),
-            JSON.stringify({
-                BLOCKPLUGINS: {
-                    testBlock: "globalThis.pluginSetupLoaded = true;"
-                }
-            }),
-            "plugins/test.json"
-        );
+        await expect(
+            processPluginData(
+                createActivity(),
+                JSON.stringify({
+                    BLOCKPLUGINS: {
+                        testBlock: "globalThis.pluginSetupLoaded = true;"
+                    }
+                }),
+                "plugins/test.json"
+            )
+        ).rejects.toThrow("Failed to execute plugin script");
 
         expect(document.head.querySelectorAll("script[src^='blob:plugin-setup']")).toHaveLength(0);
         expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup-0");
