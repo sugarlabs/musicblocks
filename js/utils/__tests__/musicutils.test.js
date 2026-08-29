@@ -3975,3 +3975,60 @@ describe("non-EDO temperament helpers", () => {
         });
     });
 });
+
+describe("generateNoteNames EDO length contract", () => {
+    // The table must have exactly one entry per division of the octave.
+    // Callers depend on this: transposition in getNote() derives octave
+    // arithmetic from the EDO but wraps note names on the table length, so a
+    // table longer than the EDO desynchronises the two and yields note names
+    // outside the temperament.
+    it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 19, 22, 24, 31, 41, 53])(
+        "returns exactly %i names for %i-EDO",
+        edo => {
+            expect(generateNoteNames(edo)).toHaveLength(edo);
+        }
+    );
+
+    // EDO < 7 leaves at least one natural letter with no room. Before the fix
+    // the letter was emitted regardless, so every one of these returned all
+    // seven naturals.
+    it.each([1, 2, 3, 4, 6])("does not fall back to all seven naturals for %i-EDO", edo => {
+        const names = generateNoteNames(edo);
+        expect(names).toHaveLength(edo);
+        expect(names).not.toEqual(["C", "D", "E", "F", "G", "A", "B"]);
+    });
+
+    it("keeps 12-EDO exactly as the standard chromatic table", () => {
+        expect(generateNoteNames(12)).toEqual([
+            "C",
+            "C" + SHARP,
+            "D",
+            "D" + SHARP,
+            "E",
+            "F",
+            "F" + SHARP,
+            "G",
+            "G" + SHARP,
+            "A",
+            "A" + SHARP,
+            "B"
+        ]);
+    });
+
+    it("keeps the small special-cased tables unchanged", () => {
+        expect(generateNoteNames(5)).toEqual(["C", "D", "E", "G", "A"]);
+        expect(generateNoteNames(7)).toEqual(["C", "D", "E", "F", "G", "A", "B"]);
+    });
+
+    it.each([3, 6, 12, 19, 31])("produces no duplicate names for %i-EDO", edo => {
+        const names = generateNoteNames(edo);
+        expect(new Set(names).size).toBe(names.length);
+    });
+
+    it("starts every table at C and returns cached results consistently", () => {
+        for (const edo of [3, 6, 12, 19]) {
+            expect(generateNoteNames(edo)[0]).toBe("C");
+            expect(generateNoteNames(edo)).toEqual(generateNoteNames(edo));
+        }
+    });
+});
