@@ -3964,9 +3964,13 @@ const getNonEDOModeSteps = (mode, temperament) => {
  * @returns {{ freq: number, noteName: string, octave: number } | null}
  */
 const getNonEDOFrequency = (note, baseOctave, temperamentKey, keySignature) => {
-    const t = global.TEMPERAMENT && global.TEMPERAMENT[temperamentKey];
+    const runtime =
+        typeof global === "undefined"
+            ? { TEMPERAMENT, isEquallyTempered, pitchToFrequency }
+            : global;
+    const t = runtime.TEMPERAMENT && runtime.TEMPERAMENT[temperamentKey];
     const labels =
-        t && Array.isArray(t.noteLabels) && !global.isEquallyTempered(temperamentKey)
+        t && Array.isArray(t.noteLabels) && !runtime.isEquallyTempered(temperamentKey)
             ? t.noteLabels
             : null;
     if (!labels || !labels[note % labels.length]) {
@@ -3974,7 +3978,7 @@ const getNonEDOFrequency = (note, baseOctave, temperamentKey, keySignature) => {
     }
     const idx = note % labels.length;
     const octave = baseOctave + Math.floor(note / labels.length);
-    const freq = global.pitchToFrequency(labels[idx], octave, 0, keySignature, temperamentKey);
+    const freq = runtime.pitchToFrequency(labels[idx], octave, 0, keySignature, temperamentKey);
     return { freq, noteName: labels[idx], octave };
 };
 

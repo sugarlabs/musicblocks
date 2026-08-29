@@ -22,7 +22,6 @@ window.widgetWindows = {
     _posCache: {},
     focused: null,
     draggingWindow: null,
-    _shortcutsInitialized: false,
     _globalListenersInitialized: false,
 
     // NOTE: This mapping only works for widgets that never set their own
@@ -143,10 +142,14 @@ window.widgetWindows = {
         this._handleGlobalMouseMove = this._handleGlobalMouseMove.bind(this);
         this._handleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
         this._handleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
+        this._handleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
 
         document.addEventListener("mouseup", this._handleGlobalMouseUp, true);
         document.addEventListener("mousemove", this._handleGlobalMouseMove, true);
         document.addEventListener("mousedown", this._handleGlobalMouseDown, true);
+        // Use capture phase (true) to handle keyboard shortcuts before individual
+        // widgets can intercept them via stopPropagation().
+        document.addEventListener("keydown", this._handleGlobalKeyDown, true);
 
         this._globalListenersInitialized = true;
     },
@@ -227,14 +230,6 @@ class WidgetWindow {
         this._setupLanguage();
 
         window.widgetWindows._initGlobalListeners();
-
-        if (!window.widgetWindows._shortcutsInitialized) {
-            // Use capture phase (true) to ensure global window control shortcuts are handled
-            // before individual widgets/blocks can intercept them via stopPropagation().
-            window.removeEventListener("keydown", window.widgetWindows._handleGlobalKeyDown, true);
-            window.addEventListener("keydown", window.widgetWindows._handleGlobalKeyDown, true);
-            window.widgetWindows._shortcutsInitialized = true;
-        }
 
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];

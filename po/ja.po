@@ -674,7 +674,7 @@ msgstr "すうち"
 #: js/turtledefs.js:137
 #: js/turtledefs.js:235
 msgid "boolean"
-msgstr "くらべる"
+msgstr "比べる"
 
 #: js/turtledefs.js:138
 #: js/turtledefs.js:236
@@ -752,6 +752,3805 @@ msgstr "ミュージック・ブロックス"
 #: js/turtledefs.js:423
 msgid "Welcome to Turtle Blocks"
 msgstr "タートル・ブロックへようこそ"
+
+#: js/turtledefs.js:424
+msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
+msgstr "タートル・ブロックスはアートと数学を求めるビジュアル・プログラミング言語だ。"
+
+#: js/turtledefs.js:426
+#: js/turtledefs.js:446
+#: js/turtledefs.js:755
+#: js/turtledefs.js:780
+msgid "The current version is"
+msgstr "ミュージック・ブロックスの最新バージョンは"
+
+#: js/turtledefs.js:430
+#: js/turtledefs.js:466
+#: js/toolbar.js:120
+#: js/toolbar.js:192
+#: js/toolbar.js:249
+#: js/toolbar.js:315
+#: js/activity.js:3880
+#: js/widgets/PhraseMakerAudio.js:141
+#: js/widgets/PhraseMakerAudio.js:358
+#: js/widgets/PhraseMakerAudio.js:363
+#: js/widgets/PhraseMakerAudio.js:364
+#: js/widgets/aiwidget.js:765
+#: js/widgets/aiwidget.js:771
+#: js/widgets/aiwidget.js:772
+#: js/widgets/meterwidget.js:185
+#: js/widgets/sampler.js:215
+#: js/widgets/sampler.js:216
+#: js/widgets/sampler.js:531
+#: js/widgets/tempo.js:96
+#: js/widgets/tempo.js:97
+#: js/widgets/timbre.js:463
+#: js/widgets/timbre.js:464
+#: js/widgets/timbre.js:496
+#: js/widgets/timbre.js:497
+#: js/widgets/timbre.js:779
+#: js/widgets/PhraseMakerUI.js:108
+#: js/widgets/PhraseMakerUI.js:109
+#: js/widgets/arpeggio.js:85
+#: js/widgets/arpeggio.js:515
+#: js/widgets/arpeggio.js:516
+#: js/widgets/arpeggio.js:618
+#: js/widgets/arpeggio.js:619
+#: js/widgets/jseditor.js:407
+#: js/widgets/legobricks.js:286
+#: js/widgets/modewidget.js:133
+#: js/widgets/musickeyboard.js:735
+#: js/widgets/musickeyboard.js:979
+#: js/widgets/musickeyboard.js:980
+#: js/widgets/musickeyboard.js:1068
+#: js/widgets/musickeyboard.js:1069
+#: js/widgets/phrasemaker.js:439
+#: js/widgets/phrasemaker.js:450
+#: js/widgets/phrasemaker.js:451
+#: js/widgets/pitchdrummatrix.js:147
+#: js/widgets/pitchdrummatrix.js:655
+#: js/widgets/pitchdrummatrix.js:656
+#: js/widgets/pitchdrummatrix.js:708
+#: js/widgets/pitchdrummatrix.js:709
+#: js/widgets/pitchdrummatrix.js:724
+#: js/widgets/pitchdrummatrix.js:725
+#: js/widgets/pitchdrummatrix.js:754
+#: js/widgets/pitchdrummatrix.js:755
+#: js/widgets/pitchstaircase.js:125
+#: js/widgets/rhythmruler.js:799
+#: js/widgets/rhythmruler.js:800
+#: js/widgets/rhythmruler.js:813
+#: js/widgets/rhythmruler.js:814
+#: js/widgets/temperament.js:721
+#: js/widgets/temperament.js:724
+#: js/widgets/temperament.js:804
+#: js/widgets/temperament.js:805
+#: js/widgets/temperament.js:2290
+#: js/widgets/temperament.js:2291
+#: js/widgets/temperament.js:2479
+#: js/widgets/temperament.js:2480
+#: plugins/rodi.rtp:191
+msgid "Play"
+msgstr "実行"
+
+#: js/turtledefs.js:431
+#: js/turtledefs.js:467
+msgid "Click the run button to run the project in fast mode."
+msgstr "クリックをすると、ふつうのスピードでプログラムを実行することができる。"
+
+#: js/turtledefs.js:435
+#: js/turtledefs.js:471
+#: js/toolbar.js:121
+#: js/toolbar.js:193
+#: js/toolbar.js:250
+#: js/toolbar.js:316
+#: js/activity.js:3915
+#: js/blocks/FlowBlocks.js:636
+#: js/widgets/PhraseMakerAudio.js:34
+#: js/widgets/meterwidget.js:207
+#: js/widgets/meterwidget.js:208
+#: js/widgets/timbre.js:447
+#: js/widgets/timbre.js:448
+#: js/widgets/PhraseMakerUI.js:93
+#: js/widgets/PhraseMakerUI.js:94
+#: js/widgets/arpeggio.js:499
+#: js/widgets/arpeggio.js:500
+#: js/widgets/modewidget.js:153
+#: js/widgets/modewidget.js:154
+#: js/widgets/musickeyboard.js:918
+#: js/widgets/musickeyboard.js:919
+#: js/widgets/phrasemaker.js:461
+#: js/widgets/phrasemaker.js:462
+#: js/widgets/pitchdrummatrix.js:643
+#: js/widgets/pitchdrummatrix.js:644
+#: js/widgets/temperament.js:2276
+#: js/widgets/temperament.js:2277
+#: plugins/rodi.rtp:29
+#: plugins/rodi.rtp:73
+#: plugins/rodi.rtp:413
+msgid "Stop"
+msgstr "停止"
+
+#: js/turtledefs.js:436
+msgid "Stop the turtle."
+msgstr "タータルを止める"
+
+#: js/turtledefs.js:436
+#: js/turtledefs.js:472
+msgid "You can also type Alt-S to stop."
+msgstr "プログラムは、このボタンをおすかわりに、キーボードで「Altキーと Sキーの同時おし」でも止めることができる。"
+
+#: js/turtledefs.js:443
+#: js/widgets/help.js:547
+msgid "Welcome to Music Blocks"
+msgstr "ミュージック・ブロックスへようこそ"
+
+#: js/turtledefs.js:444
+msgid "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
+msgstr "音楽と算数とプログラミングをむすびつけ、深く楽しむことができるツール。それが、ミュージック・ブロックスだ。"
+
+#: js/turtledefs.js:450
+#: js/widgets/help.js:548
+msgid "Meet Mr. Mouse!"
+msgstr "ミスター・マウスに会おう！"
+
+#: js/turtledefs.js:451
+msgid "Mr Mouse is our Music Blocks conductor."
+msgstr "ミスター・マウスは、ミュージック・ブロックスの指揮者。"
+
+#: js/turtledefs.js:453
+msgid "Mr Mouse encourages you to explore Music Blocks."
+msgstr "ミスター・マウスと一緒に、ミュージック・ブロックスの世界をたんきゅうしよう。"
+
+#: js/turtledefs.js:455
+msgid "Let us start our tour!"
+msgstr "では、ツアーを始めよう。"
+
+#: js/turtledefs.js:459
+#: js/turtledefs.js:737
+#: js/widgets/help.js:549
+msgid "Guide"
+msgstr "もっとくわしく知るには"
+
+#: js/turtledefs.js:460
+msgid "A detailed guide to Music Blocks is available."
+msgstr "インターネットから、ミュージック・ブロックスのさらにくわしいガイドページを見ることができる。次のリンク先を開いてみよう。"
+
+#: js/turtledefs.js:472
+msgid "Stop the music (and the mice)."
+msgstr "実行しているプログラムを止める。"
+
+#: js/turtledefs.js:479
+#: js/toolbar.js:122
+#: js/toolbar.js:194
+#: js/toolbar.js:251
+#: js/toolbar.js:317
+msgid "Record"
+msgstr "録音"
+
+#: js/turtledefs.js:480
+msgid "Record your project as video."
+msgstr "再生されているビデオを録音する"
+
+#: js/turtledefs.js:485
+#: js/toolbar.js:125
+#: js/toolbar.js:197
+#: js/toolbar.js:254
+#: js/toolbar.js:320
+msgid "Toggle Fullscreen"
+msgstr "フルスクリーンの切り替え"
+
+#: js/turtledefs.js:486
+msgid "Toggle Fullscreen mode."
+msgstr "フルスクリーンの切り替え"
+
+#: js/turtledefs.js:490
+#: js/toolbar.js:126
+#: js/toolbar.js:198
+#: js/toolbar.js:255
+#: js/toolbar.js:321
+#: js/toolbar.js:569
+#: planet/js/StringHelper.js:32
+msgid "New project"
+msgstr "新しいプロジェクト"
+
+#: js/turtledefs.js:491
+msgid "Initialize a new project."
+msgstr "新しいプロジェクトを作る。"
+
+#: js/turtledefs.js:495
+#: js/toolbar.js:127
+#: js/toolbar.js:199
+#: js/toolbar.js:256
+#: js/toolbar.js:322
+msgid "Load project from file"
+msgstr "プロジェクトを読みこむ"
+
+#: js/turtledefs.js:496
+msgid "You can also load projects from the file system."
+msgstr "コンピューターに保存してあるファイルから、ミュージック・ブロックスのプロジェクトを読み込んで開く。"
+
+#: js/turtledefs.js:501
+#: js/turtledefs.js:509
+#: js/turtledefs.js:528
+#: js/toolbar.js:128
+#: js/toolbar.js:200
+#: js/toolbar.js:201
+#: js/toolbar.js:257
+#: js/toolbar.js:323
+msgid "Save project"
+msgstr "プロジェクトをほぞん"
+
+#: js/turtledefs.js:502
+#: js/turtledefs.js:529
+#: js/toolbar.js:129
+#: js/toolbar.js:154
+#: js/toolbar.js:156
+#: js/toolbar.js:226
+#: js/toolbar.js:237
+#: js/toolbar.js:239
+#: js/toolbar.js:258
+#: js/toolbar.js:282
+#: js/toolbar.js:284
+#: js/toolbar.js:324
+#: js/toolbar.js:348
+#: js/toolbar.js:350
+msgid "Save project as HTML"
+msgstr "HTMLをほぞん"
+
+#: js/turtledefs.js:502
+#: js/toolbar.js:155
+#: js/toolbar.js:159
+#: js/toolbar.js:229
+msgid "Save mouse artwork as PNG"
+msgstr "PNGでほぞん"
+
+#: js/turtledefs.js:511
+msgid "Save your project to a file."
+msgstr "げんざい開いているプロジェクトをほぞんする。"
+
+#: js/turtledefs.js:513
+#: js/toolbar.js:240
+#: js/toolbar.js:285
+#: js/toolbar.js:351
+msgid "Save turtle artwork as SVG"
+msgstr "アートをSVGで保存"
+
+#: js/turtledefs.js:515
+msgid "Save graphics from your project to as SVG."
+msgstr "プロジェクトのグラフィックをSVGで保存"
+
+#: js/turtledefs.js:517
+#: js/toolbar.js:238
+#: js/toolbar.js:241
+#: js/toolbar.js:283
+#: js/toolbar.js:286
+#: js/toolbar.js:349
+#: js/toolbar.js:352
+msgid "Save turtle artwork as PNG"
+msgstr "アートをPNGで保存"
+
+#: js/turtledefs.js:519
+msgid "Save graphics from your project as PNG."
+msgstr "プロジェクトのグラフィックをPNGで保存"
+
+#: js/turtledefs.js:521
+#: js/toolbar.js:164
+#: js/toolbar.js:233
+#: js/toolbar.js:242
+#: js/toolbar.js:287
+#: js/toolbar.js:353
+msgid "Save block artwork as SVG"
+msgstr "ブロックのアートをほぞん"
+
+#: js/turtledefs.js:523
+msgid "Save block artwork as an SVG file."
+msgstr "ブロックのグラフィックをSVGで保存"
+
+#: js/turtledefs.js:531
+#: js/toolbar.js:157
+#: js/toolbar.js:227
+msgid "Save project as MIDI"
+msgstr "プロジェクトをMIDIとして保存"
+
+#: js/turtledefs.js:533
+#: js/toolbar.js:160
+#: js/toolbar.js:230
+msgid "Save music as WAV"
+msgstr "WAVでほぞん"
+
+#: js/turtledefs.js:535
+msgid "Save sheet music as ABC, Lilypond or MusicXML"
+msgstr "楽譜をABC、Lilypond、またはMusicXMLとして保存する。"
+
+#: js/turtledefs.js:537
+msgid "Save block artwork as SVG or PNG"
+msgstr "ブロックのアートワークをSVGまたはPNGとして保存する。"
+
+#: js/turtledefs.js:543
+msgid "Load samples from server"
+msgstr "みんなの作品"
+
+#: js/turtledefs.js:544
+msgid "This button opens a viewer for loading example projects."
+msgstr "インターネットの「プラネット（わくせい）」というページから、ほかの人が作ったプロジェクトを選んで、読みこむことができる。"
+
+#: js/turtledefs.js:548
+msgid "Expand/collapse option toolbar"
+msgstr "オプションツールバーを表示"
+
+#: js/turtledefs.js:549
+msgid "Click this button to expand or collapse the auxiliary toolbar."
+msgstr "このボタンをクリックすると「サブメニュー」を開いたり、折りたたんだりすることができる。"
+
+#: js/turtledefs.js:554
+msgid "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."
+msgstr "メインおよび補助ツールバー、ブロックとキャンバスの右クリックコンテキストメニュー、パレットのヘルプメッセージを表示します。"
+
+#: js/turtledefs.js:560
+#: js/toolbar.js:136
+#: js/toolbar.js:208
+#: js/toolbar.js:265
+#: js/toolbar.js:331
+msgid "Run slowly"
+msgstr "ゆっくり実行する"
+
+#: js/turtledefs.js:561
+msgid "Click to run the project in slow mode."
+msgstr "クリックをすると、ゆっくりとしたスピードでプログラムを実行することができる。"
+
+#: js/turtledefs.js:565
+#: js/toolbar.js:137
+#: js/toolbar.js:209
+#: js/toolbar.js:266
+#: js/toolbar.js:332
+msgid "Run step by step"
+msgstr "ブロックを１つずつ実行する"
+
+#: js/turtledefs.js:566
+msgid "Click to run the project step by step."
+msgstr "クリックをすると、とてもゆっくり、ブロックを１つずつ実行する。プログラムがうまくはたらかず、どのブロックが原因なのかを調べたいときなどに便利だ。"
+
+#: js/turtledefs.js:571
+#: js/toolbar.js:138
+#: js/toolbar.js:210
+#: js/toolbar.js:267
+#: js/toolbar.js:333
+msgid "Display statistics"
+msgstr "とうけいを表示する"
+
+#: js/turtledefs.js:572
+msgid "Display statistics about your Music project."
+msgstr "プロジェクトに含まれているブロックの種類、わりあいなど、とうけいてきなじょうほうを表示する。"
+
+#: js/turtledefs.js:576
+#: js/toolbar.js:139
+#: js/toolbar.js:211
+#: js/toolbar.js:268
+#: js/toolbar.js:334
+msgid "Load plugin"
+msgstr "プラグインを読みこむ"
+
+#: js/turtledefs.js:577
+msgid "Load a selected plugin."
+msgstr "選択したプラグインを読み込みます。"
+
+#: js/turtledefs.js:581
+#: js/toolbar.js:140
+#: js/toolbar.js:212
+#: js/toolbar.js:269
+#: js/toolbar.js:335
+msgid "Delete plugin"
+msgstr "プラグインを消す"
+
+#: js/turtledefs.js:582
+msgid "Delete a selected plugin."
+msgstr "せんたくしたプラグインを消す。"
+
+#: js/turtledefs.js:586
+msgid "Enable scrolling"
+msgstr "自由な方向に／たて方向にスクロール"
+
+#: js/turtledefs.js:587
+msgid "You can scroll the blocks on the canvas."
+msgstr "カンバス上をドラッグそうさしたときに、画面をスクロールさせることができる方向を上下だけと上下左右に変える。"
+
+#: js/turtledefs.js:592
+#: js/toolbar.js:143
+#: js/toolbar.js:215
+#: js/toolbar.js:272
+#: js/toolbar.js:338
+#: js/widgets/jseditor.js:442
+msgid "Change theme"
+msgstr "テーマを変更"
+
+#: js/turtledefs.js:593
+msgid "Switch between dark and light mode."
+msgstr "ダークモードとライトモードを切り替えます。"
+
+#: js/turtledefs.js:597
+#: js/toolbar.js:147
+#: js/toolbar.js:219
+#: js/toolbar.js:276
+#: js/toolbar.js:342
+#: planet/js/GlobalCard.js:56
+#: planet/js/StringHelper.js:78
+#: planet/js/LocalCard.js:64
+msgid "Merge with current project"
+msgstr "プロジェクトを組みあわせる"
+
+#: js/turtledefs.js:598
+msgid "Click to add another project into the current one."
+msgstr "クリックして別のプロジェクトを現在のプロジェクトに追加します。"
+
+#: js/turtledefs.js:602
+msgid "Wrap Turtle"
+msgstr "アートを包む"
+
+#: js/turtledefs.js:603
+msgid "Turn Turtle wrapping On or Off."
+msgstr "アートを包むか・包まない"
+
+#: js/turtledefs.js:607
+#: js/toolbar.js:148
+#: js/toolbar.js:220
+msgid "Set Pitch Preview"
+msgstr "変化記号を設定"
+
+#: js/turtledefs.js:608
+msgid "Click to set the current pitch."
+msgstr "クリックして現在の音高を設定します。"
+
+#: js/turtledefs.js:613
+#: js/toolbar.js:149
+#: js/toolbar.js:221
+#: js/toolbar.js:277
+#: js/toolbar.js:343
+msgid "JavaScript Editor"
+msgstr "JavaScript エディタ"
+
+#: js/turtledefs.js:614
+msgid "Converts Music Block programs to JavaScript."
+msgstr "Music BlocksのプログラムをJavaScriptに変換します。"
+
+#: js/turtledefs.js:619
+#: js/toolbar.js:150
+#: js/toolbar.js:222
+#: js/toolbar.js:278
+#: js/toolbar.js:344
+msgid "Restore"
+msgstr "すてたブロックをもどす"
+
+#: js/turtledefs.js:620
+msgid "Restore blocks from the trash."
+msgstr "ゴミ箱にすててしまったブロックを取り出してもどす。ふくすうのブロックをすててあるときは新しい順に、ゴミ箱が空になるまでブロックを拾いもどすことができる。"
+
+#: js/turtledefs.js:624
+msgid "Switch mode"
+msgstr "はってんモード／かんたんモードにする"
+
+#: js/turtledefs.js:625
+msgid "Switch between beginner and advance modes."
+msgstr "ミュージック・ブロックスをかんたんモード／はってんモードに切りかえる。モードによって使えるきのうやブロックの種類が変わる。"
+
+#: js/turtledefs.js:629
+#: js/toolbar.js:153
+#: js/toolbar.js:225
+#: js/toolbar.js:236
+#: js/toolbar.js:281
+#: js/toolbar.js:347
+msgid "Select language"
+msgstr "言語をえらぶ"
+
+#: js/turtledefs.js:630
+msgid "Select your language preference."
+msgstr "ブロックの名前などに表示される言語をえらぶ。"
+
+#: js/turtledefs.js:634
+#: js/widgets/help.js:564
+msgid "Contextual Menu for Blocks"
+msgstr "ブロックのコンテキストメニュー"
+
+#: js/turtledefs.js:635
+msgid "Right-click on a block to access common actions."
+msgstr "ブロックを右クリックして共通操作にアクセスします。"
+
+#: js/turtledefs.js:639
+#: planet/js/StringHelper.js:48
+msgid "Delete"
+msgstr "消す"
+
+#: js/turtledefs.js:640
+msgid "To delete a block, right-click on it. Then you will see the delete option."
+msgstr "ブロックを削除するには、ブロックを右クリックします。次に、削除オプションが表示されます。"
+
+#: js/turtledefs.js:644
+#: js/activity.js:3871
+#: planet/js/LocalCard.js:31
+msgid "Copy"
+msgstr "コピー"
+
+#: js/turtledefs.js:645
+msgid "To copy a block, right-click on it. Then you will see the copy option."
+msgstr "ブロックをコピーするには、ブロックを右クリックします。次に、コピーオプションが表示されます。"
+
+#: js/turtledefs.js:650
+msgid "To extract a block, right-click on it. Then you will see the extract option."
+msgstr "ブロックを抽出するには、ブロックを右クリックします。次に、抽出オプションが表示されます。"
+
+#: js/turtledefs.js:659
+#: js/widgets/help.js:563
+msgid "Tab Navigation"
+msgstr "タブのナビゲーション"
+
+#: js/turtledefs.js:660
+msgid "Press the Tab key on your keyboard to magically jump between the workspace, toolbar, and palette!"
+msgstr "キーボードの Tab キーを押すと、ワークスペース、ツールバー、パレットからを魔法のようにジャンプできます。"
+
+#: js/turtledefs.js:668
+#: js/widgets/help.js:565
+msgid "Contextual Menu for Canvas"
+msgstr "キャンバスのコンテキストメニュー"
+
+#: js/turtledefs.js:669
+msgid "Right-click on the canvas to perform additional canvas-related tasks."
+msgstr "キャンバスを右クリックして追加のキャンバス関連タスクを実行します。"
+
+#: js/turtledefs.js:674
+#: js/turtles.js:982
+#: js/palette.js:1240
+msgid "Grid"
+msgstr "グリッド"
+
+#: js/turtledefs.js:675
+msgid "Turn on/off lines for cartesian or polar grids."
+msgstr "デカルト座標または極座標グリッドの線をオン/オフにします。"
+
+#: js/turtledefs.js:677
+msgid "Turn on/off music staffs."
+msgstr "五線譜の表示/非表示を切り替えます。"
+
+#: js/turtledefs.js:681
+#: js/turtles.js:999
+#: js/blocks/GraphicsBlocks.js:369
+#: js/widgets/arpeggio.js:105
+#: js/widgets/legobricks.js:315
+#: js/widgets/modewidget.js:167
+#: js/widgets/musickeyboard.js:758
+#: js/widgets/phrasemaker.js:487
+#: js/widgets/pitchdrummatrix.js:175
+#: js/widgets/pitchstaircase.js:666
+#: js/widgets/rhythmruler.js:755
+#: js/widgets/temperament.js:327
+#: js/widgets/temperament.js:358
+#. TRANS: clear all subdivisions from the ruler.
+msgid "Clear"
+msgstr "もとにもどす"
+
+#: js/turtledefs.js:682
+msgid "Clear the screen and return the mice to their initial positions."
+msgstr "ネズミを元の位置にもどし、ペンでえがいた線をすべて消す。"
+
+#: js/turtledefs.js:686
+#: js/turtles.js:1020
+msgid "Collapse"
+msgstr "カンバスをしゅくしょう"
+
+#: js/turtledefs.js:687
+msgid "Collapse the graphics window."
+msgstr "ネズミがいどうしたり、ペンで線をえがいたりできる「カンバス」の表示サイズを しゅくしょうしたり、かくだいしたりする。カンバスをしゅくしょうした場合は、プログラムをふつうのそくどで実行しても、ブロックがかくれない。ふつうの実行そくどでプログラムの動作かくにんをしたいときなどに便利だ。"
+
+#: js/turtledefs.js:691
+#: js/activity.js:7131
+msgid "Home"
+msgstr "ホーム"
+
+#: js/turtledefs.js:692
+msgid "Return all blocks to the center of the screen."
+msgstr "すべてのブロックを、カンバスのまんなかに配置する。"
+
+#: js/turtledefs.js:696
+#: js/activity.js:7148
+msgid "Show/hide blocks"
+msgstr "ブロックを表示する／かくす"
+
+#: js/turtledefs.js:697
+msgid "Hide or show the blocks and the palettes."
+msgstr "クリックすると、パレットボタンとプログラムのブロックを画面上に表示させたり、かくしたりすることができる。"
+
+#: js/turtledefs.js:701
+#: js/activity.js:7164
+msgid "Expand/collapse blocks"
+msgstr "ブロックを広げる/折りたたむ"
+
+#: js/turtledefs.js:702
+msgid "Expand or collapse start and action stacks."
+msgstr "クリックすると、「スタート」と「アクション」に使われているブロックを、広げて表示したり、折りたたんでかくしたりすることができる。"
+
+#: js/turtledefs.js:706
+#: js/activity.js:7180
+msgid "Decrease block size"
+msgstr "ブロックの表示を小さくする"
+
+#: js/turtledefs.js:707
+msgid "Decrease the size of the blocks."
+msgstr "画面に表示されるブロックのサイズを小さくする。"
+
+#: js/turtledefs.js:711
+#: js/activity.js:7196
+msgid "Increase block size"
+msgstr "ブロックの表示を大きくする"
+
+#: js/turtledefs.js:712
+msgid "Increase the size of the blocks."
+msgstr "画面に表示されるブロックのサイズを大きくする。"
+
+#: js/turtledefs.js:717
+msgid "Select"
+msgstr "選択"
+
+#: js/turtledefs.js:718
+msgid "Left-click and drag on workspace to select multiple blocks."
+msgstr "ワークスペースを左クリックしてドラッグすると複数のブロックを選択できます。"
+
+#: js/turtledefs.js:724
+msgid "Palette buttons"
+msgstr "パレットボタン"
+
+#: js/turtledefs.js:725
+msgid "This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more."
+msgstr "ミュージック・ブロックスの左側には、プログラミングに使うさまざまなブロックをグループ分けした「パレットボタン」がある。"
+
+#: js/turtledefs.js:729
+msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+msgstr "それぞれのパレットボタンをクリックし、「音符（おんぷ）」「アクション」「ペン」などから好きなブロックを選んで、カンバス上にドラッグして置いてみよう。"
+
+#: js/turtledefs.js:738
+msgid "A detailed guide to Turtle Blocks is available."
+msgstr "インターネットから、ミュージック・ブロックスのさらにくわしいガイドページを見ることができる。次のリンク先を開いてみよう。"
+
+#: js/turtledefs.js:741
+msgid "Turtle Blocks Guide"
+msgstr "ミュージック・ブロックスガイド"
+
+#: js/turtledefs.js:744
+#: js/turtledefs.js:769
+#: js/widgets/help.js:550
+msgid "About"
+msgstr "ミュージック・ブロックスについて"
+
+#: js/turtledefs.js:745
+msgid "Turtle Blocks is an open source collection of tools for exploring musical concepts."
+msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、オープンソースのツールだ。"
+
+#: js/turtledefs.js:749
+msgid "A full list of contributors can be found in the Turtle Blocks GitHub repository."
+msgstr "ミュージック・ブロックスにかかわってきた人のいちらんは、GitHub（ギットハブ）のリポジトリで見ることができる。"
+
+#: js/turtledefs.js:753
+msgid "Turtle Blocks is licensed under the AGPL."
+msgstr "ミュージック・ブロックスのプログラムは、だれでも自由にみることができる。"
+
+#: js/turtledefs.js:760
+msgid "Turtle Blocks GitHub repository"
+msgstr "タータル・ブロックスのリポジトリ"
+
+#: js/turtledefs.js:763
+#: js/widgets/help.js:494
+#: js/widgets/help.js:551
+msgid "Congratulations."
+msgstr "おめでとうございます！"
+
+#: js/turtledefs.js:764
+msgid "You have finished the tour. Please enjoy Turtle Blocks!"
+msgstr "ツアーはここで終わり。タータル・ブロックスを自由に楽しもう。"
+
+#: js/turtledefs.js:770
+msgid "Music Blocks is an open source collection of tools for exploring musical concepts."
+msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、オープンソースのツールだ。"
+
+#: js/turtledefs.js:774
+msgid "A full list of contributors can be found in the Music Blocks GitHub repository."
+msgstr "ミュージック・ブロックスにかかわってきた人のいちらんは、GitHub（ギットハブ）のリポジトリで見ることができる。"
+
+#: js/turtledefs.js:778
+msgid "Music Blocks is licensed under the AGPL."
+msgstr "ミュージック・ブロックスのプログラムは、だれでも自由にみることができる。"
+
+#: js/turtledefs.js:783
+msgid "Music Blocks GitHub repository"
+msgstr "ミュージック・ブロックスのリポジトリ"
+
+#: js/turtledefs.js:786
+#: js/widgets/help.js:552
+msgid "Congratulations!"
+msgstr "おめでとうございます！"
+
+#: js/turtledefs.js:787
+msgid "You have finished the tour. Please enjoy Music Blocks!"
+msgstr "ミスター・マウスのツアーはここで終わり。ミュージック・ブロックスを自由に楽しもう。"
+
+#: js/turtles.js:1088
+msgid "Expand"
+msgstr "カンバスをかくだい"
+
+#: js/rubrics.js:543
+msgid "mice"
+msgstr "ネズミ達の関係"
+
+#: js/toolbar.js:119
+#: js/toolbar.js:191
+msgid "About Music Blocks"
+msgstr "ミュージック・ブロックスについて"
+
+#: js/toolbar.js:123
+#: js/toolbar.js:124
+#: js/toolbar.js:195
+#: js/toolbar.js:196
+#: js/toolbar.js:252
+#: js/toolbar.js:253
+#: js/toolbar.js:318
+#: js/toolbar.js:319
+msgid "Enter Fullscreen"
+msgstr "全画面表示に入る"
+
+#: js/toolbar.js:130
+#: js/toolbar.js:202
+#: js/toolbar.js:259
+#: js/toolbar.js:325
+msgid "Find and share projects"
+msgstr "みんなの作品"
+
+#: js/toolbar.js:131
+#: js/toolbar.js:203
+#: js/toolbar.js:260
+#: js/toolbar.js:326
+msgid "Offline. Sharing is unavailable"
+msgstr "オフライン。シェア機能が使えません"
+
+#: js/toolbar.js:132
+#: js/toolbar.js:204
+#: js/toolbar.js:261
+#: js/toolbar.js:327
+msgid "Auxiliary menu"
+msgstr "サブメニュー"
+
+#: js/toolbar.js:133
+#: js/toolbar.js:205
+#: js/toolbar.js:262
+#: js/toolbar.js:328
+msgid "Help and shortcuts"
+msgstr "ヘルプとショートカット"
+
+#: js/toolbar.js:135
+#: js/toolbar.js:207
+#: js/toolbar.js:264
+#: js/toolbar.js:330
+#: js/activity.js:7712
+#: js/activity.js:7735
+msgid "Keyboard shortcuts"
+msgstr "キーボードのショートカット"
+
+#: js/toolbar.js:141
+#: js/toolbar.js:213
+#: js/toolbar.js:270
+#: js/toolbar.js:336
+msgid "Enable horizontal scrolling"
+msgstr "自由な方向にスクロール"
+
+#: js/toolbar.js:142
+#: js/toolbar.js:214
+#: js/toolbar.js:271
+#: js/toolbar.js:337
+msgid "Disable horizontal scrolling"
+msgstr "たて方向にスクロール"
+
+#: js/toolbar.js:144
+#: js/toolbar.js:216
+#: js/toolbar.js:273
+#: js/toolbar.js:339
+msgid "Light Mode"
+msgstr "ライトモード"
+
+#: js/toolbar.js:145
+#: js/toolbar.js:217
+#: js/toolbar.js:274
+#: js/toolbar.js:340
+msgid "Dark Mode"
+msgstr "ダークモード"
+
+#: js/toolbar.js:146
+#: js/toolbar.js:218
+#: js/toolbar.js:275
+#: js/toolbar.js:341
+msgid "High-contrast Mode"
+msgstr "ハイコントラストモード"
+
+#: js/toolbar.js:151
+#: js/toolbar.js:223
+#: js/toolbar.js:279
+#: js/toolbar.js:345
+msgid "Switch to beginner mode"
+msgstr "かんたんモードにする"
+
+#: js/toolbar.js:152
+#: js/toolbar.js:224
+#: js/toolbar.js:280
+#: js/toolbar.js:346
+msgid "Switch to advanced mode"
+msgstr "はってんモードにする"
+
+#: js/toolbar.js:158
+#: js/toolbar.js:228
+msgid "Save mouse artwork as SVG"
+msgstr "SVGでほぞん"
+
+#: js/toolbar.js:161
+#: js/toolbar.js:231
+msgid "Save sheet music as ABC"
+msgstr "ABCのフォーマットでほぞん"
+
+#: js/toolbar.js:162
+#: js/toolbar.js:232
+msgid "Save sheet music as Lilypond"
+msgstr "がくふ(Lilypondのフォーマット)でほぞん"
+
+#: js/toolbar.js:163
+msgid "Save sheet music as MusicXML"
+msgstr "プロジェクトをMusicXML楽譜でほぞん"
+
+#: js/toolbar.js:165
+#: js/toolbar.js:234
+#: js/toolbar.js:243
+#: js/toolbar.js:288
+#: js/toolbar.js:354
+msgid "Save block artwork as PNG"
+msgstr "ブロックのアートワークをPNGで保存"
+
+#: js/toolbar.js:166
+#: js/toolbar.js:235
+#: js/toolbar.js:244
+#: js/toolbar.js:289
+#: js/toolbar.js:355
+#: js/toolbar.js:584
+#: js/activity.js:1608
+#: js/activity.js:1662
+#: planet/js/Planet.js:160
+msgid "Confirm"
+msgstr "作成する"
+
+#: js/toolbar.js:248
+#: js/toolbar.js:314
+msgid "About Turtle Blocks"
+msgstr "タートル・ブロックスについて"
+
+#: js/toolbar.js:470
+#: js/activity.js:7546
+msgid "Play project"
+msgstr "プロジェクトを再生"
+
+#: js/toolbar.js:532
+#: js/activity.js:7550
+msgid "Stop project"
+msgstr "プロジェクトを停止する"
+
+#: js/toolbar.js:574
+msgid "Are you sure you want to create a new project?"
+msgstr "新しいプロジェクトを作成してもよろしいですか？"
+
+#: js/toolbar.js:766
+#: js/toolbar.js:777
+#: js/toolbar.js:788
+#: js/toolbar.js:819
+#: js/toolbar.js:830
+msgid "Turtle Wrap Off"
+msgstr "画面の境界を無視しない"
+
+#: js/toolbar.js:778
+#: js/toolbar.js:787
+#: js/toolbar.js:820
+#: js/toolbar.js:829
+msgid "Turtle Wrap On"
+msgstr "画面の境界を無視する"
+
+#: js/activity.js:509
+#: js/activity.js:514
+msgid "Search for blocks"
+msgstr "ブロックを検索"
+
+#: js/activity.js:1580
+msgid "Import MIDI"
+msgstr "MIDIをインポートする"
+
+#: js/activity.js:1588
+msgid "Set the max blocks to generate:"
+msgstr "生成する最大ブロックを設定します。"
+
+#: js/activity.js:1647
+msgid "Clear workspace"
+msgstr "すっきりとしたワークスペース"
+
+#: js/activity.js:1653
+msgid "Are you sure you want to clear the workspace?"
+msgstr "ワークスペースを本当にクリアしますか？"
+
+#: js/activity.js:2014
+#: js/activity.js:2092
+msgid "Save recording"
+msgstr "録音を保存する"
+
+#: js/activity.js:2021
+#: js/activity.js:2071
+msgid "File save canceled"
+msgstr "ファイルの保存がキャンセルされました"
+
+#: js/activity.js:2042
+#: js/activity.js:2052
+msgid "Recorded file is empty. File not saved."
+msgstr "録音されたファイルは空です。ファイルが保存されていません。"
+
+#: js/activity.js:2069
+#: js/activity.js:2099
+msgid "Enter file name"
+msgstr "ファイル名を入力してください"
+
+#: js/activity.js:2082
+msgid "Saved! Check your Downloads folder."
+msgstr "保存しました！ダウンロードフォルダーを確認してください。"
+
+#: js/activity.js:2089
+msgid "Recording stopped. File saved."
+msgstr "録音が停止されました。ファイルが保存されました。"
+
+#: js/activity.js:2094
+msgid "recording"
+msgstr "録音中"
+
+#: js/activity.js:2131
+msgid "Recording started. Click stop to finish."
+msgstr "録音が開始されました。終了するには「停止」をクリックします。"
+
+#: js/activity.js:2211
+msgid "Recording failed: %s"
+msgstr "録音に失敗しました: %s"
+
+#: js/activity.js:2412
+msgid "Horizontal scrolling enabled."
+msgstr "水平スクロールが有効になりました。"
+
+#: js/activity.js:2421
+msgid "Horizontal scrolling disabled."
+msgstr "水平スクロールが無効になっています。"
+
+#: js/activity.js:2432
+msgid "Catching mice"
+msgstr "ネズミをつかまえているよ"
+
+#: js/activity.js:2433
+msgid "Cleaning the instruments"
+msgstr "楽器のおていれをしているよ"
+
+#: js/activity.js:2434
+msgid "Testing key pieces"
+msgstr "キーボードの音をたしかめているよ"
+
+#: js/activity.js:2435
+msgid "Sight-reading"
+msgstr "がくふをよみこんでいるよ"
+
+#: js/activity.js:2436
+msgid "Combining math and music"
+msgstr "音楽と算数をくっつけているよ"
+
+#: js/activity.js:2437
+msgid "Generating more blocks"
+msgstr "ブロックをたくさんつくっているよ"
+
+#: js/activity.js:2438
+msgid "Do Re Mi Fa Sol La Ti Do"
+msgstr "ド　レ　ミ　ファ　ソ　ラ　シ　ド"
+
+#: js/activity.js:2439
+msgid "Tuning string instruments"
+msgstr "弦楽器のチューニングをしているよ"
+
+#: js/activity.js:2440
+msgid "Pressing random keys"
+msgstr "キーボードでおんがくをつくっているよ"
+
+#: js/activity.js:2662
+msgid "plugins will be removed upon restart."
+msgstr "プラグインは再起動時に削除されます。"
+
+#: js/activity.js:2671
+msgid "show Cartesian"
+msgstr "ほうがん（ざひょう）を表示"
+
+#: js/activity.js:3331
+#: js/palette.js:1258
+#: js/blocks/RhythmBlocks.js:925
+#: js/blocks/PitchBlocks.js:462
+#: js/blocks/PitchBlocks.js:1831
+#. TRANS: a numeric mapping of the notes in an octave based on the musical mode
+msgid "scale degree"
+msgstr "音度"
+
+#: js/activity.js:3334
+#: js/palette.js:1267
+msgid "voice name"
+msgstr "音名"
+
+#: js/activity.js:3337
+#: js/palette.js:1264
+msgid "invert mode"
+msgstr "モードを反転させる"
+
+#: js/activity.js:3340
+msgid "output tools"
+msgstr "出力ツール"
+
+#: js/activity.js:3343
+msgid "custom note"
+msgstr "カスタムノート"
+
+#: js/activity.js:3346
+msgid "accidental name"
+msgstr "偶然の名前"
+
+#: js/activity.js:3349
+#: js/blocks/PitchBlocks.js:895
+msgid "east indian solfege"
+msgstr "東インドのソルフェージュ"
+
+#: js/activity.js:3352
+#: js/blocks/PitchBlocks.js:909
+msgid "note name"
+msgstr "音名"
+
+#: js/activity.js:3355
+#: js/blocks/IntervalsBlocks.js:94
+msgid "temperament name"
+msgstr "気質名"
+
+#: js/activity.js:3358
+#: js/palette.js:1261
+msgid "mode name"
+msgstr "モード名"
+
+#: js/activity.js:3361
+msgid "chord name"
+msgstr "chord name"
+
+#: js/activity.js:3364
+#: js/palette.js:1284
+msgid "interval name"
+msgstr "音程名"
+
+#: js/activity.js:3367
+msgid "filter type"
+msgstr "フィルターの種類"
+
+#: js/activity.js:3370
+msgid "oscillator type"
+msgstr "発振器の種類"
+
+#: js/activity.js:3373
+#: js/blocks.js:2685
+#: js/blocks.js:2693
+msgid "audio file"
+msgstr "オーディオファイル"
+
+#: js/activity.js:3376
+#: js/blocks/DrumBlocks.js:32
+msgid "noise name"
+msgstr "ノイズ名"
+
+#: js/activity.js:3379
+#: js/blocks/DrumBlocks.js:75
+msgid "drum name"
+msgstr "ドラム名"
+
+#: js/activity.js:3382
+#: js/blocks/DrumBlocks.js:119
+msgid "effects name"
+msgstr "エフェクト名"
+
+#: js/activity.js:3385
+msgid "wrap mode"
+msgstr "ラップモード"
+
+#: js/activity.js:3388
+msgid "load file"
+msgstr "ロード ファイル "
+
+#: js/activity.js:3717
+#: js/activity.js:7467
+msgid "This block is deprecated."
+msgstr "このブロックはもうありません。"
+
+#: js/activity.js:3719
+#: js/activity.js:7469
+msgid "Block cannot be found."
+msgstr "ブロックが見つかりません。"
+
+#: js/activity.js:3867
+msgid "Saving block artwork"
+msgstr "ブロックのアートを保存中"
+
+#: js/activity.js:3875
+msgid "Erase"
+msgstr "消す"
+
+#: js/activity.js:3919
+#: js/activity.js:3949
+msgid "Paste"
+msgstr "貼り付け"
+
+#: js/activity.js:3923
+msgid "Save block help"
+msgstr "ブロックの ヘルプを 保存"
+
+#: js/activity.js:3995
+msgid "Jumping to the bottom of the page."
+msgstr "画面の下にジャンプしています"
+
+#: js/activity.js:4001
+msgid "Scrolling up."
+msgstr "上にスクロールしています"
+
+#: js/activity.js:4006
+msgid "Scrolling down."
+msgstr "下にスクロールしています"
+
+#: js/activity.js:4011
+msgid "Extracting block"
+msgstr "ブロックを取り出しています"
+
+#: js/activity.js:4019
+msgid "Moving block up."
+msgstr "ブロックを上に動かしています"
+
+#: js/activity.js:4040
+msgid "Moving block down."
+msgstr "ブロックを下に動かしています"
+
+#: js/activity.js:4062
+msgid "Moving block left."
+msgstr "ブロックを左に動かしています"
+
+#: js/activity.js:4079
+msgid "Moving block right."
+msgstr "ブロックを右に動かしています"
+
+#: js/activity.js:4094
+msgid "Jump to home position."
+msgstr "まんなかにジャンプする"
+
+#: js/activity.js:4114
+#: js/blocks/ExtrasBlocks.js:275
+msgid "Hide blocks"
+msgstr "ブロックを非表示"
+
+#: js/activity.js:4498
+#: js/activity.js:4516
+msgid "Trash can is empty."
+msgstr "ゴミ箱は空です。"
+
+#: js/activity.js:4520
+#: js/activity.js:4652
+msgid "Item restored from the trash."
+msgstr "ゴミ箱からアイテムを復元しました。"
+
+#: js/activity.js:4724
+msgid "Restore last item"
+msgstr "先のアイテムを復元"
+
+#: js/activity.js:4725
+msgid "Restore all items"
+msgstr "すべてのアイテムを復元"
+
+#: js/activity.js:5393
+msgid "Click the run button to run the project."
+msgstr "プロジェクトを再生するため、再生のボタンをクリックしてください。"
+
+#: js/activity.js:6009
+msgid "Loading Complete!"
+msgstr "読み込み完了！"
+
+#: js/activity.js:7068
+msgid "Enter the name of a built-in plugin, or leave blank to upload a plugin file:"
+msgstr "組み込みプラグインの名前を入力するか、空白のままにしてプラグイン ファイルをアップロードします。"
+
+#: js/activity.js:7080
+msgid "Invalid plugin name. Only alphanumeric characters, hyphens, and underscores are allowed."
+msgstr "プラグイン名が無効です。英数字、ハイフン、アンダースコアのみが使用できます。"
+
+#: js/activity.js:7538
+msgid "Windows/Linux"
+msgstr "Windows/Linux"
+
+#: js/activity.js:7538
+msgid "Mac"
+msgstr "マック"
+
+#: js/activity.js:7542
+msgid "Workspace"
+msgstr "ワークスペース"
+
+#: js/activity.js:7554
+msgid "Play or stop depending on the current state"
+msgstr "現在の状態に応じて再生または停止します"
+
+#: js/activity.js:7558
+msgid "Play or stop when no text input or widget is active"
+msgstr "アクティブなテキスト入力またはウィジェットがない場合は再生または停止します"
+
+#: js/activity.js:7562
+msgid "Toggle stage scale"
+msgstr "ステージスケールの切り替え"
+
+#: js/activity.js:7566
+msgid "Jump to home position"
+msgstr "ホームポジションに戻る"
+
+#: js/activity.js:7570
+msgid "Jump to the bottom of the workspace"
+msgstr "ワークスペースの一番下にジャンプします"
+
+#: js/activity.js:7574
+msgid "Scroll workspace up"
+msgstr "ワークスペースを上にスクロールする"
+
+#: js/activity.js:7578
+msgid "Scroll workspace down"
+msgstr "ワークスペースを下にスクロールします"
+
+#: js/activity.js:7582
+msgid "Hide block search when it is open"
+msgstr "ブロック検索が開いているときに非表示にする"
+
+#: js/activity.js:7586
+msgid "You can type d to create a do block and r to create a re block etc."
+msgstr "キーボードを使うと、パレットボタンからブロックをドラッグして配置するだけでなく、ボタンをおすだけでちょくせつブロックを置くことができる。★ショートカットキー d …… 「ド」（４分音符、４オクターヴ） r …… 「レ」（４分音符、４オクターヴ） m …… 「ミ」（４分音符、４オクターヴ） f</em> …… 「ファ」（４分音符、４オクターヴ s …… 「ソ」（４分音符、４オクターヴ） l …… 「ラ」（４分音符、４オクターヴ） t …… 「シ」（４分音符、４オクターヴ）"
+
+#: js/activity.js:7593
+msgid "Editing"
+msgstr "編集"
+
+#: js/activity.js:7597
+msgid "Copy selected stack."
+msgstr "選択したスタックをコピーします。"
+
+#: js/activity.js:7601
+msgid "Paste previous stack."
+msgstr "この前のスタックを貼り付けます。"
+
+#: js/activity.js:7605
+msgid "Open the JSON paste box."
+msgstr "JSON 貼り付けボックスを開きます。"
+
+#: js/activity.js:7609
+msgid "Paste JSON when the paste box is focused."
+msgstr "貼り付けボックスにフォーカスがあるときに JSON を貼り付けます。"
+
+#: js/activity.js:7613
+msgid "Extract the active block."
+msgstr "アクティブなブロックを抽出します。"
+
+#: js/activity.js:7617
+msgid "Clear workspace."
+msgstr "すっきりとしたワークスペース。"
+
+#: js/activity.js:7621
+msgid "Save block artwork."
+msgstr "ブロックアートワークを保存します。"
+
+#: js/activity.js:7625
+msgid "Save block help."
+msgstr "ブロックのヘルプを保存します。"
+
+#: js/activity.js:7630
+msgid "Navigation"
+msgstr "ナビゲーション"
+
+#: js/activity.js:7634
+msgid "Move focus between the toolbar, palettes, and workspace."
+msgstr "ツールバー、パレット、ワークスペースの中からフォーカスを移動します。"
+
+#: js/activity.js:7637
+#: js/activity.js:7703
+msgid "Arrow keys"
+msgstr "矢印キー"
+
+#: js/activity.js:7638
+msgid "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context."
+msgstr "コンテキストに応じて、アクティブなブロックの移動、パレットのスクロール、テンポ ウィジェットの調整、またはワークスペースのパンを行います。"
+
+#: js/activity.js:7644
+msgid "Pan workspace right when horizontal scrolling is enabled."
+msgstr "水平スクロールが有効な場合、ワークスペースを右に移動します。"
+
+#: js/activity.js:7648
+msgid "Pan workspace left when horizontal scrolling is enabled."
+msgstr "水平スクロールが有効な場合、ワークスペースを左に移動します。"
+
+#: js/activity.js:7653
+msgid "Toolbar"
+msgstr "ツールバー"
+
+#: js/activity.js:7657
+#: js/activity.js:7658
+#: js/activity.js:7697
+#: js/activity.js:7698
+msgid "Arrow Left / Arrow Right"
+msgstr "左矢印 / 右矢印"
+
+#: js/activity.js:7660
+msgid "Move focus within the current toolbar."
+msgstr "現在のツールバー内でフォーカスを移動します。"
+
+#: js/activity.js:7664
+#: js/activity.js:7665
+msgid "Arrow Up / Arrow Down"
+msgstr "上矢印 / 下矢印"
+
+#: js/activity.js:7667
+msgid "Move focus between main and auxiliary toolbars."
+msgstr "メイン ツールバーと補助ツールバーの間でフォーカスを移動します。"
+
+#: js/activity.js:7671
+msgid "Activate the focused toolbar button."
+msgstr "フォーカスされたツールバーからのボタンをアクティブにします。"
+
+#: js/activity.js:7675
+msgid "Exit toolbar keyboard navigation."
+msgstr "ツールバーのキーボードナビゲーションを終了します。"
+
+#: js/activity.js:7680
+msgid "Widget Windows"
+msgstr "ウィジェット・ウィンドウ"
+
+#: js/activity.js:7684
+msgid "Close the focused widget window."
+msgstr "フォーカスされたウィジェット・ウィンドウを閉じます。"
+
+#: js/activity.js:7688
+msgid "Maximize or restore the focused widget window."
+msgstr "フォーカスされたウィジェット・ウィンドウを最大化または復元します。"
+
+#: js/activity.js:7693
+msgid "Help and Pitch Slider"
+msgstr "ヘルプとピッチ・スライダー"
+
+#: js/activity.js:7700
+msgid "Move between help pages when Help is open."
+msgstr "ヘルプが開いているときにヘルプ・ページの中から移動します。"
+
+#: js/activity.js:7704
+msgid "Adjust pitch by semitone when Pitch Slider is open."
+msgstr "ピッチ・スライダーが開いているときに半音単位でピッチを調整します。"
+
+#: js/activity.js:7739
+msgid "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
+msgstr "ショートカットは状況に依存します。一部の機能は、関連するパネル、ウィジェット、またはモードがアクティブな場合にのみ機能します。 Windows/Linux および Mac の同等のものを一緒に示します。"
+
+#: js/activity.js:7873
+msgid "Invalid clipboard data. To paste blocks, first copy them from the Music Blocks canvas. To paste text, click inside an input field."
+msgstr "クリップボードデータが無効です。ブロックを貼り付けるには、まずミュージック・ブロックスのキャンバスからブロックをコピーします。テキストを貼り付けるには、入力フィールド内をクリックします。"
+
+#: js/activity.js:8099
+msgid "Select is enabled."
+msgstr "選択モードが有効です。"
+
+#: js/activity.js:8100
+msgid "Select is disabled."
+msgstr "選択モードが無効です。"
+
+#: js/activity.js:8561
+#: js/activity.js:8626
+#: js/activity.js:8648
+#: js/activity.js:8688
+#: js/activity.js:8744
+#: js/activity.js:8763
+msgid "Cannot load project from the file. Please check the file type."
+msgstr "プロジェクトを読みこめません。ファイルの種類をかくにんしてください。"
+
+#: js/activity.js:8987
+msgid "Something went wrong reading JSON-encoded project data."
+msgstr "JSON エンコードされたプロジェクト データの読み取り中に問題が発生しました。"
+
+#: js/activity.js:8998
+msgid "Invalid parameters"
+msgstr "無効なパラメータ"
+
+#: js/activity.js:9291
+msgid "Error regenerating palettes. Please refresh the page."
+msgstr "パレットの再生成に失敗しました。ページを更新してください。"
+
+#: js/block.js:1738
+#: js/block.js:1857
+#: js/palette.js:1274
+#: js/blocks/IntervalsBlocks.js:63
+#: js/blocks/WidgetBlocks.js:305
+msgid "temperament"
+msgstr "音律"
+
+#: js/block.js:1752
+msgid "matrix"
+msgstr "フレーズメーカー"
+
+#: js/block.js:1759
+#: js/blocks/WidgetBlocks.js:1743
+#: plugins/rodi.rtp:324
+msgid "status"
+msgstr "実行じょうきょう"
+
+#: js/block.js:1766
+msgid "drum mapper"
+msgstr "ドラム・ピッチ行列"
+
+#: js/block.js:1773
+msgid "ruler"
+msgstr "リズムメーカー"
+
+#: js/block.js:1780
+#: js/blocks/WidgetBlocks.js:457
+#. TRANS: timbre is the character or quality of a musical sound
+msgid "timbre"
+msgstr "音色"
+
+#: js/block.js:1787
+msgid "stair"
+msgstr "階段"
+
+#: js/block.js:1794
+#: js/blocks/ProgramBlocks.js:1278
+#: js/blocks/WidgetBlocks.js:782
+#. TRANS: the speed at music is should be played.
+msgid "tempo"
+msgstr "メトロノーム"
+
+#: js/block.js:1801
+#: js/block.js:1864
+#: js/blocks/IntervalsBlocks.js:1506
+#. TRANS: mode, e.g., Major in C Major
+msgid "mode"
+msgstr "モード（音階）"
+
+#: js/block.js:1808
+msgid "slider"
+msgstr "スライダー"
+
+#: js/block.js:1815
+#: js/blocks/SensorsBlocks.js:943
+msgid "keyboard"
+msgstr "キーボード"
+
+#: js/block.js:1829
+#: js/blocks/WidgetBlocks.js:1319
+#: js/blocks/WidgetBlocks.js:1357
+#. TRANS: widget for subdividing a measure into distinct rhythmic elements
+msgid "rhythm maker"
+msgstr "リズムメーカー"
+
+#: js/block.js:1836
+#: js/block.js:2650
+#: js/block.js:2707
+#: js/blocks/RhythmBlockPaletteBlocks.js:83
+#: js/blocks/RhythmBlockPaletteBlocks.js:261
+#: js/blocks/RhythmBlockPaletteBlocks.js:526
+#: js/blocks/RhythmBlockPaletteBlocks.js:594
+#: js/blocks/RhythmBlockPaletteBlocks.js:645
+#: js/blocks/RhythmBlockPaletteBlocks.js:897
+#: js/blocks/RhythmBlocks.js:33
+#: js/blocks/RhythmBlocks.js:360
+#: js/blocks/RhythmBlocks.js:768
+#: js/blocks/RhythmBlocks.js:808
+#: js/blocks/MeterBlocks.js:1415
+#: js/blocks/OrnamentBlocks.js:220
+#: js/blocks/OrnamentBlocks.js:312
+#: js/turtleactions/DictActions.js:85
+#: js/widgets/phrasemaker.js:973
+#: js/widgets/phrasemaker.js:2742
+#: js/widgets/phrasemaker.js:2791
+#: js/widgets/phrasemaker.js:2910
+#. TRANS: the value (e.g., 1/4 note) of the note being played.
+msgid "note value"
+msgstr "音の長さ"
+
+#: js/block.js:1843
+#: js/blocks/IntervalsBlocks.js:1108
+#: js/blocks/OrnamentBlocks.js:312
+#. TRANS: calculate a relative step between notes based on semi-tones
+msgid "scalar interval"
+msgstr "音階の上下"
+
+#: js/block.js:1850
+#: js/blocks/RhythmBlocks.js:154
+msgid "milliseconds"
+msgstr "ミリ秒"
+
+#: js/block.js:2575
+#: js/block.js:2598
+msgid "scalar interval %s"
+msgstr "音階の上下 %s"
+
+#: js/block.js:2648
+#: js/block.js:2652
+#: js/block.js:2705
+#: js/block.js:2844
+#: js/blocks/RhythmBlocks.js:714
+#: js/blocks/ProgramBlocks.js:1274
+#: js/widgets/rhythmruler.js:1389
+#: js/widgets/rhythmruler.js:1545
+msgid "silence"
+msgstr "休符"
+
+#: js/block.js:2744
+#: js/block.js:3844
+#: js/block.js:3861
+#: js/utils/musicutils.js:4405
+#: js/utils/musicutils.js:6055
+#. TRANS: the note names must be separated by single spaces
+#. TRANS: the note names must be separated by single spaces
+msgid "ti la sol fa mi re do"
+msgstr "シ ラ ソ ファ ミ レ ド"
+
+#: js/block.js:2832
+#: js/blocks/IntervalsBlocks.js:627
+#. TRANS: scalar step
+msgid "down"
+msgstr "下"
+
+#: js/block.js:2833
+msgid "up"
+msgstr "上"
+
+#: js/block.js:3300
+msgid "Silence block cannot be removed."
+msgstr "「休符」は取り出すことができません。"
+
+#: js/block.js:4191
+#: js/blocks.js:2813
+#: js/blocks.js:3432
+#: js/palette.js:1287
+#: js/blocks/BooleanBlocks.js:77
+#: js/blocks/BooleanBlocks.js:166
+#: js/blocks/BooleanBlocks.js:250
+#: js/blocks/BooleanBlocks.js:334
+#: js/blocks/BooleanBlocks.js:432
+#: js/blocks/BooleanBlocks.js:537
+#: js/blocks/BooleanBlocks.js:637
+#: js/blocks/BooleanBlocks.js:737
+#: js/blocks/BooleanBlocks.js:841
+#: js/blocks/BooleanBlocks.js:942
+#: js/blocks/BooleanBlocks.js:1026
+#: js/blocks/SensorsBlocks.js:852
+msgid "true"
+msgstr "真"
+
+#: js/block.js:4191
+#: js/blocks.js:2815
+#: js/blocks.js:3434
+#: js/blocks/BooleanBlocks.js:79
+#: js/blocks/BooleanBlocks.js:168
+#: js/blocks/BooleanBlocks.js:252
+#: js/blocks/BooleanBlocks.js:336
+#: js/blocks/BooleanBlocks.js:434
+#: js/blocks/BooleanBlocks.js:539
+#: js/blocks/BooleanBlocks.js:639
+#: js/blocks/BooleanBlocks.js:739
+#: js/blocks/BooleanBlocks.js:843
+#: js/blocks/BooleanBlocks.js:944
+#: js/blocks/SensorsBlocks.js:854
+msgid "false"
+msgstr "偽"
+
+#: js/block.js:4201
+#: js/block.js:4205
+#: js/blocks/ExtrasBlocks.js:618
+msgid "Cartesian"
+msgstr "ほうがん（ざひょう）を表示"
+
+#: js/block.js:4201
+#: js/block.js:4206
+#: js/blocks/ExtrasBlocks.js:622
+msgid "polar"
+msgstr "極座標を表示"
+
+#: js/block.js:4201
+#: js/block.js:4207
+#: js/blocks/ExtrasBlocks.js:626
+msgid "Cartesian/Polar"
+msgstr "中心の角度とほうがん（ざひょう）をひょうじ"
+
+#: js/block.js:4201
+#: js/block.js:4214
+#: js/blocks/ExtrasBlocks.js:655
+msgid "none"
+msgstr "なし"
+
+#: js/block.js:4208
+#: js/blocks/ExtrasBlocks.js:631
+msgid "treble"
+msgstr "トレブル記号"
+
+#: js/block.js:4209
+#: js/blocks/ExtrasBlocks.js:635
+msgid "grand staff"
+msgstr "トレブルとバス記号"
+
+#: js/block.js:4210
+#: js/blocks/ExtrasBlocks.js:639
+msgid "mezzo-soprano"
+msgstr "メゾソプラノ記号"
+
+#: js/block.js:4211
+#: js/blocks/ExtrasBlocks.js:643
+msgid "alto"
+msgstr "アルト記号"
+
+#: js/block.js:4212
+#: js/blocks/ExtrasBlocks.js:647
+msgid "tenor"
+msgstr "テノール記号"
+
+#: js/block.js:4213
+#: js/utils/musicutils.js:1168
+#: js/utils/synthutils.js:88
+#: js/blocks/ExtrasBlocks.js:651
+#: js/widgets/legobricks.js:1932
+#. TRANS: musical instrument
+msgid "bass"
+msgstr "コントラバス"
+
+#: js/block.js:4258
+#: js/blocks.js:2806
+#: js/blocks.js:3425
+msgid "on2"
+msgstr "オン"
+
+#: js/block.js:4260
+#: js/blocks.js:2808
+#: js/blocks.js:3427
+msgid "off"
+msgstr "オフ"
+
+#: js/block.js:4731
+msgid "Not a number"
+msgstr "数字ではありません"
+
+#: js/block.js:4742
+msgid "Octave value must be between 1 and 8."
+msgstr "オクターヴの値が「１」から「8」までの範囲でなければなりません。"
+
+#: js/block.js:4750
+msgid "Numbers can have at most 10 digits."
+msgstr "数字は最大１０桁までです。"
+
+#: js/blocks.js:1423
+#: js/blocks.js:3657
+#: js/blocks.js:4081
+#: js/blocks.js:4123
+#: js/blocks.js:4178
+#: js/blocks.js:4224
+#: js/blocks.js:6991
+#: js/palette.js:1178
+#: js/palette.js:1307
+#: js/palette.js:1821
+#: js/blocks/BoxesBlocks.js:282
+#: js/blocks/BoxesBlocks.js:285
+#: js/blocks/BoxesBlocks.js:405
+#: js/blocks/BoxesBlocks.js:597
+msgid "box"
+msgstr "箱"
+
+#: js/blocks.js:1949
+msgid "Consider breaking this stack into parts."
+msgstr "アクションブロックを使ってプログラムをまとめませんか"
+
+#: js/blocks.js:2678
+#: js/palette.js:1322
+#: js/blocks/MediaBlocks.js:686
+msgid "open file"
+msgstr "ファイルを開く"
+
+#: js/blocks.js:3461
+#: js/palette.js:1243
+#: js/blocks/MediaBlocks.js:975
+#: js/blocks/MediaBlocks.js:1046
+msgid "text"
+msgstr "文字そざい"
+
+#: js/blocks.js:3656
+#: js/palette.js:1310
+#: js/palette.js:1311
+#: js/blocks/BoxesBlocks.js:517
+msgid "store in box"
+msgstr "箱にほぞん"
+
+#: js/blocks.js:3661
+#: js/blocks.js:4144
+#: js/blocks.js:4190
+#: js/blocks.js:4236
+#: js/blocks.js:6224
+#: js/blocks.js:6248
+#: js/blocks/BoxesBlocks.js:775
+msgid "box1"
+msgstr "箱１"
+
+#: js/blocks.js:3663
+#: js/blocks.js:4146
+#: js/blocks.js:4192
+#: js/blocks.js:4238
+#: js/blocks.js:6226
+#: js/blocks.js:6250
+#: js/blocks/BoxesBlocks.js:666
+msgid "box2"
+msgstr "箱２"
+
+#: js/blocks.js:4411
+#: js/palette.js:1308
+#: js/palette.js:1313
+#: js/palette.js:1762
+#: js/blocks/BoxesBlocks.js:594
+msgid "store in"
+msgstr "入れる"
+
+#: js/blocks.js:4411
+#: js/blocks/BoxesBlocks.js:598
+#: js/blocks/DictBlocks.js:215
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/EnsembleBlocks.js:408
+#: js/blocks/EnsembleBlocks.js:419
+#: js/blocks/MediaBlocks.js:829
+#: js/blocks/ToneBlocks.js:1051
+#: js/blocks/PitchBlocks.js:690
+#: js/blocks/PitchBlocks.js:974
+#: js/blocks/PitchBlocks.js:1919
+#: js/blocks/ProgramBlocks.js:394
+#: js/blocks/ProgramBlocks.js:500
+#: js/blocks/ProgramBlocks.js:664
+msgid "name"
+msgstr "名前"
+
+#: js/blocks.js:4411
+#: js/blocks/BoxesBlocks.js:75
+#: js/blocks/BoxesBlocks.js:598
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/DictBlocks.js:430
+#: js/blocks/HeapBlocks.js:544
+#: js/blocks/RhythmBlocks.js:1132
+msgid "value"
+msgstr "値"
+
+#: js/blocks.js:4749
+msgid "Forever loop detected inside a note value block. Unexpected things may happen."
+msgstr "「ずっとくり返す」状態が「音符」の中にある。"
+
+#: js/blocks.js:5296
+msgid "There is no block selected."
+msgstr "ブロックが選ばれていません"
+
+#: js/blocks.js:5408
+#: js/blocks/MediaBlocks.js:886
+#. TRANS: Avatar is the image used to determine the appearance of the mouse.
+msgid "avatar"
+msgstr "ネズミへんこう"
+
+#: js/blocks.js:5411
+#: js/utils/synthutils.js:3615
+#: js/blocks/ToneBlocks.js:1036
+#: js/widgets/sampler.js:1988
+#. TRANS: The sound sample that the user uploads.
+msgid "sample"
+msgstr "音色サンプル"
+
+#: js/languagebox.js:256
+msgid "Refresh your browser to change your language preference."
+msgstr "言語を変えるには、ブラウザをこうしんしてください。"
+
+#: js/languagebox.js:288
+msgid "Music Blocks is already set to this language."
+msgstr " Music Blocksは既にこの言語に設定されています。"
+
+#: js/loader.js:431
+msgid "Failed to load EaselJS. Please refresh the page."
+msgstr "EaselJS のロードに失敗しました。ページを更新してください。"
+
+#: js/loader.js:453
+msgid "Failed to load Music Blocks. Please refresh the page."
+msgstr "ミュージック・ブロックスの読み込みに失敗しました。ページを更新してください。"
+
+#: js/loader.js:460
+msgid "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
+msgstr "ミュージック・ブロックス コアの初期化に失敗しました。ページを更新してください。\n\nエラー: %s"
+
+#: js/logo.js:663
+#: js/blocks/ProgramBlocks.js:259
+#: js/blocks/ProgramBlocks.js:431
+msgid "You must select a file."
+msgstr "ファイルをえらんでください。"
+
+#: js/logo.js:1655
+msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
+msgstr "無限ループが検出されました。ブラウザのフリーズを防ぐために実行が停止されました。"
+
+#: js/logo.js:1852
+#: js/blocks/MediaBlocks.js:338
+msgid "width"
+msgstr "カンバスのよこはば"
+
+#: js/logo.js:1853
+#: js/blocks/MediaBlocks.js:395
+msgid "height"
+msgstr "カンバスのたてはば"
+
+#: js/logo.js:1854
+#: js/blocks/MediaBlocks.js:35
+#. TRANS: right side of the screen
+msgid "right (screen)"
+msgstr "ざひょうち（右）"
+
+#: js/logo.js:1855
+#: js/blocks/MediaBlocks.js:111
+#. TRANS: left side of the screen
+msgid "left (screen)"
+msgstr "ざひょうち（左）"
+
+#: js/logo.js:1856
+#: js/blocks/MediaBlocks.js:186
+msgid "top (screen)"
+msgstr "ざひょうち（上）"
+
+#: js/logo.js:1857
+#: js/blocks/MediaBlocks.js:261
+msgid "bottom (screen)"
+msgstr "ざひょうち（下）"
+
+#: js/logo.js:2159
+msgid "Playback is ready."
+msgstr "コンパイル完了"
+
+#: js/palette.js:618
+msgid "Block Palettes"
+msgstr "ブロックパレット"
+
+#: js/palette.js:629
+msgid "Palette Categories"
+msgstr "パレットのカテゴリ"
+
+#: js/palette.js:650
+msgid "Toggle Palette"
+msgstr "パレットの切り替え"
+
+#: js/palette.js:1249
+msgid "effect"
+msgstr "こうかおん"
+
+#: js/palette.js:1255
+msgid "sargam"
+msgstr "Sargam (インドの ソルファ)"
+
+#: js/palette.js:1270
+#: js/blocks/PitchBlocks.js:1230
+msgid "custom pitch"
+msgstr "カスタムピッチ"
+
+#: js/palette.js:1278
+msgid "accidental"
+msgstr "変化記号"
+
+#: js/palette.js:1302
+#: js/blocks/PitchBlocks.js:423
+msgid "pitch converter"
+msgstr "音の高さを調節"
+
+#: js/planetInterface.js:151
+msgid "project undefined"
+msgstr "プロジェクト未定義"
+
+#: js/planetInterface.js:282
+msgid "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
+msgstr "エラー: ローカル ストレージが不足しているため、保存できません。保存されているプロジェクトをいくつか削除してみてください。"
+
+#: js/themebox.js:375
+msgid "Theme switched to %s mode."
+msgstr "テーマが %s モードに切り替わりました。"
+
+#: js/themebox.js:568
+msgid "Music Blocks is already set to this theme."
+msgstr "Music Blocksはすでにこのテーマに設定されています。"
+
+#: js/turtle-singer.js:1509
+#. TRANS: partials are weighted components in a harmonic series
+msgid "You must have at least one Partial block inside of a Weighted-partial block"
+msgstr "「倍音ウェート」ブロックの中に一つ以上の倍音ブロックが入っている必要があります。"
+
+#: js/turtle-singer.js:1726
+msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
+msgstr "同じピッチの音符のみを結ぶことができます。スラーを使うつもりでしたか？"
+
+#: js/turtle-singer.js:2298
+msgid "synth cannot play chords."
+msgstr "このシンセでは和音ができません"
+
+#: js/utils/musicutils.js:536
+#: js/utils/musicutils.js:676
+#: js/widgets/musickeyboard.js:3122
+#: js/widgets/pitchdrummatrix.js:230
+msgid "rest"
+msgstr "休符"
+
+#: js/utils/musicutils.js:719
+msgid "Perfect unison"
+msgstr "完全1度"
+
+#: js/utils/musicutils.js:719
+msgid "Diminished second"
+msgstr "減2度"
+
+#: js/utils/musicutils.js:720
+msgid "Minor second"
+msgstr "短2度"
+
+#: js/utils/musicutils.js:720
+msgid "Augmented unison"
+msgstr "増1度"
+
+#: js/utils/musicutils.js:721
+msgid "Major second"
+msgstr "長2度"
+
+#: js/utils/musicutils.js:721
+msgid "Diminished third"
+msgstr "減3度"
+
+#: js/utils/musicutils.js:722
+msgid "Minor third"
+msgstr "短3度"
+
+#: js/utils/musicutils.js:722
+msgid "Augmented second"
+msgstr "増2度"
+
+#: js/utils/musicutils.js:723
+msgid "Major third"
+msgstr "長3度"
+
+#: js/utils/musicutils.js:723
+msgid "Diminished fourth"
+msgstr "減4度"
+
+#: js/utils/musicutils.js:724
+msgid "Perfect fourth"
+msgstr "完全4度"
+
+#: js/utils/musicutils.js:724
+msgid "Augmented third"
+msgstr "増3度"
+
+#: js/utils/musicutils.js:725
+msgid "Diminished fifth"
+msgstr "減5度"
+
+#: js/utils/musicutils.js:725
+msgid "Augmented fourth"
+msgstr "増4度"
+
+#: js/utils/musicutils.js:726
+msgid "Perfect fifth"
+msgstr "完全5度"
+
+#: js/utils/musicutils.js:726
+msgid "Diminished sixth"
+msgstr "減6度"
+
+#: js/utils/musicutils.js:727
+msgid "Minor sixth"
+msgstr "短6度"
+
+#: js/utils/musicutils.js:727
+msgid "Augmented fifth"
+msgstr "増5度"
+
+#: js/utils/musicutils.js:728
+msgid "Major sixth"
+msgstr "長6度"
+
+#: js/utils/musicutils.js:728
+msgid "Diminished seventh"
+msgstr "減7度"
+
+#: js/utils/musicutils.js:729
+msgid "Minor seventh"
+msgstr "短7度"
+
+#: js/utils/musicutils.js:729
+msgid "Augmented sixth"
+msgstr "増6度"
+
+#: js/utils/musicutils.js:730
+msgid "Major seventh"
+msgstr "長7度"
+
+#: js/utils/musicutils.js:730
+msgid "Diminished octave"
+msgstr "減8度"
+
+#: js/utils/musicutils.js:731
+msgid "Perfect octave"
+msgstr "完全8度"
+
+#: js/utils/musicutils.js:731
+msgid "Augmented seventh"
+msgstr "増7度"
+
+#: js/utils/musicutils.js:732
+msgid "Minor ninth"
+msgstr "短9度"
+
+#: js/utils/musicutils.js:732
+msgid "Augmented octave"
+msgstr "増8度"
+
+#: js/utils/musicutils.js:733
+msgid "Major ninth"
+msgstr "長9度"
+
+#: js/utils/musicutils.js:733
+msgid "Diminished tenth"
+msgstr "減10度"
+
+#: js/utils/musicutils.js:734
+msgid "Minor tenth"
+msgstr "短10度"
+
+#: js/utils/musicutils.js:734
+msgid "Augmented ninth"
+msgstr "増9度"
+
+#: js/utils/musicutils.js:735
+msgid "Major tenth"
+msgstr "長10度"
+
+#: js/utils/musicutils.js:735
+msgid "Diminished eleventh"
+msgstr "減11度"
+
+#: js/utils/musicutils.js:736
+msgid "Perfect eleventh"
+msgstr "完全11度"
+
+#: js/utils/musicutils.js:736
+msgid "Augmented tenth"
+msgstr "増10度"
+
+#: js/utils/musicutils.js:737
+msgid "Diminished twelfth"
+msgstr "減12度"
+
+#: js/utils/musicutils.js:737
+msgid "Augmented eleventh"
+msgstr "増11度"
+
+#: js/utils/musicutils.js:738
+msgid "Perfect twelfth"
+msgstr "完全12度"
+
+#: js/utils/musicutils.js:738
+msgid "Diminished thirteenth"
+msgstr "減13度"
+
+#: js/utils/musicutils.js:739
+msgid "Minor thirteenth"
+msgstr "短13度"
+
+#: js/utils/musicutils.js:739
+msgid "Augmented fifth, plus an octave"
+msgstr "増12度"
+
+#: js/utils/musicutils.js:740
+msgid "Major thirteenth"
+msgstr "長13度"
+
+#: js/utils/musicutils.js:740
+msgid "Diminished seventh, plus an octave"
+msgstr "減14度"
+
+#: js/utils/musicutils.js:868
+#. TRANS: ordinal number. Please keep exactly one space between each number.
+msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
+msgstr "１度 2度 3度 4度 5度 6度 7度 8度 9度 10度 11度 12度"
+
+#: js/utils/musicutils.js:1061
+#: js/utils/musicutils.js:1247
+#: js/utils/musicutils.js:1475
+#. TRANS: augmented is a music term related to intervals
+msgid "augmented"
+msgstr "オーギュメント（増）"
+
+#: js/utils/musicutils.js:1063
+#: js/utils/musicutils.js:1248
+#: js/utils/musicutils.js:1474
+#. TRANS: diminished is a music term related to intervals and mode
+msgid "diminished"
+msgstr "ディミニッシュ（減）"
+
+#: js/utils/musicutils.js:1069
+#: js/utils/musicutils.js:1472
+#: js/blocks/IntervalsBlocks.js:661
+#: js/turtleactions/IntervalsActions.js:160
+#: js/turtleactions/IntervalsActions.js:164
+#. TRANS: perfect is a music term related to intervals
+msgid "perfect"
+msgstr "パーフェクト（完全）"
+
+#: js/utils/musicutils.js:1071
+#. TRANS: twelve semi-tone scale for music
+msgid "chromatic"
+msgstr "クロマティック音階"
+
+#: js/utils/musicutils.js:1072
+msgid "algerian"
+msgstr "アルジェリア音階"
+
+#: js/utils/musicutils.js:1073
+msgid "spanish"
+msgstr "スペイン音階"
+
+#: js/utils/musicutils.js:1075
+#. TRANS: modal scale in music
+msgid "octatonic"
+msgstr "オクタトニック・スケール"
+
+#: js/utils/musicutils.js:1077
+#. TRANS: harmonic major scale in music
+msgid "harmonic major"
+msgstr "ハーモニック・メジャー（和声長音階）"
+
+#: js/utils/musicutils.js:1079
+#. TRANS: natural minor scales in music
+msgid "natural minor"
+msgstr "自然短音階"
+
+#: js/utils/musicutils.js:1081
+#. TRANS: harmonic minor scale in music
+msgid "harmonic minor"
+msgstr "和声短音階"
+
+#: js/utils/musicutils.js:1083
+#. TRANS: melodic minor scale in music
+msgid "melodic minor"
+msgstr "旋律短音階"
+
+#: js/utils/musicutils.js:1087
+#. TRANS: modal scale for music
+msgid "dorian"
+msgstr "ドリアン音階"
+
+#: js/utils/musicutils.js:1089
+#. TRANS: modal scale for music
+msgid "phrygian"
+msgstr "フリジアン音階"
+
+#: js/utils/musicutils.js:1091
+#. TRANS: modal scale for music
+msgid "lydian"
+msgstr "リディアン音階"
+
+#: js/utils/musicutils.js:1093
+#. TRANS: modal scale for music
+msgid "mixolydian"
+msgstr "ミクソリディアン音階"
+
+#: js/utils/musicutils.js:1097
+#. TRANS: modal scale for music
+msgid "locrian"
+msgstr "ロクリアン音階"
+
+#: js/utils/musicutils.js:1099
+#. TRANS: minor jazz scale for music
+msgid "jazz minor"
+msgstr "オルタード音階"
+
+#: js/utils/musicutils.js:1101
+#. TRANS: bebop scale for music
+msgid "bebop"
+msgstr "ビバップ音階"
+
+#: js/utils/musicutils.js:1102
+msgid "arabic"
+msgstr "アラビア音階"
+
+#: js/utils/musicutils.js:1103
+msgid "byzantine"
+msgstr "ビザンティン"
+
+#: js/utils/musicutils.js:1105
+#. TRANS: musical scale for music by Verdi
+msgid "enigmatic"
+msgstr "ヴェルディの音階"
+
+#: js/utils/musicutils.js:1106
+msgid "ethiopian"
+msgstr "エチオピア音階"
+
+#: js/utils/musicutils.js:1108
+#. TRANS: Ethiopic scale for music
+msgid "geez"
+msgstr "ゲエズ音階"
+
+#: js/utils/musicutils.js:1109
+msgid "hindu"
+msgstr "ヒンドゥー音階"
+
+#: js/utils/musicutils.js:1110
+msgid "hungarian"
+msgstr "ハンガリー音階"
+
+#: js/utils/musicutils.js:1112
+#. TRANS: minor Romanian scale for music
+msgid "romanian minor"
+msgstr "ルーマニア・マイナー音階"
+
+#: js/utils/musicutils.js:1113
+msgid "spanish gypsy"
+msgstr "スパニッシュ・ジプシー音階"
+
+#: js/utils/musicutils.js:1115
+#. TRANS: musical scale for Mid-Eastern music
+msgid "maqam"
+msgstr "マカーム音階"
+
+#: js/utils/musicutils.js:1117
+#. TRANS: minor blues scale for music
+msgid "minor blues"
+msgstr "マイナー・ブルース音階"
+
+#: js/utils/musicutils.js:1119
+#. TRANS: major blues scale for music
+msgid "major blues"
+msgstr "メジャー・ブルース音階"
+
+#: js/utils/musicutils.js:1120
+msgid "whole tone"
+msgstr "ホールトーン音階"
+
+#: js/utils/musicutils.js:1122
+#. TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
+msgid "minor pentatonic"
+msgstr "マイナー・ペンタトニック音階"
+
+#: js/utils/musicutils.js:1124
+#. TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
+msgid "major pentatonic"
+msgstr "メジャー・ペンタトニック音階"
+
+#: js/utils/musicutils.js:1125
+msgid "chinese"
+msgstr "中国音階"
+
+#: js/utils/musicutils.js:1126
+msgid "egyptian"
+msgstr "エジプト音階"
+
+#: js/utils/musicutils.js:1128
+#. TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
+msgid "hirajoshi"
+msgstr "平調子"
+
+#: js/utils/musicutils.js:1129
+msgid "Japan"
+msgstr "日本"
+
+#: js/utils/musicutils.js:1131
+#. TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
+msgid "in"
+msgstr "陰音階"
+
+#: js/utils/musicutils.js:1133
+#. TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
+msgid "minyo"
+msgstr "民謡音階"
+
+#: js/utils/musicutils.js:1135
+#. TRANS: Italian mathematician
+msgid "fibonacci"
+msgstr "フィボナッチ音階"
+
+#: js/utils/musicutils.js:1136
+#: js/utils/musicutils.js:1190
+#: js/utils/musicutils.js:1233
+#: js/utils/musicutils.js:1255
+#: js/utils/musicutils.js:1745
+#: js/utils/synthutils.js:148
+#: js/blocks/ToneBlocks.js:972
+#: js/blocks/VolumeBlocks.js:411
+#: js/blocks/IntervalsBlocks.js:1161
+#: js/blocks/WidgetBlocks.js:459
+#: js/blocks/WidgetBlocks.js:464
+#: js/turtleactions/VolumeActions.js:231
+#: js/widgets/modewidget.js:903
+#. TRANS: customize voice
+msgid "custom"
+msgstr "オリジナル"
+
+#: js/utils/musicutils.js:1138
+#: js/utils/musicutils.js:1694
+#: js/blocks/WidgetBlocks.js:222
+#. TRANS: highpass filter
+msgid "highpass"
+msgstr "ハイパス・フィルター"
+
+#: js/utils/musicutils.js:1140
+#: js/utils/musicutils.js:1695
+#. TRANS: lowpass filter
+msgid "lowpass"
+msgstr "ローパス・フィルター"
+
+#: js/utils/musicutils.js:1142
+#: js/utils/musicutils.js:1696
+#. TRANS: bandpass filter
+msgid "bandpass"
+msgstr "バンドパス・フィルター"
+
+#: js/utils/musicutils.js:1144
+#: js/utils/musicutils.js:1697
+#. TRANS: high-shelf filter
+msgid "highshelf"
+msgstr "ハイシェルフ・フィルター"
+
+#: js/utils/musicutils.js:1146
+#: js/utils/musicutils.js:1698
+#. TRANS: low-shelf filter
+msgid "lowshelf"
+msgstr "ローシェルフ・フィルター"
+
+#: js/utils/musicutils.js:1148
+#: js/utils/musicutils.js:1699
+#. TRANS: notch-shelf filter
+msgid "notch"
+msgstr "ノッチ・フィルター"
+
+#: js/utils/musicutils.js:1150
+#: js/utils/musicutils.js:1700
+#. TRANS: all-pass filter
+msgid "allpass"
+msgstr "オールパスフィルター"
+
+#: js/utils/musicutils.js:1152
+#: js/utils/musicutils.js:1701
+#. TRANS: peaking filter
+msgid "peaking"
+msgstr "ピーク・フィルタ"
+
+#: js/utils/musicutils.js:1153
+#: js/utils/musicutils.js:1709
+#: js/utils/synthutils.js:140
+#: js/blocks/PitchBlocks.js:85
+#: js/widgets/legobricks.js:1941
+#. TRANS: sine wave
+msgid "sine"
+msgstr "サイン波"
+
+#: js/utils/musicutils.js:1154
+#: js/utils/musicutils.js:1710
+#: js/utils/synthutils.js:142
+#: js/blocks/PitchBlocks.js:39
+#: js/widgets/legobricks.js:1942
+#. TRANS: square wave
+msgid "square"
+msgstr "四角の波"
+
+#: js/utils/musicutils.js:1155
+#: js/utils/musicutils.js:1711
+#: js/utils/synthutils.js:146
+#: js/blocks/ToneBlocks.js:39
+#: js/blocks/PitchBlocks.js:62
+#: js/widgets/legobricks.js:1944
+#. TRANS: triangle wave
+msgid "triangle"
+msgstr "三角の波"
+
+#: js/utils/musicutils.js:1156
+#: js/utils/musicutils.js:1712
+#: js/utils/synthutils.js:144
+#: js/blocks/PitchBlocks.js:108
+#: js/widgets/legobricks.js:1943
+#. TRANS: sawtooth wave
+msgid "sawtooth"
+msgstr "ぎざぎざの波"
+
+#: js/utils/musicutils.js:1158
+#: js/utils/musicutils.js:1462
+#: js/blocks/PitchBlocks.js:971
+#: js/blocks/PitchBlocks.js:977
+#: js/turtleactions/PitchActions.js:568
+#. TRANS: even numbers
+#. TRANS: invert based on even or odd number or musical scale
+msgid "even"
+msgstr "偶数"
+
+#: js/utils/musicutils.js:1160
+#: js/utils/musicutils.js:1463
+#: js/blocks/PitchBlocks.js:977
+#: js/turtleactions/PitchActions.js:570
+#. TRANS: odd numbers
+msgid "odd"
+msgstr "奇数"
+
+#: js/utils/musicutils.js:1161
+#: js/utils/musicutils.js:1464
+#: js/blocks/PitchBlocks.js:977
+#: js/turtleactions/PitchActions.js:572
+msgid "scalar"
+msgstr "音階的"
+
+#: js/utils/musicutils.js:1162
+#: js/utils/synthutils.js:80
+#: js/blocks/VolumeBlocks.js:47
+#: js/widgets/legobricks.js:1925
+#. TRANS: musical instrument
+msgid "piano"
+msgstr "ピアノ"
+
+#: js/utils/musicutils.js:1163
+#: js/utils/synthutils.js:82
+#: js/widgets/legobricks.js:1929
+#. TRANS: musical instrument
+msgid "violin"
+msgstr "バイオリン"
+
+#: js/utils/musicutils.js:1164
+#: js/utils/synthutils.js:84
+#: js/widgets/legobricks.js:1930
+#. TRANS: viola musical instrument
+msgid "viola"
+msgstr "ビオラ"
+
+#: js/utils/musicutils.js:1165
+#: js/utils/synthutils.js:128
+#. TRANS: xylophone musical instrument
+msgid "xylophone"
+msgstr "木琴"
+
+#: js/utils/musicutils.js:1166
+#: js/utils/synthutils.js:150
+#. TRANS: vibraphone musical instrument
+msgid "vibraphone"
+msgstr "鉄琴"
+
+#: js/utils/musicutils.js:1167
+#: js/utils/synthutils.js:86
+#: js/widgets/legobricks.js:1931
+#. TRANS: musical instrument
+msgid "cello"
+msgstr "チェロ"
+
+#: js/utils/musicutils.js:1169
+#: js/utils/synthutils.js:90
+#. TRANS: viola musical instrument
+msgid "double bass"
+msgstr "ダブルベース"
+
+#: js/utils/musicutils.js:1170
+#: js/utils/synthutils.js:98
+#: js/widgets/legobricks.js:1926
+#: js/widgets/rhythmruler.js:2729
+#. TRANS: musical instrument
+msgid "guitar"
+msgstr "ギター"
+
+#: js/utils/musicutils.js:1171
+#: js/utils/synthutils.js:92
+#. TRANS: sitar musical instrument
+msgid "sitar"
+msgstr "シタール"
+
+#: js/utils/musicutils.js:1172
+#: js/utils/synthutils.js:94
+#. TRANS: harmonium musical instrument
+msgid "harmonium"
+msgstr "ハルモニウム"
+
+#: js/utils/musicutils.js:1173
+#: js/utils/synthutils.js:96
+#. TRANS: mandolin musical instrument
+msgid "mandolin"
+msgstr "マンドリン"
+
+#: js/utils/musicutils.js:1174
+#: js/utils/synthutils.js:100
+#: js/widgets/legobricks.js:1927
+#. TRANS: musical instrument
+msgid "acoustic guitar"
+msgstr "アコースティック"
+
+#: js/utils/musicutils.js:1175
+#: js/utils/synthutils.js:102
+#: js/widgets/legobricks.js:1933
+#. TRANS: musical instrument
+msgid "flute"
+msgstr "フルート"
+
+#: js/utils/musicutils.js:1176
+#: js/utils/synthutils.js:104
+#: js/widgets/legobricks.js:1934
+#. TRANS: musical instrument
+msgid "clarinet"
+msgstr "クラリネット"
+
+#: js/utils/musicutils.js:1177
+#: js/utils/synthutils.js:106
+#: js/widgets/legobricks.js:1935
+#. TRANS: musical instrument
+msgid "saxophone"
+msgstr "サクソフォン"
+
+#: js/utils/musicutils.js:1178
+#: js/utils/synthutils.js:108
+#: js/widgets/legobricks.js:1939
+#. TRANS: musical instrument
+msgid "tuba"
+msgstr "チューバ"
+
+#: js/utils/musicutils.js:1179
+#: js/utils/synthutils.js:110
+#: js/widgets/legobricks.js:1936
+#. TRANS: musical instrument
+msgid "trumpet"
+msgstr "トランペット"
+
+#: js/utils/musicutils.js:1180
+#: js/utils/synthutils.js:112
+#: js/widgets/legobricks.js:1938
+#. TRANS: musical instrument
+msgid "oboe"
+msgstr "オーボエ"
+
+#: js/utils/musicutils.js:1181
+#: js/utils/synthutils.js:114
+#: js/widgets/legobricks.js:1937
+#. TRANS: musical instrument
+msgid "trombone"
+msgstr "トロンボーン"
+
+#: js/utils/musicutils.js:1182
+#: js/utils/synthutils.js:130
+#: js/widgets/legobricks.js:1924
+#. TRANS: polytone synthesizer
+msgid "electronic synth"
+msgstr "シンセサイザー"
+
+#: js/utils/musicutils.js:1183
+#: js/utils/synthutils.js:132
+#. TRANS: simple monotone synthesizer
+msgid "simple 1"
+msgstr "シンプル１"
+
+#: js/utils/musicutils.js:1184
+msgid "simple 2"
+msgstr "シンプル２"
+
+#: js/utils/musicutils.js:1185
+msgid "simple 3"
+msgstr "シンプル３"
+
+#: js/utils/musicutils.js:1186
+msgid "simple 4"
+msgstr "シンプル４"
+
+#: js/utils/musicutils.js:1187
+#: js/utils/synthutils.js:66
+#: js/blocks/DrumBlocks.js:191
+#. TRANS: white noise synthesizer
+msgid "white noise"
+msgstr "ホワイトノイズ"
+
+#: js/utils/musicutils.js:1188
+#: js/utils/synthutils.js:68
+#. TRANS: brown noise synthesizer
+msgid "brown noise"
+msgstr "ブラウンノイズ"
+
+#: js/utils/musicutils.js:1189
+#: js/utils/synthutils.js:70
+#. TRANS: pink noise synthesizer
+msgid "pink noise"
+msgstr "ピンクノイズ"
+
+#: js/utils/musicutils.js:1191
+#: js/utils/synthutils.js:162
+#: js/widgets/rhythmruler.js:2275
+#: js/widgets/rhythmruler.js:2537
+#. TRANS: musical instrument
+msgid "snare drum"
+msgstr "スネアドラム"
+
+#: js/utils/musicutils.js:1192
+#: js/utils/synthutils.js:164
+#. TRANS: musical instrument
+msgid "kick drum"
+msgstr "キックドラム"
+
+#: js/utils/musicutils.js:1193
+#: js/utils/synthutils.js:166
+#. TRANS: musical instrument
+msgid "tom tom"
+msgstr "タムタム"
+
+#: js/utils/musicutils.js:1194
+#: js/utils/synthutils.js:168
+#. TRANS: musical instrument
+msgid "floor tom"
+msgstr "フロアタム"
+
+#: js/utils/musicutils.js:1195
+#: js/utils/synthutils.js:170
+#. TRANS: musical instrument
+msgid "bass drum"
+msgstr "バスドラム"
+
+#: js/utils/musicutils.js:1196
+#: js/utils/synthutils.js:172
+#. TRANS: a drum made from an inverted cup
+msgid "cup drum"
+msgstr "カップドラム"
+
+#: js/utils/musicutils.js:1197
+#: js/utils/synthutils.js:174
+#. TRANS: musical instrument
+msgid "darbuka drum"
+msgstr "ダブカドラム"
+
+#: js/utils/musicutils.js:1198
+#: js/utils/synthutils.js:178
+#. TRANS: musical instrument
+msgid "hi hat"
+msgstr "ハイハット"
+
+#: js/utils/musicutils.js:1199
+#: js/utils/synthutils.js:180
+#. TRANS: a small metal bell
+msgid "ride bell"
+msgstr "ライドベル"
+
+#: js/utils/musicutils.js:1200
+#: js/utils/synthutils.js:182
+#. TRANS: musical instrument
+msgid "cow bell"
+msgstr "カウベル"
+
+#: js/utils/musicutils.js:1201
+msgid "japanese drum"
+msgstr "太鼓"
+
+#: js/utils/musicutils.js:1202
+#: js/utils/synthutils.js:188
+#. TRANS: musical instrument
+msgid "japanese bell"
+msgstr "鉦"
+
+#: js/utils/musicutils.js:1203
+#: js/utils/synthutils.js:184
+#. TRANS: musical instrument
+msgid "triangle bell"
+msgstr "トライアングル"
+
+#: js/utils/musicutils.js:1204
+#: js/utils/synthutils.js:186
+#. TRANS: musical instrument
+msgid "finger cymbals"
+msgstr "フィンガーシンバル"
+
+#: js/utils/musicutils.js:1205
+#: js/utils/synthutils.js:190
+#. TRANS: a musically tuned set of bells
+msgid "chime"
+msgstr "チャイム"
+
+#: js/utils/musicutils.js:1206
+#: js/utils/synthutils.js:192
+#. TRANS: a musical instrument
+msgid "gong"
+msgstr "ドラ"
+
+#: js/utils/musicutils.js:1207
+#: js/utils/synthutils.js:194
+#. TRANS: sound effect
+msgid "clang"
+msgstr "カチャカチャ"
+
+#: js/utils/musicutils.js:1208
+#: js/utils/synthutils.js:196
+#. TRANS: sound effect
+msgid "crash"
+msgstr "クラッシュ"
+
+#: js/utils/musicutils.js:1209
+#: js/utils/synthutils.js:198
+#. TRANS: sound effect
+msgid "bottle"
+msgstr "空きびん"
+
+#: js/utils/musicutils.js:1210
+#: js/utils/synthutils.js:200
+#. TRANS: sound effect
+msgid "clap"
+msgstr "てびょうし"
+
+#: js/utils/musicutils.js:1211
+#: js/utils/synthutils.js:202
+#. TRANS: sound effect
+msgid "slap"
+msgstr "ピシャリ"
+
+#: js/utils/musicutils.js:1212
+#: js/utils/synthutils.js:204
+#. TRANS: sound effect
+msgid "splash"
+msgstr "しぶき"
+
+#: js/utils/musicutils.js:1213
+#: js/utils/synthutils.js:206
+#. TRANS: sound effect
+msgid "bubbles"
+msgstr "あわ"
+
+#: js/utils/musicutils.js:1214
+#: js/utils/synthutils.js:208
+#. TRANS: sound effect
+msgid "raindrop"
+msgstr "雨のしずく"
+
+#: js/utils/musicutils.js:1215
+#: js/utils/synthutils.js:210
+#. TRANS: animal sound effect
+msgid "cat"
+msgstr "ねこ"
+
+#: js/utils/musicutils.js:1216
+#: js/utils/synthutils.js:212
+#. TRANS: animal sound effect
+msgid "cricket"
+msgstr "こおろぎ"
+
+#: js/utils/musicutils.js:1217
+#: js/utils/synthutils.js:214
+#. TRANS: animal sound effect
+msgid "dog"
+msgstr "いぬ"
+
+#: js/utils/musicutils.js:1219
+#: js/utils/synthutils.js:116
+#: js/widgets/legobricks.js:1940
+#. TRANS: musical instrument
+msgid "banjo"
+msgstr "バンジョー"
+
+#: js/utils/musicutils.js:1220
+#: js/utils/synthutils.js:118
+#. TRANS: musical instrument
+msgid "koto"
+msgstr "こと"
+
+#: js/utils/musicutils.js:1221
+#: js/utils/synthutils.js:120
+#. TRANS: musical instrument
+msgid "dulcimer"
+msgstr "ダルシマー"
+
+#: js/utils/musicutils.js:1222
+#: js/utils/synthutils.js:122
+#: js/widgets/legobricks.js:1928
+#. TRANS: musical instrument
+msgid "electric guitar"
+msgstr "エレキギター"
+
+#: js/utils/musicutils.js:1223
+#: js/utils/synthutils.js:124
+#. TRANS: musical instrument
+msgid "bassoon"
+msgstr "バスーン"
+
+#: js/utils/musicutils.js:1224
+#: js/utils/synthutils.js:126
+#. TRANS: musical instrument
+msgid "celeste"
+msgstr "セレスタ"
+
+#: js/utils/musicutils.js:1226
+#: js/widgets/temperament.js:923
+#. TRANS: musical temperament
+msgid "equal"
+msgstr "平均律"
+
+#: js/utils/musicutils.js:1228
+#. TRANS: musical temperament
+msgid "Pythagorean"
+msgstr "ピタゴラス音律 "
+
+#: js/utils/musicutils.js:1230
+#. TRANS: musical temperament
+msgid "just intonation"
+msgstr "純正律"
+
+#: js/utils/musicutils.js:1232
+#: js/utils/musicutils.js:1727
+#: js/utils/musicutils.js:1728
+#: js/utils/musicutils.js:1743
+#: js/utils/musicutils.js:1744
+#. TRANS: musical temperament
+msgid "Meantone"
+msgstr "中全音律"
+
+#: js/utils/musicutils.js:1249
+msgid "major 7th"
+msgstr "長七の和音（メイジャー・セブンス)"
+
+#: js/utils/musicutils.js:1250
+msgid "minor 7th"
+msgstr "短七の和音（マイナー・セブンス）"
+
+#: js/utils/musicutils.js:1251
+msgid "dominant 7th"
+msgstr "属七の和音（ドミナント・セブンス）"
+
+#: js/utils/musicutils.js:1252
+msgid "minor-major 7th"
+msgstr "短三長七の和音（マイナー・メイジャー・セブンス）"
+
+#: js/utils/musicutils.js:1253
+msgid "fully-diminished 7th"
+msgstr "減七の和音（ディミニッシュト・セブンス）"
+
+#: js/utils/musicutils.js:1254
+msgid "half-diminished 7th"
+msgstr "減五短七の和音（ハーフ・ディミニッシュト）"
+
+#: js/utils/musicutils.js:1720
+#: js/utils/musicutils.js:1736
+msgid "Equal (12EDO)"
+msgstr "12平均律"
+
+#: js/utils/musicutils.js:1721
+#: js/utils/musicutils.js:1737
+msgid "Equal (5EDO)"
+msgstr "5平均律"
+
+#: js/utils/musicutils.js:1722
+#: js/utils/musicutils.js:1738
+msgid "Equal (7EDO)"
+msgstr "7平均律"
+
+#: js/utils/musicutils.js:1723
+#: js/utils/musicutils.js:1739
+msgid "Equal (19EDO)"
+msgstr "19平均律"
+
+#: js/utils/musicutils.js:1724
+#: js/utils/musicutils.js:1740
+msgid "Equal (31EDO)"
+msgstr "31平均律"
+
+#: js/utils/musicutils.js:1725
+#: js/utils/musicutils.js:1741
+msgid "5-limit Just Intonation"
+msgstr "5限界純正律"
+
+#: js/utils/musicutils.js:1726
+#: js/utils/musicutils.js:1742
+msgid "Pythagorean (3-limit JI)"
+msgstr "ピタゴラス音律"
+
+#: js/utils/musicutils.js:4051
+#: js/widgets/temperament.js:2602
+msgid "Invalid temperament. Falling back to equal temperament."
+msgstr "無効な気質。平均律に戻ります。"
+
+#: js/utils/musicutils.js:6174
+#: js/utils/musicutils.js:6217
+msgid "current"
+msgstr "現在の"
+
+#: js/utils/musicutils.js:6177
+#: js/utils/musicutils.js:6208
+msgid "next"
+msgstr "この次の"
+
+#: js/utils/musicutils.js:6180
+#: js/utils/musicutils.js:6213
+msgid "previous"
+msgstr "この前の"
+
+#: js/utils/synthutils.js:134
+#. TRANS: simple monotone synthesizer
+msgid "simple-2"
+msgstr "シンプル・シンセ２"
+
+#: js/utils/synthutils.js:136
+#. TRANS: simple monotone synthesizer
+msgid "simple-3"
+msgstr "シンプル・シンセ３"
+
+#: js/utils/synthutils.js:138
+#. TRANS: simple monotone synthesizer
+msgid "simple-4"
+msgstr "シンプル・シンセ４"
+
+#: js/utils/synthutils.js:176
+#. TRANS: musical instrument
+msgid "taiko"
+msgstr "太鼓"
+
+#: js/utils/synthutils.js:2091
+msgid "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
+msgstr "⚠⚠ 音声は ブロックされています。。。ブラウザー の設定 (サイトの せってい > 音声) を確認して、ミュージック・ブロックスの 音声を 許可して ください。"
+
+#: js/utils/synthutils.js:3548
+msgid "Cents Adjustment"
+msgstr "セント調整"
+
+#: js/utils/synthutils.js:3577
+#: js/widgets/sampler.js:1992
+#. TRANS: The reference tone is a sound used for comparison.
+msgid "reference tone"
+msgstr "参照ピッチ"
+
+#: js/utils/utils.js:619
+msgid "Security Warning"
+msgstr "セキュリティ警告"
+
+#: js/utils/utils.js:621
+msgid "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
+msgstr "このプラグインには、ブラウザで実行されるコードが含まれています。組み込みのプラグイン ディレクトリからロードされていないため、安全でないコードが含まれている可能性があります。"
+
+#: js/utils/utils.js:625
+msgid "Do you want to allow this plugin to run?"
+msgstr "このプラグインの実行を許可しますか?"
+
+#: js/utils/utils.js:627
+msgid "Source: %s"
+msgstr "ソース: %s"
+
+#: js/utils/utils.js:627
+#: js/blocks/ExtrasBlocks.js:692
+#: js/blocks/ExtrasBlocks.js:711
+#: js/blocks/ExtrasBlocks.js:734
+#: js/blocks/ExtrasBlocks.js:757
+#: js/blocks/ExtrasBlocks.js:775
+#: js/blocks/ExtrasBlocks.js:794
+#: js/blocks/ExtrasBlocks.js:813
+#: js/blocks/ExtrasBlocks.js:832
+msgid "unknown"
+msgstr "不明"
+
+#: js/blocks/ActionBlocks.js:58
+msgid "The Return block will return a value from an action."
+msgstr "Returnブロックはアクションから値を返します。"
+
+#: js/blocks/ActionBlocks.js:75
+msgid "return"
+msgstr "リターン"
+
+#: js/blocks/ActionBlocks.js:136
+msgid "The Return to URL block will return a value to a webpage."
+msgstr "Return to URLブロックは値をウェブページに返します。"
+
+#: js/blocks/ActionBlocks.js:153
+msgid "return to URL"
+msgstr "URLに戻ります"
+
+#: js/blocks/ActionBlocks.js:186
+#: js/blocks/ProgramBlocks.js:86
+#: js/blocks/ProgramBlocks.js:181
+msgid "Invalid URL"
+msgstr "無効な URL"
+
+#: js/blocks/ActionBlocks.js:238
+#: js/blocks/ActionBlocks.js:295
+#: js/blocks/ActionBlocks.js:505
+#: js/blocks/ActionBlocks.js:692
+msgid "The Calculate block returns a value calculated by an action."
+msgstr "Calculateブロックはアクションで計算された値を返します。"
+
+#: js/blocks/ActionBlocks.js:256
+#: js/blocks/ActionBlocks.js:521
+#: js/blocks/ActionBlocks.js:711
+msgid "calculate"
+msgstr "計算する"
+
+#: js/blocks/ActionBlocks.js:381
+#: js/blocks/ActionBlocks.js:597
+#: js/blocks/ActionBlocks.js:946
+#: js/blocks/ActionBlocks.js:1396
+#. TRANS: do is the do something or take an action.
+msgid "The Do block is used to initiate an action."
+msgstr "<h2>アクションブロック（指定）</h2><br>指定したアクションブロックを実行する。"
+
+#: js/blocks/ActionBlocks.js:395
+#: js/blocks/ActionBlocks.js:614
+#: js/blocks/ActionBlocks.js:963
+#: js/blocks/ActionBlocks.js:1051
+#: js/blocks/MeterBlocks.js:804
+msgid "do1"
+msgstr "アクション実行"
+
+#: js/blocks/ActionBlocks.js:395
+#: js/blocks/ActionBlocks.js:614
+#: js/blocks/ActionBlocks.js:963
+#: js/blocks/ActionBlocks.js:1051
+#: js/blocks/FlowBlocks.js:774
+#: js/blocks/FlowBlocks.js:854
+#: js/blocks/MeterBlocks.js:804
+msgid "do"
+msgstr "アクション"
+
+#: js/blocks/ActionBlocks.js:795
+#: js/blocks/ActionBlocks.js:869
+msgid "The Arg block contains the value of an argument passed to an action."
+msgstr "Argブロックはアクションに渡された引数の値を含みます。"
+
+#: js/blocks/ActionBlocks.js:810
+#: js/blocks/ActionBlocks.js:882
+msgid "arg"
+msgstr "引数"
+
+#: js/blocks/ActionBlocks.js:840
+#: js/blocks/ActionBlocks.js:904
+#: js/blocks/ActionBlocks.js:912
+msgid "Invalid argument"
+msgstr "無効な議論"
+
+#: js/blocks/ActionBlocks.js:948
+msgid "In the example, it is used with the One of block to choose a random phase."
+msgstr "<br><br>図の例は、決まったアクションではなく、２つのうちどちらか１つのアクションをランダムに実行させる。"
+
+#: js/blocks/ActionBlocks.js:1022
+#: js/blocks/ActionBlocks.js:1029
+msgid "The Listen block is used to listen for an event such as a mouse click."
+msgstr "<h2>イベントブロック（受け取り）</h2><br>特定のイベントに対して、その発生を受け取るたびに実行するアクションを１つ決めておくことができる。"
+
+#: js/blocks/ActionBlocks.js:1031
+msgid "When the event happens, an action is taken."
+msgstr "<br><br>イベントの発生は、各スクリプトが【イベントのたびにアクション】で指定したアクションの引きがねとしてはたらく。"
+
+#: js/blocks/ActionBlocks.js:1048
+msgid "on"
+msgstr "のとき"
+
+#: js/blocks/ActionBlocks.js:1051
+#: js/blocks/ActionBlocks.js:1052
+#: js/blocks/ActionBlocks.js:1161
+msgid "event"
+msgstr "イベント"
+
+#: js/blocks/ActionBlocks.js:1141
+msgid "The Broadcast block is used to trigger an event."
+msgstr "<h2>イベントブロック（発生）</h2><br>指定した名前のイベントをすべてのネズミに送る。イベントの発生は、各スクリプトが【イベントのたびにアクション】で指定したアクションの引きがねとしてはたらく。"
+
+#: js/blocks/ActionBlocks.js:1159
+msgid "broadcast"
+msgstr "イベント発生"
+
+#: js/blocks/ActionBlocks.js:1216
+msgid "Each Start block is a separate voice."
+msgstr "<h2>スタートブロック</h2><br>実行ボタンがおされると、スタートブロックが実行される。"
+
+#: js/blocks/ActionBlocks.js:1218
+msgid "All of the Start blocks run at the same time when the Play button is pressed."
+msgstr "[再生] ボタンを押すと、すべての Start ブロックが同時に実行されます。"
+
+#: js/blocks/ActionBlocks.js:1308
+msgid "The Action block is used to group together blocks so that they can be used more than once."
+msgstr "アクション ブロックは、複数のブロックをグループ化して複数回使用できるようにするために使用されます。"
+
+#: js/blocks/ActionBlocks.js:1312
+msgid "It is often used for storing a phrase of music that is repeated."
+msgstr "<br><br>何度も実行する音楽のフレーズなどにアクションを作っておくと便利。"
+
+#: js/blocks/ActionBlocks.js:1501
+msgid "define temperament"
+msgstr "音律を明確にする"
+
+#: js/blocks/BooleanBlocks.js:44
+msgid "The Not block is the logical not operator."
+msgstr "「ではない」ブロックは論理的なNOT演算子です。"
+
+#: js/blocks/BooleanBlocks.js:62
+msgid "not"
+msgstr "ではない"
+
+#: js/blocks/BooleanBlocks.js:133
+msgid "The And block is the logical and operator."
+msgstr "「かつ」ブロックは論理積（AND）演算子です。"
+
+#: js/blocks/BooleanBlocks.js:151
+msgid "and"
+msgstr "かつ"
+
+#: js/blocks/BooleanBlocks.js:217
+msgid "The Or block is the logical or operator."
+msgstr "「または」ブロックは論理和（OR）演算子です。"
+
+#: js/blocks/BooleanBlocks.js:235
+msgid "or"
+msgstr "または"
+
+#: js/blocks/BooleanBlocks.js:301
+msgid "The XOR block is the logical XOR operator."
+msgstr "XORブロックは排他的論理和（XOR）演算子です。"
+
+#: js/blocks/BooleanBlocks.js:319
+msgid "xor"
+msgstr "XOR（エクスクルーシブ・オア）"
+
+#: js/blocks/BooleanBlocks.js:391
+msgid "The Greater-than block returns True if the top number is greater than the bottom number."
+msgstr "「＞」ブロックは、上の数値が下の数値より大きい場合に「実」を返します。"
+
+#: js/blocks/BooleanBlocks.js:496
+msgid "The Less-than block returns True if the top number is less than the bottom number."
+msgstr "「＜」ブロックは、上の数値が下の数値より小さい場合に「実」を返します。"
+
+#: js/blocks/BooleanBlocks.js:596
+msgid "The Less-than-or-equal-to block returns True if the top number is less than or equal to the bottom number."
+msgstr "「≦」ブロックは、上の数値が下の数値以下の場合に「実」を返します。"
+
+#: js/blocks/BooleanBlocks.js:696
+msgid "The Greater-than-or-equal-to block returns True if the top number is greater than or equal to the bottom number."
+msgstr "「≥」ブロックは、上の数値が下の数値以上である場合に「実」を返します。"
+
+#: js/blocks/BooleanBlocks.js:802
+msgid "The Equal block returns True if the two numbers are equal."
+msgstr "<h2>しんぎブロック（等しい）</h2><br>２つのすうちをくらべて、同じすうちであるかどうかはんていする。「＝」は、２つのすうちが同じであれば「真（しん）」、同じでなければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
+
+#: js/blocks/BooleanBlocks.js:901
+msgid "The Not-equal-to block returns True if the two numbers are not equal to each other."
+msgstr "「≠」ブロックは2つの数字が等しくない場合に「実」を返します。"
+
+#: js/blocks/BooleanBlocks.js:1001
+msgid "The Boolean block is used to specify true or false."
+msgstr "「比べる」ブロックは「実」または「偽」を指定するために使われます。"
+
+#: js/blocks/BoxesBlocks.js:53
+#: js/blocks/BoxesBlocks.js:59
+msgid "The Add-to block is used to add to the value stored in a box."
+msgstr "<h2>数の箱（あたいを変える）</h2><br>指定した箱に、好きなすうちを足す。マイナスのすうちを使うと引き算になる。"
+
+#: js/blocks/BoxesBlocks.js:61
+msgid "It can also be used with other blocks such as Color and Pen size."
+msgstr "<br><br>マイナスの数値を使うと引き算になる。"
+
+#: js/blocks/BoxesBlocks.js:73
+msgid "add"
+msgstr "足す"
+
+#: js/blocks/BoxesBlocks.js:75
+#: js/widgets/temperament.js:1001
+msgid "to"
+msgstr "箱へ"
+
+#: js/blocks/BoxesBlocks.js:75
+#: js/blocks/BoxesBlocks.js:598
+#: js/blocks/HeapBlocks.js:544
+msgid "value1"
+msgstr "すうち"
+
+#: js/blocks/BoxesBlocks.js:118
+msgid "Block does not support incrementing."
+msgstr "ブロックは、増殖をサポートできません"
+
+#: js/blocks/BoxesBlocks.js:152
+msgid "The Add-1-to block adds one to the value stored in a box."
+msgstr "<h2>数の箱（あたいを変える）</h2><br>指定した箱に、１を足す。"
+
+#: js/blocks/BoxesBlocks.js:163
+msgid "add 1 to"
+msgstr "箱に１を足す"
+
+#: js/blocks/BoxesBlocks.js:211
+msgid "The Subtract-1-from block subtracts one from the value stored in a box."
+msgstr "Subtract-1-fromブロックはボックスに保存された値から1を引きます。"
+
+#: js/blocks/BoxesBlocks.js:222
+msgid "subtract 1 from"
+msgstr "〜から１引く"
+
+#: js/blocks/BoxesBlocks.js:270
+#: js/blocks/BoxesBlocks.js:387
+msgid "The Box block returns the value stored in a box."
+msgstr "<h2>すうちブロック</h2><br>すうちブロックとして、箱のすうちを使う。"
+
+#: js/blocks/BoxesBlocks.js:503
+#: js/blocks/BoxesBlocks.js:579
+msgid "The Store in block will store a value in a box."
+msgstr "<h2>数の箱（あたいを入れる）</h2><br>指定した箱に、指定したすうちを入れる。"
+
+#: js/blocks/BoxesBlocks.js:598
+#: js/blocks/EnsembleBlocks.js:408
+#: js/blocks/EnsembleBlocks.js:419
+msgid "name1"
+msgstr "箱へ"
+
+#: js/blocks/BoxesBlocks.js:655
+msgid "The Box2 block returns the value stored in Box2."
+msgstr "Box2ブロックはBox2に保存された値を返します。"
+
+#: js/blocks/BoxesBlocks.js:706
+msgid "The Store in Box2 block is used to store a value in Box2."
+msgstr "Store in Box2ブロックは値をBox2に保存するために使われます。"
+
+#: js/blocks/BoxesBlocks.js:718
+msgid "store in box2"
+msgstr "箱２にすうちを入れる"
+
+#: js/blocks/BoxesBlocks.js:764
+msgid "The Box1 block returns the value stored in Box1."
+msgstr "Box1ブロックはBox1に保存された値を返します。"
+
+#: js/blocks/BoxesBlocks.js:815
+msgid "The Store in Box1 block is used to store a value in Box1."
+msgstr "Store in Box1ブロックは値をBox1に保存するために使われます。"
+
+#: js/blocks/BoxesBlocks.js:829
+msgid "store in box1"
+msgstr "箱１にすうちを入れる"
+
+#: js/blocks/DictBlocks.js:62
+msgid "The Show-dictionary block displays the contents of the dictionary at the top of the screen."
+msgstr "「辞書を表す」ブロックは、画面の上部に辞書の内容を表示します。"
+
+#: js/blocks/DictBlocks.js:77
+msgid "show dictionary"
+msgstr "辞書を表す"
+
+#: js/blocks/DictBlocks.js:80
+#: js/blocks/DictBlocks.js:145
+#: js/blocks/DictBlocks.js:216
+#: js/blocks/DictBlocks.js:290
+#: js/blocks/ProgramBlocks.js:400
+#: js/blocks/ProgramBlocks.js:506
+#: js/blocks/ProgramBlocks.js:670
+msgid "My Dictionary"
+msgstr "私の辞書"
+
+#: js/blocks/DictBlocks.js:129
+msgid "The Dictionary block returns a dictionary."
+msgstr "Dictionaryブロックは辞書を返します。"
+
+#: js/blocks/DictBlocks.js:197
+#: js/blocks/DictBlocks.js:339
+msgid "The Get-dict block returns a value in the dictionary for a specified key."
+msgstr "Get-dictブロックは指定されたキーの辞書の値を返します。"
+
+#: js/blocks/DictBlocks.js:212
+#: js/blocks/DictBlocks.js:354
+#. TRANS: retrieve a value from the dictionary with a given key
+msgid "get value"
+msgstr "数価を表す"
+
+#: js/blocks/DictBlocks.js:215
+#: js/blocks/DictBlocks.js:216
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/DictBlocks.js:290
+#: js/blocks/DictBlocks.js:357
+#: js/blocks/DictBlocks.js:430
+#: js/blocks/DictBlocks.js:431
+msgid "key2"
+msgstr "キーワード"
+
+#: js/blocks/DictBlocks.js:215
+#: js/blocks/DictBlocks.js:216
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/DictBlocks.js:290
+#: js/blocks/DictBlocks.js:357
+#: js/blocks/DictBlocks.js:430
+#: js/blocks/DictBlocks.js:431
+#: js/blocks/IntervalsBlocks.js:1504
+#. TRANS: key, e.g., C in C Major
+msgid "key"
+msgstr "調"
+
+#: js/blocks/DictBlocks.js:271
+#: js/blocks/DictBlocks.js:411
+msgid "The Set-dict block sets a value in the dictionary for a specified key."
+msgstr "Set-dictブロックは指定されたキーに辞書の値を設定します。"
+
+#: js/blocks/DictBlocks.js:286
+#: js/blocks/DictBlocks.js:427
+#. TRANS: set a value in the dictionary for a given key
+msgid "set value"
+msgstr "値を設定"
+
+#: js/blocks/DrumBlocks.js:59
+msgid "The Noise name block is used to select a noise synthesizer."
+msgstr "Noise nameブロックはノイズシンセサイザーを選択するために使われます。"
+
+#: js/blocks/DrumBlocks.js:102
+msgid "The Drum name block is used to select a drum."
+msgstr "<h2>ドラムブロック</h2><br>ドラムの種類を変えるときに使う。クリックで、いろいろなドラムの音を選ぶことができる。"
+
+#: js/blocks/DrumBlocks.js:146
+msgid "The Effects name block is used to select a sound effect."
+msgstr "<h2>こうかおんブロック</h2><br>こうかおんの種類を変えるときに使う。クリックで、いろいろなおもしろい音を選ぶことができる。"
+
+#: js/blocks/DrumBlocks.js:163
+msgid "noise"
+msgstr "ノイズ"
+
+#: js/blocks/DrumBlocks.js:177
+msgid "The Play noise block will generate white, pink, or brown noise."
+msgstr "Play noiseブロックはホワイトノイズ、ピンクノイズ、またはブラウンノイズを生成します。"
+
+#: js/blocks/DrumBlocks.js:332
+msgid "Replace every instance of a pitch with a drum sound."
+msgstr "すべてのピッチをドラム音に置き換えます。"
+
+#: js/blocks/DrumBlocks.js:343
+#. TRANS: map a pitch to a drum sound
+msgid "map pitch to drum"
+msgstr "音符をドラムに変える"
+
+#: js/blocks/DrumBlocks.js:397
+#: js/blocks/DrumBlocks.js:406
+msgid "The Set drum block will select a drum sound to replace the pitch of any contained notes."
+msgstr "「ドラムをせってい」ブロックは、含まれているノートのピッチを置き換えるドラム サウンドを選択します。"
+
+#: js/blocks/DrumBlocks.js:410
+msgid "In the example above, a kick drum sound will be played instead of sol."
+msgstr "例の画像に<em>ソル</em>の代わりに<em>キックドラム</em>が鳴らします。"
+
+#: js/blocks/DrumBlocks.js:422
+#. TRANS: set the current drum sound for playback
+msgid "set drum"
+msgstr "ドラムをせってい"
+
+#: js/blocks/DrumBlocks.js:466
+msgid "sound effect"
+msgstr "こうかおん"
+
+#: js/blocks/DrumBlocks.js:504
+msgid "You can use multiple Drum blocks within a Note block."
+msgstr "<h2>ドラムブロック</h2><br>「音符（おんぷ）ブロック」のなかに入れて使う。色々なドラムの音色を選ぶことができる。１つの「音符（おんぷ）ブロック」の中でふくすうの音色のドラムを組み合わせて使うことができる。"
+
+#: js/blocks/EnsembleBlocks.js:90
+msgid "mouse index heap"
+msgstr "ネズミヒープに番号をふる"
+
+#: js/blocks/EnsembleBlocks.js:90
+msgid "turtle index heap"
+msgstr "タートル ヒープに番号をふる"
+
+#: js/blocks/EnsembleBlocks.js:97
+msgid "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
+msgstr "指定されたマウスの指定された位置のヒープ内の値を返します。"
+
+#: js/blocks/EnsembleBlocks.js:104
+msgid "The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."
+msgstr "指定されたタートルの指定された位置のヒープ内の値を返します。"
+
+#: js/blocks/EnsembleBlocks.js:114
+#: js/blocks/EnsembleBlocks.js:189
+#: js/blocks/EnsembleBlocks.js:251
+#: js/blocks/EnsembleBlocks.js:333
+#: js/blocks/EnsembleBlocks.js:379
+#: js/blocks/EnsembleBlocks.js:417
+#: js/blocks/EnsembleBlocks.js:475
+#: js/blocks/EnsembleBlocks.js:525
+#: js/blocks/EnsembleBlocks.js:570
+#: js/blocks/EnsembleBlocks.js:620
+#: js/blocks/EnsembleBlocks.js:674
+#: js/blocks/EnsembleBlocks.js:784
+#: js/blocks/EnsembleBlocks.js:875
+#: js/blocks/EnsembleBlocks.js:939
+#: js/blocks/EnsembleBlocks.js:979
+#: js/blocks/EnsembleBlocks.js:1245
+#: js/blocks/EnsembleBlocks.js:1319
+msgid "Yertle"
+msgstr "ヤートル"
+
+#: js/blocks/EnsembleBlocks.js:116
+#: js/blocks/EnsembleBlocks.js:1106
+msgid "mouse name"
+msgstr "ネズミの名前"
+
+#: js/blocks/EnsembleBlocks.js:116
+#: js/blocks/EnsembleBlocks.js:1115
+msgid "turtle name"
+msgstr "ネズミの名前"
+
+#: js/blocks/EnsembleBlocks.js:116
+#: js/blocks/HeapBlocks.js:544
+#. TRANS: value1 is a numeric value (JAPANESE ONLY)
+msgid "index"
+msgstr "インデックス"
+
+#: js/blocks/EnsembleBlocks.js:144
+#: js/blocks/EnsembleBlocks.js:1223
+#: js/blocks/HeapBlocks.js:474
+#: js/blocks/HeapBlocks.js:572
+msgid "Index must be > 0."
+msgstr "インデクス番号は 0 より大きい必要があります。"
+
+#: js/blocks/EnsembleBlocks.js:149
+#: js/blocks/HeapBlocks.js:479
+#: js/blocks/HeapBlocks.js:577
+msgid "Maximum heap size is 1000."
+msgstr "ヒープの大きさは、最大1000です。"
+
+#: js/blocks/EnsembleBlocks.js:167
+msgid "stop mouse"
+msgstr "ネズミを止める"
+
+#: js/blocks/EnsembleBlocks.js:169
+msgid "The Stop mouse block stops the specified mouse."
+msgstr "指定されたマウスを停止します。"
+
+#: js/blocks/EnsembleBlocks.js:180
+msgid "stop turtle"
+msgstr "ネズミを止める"
+
+#: js/blocks/EnsembleBlocks.js:182
+msgid "The Stop turtle block stops the specified turtle."
+msgstr "指定されたタートルを停止します。"
+
+#: js/blocks/EnsembleBlocks.js:206
+#: js/blocks/EnsembleBlocks.js:266
+#: js/blocks/EnsembleBlocks.js:430
+#: js/blocks/EnsembleBlocks.js:489
+#: js/blocks/EnsembleBlocks.js:728
+#: js/blocks/EnsembleBlocks.js:829
+#: js/blocks/EnsembleBlocks.js:891
+#: js/blocks/EnsembleBlocks.js:1216
+#: js/blocks/EnsembleBlocks.js:1279
+msgid "Cannot find mouse"
+msgstr "ネズミが見つかりません。"
+
+#: js/blocks/EnsembleBlocks.js:208
+#: js/blocks/EnsembleBlocks.js:268
+#: js/blocks/EnsembleBlocks.js:432
+#: js/blocks/EnsembleBlocks.js:491
+#: js/blocks/EnsembleBlocks.js:730
+#: js/blocks/EnsembleBlocks.js:831
+#: js/blocks/EnsembleBlocks.js:893
+#: js/blocks/EnsembleBlocks.js:1218
+#: js/blocks/EnsembleBlocks.js:1281
+msgid "Cannot find turtle"
+msgstr "タートルが見つかりません。"
+
+#: js/blocks/EnsembleBlocks.js:227
+msgid "start mouse"
+msgstr "ネズミをスタート"
+
+#: js/blocks/EnsembleBlocks.js:230
+msgid "The Start mouse block starts the specified mouse."
+msgstr "指定されたマウスを開始します。"
+
+#: js/blocks/EnsembleBlocks.js:241
+msgid "start turtle"
+msgstr "ネズミをスタートする"
+
+#: js/blocks/EnsembleBlocks.js:244
+msgid "The Start turtle block starts the specified turtle."
+msgstr "指定されたタートルを開始します。"
+
+#: js/blocks/EnsembleBlocks.js:275
+msgid "Mouse is already running."
+msgstr "ネズミはすでに動いています。"
+
+#: js/blocks/EnsembleBlocks.js:277
+msgid "Turtle is already running."
+msgstr "タートルはすでに動いています。"
+
+#: js/blocks/EnsembleBlocks.js:299
+msgid "Cannot find start block"
+msgstr "「スタート」ブロックが見つかりません。"
+
+#: js/blocks/EnsembleBlocks.js:309
+#. TRANS: pen color for this mouse
+msgid "mouse color"
+msgstr "ネズミの色"
+
+#: js/blocks/EnsembleBlocks.js:311
+msgid "The Mouse color block returns the pen color of the specified mouse."
+msgstr "指定されたマウスのペンの色を返します。"
+
+#: js/blocks/EnsembleBlocks.js:323
+#. TRANS: pen color for this turtle
+msgid "turtle color"
+msgstr "タートルの色"
+
+#: js/blocks/EnsembleBlocks.js:325
+msgid "The Turtle color block returns the pen color of the specified turtle."
+msgstr "指定されたタートルのペンの色を返します。"
+
+#: js/blocks/EnsembleBlocks.js:355
+#. TRANS: heading (compass direction) for this mouse
+msgid "mouse heading"
+msgstr "ネズミの進む角度"
+
+#: js/blocks/EnsembleBlocks.js:357
+msgid "The Mouse heading block returns the heading of the specified mouse."
+msgstr "指定されたマウスの向きを返します。"
+
+#: js/blocks/EnsembleBlocks.js:369
+#. TRANS: heading (compass direction) for this turtle
+msgid "turtle heading"
+msgstr "タートルの進む角度"
+
+#: js/blocks/EnsembleBlocks.js:371
+msgid "The Turtle heading block returns the heading of the specified turtle."
+msgstr "指定されたタートルの向きを返します。"
+
+#: js/blocks/EnsembleBlocks.js:401
+#: js/blocks/EnsembleBlocks.js:458
+#. TRANS: set xy position for this mouse
+msgid "set mouse"
+msgstr "ネズミを設定"
+
+#: js/blocks/EnsembleBlocks.js:408
+#: js/blocks/EnsembleBlocks.js:419
+#: js/blocks/GraphicsBlocks.js:238
+#: js/blocks/GraphicsBlocks.js:316
+#: js/blocks/GraphicsBlocks.js:432
+#: js/blocks/GraphicsBlocks.js:483
+#: js/blocks/GraphicsBlocks.js:530
+#: js/blocks/GraphicsBlocks.js:752
+#: js/blocks/ProgramBlocks.js:895
+msgid "x"
+msgstr "xざひょう（よこ）"
+
+#: js/blocks/EnsembleBlocks.js:408
+#: js/blocks/EnsembleBlocks.js:419
+#: js/blocks/GraphicsBlocks.js:152
+#: js/blocks/GraphicsBlocks.js:316
+#: js/blocks/GraphicsBlocks.js:432
+#: js/blocks/GraphicsBlocks.js:483
+#: js/blocks/GraphicsBlocks.js:530
+#: js/blocks/GraphicsBlocks.js:752
+#: js/blocks/ProgramBlocks.js:895
+msgid "y"
+msgstr "yざひょう（たて）"
+
+#: js/blocks/EnsembleBlocks.js:412
+#: js/blocks/EnsembleBlocks.js:473
+#. TRANS: set xy position for this turtle
+msgid "set turtle"
+msgstr "タートルを設定"
+
+#: js/blocks/EnsembleBlocks.js:450
+msgid "The Set mouse block sends a stack of blocks to be run by the specified mouse."
+msgstr "指定されたマウスに実行するブロックのスタックを送ります。"
+
+#: js/blocks/EnsembleBlocks.js:465
+msgid "The Set turtle block sends a stack of blocks to be run by the specified turtle."
+msgstr "指定されたタートルに実行するブロックのスタックを送ります。"
+
+#: js/blocks/EnsembleBlocks.js:501
+#. TRANS: y position for this mouse
+msgid "mouse y"
+msgstr "ネズミのy座標"
+
+#: js/blocks/EnsembleBlocks.js:503
+msgid "The Y mouse block returns the Y position of the specified mouse."
+msgstr "指定されたマウスのY座標を返します。"
+
+#: js/blocks/EnsembleBlocks.js:515
+#. TRANS: y position for this turtle
+msgid "turtle y"
+msgstr "タートルのy座標"
+
+#: js/blocks/EnsembleBlocks.js:517
+msgid "The Y turtle block returns the Y position of the specified turtle."
+msgstr "指定されたタートルのY座標を返します。"
+
+#: js/blocks/EnsembleBlocks.js:546
+#. TRANS: x position for this mouse
+msgid "mouse x"
+msgstr "ネズミのx座標"
+
+#: js/blocks/EnsembleBlocks.js:548
+msgid "The X mouse block returns the X position of the specified mouse."
+msgstr "指定されたマウスのX座標を返します。"
+
+#: js/blocks/EnsembleBlocks.js:560
+#. TRANS: x position for this turtle
+msgid "turtle x"
+msgstr "タートルのx座標"
+
+#: js/blocks/EnsembleBlocks.js:562
+msgid "The X turtle block returns the X position of the specified turtle."
+msgstr "指定されたタートルのX座標を返します。"
+
+#: js/blocks/EnsembleBlocks.js:592
+#. TRANS: notes played by this mouse
+msgid "mouse notes played"
+msgstr "ネズミの演奏した音符の数"
+
+#: js/blocks/EnsembleBlocks.js:594
+msgid "The Mouse elapse notes block returns the number of notes played by the specified mouse."
+msgstr "指定されたマウスが演奏したノート数を返します。"
+
+#: js/blocks/EnsembleBlocks.js:608
+#. TRANS: notes played by this turtle
+msgid "turtle notes played"
+msgstr "タートルの演奏した音符の数"
+
+#: js/blocks/EnsembleBlocks.js:610
+msgid "The Turtle elapse notes block returns the number of notes played by the specified turtle."
+msgstr "指定されたタートルが演奏したノート数を返します。"
+
+#: js/blocks/EnsembleBlocks.js:646
+#. TRANS: convert current note for this turtle to piano key (1-88)
+msgid "mouse pitch number"
+msgstr "ネズミの音高数字"
+
+#: js/blocks/EnsembleBlocks.js:648
+msgid "The Mouse pitch block returns the current pitch number being played by the specified mouse."
+msgstr "指定されたマウスが現在演奏しているピッチ番号を返します。"
+
+#: js/blocks/EnsembleBlocks.js:662
+#. TRANS: convert current note for this turtle to piano key (1-88)
+msgid "turtle pitch number"
+msgstr "タートルの音高数字"
+
+#: js/blocks/EnsembleBlocks.js:664
+msgid "The Turtle pitch block returns the current pitch number being played by the specified turtle."
+msgstr "指定されたタートルが現在演奏しているピッチ番号を返します。"
+
+#: js/blocks/EnsembleBlocks.js:768
+#: js/blocks/EnsembleBlocks.js:840
+#. TRANS: note value is the duration of the note played by this mouse
+msgid "mouse note value"
+msgstr "ネズミの音価"
+
+#: js/blocks/EnsembleBlocks.js:778
+#. TRANS: note value is the duration of the note played by this turtle
+msgid "turtle note value"
+msgstr "タートルの音価"
+
+#: js/blocks/EnsembleBlocks.js:851
+#. TRANS: sync is short for synchronization
+msgid "mouse sync"
+msgstr "ネズミを同期させる"
+
+#: js/blocks/EnsembleBlocks.js:853
+msgid "The Mouse sync block aligns the beat count between mice."
+msgstr "マウス間のビート数を同期させるブロックです。"
+
+#: js/blocks/EnsembleBlocks.js:865
+#. TRANS: sync is short for synchronization
+msgid "turtle sync"
+msgstr "タートルを同期させる"
+
+#: js/blocks/EnsembleBlocks.js:867
+msgid "The Turtle sync block aligns the beat count between turtles."
+msgstr "タートル間のビート数を同期させるブロックです。"
+
+#: js/blocks/EnsembleBlocks.js:907
+msgid "The Found mouse block will return true if the specified mouse can be found."
+msgstr "指定されたマウスが見つかった場合に「実」を返します。"
+
+#: js/blocks/EnsembleBlocks.js:915
+msgid "found mouse"
+msgstr "ネズミを見つけた"
+
+#: js/blocks/EnsembleBlocks.js:925
+msgid "The Found turtle block will return true if the specified turtle can be found."
+msgstr "指定されたタートルが見つかった場合に「実」を返します。"
+
+#: js/blocks/EnsembleBlocks.js:933
+msgid "found turtle"
+msgstr "タートル見つかった"
+
+#: js/blocks/EnsembleBlocks.js:956
+msgid "new mouse"
+msgstr "新しいネズミ"
+
+#: js/blocks/EnsembleBlocks.js:958
+msgid "The New mouse block will create a new mouse."
+msgstr "新しいマウスを作成するブロックです。"
+
+#: js/blocks/EnsembleBlocks.js:969
+msgid "new turtle"
+msgstr "新しいタートル"
+
+#: js/blocks/EnsembleBlocks.js:971
+msgid "The New turtle block will create a new turtle."
+msgstr "新しいタートルを作成するブロックです。"
+
+#: js/blocks/EnsembleBlocks.js:1034
+msgid "set mouse color"
+msgstr "ネズミ色を設定"
+
+#: js/blocks/EnsembleBlocks.js:1037
+msgid "The Set-mouse-color block is used to set the color of a mouse."
+msgstr "「ネズミ色を設定」ブロックは ネズミの色を選ぶことに使います。"
+
+#: js/blocks/EnsembleBlocks.js:1043
+msgid "set turtle color"
+msgstr "タートル色を設定"
+
+#: js/blocks/EnsembleBlocks.js:1046
+msgid "The Set-turtle-color block is used to set the color of a turtle."
+msgstr "タートルの色を設定するためのブロックです。"
+
+#: js/blocks/EnsembleBlocks.js:1109
+msgid "The Mouse-name block returns the name of a mouse."
+msgstr "<h2>文字ブロック</h2><br>このプログラムを実行しているネズミの名前（文字列）を表す。"
+
+#: js/blocks/EnsembleBlocks.js:1118
+msgid "The Turtle-name block returns the name of a turtle."
+msgstr "タートルの名前を返すブロックです。"
+
+#: js/blocks/EnsembleBlocks.js:1141
+msgid "mouse count"
+msgstr "何匹のネズミ"
+
+#: js/blocks/EnsembleBlocks.js:1144
+msgid "The Mouse-count block returns the number of mice."
+msgstr "「何匹のネズミ」のブロックはネズミを数えって数字を表す。"
+
+#: js/blocks/EnsembleBlocks.js:1150
+msgid "turtle count"
+msgstr "何匹のタートル"
+
+#: js/blocks/EnsembleBlocks.js:1153
+msgid "The Turtle-count block returns the number of turtles."
+msgstr "タートルカウントブロックはタートルの数を返します。"
+
+#: js/blocks/EnsembleBlocks.js:1175
+msgid "nth mouse name"
+msgstr "何匹目のネズミの名前"
+
+#: js/blocks/EnsembleBlocks.js:1178
+msgid "The Nth-Mouse name block returns the name of the nth mouse."
+msgstr "エヌス・マウス・ネームブロックはエヌ番目のマウスの名前を返します。"
+
+#: js/blocks/EnsembleBlocks.js:1184
+msgid "nth turtle name"
+msgstr "何匹目のタートルの名前"
+
+#: js/blocks/EnsembleBlocks.js:1187
+msgid "The Nth-Turtle name block returns the name of the nth turtle."
+msgstr "エヌス・タートル・ネームブロックはエヌ番目のタートルの名前を返します。"
+
+#: js/blocks/EnsembleBlocks.js:1231
+#: js/blocks/EnsembleBlocks.js:1291
+msgid "set name"
+msgstr "ネズミに名前をつける"
+
+#: js/blocks/EnsembleBlocks.js:1240
+#: js/blocks/EnsembleBlocks.js:1247
+msgid "source"
+msgstr "ソース"
+
+#: js/blocks/EnsembleBlocks.js:1240
+#: js/blocks/EnsembleBlocks.js:1247
+msgid "target"
+msgstr "ターゲット"
+
+#: js/blocks/EnsembleBlocks.js:1297
+msgid "The Set-name block is used to name a mouse."
+msgstr "<h2>文字ブロック</h2><br>ネズミに指定した名前をつけることができる。"
+
+#: js/blocks/EnsembleBlocks.js:1310
+msgid "The Set-name block is used to name a turtle."
+msgstr "<h2>文字ブロック</h2><br>タートルに指定した名前をつけることができる。"
+
+#: js/blocks/ExtrasBlocks.js:33
+msgid "fraction"
+msgstr "分数"
+
+#: js/blocks/ExtrasBlocks.js:36
+msgid "Convert a float to a fraction"
+msgstr "小数から分数"
+
+#: js/blocks/ExtrasBlocks.js:93
+msgid "save as ABC"
+msgstr "ABCでほぞん"
 
 #: js/turtledefs.js:424
 msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
@@ -1846,6 +5645,10 @@ msgstr "ドラム・スタート"
 msgid "Not a valid pitch name"
 msgstr "選ばれた音名が適切ではありません。"
 
+#: js/blocks/HeapBlocks.js:254
+msgid "The Heap-empty? block returns true if the heap is empty."
+msgstr "Heap-empty?ブロックはヒープが空の場合に「実」を返します。"
+
 #: js/logoconstants.js:44
 msgid "Pitch index exceeds EDO range"
 msgstr ""
@@ -2091,7 +5894,7 @@ msgstr "画面の境界を無視する"
 
 #: js/trash-controller.js:286
 msgid "Restore last item"
-msgstr "最後のアイテムを復元"
+msgstr "先のアイテムを復元"
 
 #: js/trash-controller.js:287
 msgid "Restore all items"
@@ -2330,6 +6133,10 @@ msgstr "中心の角度とほうがん（ざひょう）をひょうじ"
 #: js/blocks/ExtrasBlocks.js:657
 msgid "none"
 msgstr "なし"
+
+#: js/blocks/MediaBlocks.js:819
+msgid "The To frequency block converts a pitch name and octave to Hertz."
+msgstr "トゥーフリクエンシーブロックは音名とオクターヴをヘルツに変換します。"
 
 #: js/block.js:4240
 #: js/blocks/ExtrasBlocks.js:633
@@ -4062,6 +7869,10 @@ msgstr "指定されたタートルの向きを返します。"
 msgid "set mouse"
 msgstr "ネズミを設定"
 
+#: js/blocks/ToneBlocks.js:634
+msgid "The delay (second argument) sets the time delay between chorus voices (milliseconds)."
+msgstr "ディレイ(第 2 引数) は、コーラス・ボイス間の遅延時間 (ミリ秒) を設定します。"
+
 #: js/blocks/EnsembleBlocks.js:409
 #: js/blocks/EnsembleBlocks.js:420
 #: js/blocks/BoxesBlocks.js:599
@@ -4247,6 +8058,10 @@ msgstr "ネズミ色を設定"
 msgid "The Set-mouse-color block is used to set the color of a mouse."
 msgstr "「ネズミ色を設定」ブロックは ネズミの色を選ぶことに使います。"
 
+#: js/blocks/VolumeBlocks.js:35
+msgid "synth volume"
+msgstr "シンセの音量"
+
 #: js/blocks/EnsembleBlocks.js:1043
 msgid "set turtle color"
 msgstr "タートル色を設定"
@@ -4254,6 +8069,10 @@ msgstr "タートル色を設定"
 #: js/blocks/EnsembleBlocks.js:1046
 msgid "The Set-turtle-color block is used to set the color of a turtle."
 msgstr "タートルの色を設定するためのブロックです。"
+
+#: js/blocks/VolumeBlocks.js:39
+msgid "The Synth volume block returns the current volume of the current synthesizer."
+msgstr "「シンセの音量」ブロックは現在のシンセサイザーの音量を返します。"
 
 #: js/blocks/EnsembleBlocks.js:1109
 msgid "The Mouse-name block returns the name of a mouse."
@@ -4279,6 +8098,11 @@ msgstr "何匹のタートル"
 msgid "The Turtle-count block returns the number of turtles."
 msgstr "タートルカウントブロックはタートルの数を返します。"
 
+#: js/blocks/VolumeBlocks.js:355
+#: js/blocks/VolumeBlocks.js:525
+msgid "set synth volume"
+msgstr "シンセの音量をせってい"
+
 #: js/blocks/EnsembleBlocks.js:1175
 msgid "nth mouse name"
 msgstr "何匹目のネズミの名前"
@@ -4286,6 +8110,11 @@ msgstr "何匹目のネズミの名前"
 #: js/blocks/EnsembleBlocks.js:1178
 msgid "The Nth-Mouse name block returns the name of the nth mouse."
 msgstr "エヌス・マウス・ネームブロックはエヌ番目のマウスの名前を返します。"
+
+#: js/blocks/VolumeBlocks.js:362
+#: js/blocks/VolumeBlocks.js:546
+msgid "synth"
+msgstr "シンセ"
 
 #: js/blocks/EnsembleBlocks.js:1184
 msgid "nth turtle name"
@@ -4305,6 +8134,10 @@ msgstr "ネズミに名前をつける"
 msgid "source"
 msgstr "ソース"
 
+#: js/blocks/VolumeBlocks.js:440
+msgid "Synth not found"
+msgstr "シンセ（楽器）が見つかりません"
+
 #: js/blocks/EnsembleBlocks.js:1240
 #: js/blocks/EnsembleBlocks.js:1247
 msgid "target"
@@ -4321,6 +8154,10 @@ msgstr "<h2>文字ブロック</h2><br>タートルに指定した名前をつ�
 #: js/blocks/FlowBlocks.js:41
 msgid "The Backward block runs code in reverse order (Musical retrograde)."
 msgstr "<h2>実行ブロック（ぎゃく実行）</h2><br>はさまれているブロックを、つうじょうとはぎゃくの順じょで、下から上に向かって実行する。"
+
+#: js/blocks/VolumeBlocks.js:531
+msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
+msgstr "「シンセの音量をせってい」ブロックは、ギター、バイオリン、スネアドラムなどの特定のシンセサイザーの音量を変更します。"
 
 #: js/blocks/FlowBlocks.js:48
 msgid "backward"
@@ -5193,6 +9030,10 @@ msgstr "引数"
 msgid "Invalid argument"
 msgstr "無効な議論"
 
+#: js/blocks/OrnamentBlocks.js:293
+msgid "The Neighbor block rapidly switches between neighboring pitches."
+msgstr "<h2>音を加えるブロック</h2><br>２つの同じ高さの音のあいだに、音を１つ入れることができる。<br>図の例では、ソとソのあいだにラが入り、「ソ、ラ、ソ」とすばやくえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ド、レ、ミ、ファ、ソ、ラ、シ、ド」、「ソ」を始まりの音にしたときの「ソ、ラ、シ、ド、レ、ミ、（♯ファ）、ソ」のこと。"
+
 #: js/blocks/ActionBlocks.js:967
 msgid "In the example, it is used with the One of block to choose a random phase."
 msgstr "<br><br>図の例は、決まったアクションではなく、２つのうちどちらか１つのアクションをランダムに実行させる。"
@@ -5470,6 +9311,10 @@ msgstr "デバッガ"
 msgid "The Debug block adds a debug point in your code. When reached, execution will pause and you can inspect variables."
 msgstr "「デバッガ」ブロックは、コードにデバッグ ポイントを追加します。到達すると、実行が一時停止され、変数を検査できるようになります。"
 
+#: js/blocks/PitchBlocks.js:677
+msgid "The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."
+msgstr "ピッチ番号をピッチとオクターヴにマッピングするためのオフセットを設定するために使われるブロックです。"
+
 #: js/blocks/MediaBlocks.js:45
 #: js/blocks/MediaBlocks.js:56
 msgid "The Right block returns the position of the right of the canvas."
@@ -5509,6 +9354,10 @@ msgstr "この例では、タートルはキャンバスの上端に到達する
 #: js/blocks/MediaBlocks.js:282
 msgid "The Bottom block returns the position of the bottom of the canvas."
 msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの下のｙざひょうち。マイナスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。"
+
+#: js/blocks/PitchBlocks.js:753
+msgid "The Number to octave block will convert a pitch number to an octave."
+msgstr "Number to octaveブロックはピッチ番号をオクターヴに変換します。"
 
 #: js/blocks/MediaBlocks.js:347
 msgid "The Width block returns the width of the canvas."
@@ -5656,6 +9505,10 @@ msgstr "<h2>表示ブロック（スタンプ）</h2><br>スタンプは、実�
 #.TRANS: show1 is show as in display an image or text on the screen.
 msgid "show1"
 msgstr "スタンプ"
+
+#: js/blocks/PitchBlocks.js:1065
+msgid "The Register block provides an easy way to modify the register (octave) of the notes that follow it."
+msgstr "Registerブロックは後に続く音符のオクターヴ（レジスター）を簡単に変更する方法を提供します。"
 
 #: js/blocks/MediaBlocks.js:974
 msgid "obj"
@@ -5867,6 +9720,10 @@ msgstr "ホローラインブロックは中空の線を作成します。"
 msgid "hollow line"
 msgstr "（中空の）線"
 
+#: js/blocks/PitchBlocks.js:1747
+msgid "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
+msgstr "1から始まり、音階の枠組みに関係なく（つまりオクターヴが常に8音とは限らない）"
+
 #: js/blocks/PenBlocks.js:676
 msgid "The Fill block fills in a shape with a color."
 msgstr "<h2>ペンブロック</h2><br>ネズミがえがいた図形の内がわをぬりつぶす。"
@@ -5902,6 +9759,10 @@ msgstr "太さをせってい"
 #: js/blocks/PenBlocks.js:855
 msgid "The Set-pen-size block changes the size of the pen."
 msgstr "<h2>ペンブロック</h2><br>ネズミがえがく線の太さをせっていする。太さには、0より大きいあたいを使う。"
+
+#: js/blocks/PitchBlocks.js:1839
+msgid "Scale Degree 1 is always the first pitch in a given scale, regardless of octave."
+msgstr "スケールディグリー1は、オクターヴに関係なく常に与えられたスケールの最初の音です。"
 
 #: js/blocks/PenBlocks.js:914
 #.TRANS: set degree of translucence of the pen color
@@ -7720,6 +11581,10 @@ msgstr "（エフェクタの）深さの数字が変域外です。"
 #: js/turtleactions/ToneActions.js:304
 msgid "Distortion must be from 0 to 100."
 msgstr "ディストーションは、0から100までのはんいでせっていしてください。"
+
+#: js/widgets/temperament.js:1843
+msgid "The octave ratio has changed. This changes temperament significantly."
+msgstr "オクターヴ比が変わりました。これにより調律が大きく変わります。"
 
 #: js/turtleactions/ToneActions.js:335
 #.TRANS: partials components in a harmonic series

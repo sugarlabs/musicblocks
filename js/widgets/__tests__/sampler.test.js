@@ -78,7 +78,34 @@ global.TunerDisplay = class {
     }
 };
 
-const { SampleWidget, PitchSmoother } = require("../sampler.js");
+const { SampleWidget, PitchSmoother, resolveBackendURL } = require("../sampler.js");
+
+describe("resolveBackendURL", () => {
+    test("returns window.AI_SAMPLE_ENDPOINT when defined and strips trailing slashes", () => {
+        window.AI_SAMPLE_ENDPOINT = "https://custom.endpoint.org///";
+        expect(resolveBackendURL()).toBe("https://custom.endpoint.org");
+        delete window.AI_SAMPLE_ENDPOINT;
+    });
+
+    test("respects backend query param override and strips trailing slashes", () => {
+        expect(resolveBackendURL({ search: "?backend=http://custom-api:9000/" })).toBe(
+            "http://custom-api:9000"
+        );
+
+        expect(
+            resolveBackendURL({
+                search: "?backend_url=https://staging.musicblocks.sugarlabs.org///"
+            })
+        ).toBe("https://staging.musicblocks.sugarlabs.org");
+    });
+
+    test("returns empty string when no endpoint is configured", () => {
+        delete window.AI_SAMPLE_ENDPOINT;
+        expect(resolveBackendURL(null)).toBe("");
+        expect(resolveBackendURL({})).toBe("");
+        expect(resolveBackendURL({ search: "" })).toBe("");
+    });
+});
 
 describe("SampleWidget.dependencies", () => {
     test("includes the tuner module used by the sampler", () => {
