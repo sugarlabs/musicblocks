@@ -289,6 +289,9 @@ class JSEditor {
                 document.removeEventListener("mouseup", this._resizeHandlers.stopResize);
                 this._resizeHandlers = null;
             }
+            // Remove stylesheet links added by this instance
+            this._styles.forEach(link => link.remove());
+            this._styles = [];
             this.isOpen = false;
             defaultOnClose();
         };

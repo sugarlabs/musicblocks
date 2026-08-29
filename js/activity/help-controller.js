@@ -46,6 +46,10 @@ class HelpController {
      * Toggles display of javaScript editor widget.
      */
     async toggleJSEditor() {
+        if (window.widgetWindows?.isOpen("JavaScript Editor")) {
+            return;
+        }
+
         await lazyLoad([
             "widgets/jseditor",
             "activity/js-export/samples/sample",
