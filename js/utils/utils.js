@@ -747,7 +747,7 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                 if (sScript.parentNode) {
                     sScript.parentNode.removeChild(sScript);
                 }
-                reject(new Error("Failed to execute plugin script"));
+                reject(err || new Error("Failed to execute plugin script"));
             };
             document.head.appendChild(sScript);
         });

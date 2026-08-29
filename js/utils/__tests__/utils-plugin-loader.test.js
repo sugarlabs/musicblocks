@@ -142,7 +142,7 @@ describe("processPluginData script cleanup", () => {
                 }),
                 "plugins/test.json"
             )
-        ).rejects.toThrow("Failed to execute plugin script");
+        ).rejects.toThrow("load failed");
 
         expect(document.head.querySelectorAll("script[src^='blob:plugin-setup']")).toHaveLength(0);
         expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup-0");
