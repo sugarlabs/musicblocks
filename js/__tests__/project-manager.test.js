@@ -1913,4 +1913,56 @@ describe("_setupFileHandlers inner callbacks", () => {
         activity.fileChooser.files = [];
         expect(() => handlers.change()).not.toThrow();
     });
+
+    it("change handler shows exactly one error when HTML has no project data", () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {}
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        global.extractProjectDataFromHTML.mockReturnValue(null);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.html" }];
+        handlers.change();
+
+        const reader = readers[0];
+        reader.result = "<html><body>no project data here</body></html>";
+        reader.onload();
+        jest.advanceTimersByTime(200);
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot find project data in this HTML file."
+        );
+        expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+    });
+});
+
+describe("_finishLoading", () => {
+    it("resets loading state, cursor, and update flag", () => {
+        const activity = makeActivity();
+        activity.loading = true;
+        activity.update = false;
+        document.body.style.cursor = "wait";
+        const pm = new ProjectManager(activity);
+
+        pm._finishLoading();
+
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.update).toBe(true);
+    });
 });
