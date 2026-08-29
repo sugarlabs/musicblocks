@@ -65,7 +65,6 @@ const _b64Cache = new Map();
     scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern,
     getNonEDOModeSteps,
     MODEPIEMENU_SLOT_COUNT, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
-    MODEPIEMENU_KEY_RING,
     MODEPIEMENU_NAME_TITLE_RADIUS, MODEPIEMENU_FONT_FAMILY,
     MODEPIEMENU_GROUP_FONT_RATIO, MODEPIEMENU_NAME_FONT_MIN_RATIO,
     MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
@@ -86,9 +85,10 @@ function normalizeNoteAccidentals(note) {
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
     // Strip microtonal ^ / v prefixes (temperament widget cents display)
     // so the base note can be resolved, e.g. "^C" → "C", "vvD♭" → "D♭".
-    // Strip microtonal ^ / v prefixes before matching so "^C" etc. resolve.
-    // Limit to two so real articulation prefixes aren't removed.
-    return note.replace(/^[v^]{0,2}/, "").replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+    // Strip at most two leading microtonal ^ / v prefixes (the temperament
+    // widget uses them for cents display, e.g. "^C" or "vvD♭"). Limiting to
+    // two keeps any accidental real articulation prefix from being removed.
+    return note.replace(/^[v^]{1,2}/, "").replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 }
 
 /**
@@ -1858,7 +1858,6 @@ const MODEPIEMENU_SLOT_COUNT = 12;
  */
 const MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
 const MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
-const MODEPIEMENU_KEY_RING = { minRadius: 0.85, maxRadius: 1.0 };
 
 /**
  * Mid-radius of the mode-name ring (0.3-0.85), used to size each label to its
@@ -4237,7 +4236,7 @@ const frequencyToPitch = (hz, temperament) => {
  */
 const getArticulation = note => {
     // Strip microtonal ^ / v prefixes before matching so "^C" etc. resolve.
-    const stripped = note.replace(/^[v^]{0,2}/, "");
+    const stripped = note.replace(/^[v^]{1,2}/, "");
     const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
     return match ? match[1] : stripped;
 };
@@ -8481,7 +8480,6 @@ if (typeof module !== "undefined" && module.exports) {
         FIXEDSOLFEGE1,
         MODEPIEMENU_GROUP_RING,
         MODEPIEMENU_NAME_RING,
-        MODEPIEMENU_KEY_RING,
         getSavedCustomModes,
         getModeNamesForGroup,
         getModeLabel,

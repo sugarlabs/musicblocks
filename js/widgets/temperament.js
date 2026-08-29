@@ -1131,10 +1131,6 @@ function TemperamentWidget() {
         /** Returns the color for a cents deviation from 12-EDO. */
         const _devColor = deviationColor;
 
-        const _nextCents = idx =>
-            that.cents[(idx + 1) % that.pitchNumber] + (idx + 1 >= that.pitchNumber ? 1200 : 0);
-        const _prevCents = idx =>
-            that.cents[(idx - 1 + that.pitchNumber) % that.pitchNumber] - (idx - 1 < 0 ? 1200 : 0);
         const _sortedIndex = centsVal => sortedIndex(that.cents, centsVal);
         const _largestGapMid = () => largestGapMid(that.cents);
         const _sameNodeCents = (cur, dir) => sameNodeCents(that.cents, cur, dir);
