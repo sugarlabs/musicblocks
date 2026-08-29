@@ -101,12 +101,10 @@ const piemenuBlockContext = block => {
     wheel.navItems[1].setTooltip(_("Extract"));
     wheel.navItems[2].setTooltip(_("Move to trash"));
     wheel.navItems[3].setTooltip(_("Close"));
-    if (
-        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
-            block.blocks.blockList[topBlock].name
-        )
-    ) {
-        wheel.navItems[4].setTooltip(_("Save stack"));
+    const saveStackIndex = labels.indexOf("imgsrc:header-icons/save-blocks-button.svg");
+
+    if (saveStackIndex !== -1) {
+        wheel.navItems[saveStackIndex].setTooltip(_("Save stack"));
     }
 
     if (helpButton !== null) {
@@ -183,12 +181,8 @@ const piemenuBlockContext = block => {
 
     document.body.addEventListener("click", window._contextWheelClickHandler);
 
-    if (
-        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
-            block.name
-        )
-    ) {
-        wheel.navItems[4].navigateFunction = () => {
+    if (saveStackIndex !== -1) {
+        wheel.navItems[saveStackIndex].navigateFunction = () => {
             that.blocks.activeBlock = blockBlock;
             that.blocks.prepareStackForCopy();
             that.blocks.saveStack();
