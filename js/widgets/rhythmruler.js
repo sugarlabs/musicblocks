@@ -1677,7 +1677,7 @@ class RhythmRuler {
 
             const noteValue = noteValues[newCellIndex];
             if (inputNum * noteValue > 256) {
-                this.activity.logo.errorMsg(_("Maximum value of 256 has been exceeded."));
+                this.activity.errorMsg(_("Maximum value of 256 has been exceeded."));
                 return;
             } else {
                 this.activity.hideMsgs();

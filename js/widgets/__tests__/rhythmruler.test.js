@@ -518,6 +518,32 @@ describe("RhythmRuler Widget", () => {
     });
 
     // =========================================================================
+    // DISSECTION TESTS
+    // =========================================================================
+    describe("Dissection", () => {
+        beforeEach(() => {
+            rhythmRuler.activity = mockActivity;
+            mockActivity.errorMsg = jest.fn();
+            mockActivity.hideMsgs = jest.fn();
+        });
+
+        test("__dissectByNumber should display errorMsg if subdivision exceeds 256", () => {
+            rhythmRuler._rulerSelected = 0;
+            rhythmRuler._rulers = [{ deleteCell: jest.fn() }];
+            rhythmRuler.Rulers = [[[64], []]];
+
+            const cell = { cellIndex: 0 };
+
+            rhythmRuler.__dissectByNumber(cell, 5, true);
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Maximum value of 256 has been exceeded."
+            );
+            expect(mockActivity.hideMsgs).not.toHaveBeenCalled();
+        });
+    });
+
+    // =========================================================================
     // NOTE WIDTH CALCULATION TESTS
     // =========================================================================
     describe("Note Width Calculation", () => {
