@@ -1842,6 +1842,16 @@ function SampleWidget() {
         this.reconnectSynthsToAnalyser();
     };
 
+    this._isWaveformActive = function () {
+        const projectPlaybackActive =
+            this.activity &&
+            this.activity.turtles &&
+            typeof this.activity.turtles.running === "function" &&
+            this.activity.turtles.running();
+
+        return Boolean(this.is_recording || this.isMoving || projectPlaybackActive);
+    };
+
     this._ensureWaveformLoop = function () {
         if (this.drawVisualIDs && this.drawVisualIDs[0]) {
             return;
@@ -1924,7 +1934,7 @@ function SampleWidget() {
         let needsRedraw = Boolean(resized);
 
         const draw = () => {
-            const hasActiveWork = this.is_recording || this.isMoving;
+            const hasActiveWork = this._isWaveformActive();
             const canDraw =
                 this.is_recording || (this.pitchAnalysers && this.pitchAnalysers[turtleIdx]);
 
@@ -2006,7 +2016,7 @@ function SampleWidget() {
                     }
                 }
                 needsRedraw = false;
-                if (this.running && (this.is_recording || this.isMoving)) {
+                if (this.running && this._isWaveformActive()) {
                     this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
                 } else {
                     this.drawVisualIDs[turtleIdx] = null;

@@ -1056,6 +1056,42 @@ describe("Sampler Widget", () => {
             expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
         });
 
+        test("makeCanvas schedules RAF during project playback when the widget itself is idle", () => {
+            setupWaveformCanvas({ isMoving: false, is_recording: false });
+            widget.activity = {
+                ...widget.activity,
+                turtles: { running: jest.fn(() => true) }
+            };
+
+            widget.makeCanvas(400, 300, 0, false);
+
+            expect(widget.activity.turtles.running).toHaveBeenCalled();
+            expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+            expect(widget.drawVisualIDs[0]).toBe(1);
+        });
+
+        test("makeCanvas stops scheduling RAF after project playback ends while the widget remains idle", () => {
+            setupWaveformCanvas({ isMoving: false, is_recording: false });
+            let rafCallback;
+            requestAnimationFrame.mockImplementation(cb => {
+                rafCallback = cb;
+                return 1;
+            });
+            widget.activity = {
+                ...widget.activity,
+                turtles: { running: jest.fn(() => true) }
+            };
+
+            widget.makeCanvas(400, 300, 0, false);
+            expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+
+            widget.activity.turtles.running.mockReturnValue(false);
+            rafCallback();
+
+            expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+            expect(widget.drawVisualIDs[0]).toBeNull();
+        });
+
         test("resume restarts the waveform loop after idle", () => {
             setupWaveformCanvas();
 
