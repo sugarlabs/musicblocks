@@ -970,7 +970,7 @@ class JSEditor {
         JSEditor.clearConsole();
 
         try {
-            if (!ast2blocklist_config && window.ast2blocklist_config_ready) {
+            if (!window.ast2blocklist_config && window.ast2blocklist_config_ready) {
                 try {
                     await window.ast2blocklist_config_ready;
                 } catch {
@@ -978,7 +978,7 @@ class JSEditor {
                 }
             }
 
-            if (!ast2blocklist_config) {
+            if (!window.ast2blocklist_config) {
                 throw new Error(
                     window.ast2blocklist_config_failed
                         ? _(
@@ -989,7 +989,7 @@ class JSEditor {
             }
 
             let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
-            let blockList = AST2BlockList.toBlockList(ast, ast2blocklist_config);
+            let blockList = AST2BlockList.toBlockList(ast, window.ast2blocklist_config);
             const activity = this.activity;
             // Wait for the old blocks to be removed, then load new blocks.
             const __listener = event => {
