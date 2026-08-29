@@ -979,13 +979,14 @@ class JSEditor {
             }
 
             if (!ast2blocklist_config) {
-                throw new Error(
+                JSEditor.logConsole(
                     window.ast2blocklist_config_failed
                         ? _(
                               "JavaScript block conversion is unavailable because its configuration file failed to load."
                           )
                         : _("JavaScript block conversion is still loading. Please try again.")
                 );
+                return;
             }
 
             let ast = acorn.parse(this._code, { ecmaVersion: 2020 });

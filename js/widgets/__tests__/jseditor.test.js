@@ -549,14 +549,14 @@ describe("JSEditor", () => {
             expect(AST2BlockList.toBlockList).toHaveBeenCalledWith(ast, { loaded: true });
         });
 
-        test("_codeToBlocks logs a clear error when AST config fails", async () => {
+        test("_codeToBlocks logs a warning when AST config fails", async () => {
             const editor = createEditor();
             const consoleEl = document.getElementById("editorConsole");
 
             global.ast2blocklist_config = undefined;
             window.ast2blocklist_config_ready = Promise.reject(new Error("network failed"));
 
-            await expect(editor._codeToBlocks()).rejects.toThrow();
+            await expect(editor._codeToBlocks()).resolves.toBeUndefined();
 
             expect(consoleEl.textContent).toContain(
                 "JavaScript block conversion is unavailable because its configuration file failed to load."
