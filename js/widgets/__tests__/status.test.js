@@ -383,6 +383,28 @@ describe("StatusMatrix Widget", () => {
 
                 expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
             });
+
+            test("falls back to a 100 ms timeout when requestAnimationFrame is unavailable", () => {
+                jest.useFakeTimers();
+                const savedRaf = global.requestAnimationFrame;
+                global.requestAnimationFrame = undefined;
+
+                try {
+                    statusMatrix.updateAll();
+                    statusMatrix.updateAll();
+
+                    expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+
+                    jest.advanceTimersByTime(99);
+                    expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+
+                    jest.advanceTimersByTime(1);
+                    expect(mockActivity.logo.parseArg).toHaveBeenCalledTimes(1);
+                } finally {
+                    global.requestAnimationFrame = savedRaf;
+                    jest.useRealTimers();
+                }
+            });
         });
 
         test("does not throw when a turtle is added after initialization and its column is missing", () => {

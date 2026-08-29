@@ -259,7 +259,9 @@ class StatusMatrix {
         if (typeof requestAnimationFrame === "function") {
             requestAnimationFrame(render);
         } else {
-            setTimeout(render, 50);
+            // 100 ms is still shorter than a typical 1/16th note, so no
+            // audible-note state change is skipped in rAF-less environments.
+            setTimeout(render, 100);
         }
     }
 
