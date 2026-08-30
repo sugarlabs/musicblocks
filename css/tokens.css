@@ -28,6 +28,7 @@
     /* Selector / Widget Colors */
     --color-selector-bg: #8cc6ff;
     --color-selector-selected: #1a8cff;
+    --color-label-bg: #a0a0a0;
 
     --color-success: #10b981;
     --color-success-bg: #d1fae5;
@@ -128,6 +129,7 @@ body.dark {
 
     --color-selector-bg: #64b5f6;
     --color-selector-selected: #1e88e5;
+    --color-label-bg: #bdbdbd;
 
     /* Adjusted state backgrounds for dark mode */
     --color-success-bg: rgba(16, 185, 129, 0.2);
@@ -168,6 +170,7 @@ body.highcontrast {
 
     --color-selector-bg: #00ffff;
     --color-selector-selected: #00cccc;
+    --color-label-bg: #ffffff;
 
     --color-success: #00ff00;
     --color-success-bg: #000000;

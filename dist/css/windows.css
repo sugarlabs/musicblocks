@@ -453,3 +453,18 @@
   background-color: var(--color-selector-selected);
 }
 
+/* Arpeggio widget tokens */
+.arpeggio-label-cell {
+  background-color: var(--color-label-bg);
+}
+
+.arpeggio-selector-cell {
+  background-color: var(--color-selector-bg);
+}
+
+.arpeggio-selector-cell.selected,
+.arpeggio-selector-selected {
+  background-color: var(--color-selector-selected);
+}
+
+
