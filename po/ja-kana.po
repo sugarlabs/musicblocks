@@ -1725,9 +1725,7 @@ msgstr "えらばれた おんめいが てきせつでは ありません。"
 
 #: js/logoconstants.js:44
 msgid "Pitch index exceeds EDO range"
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "ぴっちいんでっくすが へいきんりつ はんいをこえています。"
 
 #: js/project-manager.js:60
 msgid "Catching mice"
@@ -1795,9 +1793,7 @@ msgstr "プロジェクトを よみこめません。 ファイルの しゅる
 
 #: js/project-manager.js:787 js/project-manager.js:902
 msgid "Cannot find project data in this HTML file."
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "このHTMLふぁいるないにぷろじぇくとでーたがみつかりません。"
 
 #: js/project-manager.js:1076
 msgid "Something went wrong reading JSON-encoded project data."
@@ -2386,9 +2382,7 @@ msgstr "ぶろっくがごみはこにおくられる"
 
 #: js/svgAssetSelector.js:63
 msgid "Choose an image"
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "がぞうをせんたくしてください"
 
 #: js/svgAssetSelector.js:83
 msgid "Built-in images"
@@ -2408,9 +2402,7 @@ msgstr "PNG、JPG、SVG、GIF、そのほかのがぞうけいしきをさぽー
 
 #: js/svgAssetSelector.js:176
 msgid "Apply"
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "てきようする"
 
 #: js/utils/utils-logic.js:324
 msgid "Invalid input passed to rational sum"
@@ -3275,9 +3267,7 @@ msgstr "7へいきんりつ"
 
 #: js/utils/musicutils.js:1948 js/utils/musicutils.js:1965
 msgid "Equal (17EDO)"
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "17へいきんりつ"
 
 #: js/utils/musicutils.js:1949 js/utils/musicutils.js:1966
 msgid "Equal (19EDO)"
@@ -7766,9 +7756,7 @@ msgstr "ベジェきょくせん"
 
 #: js/blocks/GraphicsBlocks.js:589
 msgid "The Arc block moves the mouse in an arc."
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "あーぶろっくは、まうすをえんこじょうにうごかします。"
 
 #: js/blocks/GraphicsBlocks.js:596
 msgid "The Arc block moves the turtle in an arc."
@@ -7981,9 +7969,7 @@ msgstr "と"
 
 #: js/turtleactions/IntervalsActions.js:192
 msgid "steps"
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "てじゅん"
 
 #: js/turtleactions/IntervalsActions.js:311
 msgid "Adding missing pitch number 0."
@@ -8182,9 +8168,7 @@ msgstr "あたらしいおんせいをせいせいしています..."
 
 #: js/turtleactions/RhythmActions.js:151
 msgid "Neighbor note value is too large for the current note duration."
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "ねいばーのーとのあたいが、げんざいのおんぷのながさにくらべておおきすぎます。"
 
 #: js/widgets/jseditor.js:393
 msgid "Reset Code"
@@ -8265,9 +8249,7 @@ msgstr "さーばー エラー: AI ばっくえんどにせつぞくできませ
 msgid ""
 "Could not reach the AI assistant. Please check your connection and try "
 "again."
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "AIあしすたんとにせつぞくできませんでした。せつぞくじょうきょうをかくにんし、もういちどおためしください。"
 
 #: js/widgets/aidebugger.js:552
 msgid "Before we start"
@@ -8448,9 +8430,7 @@ msgstr "がぞうがせいじょうにプラグインされました"
 
 #: js/widgets/legobricks.js:1323
 msgid "Photo captured"
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "しゃしんをさつえいしました"
 
 #: js/widgets/legobricks.js:1328
 msgid "Webcam started"
@@ -8820,9 +8800,7 @@ msgstr "はんぷく"
 
 #: js/widgets/temperament.js:1300
 msgid "Please enter a valid ratio (e.g. 3:2) within the octave space."
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "おくたーぶのはんいないで、ゆうこうなひりつ（れい：3:2）をにゅうりょくしてください。"
 
 #: js/widgets/temperament.js:1832
 msgid "The octave ratio has changed. This changes temperament significantly."
@@ -8886,9 +8864,7 @@ msgstr "ぷろんぷと"
 
 #: js/widgets/sampler.js:732
 msgid "AI Sample Generation"
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "AIによるさんぷるせいせい"
 
 #: js/widgets/sampler.js:798
 msgid "Generating audio... (It may take up to 1 minute)"
@@ -8944,15 +8920,11 @@ msgstr "スタート"
 
 #: js/widgets/sampler.js:2251
 msgid "Detected Pitch:"
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "けんしゅつされたぴっち:"
 
 #: js/widgets/sampler.js:2260
 msgid "Note:"
-msgstr ""
-"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
-"try again later.That’s all we know."
+msgstr "おんぷ:"
 
 #: js/widgets/timbre.js:839
 msgid "Synthesizer"
