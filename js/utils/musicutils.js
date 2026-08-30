@@ -1036,6 +1036,16 @@ function generateNoteNames(edo) {
         const nextNatural = naturals[(n + 1) % 7];
         const edoSteps = intervals[n].steps;
 
+        // An interval with zero allocated steps means this natural letter
+        // has no distinct pitch class in this EDO (its scale step was
+        // absorbed into a neighboring interval) — skip it entirely rather
+        // than always emitting all 7 naturals, or names.length would never
+        // shrink below 7 for edo < 7 (see the edo === 5 special case above,
+        // which relies on exactly this: F and B are skipped).
+        if (edoSteps === 0) {
+            continue;
+        }
+
         names.push(natural);
 
         const numAccidentals = edoSteps - 1;
