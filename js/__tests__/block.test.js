@@ -489,6 +489,15 @@ describe("Block Foundation", () => {
                 expect(block.container.updateCache).toHaveBeenCalled();
             });
 
+            it("should not update a cache that has not been created yet", () => {
+                block.container.bitmapCache = null;
+
+                expect(() => block.highlight()).not.toThrow();
+                expect(block.highlightBitmap.visible).toBe(true);
+                expect(block.bitmap.visible).toBe(false);
+                expect(block.container.updateCache).not.toHaveBeenCalled();
+            });
+
             it("should do nothing if trashed", () => {
                 block.trash = true;
                 block.highlight();
@@ -503,6 +512,28 @@ describe("Block Foundation", () => {
                 block.unhighlight();
                 expect(block.bitmap.visible).toBe(true);
                 expect(block.highlightBitmap.visible).toBe(false);
+            });
+
+            it("should not update a cache that has not been created yet", () => {
+                block.container.bitmapCache = null;
+
+                expect(() => block.unhighlight()).not.toThrow();
+                expect(block.bitmap.visible).toBe(true);
+                expect(block.highlightBitmap.visible).toBe(false);
+                expect(block.container.updateCache).not.toHaveBeenCalled();
+            });
+        });
+
+        describe("unhighlightSelectedBlocks()", () => {
+            it("should not update a cache that has not been created yet", () => {
+                mockBlocks.unhighlight = jest.fn();
+                block.disconnectedBitmap = { visible: false };
+                block.container.bitmapCache = null;
+
+                expect(() => block.unhighlightSelectedBlocks(0, true)).not.toThrow();
+                expect(mockBlocks.unhighlight).toHaveBeenCalledWith(0, true);
+                expect(block.disconnectedBitmap.visible).toBe(true);
+                expect(block.container.updateCache).not.toHaveBeenCalled();
             });
         });
 
