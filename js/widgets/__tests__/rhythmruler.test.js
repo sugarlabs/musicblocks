@@ -2468,4 +2468,221 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
             expect(RhythmRuler.dependencies).toEqual(["widgets/rhythmruler"]);
         });
     });
+
+    describe("Timer and Lifecycle Management", () => {
+        it("schedules and clears timeouts using timerManager when available", () => {
+            const mockManager = {
+                setTimeout: jest.fn().mockReturnValue(123),
+                clearTimeout: jest.fn().mockReturnValue(true)
+            };
+            rhythmRuler._timerManager = mockManager;
+
+            const callback = jest.fn();
+            const id = rhythmRuler._setWidgetTimeout(callback, 500);
+            expect(id).toBe(123);
+            expect(mockManager.setTimeout).toHaveBeenCalledWith(callback, 500);
+
+            const cleared = rhythmRuler._clearWidgetTimeout(123);
+            expect(cleared).toBe(true);
+            expect(mockManager.clearTimeout).toHaveBeenCalledWith(123);
+        });
+
+        it("schedules, executes, and clears timeouts using fallback activeTimeouts set", () => {
+            jest.useFakeTimers();
+            rhythmRuler._timerManager = null;
+
+            const callback = jest.fn();
+            const id = rhythmRuler._setWidgetTimeout(callback, 300);
+            expect(rhythmRuler._activeTimeouts.has(id)).toBe(true);
+
+            jest.advanceTimersByTime(300);
+            expect(callback).toHaveBeenCalled();
+            expect(rhythmRuler._activeTimeouts.has(id)).toBe(false);
+
+            const id2 = rhythmRuler._setWidgetTimeout(jest.fn(), 1000);
+            expect(rhythmRuler._clearWidgetTimeout(id2)).toBe(true);
+            expect(rhythmRuler._activeTimeouts.has(id2)).toBe(false);
+
+            expect(rhythmRuler._clearWidgetTimeout(null)).toBe(false);
+            expect(rhythmRuler._clearWidgetTimeout(undefined)).toBe(false);
+            expect(rhythmRuler._clearWidgetTimeout(9999)).toBe(false);
+            jest.useRealTimers();
+        });
+
+        it("schedules and clears intervals using timerManager when available", () => {
+            const mockManager = {
+                setInterval: jest.fn().mockReturnValue(456),
+                clearInterval: jest.fn().mockReturnValue(true)
+            };
+            rhythmRuler._timerManager = mockManager;
+
+            const callback = jest.fn();
+            const id = rhythmRuler._setWidgetInterval(callback, 200);
+            expect(id).toBe(456);
+            expect(mockManager.setInterval).toHaveBeenCalledWith(callback, 200);
+
+            const cleared = rhythmRuler._clearWidgetInterval(456);
+            expect(cleared).toBe(true);
+            expect(mockManager.clearInterval).toHaveBeenCalledWith(456);
+        });
+
+        it("schedules and clears intervals using fallback activeIntervals set", () => {
+            jest.useFakeTimers();
+            rhythmRuler._timerManager = null;
+
+            const callback = jest.fn();
+            const id = rhythmRuler._setWidgetInterval(callback, 100);
+            expect(rhythmRuler._activeIntervals.has(id)).toBe(true);
+
+            // Advance through multiple intervals and assert repeated calls
+            jest.advanceTimersByTime(250);
+            expect(callback).toHaveBeenCalledTimes(2);
+
+            // Clear interval and assert no further execution
+            expect(rhythmRuler._clearWidgetInterval(id)).toBe(true);
+            expect(rhythmRuler._activeIntervals.has(id)).toBe(false);
+
+            jest.advanceTimersByTime(200);
+            expect(callback).toHaveBeenCalledTimes(2);
+
+            expect(rhythmRuler._clearWidgetInterval(null)).toBe(false);
+            expect(rhythmRuler._clearWidgetInterval(undefined)).toBe(false);
+            expect(rhythmRuler._clearWidgetInterval(8888)).toBe(false);
+            jest.useRealTimers();
+        });
+
+        it("clears all timers and resets _longPressBeep with _clearWidgetTimers", () => {
+            jest.useFakeTimers();
+            rhythmRuler._timerManager = null;
+            rhythmRuler._activeTimeouts = new Set();
+            rhythmRuler._activeIntervals = new Set();
+            rhythmRuler._longPressBeep = {};
+
+            const timeoutCb = jest.fn();
+            const intervalCb = jest.fn();
+            rhythmRuler._setWidgetTimeout(timeoutCb, 500);
+            rhythmRuler._setWidgetInterval(intervalCb, 200);
+
+            const count = rhythmRuler._clearWidgetTimers();
+            expect(count).toBe(2);
+            expect(rhythmRuler._activeTimeouts.size).toBe(0);
+            expect(rhythmRuler._activeIntervals.size).toBe(0);
+            expect(rhythmRuler._longPressBeep).toBeNull();
+
+            // Advance time and verify cancelled callbacks never fire
+            jest.advanceTimersByTime(1000);
+            expect(timeoutCb).not.toHaveBeenCalled();
+            expect(intervalCb).not.toHaveBeenCalled();
+            jest.useRealTimers();
+        });
+    });
+
+    describe("Helper and Calculation Methods", () => {
+        it("creates button icon image correctly via _setButtonIcon", () => {
+            const container = {
+                replaceChildren: jest.fn(),
+                appendChild: jest.fn()
+            };
+
+            const img = rhythmRuler._setButtonIcon(container, "play-button.svg", "Play Note", true);
+            expect(container.replaceChildren).toHaveBeenCalled();
+            expect(container.appendChild).toHaveBeenCalledWith(img);
+            expect(img.src).toContain("header-icons/play-button.svg");
+            expect(img.title).toBe("Play Note");
+            expect(img.alt).toBe("Play Note");
+            expect(img.height).toBe(RhythmRuler.ICONSIZE);
+            expect(img.width).toBe(RhythmRuler.ICONSIZE);
+            expect(img.style.verticalAlign).toBe("middle");
+        });
+
+        it("calculates note width based on note value and fullscreen scale factor", () => {
+            rhythmRuler.widgetWindow = {
+                isMaximized: jest.fn().mockReturnValue(false)
+            };
+            // Default 8th note width is 24. For quarter note (noteValue = 4):
+            // Math.floor(24 * (8 / 4) * 3) = Math.floor(24 * 2 * 3) = 144
+            expect(rhythmRuler._noteWidth(4)).toBe(144);
+            // Half note (noteValue = 2): Math.floor(24 * (8 / 2) * 3) = 288
+            expect(rhythmRuler._noteWidth(2)).toBe(288);
+
+            // Maximized window with custom fullscreen scale factor
+            rhythmRuler.widgetWindow.isMaximized.mockReturnValue(true);
+            rhythmRuler._fullscreenScaleFactor = 6;
+            // Quarter note maximized: Math.floor(24 * (8 / 4) * 6) = 288
+            expect(rhythmRuler._noteWidth(4)).toBe(288);
+        });
+
+        it("renders note value display without raw HTML via __setNoteValueDisplay", () => {
+            global.calcNoteValueToDisplay = jest
+                .fn()
+                .mockReturnValue('<img src="x" onerror="alert(1)">1/4<br>&mdash;');
+
+            const cell = document.createElement("td");
+            cell.textContent = "old";
+
+            rhythmRuler.__setNoteValueDisplay(cell, 1, 4, "silence");
+
+            // Verify no img element was injected into DOM (preventing XSS)
+            expect(cell.querySelector("img")).toBeNull();
+            // Verify safe text rendering
+            expect(cell.textContent).toContain('<img src="x" onerror="alert(1)">1/4');
+            expect(cell.textContent).toContain("\u2014");
+            expect(cell.textContent).toContain("silence");
+        });
+
+        it("initializes default ruler and elapsed times in _resetPlaybackState", () => {
+            rhythmRuler.Drums = [];
+            rhythmRuler.Rulers = [];
+            rhythmRuler._resetPlaybackState();
+
+            expect(rhythmRuler._bpmFactor).toBe((1000 * 240) / 90);
+            expect(rhythmRuler._playing).toBe(false);
+            expect(rhythmRuler._playingOne).toBe(false);
+            expect(rhythmRuler._playingAll).toBe(false);
+            expect(rhythmRuler._rulerPlaying).toBe(-1);
+            expect(rhythmRuler._startingTime).toBeNull();
+            expect(rhythmRuler._expanded).toBe(false);
+            expect(rhythmRuler.Drums.length).toBe(1);
+            expect(rhythmRuler.Rulers.length).toBe(1);
+            expect(rhythmRuler._elapsedTimes).toEqual([0]);
+            expect(rhythmRuler._offsets).toEqual([0]);
+            expect(rhythmRuler._cellScale).toBe(1.0);
+        });
+
+        it("applies alternating zebra stripes to ruler cells", () => {
+            const cells = [{ style: {} }, { style: {} }, { style: {} }];
+            rhythmRuler._rulers = [{ cells }];
+            rhythmRuler._rulerSelected = 0;
+
+            rhythmRuler._calculateZebraStripes(0);
+            expect(cells[0].style.border).toBe("2px solid lightgrey");
+            expect(cells[0].style.borderRadius).toBe("10px");
+            expect(cells[0].style.backgroundColor).toBe(global.platformColor.selectorBackground);
+            expect(cells[1].style.backgroundColor).toBe(global.platformColor.selectorSelected);
+            expect(cells[2].style.backgroundColor).toBe(global.platformColor.selectorBackground);
+        });
+
+        it("returns long press status via __getLongPressStatus", () => {
+            rhythmRuler._inLongPress = false;
+            expect(rhythmRuler.__getLongPressStatus()).toBe(false);
+            rhythmRuler._inLongPress = true;
+            expect(rhythmRuler.__getLongPressStatus()).toBe(true);
+        });
+
+        it("attaches pointer and click event listeners to rhythm cell via __addCellEventHandlers", () => {
+            const cell = {
+                style: {},
+                removeEventListener: jest.fn(),
+                addEventListener: jest.fn(),
+                appendChild: jest.fn(),
+                textContent: ""
+            };
+
+            rhythmRuler.__addCellEventHandlers(cell, 24, 4);
+            expect(cell.style.touchAction).toBe("pan-x");
+            expect(cell.addEventListener).toHaveBeenCalledWith("pointerdown", expect.any(Function));
+            expect(cell.addEventListener).toHaveBeenCalledWith("pointerup", expect.any(Function));
+            expect(cell.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
+        });
+    });
 });
