@@ -217,6 +217,8 @@ def evaluate(pr, rules, order):
     author_times = [t if isinstance(t, datetime) else t[0] for t in author_times]
     last_author_activity = max(author_times, default=ts(pr["createdAt"]))
     last_other = max(other_times, default=None)
+    last_comment_activity = max((ts(c["createdAt"]) for c in pr["comments"]["nodes"] + inline if human(c)), default=last_author_activity)
+    last_activity = max(last_author_activity, last_comment_activity)
 
     changes_by = [r["author"]["login"] for r in reviews if r["state"] == "CHANGES_REQUESTED"]
     approved_by = [r["author"]["login"] for r in reviews if r["state"] == "APPROVED"]
@@ -264,7 +266,7 @@ def evaluate(pr, rules, order):
         "bot": (pr["author"] or {}).get("__typename") == "Bot", "reviewers": reviewers, "hold": hold, "area_owners": area_owners, "requested": requested,
         "age": days(ts(pr["createdAt"])), "idle": days(last_author_activity), "kinds": kinds,
         "unassigned": route == "review" and not requested and not reviews,
-        "stale": route == "author" and days(last_author_activity) >= STALE_DAYS,
+        "stale": route == "author" and days(last_activity) >= STALE_DAYS,
     }
 
 
