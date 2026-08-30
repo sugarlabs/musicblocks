@@ -475,6 +475,105 @@ describe("ModeWidget", () => {
         expect(modeWidget._selectedNotes).toEqual(originalNotes);
     });
 
+    describe("_wireEdoSelect", () => {
+        // Fires the real listener _wireEdoSelect registered via
+        // addEventListener, since this file stubs document.createElement
+        // to a plain mock (see top of file) rather than a real jsdom
+        // element that supports dispatchEvent.
+        function fireEdoChange(select, value) {
+            select.value = value;
+            const handler = select.addEventListener.mock.calls.find(
+                call => call[0] === "change"
+            )[1];
+            handler();
+        }
+
+        test("rescales _selectedNotes to a never-before-visited EDO instead of leaving it untranslated", () => {
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget.logo.synth.inTemperament = "equal";
+            modeWidget._activeEDO = 12;
+            // 12-EDO major scale: root, 2nd, 3rd, 4th, 5th, 6th, 7th.
+            modeWidget._selectedNotes = [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true
+            ];
+            modeWidget._edoNoteCache = {};
+
+            const savedGetCurrentEDO = global.getCurrentEDO;
+            const savedTemperament = global.TEMPERAMENT;
+            global.getCurrentEDO = jest.fn(key => (key === "equal19" ? 19 : 12));
+            global.TEMPERAMENT = {
+                ...savedTemperament,
+                equal19: { isEDO: true, pitchNumber: 19 }
+            };
+
+            fireEdoChange(modeWidget._edoSelect, "equal19");
+
+            expect(modeWidget._activeEDO).toBe(19);
+            expect(modeWidget._selectedNotes).toHaveLength(19);
+            // A correct rescale of a 7-note pattern into 19-EDO spreads notes
+            // across the full range (scalePatternToEDO puts them at 0, 3, 6,
+            // 8, 11, 14, 17). Before the fix, _translateNotesToEDO's guard
+            // always short-circuited, so nothing above index 11 ever got
+            // selected — the array just got padded with false by
+            // _reconcileNotes downstream, silently losing the scale.
+            expect(modeWidget._selectedNotes.slice(12).some(v => v === true)).toBe(true);
+
+            global.getCurrentEDO = savedGetCurrentEDO;
+            global.TEMPERAMENT = savedTemperament;
+        });
+
+        test("restores from cache instead of re-translating on a previously-visited EDO", () => {
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget.logo.synth.inTemperament = "equal";
+            modeWidget._activeEDO = 12;
+            const twelveEdoNotes = [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true
+            ];
+            modeWidget._selectedNotes = twelveEdoNotes.slice();
+            modeWidget._edoNoteCache = {};
+
+            const savedGetCurrentEDO = global.getCurrentEDO;
+            const savedTemperament = global.TEMPERAMENT;
+            global.getCurrentEDO = jest.fn(key => (key === "equal19" ? 19 : 12));
+            global.TEMPERAMENT = {
+                ...savedTemperament,
+                equal19: { isEDO: true, pitchNumber: 19 }
+            };
+
+            // Visit 19-EDO once, then switch back to 12-EDO.
+            fireEdoChange(modeWidget._edoSelect, "equal19");
+            fireEdoChange(modeWidget._edoSelect, "equal");
+
+            expect(modeWidget._activeEDO).toBe(12);
+            expect(modeWidget._selectedNotes).toEqual(twelveEdoNotes);
+
+            global.getCurrentEDO = savedGetCurrentEDO;
+            global.TEMPERAMENT = savedTemperament;
+        });
+    });
+
     test("should fall back to generated names when numberToPitch returns a NaN octave", () => {
         modeWidget._activeEDO = 5;
         global.numberToPitch = jest.fn().mockReturnValue([undefined, NaN]);
