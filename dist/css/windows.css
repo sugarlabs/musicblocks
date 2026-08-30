@@ -467,4 +467,9 @@
   background-color: var(--color-selector-selected);
 }
 
+/* Status Matrix widget tokens */
+.status-matrix-cell {
+  background-color: var(--color-selector-bg);
+}
+
 

@@ -183,20 +183,20 @@ class StatusMatrix {
                     ? label.charAt(0).toUpperCase() + label.slice(1)
                     : "";
 
-            // console.log(str);
+            const selectorBg = "var(--color-selector-bg)";
             cell.textContent = "\u00A0";
             const b = document.createElement("b");
             b.textContent = str;
             cell.appendChild(b);
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = selectorBg;
             cell.style.paddingLeft = "10px";
             for (const turtle of this.activity.turtles.turtleList) {
                 if (turtle.inTrash) {
                     continue;
                 }
                 cell = row.insertCell();
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = selectorBg;
                 cell.style.fontSize =
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.textContent = "";
@@ -206,6 +206,7 @@ class StatusMatrix {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
+            const selectorBg = "var(--color-selector-bg)";
             const row = header.insertRow();
             cell = row.insertCell();
             cell.style.fontSize =
@@ -217,14 +218,14 @@ class StatusMatrix {
             b.textContent = label;
             cell.appendChild(b);
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = selectorBg;
             cell.style.paddingLeft = "10px";
             for (const turtle of this.activity.turtles.turtleList) {
                 if (turtle.inTrash) {
                     continue;
                 }
                 cell = row.insertCell();
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = selectorBg;
                 cell.style.fontSize =
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.textContent = "";
