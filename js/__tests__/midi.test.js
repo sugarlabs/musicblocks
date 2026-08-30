@@ -201,4 +201,74 @@ describe("transcribeMidi", () => {
         const restBlocks = loadedBlocks.filter(block => block[1] === "rest2");
         expect(restBlocks.length).toBeGreaterThan(0);
     });
+
+    it("should not treat a melodic track as percussion when it follows a percussion track", async () => {
+        // Track order: percussion first, then melodic.
+        const percussionFirstMidi = {
+            ...mockMidi,
+            tracks: [
+                {
+                    instrument: {
+                        name: "drums",
+                        family: "percussion",
+                        number: 128,
+                        percussion: true
+                    },
+                    channel: 9,
+                    notes: [{ name: "Kick Drum", midi: 36, time: 0, duration: 0.5, velocity: 0.8 }]
+                },
+                {
+                    instrument: {
+                        name: "acoustic grand piano",
+                        family: "piano",
+                        number: 0,
+                        percussion: false
+                    },
+                    channel: 1,
+                    notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5, velocity: 0.8 }]
+                }
+            ]
+        };
+
+        await transcribeMidi(percussionFirstMidi);
+        expect(loadNewBlocksSpy).toHaveBeenCalled();
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+
+        // The melodic track must produce pitch blocks, not playdrum blocks.
+        const pitchBlocks = loadedBlocks.filter(block => block[1] === "pitch");
+        expect(pitchBlocks.length).toBeGreaterThan(0);
+    });
+
+    it("should map each percussion note to its own drum sound", async () => {
+        const singlePercussionMidi = {
+            ...mockMidi,
+            tracks: [
+                {
+                    instrument: {
+                        name: "drums",
+                        family: "percussion",
+                        number: 128,
+                        percussion: true
+                    },
+                    channel: 9,
+                    notes: [
+                        { name: "Kick Drum", midi: 36, time: 0, duration: 0.3, velocity: 0.8 },
+                        { name: "Snare Drum", midi: 38, time: 0.5, duration: 0.3, velocity: 0.9 }
+                    ]
+                }
+            ]
+        };
+
+        await transcribeMidi(singlePercussionMidi);
+        expect(loadNewBlocksSpy).toHaveBeenCalled();
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+
+        // Both a kick drum and a snare drum block must be present.
+        const drumnameBlocks = loadedBlocks.filter(
+            block => Array.isArray(block[1]) && block[1][0] === "drumname"
+        );
+        const drumValues = drumnameBlocks.map(block => block[1][1].value);
+        expect(drumValues).toContain("kick drum");
+        expect(drumValues).toContain("snare drum");
+    });
 });
