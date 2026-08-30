@@ -100,6 +100,13 @@ class BlockDragController {
         const blocks = this.blocks;
         blocks._cachedDragGroup = null;
         blocks._dragActiveGroup = null;
+        // moveBlockRelative/moveBlockRelativeBatched raise isBlockMoving on
+        // every pressmove, but blockMoved() is the only place that lowers it
+        // and it runs only for a drag that passed the movement threshold and
+        // ended away from the trashcan. Clearing here instead covers every
+        // way a drag can finish, since both the mouseout and pressup handlers
+        // call this unconditionally once the drag is over.
+        blocks.isBlockMoving = false;
     }
 
     /**
@@ -258,6 +265,7 @@ class BlockDragController {
         blocks.clampBlocksToCheck = [];
         if (thisBlock === null) {
             console.debug("blockMoved called with null block.");
+            blocks.isBlockMoving = false;
             return;
         }
 
@@ -292,6 +300,7 @@ class BlockDragController {
         const myBlock = blocks.blockList[thisBlock];
         if (myBlock === null || myBlock === undefined) {
             console.debug("null block found in blockMoved method: " + thisBlock);
+            blocks.isBlockMoving = false;
             return;
         }
 
