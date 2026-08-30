@@ -534,6 +534,10 @@ describe("setupPitchBlocks", () => {
             turtles.ithTurtle(0).singer.lastNotePlayed = ["C4", 0.5];
             block.setter(logo, 60, 0);
             expect(turtles.ithTurtle(0).singer.lastNotePlayed).toBeDefined();
+
+            turtles.ithTurtle(0).singer.lastNotePlayed = null;
+            block.setter(logo, 60, 0);
+            expect(turtles.ithTurtle(0).singer.lastNotePlayed).toEqual(["C5", 4]);
         });
     });
 
