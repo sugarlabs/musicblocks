@@ -156,6 +156,115 @@ describe("transcribeMidi", () => {
         expect(drumBlocks.length).toBeGreaterThan(0);
     });
 
+    it("should keep a melodic track after percussion as pitches", async () => {
+        const mixedTrackMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "drums", percussion: true },
+                    channel: 9,
+                    notes: [{ name: "Kick Drum", midi: 36, time: 0, duration: 0.5 }]
+                },
+                {
+                    instrument: { name: "acoustic grand piano", percussion: false },
+                    channel: 0,
+                    notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await expect(transcribeMidi(mixedTrackMidi)).resolves.toBeNull();
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(loadedBlocks.filter(block => block[1] === "pitch")).toHaveLength(1);
+        expect(loadedBlocks.filter(block => block[1] === "playdrum")).toHaveLength(1);
+    });
+
+    it("should preserve each percussion note's drum sound", async () => {
+        const percussionMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "drums", percussion: true },
+                    channel: 9,
+                    notes: [
+                        { name: "Kick Drum", midi: 36, time: 0, duration: 0.5 },
+                        { name: "Snare Drum", midi: 38, time: 0.5, duration: 0.5 }
+                    ]
+                }
+            ]
+        };
+
+        await transcribeMidi(percussionMidi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        const drumNames = loadedBlocks
+            .filter(block => Array.isArray(block[1]) && block[1][0] === "drumname")
+            .map(block => block[1][1].value);
+        expect(drumNames).toEqual(["kick drum", "snare drum"]);
+    });
+
+    it("should preserve a leading rest before a note", async () => {
+        const delayedNoteMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic grand piano", percussion: false },
+                    channel: 0,
+                    notes: [{ name: "C4", midi: 60, time: 0.5, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await transcribeMidi(delayedNoteMidi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(loadedBlocks.filter(block => block[1] === "rest2")).toHaveLength(1);
+        expect(loadedBlocks.filter(block => block[1] === "pitch")).toHaveLength(1);
+    });
+
+    it("should preserve simultaneous notes as a chord", async () => {
+        const chordMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic grand piano", percussion: false },
+                    channel: 0,
+                    notes: [
+                        { name: "C4", midi: 60, time: 0, duration: 0.5 },
+                        { name: "E4", midi: 64, time: 0, duration: 0.5 }
+                    ]
+                }
+            ]
+        };
+
+        await transcribeMidi(chordMidi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(loadedBlocks.filter(block => block[1] === "pitch")).toHaveLength(2);
+    });
+
+    it("should preserve notes that overlap", async () => {
+        const overlappingNotesMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic grand piano", percussion: false },
+                    channel: 0,
+                    notes: [
+                        { name: "C4", midi: 60, time: 0, duration: 1 },
+                        { name: "E4", midi: 64, time: 0.5, duration: 0.5 }
+                    ]
+                }
+            ]
+        };
+
+        await transcribeMidi(overlappingNotesMidi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(loadedBlocks.filter(block => block[1] === "pitch")).toHaveLength(3);
+    });
+
     it("should assign correct instruments to tracks", async () => {
         await transcribeMidi(mockMidi);
         expect(loadNewBlocksSpy).toHaveBeenCalled();

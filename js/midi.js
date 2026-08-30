@@ -71,7 +71,6 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
         currentMidiTimeSignature = defaultTimeSignature;
     }
 
-    let precurssionFlag = false;
     // console.log("tempoBpm is: ", currentMidiTempoBpm);
     // console.log("tempo is : ",currentMidi.header.tempos);
     // console.log("time signatures are: ", currentMidi.header.timeSignatures);
@@ -80,6 +79,8 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
         if (stopProcessing) return; // Exit if flag is set
         if (!track.notes.length) return;
         const r = jsONON.length;
+        const isPercussionTrack =
+            track.instrument.percussion && (track.channel === 9 || track.channel === 10);
         let instrument = "electronic synth";
         if (track.instrument.name && !track.instrument.percussion) {
             for (const voices of VOICENAMES) {
@@ -87,8 +88,6 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                     instrument = voices[0];
                 }
             }
-        } else if (track.instrument.percussion) {
-            precurssionFlag = true;
         }
         actionBlockPerTrack[trackCount] = 0;
         instruments[trackCount] = instrument;
@@ -101,12 +100,9 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
         );
 
         const sched = [];
-        isPercussion.push(
-            track.instrument.percussion && (track.channel === 9 || track.channel === 10)
-        );
+        isPercussion.push(isPercussionTrack);
 
         track.notes.forEach((note, index) => {
-            const name = note.name;
             const start = Math.round(note.time * 100) / 100;
             const end = Math.round((note.time + note.duration) * 100) / 100;
 
@@ -115,11 +111,11 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
             const lastNote = sched[sched.length - 1];
 
             if (index === 0 && start > 0) {
-                sched.push({ start: 0, end: start, notes: ["R"] });
+                sched.push({ start: 0, end: start, notes: [{ name: "R" }] });
             }
 
             if (lastNote && lastNote.start === start && lastNote.end === end) {
-                lastNote.notes.push(name);
+                lastNote.notes.push(note);
                 return;
             }
 
@@ -129,7 +125,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
 
                 lastNote.end = start;
 
-                sched.push({ start: start, end: end, notes: [...prevNotes, name] });
+                sched.push({ start: start, end: end, notes: [...prevNotes, note] });
 
                 if (oldEnd > end) {
                     sched.push({ start: end, end: oldEnd, notes: prevNotes });
@@ -138,10 +134,10 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
             }
 
             if (lastNote && lastNote.end < start) {
-                sched.push({ start: lastNote.end, end: start, notes: ["R"] });
+                sched.push({ start: lastNote.end, end: start, notes: [{ name: "R" }] });
             }
 
-            sched.push({ start: start, end: end, notes: [name] });
+            sched.push({ start: start, end: end, notes: [note] });
         });
 
         let noteSum = 0;
@@ -206,10 +202,10 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
             let val = jsONON.length + currentActionBlock.length;
             const getPitch = (x, notes, prev) => {
                 const ar = [];
-                if (notes[0] === "R") {
+                if (notes[0].name === "R") {
                     ar.push([x, "rest2", 0, 0, [prev, null]]);
-                } else if (precurssionFlag) {
-                    const drumname = drumMidi[track.notes[0].midi][0] || "kick drum";
+                } else if (isPercussionTrack) {
+                    const drumname = drumMidi[notes[0].midi]?.[0] || "kick drum";
                     ar.push(
                         [x, "playdrum", 0, 0, [first ? prev : x - 1, x + 1, null]],
                         [x + 1, ["drumname", { value: drumname }], 0, 0, [x]]
@@ -217,7 +213,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                     x += 2;
                 } else {
                     for (const na in notes) {
-                        const name = notes[na];
+                        const name = notes[na].name;
                         const first = na === 0;
                         const last = na === notes.length - 1;
                         ar.push(
