@@ -1223,6 +1223,19 @@ describe("Logo runLogoCommands", () => {
         clearManagedTimerSpy.mockRestore();
     });
 
+    test("resets stale widget execution flags before a new run", () => {
+        logo.inOscilloscope = true;
+        logo.inSample = true;
+        logo.oscilloscopeTurtles = [{ id: "stale" }];
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo.inOscilloscope).toBe(false);
+        expect(logo.inSample).toBe(false);
+    });
+
     test("builds actions dictionary from action stack", () => {
         mockActivity.blocks.stackList = [0];
         logo.blockList = [
