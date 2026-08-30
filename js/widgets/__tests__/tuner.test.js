@@ -20,9 +20,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global.platformColor = {
-    selectorBackground: "#8bc34a"
+const cssTokens = {
+    "--color-selector-bg": "#8cc6ff",
+    "--color-text-primary": "#000000"
 };
+
+global.getComputedStyle = jest.fn().mockReturnValue({
+    getPropertyValue: property => cssTokens[property] || ""
+});
 
 global.generateNoteNames = edo => {
     if (edo === 12) {
@@ -48,6 +53,9 @@ const createMockElement = tagName => ({
 });
 
 global.document = {
+    body: {
+        className: ""
+    },
     createElement: jest.fn().mockImplementation(tagName => {
         const element = createMockElement(tagName);
         if (tagName === "canvas") {
@@ -646,6 +654,44 @@ describe("Tuner Widget", () => {
                 display.targetPitchButton.onclick();
 
                 expect(updateSpy).toHaveBeenCalled();
+            });
+        });
+
+        describe("_getCanvasColors", () => {
+            test("returns token colors for default theme", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const colors = display._getCanvasColors();
+
+                expect(colors.selectorBg).toBe("#8cc6ff");
+                expect(colors.textColor).toBe("#000000");
+            });
+
+            test("caches colors when theme class has not changed", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                global.getComputedStyle.mockClear();
+
+                display._getCanvasColors();
+                display._getCanvasColors();
+
+                expect(global.getComputedStyle).toHaveBeenCalledTimes(1);
+            });
+
+            test("updates cached colors when document theme class changes", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                display._getCanvasColors();
+
+                global.document.body.className = "dark";
+                global.getComputedStyle.mockReturnValueOnce({
+                    getPropertyValue: prop =>
+                        prop === "--color-selector-bg" ? "#64b5f6" : "#f9fafb"
+                });
+
+                const darkColors = display._getCanvasColors();
+
+                expect(darkColors.selectorBg).toBe("#64b5f6");
+                expect(darkColors.textColor).toBe("#f9fafb");
+
+                global.document.body.className = "";
             });
         });
     });
