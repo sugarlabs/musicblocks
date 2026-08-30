@@ -1211,4 +1211,95 @@ describe("Additional Robustness & Missing Coverage Tests", () => {
         expect(clearRectSpy).toHaveBeenCalledWith(0, 0, 800, 600);
         expect(painter.turtles.c1ctx.clearRect).toHaveBeenCalledWith(0, 0, 2400, 1800);
     });
+    test("_doArcPart with fillState false applies stroke/lineCap", () => {
+        mockTurtle.ctx.lineWidth = 999;
+        mockTurtle.ctx.lineCap = "butt";
+        painter._fillState = false;
+        painter.doArc(45, 20);
+        expect(mockTurtle.ctx.lineWidth).toBe(painter.stroke);
+        expect(mockTurtle.ctx.lineCap).toBe("round");
+    });
+
+    test("_arc pen-up fallback just moves to point", () => {
+        painter._penDown = false;
+        painter._arc(0, 0, 0, 0, 100, 200, 10, 0, Math.PI, false, false);
+        expect(mockTurtle.ctx.moveTo).toHaveBeenCalledWith(100, 200);
+    });
+
+    test("_arc clockwise diff-normalization (diff < 0)", () => {
+        painter._penDown = true;
+        painter._hollowState = false;
+        painter._arc(0, 0, 0, 0, 100, 200, 10, Math.PI * 1.5, Math.PI * 0.5, false, false);
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+    });
+
+    test("_arc anticlockwise diff-normalization (diff > 0)", () => {
+        painter._penDown = true;
+        painter._hollowState = false;
+        painter._arc(0, 0, 0, 0, 100, 200, 10, Math.PI * 0.5, Math.PI * 1.5, true, false);
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+    });
+
+    test("doBezier hollow branch: degreesFinal negative gets normalized", () => {
+        mockTurtle.ctx.lineWidth = 999;
+        mockTurtle.ctx.lineCap = "butt";
+        painter._penDown = true;
+        painter._hollowState = true;
+        painter.setControlPoint1([10, 10]);
+        painter.setControlPoint2([5, -5]);
+        painter.doBezier(0, -20);
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+    });
+
+    test("doSetXY applies lineCap when ctx starts mismatched", () => {
+        mockTurtle.ctx.lineWidth = 999;
+        mockTurtle.ctx.lineCap = "butt";
+        painter.doSetXY(50, 60);
+        expect(mockTurtle.ctx.lineCap).toBe("round");
+    });
+
+    test("doBezier non-hollow branch applies lineWidth/lineCap when ctx starts mismatched", () => {
+        mockTurtle.ctx.lineWidth = 999;
+        mockTurtle.ctx.lineCap = "butt";
+        painter._penDown = true;
+        painter._hollowState = false;
+        painter.setControlPoint1([10, 10]);
+        painter.setControlPoint2([20, 20]);
+        painter.doBezier(30, 30);
+        expect(mockTurtle.ctx.lineWidth).toBe(painter.stroke);
+        expect(mockTurtle.ctx.lineCap).toBe("round");
+    });
+
+    test("doScrollXY applies lineWidth/lineCap for pen-down turtles when ctx starts mismatched", () => {
+        mockTurtle.ctx.lineWidth = 999;
+        mockTurtle.ctx.lineCap = "butt";
+        const turtle1 = {
+            inTrash: false,
+            painter: { penState: true, stroke: 5, _processColor: jest.fn() },
+            container: { x: 10, y: 20 }
+        };
+        painter.turtles.getTurtleCount = jest.fn(() => 1);
+        painter.turtles.getTurtle = jest.fn(() => turtle1);
+        painter.doScrollXY(10, 20);
+        expect(mockTurtle.ctx.lineWidth).toBe(5);
+        expect(mockTurtle.ctx.lineCap).toBe("round");
+    });
+
+    test("_move hollow branch applies lineCap when called directly with mismatched ctx", () => {
+        mockTurtle.ctx.lineWidth = 999;
+        mockTurtle.ctx.lineCap = "butt";
+        painter._penDown = true;
+        painter._hollowState = true;
+        painter._move(0, 0, 100, 200, false);
+        expect(mockTurtle.ctx.lineCap).toBe("round");
+    });
+
+    test("_arc hollow branch applies lineCap when called directly with mismatched ctx", () => {
+        mockTurtle.ctx.lineWidth = 999;
+        mockTurtle.ctx.lineCap = "butt";
+        painter._penDown = true;
+        painter._hollowState = true;
+        painter._arc(0, 0, 0, 0, 100, 200, 10, 0, Math.PI, false, false);
+        expect(mockTurtle.ctx.lineCap).toBe("round");
+    });
 });
