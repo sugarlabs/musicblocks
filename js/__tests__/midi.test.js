@@ -271,4 +271,146 @@ describe("transcribeMidi", () => {
         expect(drumValues).toContain("kick drum");
         expect(drumValues).toContain("snare drum");
     });
+
+    it("should fall back to the default time signature when none is provided", async () => {
+        const noTimeSigMidi = {
+            ...mockMidi,
+            header: { ...mockMidi.header, timeSignatures: [] }
+        };
+        await transcribeMidi(noTimeSigMidi);
+        expect(loadNewBlocksSpy).toHaveBeenCalled();
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(Array.isArray(loadedBlocks)).toBe(true);
+    });
+
+    it("should insert a leading rest when the first note does not start at time zero", async () => {
+        const lateStartMidi = {
+            ...mockMidi,
+            tracks: [
+                {
+                    instrument: {
+                        name: "acoustic grand piano",
+                        family: "piano",
+                        number: 0,
+                        percussion: false
+                    },
+                    channel: 1,
+                    notes: [{ name: "C4", midi: 60, time: 0.5, duration: 0.5, velocity: 0.8 }]
+                }
+            ]
+        };
+        await transcribeMidi(lateStartMidi);
+        expect(loadNewBlocksSpy).toHaveBeenCalled();
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        const restBlocks = loadedBlocks.filter(block => block[1] === "rest2");
+        expect(restBlocks.length).toBeGreaterThan(0);
+    });
+
+    it("should merge simultaneous notes into a single chord slot", async () => {
+        const chordMidi = {
+            ...mockMidi,
+            tracks: [
+                {
+                    instrument: {
+                        name: "acoustic grand piano",
+                        family: "piano",
+                        number: 0,
+                        percussion: false
+                    },
+                    channel: 1,
+                    notes: [
+                        { name: "C4", midi: 60, time: 0, duration: 0.5, velocity: 0.8 },
+                        { name: "E4", midi: 64, time: 0, duration: 0.5, velocity: 0.9 }
+                    ]
+                }
+            ]
+        };
+        await transcribeMidi(chordMidi);
+        expect(loadNewBlocksSpy).toHaveBeenCalled();
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        const pitchBlocks = loadedBlocks.filter(block => block[1] === "pitch");
+        expect(pitchBlocks.length).toBe(2);
+    });
+
+    it("should handle overlapping notes by splitting the schedule slot", async () => {
+        const overlappingMidi = {
+            ...mockMidi,
+            tracks: [
+                {
+                    instrument: {
+                        name: "acoustic grand piano",
+                        family: "piano",
+                        number: 0,
+                        percussion: false
+                    },
+                    channel: 1,
+                    notes: [
+                        // C4 ends at 1.5; E4 starts at 0.5 and ends at 0.8 (oldEnd > end → hits line 144)
+                        { name: "C4", midi: 60, time: 0, duration: 1.5, velocity: 0.8 },
+                        { name: "E4", midi: 64, time: 0.5, duration: 0.3, velocity: 0.8 }
+                    ]
+                }
+            ]
+        };
+        await transcribeMidi(overlappingMidi);
+        expect(loadNewBlocksSpy).toHaveBeenCalled();
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(loadedBlocks.length).toBeGreaterThan(0);
+    });
+
+    it("should split into multiple action block chunks when cumulative duration exceeds 16", async () => {
+        const longTrackMidi = {
+            ...mockMidi,
+            tracks: [
+                {
+                    instrument: {
+                        name: "acoustic grand piano",
+                        family: "piano",
+                        number: 0,
+                        percussion: false
+                    },
+                    channel: 1,
+                    notes: [
+                        { name: "C4", midi: 60, time: 0, duration: 17, velocity: 0.8 },
+                        { name: "E4", midi: 64, time: 17, duration: 0.5, velocity: 0.8 }
+                    ]
+                }
+            ]
+        };
+        await transcribeMidi(longTrackMidi);
+        expect(loadNewBlocksSpy).toHaveBeenCalled();
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        const actionBlocks = loadedBlocks.filter(
+            block => Array.isArray(block[1]) && block[1][0] === "action"
+        );
+        expect(actionBlocks.length).toBeGreaterThan(1);
+    });
+
+    it("should stop and warn when the maxNoteBlocks limit is exceeded", async () => {
+        // A 17-second note forces isLastNoteInBlock=true after the first note, incrementing
+        // totalnoteblockCount, so the >= maxNoteBlocks guard fires on the second note.
+        const largeMidi = {
+            ...mockMidi,
+            tracks: [
+                {
+                    instrument: {
+                        name: "acoustic grand piano",
+                        family: "piano",
+                        number: 0,
+                        percussion: false
+                    },
+                    channel: 1,
+                    notes: [
+                        { name: "C4", midi: 60, time: 0, duration: 1, velocity: 0.8 },
+                        { name: "E4", midi: 64, time: 1, duration: 16, velocity: 0.8 },
+                        { name: "G4", midi: 67, time: 17, duration: 1, velocity: 0.8 }
+                    ]
+                }
+            ]
+        };
+        await transcribeMidi(largeMidi, 1);
+        expect(activity.textMsg).toHaveBeenCalledWith(
+            expect.stringContaining("MIDI file is too large")
+        );
+    });
 });
