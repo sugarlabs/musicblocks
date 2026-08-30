@@ -385,4 +385,94 @@ describe("FocusCycleManager module", () => {
             delete window.FocusCycleManager;
         });
     });
+
+    describe("notification popup bypass", () => {
+        // index.html ships both popups in the DOM permanently; css/activities.css
+        // hides them with `visibility: hidden` and reveals them by adding `.show`.
+        // Reproduce that here so getComputedStyle behaves as it does in a browser.
+        const POPUP_CSS = `
+            .popupMsg { visibility: hidden; }
+            #printText.show, #errorText.show { visibility: visible; }
+        `;
+
+        const mountPopups = () => {
+            const style = document.createElement("style");
+            style.id = "popup-css";
+            style.textContent = POPUP_CSS;
+            document.head.appendChild(style);
+            document.body.insertAdjacentHTML(
+                "beforeend",
+                '<div class="popupMsg" id="printText" tabindex="-1" aria-live="polite" role="status"></div>' +
+                    '<div class="popupMsg" id="errorText" tabindex="-1" aria-live="assertive" role="alert"></div>'
+            );
+            return {
+                printText: document.getElementById("printText"),
+                errorText: document.getElementById("errorText")
+            };
+        };
+
+        afterEach(() => {
+            const style = document.getElementById("popup-css");
+            if (style) style.remove();
+        });
+
+        test("Tab still cycles when the popups are present but hidden", () => {
+            mountPopups();
+            const manager = new FocusCycleManager();
+            manager.init();
+
+            const event = pressTab(false);
+
+            expect(manager._keyboardMode).toBe(true);
+            expect(event.defaultPrevented).toBe(true);
+
+            manager.dispose();
+        });
+
+        test("Tab is not intercepted while the print popup is shown", () => {
+            const { printText } = mountPopups();
+            printText.classList.add("show");
+
+            const manager = new FocusCycleManager();
+            manager.init();
+
+            const event = pressTab(false);
+
+            expect(manager._keyboardMode).toBe(false);
+            expect(event.defaultPrevented).toBe(false);
+
+            manager.dispose();
+        });
+
+        test("Tab is not intercepted while the error popup is shown", () => {
+            const { errorText } = mountPopups();
+            errorText.classList.add("show");
+
+            const manager = new FocusCycleManager();
+            manager.init();
+
+            const event = pressTab(false);
+
+            expect(manager._keyboardMode).toBe(false);
+            expect(event.defaultPrevented).toBe(false);
+
+            manager.dispose();
+        });
+
+        test("a popup hidden with display:none does not block cycling", () => {
+            const { errorText } = mountPopups();
+            // activity.js hides errorText this way rather than by class.
+            errorText.style.display = "none";
+
+            const manager = new FocusCycleManager();
+            manager.init();
+
+            const event = pressTab(false);
+
+            expect(manager._keyboardMode).toBe(true);
+            expect(event.defaultPrevented).toBe(true);
+
+            manager.dispose();
+        });
+    });
 });
