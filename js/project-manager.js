@@ -236,6 +236,18 @@ class ProjectManager {
         that.update = true;
     }
 
+    /**
+     * Clears the loading state after a project load attempt completes,
+     * successfully or not.
+     * @private
+     * @returns {void}
+     */
+    _finishLoading() {
+        this.activity.loading = false;
+        document.body.style.cursor = "default";
+        this.activity.update = true;
+    }
+
     _loadProject(projectID, flags) {
         const that = this.activity;
 
@@ -268,12 +280,6 @@ class ProjectManager {
 
         const pm = this;
         setTimeout(() => {
-            const finishLoading = () => {
-                that.loading = false;
-                document.body.style.cursor = "default";
-                that.update = true;
-            };
-
             try {
                 if (that.planet && typeof that.planet.openProjectFromPlanet === "function") {
                     that.planet.openProjectFromPlanet(projectID, () => {
@@ -299,7 +305,7 @@ class ProjectManager {
                 });
             }
 
-            finishLoading();
+            pm._finishLoading();
         }, 2500);
 
         const run = flags.run;
@@ -786,7 +792,7 @@ class ProjectManager {
                                         that.errorMsg(
                                             _("Cannot find project data in this HTML file.")
                                         );
-                                        finishLoading();
+                                        pm._finishLoading();
                                         return;
                                     }
                                     obj = JSON.parse(unescapeHTML(extracted));
@@ -900,7 +906,7 @@ class ProjectManager {
                                 extracted = extractProjectDataFromHTML(cleanData);
                                 if (!extracted) {
                                     that.errorMsg(_("Cannot find project data in this HTML file."));
-                                    finishLoading();
+                                    pm._finishLoading();
                                     return;
                                 }
                                 obj = JSON.parse(unescapeHTML(extracted));
