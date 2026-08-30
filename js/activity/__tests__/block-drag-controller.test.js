@@ -1427,4 +1427,86 @@ describe("BlockDragController", () => {
             expect(blocks._cachedDragGroup).toEqual([1]);
         });
     });
+
+    // ------------------------------------------------------------------
+    // isBlockMoving lifecycle
+    // ------------------------------------------------------------------
+
+    describe("isBlockMoving lifecycle", () => {
+        const oneBlock = () => [
+            makeFlowBlock({ x: 0, y: 0, docks: [[0, 0, "in"]], connections: [null] })
+        ];
+
+        it("is raised by moveBlockRelativeBatched", () => {
+            const blocks = makeBlocks(oneBlock());
+
+            expect(blocks.isBlockMoving).toBe(false);
+            blocks.moveBlockRelativeBatched(0, 5, 5);
+
+            expect(blocks.isBlockMoving).toBe(true);
+        });
+
+        it("is raised by moveBlockRelative", () => {
+            const blocks = makeBlocks(oneBlock());
+
+            blocks.moveBlockRelative(0, 5, 5);
+
+            expect(blocks.isBlockMoving).toBe(true);
+        });
+
+        it("is lowered by a completed blockMoved", async () => {
+            const blocks = makeBlocks(oneBlock());
+            blocks.moveBlockRelativeBatched(0, 5, 5);
+
+            await blocks.blockMoved(0);
+
+            expect(blocks.isBlockMoving).toBe(false);
+        });
+
+        // The drag teardown path. block.js calls clearCachedDragGroup() from
+        // both the mouseout and pressup handlers once a drag is over, whether
+        // or not blockMoved ran, so a drag that ended on the trashcan or that
+        // never passed the 5px movement threshold is released here.
+        it("is lowered by the drag teardown even when blockMoved never runs", () => {
+            const blocks = makeBlocks(oneBlock());
+            blocks.moveBlockRelativeBatched(0, 2, 1);
+            expect(blocks.isBlockMoving).toBe(true);
+
+            blocks.clearCachedDragGroup();
+
+            expect(blocks.isBlockMoving).toBe(false);
+        });
+
+        it("is lowered when blockMoved bails out on a null block", async () => {
+            const blocks = makeBlocks(oneBlock());
+            blocks.moveBlockRelativeBatched(0, 5, 5);
+
+            await blocks.blockMoved(null);
+
+            expect(blocks.isBlockMoving).toBe(false);
+        });
+
+        it("is lowered when blockMoved bails out on a missing block", async () => {
+            const blockList = oneBlock();
+            const blocks = makeBlocks(blockList);
+            blocks.moveBlockRelativeBatched(0, 5, 5);
+
+            // An index that is not present in blockList reaches the second
+            // guard, after the expandable scan has already run.
+            await blocks.blockMoved(99);
+
+            expect(blocks.isBlockMoving).toBe(false);
+        });
+
+        it("leaves the rest of the cached drag state cleared too", () => {
+            const blocks = makeBlocks(oneBlock());
+            blocks.moveBlockRelativeBatched(0, 5, 5);
+
+            blocks.clearCachedDragGroup();
+
+            expect(blocks._cachedDragGroup).toBeNull();
+            expect(blocks._dragActiveGroup).toBeNull();
+            expect(blocks.isBlockMoving).toBe(false);
+        });
+    });
 });
