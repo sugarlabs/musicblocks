@@ -350,6 +350,31 @@ describe("JSEditor", () => {
 
             removeEventListener.mockRestore();
         });
+
+        test("onclose removes the editor's stylesheet links from document.head", () => {
+            const editor = createEditor();
+            const links = editor._styles;
+
+            expect(links.every(link => document.head.contains(link))).toBe(true);
+
+            editor.widgetWindow.onclose();
+
+            expect(links.every(link => document.head.contains(link))).toBe(false);
+            expect(editor._styles).toBeNull();
+        });
+
+        test("repeated open/close cycles do not leak stylesheet links into document.head (#8325)", () => {
+            const countLinks = () =>
+                document.head.querySelectorAll('link[href*="codejar/styles/"]').length;
+            const baseline = countLinks();
+
+            for (let i = 0; i < 5; i++) {
+                const editor = createEditor();
+                expect(countLinks()).toBe(baseline + 4);
+                editor.widgetWindow.onclose();
+                expect(countLinks()).toBe(baseline);
+            }
+        });
     });
 
     describe("code editing functions", () => {
@@ -769,54 +794,6 @@ describe("JSEditor", () => {
             }
 
             expect(editor._currentStyle).toBe(0);
-        });
-    });
-
-    describe("stylesheet cleanup on close", () => {
-        const countLinks = () =>
-            document.head.querySelectorAll('link[href*="codejar/styles/"]').length;
-
-        test("constructor adds exactly 4 stylesheet links", () => {
-            createEditor();
-
-            expect(countLinks()).toBe(4);
-        });
-
-        test("onclose removes all stylesheet links from document.head", () => {
-            const editor = createEditor();
-
-            expect(countLinks()).toBe(4);
-
-            editor.widgetWindow.onclose();
-
-            expect(countLinks()).toBe(0);
-        });
-
-        test("onclose empties the _styles array", () => {
-            const editor = createEditor();
-
-            expect(editor._styles).toHaveLength(4);
-
-            editor.widgetWindow.onclose();
-
-            expect(editor._styles).toHaveLength(0);
-        });
-
-        test("open-close-open cycle does not accumulate links", () => {
-            const editor1 = createEditor();
-            expect(countLinks()).toBe(4);
-
-            editor1.widgetWindow.onclose();
-            expect(countLinks()).toBe(0);
-
-            const editor2 = createEditor();
-            expect(countLinks()).toBe(4);
-
-            editor2.widgetWindow.onclose();
-            expect(countLinks()).toBe(0);
-
-            createEditor();
-            expect(countLinks()).toBe(4);
         });
     });
 });

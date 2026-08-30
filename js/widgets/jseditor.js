@@ -289,9 +289,15 @@ class JSEditor {
                 document.removeEventListener("mouseup", this._resizeHandlers.stopResize);
                 this._resizeHandlers = null;
             }
-            // Remove stylesheet links added by this instance
-            this._styles.forEach(link => link.remove());
-            this._styles = [];
+            // Each open() adds a fresh set of theme <link> elements to
+            // document.head (see constructor); remove this instance's set
+            // on close so repeated open/close cycles don't leak them.
+            if (this._styles) {
+                for (const link of this._styles) {
+                    link.remove();
+                }
+                this._styles = null;
+            }
             this.isOpen = false;
             defaultOnClose();
         };
