@@ -128,6 +128,9 @@ document.body.appendChild(overlayCanvas);
 
 // Load JSEditor — it has a CommonJS export
 beforeEach(() => {
+    // Remove any codejar stylesheet links left from previous tests
+    document.head.querySelectorAll('link[href*="codejar/styles/"]').forEach(link => link.remove());
+
     document.body.innerHTML = "";
     // Re-create overlayCanvas
     const canvas = document.createElement("canvas");
@@ -766,6 +769,54 @@ describe("JSEditor", () => {
             }
 
             expect(editor._currentStyle).toBe(0);
+        });
+    });
+
+    describe("stylesheet cleanup on close", () => {
+        const countLinks = () =>
+            document.head.querySelectorAll('link[href*="codejar/styles/"]').length;
+
+        test("constructor adds exactly 4 stylesheet links", () => {
+            createEditor();
+
+            expect(countLinks()).toBe(4);
+        });
+
+        test("onclose removes all stylesheet links from document.head", () => {
+            const editor = createEditor();
+
+            expect(countLinks()).toBe(4);
+
+            editor.widgetWindow.onclose();
+
+            expect(countLinks()).toBe(0);
+        });
+
+        test("onclose empties the _styles array", () => {
+            const editor = createEditor();
+
+            expect(editor._styles).toHaveLength(4);
+
+            editor.widgetWindow.onclose();
+
+            expect(editor._styles).toHaveLength(0);
+        });
+
+        test("open-close-open cycle does not accumulate links", () => {
+            const editor1 = createEditor();
+            expect(countLinks()).toBe(4);
+
+            editor1.widgetWindow.onclose();
+            expect(countLinks()).toBe(0);
+
+            const editor2 = createEditor();
+            expect(countLinks()).toBe(4);
+
+            editor2.widgetWindow.onclose();
+            expect(countLinks()).toBe(0);
+
+            createEditor();
+            expect(countLinks()).toBe(4);
         });
     });
 });

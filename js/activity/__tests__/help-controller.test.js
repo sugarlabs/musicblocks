@@ -376,6 +376,17 @@ describe("HelpController.toggleJSEditor", () => {
         );
         expect(JSEditorMock.instances).toEqual([activity]);
     });
+
+    test("does not recreate the JSEditor if already open", async () => {
+        const activity = makeActivity();
+        const controller = new HelpController(activity);
+        window.widgetWindows.isOpen.mockImplementation(name => name === "JavaScript Editor");
+
+        await controller.toggleJSEditor();
+
+        expect(global.lazyLoad).not.toHaveBeenCalled();
+        expect(JSEditorMock.instances).toEqual([]);
+    });
 });
 
 describe("HelpController.showStats", () => {
