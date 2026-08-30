@@ -12,6 +12,7 @@ module.exports = {
     collectCoverageFrom: [
         "js/**/*.js",
         "!js/__tests__/**",
+        "!js/js-export/ast2blocks.config.js",
         "planet/js/**/*.js",
         "!planet/js/__tests__/**"
     ],
