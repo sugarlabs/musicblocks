@@ -62,6 +62,22 @@ global.AST2BlockList = {
     toBlockList: jest.fn()
 };
 
+// Mock pubsub (used by _codeToBlocks to wait for finishedLoading)
+global.pubsub = {
+    _listeners: {},
+    on(event, fn) {
+        if (!this._listeners[event]) this._listeners[event] = [];
+        this._listeners[event].push(fn);
+    },
+    off(event, fn) {
+        if (!this._listeners[event]) return;
+        this._listeners[event] = this._listeners[event].filter(f => f !== fn);
+    },
+    emit(event) {
+        (this._listeners[event] || []).forEach(fn => fn());
+    }
+};
+
 /**
  * Creates a mock widgetWindow object with all required methods.
  * The widget body is appended to document.body so getElementById works.
@@ -150,6 +166,7 @@ const { JSEditor } = require("../jseditor.js");
  * @returns {Object} A mock activity.
  */
 function createMockActivity() {
+    const stageListeners = {};
     return {
         logo: {
             statusMatrix: null,
@@ -163,13 +180,27 @@ function createMockActivity() {
                 dict: {}
             },
             moveBlock: jest.fn(),
-            loadNewBlocks: jest.fn()
+            loadNewBlocks: jest.fn(() => {
+                // Simulate the real loadNewBlocks → cleanupAfterLoad chain
+                // which emits "finishedLoading" once all blocks are processed.
+                global.pubsub.emit("finishedLoading");
+            })
         },
         stage: {
-            removeAllEventListeners: jest.fn(),
-            addEventListener: jest.fn()
+            removeAllEventListeners: jest.fn(event => {
+                if (event) delete stageListeners[event];
+            }),
+            addEventListener: jest.fn((event, fn) => {
+                stageListeners[event] = fn;
+            }),
+            _listeners: stageListeners
         },
-        sendAllToTrash: jest.fn()
+        sendAllToTrash: jest.fn(function () {
+            // Simulate the real sendAllToTrash which dispatches "trashsignal"
+            // after a timeout. In tests we fire it synchronously.
+            const listener = stageListeners["trashsignal"];
+            if (listener) listener();
+        })
     };
 }
 
