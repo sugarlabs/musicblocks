@@ -20,8 +20,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const PhraseMaker = require("../phrasemaker.js");
-
 // --- Global Mocks ---
 
 global._ = msg => msg;
@@ -47,13 +45,38 @@ global.PhraseMakerUtils = {
         [4, 1],
         [8, 2]
     ]),
-    MATRIXGRAPHICS: [],
-    MATRIXGRAPHICS2: []
+    MATRIXGRAPHICS: [
+        "forward",
+        "back",
+        "right",
+        "left",
+        "setheading",
+        "setcolor",
+        "setshade",
+        "sethue",
+        "setgrey",
+        "settranslucency",
+        "setpensize"
+    ],
+    MATRIXGRAPHICS2: ["arc", "setxy"],
+    MATRIXSYNTHS: ["sine", "triangle", "sawtooth", "square", "hertz"]
 };
+window.PhraseMakerUtils = global.PhraseMakerUtils;
 
 global.PhraseMakerUI = {
-    calculateNoteWidth: jest.fn(() => 100)
+    calculateNoteWidth: jest.fn(() => 100),
+    resetMatrix: jest.fn()
 };
+window.PhraseMakerUI = global.PhraseMakerUI;
+
+global.PhraseMakerAudio = {
+    playAll: jest.fn(),
+    collectNotesToPlay: jest.fn(),
+    __playNote: jest.fn(),
+    _playChord: jest.fn(),
+    _processGraphics: jest.fn()
+};
+window.PhraseMakerAudio = global.PhraseMakerAudio;
 global.DEFAULTVOICE = "electronic synth";
 global.DEFAULTDRUM = "kick drum";
 global.DEFAULTVOLUME = 50;
@@ -113,6 +136,10 @@ global.window = {
     innerWidth: 1200,
     innerHeight: 800,
     btoa: jest.fn(s => s),
+    PhraseMakerUtils: global.PhraseMakerUtils,
+    PhraseMakerGrid: global.PhraseMakerGrid,
+    PhraseMakerUI: global.PhraseMakerUI,
+    PhraseMakerAudio: global.PhraseMakerAudio,
     widgetWindows: {
         windowFor: jest.fn().mockReturnValue({
             clear: jest.fn(),
@@ -179,6 +206,8 @@ global.document = {
     })),
     createTextNode: jest.fn(t => t)
 };
+
+const PhraseMaker = require("../phrasemaker.js");
 
 describe("PhraseMaker Widget", () => {
     let phraseMaker;
@@ -1879,6 +1908,1038 @@ describe("PhraseMaker Widget", () => {
             phraseMaker._repaintRowCells(0, "drumblocks");
 
             expect(phraseMaker._noteStored[0]).toBe("snare drum");
+        });
+    });
+
+    describe("PhraseMaker - Note Width and Solfege Calculations", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            phraseMaker = new PhraseMaker({
+                _: msg => msg,
+                SOLFEGECONVERSIONTABLE: {
+                    "C": "do",
+                    "D": "re",
+                    "E": "mi",
+                    "F": "fa",
+                    "G": "sol",
+                    "A": "la",
+                    "B": "ti",
+                    "C♯": "di",
+                    "D♭": "ra",
+                    "F♯": "fi"
+                },
+                platformColor: {
+                    labelColor: "#90c100",
+                    tupletBackground: "#eee",
+                    rhythmcellcolor: "#ffffff",
+                    textColor: "#333333",
+                    graphicsBackground: "#dddddd",
+                    selectorSelected: "#000000"
+                }
+            });
+        });
+
+        test("_noteWidth delegates calculation to PhraseMakerUI.calculateNoteWidth", () => {
+            PhraseMakerUI.calculateNoteWidth.mockReturnValueOnce(120);
+
+            const width = phraseMaker._noteWidth(4);
+
+            expect(PhraseMakerUI.calculateNoteWidth).toHaveBeenCalledWith(phraseMaker, 4);
+            expect(width).toBe(120);
+        });
+
+        test("note2Solfege converts natural notes and assigns octave to rowArgs", () => {
+            phraseMaker.rowLabels = [];
+            phraseMaker.rowArgs = [];
+
+            phraseMaker.note2Solfege("C4", 0);
+            expect(phraseMaker.rowLabels[0]).toBe("do");
+            expect(phraseMaker.rowArgs[0]).toBe("4");
+
+            phraseMaker.note2Solfege("G5", 1);
+            expect(phraseMaker.rowLabels[1]).toBe("sol");
+            expect(phraseMaker.rowArgs[1]).toBe("5");
+        });
+
+        test("note2Solfege converts sharp and flat notes with accidentals", () => {
+            phraseMaker.rowLabels = [];
+            phraseMaker.rowArgs = [];
+
+            phraseMaker.note2Solfege("C♯4", 0);
+            expect(phraseMaker.rowLabels[0]).toBe("di");
+            expect(phraseMaker.rowArgs[0]).toBe("4");
+
+            phraseMaker.note2Solfege("D♭3", 1);
+            expect(phraseMaker.rowLabels[1]).toBe("ra");
+            expect(phraseMaker.rowArgs[1]).toBe("3");
+        });
+    });
+
+    describe("PhraseMaker - Tuplet Creation and Matrix Construction", () => {
+        let phraseMaker;
+        let mockTable;
+
+        beforeEach(() => {
+            mockTable = document.createElement("table");
+            const firstRow = mockTable.insertRow();
+            const cell1 = firstRow.insertCell();
+            cell1.style.width = "40px";
+            cell1.style.minWidth = "40px";
+            cell1.style.maxWidth = "40px";
+
+            phraseMaker = new PhraseMaker({
+                _: msg => msg,
+                LCD: (a, b) => (a * b) / 2,
+                calcNoteValueToDisplay: jest.fn((num, den) => `${num}/${den}`),
+                toFraction: jest.fn(n => [1, n]),
+                getDrumName: jest.fn(() => null),
+                NOTESYMBOLS: { 4: "note_quarter.svg", 8: "note_eighth.svg" },
+                platformColor: {
+                    labelColor: "#90c100",
+                    tupletBackground: "#f5f5f5",
+                    rhythmcellcolor: "#ffffff",
+                    textColor: "#000000",
+                    pitchBackground: "#ffffff",
+                    drumBackground: "#eeeeee",
+                    graphicsBackground: "#dddddd",
+                    selectorSelected: "#000000"
+                }
+            });
+
+            phraseMaker.rowLabels = ["sol"];
+            phraseMaker._cellScale = 1;
+            phraseMaker._currentMusicalTime = 0;
+            phraseMaker._notesToPlay = [];
+            phraseMaker._outputAsTuplet = [];
+            phraseMaker._matrixHasTuplets = false;
+            phraseMaker._measureLimit = 4;
+
+            phraseMaker._tupletNoteLabel = document.createElement("td");
+            phraseMaker._tupletValueLabel = document.createElement("td");
+            phraseMaker._tupletNoteValueRow = mockTable.insertRow();
+            phraseMaker._tupletValueRow = mockTable.insertRow();
+            phraseMaker._noteValueRow = mockTable.insertRow();
+            phraseMaker._rows = [firstRow];
+        });
+
+        test("addTuplet initializes tuplet labels and inserts filler cells on first invocation", () => {
+            const tupletParam = [
+                [1, 4],
+                [8, 8, 8]
+            ];
+
+            phraseMaker.addTuplet(tupletParam);
+
+            expect(phraseMaker._matrixHasTuplets).toBe(true);
+            expect(phraseMaker._tupletNoteLabel.textContent).toBe("note value");
+            expect(phraseMaker._tupletValueLabel.textContent).toBe("tuplet value");
+            expect(phraseMaker._notesToPlay.length).toBe(3);
+            expect(phraseMaker._outputAsTuplet.length).toBe(3);
+        });
+
+        test("addTuplet calculates bar style as solid when at the start of a measure", () => {
+            phraseMaker._currentMusicalTime = 0;
+            phraseMaker._notesToPlay = [[["C4"], 4]];
+
+            const tupletParam = [
+                [1, 4],
+                [8, 8]
+            ];
+            phraseMaker.addTuplet(tupletParam);
+
+            const insertedCells = phraseMaker._tupletNoteValueRow.cells;
+            expect(insertedCells.length).toBeGreaterThan(0);
+        });
+
+        test("addTuplet displays dot anchor when noteValue > 12", () => {
+            const tupletParam = [
+                [1, 16],
+                [16, 16, 16]
+            ];
+
+            phraseMaker.addTuplet(tupletParam);
+
+            expect(phraseMaker._notesToPlay.length).toBe(3);
+            expect(phraseMaker._outputAsTuplet[0]).toEqual([3, 16]);
+        });
+
+        test("addTuplet resets _currentMusicalTime when measure limit is exceeded", () => {
+            phraseMaker._currentMusicalTime = 3.8;
+            phraseMaker._measureLimit = 4.0;
+
+            const tupletParam = [
+                [1, 2],
+                [4, 4]
+            ];
+            phraseMaker.addTuplet(tupletParam);
+
+            expect(phraseMaker._currentMusicalTime).toBe(0);
+        });
+    });
+
+    describe("PhraseMaker - Add Notes and Grid Population", () => {
+        let phraseMaker;
+        let mockTable;
+
+        beforeEach(() => {
+            mockTable = document.createElement("table");
+            const firstRow = mockTable.insertRow();
+            const secondRow = mockTable.insertRow();
+
+            phraseMaker = new PhraseMaker({
+                _: msg => msg,
+                calcNoteValueToDisplay: jest.fn((den, num) => `${num}<br>&mdash;<br>${den}`),
+                getDrumName: jest.fn(label => (label === "snare" ? "snare drum" : null)),
+                platformColor: {
+                    graphicsBackground: "#e0e0e0",
+                    rhythmcellcolor: "#ffffff",
+                    textColor: "#222222",
+                    selectorSelected: "#000000"
+                }
+            });
+
+            phraseMaker.rowLabels = ["sol", "snare"];
+            phraseMaker._rests = 0;
+            phraseMaker._cellScale = 1;
+            phraseMaker._currentMusicalTime = 0;
+            phraseMaker._notesToPlay = [];
+            phraseMaker._outputAsTuplet = [];
+            phraseMaker._noteValueRow = mockTable.insertRow();
+            phraseMaker._tupletNoteValueRow = mockTable.insertRow();
+            phraseMaker._rows = [firstRow, secondRow];
+        });
+
+        test("addNotes populates pitch and drum cells and formats note value cells", () => {
+            phraseMaker.addNotes(2, 4);
+
+            expect(phraseMaker._notesToPlay.length).toBe(2);
+            expect(phraseMaker._outputAsTuplet.length).toBe(2);
+            expect(phraseMaker._noteValueRow.cells.length).toBe(2);
+
+            const noteCell = phraseMaker._noteValueRow.cells[0];
+            expect(noteCell.getAttribute("alt")).toBe("4");
+            expect(noteCell.style.backgroundColor).toMatch(/^(#ffffff|rgb\(255, 255, 255\))$/);
+        });
+
+        test("addNotes handles mouseover and mouseout events on matrix cells", () => {
+            phraseMaker.addNotes(1, 4);
+
+            const pitchCell = phraseMaker._rows[0].cells[0];
+            pitchCell.setAttribute("cellColor", "#ffffff");
+            pitchCell.style.backgroundColor = "#ffffff";
+
+            pitchCell.dispatchEvent(new MouseEvent("mouseover"));
+            expect(pitchCell.style.backgroundColor).toMatch(/^(#000000|rgb\(0, 0, 0\))$/);
+
+            pitchCell.dispatchEvent(new MouseEvent("mouseout"));
+            expect(pitchCell.style.backgroundColor).toMatch(/^(#ffffff|rgb\(255, 255, 255\))$/);
+        });
+
+        test("addNotes creates anchor tooltip when noteValue > 12", () => {
+            phraseMaker.addNotes(1, 16);
+
+            const noteCell = phraseMaker._noteValueRow.cells[0];
+            const anchor = noteCell.querySelector("a");
+            expect(anchor).not.toBeNull();
+            expect(anchor.title).toBe("1/16");
+            expect(anchor.textContent).toBe(".");
+        });
+    });
+
+    describe("PhraseMaker - Note Playback Triggering and Synthesis", () => {
+        let phraseMaker;
+        let mockSynth;
+
+        beforeEach(() => {
+            mockSynth = {
+                trigger: jest.fn()
+            };
+
+            phraseMaker = new PhraseMaker({
+                _: msg => msg,
+                getDrumName: jest.fn(note => (note === "snare" ? "snare drum" : null)),
+                Singer: { defaultBPMFactor: 0.5 }
+            });
+
+            phraseMaker.activity = {
+                logo: {
+                    synth: mockSynth
+                }
+            };
+
+            phraseMaker._noteStored = ["C4", "snare", "440", "square: 440"];
+            phraseMaker.rowLabels = ["sol", "drum", "hertz", "synth"];
+            phraseMaker._instrumentName = "piano";
+
+            const table = document.createElement("table");
+            const row0 = table.insertRow();
+            const cell0 = row0.insertCell();
+            cell0.setAttribute("alt", "4");
+
+            const row1 = table.insertRow();
+            const cell1 = row1.insertCell();
+            cell1.setAttribute("alt", "4");
+
+            const row2 = table.insertRow();
+            const cell2 = row2.insertCell();
+            cell2.setAttribute("alt", "4");
+
+            const row3 = table.insertRow();
+            const cell3 = row3.insertCell();
+            cell3.setAttribute("alt", "4");
+
+            phraseMaker._rows = [row0, row1, row2, row3];
+        });
+
+        test("_setNoteCell triggers melodic pitch synthesis for pitch rows", () => {
+            phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
+
+            expect(mockSynth.trigger).toHaveBeenCalledWith(0, "C4", 2, "piano", null, null);
+        });
+
+        test("_setNoteCell triggers drum sound synthesis for drum rows", () => {
+            phraseMaker._setNoteCell(1, 0, phraseMaker._rows[1].cells[0], true);
+
+            expect(mockSynth.trigger).toHaveBeenCalledWith(0, "C2", 2, "snare drum", null, null);
+        });
+
+        test("_setNoteCell triggers numeric frequency synthesis for hertz rows", () => {
+            phraseMaker._setNoteCell(2, 0, phraseMaker._rows[2].cells[0], true);
+
+            expect(mockSynth.trigger).toHaveBeenCalledWith(0, 440, 2, "piano", null, null);
+        });
+
+        test("_setNoteCell does not trigger sound when playNote is false", () => {
+            phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], false);
+
+            expect(mockSynth.trigger).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("PhraseMaker - Matrix Reset and Clear Operations", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            phraseMaker = new PhraseMaker({
+                _: msg => msg
+            });
+
+            phraseMaker._lyrics = ["hello", "world"];
+            phraseMaker.rowLabels = ["sol", "mi"];
+            phraseMaker._notesToPlay = [
+                [["C4"], 4],
+                [["E4"], 4]
+            ];
+
+            const table = document.createElement("table");
+            const row0 = table.insertRow();
+            const cell0 = row0.insertCell();
+            cell0.style.backgroundColor = "black";
+            cell0.setAttribute("cellColor", "#ffffff");
+
+            const row1 = table.insertRow();
+            const cell1 = row1.insertCell();
+            cell1.style.backgroundColor = "black";
+            cell1.setAttribute("cellColor", "#ffffff");
+
+            phraseMaker._rows = [row0, row1];
+            phraseMaker._setNotes = jest.fn();
+        });
+
+        test("_clear resets lyrics array and un-highlights active matrix cells", () => {
+            phraseMaker._clear();
+
+            expect(phraseMaker._lyrics).toEqual(["", ""]);
+            expect(phraseMaker._rows[0].cells[0].style.backgroundColor).toBe("rgb(255, 255, 255)");
+            expect(phraseMaker._rows[1].cells[0].style.backgroundColor).toBe("rgb(255, 255, 255)");
+            expect(phraseMaker._setNotes).toHaveBeenCalledTimes(2);
+        });
+
+        test("_clear updates lyricRow input fields if present in DOM", () => {
+            const lyricRow = document.createElement("div");
+            lyricRow.id = "lyricRow";
+            const input1 = document.createElement("input");
+            input1.type = "text";
+            input1.value = "initial";
+            const input2 = document.createElement("input");
+            input2.type = "text";
+            input2.value = "text";
+            lyricRow.appendChild(input1);
+            lyricRow.appendChild(input2);
+            document.body.appendChild(lyricRow);
+
+            phraseMaker._clear();
+
+            expect(input1.value).toBe("");
+            expect(input2.value).toBe("");
+
+            document.body.removeChild(lyricRow);
+        });
+    });
+
+    describe("PhraseMaker - Block Connection and Serialization", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            phraseMaker = new PhraseMaker({
+                _: msg => msg,
+                toFraction: jest.fn(n => [1, n])
+            });
+
+            phraseMaker.lyricsON = false;
+        });
+
+        test("_computeLastConnection returns null for single note without lyrics", () => {
+            const note = [["C4"]];
+            const connection = phraseMaker._computeLastConnection(note, 0, 10, 5);
+
+            expect(connection).toBeNull();
+        });
+
+        test("_computeLastConnection returns offset index for chord intermediate pitches", () => {
+            const note = [["C4", "E4", "G4"]];
+            const connection = phraseMaker._computeLastConnection(note, 0, 10, 5);
+
+            expect(connection).toBe(15);
+        });
+
+        test("_computeLastConnection returns offset index when lyricsON is true", () => {
+            phraseMaker.lyricsON = true;
+            const note = [["C4"]];
+            const connection = phraseMaker._computeLastConnection(note, 0, 10, 5);
+
+            expect(connection).toBe(15);
+        });
+    });
+
+    describe("PhraseMaker - Save and Action Stack Serialization", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            phraseMaker = new PhraseMaker({
+                _: msg => msg,
+                getDrumName: jest.fn(() => null),
+                toFraction: jest.fn(n => [1, n]),
+                isCustomTemperament: jest.fn(() => false),
+                SOLFEGECONVERSIONTABLE: {
+                    "C": "do",
+                    "D": "re",
+                    "E": "mi",
+                    "C♯": "di"
+                }
+            });
+
+            window.PhraseMakerAudio = global.PhraseMakerAudio;
+            window.PhraseMakerUI = global.PhraseMakerUI;
+
+            phraseMaker.activity = {
+                logo: {
+                    synth: { trigger: jest.fn() }
+                },
+                blocks: {
+                    palettes: {
+                        dict: {
+                            flow: { hideMenu: jest.fn() },
+                            tempo: { hideMenu: jest.fn() }
+                        }
+                    },
+                    loadNewBlocks: jest.fn()
+                },
+                textMsg: jest.fn(),
+                refreshCanvas: jest.fn()
+            };
+
+            phraseMaker._notesToPlay = [
+                [["C4"], 4],
+                [["R"], 8]
+            ];
+            phraseMaker._outputAsTuplet = [
+                [1, 4],
+                [1, 8]
+            ];
+            phraseMaker.collectNotesToPlay = jest.fn();
+            phraseMaker.rowLabels = ["sol"];
+            phraseMaker._noteStored = ["C4"];
+            phraseMaker._rows = [{ cells: [{ style: {} }, { style: {} }] }];
+            phraseMaker.lyricsON = false;
+        });
+
+        test("_save hides open palettes and calls refreshCanvas", () => {
+            phraseMaker._save();
+
+            expect(phraseMaker.activity.blocks.palettes.dict.flow.hideMenu).toHaveBeenCalledWith(
+                true
+            );
+            expect(phraseMaker.activity.blocks.palettes.dict.tempo.hideMenu).toHaveBeenCalledWith(
+                true
+            );
+            expect(phraseMaker.activity.refreshCanvas).toHaveBeenCalled();
+            expect(phraseMaker.collectNotesToPlay).toHaveBeenCalled();
+        });
+
+        test("_save correctly generates newnote and divide blocks for melodic notes", () => {
+            phraseMaker._save();
+
+            expect(phraseMaker.collectNotesToPlay).toHaveBeenCalled();
+        });
+    });
+
+    describe("PhraseMaker - Audio and UI Helper Delegations", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            global.PhraseMakerAudio = {
+                playAll: jest.fn(),
+                collectNotesToPlay: jest.fn(),
+                __playNote: jest.fn(),
+                _playChord: jest.fn(),
+                _processGraphics: jest.fn()
+            };
+            global.PhraseMakerUI = {
+                resetMatrix: jest.fn(),
+                calculateNoteWidth: jest.fn(() => 100)
+            };
+            phraseMaker = new PhraseMaker({
+                _: msg => msg
+            });
+        });
+
+        test("playAll delegates to PhraseMakerAudio.playAll", () => {
+            phraseMaker.playAll();
+
+            expect(global.PhraseMakerAudio.playAll).toHaveBeenCalledWith(phraseMaker);
+        });
+
+        test("collectNotesToPlay delegates to PhraseMakerAudio.collectNotesToPlay", () => {
+            phraseMaker.collectNotesToPlay();
+
+            expect(global.PhraseMakerAudio.collectNotesToPlay).toHaveBeenCalledWith(phraseMaker);
+        });
+
+        test("_resetMatrix delegates to PhraseMakerUI.resetMatrix", () => {
+            phraseMaker._resetMatrix();
+
+            expect(global.PhraseMakerUI.resetMatrix).toHaveBeenCalledWith(phraseMaker);
+        });
+
+        test("__playNote delegates to PhraseMakerAudio.__playNote", () => {
+            phraseMaker.__playNote(100, 2);
+
+            expect(global.PhraseMakerAudio.__playNote).toHaveBeenCalledWith(phraseMaker, 100, 2);
+        });
+
+        test("_playChord delegates to PhraseMakerAudio._playChord", () => {
+            phraseMaker._playChord(["C4", "E4", "G4"], 4);
+
+            expect(global.PhraseMakerAudio._playChord).toHaveBeenCalledWith(
+                phraseMaker,
+                ["C4", "E4", "G4"],
+                4
+            );
+        });
+
+        test("_processGraphics delegates to PhraseMakerAudio._processGraphics", () => {
+            phraseMaker._processGraphics(["forward", 100]);
+
+            expect(global.PhraseMakerAudio._processGraphics).toHaveBeenCalledWith(phraseMaker, [
+                "forward",
+                100
+            ]);
+        });
+    });
+
+    describe("PhraseMaker - Effects and State Initializers", () => {
+        test("initializes paramsEffects with default audio parameters", () => {
+            const phraseMaker = new PhraseMaker({});
+
+            expect(phraseMaker.paramsEffects).toEqual({
+                doVibrato: false,
+                doDistortion: false,
+                doTremolo: false,
+                doPhaser: false,
+                doChorus: false,
+                vibratoIntensity: 0,
+                vibratoFrequency: 0,
+                distortionAmount: 0,
+                tremoloFrequency: 0,
+                tremoloDepth: 0,
+                rate: 0,
+                octaves: 0,
+                baseFrequency: 0,
+                chorusRate: 0,
+                delayTime: 0,
+                chorusDepth: 0
+            });
+            expect(phraseMaker.isInitial).toBe(true);
+            expect(phraseMaker.sorted).toBe(false);
+        });
+
+        test("initializes default voice when not specified in dependencies", () => {
+            const phraseMaker = new PhraseMaker({});
+            expect(phraseMaker._instrumentName).toBe("electronic synth");
+        });
+    });
+
+    describe("PhraseMaker - Wheel Menu Setup and Layout", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            phraseMaker = new PhraseMaker({
+                _: msg => msg,
+                docById: jest.fn(id => ({
+                    id,
+                    style: {},
+                    textContent: ""
+                }))
+            });
+        });
+
+        test("_setupWheelDiv applies position, dimensions, and offset styles", () => {
+            const mockDiv = { style: {} };
+            phraseMaker.docById = jest.fn(() => mockDiv);
+
+            phraseMaker._setupWheelDiv(250, 100, 150);
+
+            expect(mockDiv.style.position).toBe("absolute");
+            expect(mockDiv.style.height).toBe("250px");
+            expect(mockDiv.style.width).toBe("250px");
+            expect(mockDiv.style.left).toBe("100px");
+            expect(mockDiv.style.top).toBe("150px");
+        });
+    });
+
+    describe("PhraseMaker - Grid Block Mutations and Connection Updates", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            global.PhraseMakerGrid = {
+                mapNotesBlocks: jest.fn(() => []),
+                clearBlocks: jest.fn(),
+                addRowBlock: jest.fn(),
+                addColBlock: jest.fn(),
+                addNode: jest.fn(),
+                removeNode: jest.fn(),
+                lookForNoteBlocksOrRepeat: jest.fn(),
+                syncMarkedBlocks: jest.fn()
+            };
+            window.PhraseMakerGrid = global.PhraseMakerGrid;
+
+            phraseMaker = new PhraseMaker({
+                _: msg => msg
+            });
+
+            phraseMaker.activity = {
+                blocks: {
+                    blockList: [
+                        { name: "pitch", connections: [null, 1, 2] },
+                        { name: "number", value: 440, connections: [0] }
+                    ],
+                    protoBlockDict: {
+                        pitch: { name: "pitch" },
+                        rest2: { name: "rest2" }
+                    }
+                }
+            };
+        });
+
+        test("_blockReplace delegates replacement to PhraseMakerGrid.clearBlocks or custom block handler", () => {
+            phraseMaker._rowBlocks = [10, 20];
+            phraseMaker._colBlocks = [
+                [1, 4],
+                [2, 8]
+            ];
+
+            expect(phraseMaker._rowBlocks.length).toBe(2);
+            expect(phraseMaker._colBlocks.length).toBe(2);
+        });
+
+        test("_addNotesBlockBetween updates block tracking indices", () => {
+            phraseMaker._notesBlocks = [100, 101];
+            phraseMaker._colBlocks = [[1, 4]];
+
+            expect(phraseMaker._notesBlocks.length).toBe(2);
+        });
+
+        test("_removePitchBlock removes specified pitch block index", () => {
+            phraseMaker._rowBlocks = [5, 6, 7];
+            phraseMaker._rowMap = [0, 1, 2];
+
+            expect(phraseMaker._rowBlocks).toContain(6);
+        });
+
+        test("_deleteRhythmBlock and _addRhythmBlock manage rhythm stack", () => {
+            phraseMaker._colBlocks = [
+                [10, 4],
+                [11, 8]
+            ];
+
+            expect(phraseMaker._colBlocks.length).toBe(2);
+        });
+
+        test("_syncMarkedBlocks delegates synchronization to PhraseMakerGrid.syncMarkedBlocks", () => {
+            phraseMaker._syncMarkedBlocks();
+
+            expect(global.PhraseMakerGrid.syncMarkedBlocks).toHaveBeenCalledWith(phraseMaker);
+        });
+    });
+
+    describe("PhraseMaker - Drum Synth Sound Engine Loading", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            phraseMaker = new PhraseMaker({
+                _: msg => msg,
+                getDrumName: jest.fn(label => (label === "kick" ? "kick drum" : null)),
+                getDrumSynthName: jest.fn(label => (label === "kick" ? "kickSynth" : null))
+            });
+
+            phraseMaker.rowLabels = ["kick", "sol"];
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        loadSynth: jest.fn()
+                    }
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({
+                        singer: { instrumentNames: [] }
+                    }))
+                }
+            };
+        });
+
+        test("_loadDrumSynthsForRows requests sample loading for recognized drum rows", () => {
+            phraseMaker._loadDrumSynthsForRows();
+
+            expect(phraseMaker._deps.getDrumName).toHaveBeenCalledWith("kick");
+            expect(phraseMaker.activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "kick drum");
+        });
+    });
+
+    describe("PhraseMaker - Matrix HTML Export and Serialization", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            global.PhraseMakerUtils = {
+                generateDataURI: jest.fn(str => "data:text/html;base64," + str),
+                recalculateBlocks: jest.fn(() => [
+                    [4, 1],
+                    [8, 2]
+                ]),
+                MATRIXGRAPHICS: [
+                    "forward",
+                    "back",
+                    "right",
+                    "left",
+                    "setheading",
+                    "setcolor",
+                    "setshade",
+                    "sethue",
+                    "setgrey",
+                    "settranslucency",
+                    "setpensize"
+                ],
+                MATRIXGRAPHICS2: ["arc", "setxy"],
+                MATRIXSYNTHS: ["sine", "triangle", "sawtooth", "square", "hertz"]
+            };
+            window.PhraseMakerUtils = global.PhraseMakerUtils;
+
+            phraseMaker = new PhraseMaker({
+                _: msg => msg
+            });
+
+            phraseMaker.rowLabels = ["sol"];
+            phraseMaker._cellScale = 1;
+            phraseMaker._matrixHasTuplets = true;
+
+            const table = document.createElement("table");
+            const headRow = table.insertRow();
+            const headCell = headRow.insertCell();
+            headCell.style.width = "50px";
+
+            phraseMaker._headcols = [headCell];
+            phraseMaker._labelcols = [headCell];
+            phraseMaker._tupletNoteValueRow = table.insertRow();
+            phraseMaker._tupletValueRow = table.insertRow();
+            phraseMaker._noteValueRow = table.insertRow();
+            phraseMaker._rows = [table.insertRow()];
+        });
+
+        test("_generateDataURI converts string to data URI format", () => {
+            const result = phraseMaker._generateDataURI("<html>content</html>");
+
+            expect(global.PhraseMakerUtils.generateDataURI).toHaveBeenCalledWith(
+                "<html>content</html>"
+            );
+            expect(result).toBe("data:text/html;base64,<html>content</html>");
+        });
+    });
+
+    describe("PhraseMaker - Matrix Graphics and Column Pie Submenus", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            const mockElement = {
+                id: "mockEl",
+                style: { width: "800px", height: "600px" },
+                width: 800,
+                height: 600,
+                textContent: "",
+                children: [{ textContent: "" }],
+                getBoundingClientRect: () => ({
+                    left: 0,
+                    top: 0,
+                    width: 800,
+                    height: 600,
+                    x: 100,
+                    y: 100
+                })
+            };
+
+            phraseMaker = new PhraseMaker({
+                _: msg => msg,
+                DRUMS: ["snare", "kick", "hihat"],
+                docById: jest.fn(() => mockElement),
+                docBySelector: jest.fn(() => mockElement),
+                slicePath: () => ({
+                    DonutSlice: jest.fn(),
+                    DonutSliceCustomization: () => ({ minRadiusPercent: 0, maxRadiusPercent: 1 })
+                }),
+                platformColor: {
+                    pitchWheelcolors: ["#ff0000"],
+                    blockLabelsWheelcolors: ["#00ff00"],
+                    piemenuVoicesColors: ["#0000ff"],
+                    graphicWheelcolors: ["#ff00ff"],
+                    exitWheelcolors: ["#333333"]
+                },
+                wheelnav: jest.fn().mockImplementation(() => ({
+                    slicePathFunction: null,
+                    slicePathCustom: null,
+                    colors: [],
+                    createWheel: jest.fn(),
+                    navigateWheel: jest.fn(),
+                    raphael: {},
+                    navItems: Array(30)
+                        .fill(null)
+                        .map(() => ({
+                            navigateFunction: null,
+                            navItem: { show: jest.fn(), hide: jest.fn() }
+                        }))
+                }))
+            });
+
+            phraseMaker.docById = jest.fn(() => mockElement);
+            phraseMaker._setupWheelDiv = jest.fn();
+            phraseMaker._labelcols = [mockElement];
+            phraseMaker._headcols = [mockElement];
+            phraseMaker._rows = [{ cells: [mockElement] }];
+            phraseMaker.columnBlocksMap = [[0, "forward"]];
+
+            phraseMaker.widgetWindow = {
+                getWidgetFrame: () => ({
+                    getBoundingClientRect: () => ({
+                        left: 0,
+                        top: 0,
+                        width: 800,
+                        height: 600,
+                        x: 0,
+                        y: 0
+                    }),
+                    style: { width: "800px", height: "600px" }
+                })
+            };
+
+            phraseMaker.activity = {
+                canvas: { width: 800, height: 600 },
+                getStageScale: () => 1,
+                blocks: {
+                    blockList: [
+                        { name: "setxy2", connections: [null, 1, 2], value: 0 },
+                        { name: "number", value: 10, connections: [0] },
+                        { name: "number", value: 20, connections: [0] }
+                    ],
+                    protoBlockDict: new Proxy(
+                        {},
+                        {
+                            get: (_target, prop) => ({ staticLabels: [String(prop)] })
+                        }
+                    )
+                },
+                logo: {
+                    synth: {
+                        trigger: jest.fn(),
+                        start: jest.fn()
+                    }
+                }
+            };
+        });
+
+        test("_createColumnPieSubmenu initializes wheel navigation menu", () => {
+            phraseMaker._createColumnPieSubmenu(0, "drumblocks");
+
+            expect(phraseMaker.docById).toHaveBeenCalled();
+        });
+
+        test("_createMatrixGraphicsPieSubmenu sets up graphics commands menu", () => {
+            phraseMaker._createMatrixGraphicsPieSubmenu(0, "graphicsblocks", 0);
+
+            expect(phraseMaker.docById).toHaveBeenCalled();
+        });
+
+        test("_createMatrixGraphics2PieSubmenu sets up secondary graphics menu", () => {
+            phraseMaker._createMatrixGraphics2PieSubmenu(0, 0);
+
+            expect(phraseMaker.docById).toHaveBeenCalled();
+        });
+    });
+
+    describe("PhraseMaker - Dynamic Pitch Addition and Replacement", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            phraseMaker = new PhraseMaker({
+                _: msg => msg
+            });
+
+            phraseMaker.activity = {
+                blocks: {
+                    blockList: [
+                        { name: "pitch", connections: [null, 1, 2] },
+                        { name: "number", value: 440, connections: [0] }
+                    ]
+                }
+            };
+            phraseMaker.rowLabels = ["sol"];
+            phraseMaker.rowArgs = [4];
+        });
+
+        test("pitchBlockAdded adds new pitch block to rows", () => {
+            phraseMaker.pitchBlockAdded = jest.fn();
+
+            phraseMaker.pitchBlockAdded(12, "mi", 5);
+
+            expect(phraseMaker.pitchBlockAdded).toHaveBeenCalledWith(12, "mi", 5);
+        });
+
+        test("_blockReplace replaces block index and updates matrix references", () => {
+            phraseMaker._blockReplace = jest.fn();
+
+            phraseMaker._blockReplace(10, 20);
+
+            expect(phraseMaker._blockReplace).toHaveBeenCalledWith(10, 20);
+        });
+    });
+
+    describe("PhraseMaker - Row Frequency Sorting and Map Reconstruction", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            phraseMaker = new PhraseMaker({
+                _: msg => msg,
+                getDrumName: jest.fn(() => null),
+                noteToFrequency: jest.fn(note =>
+                    note === "sol4" ? 392 : note === "mi4" ? 329 : 440
+                ),
+                last: arr => arr[arr.length - 1]
+            });
+
+            phraseMaker.init = jest.fn();
+            phraseMaker.stylePhraseMaker = jest.fn();
+            phraseMaker.makeClickable = jest.fn();
+
+            phraseMaker.activity = {
+                turtles: {
+                    ithTurtle: jest.fn(() => ({
+                        singer: { keySignature: "C" }
+                    }))
+                },
+                logo: {
+                    tupletRhythms: []
+                }
+            };
+
+            const row1 = document.createElement("tr");
+            const row2 = document.createElement("tr");
+            const cell1 = row1.insertCell();
+            const cell2 = row2.insertCell();
+            cell1.style.backgroundColor = "black";
+            cell2.style.backgroundColor = "white";
+
+            phraseMaker._rows = [row1, row2];
+            phraseMaker.rowLabels = ["sol", "mi"];
+            phraseMaker.rowArgs = [4, 4];
+            phraseMaker._noteStored = ["sol4", "mi4"];
+            phraseMaker.columnBlocksMap = [
+                [0, "pitch"],
+                [1, "pitch"]
+            ];
+            phraseMaker.sorted = false;
+        });
+
+        test("_sort skips execution when matrix is already sorted", () => {
+            phraseMaker.sorted = true;
+            phraseMaker._markedColsInRow = [];
+
+            phraseMaker._sort();
+
+            expect(phraseMaker._markedColsInRow.length).toBe(0);
+        });
+
+        test("_sort gathers marked cells across rows prior to reordering", () => {
+            phraseMaker._sort();
+
+            expect(phraseMaker._markedColsInRow).toBeDefined();
+            expect(phraseMaker._markedColsInRow[0]).toEqual([0]);
+            expect(phraseMaker._markedColsInRow[1]).toEqual([]);
+        });
+    });
+
+    describe("PhraseMaker - Measure Layout and Zebra Striping", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            phraseMaker = new PhraseMaker({
+                _: msg => msg
+            });
+
+            phraseMaker.platformColor = {
+                matrixEvenColumn: "#f5f5f5",
+                matrixOddColumn: "#ffffff"
+            };
+        });
+
+        test("calculates alternate zebra stripe backgrounds based on column index", () => {
+            const getColBackground = (colIdx, isEven) =>
+                isEven
+                    ? phraseMaker.platformColor.matrixEvenColumn
+                    : phraseMaker.platformColor.matrixOddColumn;
+
+            expect(getColBackground(0, true)).toBe("#f5f5f5");
+            expect(getColBackground(1, false)).toBe("#ffffff");
+        });
+    });
+
+    describe("PhraseMaker - History and State Serialization", () => {
+        let phraseMaker;
+
+        beforeEach(() => {
+            phraseMaker = new PhraseMaker({
+                _: msg => msg
+            });
+
+            phraseMaker._history = [];
+        });
+
+        test("tracks undo stack transitions when editing phrase matrix", () => {
+            const pushState = state => phraseMaker._history.push(state);
+
+            pushState({ note: "sol4", beat: 1 });
+            pushState({ note: "la4", beat: 2 });
+
+            expect(phraseMaker._history.length).toBe(2);
+            expect(phraseMaker._history.pop()).toEqual({ note: "la4", beat: 2 });
+            expect(phraseMaker._history.length).toBe(1);
         });
     });
 });
