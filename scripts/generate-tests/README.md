@@ -18,6 +18,8 @@ source file
     -> deterministic prompt      (prompt-builder.js)
     -> provider                  (llm-client.js: NoopClient / ManualClient / ...)
     -> generated Jest test       (in-memory string)
+    -> validator                 (validate-generated.js: { valid, errors, warnings })
+    -> safe writer               (write-generated.js -> *.generated.test.js)
 ```
 
 The extractor reads and parses the analysed source but never executes it. The
@@ -25,6 +27,13 @@ generation layer does not read source files, write to the source tree, require a
 credential, or make a network call. The only providers shipped are credential-free
 (`noop`, `manual`); a real model-backed provider is left for a later change and
 would be a new class in `llm-client.js` only.
+
+The **validator** and **safe writer** are the deterministic safety layer between
+a generated string and the repository. A candidate that fails validation never
+reaches the writer; the writer itself only ever creates a single, predictable
+file inside the module's own `__tests__/` directory and never overwrites
+anything. `write-generated.js` is the only file here that touches the
+filesystem, and only under the guards described below.
 
 ## Usage
 
@@ -45,9 +54,29 @@ node scripts/generate-tests/cli.js js/utils/utils-logic.js --prompt
 # candidate test source (nothing is written to disk).
 node scripts/generate-tests/cli.js js/utils/utils-logic.js --generate
 node scripts/generate-tests/cli.js js/utils/utils-logic.js --generate=manual
+
+# Generate a candidate, validate it, and report the exact path the safe writer
+# would use. Nothing is written without --write; a candidate that fails
+# validation is reported and the command exits non-zero.
+node scripts/generate-tests/cli.js js/utils/utils-logic.js --emit
+node scripts/generate-tests/cli.js js/utils/utils-logic.js --emit --write
 ```
 
-`--check`, `--prompt` and `--generate` are mutually exclusive.
+`--check`, `--prompt`, `--generate` and `--emit` are mutually exclusive;
+`--write` only applies together with `--emit`. `node cli.js --help` prints the
+same summary.
+
+`--generate` vs `--emit` (easy to confuse):
+
+|              | `--generate`                       | `--emit`                                               |
+| ------------ | ---------------------------------- | ------------------------------------------------------ |
+| output       | raw candidate **source** to stdout | a one-line **verdict** + the path the writer would use |
+| validation   | none                               | full `validateGeneratedTest`                           |
+| exit code    | 0 unless the provider errors       | 1 if the candidate is invalid                          |
+| touches disk | never                              | only with `--emit --write`, and only a valid candidate |
+
+Use `--generate` to eyeball what a provider produced; use `--emit` to see
+whether that output is safe to keep, and `--emit --write` to actually keep it.
 
 ## Programmatic API
 
@@ -56,6 +85,8 @@ const { extractFile } = require("./extract-module");
 const { buildGenerationRequest } = require("./generation-request");
 const { buildPrompt, buildPromptFromPlan } = require("./prompt-builder");
 const { generateTests, createClient, NoopClient, ManualClient } = require("./llm-client");
+const { validateGeneratedTest } = require("./validate-generated");
+const { writeGeneratedTest, generatedTestPathFor } = require("./write-generated");
 
 const plan = extractFile("js/utils/utils-logic.js");
 const prompt = buildPromptFromPlan(plan); // string, deterministic
@@ -66,19 +97,29 @@ const { request, prompt: p, source, meta } = await generateTests(plan);
 // Bring your own provider (any object with `name` and `generate(request)`):
 await generateTests(plan, { client: myClient });
 await generateTests(plan, { provider: "manual", clientOptions: { responses } });
+
+// Validate a candidate against the plan, then write it only if it is valid.
+const result = validateGeneratedTest(source, { plan });
+// -> { valid, errors: [...], warnings: [...], modulePath }
+
+if (result.valid) {
+    const { written, path } = writeGeneratedTest(source, { plan }); // or { dryRun: true }
+}
 ```
 
 ## Files
 
-| File                    | Responsibility                                                                        |
-| ----------------------- | ------------------------------------------------------------------------------------- |
-| `extract-module.js`     | Reads a file, parses it with the vendored Acorn (`lib/acorn.min.js`), returns a plan. |
-| `module-test-plan.js`   | Pure AST walker that builds the plan structure.                                       |
-| `generation-request.js` | Turns a plan into a structured `{ module, plan, instructions, ... }` request.         |
-| `prompt-builder.js`     | Renders a request as one deterministic prompt string.                                 |
-| `llm-client.js`         | Provider seam: `NoopClient`, `ManualClient`, `createClient`, `generateTests`.         |
-| `cli.js`                | Command-line wrapper: `--check`, `--prompt`, `--generate`.                            |
-| `__tests__/`            | Jest tests plus fixtures and their committed `.plan.json` plans.                      |
+| File                    | Responsibility                                                                               |
+| ----------------------- | -------------------------------------------------------------------------------------------- |
+| `extract-module.js`     | Reads a file, parses it with the vendored Acorn (`lib/acorn.min.js`), returns a plan.        |
+| `module-test-plan.js`   | Pure AST walker that builds the plan structure.                                              |
+| `generation-request.js` | Turns a plan into a structured `{ module, plan, instructions, ... }` request.                |
+| `prompt-builder.js`     | Renders a request as one deterministic prompt string.                                        |
+| `llm-client.js`         | Provider seam: `NoopClient`, `ManualClient`, `createClient`, `generateTests`.                |
+| `validate-generated.js` | Deterministic safety checks on a generated candidate; returns `{ valid, errors, warnings }`. |
+| `write-generated.js`    | Safe writer: one deterministic `*.generated.test.js` path, never overwrites, no traversal.   |
+| `cli.js`                | Command-line wrapper: `--check`, `--prompt`, `--generate`, `--emit [--write]`.               |
+| `__tests__/`            | Jest tests plus fixtures and their committed `.plan.json` plans.                             |
 
 ## Generation layer
 
@@ -100,6 +141,93 @@ await generateTests(plan, { provider: "manual", clientOptions: { responses } });
 - The prompt instructs a generator to test **observable behaviour** through the
   public API, not to emit a test per AST node, not to mock the module under
   test, and never to emit code that writes to disk.
+
+## Validation and safe writing
+
+**`validateGeneratedTest(source, { plan, modulePath, existingTitles, allowedGlobals, allowedModules })`**
+parses the candidate with the vendored Acorn and returns
+`{ valid, errors, warnings, modulePath }`. It never executes the candidate,
+never reads the module under test, and never touches the filesystem. The same
+inputs always produce the same result.
+
+It is a **static, heuristic filter**, not a JavaScript security sandbox: it
+rejects the known-unsafe and known-meaningless _patterns_ listed below, but it
+cannot catch a construct it has no rule for, and code that only does its damage
+at runtime will pass the parse-only check. Access through a **string literal**
+is covered (`fs["writeFileSync"]`, `require("fs")`), but **fully dynamic**
+access - a method name or module specifier held in a variable, `eval`,
+`Function(...)` - is out of scope. The concrete "a bad string cannot corrupt the
+repo" guarantee comes from the writer (one deterministic path, `wx` create), not
+from this list.
+
+A candidate is **rejected** (an `error`) when it:
+
+- does not parse as JavaScript, or is empty;
+- declares no `it()`/`test()` case, or contains no `expect()` assertion;
+- does not `require`/`import` the real module the plan describes;
+- `jest.mock`s / `doMock`s / `setMock`s the module under test;
+- `require`s / `import`s **anything other than the module under test** - a
+  relative path to another file, _or a bare package specifier_ - unless it is
+  listed in `options.allowedModules`. Bare package imports are not trusted: an
+  installed package is opaque to every rule below;
+- `require`s `fs`/`fs-extra` or `child_process`/`worker_threads` (these can
+  never be allow-listed);
+- uses an unsafe filesystem call (`writeFileSync`, `rmSync`, `mkdtempSync`, ...),
+  including computed `obj["writeFileSync"]` access;
+- assigns `module.exports` / `exports.*` (a test must not add exports anywhere);
+- reaches into `_`-prefixed private members (member access, computed
+  `obj["_x"]`, or destructuring);
+- has only meaningless assertions - literal-vs-equal-literal
+  (`expect(true).toBe(true)`), bare existence checks on the import
+  (`expect(target).toBeDefined()`), or only `toMatchSnapshot()`;
+- uses `Math.random` with no `jest.spyOn`/stub, or `setTimeout`/`setInterval`
+  with no `jest.useFakeTimers()`;
+- references an undeclared global from another subsystem;
+- duplicates a test title (full `describe › it` path) within the file or against
+  the supplied `existingTitles`.
+
+`warnings` (non-blocking) cover an uncontrolled `Date.now()` / `new Date()` and a
+`describe` title that names a different module file.
+
+**Allow-lists.** `options.allowedGlobals` (undeclared identifiers) and
+`options.allowedModules` (extra `require`/`import` specifiers) are the only
+escape hatches. For globals the effective list is three tiers:
+
+1. the fixed JS / Node / Jest / jsdom surface (`ALLOWED_GLOBALS` in
+   `validate-generated.js`);
+2. the module's own `plan.referencedGlobals` - the module under test already
+   depends on these, so its test legitimately may too;
+3. `options.allowedGlobals` - an explicit, per-call escape hatch.
+
+Widening either list only ever permits the named identifier / specifier. It does
+**not** disable any other rule: an aliased `writeFileSync`, `Math.random`, a
+bare timer, `fs`, `child_process` and so on are still caught by their own checks.
+Both lists are **trusted configuration supplied by the calling code** - they
+must never be derived from the candidate string or from provider output, or the
+thing being validated could widen its own allow-list.
+
+**`writeGeneratedTest(source, { plan, dryRun, cwd, existingTitles, allowedGlobals, allowedModules })`**
+resolves the deterministic output path first (so a malformed module path fails
+fast and every result still reports the path that _would_ be used), then
+validates, and only when the candidate is valid calls the safe writer. The
+writer:
+
+- writes exactly one path -
+  `<dir>/__tests__/<module>.generated.test.js` - derived deterministically from
+  the plan's module path;
+- refuses an absolute module/output path, any `..` traversal, a path outside a
+  `__tests__/` directory, and any path not ending in `.generated.test.js`
+  (`assertSafeTestPath`, lexical);
+- before writing, resolves the real path of the nearest existing ancestor and
+  refuses it if a symlink there escapes the repository
+  (`assertRealContainment`);
+- never overwrites an existing file: the create uses the `wx` open flag, which
+  fails atomically if the path exists - there is no preceding `stat` to race -
+  so a hand-written `<module>.test.js` or a previous generated run is always
+  safe;
+- creates the `__tests__/` directory only when it is missing;
+- always reports the exact repo-relative path, and writes nothing under
+  `dryRun`.
 
 ## What is extracted
 
