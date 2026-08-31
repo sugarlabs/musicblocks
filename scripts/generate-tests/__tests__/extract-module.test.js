@@ -319,21 +319,27 @@ describe("extract-module: parsing and error handling", () => {
 
 describe("cli helpers", () => {
     it("parses a bare file argument", () => {
-        expect(cli.parseArgs(["a.js"])).toEqual({ file: "a.js", check: false, expected: null });
+        expect(cli.parseArgs(["a.js"])).toEqual({
+            file: "a.js",
+            check: false,
+            expected: null,
+            prompt: false,
+            generate: null
+        });
     });
 
     it("parses --check with an optional explicit expected path", () => {
-        expect(cli.parseArgs(["a.js", "--check"])).toEqual({
+        expect(cli.parseArgs(["a.js", "--check"])).toMatchObject({
             file: "a.js",
             check: true,
             expected: null
         });
-        expect(cli.parseArgs(["a.js", "--check", "b.json"])).toEqual({
+        expect(cli.parseArgs(["a.js", "--check", "b.json"])).toMatchObject({
             file: "a.js",
             check: true,
             expected: "b.json"
         });
-        expect(cli.parseArgs(["a.js", "--check=b.json"])).toEqual({
+        expect(cli.parseArgs(["a.js", "--check=b.json"])).toMatchObject({
             file: "a.js",
             check: true,
             expected: "b.json"
