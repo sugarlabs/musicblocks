@@ -128,12 +128,13 @@ describe("processPluginData script cleanup", () => {
         const originalAppendChild = document.head.appendChild.bind(document.head);
         appendChildSpy = jest.spyOn(document.head, "appendChild").mockImplementation(script => {
             originalAppendChild(script);
-            script.onerror(new Error("load failed"));
+            script.onerror({ type: "error" });
             return script;
         });
 
-        await expect(
-            processPluginData(
+        let err;
+        try {
+            await processPluginData(
                 createActivity(),
                 JSON.stringify({
                     BLOCKPLUGINS: {
@@ -141,8 +142,13 @@ describe("processPluginData script cleanup", () => {
                     }
                 }),
                 "plugins/test.json"
-            )
-        ).rejects.toThrow("load failed");
+            );
+        } catch (e) {
+            err = e;
+        }
+
+        expect(err).toBeInstanceOf(Error);
+        expect(err.message).toBe("Failed to execute plugin script");
 
         expect(document.head.querySelectorAll("script[src^='blob:plugin-setup']")).toHaveLength(0);
         expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup-0");
@@ -153,12 +159,13 @@ describe("processPluginData script cleanup", () => {
         const originalAppendChild = document.head.appendChild.bind(document.head);
         appendChildSpy = jest.spyOn(document.head, "appendChild").mockImplementation(script => {
             originalAppendChild(script);
-            script.onerror(new Error("blob load failed"));
+            script.onerror({ type: "error" });
             return script;
         });
 
-        await expect(
-            processPluginData(
+        let err;
+        try {
+            await processPluginData(
                 createActivity(),
                 JSON.stringify({
                     FLOWPLUGINS: {
@@ -166,8 +173,13 @@ describe("processPluginData script cleanup", () => {
                     }
                 }),
                 "plugins/test.json"
-            )
-        ).rejects.toThrow("Failed to load plugin script: blob load failed");
+            );
+        } catch (e) {
+            err = e;
+        }
+
+        expect(err).toBeInstanceOf(Error);
+        expect(err.message).toBe("Failed to load plugin script");
 
         errorSpy.mockRestore();
     });
