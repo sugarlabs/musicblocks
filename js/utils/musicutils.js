@@ -1036,13 +1036,14 @@ function generateNoteNames(edo) {
         const nextNatural = naturals[(n + 1) % 7];
         const edoSteps = intervals[n].steps;
 
-        // An interval can be allotted zero steps when the octave has fewer
-        // divisions than there are natural letters (EDO < 7). Emitting the
-        // letter anyway would push the table past `edo` entries and break the
-        // length contract callers rely on, so skip letters with no room.
-        if (edoSteps === 0) {
-            continue;
-        }
+// A letter with zero allocated steps contributes no note names at
+// all (not even its own natural). Pushing it unconditionally was
+// the bug: it forced names.length to always be >= 7, even for
+// EDOs smaller than 7 (e.g. edo=4 allocates steps to only 4 of the
+// 7 letters, leaving 3 letters with 0 steps).
+if (edoSteps < 1) {
+    continue;
+}
 
         names.push(natural);
 
