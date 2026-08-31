@@ -332,8 +332,12 @@ class ModeWidget {
 
             this.logo.synth.inTemperament = key;
             this._activeTemperamentKey = key;
-            this._activeEDO = newEDO;
 
+            // _translateNotesToEDO() and _restoreState() must run while
+            // this._activeEDO still holds the OLD EDO: _translateNotesToEDO
+            // reads it to know what to rescale from, and its no-op guard
+            // (newEDO === this._activeEDO) would otherwise always be true if
+            // this._activeEDO were already set to newEDO here.
             if (bothEqual) {
                 if (this._edoNoteCache[newEDO] !== undefined) {
                     this._restoreState(newEDO);
@@ -341,6 +345,7 @@ class ModeWidget {
                     this._translateNotesToEDO(newEDO);
                 }
             }
+            this._activeEDO = newEDO;
 
             this._rebuildWheel(newEDO);
             const tName = TEMPERAMENT[key]?.name || key;
