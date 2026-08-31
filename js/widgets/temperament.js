@@ -1179,7 +1179,7 @@ function TemperamentWidget() {
 
         const temperaments = getTemperamentsList();
         for (const t of temperaments) {
-            if (isCustomTemperament(t[1])) continue;
+            if (isCustomTemperament(t[1]) && t[1] !== that.inTemperament) continue;
             const opt = document.createElement("option");
             opt.value = t[1];
             opt.textContent = t[0];
@@ -1254,20 +1254,12 @@ function TemperamentWidget() {
             _highlightTableRow(highlightDot);
             _updateRemoveButton();
         };
-        const addAfter = _iconBtn(
-            "add2.svg",
-            _("Add pitch after selected (clockwise)"),
-            function () {
-                _addPitch(1);
-            }
-        );
-        const addBefore = _iconBtn(
-            "add.svg",
-            _("Add pitch before selected (counterclockwise)"),
-            function () {
-                _addPitch(-1);
-            }
-        );
+        _iconBtn("right-arrow.png", _("Add pitch after selected (clockwise)"), function () {
+            _addPitch(1);
+        });
+        _iconBtn("left-arrow.png", _("Add pitch before selected (counterclockwise)"), function () {
+            _addPitch(-1);
+        });
         const removeBtn = _iconBtn("delete.svg", _("Remove selected pitch"), function () {
             const s =
                 highlightDot >= 0 && highlightDot < that.pitchNumber
@@ -1483,7 +1475,18 @@ function TemperamentWidget() {
             ctx.font = "12px sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText(that.inTemperament + " vs 12-EDO", cx, cy);
+            if (highlightDot >= 0 && highlightDot < that.pitchNumber) {
+                const selCents = Math.round(that.cents[highlightDot]);
+                const selHz = that.frequencies[highlightDot];
+                const noteName = that.notes[highlightDot];
+                const label = noteName ? noteName[0] + noteName[1] : "";
+                ctx.font = "bold 14px sans-serif";
+                ctx.fillText(label, cx, cy - 10);
+                ctx.font = "12px sans-serif";
+                ctx.fillText(selCents + "¢  " + selHz + " Hz", cx, cy + 8);
+            } else {
+                ctx.fillText(that.inTemperament + " vs 12-EDO", cx, cy);
+            }
             canvas.offsetWidth;
         };
 
