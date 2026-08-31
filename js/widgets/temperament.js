@@ -88,6 +88,9 @@ const largestGapMid = centsArr => {
     return bestMid;
 };
 
+/** Converts a ratio to cents relative to the tonic (1200 cents = 1 octave). */
+const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
+
 /** Tonic lock check with epsilon (guards floating error). Exported for testing. */
 const isLockedCents = cents => Math.abs(cents) < 0.5;
 
@@ -243,9 +246,6 @@ function TemperamentWidget() {
      * @type {boolean}
      */
     this.playbackForward = true;
-
-    /** Converts a ratio to cents relative to the tonic (1200 cents = 1 octave). */
-    const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
 
     /** Recomputes a frequencies array from ratios and a tonic frequency, each entry to 2dp. */
     const computeFrequencies = (ratios, baseFrequency, count) => {
@@ -1092,6 +1092,8 @@ function TemperamentWidget() {
         temperamentTableDiv.style.color = "#e0e0e0";
         temperamentTableDiv.style.fontFamily = "sans-serif";
         temperamentTableDiv.style.padding = "8px";
+        temperamentTableDiv.style.height = "";
+        temperamentTableDiv.style.overflow = "";
 
         const bodyWidth = temperamentTableDiv.parentElement
             ? temperamentTableDiv.parentElement.clientWidth - 16
@@ -1148,46 +1150,32 @@ function TemperamentWidget() {
         controlsDiv.style.marginBottom = "8px";
         controlsDiv.style.flexWrap = "wrap";
 
-        // Temperament selector — icon button with transparent select overlay
-        // (matches ModeWidget dropdown pattern)
-        const tuningIcon = document.createElement("div");
-        tuningIcon.className = "wfbtItem";
-        tuningIcon.title = _("temperament");
-        tuningIcon.setAttribute("role", "button");
-        tuningIcon.setAttribute("aria-label", _("temperament"));
-        tuningIcon.style.flexShrink = "0";
-        tuningIcon.style.display = "flex";
-        tuningIcon.style.alignItems = "center";
-        tuningIcon.style.justifyContent = "center";
-        tuningIcon.style.padding = "4px";
-        tuningIcon.style.borderRadius = "6px";
-        const tuningImg = document.createElement("img");
-        tuningImg.src = "header-icons/menu-button.svg";
-        tuningImg.alt = _("temperament");
-        tuningImg.height = 24;
-        tuningImg.width = 24;
-        tuningIcon.appendChild(tuningImg);
+        // Temperament selector — label + native select
+        const _getTemperamentLabel = function (key) {
+            const list = getTemperamentsList();
+            for (const t of list) {
+                if (t[1] === key) return t[0];
+            }
+            return key;
+        };
+        const temperLabel = document.createElement("span");
+        temperLabel.style.fontSize = "13px";
+        temperLabel.style.color = "#e0e0e0";
+        temperLabel.style.whiteSpace = "nowrap";
+        temperLabel.textContent = _getTemperamentLabel(that.inTemperament);
+        controlsDiv.appendChild(temperLabel);
 
         const compareSelect = document.createElement("select");
         compareSelect.title = _("temperament");
         compareSelect.setAttribute("aria-label", _("temperament"));
-        Object.assign(compareSelect.style, {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            opacity: 0,
-            cursor: "pointer",
-            zIndex: 1,
-            border: "none",
-            background: "transparent",
-            appearance: "none",
-            WebkitAppearance: "none",
-            MozAppearance: "none",
-            outline: "none",
-            boxShadow: "none"
-        });
+        compareSelect.style.fontSize = "12px";
+        compareSelect.style.padding = "4px 8px";
+        compareSelect.style.border = "1px solid #555";
+        compareSelect.style.borderRadius = "6px";
+        compareSelect.style.background = "#2a2a3e";
+        compareSelect.style.color = "#e0e0e0";
+        compareSelect.style.cursor = "pointer";
+        compareSelect.style.flexShrink = "0";
 
         const temperaments = getTemperamentsList();
         for (const t of temperaments) {
@@ -1199,14 +1187,11 @@ function TemperamentWidget() {
             compareSelect.appendChild(opt);
         }
 
-        const tuningGroup = document.createElement("div");
-        tuningGroup.style.position = "relative";
-        tuningGroup.style.display = "inline-flex";
-        tuningGroup.style.alignItems = "center";
-        tuningGroup.style.flexShrink = "0";
-        tuningGroup.appendChild(tuningIcon);
-        tuningGroup.appendChild(compareSelect);
-        controlsDiv.appendChild(tuningGroup);
+        compareSelect.onchange = function () {
+            temperLabel.textContent = _getTemperamentLabel(compareSelect.value);
+        };
+
+        controlsDiv.appendChild(compareSelect);
 
         temperamentTableDiv.appendChild(controlsDiv);
 
@@ -1243,39 +1228,27 @@ function TemperamentWidget() {
         opsDiv.style.gap = "4px";
         opsDiv.style.marginBottom = "8px";
         const _iconBtn = function (icon, tooltip, fn) {
-            const btn = document.createElement("div");
-            btn.className = "wfbtItem";
-            btn.title = tooltip;
-            btn.setAttribute("role", "button");
-            btn.setAttribute("aria-label", tooltip);
-            btn.setAttribute("tabindex", "0");
-            btn.style.flexShrink = "0";
-            btn.style.display = "flex";
-            btn.style.alignItems = "center";
-            btn.style.justifyContent = "center";
-            btn.style.padding = "4px";
-            btn.style.borderRadius = "6px";
-            btn.style.cursor = "pointer";
             const img = document.createElement("img");
             img.src = `header-icons/${icon}`;
             img.alt = tooltip;
-            img.height = 24;
-            img.width = 24;
-            btn.appendChild(img);
-            btn.onclick = fn;
-            opsDiv.appendChild(btn);
-            return btn;
+            img.title = tooltip;
+            img.height = 32;
+            img.width = 32;
+            img.style.flexShrink = "0";
+            img.style.padding = "4px";
+            img.style.borderRadius = "6px";
+            img.style.cursor = "pointer";
+            img.onclick = fn;
+            opsDiv.appendChild(img);
+            return img;
         };
         _iconBtn("play-scale.svg", _("Play all pitches"), _playAll);
-        const insertAtNode = function (index, dir) {
-            const cents = index < 0 ? _largestGapMid() : _sameNodeCents(that.cents[index], dir);
+        const _addPitch = function (dir) {
+            const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
+            const cents = s < 0 ? _largestGapMid() : _sameNodeCents(that.cents[s], dir);
             const idx = _sortedIndex(cents);
             _insertPitch(idx, cents);
             highlightDot = idx;
-        };
-        const _addPitch = function (dir) {
-            const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
-            insertAtNode(s, dir);
             _drawCircle();
             _buildTable();
             _highlightTableRow(highlightDot);
@@ -1693,7 +1666,6 @@ function TemperamentWidget() {
             const freq = Number(that.frequencies[0]) * that.ratios[index];
             const obj = frequencyToPitch(freq, that.inTemperament);
             that.notes.splice(index, 0, [obj[0], obj[1]]);
-            // ponytail: intervals not used by visualizer display; "" avoids stale neighbor copy
             that.intervals.splice(index, 0, "");
             that.ratiosNotesPair.splice(index, 0, [that.ratios[index], that.notes[index]]);
         };
@@ -1926,10 +1898,16 @@ function TemperamentWidget() {
             };
 
             const addBefore = mkBtn(_("Add before"), function () {
-                insertAtNode(index, -1);
+                const cents = _sameNodeCents(that.cents[index], -1);
+                const idx = _sortedIndex(cents);
+                _insertPitch(idx, cents);
+                highlightDot = idx;
             });
             const addAfter = mkBtn(_("Add after"), function () {
-                insertAtNode(index, 1);
+                const cents = _sameNodeCents(that.cents[index], 1);
+                const idx = _sortedIndex(cents);
+                _insertPitch(idx, cents);
+                highlightDot = idx;
             });
             const removeBtn = mkBtn(_("Remove"), function () {
                 const before = that.pitchNumber;
@@ -1983,7 +1961,6 @@ function TemperamentWidget() {
                     const order = that.cents
                         .map((c, i) => i)
                         .sort((a, b) => that.cents[a] - that.cents[b]);
-                    const n = that.pitchNumber;
                     that.cents = order.map(i => that.cents[i]);
                     that.ratios = order.map(i => that.ratios[i]);
                     that.frequencies = order.map(i => that.frequencies[i]);
@@ -3748,6 +3725,11 @@ function TemperamentWidget() {
                     if (pe) {
                         this.notes[i] = pe.notes;
                         this.ratios[i] = pe.ratios;
+                    } else {
+                        // Missing custom pitch entry — fall back to equal temperament
+                        const eq = getTemperament("equal");
+                        this.notes[i] = [eq["" + i][1], eq["" + i][2]];
+                        this.ratios[i] = getTemperamentRatio(eq.interval[i]);
                     }
                 }
                 this.frequencies[i] = this._logo.synth

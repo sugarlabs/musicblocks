@@ -742,7 +742,8 @@ describe("piemenuKey behavioral tests", () => {
                 findStacks: jest.fn(),
                 stackList: [],
                 _makeNewBlockWithConnections: jest.fn(),
-                adjustExpandableClampBlock: jest.fn()
+                adjustExpandableClampBlock: jest.fn(),
+                updateBlockText: jest.fn()
             },
             logo: {
                 blocks: {
@@ -753,6 +754,7 @@ describe("piemenuKey behavioral tests", () => {
             KeySignatureEnv: ["C", "major", false],
             storage: {},
             textMsg: jest.fn(),
+            refreshCanvas: jest.fn(),
             turtles: { ithTurtle: jest.fn().mockReturnValue({ singer: { instrumentNames: [] } }) }
         };
         global.event = { clientX: 100, clientY: 100 };

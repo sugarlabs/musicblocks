@@ -822,10 +822,8 @@ class ModeWidget {
     }
 
     /**
-     * Called by the regular mode pie menu (piemenuModes) when a mode is picked
-     * while this widget is open, so the builder view stays in sync with the
-     * selection made in the pie menu.
-     * @param {string} modeName - The selected internal mode name.
+     * Applies a step-count pattern to _selectedNotes and updates the note wheel.
+     * @param {number[]} pattern - Array of integer step counts between active notes.
      * @returns {void}
      */
     _applyModePattern(pattern) {
@@ -893,8 +891,10 @@ class ModeWidget {
     _resetToCustom() {
         this._saveState();
         this._selectedNotes = this._blankNotes(this._activeEDO);
+        this._selectedModeName = "";
         this._resetNotes();
         this._updateModeDisplay("");
+        this._syncModeBlockName();
     }
 
     _resetNotes() {
