@@ -148,6 +148,30 @@ describe("processPluginData script cleanup", () => {
         expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup-0");
     });
 
+    it("rejects when main blob script fails to load", async () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        const originalAppendChild = document.head.appendChild.bind(document.head);
+        appendChildSpy = jest.spyOn(document.head, "appendChild").mockImplementation(script => {
+            originalAppendChild(script);
+            script.onerror(new Error("blob load failed"));
+            return script;
+        });
+
+        await expect(
+            processPluginData(
+                createActivity(),
+                JSON.stringify({
+                    FLOWPLUGINS: {
+                        testFlow: "return true;"
+                    }
+                }),
+                "plugins/test.json"
+            )
+        ).rejects.toThrow("Failed to load plugin script: blob load failed");
+
+        errorSpy.mockRestore();
+    });
+
     it("returns null and logs error when plugin data is invalid JSON", async () => {
         const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
         const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
