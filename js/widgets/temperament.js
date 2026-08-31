@@ -94,33 +94,42 @@ const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(bas
 /** Tonic lock check with epsilon (guards floating error). Exported for testing. */
 const isLockedCents = cents => Math.abs(cents) < 0.5;
 
-/** Same-node cents: offset by one step (1200/pitchNumber) in the given direction.
-/// Wraps circularly (0..1200). Falls back to largest gap if position occupied. */
-const sameNodeCents = (centsArr, cur, dir, pitchNumber = 12) => {
-    const step = 1200 / pitchNumber;
-    let c = cur + dir * step;
-    if (c < 0) c += 1200;
-    if (c >= 1200) c -= 1200;
-    c = Math.max(1, Math.min(1199, c));
-    let tries = 0;
-    while (centsArr.includes(Math.round(c)) && tries < 8) {
-        c = cur + dir * (step + (tries + 1));
-        if (c < 0) c += 1200;
-        if (c >= 1200) c -= 1200;
-        c = Math.max(1, Math.min(1199, c));
-        tries++;
+/** Same-node cents: midpoint of the next gap in dir from cur (circular 0..1200).
+ *  Skips gaps that are smaller than the average gap so consecutive adds
+ *  distribute pitches across the octave instead of converging on one spot. */
+const sameNodeCents = (centsArr, cur, dir) => {
+    const sorted = [...centsArr].sort((a, b) => a - b);
+    const curIdx = sorted.findIndex(c => Math.abs(c - cur) < 0.5);
+    const n = sorted.length;
+
+    // Average circular gap
+    let totalGap = 0;
+    for (let i = 0; i < n; i++) {
+        totalGap += (sorted[(i + 1) % n] - sorted[i] + 1200) % 1200;
     }
-    if (centsArr.includes(Math.round(c))) {
-        let mid = largestGapMid(centsArr);
-        let ftries = 0;
-        while (centsArr.includes(Math.round(mid)) && ftries < 5) {
-            mid = (mid + 1) % 1200;
-            if (mid === 0) mid = 1;
-            ftries++;
+    const avgGap = totalGap / n;
+
+    // Walk in dir, find first gap >= avgGap to split
+    for (let step = 0; step < n; step++) {
+        const idx = dir > 0 ? (curIdx + step) % n : (curIdx - step + n) % n;
+        const nextIdx = dir > 0 ? (idx + 1) % n : (idx - 1 + n) % n;
+        const gap =
+            dir > 0
+                ? (sorted[nextIdx] - sorted[idx] + 1200) % 1200
+                : (sorted[idx] - sorted[nextIdx] + 1200) % 1200;
+        if (gap >= avgGap * 0.8) {
+            const a = sorted[idx];
+            const b = sorted[nextIdx];
+            let mid =
+                dir > 0
+                    ? a + (b > a ? (b - a) / 2 : (b + 1200 - a) / 2)
+                    : a - (a > b ? (a - b) / 2 : (a + 1200 - b) / 2);
+            mid = ((mid % 1200) + 1200) % 1200;
+            return Math.round(mid * 10) / 10;
         }
-        c = Math.max(1, Math.min(1199, mid));
     }
-    return c;
+
+    return largestGapMid(centsArr);
 };
 
 /**
@@ -1131,7 +1140,7 @@ function TemperamentWidget() {
 
         const _sortedIndex = centsVal => sortedIndex(that.cents, centsVal);
         const _largestGapMid = () => largestGapMid(that.cents);
-        const _sameNodeCents = (cur, dir) => sameNodeCents(that.cents, cur, dir, that.pitchNumber);
+        const _sameNodeCents = (cur, dir) => sameNodeCents(that.cents, cur, dir);
 
         /** Converts a mouse/touch event to canvas-space coordinates. */
         const _canvasCoords = function (e, target) {
