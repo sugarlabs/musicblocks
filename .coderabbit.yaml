@@ -95,7 +95,30 @@ reviews:
                   Pass: The PR references multiple closely related issues fixed together.
                   Fail: The PR references multiple functionally unrelated issues that should be split into separate PRs.
                   Inconclusive: Only one issue or no issue is linked.
+            - name: "PR Description Requirements"
+              mode: "warning"
+              instructions: |
+                  Evaluate whether the PR description contains the sections required for its category. Identify the checked category from the PR description (the checkbox marked with [x]).
 
+                  Bug Fix (- [x] Bug Fix):
+                  Pass: The "Bug Fix" checkbox is checked, no GitHub issue is linked, and the description contains a non-empty "Steps to Reproduce" section (or equivalent: "How to Reproduce", "Reproduction Steps") with at least one concrete step describing how to trigger the bug.
+                  Fail: The "Bug Fix" checkbox is checked, no GitHub issue is linked, and the "Steps to Reproduce" section is absent, empty, or contains only placeholder HTML comment text.
+                  Inconclusive: The "Bug Fix" checkbox is checked and a GitHub issue is linked with an actual number (e.g. "Fixes #123") — steps are expected in the issue. Also Inconclusive if "Bug Fix" is not the checked category.
+
+                  Feature (- [x] Feature):
+                  Pass: The "Feature" checkbox is checked and the description contains a non-empty "Benefits" section or equivalent phrasing ("Motivation", "Why this change", "Value added", "User impact") with at least one real sentence explaining the benefit.
+                  Fail: The "Feature" checkbox is checked and no benefits/motivation section exists or it contains only placeholder text.
+                  Inconclusive: "Feature" is not the checked category.
+
+                  Performance / Tests / Documentation / Chore / Refactor / CI/CD (any of these checked):
+                  Pass: All three of these sections are present with real, non-placeholder content — "Description" (what changed and why), "Changes Made" (technical details), "Testing Performed" (how the change was validated).
+                  Fail: One or more of those three sections is absent or contains only the default comment placeholder.
+                  Inconclusive: The checked category is "Bug Fix" or "Feature".
+
+                  Visual changes (any category):
+                  Pass: The diff or the PR description indicates visual/UI changes (CSS, SCSS, canvas rendering, palette layouts, block artwork, widget styles), and the "Visual Changes" section contains at least one Before and one After screenshot or media link.
+                  Fail: Visual changes are detected in the diff or description but the "Visual Changes" section is missing, empty, or contains only the default placeholder comment.
+                  Inconclusive: No visual changes are detected in the diff or description.
     tools:
         eslint:
             enabled: true
