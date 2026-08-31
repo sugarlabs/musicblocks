@@ -1159,4 +1159,1313 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
         jest.advanceTimersByTime(100);
         jest.useRealTimers();
     });
+
+    describe("RhythmRuler - Dissection and Subdivision Engine", () => {
+        let cell;
+        let mockRuler;
+
+        beforeEach(() => {
+            cell = {
+                cellIndex: 0,
+                style: { width: "100px", backgroundColor: "#ffb020" },
+                textContent: "1/4",
+                replaceChildren: jest.fn(),
+                setAttribute: jest.fn(),
+                parentNode: {
+                    cells: []
+                }
+            };
+            cell.parentNode.cells.push(cell);
+
+            mockRuler = {
+                cells: [cell],
+                deleteCell: jest.fn(),
+                insertCell: jest.fn().mockImplementation(() => ({
+                    style: {},
+                    setAttribute: jest.fn(),
+                    replaceChildren: jest.fn(),
+                    addEventListener: jest.fn(),
+                    textContent: ""
+                }))
+            };
+
+            rhythmRuler._rulers = [mockRuler];
+            rhythmRuler.Rulers = [[[4], []]];
+            rhythmRuler.Drums = [null];
+            rhythmRuler._rulerSelected = 0;
+            rhythmRuler._undoList = [];
+            rhythmRuler._dissectNumber = { value: "2" };
+            rhythmRuler.widgetWindow = {
+                isMaximized: jest.fn(() => false),
+                getWidgetBody: jest.fn(() => ({
+                    clientWidth: 400,
+                    clientHeight: 400,
+                    append: jest.fn()
+                }))
+            };
+            rhythmRuler.activity = {
+                errorMsg: jest.fn(),
+                hideMsgs: jest.fn(),
+                logo: {
+                    synth: {
+                        stop: jest.fn()
+                    }
+                }
+            };
+            rhythmRuler._setButtonIcon = jest.fn();
+            rhythmRuler._calculateZebraStripes = jest.fn();
+            rhythmRuler._refreshCircularView = jest.fn();
+            rhythmRuler.__addCellEventHandlers = jest.fn();
+            rhythmRuler.__setNoteValueDisplay = jest.fn();
+        });
+
+        test("__dissectByNumber splits cell into equal subdivisions", () => {
+            rhythmRuler.__dissectByNumber(cell, 2, true);
+
+            expect(rhythmRuler.Rulers[0][0]).toEqual([8, 8]);
+            expect(rhythmRuler._undoList.length).toBe(1);
+            expect(rhythmRuler._undoList[0][0]).toBe("dissect");
+            expect(rhythmRuler._calculateZebraStripes).toHaveBeenCalledWith(0);
+            expect(rhythmRuler._refreshCircularView).toHaveBeenCalled();
+        });
+
+        test("__dissectByNumber rejects division when note value exceeds 256", () => {
+            rhythmRuler.Rulers[0][0] = [128];
+
+            rhythmRuler.__dissectByNumber(cell, 4, true);
+
+            expect(rhythmRuler.activity.errorMsg).toHaveBeenCalled();
+            expect(rhythmRuler._undoList.length).toBe(0);
+        });
+
+        test("__dissectByNumber safely returns and preserves state on invalid parameters", () => {
+            const initialRulerValues = [...rhythmRuler.Rulers[0][0]];
+
+            rhythmRuler.__dissectByNumber(undefined, 2, true);
+            expect(rhythmRuler.Rulers[0][0]).toEqual(initialRulerValues);
+            expect(rhythmRuler._undoList).toHaveLength(0);
+            expect(mockRuler.deleteCell).not.toHaveBeenCalled();
+
+            rhythmRuler.__dissectByNumber(cell, "invalid", true);
+            expect(rhythmRuler.Rulers[0][0]).toEqual(initialRulerValues);
+            expect(rhythmRuler._undoList).toHaveLength(0);
+            expect(mockRuler.deleteCell).not.toHaveBeenCalled();
+        });
+
+        test("__divideFromList divides cell into custom list of subdivisions", () => {
+            rhythmRuler.__divideFromList(cell, [8, 16, 16], true);
+
+            expect(rhythmRuler.Rulers[0][0]).toEqual([8, 16, 16]);
+            expect(rhythmRuler._undoList.length).toBe(1);
+            expect(rhythmRuler._undoList[0][0]).toBe("tap");
+            expect(rhythmRuler._calculateZebraStripes).toHaveBeenCalledWith(0);
+            expect(rhythmRuler._refreshCircularView).toHaveBeenCalled();
+        });
+
+        test("__divideFromList safely returns and preserves state on invalid arguments", () => {
+            const initialRulerValues = [...rhythmRuler.Rulers[0][0]];
+
+            rhythmRuler.__divideFromList(undefined, [8, 8], true);
+            expect(rhythmRuler.Rulers[0][0]).toEqual(initialRulerValues);
+            expect(rhythmRuler._undoList).toHaveLength(0);
+            expect(mockRuler.deleteCell).not.toHaveBeenCalled();
+
+            rhythmRuler.__divideFromList(cell, "not-an-object", true);
+            expect(rhythmRuler.Rulers[0][0]).toEqual(initialRulerValues);
+            expect(rhythmRuler._undoList).toHaveLength(0);
+            expect(mockRuler.deleteCell).not.toHaveBeenCalled();
+        });
+
+        test("_tap activates tap mode and updates button icon", () => {
+            rhythmRuler._tapButton = {};
+            rhythmRuler._tap();
+
+            expect(rhythmRuler._tapMode).toBe(true);
+            expect(rhythmRuler._setButtonIcon).toHaveBeenCalledWith(
+                rhythmRuler._tapButton,
+                "tap-active-button.svg",
+                "tap a rhythm"
+            );
+        });
+    });
+
+    describe("RhythmRuler - Tie and Rest State Engine", () => {
+        let cellA, cellB;
+        let mockRuler;
+
+        beforeEach(() => {
+            cellA = {
+                cellIndex: 0,
+                style: { width: "50px", backgroundColor: "#ffb020" },
+                textContent: "1/8",
+                getAttribute: jest.fn(() => "0"),
+                parentNode: null
+            };
+            cellB = {
+                cellIndex: 1,
+                style: { width: "50px", backgroundColor: "#ffb020" },
+                textContent: "1/8",
+                getAttribute: jest.fn(() => "0"),
+                parentNode: null
+            };
+
+            const parent = {
+                getAttribute: jest.fn(() => "0"),
+                cells: [cellA, cellB],
+                deleteCell: jest.fn(idx => {
+                    parent.cells.splice(idx, 1);
+                }),
+                insertCell: jest.fn().mockImplementation(() => ({
+                    style: {},
+                    setAttribute: jest.fn(),
+                    replaceChildren: jest.fn(),
+                    addEventListener: jest.fn(),
+                    textContent: ""
+                }))
+            };
+            cellA.parentNode = parent;
+            cellB.parentNode = parent;
+
+            mockRuler = parent;
+            rhythmRuler._rulers = [mockRuler];
+            rhythmRuler.Rulers = [[[8, 8], []]];
+            rhythmRuler.Drums = [null];
+            rhythmRuler._rulerSelected = 0;
+            rhythmRuler._undoList = [];
+            rhythmRuler._playing = false;
+            rhythmRuler.widgetWindow = {
+                isMaximized: jest.fn(() => false)
+            };
+            rhythmRuler._calculateZebraStripes = jest.fn();
+            rhythmRuler._refreshCircularView = jest.fn();
+            rhythmRuler.__addCellEventHandlers = jest.fn();
+            rhythmRuler.__setNoteValueDisplay = jest.fn();
+        });
+
+        test("_tieRuler initiates tie when cell and parent node are valid", () => {
+            rhythmRuler._mouseDownCell = cellA;
+            rhythmRuler._mouseUpCell = cellB;
+
+            const fakeEvent = { currentTarget: cellA };
+            rhythmRuler._tieRuler(fakeEvent, mockRuler);
+
+            expect(rhythmRuler._undoList.length).toBe(1);
+            expect(rhythmRuler._undoList[0][0]).toBe("tie");
+            expect(rhythmRuler.Rulers[0][0]).toEqual([4]);
+        });
+
+        test("_tieRuler handles reverse drag selection correctly", () => {
+            rhythmRuler._mouseDownCell = cellB;
+            rhythmRuler._mouseUpCell = cellA;
+
+            const fakeEvent = { currentTarget: cellB };
+            rhythmRuler._tieRuler(fakeEvent, mockRuler);
+
+            expect(rhythmRuler._undoList.length).toBe(1);
+            expect(rhythmRuler.Rulers[0][0]).toEqual([4]);
+            expect(rhythmRuler._mouseDownCell).toBe(cellA);
+            expect(rhythmRuler._mouseUpCell).toBe(cellB);
+        });
+
+        test("_tieRuler ignores tie operations when widget is currently playing", () => {
+            rhythmRuler._playing = true;
+            rhythmRuler._mouseDownCell = cellA;
+            rhythmRuler._mouseUpCell = cellB;
+
+            rhythmRuler._tieRuler({ currentTarget: cellA }, mockRuler);
+
+            expect(rhythmRuler._undoList.length).toBe(0);
+        });
+
+        test("__tie safely ignores tie when mouseDown and mouseUp cells are identical", () => {
+            rhythmRuler._mouseDownCell = cellA;
+            rhythmRuler._mouseUpCell = cellA;
+
+            rhythmRuler.__tie(true);
+
+            expect(rhythmRuler._undoList.length).toBe(0);
+        });
+
+        test("__tie safely ignores tie when mouseDown or mouseUp cell is null", () => {
+            rhythmRuler._mouseDownCell = null;
+            rhythmRuler._mouseUpCell = cellB;
+
+            rhythmRuler.__tie(true);
+
+            expect(rhythmRuler._undoList.length).toBe(0);
+        });
+
+        test("__toggleRestState toggles between positive note and negative rest value", () => {
+            cellA.removeEventListener = jest.fn();
+            cellA.addEventListener = jest.fn();
+
+            rhythmRuler.__toggleRestState(cellA, true);
+
+            expect(rhythmRuler.Rulers[0][0][0]).toBe(-8);
+            expect(rhythmRuler._undoList.length).toBe(1);
+            expect(rhythmRuler._undoList[0][0]).toBe("rest");
+
+            rhythmRuler.__toggleRestState(cellA, true);
+            expect(rhythmRuler.Rulers[0][0][0]).toBe(8);
+        });
+    });
+
+    describe("RhythmRuler - Polyrhythmic Merging & Math Engine", () => {
+        beforeEach(() => {
+            rhythmRuler.Rulers = [
+                [[4, 4], []],
+                [[8, 8, 8, 8], []]
+            ];
+            rhythmRuler.Drums = [null, null];
+        });
+
+        test("_mergeRulers calculates combined polyrhythmic note values array", () => {
+            const merged = rhythmRuler._mergeRulers();
+
+            expect(Array.isArray(merged)).toBe(true);
+            expect(merged.length).toBeGreaterThan(0);
+            expect(merged).toEqual([8, 8, 8, 8]);
+        });
+
+        test("_mergeRulers handles 3-against-2 polyrhythms correctly", () => {
+            rhythmRuler.Rulers = [
+                [[2, 2], []], // Half notes (0.5, 1.0)
+                [[3, 3, 3], []] // Triplets (0.333, 0.666, 1.0)
+            ];
+
+            const merged = rhythmRuler._mergeRulers();
+
+            expect(merged).toHaveLength(4);
+            expect(merged[0]).toBeCloseTo(3);
+            expect(merged[1]).toBeCloseTo(6);
+            expect(merged[2]).toBeCloseTo(6);
+            expect(merged[3]).toBeCloseTo(3);
+        });
+
+        test("_get_save_lock returns save lock status", () => {
+            rhythmRuler._save_lock = false;
+            expect(rhythmRuler._get_save_lock()).toBe(false);
+            rhythmRuler._save_lock = true;
+            expect(rhythmRuler._get_save_lock()).toBe(true);
+        });
+    });
+
+    describe("RhythmRuler - History Restoration & Replay Engine", () => {
+        let mockRuler;
+        let cell0, cell1;
+
+        beforeEach(() => {
+            cell0 = {
+                style: { width: "50px" },
+                cellIndex: 0,
+                removeEventListener: jest.fn(),
+                addEventListener: jest.fn(),
+                parentNode: null
+            };
+            cell1 = {
+                style: { width: "50px" },
+                cellIndex: 1,
+                removeEventListener: jest.fn(),
+                addEventListener: jest.fn(),
+                parentNode: null
+            };
+
+            const parent = {
+                getAttribute: jest.fn(() => "0"),
+                cells: [cell0, cell1],
+                deleteCell: jest.fn(idx => {
+                    parent.cells.splice(idx, 1);
+                }),
+                insertCell: jest.fn().mockImplementation(() => ({
+                    style: {},
+                    setAttribute: jest.fn(),
+                    replaceChildren: jest.fn(),
+                    addEventListener: jest.fn(),
+                    textContent: ""
+                }))
+            };
+            cell0.parentNode = parent;
+            cell1.parentNode = parent;
+
+            mockRuler = parent;
+            rhythmRuler._rulers = [mockRuler];
+            rhythmRuler.Rulers = [[[8, 8], [[0, 2]]]];
+            rhythmRuler.Drums = [0];
+            rhythmRuler._rulerSelected = 0;
+            rhythmRuler._undoList = [];
+            rhythmRuler._dissectNumber = {
+                classList: { add: jest.fn(), remove: jest.fn() }
+            };
+            rhythmRuler.widgetWindow = {
+                isMaximized: jest.fn(() => false)
+            };
+            rhythmRuler.activity = {
+                logo: {
+                    synth: {
+                        stop: jest.fn()
+                    }
+                }
+            };
+            rhythmRuler.__setNoteValueDisplay = jest.fn();
+            rhythmRuler.__addCellEventHandlers = jest.fn();
+            rhythmRuler._calculateZebraStripes = jest.fn();
+            rhythmRuler._refreshCircularView = jest.fn();
+        });
+
+        test("_undo safely returns when undo list is empty", () => {
+            rhythmRuler._undoList = [];
+            expect(() => rhythmRuler._undo()).not.toThrow();
+            expect(rhythmRuler.activity.logo.synth.stop).toHaveBeenCalled();
+        });
+
+        test("_undo restores previous state for dissect action", () => {
+            rhythmRuler._undoList.push(["dissect", 0]);
+
+            rhythmRuler._undo();
+
+            expect(rhythmRuler.Rulers[0][0][0]).toBe(4);
+        });
+
+        test("_undo restores previous state for rest action", () => {
+            rhythmRuler.Rulers = [[[-8, 8], [0]]];
+            rhythmRuler._undoList.push(["rest", 0]);
+
+            rhythmRuler._undo();
+
+            expect(rhythmRuler.Rulers[0][0][0]).toBe(8);
+        });
+
+        test("_restoreDissectHistory replays recorded rest, dissect, divide, and tie operations", () => {
+            const cell0 = { cellIndex: 0 };
+            const cell1 = { cellIndex: 1 };
+            const cell2 = { cellIndex: 2 };
+            rhythmRuler._rulers = [{ cells: [cell0, cell1, cell2] }];
+            rhythmRuler.Drums = [0];
+            rhythmRuler._dissectHistory = [
+                [
+                    [
+                        0, // toggle rest at cell 0
+                        [1, 2], // dissect cell 1 into 2
+                        [2, [8, 8]], // divide cell 2 from list
+                        [
+                            [0, 8],
+                            [1, 8]
+                        ] // tie cell 0 and 1
+                    ],
+                    0 // drum index 0
+                ]
+            ];
+            rhythmRuler.__toggleRestState = jest.fn();
+            rhythmRuler.__dissectByNumber = jest.fn();
+            rhythmRuler.__divideFromList = jest.fn();
+            rhythmRuler.__tie = jest.fn(() => {
+                expect(rhythmRuler._mouseDownCell).toBe(cell0);
+                expect(rhythmRuler._mouseUpCell).toBe(cell1);
+            });
+
+            rhythmRuler._restoreDissectHistory();
+
+            expect(rhythmRuler._rulerSelected).toBe(0);
+            expect(rhythmRuler.__toggleRestState).toHaveBeenCalledWith(cell0, false);
+            expect(rhythmRuler.__dissectByNumber).toHaveBeenCalledWith(cell1, 2, false);
+            expect(rhythmRuler.__divideFromList).toHaveBeenCalledWith(cell2, [8, 8], false);
+            expect(rhythmRuler._mouseDownCell).toBeNull();
+            expect(rhythmRuler._mouseUpCell).toBeNull();
+            expect(rhythmRuler.__tie).toHaveBeenCalledWith(false);
+        });
+
+        test("saveDissectHistory saves dissect history to internal state", () => {
+            rhythmRuler._dissectHistory = [[["old"], 1]];
+            rhythmRuler.Rulers = [[[8, 8], [[0, 2]]]];
+            rhythmRuler.Drums = [0];
+
+            rhythmRuler.saveDissectHistory();
+
+            expect(rhythmRuler._dissectHistory.length).toBe(2);
+            expect(rhythmRuler._dissectNumber.classList.add).toHaveBeenCalledWith("hasKeyboard");
+        });
+    });
+
+    describe("RhythmRuler - Block Serialization and Save Pipelines", () => {
+        let mockRulerElement;
+
+        beforeEach(() => {
+            mockRulerElement = {
+                cells: [
+                    { textContent: "1/4", style: { backgroundColor: "#ffb020" } },
+                    { textContent: "1/4", style: { backgroundColor: "#303030" } }
+                ]
+            };
+
+            rhythmRuler._rulers = [mockRulerElement];
+            rhythmRuler.Rulers = [[[4, -4], []]];
+            rhythmRuler.Drums = [null];
+            rhythmRuler.activity = {
+                palettes: {
+                    dict: {
+                        rhythm: { hideMenu: jest.fn() }
+                    }
+                },
+                blocks: {
+                    blockList: [{ name: "start", connections: [null, null] }],
+                    loadNewBlocks: jest.fn(),
+                    adjustDocks: jest.fn(),
+                    clampBlocksToCheck: []
+                },
+                refreshCanvas: jest.fn(),
+                textMsg: jest.fn()
+            };
+            rhythmRuler._rulerSelected = 0;
+            rhythmRuler.blockNo = 0;
+            rhythmRuler.styleRhythmRuler = jest.fn();
+        });
+
+        test("_save generates action stack with note and rest blocks", () => {
+            jest.useFakeTimers();
+            rhythmRuler.docById = jest.fn(() => mockRulerElement);
+
+            rhythmRuler._save(0);
+
+            jest.advanceTimersByTime(1000);
+            expect(rhythmRuler.activity.palettes.dict.rhythm.hideMenu).toHaveBeenCalled();
+            expect(rhythmRuler.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+            const stack = rhythmRuler.activity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(stack).toHaveLength(16);
+            expect(stack[0][1]).toEqual(["action", { collapsed: true }]);
+            expect(stack[1][1]).toEqual(["text", { value: "snare drum rhythm" }]);
+            expect(stack[2][1]).toBe("rhythm2");
+            expect(stack[3][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[4][1]).toBe("divide");
+            expect(stack[5][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[6][1]).toEqual(["number", { value: 4 }]);
+            expect(stack[7][1]).toBe("vspace");
+            expect(stack[8][1]).toBe("hidden");
+            expect(stack[9][1]).toBe("rhythm2");
+            expect(stack[15][1]).toBe("hidden");
+            expect(stack[15][4]).toEqual([14, null]);
+            jest.useRealTimers();
+        });
+
+        test("_saveTuplets generates tuplet-specific action blocks", () => {
+            jest.useFakeTimers();
+            rhythmRuler.docById = jest.fn(() => mockRulerElement);
+
+            rhythmRuler._saveTuplets(0);
+
+            jest.advanceTimersByTime(1000);
+            expect(rhythmRuler.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+            const stack = rhythmRuler.activity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(stack).toHaveLength(16);
+            expect(stack[0][1]).toEqual(["action", { collapsed: true }]);
+            expect(stack[1][1]).toEqual(["text", { value: "rhythm" }]);
+            expect(stack[2][1]).toBe("stuplet");
+            expect(stack[3][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[4][1]).toBe("divide");
+            expect(stack[5][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[6][1]).toEqual(["number", { value: 4 }]);
+            expect(stack[7][1]).toBe("vspace");
+            expect(stack[8][1]).toBe("hidden");
+            expect(stack[9][1]).toBe("stuplet");
+            expect(stack[15][1]).toBe("hidden");
+            expect(stack[15][4]).toEqual([14, null]);
+            jest.useRealTimers();
+        });
+
+        test("_saveTupletsMerged serializes merged note values array", () => {
+            jest.useFakeTimers();
+            rhythmRuler._saveTupletsMerged([4, 4, 8, 8]);
+
+            jest.advanceTimersByTime(1000);
+            expect(rhythmRuler.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+            const stack = rhythmRuler.activity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(stack).toHaveLength(16);
+            expect(stack[0][1]).toEqual(["action", { collapsed: true }]);
+            expect(stack[1][1]).toEqual(["text", { value: "rhythm" }]);
+            expect(stack[2][1]).toBe("rhythm2");
+            expect(stack[3][1]).toEqual(["number", { value: 2 }]);
+            expect(stack[4][1]).toBe("divide");
+            expect(stack[5][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[6][1]).toEqual(["number", { value: 4 }]);
+            expect(stack[9][1]).toBe("rhythm2");
+            expect(stack[10][1]).toEqual(["number", { value: 2 }]);
+            expect(stack[11][1]).toBe("divide");
+            expect(stack[12][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[13][1]).toEqual(["number", { value: 8 }]);
+            expect(stack[15][1]).toBe("hidden");
+            expect(stack[15][4]).toEqual([14, null]);
+            jest.useRealTimers();
+        });
+
+        test("_saveDrumMachine generates drum synth action stack with effect params", () => {
+            jest.useFakeTimers();
+            rhythmRuler.docById = jest.fn(() => mockRulerElement);
+
+            rhythmRuler._saveDrumMachine(0, "snare drum", true);
+
+            jest.advanceTimersByTime(1000);
+            expect(rhythmRuler.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+            const stack = rhythmRuler.activity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(stack).toHaveLength(18);
+            expect(stack[0][1]).toEqual(["action", { collapsed: true }]);
+            expect(stack[1][1]).toEqual(["text", { value: "snare drum action" }]);
+            expect(stack[2][1]).toBe("newnote");
+            expect(stack[3][1]).toBe("divide");
+            expect(stack[4][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[5][1]).toEqual(["number", { value: 4 }]);
+            expect(stack[6][1]).toBe("vspace");
+            expect(stack[7][1]).toBe("playdrum");
+            expect(stack[8][1]).toEqual(["effectsname", { value: "snare drum" }]);
+            expect(stack[9][1]).toBe("hidden");
+            expect(stack[10][1]).toBe("newnote");
+            expect(stack[14][1]).toBe("vspace");
+            expect(stack[15][1]).toBe("rest2");
+            expect(stack[17][1]).toBe("hidden");
+            jest.useRealTimers();
+        });
+
+        test("_saveVoiceMachine generates vocal synth action stack", () => {
+            jest.useFakeTimers();
+            rhythmRuler.docById = jest.fn(() => mockRulerElement);
+
+            rhythmRuler._saveVoiceMachine(0, "electronic synth");
+
+            jest.advanceTimersByTime(1000);
+            expect(rhythmRuler.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+            const stack = rhythmRuler.activity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(stack).toHaveLength(22);
+            expect(stack[0][1]).toEqual(["action", { collapsed: true }]);
+            expect(stack[1][1]).toEqual(["text", { value: "guitar action" }]);
+            expect(stack[2][1]).toBe("settimbre");
+            expect(stack[3][1]).toEqual(["voicename", { value: "electronic synth" }]);
+            expect(stack[4][1]).toBe("hidden");
+            expect(stack[5][1]).toBe("newnote");
+            expect(stack[10][1]).toBe("pitch");
+            expect(stack[11][1]).toEqual(["notename", { value: "C" }]);
+            expect(stack[12][1]).toEqual(["number", { value: 4 }]);
+            expect(stack[14][1]).toBe("newnote");
+            expect(stack[19][1]).toBe("rest2");
+            expect(stack[21][1]).toBe("hidden");
+            jest.useRealTimers();
+        });
+    });
+
+    describe("RhythmRuler - Playback Scheduler and Tone Triggering Engine", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            rhythmRuler.Rulers = [
+                [[4, 4], []],
+                [[8, 8, 8, 8], []]
+            ];
+            rhythmRuler.Drums = [null, null];
+            rhythmRuler.activity = {
+                logo: {
+                    synth: {
+                        stop: jest.fn(),
+                        trigger: jest.fn(),
+                        start: jest.fn()
+                    },
+                    resetSynth: jest.fn()
+                }
+            };
+            rhythmRuler._playing = false;
+            rhythmRuler._playingAll = false;
+            rhythmRuler._playingOne = false;
+            rhythmRuler._offsets = [0, 0];
+            rhythmRuler._elapsedTimes = [0, 0];
+            rhythmRuler._playAllCell = {};
+            rhythmRuler._setButtonIcon = jest.fn();
+            rhythmRuler._calculateZebraStripes = jest.fn();
+            rhythmRuler._refreshCircularView = jest.fn();
+            rhythmRuler._clearWidgetTimers = jest.fn();
+            rhythmRuler.__loop = jest.fn();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("playAll starts playback via __resume when not playing", () => {
+            rhythmRuler.playAll();
+
+            expect(rhythmRuler._playing).toBe(true);
+            expect(rhythmRuler._playingAll).toBe(true);
+            expect(rhythmRuler._setButtonIcon).toHaveBeenCalledWith(
+                rhythmRuler._playAllCell,
+                "pause-button.svg",
+                "Pause"
+            );
+        });
+
+        test("playAll pauses and schedules restart when already playing all", () => {
+            rhythmRuler._playing = true;
+            rhythmRuler._playingAll = true;
+            rhythmRuler._setWidgetTimeout = jest.fn();
+            rhythmRuler.__resume = jest.fn();
+
+            rhythmRuler.playAll();
+
+            expect(rhythmRuler._setButtonIcon).toHaveBeenCalledWith(
+                rhythmRuler._playAllCell,
+                "play-button.svg",
+                "Play all"
+            );
+            expect(rhythmRuler._setWidgetTimeout).toHaveBeenCalledWith(expect.any(Function), 1000);
+            expect(rhythmRuler.__resume).not.toHaveBeenCalled();
+
+            // Trigger the scheduled callback
+            const timeoutCb = rhythmRuler._setWidgetTimeout.mock.calls[0][0];
+            timeoutCb();
+            expect(rhythmRuler.__resume).toHaveBeenCalled();
+        });
+
+        test("_playAll initializes starting time and initiates loops for each ruler", () => {
+            rhythmRuler._playAll();
+
+            expect(rhythmRuler.activity.logo.synth.stop).toHaveBeenCalled();
+            expect(rhythmRuler.activity.logo.resetSynth).toHaveBeenCalledWith(0);
+            expect(typeof rhythmRuler._startingTime).toBe("number");
+            expect(rhythmRuler.__loop).toHaveBeenCalledTimes(2);
+        });
+
+        test("_playOne plays isolated ruler track", () => {
+            rhythmRuler._rulerSelected = 0;
+
+            rhythmRuler._playOne();
+
+            expect(rhythmRuler.activity.logo.synth.stop).toHaveBeenCalled();
+            expect(typeof rhythmRuler._startingTime).toBe("number");
+            expect(rhythmRuler.__loop).toHaveBeenCalledWith(0, 0, 0);
+        });
+    });
+
+    describe("RhythmRuler - Circular Polyrhythmic View & Canvas Engine", () => {
+        let mockCanvas;
+        let mockCtx;
+        let origCreateElement;
+
+        beforeEach(() => {
+            origCreateElement = global.document.createElement;
+            mockCtx = {
+                clearRect: jest.fn(),
+                beginPath: jest.fn(),
+                arc: jest.fn(),
+                fill: jest.fn(),
+                stroke: jest.fn(),
+                closePath: jest.fn(),
+                moveTo: jest.fn(),
+                lineTo: jest.fn(),
+                fillText: jest.fn(),
+                fillStyle: "",
+                strokeStyle: "",
+                lineWidth: 1,
+                font: "",
+                textAlign: "",
+                textBaseline: ""
+            };
+
+            mockCanvas = {
+                width: 400,
+                height: 400,
+                style: {},
+                getContext: jest.fn(() => mockCtx),
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                parentNode: {
+                    removeChild: jest.fn(),
+                    backgroundColor: "#303030"
+                },
+                getBoundingClientRect: jest.fn(() => ({
+                    left: 50,
+                    top: 50,
+                    width: 400,
+                    height: 400
+                }))
+            };
+
+            rhythmRuler.Rulers = [
+                [[4, 4, 4, 4], []],
+                [[8, 8, 8, 8, 8, 8, 8, 8], []]
+            ];
+            rhythmRuler.Drums = [null, null];
+            rhythmRuler._circularView = false;
+            rhythmRuler._circularCanvas = null;
+            rhythmRuler._rhythmRulerTable = { style: {} };
+            rhythmRuler.widgetWindow = {
+                getWidgetBody: jest.fn(() => ({
+                    clientWidth: 400,
+                    clientHeight: 400,
+                    append: jest.fn()
+                }))
+            };
+            rhythmRuler._calculateZebraStripes = jest.fn();
+        });
+
+        afterEach(() => {
+            global.document.createElement = origCreateElement;
+        });
+
+        test("_toggleCircularView creates canvas and activates circular view", () => {
+            rhythmRuler._circularView = true;
+            global.document.createElement = jest.fn(() => mockCanvas);
+
+            rhythmRuler._toggleCircularView();
+
+            expect(rhythmRuler._rhythmRulerTable.style.display).toBe("none");
+            expect(rhythmRuler._circularCanvas).toBeDefined();
+            expect(rhythmRuler._circularCanvas.style.display).toBe("block");
+        });
+
+        test("_toggleCircularView restores linear table view when deactivated", () => {
+            rhythmRuler._circularView = false;
+            rhythmRuler._circularCanvas = mockCanvas;
+
+            rhythmRuler._toggleCircularView();
+
+            expect(mockCanvas.style.display).toBe("none");
+            expect(rhythmRuler._rhythmRulerTable.style.display).toBe("");
+            expect(rhythmRuler._calculateZebraStripes).toHaveBeenCalled();
+        });
+
+        test("_getRingGeometry computes layout metrics with inner hole and gaps", () => {
+            const geom = rhythmRuler._getRingGeometry(400, 2);
+
+            expect(geom.innerHoleRadius).toBe(40); // 400 * 0.1
+            expect(geom.outerLimit).toBe(188); // 400 * 0.47
+            expect(geom.ringGap).toBe(2);
+            expect(geom.ringThickness).toBe((148 - 2) / 2);
+        });
+
+        test("_getRingGeometry handles single ring geometry without divide-by-zero", () => {
+            const geom = rhythmRuler._getRingGeometry(400, 1);
+
+            expect(geom.innerHoleRadius).toBe(40);
+            expect(geom.outerLimit).toBe(188);
+            expect(geom.ringThickness).toBe(148);
+        });
+
+        test("_drawCircularView renders multi-ruler concentric rings to canvas context", () => {
+            rhythmRuler._circularCanvas = mockCanvas;
+
+            rhythmRuler._drawCircularView();
+
+            expect(mockCtx.clearRect).toHaveBeenCalledWith(0, 0, 380, 380);
+            expect(mockCtx.beginPath).toHaveBeenCalled();
+            expect(mockCtx.arc).toHaveBeenCalled();
+            expect(mockCtx.fill).toHaveBeenCalled();
+        });
+
+        test("_refreshCircularView skips render when circular canvas is null", () => {
+            rhythmRuler._circularCanvas = null;
+            expect(() => rhythmRuler._refreshCircularView()).not.toThrow();
+        });
+    });
+
+    describe("RhythmRuler - Circular Pointer Gesture Engine", () => {
+        let mockCanvas;
+
+        beforeEach(() => {
+            mockCanvas = {
+                width: 400,
+                height: 400,
+                style: {},
+                getContext: jest.fn(() => ({
+                    clearRect: jest.fn(),
+                    beginPath: jest.fn(),
+                    arc: jest.fn(),
+                    fill: jest.fn(),
+                    stroke: jest.fn(),
+                    closePath: jest.fn(),
+                    moveTo: jest.fn(),
+                    lineTo: jest.fn(),
+                    fillText: jest.fn()
+                })),
+                parentNode: {
+                    backgroundColor: "#303030"
+                },
+                getBoundingClientRect: jest.fn(() => ({
+                    left: 0,
+                    top: 0,
+                    width: 400,
+                    height: 400
+                }))
+            };
+
+            rhythmRuler.Rulers = [
+                [[4, 4, 4, 4], []],
+                [[8, 8, 8, 8, 8, 8, 8, 8], []]
+            ];
+            rhythmRuler.Drums = [null, null];
+            rhythmRuler._circularCanvas = mockCanvas;
+            rhythmRuler._circularDownHit = null;
+            rhythmRuler._circularDragTo = null;
+            rhythmRuler._playing = false;
+            rhythmRuler._dissectNumber = {
+                classList: { add: jest.fn(), remove: jest.fn() }
+            };
+            rhythmRuler.widgetWindow = {
+                getWidgetBody: jest.fn(() => ({
+                    clientWidth: 400,
+                    clientHeight: 400
+                }))
+            };
+        });
+
+        test("_hitTestCircular resolves polar coordinates to exact ruler and cell indices", () => {
+            // Point at 12 o'clock in Ring 0 (radius = 100, center = 200,200) -> Ruler 0, Cell 0
+            const hitTopRing0 = rhythmRuler._hitTestCircular({ clientX: 200, clientY: 100 });
+            expect(hitTopRing0).toEqual({ rulerIndex: 0, cellIndex: 0 });
+
+            // Point at 6 o'clock in Ring 0 (radius = 100, angle = PI) -> Ruler 0, Cell 2
+            const hitBottomRing0 = rhythmRuler._hitTestCircular({ clientX: 200, clientY: 300 });
+            expect(hitBottomRing0).toEqual({ rulerIndex: 0, cellIndex: 2 });
+
+            // Point at 12 o'clock in Ring 1 (radius = 160, center = 200,200) -> Ruler 1, Cell 0
+            const hitTopRing1 = rhythmRuler._hitTestCircular({ clientX: 200, clientY: 40 });
+            expect(hitTopRing1).toEqual({ rulerIndex: 1, cellIndex: 0 });
+        });
+
+        test("_hitTestCircular returns null when pointer is outside rings", () => {
+            const hit = rhythmRuler._hitTestCircular({ clientX: 10, clientY: 10 });
+            expect(hit).toBeNull();
+        });
+
+        test("_onCircularMouseDown stores down hit position", () => {
+            rhythmRuler._hitTestCircular = jest.fn(() => ({ rulerIndex: 0, cellIndex: 2 }));
+
+            rhythmRuler._onCircularMouseDown({ clientX: 200, clientY: 100 });
+
+            expect(rhythmRuler._circularDownHit).toEqual({ rulerIndex: 0, cellIndex: 2 });
+            expect(rhythmRuler._circularDragTo).toEqual({ rulerIndex: 0, cellIndex: 2 });
+        });
+
+        test("_onCircularMouseMove updates drag destination when pointer crosses cell boundary", () => {
+            rhythmRuler._circularDownHit = { rulerIndex: 0, cellIndex: 0 };
+            rhythmRuler._circularDragTo = { rulerIndex: 0, cellIndex: 0 };
+            rhythmRuler._drawCircularView = jest.fn();
+            rhythmRuler._hitTestCircular = jest.fn(() => ({ rulerIndex: 0, cellIndex: 1 }));
+
+            rhythmRuler._onCircularMouseMove({ clientX: 250, clientY: 100 });
+
+            expect(rhythmRuler._circularDragTo).toEqual({ rulerIndex: 0, cellIndex: 1 });
+            expect(rhythmRuler._drawCircularView).toHaveBeenCalled();
+        });
+
+        test("_onCircularMouseUp performs tie when down and up hit different cells on same ruler", () => {
+            rhythmRuler._circularDownHit = { rulerIndex: 0, cellIndex: 0 };
+            rhythmRuler._circularDragTo = { rulerIndex: 0, cellIndex: 1 };
+            rhythmRuler._hitTestCircular = jest.fn(() => ({ rulerIndex: 0, cellIndex: 1 }));
+            rhythmRuler._tieCircular = jest.fn();
+
+            rhythmRuler._onCircularMouseUp({ clientX: 250, clientY: 100 });
+
+            expect(rhythmRuler._tieCircular).toHaveBeenCalledWith(0, 0, 1);
+            expect(rhythmRuler._circularDownHit).toBeNull();
+        });
+
+        test("_onCircularMouseUp performs single-cell dissection when clicking in place", () => {
+            const mockCell = { style: {} };
+            rhythmRuler._rulers = [{ cells: [mockCell] }];
+            rhythmRuler._circularDownHit = { rulerIndex: 0, cellIndex: 0 };
+            rhythmRuler._hitTestCircular = jest.fn(() => ({ rulerIndex: 0, cellIndex: 0 }));
+            rhythmRuler._dissectNumber = {
+                value: "3",
+                classList: { add: jest.fn(), remove: jest.fn() }
+            };
+            rhythmRuler.__dissectByNumber = jest.fn();
+            rhythmRuler.saveDissectHistory = jest.fn();
+            rhythmRuler._drawCircularView = jest.fn();
+
+            rhythmRuler._onCircularMouseUp({ clientX: 200, clientY: 100 });
+
+            expect(rhythmRuler.__dissectByNumber).toHaveBeenCalledWith(mockCell, 3, true);
+            expect(rhythmRuler.saveDissectHistory).toHaveBeenCalled();
+            expect(rhythmRuler._drawCircularView).toHaveBeenCalled();
+        });
+
+        test("_tieCircular configures linear tie cells and triggers tie operation", () => {
+            const cell1 = { style: {} };
+            const cell2 = { style: {} };
+            rhythmRuler._rulers = [{ cells: [cell1, cell2] }];
+            rhythmRuler.__tie = jest.fn(() => {
+                expect(rhythmRuler._mouseDownCell).toBe(cell1);
+                expect(rhythmRuler._mouseUpCell).toBe(cell2);
+            });
+            rhythmRuler.saveDissectHistory = jest.fn();
+            rhythmRuler._drawCircularView = jest.fn();
+
+            rhythmRuler._tieCircular(0, 0, 1);
+
+            expect(rhythmRuler._rulerSelected).toBe(0);
+            expect(rhythmRuler._mouseDownCell).toBeNull();
+            expect(rhythmRuler._mouseUpCell).toBeNull();
+            expect(rhythmRuler.__tie).toHaveBeenCalledWith(true);
+            expect(rhythmRuler.saveDissectHistory).toHaveBeenCalled();
+            expect(rhythmRuler._drawCircularView).toHaveBeenCalled();
+
+            // Reverse slice index order (fromCell > toCell)
+            rhythmRuler._tieCircular(0, 1, 0);
+            expect(rhythmRuler.__tie).toHaveBeenCalledWith(true);
+
+            // Invalid ruler or missing cells return safely without triggering tie
+            rhythmRuler.__tie.mockClear();
+            rhythmRuler._tieCircular(99, 0, 1);
+            rhythmRuler._tieCircular(0, 0, 99);
+            expect(rhythmRuler.__tie).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("RhythmRuler - Note Width, Display Formatting & Responsive Scaling", () => {
+        beforeEach(() => {
+            rhythmRuler.widgetWindow = {
+                isMaximized: jest.fn(() => false)
+            };
+            rhythmRuler._fullscreenScaleFactor = 5;
+        });
+
+        test("_noteWidth calculates scaled pixel width based on note duration", () => {
+            // EIGHTHNOTEWIDTH (24) * (8 / 4) * 3 = 24 * 2 * 3 = 144
+            const quarterWidth = rhythmRuler._noteWidth(4);
+            expect(quarterWidth).toBe(144);
+
+            // Eighth note: 24 * (8 / 8) * 3 = 72
+            const eighthWidth = rhythmRuler._noteWidth(8);
+            expect(eighthWidth).toBe(72);
+        });
+
+        test("_noteWidth scales using fullscreen factor when window is maximized", () => {
+            rhythmRuler.widgetWindow.isMaximized = jest.fn(() => true);
+
+            // 24 * (8 / 4) * 5 = 240
+            const maxQuarterWidth = rhythmRuler._noteWidth(4);
+            expect(maxQuarterWidth).toBe(240);
+        });
+
+        test("__setNoteValueDisplay constructs formatted text nodes inside cell", () => {
+            const mockCell = {
+                textContent: "",
+                appendChild: jest.fn()
+            };
+            const origCalc = global.calcNoteValueToDisplay;
+            global.calcNoteValueToDisplay = jest.fn(() => "1<br>&mdash;<br>4");
+
+            try {
+                rhythmRuler.__setNoteValueDisplay(mockCell, 1, 4, "sec");
+
+                expect(global.calcNoteValueToDisplay).toHaveBeenCalledWith(1, 4);
+                expect(mockCell.textContent).toBe("");
+                expect(mockCell.appendChild).toHaveBeenCalledTimes(6);
+                expect(mockCell.appendChild.mock.calls[0][0].textContent).toBe("1");
+                expect(mockCell.appendChild.mock.calls[1][0].nodeName).toBe("BR");
+                expect(mockCell.appendChild.mock.calls[2][0].textContent).toBe("\u2014");
+                expect(mockCell.appendChild.mock.calls[3][0].nodeName).toBe("BR");
+                expect(mockCell.appendChild.mock.calls[4][0].textContent).toBe("4");
+                expect(mockCell.appendChild.mock.calls[5][0].textContent).toBe(" sec");
+            } finally {
+                global.calcNoteValueToDisplay = origCalc;
+            }
+        });
+    });
+
+    describe("RhythmRuler - Dissect Click & Tap Event Handling", () => {
+        let mockCell;
+        let mockRuler;
+
+        beforeEach(() => {
+            mockCell = {
+                cellIndex: 0,
+                style: { width: "100px" },
+                parentNode: {
+                    getAttribute: jest.fn(() => "0")
+                },
+                replaceChildren: jest.fn(),
+                appendChild: jest.fn()
+            };
+            mockRuler = {
+                cells: [mockCell],
+                deleteCell: jest.fn(),
+                insertCell: jest.fn().mockImplementation(() => ({
+                    style: {},
+                    setAttribute: jest.fn(),
+                    replaceChildren: jest.fn(),
+                    addEventListener: jest.fn(),
+                    textContent: ""
+                }))
+            };
+
+            rhythmRuler._rulers = [mockRuler];
+            rhythmRuler.Rulers = [[[4], []]];
+            rhythmRuler.Drums = [null];
+            rhythmRuler._rulerSelected = 0;
+            rhythmRuler._tapMode = false;
+            rhythmRuler._tapCell = null;
+            rhythmRuler._tapTimes = [];
+            rhythmRuler._bpmFactor = 1000;
+            rhythmRuler._dissectNumber = {
+                value: "4",
+                classList: { add: jest.fn(), remove: jest.fn() }
+            };
+            rhythmRuler.widgetWindow = {
+                isMaximized: () => false
+            };
+            rhythmRuler._calculateZebraStripes = jest.fn();
+            rhythmRuler._refreshCircularView = jest.fn();
+            rhythmRuler.__addCellEventHandlers = jest.fn();
+            rhythmRuler.__setNoteValueDisplay = jest.fn();
+            rhythmRuler.__dissectByNumber = jest.fn();
+            rhythmRuler.saveDissectHistory = jest.fn();
+            rhythmRuler._setWidgetTimeout = jest.fn((cb, time) => cb());
+            rhythmRuler._setWidgetInterval = jest.fn(() => 1);
+            rhythmRuler._clearWidgetInterval = jest.fn();
+            rhythmRuler._setButtonIcon = jest.fn();
+            rhythmRuler.activity = {
+                turtles: {
+                    ithTurtle: () => ({
+                        singer: { beatsPerMeasure: 4 }
+                    })
+                },
+                logo: {
+                    synth: {
+                        trigger: jest.fn()
+                    }
+                }
+            };
+        });
+
+        test("_dissectRuler reads dissectNumber input and triggers __dissectByNumber", () => {
+            const fakeEvent = { currentTarget: mockCell };
+
+            rhythmRuler._dissectRuler(fakeEvent, "0");
+
+            expect(rhythmRuler.__dissectByNumber).toHaveBeenCalledWith(mockCell, 4, true);
+            expect(rhythmRuler.saveDissectHistory).toHaveBeenCalled();
+        });
+
+        test("_dissectRuler defaults subdivision count to 2 when input is non-numeric", () => {
+            rhythmRuler._dissectNumber.value = "invalid";
+            const fakeEvent = { currentTarget: mockCell };
+
+            rhythmRuler._dissectRuler(fakeEvent, "0");
+
+            expect(rhythmRuler.__dissectByNumber).toHaveBeenCalledWith(mockCell, 2, true);
+        });
+
+        test("_dissectRuler ignores clicks when playback is active", () => {
+            rhythmRuler._playing = true;
+            const fakeEvent = { currentTarget: mockCell };
+
+            rhythmRuler._dissectRuler(fakeEvent, "0");
+
+            expect(rhythmRuler.__dissectByNumber).not.toHaveBeenCalled();
+        });
+
+        test("_dissectRuler cancels tap mode when clicking on a rest note", () => {
+            rhythmRuler._tapMode = true;
+            rhythmRuler.Rulers = [[[-4], []]];
+            rhythmRuler._tapButton = {};
+
+            const fakeEvent = { currentTarget: mockCell };
+            rhythmRuler._dissectRuler(fakeEvent, "0");
+
+            expect(rhythmRuler._tapMode).toBe(false);
+            expect(rhythmRuler._tapCell).toBeNull();
+            expect(rhythmRuler._setButtonIcon).toHaveBeenCalled();
+        });
+
+        test("_dissectRuler schedules count-off and starts tapping for valid note", () => {
+            rhythmRuler._tapMode = true;
+            rhythmRuler.__startTapping = jest.fn();
+            const fakeEvent = { currentTarget: mockCell };
+
+            rhythmRuler._dissectRuler(fakeEvent, "0");
+
+            expect(rhythmRuler._tapCell).toBe(mockCell);
+            expect(rhythmRuler.activity.logo.synth.trigger).toHaveBeenCalled();
+            expect(rhythmRuler.__startTapping).toHaveBeenCalled();
+        });
+
+        test("_dissectRuler appends timestamp on subsequent taps during active tap mode", () => {
+            rhythmRuler._tapMode = true;
+            rhythmRuler._tapTimes = [1000];
+            const fakeEvent = { currentTarget: mockCell };
+
+            rhythmRuler._dissectRuler(fakeEvent, "0");
+
+            expect(rhythmRuler._tapTimes.length).toBe(2);
+        });
+    });
+
+    describe("RhythmRuler - Visual Zebra Striping & Layout Styling", () => {
+        let cellA, cellB;
+        let mockRuler;
+        let origPlatformColor;
+        let origDocById;
+
+        beforeEach(() => {
+            origPlatformColor = global.platformColor;
+            origDocById = global.docById;
+            cellA = { style: {} };
+            cellB = { style: {} };
+            mockRuler = {
+                cells: [cellA, cellB],
+                children: [cellA, cellB]
+            };
+
+            rhythmRuler._rulers = [mockRuler];
+            rhythmRuler._rulerSelected = 0;
+            global.platformColor = {
+                selectorBackground: "#ffb020",
+                selectorSelected: "#ff8000"
+            };
+        });
+
+        afterEach(() => {
+            global.platformColor = origPlatformColor;
+            global.docById = origDocById;
+        });
+
+        test("_calculateZebraStripes alternates background colors for even ruler", () => {
+            rhythmRuler._rulerSelected = 0;
+
+            rhythmRuler._calculateZebraStripes(0);
+
+            expect(cellA.style.backgroundColor).toBe("#ffb020");
+            expect(cellB.style.backgroundColor).toBe("#ff8000");
+            expect(cellA.style.borderRadius).toBe("10px");
+        });
+
+        test("_calculateZebraStripes inverts colors for odd selected ruler", () => {
+            rhythmRuler._rulerSelected = 1;
+
+            rhythmRuler._calculateZebraStripes(0);
+
+            expect(cellA.style.backgroundColor).toBe("#ff8000");
+            expect(cellB.style.backgroundColor).toBe("#ffb020");
+        });
+
+        test("_scale adjusts note widths based on fullscreen scale factor", () => {
+            cellA.style.width = "100px";
+            cellB.style.width = "100px";
+
+            rhythmRuler._fullscreenScaleFactor = 6;
+            rhythmRuler.widgetWindow = {
+                isMaximized: () => true,
+                getWidgetBody: () => ({
+                    getBoundingClientRect: () => ({ width: 1200 })
+                })
+            };
+
+            rhythmRuler._scale();
+
+            expect(cellA.style.width).toBe("200px"); // 100 * (6 / 3) = 200px
+        });
+
+        test("_scale restores original widths when un-maximized", () => {
+            cellA.style.width = "200px";
+            cellB.style.width = "200px";
+
+            rhythmRuler._fullscreenScaleFactor = 6;
+            rhythmRuler.widgetWindow = {
+                isMaximized: () => false
+            };
+
+            rhythmRuler._scale();
+
+            expect(cellA.style.width).toBe("100px"); // 200 / (6 / 3) = 100px
+        });
+
+        test("_positionWheel calculates coordinates and positions wheelDiv", () => {
+            const wheelMock = {
+                style: { display: "block" }
+            };
+            global.docById = jest.fn(() => wheelMock);
+            rhythmRuler._left = 100;
+            rhythmRuler._top = 200;
+            rhythmRuler.activity = {
+                canvas: { width: 1000, height: 800 }
+            };
+
+            rhythmRuler._positionWheel();
+
+            expect(wheelMock.style.position).toBe("absolute");
+            expect(wheelMock.style.width).toBe("300px");
+            expect(wheelMock.style.height).toBe("300px");
+            expect(wheelMock.style.left).toBe("125px");
+            expect(wheelMock.style.top).toBe("260px");
+
+            // When top >= 300, wheel positions above the block (top = y - 300)
+            rhythmRuler._top = 400;
+            rhythmRuler._positionWheel();
+            expect(wheelMock.style.top).toBe("100px");
+        });
+
+        test("_positionWheel skips positioning when wheelDiv display is none", () => {
+            const wheelMock = {
+                style: { display: "none" }
+            };
+            global.docById = jest.fn(() => wheelMock);
+
+            rhythmRuler._positionWheel();
+
+            expect(wheelMock.style.position).toBeUndefined();
+        });
+    });
+
+    describe("RhythmRuler - UI Controls, Buttons, and AMD Module Interface", () => {
+        beforeEach(() => {
+            rhythmRuler.Rulers = [
+                [
+                    [4, 4],
+                    ["hist1", "hist2"]
+                ]
+            ];
+            rhythmRuler.Drums = [null];
+            rhythmRuler._playAllCell = {};
+            rhythmRuler.activity = {
+                canvas: { width: 800, height: 600 },
+                getStageScale: () => 1,
+                logo: {
+                    synth: {
+                        stop: jest.fn()
+                    },
+                    resetSynth: jest.fn()
+                }
+            };
+            rhythmRuler._tapButton = {};
+            rhythmRuler._setButtonIcon = jest.fn();
+            rhythmRuler._refreshCircularView = jest.fn();
+        });
+
+        test("_clear resets all active rulers, state flags, and stops synth playback", () => {
+            rhythmRuler._playing = true;
+            rhythmRuler._playingAll = true;
+            rhythmRuler._rulerPlaying = 0;
+            rhythmRuler._startingTime = 12345;
+            rhythmRuler._undo = jest.fn(() => {
+                rhythmRuler.Rulers[0][1].pop();
+            });
+
+            rhythmRuler._clear();
+
+            expect(rhythmRuler.activity.logo.synth.stop).toHaveBeenCalled();
+            expect(rhythmRuler.activity.logo.resetSynth).toHaveBeenCalledWith(0);
+            expect(rhythmRuler._playing).toBe(false);
+            expect(rhythmRuler._playingAll).toBe(false);
+            expect(rhythmRuler._playingOne).toBe(false);
+            expect(rhythmRuler._rulerPlaying).toBe(-1);
+            expect(rhythmRuler._startingTime).toBeNull();
+            expect(rhythmRuler._setButtonIcon).toHaveBeenCalledWith(
+                rhythmRuler._playAllCell,
+                "play-button.svg",
+                "Play all"
+            );
+            expect(rhythmRuler._undo).toHaveBeenCalledTimes(2);
+            expect(rhythmRuler.Rulers[0][1]).toHaveLength(0);
+            expect(rhythmRuler._refreshCircularView).toHaveBeenCalled();
+        });
+
+        test("RhythmRuler.dependencies declares AMD dependencies", () => {
+            expect(Array.isArray(RhythmRuler.dependencies)).toBe(true);
+            expect(RhythmRuler.dependencies).toEqual(["widgets/rhythmruler"]);
+        });
+    });
 });

@@ -1778,7 +1778,7 @@ class RhythmRuler {
                 let tmp = downCellIndex;
                 downCellIndex = upCellIndex;
                 upCellIndex = tmp;
-                tmp = this._mouseDdownCell;
+                tmp = this._mouseDownCell;
                 this._mouseDownCell = this._mouseUpCell;
                 this._mouseUpCell = tmp;
             }
