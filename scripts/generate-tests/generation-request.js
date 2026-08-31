@@ -169,9 +169,11 @@ function buildGenerationRequest(plan, options = {}) {
     const normalized = normalizePlan(plan);
     const module = summarizeModule(normalized);
 
-    const instructions = asArray(options.instructions).filter(s => typeof s === "string");
-    const testRequirements = asArray(options.testRequirements).filter(s => typeof s === "string");
-    const conventions = asArray(options.conventions).filter(s => typeof s === "string");
+    const meaningfulStrings = values =>
+        asArray(values).filter(value => typeof value === "string" && value.trim() !== "");
+    const instructions = meaningfulStrings(options.instructions);
+    const testRequirements = meaningfulStrings(options.testRequirements);
+    const conventions = meaningfulStrings(options.conventions);
 
     return {
         module,

@@ -112,13 +112,22 @@ describe("buildGenerationRequest: structure", () => {
         expect(request.conventions).toEqual(["plus this"]);
     });
 
-    it("ignores an empty or non-string override and keeps the defaults", () => {
+    it("ignores blank or non-string overrides and keeps the defaults", () => {
         const request = buildGenerationRequest(functionPlan, {
-            instructions: [],
-            conventions: [1, 2, 3]
+            instructions: ["", "   "],
+            testRequirements: [],
+            conventions: [1, 2, 3, "\t"]
         });
         expect(request.instructions).toEqual(DEFAULT_INSTRUCTIONS);
+        expect(request.testRequirements).toEqual(DEFAULT_TEST_REQUIREMENTS);
         expect(request.conventions).toEqual(DEFAULT_CONVENTIONS);
+    });
+
+    it("preserves non-empty string overrides while dropping blank entries", () => {
+        const request = buildGenerationRequest(functionPlan, {
+            instructions: ["", "keep this", "  "]
+        });
+        expect(request.instructions).toEqual(["keep this"]);
     });
 });
 

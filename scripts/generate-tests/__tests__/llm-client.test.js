@@ -89,6 +89,25 @@ describe("NoopClient", () => {
         }
     });
 
+    it("builds the module import relative to a custom target test path", () => {
+        const customRequest = buildGenerationRequest(utilsLogicPlan(), {
+            targetTestPath: "custom/here.test.js"
+        });
+        const { source } = new NoopClient().generate(customRequest);
+        expect(source).toContain('const target = require("../js/utils/utils-logic");');
+    });
+
+    it("escapes request-derived strings in the generated source", () => {
+        const hostilePlan = {
+            file: 'js/quoted"directory/module.js',
+            exports: [{ name: 'quoted"export', kind: "value" }]
+        };
+        const { source } = new NoopClient().generate(buildGenerationRequest(hostilePlan));
+        expect(source).toContain('describe("js/quoted\\"directory/module.js"');
+        expect(source).toContain('it.todo("quoted\\"export: describe the behaviour under test")');
+        expect(() => parseSource(source, "noop-escaped-output.js")).not.toThrow();
+    });
+
     it("is deterministic for a given request", () => {
         const a = new NoopClient().generate(request).source;
         const b = new NoopClient().generate(request).source;
@@ -128,6 +147,13 @@ describe("ManualClient", () => {
     it("wraps the prompt in a comment that still parses as JavaScript", () => {
         const { source } = new ManualClient().generate(request);
         expect(() => parseSource(source, "manual-output.js")).not.toThrow();
+    });
+
+    it("escapes a block-comment terminator in the module path", () => {
+        const hostileRequest = buildGenerationRequest({ file: "js/bad*/path.js" });
+        const { source } = new ManualClient().generate(hostileRequest);
+        expect(source).toContain("js/bad*\\/path.js");
+        expect(() => parseSource(source, "manual-escaped-output.js")).not.toThrow();
     });
 });
 

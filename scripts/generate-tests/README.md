@@ -10,7 +10,7 @@ On top of that plan sits a **generation layer** that turns a plan into a
 structured, deterministic request and finally a prompt string for a future
 test-generation provider:
 
-```
+```sh
 source file
     -> AST extractor            (extract-module.js / module-test-plan.js)
     -> ModuleTestPlan            (JSON)
@@ -20,10 +20,11 @@ source file
     -> generated Jest test       (in-memory string)
 ```
 
-Nothing in this directory reads the analysed code, writes to the source tree,
-requires a credential, or makes a network call. The only providers shipped are
-credential-free (`noop`, `manual`); a real model-backed provider is left for a
-later change and would be a new class in `llm-client.js` only.
+The extractor reads and parses the analysed source but never executes it. The
+generation layer does not read source files, write to the source tree, require a
+credential, or make a network call. The only providers shipped are credential-free
+(`noop`, `manual`); a real model-backed provider is left for a later change and
+would be a new class in `llm-client.js` only.
 
 ## Usage
 
