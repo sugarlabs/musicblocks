@@ -44,6 +44,8 @@ class PitchStaircase {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static DEFAULTFREQUENCY = 220.0;
+    static MINFREQUENCY = 20.0;
+    static MAXFREQUENCY = 20000.0;
 
     /**
      * @constructor
@@ -288,6 +290,26 @@ class PitchStaircase {
         }
 
         const newFrequency = parseFloat(frequency) / inputNum;
+
+        // Reject the dissection outright once it would push the frequency
+        // outside the audible range, instead of silently clamping it. This
+        // both surfaces the limit to the user and guarantees no stair ever
+        // stores an out-of-range value that further clicks could keep
+        // compounding — so once a step can no longer be validly divided,
+        // it simply stays put.
+        if (
+            !Number.isFinite(newFrequency) ||
+            newFrequency < PitchStaircase.MINFREQUENCY ||
+            newFrequency > PitchStaircase.MAXFREQUENCY
+        ) {
+            this.activity.errorMsg(
+                newFrequency > PitchStaircase.MAXFREQUENCY
+                    ? _("Maximum audible frequency reached. This step cannot be divided further.")
+                    : _("Minimum audible frequency reached. This step cannot be divided further.")
+            );
+            return;
+        }
+
         const obj = frequencyToPitch(newFrequency);
         let foundStep = false;
         let repeatStep = false;
