@@ -235,6 +235,13 @@ class HelpController {
                     {
                         keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
                         action: _("Maximize or restore the focused widget window.")
+                    },
+                    {
+                        keys: platformKeys(
+                            _("Shift + Arrow Up / Arrow Down"),
+                            _("Shift + Arrow Up / Arrow Down")
+                        ),
+                        action: _("Shift keyboard octave up or down in Music Keyboard widget.")
                     }
                 ]
             },

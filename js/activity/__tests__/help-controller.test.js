@@ -468,4 +468,36 @@ describe("HelpController.saveHelpBlocks", () => {
         expect(global.getMacroExpansion).toHaveBeenCalledWith(activity, "macroName", 0, 0);
         expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
     });
+
+    test("showKeyboardShortcuts opens keyboard shortcuts widget window containing shortcut entries", () => {
+        const activity = makeActivity();
+        const controller = new HelpController(activity);
+        window.widgetWindows.isOpen = jest.fn(() => true);
+
+        controller.showKeyboardShortcuts();
+
+        expect(window.widgetWindows.clear).toHaveBeenCalledWith("help");
+        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
+            activity,
+            "Keyboard shortcuts",
+            "keyboard-shortcuts",
+            true
+        );
+    });
+
+    test("showKeyboardShortcuts opens shortcuts window when help window is closed (isOpen returns false)", () => {
+        const activity = makeActivity();
+        const controller = new HelpController(activity);
+        window.widgetWindows.isOpen = jest.fn(() => false);
+
+        controller.showKeyboardShortcuts();
+
+        expect(window.widgetWindows.clear).not.toHaveBeenCalled();
+        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
+            activity,
+            "Keyboard shortcuts",
+            "keyboard-shortcuts",
+            true
+        );
+    });
 });
