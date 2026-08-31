@@ -92,7 +92,8 @@ await generateTests(plan, { provider: "manual", clientOptions: { responses } });
   string (ending in a single newline).
 - **Providers** are any object exposing `name` and
   `generate(request) -> { source, meta }` (sync or async). `NoopClient` returns
-  a compilable Jest skeleton (`it.todo` per export); `ManualClient` returns a
+  a syntactically valid Jest skeleton (`it.todo` per export, parse-checked in
+  the tests); `ManualClient` returns a
   pre-registered response or the prompt wrapped in a comment. `createClient`
   throws a clear error for a named-but-unimplemented provider (`openai`, ...).
 - The prompt instructs a generator to test **observable behaviour** through the

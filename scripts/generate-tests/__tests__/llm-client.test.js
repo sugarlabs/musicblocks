@@ -22,7 +22,7 @@ const path = require("path");
 const http = require("http");
 const https = require("https");
 
-const { extractFile } = require("../extract-module");
+const { extractFile, parseSource } = require("../extract-module");
 const { buildGenerationRequest } = require("../generation-request");
 const {
     NoopClient,
@@ -62,7 +62,7 @@ describe("createClient", () => {
 describe("NoopClient", () => {
     const request = buildGenerationRequest(utilsLogicPlan());
 
-    it("returns compilable-looking Jest source referencing the real module", () => {
+    it("returns Jest source referencing the real module", () => {
         const { source, meta } = new NoopClient().generate(request);
         expect(source).toContain('const target = require("../utils-logic");');
         expect(source).toContain('describe("js/utils/utils-logic.js"');
@@ -70,6 +70,23 @@ describe("NoopClient", () => {
         expect(source.trimStart().startsWith("/**")).toBe(true); // license header
         expect(meta).toMatchObject({ client: "noop", generated: false });
         expect(meta.exports).toEqual(request.module.exportNames);
+    });
+
+    it("returns source that actually parses as JavaScript", () => {
+        // The provider boundary promises "generated test source"; prove the
+        // NoopClient's output is syntactically valid, not just that it contains
+        // the right substrings. parseSource throws on a syntax error.
+        const plans = [
+            utilsLogicPlan(),
+            extractFile("js/utils/language-utils.js"),
+            extractFile("js/utils/musicutils.js"),
+            { file: "js/no-exports.js", exports: [] },
+            { file: "js/weird.js", exports: [{ name: "a-b", kind: "value" }] }
+        ];
+        for (const plan of plans) {
+            const { source } = new NoopClient().generate(buildGenerationRequest(plan));
+            expect(() => parseSource(source, "noop-output.js")).not.toThrow();
+        }
     });
 
     it("is deterministic for a given request", () => {
@@ -83,6 +100,7 @@ describe("NoopClient", () => {
             buildGenerationRequest({ file: "js/x.js", exports: [] })
         );
         expect(source).toContain("module exposes no direct exports");
+        expect(() => parseSource(source, "noop-output.js")).not.toThrow();
     });
 });
 
@@ -106,6 +124,11 @@ describe("ManualClient", () => {
         // the embedded prompt must not prematurely close the block comment
         expect(source.slice(2, -3)).not.toContain("*/");
     });
+
+    it("wraps the prompt in a comment that still parses as JavaScript", () => {
+        const { source } = new ManualClient().generate(request);
+        expect(() => parseSource(source, "manual-output.js")).not.toThrow();
+    });
 });
 
 describe("generateTests pipeline", () => {
@@ -115,6 +138,7 @@ describe("generateTests pipeline", () => {
         expect(result.prompt).toContain("Source path: js/utils/utils-logic.js");
         expect(result.request.module.path).toBe("js/utils/utils-logic.js");
         expect(result.source).toContain("describe(");
+        expect(() => parseSource(result.source, "pipeline-output.js")).not.toThrow();
         expect(result.meta.generated).toBe(false);
     });
 

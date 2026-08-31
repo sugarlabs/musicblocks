@@ -80,10 +80,11 @@ function requirePathFor(request) {
 }
 
 /**
- * A deterministic provider that returns a compilable Jest skeleton: one
- * `describe` per module and an `it.todo` per exported symbol. It never calls a
- * model; it exists so the pipeline (plan -> request -> prompt -> client ->
- * source) can be exercised end to end without credentials.
+ * A deterministic provider that returns a syntactically valid Jest skeleton:
+ * one `describe` per module and an `it.todo` per exported symbol (the tests in
+ * __tests__/llm-client.test.js parse its output with the vendored Acorn). It
+ * never calls a model; it exists so the pipeline (plan -> request -> prompt ->
+ * client -> source) can be exercised end to end without credentials.
  */
 class NoopClient {
     /**
