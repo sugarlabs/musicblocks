@@ -2603,4 +2603,50 @@ describe("Palettes edge cases", () => {
         palettes.setSize(0);
         expect(palettes.cellSize).toBe(0); // Math.floor(0 * 0.5 + 0.5) = Math.floor(0.5) = 0
     });
+
+    describe("toggleCollapse", () => {
+        test("hides first half of palette options when collapsed and restores on toggle", () => {
+            const row1 = { style: {} };
+            const row2 = { style: {} };
+            const row3 = { style: {} };
+            const row4 = { style: {} };
+            const listBody = { children: [row1, row2, row3, row4] };
+
+            const paletteElem = {
+                querySelector: jest.fn(() => listBody),
+                style: {}
+            };
+            const toggleBtn = {
+                innerHTML: "",
+                setAttribute: jest.fn()
+            };
+
+            const origGetElementById = document.getElementById;
+            document.getElementById = jest.fn(id => {
+                if (id === "palette") return paletteElem;
+                if (id === "paletteToggle") return toggleBtn;
+                return null;
+            });
+
+            expect(palettes.collapsed).toBe(false);
+
+            palettes.toggleCollapse();
+
+            expect(palettes.collapsed).toBe(true);
+            expect(row1.style.display).toBe("none");
+            expect(row2.style.display).toBe("none");
+            expect(row3.style.display).toBe("flex");
+            expect(row4.style.display).toBe("flex");
+
+            palettes.toggleCollapse();
+
+            expect(palettes.collapsed).toBe(false);
+            expect(row1.style.display).toBe("flex");
+            expect(row2.style.display).toBe("flex");
+            expect(row3.style.display).toBe("flex");
+            expect(row4.style.display).toBe("flex");
+
+            document.getElementById = origGetElementById;
+        });
+    });
 });

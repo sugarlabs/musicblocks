@@ -592,6 +592,20 @@ class Palettes {
         palette.style.top = curr + dy + "px";
     }
 
+    _updateCollapsedVisibility(listBody) {
+        if (!listBody || !listBody.children) return;
+        const rows = Array.from(listBody.children);
+        const halfCount = Math.floor(rows.length / 2);
+        rows.forEach((row, index) => {
+            if (!row || !row.style) return;
+            if (this.collapsed && index < halfCount) {
+                row.style.display = "none";
+            } else {
+                row.style.display = "flex";
+            }
+        });
+    }
+
     toggleCollapse() {
         const palette = document.getElementById("palette");
 
@@ -599,17 +613,17 @@ class Palettes {
 
         this.collapsed = !this.collapsed;
 
-        if (this.collapsed) {
-            palette.style.transform = "translateX(-100%)";
-            document.getElementById("paletteToggle").innerHTML = "▶";
-            document.getElementById("paletteToggle").setAttribute("aria-expanded", "false");
-            palette.style.transition = "transform 0.3s ease";
-            this.paletteWidth = 0;
-        } else {
-            palette.style.transform = "translateX(0)";
-            document.getElementById("paletteToggle").innerHTML = "◀";
-            document.getElementById("paletteToggle").setAttribute("aria-expanded", "true");
-            this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
+        palette.style.transform = "translateX(0)";
+        this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
+
+        const listBody =
+            palette.querySelector("tbody") || palette.children[0]?.children[1]?.children[1];
+        this._updateCollapsedVisibility(listBody);
+
+        const toggleBtn = document.getElementById("paletteToggle");
+        if (toggleBtn) {
+            toggleBtn.innerHTML = this.collapsed ? "▶" : "◀";
+            toggleBtn.setAttribute("aria-expanded", this.collapsed ? "false" : "true");
         }
     }
 
@@ -882,6 +896,7 @@ class Palettes {
                 listBody
             );
         }
+        this._updateCollapsedVisibility(listBody);
     }
 
     makeSearchButton(name, icon, listBody) {
