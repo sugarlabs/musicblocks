@@ -1,0 +1,928 @@
+{
+  "file": "js/utils/utils-logic.js",
+  "sourceType": "script",
+  "exports": [
+    {
+      "name": "clampNumber",
+      "kind": "function",
+      "params": [
+        "val",
+        "min",
+        "max",
+        "fallback"
+      ],
+      "arity": 3,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "deepClone",
+      "kind": "function",
+      "params": [
+        "obj"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "escapeHTML",
+      "kind": "function",
+      "params": [
+        "str"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "fileBasename",
+      "kind": "function",
+      "params": [
+        "file"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "fileExt",
+      "kind": "function",
+      "params": [
+        "file"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "formatSeconds",
+      "kind": "function",
+      "params": [
+        "seconds"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "GCD",
+      "kind": "function",
+      "params": [
+        "a",
+        "b"
+      ],
+      "arity": 2,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "hex2rgb",
+      "kind": "function",
+      "params": [
+        "hex",
+        "alpha"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "hexToRGB",
+      "kind": "function",
+      "params": [
+        "hex"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "isSafeUrl",
+      "kind": "function",
+      "params": [
+        "urlString"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "isUnsafeObjectKey",
+      "kind": "function",
+      "params": [
+        "key"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "isValidHex",
+      "kind": "function",
+      "params": [
+        "hex"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "last",
+      "kind": "function",
+      "params": [
+        "myList"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "LCD",
+      "kind": "function",
+      "params": [
+        "a",
+        "b"
+      ],
+      "arity": 2,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "mixedNumber",
+      "kind": "function",
+      "params": [
+        "d"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "nearestBeat",
+      "kind": "function",
+      "params": [
+        "d",
+        "b"
+      ],
+      "arity": 2,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "oneHundredToFraction",
+      "kind": "function",
+      "params": [
+        "d"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "rationalSum",
+      "kind": "function",
+      "params": [
+        "a",
+        "b"
+      ],
+      "arity": 2,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "rationalToFraction",
+      "kind": "function",
+      "params": [
+        "d"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "resolveObject",
+      "kind": "function",
+      "params": [
+        "path"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "rgbToHex",
+      "kind": "function",
+      "params": [
+        "r",
+        "g",
+        "b"
+      ],
+      "arity": 3,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "safeJSONParse",
+      "kind": "function",
+      "params": [
+        "data",
+        "fallback"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "safeNumber",
+      "kind": "function",
+      "params": [
+        "val",
+        "fallback"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "safeSVG",
+      "kind": "function",
+      "params": [
+        "text"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "toArray",
+      "kind": "function",
+      "params": [
+        "val"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "toFixed2",
+      "kind": "function",
+      "params": [
+        "n"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "toTitleCase",
+      "kind": "function",
+      "params": [
+        "str"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    },
+    {
+      "name": "unescapeHTML",
+      "kind": "function",
+      "params": [
+        "str"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "UtilsLogic"
+    }
+  ],
+  "functions": [
+    {
+      "name": "clampNumber",
+      "params": [
+        "val",
+        "min",
+        "max",
+        "fallback"
+      ],
+      "arity": 3,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 2,
+      "throws": 0,
+      "branches": 2
+    },
+    {
+      "name": "deepClone",
+      "params": [
+        "obj"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 4
+    },
+    {
+      "name": "escapeHTML",
+      "params": [
+        "str"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 1,
+      "throws": 0,
+      "branches": 0
+    },
+    {
+      "name": "fileBasename",
+      "params": [
+        "file"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 4,
+      "throws": 0,
+      "branches": 4
+    },
+    {
+      "name": "fileExt",
+      "params": [
+        "file"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 4
+    },
+    {
+      "name": "formatSeconds",
+      "params": [
+        "seconds"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 4,
+      "throws": 0,
+      "branches": 5
+    },
+    {
+      "name": "GCD",
+      "params": [
+        "a",
+        "b"
+      ],
+      "arity": 2,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 1,
+      "throws": 0,
+      "branches": 0
+    },
+    {
+      "name": "hex2rgb",
+      "params": [
+        "hex",
+        "alpha"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 4
+    },
+    {
+      "name": "hexToRGB",
+      "params": [
+        "hex"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 4,
+      "throws": 0,
+      "branches": 3
+    },
+    {
+      "name": "isSafeUrl",
+      "params": [
+        "urlString"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 6
+    },
+    {
+      "name": "isUnsafeObjectKey",
+      "params": [
+        "key"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 0,
+      "throws": 0,
+      "branches": 0
+    },
+    {
+      "name": "isValidHex",
+      "params": [
+        "hex"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 2,
+      "throws": 0,
+      "branches": 1
+    },
+    {
+      "name": "last",
+      "params": [
+        "myList"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 2,
+      "throws": 0,
+      "branches": 2
+    },
+    {
+      "name": "LCD",
+      "params": [
+        "a",
+        "b"
+      ],
+      "arity": 2,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 1,
+      "throws": 0,
+      "branches": 0
+    },
+    {
+      "name": "mixedNumber",
+      "params": [
+        "d"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 6,
+      "throws": 0,
+      "branches": 7
+    },
+    {
+      "name": "nearestBeat",
+      "params": [
+        "d",
+        "b"
+      ],
+      "arity": 2,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 1,
+      "throws": 0,
+      "branches": 0
+    },
+    {
+      "name": "oneHundredToFraction",
+      "params": [
+        "d"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 35,
+      "throws": 0,
+      "branches": 101
+    },
+    {
+      "name": "rationalSum",
+      "params": [
+        "a",
+        "b"
+      ],
+      "arity": 2,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 16
+    },
+    {
+      "name": "rationalToFraction",
+      "params": [
+        "d"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 5,
+      "throws": 0,
+      "branches": 10
+    },
+    {
+      "name": "resolveObject",
+      "params": [
+        "path"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 4
+    },
+    {
+      "name": "rgbToHex",
+      "params": [
+        "r",
+        "g",
+        "b"
+      ],
+      "arity": 3,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 1,
+      "throws": 0,
+      "branches": 0
+    },
+    {
+      "name": "safeJSONParse",
+      "params": [
+        "data",
+        "fallback"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 3
+    },
+    {
+      "name": "safeNumber",
+      "params": [
+        "val",
+        "fallback"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 7
+    },
+    {
+      "name": "safeSVG",
+      "params": [
+        "text"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 2,
+      "throws": 0,
+      "branches": 1
+    },
+    {
+      "name": "toArray",
+      "params": [
+        "val"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 3
+    },
+    {
+      "name": "toFixed2",
+      "params": [
+        "n"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 2
+    },
+    {
+      "name": "toTitleCase",
+      "params": [
+        "str"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 2
+    },
+    {
+      "name": "unescapeHTML",
+      "params": [
+        "str"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 1,
+      "throws": 0,
+      "branches": 0
+    }
+  ],
+  "classes": [],
+  "dependencies": [],
+  "referencedGlobals": [
+    "Array",
+    "DOMParser",
+    "JSON",
+    "Math",
+    "Number",
+    "Object",
+    "String",
+    "URL",
+    "_",
+    "console",
+    "document",
+    "global",
+    "isFinite",
+    "isNaN",
+    "module",
+    "parseInt",
+    "window"
+  ],
+  "jsdoc": [
+    {
+      "target": "clampNumber",
+      "description": "Clamps a numeric value between a minimum and maximum bound with fallback handling.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{number} val - Value to clamp"
+        },
+        {
+          "tag": "param",
+          "text": "{number} min - Minimum allowed bound"
+        },
+        {
+          "tag": "param",
+          "text": "{number} max - Maximum allowed bound"
+        },
+        {
+          "tag": "param",
+          "text": "{number} [fallback=min] - Fallback value if val is non-numeric or NaN"
+        },
+        {
+          "tag": "returns",
+          "text": "{number} The clamped numeric value"
+        }
+      ]
+    },
+    {
+      "target": "deepClone",
+      "description": "Creates a deep clone of an object or array.",
+      "tags": []
+    },
+    {
+      "target": "escapeHTML",
+      "description": "Escapes special characters in a string for use in HTML.",
+      "tags": []
+    },
+    {
+      "target": "fileBasename",
+      "description": "Extracts the base name (filename without extension) from a filename or URL.",
+      "tags": []
+    },
+    {
+      "target": "fileExt",
+      "description": "Extracts the file extension from a filename or URL.",
+      "tags": []
+    },
+    {
+      "target": "formatSeconds",
+      "description": "Formats a duration in seconds into a standardized digital time display string (MM:SS or HH:MM:SS).",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{number|string} seconds - Duration in seconds"
+        },
+        {
+          "tag": "returns",
+          "text": "{string} Formatted duration string e.g. \"02:05\" or \"01:01:05\", defaulting to \"00:00\" for invalid inputs"
+        }
+      ]
+    },
+    {
+      "target": "GCD",
+      "description": "Calculates the greatest common divisor (GCD) of two numbers.",
+      "tags": []
+    },
+    {
+      "target": "hex2rgb",
+      "description": "Converts a hexadecimal color code to RGBA format. Supports both 3-digit shorthand (#rgb) and 6-digit (#rrggbb) formats with an optional alpha parameter.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{string} hex - Hex color code (3-digit or 6-digit, with or without #)"
+        },
+        {
+          "tag": "param",
+          "text": "{number} [alpha=1] - Alpha transparency value (0 to 1)"
+        },
+        {
+          "tag": "returns",
+          "text": "{string} RGBA formatted string e.g. \"rgba(255,0,0,1)\""
+        }
+      ]
+    },
+    {
+      "target": "hexToRGB",
+      "description": "Converts a hexadecimal color code to RGB values.",
+      "tags": []
+    },
+    {
+      "target": "isSafeUrl",
+      "description": "Checks if a URL is considered safe. Decodes HTML entities and handles common bypass attempts.",
+      "tags": []
+    },
+    {
+      "target": "isUnsafeObjectKey",
+      "description": "Checks whether a key is unsafe to assign onto a plain object.",
+      "tags": []
+    },
+    {
+      "target": "isValidHex",
+      "description": "Validates whether a given string is a valid 3-digit (#rgb) or 6-digit (#rrggbb) hexadecimal color code.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{string} hex - Hex color string to validate"
+        },
+        {
+          "tag": "returns",
+          "text": "{boolean} True if string is a valid hex color code, false otherwise"
+        }
+      ]
+    },
+    {
+      "target": "last",
+      "description": "Returns the last element of an array.",
+      "tags": []
+    },
+    {
+      "target": "LCD",
+      "description": "Calculates the least common denominator (LCD) of two numbers.",
+      "tags": []
+    },
+    {
+      "target": "mixedNumber",
+      "description": "Converts a number to a mixed fraction string.",
+      "tags": []
+    },
+    {
+      "target": "nearestBeat",
+      "description": "Finds the nearest beat for a given fraction.",
+      "tags": []
+    },
+    {
+      "target": "oneHundredToFraction",
+      "description": "Converts a value (0-100) to a musical fraction representation.",
+      "tags": []
+    },
+    {
+      "target": "rationalSum",
+      "description": "Adds two rational numbers [numerator, denominator]. NOTE: The result is NOT normalized/simplified (e.g., [1,2] + [1,2] returns [2,2]). This preserves original musical division context where explicit denominators matter.",
+      "tags": []
+    },
+    {
+      "target": "rationalToFraction",
+      "description": "Convert float to its approximate fractional representation.",
+      "tags": []
+    },
+    {
+      "target": "RESERVED_OBJECT_KEYS",
+      "description": "Reserved property names that must never be used as keys when copying externally-supplied data onto a plain object. Assigning to these keys via bracket notation can reach Object.prototype (prototype pollution) or overwrite the target's own constructor reference.",
+      "tags": []
+    },
+    {
+      "target": "resolveObject",
+      "description": "Resolves a dot-notation string path globally. NOTE: This depends on window/global context.",
+      "tags": []
+    },
+    {
+      "target": "rgbToHex",
+      "description": "Converts RGB values to a hexadecimal color code.",
+      "tags": []
+    },
+    {
+      "target": "safeJSONParse",
+      "description": "Parses a JSON string with a fallback value. NOTE: This is an environment-aware helper that may log warnings to the console.",
+      "tags": []
+    },
+    {
+      "target": "safeNumber",
+      "description": "Safely parses a value into a finite number with a fallback value.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{*} val - Value to parse into a number"
+        },
+        {
+          "tag": "param",
+          "text": "{number} [fallback=0] - Fallback numeric value if val is not finite or is NaN"
+        },
+        {
+          "tag": "returns",
+          "text": "{number} The parsed finite number or fallback value"
+        }
+      ]
+    },
+    {
+      "target": "safeSVG",
+      "description": "Escapes characters in a string to make it safe for use in an SVG.",
+      "tags": []
+    },
+    {
+      "target": "toArray",
+      "description": "Safely converts a single value, array, or nullish input into an array.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{*} val - Value to convert"
+        },
+        {
+          "tag": "returns",
+          "text": "{Array} An array containing the value, the original array if already an array, or an empty array for null/undefined"
+        }
+      ]
+    },
+    {
+      "target": "toFixed2",
+      "description": "Formats a number to at most two decimal places. NOTE: This function removes trailing zeros (e.g., 3.10 becomes 3.1).",
+      "tags": []
+    },
+    {
+      "target": "toTitleCase",
+      "description": "Converts a string to Title Case.",
+      "tags": []
+    },
+    {
+      "target": "unescapeHTML",
+      "description": "Unescapes HTML entities in a string.",
+      "tags": []
+    },
+    {
+      "target": "UtilsLogic",
+      "description": "Module/Global Export logic",
+      "tags": []
+    }
+  ],
+  "totals": {
+    "branches": 196,
+    "returns": 107,
+    "throws": 0
+  }
+}
