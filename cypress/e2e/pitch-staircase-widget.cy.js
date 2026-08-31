@@ -1,4 +1,4 @@
-/* global cy, beforeEach, describe, it */
+/* global cy, beforeEach, describe, expect, it */
 
 /**
  * Cypress E2E test suite for the Pitch Staircase widget.
@@ -20,11 +20,13 @@ const loadFixtureProject = fixtureName => {
     cy.get("#load").click();
     cy.get("#myOpenFile").selectFile(`cypress/fixtures/${fixtureName}`, { force: true });
 
-    // Wait for the load overlay to appear before waiting for it to disappear.
-    // Without this guard, the `not.be.visible` check passes trivially on the
-    // container's default hidden state before loading has even begun, which
-    // causes Play to run before the project is fully loaded.
-    cy.get("#load-container").should("be.visible");
+    cy.window({ timeout: 30000 }).should(win => {
+        const { blocks } = win.ActivityContext.getActivity();
+        const fixtureLoaded = blocks.blockList.some(
+            block => !block.trash && block.name === "pitchstaircase"
+        );
+        expect(fixtureLoaded, "fixture pitch staircase block should be loaded").to.be.true;
+    });
     cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
     cy.get("#errorText").should("not.be.visible");
 };
@@ -68,13 +70,11 @@ describe("Pitch Staircase widget", () => {
         // PitchStaircase._makeStairs() builds the staircase inside this._pscTable
         // which is appended to the widget body. The table must be present and
         // contain at least one row (one per pitch in the Stairs array).
-        cy.get('[aria-label="pitch staircase"]')
-            .find("table.pitch-staircase-step, .pitch-staircase-step")
-            .should("have.length.greaterThan", 0);
-
-        // Each row contains a play button cell with class "headcol" and a
-        // frequency/note cell with class "pitch-staircase-step".
-        cy.get(".pitch-staircase-step").first().should("be.visible");
+        cy.get('[aria-label="pitch staircase"] .pitch-staircase-step')
+            .should("have.length.greaterThan", 0)
+            .first()
+            .should("be.visible")
+            .and("contain.text", "G3");
     });
 
     it("renders the full toolbar with all expected action buttons", () => {
@@ -83,23 +83,11 @@ describe("Pitch Staircase widget", () => {
 
         cy.get('[aria-label="pitch staircase"]', { timeout: 30000 }).should("be.visible");
 
-        // PitchStaircase.init() adds buttons to the widget toolbar in this order:
-        // Play chord, Play scale, Save, (ratio inputs), Undo, Clear.
-
-        // The "Play chord" button plays all pitches simultaneously.
-        cy.get('[aria-label="pitch staircase"]').find('img[title="Play chord"]').should("exist");
-
-        // The "Play scale" button plays pitches sequentially up and down.
-        cy.get('[aria-label="pitch staircase"]').find('img[title="Play scale"]').should("exist");
-
-        // The "Save" button generates a new action block from the current staircase.
-        cy.get('[aria-label="pitch staircase"]').find('img[title="Save"]').should("exist");
-
-        // The "Undo" button removes the last added stair step.
-        cy.get('[aria-label="pitch staircase"]').find('img[title="Undo"]').should("exist");
-
-        // The "Clear" button removes all added stair steps.
-        cy.get('[aria-label="pitch staircase"]').find('img[title="Clear"]').should("exist");
+        for (const label of ["Play chord", "Play scale", "Save", "Undo", "Clear"]) {
+            cy.get(`[aria-label="pitch staircase"] [role="button"][aria-label="${label}"]`).should(
+                "be.visible"
+            );
+        }
     });
 
     it("closes the Pitch Staircase widget and cleans up the DOM", () => {
@@ -115,10 +103,7 @@ describe("Pitch Staircase widget", () => {
         // PitchStaircase.init() wires widgetWindow.onclose to clear all
         // timeouts, stop synth audio, and call widgetWindow.destroy() -
         // which removes the .windowFrame from the DOM.
-        cy.get('[aria-label="pitch staircase"]')
-            .find('[title="Close"]')
-            .first()
-            .click({ force: true });
+        cy.get('[aria-label="pitch staircase"] [role="button"][aria-label="Close window"]').click();
 
         // The window frame should be fully destroyed.
         cy.get('[aria-label="pitch staircase"]').should("not.exist");
