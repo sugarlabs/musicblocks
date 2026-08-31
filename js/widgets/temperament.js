@@ -91,27 +91,23 @@ const largestGapMid = centsArr => {
 /** Tonic lock check with epsilon (guards floating error). Exported for testing. */
 const isLockedCents = cents => Math.abs(cents) < 0.5;
 
-/** Same-node cents: stay within tick's +/-49 window, ±20 from tick, circular-aware.
-/// Wrap only for negative values (tick 0 window), clamp for >=1200 (tick 1200 window).
-/// Falls back to largest gap if window is full. Exported for testing. */
-const sameNodeCents = (centsArr, cur, dir) => {
-    const tick = Math.round(cur / 100) * 100;
-    let c = tick + dir * 20;
-    c = Math.max(tick - 49, Math.min(tick + 49, c));
+/** Same-node cents: offset by one step (1200/pitchNumber) in the given direction.
+/// Wraps circularly (0..1200). Falls back to largest gap if position occupied. */
+const sameNodeCents = (centsArr, cur, dir, pitchNumber = 12) => {
+    const step = 1200 / pitchNumber;
+    let c = cur + dir * step;
     if (c < 0) c += 1200;
-    else if (c >= 1200) c = Math.min(1199, c);
+    if (c >= 1200) c -= 1200;
     c = Math.max(1, Math.min(1199, c));
     let tries = 0;
     while (centsArr.includes(Math.round(c)) && tries < 8) {
-        c = tick + dir * (20 + tries + 1);
-        c = Math.max(tick - 49, Math.min(tick + 49, c));
+        c = cur + dir * (step + (tries + 1));
         if (c < 0) c += 1200;
-        else if (c >= 1200) c = Math.min(1199, c);
+        if (c >= 1200) c -= 1200;
         c = Math.max(1, Math.min(1199, c));
         tries++;
     }
     if (centsArr.includes(Math.round(c))) {
-        // Window full — fall back to largest gap middle, then nudge if still duplicate.
         let mid = largestGapMid(centsArr);
         let ftries = 0;
         while (centsArr.includes(Math.round(mid)) && ftries < 5) {
@@ -1133,7 +1129,7 @@ function TemperamentWidget() {
 
         const _sortedIndex = centsVal => sortedIndex(that.cents, centsVal);
         const _largestGapMid = () => largestGapMid(that.cents);
-        const _sameNodeCents = (cur, dir) => sameNodeCents(that.cents, cur, dir);
+        const _sameNodeCents = (cur, dir) => sameNodeCents(that.cents, cur, dir, that.pitchNumber);
 
         /** Converts a mouse/touch event to canvas-space coordinates. */
         const _canvasCoords = function (e, target) {
@@ -1144,15 +1140,6 @@ function TemperamentWidget() {
             ];
         };
 
-        const _selectStyle = function (el) {
-            el.style.fontSize = "12px";
-            el.style.padding = "2px 4px";
-            el.style.backgroundColor = "#2a2a3e";
-            el.style.color = "#e0e0e0";
-            el.style.border = "1px solid #555";
-            el.style.borderRadius = "3px";
-        };
-
         // ── Controls bar: dropdowns + hide-table toggle ──
         const controlsDiv = document.createElement("div");
         controlsDiv.style.display = "flex";
@@ -1161,14 +1148,46 @@ function TemperamentWidget() {
         controlsDiv.style.marginBottom = "8px";
         controlsDiv.style.flexWrap = "wrap";
 
-        const compareLabel = document.createElement("span");
-        compareLabel.textContent = _("active temperament");
-        compareLabel.style.fontSize = "11px";
-        compareLabel.style.color = "#aaa";
-        controlsDiv.appendChild(compareLabel);
+        // Temperament selector — icon button with transparent select overlay
+        // (matches ModeWidget dropdown pattern)
+        const tuningIcon = document.createElement("div");
+        tuningIcon.className = "wfbtItem";
+        tuningIcon.title = _("temperament");
+        tuningIcon.setAttribute("role", "button");
+        tuningIcon.setAttribute("aria-label", _("temperament"));
+        tuningIcon.style.flexShrink = "0";
+        tuningIcon.style.display = "flex";
+        tuningIcon.style.alignItems = "center";
+        tuningIcon.style.justifyContent = "center";
+        tuningIcon.style.padding = "4px";
+        tuningIcon.style.borderRadius = "6px";
+        const tuningImg = document.createElement("img");
+        tuningImg.src = "header-icons/menu-button.svg";
+        tuningImg.alt = _("temperament");
+        tuningImg.height = 24;
+        tuningImg.width = 24;
+        tuningIcon.appendChild(tuningImg);
 
         const compareSelect = document.createElement("select");
-        _selectStyle(compareSelect);
+        compareSelect.title = _("temperament");
+        compareSelect.setAttribute("aria-label", _("temperament"));
+        Object.assign(compareSelect.style, {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            opacity: 0,
+            cursor: "pointer",
+            zIndex: 1,
+            border: "none",
+            background: "transparent",
+            appearance: "none",
+            WebkitAppearance: "none",
+            MozAppearance: "none",
+            outline: "none",
+            boxShadow: "none"
+        });
 
         const temperaments = getTemperamentsList();
         for (const t of temperaments) {
@@ -1179,71 +1198,104 @@ function TemperamentWidget() {
             if (t[1] === that.inTemperament) opt.selected = true;
             compareSelect.appendChild(opt);
         }
-        controlsDiv.appendChild(compareSelect);
+
+        const tuningGroup = document.createElement("div");
+        tuningGroup.style.position = "relative";
+        tuningGroup.style.display = "inline-flex";
+        tuningGroup.style.alignItems = "center";
+        tuningGroup.style.flexShrink = "0";
+        tuningGroup.appendChild(tuningIcon);
+        tuningGroup.appendChild(compareSelect);
+        controlsDiv.appendChild(tuningGroup);
 
         temperamentTableDiv.appendChild(controlsDiv);
 
         // ── Operations toolbar (presets + pitch count) ──
+        let _playAllTimer = null;
+        let _playAllRunning = false;
+        const _playAll = function () {
+            if (_playAllRunning) {
+                clearTimeout(_playAllTimer);
+                _playAllRunning = false;
+                flashDot = -1;
+                _drawCircle();
+                return;
+            }
+            _playAllRunning = true;
+            let i = 0;
+            const step = function () {
+                if (i >= that.pitchNumber || !_playAllRunning) {
+                    _playAllRunning = false;
+                    flashDot = -1;
+                    _drawCircle();
+                    return;
+                }
+                _playNote(i);
+                i++;
+                _playAllTimer = setTimeout(step, 300);
+            };
+            step();
+        };
+
         const opsDiv = document.createElement("div");
         opsDiv.style.display = "flex";
         opsDiv.style.flexWrap = "wrap";
         opsDiv.style.gap = "4px";
         opsDiv.style.marginBottom = "8px";
-        const _opsBtn = function (label, fn) {
-            const b = document.createElement("button");
-            b.textContent = label;
-            b.style.fontSize = "11px";
-            b.style.padding = "2px 6px";
-            b.style.backgroundColor = "#2a2a3e";
-            b.style.color = "#e0e0e0";
-            b.style.border = "1px solid #555";
-            b.style.borderRadius = "3px";
-            b.style.cursor = "pointer";
-            b.onclick = fn;
-            opsDiv.appendChild(b);
-            return b;
+        const _iconBtn = function (icon, tooltip, fn) {
+            const btn = document.createElement("div");
+            btn.className = "wfbtItem";
+            btn.title = tooltip;
+            btn.setAttribute("role", "button");
+            btn.setAttribute("aria-label", tooltip);
+            btn.setAttribute("tabindex", "0");
+            btn.style.flexShrink = "0";
+            btn.style.display = "flex";
+            btn.style.alignItems = "center";
+            btn.style.justifyContent = "center";
+            btn.style.padding = "4px";
+            btn.style.borderRadius = "6px";
+            btn.style.cursor = "pointer";
+            const img = document.createElement("img");
+            img.src = `header-icons/${icon}`;
+            img.alt = tooltip;
+            img.height = 24;
+            img.width = 24;
+            btn.appendChild(img);
+            btn.onclick = fn;
+            opsDiv.appendChild(btn);
+            return btn;
         };
-        const addAfter = _opsBtn("+ After", function () {
-            const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
-            let cents, idx;
-            if (s < 0) {
-                cents = _largestGapMid();
-                idx = _sortedIndex(cents);
-            } else {
-                cents = _sameNodeCents(that.cents[s], 1);
-                idx = _sortedIndex(cents);
-            }
+        _iconBtn("play-scale.svg", _("Play all pitches"), _playAll);
+        const insertAtNode = function (index, dir) {
+            const cents = index < 0 ? _largestGapMid() : _sameNodeCents(that.cents[index], dir);
+            const idx = _sortedIndex(cents);
             _insertPitch(idx, cents);
             highlightDot = idx;
+        };
+        const _addPitch = function (dir) {
+            const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
+            insertAtNode(s, dir);
             _drawCircle();
             _buildTable();
             _highlightTableRow(highlightDot);
             _updateRemoveButton();
-        });
-        addAfter.title = _(
-            "Add a pitch after the selected note (clockwise); appends at the end if none is selected"
-        );
-        const addBefore = _opsBtn("+ before", function () {
-            const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
-            let cents, idx;
-            if (s < 0) {
-                cents = _largestGapMid();
-                idx = _sortedIndex(cents);
-            } else {
-                cents = _sameNodeCents(that.cents[s], -1);
-                idx = _sortedIndex(cents);
+        };
+        const addAfter = _iconBtn(
+            "add2.svg",
+            _("Add pitch after selected (clockwise)"),
+            function () {
+                _addPitch(1);
             }
-            _insertPitch(idx, cents);
-            highlightDot = idx;
-            _drawCircle();
-            _buildTable();
-            _highlightTableRow(highlightDot);
-            _updateRemoveButton();
-        });
-        addBefore.title = _(
-            "Add a pitch before the selected note (counterclockwise); prepends at the start if none is selected"
         );
-        const removeBtn = _opsBtn("Remove", function () {
+        const addBefore = _iconBtn(
+            "add.svg",
+            _("Add pitch before selected (counterclockwise)"),
+            function () {
+                _addPitch(-1);
+            }
+        );
+        const removeBtn = _iconBtn("delete.svg", _("Remove selected pitch"), function () {
             const s =
                 highlightDot >= 0 && highlightDot < that.pitchNumber
                     ? highlightDot
@@ -1264,11 +1316,10 @@ function TemperamentWidget() {
             if (highlightDot >= 0) _highlightTableRow(highlightDot);
             _updateRemoveButton();
         });
-        removeBtn.title = _("Remove the selected note (or the last note if none is selected)");
         const _updateRemoveButton = () => {
             const locked = highlightDot >= 0 && _isLocked(highlightDot);
-            removeBtn.disabled = locked;
             removeBtn.style.opacity = locked ? "0.4" : "1";
+            removeBtn.style.pointerEvents = locked ? "none" : "auto";
             removeBtn.style.cursor = locked ? "not-allowed" : "pointer";
         };
         _updateRemoveButton();
@@ -1613,7 +1664,7 @@ function TemperamentWidget() {
         // ── Interactivity ──
         const _applyCents = function (i, cents) {
             that.cents[i] = cents;
-            that.ratios[i] = Math.pow(2, cents / 1200);
+            that.ratios[i] = Math.pow(that.powerBase, cents / 1200);
             that.frequencies[i] = (Number(that.frequencies[0]) * that.ratios[i]).toFixed(2);
             if (that.ratiosNotesPair[i]) that.ratiosNotesPair[i][0] = that.ratios[i];
         };
@@ -1632,22 +1683,18 @@ function TemperamentWidget() {
             if (index > that.pitchNumber) index = that.pitchNumber;
             that.pitchNumber += 1;
             that.cents.splice(index, 0, cents);
-            that.ratios.splice(index, 0, Math.pow(2, cents / 1200));
+            that.ratios.splice(index, 0, Math.pow(that.powerBase, cents / 1200));
             that.frequencies.splice(
                 index,
                 0,
                 (Number(that.frequencies[0]) * that.ratios[index]).toFixed(2)
             );
-            // Copy note data from adjacent pitch (prefer previous, fallback to next)
-            const noteSrc = that.notes[index - 1] || that.notes[index] || ["C", "4"];
-            that.notes.splice(index, 0, noteSrc.slice());
-            const intervalSrc =
-                that.intervals[index - 1] !== undefined
-                    ? that.intervals[index - 1]
-                    : that.intervals[index] !== undefined
-                      ? that.intervals[index]
-                      : 0;
-            that.intervals.splice(index, 0, intervalSrc);
+            // Derive note name from the temperament's own conversion, not 12-EDO labels
+            const freq = Number(that.frequencies[0]) * that.ratios[index];
+            const obj = frequencyToPitch(freq, that.inTemperament);
+            that.notes.splice(index, 0, [obj[0], obj[1]]);
+            // ponytail: intervals not used by visualizer display; "" avoids stale neighbor copy
+            that.intervals.splice(index, 0, "");
             that.ratiosNotesPair.splice(index, 0, [that.ratios[index], that.notes[index]]);
         };
 
@@ -1879,19 +1926,15 @@ function TemperamentWidget() {
             };
 
             const addBefore = mkBtn(_("Add before"), function () {
-                const cents = _sameNodeCents(that.cents[index], -1);
-                const idx = _sortedIndex(cents);
-                _insertPitch(idx, cents);
-                highlightDot = idx;
+                insertAtNode(index, -1);
             });
             const addAfter = mkBtn(_("Add after"), function () {
-                const cents = _sameNodeCents(that.cents[index], 1);
-                const idx = _sortedIndex(cents);
-                _insertPitch(idx, cents);
-                highlightDot = idx;
+                insertAtNode(index, 1);
             });
             const removeBtn = mkBtn(_("Remove"), function () {
+                const before = that.pitchNumber;
                 _removePitch(index);
+                if (that.pitchNumber === before) return;
                 if (that.pitchNumber > 0) {
                     highlightDot = Math.min(index, that.pitchNumber - 1);
                     if (_isLocked(highlightDot)) highlightDot = -1;
@@ -1935,6 +1978,20 @@ function TemperamentWidget() {
         const _endDrag = function () {
             if (dragIndex >= 0) {
                 if (!dragMoved) _playNote(dragIndex);
+                // Re-sort parallel arrays by cents after drag shifts a value.
+                if (dragMoved) {
+                    const order = that.cents
+                        .map((c, i) => i)
+                        .sort((a, b) => that.cents[a] - that.cents[b]);
+                    const n = that.pitchNumber;
+                    that.cents = order.map(i => that.cents[i]);
+                    that.ratios = order.map(i => that.ratios[i]);
+                    that.frequencies = order.map(i => that.frequencies[i]);
+                    that.notes = order.map(i => that.notes[i]);
+                    that.intervals = order.map(i => that.intervals[i]);
+                    that.ratiosNotesPair = order.map(i => that.ratiosNotesPair[i]);
+                    highlightDot = order.indexOf(dragIndex);
+                }
                 dragIndex = -1;
                 lockedDrag = false;
                 _drawCircle();
