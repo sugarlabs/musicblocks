@@ -722,14 +722,18 @@ class Logo {
      * @param {Number} turtle - Turtle index in turtles.turtleList
      * @param {String} listenerName
      * @param {Function} listener
+     * @param {boolean} persistent - when true, clearTurtleListeners() leaves this
+     *  listener attached on stop/completion (e.g. a Listen block's click handler
+     *  is meant to keep firing after the run that registered it has ended).
      * @returns {void}
      */
-    setTurtleListener(turtle, listenerName, listener) {
+    setTurtleListener(turtle, listenerName, listener, persistent = false) {
         const tur = this.turtles.ithTurtle(turtle);
         if (listenerName in tur.listeners) {
             this.stage.removeEventListener(listenerName, tur.listeners[listenerName], false);
         }
 
+        listener.persistent = persistent;
         tur.listeners[listenerName] = listener;
         this.stage.addEventListener(listenerName, listener, false);
     }
@@ -737,15 +741,21 @@ class Logo {
     /**
      * Removes active event listeners from all turtles and clears listener objects.
      *
+     * @param {boolean} preservePersistent - when true, listeners registered as
+     *  persistent (see setTurtleListener) are left attached instead of removed.
      * @returns {void}
      */
-    clearTurtleListeners() {
+    clearTurtleListeners(preservePersistent = false) {
         for (const turtle of this.turtles.turtleList) {
             if (turtle && turtle.listeners) {
-                for (const listener in turtle.listeners) {
-                    this.stage.removeEventListener(listener, turtle.listeners[listener], false);
+                for (const listenerName in turtle.listeners) {
+                    const listener = turtle.listeners[listenerName];
+                    if (preservePersistent && listener && listener.persistent) {
+                        continue;
+                    }
+                    this.stage.removeEventListener(listenerName, listener, false);
+                    delete turtle.listeners[listenerName];
                 }
-                turtle.listeners = {};
             }
         }
     }
@@ -1260,7 +1270,7 @@ class Logo {
         this.synth.disposeAllInstruments();
         this._synthsInitialized = false;
 
-        this.clearTurtleListeners();
+        this.clearTurtleListeners(true);
 
         // eslint-disable-next-line eqeqeq
         if (this.cameraID != null) {
@@ -1286,8 +1296,9 @@ class Logo {
             );
         }
 
-        // Remove active stage listeners and clear listener objects across all turtles.
-        this.clearTurtleListeners();
+        // Remove active stage listeners and clear listener objects across all turtles,
+        // except ones marked persistent (e.g. a Listen block's click handler).
+        this.clearTurtleListeners(true);
 
         // Prevent stale timeout from firing cleanup on next run.
         this._lastNoteTimeout = null;

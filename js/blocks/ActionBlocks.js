@@ -1119,8 +1119,10 @@ function setupActionBlocks(activity) {
                     }
                 };
 
-                // If there is already a listener, remove it before adding the new one
-                logo.setTurtleListener(turtle, args[0], __listener);
+                // If there is already a listener, remove it before adding the new one.
+                // Mark it persistent so it keeps listening for events (e.g. a click)
+                // after this run stops or finishes, which is the whole point of Listen.
+                logo.setTurtleListener(turtle, args[0], __listener, true);
             }
         }
     }

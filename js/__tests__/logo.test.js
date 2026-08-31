@@ -680,6 +680,89 @@ describe("Logo setTurtleListener", () => {
             false
         );
     });
+
+    test("defaults a listener to non-persistent", () => {
+        const listener = jest.fn();
+        mockActivity.turtles.ithTurtle = jest.fn(() => ({ listeners: {} }));
+
+        logo.setTurtleListener(0, "testListener", listener);
+
+        expect(listener.persistent).toBe(false);
+    });
+
+    test("marks a listener persistent when requested", () => {
+        const listener = jest.fn();
+        mockActivity.turtles.ithTurtle = jest.fn(() => ({ listeners: {} }));
+
+        logo.setTurtleListener(0, "testListener", listener, true);
+
+        expect(listener.persistent).toBe(true);
+    });
+});
+
+// ─── Logo clearTurtleListeners ─────────────────────────────────────────────────
+
+describe("Logo clearTurtleListeners", () => {
+    let logo;
+    let mockActivity;
+    let turtle;
+
+    beforeEach(() => {
+        setupLogoEnv();
+        turtle = createMockTurtle();
+        mockActivity = createMockActivity(turtle);
+        logo = new Logo(mockActivity);
+    });
+
+    afterEach(() => jest.restoreAllMocks());
+
+    test("removes every listener when preservePersistent is not set", () => {
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        const ephemeralListener = jest.fn();
+        turtle.listeners = { clickListener: persistentListener, beatListener: ephemeralListener };
+
+        logo.clearTurtleListeners();
+
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "beatListener",
+            ephemeralListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({});
+    });
+
+    test("preserves persistent listeners when preservePersistent is true", () => {
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        const ephemeralListener = jest.fn();
+        turtle.listeners = { clickListener: persistentListener, beatListener: ephemeralListener };
+
+        logo.clearTurtleListeners(true);
+
+        expect(mockActivity.stage.removeEventListener).not.toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "beatListener",
+            ephemeralListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({ clickListener: persistentListener });
+    });
+
+    test("does nothing when a turtle has no listeners object", () => {
+        mockActivity.turtles.turtleList = [null, { listeners: null }];
+
+        expect(() => logo.clearTurtleListeners()).not.toThrow();
+    });
 });
 
 // ─── Logo initTurtle ─────────────────────────────────────────────────────────
@@ -1010,6 +1093,33 @@ describe("Logo doStopTurtles", () => {
         expect(turtle.listeners).toEqual({});
     });
 
+    test("keeps a persistent listener attached on stop (#8367)", () => {
+        // A listener set up by a Listen block is marked persistent so it keeps
+        // responding to its event (e.g. a click) after Stop is pressed, the
+        // same way it did before #8244 started sweeping all listeners here.
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        const ephemeralListener = jest.fn();
+        turtle.listeners = {
+            clickListener: persistentListener,
+            __beat_1_0__: ephemeralListener
+        };
+
+        logo.doStopTurtles();
+
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "__beat_1_0__",
+            ephemeralListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).not.toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({ clickListener: persistentListener });
+    });
+
     describe("with Transport and audio streams", () => {
         let turtle0;
         let turtle1;
@@ -1319,6 +1429,25 @@ describe("Logo runLogoCommands", () => {
         expect(disposeSpy).toHaveBeenCalledTimes(1);
 
         global.Tone = savedTone;
+    });
+
+    test("keeps a persistent listener attached after natural playback completion (#8367)", () => {
+        // Before #8244, a Listen block's click listener stayed on the stage once
+        // a project finished playing on its own. _cleanupAfterCompletion() now
+        // runs clearTurtleListeners() automatically, so listeners marked
+        // persistent must survive this path too, not just an explicit Stop.
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        turtle0.listeners = { clickListener: persistentListener };
+
+        logo._cleanupAfterCompletion();
+
+        expect(mockActivity.stage.removeEventListener).not.toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(turtle0.listeners).toEqual({ clickListener: persistentListener });
     });
 
     describe("performance instrumentation", () => {
