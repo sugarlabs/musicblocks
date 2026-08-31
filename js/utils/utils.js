@@ -684,8 +684,11 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
             script.onerror = e => {
                 URL.revokeObjectURL(url);
                 document.head.removeChild(script);
-                console.error("Failed to load CSP Blob script for plugins", e);
-                reject(e);
+                const err = new Error(
+                    "Failed to load plugin script" + (e && e.message ? ": " + e.message : "")
+                );
+                console.error("Failed to load CSP Blob script for plugins", err);
+                reject(err);
             };
             document.head.appendChild(script);
         });
@@ -742,12 +745,15 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                 }
                 resolve();
             };
-            sScript.onerror = err => {
+            sScript.onerror = e => {
                 URL.revokeObjectURL(sUrl);
                 if (sScript.parentNode) {
                     sScript.parentNode.removeChild(sScript);
                 }
-                reject(err || new Error("Failed to execute plugin script"));
+                const err = new Error(
+                    "Failed to execute plugin script" + (e && e.message ? ": " + e.message : "")
+                );
+                reject(err);
             };
             document.head.appendChild(sScript);
         });
