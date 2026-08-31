@@ -1196,28 +1196,28 @@ function TemperamentWidget() {
         temperamentTableDiv.appendChild(controlsDiv);
 
         // ── Operations toolbar (presets + pitch count) ──
-        let _playAllTimer = null;
-        let _playAllRunning = false;
+        that._playAllTimer = null;
+        that._playAllRunning = false;
         const _playAll = function () {
-            if (_playAllRunning) {
-                clearTimeout(_playAllTimer);
-                _playAllRunning = false;
+            if (that._playAllRunning) {
+                clearTimeout(that._playAllTimer);
+                that._playAllRunning = false;
                 flashDot = -1;
                 _drawCircle();
                 return;
             }
-            _playAllRunning = true;
+            that._playAllRunning = true;
             let i = 0;
             const step = function () {
-                if (i >= that.pitchNumber || !_playAllRunning) {
-                    _playAllRunning = false;
+                if (i >= that.pitchNumber || !that._playAllRunning) {
+                    that._playAllRunning = false;
                     flashDot = -1;
                     _drawCircle();
                     return;
                 }
                 _playNote(i);
                 i++;
-                _playAllTimer = setTimeout(step, 300);
+                that._playAllTimer = setTimeout(step, 300);
             };
             step();
         };
@@ -1225,20 +1225,26 @@ function TemperamentWidget() {
         const opsDiv = document.createElement("div");
         opsDiv.style.display = "flex";
         opsDiv.style.flexWrap = "wrap";
-        opsDiv.style.gap = "4px";
-        opsDiv.style.marginBottom = "8px";
+        opsDiv.style.gap = "8px";
+        opsDiv.style.marginBottom = "10px";
+        opsDiv.style.alignItems = "center";
         const _iconBtn = function (icon, tooltip, fn) {
             const img = document.createElement("img");
             img.src = `header-icons/${icon}`;
             img.alt = tooltip;
             img.title = tooltip;
-            img.height = 32;
-            img.width = 32;
-            img.style.flexShrink = "0";
-            img.style.padding = "4px";
-            img.style.borderRadius = "6px";
-            img.style.cursor = "pointer";
+            img.height = 44;
+            img.width = 44;
+            img.className = "viz-icon-btn";
+            img.setAttribute("role", "button");
+            img.setAttribute("tabindex", "0");
             img.onclick = fn;
+            img.onkeydown = e => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    fn();
+                }
+            };
             opsDiv.appendChild(img);
             return img;
         };
@@ -1254,12 +1260,16 @@ function TemperamentWidget() {
             _highlightTableRow(highlightDot);
             _updateRemoveButton();
         };
-        _iconBtn("right-arrow.png", _("Add pitch after selected (clockwise)"), function () {
+        _iconBtn("add-clockwise.svg", _("Add pitch after selected (clockwise)"), function () {
             _addPitch(1);
         });
-        _iconBtn("left-arrow.png", _("Add pitch before selected (counterclockwise)"), function () {
-            _addPitch(-1);
-        });
+        _iconBtn(
+            "add-counterclockwise.svg",
+            _("Add pitch before selected (counterclockwise)"),
+            function () {
+                _addPitch(-1);
+            }
+        );
         const removeBtn = _iconBtn("delete.svg", _("Remove selected pitch"), function () {
             const s =
                 highlightDot >= 0 && highlightDot < that.pitchNumber
@@ -1734,6 +1744,7 @@ function TemperamentWidget() {
                 t = getTemperament("equal");
                 that.inTemperament = "equal";
             }
+            that._logo.synth.inTemperament = that.inTemperament;
             that.pitchNumber = t.pitchNumber;
             that.scale = Array.isArray(that.scale)
                 ? that.scale[0] + " " + that.scale[1]
@@ -2063,12 +2074,7 @@ function TemperamentWidget() {
 
         canvas.ontouchend = function () {
             _clearLongPress();
-            if (dragIndex >= 0) {
-                if (!dragMoved) _playNote(dragIndex);
-                dragIndex = -1;
-                lockedDrag = false;
-                _drawCircle();
-            }
+            _endDrag();
         };
 
         // Dropdown: switch active temperament
@@ -3633,6 +3639,19 @@ function TemperamentWidget() {
         const that = this;
 
         widgetWindow.onclose = function () {
+            if (that._playAllTimer) {
+                clearTimeout(that._playAllTimer);
+                that._playAllTimer = null;
+            }
+            that._playAllRunning = false;
+            if (that._vizMenu && that._vizMenu.parentNode) {
+                that._vizMenu.parentNode.removeChild(that._vizMenu);
+                that._vizMenu = null;
+            }
+            if (that._vizMenuClose) {
+                document.removeEventListener("mousedown", that._vizMenuClose);
+                that._vizMenuClose = null;
+            }
             if (that._playTimeout) {
                 clearTimeout(that._playTimeout);
                 that._playTimeout = null;
@@ -3829,6 +3848,11 @@ function TemperamentWidget() {
         };
 
         widgetWindow.addButton("circle.svg", ICONSIZE, _("Visualizer")).onclick = function () {
+            if (that._playAllTimer) {
+                clearTimeout(that._playAllTimer);
+                that._playAllTimer = null;
+            }
+            that._playAllRunning = false;
             that._visualizerView();
         };
 
