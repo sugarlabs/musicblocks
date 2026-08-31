@@ -3265,10 +3265,14 @@ const getTemperamentKeys = () => {
  * @returns {void}
  */
 const addTemperamentToList = newEntry => {
-    for (let i = 0; i < TEMPERAMENTS.length; i++) {
-        if (TEMPERAMENTS.some(entry => entry === newEntry)) {
-            return;
-        }
+    if (
+        TEMPERAMENTS.some(
+            entry =>
+                entry.length === newEntry.length &&
+                entry.every((value, index) => value === newEntry[index])
+        )
+    ) {
+        return;
     }
     TEMPERAMENTS.push(newEntry);
 };
