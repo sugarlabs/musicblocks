@@ -53,8 +53,8 @@ Reopen in Container
 Alternatively:
 
 1. Open the Command Palette:
-   - Linux/Windows: `Ctrl+Shift+P`
-   - macOS: `Cmd+Shift+P`
+    - Linux/Windows: `Ctrl+Shift+P`
+    - macOS: `Cmd+Shift+P`
 
 2. Run:
 
@@ -188,14 +188,14 @@ http://localhost:3000
 
 # What's Included
 
-| Feature | Details |
-|---|---|
-| Base Image | `mcr.microsoft.com/devcontainers/javascript-node:20` |
-| Node.js Version | 20 LTS |
-| Pre-installed Tools | `git`, `node`, `npm` |
-| VS Code Extensions | ESLint, Prettier, JSON support |
-| Forwarded Port | `3000` |
-| Post-create Hook | `npm install` |
+| Feature             | Details                                              |
+| ------------------- | ---------------------------------------------------- |
+| Base Image          | `mcr.microsoft.com/devcontainers/javascript-node:20` |
+| Node.js Version     | 20 LTS                                               |
+| Pre-installed Tools | `git`, `node`, `npm`                                 |
+| VS Code Extensions  | ESLint, Prettier, JSON support                       |
+| Forwarded Port      | `3000`                                               |
+| Post-create Hook    | `npm install`                                        |
 
 ---
 

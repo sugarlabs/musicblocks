@@ -1,156 +1,299 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Music Blocks Guide - Introduction</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"/>
-    <style>
-        body { padding-top: 20px; }
-        .sidebar { background-color: #f8f9fa; padding: 20px; border-radius: 4px; border-right: 1px solid #eee; }
-        .content { padding: 20px; }
-        img { max-width: 100%; height: auto; display: block; margin: 10px 0; }
-        pre { background-color: #f8f8f8; padding: 10px; border: 1px solid #ccc; white-space: pre-wrap; }
-        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background-color: #f2f2f2; text-align: left; }
-    </style>
-</head>
-<body>
-    <div class="container-fluid" style="max-width: 1200px;">
-        <div class="row">
-            <div class="col-md-3 sidebar">
-                <h4 style="margin-top: 0;">Navigation</h4>
-                <ul class="nav nav-pills nav-stacked" style="position: sticky; top: 20px;">
-<li class="active"><a href="index.html">Introduction</a></li>
-<li><a href="01-getting-started.html">1. Getting Started</a></li>
-<li><a href="02-making-sounds.html">2. Making Sounds</a></li>
-<li><a href="03-programming-with-music.html">3. Programming with Music</a></li>
-<li><a href="04-widgets.html">4. Widgets</a></li>
-<li><a href="05-beyond-music-blocks.html">5. Beyond Music Blocks</a></li>
-<li><a href="06-appendix.html">6. Appendix</a></li>
-</ul>
-            </div>
-            <div class="col-md-9 content">
-                <p>
-                  <a href="../guide/index.html">English</a> |
-                  <a href="../guide-es/index.html">Español</a> |
-                  <a href="../guide-ja/index.html">日本語</a> |
-                  <a href="../guide-zhCN/index.html">中文</a> |
-                  <a href="../guide-pt/index.html">Português</a>
-                </p>
-                <hr>
-                <h1>Guide to Programming with Music Blocks</h1>
-<p>Music Blocks is a programming environment for children interested in
-music and graphics. It expands upon Turtle Blocks by adding a
-collection of features relating to pitch and rhythm.</p>
-<p>The <a href="https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md">Turtle Blocks
-guide</a>
-is a good place to start learning about the basics. In this guide, we
-illustrate the musical features by walking the reader through numerous
-examples.</p>
-<p>The Music Blocks <a href="../documentation/README.md">basic documentation</a> is
-also a good resource.</p>
-<p>And there is a short <a href="../Debugging.md">Guide to Debugging</a> to help you
-with your programming.</p>
-<p>This guide details the many musical features of the language.</p>
-<h2><a name="TOC">TABLE OF CONTENTS</a></h2>
-<ol>
-<li><a href="#1-getting-started">Getting Started</a></li>
-<li><a href="#2-making-sounds">Making Sounds</a></li>
-<li><a href="#21-note-value-blocks">Note Value Blocks</a></li>
-<li><a href="#22-pitch-blocks">Pitch Blocks</a></li>
-<li><a href="#23-multiple-pitches">Multiple pitches</a></li>
-<li><a href="#24-rests">Rests</a></li>
-<li><a href="#25-drums">Drums</a></li>
-<li><a href="#3-programming-with-music">Programming with Music</a></li>
-<li><a href="#31-actions">Actions</a></li>
-<li><a href="#32-pitch-transformations">Pitch Transformations</a><ol>
-<li><a href="#321-step-pitch-block">Step Pitch Block</a></li>
-<li><a href="#322-sharps-and-flats">Sharps and Flats</a></li>
-<li><a href="#323-adjusting-transposition">Adjusting Transposition</a></li>
-<li><a href="#324-summary-of-pitch-movements">Summary of Pitch Movements</a></li>
-<li><a href="#325-set-key">Set Key</a></li>
-<li><a href="#326-fixed-and-movable-pitch-systems">Fixed and Movable Pitch Systems</a></li>
-<li><a href="#327-intervals">Intervals</a><ol>
-<li><a href="#3271-absolute-intervals">Absolute Intervals</a></li>
-<li><a href="#3272-ratio-intervals">Ratio Intervals</a></li>
-</ol>
-</li>
-<li><a href="#328-chords">Chords</a></li>
-<li><a href="#329-inversion">Inversion</a></li>
-<li><a href="#3210-converters">Converters</a><ol>
-<li><a href="#32101-y-to-pitch">Y to Pitch</a></li>
-<li><a href="#32102-pitch-converter">Pitch converter</a></li>
-<li><a href="#32103-number-to-octave">Number to Octave</a></li>
-<li><a href="#32104-number-to-pitch">Number to Pitch</a></li>
-</ol>
-</li>
-</ol>
-</li>
-<li><a href="#33-note-value-transformations">Note Value Transformations</a><ol>
-<li><a href="#331-dotted-notes">Dotted Notes</a></li>
-<li><a href="#332-speeding-up-and-slowing-down-notes-via-mathematical-operations">Speeding Up and Slowing Down Notes via Mathematical Operations</a></li>
-<li><a href="#333-repeating-notes">Repeating Notes</a></li>
-<li><a href="#334-swinging-notes-and-tied-notes">Swinging Notes and Tied Notes</a></li>
-<li><a href="#335-beat">Beat</a></li>
-<li><a href="#336-staccato-and-slur">Staccato and Slur Blocks</a></li>
-<li><a href="#337-backwards">Backwards</a></li>
-</ol>
-</li>
-<li><a href="#34-other-transformations">Other Transformations</a><ol>
-<li><a href="#341-set-volume-and-crescendo">Set Volume and Crescendo Blocks</a></li>
-<li><a href="#342-setting-instrument">Setting Instrument</a></li>
-<li><a href="#343-setting-key-and-mode">Setting Key and Mode</a></li>
-<li><a href="#344-vibrato-tremelo-et-al">Vibrato, Tremelo, et al.</a></li>
-</ol>
-</li>
-<li><a href="#35-voices">Voices</a></li>
-<li><a href="#36-adding-graphics">Graphics</a></li>
-<li><a href="#37-interactions">Interactions</a></li>
-<li><a href="#38-ensemble">Ensemble</a></li>
-<li><a href="#39-program-blocks">Program Blocks</a></li>
-<li><a href="#4-widgets">Widgets</a><ol>
-<li><a href="#41-monitoring-status">Monitoring Status</a></li>
-<li><a href="#42-generating-chunks-of-notes">Generating groups of Notes</a></li>
-<li><a href="#421-the-phrase-maker">The Phrase Maker</a></li>
-<li><a href="#422-the-rhythm-block">The Rhythm Block</a> </li>
-<li><a href="#423-creating-tuplets">Creating Tuplets</a></li>
-<li><a href="#424-what-is-a-tuplet">What is a Tuplet?</a></li>
-<li><a href="#425-using-individual-notes">Using Individual Notes</a></li>
-<li><a href="#426-using-a-scale-of-pitches">Using a Scale of Pitches</a></li>
-<li><a href="#427-lego-bricks-widget">LEGO Bricks Widget</a></li>
-<li><a href="#43-generating-rhythms">Generating Rhythms (or How to Make a Drum Machine)</a></li>
-<li><a href="#44-musical-modes">Musical Modes</a></li>
-<li><a href="#45-meters">Changing Meter</a></li>
-<li><a href="#46-the-pitch-drum-matrix">The Pitch-Drum Matrix</a></li>
-<li><a href="#47-exploring-musical-proportions">Exploring Musical Proportions</a></li>
-<li><a href="#48-generating-arbitrary-pitches">Generating Arbitrary Pitches</a></li>
-<li><a href="#49-changing-tempo">Changing Tempo</a></li>
-<li><a href="#410-custom-timbres">Creating Custom Timbres</a></li>
-<li><a href="#411-the-music-keyboard">The Music Keyboard</a></li>
-<li><a href="#412-changing-temperament">Changing Temperament</a></li>
-<li><a href="#413-the-oscilloscope">The Oscilloscope</a></li>
-<li><a href="#414-the-sampler">The Sampler</a></li>
-<li><a href="#415-arpeggio">Arpeggio</a></li>
-</ol>
-</li>
-<li><a href="#5-beyond-music-blocks">Beyond Music Blocks</a><ol>
-<li><a href="#51-lilypond">LilyPond (or How to Generate Sheet Music)</a></li>
-<li><a href="#52-other-exports">Other Exports</a></li>
-<li><a href="#53-the-javascript-editor">The JavaScript Editor</a></li>
-</ol>
-</li>
-<li><a href="#6-appendix">Appendix</a><ol>
-<li><a href="#61-beginner-palettes">Beginner Palette Tables</a></li>
-<li><a href="#62-advanced-palettes">Advanced Palette Tables</a></li>
-</ol>
-</li>
-</ol>
-<p>Many of the examples given in the guide have links to code you can
-run. Look for <code>RUN LIVE</code> links.</p>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Music Blocks Guide - Introduction</title>
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+            integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+            crossorigin="anonymous"
+        />
+        <style>
+            body {
+                padding-top: 20px;
+            }
+            .sidebar {
+                background-color: #f8f9fa;
+                padding: 20px;
+                border-radius: 4px;
+                border-right: 1px solid #eee;
+            }
+            .content {
+                padding: 20px;
+            }
+            img {
+                max-width: 100%;
+                height: auto;
+                display: block;
+                margin: 10px 0;
+            }
+            pre {
+                background-color: #f8f8f8;
+                padding: 10px;
+                border: 1px solid #ccc;
+                white-space: pre-wrap;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            th,
+            td {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+            th {
+                background-color: #f2f2f2;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container-fluid" style="max-width: 1200px">
+            <div class="row">
+                <div class="col-md-3 sidebar">
+                    <h4 style="margin-top: 0">Navigation</h4>
+                    <ul class="nav nav-pills nav-stacked" style="position: sticky; top: 20px">
+                        <li class="active"><a href="index.html">Introduction</a></li>
+                        <li><a href="01-getting-started.html">1. Getting Started</a></li>
+                        <li><a href="02-making-sounds.html">2. Making Sounds</a></li>
+                        <li>
+                            <a href="03-programming-with-music.html">3. Programming with Music</a>
+                        </li>
+                        <li><a href="04-widgets.html">4. Widgets</a></li>
+                        <li><a href="05-beyond-music-blocks.html">5. Beyond Music Blocks</a></li>
+                        <li><a href="06-appendix.html">6. Appendix</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-9 content">
+                    <p>
+                        <a href="../guide/index.html">English</a> |
+                        <a href="../guide-es/index.html">Español</a> |
+                        <a href="../guide-ja/index.html">日本語</a> |
+                        <a href="../guide-zhCN/index.html">中文</a> |
+                        <a href="../guide-pt/index.html">Português</a>
+                    </p>
+                    <hr />
+                    <h1>Guide to Programming with Music Blocks</h1>
+                    <p>
+                        Music Blocks is a programming environment for children interested in music
+                        and graphics. It expands upon Turtle Blocks by adding a collection of
+                        features relating to pitch and rhythm.
+                    </p>
+                    <p>
+                        The
+                        <a
+                            href="https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md"
+                            >Turtle Blocks guide</a
+                        >
+                        is a good place to start learning about the basics. In this guide, we
+                        illustrate the musical features by walking the reader through numerous
+                        examples.
+                    </p>
+                    <p>
+                        The Music Blocks
+                        <a href="../documentation/README.md">basic documentation</a> is also a good
+                        resource.
+                    </p>
+                    <p>
+                        And there is a short <a href="../Debugging.md">Guide to Debugging</a> to
+                        help you with your programming.
+                    </p>
+                    <p>This guide details the many musical features of the language.</p>
+                    <h2><a name="TOC">TABLE OF CONTENTS</a></h2>
+                    <ol>
+                        <li><a href="#1-getting-started">Getting Started</a></li>
+                        <li><a href="#2-making-sounds">Making Sounds</a></li>
+                        <li><a href="#21-note-value-blocks">Note Value Blocks</a></li>
+                        <li><a href="#22-pitch-blocks">Pitch Blocks</a></li>
+                        <li><a href="#23-multiple-pitches">Multiple pitches</a></li>
+                        <li><a href="#24-rests">Rests</a></li>
+                        <li><a href="#25-drums">Drums</a></li>
+                        <li><a href="#3-programming-with-music">Programming with Music</a></li>
+                        <li><a href="#31-actions">Actions</a></li>
+                        <li>
+                            <a href="#32-pitch-transformations">Pitch Transformations</a>
+                            <ol>
+                                <li><a href="#321-step-pitch-block">Step Pitch Block</a></li>
+                                <li><a href="#322-sharps-and-flats">Sharps and Flats</a></li>
+                                <li>
+                                    <a href="#323-adjusting-transposition"
+                                        >Adjusting Transposition</a
+                                    >
+                                </li>
+                                <li>
+                                    <a href="#324-summary-of-pitch-movements"
+                                        >Summary of Pitch Movements</a
+                                    >
+                                </li>
+                                <li><a href="#325-set-key">Set Key</a></li>
+                                <li>
+                                    <a href="#326-fixed-and-movable-pitch-systems"
+                                        >Fixed and Movable Pitch Systems</a
+                                    >
+                                </li>
+                                <li>
+                                    <a href="#327-intervals">Intervals</a>
+                                    <ol>
+                                        <li>
+                                            <a href="#3271-absolute-intervals"
+                                                >Absolute Intervals</a
+                                            >
+                                        </li>
+                                        <li><a href="#3272-ratio-intervals">Ratio Intervals</a></li>
+                                    </ol>
+                                </li>
+                                <li><a href="#328-chords">Chords</a></li>
+                                <li><a href="#329-inversion">Inversion</a></li>
+                                <li>
+                                    <a href="#3210-converters">Converters</a>
+                                    <ol>
+                                        <li><a href="#32101-y-to-pitch">Y to Pitch</a></li>
+                                        <li>
+                                            <a href="#32102-pitch-converter">Pitch converter</a>
+                                        </li>
+                                        <li>
+                                            <a href="#32103-number-to-octave">Number to Octave</a>
+                                        </li>
+                                        <li>
+                                            <a href="#32104-number-to-pitch">Number to Pitch</a>
+                                        </li>
+                                    </ol>
+                                </li>
+                            </ol>
+                        </li>
+                        <li>
+                            <a href="#33-note-value-transformations">Note Value Transformations</a>
+                            <ol>
+                                <li><a href="#331-dotted-notes">Dotted Notes</a></li>
+                                <li>
+                                    <a
+                                        href="#332-speeding-up-and-slowing-down-notes-via-mathematical-operations"
+                                        >Speeding Up and Slowing Down Notes via Mathematical
+                                        Operations</a
+                                    >
+                                </li>
+                                <li><a href="#333-repeating-notes">Repeating Notes</a></li>
+                                <li>
+                                    <a href="#334-swinging-notes-and-tied-notes"
+                                        >Swinging Notes and Tied Notes</a
+                                    >
+                                </li>
+                                <li><a href="#335-beat">Beat</a></li>
+                                <li>
+                                    <a href="#336-staccato-and-slur">Staccato and Slur Blocks</a>
+                                </li>
+                                <li><a href="#337-backwards">Backwards</a></li>
+                            </ol>
+                        </li>
+                        <li>
+                            <a href="#34-other-transformations">Other Transformations</a>
+                            <ol>
+                                <li>
+                                    <a href="#341-set-volume-and-crescendo"
+                                        >Set Volume and Crescendo Blocks</a
+                                    >
+                                </li>
+                                <li><a href="#342-setting-instrument">Setting Instrument</a></li>
+                                <li>
+                                    <a href="#343-setting-key-and-mode">Setting Key and Mode</a>
+                                </li>
+                                <li>
+                                    <a href="#344-vibrato-tremelo-et-al"
+                                        >Vibrato, Tremelo, et al.</a
+                                    >
+                                </li>
+                            </ol>
+                        </li>
+                        <li><a href="#35-voices">Voices</a></li>
+                        <li><a href="#36-adding-graphics">Graphics</a></li>
+                        <li><a href="#37-interactions">Interactions</a></li>
+                        <li><a href="#38-ensemble">Ensemble</a></li>
+                        <li><a href="#39-program-blocks">Program Blocks</a></li>
+                        <li>
+                            <a href="#4-widgets">Widgets</a>
+                            <ol>
+                                <li><a href="#41-monitoring-status">Monitoring Status</a></li>
+                                <li>
+                                    <a href="#42-generating-chunks-of-notes"
+                                        >Generating groups of Notes</a
+                                    >
+                                </li>
+                                <li><a href="#421-the-phrase-maker">The Phrase Maker</a></li>
+                                <li><a href="#422-the-rhythm-block">The Rhythm Block</a></li>
+                                <li><a href="#423-creating-tuplets">Creating Tuplets</a></li>
+                                <li><a href="#424-what-is-a-tuplet">What is a Tuplet?</a></li>
+                                <li>
+                                    <a href="#425-using-individual-notes">Using Individual Notes</a>
+                                </li>
+                                <li>
+                                    <a href="#426-using-a-scale-of-pitches"
+                                        >Using a Scale of Pitches</a
+                                    >
+                                </li>
+                                <li><a href="#427-lego-bricks-widget">LEGO Bricks Widget</a></li>
+                                <li>
+                                    <a href="#43-generating-rhythms"
+                                        >Generating Rhythms (or How to Make a Drum Machine)</a
+                                    >
+                                </li>
+                                <li><a href="#44-musical-modes">Musical Modes</a></li>
+                                <li><a href="#45-meters">Changing Meter</a></li>
+                                <li>
+                                    <a href="#46-the-pitch-drum-matrix">The Pitch-Drum Matrix</a>
+                                </li>
+                                <li>
+                                    <a href="#47-exploring-musical-proportions"
+                                        >Exploring Musical Proportions</a
+                                    >
+                                </li>
+                                <li>
+                                    <a href="#48-generating-arbitrary-pitches"
+                                        >Generating Arbitrary Pitches</a
+                                    >
+                                </li>
+                                <li><a href="#49-changing-tempo">Changing Tempo</a></li>
+                                <li><a href="#410-custom-timbres">Creating Custom Timbres</a></li>
+                                <li><a href="#411-the-music-keyboard">The Music Keyboard</a></li>
+                                <li>
+                                    <a href="#412-changing-temperament">Changing Temperament</a>
+                                </li>
+                                <li><a href="#413-the-oscilloscope">The Oscilloscope</a></li>
+                                <li><a href="#414-the-sampler">The Sampler</a></li>
+                                <li><a href="#415-arpeggio">Arpeggio</a></li>
+                            </ol>
+                        </li>
+                        <li>
+                            <a href="#5-beyond-music-blocks">Beyond Music Blocks</a>
+                            <ol>
+                                <li>
+                                    <a href="#51-lilypond"
+                                        >LilyPond (or How to Generate Sheet Music)</a
+                                    >
+                                </li>
+                                <li><a href="#52-other-exports">Other Exports</a></li>
+                                <li>
+                                    <a href="#53-the-javascript-editor">The JavaScript Editor</a>
+                                </li>
+                            </ol>
+                        </li>
+                        <li>
+                            <a href="#6-appendix">Appendix</a>
+                            <ol>
+                                <li><a href="#61-beginner-palettes">Beginner Palette Tables</a></li>
+                                <li><a href="#62-advanced-palettes">Advanced Palette Tables</a></li>
+                            </ol>
+                        </li>
+                    </ol>
+                    <p>
+                        Many of the examples given in the guide have links to code you can run. Look
+                        for <code>RUN LIVE</code> links.
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
-</body>
+    </body>
 </html>

@@ -25,7 +25,7 @@
 }
 
 /* Individual floating buttons */
-.play-only #buttoncontainerBOTTOM>div {
+.play-only #buttoncontainerBOTTOM > div {
     position: static !important;
     display: flex !important;
     pointer-events: auto !important;
@@ -47,11 +47,11 @@
     transition: transform 0.2s ease !important;
 }
 
-.play-only #buttoncontainerBOTTOM>div:active {
+.play-only #buttoncontainerBOTTOM > div:active {
     transform: scale(0.9) !important;
 }
 
-.play-only #buttoncontainerBOTTOM>div img {
+.play-only #buttoncontainerBOTTOM > div img {
     width: 32px !important;
     height: 32px !important;
     margin: 0 !important;
@@ -73,7 +73,7 @@
     pointer-events: none !important;
 }
 
-.play-only #floatingWindows>div {
+.play-only #floatingWindows > div {
     pointer-events: auto !important;
 }
 

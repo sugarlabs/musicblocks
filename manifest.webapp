@@ -1,28 +1,32 @@
 {
-  "name": "Music Blocks",
-  "short_name": "MB",
-  "description": "Learn to program music with snap-together blocks!",
-  "start_url": ".",
-  "launch_path": "/index.html",
-  "background_color": "white",
-  "icons": [{
-    "src": "/activity/activity-icon-color-512.png",
-    "sizes": "512x512",
-    "type": "image/png"
-  },
-  {
-    "src": "/activity/activity-icon-color-128.png",
-    "sizes": "128x128",
-    "type": "image/png"
-  }],
-  "developer": {
-    "name": "Walter Bender",
-    "url": "https://sugarlabs.org"
-  },
-  "default_locale": "en",
-  "screenshots": [{
-      "src": "screenshots/Screenshot-1.png",
-      "sizes": "1440x715",
-      "type": "image/png"
-  }]
+    "name": "Music Blocks",
+    "short_name": "MB",
+    "description": "Learn to program music with snap-together blocks!",
+    "start_url": ".",
+    "launch_path": "/index.html",
+    "background_color": "white",
+    "icons": [
+        {
+            "src": "/activity/activity-icon-color-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/activity/activity-icon-color-128.png",
+            "sizes": "128x128",
+            "type": "image/png"
+        }
+    ],
+    "developer": {
+        "name": "Walter Bender",
+        "url": "https://sugarlabs.org"
+    },
+    "default_locale": "en",
+    "screenshots": [
+        {
+            "src": "screenshots/Screenshot-1.png",
+            "sizes": "1440x715",
+            "type": "image/png"
+        }
+    ]
 }

@@ -8,5 +8,5 @@ module.exports = defineConfig({
         viewportWidth: 1400,
         viewportHeight: 1000,
         testIsolation: false
-    },
+    }
 });

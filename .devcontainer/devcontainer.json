@@ -23,7 +23,7 @@
     },
 
     "forwardPorts": [3000],
-    "portsAttributes": {
+    "portsAttributes": { 
         "3000": {
             "label": "Music Blocks Dev Server",
             "onAutoForward": "notify"

@@ -14,12 +14,12 @@ application (toolbar, palettes, widgets, modals) is audited.
 
 ## Summary (first pass)
 
-| Severity | Count |
-|----------|-------|
-| Critical | 14 |
-| Serious  | 2 |
-| Moderate | 0 |
-| Minor    | 0 |
+| Severity  | Count  |
+| --------- | ------ |
+| Critical  | 14     |
+| Serious   | 2      |
+| Moderate  | 0      |
+| Minor     | 0      |
 | **Total** | **16** |
 
 ---
@@ -27,6 +27,7 @@ application (toolbar, palettes, widgets, modals) is audited.
 ## Findings
 
 ### 1. Insufficient color contrast on tour/help tooltip text
+
 - **Severity:** Serious (2 instances)
 - **WCAG criterion:** 1.4.3 Contrast (Minimum) — AA
 - **Rule:** `color-contrast` (axe)
@@ -42,6 +43,7 @@ application (toolbar, palettes, widgets, modals) is audited.
 ---
 
 ### 2. Palette category icons missing accessible names
+
 - **Severity:** Critical (13 instances)
 - **WCAG criterion:** 1.1.1 Non-text Content — A (blocks AA compliance)
 - **Rule:** `image-alt` (axe)
@@ -53,14 +55,15 @@ application (toolbar, palettes, widgets, modals) is audited.
   users get no indication of which palette category each tab represents.
 - **Likely file:** `js/palette.js` (palette tab/icon construction)
 - **Recommended fix:**
-  - If the parent `td[role="tab"]` already carries a textual label, mark the
-    icon itself as decorative with `alt=""` or `role="presentation"`.
-  - Otherwise, add `aria-label="<Palette name> palette"` (e.g.
-    `aria-label="Pitch palette"`) to each icon so it has a discernible name.
+    - If the parent `td[role="tab"]` already carries a textual label, mark the
+      icon itself as decorative with `alt=""` or `role="presentation"`.
+    - Otherwise, add `aria-label="<Palette name> palette"` (e.g.
+      `aria-label="Pitch palette"`) to each icon so it has a discernible name.
 
 ---
 
 ### 3. Paste input button has no discernible text
+
 - **Severity:** Critical (1 instance)
 - **WCAG criterion:** 4.1.2 Name, Role, Value — A (blocks AA compliance)
 - **Rule:** `input-button-name` (axe)
@@ -71,9 +74,9 @@ application (toolbar, palettes, widgets, modals) is audited.
 - **Likely file:** `js/activity.js` or related toolbar/clipboard handling
   code (search for `doPaste()`)
 - **Recommended fix:**
-  - Add `aria-label="Paste"` so the button has a discernible name.
-  - Re-evaluate `tabindex="-1"` — if this control should be keyboard
-    reachable, change to `tabindex="0"` (see Known Issue below on tab order).
+    - Add `aria-label="Paste"` so the button has a discernible name.
+    - Re-evaluate `tabindex="-1"` — if this control should be keyboard
+      reachable, change to `tabindex="0"` (see Known Issue below on tab order).
 
 ---
 
@@ -86,12 +89,12 @@ in #6608, but are noted here for completeness:
   unconditionally called `event.preventDefault()` on `keyCode === 9`,
   trapping keyboard focus. **Fixed** — Tab is now only suppressed when
   focus is on the canvas/body; real DOM elements (toolbar buttons, widget
-  inputs) receive normal Tab navigation. *(WCAG 2.1.2 No Keyboard Trap)*
+  inputs) receive normal Tab navigation. _(WCAG 2.1.2 No Keyboard Trap)_
 - **Focus indicator suppressed on `#search` input** in
   `css/activities.css` — `outline: none` on `#search:focus` removes the
   visible focus ring for keyboard users on the search field, even though
   the global `*:focus-visible` rule provides one elsewhere.
-  *(WCAG 2.4.7 Focus Visible)*
+  _(WCAG 2.4.7 Focus Visible)_
 
 ---
 

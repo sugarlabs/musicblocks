@@ -146,7 +146,9 @@ function setupRhythmActions(activity) {
                         const nextBeat = 1 / noteBeatValue - 2 * tur.singer.neighborNoteValue;
                         if (nextBeat <= 0 || !isFinite(nextBeat)) {
                             activity.errorMsg(
-                                _("Neighbor note value is too large for the current note duration."),
+                                _(
+                                    "Neighbor note value is too large for the current note duration."
+                                ),
                                 blk
                             );
                         } else {

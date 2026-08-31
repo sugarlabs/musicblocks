@@ -1,5 +1,5 @@
 # ミュージック・ブロックスのプログラミング案内
-  
+
 ミュージック・ブロックスは子供のための音楽とコードが合体されているプログラミング環境。子供さん達はこのツールで音楽、数学、またコードの基本な色々が楽しく発見することができます。ミュージック・ブロックスはタートルブロックから作られて、ピッチとリズムのツールもあります。
 
 タートルブロックの案内はミュージック・ブロックスより基本的なコンセプトがあります。この案内は音楽の基本があり、ミュージック・ブロックスの実例があります。
@@ -8,52 +8,52 @@
 
 1. [初めに](#初めに)
 2. [音の関係](#音符)
-   1. [音価のブロック](#音価)
-   2. [ピッチのブロック](#ピッチ)
-   3. [和音](#和音)
-   4. [休符](#休符)
-   5. [ドラム](#ドラム)
+    1. [音価のブロック](#音価)
+    2. [ピッチのブロック](#ピッチ)
+    3. [和音](#和音)
+    4. [休符](#休符)
+    5. [ドラム](#ドラム)
 3. [音楽でプログラミング](#音楽でプログラミング)
-   1. [チャンク](#チャンク)
-   2. [音楽的の転化](#転化)
-      1. [音符動きのブロック](#音符動き)
-      2. [シャープ(嬰)とフラット(変)](#シャープ(嬰)とフラット(変))
-      3. [移調をアジャストのブロック](#移調をアジャスト)
-      4. [付点音符](#付点音符（ドット）)
-      5. [演算で音価をかけ割ること](#かけることと割ること)
-      6. [回繰り返し音符](#繰り返し)
-      7. [スイング・リズムとタイの音符](#スイング)
-      8. [音量、クレシェンド、スタッカート、スラーのブロック](#他の転化)
-      9. [音程と相対的な音量の関係](#音程と相対的な音量)
-      10. [絶対音程](#絶対音程)
-      11. [音符転回](#転回)
-      12. [逆に](#逆に)
-      13. [音色と調の設定](#音色と調の設定)
-      14. [ビブラート](#ビブラート)
-   3. [声部](#声部)
-   4. [グラフィックス](#グラフィックス)
-   5. [拍子](#拍子)
-   6. [相互作用](#相互作用)
- 4. [ウィジェット](#ウィジェット)
+    1. [チャンク](#チャンク)
+    2. [音楽的の転化](#転化)
+        1. [音符動きのブロック](#音符動き)
+        2. [シャープ(嬰)とフラット(変)](<#シャープ(嬰)とフラット(変)>)
+        3. [移調をアジャストのブロック](#移調をアジャスト)
+        4. [付点音符](#付点音符（ドット）)
+        5. [演算で音価をかけ割ること](#かけることと割ること)
+        6. [回繰り返し音符](#繰り返し)
+        7. [スイング・リズムとタイの音符](#スイング)
+        8. [音量、クレシェンド、スタッカート、スラーのブロック](#他の転化)
+        9. [音程と相対的な音量の関係](#音程と相対的な音量)
+        10. [絶対音程](#絶対音程)
+        11. [音符転回](#転回)
+        12. [逆に](#逆に)
+        13. [音色と調の設定](#音色と調の設定)
+        14. [ビブラート](#ビブラート)
+    3. [声部](#声部)
+    4. [グラフィックス](#グラフィックス)
+    5. [拍子](#拍子)
+    6. [相互作用](#相互作用)
+4. [ウィジェット](#ウィジェット)
     1. [ステータス・モニター](#ステータス)
     2. [音符のチャンクを作ること](#ピッチ・タイム行列)
-       1. [ピッチ・タイム行列](#ピッチ・タイム行列) 
-       2. [リズムのブロック](#リズムのブロック) 
-       3. [タプルのこと](#タプルのこと)
-       4. [「タプル」というのは？](#タプルとは)
-       5. [Using Individual Notes in the Matrix](#INDIVIDUAL-NOTES)
+        1. [ピッチ・タイム行列](#ピッチ・タイム行列)
+        2. [リズムのブロック](#リズムのブロック)
+        3. [タプルのこと](#タプルのこと)
+        4. [「タプル」というのは？](#タプルとは)
+        5. [Using Individual Notes in the Matrix](#INDIVIDUAL-NOTES)
     3. [リズム・ブロックでリズムを](#リズム・ブロック)
     4. [音楽の音階とモード](#音階とモード)
     5. [ピッチ・ドラム・グラフ](#ピッチ・ドラム)
     6. [音程の関係のことをピッチスライダーで発見](#ピッチの階段)
     7. [ピッチ・スライダーで何のピッチでも発見](#ピッチ・スライダー)
     8. [テンポを変えること](#テンポ)
- 5. [ミュージック・ブロックスから以遠](#ミュージック・ブロックスから以遠)
+5. [ミュージック・ブロックスから以遠](#ミュージック・ブロックスから以遠)
 
 この案内の中の例はコードのリンクもあります。そのすぐ楽しめるコードのリンクは`ライブで再生`と書いております。
 
 ## <a name="初めに"></a>1. 初めに
-                                                     
+
 [目次に戻す](#目次) | [次のトピック (2. 音符の音を鳴らすのに)](#音符)
 
 ミュージック・ブロックスはブラウザーで実行するために作られています。クローム・ブラウザーで一番テストされていますがファイヤーフォックスも実行できます。[github io（ギットハーブ）](https://musicblocks.sugarlabs.org)のウェブサイトから実行でき、ミュージック・ブロックスのソース・コードもダウンロードして自分のパソコンで実行できます。
@@ -62,12 +62,14 @@
 ミュージック・ブロックスの元のタートル・ブロックスの細かいを楽しみたかったら、[タートル・ブロックスの基本](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation)をどうぞ読んでください。
 
 ## <a name="音符"></a>
+
 2. 音の関係 [前のトピック (1. 初めに)](#初めに) | [目次に戻す](#目次) |
-[次のトピック (3. 音楽でプログラミング)](#音楽でプログラミング)
+   [次のトピック (3. 音楽でプログラミング)](#音楽でプログラミング)
 
 ミュージック・ブロックスは音楽の基本の色々があります。例えば、[ピッチ](#ピッチ), [リズム](#リズム・ブロック), [音量](#他の転化),[音色とシンセ](#シンセ)のツールもあります。
 
 ### <a name="音価"></a>
+
 2.1 音価のブロック
 
 ミュージック・ブロックスの一番基本なブロックは*音価*ブロックです。*音価*ブロックの中に[*ピッチ*ブロック](#ピッチ)が入られることができます。音価ブロックはピッチの長さがどのぐらいか決めます。
@@ -87,15 +89,15 @@
 *音価*ブロックの数値を数字・計算のブロックでいろいろな算数ができますよ。
 
 ![alt
- tag](../charts/NotationRestChart.svg
- "音価とその音価の音価ブロックの図表です。")
+ tag](../charts/NotationRestChart.svg "音価とその音価の音価ブロックの図表です。")
 
 上の図表を使って音価とその音価のブロックを閲覧してください。
 
 ### <a name="ピッチ"></a>
+
 2.2 ピッチのブロック
 
-*ピッチ*ブロックは[*音価*](#音価)ブロックの中に使われています。*ピッチ*ブロックはピッチの名前とピッチのオクターヴを決めます。ピッチの名前とオクターヴの数値を組み合わせて、音符の振動（音波の振動）を決めます。
+*ピッチ*ブロックは[_音価_](#音価)ブロックの中に使われています。*ピッチ*ブロックはピッチの名前とピッチのオクターヴを決めます。ピッチの名前とオクターヴの数値を組み合わせて、音符の振動（音波の振動）を決めます。
 
 ![alt
  tag](./note3.svg "ピッチブロックの名前とオクターヴを決める方法")
@@ -114,7 +116,7 @@
 
 ハーツを使うとオクターヴのインプットがむしします。オクターヴの数値のインプットは全数の必要があります。
 
-ピッチの名前は*文事*ブロックでもインプットができますよ。 
+ピッチの名前は*文事*ブロックでもインプットができますよ。
 
 ![alt tag](../charts/KeyboardChart.svg "音符のピッチとピアノ・キーボード図")
 ![alt tag](../charts/MalletChart.svg "音符のピッチとマレット・パーカッション（打楽器）図")
@@ -148,7 +150,7 @@
 
 [前のトピック (2. 音の関係)](#音符) | [目次に戻す](#目次) | [次のトピック (4. ウィジェット)](#ウィジェット)
 
-このセクションのトピックはチャンクで*動作*ブロックを使って音楽とプログラミングができます。チャンクが自分で動作ブロックを使って作ることも、[*ピッチ・タイム行列*](#ピッチ・タイム行列)を使って作ることもできます。
+このセクションのトピックはチャンクで*動作*ブロックを使って音楽とプログラミングができます。チャンクが自分で動作ブロックを使って作ることも、[_ピッチ・タイム行列_](#ピッチ・タイム行列)を使って作ることもできます。
 
 ### <a name="チャンク"></a>3.1 チャンク
 
@@ -199,10 +201,10 @@
 ![alt tag](./transform16.svg "Using the Consonant Step Up and Down blocks")
 
 Another way to move up and down notes in a scale is to use the
-*Consonant Step Up* and *Consonant Step Down* blocks. These blocks
+_Consonant Step Up_ and _Consonant Step Down_ blocks. These blocks
 calculate the number of half-steps to the next note in the current
 mode. (You can read more about [音楽の音階とモード](#音階とモード) below.) Note
-that the *Mouse,ピッチ,数字・算数* block returns the ピッチ number of the
+that the _Mouse,ピッチ,数字・算数_ block returns the ピッチ number of the
 most recent note played.
 
 #### <a name="シャープ(嬰)とフラット(変)"></a>3.2.2 シャープ(嬰)とフラット(変)
@@ -259,7 +261,7 @@ note.
 
 対の音符の音価は同じじゃないのスイング・ブロックは効果がありません。
 
-上の例で`レ 5`は`1/6`の音価で鳴らして、`ミ 5`は`1/12`の音価で鳴らします。(`1/8 + 1/24 === 1/6` and `1/8 - 1/24 ===　1/12`)。 
+上の例で`レ 5`は`1/6`の音価で鳴らして、`ミ 5`は`1/12`の音価で鳴らします。(`1/8 + 1/24 === 1/6` and `1/8 - 1/24 ===　1/12`)。
 
 対の音符の音価の合計は変わっていませんよ。
 
@@ -332,7 +334,7 @@ note.
 The *音階/モードを設定*ブロックは block will change the key and mode of the mapping
 between solfege, e.g., `ド`, `レ`, `ミ`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. 音階とモード include 長 and 短, Chromatic,
-and a number of more exotic 音階とモード, such as Bebop, Geez, Maqam, etc. 
+and a number of more exotic 音階とモード, such as Bebop, Geez, Maqam, etc.
 This block allows users to access "movable ド" within Music
 Blocks, where the mapping of solfege to particular ピッチ changes
 depending on the user's specified tonality.
@@ -407,13 +409,13 @@ In the above example, the sequence of [ドラム](#ドラム) beats is increased
 
 グラフィックスと音楽が一緒に合わせるため、もう一つのやり方がグラフィックスのコードを*音価*ブロックに入れるとその音価の期間で動作が行います。
 
-ネズミのスプライトがダンスのように動くんでしょう。(added a comment that it is "dance-like"; need to change instances of turtle to mouse in English version) 
+ネズミのスプライトがダンスのように動くんでしょう。(added a comment that it is "dance-like"; need to change instances of turtle to mouse in English version)
 
 [ライブで再生](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
 ![alt tag](./fibonacci3.svg "「クロックなし」ブロックの使い方")
 
-上の例に、グラフィックスとと音楽のコンピュータの操作がもと複雑の訳で音楽のタイミングをずらさないため、*クロックなし*ブロックがグラフィックスと音楽の動きを区別します。"クロックなし*ブロックはそれぞれの動作の順番をリズムより優先します。
+上の例に、グラフィックスとと音楽のコンピュータの操作がもと複雑の訳で音楽のタイミングをずらさないため、*クロックなし*ブロックがグラフィックスと音楽の動きを区別します。"クロックなし\*ブロックはそれぞれの動作の順番をリズムより優先します。
 
 ![alt tag](./graphics4.png "リズムの連続")
 
@@ -502,7 +504,7 @@ the volumne to 5. The resultant graphic is shown below.
 
 ステータス・ブロックでその他にプログラムできます。上の例でステータス・ブロックに入っているのは今の鳴らされている音量が放送する前、10割の計算がされています。
 
-### <a name="GENERATION"></a>4.2 音符のチャンクの作り方 
+### <a name="GENERATION"></a>4.2 音符のチャンクの作り方
 
 Using the ピッチ・タイム行列を使って、音符のチャンク(メロデイ)を簡単に作ることができます。
 
@@ -518,20 +520,20 @@ Using the ピッチ・タイム行列を使って、音符のチャンク(メロ
 
 *ピッチ・タイム行列*を使いたい際はパレットで「ウィジット」をクリックして「ピッチ・タイム行列」をそのパレットから引きます。そのブロックをクリックすると行列が現れるべきです。ピッチが横でリズム(時期)が縦です.
 
-(This in the English version is dated as we do not have the pitch-time matrix at the start) 
+(This in the English version is dated as we do not have the pitch-time matrix at the start)
 
 ![alt tag](./matrix2.svg "ピッチ・タイム行列にピッチとリズムのそれぞれのブロックの使い方")
 
-The matrix in the figure above has three *ピッチ* blocks and one
-*リズム* block, which is used to create a 3 x 3 grid of ピッチ and
+The matrix in the figure above has three _ピッチ_ blocks and one
+_リズム_ block, which is used to create a 3 x 3 grid of ピッチ and
 time.
 
-Note that the default matrix has five *ピッチ* blocks, hence, you will
+Note that the default matrix has five _ピッチ_ blocks, hence, you will
 see five rows, one for each ピッチ. (A sixth row at the bottom is used
 for specifying the リズム・ブロック associated with each note.) Also by
-default, there are two *リズム* blocks, which specifies six quarter
-notes followed by one half note. Since the *リズム* blocks are inside
-of a *回繰り返す* block, there are fourteen (2 x 7) columns for selecting
+default, there are two _リズム_ blocks, which specifies six quarter
+notes followed by one half note. Since the _リズム_ blocks are inside
+of a _回繰り返す_ block, there are fourteen (2 x 7) columns for selecting
 notes.
 
 ![alt tag](./matrix3.svg "matrix")
@@ -543,15 +545,14 @@ cells). First `レ 4`, followed by `ミ 4`, followed by `ソ 4`.
 
 ![alt tag](../header-icons/play-button.svg "play button")
 
-If you クリック on the *Play* button (found in the top row of the grid),
+If you クリック on the _Play_ button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `レ 4`,
 `ミ 4`, `ソ 4`.
 
 ![alt tag](../header-icons/export-chunk.svg "save button")
 
-
 Once you have a group of notes (a "チャンク") that you like, クリック on the
-*Save* button (just to the right of the *Play* button). This will
+_Save_ button (just to the right of the _Play_ button). This will
 create a stack of blocks that can used to play these same notes
 programmatically. (More on that below.)
 
@@ -560,18 +561,15 @@ as well.
 
 ![alt tag](../header-icons/sort.svg "sort button")
 
-
-The *Sort* button will reorder the ピッチ in the matrix from highest
-to lowest and eliminate any 重に *ピッチ* blocks.
+The _Sort_ button will reorder the ピッチ in the matrix from highest
+to lowest and eliminate any 重に _ピッチ_ blocks.
 
 ![alt tag](../header-icons/close-button.svg "close button")
 
-
-You can hide the matrix by クリックing on the *Close* button (the right-most
+You can hide the matrix by クリックing on the _Close_ button (the right-most
 button in the top row of the grid.)
 
 ![alt tag](../header-icons/erase-button.svg "erase button")
-
 
 There is also an Erase button that will clear the grid.
 
@@ -579,20 +577,20 @@ Don't worry. You can reopen the matrix at anytime (it will remember
 its previous state) and since you can define as many チャンク as you
 want, feel free to experiment.
 
-Tip: You can put a チャンク inside a *ピッチ・タイム行列* block to generate
+Tip: You can put a チャンク inside a _ピッチ・タイム行列_ block to generate
 the matrix to corresponds to that チャンク.
 
 ![alt tag](./matrix4.svg "usage of octave for a ピッチ")
 
 The チャンク created when you クリック on the matrix is a stack of
-blocks. The blocks are nested: an *動作* block contains three *Note
-value* blocks, each of which contains a *ピッチ* block. The *動作*
+blocks. The blocks are nested: an _動作_ block contains three _Note
+value_ blocks, each of which contains a _ピッチ_ block. The _動作_
 block has a name automatically generated by the matrix, in this case,
 チャンク. (You can rename the action by クリックing on the name.). Each note
 has a duration (in this case 4, which represents a quarter note). Try
 putting different numbers in and see (hear) what happens. Each note
 block also has a ピッチ block (if it were a 和音, there would be
-multiple *ピッチ* blocks nested inside the Note block's clamp). Each
+multiple _ピッチ_ blocks nested inside the Note block's clamp). Each
 ピッチ block has a ピッチ name (`レ`, `ミ`, and `ソ`), and a ピッチ
 octave; in this example, the octave is 4 for each ピッチ. (Try changing
 the ピッチ names and the ピッチ octaves.)
@@ -604,8 +602,8 @@ action). You should hear the notes play, ordered from top to bottom.
 
 ![alt tag](./matrix6.svg "the リズム block")
 
-*リズム* blocks are used to generate リズム patterns in the
-*ピッチ・タイム行列* block. The top argument to the *リズム* block
+_リズム_ blocks are used to generate リズム patterns in the
+_ピッチ・タイム行列_ block. The top argument to the _リズム_ block
 is the number of notes. The bottom argument is the duration of the
 note. In the top example above, three columns for quarter notes
 would be generated in the matrix. In the middle example, one column
@@ -616,8 +614,8 @@ columns for 16th notes would be generated.
 
 ![alt tag](./matrix8.svg "resulting notes in tabular format")
 
-You can use as many *リズム* blocks as you'd like inside the
-*ピッチ・タイム行列* block. In the above example, two *リズム*
+You can use as many _リズム_ blocks as you'd like inside the
+_ピッチ・タイム行列_ block. In the above example, two _リズム_
 blocks are used, resulting in three quarter notes and six eighth
 notes.
 
@@ -631,17 +629,17 @@ Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
 are not based on a power of 2.
 
-In the example above, three quarter notes&mdash;defined in the *Simple
-Tuplet* block&mdash;are played in the time of a single quarter
+In the example above, three quarter notes&mdash;defined in the _Simple
+Tuplet_ block&mdash;are played in the time of a single quarter
 note. The result is three twelfth notes. (This form, which is quite
-common in music, is called a *triplet*. Other common tuplets include a
-*quintuplet* and a *septuplet*.)
+common in music, is called a _triplet_. Other common tuplets include a
+_quintuplet_ and a _septuplet_.)
 
 ![alt tag](./matrix11.svg "usage of tuplet")
 
 In the example above, the three quarter notes are defined in the
-*リズム* block embedded in the *Tuplet* block. As with the *Simple
-Tuplet* example, they are played in the time of a single quarter
+_リズム_ block embedded in the _Tuplet_ block. As with the _Simple
+Tuplet_ example, they are played in the time of a single quarter
 note. The result is three twelfth notes. This more complex form allows
 for intermixing multiple リズム・ブロック within single tuplet.
 
@@ -649,10 +647,10 @@ for intermixing multiple リズム・ブロック within single tuplet.
 
 ![alt tag](./matrix13.svg "tuplet and rhythmic note values")
 
-In the example above, the two *リズム* blocks are embedded in the
-*Tuplet* block, resulting in a more complex リズム.
+In the example above, the two _リズム_ blocks are embedded in the
+_Tuplet_ block, resulting in a more complex リズム.
 
-Note: You can mix and match *リズム* blocks and *Tuplet* blocks when
+Note: You can mix and match _リズム_ blocks and _Tuplet_ blocks when
 defining your matrix.
 
 #### <a name="タプルとは"></a>4.2.4 What is a tuplet?
@@ -666,28 +664,28 @@ defining your matrix.
 ![alt tag](./matrix14.svg)
 
 You can also use individual notes when defining the grid. These blocks
-will expand into *リズム* blocks with the corresponding values.
+will expand into _リズム_ blocks with the corresponding values.
 
 ### <a name="リズム・ブロック"></a>4.3 リズム・ブロックでリズムを
 
-The *Rhythm Ruler* block is used to launch a ウィジェット similar to the
-*ピッチ・タイム行列* block. The ウィジェット can be used to generate rhythmic
+The _Rhythm Ruler_ block is used to launch a ウィジェット similar to the
+_ピッチ・タイム行列_ block. The ウィジェット can be used to generate rhythmic
 patterns.
 
 ![alt tag](./rhythm1.svg "generating リズム・ブロック")
 
-The argument to the *Rhythm Ruler* block specifies the duration that
+The argument to the _Rhythm Ruler_ block specifies the duration that
 will be subdivided to generate a rhythmic pattern. By default, it is 1
 / 1, e.g., a whole note.
 
-The *Set ドラム* blocks contained in the clamp of the *Rhythm Ruler*
+The _Set ドラム_ blocks contained in the clamp of the _Rhythm Ruler_
 block indicates the number of リズム・ブロック to be defined simultaneously. By
-default, two リズム・ブロック are defined. The embedded *リズム* blocks define
+default, two リズム・ブロック are defined. The embedded _リズム_ blocks define
 the initial subdivision of each rhythm ruler.
 
 ![alt tag](./rhythm2.svg "rhythm ruler")
 
-When the *Rhythm Ruler* block is クリックed, the *Rhythm Ruler* ウィジェット is
+When the _Rhythm Ruler_ block is クリックed, the _Rhythm Ruler_ ウィジェット is
 opened. It contains a row for each リズム ruler. An input in the top
 row of the ウィジェット is used to specify how many subdivisions will be
 created within a cell when it is クリックed. By default, 2 subdivisions
@@ -697,8 +695,8 @@ are created.
 
 As shown in the above figure, the top rhythm ruler has been divided
 into two half-notes and the bottom rhythm ruler has been divided into
-three third-notes. クリックing on the *Play* button to the left of each row
-will playback the リズム using a ドラム for each 拍子. The *Play-all*
+three third-notes. クリックing on the _Play_ button to the left of each row
+will playback the リズム using a ドラム for each 拍子. The _Play-all_
 button on the upper-left of the ウィジェット will play back all リズム・ブロック
 simultaneously.
 
@@ -715,16 +713,16 @@ above, two third-notes have been タイd into one two-thirds-note.
 
 ![alt tag](./rhythm5.svg "save stack button")
 
-The *Save stack* button will export リズム stacks.
+The _Save stack_ button will export リズム stacks.
 
-![alt tag](./rhythm6.svg "stacks of リズム・ブロック" )
+![alt tag](./rhythm6.svg "stacks of リズム・ブロック")
 
 These stacks of リズム・ブロック can be used to define rhythmic patterns used
-with the *ピッチ・タイム行列* block.
+with the _ピッチ・タイム行列_ block.
 
 ![alt tag](./rhythm7.svg "ドラムループを保存のボタン")
 
-The *ドラムループを保存* button will export *スタート* stacks that will
+The _ドラムループを保存_ button will export _スタート_ stacks that will
 play the リズム・ブロック as ドラムループ(既に再生 <=== check this!) machines.
 
 ### <a name="音階とモード"></a>4.4 音楽の音階とモード
@@ -734,89 +732,89 @@ Musical 音階とモード are used to specify the relationship between [interva
 per octave, 音階とモード speficy how many half steps there are between each
 note in a scale.
 
-By default, ミュージック・ブロックス uses the *長* mode, which, in the [Key](#音色と調の設定) of
-C, maps to the white keys on a piano. The intervals in the *長*
+By default, ミュージック・ブロックス uses the _長_ mode, which, in the [Key](#音色と調の設定) of
+C, maps to the white keys on a piano. The intervals in the _長_
 mode are `2, 2, 1, 2, 2, 2, 1`. Many other common 音階とモード are
-built into ミュージック・ブロックス, including, of course, *短音階* (<===check this) mode, which
+built into ミュージック・ブロックス, including, of course, _短音階_ (<===check this) mode, which
 uses `2, 1, 2, 2, 1, 2, 2` as its intervals.
 
 Note that not every mode uses 7 intervals per octave. For example, the
-*Chromatic* mode uses 11 intervals: `1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1`. The *Japanese* mode uses only 5 intervals: `1, 4,
+_Chromatic_ mode uses 11 intervals: `1, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1`. The _Japanese_ mode uses only 5 intervals: `1, 4,
 2, 3, 2],`. What is important is that the sum of the intervals
 in an octave is 12 half-steps.
 
 ![alt tag](./mode1.svg "mode ウィジェット")
 
-The *Mode* ウィジェット lets you explore 音階とモード and generate custom
-音階とモード. You invoke the ウィジェット with the *Custom mode* block. The mode
-specified in the *Set key* block will be the default mode when the
+The _Mode_ ウィジェット lets you explore 音階とモード and generate custom
+音階とモード. You invoke the ウィジェット with the _Custom mode_ block. The mode
+specified in the _Set key_ block will be the default mode when the
 ウィジェット launches.
 
 ![alt tag](./mode2.svg "launching ウィジェット with Major mode")
 
-In the above example, the ウィジェット has been launched with *Major* mode
+In the above example, the ウィジェット has been launched with _Major_ mode
 (the default). Note that the notes included in the mode are indicated by
 the black boxes, which are arrayed in a circular pattern of tweleve
 half-steps to complete the octave.
 
-Since the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`, the
+Since the intervals in the _Major_ mode are `2, 2, 1, 2, 2, 2, 1`, the
 notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`, and `12` (one octave
 above `0`).
 
 The ウィジェット controls run along the toolbar at the top. From left to
 right are:
 
-*Play all*, which will play a scale using the current mode;
+_Play all_, which will play a scale using the current mode;
 
-*Save*, which will save the current mode as the *Custom* mode and save
- a stack of *ピッチ* blocks that can be used with the *Pitch-time
- Matrix* block;
+_Save_, which will save the current mode as the _Custom_ mode and save
+a stack of _ピッチ_ blocks that can be used with the _Pitch-time
+Matrix_ block;
 
-*Rotate counter-clockwise*, which will rotate the mode
- counter-clockwise (See the example below);
+_Rotate counter-clockwise_, which will rotate the mode
+counter-clockwise (See the example below);
 
-*Rotate clockwise*, which will rotate the mode clockwise (See the
- example below);
+_Rotate clockwise_, which will rotate the mode clockwise (See the
+example below);
 
-*転回*, which will 転回 the mode (See the example below);
+_転回_, which will 転回 the mode (See the example below);
 
-*Undo*, which will restore the mode to the previous version; and
+_Undo_, which will restore the mode to the previous version; and
 
-*Close*, which will close the ウィジェット.
+_Close_, which will close the ウィジェット.
 
 You can also クリック on individual notes to activate or deactivate them.
 
-Note that the mode inside the *Custom mode* block is updated whenever
+Note that the mode inside the _Custom mode_ block is updated whenever
 the mode is changed inside the ウィジェット.
 
 ![alt tag](./mode3.svg "creating Dorian mode")
 
-In the above example, the *Major* mode has been rotated clockwise,
-transforming it into *Dorian*.
+In the above example, the _Major_ mode has been rotated clockwise,
+transforming it into _Dorian_.
 
 ![alt tag](./mode4.svg "creating Locrian mode")
 
-In the above example, the *Major* mode has been rotated
-counter-clockwise, transforming it into *Locrian*.
+In the above example, the _Major_ mode has been rotated
+counter-clockwise, transforming it into _Locrian_.
 
 ![alt tag](./mode5.svg "creating Phrygian mode")
 
-In the above example, the *Major* mode has been 転回ed, transforming
-it into *Phrygian*.
+In the above example, the _Major_ mode has been 転回ed, transforming
+it into _Phrygian_.
 
 Note: The build-in 音階とモード in ミュージック・ブロックス can be found in [musicutils.js](https://github.com/sugarlabs/musicblocks/blob/master/js/utils/musicutils.js#L68).
 
 ![alt tag](./mode6.svg "ピッチ・タイム行列 block")
 
-The *Save* button exports a stack of blocks representing the mode that
-can be used inside the *ピッチ・タイム行列* block.
+The _Save_ button exports a stack of blocks representing the mode that
+can be used inside the _ピッチ・タイム行列_ block.
 
 ### <a name="ピッチ・ドラム"></a>4.5 ピッチ・ドラム・グラフ
 
 ![alt tag](./drum2.svg "ピッチ・ドラム・グラフ")
 
-The *Set ドラム* block is used to map the enclosed pitches into ドラム
+The _Set ドラム_ block is used to map the enclosed pitches into ドラム
 sounds. ドラム sounds are played in a monopitch using the specified ドラム
 sample. In the example above, a `kick ドラム` will be substituted for
 each occurrence of a `レ` `4`.
@@ -829,25 +827,25 @@ each occurrence of a `レ` `4`.
 
 ![alt tag](./drum7.svg "ピッチ・ドラム・グラフ 1")
 
-As an experience for creating mapping with the *Set ドラム* block, we
-provide the *Drum-Pitch* Matrix. You use it to map between pitches and
-drums. The output is a stack of *Set Dum* blocks.
+As an experience for creating mapping with the _Set ドラム_ block, we
+provide the _Drum-Pitch_ Matrix. You use it to map between pitches and
+drums. The output is a stack of _Set Dum_ blocks.
 
 ### <a name="ピッチの階段"></a>4.6 音程の関係のことをピッチの階段ーで発見
 
-The *Pitch Staircase* block is used to launch a ウィジェット similar to the
-*ピッチ・タイム行列*, which can be used to generate different pitches
+The _Pitch Staircase_ block is used to launch a ウィジェット similar to the
+_ピッチ・タイム行列_, which can be used to generate different pitches
 using a given pitch and musical proportion.
 
-The *ピッチ* blocks contained in the clamp of the *Pitch Staircase*
+The _ピッチ_ blocks contained in the clamp of the _Pitch Staircase_
 block define the pitches to be initialized simultaneously. By default,
 one pitch is defined and it have default note "la" and octave "3".
 
 ![alt tag](./pitchstaircase0.svg "ピッチ・スライダーで何のピッチでも発見")
 
-When *Pitch Staircase* block is クリックed, the *Pitch Staircase* ウィジェット is
-initialized. The ウィジェット contains row for every *ピッチ* block contained
-in the clamp of the *Pitch Staircase* block. The input fields in the top
+When _Pitch Staircase_ block is クリックed, the _Pitch Staircase_ ウィジェット is
+initialized. The ウィジェット contains row for every _ピッチ_ block contained
+in the clamp of the _Pitch Staircase_ block. The input fields in the top
 row of the ウィジェット specify the musical proportions used to create new
 pitches in the staircase. The inputs correspond to the numerator and
 denominator in the proportion resectively. By default the proportion
@@ -859,39 +857,39 @@ is 3:2.
 
 ![alt tag](./pitchstaircase3.svg "notes associated with the step in the ピッチの階段")
 
-クリックing on the *Play* button to the left of each row will playback
-the notes associated with that step in the ピッチの階段. The *Play-all*
+クリックing on the _Play_ button to the left of each row will playback
+the notes associated with that step in the ピッチの階段. The _Play-all_
 button on the upper-left of the ウィジェット will play back all the pitch
-steps simultaneously. A second *Play-all* button to the right of the
-stair plays in increasing order of frequency first, then in 
+steps simultaneously. A second _Play-all_ button to the right of the
+stair plays in increasing order of frequency first, then in
 decreasing order of frequency as well, completing a scale.
 
-The *Save stack* button will export pitch stacks. For example, in the above 
-configuration, the output  from pressing the *Save stack* button is shown below:
+The _Save stack_ button will export pitch stacks. For example, in the above
+configuration, the output from pressing the _Save stack_ button is shown below:
 
 ![alt tag](./pitchstaircase4.svg "Pitch Stair block")
 
-These stacks can be used with the *ピッチ・タイム行列* block to define
+These stacks can be used with the _ピッチ・タイム行列_ block to define
 the rows in the matrix.
 
 ![alt tag](./pitchstaircase5.svg "Pitch Stair block")
 
 ### <a name="ピッチ・スライダー"></a>4.7 ピッチ・スライダーで何のピッチでも発見
 
-The *ピッチ・スライダー* block is used to launch a ウィジェット that is used to
-generate arbitray pitches. It differs from the *Pitch Staircase* ウィジェット in
+The _ピッチ・スライダー_ block is used to launch a ウィジェット that is used to
+generate arbitray pitches. It differs from the _Pitch Staircase_ ウィジェット in
 that it is used to create frequencies that vary continuously within
 the range of a specified octave.
 
-Each *Sine* block contained within the clamp of the *ピッチ・スライダー* block defines the initial pitch
+Each _Sine_ block contained within the clamp of the _ピッチ・スライダー_ block defines the initial pitch
 for an ocatve.
 
 ![alt tag](./pitchslider0.svg "ピッチ・スライダー")
 
 ![alt tag](./pitchslider1.svg "ピッチ・スライダー")
 
-When the *ピッチ・スライダー* block is クリックed, the *ピッチ・スライダー* ウィジェット is
-initialized. The ウィジェット will have one column for each *Sine* block in
+When the _ピッチ・スライダー_ block is クリックed, the _ピッチ・スライダー_ ウィジェット is
+initialized. The ウィジェット will have one column for each _Sine_ block in
 the clamp. Every column has a slider that can be used to move up or
 down in frequency, continuously or in intervals of 1/12th of the
 starting frequency. The mouse is used to move the frequency up and down continuously. Buttons are
@@ -902,7 +900,7 @@ or between columns.
 
 ![alt tag](./pitchslider2.svg "ピッチ・スライダー")
 
-クリックing in a column will extact the corresponding *Note* blocks, for example:
+クリックing in a column will extact the corresponding _Note_ blocks, for example:
 
 ![alt tag](./pitchslider3.svg "ピッチ・スライダー")
 
@@ -912,20 +910,20 @@ or between columns.
 
 ### <a name="テンポ"></a>4.8 テンポを変えること
 
-The *テンポ* block is used to launch a ウィジェット that enables the user to
-visualize テンポ, defined in 拍子s per minute (BPM). When the *テンポ* block
-is クリックed, the *テンポ* ウィジェット is initialized.
+The _テンポ_ block is used to launch a ウィジェット that enables the user to
+visualize テンポ, defined in 拍子s per minute (BPM). When the _テンポ_ block
+is クリックed, the _テンポ_ ウィジェット is initialized.
 
-The *Master 泊s per Minute* block contained in the clamp of the
-*テンポ* block sets the initial テンポ used by the ウィジェット. This
+The _Master 泊s per Minute_ block contained in the clamp of the
+_テンポ_ block sets the initial テンポ used by the ウィジェット. This
 determines the speed at which the ball in the ウィジェット moves back and
 forth. If BPM is 60, then it will take one second for the ball to move
 across the ウィジェット. A round-trip would take two seconds.
 
 ![alt tag](./tempo0.svg "テンポを変えること")
 
-The top row of the ウィジェット holds the *Play/pause* button, the *Speed
-up* and *Slow down* buttons, and an input field for updating the
+The top row of the ウィジェット holds the _Play/pause_ button, the _Speed
+up_ and _Slow down_ buttons, and an input field for updating the
 テンポ.
 
 ![alt tag](./tempo1.svg "テンポを変えること")
@@ -944,9 +942,9 @@ point the learner towards other powerful tools. One such tool is
 
 ![alt tag](./lilypond1.svg "adding Save as Lilypond block")
 
-The *Save as Lilypond* block will transcribe your composition. The
+The _Save as Lilypond_ block will transcribe your composition. The
 output of the program above is saved to `Downloads/hotdog.ly`. There is
-also a *Save as Lilypond* button on the secondary toolbar.
+also a _Save as Lilypond_ button on the secondary toolbar.
 
 ![alt tag](./lilypond2.svg "Save as Lilypond icon")
 

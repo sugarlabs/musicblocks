@@ -6,9 +6,9 @@ This document audits implicit global state dependencies in the **Logo subsystem*
 
 ## Scope
 
--   **Subsystem**: Logo (`js/logo.js`)
--   **Related Issue**: Audit and Reduce Implicit Global State Usage
--   **Date**: 2026-02-04
+- **Subsystem**: Logo (`js/logo.js`)
+- **Related Issue**: Audit and Reduce Implicit Global State Usage
+- **Date**: 2026-02-04
 
 ## Current Architecture
 
@@ -27,58 +27,58 @@ constructor(activity) {
 
 #### 1. **Blocks Subsystem** (`this.activity.blocks`)
 
--   **Usage Count**: ~50+ references
--   **Access Pattern**: `this.activity.blocks.*`
--   **Key Methods Used**:
-    -   `blockList` - Direct property access
-    -   `unhighlightAll()` - Visual feedback
-    -   `bringToTop()` - Z-index management
-    -   `showBlocks()` / `hideBlocks()` - Visibility control
-    -   `sameGeneration()` - Block relationship queries
-    -   `visible` - State query
+- **Usage Count**: ~50+ references
+- **Access Pattern**: `this.activity.blocks.*`
+- **Key Methods Used**:
+    - `blockList` - Direct property access
+    - `unhighlightAll()` - Visual feedback
+    - `bringToTop()` - Z-index management
+    - `showBlocks()` / `hideBlocks()` - Visibility control
+    - `sameGeneration()` - Block relationship queries
+    - `visible` - State query
 
 **Impact**: High - Logo heavily depends on Blocks for execution flow and visual feedback
 
 #### 2. **Turtles Subsystem** (`this.activity.turtles`)
 
--   **Usage Count**: ~80+ references
--   **Access Pattern**: `this.activity.turtles.*`
--   **Key Methods Used**:
-    -   `turtleList` - Direct iteration over turtles
-    -   `ithTurtle(index)` - Get specific turtle
-    -   `getTurtle(index)` - Get turtle by index
-    -   `getTurtleCount()` - Count query
-    -   `add()` - Create new turtle
-    -   `markAllAsStopped()` - State management
+- **Usage Count**: ~80+ references
+- **Access Pattern**: `this.activity.turtles.*`
+- **Key Methods Used**:
+    - `turtleList` - Direct iteration over turtles
+    - `ithTurtle(index)` - Get specific turtle
+    - `getTurtle(index)` - Get turtle by index
+    - `getTurtleCount()` - Count query
+    - `add()` - Create new turtle
+    - `markAllAsStopped()` - State management
 
 **Impact**: Critical - Logo is the execution engine for turtle commands
 
 #### 3. **Stage** (`this.activity.stage`)
 
--   **Usage Count**: ~10+ references
--   **Access Pattern**: `this.activity.stage.*`
--   **Key Methods Used**:
-    -   `addEventListener()` - Event handling
-    -   `removeEventListener()` - Cleanup
+- **Usage Count**: ~10+ references
+- **Access Pattern**: `this.activity.stage.*`
+- **Key Methods Used**:
+    - `addEventListener()` - Event handling
+    - `removeEventListener()` - Cleanup
 
 **Impact**: Medium - Used for interaction and event handling
 
 #### 4. **UI/Error Handling**
 
--   **Methods**:
-    -   `this.activity.errorMsg()` - Error display
-    -   `this.activity.hideMsgs()` - Message management
-    -   `this.activity.saveLocally()` - Persistence
+- **Methods**:
+    - `this.activity.errorMsg()` - Error display
+    - `this.activity.hideMsgs()` - Message management
+    - `this.activity.saveLocally()` - Persistence
 
 **Impact**: Medium - UI feedback and state persistence
 
 #### 5. **Configuration/State**
 
--   **Properties**:
-    -   `this.activity.showBlocksAfterRun` - Boolean flag
-    -   `this.activity.onStopTurtle` - Callback
-    -   `this.activity.onRunTurtle` - Callback
-    -   `this.activity.meSpeak` - Speech synthesis
+- **Properties**:
+    - `this.activity.showBlocksAfterRun` - Boolean flag
+    - `this.activity.onStopTurtle` - Callback
+    - `this.activity.onRunTurtle` - Callback
+    - `this.activity.meSpeak` - Speech synthesis
 
 **Impact**: Low-Medium - Configuration and callbacks
 
@@ -108,25 +108,25 @@ Logo
 
 Some dependencies are fundamental to Logo's role as the execution engine:
 
--   **Turtles**: Logo executes turtle commands, so this dependency is core
--   **Blocks**: Logo interprets block programs, so this dependency is core
+- **Turtles**: Logo executes turtle commands, so this dependency is core
+- **Blocks**: Logo interprets block programs, so this dependency is core
 
 ### Refactorable Dependencies
 
 These could be made explicit or injected:
 
--   **Stage**: Could be injected as an event bus interface
--   **Error handling**: Could be injected as a logger/error handler interface
--   **Configuration**: Could be passed as a config object
--   **Callbacks**: Could be injected explicitly
+- **Stage**: Could be injected as an event bus interface
+- **Error handling**: Could be injected as a logger/error handler interface
+- **Configuration**: Could be passed as a config object
+- **Callbacks**: Could be injected explicitly
 
 ## Proposed Refactoring Strategy
 
 ### Phase 1: Document Current State ✅
 
--   Create this audit document
--   Identify all `this.activity.*` references
--   Categorize by subsystem and impact
+- Create this audit document
+- Identify all `this.activity.*` references
+- Categorize by subsystem and impact
 
 ### Phase 2: Extract Interfaces (Small, Safe Changes)
 
@@ -196,10 +196,10 @@ constructor(activityOrDeps) {
 
 This allows using `this.blocks.doSomething()` instead of `this.deps.blocks.doSomething()` throughout the class, while still preserving:
 
--   **Explicit dependency tracking**: All dependencies are declared in the constructor
--   **Grep-ability**: Can search for `this.blocks` to find all usages
--   **Auditability**: Clear what external dependencies the class uses
--   **No behavior change**: Functionally equivalent to `this.deps.*` access
+- **Explicit dependency tracking**: All dependencies are declared in the constructor
+- **Grep-ability**: Can search for `this.blocks` to find all usages
+- **Auditability**: Clear what external dependencies the class uses
+- **No behavior change**: Functionally equivalent to `this.deps.*` access
 
 **Note**: Both `this.deps.*` (maximum audit clarity) and locally bound references (improved readability) are acceptable patterns. Choose based on the specific needs of each subsystem.
 
@@ -241,13 +241,13 @@ const logo = new Logo(mockDeps);
 
 ## Success Metrics
 
--   [x] All Logo dependencies explicitly documented
--   [x] Dependency interface created and documented
--   [x] Logo constructor supports explicit dependencies
--   [x] Backward compatibility maintained (both patterns supported)
--   [ ] No behavior changes (existing tests pass) - _needs verification_
--   [x] New unit tests for Logo with mocked dependencies
--   [x] Pattern documented for future subsystems
+- [x] All Logo dependencies explicitly documented
+- [x] Dependency interface created and documented
+- [x] Logo constructor supports explicit dependencies
+- [x] Backward compatibility maintained (both patterns supported)
+- [ ] No behavior changes (existing tests pass) - _needs verification_
+- [x] New unit tests for Logo with mocked dependencies
+- [x] Pattern documented for future subsystems
 
 ## Implementation Status
 
@@ -255,21 +255,21 @@ The Logo subsystem has been updated to support the `LogoDependencies` pattern. T
 
 ### Completed
 
--   [x] Initial audit of global state in Logo subsystem
--   [x] Creation of `LogoDependencies` class
--   [x] Update to `Logo` constructor to support dependency injection
--   [x] Unit tests for `LogoDependencies` pattern
+- [x] Initial audit of global state in Logo subsystem
+- [x] Creation of `LogoDependencies` class
+- [x] Update to `Logo` constructor to support dependency injection
+- [x] Unit tests for `LogoDependencies` pattern
 
 ### Planned
 
--   [ ] Gradual refactoring of internal `this.activity` references
--   [ ] Application of pattern to other core subsystems (Blocks, Turtles)
+- [ ] Gradual refactoring of internal `this.activity` references
+- [ ] Application of pattern to other core subsystems (Blocks, Turtles)
 
 ## References
 
--   Issue #2767: Identify and/or fix high-level inconsistencies
--   Related work: PhraseMaker widget isolation
--   RequireJS migration considerations
+- Issue #2767: Identify and/or fix high-level inconsistencies
+- Related work: PhraseMaker widget isolation
+- RequireJS migration considerations
 
 ---
 

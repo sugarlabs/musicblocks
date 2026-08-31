@@ -42,8 +42,8 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22'
-                  cache: 'npm'
+                  node-version: "22"
+                  cache: "npm"
 
             - name: Install dependencies
               run: npm ci
@@ -73,8 +73,8 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22.x'
-                  cache: 'npm'
+                  node-version: "22.x"
+                  cache: "npm"
 
             - name: Install dependencies
               run: npm ci
@@ -140,7 +140,7 @@ jobs:
               uses: actions/setup-node@v5
               with:
                   node-version: ${{ matrix.node-version }}
-                  cache: 'npm'
+                  cache: "npm"
 
             - name: Install dependencies
               run: npm ci
@@ -164,8 +164,8 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22'
-                  cache: 'npm'
+                  node-version: "22"
+                  cache: "npm"
 
             - name: Install dependencies
               run: npm ci
@@ -205,15 +205,15 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22'
-                  cache: 'npm'
+                  node-version: "22"
+                  cache: "npm"
 
             - name: Run Cypress E2E tests
               uses: cypress-io/github-action@v6
               with:
                   install-command: npm ci
                   start: npm start
-                  wait-on: 'http://127.0.0.1:3000'
+                  wait-on: "http://127.0.0.1:3000"
                   wait-on-timeout: 120
                   browser: chrome
                   config: video=false
@@ -244,7 +244,7 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
-                  node-version: '22'
+                  node-version: "22"
 
             - name: Run npm audit
               run: npm audit --omit=dev --audit-level=high

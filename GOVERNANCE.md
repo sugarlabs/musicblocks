@@ -58,18 +58,18 @@ Project Maintainer.
 
 ## Routing Examples
 
-| Changed files | Requested review |
-| --- | --- |
-| `js/blocks/NumberBlocks.js` | Blocks & Runtime |
-| `js/blocks/__tests__/NumberBlocks.test.js` | Blocks & Runtime |
-| `js/widgets/tempo.js` | UI/UX & Accessibility |
-| `js/widgets/__tests__/tempo.test.js` | Tests & CI |
-| `planet/js/Publisher.js` | Planet & Project Sharing |
-| `.github/workflows/...` | Tests & CI |
-| `README.md` | Project Maintainer |
-| `js/widgets/tempo.js` and `js/widgets/__tests__/tempo.test.js` | UI/UX & Accessibility and Tests & CI |
-| `js/widgets/tempo.js` and `planet/js/Publisher.js` | UI/UX & Accessibility and Planet & Project Sharing |
-| `js/widgets/tempo.js` and `README.md` | UI/UX & Accessibility and Project Maintainer |
+| Changed files                                                  | Requested review                                   |
+| -------------------------------------------------------------- | -------------------------------------------------- |
+| `js/blocks/NumberBlocks.js`                                    | Blocks & Runtime                                   |
+| `js/blocks/__tests__/NumberBlocks.test.js`                     | Blocks & Runtime                                   |
+| `js/widgets/tempo.js`                                          | UI/UX & Accessibility                              |
+| `js/widgets/__tests__/tempo.test.js`                           | Tests & CI                                         |
+| `planet/js/Publisher.js`                                       | Planet & Project Sharing                           |
+| `.github/workflows/...`                                        | Tests & CI                                         |
+| `README.md`                                                    | Project Maintainer                                 |
+| `js/widgets/tempo.js` and `js/widgets/__tests__/tempo.test.js` | UI/UX & Accessibility and Tests & CI               |
+| `js/widgets/tempo.js` and `planet/js/Publisher.js`             | UI/UX & Accessibility and Planet & Project Sharing |
+| `js/widgets/tempo.js` and `README.md`                          | UI/UX & Accessibility and Project Maintainer       |
 
 Feature tests stay with the same technical area when that area already has a
 clear code owner, such as Blocks & Runtime or Planet. This keeps source-and-test
@@ -83,12 +83,12 @@ maintaining the project's test practice. Tests that would otherwise fall back
 to a Project Maintainer also go to Tests & CI. Shared test setup and CI
 infrastructure go to Tests & CI.
 
-| Situation | Approval needed for merge |
-| --- | --- |
-| One area has one Area Approver | Approval from that Area Approver |
-| One area has more than one Area Approver | Approval from any one of them |
-| A pull request changes files from two areas | Approval from each affected area |
-| One file spans more than one area | Approval from its listed owner, with input from the other area when needed |
+| Situation                                   | Approval needed for merge                                                  |
+| ------------------------------------------- | -------------------------------------------------------------------------- |
+| One area has one Area Approver              | Approval from that Area Approver                                           |
+| One area has more than one Area Approver    | Approval from any one of them                                              |
+| A pull request changes files from two areas | Approval from each affected area                                           |
+| One file spans more than one area           | Approval from its listed owner, with input from the other area when needed |
 
 ## Role Growth and Changes
 
@@ -98,12 +98,12 @@ visible project work.
 
 ### Quick reference
 
-| Role change | Files to edit | Ask for review from | Adds merge authority? |
-| --- | --- | --- | --- |
-| Add or remove a Reviewer | [MAINTAINERS.md](MAINTAINERS.md) | A Project Maintainer; Area Approvers for the area, if any | No |
-| Add or remove an Area Approver | [MAINTAINERS.md](MAINTAINERS.md) and [CODEOWNERS](.github/CODEOWNERS) | A Project Maintainer; other Area Approvers for the area, if any | Yes, after write access and CODEOWNERS are in place |
-| Add or remove a Project Maintainer | [MAINTAINERS.md](MAINTAINERS.md); [CODEOWNERS](.github/CODEOWNERS) when ownership changes | Current Project Maintainers not being changed | Yes, for additions |
-| Move someone to emeritus | [MAINTAINERS.md](MAINTAINERS.md); [CODEOWNERS](.github/CODEOWNERS) if they are an Area Approver | Use the row above for the role they are leaving | No |
+| Role change                        | Files to edit                                                                                   | Ask for review from                                             | Adds merge authority?                               |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------- |
+| Add or remove a Reviewer           | [MAINTAINERS.md](MAINTAINERS.md)                                                                | A Project Maintainer; Area Approvers for the area, if any       | No                                                  |
+| Add or remove an Area Approver     | [MAINTAINERS.md](MAINTAINERS.md) and [CODEOWNERS](.github/CODEOWNERS)                           | A Project Maintainer; other Area Approvers for the area, if any | Yes, after write access and CODEOWNERS are in place |
+| Add or remove a Project Maintainer | [MAINTAINERS.md](MAINTAINERS.md); [CODEOWNERS](.github/CODEOWNERS) when ownership changes       | Current Project Maintainers not being changed                   | Yes, for additions                                  |
+| Move someone to emeritus           | [MAINTAINERS.md](MAINTAINERS.md); [CODEOWNERS](.github/CODEOWNERS) if they are an Area Approver | Use the row above for the role they are leaving                 | No                                                  |
 
 ### Making a role-change pull request
 

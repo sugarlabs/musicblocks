@@ -10,9 +10,10 @@ Problem:
 The application loads but shows a blank screen or blocks do not appear.
 
 Solution:
+
 1. Open the browser Developer Tools.
-   - Chrome / Edge: F12 or Ctrl + Shift + J
-   - Firefox: Ctrl + Shift + K
+    - Chrome / Edge: F12 or Ctrl + Shift + J
+    - Firefox: Ctrl + Shift + K
 2. Check the Console tab for JavaScript errors.
 3. Fix the reported errors and reload the page.
 4. Try running the app in Chrome or Firefox if the issue persists.
@@ -74,6 +75,7 @@ Problem:
 The application runs but produces no sound.
 
 Solution:
+
 1. Ensure system volume is not muted.
 2. Check browser audio permissions.
 3. Click once anywhere on the page to enable audio playback.
@@ -93,10 +95,11 @@ npm install
 ## Still Having Issues?
 
 If problems persist:
+
 1. Search existing GitHub issues:
    https://github.com/sugarlabs/musicblocks/issues
 2. Review developer documentation.
 3. Open a new issue with:
-   - Error logs
-   - Steps to reproduce
-   - Browser and OS details
+    - Error logs
+    - Steps to reproduce
+    - Browser and OS details

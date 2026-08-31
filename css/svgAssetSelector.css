@@ -85,7 +85,9 @@
     font-size: 14px;
     font-weight: 500;
     color: #616161;
-    transition: background 0.2s, color 0.2s;
+    transition:
+        background 0.2s,
+        color 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -130,7 +132,10 @@
     border: 2px solid #e0e0e0;
     border-radius: 8px;
     cursor: pointer;
-    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    transition:
+        border-color 0.2s,
+        background 0.2s,
+        transform 0.15s;
     background: #fafafa;
 }
 
