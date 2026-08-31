@@ -52,6 +52,14 @@ describe("setupToneActions", () => {
                 return _tur ? { MB: { listeners: [] } } : null;
             }
         };
+        global.safeNumber = (val, fallback = 0) => {
+            if (typeof val === "number" && Number.isFinite(val)) return val;
+            if (typeof val === "string" && val.trim() !== "") {
+                const parsed = Number(val);
+                if (Number.isFinite(parsed)) return parsed;
+            }
+            return typeof fallback === "number" && Number.isFinite(fallback) ? fallback : 0;
+        };
     });
 
     beforeEach(() => {
@@ -909,6 +917,103 @@ describe("setupToneActions", () => {
             Singer.ToneActions.defDuoSynth(10, 20, 0, 1);
             expect(activity.errorMsg).not.toHaveBeenCalled();
             expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("doVibrato", () => {
+        beforeEach(() => {
+            targetTurtle = {
+                singer: { vibratoIntensity: [], vibratoRate: [] }
+            };
+            activity.logo.stopTurtle = false;
+            activity.errorMsg = jest.fn();
+            activity.logo.inTimbre = false;
+            activity.logo.timbre = {
+                instrumentName: "default-voice",
+                vibratoEffect: [],
+                vibratoParams: []
+            };
+            activity.logo.setDispatchBlock = jest.fn();
+            activity.logo.setTurtleListener = jest.fn((_, __, cb) => {
+                cb(); // immediately execute __listener which pops
+            });
+        });
+
+        it("should gracefully reject non-finite parameters by coercing them to 0", () => {
+            Singer.ToneActions.doVibrato(NaN, 10, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                _("Vibrato intensity must be between 1 and 100."),
+                1
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+
+            activity.logo.stopTurtle = false;
+            Singer.ToneActions.doVibrato(10, Infinity, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                _("Vibrato rate must be greater than 0."),
+                1
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+        });
+
+        it("should gracefully reject out-of-bounds intensity", () => {
+            Singer.ToneActions.doVibrato(0, 10, 0, 1); // < 1
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                _("Vibrato intensity must be between 1 and 100."),
+                1
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+
+            activity.logo.stopTurtle = false;
+            Singer.ToneActions.doVibrato(101, 10, 0, 1); // > 100
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                _("Vibrato intensity must be between 1 and 100."),
+                1
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+        });
+
+        it("should gracefully reject invalid rate", () => {
+            Singer.ToneActions.doVibrato(50, 0, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                _("Vibrato rate must be greater than 0."),
+                1
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+        });
+
+        it("should push values and register dispatch correctly", () => {
+            Singer.ToneActions.doVibrato(50, 10, 0, 1);
+            expect(targetTurtle.singer.vibratoIntensity.length).toBe(0);
+            expect(targetTurtle.singer.vibratoRate.length).toBe(0);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_vibrato_0");
+            expect(activity.logo.setTurtleListener).toHaveBeenCalled();
+        });
+
+        it("should register for timbre when inTimbre is true", () => {
+            activity.logo.inTimbre = true;
+            activity.logo.setTurtleListener = jest.fn(); // don't pop synchronously
+
+            Singer.ToneActions.doVibrato(50, 10, 0, 1);
+
+            expect(targetTurtle.singer.vibratoIntensity[0]).toBe(0.5);
+            expect(targetTurtle.singer.vibratoRate[0]).toBe(0.1);
+
+            expect(instrumentsEffects[0]["default-voice"]["vibratoActive"]).toBe(true);
+            expect(activity.logo.timbre.vibratoEffect).toContain(1);
+            expect(activity.logo.timbre.vibratoParams).toContain(50);
+            expect(activity.logo.timbre.vibratoParams).toContain(0.1);
+        });
+
+        it("should push mouse listeners if blk is undefined and MusicBlocks.isRun", () => {
+            activity.logo.setTurtleListener = jest.fn();
+            global.MusicBlocks.isRun = true;
+            const mockMouse = { MB: { listeners: [] } };
+            global.Mouse.getMouseFromTurtle.mockReturnValueOnce(mockMouse);
+
+            Singer.ToneActions.doVibrato(50, 10, 0, undefined);
+
+            expect(mockMouse.MB.listeners).toContain("_vibrato_0");
         });
     });
 });
