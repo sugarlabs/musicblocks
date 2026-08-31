@@ -3234,6 +3234,15 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
         hideWheelDiv();
+        // Remove the wheels so wheelnav detaches the window keydown listener it
+        // installs for keynavigateEnabled. Without this the closed menu keeps
+        // responding to the arrow keys.
+        that._voiceWheel.removeWheel();
+        that._exitWheel.removeWheel();
+        // The pie menu covers the canvas, so the block never receives the
+        // mouseout that would normally clear this. Left set, the arrow keys
+        // move the block instead of doing nothing.
+        that.blocks.activeBlock = null;
     };
 };
 
