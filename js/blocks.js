@@ -4821,15 +4821,24 @@ class Blocks {
                         const id = blkData[0];
                         const connections = blkData[4] || [];
 
-                        // All non-null connections (including parent dock 0)
-                        const neighbors = [];
+                        // Self-loop check: reject if any dock points to the block itself.
                         for (let c = 0; c < connections.length; c++) {
-                            const connId = connections[c];
-                            if (connId !== null && connId !== undefined) {
-                                neighbors.push(connId);
+                            if (connections[c] === id) {
+                                return true;
                             }
                         }
-                        adj.set(id, neighbors);
+
+                        // Build directed adjacency from child docks only (index >= 1).
+                        // Dock 0 is the parent back-pointer and must be excluded
+                        // to avoid false cycles in normal parent-child trees.
+                        const children = [];
+                        for (let c = 1; c < connections.length; c++) {
+                            const connId = connections[c];
+                            if (connId !== null && connId !== undefined) {
+                                children.push(connId);
+                            }
+                        }
+                        adj.set(id, children);
                     }
 
                     const visited = new Set();
