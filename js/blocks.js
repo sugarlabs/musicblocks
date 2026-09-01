@@ -212,6 +212,15 @@ class Blocks {
         /** Number of blocks to load */
         this._loadCounter = 0;
         /**
+         * loadNewBlocks() is not re-entrant: it tracks the in-progress load
+         * on _loadCounter/_adjustTheseStacks/_adjustTheseDocks below, shared
+         * instance state. A second call made while one is still chunking
+         * through blocks would otherwise reset that state out from under the
+         * first (issue #8392), so calls are queued and run one at a time.
+         */
+        this._loadQueue = [];
+        this._loadInProgress = false;
+        /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
          */
@@ -4769,12 +4778,47 @@ class Blocks {
         };
 
         /**
-         * Load new blocks.
+         * Load new blocks. Queues the call instead of running it immediately
+         * if another load is still in progress, so the two loads' bookkeeping
+         * never overlaps (issue #8392).
          * @param - blockObj - Block Objects
          * @public
          * return {void}
          */
         this.loadNewBlocks = blockObjs => {
+            if (this._loadInProgress) {
+                this._loadQueue.push(blockObjs);
+                return;
+            }
+
+            this._loadInProgress = true;
+            this._loadNewBlocksNow(blockObjs);
+        };
+
+        /**
+         * Marks the current load as finished and, if another load was
+         * queued while it ran, starts that one.
+         * @private
+         * @returns {void}
+         */
+        this._advanceLoadQueue = () => {
+            this._loadInProgress = false;
+
+            if (this._loadQueue.length > 0) {
+                const nextBlockObjs = this._loadQueue.shift();
+                this._loadInProgress = true;
+                this._loadNewBlocksNow(nextBlockObjs);
+            }
+        };
+
+        /**
+         * Does the actual work of loading new blocks. Only ever runs for one
+         * call to loadNewBlocks at a time, see _advanceLoadQueue above.
+         * @private
+         * @param - blockObj - Block Objects
+         * @returns {void}
+         */
+        this._loadNewBlocksNow = blockObjs => {
             /** Suppress intermediate canvas redraws during block loading. */
             this.activity._suppressRefresh = true;
 
@@ -4898,6 +4942,7 @@ class Blocks {
                         );
                     }
                     this.activity._suppressRefresh = false;
+                    this._advanceLoadQueue();
                     return;
                 }
 
@@ -5438,9 +5483,19 @@ class Blocks {
                     }
                 };
 
-                processChunk();
+                if (totalBlocks === 0) {
+                    // No blocks means no per-block async completion will ever
+                    // call cleanupAfterLoad, so nothing would otherwise mark
+                    // this load finished. Route through the same finalize
+                    // path a normal load ends on so finishedLoading still
+                    // fires and the queue still advances.
+                    this.cleanupAfterLoad();
+                } else {
+                    processChunk();
+                }
             } catch (e) {
                 this.activity._suppressRefresh = false;
+                this._advanceLoadQueue();
                 throw e;
             }
         };
@@ -6386,6 +6441,7 @@ class Blocks {
                 /** All blocks loaded — allow canvas redraws again. */
                 this.activity._suppressRefresh = false;
                 this.activity.refreshCanvas();
+                this._advanceLoadQueue();
             }
         };
 

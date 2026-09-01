@@ -978,6 +978,166 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("loadNewBlocks re-entrancy (#8392)", () => {
+        const { PubSub } = require("../pubsub");
+        let mockActivity;
+        let loadContainer;
+        let blocks;
+
+        // Block objects: [id, name, x, y, connections]. blockOffset is 0 for
+        // every one of these tests, so a batch of length N occupies indices
+        // 0..N-1 in blockList/_adjustTheseStacks.
+        const makeBatch = n =>
+            Array.from({ length: n }, (_, i) => [i, "forward", 0, 0, [null, null, null]]);
+
+        // Stands in for the real path: block.js calls cleanupAfterLoad()
+        // once a block's own artwork generation finishes, asynchronously,
+        // after _processOneBlock has already recorded the block for the
+        // finalize step.
+        const stubProcessOneBlock = () =>
+            jest.fn((b, blockObjs, blockOffset) => {
+                const thisBlock = blockOffset + b;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            mockActivity = {
+                storage: {},
+                trashcan: {},
+                turtles: {},
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: { synth: { loadSynth: jest.fn(), preloadProjectSamples: jest.fn() } },
+                blocksContainer: { x: 0, y: 0 },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false
+            };
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+
+            blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.customTemperamentDefined = true;
+            blocks._processOneBlock = stubProcessOneBlock();
+            // These tests are only about load serialization, not the
+            // finalize step's internals, so stub it out the same way the
+            // "cleanupAfterLoad" describe block above does.
+            blocks._findDrumURLs = jest.fn();
+            blocks.updateBlockPositions = jest.fn();
+            blocks._rebuildSpatialGrid = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+        });
+
+        afterEach(async () => {
+            // Drain any cleanupAfterLoad callbacks still pending from a test
+            // that didn't await every scheduled block completion, so they
+            // can't fire during a later test against its fresh blocks
+            // instance.
+            await new Promise(r => setTimeout(r, 50));
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("does not start a second call while a first call is still processing", () => {
+            blocks.loadNewBlocks(makeBatch(25));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(20); // first CHUNK_SIZE
+
+            blocks.loadNewBlocks(makeBatch(3));
+
+            // The second call is queued, not run: _processOneBlock has not
+            // been called any additional times for it yet.
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(20);
+            expect(blocks._loadQueue).toHaveLength(1);
+        });
+
+        it("does not lose the first call's in-flight _adjustTheseStacks entries when a second call arrives mid-load", async () => {
+            blocks.loadNewBlocks(makeBatch(25));
+            // Let the first chunk's 20 synchronous _processOneBlock calls'
+            // queued cleanupAfterLoad callbacks start landing.
+            await new Promise(r => setTimeout(r, 0));
+
+            blocks.loadNewBlocks(makeBatch(3));
+
+            // Let everything settle: remaining chunks, all cleanupAfterLoad
+            // callbacks, and the queued second load running to completion.
+            await new Promise(r => setTimeout(r, 50));
+
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(28); // 25 + 3
+            expect(blocks._loadInProgress).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
+        });
+
+        it("emits finishedLoading once per queued load, not merged into a single early event", async () => {
+            const finishedLoadingCalls = [];
+            global.pubsub.on("finishedLoading", () => finishedLoadingCalls.push(Date.now()));
+
+            blocks.loadNewBlocks(makeBatch(25));
+            await new Promise(r => setTimeout(r, 0));
+            blocks.loadNewBlocks(makeBatch(3));
+
+            await new Promise(r => setTimeout(r, 50));
+
+            expect(finishedLoadingCalls).toHaveLength(2);
+        });
+
+        it("starts a queued load once an earlier load's circular-connection early return resolves", () => {
+            // Block connected to itself: connections[0] === block id.
+            const circularBatch = [[0, "forward", 0, 0, [0, null, null]]];
+            blocks.loadNewBlocks(circularBatch);
+
+            // The early return must not leave the queue stuck: a load
+            // queued behind it should still get its turn.
+            expect(blocks._loadInProgress).toBe(false);
+
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("runs a second call immediately when no load is already in progress", () => {
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadQueue).toHaveLength(0);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("loading an empty batch does not hang and still advances the queue", async () => {
+            const finishedLoadingCalls = [];
+            global.pubsub.on("finishedLoading", () => finishedLoadingCalls.push(Date.now()));
+
+            blocks.loadNewBlocks([]);
+            await new Promise(r => setTimeout(r, 0));
+
+            expect(finishedLoadingCalls).toHaveLength(1);
+            expect(blocks._loadInProgress).toBe(false);
+
+            // A load queued behind the empty one must not be stranded.
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+    });
+
     describe("renameNameddos", () => {
         let blocksInstance;
 
