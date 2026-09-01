@@ -727,6 +727,9 @@ describe("Blocks Foundation", () => {
             blocks.loadNewBlocks(blockObjs);
 
             expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Circular connection detected in project data."
+            );
         });
 
         it("detects and rejects multi-block cycles in loadNewBlocks", () => {
@@ -742,6 +745,9 @@ describe("Blocks Foundation", () => {
             mockActivity._suppressRefresh = true;
             blocks.loadNewBlocks(twoBlockCycle);
             expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Circular connection detected in project data."
+            );
 
             // Three-block cycle: 0 -> 1 -> 2 -> 0
             const threeBlockCycle = [
@@ -751,8 +757,12 @@ describe("Blocks Foundation", () => {
             ];
 
             mockActivity._suppressRefresh = true;
+            mockActivity.errorMsg.mockClear();
             blocks.loadNewBlocks(threeBlockCycle);
             expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Circular connection detected in project data."
+            );
         });
 
         it("accepts valid parent-child stacks without false cycle detection", () => {

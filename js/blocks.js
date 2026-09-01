@@ -30,7 +30,7 @@
     CAMERAVALUE, VIDEOVALUE, setupBlockDragController
 */
 
-/* global showZoomOverlay */
+/* global showZoomOverlay, _ */
 
 /*
    Global locations
@@ -4888,6 +4888,9 @@ class Blocks {
                         "Circular connection detected in block data. Punting loading of new blocks!"
                     );
                     console.debug("Circular block data:", blockObjs);
+                    if (this.activity && typeof this.activity.errorMsg === "function") {
+                        this.activity.errorMsg(_("Circular connection detected in project data."));
+                    }
                     this.activity._suppressRefresh = false;
                     return;
                 }
