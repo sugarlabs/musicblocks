@@ -1136,6 +1136,49 @@ describe("Blocks Foundation", () => {
             expect(blocks._loadInProgress).toBe(true);
             expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
         });
+
+        it("does not leave the queue stuck if a deferred chunk (block 21+) throws", async () => {
+            // Block 20 is the first block of the second chunk, the one
+            // processed inside the deferred setTimeout(processChunk, 0)
+            // callback rather than the first, synchronous chunk. A throw
+            // there runs outside any caller's try/catch, so it can only be
+            // observed here as a window error event, the same way a real
+            // browser would surface it.
+            let callCount = 0;
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+                if (callCount === 21) {
+                    throw new Error("deferred chunk failure");
+                }
+                const thisBlock = blockOffset + b;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+            const windowErrors = [];
+            const onWindowError = event => {
+                event.preventDefault();
+                windowErrors.push(event.error || event.message);
+            };
+            window.addEventListener("error", onWindowError);
+
+            blocks.loadNewBlocks(makeBatch(25));
+            await new Promise(r => setTimeout(r, 50));
+
+            window.removeEventListener("error", onWindowError);
+
+            expect(windowErrors.length).toBeGreaterThan(0);
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(blocks._loadInProgress).toBe(false);
+
+            // A load issued after the failure must not be stranded behind it.
+            blocks._processOneBlock = stubProcessOneBlock();
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
     });
 
     describe("renameNameddos", () => {

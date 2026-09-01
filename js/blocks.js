@@ -5479,7 +5479,23 @@ class Blocks {
                         // silently stalls loading after the first chunk. setTimeout(0)
                         // still yields to the main thread but keeps running regardless
                         // of tab visibility.
-                        setTimeout(processChunk, 0);
+                        //
+                        //
+                        // A deferred chunk runs on its own event-loop turn, outside
+                        // the synchronous try/catch below that only covers the very
+                        // first, synchronous processChunk() call. Without catching
+                        // here too, a throw from block 21 onward would leave
+                        // _loadInProgress stuck true forever, silently blocking
+                        // every future loadNewBlocks() call.
+                        setTimeout(() => {
+                            try {
+                                processChunk();
+                            } catch (e) {
+                                this.activity._suppressRefresh = false;
+                                this._advanceLoadQueue();
+                                throw e;
+                            }
+                        }, 0);
                     }
                 };
 
