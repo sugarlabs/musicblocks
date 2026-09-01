@@ -1472,3 +1472,350 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
         jest.useRealTimers();
     });
 });
+
+describe("MusicKeyboard sequencer matrix, note tracking, and chord grouping", () => {
+    let activity;
+    let keyboard;
+
+    beforeEach(() => {
+        activity = {
+            turtles: {
+                ithTurtle: jest.fn().mockReturnValue({
+                    singer: {
+                        bpm: [],
+                        keySignature: "C Major",
+                        movable: false
+                    }
+                })
+            },
+            logo: {
+                errorMsg: jest.fn(),
+                synth: {
+                    inTemperament: "equal",
+                    stopSound: jest.fn(),
+                    trigger: jest.fn(),
+                    setMasterVolume: jest.fn()
+                }
+            },
+            canvas: {
+                width: 1000,
+                height: 1000
+            },
+            getStageScale: jest.fn().mockReturnValue(1)
+        };
+
+        global.docById = jest.fn();
+        global.resolveSynthNoteName = jest.fn((name, oct) => `${name}${oct}`);
+        global.platformColor = {
+            orange: "#ff5722",
+            selectorBackground: "#eeeeee"
+        };
+        global.FIXEDSOLFEGE1 = {};
+        global.SHARP = "♯";
+        global.FLAT = "♭";
+
+        keyboard = new MusicKeyboard(activity);
+        keyboard.layout = [
+            { noteName: "c", noteOctave: "4", blockNumber: 1 },
+            { noteName: "e", noteOctave: "4", blockNumber: 2 },
+            { noteName: "g", noteOctave: "4", blockNumber: 3 }
+        ];
+        keyboard.displayLayout = [
+            { objId: "obj1", voice: "electronic synth" },
+            { objId: "obj2", voice: "electronic synth" },
+            { objId: "obj3", voice: "electronic synth" }
+        ];
+        keyboard.instruments = ["electronic synth"];
+    });
+
+    describe("processSelected chord and polyphonic grouping engine", () => {
+        test("sorts _notesPlayed chronologically by startTime and groups coincident chord notes", () => {
+            keyboard._notesPlayed = [
+                {
+                    startTime: 200,
+                    noteOctave: "g4",
+                    objId: "obj3",
+                    duration: 0.5,
+                    voice: "synth",
+                    blockNumber: 3
+                },
+                {
+                    startTime: 0,
+                    noteOctave: "c4",
+                    objId: "obj1",
+                    duration: 1.0,
+                    voice: "synth",
+                    blockNumber: 1
+                },
+                {
+                    startTime: 0,
+                    noteOctave: "e4",
+                    objId: "obj2",
+                    duration: 1.0,
+                    voice: "synth",
+                    blockNumber: 2
+                },
+                {
+                    startTime: 100,
+                    noteOctave: "d4",
+                    objId: "obj1",
+                    duration: 0.5,
+                    voice: "synth",
+                    blockNumber: 1
+                }
+            ];
+
+            keyboard.processSelected();
+
+            // Notes played must be sorted by startTime
+            expect(keyboard._notesPlayed[0].startTime).toBe(0);
+            expect(keyboard._notesPlayed[1].startTime).toBe(0);
+            expect(keyboard._notesPlayed[2].startTime).toBe(100);
+            expect(keyboard._notesPlayed[3].startTime).toBe(200);
+
+            // Verify coincident notes at startTime 0 were grouped into a single chord for playback
+            global.docById = jest.fn(() => ({ style: {} }));
+            keyboard.playButton = document.createElement("div");
+            keyboard._playChord = jest.fn();
+            keyboard.playOne = jest.fn();
+            keyboard.bpm = 90;
+
+            keyboard.playAll();
+
+            expect(keyboard._playChord).toHaveBeenCalledWith(["c4", "e4"], expect.any(Array), [
+                "synth",
+                "synth"
+            ]);
+            expect(keyboard.playOne).toHaveBeenCalledWith(
+                1,
+                expect.any(Number),
+                keyboard.playButton
+            );
+        });
+
+        test("safely handles empty _notesPlayed array without triggering synth playback", () => {
+            keyboard._notesPlayed = [];
+
+            keyboard.processSelected();
+
+            expect(keyboard._notesPlayed).toEqual([]);
+
+            // Verify downstream playback aborts cleanly when selectedNotes is empty
+            keyboard.playAll();
+            expect(activity.logo.synth.trigger).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("_setNotes column note and rest matrix scanner", () => {
+        test("scans column cells and triggers _setNoteCell for each active cell", () => {
+            const mockColCell = {
+                getAttribute: jest.fn(attr => (attr === "start" ? "500" : "0.5"))
+            };
+            const cell0 = { style: { backgroundColor: "black" } };
+            const cell1 = { style: { backgroundColor: "white" } };
+            const cell2 = { style: { backgroundColor: "black" } };
+
+            const mockRow0 = { cells: [cell0] };
+            const mockRow1 = { cells: [cell1] };
+            const mockRow2 = { cells: [cell2] };
+
+            global.docById = jest.fn(id => {
+                if (id === "cells-0") return mockColCell;
+                if (id === "mkb0") return mockRow0;
+                if (id === "mkb1") return mockRow1;
+                if (id === "mkb2") return mockRow2;
+                if (id === "0:0") return { getAttribute: () => "0.5" };
+                if (id === "2:0") return { getAttribute: () => "0.5" };
+                return null;
+            });
+
+            keyboard._setNoteCell = jest.fn();
+            keyboard._notesPlayed = [
+                { startTime: 500, noteOctave: "old" },
+                { startTime: 1000, noteOctave: "keep" }
+            ];
+
+            keyboard._setNotes(0, true);
+
+            expect(keyboard._notesPlayed).toEqual([{ startTime: 1000, noteOctave: "keep" }]);
+            expect(keyboard._setNoteCell).toHaveBeenCalledTimes(2);
+            expect(keyboard._setNoteCell).toHaveBeenCalledWith(0, 0, "500", true);
+            expect(keyboard._setNoteCell).toHaveBeenCalledWith(2, 0, "500", true);
+        });
+
+        test("inserts a rest note when no cells in column are marked (silence)", () => {
+            const mockColCell = {
+                getAttribute: jest.fn(attr =>
+                    attr === "start" ? "300" : attr === "dur" ? "0.25" : null
+                )
+            };
+            const cell0 = { style: { backgroundColor: "white" } };
+            const cell1 = { style: { backgroundColor: "white" } };
+            const cell2 = { style: { backgroundColor: "white" } };
+
+            global.docById = jest.fn(id => {
+                if (id === "cells-1") return mockColCell;
+                if (id === "mkb0") return { cells: [null, cell0] };
+                if (id === "mkb1") return { cells: [null, cell1] };
+                if (id === "mkb2") return { cells: [null, cell2] };
+                return null;
+            });
+
+            keyboard._notesPlayed = [];
+
+            keyboard._setNotes(1, false);
+
+            expect(keyboard._notesPlayed).toHaveLength(1);
+            expect(keyboard._notesPlayed[0]).toEqual({
+                startTime: 300,
+                noteOctave: "R",
+                objId: null,
+                duration: 0.25
+            });
+        });
+    });
+
+    describe("_setNoteCell note formatting and synth playback", () => {
+        test("resolves standard pitch and appends note to _notesPlayed and triggers synth audio", () => {
+            const mockCellElem = {
+                getAttribute: jest.fn(attr => (attr === "alt" ? "0.5" : null))
+            };
+            global.docById = jest.fn(id => (id === "0:0" ? mockCellElem : null));
+
+            keyboard._notesPlayed = [];
+
+            // j = 0 maps to layout[3 - 0 - 1] = layout[2] = g4
+            keyboard._setNoteCell(0, 0, "100", true);
+
+            expect(keyboard._notesPlayed).toHaveLength(1);
+            expect(keyboard._notesPlayed[0]).toEqual({
+                startTime: 100,
+                noteOctave: "g4",
+                blockNumber: 3,
+                duration: 0.5,
+                objId: "obj3",
+                voice: "electronic synth"
+            });
+
+            expect(activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "g4",
+                "0.5",
+                "electronic synth",
+                null,
+                null
+            );
+        });
+
+        test("handles hertz frequency note without synth trigger when playNote is false", () => {
+            keyboard.layout = [{ noteName: "hertz", noteOctave: 440, blockNumber: 10 }];
+            keyboard.displayLayout = [{ objId: "hertzObj", voice: "electronic synth" }];
+
+            const mockCellElem = {
+                getAttribute: jest.fn(attr => (attr === "alt" ? "1.0" : null))
+            };
+            global.docById = jest.fn(id => (id === "0:0" ? mockCellElem : null));
+            keyboard._notesPlayed = [];
+
+            keyboard._setNoteCell(0, 0, "200", false);
+
+            expect(keyboard._notesPlayed).toHaveLength(1);
+            expect(keyboard._notesPlayed[0].noteOctave).toBe(440);
+            expect(activity.logo.synth.trigger).not.toHaveBeenCalled();
+        });
+
+        test("handles drum note name translating to c2", () => {
+            keyboard.layout = [{ noteName: "drum", noteOctave: "snare", blockNumber: 20 }];
+            keyboard.displayLayout = [{ objId: "drumObj", voice: "electronic synth" }];
+
+            const mockCellElem = {
+                getAttribute: jest.fn(attr => (attr === "alt" ? "0.25" : null))
+            };
+            global.docById = jest.fn(id => (id === "0:0" ? mockCellElem : null));
+            keyboard._notesPlayed = [];
+
+            keyboard._setNoteCell(0, 0, "400", true);
+
+            expect(keyboard._notesPlayed).toHaveLength(1);
+            expect(keyboard._notesPlayed[0].noteOctave).toBe("c2");
+            expect(activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "c2",
+                "0.25",
+                "electronic synth",
+                null,
+                null
+            );
+        });
+    });
+
+    describe("makeClickable DOM grid event registration", () => {
+        test("binds duration header click and grid cell mouse interactions", () => {
+            const headerCell0 = {
+                getAttribute: jest.fn(attr =>
+                    attr === "id" ? "hdr0" : attr === "start" ? "0" : "1.0"
+                ),
+                onclick: null
+            };
+            const mockHeaderRow = { cells: [headerCell0] };
+
+            const gridCell00 = {
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn(attr => (attr === "cellColor" ? "#ffffff" : null)),
+                style: { backgroundColor: "white" },
+                id: "0:0",
+                onmousedown: null,
+                onmouseover: null,
+                onmouseup: null
+            };
+            const mockMkbRow0 = { cells: [gridCell00] };
+
+            global.docById = jest.fn(id => {
+                if (id === "mkbNoteDurationRow") return mockHeaderRow;
+                if (id === "mkb0") return mockMkbRow0;
+                if (id === "mkb1") return { cells: [] };
+                if (id === "mkb2") return { cells: [] };
+                return null;
+            });
+
+            keyboard._notesPlayed = [
+                {
+                    startTime: 0,
+                    noteOctave: "c4",
+                    objId: "o1",
+                    duration: 1,
+                    voice: "v",
+                    blockNumber: 1
+                }
+            ];
+            keyboard.processSelected();
+            keyboard._createpiesubmenu = jest.fn();
+            keyboard._setNotes = jest.fn();
+
+            keyboard.makeClickable();
+
+            // Test header cell click invokes _createpiesubmenu
+            headerCell0.onclick({ target: headerCell0 });
+            expect(keyboard._createpiesubmenu).toHaveBeenCalledWith("hdr0", "0", "1.0");
+
+            // Test cell onmousedown toggles to black and calls _setNotes
+            gridCell00.onmousedown({ target: gridCell00 });
+            expect(gridCell00.style.backgroundColor).toBe("black");
+            expect(keyboard._setNotes).toHaveBeenCalledWith(0, true);
+
+            // Test second onmousedown toggles cell back to cellColor and calls _setNotes
+            gridCell00.onmousedown({ target: gridCell00 });
+            expect(gridCell00.style.backgroundColor).toBe("#ffffff");
+            expect(keyboard._setNotes).toHaveBeenCalledWith(0, false);
+
+            // Test onmouseover while isMouseDown is true toggles to black
+            gridCell00.onmouseover();
+            expect(gridCell00.style.backgroundColor).toBe("black");
+
+            // Test onmouseup clears isMouseDown so subsequent mouseover does not change color
+            gridCell00.onmouseup();
+            gridCell00.onmouseover();
+            expect(gridCell00.style.backgroundColor).toBe("black"); // Stays unchanged
+        });
+    });
+});
