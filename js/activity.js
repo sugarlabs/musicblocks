@@ -1921,6 +1921,10 @@ class Activity {
          * @param {boolean} closeAllWidgets  {if true close all open widgets}
          */
         this.sendAllToTrash = (addStartBlock, doNotSave, closeAllWidgets = true) => {
+            if (typeof this.blocks.cancelPendingLoad === "function") {
+                this.blocks.cancelPendingLoad();
+            }
+
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;

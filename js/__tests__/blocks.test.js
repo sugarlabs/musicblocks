@@ -852,6 +852,47 @@ describe("Blocks Foundation", () => {
             expect(() => blocks.loadNewBlocks(blockObjs)).toThrow("simulated processing error");
             expect(mockActivity._suppressRefresh).toBe(false);
         });
+
+        it("cancels stale chunks and ignores their cleanup after a new load starts", async () => {
+            jest.useFakeTimers();
+
+            try {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.protoBlockDict = {};
+                blocks.newStorein2Block = jest.fn();
+                blocks.newNamedboxBlock = jest.fn();
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks.customTemperamentDefined = true;
+                blocks._processOneBlock = jest.fn();
+
+                const oldBlockObjs = Array.from({ length: 40 }, (_, index) => [
+                    index,
+                    "forward",
+                    0,
+                    0,
+                    [null, null, null]
+                ]);
+                const newBlockObjs = [[0, "forward", 0, 0, [null, null, null]]];
+
+                blocks.loadNewBlocks(oldBlockObjs);
+                const oldGeneration = blocks._activeLoadGeneration;
+                expect(blocks._processOneBlock).toHaveBeenCalledTimes(20);
+                expect(jest.getTimerCount()).toBe(1);
+
+                blocks.loadNewBlocks(newBlockObjs);
+
+                expect(blocks._processOneBlock).toHaveBeenCalledTimes(21);
+                expect(jest.getTimerCount()).toBe(0);
+                await blocks.cleanupAfterLoad("forward", oldGeneration);
+                expect(blocks._loadCounter).toBe(1);
+
+                jest.runOnlyPendingTimers();
+                expect(blocks._processOneBlock).toHaveBeenCalledTimes(21);
+            } finally {
+                jest.useRealTimers();
+            }
+        });
     });
 
     describe("renameNameddos", () => {

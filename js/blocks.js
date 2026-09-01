@@ -211,6 +211,10 @@ class Blocks {
         this._expandablesList = [];
         /** Number of blocks to load */
         this._loadCounter = 0;
+        /** Generation for invalidating stale asynchronous block loads. */
+        this._loadGeneration = 0;
+        this._activeLoadGeneration = null;
+        this._loadTimeoutId = null;
         /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
@@ -2639,6 +2643,7 @@ class Blocks {
             // Cache the block's index for O(1) lookups instead of
             // O(N) blockList.indexOf() scans.
             myBlock.blockIndex = this.blockList.length - 1;
+            myBlock.loadGeneration = this._activeLoadGeneration;
             myBlock.copySize();
 
             /** We may need to do some postProcessing to the block */
@@ -4769,12 +4774,30 @@ class Blocks {
         };
 
         /**
+         * Cancel any pending chunk from the current block load.
+         * @public
+         * @returns {void}
+         */
+        this.cancelPendingLoad = () => {
+            if (this._loadTimeoutId !== null) {
+                clearTimeout(this._loadTimeoutId);
+                this._loadTimeoutId = null;
+            }
+
+            this._loadGeneration += 1;
+            this._activeLoadGeneration = null;
+            this._loadCounter = 0;
+            this.activity._suppressRefresh = false;
+        };
+
+        /**
          * Load new blocks.
          * @param - blockObj - Block Objects
          * @public
          * return {void}
          */
         this.loadNewBlocks = blockObjs => {
+            this.cancelPendingLoad();
             /** Suppress intermediate canvas redraws during block loading. */
             this.activity._suppressRefresh = true;
 
@@ -5317,6 +5340,8 @@ class Blocks {
                 this._adjustTheseStacks = [];
                 this._adjustTheseDocks = [];
                 this._loadCounter = blockObjs.length;
+                const loadGeneration = this._loadGeneration;
+                this._activeLoadGeneration = loadGeneration;
 
                 // Preload audio samples for instruments used in this project (background task)
                 if (this.activity && this.activity.logo && this.activity.logo.synth) {
@@ -5357,6 +5382,11 @@ class Blocks {
                 }
 
                 const processChunk = () => {
+                    if (loadGeneration !== this._activeLoadGeneration) {
+                        return;
+                    }
+
+                    this._loadTimeoutId = null;
                     const chunkEnd = Math.min(bIndex + CHUNK_SIZE, totalBlocks);
                     for (let b = bIndex; b < chunkEnd; b++) {
                         this._processOneBlock(b, blockObjs, blockOffset, firstBlock);
@@ -5368,7 +5398,7 @@ class Blocks {
                         // silently stalls loading after the first chunk. setTimeout(0)
                         // still yields to the main thread but keeps running regardless
                         // of tab visibility.
-                        setTimeout(processChunk, 0);
+                        this._loadTimeoutId = setTimeout(processChunk, 0);
                     }
                 };
 
@@ -6232,7 +6262,11 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        this.cleanupAfterLoad = async () => {
+        this.cleanupAfterLoad = async (name, loadGeneration = this._activeLoadGeneration) => {
+            if (loadGeneration !== this._activeLoadGeneration) {
+                return;
+            }
+
             this._loadCounter -= 1;
             // Early return BEFORE the try block is intentional:
             // intermediate calls must not run the finally, which resets
@@ -6318,8 +6352,11 @@ class Blocks {
                 pubsub.emit("finishedLoading");
             } finally {
                 /** All blocks loaded — allow canvas redraws again. */
-                this.activity._suppressRefresh = false;
-                this.activity.refreshCanvas();
+                if (loadGeneration === this._activeLoadGeneration) {
+                    this._activeLoadGeneration = null;
+                    this.activity._suppressRefresh = false;
+                    this.activity.refreshCanvas();
+                }
             }
         };
 
