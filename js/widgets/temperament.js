@@ -1610,6 +1610,49 @@ function TemperamentWidget() {
                     e.preventDefault();
                     _showMenu(e, i);
                 };
+                tdCents.style.cursor = _isLocked(i) ? "default" : "text";
+                tdCents.ondblclick = function (ev) {
+                    ev.stopPropagation();
+                    if (_isLocked(i)) return;
+                    const input = document.createElement("input");
+                    input.type = "number";
+                    input.step = "0.1";
+                    input.min = "0";
+                    input.max = "1200";
+                    input.value = that.cents[i].toFixed(1);
+                    input.style.width = "60px";
+                    input.style.fontSize = "12px";
+                    input.style.background = "#2a2a3e";
+                    input.style.color = "#e0e0e0";
+                    input.style.border = "1px solid #555";
+                    input.style.borderRadius = "3px";
+                    input.style.textAlign = "center";
+                    tdCents.textContent = "";
+                    tdCents.appendChild(input);
+                    input.focus();
+                    input.select();
+                    const _commit = function () {
+                        const v = Math.max(0, Math.min(1200, parseFloat(input.value)));
+                        if (!isNaN(v)) {
+                            _applyCents(i, v);
+                            _drawCircle();
+                            _updateTableRow(i);
+                        } else {
+                            _updateTableRow(i);
+                        }
+                    };
+                    input.onblur = _commit;
+                    input.onkeydown = function (e) {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            input.blur();
+                        } else if (e.key === "Escape") {
+                            e.preventDefault();
+                            input.onblur = null;
+                            _updateTableRow(i);
+                        }
+                    };
+                };
             }
             _refreshTable();
         };
@@ -1658,8 +1701,8 @@ function TemperamentWidget() {
 
         // ── Interactivity ──
         const _applyCents = function (i, cents) {
-            that.cents[i] = cents;
-            that.ratios[i] = Math.pow(that.powerBase, cents / 1200);
+            that.cents[i] = Math.max(0, Math.min(1200, cents));
+            that.ratios[i] = Math.pow(that.powerBase, that.cents[i] / 1200);
             that.frequencies[i] = (Number(that.frequencies[0]) * that.ratios[i]).toFixed(2);
             if (that.ratiosNotesPair[i]) that.ratiosNotesPair[i][0] = that.ratios[i];
         };
