@@ -11,6 +11,9 @@ function TunerDisplay(canvas, width, height) {
     this.cents = 0;
     this.frequency = 440;
     this.chromaticMode = true; // Default to chromatic mode
+    this._cachedTheme = null;
+    this._selectorBg = null;
+    this._textColor = null;
 
     // Create mode toggle container
     this.modeContainer = document.createElement("div");
@@ -96,16 +99,42 @@ function TunerDisplay(canvas, width, height) {
 }
 
 /**
+ * Resolves and caches CSS token colors for Canvas 2D rendering,
+ * updating only when document theme changes.
+ * @private
+ * @returns {{ selectorBg: string, textColor: string }}
+ */
+TunerDisplay.prototype._getCanvasColors = function () {
+    const currentTheme =
+        typeof document !== "undefined" && document.body ? document.body.className : "";
+    if (this._cachedTheme !== currentTheme || !this._selectorBg) {
+        this._cachedTheme = currentTheme;
+        if (typeof getComputedStyle !== "undefined" && document.body) {
+            const style = getComputedStyle(document.body);
+            this._selectorBg = style.getPropertyValue("--color-selector-bg").trim() || "#8cc6ff";
+            this._textColor = style.getPropertyValue("--color-text-primary").trim() || "#000000";
+        } else {
+            this._selectorBg = "#8cc6ff";
+            this._textColor = "#000000";
+        }
+    }
+    return {
+        selectorBg: this._selectorBg,
+        textColor: this._textColor
+    };
+};
+
+/**
  * Updates the styles of mode toggle buttons based on current mode
  */
 TunerDisplay.prototype.updateButtonStyles = function () {
     if (this.chromaticMode) {
-        this.chromaticButton.style.backgroundColor = platformColor.selectorBackground;
+        this.chromaticButton.style.backgroundColor = "var(--color-selector-bg)";
         this.chromaticButton.querySelector("img").style.filter = "brightness(0) invert(1)";
         this.targetPitchButton.style.backgroundColor = "transparent";
         this.targetPitchButton.querySelector("img").style.filter = "none";
     } else {
-        this.targetPitchButton.style.backgroundColor = platformColor.selectorBackground;
+        this.targetPitchButton.style.backgroundColor = "var(--color-selector-bg)";
         this.targetPitchButton.querySelector("img").style.filter = "brightness(0) invert(1)";
         this.chromaticButton.style.backgroundColor = "transparent";
         this.chromaticButton.querySelector("img").style.filter = "none";
@@ -132,6 +161,7 @@ TunerDisplay.prototype.draw = function () {
     const ctx = this.ctx;
     const width = this.width;
     const height = this.height;
+    const { selectorBg, textColor } = this._getCanvasColors();
 
     // Clear the canvas
     ctx.clearRect(0, 0, width, height);
@@ -143,11 +173,11 @@ TunerDisplay.prototype.draw = function () {
     const meterY = height - 80; // Base position of meter
 
     // Draw the tuning meter background
-    ctx.fillStyle = platformColor.selectorBackground || "#e0e0e0";
+    ctx.fillStyle = selectorBg;
     ctx.fillRect(meterX, meterY, meterWidth, meterHeight);
 
     // Draw the center line
-    ctx.fillStyle = platformColor.textColor || "#000000";
+    ctx.fillStyle = textColor;
     ctx.fillRect(meterX + meterWidth / 2 - 1, meterY, 2, meterHeight);
 
     // Draw the indicator
@@ -159,7 +189,7 @@ TunerDisplay.prototype.draw = function () {
     // Draw the note
     ctx.font = "bold 48px Arial";
     ctx.textAlign = "center";
-    ctx.fillStyle = platformColor.textColor || "#000000";
+    ctx.fillStyle = textColor;
     ctx.fillText(this.note, width / 2, height - 200); // Much lower position
 
     // Draw the cents deviation
