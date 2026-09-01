@@ -383,6 +383,19 @@ describe("Utility Functions (logic-only)", () => {
 
         it("handles numbers greater than 1", () => {
             expect(rationalToFraction(2)).toEqual([2, 1]);
+            expect(rationalToFraction(4 / 3)).toEqual([4, 3]);
+        });
+
+        it("handles negative numbers", () => {
+            expect(rationalToFraction(-0.5)).toEqual([-1, 2]);
+            expect(rationalToFraction(-2.5)).toEqual([-5, 2]);
+        });
+
+        it("handles numbers exceeding iteration cap without returning reciprocal", () => {
+            const [n, d] = rationalToFraction(Math.PI);
+            expect(n / d).toBeGreaterThan(1);
+            expect(Math.abs(n / d - Math.PI)).toBeLessThan(0.001);
+            expect(d).toBeGreaterThan(0);
         });
     });
 

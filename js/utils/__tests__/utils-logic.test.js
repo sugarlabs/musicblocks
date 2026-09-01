@@ -22,6 +22,7 @@ const {
     nearestBeat,
     oneHundredToFraction,
     rationalToFraction,
+    GCD,
     rationalSum,
     rgbToHex,
     hexToRGB,
@@ -190,12 +191,60 @@ describe("Utility Logic Functions", () => {
         it("converts float to fraction", () => {
             expect(rationalToFraction(0.5)).toEqual([1, 2]);
             expect(rationalToFraction(2)).toEqual([2, 1]);
+            expect(rationalToFraction(1)).toEqual([1, 1]);
+            expect(rationalToFraction(4 / 3)).toEqual([4, 3]);
         });
 
-        it("handles 0, NaN, Infinity", () => {
+        it("handles 0, NaN, Infinity, -Infinity", () => {
             expect(rationalToFraction(0)).toEqual([0, 1]);
             expect(rationalToFraction(NaN)).toEqual([0, 1]);
             expect(rationalToFraction(Infinity)).toEqual([0, 1]);
+            expect(rationalToFraction(-Infinity)).toEqual([0, 1]);
+        });
+
+        it("handles negative numbers preserving sign on numerator", () => {
+            expect(rationalToFraction(-0.5)).toEqual([-1, 2]);
+            expect(rationalToFraction(-2.5)).toEqual([-5, 2]);
+            expect(rationalToFraction(-0.75)).toEqual([-3, 4]);
+        });
+
+        it("handles values greater than one that exhaust iteration cap without reciprocal bug (pi, e)", () => {
+            const [nPi, dPi] = rationalToFraction(Math.PI);
+            expect(nPi / dPi).toBeGreaterThan(1);
+            expect(Math.abs(nPi / dPi - Math.PI)).toBeLessThan(0.001);
+            expect(GCD(nPi, dPi)).toBe(1);
+            expect(dPi).toBeGreaterThan(0);
+
+            const [nE, dE] = rationalToFraction(Math.E);
+            expect(nE / dE).toBeGreaterThan(1);
+            expect(Math.abs(nE / dE - Math.E)).toBeLessThan(0.001);
+            expect(GCD(nE, dE)).toBe(1);
+            expect(dE).toBeGreaterThan(0);
+        });
+
+        it("handles negative numbers greater than one without unreduced denominator", () => {
+            const [n, d] = rationalToFraction(-Math.PI);
+            expect(n).toBeLessThan(0);
+            expect(d).toBeGreaterThan(0);
+            expect(d).toBeLessThan(5000);
+            expect(Math.abs(n / d - -Math.PI)).toBeLessThan(0.001);
+            expect(GCD(Math.abs(n), d)).toBe(1);
+        });
+
+        it("reduces fractions via GCD on iteration cap", () => {
+            const [n, d] = rationalToFraction(0.0003);
+            expect(GCD(n, d)).toBe(1);
+            expect(n).toBe(1);
+            expect(d).toBe(3334);
+        });
+
+        it("ensures standard musical subdivisions stay exact and reduced", () => {
+            for (let j = 1; j <= 64; j++) {
+                const [n, d] = rationalToFraction(j / 64);
+                expect(Math.abs(n / d - j / 64)).toBeLessThan(0.000001);
+                expect(GCD(n, d)).toBe(1);
+                expect(d).toBeGreaterThan(0);
+            }
         });
     });
 
