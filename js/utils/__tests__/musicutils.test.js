@@ -3998,6 +3998,10 @@ describe("generateNoteNames EDO length contract", () => {
         expect(names).not.toEqual(["C", "D", "E", "F", "G", "A", "B"]);
     });
 
+    it("generates the correct note names for 4-EDO", () => {
+        expect(generateNoteNames(4)).toEqual(["C", "D", "F", "G"]);
+    });
+
     it("keeps 12-EDO exactly as the standard chromatic table", () => {
         expect(generateNoteNames(12)).toEqual([
             "C",
