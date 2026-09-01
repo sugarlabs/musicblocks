@@ -245,6 +245,33 @@ class StatusMatrix {
             return;
         }
 
+        // The interpreter calls this after every executed block; coalesce
+        // those requests into at most one DOM render per animation frame.
+        if (this._updateQueued) {
+            return;
+        }
+        this._updateQueued = true;
+
+        const render = () => {
+            this._updateQueued = false;
+            this._renderAll();
+        };
+
+        if (typeof requestAnimationFrame === "function") {
+            requestAnimationFrame(render);
+        } else {
+            // 100 ms is still shorter than a typical 1/16th note, so no
+            // audible-note state change is skipped in rAF-less environments.
+            setTimeout(render, 100);
+        }
+    }
+
+    _renderAll() {
+        // The widget may have closed between scheduling and the frame firing.
+        if (!this.isOpen || !this._statusTable) {
+            return;
+        }
+
         // Update status of all of the voices in the matrix.
         this.activity.logo.updatingStatusMatrix = true;
 
