@@ -829,8 +829,12 @@ class ProjectManager {
                                                 operation: "loadProjectFromFile"
                                             });
                                             finishLoading();
+                                            return;
                                         } finally {
                                             that.stage.removeAllEventListeners("trashsignal");
+                                        }
+                                        if (that.planet) {
+                                            that.planet.saveLocally();
                                         }
                                     };
 
