@@ -759,6 +759,12 @@ class ProjectManager {
         const that = this.activity;
         const pm = this;
 
+        const finishLoading = () => {
+            that.loading = false;
+            document.body.style.cursor = "default";
+            that.stopLoadAnimation();
+        };
+
         that.fileChooser.addEventListener("click", event => {
             event.currentTarget.value = "";
         });
@@ -780,6 +786,7 @@ class ProjectManager {
                             that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
+                            finishLoading();
                         } else {
                             /* istanbul ignore next -- file-chooser change handler is browser-only; inaccessible from Jest */
                             const cleanData = rawData.replace(/\n/g, " ");
@@ -792,7 +799,7 @@ class ProjectManager {
                                         that.errorMsg(
                                             _("Cannot find project data in this HTML file.")
                                         );
-                                        pm._finishLoading();
+                                        finishLoading();
                                         return;
                                     }
                                     obj = JSON.parse(unescapeHTML(extracted));
@@ -807,8 +814,25 @@ class ProjectManager {
 
                                 if (!that.merging) {
                                     const __listener = () => {
-                                        that.blocks.loadNewBlocks(obj);
-                                        that.stage.removeAllEventListeners("trashsignal");
+                                        try {
+                                            that.blocks.loadNewBlocks(obj);
+                                            if (that.planet) {
+                                                that.planet.saveLocally();
+                                            }
+                                        } catch (e) {
+                                            that.errorMsg(
+                                                _(
+                                                    "Cannot load project from the file. Please check the file type."
+                                                )
+                                            );
+                                            ErrorHandler.capture(e, {
+                                                operation: "loadProjectFromFile"
+                                            });
+                                            finishLoading();
+                                            return;
+                                        } finally {
+                                            that.stage.removeAllEventListeners("trashsignal");
+                                        }
                                         if (that.planet) {
                                             that.planet.saveLocally();
                                         }
@@ -841,8 +865,7 @@ class ProjectManager {
                                 );
 
                                 ErrorHandler.capture(e, { operation: "loadProjectFromFile" });
-                                document.body.style.cursor = "default";
-                                that.loading = false;
+                                finishLoading();
                             }
                         }
                     }, 200);
@@ -896,6 +919,7 @@ class ProjectManager {
                         that.errorMsg(
                             _("Cannot load project from the file. Please check the file type.")
                         );
+                        finishLoading();
                     } else {
                         /* istanbul ignore next -- drag-and-drop file handler is browser-only; inaccessible from Jest */
                         const cleanData = rawData.replace(/\n/g, " ");
@@ -906,7 +930,7 @@ class ProjectManager {
                                 extracted = extractProjectDataFromHTML(cleanData);
                                 if (!extracted) {
                                     that.errorMsg(_("Cannot find project data in this HTML file."));
-                                    pm._finishLoading();
+                                    finishLoading();
                                     return;
                                 }
                                 obj = JSON.parse(unescapeHTML(extracted));
@@ -924,10 +948,20 @@ class ProjectManager {
                             };
 
                             const __listener = () => {
-                                that.blocks.loadNewBlocks(obj);
-                                that.stage.removeAllEventListeners("trashsignal");
-
-                                pubsub.on("finishedLoading", __afterLoad);
+                                try {
+                                    that.blocks.loadNewBlocks(obj);
+                                    pubsub.on("finishedLoading", __afterLoad);
+                                } catch (e) {
+                                    ErrorHandler.capture(e, { operation: "loadFromFile" });
+                                    that.errorMsg(
+                                        _(
+                                            "Cannot load project from the file. Please check the file type."
+                                        )
+                                    );
+                                    finishLoading();
+                                } finally {
+                                    that.stage.removeAllEventListeners("trashsignal");
+                                }
                             };
 
                             that.stage.addEventListener("trashsignal", __listener, false);
@@ -945,8 +979,7 @@ class ProjectManager {
                             that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
-                            document.body.style.cursor = "default";
-                            that.loading = false;
+                            finishLoading();
                         }
                     }
                 }, 200);
@@ -967,16 +1000,25 @@ class ProjectManager {
             };
 
             abcReader.onload = async event => {
-                let abcData = event.target.result;
-                abcData = abcData.replace(/\\/g, "");
+                that.loading = true;
+                document.body.style.cursor = "wait";
+                try {
+                    let abcData = event.target.result;
+                    abcData = abcData.replace(/\\/g, "");
 
-                await ensureABCJS();
-                const tunebook = new ABCJS.parseOnly(abcData);
+                    await ensureABCJS();
+                    const tunebook = new ABCJS.parseOnly(abcData);
 
-                debugLog(tunebook);
-                tunebook.forEach(tune => {
-                    that.parseABC(tune);
-                });
+                    debugLog(tunebook);
+                    await Promise.all(tunebook.map(tune => that.parseABC(tune)));
+                    finishLoading();
+                } catch (e) {
+                    ErrorHandler.capture(e, { operation: "abcImport" });
+                    that.errorMsg(
+                        _("Cannot load project from the file. Please check the file type.")
+                    );
+                    finishLoading();
+                }
             };
 
             if (files[0] !== undefined) {

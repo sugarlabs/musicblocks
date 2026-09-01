@@ -1802,6 +1802,9 @@ describe("_setupFileHandlers inner callbacks", () => {
             .mockImplementation((evt, handler, _flag) => {
                 handlers[evt] = handler;
             });
+        canvasHolder.addEventListener = jest.fn((evt, handler) => {
+            handlers[evt] = handler;
+        });
         return handlers;
     };
 
@@ -1817,11 +1820,11 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(mockEvent.currentTarget.value).toBe("");
     });
 
-    it("change handler shows error when file is empty (null result)", () => {
+    it.each([null, ""])("change handler cleans up when file is empty (%j result)", rawData => {
         origFileReader = global.FileReader;
         class MockFR {
             constructor() {
-                this.result = null;
+                this.result = rawData;
                 this.onload = null;
             }
             readAsText() {
@@ -1842,7 +1845,118 @@ describe("_setupFileHandlers inner callbacks", () => {
         jest.advanceTimersByTime(200);
 
         expect(activity.errorMsg).toHaveBeenCalled();
-        expect(activity.loading).toBe(true);
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("change handler reports malformed JSON without clearing the workspace", () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = "not JSON";
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "broken.tb" }];
+        handlers.change();
+        jest.advanceTimersByTime(200);
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(expect.any(SyntaxError), {
+            operation: "loadProjectFromFile"
+        });
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("change handler reports HTML without project data once and preserves the workspace", () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = "<html><body>No project here</body></html>";
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        global.extractProjectDataFromHTML.mockImplementationOnce(() => null);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "broken.html" }];
+        handlers.change();
+        jest.advanceTimersByTime(200);
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot find project data in this HTML file."
+        );
+        expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("change handler cleans up when loading merged blocks throws", () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = "[]";
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const loadError = new Error("block load failed");
+        const activity = makeActivity({ merging: true });
+        activity.blocks.loadNewBlocks.mockImplementation(() => {
+            throw loadError;
+        });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "broken.tb" }];
+        handlers.change();
+        jest.advanceTimersByTime(200);
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(loadError, {
+            operation: "loadProjectFromFile"
+        });
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
     it("change handler imports MIDI when .mid file selected", () => {
@@ -1914,31 +2028,65 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(() => handlers.change()).not.toThrow();
     });
 
-    it("change handler shows exactly one error when HTML has no project data", () => {
+    it("drop handler cleans up when file is empty", () => {
         origFileReader = global.FileReader;
-        const readers = [];
         class MockFR {
             constructor() {
+                this.result = "";
                 this.onload = null;
-                readers.push(this);
             }
-            readAsText() {}
+            readAsText() {
+                if (this.onload) this.onload();
+            }
             readAsArrayBuffer() {}
         }
         global.FileReader = MockFR;
-        global.extractProjectDataFromHTML.mockReturnValue(null);
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
 
         const activity = makeActivity();
         const handlers = captureHandlers(activity);
         const pm = new ProjectManager(activity);
         pm._setupFileHandlers();
 
-        activity.fileChooser.files = [{ name: "song.html" }];
-        handlers.change();
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "empty.tb" }] }
+        });
+        jest.advanceTimersByTime(200);
 
-        const reader = readers[0];
-        reader.result = "<html><body>no project data here</body></html>";
-        reader.onload();
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler reports HTML without project data once", () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = "<html><body>No project here</body></html>";
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        global.extractProjectDataFromHTML.mockImplementationOnce(() => null);
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "broken.html" }] }
+        });
         jest.advanceTimersByTime(200);
 
         expect(activity.errorMsg).toHaveBeenCalledTimes(1);
@@ -1946,8 +2094,150 @@ describe("_setupFileHandlers inner callbacks", () => {
             "Cannot find project data in this HTML file."
         );
         expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler catches a deferred block-load failure and restores state", () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = "[]";
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const loadError = new Error("deferred block load failed");
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            dispatchEvent: jest.fn(event => {
+                if (listeners[event]) listeners[event]();
+            }),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            })
+        };
+        const activity = makeActivity({ stage });
+        activity.blocks.loadNewBlocks.mockImplementation(() => {
+            throw loadError;
+        });
+        activity.sendAllToTrash = jest.fn(() => stage.dispatchEvent("trashsignal"));
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "broken.tb" }] }
+        });
+        jest.advanceTimersByTime(200);
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(loadError, {
+            operation: "loadFromFile"
+        });
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler imports ABC and cleans up after ABC parsing", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "X:1\nK:C\nC";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+        global.ensureABCJS.mockResolvedValueOnce(undefined);
+        global.ABCJS.parseOnly.mockReturnValueOnce([{ header: {} }]);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "song.abc" }] }
+        });
+        await readers[2].promise;
+
+        expect(global.ensureABCJS).toHaveBeenCalledTimes(1);
+        expect(global.ABCJS.parseOnly).toHaveBeenCalledWith("X:1\nK:C\nC");
+        expect(activity.parseABC).toHaveBeenCalledWith({ header: {} });
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler reports rejected ABCJS loading and restores state", async () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = "X:1\nK:C\nC";
+                this.onload = null;
+                readers.push(this);
+            }
+            readAsText() {
+                this.promise = this.onload({ target: { result: this.result } });
+                return this.promise;
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+        const abcError = new Error("ABCJS unavailable");
+        global.ensureABCJS.mockRejectedValueOnce(abcError);
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "song.abc" }] }
+        });
+        await readers[2].promise;
+
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(abcError, {
+            operation: "abcImport"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+        expect(activity.parseABC).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 });
 
