@@ -728,3 +728,93 @@ describe("piemenuKey behavioral tests", () => {
         expect(mockActivity.blocks._makeNewBlockWithConnections).toHaveBeenCalled();
     });
 });
+
+describe("pie menu Escape-key dismissal", () => {
+    let elements;
+
+    const makeEl = () => ({
+        style: { display: "", position: "", opacity: "" },
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
+    });
+
+    beforeEach(() => {
+        elements = {};
+        global.docById = jest.fn(id => {
+            if (!elements[id]) elements[id] = makeEl();
+            return elements[id];
+        });
+        global.document = {
+            getElementById: global.docById,
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn()
+        };
+        // Earlier suites may leave a module-level activeExitWheel behind;
+        // dismiss once so each test starts from the no-exit-wheel state.
+        require("../piemenus").dismissActivePieMenu();
+        elements = {};
+        global.document.removeEventListener.mockClear();
+    });
+
+    test("Escape hides every visible pie-menu container and detaches listeners", () => {
+        const { handleEscapeKey } = require("../piemenus");
+        const event = { key: "Escape", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+
+        handleEscapeKey(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(elements["wheelDiv"].style.display).toBe("none");
+        expect(elements["wheelDivptm"].style.display).toBe("none");
+        expect(global.document.removeEventListener).toHaveBeenCalledWith(
+            "keydown",
+            handleEscapeKey,
+            true
+        );
+    });
+
+    test("other keys leave the menu open", () => {
+        const { handleEscapeKey } = require("../piemenus");
+        const event = { key: "a", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+
+        handleEscapeKey(event);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(elements["wheelDiv"] ? elements["wheelDiv"].style.display : "").not.toBe("none");
+    });
+
+    test("Escape does nothing when no pie menu is open", () => {
+        const { handleEscapeKey } = require("../piemenus");
+        global.docById = jest.fn(id => {
+            if (!elements[id]) {
+                elements[id] = makeEl();
+                elements[id].style.display = "none";
+            }
+            return elements[id];
+        });
+        global.document.getElementById = global.docById;
+        const event = { key: "Escape", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+
+        handleEscapeKey(event);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+    });
+
+    test("showWheelDiv registers the Escape listener alongside outside-click", () => {
+        jest.useFakeTimers();
+        const { showWheelDiv, handleEscapeKey } = require("../piemenus");
+
+        try {
+            showWheelDiv();
+            jest.advanceTimersByTime(50);
+
+            expect(global.document.addEventListener).toHaveBeenCalledWith(
+                "keydown",
+                handleEscapeKey,
+                true
+            );
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+});
