@@ -221,6 +221,14 @@ class Blocks {
         this._loadQueue = [];
         this._loadInProgress = false;
         /**
+         * Bumped once per load attempt (see _loadNewBlocksNow). Every block
+         * created during a load is tagged with the value active at the time,
+         * so a completion callback that lands after its own load has already
+         * been abandoned (queue advanced past it on failure) can recognize
+         * itself as stale and skip touching the next load's _loadCounter.
+         */
+        this._activeLoadGeneration = 0;
+        /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
          */
@@ -2648,6 +2656,10 @@ class Blocks {
             // Cache the block's index for O(1) lookups instead of
             // O(N) blockList.indexOf() scans.
             myBlock.blockIndex = this.blockList.length - 1;
+            // Tag with the load this block belongs to, so a stale
+            // cleanupAfterLoad() completion from an abandoned load can be
+            // told apart from one belonging to whatever load is active now.
+            myBlock._loadGeneration = this._activeLoadGeneration;
             myBlock.copySize();
 
             /** We may need to do some postProcessing to the block */
@@ -4821,6 +4833,11 @@ class Blocks {
         this._loadNewBlocksNow = blockObjs => {
             /** Suppress intermediate canvas redraws during block loading. */
             this.activity._suppressRefresh = true;
+            // Every load attempt gets its own generation, win or lose, so a
+            // completion that lands after this one has been abandoned can be
+            // told apart from a completion belonging to whatever load is
+            // active by the time it fires.
+            this._activeLoadGeneration += 1;
 
             try {
                 /**
@@ -6365,11 +6382,21 @@ class Blocks {
 
         /**
          * If all the blocks are loaded, we can make the final adjustments.
-         * @param - name
+         * @param {Number} [loadGeneration] - the calling block's _loadGeneration
+         *  (see makeNewBlock). A load that failed mid-chunk advances the queue
+         *  immediately rather than waiting for its remaining blocks, so a
+         *  completion arriving afterward belongs to an already-abandoned
+         *  load; ignore it instead of decrementing whatever load is active
+         *  now. Callers that don't pass this (e.g. existing direct calls)
+         *  are treated as always belonging to the current load.
          * @public
          * @returns {void}
          */
-        this.cleanupAfterLoad = async () => {
+        this.cleanupAfterLoad = async loadGeneration => {
+            if (loadGeneration !== undefined && loadGeneration !== this._activeLoadGeneration) {
+                return;
+            }
+
             this._loadCounter -= 1;
             // Early return BEFORE the try block is intentional:
             // intermediate calls must not run the finally, which resets

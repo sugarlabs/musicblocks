@@ -1179,6 +1179,81 @@ describe("Blocks Foundation", () => {
             expect(blocks._loadInProgress).toBe(true);
             expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
         });
+
+        it("does not let a stale completion from a failed load corrupt the next queued load's counter", async () => {
+            // One stub shared by both loads (load B is queued while load A
+            // is still running, so swapping _processOneBlock out from under
+            // it mid-flight would mean load A's own deferred chunk never
+            // actually calls the code meant to fail). Mirrors what
+            // makeNewBlock() really does: every block created is tagged
+            // with the generation active at the moment it was made, and
+            // carries that tag to its own (possibly much later)
+            // cleanupAfterLoad() call, the same way a real Block instance
+            // carries _loadGeneration to block.js's
+            // cleanupAfterLoad(this._loadGeneration) call.
+            //
+            // Load A's chunk-1 (b < 20) completions are collected as plain
+            // functions rather than scheduled with a timer: under parallel
+            // test-worker load, real timer delays aren't a reliable way to
+            // force "arrives after load B finishes" ordering, so that
+            // ordering is enforced explicitly below instead.
+            const staleCleanups = [];
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                const thisBlock = blockOffset + b;
+                const myGeneration = blocks._activeLoadGeneration;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                if (myGeneration === 1 && b === 20) {
+                    // Load A's first block of its deferred (second) chunk.
+                    throw new Error("deferred chunk failure");
+                }
+                if (myGeneration === 1) {
+                    staleCleanups.push(() => blocks.cleanupAfterLoad(myGeneration));
+                } else {
+                    // Load B's blocks: complete promptly, like a normal load.
+                    setTimeout(() => blocks.cleanupAfterLoad(myGeneration), 0);
+                }
+            });
+
+            window.addEventListener("error", event => event.preventDefault());
+
+            const finishedLoadingCalls = [];
+            const loadBFinished = new Promise(resolve => {
+                global.pubsub.on("finishedLoading", () => {
+                    finishedLoadingCalls.push(Date.now());
+                    resolve();
+                });
+            });
+
+            // Load A: 25 blocks, fails on block 20 (first of the deferred
+            // chunk, which only runs once the setTimeout(0) scheduling it
+            // fires). Load B: queued behind A, starts as soon as A's
+            // failure advances the queue.
+            blocks.loadNewBlocks(makeBatch(25));
+            blocks.loadNewBlocks(makeBatch(3));
+
+            // Wait specifically for load B to finish (not a fixed delay),
+            // so this isn't sensitive to how busy the test runner is.
+            await loadBFinished;
+
+            expect(staleCleanups).toHaveLength(20);
+
+            // Now let load A's 20 chunk-1 completions land, well after load
+            // B has already finished and _activeLoadGeneration has moved on.
+            for (const cleanup of staleCleanups) {
+                await cleanup();
+            }
+
+            // Load B's own 3 blocks are all that should count toward it. If
+            // a stale straggler from A had been accepted, B's shared
+            // _loadCounter would go negative, and every one of A's 20
+            // stragglers would independently satisfy the "<= 0" finalize
+            // check again, firing finishedLoading many more times than the
+            // one legitimate completion of load B.
+            expect(finishedLoadingCalls).toHaveLength(1);
+            expect(blocks._loadInProgress).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
+        });
     });
 
     describe("renameNameddos", () => {

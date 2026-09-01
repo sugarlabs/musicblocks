@@ -1591,7 +1591,7 @@ class Block {
             }
 
             // this.activity.refreshCanvas();
-            this.blocks.cleanupAfterLoad(this.name);
+            this.blocks.cleanupAfterLoad(this._loadGeneration);
         } else {
             // Some blocks, e.g., Start blocks and Action blocks can
             // collapse, so add an event handler.
@@ -1651,7 +1651,7 @@ class Block {
             }
 
             that.activity.refreshCanvas();
-            that.blocks.cleanupAfterLoad(that.name);
+            that.blocks.cleanupAfterLoad(that._loadGeneration);
             if (that.trash) {
                 that.collapseText.visible = false;
                 that.collapseButtonBitmap.visible = false;
