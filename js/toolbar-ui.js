@@ -416,8 +416,17 @@ class ToolbarUI {
             });
         }
 
+        // Hide the tooltip node directly. Materialize has no "close" command:
+        // it recognises only "remove", and anything else falls through to a
+        // full re-initialisation that rebuilds the tooltip with the plugin
+        // defaults, discarding the delay set just above. Setting visibility is
+        // what Materialize's own mouseleave handler does, and it leaves the
+        // element's configuration and its cached tooltip node untouched.
         $j(".tooltipped").on("click", function () {
-            $j(this).tooltip("close");
+            const tooltipId = this.getAttribute("data-tooltip-id");
+            if (tooltipId) {
+                $j("#" + tooltipId).css("visibility", "hidden");
+            }
         });
 
         const restoreWidgetFocus = () => {
