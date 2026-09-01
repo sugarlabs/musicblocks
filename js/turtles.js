@@ -475,6 +475,20 @@ Turtles.TurtlesModel = class {
                 turtle.interval = undefined;
             }
 
+            // addTurtle() attaches three children to the stage for every
+            // turtle: imageContainer, penstrokes and container. Detach them
+            // here, otherwise a removed turtle keeps costing a display-list
+            // walk on every frame and cannot be garbage collected. Anything
+            // the turtle drew or displayed also stays on screen.
+            const turtlesStage = this._stage;
+            if (turtlesStage) {
+                for (const child of [turtle.imageContainer, turtle.penstrokes, turtle.container]) {
+                    if (child) {
+                        turtlesStage.removeChild(child);
+                    }
+                }
+            }
+
             this._turtleList.splice(index, 1);
         }
     }

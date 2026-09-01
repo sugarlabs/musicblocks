@@ -805,3 +805,111 @@ describe("turtleCount", () => {
         expect(turtles.turtleCount()).toBe(1);
     });
 });
+
+// ---------------------------------------------------------------------------
+// removeTurtle — stage cleanup
+// ---------------------------------------------------------------------------
+
+describe("TurtlesModel.removeTurtle", () => {
+    let stage;
+    let model;
+
+    // importMembers is mocked in this file, so new Turtles() never runs the
+    // TurtlesModel constructor. Construct the model directly, the same way the
+    // doGrid tests above do, so removeTurtle is actually present.
+    const makeModel = () => {
+        stage = { addChild: jest.fn(), removeChild: jest.fn() };
+        const activity = {
+            stage: { addChild: jest.fn(), removeChild: jest.fn() },
+            turtleContainer: stage,
+            canvas: {},
+            hideAuxMenu: jest.fn(),
+            doClear: jest.fn(),
+            hideGrids: jest.fn(),
+            refreshCanvas: jest.fn()
+        };
+        return new Turtles.TurtlesModel(activity);
+    };
+
+    const makeTurtle = (overrides = {}) => ({
+        imageContainer: { id: "image" },
+        penstrokes: { id: "pen" },
+        container: { id: "body" },
+        ...overrides
+    });
+
+    beforeEach(() => {
+        model = makeModel();
+        stage.addChild.mockClear();
+        stage.removeChild.mockClear();
+    });
+
+    // add() attaches imageContainer, penstrokes and container to the stage for
+    // every turtle. Leaving them behind keeps the turtle in the display list,
+    // so it still costs a walk on every frame and whatever it displayed stays
+    // on screen.
+    it("detaches the three children that were attached to the stage", () => {
+        const turtle = makeTurtle();
+        model._turtleList = [turtle];
+
+        model.removeTurtle(0);
+
+        expect(stage.removeChild).toHaveBeenCalledWith(turtle.imageContainer);
+        expect(stage.removeChild).toHaveBeenCalledWith(turtle.penstrokes);
+        expect(stage.removeChild).toHaveBeenCalledWith(turtle.container);
+        expect(stage.removeChild).toHaveBeenCalledTimes(3);
+    });
+
+    it("drops the turtle from the list", () => {
+        const a = makeTurtle();
+        const b = makeTurtle();
+        model._turtleList = [a, b];
+
+        model.removeTurtle(0);
+
+        expect(model._turtleList).toEqual([b]);
+    });
+
+    it("still clears a pending interval", () => {
+        const clearSpy = jest.spyOn(global, "clearInterval");
+        const turtle = makeTurtle({ interval: 4242 });
+        model._turtleList = [turtle];
+
+        model.removeTurtle(0);
+
+        expect(clearSpy).toHaveBeenCalledWith(4242);
+        expect(turtle.interval).toBeUndefined();
+        clearSpy.mockRestore();
+    });
+
+    it("skips children the turtle never had", () => {
+        const turtle = makeTurtle({ imageContainer: null, penstrokes: null });
+        model._turtleList = [turtle];
+
+        expect(() => model.removeTurtle(0)).not.toThrow();
+        expect(stage.removeChild).toHaveBeenCalledTimes(1);
+        expect(stage.removeChild).toHaveBeenCalledWith(turtle.container);
+    });
+
+    it("removes the turtle even when the stage is unavailable", () => {
+        const turtle = makeTurtle();
+        model._turtleList = [turtle];
+        model._stage = null;
+
+        expect(() => model.removeTurtle(0)).not.toThrow();
+        expect(model._turtleList).toEqual([]);
+    });
+
+    it.each([
+        ["a negative index", -1],
+        ["an index past the end", 5]
+    ])("leaves the list untouched for %s", (label, index) => {
+        const turtle = makeTurtle();
+        model._turtleList = [turtle];
+
+        model.removeTurtle(index);
+
+        expect(model._turtleList).toEqual([turtle]);
+        expect(stage.removeChild).not.toHaveBeenCalled();
+    });
+});
