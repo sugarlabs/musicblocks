@@ -91,6 +91,7 @@ window.innerWidth = 1024;
 let mockAddButton = jest.fn().mockImplementation((img, size, tip) => ({
     onclick: () => {},
     appendChild: jest.fn(),
+    setAttribute: jest.fn(),
     textContent: "",
     innerHTML: "",
     tip,

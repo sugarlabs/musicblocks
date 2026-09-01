@@ -189,6 +189,7 @@ class MeterWidget {
          * @private
          */
         const playBtn = widgetWindow.addButton("play-button.svg", MeterWidget.ICONSIZE, _("Play"));
+        playBtn.setAttribute("data-test", "meter-play-btn");
         playBtn.onclick = () => {
             if (this._get_click_lock()) {
                 return;
@@ -215,6 +216,7 @@ class MeterWidget {
                     img.setAttribute("height", MeterWidget.ICONSIZE);
                     img.setAttribute("width", MeterWidget.ICONSIZE);
                     img.setAttribute("vertical-align", "middle");
+                    playBtn.setAttribute("data-test", "meter-stop-btn");
                     playBtn.appendChild(img);
                     playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
                     this._playing = true;
@@ -229,10 +231,11 @@ class MeterWidget {
             }, 1000);
         };
 
-        widgetWindow.addButton("export-chunk.svg", MeterWidget.ICONSIZE, _("Save")).onclick =
-            () => {
-                this._save();
-            };
+        const saveBtn = widgetWindow.addButton("export-chunk.svg", MeterWidget.ICONSIZE, _("Save"));
+        saveBtn.setAttribute("data-test", "meter-save-btn");
+        saveBtn.onclick = () => {
+            this._save();
+        };
 
         // The pie menu goes here.
         const meterTableDiv = this.meterDiv;
@@ -295,7 +298,9 @@ class MeterWidget {
         widgetWindow._toolbar.appendChild(divInput2);
 
         //TRANS.: Reset the widget layout
-        widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset")).onclick = () => {
+        const resetBtn = widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset"));
+        resetBtn.setAttribute("data-test", "meter-reset-btn");
+        resetBtn.onclick = () => {
             //change Values of blocks in stack.
             this._playing = false;
             const el = divInput.children[0];
