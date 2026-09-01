@@ -20,7 +20,7 @@
    global
 
    _, Singer, VOICENAMES, MusicBlocks, Mouse, last, instrumentsEffects,
-   NOINPUTERRORMSG, CUSTOMSAMPLES, DEFAULTVOICE, safeNumber
+   NOINPUTERRORMSG, CUSTOMSAMPLES, DEFAULTVOICE
 */
 
 /*
@@ -132,9 +132,6 @@ function setupToneActions(activity) {
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
         static doVibrato(intensity, rate, turtle, blk) {
-            intensity = safeNumber(intensity);
-            rate = safeNumber(rate);
-
             if (intensity < 1 || intensity > 100) {
                 activity.errorMsg(_("Vibrato intensity must be between 1 and 100."), blk);
                 activity.logo.stopTurtle = true;
