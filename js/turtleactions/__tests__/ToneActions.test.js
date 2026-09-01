@@ -43,6 +43,7 @@ describe("setupToneActions", () => {
         };
         global.CUSTOMSAMPLES = {};
         global.DEFAULTVOICE = "default-voice";
+        global.safeNumber = require("../../utils/utils-logic").safeNumber;
         global.last = array => array[array.length - 1];
         global._ = msg => msg;
         global.NOINPUTERRORMSG = "Missing input";

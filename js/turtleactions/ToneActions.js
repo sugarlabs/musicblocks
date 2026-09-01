@@ -20,7 +20,7 @@
    global
 
    _, Singer, VOICENAMES, MusicBlocks, Mouse, last, instrumentsEffects,
-   NOINPUTERRORMSG, CUSTOMSAMPLES, DEFAULTVOICE
+   NOINPUTERRORMSG, CUSTOMSAMPLES, DEFAULTVOICE, safeNumber
 */
 
 /*
@@ -44,10 +44,6 @@
  * @returns {void}
  */
 function setupToneActions(activity) {
-    var { safeNumber } =
-        (typeof window !== "undefined" ? window.UtilsLogic : null) ||
-        (typeof require !== "undefined" ? require("../utils/utils-logic") : {});
-
     Singer.ToneActions = class {
         /**
          * Selects a voice for the synthesizer.
