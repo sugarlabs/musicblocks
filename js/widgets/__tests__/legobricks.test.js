@@ -1609,12 +1609,20 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
         // jsdom canvases have no 2d context, so stand in a minimal one whose
         // getImageData returns a known pixel. Only "canvas" is intercepted;
         // every other createElement call falls through to the real DOM.
-        const stubCanvas = ({ rgb = [255, 0, 0], throwOnDraw = false } = {}) => {
+        const stubCanvas = ({ rgb = [255, 0, 0], taint = false } = {}) => {
             const ctx = {
-                drawImage: jest.fn(() => {
-                    if (throwOnDraw) throw new Error("tainted canvas");
-                }),
-                getImageData: jest.fn(() => ({ data: [...rgb, 255] }))
+                // A cross-origin image does not make drawImage throw. It taints
+                // the canvas silently, and the SecurityError surfaces on the
+                // first pixel read, so that is where the failure is simulated.
+                drawImage: jest.fn(),
+                getImageData: jest.fn(() => {
+                    if (taint) {
+                        const err = new Error("Tainted canvases may not be read.");
+                        err.name = "SecurityError";
+                        throw err;
+                    }
+                    return { data: [...rgb, 255] };
+                })
             };
             const realCreate = document.createElement.bind(document);
             jest.spyOn(document, "createElement").mockImplementation(tag => {
@@ -1652,12 +1660,14 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
             expect(legoWidget._sampleColorAtPosition(10, 10)).toBeNull();
         });
 
-        it("returns null when the canvas cannot be drawn to", () => {
-            // A cross-origin image taints the canvas and drawImage throws.
-            stubCanvas({ throwOnDraw: true });
+        it("returns null when the canvas has been tainted by a cross-origin image", () => {
+            const ctx = stubCanvas({ taint: true });
             mountMedia();
 
-            expect(legoWidget._sampleColorAtPosition(10, 10)).toBeNull();
+            expect(legoWidget._sampleColorAtPosition(50, 50)).toBeNull();
+            // The read is what fails, so it has to be attempted before the
+            // function can report the failure.
+            expect(ctx.getImageData).toHaveBeenCalled();
         });
 
         it.each([
@@ -1680,8 +1690,9 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
 
             expect(ctx.drawImage).toHaveBeenCalled();
             expect(ctx.getImageData).toHaveBeenCalledWith(50, 50, 1, 1);
-            expect(result).not.toBeNull();
-            expect(typeof result.name).toBe("string");
+            // A pure red pixel must map to the red family, which is what
+            // proves the rgb -> hsl -> family chain actually ran.
+            expect(result).toEqual(expect.objectContaining({ name: "red" }));
         });
     });
 
@@ -1779,6 +1790,12 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
     });
 
     describe("background colour display", () => {
+        // jsdom normalises any colour it is given to the rgb() form.
+        const hexToRgb = hex => {
+            const n = parseInt(hex.replace("#", ""), 16);
+            return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`;
+        };
+
         it("is a no-op when the display element is absent", () => {
             legoWidget.backgroundColorDisplay = null;
 
@@ -1791,10 +1808,21 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
 
             legoWidget._updateBackgroundColorDisplay();
 
+            const style = legoWidget.backgroundColorDisplay.style;
             expect(legoWidget.backgroundColorDisplay.textContent).toBe("yellow");
-            // Yellow is a light colour, so the label must be dark to stay legible.
-            expect(legoWidget._getContrastColor("yellow")).toBe("#000000");
-            expect(legoWidget._getContrastColor("blue")).toBe("#FFFFFF");
+            // Yellow is a light colour, so the update must paint the swatch
+            // yellow and drop the label to black to stay legible.
+            expect(style.backgroundColor).toBe(hexToRgb(legoWidget._getColorHex("yellow")));
+            expect(style.color).toBe("rgb(0, 0, 0)");
+        });
+
+        it("uses a light label on a dark background", () => {
+            legoWidget.backgroundColorDisplay = document.createElement("div");
+            legoWidget.selectedBackgroundColor = { name: "blue" };
+
+            legoWidget._updateBackgroundColorDisplay();
+
+            expect(legoWidget.backgroundColorDisplay.style.color).toBe("rgb(255, 255, 255)");
         });
 
         it("falls back to grey for an unknown colour name", () => {
