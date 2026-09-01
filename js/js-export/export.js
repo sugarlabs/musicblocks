@@ -205,6 +205,10 @@ class MusicBlocks {
 
         Mouse.MouseList = [];
         Mouse.TurtleMouseMap = {};
+        // Every run pushes onto AddedTurtles, so it has to be reset alongside
+        // its siblings. Otherwise it keeps the removed turtles referenced and
+        // the loop above re-walks every turtle from every previous run.
+        Mouse.AddedTurtles = [];
     }
 
     /**
