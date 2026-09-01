@@ -420,6 +420,18 @@ describe("ProtoBlock generators", () => {
     let svgCalls;
     let originalSVG;
 
+    // The renderer hands its docks and dimensions straight back to the caller,
+    // so the stub's geometry is named once here and asserted against by name.
+    const STUB_DOCKS = [
+        [0, 0],
+        [10, 20],
+        [10, 40],
+        [10, 60],
+        [10, 80]
+    ];
+    const STUB_WIDTH = 120;
+    const STUB_HEIGHT = 60;
+
     // The shared SVG stub at the top of this file covers the simpler blocks.
     // Clamp and boolean generators reach for more of the drawing API, so this
     // records every call and returns predictable geometry.
@@ -450,15 +462,10 @@ describe("ProtoBlock generators", () => {
             booleanCompare: jest.fn(() => "<svg>compare</svg>"),
             // Wide enough for every generator here. The two-argument clamp
             // reads docks[3] for its clamp offset, so a shorter list throws.
-            docks: [
-                [0, 0],
-                [10, 20],
-                [10, 40],
-                [10, 60],
-                [10, 80]
-            ],
-            getWidth: jest.fn(() => 120),
-            getHeight: jest.fn(() => 60)
+            // Copied per instance so one test cannot mutate another's docks.
+            docks: STUB_DOCKS.map(dock => [...dock]),
+            getWidth: jest.fn(() => STUB_WIDTH),
+            getHeight: jest.fn(() => STUB_HEIGHT)
         }));
     });
 
@@ -531,15 +538,9 @@ describe("ProtoBlock generators", () => {
             const [artwork, docks, width, height] = block.generator();
 
             expect(artwork).toBe("<svg>clamp</svg>");
-            expect(docks).toEqual([
-                [0, 0],
-                [10, 20],
-                [10, 40],
-                [10, 60],
-                [10, 80]
-            ]);
-            expect(width).toBe(120);
-            expect(height).toBe(60);
+            expect(docks).toEqual(STUB_DOCKS);
+            expect(width).toBe(STUB_WIDTH);
+            expect(height).toBe(STUB_HEIGHT);
         });
 
         it("argument clamp generators return the arg clamp artwork", () => {
@@ -550,27 +551,131 @@ describe("ProtoBlock generators", () => {
             expect(artwork).toBe("<svg>argclamp</svg>");
         });
 
-        it.each([
-            "threeArgBlock",
-            "fourArgBlock",
-            "oneBooleanArgBlock",
-            "oneArgMathBlock",
-            "twoArgMathBlock",
-            "threeArgMathBlock",
-            "fourArgMathBlock",
-            "valueBlock",
-            "mediaBlock",
-            "basicBlockNoFlow",
-            "basicBlockCollapsed"
-        ])("%s returns artwork, docks and non-zero dimensions", shape => {
+        // Each shape is pinned to the primitive that draws it and to the calls
+        // that separate it from its neighbours, so a shape wired to the wrong
+        // generator cannot pass. Innies are the argument slots along the left
+        // edge, an outie is the plug a reporter hands its value back through,
+        // and the tab and slot are the connections a block that carries flow
+        // makes above and below itself.
+        const SHAPES = [
+            {
+                shape: "threeArgBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setTab", true],
+                    ["setSlot", true],
+                    ["setInnies", [true, true, true]],
+                    ["setExpand", 30, 0, 0, 0]
+                ]
+            },
+            {
+                shape: "fourArgBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setTab", true],
+                    ["setSlot", true],
+                    ["setInnies", [true, true, true, true]]
+                ]
+            },
+            {
+                shape: "oneBooleanArgBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setBoolean", true],
+                    ["setClampCount", 0]
+                ]
+            },
+            {
+                shape: "oneArgMathBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setSlot", false],
+                    ["setTab", false],
+                    ["setOutie", true],
+                    ["setInnies", [true]]
+                ]
+            },
+            {
+                shape: "twoArgMathBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setOutie", true],
+                    ["setInnies", [true, true]]
+                ]
+            },
+            {
+                shape: "threeArgMathBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setOutie", true],
+                    ["setInnies", [true, true, true]]
+                ]
+            },
+            {
+                shape: "fourArgMathBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setOutie", true],
+                    ["setInnies", [true, true, true, true]]
+                ]
+            },
+            {
+                shape: "valueBlock",
+                artwork: "<svg>box</svg>",
+                calls: [
+                    ["setOutie", true],
+                    ["setExpand", 60, 0, 0, 0]
+                ]
+            },
+            {
+                // The one shape that opens vertically, by the 23 it expands by.
+                shape: "mediaBlock",
+                artwork: "<svg>box</svg>",
+                calls: [
+                    ["setOutie", true],
+                    ["setExpand", 60, 23, 0, 0]
+                ]
+            },
+            {
+                shape: "basicBlockNoFlow",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setSlot", true],
+                    ["setTail", true]
+                ]
+            },
+            {
+                shape: "basicBlockCollapsed",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setCap", true],
+                    ["setTail", true]
+                ]
+            }
+        ];
+
+        it.each(SHAPES)("$shape draws $artwork", ({ shape, artwork, calls }) => {
             const block = build(shape);
 
-            const result = block.generator();
+            const [drawn, docks, width, height] = block.generator();
 
-            expect(typeof result[0]).toBe("string");
-            expect(Array.isArray(result[1])).toBe(true);
-            expect(result[2]).toBeGreaterThan(0);
-            expect(result[3]).toBeGreaterThan(0);
+            expect(drawn).toBe(artwork);
+            expect(docks).toEqual(STUB_DOCKS);
+            expect(width).toBe(STUB_WIDTH);
+            expect(height).toBe(STUB_HEIGHT);
+            for (const call of calls) {
+                expect(svgCalls).toContainEqual(call);
+            }
+        });
+
+        it("no two shapes issue the same set of drawing calls", () => {
+            const signatures = SHAPES.map(({ shape }) => {
+                svgCalls = [];
+                build(shape).generator();
+                return JSON.stringify(svgCalls);
+            });
+
+            expect(new Set(signatures).size).toBe(SHAPES.length);
         });
     });
 
@@ -583,7 +688,11 @@ describe("ProtoBlock generators", () => {
 
                 block.generator();
 
-                expect(callsTo("setScale")).toContainEqual(["setScale", 2.5]);
+                // Asserted by position, not by presence. Scale has to be set
+                // before any geometry call, because the renderer multiplies
+                // the geometry it is given by whatever scale it holds.
+                expect(svgCalls[0]).toEqual(["setScale", 2.5]);
+                expect(callsTo("setScale")).toHaveLength(1);
             }
         );
     });
