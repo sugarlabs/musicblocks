@@ -6968,12 +6968,17 @@ class Blocks {
                     block._viewportVisible = true;
                     continue;
                 }
+                const wasViewportVisible = block._viewportVisible;
                 block._viewportVisible = !(
                     c.x + block.width <= vpLeft ||
                     c.x >= vpRight ||
                     c.y + block.height <= vpTop ||
                     c.y >= vpBottom
                 );
+                if (wasViewportVisible === false && block._viewportVisible) {
+                    // Visual state may have changed while its cache update was culled.
+                    block.container.updateCache();
+                }
             }
         };
 
