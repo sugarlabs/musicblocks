@@ -1484,7 +1484,7 @@ describe("Palettes Class", () => {
 
         test("showMenu sizes the scrollable body from its rendered top", () => {
             const paletteItems = {
-                style: { overflow: "auto", overflowX: "hidden" },
+                style: {},
                 getBoundingClientRect: jest.fn(() => ({ top: 180 }))
             };
             const paletteBody = {
@@ -1537,8 +1537,9 @@ describe("Palettes Class", () => {
             palette.showMenu(true);
 
             expect(paletteItems.style.height).toBe("720px");
-            expect(paletteItems.style.overflow).toBe("auto");
-            expect(paletteItems.style.overflowX).toBe("hidden");
+            const insertedMarkup = paletteBody.insertAdjacentHTML.mock.calls[0][1];
+            expect(insertedMarkup).toContain("overflow: auto");
+            expect(insertedMarkup).toContain("overflow-x: hidden");
         });
 
         test("_showMenuItems renders a basic block", () => {
