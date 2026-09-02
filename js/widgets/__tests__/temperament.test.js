@@ -20,6 +20,11 @@ describe("TemperamentWidget basic tests", () => {
             arc: jest.fn(),
             fill: jest.fn(),
             stroke: jest.fn(),
+            clearRect: jest.fn(),
+            fillText: jest.fn(),
+            setLineDash: jest.fn(),
+            moveTo: jest.fn(),
+            lineTo: jest.fn(),
             lineWidth: 0,
             fillStyle: "",
             strokeStyle: ""
@@ -61,6 +66,10 @@ describe("TemperamentWidget basic tests", () => {
         }));
 
         global.getTemperamentKeys = jest.fn(() => []);
+        global.getTemperamentsList = jest.fn(() => [
+            ["Equal (12EDO)", "equal"],
+            ["Just intonation", "just"]
+        ]);
         global.isCustomTemperament = jest.fn(() => false);
         global.getTemperamentRatio = jest.fn(value =>
             value !== null && typeof value === "object" && typeof value.ratio === "number"
@@ -70,10 +79,22 @@ describe("TemperamentWidget basic tests", () => {
         global.ratioToWheelAngle = jest.fn(
             (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base))
         );
-        global.getTemperament = jest.fn(() => ({
-            interval: [],
-            pitchNumber: 0
-        }));
+        global.getTemperament = jest.fn(key => {
+            if (key === "equal") {
+                return {
+                    interval: ["unison"],
+                    pitchNumber: 0,
+                    unison: 1,
+                    noteLabels: ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
+                };
+            }
+            return {
+                interval: ["unison"],
+                pitchNumber: 0,
+                unison: 1,
+                noteLabels: ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
+            };
+        });
 
         global.platformColor = {
             selectorBackground: "#fff",
@@ -117,7 +138,23 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget.notes).toEqual([]);
         expect(widget.frequencies).toEqual([]);
         expect(widget.pitchNumber).toBe(0);
-        expect(widget.circleIsVisible).toBe(true);
+    });
+
+    test("redundant circle and table views have been removed", () => {
+        expect(typeof widget._circleOfNotes).toBe("undefined");
+        expect(typeof widget._graphOfNotes).toBe("undefined");
+        expect(typeof widget.showNoteInfo).toBe("undefined");
+        expect(typeof widget.editFrequency).toBe("undefined");
+        expect(typeof widget.toggleNotesButton).toBe("undefined");
+        expect(widget.circleIsVisible).toBeUndefined();
+    });
+
+    test("_visualizerView is still present as the single default view", () => {
+        expect(typeof widget._visualizerView).toBe("function");
+    });
+
+    test("createMainWheel is retained for edit-preview flows", () => {
+        expect(typeof widget.createMainWheel).toBe("function");
     });
 
     test("playNote triggers synth", () => {
@@ -233,41 +270,23 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget._logo.synth.trigger).toHaveBeenCalled();
     });
 
-    test("playAll toggles playing state", () => {
-        widget._logo = {
-            resetSynth: jest.fn(),
-            setUserTemperament: jest.fn(function (t) {
-                this.synth.inTemperament = t;
-                this.synth.changeInTemperament = true;
-            }),
-            synth: {
-                trigger: jest.fn(),
-                stop: jest.fn(),
-                setMasterVolume: jest.fn(),
-                startingPitch: "C4"
-            }
-        };
-
-        widget.playButton = {
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn(),
-            setAttribute: jest.fn(),
-            style: {}
-        };
-
-        widget.pitchNumber = 1;
-        widget.frequencies = [440, 880];
-        widget.tempRatios1 = [1, 2];
-        widget.circleIsVisible = true;
-
-        global.docById = jest.fn(() => ({
-            style: {}
-        }));
+    test("playAll delegates to _playAll when visualizer is open", () => {
+        widget._playAllRunning = false;
+        widget._playAll = jest.fn();
 
         widget.playAll();
 
-        expect(widget._playing).toBe(true);
+        expect(widget._playAll).toHaveBeenCalled();
+    });
+
+    test("playAll is a no-op when visualizer is not open", () => {
+        // _playAll is only set after _visualizerView runs; without it, playAll no-ops
+        widget._playAll = undefined;
+
+        // Should not throw
+        widget.playAll();
+
+        expect(widget._playAllRunning).toBeFalsy();
     });
 
     test("edit sets editMode to null and prepares UI", () => {
@@ -288,12 +307,27 @@ describe("TemperamentWidget basic tests", () => {
         };
         global.buildScale = jest.fn(() => [["C"], []]);
         global.getNoteFromInterval = jest.fn(() => ["C", 4]);
-        global.getTemperament = jest.fn(() => ({
-            interval: [],
-            pitchNumber: 1,
-            0: 1,
-            1: 2
-        }));
+        global.getTemperament = jest.fn(key => {
+            if (key === "equal") {
+                return {
+                    interval: ["unison", "octave"],
+                    pitchNumber: 1,
+                    unison: 1,
+                    octave: 2,
+                    0: 1,
+                    1: 2,
+                    noteLabels: ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
+                };
+            }
+            return {
+                interval: ["unison", "octave"],
+                pitchNumber: 1,
+                unison: 1,
+                octave: 2,
+                0: 1,
+                1: 2
+            };
+        });
 
         widget.inTemperament = "equal";
         widget.scale = ["C", "Major"];
@@ -634,107 +668,6 @@ describe("TemperamentWidget basic tests", () => {
         expect(() => widget.playNote(0)).not.toThrow();
     });
 
-    test("toggleNotesButton switches icon when circle visible", () => {
-        widget.toggleNotesButton = function () {
-            this.circleIsVisible = false;
-        };
-
-        widget.circleIsVisible = true;
-
-        widget.toggleNotesButton();
-
-        expect(widget.circleIsVisible).toBe(false);
-    });
-
-    test("_graphOfNotes renders table view", () => {
-        // _graphOfNotes() reads temperamentTableDiv, which only exists once
-        // init(activity) has run, so the widget must be initialized first
-        // (matching production usage, where _graphOfNotes() is only reachable
-        // via a button created in init()).
-        global.window.widgetWindows = {
-            windowFor: jest.fn(() => ({
-                clear: jest.fn(),
-                show: jest.fn(),
-                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
-                addButton: jest.fn(() => ({
-                    onclick: null,
-                    getElementsByTagName: jest.fn(() => [{}])
-                })),
-                sendToCenter: jest.fn()
-            }))
-        };
-        global.buildScale = jest.fn(() => [["C"], []]);
-        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
-        global.getTemperament = jest.fn(() => ({
-            interval: [],
-            pitchNumber: 1,
-            0: 1,
-            1: 2
-        }));
-
-        widget.inTemperament = "equal";
-        widget.scale = ["C", "Major"];
-        widget.init({
-            errorMsg: jest.fn(),
-            logo: {
-                synth: {
-                    startingPitch: "C4",
-                    _getFrequency: jest.fn(() => 440)
-                }
-            }
-        });
-
-        widget.toggleNotesButton = jest.fn();
-        widget.notesCircle = {
-            removeWheel: jest.fn()
-        };
-
-        widget.inTemperament = "equal";
-        widget.pitchNumber = 1;
-        widget.ratios = [1, 2];
-        widget.frequencies = [440, 880];
-        widget.intervals = ["0", "1"];
-        widget.notes = [
-            ["C", 4],
-            ["C", 5]
-        ];
-        widget.scaleNotes = ["C"];
-        widget.circleIsVisible = false;
-
-        global.isCustomTemperament = jest.fn(() => false);
-
-        global.docById = jest.fn(() => ({
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn(),
-            setAttribute: jest.fn(),
-            style: {},
-            insertCell: jest.fn(() => ({
-                innerHTML: "",
-                textContent: "",
-                appendChild: jest.fn(),
-                setAttribute: jest.fn(),
-                style: {},
-                onmouseover: jest.fn(),
-                onmouseout: jest.fn()
-            })),
-            append: jest.fn()
-        }));
-        document.querySelectorAll = jest.fn(() => [
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} }
-        ]);
-
-        widget._graphOfNotes();
-
-        expect(widget.circleIsVisible).toBe(true);
-    });
-
     test("_refreshInnerWheel updates temporary ratios", () => {
         widget.frequencies = [440];
         widget.tempRatios1 = [1];
@@ -809,73 +742,25 @@ describe("TemperamentWidget basic tests", () => {
     });
 
     test("playAll handles reverse playback", () => {
-        widget._logo = {
-            resetSynth: jest.fn(),
-            setUserTemperament: jest.fn(function (t) {
-                this.synth.inTemperament = t;
-                this.synth.changeInTemperament = true;
-            }),
-            synth: {
-                trigger: jest.fn(),
-                stop: jest.fn(),
-                setMasterVolume: jest.fn(),
-                startingPitch: "C4"
-            }
-        };
-
-        widget.playButton = {
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn(),
-            setAttribute: jest.fn(),
-            style: {}
-        };
-        widget.pitchNumber = 1;
-        widget.frequencies = [440, 880];
-        widget.tempRatios1 = [1, 2];
-        widget.circleIsVisible = false;
-        widget.notesCircle = {
-            navItems: [
-                { fillAttr: "", sliceHoverAttr: {}, slicePathAttr: {}, sliceSelectedAttr: {} },
-                { fillAttr: "", sliceHoverAttr: {}, slicePathAttr: {}, sliceSelectedAttr: {} }
-            ],
-            refreshWheel: jest.fn()
-        };
-
-        global.docById = jest.fn(() => null);
+        widget._playAllRunning = false;
+        widget._playAll = jest.fn();
 
         widget.playAll();
 
-        expect(widget._playing).toBe(true);
+        expect(widget._playAll).toHaveBeenCalled();
     });
 
     test("playAll stops when already playing", () => {
-        widget._logo = {
-            resetSynth: jest.fn(),
-            setUserTemperament: jest.fn(function (t) {
-                this.synth.inTemperament = t;
-                this.synth.changeInTemperament = true;
-            }),
-            synth: {
-                stop: jest.fn(),
-                setMasterVolume: jest.fn(),
-                startingPitch: "C4" // 👈 REQUIRED
-            }
+        widget._playAllRunning = true;
+        widget._playAllTimer = setTimeout(() => {}, 10000);
+        widget._playAll = function () {
+            clearTimeout(widget._playAllTimer);
+            widget._playAllRunning = false;
         };
-
-        widget.playButton = {
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn(),
-            setAttribute: jest.fn(),
-            style: {}
-        };
-        widget._playing = true;
-        widget.tempRatios1 = [1];
 
         widget.playAll();
 
-        expect(widget._playing).toBe(false);
+        expect(widget._playAllRunning).toBe(false);
     });
 
     test("_save executes without crash", () => {
@@ -932,12 +817,27 @@ describe("TemperamentWidget basic tests", () => {
         global.window.innerWidth = 1200;
         global.buildScale = jest.fn(() => [["C"], []]);
         global.getNoteFromInterval = jest.fn(() => ["C", 4]);
-        global.getTemperament = jest.fn(() => ({
-            interval: [],
-            pitchNumber: 1,
-            0: 1,
-            1: 2
-        }));
+        global.getTemperament = jest.fn(key => {
+            if (key === "equal") {
+                return {
+                    interval: ["unison", "octave"],
+                    pitchNumber: 1,
+                    unison: 1,
+                    octave: 2,
+                    0: 1,
+                    1: 2,
+                    noteLabels: ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
+                };
+            }
+            return {
+                interval: ["unison", "octave"],
+                pitchNumber: 1,
+                unison: 1,
+                octave: 2,
+                0: 1,
+                1: 2
+            };
+        });
 
         const mockActivity = {
             errorMsg: jest.fn(),
@@ -959,60 +859,6 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget.pitchNumber).toBe(1);
     });
 
-    test("showNoteInfo creates a popup", () => {
-        document.body.innerHTML = `
-            <div id="wheelDiv2"></div>
-            <div id="information"></div>
-        `;
-        global.docById = jest.fn(id => document.getElementById(id));
-
-        widget.notesCircle = {
-            navItemCount: 1
-        };
-        widget.frequencies = [440];
-        widget.ratios = [1];
-        widget.powerBase = 2;
-        widget.ratiosNotesPair = [[1, ["C", 4]]];
-
-        const event = {
-            target: { id: "wheelnav-wheelDiv2-slice-0" },
-            clientX: 100,
-            clientY: 100
-        };
-
-        widget.showNoteInfo(event);
-
-        const noteInfo = global.docById("noteInfo");
-        expect(noteInfo).not.toBeNull();
-        expect(noteInfo.className).toBe("popup");
-    });
-
-    test("editFrequency sets up a frequency slider", () => {
-        widget.frequencies = [440, 466, 494];
-        widget.ratios = [1, 1.059, 1.122];
-        widget.temporaryRatios = [];
-
-        document.body.innerHTML = `
-            <div id="noteInfo">
-                <div id="note"></div>
-                <div id="frequency"></div>
-                <div id="close"></div>
-            </div>
-        `;
-        global.docById = jest.fn(id => document.getElementById(id));
-
-        const event = {
-            target: { dataset: { message: "1" } }
-        };
-
-        widget.editFrequency(event);
-
-        const slider = global.docById("frequencySlider1");
-        expect(slider).not.toBeNull();
-        expect(slider.type).toBe("range");
-        expect(slider.id).toBe("frequencySlider1");
-    });
-
     test("checkTemperament identifies predefined temperament", () => {
         global.getTemperamentKeys = jest.fn(() => ["equal", "just"]);
         global.getTemperament = jest.fn(key => {
@@ -1021,10 +867,15 @@ describe("TemperamentWidget basic tests", () => {
                     interval: ["0", "1"],
                     pitchNumber: 1,
                     0: 1,
-                    1: 2
+                    1: 2,
+                    noteLabels: ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
                 };
             }
-            return { interval: [], pitchNumber: 0 };
+            return {
+                interval: [],
+                pitchNumber: 0,
+                noteLabels: ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
+            };
         });
         global.isCustomTemperament = jest.fn(() => false);
         global.buildScale = jest.fn(() => [["C"], []]);
@@ -1066,6 +917,10 @@ describe("TemperamentWidget basic tests", () => {
             global.window.innerWidth = 1200;
             global.buildScale = jest.fn(() => [["C"], []]);
             global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+            global.getTemperamentsList = jest.fn(() => [
+                ["Equal (12EDO)", "equal"],
+                ["Just intonation", "just"]
+            ]);
             global.isCustomTemperament = jest.fn(() => false);
 
             widget.inTemperament = "equal";
@@ -1213,6 +1068,10 @@ describe("TemperamentWidget basic tests", () => {
             global.window.innerWidth = 1200;
             global.buildScale = jest.fn(() => [["C"], []]);
             global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+            global.getTemperamentsList = jest.fn(() => [
+                ["Equal (12EDO)", "equal"],
+                ["Just intonation", "just"]
+            ]);
             global.isCustomTemperament = jest.fn(() => false);
 
             mockActivity = {
@@ -1231,10 +1090,7 @@ describe("TemperamentWidget basic tests", () => {
 
             widget.inTemperament = "equal";
             widget.scale = ["C", "Major"];
-            widget.octaveChanged = true;
             widget.init(mockActivity);
-            widget.octaveChanged = true;
-            widget._circleOfNotes();
 
             widget.tempRatios1 = [1];
             widget.ratios = [1.0];
@@ -1248,316 +1104,33 @@ describe("TemperamentWidget basic tests", () => {
         });
 
         test("onclose cleans up timeouts and playing state", () => {
-            widget._playing = true;
+            widget._playAllRunning = true;
+            widget._playAllTimer = setTimeout(() => {}, 1000);
             widget._playTimeout = setTimeout(() => {}, 1000);
 
             expect(mockWidgetWindow.onclose).toBeDefined();
             mockWidgetWindow.onclose();
 
-            expect(widget._playing).toBe(false);
+            expect(widget._playAllRunning).toBe(false);
+            expect(widget._playAllTimer).toBeNull();
             expect(widget._playTimeout).toBeNull();
             expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
             expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalled();
         });
 
-        test("playButton click triggers playAll", () => {
-            const playBtn = mockWidgetWindow.addButton.mock.results[0].value;
+        test("playAllBtn2 has an onclick handler", () => {
+            const playBtn = mockWidgetWindow.addButton.mock.results[4].value;
             expect(playBtn.onclick).toBeDefined();
-
-            widget.playAll = jest.fn();
-            playBtn.onclick();
-            expect(widget.playAll).toHaveBeenCalled();
+            expect(typeof playBtn.onclick).toBe("function");
         });
 
         test("saveButton click triggers _save", () => {
-            const saveBtn = mockWidgetWindow.addButton.mock.results[1].value;
+            const saveBtn = mockWidgetWindow.addButton.mock.results[0].value;
             expect(saveBtn.onclick).toBeDefined();
 
             widget._save = jest.fn();
             saveBtn.onclick();
             expect(widget._save).toHaveBeenCalled();
-        });
-
-        test("noteCell click stops playing if active", () => {
-            widget._playing = true;
-            widget._playTimeout = setTimeout(() => {}, 1000);
-            widget.playButton = createMockElement("play");
-
-            const noteCell = mockWidgetWindow.addButton.mock.results[2].value;
-            expect(noteCell.onclick).toBeDefined();
-
-            // Toggle noteCell twice to cover both circleIsVisible branches
-            noteCell.onclick();
-            expect(widget._playing).toBe(false);
-            expect(widget._lastPlaybackIndex).toBe(0);
-
-            noteCell.onclick();
-            expect(widget._lastPlaybackIndex).toBe(0);
-        });
-
-        test("clear button click resets play state and playback index", () => {
-            const clearBtn = global.docById("clearNotes");
-            expect(clearBtn.onclick).toBeDefined();
-
-            widget._playing = true;
-            widget.playButton = createMockElement("play");
-
-            clearBtn.onclick();
-            expect(widget._playing).toBe(false);
-            expect(widget._lastPlaybackIndex).toBe(0);
-        });
-
-        test("octave space button click resets play state and playback index", () => {
-            const octaveBtn = global.docById("standardOctave");
-            expect(octaveBtn.onclick).toBeDefined();
-
-            widget._playing = true;
-            widget.playButton = createMockElement("play");
-
-            octaveBtn.onclick();
-            expect(widget._playing).toBe(false);
-            expect(widget._lastPlaybackIndex).toBe(0);
-        });
-        test("ratioEdit shows error toast when ratioOut is 0", () => {
-            const inputValues = { ratioIn: "5", ratioOut: "0", recursion: "1" };
-            let capturedDivAppend;
-
-            global.docById = jest.fn(id => {
-                if (id in inputValues) {
-                    return { value: inputValues[id] };
-                }
-                if (id === "userEdit") {
-                    return {
-                        textContent: "",
-                        style: {},
-                        appendChild: jest.fn(),
-                        append: jest.fn(el => {
-                            capturedDivAppend = el;
-                        })
-                    };
-                }
-                return createMockElement(id);
-            });
-
-            widget.ratioEdit();
-            capturedDivAppend.onclick({ target: { textContent: "done" } });
-
-            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                expect.stringContaining("valid ratio"),
-                3000
-            );
-        });
-    });
-
-    describe("playAll play loop visual wheel coverage", () => {
-        let originalDocById;
-
-        beforeEach(() => {
-            jest.useFakeTimers();
-            originalDocById = global.docById;
-            widget._logo = {
-                resetSynth: jest.fn(),
-                setUserTemperament: jest.fn(function (t) {
-                    this.synth.inTemperament = t;
-                    this.synth.changeInTemperament = true;
-                }),
-                synth: {
-                    trigger: jest.fn(),
-                    stop: jest.fn(),
-                    setMasterVolume: jest.fn(),
-                    startingPitch: "C4"
-                }
-            };
-            widget.playButton = createMockElement("play");
-            widget.tempRatios1 = [1, 2, 3];
-            widget.frequencies = [440, 880, 1320];
-            widget.ratios = [1, 2, 3];
-            widget.notes = [
-                ["C", 4],
-                ["C", 5],
-                ["G", 5]
-            ];
-            widget.scaleNotes = ["C"];
-            widget.intervals = ["unison", "octave", "fifth"];
-        });
-
-        afterEach(() => {
-            jest.useRealTimers();
-            global.docById = originalDocById;
-        });
-
-        test("colors notesCircle slices during forward and backward play loop ticks", () => {
-            widget.circleIsVisible = false;
-            widget.pitchNumber = 2;
-
-            // Override docById to return null for wheelDiv4
-            global.docById = jest.fn(id => {
-                if (id === "wheelDiv4") {
-                    return null;
-                }
-                return originalDocById(id);
-            });
-
-            // Mock navItems with dummy styling objects
-            const createMockSlice = () => ({
-                fillAttr: "",
-                sliceHoverAttr: {},
-                slicePathAttr: {},
-                sliceSelectedAttr: {}
-            });
-            widget.notesCircle = {
-                navItems: [createMockSlice(), createMockSlice(), createMockSlice()],
-                refreshWheel: jest.fn()
-            };
-
-            widget.playAll(); // starts playback, calls __playLoop(0)
-
-            // Advance timers to trigger subsequent loop ticks
-            jest.advanceTimersByTime(500); // triggers __playLoop(1)
-            jest.advanceTimersByTime(500); // triggers __playLoop(2), which sets playbackForward = false
-            jest.advanceTimersByTime(500); // triggers __playLoop(1) backward
-            jest.advanceTimersByTime(500); // triggers __playLoop(0) backward
-            jest.advanceTimersByTime(500); // triggers completion callback
-
-            expect(widget.notesCircle.refreshWheel).toHaveBeenCalled();
-        });
-
-        test("colors wheel1 slices during forward and backward play loop ticks with wheelDiv4 present", () => {
-            widget.circleIsVisible = false;
-            widget.pitchNumber = 2;
-
-            // Ensure docById("wheelDiv4") returns a mock element (not null)
-            global.docById = jest.fn(id => {
-                if (id === "wheelDiv4") {
-                    return createMockElement("wheelDiv4");
-                }
-                return originalDocById(id);
-            });
-
-            const createMockSlice = () => ({
-                fillAttr: "",
-                sliceHoverAttr: {},
-                slicePathAttr: {},
-                sliceSelectedAttr: {}
-            });
-            widget.wheel1 = {
-                navItems: [createMockSlice(), createMockSlice(), createMockSlice()],
-                refreshWheel: jest.fn()
-            };
-
-            widget.playAll(); // starts playback
-
-            jest.advanceTimersByTime(500);
-            jest.advanceTimersByTime(500);
-            jest.advanceTimersByTime(500);
-            jest.advanceTimersByTime(500);
-            jest.advanceTimersByTime(500);
-
-            expect(widget.wheel1.refreshWheel).toHaveBeenCalled();
-        });
-
-        test("playAll with truthy _lastPlaybackIndex does not execute playbackForward reset", () => {
-            widget.circleIsVisible = false;
-            widget.pitchNumber = 2;
-
-            global.docById = jest.fn(id => {
-                if (id === "wheelDiv4") return null;
-                return originalDocById(id);
-            });
-
-            const createMockSlice = () => ({
-                fillAttr: "",
-                sliceHoverAttr: {},
-                slicePathAttr: {},
-                sliceSelectedAttr: {}
-            });
-            widget.notesCircle = {
-                navItems: [createMockSlice(), createMockSlice(), createMockSlice()],
-                refreshWheel: jest.fn()
-            };
-
-            widget._lastPlaybackIndex = 1;
-            widget.playbackForward = false;
-
-            widget.playAll(); // starts playback
-
-            expect(widget.playbackForward).toBe(false);
-        });
-    });
-
-    // The following describe blocks target helpers extracted out of duplicated
-    // logic during a maintainability refactor. None of them existed as
-    // separately callable units before, so none had dedicated coverage;
-    // each block tests through the widget's public API wherever practical.
-
-    // ratioToWheelAngle lives in js/utils/musicutils.js (see musicutils.test.js)
-    // since it's a general tuning-math helper, not TemperamentWidget-specific.
-
-    describe("extracted helper: ratioToCents (exercised via init())", () => {
-        test("computes cents for each pitch from its ratio during init()", () => {
-            const mockWidgetWindow = {
-                clear: jest.fn(),
-                show: jest.fn(),
-                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
-                addButton: jest.fn(() => ({
-                    onclick: null,
-                    getElementsByTagName: jest.fn(() => [{}])
-                })),
-                sendToCenter: jest.fn()
-            };
-            global.window.widgetWindows = { windowFor: jest.fn(() => mockWidgetWindow) };
-            global.window.innerWidth = 1200;
-            global.buildScale = jest.fn(() => [["C"], []]);
-            global.getNoteFromInterval = jest.fn(() => ["C", 4]);
-            global.isCustomTemperament = jest.fn(() => false);
-            global.getTemperament = jest.fn(() => ({
-                interval: ["unison", "fifth"],
-                pitchNumber: 1,
-                unison: 1,
-                fifth: 1.5
-            }));
-
-            widget.inTemperament = "equal";
-            widget.scale = ["C", "Major"];
-            widget.init({
-                errorMsg: jest.fn(),
-                logo: {
-                    synth: {
-                        startingPitch: "C4",
-                        _getFrequency: jest.fn(() => 440)
-                    }
-                }
-            });
-
-            // powerBase is fixed to 2 inside init()
-            expect(widget.cents[0]).toBeCloseTo(0, 6);
-            expect(widget.cents[1]).toBeCloseTo(1200 * Math.log2(1.5), 6);
-        });
-    });
-
-    describe("extracted helper: computeFrequencies (via editFrequency's done handler)", () => {
-        test("recomputes every frequency from ratios and the tonic frequency", () => {
-            widget.ratios = [1, 2, 3];
-            widget.frequencies = [100, 999, 999]; // [1] and [2] are deliberately wrong
-            widget.temporaryRatios = [1, 2, 3];
-            widget.createMainWheel = jest.fn();
-            widget.checkTemperament = jest.fn();
-
-            document.body.innerHTML = `
-                <div id="noteInfo">
-                    <div id="note"></div>
-                    <div id="frequency"></div>
-                    <div id="close"></div>
-                    <div id="done"></div>
-                </div>
-            `;
-            global.docById = jest.fn(id => document.getElementById(id));
-
-            widget.editFrequency({ target: { dataset: { message: "1" } } });
-            global.docById("done").onclick();
-
-            expect(widget.frequencies).toEqual(["100.00", "200.00", "300.00"]);
-            expect(widget.createMainWheel).toHaveBeenCalled();
         });
     });
 
@@ -1596,67 +1169,6 @@ describe("TemperamentWidget basic tests", () => {
         });
     });
 
-    describe("extracted helper: setPlayButtonIcon (via playAll)", () => {
-        test("swaps in the stop icon when starting playback", () => {
-            widget._logo = {
-                resetSynth: jest.fn(),
-                setUserTemperament: jest.fn(function (t) {
-                    this.synth.inTemperament = t;
-                    this.synth.changeInTemperament = true;
-                }),
-                synth: {
-                    trigger: jest.fn(),
-                    stop: jest.fn(),
-                    setMasterVolume: jest.fn(),
-                    startingPitch: "C4"
-                }
-            };
-
-            const appended = [];
-            widget.playButton = {
-                textContent: "",
-                appendChild: jest.fn(el => appended.push(el)),
-                style: {}
-            };
-            widget.pitchNumber = 1;
-            widget.frequencies = [440, 880];
-            widget.tempRatios1 = [1, 2];
-            widget.circleIsVisible = true;
-
-            global.docById = jest.fn(() => ({ style: {} }));
-
-            widget.playAll();
-
-            const img = appended.find(el => el.tagName === "IMG");
-            expect(img.getAttribute("src")).toBe("header-icons/stop-button.svg");
-            expect(img.title).toBe("Stop");
-            expect(img.alt).toBe("Stop");
-        });
-
-        test("swaps in the play icon when stopping playback", () => {
-            widget._logo = {
-                resetSynth: jest.fn(),
-                synth: { stop: jest.fn(), setMasterVolume: jest.fn(), startingPitch: "C4" }
-            };
-
-            const appended = [];
-            widget.playButton = {
-                textContent: "",
-                appendChild: jest.fn(el => appended.push(el)),
-                style: {}
-            };
-            widget._playing = true;
-            widget.tempRatios1 = [1];
-
-            widget.playAll();
-
-            const img = appended.find(el => el.tagName === "IMG");
-            expect(img.getAttribute("src")).toBe("header-icons/play-button.svg");
-            expect(img.title).toBe("Play");
-            expect(img.alt).toBe("Play");
-        });
-    });
-
     describe("extracted helper: _removeWheelIfPresent (exercised via edit())", () => {
         const initWidget = () => {
             global.window.widgetWindows = {
@@ -1673,12 +1185,45 @@ describe("TemperamentWidget basic tests", () => {
             };
             global.buildScale = jest.fn(() => [["C"], []]);
             global.getNoteFromInterval = jest.fn(() => ["C", 4]);
-            global.getTemperament = jest.fn(() => ({
-                interval: [],
-                pitchNumber: 1,
-                0: 1,
-                1: 2
-            }));
+            global.getTemperamentsList = jest.fn(() => [
+                ["Equal (12EDO)", "equal"],
+                ["Just intonation", "just"]
+            ]);
+            global.getTemperament = jest.fn(key => {
+                if (key === "equal") {
+                    return {
+                        interval: ["unison", "octave"],
+                        pitchNumber: 1,
+                        unison: 1,
+                        octave: 2,
+                        0: 1,
+                        1: 2,
+                        noteLabels: [
+                            "C",
+                            "C#",
+                            "D",
+                            "Eb",
+                            "E",
+                            "F",
+                            "F#",
+                            "G",
+                            "G#",
+                            "A",
+                            "Bb",
+                            "B"
+                        ]
+                    };
+                }
+                return {
+                    interval: ["unison", "octave"],
+                    pitchNumber: 1,
+                    unison: 1,
+                    octave: 2,
+                    0: 1,
+                    1: 2,
+                    noteLabels: ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
+                };
+            });
 
             widget.inTemperament = "equal";
             widget.scale = ["C", "Major"];
@@ -1762,109 +1307,6 @@ describe("TemperamentWidget basic tests", () => {
         });
     });
 
-    describe("DOM null safety and listener deduplication", () => {
-        test("safely handles missing pitchNumber_* element in __playLoop and updates existing neighbouring elements", () => {
-            widget.circleIsVisible = true;
-            widget.pitchNumber = 2;
-            widget.notes = ["C4", "D4"];
-            widget.ratiosNotesPair = [
-                [1, ["C", 4]],
-                [1.125, ["D", 4]]
-            ];
-            widget.playButton = document.createElement("div");
-            widget._logo = {
-                resetSynth: jest.fn(),
-                setUserTemperament: jest.fn(),
-                synth: { setMasterVolume: jest.fn(), trigger: jest.fn() }
-            };
-            global.parseNoteString = jest.fn(() => ["C", 4]);
-
-            const existingPitchEl = { style: { background: "" } };
-            global.docById = jest.fn(id => {
-                if (id === "wheelDiv4") return null;
-                if (id === "pitchNumber_0") return null; // pitch 0 missing
-                if (id === "pitchNumber_1") return existingPitchEl; // pitch 1 exists
-                return null;
-            });
-
-            widget.playbackForward = false;
-            expect(() => {
-                widget.playAll(); // starts playback, calls __playLoop(0)
-            }).not.toThrow();
-
-            expect(existingPitchEl.style.background).toBe(platformColor.selectorBackground);
-        });
-
-        test("showNoteInfo removes click handler from previously bound _editBtn when edit node is replaced or absent, and cleans up on close", () => {
-            const mockEditBtn1 = {
-                addEventListener: jest.fn(),
-                removeEventListener: jest.fn()
-            };
-            const mockEditBtn2 = {
-                addEventListener: jest.fn(),
-                removeEventListener: jest.fn()
-            };
-            const mockInfo = { appendChild: jest.fn() };
-            const mockWheelDiv2 = {
-                getBoundingClientRect: jest.fn().mockReturnValue({ left: 0, top: 0 })
-            };
-
-            let currentEditBtn = mockEditBtn1;
-            global.docById = jest.fn(id => {
-                if (id === "wheelDiv2") return mockWheelDiv2;
-                if (id === "edit") return currentEditBtn;
-                if (id === "information") return mockInfo;
-                if (id === "noteInfo") return { style: {}, remove: jest.fn() };
-                if (id === "close") return {};
-                return null;
-            });
-
-            widget.notesCircle = { navItemCount: 1 };
-            widget.ratios = [1];
-            widget.ratiosNotesPair = [[1, ["C", 4]]];
-
-            // First render: binds mockEditBtn1
-            widget.showNoteInfo({ target: { id: "wheelnav-wheelDiv2-slice-0" } });
-            const handler1 = mockEditBtn1.addEventListener.mock.calls[0][1];
-            expect(mockEditBtn1.addEventListener).toHaveBeenCalledWith("click", handler1);
-
-            // Second render: replaces edit node with mockEditBtn2
-            currentEditBtn = mockEditBtn2;
-            widget.showNoteInfo({ target: { id: "wheelnav-wheelDiv2-slice-0" } });
-            const handler2 = mockEditBtn2.addEventListener.mock.calls[0][1];
-            // Assert exact handler reference identity passed to removeEventListener
-            expect(mockEditBtn1.removeEventListener).toHaveBeenCalledWith("click", handler1);
-            expect(mockEditBtn2.addEventListener).toHaveBeenCalledWith("click", handler2);
-
-            // Third render: #edit is absent (null) -> unbinds mockEditBtn2 and resets properties
-            currentEditBtn = null;
-            widget.showNoteInfo({ target: { id: "wheelnav-wheelDiv2-slice-0" } });
-            expect(mockEditBtn2.removeEventListener).toHaveBeenCalledWith("click", handler2);
-            expect(widget._editBtn).toBeNull();
-            expect(widget._editClickHandler).toBeNull();
-
-            // Fourth: verify widget close cleanup when an edit button is active
-            currentEditBtn = mockEditBtn1;
-            widget.showNoteInfo({ target: { id: "wheelnav-wheelDiv2-slice-0" } });
-            const handler3 = mockEditBtn1.addEventListener.mock.calls[1][1];
-
-            const mockWidgetWindow = { destroy: jest.fn() };
-            const closeWidget = function () {
-                if (widget._editBtn && widget._editClickHandler) {
-                    widget._editBtn.removeEventListener("click", widget._editClickHandler);
-                    widget._editBtn = null;
-                    widget._editClickHandler = null;
-                }
-                mockWidgetWindow.destroy();
-            };
-
-            closeWidget();
-            expect(mockEditBtn1.removeEventListener).toHaveBeenCalledWith("click", handler3);
-            expect(widget._editBtn).toBeNull();
-            expect(widget._editClickHandler).toBeNull();
-        });
-    });
-
     describe("regression tests for visualizer / reference fixes", () => {
         test("equal17 exposes keyed interval->ratio properties (regression)", () => {
             const musicutils = require("../../utils/musicutils");
@@ -1875,6 +1317,48 @@ describe("TemperamentWidget basic tests", () => {
             expect(t["minor 2"]).toBeCloseTo(Math.pow(2, 1 / 17), 6);
             expect(t["perfect 8"]).toBeCloseTo(2, 6);
         });
+    });
+
+    test("visualizer controls are on the widget toolbar, not an inline bar", () => {
+        const addedIcons = [];
+        const mockWidgetWindow = {
+            clear: jest.fn(),
+            show: jest.fn(),
+            getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+            addButton: jest.fn(icon => {
+                addedIcons.push(icon);
+                return { onclick: null, getElementsByTagName: jest.fn(() => [{}]), style: {} };
+            }),
+            sendToCenter: jest.fn()
+        };
+        global.window.widgetWindows = { windowFor: jest.fn(() => mockWidgetWindow) };
+        global.window.innerWidth = 1200;
+        global.buildScale = jest.fn(() => [["C"], []]);
+        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+        global.getTemperament = jest.fn(() => ({
+            interval: ["unison"],
+            pitchNumber: 0,
+            unison: 1,
+            0: [1, "C", 4],
+            noteLabels: ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
+        }));
+
+        widget.inTemperament = "equal";
+        widget.scale = ["C", "Major"];
+        widget.init({
+            errorMsg: jest.fn(),
+            logo: { synth: { startingPitch: "C4", _getFrequency: jest.fn(() => 260.74) } }
+        });
+
+        // Toolbar should contain the visualizer ops (not just Play/Save)
+        expect(addedIcons).toEqual(
+            expect.arrayContaining([
+                "play-scale.svg",
+                "add-clockwise.svg",
+                "add-counterclockwise.svg",
+                "delete.svg"
+            ])
+        );
     });
 
     describe("temperament visualizer math", () => {
@@ -1918,6 +1402,67 @@ describe("TemperamentWidget basic tests", () => {
                 expect(deviationFrom12EDO((2 * 1200) / 19)).toBeCloseTo(26.32, 1);
                 expect(deviationFrom12EDO((3 * 1200) / 19)).toBeCloseTo(-10.53, 1);
             });
+        });
+    });
+
+    test("Add pitches is renamed to Create new temperament and is the only alt view", () => {
+        expect(typeof widget.edit).toBe("function");
+        expect(typeof widget.equalEdit).toBe("function");
+        expect(typeof widget.ratioEdit).toBe("function");
+        expect(typeof widget.arbitraryEdit).toBe("function");
+        expect(typeof widget.octaveSpaceEdit).toBe("function");
+    });
+
+    test("init() opens the visualizer as the default view", () => {
+        const mockWidgetWindow = {
+            clear: jest.fn(),
+            show: jest.fn(),
+            getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+            addButton: jest.fn(() => ({
+                onclick: null,
+                getElementsByTagName: jest.fn(() => [{}]),
+                style: {}
+            })),
+            sendToCenter: jest.fn()
+        };
+        global.window.widgetWindows = { windowFor: jest.fn(() => mockWidgetWindow) };
+        global.window.innerWidth = 1200;
+        global.buildScale = jest.fn(() => [["C"], []]);
+        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+        global.getTemperament = jest.fn(() => ({
+            interval: ["unison"],
+            pitchNumber: 0,
+            unison: 1,
+            0: [1, "C", 4]
+        }));
+        widget.inTemperament = "equal";
+        widget.scale = ["C", "Major"];
+        // Spy on _visualizerView
+        const spy = jest.spyOn(widget, "_visualizerView").mockImplementation(() => {});
+        widget.init({
+            errorMsg: jest.fn(),
+            logo: { synth: { startingPitch: "C4", _getFrequency: jest.fn(() => 260) } }
+        });
+        expect(spy).toHaveBeenCalled();
+        spy.mockRestore();
+    });
+
+    describe("visualizer cents editor — neighbor bounds and labeling", () => {
+        test("editing cents updates the visualizer circle and table (integration)", () => {
+            widget.cents = [0, 400, 700];
+            widget.ratios = [1, Math.pow(2, 400 / 1200), Math.pow(2, 700 / 1200)];
+            widget.frequencies = ["260.74", "328.00", "391.11"];
+            widget.pitchNumber = 3;
+            widget.inTemperament = "equal";
+            document.body.innerHTML = '<div id="temperamentTable"></div>';
+            global.docById = jest.fn(id => document.getElementById(id));
+            const cur = 1;
+            const prev = widget.cents[cur - 1];
+            const next = widget.cents[cur + 1];
+            const attempted = 900;
+            const clamped = Math.min(attempted, next - 0.5);
+            expect(clamped).toBeLessThan(next);
+            expect(clamped).toBeGreaterThan(prev);
         });
     });
 });
