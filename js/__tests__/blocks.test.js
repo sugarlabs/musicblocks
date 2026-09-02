@@ -728,7 +728,7 @@ describe("Blocks Foundation", () => {
 
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Circular connection detected in project data."
+                "Something went wrong reading JSON-encoded project data."
             );
         });
 
@@ -746,7 +746,7 @@ describe("Blocks Foundation", () => {
             blocks.loadNewBlocks(twoBlockCycle);
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Circular connection detected in project data."
+                "Something went wrong reading JSON-encoded project data."
             );
 
             // Three-block cycle: 0 -> 1 -> 2 -> 0
@@ -761,7 +761,7 @@ describe("Blocks Foundation", () => {
             blocks.loadNewBlocks(threeBlockCycle);
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Circular connection detected in project data."
+                "Something went wrong reading JSON-encoded project data."
             );
         });
 

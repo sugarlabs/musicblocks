@@ -4889,7 +4889,9 @@ class Blocks {
                     );
                     console.debug("Circular block data:", blockObjs);
                     if (this.activity && typeof this.activity.errorMsg === "function") {
-                        this.activity.errorMsg(_("Circular connection detected in project data."));
+                        this.activity.errorMsg(
+                            _("Something went wrong reading JSON-encoded project data.")
+                        );
                     }
                     this.activity._suppressRefresh = false;
                     return;
