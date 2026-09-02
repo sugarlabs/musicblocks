@@ -86,6 +86,8 @@ const largestGapMid = centsArr => {
 /** Converts a ratio to cents relative to the tonic (1200 cents = 1 octave). */
 const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
 
+const MAX_DIVISIONS = 57;
+
 function TemperamentWidget() {
     // Constants for button and icon sizes
     const BUTTONDIVWIDTH = 430;
@@ -1681,8 +1683,12 @@ function TemperamentWidget() {
             document.createTextNode(_("number of divisions") + " \u00A0\u00A0\u00A0\u00A0 ")
         );
         const divisions = document.createElement("input");
-        divisions.type = "text";
+        divisions.type = "number";
         divisions.id = "divisions";
+        divisions.min = "1";
+        divisions.max = String(MAX_DIVISIONS);
+        divisions.step = "1";
+        divisions.title = _("Maximum 57 divisions");
         divisions.value = this.pitchNumber;
         equalEdit.appendChild(divisions);
         equalEdit.style.paddingLeft = "80px";
@@ -1720,6 +1726,17 @@ function TemperamentWidget() {
             pitchNumber1 = Number(docById("octaveIn").value);
             pitchNumber2 = Number(docById("octaveOut").value);
             numDivs = Number(docById("divisions").value);
+            if (!Number.isFinite(numDivs) || !Number.isInteger(numDivs) || numDivs < 1) {
+                this.activity.errorMsg(_("Please enter a valid number of divisions."), 3000);
+                return;
+            }
+            if (numDivs > MAX_DIVISIONS) {
+                this.activity.errorMsg(
+                    _("Maximum 57 divisions. For larger, use a dedicated tool."),
+                    3000
+                );
+                return;
+            }
             this.tempRatios = this.ratios.slice();
             if (pitchNumber1 === pitchNumber2) {
                 for (let i = 0; i < numDivs; i++) {
@@ -1867,7 +1884,9 @@ function TemperamentWidget() {
             document.createTextNode(_("recursion") + " \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 ")
         );
         const recursion = document.createElement("input");
-        recursion.type = "text";
+        recursion.type = "number";
+        recursion.min = "1";
+        recursion.max = "56";
         recursion.id = "recursion";
         recursion.value = "1";
         ratioEdit.appendChild(recursion);
@@ -1945,6 +1964,13 @@ function TemperamentWidget() {
             that.tempRatios.sort(function (a, b) {
                 return a - b;
             });
+            if (that.tempRatios.length - 1 > MAX_DIVISIONS) {
+                that.activity.errorMsg(
+                    _("Maximum 57 divisions. For larger, use a dedicated tool."),
+                    3000
+                );
+                return;
+            }
             const pitchNumber = that.tempRatios.length - 1;
             if (event.target.textContent === _("done")) {
                 that.ratios = that.tempRatios.slice();
