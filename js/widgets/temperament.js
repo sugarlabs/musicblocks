@@ -23,7 +23,7 @@
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
    isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
+   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, SHARP, Singer,
    slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber
  */
 
@@ -85,6 +85,9 @@ const largestGapMid = centsArr => {
 
 /** Converts ratio to cents for arbitrary octave base. For base=2 this is 1200*log2(ratio). Uses log10/log10 which equals log2/log2; kept for powerBase≠2 stretched octaves. NOTE: widget powerBase vs engine getOctaveRatio() diverge — pitchToFrequency/frequencyToPitch in musicutils still hard-code base 2; full unification deferred. */
 const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
+const DEG_PER_CENT = 0.3;
+const centsToAngle = cents => 270 + cents * DEG_PER_CENT;
+const angleToCents = angle => (angle - 270) / DEG_PER_CENT;
 
 const MAX_DIVISIONS = 57;
 
@@ -191,6 +194,16 @@ function TemperamentWidget() {
             frequencies[i] = (ratios[i] * baseFrequency).toFixed(2);
         }
         return frequencies;
+    };
+    const _rebuildStateFromRatios = (target, pitchNum) => {
+        for (let k = 0; k < pitchNum; k++) {
+            target.cents[k] = ratioToCents(target.ratios[k], target.powerBase);
+            const f = Number(target.frequencies[0]) * target.ratios[k];
+            const o = frequencyToPitch(f, target.inTemperament);
+            target.notes[k] = [o[0], o[1]];
+            target.intervals[k] = "";
+            target.ratiosNotesPair[k] = [target.ratios[k], target.notes[k]];
+        }
     };
 
     /** Sets a wheelnav nav item's fill/hover/path/selected color attributes to one color. */
@@ -353,20 +366,10 @@ function TemperamentWidget() {
         docById("wheelDiv2").style.zIndex = 5;
     };
 
-    this._freqToCents = function (freq, baseFreq) {
-        return 1200 * Math.log2(freq / baseFreq);
-    };
+    this._freqToCents = (freq, baseFreq) => ratioToCents(freq / baseFreq, 2);
 
-    /**
-     * Converts a cents offset back to an absolute frequency in Hz relative
-     * to a base frequency.
-     * @param {number} cents - The cents offset from base.
-     * @param {number} baseFreq - The reference frequency in Hz.
-     * @returns {number} The resulting frequency in Hz.
-     */
-    this._centsToFreq = function (cents, baseFreq) {
-        return baseFreq * Math.pow(2, cents / 1200);
-    };
+    /** Converts a cents offset back to absolute frequency. */
+    this._centsToFreq = (cents, baseFreq) => baseFreq * Math.pow(2, cents / 1200);
 
     /** Hides and removes a wheelnav wheel if its container div is present in the DOM. */
     const removeWheelIfPresent = (divId, wheel) => {
@@ -414,7 +417,6 @@ function TemperamentWidget() {
             document.removeEventListener("mousedown", that._vizMenuClose);
             that._vizMenuClose = null;
         }
-        const refName = "12-EDO";
         let highlightDot = -1;
         let flashDot = -1;
         const _isLocked = i => i === 0;
@@ -752,7 +754,7 @@ function TemperamentWidget() {
             // Inner dots and spokes for active temperament
             for (let i = 0; i < that.pitchNumber; i++) {
                 const cents = that.cents[i];
-                const angleDeg = 270 + cents * 0.3;
+                const angleDeg = centsToAngle(cents);
                 const dev = deviationFrom12EDO(that.cents[i]);
 
                 const dashed = Math.abs(dev) <= 1;
@@ -812,7 +814,6 @@ function TemperamentWidget() {
             } else {
                 ctx.fillText(that.inTemperament + " vs 12-EDO", cx, cy);
             }
-            canvas.offsetWidth;
         };
 
         _drawCircle();
@@ -855,8 +856,8 @@ function TemperamentWidget() {
         const rowRefs = [];
 
         /** Ups-and-downs prefix for a cents value (deviation from 12-EDO). */
-        const _updown = function (cents) {
-            const dev = cents - Math.round(cents / 100) * 100;
+        const _updown = cents => {
+            const dev = deviationFrom12EDO(cents);
             if (dev > 30) return "^^";
             if (dev > 15) return "^";
             if (dev < -30) return "vv";
@@ -885,6 +886,52 @@ function TemperamentWidget() {
             if (highlightDot >= 0) _highlightTableRow(highlightDot);
             _updateRemoveButton();
             _checkModified();
+        };
+        const _makeEditable = (td, i, getPrev, getNext, getCur, opts, onCommit) => {
+            td.style.cursor = _isLocked(i) ? "default" : "text";
+            td.ondblclick = ev => {
+                ev.stopPropagation();
+                if (_isLocked(i)) return;
+                const prev = getPrev(i);
+                const next = getNext(i);
+                const cur = getCur(i);
+                const lo = prev !== null ? prev + opts.eps : opts.eps;
+                const hi = next !== null ? next - opts.eps : Infinity;
+                const input = document.createElement("input");
+                input.type = "number";
+                input.step = opts.step;
+                input.min = String(lo);
+                if (hi !== Infinity) input.max = String(hi);
+                input.value = cur.toFixed(opts.decimals);
+                input.title = opts.title(lo, hi, cur);
+                input.setAttribute("aria-label", opts.aria(i));
+                _styleInput(input);
+                td.textContent = "";
+                td.appendChild(input);
+                input.focus();
+                input.select();
+                const commit = () => {
+                    let v = parseFloat(input.value);
+                    if (isNaN(v)) {
+                        _updateTableRow(i);
+                        return;
+                    }
+                    v = Math.max(lo, Math.min(hi, v));
+                    onCommit(v, i);
+                    _doneEdit(i);
+                };
+                input.onblur = commit;
+                input.onkeydown = e => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        input.blur();
+                    } else if (e.key === "Escape") {
+                        e.preventDefault();
+                        input.onblur = null;
+                        _updateTableRow(i);
+                    }
+                };
+            };
         };
 
         /** (Re)builds the table rows from current state, storing cell refs. */
@@ -946,163 +993,68 @@ function TemperamentWidget() {
                     e.preventDefault();
                     _showMenu(e, i);
                 };
-                tdCents.style.cursor = _isLocked(i) ? "default" : "text";
-                tdCents.ondblclick = function (ev) {
-                    ev.stopPropagation();
-                    if (_isLocked(i)) return;
-                    const prev = i > 0 ? that.cents[i - 1] : null;
-                    const next = i < that.pitchNumber - 1 ? that.cents[i + 1] : null;
-                    const cur = that.cents[i];
-                    const lo = prev !== null ? prev + 1 : 1;
-                    const hi = next !== null ? next - 1 : Infinity;
-                    const input = document.createElement("input");
-                    input.type = "number";
-                    input.step = "0.1";
-                    input.min = String(lo);
-                    if (hi !== Infinity) input.max = String(hi);
-                    input.value = cur.toFixed(1);
-                    const dev = deviationFrom12EDO(cur);
-                    input.title =
-                        "Absolute cents (" +
-                        lo.toFixed(1) +
-                        " \u2013 " +
-                        hi.toFixed(1) +
-                        "); deviation from 12-EDO: " +
-                        dev.toFixed(1) +
-                        "\u00A2";
-                    input.setAttribute(
-                        "aria-label",
-                        "Cents for pitch " + i + ", absolute 0-1200, between neighbors"
-                    );
-                    _styleInput(input);
-                    tdCents.textContent = "";
-                    tdCents.appendChild(input);
-                    input.focus();
-                    input.select();
-                    const _commit = function () {
-                        let v = parseFloat(input.value);
-                        if (isNaN(v)) {
-                            _updateTableRow(i);
-                            return;
-                        }
-                        v = Math.max(lo, Math.min(hi, v));
-                        _applyCents(i, v);
-                        _doneEdit(i);
-                    };
-                    input.onblur = _commit;
-                    input.onkeydown = function (e) {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            input.blur();
-                        } else if (e.key === "Escape") {
-                            e.preventDefault();
-                            input.onblur = null;
-                            _updateTableRow(i);
-                        }
-                    };
-                };
-                tdFreq.style.cursor = _isLocked(i) ? "default" : "text";
-                tdFreq.ondblclick = function (ev) {
-                    ev.stopPropagation();
-                    if (_isLocked(i)) return;
-                    const prev = i > 0 ? Number(that.frequencies[i - 1]) : null;
-                    const next = i < that.pitchNumber - 1 ? Number(that.frequencies[i + 1]) : null;
-                    const cur = Number(that.frequencies[i]);
-                    const lo = prev !== null ? prev + 0.01 : 0.01;
-                    const hi = next !== null ? next - 0.01 : Infinity;
-                    const input = document.createElement("input");
-                    input.type = "number";
-                    input.step = "0.01";
-                    input.min = String(lo);
-                    if (hi !== Infinity) input.max = String(hi);
-                    input.value = cur.toFixed(2);
-                    const hiStr = hi !== Infinity ? hi.toFixed(2) : "\u221E";
-                    input.title = "Frequency in Hz (" + lo.toFixed(2) + " \u2013 " + hiStr + ")";
-                    input.setAttribute(
-                        "aria-label",
-                        "Frequency for pitch " + i + " in Hz, between neighbors"
-                    );
-                    _styleInput(input);
-                    tdFreq.textContent = "";
-                    tdFreq.appendChild(input);
-                    input.focus();
-                    input.select();
-                    const _commit2 = function () {
-                        let v = parseFloat(input.value);
-                        if (isNaN(v)) {
-                            _updateTableRow(i);
-                            return;
-                        }
-                        v = Math.max(lo, Math.min(hi, v));
-                        that.frequencies[i] = v.toFixed(2);
-                        that.ratios[i] = v / Number(that.frequencies[0]);
-                        that.cents[i] = ratioToCents(that.ratios[i], that.powerBase);
-                        if (that.ratiosNotesPair[i]) that.ratiosNotesPair[i][0] = that.ratios[i];
-                        _doneEdit(i);
-                    };
-                    input.onblur = _commit2;
-                    input.onkeydown = function (e) {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            input.blur();
-                        } else if (e.key === "Escape") {
-                            e.preventDefault();
-                            input.onblur = null;
-                            _updateTableRow(i);
-                        }
-                    };
-                };
-                tdRatio.style.cursor = _isLocked(i) ? "default" : "text";
-                tdRatio.ondblclick = function (ev) {
-                    ev.stopPropagation();
-                    if (_isLocked(i)) return;
-                    const prev = i > 0 ? that.ratios[i - 1] : null;
-                    const next = i < that.pitchNumber - 1 ? that.ratios[i + 1] : null;
-                    const cur = that.ratios[i];
-                    const lo = prev !== null ? prev + 0.001 : 0.001;
-                    const hi = next !== null ? next - 0.001 : Infinity;
-                    const input = document.createElement("input");
-                    input.type = "number";
-                    input.step = "0.001";
-                    input.min = String(lo);
-                    if (hi !== Infinity) input.max = String(hi);
-                    input.value = cur.toFixed(3);
-                    const hiStr = hi !== Infinity ? hi.toFixed(3) : "\u221E";
-                    input.title = "Ratio (" + lo.toFixed(3) + " \u2013 " + hiStr + ")";
-                    input.setAttribute(
-                        "aria-label",
-                        "Ratio for pitch " + i + ", between neighbors"
-                    );
-                    _styleInput(input);
-                    tdRatio.textContent = "";
-                    tdRatio.appendChild(input);
-                    input.focus();
-                    input.select();
-                    const _commit3 = function () {
-                        let v = parseFloat(input.value);
-                        if (isNaN(v)) {
-                            _updateTableRow(i);
-                            return;
-                        }
-                        v = Math.max(lo, Math.min(hi, v));
-                        that.ratios[i] = v;
-                        that.cents[i] = ratioToCents(v, that.powerBase);
-                        that.frequencies[i] = (Number(that.frequencies[0]) * v).toFixed(2);
-                        if (that.ratiosNotesPair[i]) that.ratiosNotesPair[i][0] = v;
-                        _doneEdit(i);
-                    };
-                    input.onblur = _commit3;
-                    input.onkeydown = function (e) {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            input.blur();
-                        } else if (e.key === "Escape") {
-                            e.preventDefault();
-                            input.onblur = null;
-                            _updateTableRow(i);
-                        }
-                    };
-                };
+                _makeEditable(
+                    tdCents,
+                    i,
+                    j => (j > 0 ? that.cents[j - 1] : null),
+                    j => (j < that.pitchNumber - 1 ? that.cents[j + 1] : null),
+                    j => that.cents[j],
+                    {
+                        eps: 1,
+                        step: "0.1",
+                        decimals: 1,
+                        title: (lo, hi, cur) =>
+                            `Absolute cents (${lo.toFixed(1)} – ${hi.toFixed(1)}); deviation from 12-EDO: ${deviationFrom12EDO(cur).toFixed(1)}¢`,
+                        aria: j => `Cents for pitch ${j}, absolute 0-1200, between neighbors`
+                    },
+                    (v, j) => _applyCents(j, v)
+                );
+                _makeEditable(
+                    tdFreq,
+                    i,
+                    j => (j > 0 ? Number(that.frequencies[j - 1]) : null),
+                    j => (j < that.pitchNumber - 1 ? Number(that.frequencies[j + 1]) : null),
+                    j => Number(that.frequencies[j]),
+                    {
+                        eps: 0.01,
+                        step: "0.01",
+                        decimals: 2,
+                        title: (lo, hi) => {
+                            const hiStr = hi !== Infinity ? hi.toFixed(2) : "∞";
+                            return `Frequency in Hz (${lo.toFixed(2)} – ${hiStr})`;
+                        },
+                        aria: j => `Frequency for pitch ${j} in Hz, between neighbors`
+                    },
+                    (v, j) => {
+                        that.frequencies[j] = v.toFixed(2);
+                        that.ratios[j] = v / Number(that.frequencies[0]);
+                        that.cents[j] = ratioToCents(that.ratios[j], that.powerBase);
+                        if (that.ratiosNotesPair[j]) that.ratiosNotesPair[j][0] = that.ratios[j];
+                    }
+                );
+                _makeEditable(
+                    tdRatio,
+                    i,
+                    j => (j > 0 ? that.ratios[j - 1] : null),
+                    j => (j < that.pitchNumber - 1 ? that.ratios[j + 1] : null),
+                    j => that.ratios[j],
+                    {
+                        eps: 0.001,
+                        step: "0.001",
+                        decimals: 3,
+                        title: (lo, hi) => {
+                            const hiStr = hi !== Infinity ? hi.toFixed(3) : "∞";
+                            return `Ratio (${lo.toFixed(3)} – ${hiStr})`;
+                        },
+                        aria: j => `Ratio for pitch ${j}, between neighbors`
+                    },
+                    (v, j) => {
+                        that.ratios[j] = v;
+                        that.cents[j] = ratioToCents(v, that.powerBase);
+                        that.frequencies[j] = (Number(that.frequencies[0]) * v).toFixed(2);
+                        if (that.ratiosNotesPair[j]) that.ratiosNotesPair[j][0] = v;
+                    }
+                );
             }
             _refreshTable();
         };
@@ -1180,7 +1132,7 @@ function TemperamentWidget() {
 
         const _centsFromPointer = function (i, px, py) {
             const a = ((Math.atan2(py - cy, px - cx) * 180) / Math.PI + 360) % 360;
-            let rawCents = (a - 270) / 0.3;
+            let rawCents = angleToCents(a);
             while (rawCents - that.cents[i] > 600) rawCents -= 1200;
             while (rawCents - that.cents[i] < -600) rawCents += 1200;
             return rawCents;
@@ -1246,7 +1198,7 @@ function TemperamentWidget() {
             let nearestDist = Infinity;
             for (let i = 0; i < that.pitchNumber; i++) {
                 const cents = that.cents[i];
-                const angleDeg = 270 + cents * 0.3;
+                const angleDeg = centsToAngle(cents);
                 const dotA = (angleDeg * Math.PI) / 180;
                 const dx = cx + innerR * Math.cos(dotA);
                 const dy = cy + innerR * Math.sin(dotA);
@@ -1845,16 +1797,7 @@ function TemperamentWidget() {
                 this.frequencies = computeFrequencies(this.ratios, frequency, pitchNumber);
 
                 this.pitchNumber = pitchNumber;
-                // Rebuild cents, notes, intervals, ratiosNotesPair from new ratios
-                const startingPitch = this._logo.synth.startingPitch;
-                for (let i = 0; i < this.pitchNumber; i++) {
-                    this.cents[i] = ratioToCents(this.ratios[i], this.powerBase);
-                    const freq = Number(this.frequencies[0]) * this.ratios[i];
-                    const obj = frequencyToPitch(freq, this.inTemperament);
-                    this.notes[i] = [obj[0], obj[1]];
-                    this.intervals[i] = "";
-                    this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
-                }
+                _rebuildStateFromRatios(this, pitchNumber);
                 this.checkTemperament(compareRatios);
                 this._visualizerView();
             } else if (event.target.textContent === _("preview")) {
@@ -1885,16 +1828,7 @@ function TemperamentWidget() {
                     that.frequencies = computeFrequencies(that.ratios, frequency, pitchNumber);
 
                     that.pitchNumber = pitchNumber;
-                    // Rebuild cents, notes, intervals, ratiosNotesPair from new ratios
-                    const sp = that._logo.synth.startingPitch;
-                    for (let j = 0; j < that.pitchNumber; j++) {
-                        that.cents[j] = ratioToCents(that.ratios[j], that.powerBase);
-                        const freq = Number(that.frequencies[0]) * that.ratios[j];
-                        const obj = frequencyToPitch(freq, that.inTemperament);
-                        that.notes[j] = [obj[0], obj[1]];
-                        that.intervals[j] = "";
-                        that.ratiosNotesPair[j] = [that.ratios[j], that.notes[j]];
-                    }
+                    _rebuildStateFromRatios(that, pitchNumber);
                     that.eqTempPitchNumber = null;
                     that.eqTempHzs = [];
                     that.checkTemperament(compareRatios);
@@ -3159,6 +3093,5 @@ if (typeof module !== "undefined") {
     module.exports.deviationColor = deviationColor;
     module.exports.deviationFrom12EDO = deviationFrom12EDO;
     module.exports.largestGapMid = largestGapMid;
-    module.exports.sameNodeCents = largestGapMid;
     module.exports.ratioToCents = ratioToCents;
 }
