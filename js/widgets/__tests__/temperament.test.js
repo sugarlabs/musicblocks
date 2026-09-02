@@ -1465,4 +1465,55 @@ describe("TemperamentWidget basic tests", () => {
             expect(clamped).toBeGreaterThan(prev);
         });
     });
+
+    describe("equal divisions cap at 57", () => {
+        test("57 divisions succeeds", () => {
+            global.docById = jest.fn(id => {
+                if (id === "octaveIn") return { value: "0" };
+                if (id === "octaveOut") return { value: "0" };
+                if (id === "divisions") return { value: "57" };
+                return createMockElement(id);
+            });
+            widget.ratios = [1];
+            widget.frequencies = [440];
+            widget.pitchNumber = 1;
+            widget.powerBase = 2;
+            widget.activity = { errorMsg: jest.fn() };
+            widget.createMainWheel = jest.fn();
+            widget.notesCircle = {
+                navItems: Array(60).fill({
+                    fillAttr: "",
+                    sliceHoverAttr: {},
+                    slicePathAttr: {},
+                    sliceSelectedAttr: {},
+                    refreshWheel: jest.fn()
+                }),
+                refreshWheel: jest.fn()
+            };
+            widget.checkTemperament = jest.fn();
+            global.frequencyToPitch = jest.fn(() => ["C", 4]);
+            widget.equalEdit();
+            widget.performEqualEdit({ target: { textContent: "preview" } });
+            expect(widget.activity.errorMsg).not.toHaveBeenCalled();
+        });
+        test("58 divisions shows cap error", () => {
+            global.docById = jest.fn(id => {
+                if (id === "octaveIn") return { value: "0" };
+                if (id === "octaveOut") return { value: "0" };
+                if (id === "divisions") return { value: "58" };
+                return createMockElement(id);
+            });
+            widget.ratios = [1];
+            widget.frequencies = [440];
+            widget.pitchNumber = 1;
+            widget.powerBase = 2;
+            widget.activity = { errorMsg: jest.fn() };
+            widget.equalEdit();
+            widget.performEqualEdit({ target: { textContent: "preview" } });
+            expect(widget.activity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("57"),
+                3000
+            );
+        });
+    });
 });
