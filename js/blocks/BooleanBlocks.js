@@ -101,7 +101,7 @@ function setupBooleanBlocks(activity) {
             try {
                 return !a;
             } catch (e) {
-                console.debug(e);
+                console.error(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
@@ -458,7 +458,7 @@ function setupBooleanBlocks(activity) {
             try {
                 return Number(a) > Number(b);
             } catch (e) {
-                console.debug(e);
+                console.error(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
@@ -563,7 +563,7 @@ function setupBooleanBlocks(activity) {
             try {
                 return Number(a) < Number(b);
             } catch (e) {
-                console.debug(e);
+                console.error(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
@@ -663,7 +663,7 @@ function setupBooleanBlocks(activity) {
             try {
                 return Number(a) <= Number(b);
             } catch (e) {
-                console.debug(e);
+                console.error(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
@@ -763,7 +763,7 @@ function setupBooleanBlocks(activity) {
             try {
                 return Number(a) >= Number(b);
             } catch (e) {
-                console.debug(e);
+                console.error(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
@@ -867,7 +867,7 @@ function setupBooleanBlocks(activity) {
             try {
                 return a === b;
             } catch (e) {
-                console.debug(e);
+                console.error(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
@@ -968,7 +968,7 @@ function setupBooleanBlocks(activity) {
             try {
                 return a !== b;
             } catch (e) {
-                console.debug(e);
+                console.error(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
