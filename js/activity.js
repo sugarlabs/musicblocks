@@ -594,22 +594,31 @@ class Activity {
                         this.selectionController.isDragging || this.selectionController.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
-                        // Recompute culling when container moved.
-                        if (
-                            this.blocks &&
-                            this.blocksContainer &&
-                            (this._lastCullContainerX !== this.blocksContainer.x ||
-                                this._lastCullContainerY !== this.blocksContainer.y)
-                        ) {
-                            this.blocks._updateViewportCulling();
-                            this._lastCullContainerX = this.blocksContainer.x;
-                            this._lastCullContainerY = this.blocksContainer.y;
-                        }
+                        try {
+                            // Recompute culling when container moved.
+                            if (
+                                this.blocks &&
+                                this.blocksContainer &&
+                                (this._lastCullContainerX !== this.blocksContainer.x ||
+                                    this._lastCullContainerY !== this.blocksContainer.y)
+                            ) {
+                                this.blocks._updateViewportCulling();
+                                this._lastCullContainerX = this.blocksContainer.x;
+                                this._lastCullContainerY = this.blocksContainer.y;
+                            }
 
-                        this.stage.update();
-                        this.stageDirty = false;
-                        // Continue the loop if there's work or ongoing interaction
-                        this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                            this.stage.update();
+                        } catch (err) {
+                            // Anything thrown here used to leave _renderLoopRunning set
+                            // with no frame queued, and _startRenderLoop() refuses to
+                            // restart on that flag, so the canvas stopped repainting for
+                            // the rest of the session. Report the frame and keep going.
+                            console.error("Music Blocks: render frame failed", err);
+                        } finally {
+                            this.stageDirty = false;
+                            // Continue the loop if there's work or ongoing interaction
+                            this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                        }
                     } else {
                         // Nothing to render — let the loop go idle
                         this._renderLoopRunning = false;
