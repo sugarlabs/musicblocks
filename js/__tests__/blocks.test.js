@@ -848,6 +848,72 @@ describe("Blocks Foundation", () => {
             blocks.loadNewBlocks(blockObjs);
 
             expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Something went wrong reading JSON-encoded project data."
+            );
+        });
+
+        it("detects and rejects multi-block cycles in loadNewBlocks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+
+            // Multi-block cycle: 0 -> 1 -> 0
+            const twoBlockCycle = [
+                [0, "forward", 0, 0, [null, 1]],
+                [1, "forward", 0, 0, [null, 0]]
+            ];
+
+            mockActivity._suppressRefresh = true;
+            blocks.loadNewBlocks(twoBlockCycle);
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Something went wrong reading JSON-encoded project data."
+            );
+
+            // Three-block cycle: 0 -> 1 -> 2 -> 0
+            const threeBlockCycle = [
+                [0, "forward", 0, 0, [null, 1]],
+                [1, "forward", 0, 0, [null, 2]],
+                [2, "forward", 0, 0, [null, 0]]
+            ];
+
+            mockActivity._suppressRefresh = true;
+            mockActivity.errorMsg.mockClear();
+            blocks.loadNewBlocks(threeBlockCycle);
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Something went wrong reading JSON-encoded project data."
+            );
+        });
+
+        it("accepts valid parent-child stacks without false cycle detection", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn();
+
+            // Mimics the default project DATAOBJS structure:
+            // Block 0 (start): no parent, child at dock 1 is block 1, dock 2 is null
+            // Block 1 (settimbre): parent dock 0 = block 0, children at docks 1-3
+            // Block 3 (hidden): parent dock 0 = block 1, no children
+            // Dock 0 back-pointers form a tree, NOT a cycle.
+            const validStack = [
+                [0, "start", 100, 100, [null, 1, null]],
+                [1, "forward", 0, 0, [0, 2, 3]],
+                [2, ["number", { value: 100 }], 0, 0, [1]],
+                [3, "right", 0, 0, [1, 4, null]],
+                [4, ["number", { value: 90 }], 0, 0, [3]]
+            ];
+
+            mockActivity._suppressRefresh = true;
+            // Should NOT trigger cycle detection and abort
+            expect(() => blocks.loadNewBlocks(validStack)).not.toThrow();
+            // If cycle detection falsely trips, _suppressRefresh would be
+            // reset to false and loadNewBlocks would return early.
+            // We verify the code proceeded past cycle detection by checking
+            // that _makeNewBlockWithConnections was called (it runs after
+            // the cycle check).
+            expect(blocks._makeNewBlockWithConnections).toHaveBeenCalled();
         });
 
         it("resets _suppressRefresh after cleanupAfterLoad finishes", async () => {

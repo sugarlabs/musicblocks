@@ -4817,22 +4817,88 @@ class Blocks {
                     blockObjs.pop();
                 }
 
-                /** Check for blocks connected to themselves, */
-                /** and for action blocks not connected to text blocks. */
-                for (let b = 0; b < blockObjs.length; b++) {
-                    const blkData = blockObjs[b];
+                /** Check for circular connections in block data using iterative DFS. */
+                const hasCycle = () => {
+                    const adj = new Map();
+                    for (let b = 0; b < blockObjs.length; b++) {
+                        const blkData = blockObjs[b];
+                        const id = blkData[0];
+                        const connections = blkData[4] || [];
 
-                    for (const c in blkData[4]) {
-                        if (blkData[4][c] === blkData[0]) {
-                            console.debug("Circular connection in block data: " + blkData);
+                        // Self-loop check: reject if any dock points to the block itself.
+                        for (let c = 0; c < connections.length; c++) {
+                            if (connections[c] === id) {
+                                return true;
+                            }
+                        }
 
-                            console.debug("Punting loading of new blocks!");
+                        // Build directed adjacency from child docks only (index >= 1).
+                        // Dock 0 is the parent back-pointer and must be excluded
+                        // to avoid false cycles in normal parent-child trees.
+                        const children = [];
+                        for (let c = 1; c < connections.length; c++) {
+                            const connId = connections[c];
+                            if (connId !== null && connId !== undefined) {
+                                children.push(connId);
+                            }
+                        }
+                        adj.set(id, children);
+                    }
 
-                            console.debug(blockObjs);
-                            this.activity._suppressRefresh = false;
-                            return;
+                    const visited = new Set();
+                    const activeStack = new Set();
+
+                    for (let b = 0; b < blockObjs.length; b++) {
+                        const startId = blockObjs[b][0];
+                        if (visited.has(startId)) {
+                            continue;
+                        }
+
+                        // Stack stores tuple: [nodeId, neighborIndex]
+                        const stack = [[startId, 0]];
+                        visited.add(startId);
+                        activeStack.add(startId);
+
+                        while (stack.length > 0) {
+                            const top = stack[stack.length - 1];
+                            const nodeId = top[0];
+                            const neighborIndex = top[1];
+                            const neighbors = adj.get(nodeId) || [];
+
+                            if (neighborIndex < neighbors.length) {
+                                top[1]++;
+                                const neighborId = neighbors[neighborIndex];
+
+                                if (activeStack.has(neighborId)) {
+                                    return true;
+                                }
+
+                                if (!visited.has(neighborId)) {
+                                    visited.add(neighborId);
+                                    activeStack.add(neighborId);
+                                    stack.push([neighborId, 0]);
+                                }
+                            } else {
+                                activeStack.delete(nodeId);
+                                stack.pop();
+                            }
                         }
                     }
+                    return false;
+                };
+
+                if (hasCycle()) {
+                    console.warn(
+                        "Circular connection detected in block data. Punting loading of new blocks!"
+                    );
+                    console.debug("Circular block data:", blockObjs);
+                    if (this.activity && typeof this.activity.errorMsg === "function") {
+                        this.activity.errorMsg(
+                            _("Something went wrong reading JSON-encoded project data.")
+                        );
+                    }
+                    this.activity._suppressRefresh = false;
+                    return;
                 }
 
                 /** We'll need a list of existing storein and action names. */
