@@ -8015,11 +8015,7 @@ const calcOctaveInterval = arg => {
  * @returns {boolean} True if the value is an integer, false otherwise.
  */
 const isInt = value => {
-    return (
-        !isNaN(value) &&
-        parseInt(Number(value), 10) === Number(value) &&
-        !isNaN(parseInt(value, 10))
-    );
+    return !isNaN(parseFloat(value)) && Number.isInteger(Number(value));
 };
 
 /**

@@ -2662,6 +2662,17 @@ describe("isInt", () => {
         expect(isInt("-10")).toBe(true); // String containing a negative integer
         expect(isInt("3.5")).toBe(false); // String containing a decimal
     });
+
+    it("should handle edge cases correctly", () => {
+        expect(isInt("1e21")).toBe(true); // Scientific notation integer
+        expect(isInt("1e-21")).toBe(false); // Scientific notation decimal
+        expect(isInt("")).toBe(false); // Empty string
+        expect(isInt("   ")).toBe(false); // Whitespace string
+        expect(isInt("0x10")).toBe(true); // Hexadecimal string
+        expect(isInt(null)).toBe(false); // Null
+        expect(isInt(false)).toBe(false); // Boolean
+        expect(isInt([])).toBe(false); // Empty array
+    });
 });
 
 describe("convertFromSolfege", () => {
