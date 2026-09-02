@@ -1311,20 +1311,23 @@ describe("pitchToNumber", () => {
     });
 
     it("should work with equal19 temperament", () => {
-        global.TEMPERAMENT = { equal19: [] };
         const result = pitchToNumber("C", 4, "C major", "equal19");
         // 4 * 19 + 0 (C index) - 14 (A index in 19-EDO table) = 62
         expect(result).toBe(62);
     });
 
+    it("should handle lowercase pitches in alternate tunings (equal19)", () => {
+        // Verifies that lowercase 'c' and uppercase 'C' resolve identically in equal19
+        const upperCaseResult = pitchToNumber("C", 4, "C major", "equal19");
+        expect(pitchToNumber("c", 4, "C major", "equal19")).toBe(upperCaseResult);
+    });
+
     it("should fallback to 12-EDO for undefined temperament", () => {
-        global.TEMPERAMENT = {};
         const result = pitchToNumber("C", 4, "C major", undefined);
         expect(result).toBe(39);
     });
 
     it("should fallback to 12-EDO for unknown temperament", () => {
-        global.TEMPERAMENT = {};
         const result = pitchToNumber("C", 4, "C major", "unknown");
         expect(result).toBe(39);
     });
