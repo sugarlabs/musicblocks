@@ -6975,9 +6975,12 @@ class Blocks {
                     c.y + block.height <= vpTop ||
                     c.y >= vpBottom
                 );
-                if (wasViewportVisible === false && block._viewportVisible) {
+                if (wasViewportVisible === false && block._viewportVisible && c.bitmapCache) {
                     // Visual state may have changed while its cache update was culled.
-                    block.container.updateCache();
+                    // The bitmap cache can legitimately be missing here: regenerating a
+                    // block's artwork uncaches the container and rebuilds it
+                    // asynchronously, and updateCache() throws if we land in that window.
+                    c.updateCache();
                 }
             }
         };

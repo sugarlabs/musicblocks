@@ -209,6 +209,7 @@ describe("Viewport Culling", () => {
             container: {
                 x: 900,
                 y: 100,
+                bitmapCache: {},
                 updateCache: jest.fn(() => {
                     cachedHighlightVisible = block.highlightVisible;
                 })
@@ -234,6 +235,63 @@ describe("Viewport Culling", () => {
 
         expect(block.container.updateCache).toHaveBeenCalledTimes(1);
         expect(cachedHighlightVisible).toBe(false);
+    });
+
+    it("should not touch the cache of a block whose artwork is being rebuilt", () => {
+        // Regenerating a block's artwork uncaches the container and rebuilds it
+        // asynchronously. A block that re-enters the viewport inside that window
+        // has no bitmapCache, and createjs throws on updateCache() without one.
+        const block = {
+            trash: false,
+            container: {
+                x: 900,
+                y: 100,
+                bitmapCache: null,
+                updateCache: jest.fn(() => {
+                    throw "cache() must be called before updateCache()";
+                })
+            },
+            width: 50,
+            height: 30,
+            _viewportVisible: false
+        };
+        blocks.blockList = [block];
+
+        block.container.x = 100;
+
+        expect(() => blocks._updateViewportCulling()).not.toThrow();
+        expect(block.container.updateCache).not.toHaveBeenCalled();
+        expect(block._viewportVisible).toBe(true);
+    });
+
+    it("should keep culling the rest of the list past an uncached block", () => {
+        const rebuilding = {
+            trash: false,
+            container: {
+                x: 100,
+                y: 100,
+                bitmapCache: null,
+                updateCache: jest.fn(() => {
+                    throw "cache() must be called before updateCache()";
+                })
+            },
+            width: 50,
+            height: 30,
+            _viewportVisible: false
+        };
+        const trailing = {
+            trash: false,
+            container: { x: 2000, y: 2000 },
+            width: 50,
+            height: 30,
+            _viewportVisible: true
+        };
+        blocks.blockList = [rebuilding, trailing];
+
+        blocks._updateViewportCulling();
+
+        // The throw used to abort the loop, leaving every later block stale.
+        expect(trailing._viewportVisible).toBe(false);
     });
 
     it("should skip trashed blocks without modifying their visibility", () => {
