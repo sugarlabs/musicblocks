@@ -63,7 +63,7 @@ const deviationColor = dev => {
  */
 const deviationFrom12EDO = cents => cents - Math.round(cents / 100) * 100;
 
-/** Mid of largest gap (circular 0..1200). Exported for testing. */
+/** Mid of largest gap (circular 0..1200), clamped 1..1199. Exported for testing. */
 const largestGapMid = centsArr => {
     if (centsArr.length < 2) return 600;
     let maxGap = -1;
@@ -83,7 +83,7 @@ const largestGapMid = centsArr => {
     return bestMid;
 };
 
-/** Converts a ratio to cents relative to the tonic (1200 cents = 1 octave). */
+/** Converts ratio to cents for arbitrary octave base. For base=2 this is 1200*log2(ratio). Uses log10/log10 which equals log2/log2; kept for powerBase≠2 stretched octaves. NOTE: widget powerBase vs engine getOctaveRatio() diverge — pitchToFrequency/frequencyToPitch in musicutils still hard-code base 2; full unification deferred. */
 const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
 
 const MAX_DIVISIONS = 57;
@@ -187,7 +187,7 @@ function TemperamentWidget() {
     /** Recomputes a frequencies array from ratios and a tonic frequency, each entry to 2dp. */
     const computeFrequencies = (ratios, baseFrequency, count) => {
         const frequencies = [];
-        for (let i = 0; i <= count; i++) {
+        for (let i = 0; i < count; i++) {
             frequencies[i] = (ratios[i] * baseFrequency).toFixed(2);
         }
         return frequencies;
@@ -557,11 +557,51 @@ function TemperamentWidget() {
         // Expose on the widget instance for the public playAll() wrapper
         that._playAll = _playAll;
 
-        const _addPitch = function () {
-            const cents = largestGapMid(that.cents);
+        const _addPitch = function (dir) {
+            const n = that.cents.length;
+            const s = highlightDot >= 0 && highlightDot < n ? highlightDot : -1;
+            let cents;
+            if (s < 0) {
+                cents = largestGapMid(that.cents);
+            } else {
+                // Distribute: walk in dir from s and pick first gap >= 0.8*avgGap
+                // (avoids repeatedly halving the same tiny gap → duplicates like 200.1→200)
+                const sorted = [...that.cents].sort((a, b) => a - b);
+                const curVal = that.cents[s];
+                let curIdx = sorted.findIndex(c => Math.abs(c - curVal) < 0.5);
+                if (curIdx < 0) curIdx = 0;
+                const avgGap = 1200 / n;
+                let found = false;
+                for (let step = 0; step < n; step++) {
+                    const idx = dir > 0 ? (curIdx + step) % n : (curIdx - step + n) % n;
+                    const nextIdx = dir > 0 ? (idx + 1) % n : (idx - 1 + n) % n;
+                    const a = sorted[idx];
+                    const b = sorted[nextIdx];
+                    const gap = dir > 0 ? (b - a + 1200) % 1200 : (a - b + 1200) % 1200;
+                    if (gap >= avgGap * 0.8) {
+                        let mid = dir > 0 ? a + gap / 2 : a - gap / 2;
+                        mid = ((mid % 1200) + 1200) % 1200;
+                        if (mid === 0) mid = 1;
+                        mid = Math.max(1, Math.min(1199, Math.round(mid * 10) / 10));
+                        // Avoid duplicate within 0.5¢
+                        const dup = that.cents.some(c => Math.abs(c - mid) < 0.5);
+                        if (!dup) {
+                            cents = mid;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (!found) cents = largestGapMid(that.cents);
+            }
             const idx = that.cents.findIndex(c => cents < c);
-            _insertPitch(idx === -1 ? that.cents.length : idx, cents);
-            highlightDot = idx;
+            const insertAt = idx === -1 ? that.cents.length : idx;
+            _insertPitch(insertAt, cents);
+            if (s >= 0) {
+                highlightDot = insertAt <= s ? s + 1 : s;
+            } else {
+                highlightDot = idx === -1 ? that.cents.length - 1 : idx;
+            }
             _drawCircle();
             _buildTable();
             _highlightTableRow(highlightDot);
@@ -1526,8 +1566,8 @@ function TemperamentWidget() {
         // Bind visualizer ops to the left-side toolbar (created in init)
         if (that._vizToolbar) {
             that._vizToolbar.playAllBtn2.onclick = _playAll;
-            that._vizToolbar.addPitchAfterBtn.onclick = _addPitch;
-            that._vizToolbar.addPitchBeforeBtn.onclick = _addPitch;
+            that._vizToolbar.addPitchAfterBtn.onclick = () => _addPitch(1);
+            that._vizToolbar.addPitchBeforeBtn.onclick = () => _addPitch(-1);
             that._vizToolbar.removePitchBtn.onclick = () => {
                 const s =
                     highlightDot >= 0 && highlightDot < that.pitchNumber
@@ -1740,15 +1780,17 @@ function TemperamentWidget() {
             this.tempRatios = this.ratios.slice();
             if (pitchNumber1 === pitchNumber2) {
                 for (let i = 0; i < numDivs; i++) {
+                    // 2^(n/edo) — equal temperament: ratio = 2^(pitch / divisions)
                     ratio[i] = Math.pow(this.powerBase, i / numDivs);
-                    ratio1[i] = ratio[i].toFixed(2);
+                    ratio1[i] = ratio[i];
                 }
                 for (let i = 0; i < this.tempRatios.length; i++) {
                     ratio2[i] = this.tempRatios[i];
-                    ratio2[i] = ratio2[i].toFixed(2);
                 }
                 const ratio4 = ratio1.filter(function (val) {
-                    return ratio2.indexOf(val) === -1;
+                    return !ratio2.some(function (u) {
+                        return Math.abs(val - u) < 1e-6;
+                    });
                 });
 
                 for (let i = 0; i < ratio4.length; i++) {
@@ -1793,7 +1835,7 @@ function TemperamentWidget() {
                 this.pitchNumber = pitchNumber;
                 // Rebuild cents, notes, intervals, ratiosNotesPair from new ratios
                 const startingPitch = this._logo.synth.startingPitch;
-                for (let i = 0; i <= this.pitchNumber; i++) {
+                for (let i = 0; i < this.pitchNumber; i++) {
                     this.cents[i] = ratioToCents(this.ratios[i], this.powerBase);
                     const freq = Number(this.frequencies[0]) * this.ratios[i];
                     const obj = frequencyToPitch(freq, this.inTemperament);
@@ -1833,7 +1875,7 @@ function TemperamentWidget() {
                     that.pitchNumber = pitchNumber;
                     // Rebuild cents, notes, intervals, ratiosNotesPair from new ratios
                     const sp = that._logo.synth.startingPitch;
-                    for (let j = 0; j <= that.pitchNumber; j++) {
+                    for (let j = 0; j < that.pitchNumber; j++) {
                         that.cents[j] = ratioToCents(that.ratios[j], that.powerBase);
                         const freq = Number(that.frequencies[0]) * that.ratios[j];
                         const obj = frequencyToPitch(freq, that.inTemperament);
@@ -2377,17 +2419,21 @@ function TemperamentWidget() {
         const ratioDifference = [];
         this.tempRatios = this.tempRatios1.slice();
 
+        const EPS = 1e-6;
         for (let j = 0; j < this.tempRatios.length; j++) {
-            ratioDifference[j] = ratio - this.tempRatios[j];
-            ratioDifference[j] = ratioDifference[j].toFixed(2);
-            let index;
-            if (ratioDifference[j] < 0) {
-                index = j;
-                this.tempRatios.splice(index, 0, ratio);
+            const diff = ratio - this.tempRatios[j];
+            if (diff < -EPS) {
+                if (this.tempRatios.length > MAX_DIVISIONS) {
+                    this.activity.errorMsg(
+                        _("Maximum 57 divisions. For larger, use a dedicated tool."),
+                        3000
+                    );
+                    return;
+                }
+                this.tempRatios.splice(j, 0, ratio);
                 break;
-            } else if (ratioDifference[j] === 0) {
-                index = j;
-                this.tempRatios.splice(index, 1, ratio);
+            } else if (Math.abs(diff) < EPS) {
+                this.tempRatios.splice(j, 1, ratio);
                 break;
             }
         }
@@ -2516,12 +2562,13 @@ function TemperamentWidget() {
                 const temperamentRatios = [];
                 for (let j = 0; j < t.interval.length; j++) {
                     intervals[j] = t.interval[j];
-                    temperamentRatios[j] = getTemperamentRatio(t[intervals[j]]).toFixed(2);
+                    temperamentRatios[j] = getTemperamentRatio(t[intervals[j]]);
                 }
+                const EPS = 1e-6;
                 const ratiosEqual =
                     ratios.length === temperamentRatios.length &&
                     ratios.every(function (element, index) {
-                        return element === temperamentRatios[index];
+                        return Math.abs(parseFloat(element) - temperamentRatios[index]) < EPS;
                     });
 
                 if (ratiosEqual) {
@@ -3101,4 +3148,5 @@ if (typeof module !== "undefined") {
     module.exports.deviationFrom12EDO = deviationFrom12EDO;
     module.exports.largestGapMid = largestGapMid;
     module.exports.sameNodeCents = largestGapMid;
+    module.exports.ratioToCents = ratioToCents;
 }
