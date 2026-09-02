@@ -1523,7 +1523,7 @@ class Palette {
     showMenu(createHeader) {
         const palDiv = docById("palette");
         palDiv.childNodes[0].style.borderRight = "0";
-        if (docById("PaletteBody")) palDiv.removeChild(docById("PaletteBody"));
+        if (docById("PaletteBody")) docById("PaletteBody").remove();
         const palBody = document.createElement("table");
         palBody.id = "PaletteBody";
         const palBodyHeight = window.innerHeight - this.palettes.top - this.palettes.cellSize - 26;
@@ -1538,13 +1538,17 @@ class Palette {
         palBody.style.minWidth = "180px";
         palBody.style.background = platformColor.paletteBackground;
         palBody.style.float = "left";
+        palBody.style.position = "fixed";
+        palBody.style.left = `${palDiv.offsetLeft + palDiv.children[0].offsetWidth}px`;
+        palBody.style.top = `${palDiv.offsetTop}px`;
+        palBody.style.zIndex = palDiv.style.zIndex;
 
         palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
         [palBody.childNodes[0], palBody.childNodes[1]].forEach(item => {
             item.style.boxSizing = "border-box";
             item.style.padding = "8px";
         });
-        palDiv.appendChild(palBody);
+        palDiv.parentNode.appendChild(palBody);
 
         this.menuContainer = palBody;
 
@@ -1598,6 +1602,8 @@ class Palette {
         }
 
         this._showMenuItems();
+        const paletteItems = docById("PaletteBody_items");
+        paletteItems.style.height = `${window.innerHeight - paletteItems.getBoundingClientRect().top}px`;
 
         // Close palette menu on outside click
         // Remove any existing outside-click listener
@@ -1625,7 +1631,7 @@ class Palette {
         if (this.name === "search" && this.activity.hideSearchWidget !== null) {
             this.activity.hideSearchWidget(true);
         }
-        if (docById("PaletteBody")) docById("palette").removeChild(docById("PaletteBody"));
+        if (docById("PaletteBody")) docById("PaletteBody").remove();
     }
 
     _showMenuItems() {
