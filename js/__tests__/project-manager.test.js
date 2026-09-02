@@ -828,6 +828,24 @@ describe("prepareExport", () => {
         expect(result[0][1]).toEqual(["action", { collapsed: true }]);
     });
 
+    it("exports rhythmruler2 block's collapsed state (regression: block name is 'rhythmruler2', not 'rhythmruler')", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [
+            {
+                name: "rhythmruler2",
+                trash: false,
+                value: null,
+                collapsed: true,
+                container: { x: 0, y: 0 },
+                connections: [null],
+                isValueBlock: () => false
+            }
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1]).toEqual(["rhythmruler2", { collapsed: true }]);
+    });
+
     it("remaps connections to dense indices", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
