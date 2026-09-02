@@ -471,6 +471,18 @@ function TemperamentWidget() {
                 cur.some((r, idx) => idx < _originalRatios.length && r !== _originalRatios[idx]);
             modifiedLabel.textContent = isModified ? _("modified") : "";
             modifiedLabel.style.display = isModified ? "inline" : "none";
+            // Any change to a built-in temperament (e.g. 19 EDO) makes it custom.
+            if (isModified && !isCustomTemperament(that.inTemperament)) {
+                that.inTemperament = "custom";
+                temperLabel.textContent = _getTemperamentLabel("custom");
+                if (![...compareSelect.options].some(o => o.value === "custom")) {
+                    const o = document.createElement("option");
+                    o.value = "custom";
+                    o.textContent = _getTemperamentLabel("custom");
+                    compareSelect.appendChild(o);
+                }
+                compareSelect.value = "custom";
+            }
         };
 
         const compareSelect = document.createElement("select");
