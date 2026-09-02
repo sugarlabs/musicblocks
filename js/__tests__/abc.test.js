@@ -68,7 +68,7 @@ describe("processABCNotes - Basic Note Processing", () => {
 
     it("should process notes and update notationNotes correctly", () => {
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("G^4 G^4 F4 F4 G^2 G^8 ");
+        expect(logo.notationNotes["0"]).toBe("^G4 ^G4 F4 F4 ^G2 ^G8 ");
     });
 
     it("should handle octaves 5 and above correctly (lowercase and proper octave markers)", () => {
@@ -129,6 +129,40 @@ describe("processABCNotes - Advanced Note Handling", () => {
         expect(output).toContain("D1/2");
         expect(output).toContain("E16");
         expect(output).toContain("F5");
+    });
+
+    it("should write accidental markers before the ABC pitch", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C𝄪4"], 4, 0, null, null, -1, false],
+            [["D♯4"], 4, 0, null, null, -1, false],
+            [["E♮4"], 4, 0, null, null, -1, false],
+            [["F♭4"], 4, 0, null, null, -1, false],
+            [["G𝄫4"], 4, 0, null, null, -1, false]
+        ];
+
+        processABCNotes(logo, "0");
+
+        expect(logo.notationNotes["0"]).toBe("^^C4 ^^C4 ^D4 ^D4 =E4 =E4 _F4 _F4 __G4 __G4 ");
+    });
+
+    it("should support ASCII accidentals without changing lowercase B notes", () => {
+        logo.notation.notationStaging["0"] = [
+            [["G#4"], 4, 0, null, null, -1, false],
+            [["Bb4"], 4, 0, null, null, -1, false],
+            [["b4"], 4, 0, null, null, -1, false]
+        ];
+
+        processABCNotes(logo, "0");
+
+        expect(logo.notationNotes["0"]).toBe("^G4 ^G4 _B4 _B4 B4 B4 ");
+    });
+
+    it("should preserve rests without accidental matching", () => {
+        logo.notation.notationStaging["0"] = [[["R"], 4, 0, null, null, -1, false]];
+
+        processABCNotes(logo, "0");
+
+        expect(logo.notationNotes["0"]).toBe("R4 R4 ");
     });
 });
 describe("processABCNotes - Control Strings", () => {
@@ -239,7 +273,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2 ");
+        expect(logo.notationNotes["0"]).toBe("(1:1^G 2^G 2^G 2 ");
     });
 
     it("should handle array of notes (chords) inside tuplets", () => {
@@ -376,7 +410,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         };
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2 ");
+        expect(logo.notationNotes["0"]).toBe("(1:1^G 2^G 2^G 2 ");
     });
 });
 
@@ -434,11 +468,16 @@ describe("OCTAVE_NOTATION_MAP", () => {
 
 describe("ACCIDENTAL_MAP", () => {
     test("should correctly map accidentals to ABC notation", () => {
+        expect(ACCIDENTAL_MAP["𝄪"]).toBe("^^");
         expect(ACCIDENTAL_MAP["♯"]).toBe("^");
+        expect(ACCIDENTAL_MAP["#"]).toBe("^");
+        expect(ACCIDENTAL_MAP["♮"]).toBe("=");
         expect(ACCIDENTAL_MAP["♭"]).toBe("_");
+        expect(ACCIDENTAL_MAP.b).toBe("_");
+        expect(ACCIDENTAL_MAP["𝄫"]).toBe("__");
     });
 
     test("should return undefined for unmapped accidentals", () => {
-        expect(ACCIDENTAL_MAP["♮"]).toBeUndefined();
+        expect(ACCIDENTAL_MAP["x"]).toBeUndefined();
     });
 });
