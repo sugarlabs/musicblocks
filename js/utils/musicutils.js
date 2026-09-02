@@ -1036,14 +1036,14 @@ function generateNoteNames(edo) {
         const nextNatural = naturals[(n + 1) % 7];
         const edoSteps = intervals[n].steps;
 
-// A letter with zero allocated steps contributes no note names at
-// all (not even its own natural). Pushing it unconditionally was
-// the bug: it forced names.length to always be >= 7, even for
-// EDOs smaller than 7 (e.g. edo=4 allocates steps to only 4 of the
-// 7 letters, leaving 3 letters with 0 steps).
-if (edoSteps < 1) {
-    continue;
-}
+        // A letter with zero allocated steps contributes no note names at
+        // all (not even its own natural). Pushing it unconditionally was
+        // the bug: it forced names.length to always be >= 7, even for
+        // EDOs smaller than 7 (e.g. edo=4 allocates steps to only 4 of the
+        // 7 letters, leaving 3 letters with 0 steps).
+        if (edoSteps < 1) {
+            continue;
+        }
 
         names.push(natural);
 

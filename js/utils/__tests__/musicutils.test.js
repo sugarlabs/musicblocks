@@ -3992,14 +3992,14 @@ describe("generateNoteNames EDO length contract", () => {
     // EDO < 7 leaves at least one natural letter with no room. Before the fix
     // the letter was emitted regardless, so every one of these returned all
     // seven naturals.
-    it.each([1, 2, 3, 4, 6])("does not fall back to all seven naturals for %i-EDO", edo => {
-        const names = generateNoteNames(edo);
-        expect(names).toHaveLength(edo);
-        expect(names).not.toEqual(["C", "D", "E", "F", "G", "A", "B"]);
-    });
-
-    it("generates the correct note names for 4-EDO", () => {
-        expect(generateNoteNames(4)).toEqual(["C", "D", "F", "G"]);
+    it.each([
+        [1, ["C"]],
+        [2, ["C", "D"]],
+        [3, ["C", "D", "F"]],
+        [4, ["C", "D", "F", "G"]],
+        [6, ["C", "D", "E", "F", "G", "A"]]
+    ])("returns the expected names for %i-EDO", (edo, expected) => {
+        expect(generateNoteNames(edo)).toEqual(expected);
     });
 
     it("keeps 12-EDO exactly as the standard chromatic table", () => {
