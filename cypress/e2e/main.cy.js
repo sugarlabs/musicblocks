@@ -36,9 +36,8 @@ describe("MusicBlocks Application", () => {
     describe("Audio Controls", () => {
         it("should have a functional play button", () => {
             cy.get("#play").should("be.visible").click();
-            cy.window().then(win => {
-                const audioContext = win.Tone.context;
-                cy.wrap(audioContext.state).should("eq", "running");
+            cy.window().should(win => {
+                expect(win.Tone.context.state).to.eq("running");
             });
             // Assert the underlying Tone.Transport clock actually started, not only that
             // the audio context was resumed -- Tone.Transport is the scheduling API
@@ -209,7 +208,7 @@ describe("MusicBlocks Application", () => {
         it("should transition audio context correctly on play and stop", () => {
             cy.get("#play").click();
 
-            cy.window().then(win => {
+            cy.window().should(win => {
                 const ctx = win.Tone.context;
                 expect(ctx.state).to.eq("running");
             });
@@ -223,7 +222,7 @@ describe("MusicBlocks Application", () => {
 
             cy.get("#stop").click({ force: true });
 
-            cy.window().then(win => {
+            cy.window().should(win => {
                 const ctx = win.Tone.context;
                 expect(ctx.state === "suspended" || ctx.state === "running").to.be.true;
             });

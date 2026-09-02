@@ -547,9 +547,9 @@
       "hasRestParam": false,
       "isAsync": false,
       "isGenerator": false,
-      "returns": 5,
+      "returns": 3,
       "throws": 0,
-      "branches": 10
+      "branches": 9
     },
     {
       "name": "resolveObject",
@@ -839,7 +839,7 @@
     },
     {
       "target": "rationalToFraction",
-      "description": "Convert float to its approximate fractional representation.",
+      "description": "Convert float to its approximate fractional representation. Returns a reduced [numerator, denominator] pair with a positive denominator. Values above 1 are handled by inverting on entry and swapping back on every exit path (including the iteration-cap path); the sign of the input is carried on the numerator.",
       "tags": []
     },
     {
@@ -921,8 +921,8 @@
     }
   ],
   "totals": {
-    "branches": 196,
-    "returns": 107,
+    "branches": 195,
+    "returns": 105,
     "throws": 0
   }
 }
