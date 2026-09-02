@@ -7691,6 +7691,7 @@ const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
 
     const pitchNumber = pitchToNumber(pitch, octave, keySignature, temperament);
 
+    // NOTE: stretched-octave powerBase (widget) vs engine getOctaveRatio() diverge here — this function hard-codes base 2; widget ratioToCents generalizes to powerBase. Full unification deferred.
     // Frequency = A0 * 2^(pitchNumber / currentEDO)
     // With cents offset: Frequency = A0 * 2^((pitchNumber * 100 + cents) / (currentEDO * 100))
     // This works because 1 semitone = 100 cents, and 2^(1/1200) is the cents resolution.
