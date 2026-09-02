@@ -250,6 +250,13 @@ const hideWheelDiv = () => {
     wheelDiv.style.display = "none";
     disableWheelResizeHandling();
 
+    // enableWheelScroll() hangs this listener on the persistent wheelDiv, so it
+    // outlives the wheel and block it closes over unless we take it off here.
+    if (wheelDiv._scrollHandler) {
+        wheelDiv.removeEventListener("wheel", wheelDiv._scrollHandler);
+        wheelDiv._scrollHandler = null;
+    }
+
     if (!isAnyPieMenuVisible()) {
         document.removeEventListener("mousedown", handleOutsideClick);
         document.removeEventListener("keydown", handleEscapeKey, true);
@@ -3149,6 +3156,10 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
         that.updateCache();
     };
 
+    // A preview of an unloaded voice is deferred to give the synth time to
+    // load. Held here so the exit handler can cancel one that is still pending.
+    let voicePreviewTimeout = null;
+
     /*
      * Preview voice
      * @return{void}
@@ -3173,7 +3184,9 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
             timeout = 500;
         }
 
-        setTimeout(() => {
+        clearTimeout(voicePreviewTimeout);
+        voicePreviewTimeout = setTimeout(() => {
+            voicePreviewTimeout = null;
             Singer.setSynthVolume(that.activity.logo, 0, voice, DEFAULTVOLUME);
             that.activity.logo.synth.trigger(0, "G4", 1 / 4, voice, null, null, false);
             that.activity.logo.synth.start();
@@ -3234,6 +3247,19 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
         hideWheelDiv();
+        // A preview scheduled just before the menu closed would otherwise play
+        // into a dismissed menu.
+        clearTimeout(voicePreviewTimeout);
+        voicePreviewTimeout = null;
+        // Remove the wheels so wheelnav detaches the window keydown listener it
+        // installs for keynavigateEnabled. Without this the closed menu keeps
+        // responding to the arrow keys.
+        that._voiceWheel.removeWheel();
+        that._exitWheel.removeWheel();
+        // The pie menu covers the canvas, so the block never receives the
+        // mouseout that would normally clear this. Left set, the arrow keys
+        // move the block instead of doing nothing.
+        that.blocks.activeBlock = null;
     };
 };
 
@@ -4506,6 +4532,7 @@ if (typeof module !== "undefined" && module.exports) {
         piemenuKey,
         piemenuNumber,
         piemenuModes,
+        piemenuVoices,
         handleEscapeKey,
         dismissActivePieMenu,
         showWheelDiv,
