@@ -27,7 +27,7 @@
    slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber
  */
 
-/* exported TemperamentWidget, deviationColor, deviationFrom12EDO, largestGapMid, sameNodeCents */
+/* exported TemperamentWidget, deviationColor, deviationFrom12EDO, largestGapMid */
 
 /** AMD module dependencies for lazy loading. */
 TemperamentWidget.dependencies = ["widgets/temperament"];
@@ -39,11 +39,18 @@ TemperamentWidget.dependencies = ["widgets/temperament"];
 
 /**
  * Color for a cents deviation from a reference. Green within ±1 cent,
- * orange for sharp, red for flat. Exported for unit testing.
+ * orange for sharp, red for flat. Uses design tokens so high-contrast
+ * theme gets accessible colors. Exported for unit testing.
  * @param {number} dev - deviation in cents
  * @returns {string} CSS color
  */
-const deviationColor = dev => (Math.abs(dev) <= 1 ? "#4caf50" : dev > 1 ? "#ff9800" : "#f44336");
+const deviationColor = dev => {
+    const s =
+        typeof document !== "undefined" && document.body ? getComputedStyle(document.body) : null;
+    const g = n => (s && s.getPropertyValue(n).trim()) || "";
+    if (Math.abs(dev) <= 1) return g("--color-success") || "#4caf50";
+    return dev > 1 ? g("--color-warning") || "#ff9800" : g("--color-error") || "#f44336";
+};
 
 /**
  * Deviation of a pitch (in cents) from the nearest 12-EDO step. The
@@ -78,9 +85,6 @@ const largestGapMid = centsArr => {
 
 /** Converts a ratio to cents relative to the tonic (1200 cents = 1 octave). */
 const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
-
-/** Same-node cents: midpoint of largest gap (dir ignored, kept for API compat). */
-const sameNodeCents = centsArr => largestGapMid(centsArr);
 
 function TemperamentWidget() {
     // Constants for button and icon sizes
@@ -378,8 +382,8 @@ function TemperamentWidget() {
      */
     this._visualizerView = function () {
         temperamentTableDiv.textContent = "";
-        temperamentTableDiv.style.backgroundColor = "#1a1a2e";
-        temperamentTableDiv.style.color = "#e0e0e0";
+        temperamentTableDiv.style.backgroundColor = "var(--color-bg-primary, #1a1a2e)";
+        temperamentTableDiv.style.color = "var(--color-text-primary, #e0e0e0)";
         temperamentTableDiv.style.fontFamily = "sans-serif";
         temperamentTableDiv.style.padding = "8px";
         temperamentTableDiv.style.height = "";
@@ -413,6 +417,8 @@ function TemperamentWidget() {
         let flashDot = -1;
         const _isLocked = i => i === 0;
 
+        const _cssVar = (n, f) => getComputedStyle(document.body).getPropertyValue(n).trim() || f;
+
         const _canvasCoords = function (e, target) {
             const rect = target.getBoundingClientRect();
             return [
@@ -439,7 +445,7 @@ function TemperamentWidget() {
         };
         const temperLabel = document.createElement("span");
         temperLabel.style.fontSize = "13px";
-        temperLabel.style.color = "#e0e0e0";
+        temperLabel.style.color = "var(--color-text-primary, #e0e0e0)";
         temperLabel.style.whiteSpace = "nowrap";
         temperLabel.textContent = _getTemperamentLabel(that.inTemperament);
         controlsDiv.appendChild(temperLabel);
@@ -447,7 +453,7 @@ function TemperamentWidget() {
         // "Modified" indicator — shown when pitches differ from the saved temperament
         const modifiedLabel = document.createElement("span");
         modifiedLabel.style.fontSize = "11px";
-        modifiedLabel.style.color = "#f0ad4e";
+        modifiedLabel.style.color = "var(--color-warning, #f0ad4e)";
         modifiedLabel.style.marginLeft = "4px";
         modifiedLabel.style.fontStyle = "italic";
         modifiedLabel.textContent = "";
@@ -470,10 +476,10 @@ function TemperamentWidget() {
         compareSelect.setAttribute("aria-label", _("temperament"));
         compareSelect.style.fontSize = "12px";
         compareSelect.style.padding = "4px 8px";
-        compareSelect.style.border = "1px solid #555";
+        compareSelect.style.border = "1px solid var(--color-border-primary, #555)";
         compareSelect.style.borderRadius = "6px";
-        compareSelect.style.background = "#2a2a3e";
-        compareSelect.style.color = "#e0e0e0";
+        compareSelect.style.background = "var(--color-bg-tertiary, #2a2a3e)";
+        compareSelect.style.color = "var(--color-text-primary, #e0e0e0)";
         compareSelect.style.cursor = "pointer";
         compareSelect.style.flexShrink = "0";
 
@@ -588,7 +594,7 @@ function TemperamentWidget() {
         legendDiv.style.flexWrap = "wrap";
         legendDiv.style.marginTop = "4px";
         legendDiv.style.fontSize = "10px";
-        legendDiv.style.color = "#aaa";
+        legendDiv.style.color = "var(--color-text-tertiary, #aaa)";
 
         const _legendItem = function (color, label, isDashed, isDot) {
             const span = document.createElement("span");
@@ -614,7 +620,9 @@ function TemperamentWidget() {
         };
 
         legendDiv.appendChild(_legendItem("#4caf50", _("active temperament"), false, true));
-        legendDiv.appendChild(_legendItem("#aaa", _("12-EDO reference"), false, false));
+        legendDiv.appendChild(
+            _legendItem("var(--color-text-tertiary, #aaa)", _("12-EDO reference"), false, false)
+        );
         legendDiv.appendChild(_legendItem("#4caf50", _("no deviation"), true, false));
         legendDiv.appendChild(_legendItem("#ff9800", _("sharp (+cents)"), false, false));
         legendDiv.appendChild(_legendItem("#f44336", _("flat (-cents)"), false, false));
@@ -679,11 +687,11 @@ function TemperamentWidget() {
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
-                ctx.strokeStyle = "#666";
+                ctx.strokeStyle = _cssVar("--color-text-tertiary", "#666");
                 ctx.stroke();
                 const lx = cx + (outerR + 18) * Math.cos(a);
                 const ly = cy + (outerR + 18) * Math.sin(a);
-                ctx.fillStyle = "#aaa";
+                ctx.fillStyle = _cssVar("--color-text-tertiary", "#aaa");
                 ctx.fillText(labels[k], lx, ly);
             }
 
@@ -727,14 +735,14 @@ function TemperamentWidget() {
                     ctx.stroke();
                     ctx.beginPath();
                     ctx.arc(dx, dy, dotR + 3, 0, 2 * Math.PI);
-                    ctx.strokeStyle = "#fff";
+                    ctx.strokeStyle = _cssVar("--color-bg-inverse", "#fff");
                     ctx.lineWidth = 2;
                     ctx.stroke();
                     ctx.lineWidth = 1;
                 }
             }
 
-            ctx.fillStyle = "#e0e0e0";
+            ctx.fillStyle = _cssVar("--color-text-primary", "#e0e0e0");
             ctx.font = "12px sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -778,11 +786,11 @@ function TemperamentWidget() {
         for (const h of headers) {
             const th = document.createElement("th");
             th.textContent = h;
-            th.style.border = "1px solid #333";
+            th.style.border = "1px solid var(--color-border-secondary, #333)";
             th.style.padding = "6px 8px";
             th.style.textAlign = "center";
-            th.style.backgroundColor = "#2a2a3e";
-            th.style.color = "#ccc";
+            th.style.backgroundColor = "var(--color-bg-tertiary, #2a2a3e)";
+            th.style.color = "var(--color-text-secondary, #ccc)";
             th.style.fontWeight = "bold";
             thead.appendChild(th);
         }
@@ -802,13 +810,39 @@ function TemperamentWidget() {
             return "";
         };
 
+        const _styleInput = el => {
+            el.style.width = "70px";
+            el.style.fontSize = "12px";
+            el.style.background = "var(--color-bg-tertiary, #2a2a3e)";
+            el.style.color = "var(--color-text-primary, #e0e0e0)";
+            el.style.border = "1px solid var(--color-border-primary, #555)";
+            el.style.borderRadius = "3px";
+            el.style.textAlign = "center";
+        };
+        const _doneEdit = idx => {
+            const order = that.cents
+                .map((c, j) => [c, j])
+                .sort((a, b) => a[0] - b[0])
+                .map(p => p[1]);
+            _reorderArrays(order);
+            highlightDot = order.indexOf(idx);
+            _drawCircle();
+            _buildTable();
+            if (highlightDot >= 0) _highlightTableRow(highlightDot);
+            _updateRemoveButton();
+            _checkModified();
+        };
+
         /** (Re)builds the table rows from current state, storing cell refs. */
         const _buildTable = function () {
             tbody.textContent = "";
             rowRefs.length = 0;
             for (let i = 0; i < that.pitchNumber; i++) {
                 const tr = document.createElement("tr");
-                const bgColor = i % 2 === 0 ? "#1a1a2e" : "#22223a";
+                const bgColor =
+                    i % 2 === 0
+                        ? "var(--color-bg-primary, #1a1a2e)"
+                        : "var(--color-bg-secondary, #22223a)";
                 tr.style.backgroundColor = bgColor;
                 tr.style.cursor = "pointer";
 
@@ -819,7 +853,7 @@ function TemperamentWidget() {
                 const tdRatio = document.createElement("td");
 
                 for (const td of [tdName, tdStep, tdFreq, tdCents, tdRatio]) {
-                    td.style.border = "1px solid #333";
+                    td.style.border = "1px solid var(--color-border-secondary, #333)";
                     td.style.padding = "6px 8px";
                     td.style.textAlign = "center";
                     td.style.backgroundColor = bgColor;
@@ -839,11 +873,14 @@ function TemperamentWidget() {
                 rowRefs.push(ref);
                 const cells = [tdName, tdStep, tdFreq, tdCents, tdRatio];
                 tr.onmouseenter = function () {
-                    for (const td of cells) td.style.backgroundColor = "#33334d";
+                    for (const td of cells)
+                        td.style.backgroundColor = "var(--color-bg-tertiary, #33334d)";
                 };
                 tr.onmouseleave = function () {
                     for (const td of cells)
-                        td.style.backgroundColor = ref.selected ? "#3a3a5e" : bgColor;
+                        td.style.backgroundColor = ref.selected
+                            ? "var(--color-selector-selected, #3a3a5e)"
+                            : bgColor;
                 };
                 tr.onclick = function () {
                     highlightDot = i;
@@ -883,13 +920,7 @@ function TemperamentWidget() {
                         "aria-label",
                         "Cents for pitch " + i + ", absolute 0-1200, between neighbors"
                     );
-                    input.style.width = "70px";
-                    input.style.fontSize = "12px";
-                    input.style.background = "#2a2a3e";
-                    input.style.color = "#e0e0e0";
-                    input.style.border = "1px solid #555";
-                    input.style.borderRadius = "3px";
-                    input.style.textAlign = "center";
+                    _styleInput(input);
                     tdCents.textContent = "";
                     tdCents.appendChild(input);
                     input.focus();
@@ -902,17 +933,7 @@ function TemperamentWidget() {
                         }
                         v = Math.max(lo, Math.min(hi, v));
                         _applyCents(i, v);
-                        const order = that.cents
-                            .map((c, idx) => [c, idx])
-                            .sort((a, b) => a[0] - b[0])
-                            .map(p => p[1]);
-                        _reorderArrays(order);
-                        highlightDot = order.indexOf(i);
-                        _drawCircle();
-                        _buildTable();
-                        if (highlightDot >= 0) _highlightTableRow(highlightDot);
-                        _updateRemoveButton();
-                        _checkModified();
+                        _doneEdit(i);
                     };
                     input.onblur = _commit;
                     input.onkeydown = function (e) {
@@ -947,13 +968,7 @@ function TemperamentWidget() {
                         "aria-label",
                         "Frequency for pitch " + i + " in Hz, between neighbors"
                     );
-                    input.style.width = "70px";
-                    input.style.fontSize = "12px";
-                    input.style.background = "#2a2a3e";
-                    input.style.color = "#e0e0e0";
-                    input.style.border = "1px solid #555";
-                    input.style.borderRadius = "3px";
-                    input.style.textAlign = "center";
+                    _styleInput(input);
                     tdFreq.textContent = "";
                     tdFreq.appendChild(input);
                     input.focus();
@@ -969,17 +984,7 @@ function TemperamentWidget() {
                         that.ratios[i] = v / Number(that.frequencies[0]);
                         that.cents[i] = ratioToCents(that.ratios[i], that.powerBase);
                         if (that.ratiosNotesPair[i]) that.ratiosNotesPair[i][0] = that.ratios[i];
-                        const order = that.cents
-                            .map((c, idx) => [c, idx])
-                            .sort((a, b) => a[0] - b[0])
-                            .map(p => p[1]);
-                        _reorderArrays(order);
-                        highlightDot = order.indexOf(i);
-                        _drawCircle();
-                        _buildTable();
-                        if (highlightDot >= 0) _highlightTableRow(highlightDot);
-                        _updateRemoveButton();
-                        _checkModified();
+                        _doneEdit(i);
                     };
                     input.onblur = _commit2;
                     input.onkeydown = function (e) {
@@ -1014,13 +1019,7 @@ function TemperamentWidget() {
                         "aria-label",
                         "Ratio for pitch " + i + ", between neighbors"
                     );
-                    input.style.width = "70px";
-                    input.style.fontSize = "12px";
-                    input.style.background = "#2a2a3e";
-                    input.style.color = "#e0e0e0";
-                    input.style.border = "1px solid #555";
-                    input.style.borderRadius = "3px";
-                    input.style.textAlign = "center";
+                    _styleInput(input);
                     tdRatio.textContent = "";
                     tdRatio.appendChild(input);
                     input.focus();
@@ -1036,17 +1035,7 @@ function TemperamentWidget() {
                         that.cents[i] = ratioToCents(v, that.powerBase);
                         that.frequencies[i] = (Number(that.frequencies[0]) * v).toFixed(2);
                         if (that.ratiosNotesPair[i]) that.ratiosNotesPair[i][0] = v;
-                        const order = that.cents
-                            .map((c, idx) => [c, idx])
-                            .sort((a, b) => a[0] - b[0])
-                            .map(p => p[1]);
-                        _reorderArrays(order);
-                        highlightDot = order.indexOf(i);
-                        _drawCircle();
-                        _buildTable();
-                        if (highlightDot >= 0) _highlightTableRow(highlightDot);
-                        _updateRemoveButton();
-                        _checkModified();
+                        _doneEdit(i);
                     };
                     input.onblur = _commit3;
                     input.onkeydown = function (e) {
@@ -1076,7 +1065,9 @@ function TemperamentWidget() {
             for (let i = 0; i < rowRefs.length; i++) {
                 const ref = rowRefs[i];
                 ref.selected = i === index;
-                const color = ref.selected ? "#3a3a5e" : ref.bgColor;
+                const color = ref.selected
+                    ? "var(--color-selector-selected, #3a3a5e)"
+                    : ref.bgColor;
                 for (const td of [ref.name, ref.step, ref.freq, ref.cents, ref.ratio]) {
                     td.style.backgroundColor = color;
                 }
@@ -1102,7 +1093,7 @@ function TemperamentWidget() {
         hint.textContent = _("scroll for all") + " " + that.pitchNumber + " " + _("pitches");
         hint.style.textAlign = "center";
         hint.style.fontSize = "11px";
-        hint.style.color = "#777";
+        hint.style.color = "var(--color-text-tertiary, #777)";
         hint.style.marginTop = "4px";
         tableDiv.appendChild(hint);
 
@@ -1337,13 +1328,13 @@ function TemperamentWidget() {
             menu.style.position = "fixed";
             menu.style.left = e.clientX + "px";
             menu.style.top = e.clientY + "px";
-            menu.style.background = "#2a2a3e";
-            menu.style.border = "1px solid #555";
+            menu.style.background = "var(--color-bg-tertiary, #2a2a3e)";
+            menu.style.border = "1px solid var(--color-border-primary, #555)";
             menu.style.borderRadius = "4px";
             menu.style.padding = "6px";
             menu.style.zIndex = "1000";
             menu.style.fontSize = "12px";
-            menu.style.color = "#e0e0e0";
+            menu.style.color = "var(--color-text-primary, #e0e0e0)";
             menu.style.display = "flex";
             menu.style.flexDirection = "column";
             menu.style.gap = "4px";
@@ -3083,5 +3074,5 @@ if (typeof module !== "undefined") {
     module.exports.deviationColor = deviationColor;
     module.exports.deviationFrom12EDO = deviationFrom12EDO;
     module.exports.largestGapMid = largestGapMid;
-    module.exports.sameNodeCents = sameNodeCents;
+    module.exports.sameNodeCents = largestGapMid;
 }
