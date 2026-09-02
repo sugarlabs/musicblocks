@@ -172,7 +172,7 @@ class StatusMatrix {
                     if (label === null || label === undefined) {
                         label = block?.protoblock?.staticLabels?.[0] || "";
                     }
-                    label = _(label);
+                    label = label ? _(label) : "";
                     break;
                 default: {
                     label = block?.protoblock?.staticLabels?.[0] || "";
