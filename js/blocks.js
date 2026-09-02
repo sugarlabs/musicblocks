@@ -30,7 +30,7 @@
     CAMERAVALUE, VIDEOVALUE, setupBlockDragController
 */
 
-/* global showZoomOverlay, _ */
+/* global showZoomOverlay */
 
 /*
    Global locations
