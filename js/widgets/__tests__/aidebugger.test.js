@@ -659,6 +659,37 @@ describe("AIDebuggerWidget", () => {
             expect(result).toContain("Start Block");
             expect(result).toContain("Move Forward → 100 Steps");
         });
+        test("processes children of hidden blocks", () => {
+            const projectData = [
+                [
+                    0,
+                    [
+                        "start",
+                        {
+                            id: 0,
+                            xcor: 0,
+                            ycor: 0,
+                            heading: 0,
+                            color: 0,
+                            shade: 50,
+                            pensize: 5,
+                            grey: 100
+                        }
+                    ],
+                    100,
+                    100,
+                    [null, 1, null]
+                ],
+                [1, ["hidden", null], 0, 0, [2]],
+                [2, ["forward", null], 0, 0, [1, 3, null]],
+                [3, ["number", { value: 50 }], 0, 0, [2]]
+            ];
+
+            const result = debuggerWidget._convertProjectToLLMFormat(projectData);
+
+            expect(result).toContain("Start of Project");
+            expect(result).toContain("Move Forward → 50 Steps");
+        });
     });
 
     describe("_addMessageToUI", () => {
@@ -833,6 +864,50 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
                 "No conversation to export."
             );
+        });
+        test("exports chat conversation successfully", () => {
+            const originalCreateObjectURL = URL.createObjectURL;
+            const originalRevokeObjectURL = URL.revokeObjectURL;
+            debuggerWidget.chatHistory = [
+                {
+                    type: "user",
+                    content: "How do I move forward?"
+                },
+                {
+                    type: "bot",
+                    content: "Use the forward block."
+                }
+            ];
+
+            URL.createObjectURL = jest.fn(() => "blob:url");
+            URL.revokeObjectURL = jest.fn();
+
+            const click = jest
+                .spyOn(HTMLAnchorElement.prototype, "click")
+                .mockImplementation(() => {});
+
+            debuggerWidget._exportChat();
+
+            expect(debuggerWidget.activity.prepareExport).toHaveBeenCalled();
+            expect(URL.createObjectURL).toHaveBeenCalled();
+            expect(click).toHaveBeenCalled();
+            expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:url");
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Chat exported successfully."
+            );
+
+            click.mockRestore();
+            if (originalCreateObjectURL) {
+                URL.createObjectURL = originalCreateObjectURL;
+            } else {
+                delete URL.createObjectURL;
+            }
+
+            if (originalRevokeObjectURL) {
+                URL.revokeObjectURL = originalRevokeObjectURL;
+            } else {
+                delete URL.revokeObjectURL;
+            }
         });
     });
 });
