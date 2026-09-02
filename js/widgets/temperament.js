@@ -2919,6 +2919,11 @@ function TemperamentWidget() {
         this.playbackForward = true;
         this.inbetween = false;
 
+        const playAllBtn2 = widgetWindow.addButton(
+            "play-scale.svg",
+            ICONSIZE,
+            _("Play all pitches")
+        );
         widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save")).onclick = function () {
             that._save();
         };
@@ -2937,11 +2942,6 @@ function TemperamentWidget() {
             "delete.svg",
             ICONSIZE,
             _("Remove selected pitch")
-        );
-        const playAllBtn2 = widgetWindow.addButton(
-            "play-scale.svg",
-            ICONSIZE,
-            _("Play all pitches")
         );
         this._vizToolbar = {
             addPitchAfterBtn,
