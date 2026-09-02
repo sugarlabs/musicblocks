@@ -69,14 +69,8 @@ const largestGapMid = centsArr => {
         if (gap > maxGap) {
             maxGap = gap;
             let mid = (cur + nxt) / 2;
-            if (mid >= 1200) mid -= 1200;
-            let tries = 0;
-            while (centsArr.includes(Math.round(mid)) && tries < 5) {
-                mid = (mid + 1) % 1200;
-                if (mid === 0) mid = 1;
-                tries++;
-            }
-            bestMid = Math.max(1, Math.min(1199, ((mid % 1200) + 1200) % 1200 || 1));
+            mid = ((mid % 1200) + 1200) % 1200;
+            bestMid = Math.max(1, Math.min(1199, mid || 1));
         }
     }
     return bestMid;
@@ -85,63 +79,8 @@ const largestGapMid = centsArr => {
 /** Converts a ratio to cents relative to the tonic (1200 cents = 1 octave). */
 const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
 
-/** Same-node cents: midpoint of the next gap in dir from cur (circular 0..1200).
- *  Skips gaps that are smaller than the average gap so consecutive adds
- *  distribute pitches across the octave instead of converging on one spot. */
-const sameNodeCents = (centsArr, cur, dir) => {
-    const sorted = [...centsArr].sort((a, b) => a - b);
-    const curIdx = sorted.findIndex(c => Math.abs(c - cur) < 0.5);
-    const n = sorted.length;
-
-    // Average circular gap
-    let totalGap = 0;
-    for (let i = 0; i < n; i++) {
-        totalGap += (sorted[(i + 1) % n] - sorted[i] + 1200) % 1200;
-    }
-    const avgGap = totalGap / n;
-
-    // Walk in dir, find first gap >= avgGap to split
-    for (let step = 0; step < n; step++) {
-        const idx = dir > 0 ? (curIdx + step) % n : (curIdx - step + n) % n;
-        const nextIdx = dir > 0 ? (idx + 1) % n : (idx - 1 + n) % n;
-        const gap =
-            dir > 0
-                ? (sorted[nextIdx] - sorted[idx] + 1200) % 1200
-                : (sorted[idx] - sorted[nextIdx] + 1200) % 1200;
-        if (gap >= avgGap * 0.8) {
-            const a = sorted[idx];
-            const b = sorted[nextIdx];
-            let mid =
-                dir > 0
-                    ? a + (b > a ? (b - a) / 2 : (b + 1200 - a) / 2)
-                    : a - (a > b ? (a - b) / 2 : (a + 1200 - b) / 2);
-            mid = ((mid % 1200) + 1200) % 1200;
-            return Math.round(mid * 10) / 10;
-        }
-    }
-
-    return largestGapMid(centsArr);
-};
-
-/**
- * Reads a user-defined (custom) temperament pitch entry at index i.
- * Returns {notes, ratios, cents} or null when no stored note data exists.
- * Shared by the widget constructor and the visualizer loader so the custom
- * format ([ratio, note, octave]) is parsed in exactly one place.
- * @param {Object} t temperament object
- * @param {number} i pitch index
- * @param {number} powerBase usually 2
- * @returns {Object|null}
- */
-const _readCustomPitch = (t, i, powerBase) => {
-    const entry = t["" + i];
-    if (!entry || entry[1] === undefined) return null;
-    return {
-        notes: [entry[1], entry[2]],
-        ratios: entry[0],
-        cents: ratioToCents(entry[0], powerBase)
-    };
-};
+/** Same-node cents: midpoint of largest gap (dir ignored, kept for API compat). */
+const sameNodeCents = centsArr => largestGapMid(centsArr);
 
 function TemperamentWidget() {
     // Constants for button and icon sizes
@@ -585,7 +524,7 @@ function TemperamentWidget() {
                     i++;
                     if (i >= that.pitchNumber) {
                         forward = false;
-                        i = that.pitchNumber - 2;
+                        i = that.pitchNumber - 1;
                         // For ≤2 pitches there is no meaningful reverse pass
                         if (i < 1) {
                             that._playAllRunning = false;
@@ -610,14 +549,8 @@ function TemperamentWidget() {
         // Expose on the widget instance for the public playAll() wrapper
         that._playAll = _playAll;
 
-        const _addPitch = function (dir) {
-            const s = highlightDot >= 0 && highlightDot < that.pitchNumber ? highlightDot : -1;
-            let cents;
-            if (s < 0) {
-                cents = largestGapMid(that.cents);
-            } else {
-                cents = sameNodeCents(that.cents, that.cents[s], dir);
-            }
+        const _addPitch = function () {
+            const cents = largestGapMid(that.cents);
             const idx = that.cents.findIndex(c => cents < c);
             _insertPitch(idx === -1 ? that.cents.length : idx, cents);
             highlightDot = idx;
@@ -787,9 +720,6 @@ function TemperamentWidget() {
                 ctx.fill();
 
                 if (i === highlightDot || i === flashDot) {
-                    // Selected note (persistent highlightDot) or transient
-                    // playback flash (flashDot, 200ms) — same yellow double
-                    // ring, but flashDot is cleared without losing selection.
                     ctx.beginPath();
                     ctx.arc(dx, dy, dotR + 7, 0, 2 * Math.PI);
                     ctx.strokeStyle = "#ffeb3b";
@@ -925,128 +855,211 @@ function TemperamentWidget() {
                     e.preventDefault();
                     _showMenu(e, i);
                 };
-                // Inline editor factory for cents, frequency, and ratio columns
-                const _makeInlineEditor = function (td, rowIdx, cfg) {
-                    td.style.cursor = _isLocked(rowIdx) ? "default" : "text";
-                    td.ondblclick = function (ev) {
-                        ev.stopPropagation();
-                        if (_isLocked(rowIdx)) return;
-                        const prev = rowIdx > 0 ? cfg.getVal(rowIdx - 1) : null;
-                        const next = rowIdx < that.pitchNumber - 1 ? cfg.getVal(rowIdx + 1) : null;
-                        const cur = cfg.getVal(rowIdx);
-                        const lo = prev !== null ? prev + cfg.eps : cfg.eps;
-                        const hi = next !== null ? next - cfg.eps : Infinity;
-                        const input = document.createElement("input");
-                        input.type = "number";
-                        input.step = cfg.step;
-                        input.min = String(lo);
-                        if (hi !== Infinity) input.max = String(hi);
-                        input.value = cfg.fmt(cur);
-                        input.title = cfg.title(rowIdx, lo, hi);
-                        input.setAttribute("aria-label", cfg.aria(rowIdx));
-                        input.style.width = "70px";
-                        input.style.fontSize = "12px";
-                        input.style.background = "#2a2a3e";
-                        input.style.color = "#e0e0e0";
-                        input.style.border = "1px solid #555";
-                        input.style.borderRadius = "3px";
-                        input.style.textAlign = "center";
-                        td.textContent = "";
-                        td.appendChild(input);
-                        input.focus();
-                        input.select();
-                        const _commit = function () {
-                            let v = parseFloat(input.value);
-                            if (isNaN(v)) {
-                                _updateTableRow(rowIdx);
-                                return;
-                            }
-                            v = Math.max(lo, Math.min(hi, v));
-                            cfg.apply(rowIdx, v);
-                            const order = that.cents
-                                .map((c, idx) => [c, idx])
-                                .sort((a, b) => a[0] - b[0])
-                                .map(p => p[1]);
-                            _reorderArrays(order);
-                            highlightDot = order.indexOf(rowIdx);
-                            _drawCircle();
-                            _buildTable();
-                            if (highlightDot >= 0) _highlightTableRow(highlightDot);
-                            _updateRemoveButton();
-                            _checkModified();
-                        };
-                        input.onblur = _commit;
-                        input.onkeydown = function (e) {
-                            if (e.key === "Enter") {
-                                e.preventDefault();
-                                input.blur();
-                            } else if (e.key === "Escape") {
-                                e.preventDefault();
-                                input.onblur = null;
-                                _updateTableRow(rowIdx);
-                            }
-                        };
+                tdCents.style.cursor = _isLocked(i) ? "default" : "text";
+                tdCents.ondblclick = function (ev) {
+                    ev.stopPropagation();
+                    if (_isLocked(i)) return;
+                    const prev = i > 0 ? that.cents[i - 1] : null;
+                    const next = i < that.pitchNumber - 1 ? that.cents[i + 1] : null;
+                    const cur = that.cents[i];
+                    const lo = prev !== null ? prev + 1 : 1;
+                    const hi = next !== null ? next - 1 : Infinity;
+                    const input = document.createElement("input");
+                    input.type = "number";
+                    input.step = "0.1";
+                    input.min = String(lo);
+                    if (hi !== Infinity) input.max = String(hi);
+                    input.value = cur.toFixed(1);
+                    const dev = deviationFrom12EDO(cur);
+                    input.title =
+                        "Absolute cents (" +
+                        lo.toFixed(1) +
+                        " \u2013 " +
+                        hi.toFixed(1) +
+                        "); deviation from 12-EDO: " +
+                        dev.toFixed(1) +
+                        "\u00A2";
+                    input.setAttribute(
+                        "aria-label",
+                        "Cents for pitch " + i + ", absolute 0-1200, between neighbors"
+                    );
+                    input.style.width = "70px";
+                    input.style.fontSize = "12px";
+                    input.style.background = "#2a2a3e";
+                    input.style.color = "#e0e0e0";
+                    input.style.border = "1px solid #555";
+                    input.style.borderRadius = "3px";
+                    input.style.textAlign = "center";
+                    tdCents.textContent = "";
+                    tdCents.appendChild(input);
+                    input.focus();
+                    input.select();
+                    const _commit = function () {
+                        let v = parseFloat(input.value);
+                        if (isNaN(v)) {
+                            _updateTableRow(i);
+                            return;
+                        }
+                        v = Math.max(lo, Math.min(hi, v));
+                        _applyCents(i, v);
+                        const order = that.cents
+                            .map((c, idx) => [c, idx])
+                            .sort((a, b) => a[0] - b[0])
+                            .map(p => p[1]);
+                        _reorderArrays(order);
+                        highlightDot = order.indexOf(i);
+                        _drawCircle();
+                        _buildTable();
+                        if (highlightDot >= 0) _highlightTableRow(highlightDot);
+                        _updateRemoveButton();
+                        _checkModified();
+                    };
+                    input.onblur = _commit;
+                    input.onkeydown = function (e) {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            input.blur();
+                        } else if (e.key === "Escape") {
+                            e.preventDefault();
+                            input.onblur = null;
+                            _updateTableRow(i);
+                        }
                     };
                 };
-
-                // Cents editor
-                _makeInlineEditor(tdCents, i, {
-                    eps: 1,
-                    step: "0.1",
-                    getVal: idx => that.cents[idx],
-                    fmt: v => v.toFixed(1),
-                    title: (idx, lo, hi) => {
-                        const dev = deviationFrom12EDO(that.cents[idx]);
-                        return (
-                            "Absolute cents (" +
-                            lo.toFixed(1) +
-                            " \u2013 " +
-                            hi.toFixed(1) +
-                            "); deviation from 12-EDO: " +
-                            dev.toFixed(1) +
-                            "\u00A2"
-                        );
-                    },
-                    aria: idx => "Cents for pitch " + idx + ", absolute 0-1200, between neighbors",
-                    apply: (idx, v) => _applyCents(idx, v)
-                });
-                // Frequency editor
-                _makeInlineEditor(tdFreq, i, {
-                    eps: 0.01,
-                    step: "0.01",
-                    getVal: idx => Number(that.frequencies[idx]),
-                    fmt: v => v.toFixed(2),
-                    title: (idx, lo, hi) => {
-                        const hiStr = hi !== Infinity ? hi.toFixed(2) : "\u221E";
-                        return "Frequency in Hz (" + lo.toFixed(2) + " \u2013 " + hiStr + ")";
-                    },
-                    aria: idx => "Frequency for pitch " + idx + " in Hz, between neighbors",
-                    apply: (idx, v) => {
-                        that.frequencies[idx] = v.toFixed(2);
-                        that.ratios[idx] = v / Number(that.frequencies[0]);
-                        that.cents[idx] = ratioToCents(that.ratios[idx], that.powerBase);
-                        if (that.ratiosNotesPair[idx])
-                            that.ratiosNotesPair[idx][0] = that.ratios[idx];
-                    }
-                });
-                // Ratio editor
-                _makeInlineEditor(tdRatio, i, {
-                    eps: 0.001,
-                    step: "0.001",
-                    getVal: idx => that.ratios[idx],
-                    fmt: v => v.toFixed(3),
-                    title: (idx, lo, hi) => {
-                        const hiStr = hi !== Infinity ? hi.toFixed(3) : "\u221E";
-                        return "Ratio (" + lo.toFixed(3) + " \u2013 " + hiStr + ")";
-                    },
-                    aria: idx => "Ratio for pitch " + idx + ", between neighbors",
-                    apply: (idx, v) => {
-                        that.ratios[idx] = v;
-                        that.cents[idx] = ratioToCents(v, that.powerBase);
-                        that.frequencies[idx] = (Number(that.frequencies[0]) * v).toFixed(2);
-                        if (that.ratiosNotesPair[idx]) that.ratiosNotesPair[idx][0] = v;
-                    }
-                });
+                tdFreq.style.cursor = _isLocked(i) ? "default" : "text";
+                tdFreq.ondblclick = function (ev) {
+                    ev.stopPropagation();
+                    if (_isLocked(i)) return;
+                    const prev = i > 0 ? Number(that.frequencies[i - 1]) : null;
+                    const next = i < that.pitchNumber - 1 ? Number(that.frequencies[i + 1]) : null;
+                    const cur = Number(that.frequencies[i]);
+                    const lo = prev !== null ? prev + 0.01 : 0.01;
+                    const hi = next !== null ? next - 0.01 : Infinity;
+                    const input = document.createElement("input");
+                    input.type = "number";
+                    input.step = "0.01";
+                    input.min = String(lo);
+                    if (hi !== Infinity) input.max = String(hi);
+                    input.value = cur.toFixed(2);
+                    const hiStr = hi !== Infinity ? hi.toFixed(2) : "\u221E";
+                    input.title = "Frequency in Hz (" + lo.toFixed(2) + " \u2013 " + hiStr + ")";
+                    input.setAttribute(
+                        "aria-label",
+                        "Frequency for pitch " + i + " in Hz, between neighbors"
+                    );
+                    input.style.width = "70px";
+                    input.style.fontSize = "12px";
+                    input.style.background = "#2a2a3e";
+                    input.style.color = "#e0e0e0";
+                    input.style.border = "1px solid #555";
+                    input.style.borderRadius = "3px";
+                    input.style.textAlign = "center";
+                    tdFreq.textContent = "";
+                    tdFreq.appendChild(input);
+                    input.focus();
+                    input.select();
+                    const _commit2 = function () {
+                        let v = parseFloat(input.value);
+                        if (isNaN(v)) {
+                            _updateTableRow(i);
+                            return;
+                        }
+                        v = Math.max(lo, Math.min(hi, v));
+                        that.frequencies[i] = v.toFixed(2);
+                        that.ratios[i] = v / Number(that.frequencies[0]);
+                        that.cents[i] = ratioToCents(that.ratios[i], that.powerBase);
+                        if (that.ratiosNotesPair[i]) that.ratiosNotesPair[i][0] = that.ratios[i];
+                        const order = that.cents
+                            .map((c, idx) => [c, idx])
+                            .sort((a, b) => a[0] - b[0])
+                            .map(p => p[1]);
+                        _reorderArrays(order);
+                        highlightDot = order.indexOf(i);
+                        _drawCircle();
+                        _buildTable();
+                        if (highlightDot >= 0) _highlightTableRow(highlightDot);
+                        _updateRemoveButton();
+                        _checkModified();
+                    };
+                    input.onblur = _commit2;
+                    input.onkeydown = function (e) {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            input.blur();
+                        } else if (e.key === "Escape") {
+                            e.preventDefault();
+                            input.onblur = null;
+                            _updateTableRow(i);
+                        }
+                    };
+                };
+                tdRatio.style.cursor = _isLocked(i) ? "default" : "text";
+                tdRatio.ondblclick = function (ev) {
+                    ev.stopPropagation();
+                    if (_isLocked(i)) return;
+                    const prev = i > 0 ? that.ratios[i - 1] : null;
+                    const next = i < that.pitchNumber - 1 ? that.ratios[i + 1] : null;
+                    const cur = that.ratios[i];
+                    const lo = prev !== null ? prev + 0.001 : 0.001;
+                    const hi = next !== null ? next - 0.001 : Infinity;
+                    const input = document.createElement("input");
+                    input.type = "number";
+                    input.step = "0.001";
+                    input.min = String(lo);
+                    if (hi !== Infinity) input.max = String(hi);
+                    input.value = cur.toFixed(3);
+                    const hiStr = hi !== Infinity ? hi.toFixed(3) : "\u221E";
+                    input.title = "Ratio (" + lo.toFixed(3) + " \u2013 " + hiStr + ")";
+                    input.setAttribute(
+                        "aria-label",
+                        "Ratio for pitch " + i + ", between neighbors"
+                    );
+                    input.style.width = "70px";
+                    input.style.fontSize = "12px";
+                    input.style.background = "#2a2a3e";
+                    input.style.color = "#e0e0e0";
+                    input.style.border = "1px solid #555";
+                    input.style.borderRadius = "3px";
+                    input.style.textAlign = "center";
+                    tdRatio.textContent = "";
+                    tdRatio.appendChild(input);
+                    input.focus();
+                    input.select();
+                    const _commit3 = function () {
+                        let v = parseFloat(input.value);
+                        if (isNaN(v)) {
+                            _updateTableRow(i);
+                            return;
+                        }
+                        v = Math.max(lo, Math.min(hi, v));
+                        that.ratios[i] = v;
+                        that.cents[i] = ratioToCents(v, that.powerBase);
+                        that.frequencies[i] = (Number(that.frequencies[0]) * v).toFixed(2);
+                        if (that.ratiosNotesPair[i]) that.ratiosNotesPair[i][0] = v;
+                        const order = that.cents
+                            .map((c, idx) => [c, idx])
+                            .sort((a, b) => a[0] - b[0])
+                            .map(p => p[1]);
+                        _reorderArrays(order);
+                        highlightDot = order.indexOf(i);
+                        _drawCircle();
+                        _buildTable();
+                        if (highlightDot >= 0) _highlightTableRow(highlightDot);
+                        _updateRemoveButton();
+                        _checkModified();
+                    };
+                    input.onblur = _commit3;
+                    input.onkeydown = function (e) {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            input.blur();
+                        } else if (e.key === "Escape") {
+                            e.preventDefault();
+                            input.onblur = null;
+                            _updateTableRow(i);
+                        }
+                    };
+                };
             }
             _refreshTable();
         };
@@ -1228,25 +1241,24 @@ function TemperamentWidget() {
 
             for (let i = 0; i < that.pitchNumber; i++) {
                 if (isCustomTemperament(that.inTemperament)) {
-                    const pe = _readCustomPitch(t, i, that.powerBase);
-                    if (pe) {
-                        // User-defined temperament: read the stored [ratio, note,
-                        // octave] entries so the visualizer shows the real tuning
-                        // and note names, not 12-EDO.
-                        that.notes[i] = pe.notes;
-                        that.ratios[i] = pe.ratios;
-                        that.cents[i] = pe.cents;
+                    const entry = t["" + i];
+                    if (entry && entry[1] !== undefined) {
+                        const peNotes = [entry[1], entry[2]];
+                        const peRatios = entry[0];
+                        that.notes[i] = peNotes;
+                        that.ratios[i] = peRatios;
+                        that.cents[i] = ratioToCents(peRatios, that.powerBase);
                         that.frequencies[i] =
                             i === 0
                                 ? that._logo.synth
                                       .getCustomFrequency(
-                                          pe.notes[0] + pe.notes[1],
+                                          peNotes[0] + peNotes[1],
                                           that.inTemperament
                                       )
                                       .toFixed(2)
-                                : (Number(that.frequencies[0]) * pe.ratios).toFixed(2);
-                        that.intervals[i] = pe.ratios;
-                        that.ratiosNotesPair[i] = [pe.ratios, pe.notes];
+                                : (Number(that.frequencies[0]) * peRatios).toFixed(2);
+                        that.intervals[i] = peRatios;
+                        that.ratiosNotesPair[i] = [peRatios, peNotes];
                         continue;
                     }
                     // No stored note data: fall back to equal temperament display.
@@ -1521,8 +1533,8 @@ function TemperamentWidget() {
         // Bind visualizer ops to the left-side toolbar (created in init)
         if (that._vizToolbar) {
             that._vizToolbar.playAllBtn2.onclick = _playAll;
-            that._vizToolbar.addPitchAfterBtn.onclick = () => _addPitch(1);
-            that._vizToolbar.addPitchBeforeBtn.onclick = () => _addPitch(-1);
+            that._vizToolbar.addPitchAfterBtn.onclick = _addPitch;
+            that._vizToolbar.addPitchBeforeBtn.onclick = _addPitch;
             that._vizToolbar.removePitchBtn.onclick = () => {
                 const s =
                     highlightDot >= 0 && highlightDot < that.pitchNumber
@@ -2986,10 +2998,10 @@ function TemperamentWidget() {
                     this.notes[i] = [t["0"][1], Number(t["0"][2]) + 1];
                     this.ratios[i] = this.powerBase;
                 } else {
-                    const pe = _readCustomPitch(t, i, this.powerBase);
-                    if (pe) {
-                        this.notes[i] = pe.notes;
-                        this.ratios[i] = pe.ratios;
+                    const entry = t["" + i];
+                    if (entry && entry[1] !== undefined) {
+                        this.notes[i] = [entry[1], entry[2]];
+                        this.ratios[i] = entry[0];
                     } else {
                         // Missing custom pitch entry — fall back to equal temperament
                         const eq = getTemperament("equal");
