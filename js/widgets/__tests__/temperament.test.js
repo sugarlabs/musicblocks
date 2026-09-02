@@ -1119,13 +1119,13 @@ describe("TemperamentWidget basic tests", () => {
         });
 
         test("playAllBtn2 has an onclick handler", () => {
-            const playBtn = mockWidgetWindow.addButton.mock.results[4].value;
+            const playBtn = mockWidgetWindow.addButton.mock.results[0].value;
             expect(playBtn.onclick).toBeDefined();
             expect(typeof playBtn.onclick).toBe("function");
         });
 
         test("saveButton click triggers _save", () => {
-            const saveBtn = mockWidgetWindow.addButton.mock.results[0].value;
+            const saveBtn = mockWidgetWindow.addButton.mock.results[1].value;
             expect(saveBtn.onclick).toBeDefined();
 
             widget._save = jest.fn();
