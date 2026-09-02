@@ -2657,9 +2657,10 @@ describe("isInt", () => {
         expect(isInt(NaN)).toBe(false); // NaN value
     });
 
-    it("should return false for numeric strings", () => {
-        expect(isInt("1")).toBe(false); // String containing an integer
-        expect(isInt("-10")).toBe(false); // String containing a negative integer
+    it("should return true for numeric strings", () => {
+        expect(isInt("1")).toBe(true); // String containing an integer
+        expect(isInt("-10")).toBe(true); // String containing a negative integer
+        expect(isInt("3.5")).toBe(false); // String containing a decimal
     });
 });
 
