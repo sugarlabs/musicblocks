@@ -29,6 +29,15 @@
  *       The expected file defaults to the source path with `.js` replaced by
  *       `.plan.json`.
  *
+ *   node scripts/generate-tests/cli.js path/to/module.js --prompt
+ *       Prints the deterministic test-generation prompt for the module. No
+ *       provider is invoked.
+ *
+ *   node scripts/generate-tests/cli.js path/to/module.js --generate[=provider]
+ *       Runs the generation pipeline through a credential-free provider
+ *       ("noop" by default, or "manual") and prints the candidate test source
+ *       to stdout. Nothing is written to disk and no network call is made.
+ *
  * This tool only reads and parses the target file. It never requires, imports,
  * executes or modifies it, and it never writes to the source tree.
  */
@@ -36,8 +45,13 @@
 const fs = require("fs");
 const path = require("path");
 const { extractFile, stringifyPlan } = require("./extract-module");
+const { buildGenerationRequest } = require("./generation-request");
+const { buildPrompt } = require("./prompt-builder");
+const { createClient } = require("./llm-client");
 
-const USAGE = "usage: node scripts/generate-tests/cli.js <module.js> [--check [expected.json]]";
+const USAGE =
+    "usage: node scripts/generate-tests/cli.js <module.js> " +
+    "[--check [expected.json] | --prompt | --generate[=provider]]";
 
 /**
  * Parses argv into `{ file, check, expected }`.
@@ -49,6 +63,8 @@ function parseArgs(argv) {
     let file = null;
     let check = false;
     let expected = null;
+    let prompt = false;
+    let generate = null;
 
     for (let i = 0; i < argv.length; i += 1) {
         const arg = argv[i];
@@ -63,6 +79,13 @@ function parseArgs(argv) {
             check = true;
             expected = arg.slice("--check=".length);
             if (expected === "") throw new Error("--check= requires a path");
+        } else if (arg === "--prompt") {
+            prompt = true;
+        } else if (arg === "--generate") {
+            generate = "noop";
+        } else if (arg.startsWith("--generate=")) {
+            generate = arg.slice("--generate=".length);
+            if (generate === "") throw new Error("--generate= requires a provider name");
         } else if (arg === "--help" || arg === "-h") {
             process.stdout.write(USAGE + "\n");
             process.exit(0);
@@ -76,7 +99,9 @@ function parseArgs(argv) {
     }
 
     if (!file) throw new Error(USAGE);
-    return { file, check, expected };
+    const modes = [check, prompt, generate !== null].filter(Boolean).length;
+    if (modes > 1) throw new Error("--check, --prompt and --generate are mutually exclusive");
+    return { file, check, expected, prompt, generate };
 }
 
 /**
@@ -110,6 +135,25 @@ function main(argv) {
     } catch (err) {
         process.stderr.write(err.message + "\n");
         return 1;
+    }
+
+    if (args.prompt) {
+        process.stdout.write(buildPrompt(buildGenerationRequest(plan)));
+        return 0;
+    }
+
+    if (args.generate !== null) {
+        let client;
+        try {
+            client = createClient(args.generate);
+        } catch (err) {
+            process.stderr.write(err.message + "\n");
+            return 1;
+        }
+        const request = buildGenerationRequest(plan);
+        const result = client.generate(request);
+        process.stdout.write(result.source);
+        return 0;
     }
 
     const generated = stringifyPlan(plan);
