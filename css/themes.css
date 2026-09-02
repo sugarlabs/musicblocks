@@ -89,7 +89,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
-    color: var(--color-border-primary) !important;
+    color: var(--color-text-secondary) !important;
     background-color: var(--color-bg-secondary) !important;
 }
 
@@ -541,8 +541,8 @@ body.highcontrast {
 }
 
 .highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
-    color: var(--color-text-inverse) !important;
-    background-color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-secondary) !important;
 }
 
 .highcontrast .popupMsg {
@@ -625,8 +625,8 @@ body.highcontrast {
 }
 
 .highcontrast .modal-message {
-    color: var(--color-text-inverse);
-    background-color: var(--color-text-inverse);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
 }
 
 .highcontrast #newdropdown {
