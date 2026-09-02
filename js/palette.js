@@ -1602,6 +1602,9 @@ class Palette {
         }
 
         this._showMenuItems();
+        if (this.palettes.mobile) {
+            return;
+        }
         const paletteItems = docById("PaletteBody_items");
         paletteItems.style.height = `${window.innerHeight - paletteItems.getBoundingClientRect().top}px`;
 
