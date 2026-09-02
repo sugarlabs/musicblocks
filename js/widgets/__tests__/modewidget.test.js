@@ -236,6 +236,9 @@ window.widgetWindows = {
             return btn;
         }),
         getWidgetBody: jest.fn().mockReturnValue({
+            style: {},
+            children: [{ style: {} }],
+            offsetHeight: 400,
             append: jest.fn(),
             getElementsByTagName: jest.fn().mockReturnValue([
                 {
@@ -266,6 +269,11 @@ document.createElement = jest.fn().mockImplementation(tag => ({
     replaceChildren: jest.fn(),
     removeChild: jest.fn(),
     firstChild: null,
+    children: [{ style: {} }],
+    querySelector: jest.fn().mockReturnValue({
+        style: {},
+        setAttribute: jest.fn()
+    }),
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
@@ -773,6 +781,38 @@ describe("ModeWidget", () => {
             expect(modeWidget._modePiemenuOpen).toBe(true);
             modeWidget._onModePieButtonClick();
             expect(modeWidget._modePiemenuOpen).toBe(false);
+        });
+    });
+
+    describe("window maximization and scaling", () => {
+        test("widgetWindow.onmaximize is bound to the ModeWidget instance", () => {
+            const scaleSpy = jest.spyOn(ModeWidget.prototype, "_scale");
+            const widget = new ModeWidget(mockActivity);
+            expect(typeof widget.widgetWindow.onmaximize).toBe("function");
+
+            // Invoke as WidgetWindow would invoke it (this = widgetWindow)
+            widget.widgetWindow.onmaximize.call(widget.widgetWindow);
+            expect(scaleSpy).toHaveBeenCalled();
+            scaleSpy.mockRestore();
+        });
+
+        test("_scale executes without throwing when maximized", () => {
+            modeWidget.widgetWindow.isMaximized = jest.fn().mockReturnValue(true);
+            expect(() => {
+                modeWidget._scale();
+            }).not.toThrow();
+        });
+
+        test("_scale executes without throwing when unmaximized", () => {
+            modeWidget.widgetWindow.isMaximized = jest.fn().mockReturnValue(false);
+            expect(() => {
+                modeWidget._scale();
+            }).not.toThrow();
+        });
+
+        test("_scale safely exits if widgetWindow or svg is not available", () => {
+            modeWidget.widgetWindow = null;
+            expect(() => modeWidget._scale()).not.toThrow();
         });
     });
 });

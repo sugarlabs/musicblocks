@@ -129,7 +129,7 @@ class ModeWidget {
             this.widgetWindow.destroy();
         };
 
-        this.widgetWindow.onmaximize = this._scale;
+        this.widgetWindow.onmaximize = this._scale.bind(this);
 
         this._playButton = this.widgetWindow.addButton(
             "play-button.svg",
@@ -709,20 +709,32 @@ class ModeWidget {
     // ── Scaling ───────────────────────────────────────────────────
 
     _scale() {
+        if (!this.widgetWindow) {
+            return;
+        }
         const windowHeight =
-            this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
-        const widgetBody = this.getWidgetBody();
-        const scale = this.isMaximized() ? windowHeight / widgetBody.offsetHeight : 1;
+            this.widgetWindow.getWidgetFrame().offsetHeight -
+            this.widgetWindow.getDragElement().offsetHeight;
+        const widgetBody = this.widgetWindow.getWidgetBody();
+        if (!widgetBody || !widgetBody.style) {
+            return;
+        }
+        const scale = this.widgetWindow.isMaximized() ? windowHeight / widgetBody.offsetHeight : 1;
         widgetBody.style.display = "flex";
         widgetBody.style.flexDirection = "column";
         widgetBody.style.alignItems = "center";
-        widgetBody.children[0].style.display = "flex";
-        widgetBody.children[0].style.flexDirection = "column";
-        widgetBody.children[0].style.alignItems = "center";
+        if (widgetBody.children && widgetBody.children[0] && widgetBody.children[0].style) {
+            widgetBody.children[0].style.display = "flex";
+            widgetBody.children[0].style.flexDirection = "column";
+            widgetBody.children[0].style.alignItems = "center";
+        }
 
         // When the mode piemenu is open, scale the global wheelDiv SVG;
         // otherwise scale the note-wheel SVG.
         const svgContainer = this._modePiemenuOpen ? docById("wheelDiv") : this._meterWheelDiv;
+        if (!svgContainer) {
+            return;
+        }
         const svg = svgContainer.querySelector("svg");
         if (!svg) {
             return;
