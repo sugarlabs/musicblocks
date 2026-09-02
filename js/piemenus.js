@@ -59,8 +59,8 @@
 
    piemenuModes, piemenuPitches, piemenuCustomNotes, piemenuGrid,
    piemenuIntervals, piemenuVoices, piemenuBoolean,
-    piemenuBasic, piemenuColor, piemenuNumber,
-    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords,
+   piemenuBasic, piemenuColor, piemenuNumber,
+   piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords,
    piemenuDissectNumber
 */
 

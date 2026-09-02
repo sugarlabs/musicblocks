@@ -119,8 +119,12 @@ class ModeWidget {
             this._locked = false;
             this.hideMsgs();
             if (this.logo) {
-                // Release the in-widget flag so a later run can open a fresh widget.
+                // Release the singleton reference and the in-widget flag so a
+                // later run can open a fresh widget.
                 this.logo.insideModeWidget = false;
+                if (this.logo.modeWidget === this) {
+                    this.logo.modeWidget = null;
+                }
             }
             this.widgetWindow.destroy();
         };
@@ -341,6 +345,8 @@ class ModeWidget {
                     this._translateNotesToEDO(newEDO);
                 }
             }
+            this._activeEDO = newEDO;
+
             this._activeEDO = newEDO;
 
             this._rebuildWheel(newEDO);
