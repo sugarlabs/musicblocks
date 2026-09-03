@@ -170,7 +170,15 @@ describe("safeWrite", () => {
         const outside = fs.mkdtempSync(path.join(os.tmpdir(), "mb-outside-"));
         try {
             fs.mkdirSync(path.join(sandbox, "js", "utils"), { recursive: true });
-            fs.symlinkSync(outside, path.join(sandbox, "js", "utils", "__tests__"), "dir");
+            try {
+                fs.symlinkSync(outside, path.join(sandbox, "js", "utils", "__tests__"), "dir");
+            } catch (err) {
+                if (err.code === "EPERM" || err.code === "EACCES") {
+                    // windows without developer mode or elevated privileges cannot create symlinks
+                    return;
+                }
+                throw err;
+            }
             expect(() =>
                 safeWrite(validSource, { modulePath: "js/utils/utils-logic.js", cwd: sandbox })
             ).toThrow(/real path resolves outside the repository/);
