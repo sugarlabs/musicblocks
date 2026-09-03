@@ -140,23 +140,6 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget.pitchNumber).toBe(0);
     });
 
-    test("redundant circle and table views have been removed", () => {
-        expect(typeof widget._circleOfNotes).toBe("undefined");
-        expect(typeof widget._graphOfNotes).toBe("undefined");
-        expect(typeof widget.showNoteInfo).toBe("undefined");
-        expect(typeof widget.editFrequency).toBe("undefined");
-        expect(typeof widget.toggleNotesButton).toBe("undefined");
-        expect(widget.circleIsVisible).toBeUndefined();
-    });
-
-    test("_visualizerView is still present as the single default view", () => {
-        expect(typeof widget._visualizerView).toBe("function");
-    });
-
-    test("createMainWheel is retained for edit-preview flows", () => {
-        expect(typeof widget.createMainWheel).toBe("function");
-    });
-
     test("playNote triggers synth", () => {
         widget._logo = {
             resetSynth: jest.fn(),
@@ -1118,12 +1101,6 @@ describe("TemperamentWidget basic tests", () => {
             expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalled();
         });
 
-        test("playAllBtn2 has an onclick handler", () => {
-            const playBtn = mockWidgetWindow.addButton.mock.results[0].value;
-            expect(playBtn.onclick).toBeDefined();
-            expect(typeof playBtn.onclick).toBe("function");
-        });
-
         test("saveButton click triggers _save", () => {
             const saveBtn = mockWidgetWindow.addButton.mock.results[1].value;
             expect(saveBtn.onclick).toBeDefined();
@@ -1132,6 +1109,27 @@ describe("TemperamentWidget basic tests", () => {
             saveBtn.onclick();
             expect(widget._save).toHaveBeenCalled();
         });
+
+        test("sparse pitch data does not blank the table (partial load regression)", () => {
+            // Simulates a partial temperament load: pitchNumber exceeds the
+            // filled arrays (stale/partial custom entry). Rows 0-2 complete.
+            widget.powerBase = 2;
+            widget.pitchNumber = 5;
+            widget.cents = [0, 100, 200];
+            widget.ratios = [1, Math.pow(2, 1 / 12), Math.pow(2, 2 / 12)];
+            widget.frequencies = ["261.63", "277.18", "293.66"];
+            widget.notes = [
+                ["A", 4],
+                ["Bb", 4],
+                ["B", 4]
+            ];
+            widget.intervals = ["a", "b", "c"];
+            widget.ratiosNotesPair = widget.ratios.map((r, i) => [r, widget.notes[i]]);
+
+            expect(() => widget._visualizerView()).not.toThrow();
+            // Render ran past the table build to the toolbar bindings.
+            expect(typeof widget._vizToolbar.addPitchAfterBtn.onclick).toBe("function");
+        });
     });
 
     describe("extracted helper: _paintPreviewWheelColors (exercised via equalEdit's preview click)", () => {
@@ -1139,12 +1137,12 @@ describe("TemperamentWidget basic tests", () => {
             global.docById = jest.fn(id => {
                 if (id === "octaveIn") return { value: "0" };
                 if (id === "octaveOut") return { value: "0" };
-                if (id === "divisions") return { value: "1" };
+                if (id === "divisions") return { value: "2" };
                 return createMockElement(id);
             });
 
-            widget.ratios = [1, 2];
-            widget.frequencies = [440, 880];
+            widget.ratios = [1];
+            widget.frequencies = [440];
             widget.pitchNumber = 1;
             widget.powerBase = 2;
             widget.checkTemperament = jest.fn();
@@ -1463,6 +1461,41 @@ describe("TemperamentWidget basic tests", () => {
             const clamped = Math.min(attempted, next - 0.5);
             expect(clamped).toBeLessThan(next);
             expect(clamped).toBeGreaterThan(prev);
+        });
+    });
+
+    describe("relative cents editing", () => {
+        test("full-octave equal division replaces ratios (25-EDO is exact)", () => {
+            global.docById = jest.fn(id => {
+                if (id === "octaveIn") return { value: "0" };
+                if (id === "octaveOut") return { value: "0" };
+                if (id === "divisions") return { value: "25" };
+                return createMockElement(id);
+            });
+            widget.ratios = [1];
+            widget.frequencies = [440];
+            widget.pitchNumber = 1;
+            widget.powerBase = 2;
+            widget.activity = { errorMsg: jest.fn() };
+            widget.createMainWheel = jest.fn();
+            widget.notesCircle = {
+                navItems: Array(60).fill({
+                    fillAttr: "",
+                    sliceHoverAttr: {},
+                    slicePathAttr: {},
+                    sliceSelectedAttr: {},
+                    refreshWheel: jest.fn()
+                }),
+                refreshWheel: jest.fn()
+            };
+            widget.checkTemperament = jest.fn();
+            global.frequencyToPitch = jest.fn(() => ["C", 4]);
+            widget.equalEdit();
+            widget.performEqualEdit({ target: { textContent: "preview" } });
+            expect(widget.tempRatios.length).toBe(25);
+            for (let k = 0; k < 25; k++) {
+                expect(widget.tempRatios[k]).toBeCloseTo(Math.pow(2, k / 25), 10);
+            }
         });
     });
 

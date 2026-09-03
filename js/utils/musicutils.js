@@ -3895,6 +3895,8 @@ const isEquallyTempered = temperament => {
     if (t.ratios) {
         if (!Array.isArray(t.ratios) || t.ratios.length < 2) return false;
         const n = Number.isInteger(t.pitchNumber) ? t.pitchNumber : t.ratios.length;
+        // 1e-9 is safe: stored ratios are exact Math.pow values or full-precision
+        // editor output (toFixed(3) is display-only, never persisted).
         for (let i = 0; i < t.ratios.length; i++) {
             if (Math.abs(t.ratios[i] - Math.pow(2, i / n)) > 1e-9) return false;
         }
@@ -3936,9 +3938,6 @@ const isNonEDO = temperament => {
     }
     return temperamentHasRatios(temperament) && !isEquallyTempered(temperament);
 };
-
-// Retained for API compat — isEquallyTempered is now uncached; tests call this
-const clearTemperamentCaches = () => {};
 
 /**
  * Integer step pattern for a mode under a non-EDO temperament: each
@@ -8383,7 +8382,6 @@ if (typeof module !== "undefined" && module.exports) {
         isTrueEDO,
         isEquallyTempered,
         isNonEDO,
-        clearTemperamentCaches,
         getTemperamentRatio,
         getTemperamentCents,
         getTemperamentName,

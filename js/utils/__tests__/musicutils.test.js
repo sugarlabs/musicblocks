@@ -138,8 +138,7 @@ const {
     updateModeWheelItems,
     getModeGroupTitleFont,
     temperamentHasRatios,
-    isEquallyTempered,
-    clearTemperamentCaches
+    isEquallyTempered
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -949,6 +948,13 @@ describe("frequencyToPitch", () => {
         expect(result[0]).toBe("A");
         expect(result[1]).toBe(4);
     });
+
+    it("should fallback to 12-EDO for unknown temperament", () => {
+        global.TEMPERAMENT = {};
+        const result = frequencyToPitch(440, "unknown");
+        expect(result[0]).toBe("A");
+        expect(result[1]).toBe(4);
+    });
 });
 
 describe("cents calculations", () => {
@@ -989,6 +995,11 @@ describe("cents calculations", () => {
 
         it("extracts ratio from object format", () => {
             expect(getTemperamentRatio({ ratio: 3 / 2, cents: 700 })).toBe(3 / 2);
+        });
+
+        it("returns 1 for invalid input", () => {
+            expect(getTemperamentRatio(null)).toBe(1);
+            expect(getTemperamentRatio(undefined)).toBe(1);
         });
     });
 
@@ -3998,7 +4009,6 @@ describe("temperamentHasRatios / isEquallyTempered", () => {
     });
 
     it("isEquallyTempered detects equal steps for unknown-flag custom temperament", () => {
-        clearTemperamentCaches();
         TEMPERAMENT["custom"] = {
             pitchNumber: 2,
             0: [1, "C", 4],
@@ -4008,7 +4018,6 @@ describe("temperamentHasRatios / isEquallyTempered", () => {
     });
 
     it("isEquallyTempered false for non-equal intervals", () => {
-        clearTemperamentCaches();
         TEMPERAMENT["custom"] = {
             pitchNumber: 2,
             0: [1, "C", 4],
