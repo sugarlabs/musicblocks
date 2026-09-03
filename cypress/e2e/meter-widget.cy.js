@@ -45,7 +45,7 @@ describe("Meter widget", () => {
         // auto-save from re-triggering the widget on subsequent test runs.
         cy.visit("http://127.0.0.1:3000");
         cy.clearLocalStorage();
-        cy.visit("http://127.0.0.1:3000");
+        cy.reload();
         cy.waitForAppReady();
 
         // Dismiss the first-run "Take a Tour" guide if it appears, so that
@@ -53,7 +53,25 @@ describe("Meter widget", () => {
         cy.get("body").then($body => {
             const closeButtons = $body.find(".windowFrame .wftButton.close");
             if (closeButtons.length) {
-                cy.wrap(closeButtons).click({ multiple: true, force: true });
+                cy.wrap(closeButtons).each($btn => {
+                    cy.wrap($btn).click({ force: true });
+                });
+            }
+        });
+    });
+
+    afterEach(() => {
+        // Stop audio playback and close any open widget windows to prevent
+        // active loops from interrupting the next test's page initialization.
+        cy.get("body").then($body => {
+            if ($body.find("#stop").length) {
+                cy.get("#stop").click({ force: true });
+            }
+            const closeButtons = $body.find(".windowFrame .wftButton.close");
+            if (closeButtons.length) {
+                cy.wrap(closeButtons).each($btn => {
+                    cy.wrap($btn).click({ force: true });
+                });
             }
         });
     });
