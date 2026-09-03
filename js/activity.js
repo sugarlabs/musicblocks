@@ -1808,39 +1808,32 @@ class Activity {
                 return;
             }
 
-            const isMaximized =
-                window.innerWidth === window.screen.width &&
-                window.innerHeight === window.screen.height;
-            if (isMaximized) {
-                container.style.width = defaultWidth + "px";
-                container.style.height = defaultHeight + "px";
-                canvas.width = defaultWidth;
-                canvas.height = defaultHeight;
-                overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
-                canvasHolder.width = defaultWidth;
-                canvasHolder.height = defaultHeight;
-            } else {
-                const windowWidth = window.innerWidth;
-                const windowHeight = window.innerHeight;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
 
-                // Guard against zero or invalid dimensions
-                if (windowWidth <= 0 || windowHeight <= 0) {
-                    return;
-                }
-
-                container.style.width = windowWidth + "px";
-                container.style.height = windowHeight + "px";
-                overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
-                canvasHolder.width = canvas.width;
-                canvasHolder.height = canvas.height;
+            // Guard against zero or invalid dimensions
+            if (windowWidth <= 0 || windowHeight <= 0) {
+                return;
             }
+
+            container.style.width = windowWidth + "px";
+            container.style.height = windowHeight + "px";
+            canvas.width = windowWidth;
+            canvas.height = windowHeight;
+            overCanvas.width = windowWidth;
+            overCanvas.height = windowHeight;
+            canvasHolder.width = windowWidth;
+            canvasHolder.height = windowHeight;
+
             const hideContents = document.getElementById("hideContents");
             if (hideContents) {
                 hideContents.click();
             }
-            that.refreshCanvas();
+            if (typeof that._onResize === "function") {
+                that._onResize(false);
+            } else {
+                that.refreshCanvas();
+            }
         }
 
         let resizeTimeout;
