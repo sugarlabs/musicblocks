@@ -1745,7 +1745,7 @@ const INTERVALVALUES = {
     "augmented 5": [8, 1, 25 / 16],
     "minor 6": [8, -1, 8 / 5],
     "major 6": [9, 1, 5 / 3],
-    "diminished 7": [9, -1, 9 / 5],
+    "diminished 7": [9, -1, 128 / 75],
     "augmented 6": [10, 1, 125 / 72],
     "minor 7": [10, -1, 16 / 9],
     "major 7": [11, 1, 15 / 8],
