@@ -574,10 +574,9 @@ class Singer {
         tur.singer.justCounting.push(true);
 
         for (const b in tur.endOfClampSignals) {
-            tur.butNotThese[b] = [];
-            for (const i of tur.endOfClampSignals[b]) {
-                tur.butNotThese[b].push(i);
-            }
+            // Record the indices (as strings, matching the dispatch check in
+            // runFromBlockNow) of the signals registered before counting.
+            tur.butNotThese[b] = Object.keys(tur.endOfClampSignals[b]);
         }
 
         const actionArgs = [];

@@ -2276,7 +2276,9 @@ class Logo {
                             if (
                                 // eslint-disable-next-line eqeqeq
                                 tur.butNotThese[b] == null ||
-                                tur.butNotThese[b].indexOf(i) === -1
+                                // butNotThese stores array indices as strings
+                                // (for..in / Object.keys in the producers).
+                                tur.butNotThese[b].indexOf(String(i)) === -1
                             ) {
                                 if (!tur.singer.runningFromEvent) {
                                     logo.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
