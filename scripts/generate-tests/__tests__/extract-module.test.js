@@ -324,7 +324,9 @@ describe("cli helpers", () => {
             check: false,
             expected: null,
             prompt: false,
-            generate: null
+            generate: null,
+            emit: null,
+            write: false
         });
     });
 

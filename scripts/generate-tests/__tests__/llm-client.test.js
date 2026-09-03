@@ -18,6 +18,7 @@
  */
 
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const http = require("http");
 const https = require("https");
@@ -255,5 +256,69 @@ describe("cli: --prompt and --generate", () => {
     it("--prompt and --generate exit 1 for an unreadable source file", () => {
         expect(cli.main(["does/not/exist.js", "--prompt"])).toBe(1);
         expect(cli.main(["does/not/exist.js", "--generate"])).toBe(1);
+    });
+});
+
+describe("cli: --emit (generate -> validate -> safe write)", () => {
+    // The CLI writes relative to process.cwd() (the repo root under Jest), so a
+    // regression that made the NoopClient candidate valid would drop a real file
+    // here. Remove it after every test, even one that failed mid-way.
+    const GENERATED_IN_TREE = path.join(
+        SCRIPT_DIR,
+        "..",
+        "..",
+        "js",
+        "utils",
+        "__tests__",
+        "utils-logic.generated.test.js"
+    );
+    afterEach(() => {
+        fs.rmSync(GENERATED_IN_TREE, { force: true });
+    });
+
+    it("parses --emit and --write", () => {
+        expect(cli.parseArgs(["m.js", "--emit"])).toMatchObject({ emit: "noop", write: false });
+        expect(cli.parseArgs(["m.js", "--emit=manual", "--write"])).toMatchObject({
+            emit: "manual",
+            write: true
+        });
+    });
+
+    it("rejects --write without --emit", () => {
+        expect(() => cli.parseArgs(["m.js", "--write"])).toThrow(/--write only applies/);
+    });
+
+    it("rejects combining --emit with another mode", () => {
+        expect(() => cli.parseArgs(["m.js", "--emit", "--generate"])).toThrow(/mutually exclusive/);
+    });
+
+    it("exits 1 and writes nothing when the candidate fails validation", () => {
+        // The NoopClient emits an it.todo skeleton whose only assertion is an
+        // existence check - the validator correctly rejects it.
+        const before = fs.readdirSync(
+            path.join(SCRIPT_DIR, "..", "..", "js", "utils", "__tests__")
+        );
+        expect(cli.main(["js/utils/utils-logic.js", "--emit"])).toBe(1);
+        expect(cli.main(["js/utils/utils-logic.js", "--emit", "--write"])).toBe(1);
+        const after = fs.readdirSync(path.join(SCRIPT_DIR, "..", "..", "js", "utils", "__tests__"));
+        expect(after).toEqual(before);
+    });
+
+    it("exits 1 (no uncaught throw) for a source file that resolves outside the repo", () => {
+        const outside = fs.mkdtempSync(path.join(os.tmpdir(), "mb-emit-outside-"));
+        const modPath = path.join(outside, "stray.js");
+        fs.writeFileSync(modPath, "function f(x) { return x; }\nmodule.exports = { f };\n");
+        try {
+            // plan.file becomes a "../../.." path -> generatedTestPathFor throws;
+            // the CLI must convert that to exit code 1, not an exception.
+            let code;
+            expect(() => {
+                code = cli.main([modPath, "--emit"]);
+            }).not.toThrow();
+            expect(code).toBe(1);
+            expect(code).not.toBe(0);
+        } finally {
+            fs.rmSync(outside, { recursive: true, force: true });
+        }
     });
 });

@@ -38,8 +38,16 @@
  *       ("noop" by default, or "manual") and prints the candidate test source
  *       to stdout. Nothing is written to disk and no network call is made.
  *
- * This tool only reads and parses the target file. It never requires, imports,
- * executes or modifies it, and it never writes to the source tree.
+ *   node scripts/generate-tests/cli.js path/to/module.js --emit[=provider] [--write]
+ *       Generates a candidate, runs it through the deterministic validator
+ *       (./validate-generated.js) and reports the result plus the exact path
+ *       the safe writer would use. Without --write nothing is written; with
+ *       --write a valid candidate is written to
+ *       `<dir>/__tests__/<module>.generated.test.js` (an existing file is never
+ *       overwritten). Exits non-zero when the candidate is invalid.
+ *
+ * Without --emit --write this tool only reads and parses the target file. It
+ * never requires, imports or executes it.
  */
 
 const fs = require("fs");
@@ -48,10 +56,29 @@ const { extractFile, stringifyPlan } = require("./extract-module");
 const { buildGenerationRequest } = require("./generation-request");
 const { buildPrompt } = require("./prompt-builder");
 const { createClient } = require("./llm-client");
+const { validateGeneratedTest } = require("./validate-generated");
+const { writeGeneratedTest, generatedTestPathFor } = require("./write-generated");
 
 const USAGE =
     "usage: node scripts/generate-tests/cli.js <module.js> " +
-    "[--check [expected.json] | --prompt | --generate[=provider]]";
+    "[--check [expected.json] | --prompt | --generate[=provider] | --emit[=provider] [--write]]";
+
+const HELP = [
+    USAGE,
+    "",
+    "modes (mutually exclusive):",
+    "  (none)              print the module test plan as JSON",
+    "  --check [file]      compare the plan against a committed expected plan; exit 1 on mismatch",
+    "  --prompt            print the deterministic generation prompt; no provider is run",
+    "  --generate[=prov]   run the pipeline through a provider and print the RAW candidate source.",
+    "                      No validation, no file path, nothing written. For eyeballing output.",
+    "  --emit[=prov]       run the pipeline, then VALIDATE the candidate and report the exact",
+    "                      path the safe writer would use. Exit 1 if the candidate is invalid.",
+    "    --write           with --emit only: actually write a valid candidate to",
+    "                      <dir>/__tests__/<module>.generated.test.js (never overwrites).",
+    "",
+    'provider is "noop" (default) or "manual"; both are credential-free and offline.'
+].join("\n");
 
 /**
  * Parses argv into `{ file, check, expected }`.
@@ -65,10 +92,19 @@ function parseArgs(argv) {
     let expected = null;
     let prompt = false;
     let generate = null;
+    let emit = null;
+    let write = false;
 
     for (let i = 0; i < argv.length; i += 1) {
         const arg = argv[i];
-        if (arg === "--check") {
+        if (arg === "--write") {
+            write = true;
+        } else if (arg === "--emit") {
+            emit = "noop";
+        } else if (arg.startsWith("--emit=")) {
+            emit = arg.slice("--emit=".length);
+            if (emit === "") throw new Error("--emit= requires a provider name");
+        } else if (arg === "--check") {
             check = true;
             const next = argv[i + 1];
             if (next && !next.startsWith("--")) {
@@ -87,7 +123,7 @@ function parseArgs(argv) {
             generate = arg.slice("--generate=".length);
             if (generate === "") throw new Error("--generate= requires a provider name");
         } else if (arg === "--help" || arg === "-h") {
-            process.stdout.write(USAGE + "\n");
+            process.stdout.write(HELP + "\n");
             process.exit(0);
         } else if (arg.startsWith("--")) {
             throw new Error(`unknown option: ${arg}`);
@@ -99,9 +135,12 @@ function parseArgs(argv) {
     }
 
     if (!file) throw new Error(USAGE);
-    const modes = [check, prompt, generate !== null].filter(Boolean).length;
-    if (modes > 1) throw new Error("--check, --prompt and --generate are mutually exclusive");
-    return { file, check, expected, prompt, generate };
+    const modes = [check, prompt, generate !== null, emit !== null].filter(Boolean).length;
+    if (modes > 1) {
+        throw new Error("--check, --prompt, --generate and --emit are mutually exclusive");
+    }
+    if (write && emit === null) throw new Error("--write only applies together with --emit");
+    return { file, check, expected, prompt, generate, emit, write };
 }
 
 /**
@@ -151,8 +190,68 @@ function main(argv) {
             return 1;
         }
         const request = buildGenerationRequest(plan);
-        const result = client.generate(request);
+        let result;
+        try {
+            result = client.generate(request);
+        } catch (err) {
+            process.stderr.write(err.message + "\n");
+            return 1;
+        }
         process.stdout.write(result.source);
+        return 0;
+    }
+
+    if (args.emit !== null) {
+        let client;
+        try {
+            client = createClient(args.emit);
+        } catch (err) {
+            process.stderr.write(err.message + "\n");
+            return 1;
+        }
+
+        // Generation and the deterministic output-path derivation can both throw
+        // (a provider error, or a `plan.file` that resolves outside the repo);
+        // convert either into the CLI's numeric failure contract.
+        let source;
+        let outPath;
+        try {
+            source = client.generate(buildGenerationRequest(plan)).source;
+            outPath = generatedTestPathFor(plan.file);
+        } catch (err) {
+            process.stderr.write(err.message + "\n");
+            return 1;
+        }
+        const validation = validateGeneratedTest(source, { plan });
+
+        for (const warning of validation.warnings) {
+            process.stderr.write(`warning: ${warning}\n`);
+        }
+        if (!validation.valid) {
+            for (const error of validation.errors) {
+                process.stderr.write(`invalid: ${error}\n`);
+            }
+            process.stderr.write(`${plan.file}: candidate rejected; nothing written\n`);
+            return 1;
+        }
+
+        if (!args.write) {
+            process.stdout.write(`${plan.file}: candidate is valid; would write ${outPath}\n`);
+            return 0;
+        }
+
+        let outcome;
+        try {
+            outcome = writeGeneratedTest(source, { plan });
+        } catch (err) {
+            process.stderr.write(err.message + "\n");
+            return 1;
+        }
+        if (!outcome.written) {
+            process.stderr.write(`${plan.file}: not written\n`);
+            return 1;
+        }
+        process.stdout.write(`${plan.file}: wrote ${outcome.path}\n`);
         return 0;
     }
 
