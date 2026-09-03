@@ -114,6 +114,16 @@ const createActivityMock = turtleMock => ({
         notation: { notationInsertTie: jest.fn(), notationRemoveTie: jest.fn() },
         firstNoteTime: null,
         stopTurtle: false,
+        _timerManager: {
+            setGuardedTimeout: jest.fn((cb, delay, guard) => {
+                return setTimeout(() => {
+                    if (!guard || !guard()) cb();
+                }, delay);
+            }),
+            setTimeout: jest.fn((cb, delay) => setTimeout(cb, delay)),
+            clearTimeout: jest.fn(id => clearTimeout(id)),
+            clearAll: jest.fn(() => 0)
+        },
         inPitchDrumMatrix: false,
         inMatrix: false,
         clearNoteParams: jest.fn()

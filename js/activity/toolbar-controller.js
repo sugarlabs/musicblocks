@@ -65,12 +65,16 @@ class ToolbarController {
                 this.activity.logo.doStopTurtles();
 
                 const that = this;
-                setTimeout(() => {
-                    // Stop leaves the drawing in place, so clear here the way
-                    // every other Run path does before starting fresh.
-                    that._clearAllTurtles();
-                    that.activity.logo.runLogoCommands(null, env);
-                }, 500);
+                this.activity.logo._timerManager.setGuardedTimeout(
+                    () => {
+                        // Stop leaves the drawing in place, so clear here the way
+                        // every other Run path does before starting fresh.
+                        that._clearAllTurtles();
+                        that.activity.logo.runLogoCommands(null, env);
+                    },
+                    500,
+                    () => this.activity.logo.stopTurtle
+                );
             }
         }
     }
@@ -124,7 +128,7 @@ class ToolbarController {
                 // the very first click and forcing an extra click before the first
                 // block runs. Defer the first step() so it runs after the queue
                 // has been populated.
-                setTimeout(() => this.activity.logo.step(), 0);
+                this.activity.logo._timerManager.setTimeout(() => this.activity.logo.step(), 0);
             } else {
                 this.activity.logo.step();
             }

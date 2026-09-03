@@ -29,10 +29,21 @@ function makeMockActivity() {
         logo: {
             turtleDelay: 500,
             _alreadyRunning: false,
+            stopTurtle: false,
             runLogoCommands: jest.fn(),
             step: jest.fn(),
             doStopTurtles: jest.fn(),
             stepQueue: {},
+            _timerManager: {
+                setGuardedTimeout: jest.fn((cb, delay, guard) => {
+                    return setTimeout(() => {
+                        if (!guard()) cb();
+                    }, delay);
+                }),
+                setTimeout: jest.fn((cb, delay) => setTimeout(cb, delay)),
+                clearTimeout: jest.fn(id => clearTimeout(id)),
+                clearAll: jest.fn(() => 0)
+            },
             synth: {
                 resume: jest.fn()
             }
