@@ -17,7 +17,7 @@
    DEFAULTOSCILLATORTYPE, platformColor, rationalToFraction, last,
    Singer, instrumentsEffects:writeable, instrumentsFilters:writeable,
    docById, DEFAULTFILTERTYPE, docByName, OSCTYPES, FILTERTYPES,
-   oneHundredToFraction, delayExecution, ManagedTimer
+   oneHundredToFraction, delayExecution, ManagedTimer, announceToScreenReader
  */
 
 /*
@@ -851,6 +851,7 @@ class TimbreWidget {
         this._playing = false;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "timbre", "timbre", true);
+        announceToScreenReader(_("Timbre Widget opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -869,6 +870,7 @@ class TimbreWidget {
             // Clean up all event listeners
             this._cleanupEventListeners();
             this.activity.hideMsgs();
+            announceToScreenReader(_("Timbre Widget closed"));
             widgetWindow.destroy();
         };
 

@@ -24,6 +24,7 @@ const PitchStaircase = require("../pitchstaircase.js");
 
 // --- Global Mocks ---
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 global.platformColor = {
     labelColor: "#90c100",
     selectorBackground: "#f0f0f0",
