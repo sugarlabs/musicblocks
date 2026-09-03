@@ -987,6 +987,26 @@ class JSEditor {
                 }
             }
 
+            if (
+                !window.ast2blocklist_config &&
+                typeof window !== "undefined" &&
+                typeof window.require === "function"
+            ) {
+                try {
+                    await new Promise((resolve, reject) => {
+                        window.require(
+                            ["activity/js-export/ast2blocks.config"],
+                            () => {
+                                resolve(window.ast2blocklist_config);
+                            },
+                            reject
+                        );
+                    });
+                } catch {
+                    window.ast2blocklist_config_failed = true;
+                }
+            }
+
             if (!window.ast2blocklist_config) {
                 throw new Error(
                     window.ast2blocklist_config_failed
@@ -999,6 +1019,9 @@ class JSEditor {
 
             let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
             let blockList = AST2BlockList.toBlockList(ast, window.ast2blocklist_config);
+            if (!blockList || blockList.length === 0) {
+                throw new Error(_("No valid blocks could be generated from the code."));
+            }
             const activity = this.activity;
             // Wait for blocks to be trashed, loaded, and fully processed
             // before returning. loadNewBlocks processes blocks in async
