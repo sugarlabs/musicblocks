@@ -946,6 +946,9 @@ describe("Block Foundation", () => {
                 stageY: 100,
                 nativeEvent: { preventDefault: jest.fn() }
             });
+
+            expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+
             handlers.pressup({ stageX: 110, stageY: 100 });
 
             expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(0, 10, 0, true);
