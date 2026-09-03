@@ -236,6 +236,9 @@ window.widgetWindows = {
             return btn;
         }),
         getWidgetBody: jest.fn().mockReturnValue({
+            style: {},
+            children: [{ style: {} }],
+            offsetHeight: 400,
             append: jest.fn(),
             getElementsByTagName: jest.fn().mockReturnValue([
                 {
@@ -266,6 +269,11 @@ document.createElement = jest.fn().mockImplementation(tag => ({
     replaceChildren: jest.fn(),
     removeChild: jest.fn(),
     firstChild: null,
+    children: [{ style: {} }],
+    querySelector: jest.fn().mockReturnValue({
+        style: {},
+        setAttribute: jest.fn()
+    }),
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
@@ -773,6 +781,92 @@ describe("ModeWidget", () => {
             expect(modeWidget._modePiemenuOpen).toBe(true);
             modeWidget._onModePieButtonClick();
             expect(modeWidget._modePiemenuOpen).toBe(false);
+        });
+    });
+
+    describe("window maximization and scaling", () => {
+        test("widgetWindow.onmaximize is bound to the ModeWidget instance", () => {
+            const widget = new ModeWidget(mockActivity);
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            widget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            expect(typeof widget.widgetWindow.onmaximize).toBe("function");
+
+            // Invoke as WidgetWindow would invoke it (this = widgetWindow)
+            widget.widgetWindow.onmaximize.call(widget.widgetWindow);
+
+            // Verify _scale ran successfully with correct context by checking SVG was modified
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", expect.any(String));
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", expect.any(String));
+        });
+
+        test("_scale scales SVG to fit window when maximized", () => {
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            const originalIsMaximized = modeWidget.widgetWindow.isMaximized;
+            const originalGetFrame = modeWidget.widgetWindow.getWidgetFrame;
+            const originalGetDrag = modeWidget.widgetWindow.getDragElement;
+            const originalGetBody = modeWidget.widgetWindow.getWidgetBody;
+
+            modeWidget.widgetWindow.isMaximized = jest.fn().mockReturnValue(true);
+            modeWidget.widgetWindow.getWidgetFrame = jest
+                .fn()
+                .mockReturnValue({ offsetHeight: 500 });
+            modeWidget.widgetWindow.getDragElement = jest
+                .fn()
+                .mockReturnValue({ offsetHeight: 20 });
+            const widgetBody = { style: {}, offsetHeight: 400, children: [{ style: {} }] };
+            modeWidget.widgetWindow.getWidgetBody = jest.fn().mockReturnValue(widgetBody);
+
+            modeWidget._scale();
+
+            const expectedScale = (500 - 20) / 400; // windowHeight / bodyHeight = 1.2
+            const expectedSize = `${400 * expectedScale}px`; // WHEELSIZE (400) * scale
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", expectedSize);
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", expectedSize);
+
+            // Restore
+            modeWidget.widgetWindow.isMaximized = originalIsMaximized;
+            modeWidget.widgetWindow.getWidgetFrame = originalGetFrame;
+            modeWidget.widgetWindow.getDragElement = originalGetDrag;
+            modeWidget.widgetWindow.getWidgetBody = originalGetBody;
+        });
+
+        test("_scale resets SVG to default size when unmaximized", () => {
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            const originalIsMaximized = modeWidget.widgetWindow.isMaximized;
+            modeWidget.widgetWindow.isMaximized = jest.fn().mockReturnValue(false);
+
+            modeWidget._scale();
+
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", "400px"); // scale = 1
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", "400px");
+
+            // Restore
+            modeWidget.widgetWindow.isMaximized = originalIsMaximized;
+        });
+
+        test("_scale safely exits if widgetWindow or svg is not available", () => {
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            // Test: widgetWindow is null
+            const originalWindow = modeWidget.widgetWindow;
+            modeWidget.widgetWindow = null;
+            expect(() => modeWidget._scale()).not.toThrow();
+            expect(mockSvg.setAttribute).not.toHaveBeenCalled();
+
+            // Restore and test: svgContainer is null
+            modeWidget.widgetWindow = originalWindow;
+            modeWidget._meterWheelDiv = null;
+            expect(() => modeWidget._scale()).not.toThrow();
+
+            // Test: svg element is null
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(null) };
+            expect(() => modeWidget._scale()).not.toThrow();
         });
     });
 });
