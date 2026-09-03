@@ -186,6 +186,44 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             expect(Singer.processNote).not.toHaveBeenCalled();
             jest.useRealTimers();
         });
+
+        it("rejects non-finite note counts", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            logo._timerManager = new ManagedTimer();
+            rhythmBlock.flow([NaN, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(activity.errorMsg).toHaveBeenCalledWith("No input provided", "blkRhythm");
+            expect(logo._timerManager.activeTimeoutCount).toBe(3);
+            logo._timerManager.clearAll();
+        });
+
+        it("caps oversized note counts", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            logo._timerManager = new ManagedTimer();
+            rhythmBlock.flow([1001, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Maximum number of notes is 1000.",
+                "blkRhythm"
+            );
+            expect(logo._timerManager.activeTimeoutCount).toBe(1000);
+            logo._timerManager.clearAll();
+        });
+
+        it("normalizes fractional note counts", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            logo._timerManager = new ManagedTimer();
+            rhythmBlock.flow([2.5, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(logo._timerManager.activeTimeoutCount).toBe(2);
+            logo._timerManager.clearAll();
+        });
     });
 
     describe("Rhythm2Block", () => {
@@ -355,6 +393,21 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             const ret = stupletBlock.flow([3, 0.5], logo, turtleIndex, "blkSTuplet");
             expect(logo.tupletRhythms.length).toBeGreaterThan(0);
             expect(ret).toBeUndefined();
+        });
+
+        it("caps oversized note counts before scheduling notes", () => {
+            const stupletBlock = DummyFlowBlock.createdBlocks["stuplet"];
+            activity.blocks.blockList["blkSTuplet"] = { name: "stuplet" };
+            logo._timerManager = new ManagedTimer();
+
+            stupletBlock.flow([1001, 0.5], logo, turtleIndex, "blkSTuplet");
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Maximum number of notes is 1000.",
+                "blkSTuplet"
+            );
+            expect(logo._timerManager.activeTimeoutCount).toBe(1000);
+            logo._timerManager.clearAll();
         });
     });
 });
