@@ -876,6 +876,78 @@ describe("processPitch — note block execution path", () => {
     });
 });
 
+describe("processPitch widget-row definition adds one row per visit", () => {
+    // The Duplicate block re-queues each block in its clamp `factor` times
+    // (see DuplicateBlock.flow), so a pitch block is already visited once per
+    // duplicate. These guard against re-introducing a per-visit multiplier
+    // here, which would add factor x factor rows.
+    let turtleMock;
+    let activityMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        savedGlobals = {
+            noteIsSolfege: global.noteIsSolfege,
+            getSolfege: global.getSolfege
+        };
+        global.noteIsSolfege = jest.fn().mockReturnValue(false);
+        global.getSolfege = jest.fn(note => note);
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.inNoteBlock = [];
+        turtleMock.singer.duplicateFactor = 3;
+
+        activityMock = {
+            turtles: { ithTurtle: jest.fn().mockReturnValue(turtleMock) },
+            errorMsg: jest.fn(),
+            logo: {
+                synth: { inTemperament: false },
+                clearNoteParams: jest.fn(),
+                pitchBlocks: [],
+                inPitchDrumMatrix: false,
+                inMatrix: false,
+                inLegoWidget: false,
+                pitchDrumMatrix: { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [], drums: [] },
+                phraseMaker: { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [] },
+                legoWidget: { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [] }
+            }
+        };
+    });
+
+    afterEach(() => {
+        global.noteIsSolfege = savedGlobals.noteIsSolfege;
+        global.getSolfege = savedGlobals.getSolfege;
+    });
+
+    test("pitch-drum matrix adds exactly one row while duplicateFactor is 3", () => {
+        activityMock.logo.inPitchDrumMatrix = true;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.pitchDrumMatrix.rowLabels).toHaveLength(1);
+        expect(activityMock.logo.pitchDrumMatrix.rowArgs).toHaveLength(1);
+    });
+
+    test("phrase maker adds exactly one row while duplicateFactor is 3", () => {
+        activityMock.logo.inMatrix = true;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.phraseMaker.rowLabels).toHaveLength(1);
+        expect(activityMock.logo.phraseMaker.rowArgs).toHaveLength(1);
+    });
+
+    test("row count stays at one for a fractional duplicateFactor", () => {
+        activityMock.logo.inMatrix = true;
+        turtleMock.singer.duplicateFactor = 0.5;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(activityMock.logo.phraseMaker.rowLabels).toHaveLength(1);
+    });
+});
+
 describe("noteCounter regression behavior", () => {
     let turtleMock;
     let activityMock;
