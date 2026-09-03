@@ -2790,6 +2790,8 @@ describe("EQUIVALENTNATURALS double flats", () => {
         // spellings of the same two pitches must not land a semitone higher.
         expect(convertFromSolfege("C" + DOUBLEFLAT)).toBe("B" + FLAT);
         expect(convertFromSolfege("F" + DOUBLEFLAT)).toBe("E" + FLAT);
+        expect(convertFromSolfege("C" + FLAT + FLAT)).toBe("B" + FLAT);
+        expect(convertFromSolfege("F" + FLAT + FLAT)).toBe("E" + FLAT);
         expect(convertFromSolfege("C" + DOUBLEFLAT)).toBe(convertFromSolfege("do" + DOUBLEFLAT));
         expect(convertFromSolfege("F" + DOUBLEFLAT)).toBe(convertFromSolfege("fa" + DOUBLEFLAT));
     });
