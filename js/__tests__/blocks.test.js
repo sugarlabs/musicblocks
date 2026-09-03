@@ -1215,7 +1215,8 @@ describe("Blocks Foundation", () => {
                 }
             });
 
-            window.addEventListener("error", event => event.preventDefault());
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
 
             const finishedLoadingCalls = [];
             const loadBFinished = new Promise(resolve => {
@@ -1253,6 +1254,8 @@ describe("Blocks Foundation", () => {
             expect(finishedLoadingCalls).toHaveLength(1);
             expect(blocks._loadInProgress).toBe(false);
             expect(blocks._loadQueue).toHaveLength(0);
+
+            window.removeEventListener("error", onWindowError);
         });
     });
 
