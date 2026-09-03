@@ -2619,18 +2619,22 @@ class Singer {
                     tur.singer._unhighlightTimers = {};
                 }
                 if (tur.singer._unhighlightTimers[blk]) {
-                    clearTimeout(tur.singer._unhighlightTimers[blk]);
+                    activity.logo._timerManager.clearTimeout(tur.singer._unhighlightTimers[blk]);
                 }
                 const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
-                tur.singer._unhighlightTimers[blk] = setTimeout(() => {
-                    if (activity.blocks.visible && blk in activity.blocks.blockList) {
-                        activity.blocks.unhighlight(blk);
-                        if (activity.stage) {
-                            activity.stageDirty = true;
+                tur.singer._unhighlightTimers[blk] = activity.logo._timerManager.setGuardedTimeout(
+                    () => {
+                        if (activity.blocks.visible && blk in activity.blocks.blockList) {
+                            activity.blocks.unhighlight(blk);
+                            if (activity.stage) {
+                                activity.stageDirty = true;
+                            }
                         }
-                    }
-                    delete tur.singer._unhighlightTimers[blk];
-                }, highlightDurationMs);
+                        delete tur.singer._unhighlightTimers[blk];
+                    },
+                    highlightDurationMs,
+                    () => activity.logo.stopTurtle
+                );
             };
 
             if (last(tur.singer.inNoteBlock) !== null || noteInNote) {

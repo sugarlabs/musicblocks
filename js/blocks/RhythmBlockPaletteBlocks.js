@@ -45,11 +45,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
     const scheduleNote = (logo, activity, beat, blk, turtle, callback, timeout) => {
         const processNote = () => Singer.processNote(activity, beat, false, blk, turtle, callback);
 
-        if (logo._timerManager && typeof logo._timerManager.setGuardedTimeout === "function") {
-            logo._timerManager.setGuardedTimeout(processNote, timeout, () => logo.stopTurtle);
-        } else {
-            setTimeout(processNote, timeout);
-        }
+        logo._timerManager.setGuardedTimeout(processNote, timeout, () => logo.stopTurtle);
     };
 
     /**
