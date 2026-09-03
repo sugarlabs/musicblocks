@@ -27,7 +27,7 @@
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
     docById, define, BlocksDependencies, deepClone, pubsub,
     MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
-    CAMERAVALUE, VIDEOVALUE, setupBlockDragController
+    CAMERAVALUE, VIDEOVALUE, VIEWPORT_CULL_PADDING, setupBlockDragController
 */
 
 /* global showZoomOverlay */
@@ -38,7 +38,7 @@
         createjs
    - js/block-constants.js
         MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
-        CAMERAVALUE, VIDEOVALUE
+        CAMERAVALUE, VIDEOVALUE, VIEWPORT_CULL_PADDING
    - js/block.js
         Block
    - js/activity/block-drag-controller.js
@@ -7015,11 +7015,16 @@ class Blocks {
             const container = this.activity.blocksContainer;
             if (!container) return;
 
-            // Viewport rect in container-space
-            const vpLeft = -container.x;
-            const vpTop = -container.y;
-            const vpRight = vpLeft + canvas.width;
-            const vpBottom = vpTop + canvas.height;
+            // Viewport rect in container-space with screen-space padding converted to container units
+            const scaleX = container.scaleX || 1;
+            const scaleY = container.scaleY || 1;
+            const paddingX = VIEWPORT_CULL_PADDING / scaleX;
+            const paddingY = VIEWPORT_CULL_PADDING / scaleY;
+
+            const vpLeft = -container.x / scaleX - paddingX;
+            const vpTop = -container.y / scaleY - paddingY;
+            const vpRight = (-container.x + canvas.width) / scaleX + paddingX;
+            const vpBottom = (-container.y + canvas.height) / scaleY + paddingY;
 
             for (let i = 0; i < this.blockList.length; i++) {
                 const block = this.blockList[i];

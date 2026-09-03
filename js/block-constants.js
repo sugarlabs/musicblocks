@@ -12,7 +12,7 @@
 /*
    exported
    MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
-   CAMERAVALUE, VIDEOVALUE
+   CAMERAVALUE, VIDEOVALUE, VIEWPORT_CULL_PADDING
  */
 
 /**
@@ -35,12 +35,20 @@ const SPATIAL_GRID_CELL_SIZE = 50;
 const CAMERAVALUE = "##__CAMERA__##";
 const VIDEOVALUE = "##__VIDEO__##";
 
+/**
+ * Viewport culling buffer in screen-space pixels.
+ * Blocks within this margin outside the visible screen stay rendered,
+ * preventing visual pop-in during panning, dragging, and fast zooming.
+ */
+const VIEWPORT_CULL_PADDING = 150;
+
 const blockConstants = {
     MINIMUMDOCKDISTANCE,
     LONGSTACK,
     SPATIAL_GRID_CELL_SIZE,
     CAMERAVALUE,
-    VIDEOVALUE
+    VIDEOVALUE,
+    VIEWPORT_CULL_PADDING
 };
 
 if (typeof module !== "undefined" && module.exports) {

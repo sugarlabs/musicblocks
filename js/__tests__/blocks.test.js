@@ -169,10 +169,10 @@ describe("Viewport Culling", () => {
 
     it("should mark blocks outside the viewport as not visible", () => {
         blocks.blockList = [
-            { trash: false, container: { x: -200, y: 100 }, width: 50, height: 30 },
-            { trash: false, container: { x: 900, y: 100 }, width: 50, height: 30 },
-            { trash: false, container: { x: 100, y: -100 }, width: 50, height: 30 },
-            { trash: false, container: { x: 100, y: 700 }, width: 50, height: 30 }
+            { trash: false, container: { x: -300, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 1100, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 100, y: -300 }, width: 50, height: 30 },
+            { trash: false, container: { x: 100, y: 900 }, width: 50, height: 30 }
         ];
 
         blocks._updateViewportCulling();
@@ -183,23 +183,158 @@ describe("Viewport Culling", () => {
         expect(blocks.blockList[3]._viewportVisible).toBe(false);
     });
 
-    it("should handle scrolled viewport offset", () => {
-        mockActivity.blocksContainer.x = -200;
-        mockActivity.blocksContainer.y = -100;
-
+    it("should keep blocks within the 150px screen-space padding visible (prevent edge pop-in)", () => {
+        // Canvas: 800x600, scale: 1.0, padding: 150px
+        // Padded viewport: X in [-150, 950], Y in [-150, 750]
         blocks.blockList = [
-            { trash: false, container: { x: 0, y: 0 }, width: 50, height: 30 },
-            { trash: false, container: { x: 300, y: 200 }, width: 50, height: 30 },
-            { trash: false, container: { x: 1000, y: 800 }, width: 50, height: 30 }
+            // Block positioned just outside screen (x: 850) but within 150px padding (850 < 950)
+            { trash: false, container: { x: 850, y: 100 }, width: 50, height: 30 },
+            // Block positioned just outside screen on left (x: -100, width: 50, right edge = -50 > -150)
+            { trash: false, container: { x: -100, y: 100 }, width: 50, height: 30 },
+            // Block strictly beyond the 150px padding boundary (x: 951 > 950)
+            { trash: false, container: { x: 951, y: 100 }, width: 50, height: 30 }
         ];
 
         blocks._updateViewportCulling();
 
-        // vp rect = (200, 100) to (1000, 700)
-        // Block at (0,0) with w=50,h=30: (0+50) <= 200 → off-screen left
+        expect(blocks.blockList[0]._viewportVisible).toBe(true);
+        expect(blocks.blockList[1]._viewportVisible).toBe(true);
+        expect(blocks.blockList[2]._viewportVisible).toBe(false);
+    });
+
+    it("should handle scrolled viewport offset with padding", () => {
+        mockActivity.blocksContainer.x = -200;
+        mockActivity.blocksContainer.y = -100;
+
+        // Container offset: (-200, -100), canvas: 800x600, padding: 150
+        // Padded world viewport: X in [50, 1150], Y in [-50, 850]
+        blocks.blockList = [
+            // Right edge at -50 + 50 = 0 <= 50 -> off-screen left beyond padding
+            { trash: false, container: { x: -50, y: 0 }, width: 50, height: 30 },
+            // Inside padded viewport (300, 200)
+            { trash: false, container: { x: 300, y: 200 }, width: 50, height: 30 },
+            // Right edge at 1200 > 1150 and left edge at 1200 >= 1150 -> off-screen right beyond padding
+            { trash: false, container: { x: 1200, y: 800 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
         expect(blocks.blockList[0]._viewportVisible).toBe(false);
         expect(blocks.blockList[1]._viewportVisible).toBe(true);
         expect(blocks.blockList[2]._viewportVisible).toBe(false);
+    });
+
+    describe("Deterministic Zoom & Scale-Aware Viewport AABB Geometry", () => {
+        // Canvas: 800 x 600, Container: (0, 0), Screen padding: 150px
+        it("should correctly calculate AABB visibility at scale = 0.5 (zoomed out)", () => {
+            mockActivity.blocksContainer.scaleX = 0.5;
+            mockActivity.blocksContainer.scaleY = 0.5;
+            // Screen padding 150px / 0.5 = 300 world units
+            // World viewport: X in [-300, 1900], Y in [-300, 1500]
+            const inside = {
+                trash: false,
+                container: { x: 400, y: 300 },
+                width: 50,
+                height: 30
+            };
+            // Block B: x = 1880, width = 50 -> [1880, 1930] overlaps X <= 1900 boundary
+            const edgeOverlap = {
+                trash: false,
+                container: { x: 1880, y: 500 },
+                width: 50,
+                height: 30
+            };
+            // Block C: x = 1901, width = 50 -> strictly outside (left edge 1901 > 1900)
+            const outside = {
+                trash: false,
+                container: { x: 1901, y: 500 },
+                width: 50,
+                height: 30
+            };
+
+            blocks.blockList = [inside, edgeOverlap, outside];
+            blocks._updateViewportCulling();
+
+            expect(inside._viewportVisible).toBe(true);
+            expect(edgeOverlap._viewportVisible).toBe(true);
+            expect(outside._viewportVisible).toBe(false);
+        });
+
+        it("should correctly calculate AABB visibility at scale = 1.0 (default)", () => {
+            mockActivity.blocksContainer.scaleX = 1.0;
+            mockActivity.blocksContainer.scaleY = 1.0;
+            // Screen padding 150px / 1.0 = 150 world units
+            // World viewport: X in [-150, 950], Y in [-150, 750]
+            const inside = {
+                trash: false,
+                container: { x: 400, y: 300 },
+                width: 50,
+                height: 30
+            };
+            // Block B: x = 940, width = 50 -> [940, 990] overlaps X <= 950 boundary
+            const edgeOverlap = {
+                trash: false,
+                container: { x: 940, y: 300 },
+                width: 50,
+                height: 30
+            };
+            // Block C: x = 951, width = 50 -> strictly outside (left edge 951 > 950)
+            const outside = {
+                trash: false,
+                container: { x: 951, y: 300 },
+                width: 50,
+                height: 30
+            };
+
+            blocks.blockList = [inside, edgeOverlap, outside];
+            blocks._updateViewportCulling();
+
+            expect(inside._viewportVisible).toBe(true);
+            expect(edgeOverlap._viewportVisible).toBe(true);
+            expect(outside._viewportVisible).toBe(false);
+        });
+
+        it("should correctly calculate AABB visibility at scale = 2.0 (zoomed in)", () => {
+            mockActivity.blocksContainer.scaleX = 2.0;
+            mockActivity.blocksContainer.scaleY = 2.0;
+            // Screen padding 150px / 2.0 = 75 world units
+            // World viewport: X in [-75, 475], Y in [-75, 375]
+            const inside = {
+                trash: false,
+                container: { x: 200, y: 150 },
+                width: 50,
+                height: 30
+            };
+            // Block B: x = 470, width = 50 -> [470, 520] overlaps X <= 475 boundary
+            const edgeOverlap = {
+                trash: false,
+                container: { x: 470, y: 150 },
+                width: 50,
+                height: 30
+            };
+            // Block C: x = 476, width = 50 -> strictly outside (left edge 476 > 475)
+            const outside = {
+                trash: false,
+                container: { x: 476, y: 150 },
+                width: 50,
+                height: 30
+            };
+            // Block D: at (1000, 700) - would be visible at scale 0.5, but culled at scale 2.0
+            const farOutside = {
+                trash: false,
+                container: { x: 1000, y: 700 },
+                width: 50,
+                height: 30
+            };
+
+            blocks.blockList = [inside, edgeOverlap, outside, farOutside];
+            blocks._updateViewportCulling();
+
+            expect(inside._viewportVisible).toBe(true);
+            expect(edgeOverlap._viewportVisible).toBe(true);
+            expect(outside._viewportVisible).toBe(false);
+            expect(farOutside._viewportVisible).toBe(false);
+        });
     });
 
     it("should refresh a stale highlight cache when a block re-enters the viewport", () => {
