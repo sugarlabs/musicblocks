@@ -1175,6 +1175,60 @@ describe("Blocks Foundation", () => {
             expect(blocks.blockList[0].connections[1]).toBeNull();
         });
 
+        it("snaps a booleanout block (e.g. And/Or/Not) onto an anyin dock, like Switch/Case (#8463)", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "anyin"]
+                    ],
+                    connections: [null, null],
+                    name: "switch"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "booleanout"]],
+                    connections: [null],
+                    name: "and"
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[0].connections[1]).toBe(1);
+        });
+
+        it("snaps an anyout block (e.g. namedbox) onto a booleanin dock, like If/While (#8463)", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "booleanin"]
+                    ],
+                    connections: [null, null],
+                    name: "if"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "anyout"]],
+                    connections: [null],
+                    name: "namedbox"
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[0].connections[1]).toBe(1);
+        });
+
         it("exposes the same BlockDragController instance to every delegated method", () => {
             expect(blocks.blockDragController).toBeDefined();
             expect(blocks.findDragGroup).not.toBe(blocks.blockDragController.findDragGroup);
