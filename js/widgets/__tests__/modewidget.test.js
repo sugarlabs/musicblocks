@@ -785,34 +785,78 @@ describe("ModeWidget", () => {
     });
 
     describe("window maximization and scaling", () => {
+        let mockSvg;
+        let mockMeterWheelDiv;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            mockSvg = {
+                style: { pointerEvents: "auto" },
+                setAttribute: jest.fn()
+            };
+            mockMeterWheelDiv = {
+                querySelector: jest.fn(selector => {
+                    if (selector === "svg") return mockSvg;
+                    return null;
+                })
+            };
+        });
+
+        afterEach(() => {
+            jest.runOnlyPendingTimers();
+            jest.useRealTimers();
+        });
+
         test("widgetWindow.onmaximize is bound to the ModeWidget instance", () => {
-            const scaleSpy = jest.spyOn(ModeWidget.prototype, "_scale");
             const widget = new ModeWidget(mockActivity);
+            widget._meterWheelDiv = mockMeterWheelDiv;
             expect(typeof widget.widgetWindow.onmaximize).toBe("function");
 
-            // Invoke as WidgetWindow would invoke it (this = widgetWindow)
+            // Execute callback with an external context (simulating WidgetWindow call)
             widget.widgetWindow.onmaximize.call(widget.widgetWindow);
-            expect(scaleSpy).toHaveBeenCalled();
-            scaleSpy.mockRestore();
+
+            // Assert it called ModeWidget's logic and set the SVG attributes
+            expect(mockMeterWheelDiv.querySelector).toHaveBeenCalledWith("svg");
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", expect.any(String));
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", expect.any(String));
         });
 
-        test("_scale executes without throwing when maximized", () => {
-            modeWidget.widgetWindow.isMaximized = jest.fn().mockReturnValue(true);
-            expect(() => {
-                modeWidget._scale();
-            }).not.toThrow();
+        test("_scale safely exits if svgContainer or svg is null", () => {
+            const widget = new ModeWidget(mockActivity);
+            widget._meterWheelDiv = null;
+            expect(() => widget._scale()).not.toThrow();
+
+            widget._meterWheelDiv = { querySelector: () => null };
+            expect(() => widget._scale()).not.toThrow();
         });
 
-        test("_scale executes without throwing when unmaximized", () => {
-            modeWidget.widgetWindow.isMaximized = jest.fn().mockReturnValue(false);
-            expect(() => {
-                modeWidget._scale();
-            }).not.toThrow();
-        });
+        test("_scale updates SVG dimensions based on window maximization", () => {
+            const widget = new ModeWidget(mockActivity);
+            widget._meterWheelDiv = mockMeterWheelDiv;
+            widget.widgetWindow.isMaximized = jest.fn().mockReturnValue(true);
+            widget.widgetWindow.getWidgetFrame = jest.fn().mockReturnValue({ offsetHeight: 600 });
+            widget.widgetWindow.getDragElement = jest.fn().mockReturnValue({ offsetHeight: 40 });
+            widget.widgetWindow.getWidgetBody = jest.fn().mockReturnValue({
+                offsetHeight: 280,
+                style: {},
+                children: [{ style: {} }]
+            });
 
-        test("_scale safely exits if widgetWindow or svg is not available", () => {
-            modeWidget.widgetWindow = null;
-            expect(() => modeWidget._scale()).not.toThrow();
+            widget._scale();
+
+            const expectedScale = (600 - 40) / 280; // 2
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith(
+                "height",
+                `${ModeWidget.WHEELSIZE * expectedScale}px`
+            );
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith(
+                "width",
+                `${ModeWidget.WHEELSIZE * expectedScale}px`
+            );
+            expect(mockSvg.style.pointerEvents).toBe("none");
+
+            jest.advanceTimersByTime(100);
+            expect(mockSvg.style.pointerEvents).toBe("auto");
         });
     });
 });
