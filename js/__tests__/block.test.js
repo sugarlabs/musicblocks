@@ -918,25 +918,26 @@ describe("Block Foundation", () => {
             mockBlocks.clearCachedDragGroup = jest.fn();
             mockBlocks.invalidateTopBlockCache = jest.fn();
             mockBlocks.unhighlight = jest.fn();
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
 
             block.activity.getStageScale = jest.fn().mockReturnValue(1);
             block.activity.blocksContainer = { y: 0 };
             block.activity.scrollBlockContainer = false;
             block.activity.trashcan = {
                 show: jest.fn(),
+                hide: jest.fn(),
                 overTrashcan: jest.fn().mockReturnValue(false),
                 startHighlightAnimation: jest.fn(),
                 stopHighlightAnimation: jest.fn()
             };
 
             block._loadEventHandlers();
+            global.docById.mockReturnValue({ style: {} });
             return { block, handlers };
         };
 
         it("defers cached drag-group updates and marks the release dirty", () => {
-            const { block, handlers } = makeEventBlock();
-            const mouseoutSpy = jest.spyOn(block, "_mouseoutCallback").mockImplementation(() => {});
-            global.docById.mockReturnValue({ style: {} });
+            const { handlers } = makeEventBlock();
 
             handlers.mousedown({ stageX: 100, stageY: 100 });
 
@@ -949,18 +950,12 @@ describe("Block Foundation", () => {
 
             expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(0, 10, 0, true);
             expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(1, 10, 0, true);
-            expect(mouseoutSpy).toHaveBeenCalledWith(
-                expect.anything(),
-                false,
-                false,
-                false,
-                true,
-                true
-            );
+            expect(mockBlocks.syncDragGroupSpatialGrid).toHaveBeenCalledTimes(1);
         });
 
         it("defers drag-group updates when the cached group is unavailable", () => {
             const { handlers } = makeEventBlock();
+            handlers.mousedown({ stageX: 100, stageY: 100 });
             mockBlocks._cachedDragGroup = null;
             mockBlocks.dragGroup = [0, 1];
             mockBlocks.findDragGroup = jest.fn();
@@ -977,19 +972,12 @@ describe("Block Foundation", () => {
         });
 
         it("reports a clean grid when release follows no coordinate movement", () => {
-            const { block, handlers } = makeEventBlock();
-            const mouseoutSpy = jest.spyOn(block, "_mouseoutCallback").mockImplementation(() => {});
+            const { handlers } = makeEventBlock();
 
+            handlers.mousedown({ stageX: 100, stageY: 100 });
             handlers.pressup({ stageX: 100, stageY: 100 });
 
-            expect(mouseoutSpy).toHaveBeenCalledWith(
-                expect.anything(),
-                false,
-                false,
-                false,
-                true,
-                false
-            );
+            expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
         });
 
         it("reconciles the grid after restoring trash-hover positions and before docking", () => {
