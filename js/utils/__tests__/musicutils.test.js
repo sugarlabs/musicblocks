@@ -436,6 +436,66 @@ describe("getIntervalRatio", () => {
         expect(getIntervalRatio("perfect 5")).toBe(1.5);
         expect(getIntervalRatio("major 3")).toBe(1.25);
     });
+
+    it("should return the just diminished seventh for diminished 7", () => {
+        expect(getIntervalRatio("diminished 7")).toBeCloseTo(128 / 75, 10);
+    });
+
+    it("should keep every diminished ratio the octave inversion of its augmented complement", () => {
+        // A diminished nth and an augmented (9 - n)th add up to an octave, so
+        // their ratios must multiply to 2.
+        const complements = [
+            ["diminished 2", "augmented 7"],
+            ["diminished 3", "augmented 6"],
+            ["diminished 4", "augmented 5"],
+            ["diminished 5", "augmented 4"],
+            ["diminished 6", "augmented 3"],
+            ["diminished 7", "augmented 2"],
+            ["diminished 8", "augmented 1"]
+        ];
+
+        for (const [diminished, augmented] of complements) {
+            expect(getIntervalNumber(diminished) + getIntervalNumber(augmented)).toBe(12);
+            expect(getIntervalRatio(diminished) * getIntervalRatio(augmented)).toBeCloseTo(2, 10);
+        }
+    });
+
+    it("should keep every ratio within half a semitone of its semitone count", () => {
+        const intervals = [
+            "perfect 1",
+            "diminished 2",
+            "augmented 1",
+            "minor 2",
+            "major 2",
+            "diminished 3",
+            "augmented 2",
+            "minor 3",
+            "major 3",
+            "diminished 4",
+            "augmented 3",
+            "perfect 4",
+            "augmented 4",
+            "diminished 5",
+            "perfect 5",
+            "diminished 6",
+            "augmented 5",
+            "minor 6",
+            "major 6",
+            "diminished 7",
+            "augmented 6",
+            "minor 7",
+            "major 7",
+            "diminished 8",
+            "augmented 7",
+            "perfect 8",
+            "augmented 8"
+        ];
+
+        for (const interval of intervals) {
+            const semitones = 12 * Math.log2(getIntervalRatio(interval));
+            expect(Math.abs(semitones - getIntervalNumber(interval))).toBeLessThan(0.5);
+        }
+    });
 });
 
 describe("getModeNumbers", () => {
