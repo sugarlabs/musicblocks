@@ -73,6 +73,7 @@ const {
     getIntervalNumber,
     getIntervalDirection,
     getIntervalRatio,
+    INTERVALVALUES,
     getModeNumbers,
     getDrumIndex,
     getDrumName,
@@ -461,35 +462,9 @@ describe("getIntervalRatio", () => {
     });
 
     it("should keep every ratio within half a semitone of its semitone count", () => {
-        const intervals = [
-            "perfect 1",
-            "diminished 2",
-            "augmented 1",
-            "minor 2",
-            "major 2",
-            "diminished 3",
-            "augmented 2",
-            "minor 3",
-            "major 3",
-            "diminished 4",
-            "augmented 3",
-            "perfect 4",
-            "augmented 4",
-            "diminished 5",
-            "perfect 5",
-            "diminished 6",
-            "augmented 5",
-            "minor 6",
-            "major 6",
-            "diminished 7",
-            "augmented 6",
-            "minor 7",
-            "major 7",
-            "diminished 8",
-            "augmented 7",
-            "perfect 8",
-            "augmented 8"
-        ];
+        // Derived from the table itself so a newly added interval is covered
+        // automatically rather than needing to be listed here.
+        const intervals = Object.keys(INTERVALVALUES);
 
         for (const interval of intervals) {
             const semitones = 12 * Math.log2(getIntervalRatio(interval));
