@@ -199,6 +199,18 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             logo._timerManager.clearAll();
         });
 
+        it("rejects Infinity note counts", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            logo._timerManager = new ManagedTimer();
+            rhythmBlock.flow([Infinity, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(activity.errorMsg).toHaveBeenCalledWith("No input provided", "blkRhythm");
+            expect(logo._timerManager.activeTimeoutCount).toBe(3);
+            logo._timerManager.clearAll();
+        });
+
         it("caps oversized note counts", () => {
             const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
             activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };

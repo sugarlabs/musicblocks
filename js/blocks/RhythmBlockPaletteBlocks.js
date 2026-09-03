@@ -41,7 +41,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
 
         if (value > MAX_RHYTHM_NOTES) {
-            activity.errorMsg(_("Maximum number of notes is 1000."), blk);
+            activity.errorMsg(
+                _("Maximum number of notes is %s.").replace(/%s/g, MAX_RHYTHM_NOTES),
+                blk
+            );
             return MAX_RHYTHM_NOTES;
         }
 
