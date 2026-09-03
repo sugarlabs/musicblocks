@@ -195,16 +195,6 @@ function TemperamentWidget() {
         }
         return frequencies;
     };
-    const _rebuildStateFromRatios = (target, pitchNum) => {
-        for (let k = 0; k < pitchNum; k++) {
-            target.cents[k] = ratioToCents(target.ratios[k], target.powerBase);
-            const f = Number(target.frequencies[0]) * target.ratios[k];
-            const o = frequencyToPitch(f, target.inTemperament);
-            target.notes[k] = [o[0], o[1]];
-            target.intervals[k] = "";
-            target.ratiosNotesPair[k] = [target.ratios[k], target.notes[k]];
-        }
-    };
 
     /** Sets a wheelnav nav item's fill/hover/path/selected color attributes to one color. */
     const setNavItemColor = (navObj, index, color) => {
@@ -1797,7 +1787,14 @@ function TemperamentWidget() {
                 this.frequencies = computeFrequencies(this.ratios, frequency, pitchNumber);
 
                 this.pitchNumber = pitchNumber;
-                _rebuildStateFromRatios(this, pitchNumber);
+                for (let k = 0; k < pitchNumber; k++) {
+                    this.cents[k] = ratioToCents(this.ratios[k], this.powerBase);
+                    const f = Number(this.frequencies[0]) * this.ratios[k];
+                    const o = frequencyToPitch(f, this.inTemperament);
+                    this.notes[k] = [o[0], o[1]];
+                    this.intervals[k] = "";
+                    this.ratiosNotesPair[k] = [this.ratios[k], this.notes[k]];
+                }
                 this.checkTemperament(compareRatios);
                 this._visualizerView();
             } else if (event.target.textContent === _("preview")) {
@@ -1828,7 +1825,14 @@ function TemperamentWidget() {
                     that.frequencies = computeFrequencies(that.ratios, frequency, pitchNumber);
 
                     that.pitchNumber = pitchNumber;
-                    _rebuildStateFromRatios(that, pitchNumber);
+                    for (let k = 0; k < pitchNumber; k++) {
+                        that.cents[k] = ratioToCents(that.ratios[k], that.powerBase);
+                        const f = Number(that.frequencies[0]) * that.ratios[k];
+                        const o = frequencyToPitch(f, that.inTemperament);
+                        that.notes[k] = [o[0], o[1]];
+                        that.intervals[k] = "";
+                        that.ratiosNotesPair[k] = [that.ratios[k], that.notes[k]];
+                    }
                     that.eqTempPitchNumber = null;
                     that.eqTempHzs = [];
                     that.checkTemperament(compareRatios);

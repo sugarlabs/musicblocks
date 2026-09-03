@@ -3890,51 +3890,20 @@ const isTrueEDO = temperament => {
  * @param {string} temperament - The temperament key.
  * @returns {boolean} True if the temperament is an equal division of the octave.
  */
-const _isEquallyTemperedCache = new Map();
-
 const isEquallyTempered = temperament => {
-    if (_isEquallyTemperedCache.has(temperament)) {
-        return _isEquallyTemperedCache.get(temperament);
-    }
-    let result = false;
     const t = getTemperament(temperament);
-    if (!t || typeof t !== "object") {
-        result = false;
-    } else if (t.isEDO === true) {
-        // Explicit equal temperament flag always wins.
-        result = true;
-    } else if (t.isEDO === false) {
-        // Explicit non-EDO (JI, meantone, Pythagorean) is never EDO, even when
-        // its intervals approximate an EDO within tolerance.
-        result = false;
-    } else if (t.ratios) {
-        // EDO temperaments commonly expose a `ratios` array; treat presence of a
-        // full ratios array as equally tempered without re-verifying each entry.
-        result = Array.isArray(t.ratios) && t.ratios.length >= 2;
-    } else {
-        // No explicit flag and no ratios array (e.g. editor-saved "custom"
-        // temperaments): detect by verifying the numeric pitch entries match
-        // equal steps. Tolerance is tight (1e-9) so only genuinely equal grids
-        // are classified as EDO.
-        const n = t.pitchNumber;
-        if (Number.isInteger(n) && n >= 2) {
-            result = true;
-            for (let i = 0; i < n; i++) {
-                const entry = t["" + i];
-                if (!Array.isArray(entry) || typeof entry[0] !== "number") {
-                    result = false;
-                    break;
-                }
-                const expected = Math.pow(2, i / n);
-                if (Math.abs(entry[0] - expected) > 1e-9) {
-                    result = false;
-                    break;
-                }
-            }
-        }
+    if (!t || typeof t !== "object") return false;
+    if (t.isEDO === true) return true;
+    if (t.isEDO === false) return false;
+    if (t.ratios) return Array.isArray(t.ratios) && t.ratios.length >= 2;
+    const n = t.pitchNumber;
+    if (!Number.isInteger(n) || n < 2) return false;
+    for (let i = 0; i < n; i++) {
+        const entry = t["" + i];
+        if (!Array.isArray(entry) || typeof entry[0] !== "number") return false;
+        if (Math.abs(entry[0] - Math.pow(2, i / n)) > 1e-9) return false;
     }
-    _isEquallyTemperedCache.set(temperament, result);
-    return result;
+    return true;
 };
 
 /**
@@ -3964,14 +3933,7 @@ const isNonEDO = temperament => {
     return temperamentHasRatios(temperament) && !isEquallyTempered(temperament);
 };
 
-/**
- * Clear cached temperament classifications. Call this whenever a temperament
- * entry is (re)defined at runtime (editor save, custom-mode load, widget
- * dynamic registration) so a stale result is not returned for the same key.
- */
-const clearTemperamentCaches = () => {
-    _isEquallyTemperedCache.clear();
-};
+const clearTemperamentCaches = () => {};
 
 /**
  * Integer step pattern for a mode under a non-EDO temperament: each
