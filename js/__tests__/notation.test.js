@@ -79,10 +79,29 @@ describe("Notation Class", () => {
             expect(notation.notationDrumStaging).toEqual(drumStaging);
         });
 
-        it("should correctly set and get notationMarkup", () => {
-            const markup = { turtle1: ["markup1", "markup2"] };
-            notation.notationMarkup = markup;
-            expect(notation.notationMarkup).toEqual(markup);
+        it("should queue markup for the next note using notationMarkup", () => {
+            const turtle = "turtle1";
+            notation.notationMarkup(turtle, 440.25);
+            notation.notationMarkup(turtle, "adagio");
+            expect(notation._markup[turtle]).toEqual([440.25, "adagio"]);
+            // Nothing is staged until the next note arrives.
+            expect(notation._notationStaging[turtle]).toEqual([]);
+        });
+
+        it("should initialize the markup queue for an unseen turtle", () => {
+            notation.notationMarkup("turtle2", 220.5);
+            expect(notation._markup["turtle2"]).toEqual([220.5]);
+        });
+
+        it("should attach queued markup after the note staged by doUpdateNotation", () => {
+            const turtle = "turtle1";
+            notation.notationMarkup(turtle, 440.25);
+            notation.doUpdateNotation(["A4"], 4, turtle, false, "");
+            const staging = notation._notationStaging[turtle];
+            expect(Array.isArray(staging[0])).toBe(true);
+            expect(staging[0][0]).toEqual(["A4"]);
+            expect(staging.slice(1)).toEqual(["markup", 440.25]);
+            expect(notation._markup[turtle]).toEqual([]);
         });
 
         it("should correctly return pickupPOW2 and pickupPoint", () => {
@@ -211,6 +230,17 @@ describe("Notation Class", () => {
             expect(notation._notationStaging[turtle]).toEqual(["meter", count, value]);
         });
 
+        it("should move the meter before a staged pickup", () => {
+            const turtle = "turtle1";
+            // convertFactor is mocked to return 4, so this stages "pickup", 4.
+            notation.notationPickup(turtle, 0.25);
+            expect(notation._notationStaging[turtle]).toEqual(["pickup", 4]);
+            notation.notationMeter(turtle, 3, 4);
+            // Lilypond prefers meter to be before partials.
+            expect(notation._notationStaging[turtle]).toEqual(["meter", 3, 4, "pickup", 4]);
+            expect(notation._pickupPoint[turtle]).toBeNull();
+        });
+
         it("should handle notationSwing", () => {
             const turtle = "turtle1";
             notation.notationSwing(turtle);
@@ -324,20 +354,6 @@ describe("Notation Class", () => {
             notation.notationRemoveTie(turtle);
             expect(notation._notationStaging[turtle].length).toBe(initialLength - 1);
             expect(notation._pickupPoint[turtle]).toBeNull();
-        });
-    });
-
-    describe("Static Methods", () => {
-        it("should handle notation markup via static method", () => {
-            // Mock the static property that the method uses
-            const originalMarkup = Notation._markup;
-            Notation._markup = { turtle1: [] };
-
-            Notation.notationMarkup("turtle1", "staccato");
-            expect(Notation._markup["turtle1"]).toContain("staccato");
-
-            // Restore the original
-            Notation._markup = originalMarkup;
         });
     });
 
