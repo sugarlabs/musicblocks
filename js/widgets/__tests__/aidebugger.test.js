@@ -847,10 +847,88 @@ describe("AIDebuggerWidget", () => {
         });
     });
 
-    describe("_exportChat", () => {
+    describe("_initializeBackendWithProject", () => {
         let debuggerWidget;
 
         beforeEach(() => {
+            debuggerWidget = new AIDebuggerWidget();
+
+            debuggerWidget.activity = {
+                textMsg: jest.fn()
+            };
+
+            debuggerWidget._addMessageToUI = jest.fn();
+            debuggerWidget._addWelcomeMessage = jest.fn();
+            debuggerWidget._showTypingIndicator = jest.fn();
+            debuggerWidget._hideTypingIndicator = jest.fn();
+            debuggerWidget._updateMessageCount = jest.fn();
+
+            debuggerWidget.chatHistory = [
+                {
+                    type: "user",
+                    content: "How do I fix this?"
+                }
+            ];
+        });
+
+        test("initializes backend and adds response to chat history", async () => {
+            global.fetch = jest.fn(() =>
+                Promise.resolve({
+                    ok: true,
+                    json: () =>
+                        Promise.resolve({
+                            response: "Use the forward block."
+                        })
+                })
+            );
+
+            debuggerWidget._initializeBackendWithProject("project data");
+
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(fetch).toHaveBeenCalledWith(
+                expect.stringContaining("/analyze"),
+                expect.objectContaining({
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+            );
+
+            expect(debuggerWidget._showTypingIndicator).toHaveBeenCalled();
+            expect(debuggerWidget._hideTypingIndicator).toHaveBeenCalled();
+
+            expect(debuggerWidget.chatHistory).toContainEqual(
+                expect.objectContaining({
+                    type: "bot",
+                    content: "Use the forward block."
+                })
+            );
+
+            expect(debuggerWidget._addMessageToUI).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: "bot",
+                    content: "Use the forward block."
+                })
+            );
+
+            delete global.fetch;
+        });
+    });
+
+    describe("_exportChat", () => {
+        let debuggerWidget;
+        let originalCreateObjectURL;
+        let originalRevokeObjectURL;
+
+        beforeEach(() => {
+            originalCreateObjectURL = URL.createObjectURL;
+            originalRevokeObjectURL = URL.revokeObjectURL;
+
+            URL.createObjectURL = jest.fn(() => "blob:url");
+            URL.revokeObjectURL = jest.fn();
+
             debuggerWidget = new AIDebuggerWidget();
             debuggerWidget.activity = {
                 textMsg: jest.fn(),
@@ -858,45 +936,7 @@ describe("AIDebuggerWidget", () => {
             };
         });
 
-        test("shows message when no conversation to export", () => {
-            debuggerWidget.chatHistory = [];
-            debuggerWidget._exportChat();
-            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
-                "No conversation to export."
-            );
-        });
-        test("exports chat conversation successfully", () => {
-            const originalCreateObjectURL = URL.createObjectURL;
-            const originalRevokeObjectURL = URL.revokeObjectURL;
-            debuggerWidget.chatHistory = [
-                {
-                    type: "user",
-                    content: "How do I move forward?"
-                },
-                {
-                    type: "bot",
-                    content: "Use the forward block."
-                }
-            ];
-
-            URL.createObjectURL = jest.fn(() => "blob:url");
-            URL.revokeObjectURL = jest.fn();
-
-            const click = jest
-                .spyOn(HTMLAnchorElement.prototype, "click")
-                .mockImplementation(() => {});
-
-            debuggerWidget._exportChat();
-
-            expect(debuggerWidget.activity.prepareExport).toHaveBeenCalled();
-            expect(URL.createObjectURL).toHaveBeenCalled();
-            expect(click).toHaveBeenCalled();
-            expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:url");
-            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
-                "Chat exported successfully."
-            );
-
-            click.mockRestore();
+        afterEach(() => {
             if (originalCreateObjectURL) {
                 URL.createObjectURL = originalCreateObjectURL;
             } else {
@@ -908,6 +948,121 @@ describe("AIDebuggerWidget", () => {
             } else {
                 delete URL.revokeObjectURL;
             }
+        });
+
+        test("shows message when no conversation to export", () => {
+            debuggerWidget.chatHistory = [];
+            debuggerWidget._exportChat();
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "No conversation to export."
+            );
+        });
+
+        test("exports chat conversation successfully", async () => {
+            debuggerWidget.chatHistory = [
+                {
+                    type: "user",
+                    content: "How do I move forward?"
+                },
+                {
+                    type: "bot",
+                    content: "Use the forward block."
+                }
+            ];
+
+            debuggerWidget.activity.prepareExport = jest.fn(() =>
+                JSON.stringify({
+                    chatHistory: debuggerWidget.chatHistory
+                })
+            );
+
+            const click = jest
+                .spyOn(HTMLAnchorElement.prototype, "click")
+                .mockImplementation(() => {});
+
+            try {
+                debuggerWidget._exportChat();
+
+                expect(debuggerWidget.activity.prepareExport).toHaveBeenCalled();
+                expect(URL.createObjectURL).toHaveBeenCalled();
+                expect(click).toHaveBeenCalled();
+
+                const exportedBlob = URL.createObjectURL.mock.calls[0][0];
+                const exportedContent = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+
+                    reader.readAsText(exportedBlob);
+                });
+
+                expect(exportedContent).toContain("How do I move forward?");
+                expect(exportedContent).toContain("Use the forward block.");
+                expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:url");
+                expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                    "Chat exported successfully."
+                );
+            } finally {
+                click.mockRestore();
+            }
+        });
+
+        test("handles project export errors", () => {
+            debuggerWidget.chatHistory = [
+                {
+                    type: "user",
+                    content: "How do I move forward?"
+                }
+            ];
+
+            debuggerWidget.activity.prepareExport = jest.fn(() => {
+                throw new Error("Export failed");
+            });
+
+            const consoleError = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            debuggerWidget._exportChat();
+
+            expect(consoleError).toHaveBeenCalled();
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Debugger error: Could not retrieve project data for export."
+            );
+
+            consoleError.mockRestore();
+        });
+
+        test("handles invalid project JSON during export", () => {
+            debuggerWidget.chatHistory = [
+                {
+                    type: "user",
+                    content: "How do I move forward?"
+                }
+            ];
+
+            debuggerWidget.activity.prepareExport = jest.fn(() => "invalid json");
+
+            debuggerWidget._exportChat();
+
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Chat exported successfully."
+            );
+        });
+        test("handles invalid project JSON during export", () => {
+            debuggerWidget.chatHistory = [
+                {
+                    type: "user",
+                    content: "How do I move forward?"
+                }
+            ];
+
+            debuggerWidget.activity.prepareExport = jest.fn(() => "invalid json");
+
+            debuggerWidget._exportChat();
+
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Chat exported successfully."
+            );
         });
     });
 });
