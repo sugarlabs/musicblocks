@@ -883,6 +883,158 @@ describe("Block Foundation", () => {
         });
     });
 
+    describe("drag spatial-grid deferral", () => {
+        const makeEventBlock = () => {
+            const handlers = {};
+            const block = new Block(mockProtoBlock, mockBlocks);
+
+            block.blockIndex = 0;
+            block.connections = [null, null];
+            block.container = {
+                x: 100,
+                y: 100,
+                children: [],
+                on: jest.fn((type, handler) => {
+                    handlers[type] = handler;
+                }),
+                setChildIndex: jest.fn()
+            };
+            block.original = { x: 100, y: 100 };
+            block.offset = { x: 0, y: 0 };
+            block._calculateBlockHitArea = jest.fn();
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.isValueBlock = jest.fn().mockReturnValue(false);
+
+            mockBlocks.blockList = [block, { container: { x: 100, y: 120 } }];
+            mockBlocks._cachedDragGroup = [0, 1];
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.selectionModeOn = false;
+            mockBlocks.getLongPressStatus = jest.fn().mockReturnValue(false);
+            mockBlocks.clearLongPress = jest.fn();
+            mockBlocks.cacheDragGroup = jest.fn();
+            mockBlocks.raiseStackToTop = jest.fn();
+            mockBlocks.moveBlockRelativeBatched = jest.fn();
+            mockBlocks.scheduleCheckBounds = jest.fn();
+            mockBlocks.clearCachedDragGroup = jest.fn();
+            mockBlocks.invalidateTopBlockCache = jest.fn();
+            mockBlocks.unhighlight = jest.fn();
+
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.blocksContainer = { y: 0 };
+            block.activity.scrollBlockContainer = false;
+            block.activity.trashcan = {
+                show: jest.fn(),
+                overTrashcan: jest.fn().mockReturnValue(false),
+                startHighlightAnimation: jest.fn(),
+                stopHighlightAnimation: jest.fn()
+            };
+
+            block._loadEventHandlers();
+            return { block, handlers };
+        };
+
+        it("defers cached drag-group updates and marks the release dirty", () => {
+            const { block, handlers } = makeEventBlock();
+            const mouseoutSpy = jest.spyOn(block, "_mouseoutCallback").mockImplementation(() => {});
+            global.docById.mockReturnValue({ style: {} });
+
+            handlers.mousedown({ stageX: 100, stageY: 100 });
+
+            handlers.pressmove({
+                stageX: 110,
+                stageY: 100,
+                nativeEvent: { preventDefault: jest.fn() }
+            });
+            handlers.pressup({ stageX: 110, stageY: 100 });
+
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(0, 10, 0, true);
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(1, 10, 0, true);
+            expect(mouseoutSpy).toHaveBeenCalledWith(
+                expect.anything(),
+                false,
+                false,
+                false,
+                true,
+                true
+            );
+        });
+
+        it("defers drag-group updates when the cached group is unavailable", () => {
+            const { handlers } = makeEventBlock();
+            mockBlocks._cachedDragGroup = null;
+            mockBlocks.dragGroup = [0, 1];
+            mockBlocks.findDragGroup = jest.fn();
+
+            handlers.pressmove({
+                stageX: 100,
+                stageY: 110,
+                nativeEvent: { preventDefault: jest.fn() }
+            });
+
+            expect(mockBlocks.findDragGroup).toHaveBeenCalledWith(0);
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(0, 0, 10, true);
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(1, 0, 10, true);
+        });
+
+        it("reports a clean grid when release follows no coordinate movement", () => {
+            const { block, handlers } = makeEventBlock();
+            const mouseoutSpy = jest.spyOn(block, "_mouseoutCallback").mockImplementation(() => {});
+
+            handlers.pressup({ stageX: 100, stageY: 100 });
+
+            expect(mouseoutSpy).toHaveBeenCalledWith(
+                expect.anything(),
+                false,
+                false,
+                false,
+                true,
+                false
+            );
+        });
+
+        it("reconciles the grid after restoring trash-hover positions and before docking", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            const order = [];
+
+            block.blockIndex = 0;
+            block._setDragGroupTrashHoverScale = jest.fn(() => order.push("restore"));
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.trashcan = {
+                hide: jest.fn(),
+                isVisible: true,
+                overTrashcan: jest.fn(() => {
+                    order.push("query-trash");
+                    return false;
+                })
+            };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn(() => order.push("sync-grid"));
+            mockBlocks.blockMoved = jest.fn(() => order.push("dock"));
+            mockBlocks.adjustDocks = jest.fn(() => order.push("adjust"));
+
+            block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true, true);
+
+            expect(order).toEqual(["restore", "sync-grid", "query-trash", "dock", "adjust"]);
+        });
+
+        it("does not reconcile a clean grid", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.trashcan = { hide: jest.fn() };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+
+            block._mouseoutCallback({}, false, false, false, true, false);
+
+            expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+        });
+    });
+
     describe("dispose()", () => {
         it("should clean up connections, DOM nodes, containers, bitmaps, and parent pointers", () => {
             const block = new Block(mockProtoBlock, mockBlocks);
