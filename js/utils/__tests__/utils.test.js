@@ -132,6 +132,7 @@ const {
     prepareMacroExports,
     processMacroData,
     updatePluginObj,
+    processPluginData,
     processRawPluginData,
     preparePluginExports,
     hideDOMLabel,
@@ -1489,6 +1490,342 @@ describe("Plugin and Macro Utilities", () => {
             expect(res).toBeNull();
             expect(spy).toHaveBeenCalled();
             spy.mockRestore();
+        });
+    });
+
+    describe("processPluginData()", () => {
+        // processPluginData compiles trusted plugin code into dedicated Blob
+        // URLs and loads them as <script> tags to satisfy CSP (no unsafe-eval).
+        // There's no real script loading/network in Node, so this fake
+        // document.createElement("script")/head.appendChild pair captures the
+        // most recently constructed Blob's source and eval()s it immediately
+        // (synchronously, from inside appendChild) instead of waiting for a
+        // "load" event that would never fire — that's what actually runs the
+        // `window.__mb_plugin_registry[...] = function(...) {...}` assignment
+        // the production code depends on, so the mapping-back-into-dicts logic
+        // downstream of it is exercised with real functions, not stand-ins.
+        let pluginActivity;
+        let lastBlobContent;
+        let headChildren;
+        let realConsoleWarn;
+        let realConsoleError;
+        let realConsoleDebug;
+
+        beforeEach(() => {
+            pluginActivity = {
+                palettes: {
+                    buttons: {},
+                    add: jest.fn(),
+                    makePalettes: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    show: jest.fn(),
+                    pluginMacros: {}
+                },
+                pluginsImages: {},
+                logo: {
+                    evalFlowDict: {},
+                    evalArgDict: {},
+                    evalSetterDict: {},
+                    evalParameterDict: {},
+                    evalOnStartList: {},
+                    evalOnStopList: {}
+                },
+                blocks: {
+                    protoBlockDict: {}
+                }
+            };
+
+            global.PALETTEICONS = {};
+            global.PALETTEFILLCOLORS = {};
+            global.PALETTESTROKECOLORS = {};
+            global.PALETTEHIGHLIGHTCOLORS = {};
+            global.HIGHLIGHTSTROKECOLORS = {};
+            global.MULTIPALETTES = { 2: [] };
+            global.platformColor = { paletteColors: {} };
+            global.confirm = jest.fn(() => true);
+
+            lastBlobContent = null;
+            global.Blob = class Blob {
+                constructor(parts) {
+                    lastBlobContent = parts.join("");
+                }
+            };
+            global.URL.createObjectURL = jest.fn(() => "blob:mock-url");
+            global.URL.revokeObjectURL = jest.fn();
+
+            // document.head is a real jsdom element with a read-only accessor
+            // (no setter), so it can't be reassigned wholesale -- spy on its
+            // methods instead of replacing the element.
+            headChildren = [];
+            jest.spyOn(document.head, "appendChild").mockImplementation(script => {
+                headChildren.push(script);
+                try {
+                    eval(lastBlobContent);
+                } catch (e) {
+                    script.onerror && script.onerror(e);
+                    return script;
+                }
+                script.onload && script.onload();
+                return script;
+            });
+            jest.spyOn(document.head, "removeChild").mockImplementation(script => script);
+            jest.spyOn(document, "createElement").mockImplementation(tag => ({
+                tagName: tag.toUpperCase(),
+                set src(v) {
+                    this._src = v;
+                },
+                get src() {
+                    return this._src;
+                },
+                onload: null,
+                onerror: null,
+                parentNode: document.head
+            }));
+
+            realConsoleWarn = console.warn;
+            realConsoleError = console.error;
+            realConsoleDebug = console.debug;
+            console.warn = jest.fn();
+            console.error = jest.fn();
+            console.debug = jest.fn();
+        });
+
+        afterEach(() => {
+            document.createElement.mockRestore();
+            document.head.appendChild.mockRestore();
+            document.head.removeChild.mockRestore();
+            console.warn = realConsoleWarn;
+            console.error = realConsoleError;
+            console.debug = realConsoleDebug;
+        });
+
+        it("returns null when pluginData is undefined", async () => {
+            const res = await processPluginData(pluginActivity, undefined, "plugins/test.json");
+            expect(res).toBeNull();
+        });
+
+        it("returns null and logs an error when JSON.parse fails", async () => {
+            const res = await processPluginData(pluginActivity, "{ not json", "plugins/test.json");
+            expect(res).toBeNull();
+            expect(console.error).toHaveBeenCalled();
+        });
+
+        it("skips the confirm() prompt for a vetted plugin source", async () => {
+            await processPluginData(pluginActivity, "{}", "plugins/trusted.json");
+            expect(global.confirm).not.toHaveBeenCalled();
+        });
+
+        it("returns null without processing when the user declines an unvetted plugin", async () => {
+            global.confirm.mockReturnValue(false);
+            const res = await processPluginData(
+                pluginActivity,
+                JSON.stringify({ IMAGES: { foo: "data:x" } }),
+                "https://example.com/plugin.json"
+            );
+            expect(res).toBeNull();
+            expect(console.warn).toHaveBeenCalled();
+            expect(pluginActivity.pluginsImages.foo).toBeUndefined();
+        });
+
+        it("proceeds when the user accepts an unvetted plugin", async () => {
+            global.confirm.mockReturnValue(true);
+            const res = await processPluginData(
+                pluginActivity,
+                JSON.stringify({ IMAGES: { foo: "data:x" } }),
+                "https://example.com/plugin.json"
+            );
+            expect(res).not.toBeNull();
+            expect(pluginActivity.pluginsImages.foo).toBe("data:x");
+        });
+
+        it("creates a new palette entry with default and custom colors", async () => {
+            const pluginData = JSON.stringify({
+                PALETTEPLUGINS: { myPalette: "icon.svg" },
+                PALETTEFILLCOLORS: { myPalette: "#111111" }
+            });
+            await processPluginData(pluginActivity, pluginData, "plugins/test.json");
+
+            expect(global.PALETTEICONS.myPalette).toBe("icon.svg");
+            expect(global.PALETTEFILLCOLORS.myPalette).toBe("#111111");
+            // Colors not supplied fall back to the hard-coded defaults.
+            expect(global.PALETTESTROKECOLORS.myPalette).toBe("#ef003e");
+            expect(global.platformColor.paletteColors.myPalette).toEqual([
+                "#111111",
+                "#ef003e",
+                "#ffb1b3",
+                "#404040"
+            ]);
+            expect(pluginActivity.palettes.add).toHaveBeenCalledWith("myPalette");
+            expect(pluginActivity.palettes.makePalettes).toHaveBeenCalledWith(1);
+            expect(pluginActivity.palettes.updatePalettes).toHaveBeenCalledWith("myPalette");
+        });
+
+        it("does not re-add a palette that already exists", async () => {
+            pluginActivity.palettes.buttons.existing = {};
+            const pluginData = JSON.stringify({ PALETTEPLUGINS: { existing: "icon.svg" } });
+            await processPluginData(pluginActivity, pluginData, "plugins/test.json");
+
+            expect(pluginActivity.palettes.add).not.toHaveBeenCalled();
+            expect(pluginActivity.palettes.makePalettes).not.toHaveBeenCalled();
+        });
+
+        it("filters out unsafe object keys to prevent prototype pollution", async () => {
+            const pluginData =
+                '{"PALETTEPLUGINS": {"__proto__": "bad", "constructor": "bad", "safe": "icon.svg"}}';
+            await processPluginData(pluginActivity, pluginData, "plugins/test.json");
+
+            expect(global.PALETTEICONS.safe).toBe("icon.svg");
+            expect(Object.prototype.hasOwnProperty.call(global.PALETTEICONS, "__proto__")).toBe(
+                false
+            );
+            expect(Object.prototype.hasOwnProperty.call(global.PALETTEICONS, "constructor")).toBe(
+                false
+            );
+        });
+
+        it("compiles a FLOWPLUGINS entry from a vetted source into a real callable function", async () => {
+            const pluginData = JSON.stringify({
+                FLOWPLUGINS: { myFlow: "logo.__flowRan = true;" }
+            });
+            await processPluginData(pluginActivity, pluginData, "plugins/test.json");
+
+            const fn = pluginActivity.logo.evalFlowDict.myFlow;
+            expect(typeof fn).toBe("function");
+            fn(pluginActivity.logo, 0, 1, null, null, null, true);
+            expect(pluginActivity.logo.__flowRan).toBe(true);
+        });
+
+        it("compiles ARGPLUGINS, SETTERPLUGINS, PARAMETERPLUGINS, ONSTART and ONSTOP entries into real functions", async () => {
+            const pluginData = JSON.stringify({
+                ARGPLUGINS: { myArg: "return 42;" },
+                SETTERPLUGINS: { mySetter: "logo.__setterValue = value;" },
+                PARAMETERPLUGINS: { myParam: "return logo.__paramValue;" },
+                ONSTART: { myStart: "logo.__startRan = true;" },
+                ONSTOP: { myStop: "logo.__stopRan = true;" }
+            });
+            await processPluginData(pluginActivity, pluginData, "plugins/test.json");
+
+            expect(typeof pluginActivity.logo.evalArgDict.myArg).toBe("function");
+            expect(pluginActivity.logo.evalArgDict.myArg()).toBe(42);
+
+            expect(typeof pluginActivity.logo.evalSetterDict.mySetter).toBe("function");
+            pluginActivity.logo.evalSetterDict.mySetter(pluginActivity.logo, null, "hi", 0);
+            expect(pluginActivity.logo.__setterValue).toBe("hi");
+
+            expect(typeof pluginActivity.logo.evalParameterDict.myParam).toBe("function");
+            pluginActivity.logo.__paramValue = "seen";
+            expect(pluginActivity.logo.evalParameterDict.myParam(pluginActivity.logo)).toBe("seen");
+
+            expect(typeof pluginActivity.logo.evalOnStartList.myStart).toBe("function");
+            pluginActivity.logo.evalOnStartList.myStart(pluginActivity.logo);
+            expect(pluginActivity.logo.__startRan).toBe(true);
+
+            expect(typeof pluginActivity.logo.evalOnStopList.myStop).toBe("function");
+            pluginActivity.logo.evalOnStopList.myStop(pluginActivity.logo);
+            expect(pluginActivity.logo.__stopRan).toBe(true);
+        });
+
+        it("applies custom PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS and HIGHLIGHTSTROKECOLORS when supplied", async () => {
+            const pluginData = JSON.stringify({
+                PALETTEPLUGINS: { myPalette: "icon.svg" },
+                PALETTESTROKECOLORS: { myPalette: "#222222" },
+                PALETTEHIGHLIGHTCOLORS: { myPalette: "#333333" },
+                HIGHLIGHTSTROKECOLORS: { myPalette: "#444444" }
+            });
+            await processPluginData(pluginActivity, pluginData, "plugins/test.json");
+
+            expect(global.PALETTESTROKECOLORS.myPalette).toBe("#222222");
+            expect(global.PALETTEHIGHLIGHTCOLORS.myPalette).toBe("#333333");
+            expect(global.HIGHLIGHTSTROKECOLORS.myPalette).toBe("#444444");
+        });
+
+        it("logs an error and rejects when the bulk plugin script fails to load", async () => {
+            document.head.appendChild.mockImplementation(script => {
+                script.onerror && script.onerror(new Error("blob load failed"));
+                return script;
+            });
+
+            const pluginData = JSON.stringify({ FLOWPLUGINS: { myFlow: "1;" } });
+            await expect(
+                processPluginData(pluginActivity, pluginData, "plugins/test.json")
+            ).rejects.toBeDefined();
+            expect(console.error).toHaveBeenCalled();
+        });
+
+        it("does not fail the whole plugin load when one setup (safeEval) script errors out", async () => {
+            document.head.appendChild.mockImplementation(script => {
+                script.onerror && script.onerror(new Error("setup script failed"));
+                return script;
+            });
+
+            const pluginData = JSON.stringify({ GLOBALS: "activity.__globalsRan = true;" });
+            const res = await processPluginData(pluginActivity, pluginData, "plugins/test.json");
+
+            // Per the "Still resolve to let others run" comment on the onerror
+            // handler, a failed setup script must not reject the overall load.
+            expect(res).not.toBeNull();
+            expect(pluginActivity.__globalsRan).toBeUndefined();
+        });
+
+        it("stores an unvetted (but confirmed) FLOWPLUGINS entry as a raw string, not compiled", async () => {
+            global.confirm.mockReturnValue(true);
+            const pluginData = JSON.stringify({ FLOWPLUGINS: { myFlow: "some code" } });
+            await processPluginData(pluginActivity, pluginData, "https://example.com/plugin.json");
+
+            expect(pluginActivity.logo.evalFlowDict.myFlow).toBe("some code");
+        });
+
+        it("parses a valid MACROPLUGINS entry into pluginMacros", async () => {
+            const pluginData = JSON.stringify({
+                MACROPLUGINS: { myMacro: JSON.stringify([["note", {}]]) }
+            });
+            await processPluginData(pluginActivity, pluginData, "plugins/test.json");
+
+            expect(pluginActivity.palettes.pluginMacros.myMacro).toEqual([["note", {}]]);
+        });
+
+        it("skips an invalid MACROPLUGINS entry without throwing", async () => {
+            const pluginData = JSON.stringify({ MACROPLUGINS: { badMacro: "{ not json" } });
+            const res = await processPluginData(pluginActivity, pluginData, "plugins/test.json");
+
+            expect(res).not.toBeNull();
+            expect(pluginActivity.palettes.pluginMacros.badMacro).toBeUndefined();
+        });
+
+        it("runs GLOBALS setup code with activity and globalActivity as arguments", async () => {
+            const pluginData = JSON.stringify({
+                GLOBALS: "activity.__globalsRan = globalActivity;"
+            });
+            await processPluginData(pluginActivity, pluginData, "plugins/test.json");
+
+            expect(pluginActivity.__globalsRan).toBe(pluginActivity);
+        });
+
+        it("registers protoblocks onto their palette and tolerates a missing palette", async () => {
+            const addToPalette = jest.fn();
+            pluginActivity.blocks.protoBlockDict = {
+                withPalette: { palette: { add: addToPalette } },
+                withoutPalette: { palette: undefined },
+                withNullPalette: { palette: null }
+            };
+
+            const res = await processPluginData(pluginActivity, "{}", "plugins/test.json");
+
+            expect(res).not.toBeNull();
+            expect(addToPalette).toHaveBeenCalledWith(
+                pluginActivity.blocks.protoBlockDict.withPalette
+            );
+        });
+
+        it("shows the palettes after the 2-second post-load delay", async () => {
+            jest.useFakeTimers();
+            const promise = processPluginData(pluginActivity, "{}", "plugins/test.json");
+            await Promise.resolve();
+            jest.runAllTimers();
+            await promise;
+
+            expect(pluginActivity.palettes.show).toHaveBeenCalled();
+            jest.useRealTimers();
         });
     });
 
