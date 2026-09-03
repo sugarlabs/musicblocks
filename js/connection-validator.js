@@ -32,6 +32,8 @@ const ALLOWED_CONNECTIONS = new Set([
     "anyout:textin",
     "booleanout:booleanin",
     "booleanin:booleanout",
+    "booleanin:anyout",
+    "anyout:booleanin",
     "mediain:mediaout",
     "mediaout:mediain",
     "mediain:textout",
@@ -74,6 +76,7 @@ const ALLOWED_CONNECTIONS = new Set([
     "anyin:solfegeout",
     "anyin:scaledegreeout",
     "anyin:noteout",
+    "anyin:booleanout",
     "textout:anyin",
     "mediaout:anyin",
     "numberout:anyin",
@@ -81,7 +84,8 @@ const ALLOWED_CONNECTIONS = new Set([
     "fileout:anyin",
     "solfegeout:anyin",
     "scaledegreeout:anyin",
-    "noteout:anyin"
+    "noteout:anyin",
+    "booleanout:anyin"
 ]);
 
 /**
