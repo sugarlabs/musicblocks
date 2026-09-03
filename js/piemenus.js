@@ -3886,6 +3886,7 @@ const syncKeySignatureBlocks = activity => {
         activity.blocks.blockList[conn1].name === "notename"
     ) {
         activity.blocks.blockList[conn1].value = activity.KeySignatureEnv[0];
+        activity.blocks.updateBlockText(conn1);
     }
     if (
         conn2 !== null &&
@@ -3893,7 +3894,9 @@ const syncKeySignatureBlocks = activity => {
         activity.blocks.blockList[conn2].name === "modename"
     ) {
         activity.blocks.blockList[conn2].value = activity.KeySignatureEnv[1];
+        activity.blocks.updateBlockText(conn2);
     }
+    activity.refreshCanvas();
 };
 
 const piemenuKey = activity => {
@@ -4016,102 +4019,6 @@ const piemenuKey = activity => {
     docById("movable").style.left = x - 110 + "px";
     docById("movable").style.top = y + 400 + "px";
 
-    const __generateSetKeyBlocks = () => {
-        // Update an existing setkey2 block in place, or create one if none exists.
-        let setKeyBlock = null;
-        for (const i in activity.blocks.blockList) {
-            if (
-                activity.blocks.blockList[i].name === "setkey2" &&
-                !activity.blocks.blockList[i].trash
-            ) {
-                setKeyBlock = activity.blocks.blockList[i];
-                break;
-            }
-        }
-        if (setKeyBlock !== null) {
-            const c1 = setKeyBlock.connections[1];
-            const c2 = setKeyBlock.connections[2];
-            if (c1 !== null && activity.blocks.blockList[c1]?.name === "notename") {
-                activity.blocks.blockList[c1].value = activity.KeySignatureEnv[0];
-                activity.blocks.updateBlockText(c1);
-            }
-            if (c2 !== null && activity.blocks.blockList[c2]?.name === "modename") {
-                activity.blocks.blockList[c2].value = activity.KeySignatureEnv[1];
-                activity.blocks.updateBlockText(c2);
-            }
-            activity.refreshCanvas();
-            return;
-        }
-
-        activity.blocks.findStacks();
-        const stacks = activity.blocks.stackList;
-        stacks.sort();
-        let connectionsSetKey;
-        let movable;
-        for (const stackId of stacks) {
-            if (activity.blocks.blockList[stackId].name === "start") {
-                const bottomBlock = activity.blocks.blockList[stackId].connections[1];
-                if (activity.KeySignatureEnv[2]) {
-                    activity.blocks._makeNewBlockWithConnections(
-                        "movable",
-                        0,
-                        [stackId, null, null],
-                        null,
-                        null
-                    );
-                    movable = activity.logo.blocks.blockList.length - 1;
-                    activity.blocks._makeNewBlockWithConnections(
-                        "boolean",
-                        0,
-                        [movable],
-                        null,
-                        null
-                    );
-                    activity.blocks.blockList[movable].connections[1] =
-                        activity.blocks.blockList.length - 1;
-                    connectionsSetKey = [movable, null, null, bottomBlock];
-                } else {
-                    connectionsSetKey = [stackId, null, null, bottomBlock];
-                }
-
-                activity.blocks._makeNewBlockWithConnections(
-                    "setkey2",
-                    0,
-                    connectionsSetKey,
-                    null,
-                    null
-                );
-
-                const setKey = activity.blocks.blockList.length - 1;
-                activity.blocks.blockList[bottomBlock].connections[0] = setKey;
-
-                if (activity.KeySignatureEnv[2]) {
-                    activity.blocks.blockList[stackId].connections[1] = movable;
-                    activity.blocks.blockList[movable].connections[2] = setKey;
-                } else {
-                    activity.blocks.blockList[stackId].connections[1] = setKey;
-                }
-
-                activity.blocks.adjustExpandableClampBlock();
-
-                activity.blocks._makeNewBlockWithConnections("notename", 0, [setKey], null, null);
-                activity.blocks.blockList[setKey].connections[1] =
-                    activity.blocks.blockList.length - 1;
-                activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
-                    activity.KeySignatureEnv[0];
-                activity.blocks._makeNewBlockWithConnections("modename", 0, [setKey], null, null);
-                activity.blocks.blockList[setKey].connections[2] =
-                    activity.blocks.blockList.length - 1;
-                activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
-                    activity.KeySignatureEnv[1];
-                activity.textMsg(
-                    `${_("You have chosen key for your pitch preview.")} ${
-                        activity.KeySignatureEnv[0]
-                    } ${activity.KeySignatureEnv[1]}`
-                );
-            }
-        }
-    };
     const __exitMenu = () => {
         docById("chooseKeyDiv").style.display = "none";
         docById("movable").style.display = "none";

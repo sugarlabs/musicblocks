@@ -79,14 +79,11 @@ const _b64Cache = new Map();
  * @param {string} note
  * @returns {string}
  */
+const stripMicrotonalPrefix = s => s.replace(/^[v^]{1,2}/, "");
 function normalizeNoteAccidentals(note) {
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
-    // Strip microtonal ^ / v prefixes (temperament widget cents display)
-    // so the base note can be resolved, e.g. "^C" → "C", "vvD♭" → "D♭".
-    // Strip at most two leading microtonal ^ / v prefixes (the temperament
-    // widget uses them for cents display, e.g. "^C" or "vvD♭"). Limiting to
-    // two keeps any accidental real articulation prefix from being removed.
-    return note.replace(/^[v^]{1,2}/, "").replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+    // Strip at most two leading ^ / v so "^C"/"vvD♭" resolve but "^^^C" keeps a "^"
+    return stripMicrotonalPrefix(note).replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 }
 
 /**
@@ -3895,7 +3892,14 @@ const isEquallyTempered = temperament => {
     if (!t || typeof t !== "object") return false;
     if (t.isEDO === true) return true;
     if (t.isEDO === false) return false;
-    if (t.ratios) return Array.isArray(t.ratios) && t.ratios.length >= 2;
+    if (t.ratios) {
+        if (!Array.isArray(t.ratios) || t.ratios.length < 2) return false;
+        const n = Number.isInteger(t.pitchNumber) ? t.pitchNumber : t.ratios.length;
+        for (let i = 0; i < t.ratios.length; i++) {
+            if (Math.abs(t.ratios[i] - Math.pow(2, i / n)) > 1e-9) return false;
+        }
+        return true;
+    }
     const n = t.pitchNumber;
     if (!Number.isInteger(n) || n < 2) return false;
     for (let i = 0; i < n; i++) {
@@ -3933,6 +3937,7 @@ const isNonEDO = temperament => {
     return temperamentHasRatios(temperament) && !isEquallyTempered(temperament);
 };
 
+// Retained for API compat — isEquallyTempered is now uncached; tests call this
 const clearTemperamentCaches = () => {};
 
 /**
@@ -4195,8 +4200,7 @@ const frequencyToPitch = (hz, temperament) => {
  *     or the full string unchanged if no recognised prefix is found.
  */
 const getArticulation = note => {
-    // Strip microtonal ^ / v prefixes before matching so "^C" etc. resolve.
-    const stripped = note.replace(/^[v^]{1,2}/, "");
+    const stripped = stripMicrotonalPrefix(note);
     const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
     return match ? match[1] : stripped;
 };
