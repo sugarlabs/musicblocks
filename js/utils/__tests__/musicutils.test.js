@@ -2782,6 +2782,27 @@ describe("EQUIVALENTNATURALS extended mappings", () => {
     });
 });
 
+describe("EQUIVALENTNATURALS double flats", () => {
+    const DOUBLEFLAT = "𝄫";
+
+    it("should spell C𝄫 and F𝄫 the way the solfege table spells them", () => {
+        // FIXEDSOLFEGE1 already maps do𝄫 to B♭ and fa𝄫 to E♭, so the Western
+        // spellings of the same two pitches must not land a semitone higher.
+        expect(convertFromSolfege("C" + DOUBLEFLAT)).toBe("B" + FLAT);
+        expect(convertFromSolfege("F" + DOUBLEFLAT)).toBe("E" + FLAT);
+        expect(convertFromSolfege("C" + DOUBLEFLAT)).toBe(convertFromSolfege("do" + DOUBLEFLAT));
+        expect(convertFromSolfege("F" + DOUBLEFLAT)).toBe(convertFromSolfege("fa" + DOUBLEFLAT));
+    });
+
+    it("should place every double flat a semitone below the matching single flat", () => {
+        for (const letter of NOTENAMES) {
+            const flat = _calculate_pitch_number(letter + FLAT, 4);
+            expect(_calculate_pitch_number(letter + DOUBLEFLAT, 4)).toBe(flat - 1);
+            expect(_calculate_pitch_number(letter + FLAT + FLAT, 4)).toBe(flat - 1);
+        }
+    });
+});
+
 describe("convertFactor", () => {
     const testCases = [
         { input: 0.0625, expected: "16" },
