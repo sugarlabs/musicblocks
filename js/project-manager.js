@@ -521,7 +521,7 @@ class ProjectManager {
                     case "action":
                     case "matrix":
                     case "pitchdrummatrix":
-                    case "rhythmruler":
+                    case "rhythmruler2":
                     case "timbre":
                     case "pitchstaircase":
                     case "tempo":
