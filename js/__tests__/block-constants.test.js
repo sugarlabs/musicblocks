@@ -27,7 +27,8 @@ describe("block-constants", () => {
             "LONGSTACK",
             "SPATIAL_GRID_CELL_SIZE",
             "CAMERAVALUE",
-            "VIDEOVALUE"
+            "VIDEOVALUE",
+            "VIEWPORT_CULL_PADDING"
         ];
         expect(Object.keys(constants).sort()).toEqual(expectedKeys.sort());
     });
@@ -38,5 +39,6 @@ describe("block-constants", () => {
         expect(global.SPATIAL_GRID_CELL_SIZE).toBeUndefined();
         expect(global.CAMERAVALUE).toBeUndefined();
         expect(global.VIDEOVALUE).toBeUndefined();
+        expect(global.VIEWPORT_CULL_PADDING).toBeUndefined();
     });
 });
