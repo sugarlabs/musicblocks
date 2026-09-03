@@ -410,6 +410,7 @@ function TemperamentWidget() {
         let highlightDot = -1;
         let flashDot = -1;
         const _isLocked = i => i === 0;
+        const _ref12 = j => Math.round(that.cents[j] / 100) * 100;
 
         const _cssVar = (n, f) => getComputedStyle(document.body).getPropertyValue(n).trim() || f;
 
@@ -793,14 +794,18 @@ function TemperamentWidget() {
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             if (highlightDot >= 0 && highlightDot < that.pitchNumber) {
-                const selCents = Math.round(that.cents[highlightDot]);
+                const selDev = deviationFrom12EDO(that.cents[highlightDot]);
                 const selHz = that.frequencies[highlightDot];
                 const noteName = that.notes[highlightDot];
                 const label = noteName ? noteName[0] + noteName[1] : "";
                 ctx.font = "bold 14px sans-serif";
                 ctx.fillText(label, cx, cy - 10);
                 ctx.font = "12px sans-serif";
-                ctx.fillText(selCents + "¢  " + selHz + " Hz", cx, cy + 8);
+                ctx.fillText(
+                    (selDev >= 0 ? "+" : "") + selDev.toFixed(1) + "¢  " + selHz + " Hz",
+                    cx,
+                    cy + 8
+                );
             } else {
                 ctx.fillText(that.inTemperament + " vs 12-EDO", cx, cy);
             }
@@ -986,18 +991,24 @@ function TemperamentWidget() {
                 _makeEditable(
                     tdCents,
                     i,
-                    j => (j > 0 ? that.cents[j - 1] : null),
-                    j => (j < that.pitchNumber - 1 ? that.cents[j + 1] : null),
-                    j => that.cents[j],
+                    j => {
+                        if (j <= 0) return null;
+                        return Math.max(that.cents[j - 1] - _ref12(j), -51);
+                    },
+                    j => {
+                        if (j >= that.pitchNumber - 1) return 51;
+                        return Math.min(that.cents[j + 1] - _ref12(j), 51);
+                    },
+                    j => deviationFrom12EDO(that.cents[j]),
                     {
                         eps: 1,
                         step: "0.1",
                         decimals: 1,
-                        title: (lo, hi, cur) =>
-                            `Absolute cents (${lo.toFixed(1)} – ${hi.toFixed(1)}); deviation from 12-EDO: ${deviationFrom12EDO(cur).toFixed(1)}¢`,
-                        aria: j => `Cents for pitch ${j}, absolute 0-1200, between neighbors`
+                        title: (lo, hi) =>
+                            `Relative cents from 12-EDO (${lo.toFixed(1)} – ${hi.toFixed(1)})`,
+                        aria: j => `Cents for pitch ${j}, relative to 12-EDO, between neighbors`
                     },
-                    (v, j) => _applyCents(j, v)
+                    (v, j) => _applyCents(j, _ref12(j) + v)
                 );
                 _makeEditable(
                     tdFreq,
@@ -1067,6 +1078,10 @@ function TemperamentWidget() {
         /** Updates a single row (used during drag). */
         const _updateTableRow = function (i) {
             if (!rowRefs[i]) return;
+            // Sparse state (e.g. partial temperament data on load): skip the
+            // row instead of throwing and blanking every row rendered after it.
+            if (!that.notes[i] || that.cents[i] === undefined || that.ratios[i] === undefined)
+                return;
             const cents = that.cents[i];
             const dev = deviationFrom12EDO(that.cents[i]);
             rowRefs[i].name.textContent = _updown(cents) + that.notes[i][0];
@@ -1156,7 +1171,7 @@ function TemperamentWidget() {
         };
 
         const _resetTo12 = function (index) {
-            _applyCents(index, Math.round(that.cents[index] / 100) * 100);
+            _applyCents(index, _ref12(index));
         };
 
         const _playNote = function (index) {
@@ -1332,7 +1347,10 @@ function TemperamentWidget() {
             const centsInput = document.createElement("input");
             centsInput.type = "number";
             centsInput.step = "0.1";
-            centsInput.value = that.cents[index].toFixed(1);
+            centsInput.min = "-50";
+            centsInput.max = "50";
+            centsInput.value = deviationFrom12EDO(that.cents[index]).toFixed(1);
+            centsInput.title = _("Relative cents from 12-EDO (-50 to +50)");
             centsInput.style.width = "80px";
             centsInput.style.fontSize = "12px";
 
@@ -1343,9 +1361,10 @@ function TemperamentWidget() {
                 ev.stopPropagation();
                 const v = parseFloat(centsInput.value);
                 if (!isNaN(v)) {
-                    _applyCents(index, v);
+                    _applyCents(index, _ref12(index) + Math.max(-50, Math.min(50, v)));
                     _drawCircle();
                     _updateTableRow(index);
+                    _checkModified();
                 }
                 _removeMenu();
             };
@@ -1367,6 +1386,7 @@ function TemperamentWidget() {
                     _buildTable();
                     if (highlightDot >= 0) _highlightTableRow(highlightDot);
                     _updateRemoveButton();
+                    _checkModified();
                     _removeMenu();
                 };
                 return b;
@@ -1700,10 +1720,6 @@ function TemperamentWidget() {
         let numDivs = Number(docById("divisions").value);
         const ratio = [];
         const compareRatios = [];
-        const ratio1 = [];
-        const ratio2 = [];
-        const ratio3 = [];
-        const index = [];
         this.tempRatios = [];
 
         divAppend.addEventListener("click", function (event) {
@@ -1730,23 +1746,12 @@ function TemperamentWidget() {
                 for (let i = 0; i < numDivs; i++) {
                     // 2^(n/edo) — equal temperament: ratio = 2^(pitch / divisions)
                     ratio[i] = Math.pow(this.powerBase, i / numDivs);
-                    ratio1[i] = ratio[i];
-                }
-                for (let i = 0; i < this.tempRatios.length; i++) {
-                    ratio2[i] = this.tempRatios[i];
-                }
-                const ratio4 = ratio1.filter(function (val) {
-                    return !ratio2.some(function (u) {
-                        return Math.abs(val - u) < 1e-6;
-                    });
-                });
-
-                for (let i = 0; i < ratio4.length; i++) {
-                    index[i] = ratio1.indexOf(ratio4[i]);
-                    ratio3[i] = ratio[index[i]];
                 }
 
-                this.tempRatios = this.tempRatios.concat(ratio3);
+                // Fresh equal division replaces the scale; merging with the
+                // previous ratios produced hybrids (e.g. 12-EDO + 25-div
+                // request = 25 non-EDO notes).
+                this.tempRatios = ratio.slice(0, numDivs);
                 this.tempRatios.sort(function (a, b) {
                     return a - b;
                 });
