@@ -1015,12 +1015,11 @@ function TemperamentWidget() {
                         },
                         aria: j => `Frequency for pitch ${j} in Hz, between neighbors`
                     },
-                    (v, j) => {
-                        that.frequencies[j] = v.toFixed(2);
-                        that.ratios[j] = v / Number(that.frequencies[0]);
-                        that.cents[j] = ratioToCents(that.ratios[j], that.powerBase);
-                        if (that.ratiosNotesPair[j]) that.ratiosNotesPair[j][0] = that.ratios[j];
-                    }
+                    (v, j) =>
+                        _applyCents(
+                            j,
+                            ratioToCents(v / Number(that.frequencies[0]), that.powerBase)
+                        )
                 );
                 _makeEditable(
                     tdRatio,
@@ -1038,12 +1037,7 @@ function TemperamentWidget() {
                         },
                         aria: j => `Ratio for pitch ${j}, between neighbors`
                     },
-                    (v, j) => {
-                        that.ratios[j] = v;
-                        that.cents[j] = ratioToCents(v, that.powerBase);
-                        that.frequencies[j] = (Number(that.frequencies[0]) * v).toFixed(2);
-                        if (that.ratiosNotesPair[j]) that.ratiosNotesPair[j][0] = v;
-                    }
+                    (v, j) => _applyCents(j, ratioToCents(v, that.powerBase))
                 );
             }
             _refreshTable();

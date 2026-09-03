@@ -353,8 +353,6 @@ class ModeWidget {
             }
             this._activeEDO = newEDO;
 
-            this._activeEDO = newEDO;
-
             this._rebuildWheel(newEDO);
             const tName = TEMPERAMENT[key]?.name || key;
             this.textMsg(
