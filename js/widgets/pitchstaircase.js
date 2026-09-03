@@ -754,8 +754,20 @@ class PitchStaircase {
             window.widgetWindows &&
             window.widgetWindows.openWindows &&
             window.widgetWindows.openWindows["pitch staircase"]
-        )
+        ) {
+            // Previously this branch just returned, meaning any block value
+            // feeding this widget could change (via reInitWidget()) while
+            // the widget was open, without the visible stairs table ever
+            // reflecting it. this._refresh() (which calls
+            // this._makeStairs(true)) rebuilds the table from the current
+            // this.Stairs data without recreating the widgetWindow/buttons,
+            // so it can't reintroduce an #8234-style duplicate-buttons bug.
+            // Reported by @walterbender: "Changing the value in the
+            // pitchstaircase pitch still seems to break the open pitch
+            // staircase."
+            this._refresh();
             return;
+        }
 
         const widgetWindow = window.widgetWindows.windowFor(
             this,

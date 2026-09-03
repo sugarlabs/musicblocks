@@ -68,6 +68,27 @@ class KeyboardController {
     __keyPressed(event) {
         const activity = this.activity;
 
+        // Alt+S (Option+S) must be able to stop a running program regardless
+        // of any other UI state. It is checked here, before every other
+        // early-return guard in this function (widget-open checks,
+        // keyboardEnableFlag, the hasKeyboard-class check, and critically
+        // the guard further down that returns early whenever
+        // activity.printText has the "show" class). That guard matters
+        // because activity.textMsg() — called by Alt+R when starting
+        // playback — keeps the printText message visible for a full 60
+        // seconds (AlertController.MSG_TIMEOUT), so pressing Alt+S anytime
+        // in that window was previously swallowed before ever reaching the
+        // Alt+S handling further below, and the browser handled the raw
+        // keydown instead of MB. preventDefault() here ensures MB — not
+        // the browser — owns this keystroke.
+        if (event.altKey && event.keyCode === 83 && activity.turtles.running()) {
+            event.preventDefault();
+            activity.textMsg("Alt-S " + _("Stop"));
+            activity.logo.doStopTurtles();
+            activity.currentKeyCode = event.keyCode;
+            return;
+        }
+
         // First, check if the pitch slider is open
         if (this._isWidgetOpen("slider")) {
             // If the event is an arrow key, let the PitchSlider handle it
@@ -192,19 +213,7 @@ class KeyboardController {
                 break;
             }
         }
-        // Alt+S (Option+S) must be able to stop a running program even
-        // though `disableKeys` is true whenever activity.turtles.running()
-        // is true — otherwise the one time a user needs Stop, the shortcut
-        // is unreachable. This mirrors how RETURN/SPACE below check
-        // turtles.running() as an independent branch before consulting
-        // disableKeys, rather than folding "running" into the same gate
-        // as unrelated UI-blocking states (modals, search, paste box).
-        if (event.altKey && event.keyCode === 83 && activity.turtles.running()) {
-            activity.textMsg("Alt-S " + _("Stop"));
-            activity.logo.doStopTurtles();
-            activity.currentKeyCode = event.keyCode;
-            return;
-        }
+
         if (
             (event.altKey && !disableKeys) ||
             event.keyCode === 13 ||
