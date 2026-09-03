@@ -216,13 +216,13 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
 
             logo._timerManager = new ManagedTimer();
-            rhythmBlock.flow([1001, 0.25], logo, turtleIndex, "blkRhythm");
+            rhythmBlock.flow([129, 0.25], logo, turtleIndex, "blkRhythm");
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "Maximum number of notes is 1000.",
+                "Maximum number of notes is 128.",
                 "blkRhythm"
             );
-            expect(logo._timerManager.activeTimeoutCount).toBe(1000);
+            expect(logo._timerManager.activeTimeoutCount).toBe(128);
             logo._timerManager.clearAll();
         });
 
@@ -412,13 +412,13 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             activity.blocks.blockList["blkSTuplet"] = { name: "stuplet" };
             logo._timerManager = new ManagedTimer();
 
-            stupletBlock.flow([1001, 0.5], logo, turtleIndex, "blkSTuplet");
+            stupletBlock.flow([129, 0.5], logo, turtleIndex, "blkSTuplet");
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "Maximum number of notes is 1000.",
+                "Maximum number of notes is 128.",
                 "blkSTuplet"
             );
-            expect(logo._timerManager.activeTimeoutCount).toBe(1000);
+            expect(logo._timerManager.activeTimeoutCount).toBe(128);
             logo._timerManager.clearAll();
         });
     });

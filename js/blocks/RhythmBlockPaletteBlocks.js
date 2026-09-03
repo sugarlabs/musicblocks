@@ -32,7 +32,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 }
 
 function setupRhythmBlockPaletteBlocks(activity) {
-    const MAX_RHYTHM_NOTES = 1000;
+    const MAX_RHYTHM_NOTES = 128;
 
     const getNoteCount = (value, defaultValue, blk) => {
         if (value === null || typeof value !== "number" || !Number.isFinite(value) || value < 1) {
