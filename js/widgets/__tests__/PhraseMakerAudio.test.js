@@ -338,12 +338,12 @@ describe("PhraseMakerAudio", () => {
         });
 
         test("triggers notes for a chord", () => {
-            const notes = ["C4", "E4", "G4"];
+            const notes = ["C4", "E4", "G4", "B4"];
             PhraseMakerAudio._playChord(mockPM, notes, 1);
 
             jest.runAllTimers();
 
-            expect(mockPM.activity.logo.synth.trigger).toHaveBeenCalledTimes(3);
+            expect(mockPM.activity.logo.synth.trigger).toHaveBeenCalledTimes(4);
             expect(mockPM.activity.logo.synth.trigger).toHaveBeenCalledWith(
                 0,
                 "C4",
@@ -363,6 +363,14 @@ describe("PhraseMakerAudio", () => {
             expect(mockPM.activity.logo.synth.trigger).toHaveBeenCalledWith(
                 0,
                 "G4",
+                1,
+                "piano",
+                null,
+                null
+            );
+            expect(mockPM.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "B4",
                 1,
                 "piano",
                 null,
@@ -475,6 +483,109 @@ describe("PhraseMakerAudio", () => {
             jest.runOnlyPendingTimers(); // Run the first note's timeout
             expect(mockPM._spanCounter).toBe(1);
             expect(mockPM._colIndex).toBe(0); // Should not advance yet
+        });
+
+        test("does not schedule or execute when _stopOrCloseClicked is true", () => {
+            mockPM._stopOrCloseClicked = true;
+            PhraseMakerAudio.__playNote(mockPM, 0, 0);
+            expect(mockPM._playNoteTimeout).toBeFalsy();
+            jest.runAllTimers();
+            expect(mockPM._notesCounter).toBe(0);
+        });
+
+        test("cancels execution and resets matrix if stopped before timeout fires", () => {
+            PhraseMakerAudio.__playNote(mockPM, 0, 0);
+            expect(mockPM._playNoteTimeout).not.toBeNull();
+
+            // Simulate stop clicked before timer executes
+            mockPM._stopOrCloseClicked = true;
+            jest.runAllTimers();
+
+            expect(global.PhraseMakerUI.resetMatrix).toHaveBeenCalled();
+            expect(mockPM._notesCounter).toBe(0);
+        });
+
+        test("does not clear pending chord timeouts when scheduling note", () => {
+            const chordTimeout = setTimeout(() => {}, 100);
+            mockPM._chordTimeouts = [chordTimeout];
+
+            PhraseMakerAudio.__playNote(mockPM, 0, 0);
+
+            expect(mockPM._chordTimeouts).toContain(chordTimeout);
+            expect(mockPM._chordTimeouts.length).toBe(1);
+        });
+
+        test("clears existing _playNoteTimeout before setting a new one", () => {
+            const previousTimeout = setTimeout(() => {}, 1000);
+            mockPM._playNoteTimeout = previousTimeout;
+
+            PhraseMakerAudio.__playNote(mockPM, 0, 0);
+
+            expect(mockPM._playNoteTimeout).not.toBe(previousTimeout);
+            expect(mockPM._playNoteTimeout).not.toBeNull();
+        });
+
+        test("recursively plays next note when noteCounter < notesToPlay.length - 1 and playingNow is true", () => {
+            mockPM.playingNow = true;
+            const playNoteSpy = jest.spyOn(PhraseMakerAudio, "__playNote");
+
+            PhraseMakerAudio.__playNote(mockPM, 0, 0);
+            jest.runAllTimers();
+
+            expect(playNoteSpy).toHaveBeenCalledWith(mockPM, expect.any(Number), 1);
+            playNoteSpy.mockRestore();
+        });
+
+        test("resets matrix and clears timers when playingNow becomes false during sequence", () => {
+            mockPM.playingNow = true;
+            mockPM._stopOrCloseClicked = false;
+            const clearSpy = jest.spyOn(PhraseMakerAudio, "clearPlaybackTimers");
+
+            PhraseMakerAudio.__playNote(mockPM, 0, 0);
+
+            // Change playingNow to false while timer is pending
+            mockPM.playingNow = false;
+            jest.runAllTimers();
+
+            expect(global.PhraseMakerUI.resetMatrix).toHaveBeenCalled();
+            expect(clearSpy).toHaveBeenCalled();
+            clearSpy.mockRestore();
+        });
+    });
+
+    describe("clearPlaybackTimers", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("clears active _playNoteTimeout and sets it to null", () => {
+            const timeoutId = setTimeout(() => {}, 1000);
+            mockPM._playNoteTimeout = timeoutId;
+
+            PhraseMakerAudio.clearPlaybackTimers(mockPM);
+
+            expect(mockPM._playNoteTimeout).toBeNull();
+        });
+
+        test("clears all timeouts in _chordTimeouts array and empties it", () => {
+            const t1 = setTimeout(() => {}, 500);
+            const t2 = setTimeout(() => {}, 600);
+            mockPM._chordTimeouts = [t1, t2];
+
+            PhraseMakerAudio.clearPlaybackTimers(mockPM);
+
+            expect(mockPM._chordTimeouts).toEqual([]);
+        });
+
+        test("handles missing or undefined timer properties safely", () => {
+            delete mockPM._playNoteTimeout;
+            delete mockPM._chordTimeouts;
+
+            expect(() => PhraseMakerAudio.clearPlaybackTimers(mockPM)).not.toThrow();
         });
     });
 });
