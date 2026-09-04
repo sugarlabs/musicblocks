@@ -1204,6 +1204,16 @@ describe("Turtles.TurtlesView", () => {
     });
 
     afterEach(() => {
+        // The constructor attaches a resize listener, and restoring the spy
+        // does not detach it. Left behind, every view built here would keep
+        // receiving resize events for the rest of the run, so each one is
+        // removed while the spy still has the handlers on record.
+        for (const [type, handler] of addEventListenerSpy.mock.calls) {
+            if (type === "resize") {
+                window.removeEventListener("resize", handler);
+            }
+        }
+
         global.platformColor = savedPlatformColor;
         addEventListenerSpy.mockRestore();
     });
