@@ -925,6 +925,17 @@ describe("noteToObj", () => {
         expect(noteToObj("C")).toEqual(["C", 4]);
         expect(noteToObj("Bb")).toEqual(["Bb", 4]);
     });
+    it("should parse octaves of more than one digit", () => {
+        expect(noteToObj("C10")).toEqual(["C", 10]);
+        expect(noteToObj("Gb12")).toEqual(["Gb", 12]);
+    });
+    it("should parse negative octaves", () => {
+        expect(noteToObj("A-1")).toEqual(["A", -1]);
+        expect(noteToObj("Gb-2")).toEqual(["Gb", -2]);
+    });
+    it("should parse octave zero", () => {
+        expect(noteToObj("C0")).toEqual(["C", 0]);
+    });
 });
 
 describe("frequencyToPitch", () => {

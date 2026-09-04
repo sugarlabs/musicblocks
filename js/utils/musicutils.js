@@ -4052,13 +4052,15 @@ const getTemperamentName = name => {
  * @returns {Array} An array containing the note, octave, and cents.
  */
 const noteToObj = note => {
-    let octave = parseInt(note.slice(note.length - 1), 10);
-    if (isNaN(octave)) {
-        octave = 4;
-    } else {
-        note = note.slice(0, note.length - 1);
+    // Take the whole trailing number rather than just the final character, so
+    // that octaves outside 0-9 survive: "C10" is C in octave 10, not "C1" in
+    // octave 0, and "A-1" is A in octave -1, not "A-" in octave 1. A leading
+    // minus only counts as a sign when digits follow it.
+    const match = /^(.*?)(-?\d+)$/.exec(note);
+    if (match === null) {
+        return [note, 4];
     }
-    return [note, octave];
+    return [match[1], parseInt(match[2], 10)];
 };
 
 /**
