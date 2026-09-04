@@ -97,7 +97,10 @@ describe("munsell", () => {
         it("should identify a close match for a RGB value", () => {
             const color = searchColors(100, 150, 200);
             const nearestColor = getcolor(color);
-            expect(nearestColor[2]).toMatch(/^#[0-9a-fA-F]{6}$/);
+            // getcolor() yields "#rrggbb" for only 20 of the 100 candidates and
+            // "rgba(...)" for the rest, so accept both. This previously matched
+            // hex alone, which held only while those other 80 were unreachable.
+            expect(nearestColor[2]).toMatch(/^(#[0-9a-fA-F]{6}|rgba\(\d+, \d+, \d+, \d+\.?\d*\))$/);
         });
     });
 });
@@ -197,5 +200,39 @@ describe("getMunsellColor edge cases", () => {
     it("should handle chroma at boundary 0", () => {
         const color = getMunsellColor(50, 50, 0);
         expect(color).toBeDefined();
+    });
+});
+
+describe("searchColors", () => {
+    const rgbOf = color =>
+        color.charAt(0) === "#"
+            ? [
+                  parseInt(color.substr(1, 2), 16),
+                  parseInt(color.substr(3, 2), 16),
+                  parseInt(color.substr(5, 2), 16)
+              ]
+            : color
+                  .match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/)
+                  .slice(1)
+                  .map(Number);
+
+    it("should find every candidate when asked for that candidate's own colour", () => {
+        // getcolor() returns "#rrggbb" for only 20 of the 100 candidates and
+        // "rgba(...)" for the rest. Parsing every one as hex gave NaN
+        // distances for those 80, and NaN < distance is false, so they could
+        // never be returned -- not even for their own colour.
+        for (let i = 0; i < 100; i++) {
+            const [r, g, b] = rgbOf(String(getcolor(i)[2]));
+            expect(searchColors(r, g, b)).toBe(i);
+        }
+    });
+
+    it("should be able to return more than the 20 hex-valued candidates", () => {
+        const reachable = new Set();
+        for (let i = 0; i < 100; i++) {
+            const [r, g, b] = rgbOf(String(getcolor(i)[2]));
+            reachable.add(searchColors(r, g, b));
+        }
+        expect(reachable.size).toBe(100);
     });
 });

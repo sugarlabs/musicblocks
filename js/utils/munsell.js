@@ -6833,14 +6833,37 @@ let getcolor = color => {
  * @param {number} b - Intensity of blue.
  * @returns {number} The color value of the nearest match.
  */
+/**
+ * Extract [r, g, b] from either of the two forms `interpColor` produces.
+ * It returns "#rrggbb" only when the interpolation parameter lands exactly on
+ * 0 or 1, and "rgba(r, g, b, a)" for every value in between.
+ * @param {string} color
+ * @returns {number[]} the red, green and blue components
+ */
+const colorToRGB = color => {
+    if (color.charAt(0) === "#") {
+        return [
+            parseInt(color.substr(1, 2), 16),
+            parseInt(color.substr(3, 2), 16),
+            parseInt(color.substr(5, 2), 16)
+        ];
+    }
+    const parts = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+    return parts === null
+        ? [0, 0, 0]
+        : [parseInt(parts[1], 10), parseInt(parts[2], 10), parseInt(parts[3], 10)];
+};
+
 let searchColors = (r, g, b) => {
     let nearestColor = -1;
     let distance = 10000000;
     for (let i = 0; i < 100; i++) {
         const color = getcolor(i);
-        const r1 = parseInt(color[2].substr(1, 2), 16);
-        const g1 = parseInt(color[2].substr(3, 2), 16);
-        const b1 = parseInt(color[2].substr(5, 2), 16);
+        // Parse both forms. Reading every candidate as hex made the 80 that
+        // interpolate to "rgba(...)" yield NaN distances, and `NaN < distance`
+        // is false, so they could never be chosen -- a candidate could not even
+        // find itself.
+        const [r1, g1, b1] = colorToRGB(color[2]);
         const distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
         if (distSquared < distance) {
             distance = distSquared;
