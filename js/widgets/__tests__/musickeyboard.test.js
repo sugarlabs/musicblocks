@@ -948,9 +948,10 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         keyboard.init();
 
         // The keys generated above the single note used to be created without a
-        // voice, which made them silent and threw when they were pressed.
-        const voiceless = keyboard.displayLayout.filter(item => item.voice === undefined);
-        expect(voiceless).toEqual([]);
+        // voice, which made them silent and threw when they were pressed. Every
+        // key in the padded octave should carry the source note's voice.
+        expect(keyboard.displayLayout).toHaveLength(13);
+        expect(keyboard.displayLayout.every(item => item.voice === "guitar")).toBe(true);
 
         // The padded keys should carry the voice of the note they were built from.
         const c5Item = keyboard.displayLayout.find(
