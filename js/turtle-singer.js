@@ -24,7 +24,7 @@
     temperamentHasRatios, isEquallyTempered,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
-   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
+   noteToFrequency, getTemperament,
    SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO,
    keySignatureToMode, getSavedCustomModes,
    clampNumber
@@ -37,10 +37,10 @@
     js/utils/musicutils.js
         frequencyToPitch, pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1,
-        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament, getOctaveRatio,
+        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament,
         getCurrentEDO, isEquallyTempered
     js/utils/utils.js
-        rationalSum, _, rationalToFraction
+        rationalSum, _
     js/utils/synthutils.js
         instrumentsEffects, instrumentsFilters
  */
@@ -2267,43 +2267,6 @@ class Singer {
                                 );
                                 activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
-                        }
-                    }
-
-                    const notesFrequency = isCustomTemperament(activity.logo.synth.inTemperament)
-                        ? activity.logo.synth.getCustomFrequency(notes)
-                        : activity.logo.synth.getFrequency(
-                              notes,
-                              activity.logo.synth.changeInTemperament
-                          );
-                    const startingPitch = activity.logo.synth.startingPitch;
-                    const startPitchParsed = parseNoteString(startingPitch);
-                    const frequency = getCachedPitchToFrequency(
-                        startPitchParsed[0],
-                        startPitchParsed[1],
-                        0,
-                        null,
-                        activity.logo.synth.inTemperament
-                    );
-                    const pitchNumber = getTemperament(
-                        activity.logo.synth.inTemperament
-                    ).pitchNumber;
-                    const ratio = [];
-                    const number = [];
-                    const numerator = [];
-                    const denominator = [];
-
-                    for (let k = 0; k < notesFrequency.length; k++) {
-                        if (notesFrequency[k] !== undefined) {
-                            ratio[k] = notesFrequency[k] / frequency;
-                            number[k] = (
-                                pitchNumber *
-                                (Math.log10(ratio[k]) / Math.log10(getOctaveRatio()))
-                            ).toFixed(0);
-                            // Cache rationalToFraction result to avoid duplicate calls
-                            const fraction = rationalToFraction(ratio[k]);
-                            numerator[k] = fraction[0];
-                            denominator[k] = fraction[1];
                         }
                     }
 
