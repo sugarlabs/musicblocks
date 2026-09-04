@@ -384,6 +384,269 @@ describe("Viewport Culling", () => {
     });
 });
 
+// ---------------------------------------------------------------------------
+// renameDos
+//
+// Called when an action is renamed, to carry the new name onto every block
+// that refers to it. Two of its checks compare the loop index against block
+// numbers: the skipBlock guard, and the slot check that only renames the
+// action-name argument of an onbeatdo or listen block. Both need the index to
+// be a number.
+// ---------------------------------------------------------------------------
+
+describe("renameDos", () => {
+    let blocks;
+
+    beforeEach(() => {
+        const mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    /**
+     * Builds a text block holding a value, as the action-name argument is.
+     * @param {string} value - the name the block carries
+     * @param {number} parent - index of the block it hangs from
+     * @returns {Object} A text block shaped the way renameDos expects.
+     */
+    function textBlock(value, parent) {
+        return {
+            name: "text",
+            value,
+            trash: false,
+            connections: [parent],
+            text: { text: value },
+            container: { updateCache: jest.fn() }
+        };
+    }
+
+    /**
+     * Builds a parent block. Connections hold block numbers, matching the
+     * real blockList, because the slot check searches them with indexOf.
+     * @param {string} name - block name, such as "do" or "onbeatdo"
+     * @param {Array} connections - [parent, ...arguments]
+     * @returns {Object} A parent block.
+     */
+    function parentBlock(name, connections) {
+        return {
+            name,
+            value: null,
+            trash: false,
+            connections,
+            text: { text: "" },
+            container: { updateCache: jest.fn() }
+        };
+    }
+
+    describe("blocks that carry an action name", () => {
+        it("renames the argument of a plain do block", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", 0)];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("newAction");
+            expect(blocks.blockList[1].text.text).toBe("newAction");
+            expect(blocks.blockList[1].container.updateCache).toHaveBeenCalled();
+        });
+
+        it.each(["do", "calc", "doArg", "calcArg", "action"])(
+            "renames the argument of a %s block",
+            name => {
+                blocks.blockList = [parentBlock(name, [null, 1]), textBlock("myAction", 0)];
+
+                blocks.renameDos("myAction", "newAction");
+
+                expect(blocks.blockList[1].value).toBe("newAction");
+            }
+        );
+
+        it("leaves a block naming a different action alone", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("otherAction", 0)];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("otherAction");
+        });
+
+        it("leaves a block whose parent refers to nothing alone", () => {
+            blocks.blockList = [parentBlock("repeat", [null, 1]), textBlock("myAction", 0)];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+        });
+    });
+
+    // onbeatdo and listen take two arguments. The first is the beat or the
+    // event name, the second is the action to run, so only slot 2 is renamed.
+    describe("onbeatdo and listen, which rename only their slot 2 argument", () => {
+        it.each(["onbeatdo", "listen"])("renames the action name of a %s block", name => {
+            blocks.blockList = [
+                parentBlock(name, [null, 1, 2]),
+                textBlock("4", 0),
+                textBlock("myAction", 0)
+            ];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[2].value).toBe("newAction");
+            expect(blocks.blockList[2].text.text).toBe("newAction");
+        });
+
+        it.each(["onbeatdo", "listen"])("leaves the slot 1 argument of a %s block alone", name => {
+            // Slot 1 is the beat or the event name, which is not an action
+            // and must keep its value even when it reads the same.
+            blocks.blockList = [
+                parentBlock(name, [null, 1, 2]),
+                textBlock("myAction", 0),
+                textBlock("somethingElse", 0)
+            ];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[2].value).toBe("somethingElse");
+        });
+
+        it("renames slot 2 and leaves slot 1 alone when both name the action", () => {
+            blocks.blockList = [
+                parentBlock("onbeatdo", [null, 1, 2]),
+                textBlock("myAction", 0),
+                textBlock("myAction", 0)
+            ];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[2].value).toBe("newAction");
+        });
+    });
+
+    describe("skipBlock", () => {
+        it("leaves the block it is asked to skip untouched", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", 0)];
+
+            blocks.renameDos("myAction", "newAction", 1);
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[1].text.text).toBe("myAction");
+            expect(blocks.blockList[1].container.updateCache).not.toHaveBeenCalled();
+        });
+
+        it("renames the others while skipping the one named", () => {
+            blocks.blockList = [
+                parentBlock("do", [null, 1]),
+                textBlock("myAction", 0),
+                parentBlock("do", [null, 3]),
+                textBlock("myAction", 2)
+            ];
+
+            blocks.renameDos("myAction", "newAction", 1);
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[3].value).toBe("newAction");
+        });
+
+        it("skips block 0 when asked, rather than treating it as absent", () => {
+            // Block 0 is falsy as an index, so a guard written as a truth test
+            // rather than a comparison would fail to skip it.
+            blocks.blockList = [textBlock("myAction", 1), parentBlock("do", [null, 0])];
+
+            blocks.renameDos("myAction", "newAction", 0);
+
+            expect(blocks.blockList[0].value).toBe("myAction");
+        });
+
+        it("renames everything when no block is named", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", 0)];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("newAction");
+        });
+    });
+
+    describe("edge cases", () => {
+        it("does nothing when the name is unchanged", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", 0)];
+
+            blocks.renameDos("myAction", "myAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[1].container.updateCache).not.toHaveBeenCalled();
+        });
+
+        it("handles an empty block list", () => {
+            blocks.blockList = [];
+
+            expect(() => blocks.renameDos("myAction", "newAction")).not.toThrow();
+        });
+
+        it("leaves trashed blocks alone", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", 0)];
+            blocks.blockList[1].trash = true;
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+        });
+
+        it("skips a block whose parent connection is null", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", null)];
+
+            expect(() => blocks.renameDos("myAction", "newAction")).not.toThrow();
+            expect(blocks.blockList[1].value).toBe("myAction");
+        });
+
+        it("renames every referring block across a larger workspace", () => {
+            blocks.blockList = [
+                parentBlock("do", [null, 1]),
+                textBlock("myAction", 0),
+                parentBlock("onbeatdo", [null, 3, 4]),
+                textBlock("4", 2),
+                textBlock("myAction", 2),
+                parentBlock("listen", [null, 6, 7]),
+                textBlock("event", 5),
+                textBlock("myAction", 5),
+                parentBlock("repeat", [null, 9]),
+                textBlock("myAction", 8)
+            ];
+
+            blocks.renameDos("myAction", "newAction");
+
+            // Everything that names the action through a do, onbeatdo or
+            // listen is renamed; the repeat argument is not an action name.
+            expect(blocks.blockList.map(b => b.value)).toEqual([
+                null,
+                "newAction",
+                null,
+                "4",
+                "newAction",
+                null,
+                "event",
+                "newAction",
+                null,
+                "myAction"
+            ]);
+        });
+    });
+});
+
 describe("Blocks Foundation", () => {
     let mockActivity;
 
