@@ -591,10 +591,14 @@ describe("renameDos", () => {
             expect(blocks.blockList[1].container.updateCache).not.toHaveBeenCalled();
         });
 
-        it("handles an empty block list", () => {
+        it("leaves an empty block list empty", () => {
             blocks.blockList = [];
 
-            expect(() => blocks.renameDos("myAction", "newAction")).not.toThrow();
+            blocks.renameDos("myAction", "newAction");
+
+            // A throw would fail the test on its own, so the postcondition is
+            // what is asserted: nothing was added to the list.
+            expect(blocks.blockList).toEqual([]);
         });
 
         it("leaves trashed blocks alone", () => {
@@ -609,8 +613,11 @@ describe("renameDos", () => {
         it("skips a block whose parent connection is null", () => {
             blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", null)];
 
-            expect(() => blocks.renameDos("myAction", "newAction")).not.toThrow();
+            blocks.renameDos("myAction", "newAction");
+
             expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[1].text.text).toBe("myAction");
+            expect(blocks.blockList[1].container.updateCache).not.toHaveBeenCalled();
         });
 
         it("renames every referring block across a larger workspace", () => {
