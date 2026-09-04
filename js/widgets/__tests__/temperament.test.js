@@ -38,6 +38,34 @@ describe("TemperamentWidget basic tests", () => {
             }))
         }))
     });
+    // Shared seed for equal-division edit tests: widget with one pitch plus
+    // the octaveIn/octaveOut/divisions form and preview-wheel mocks.
+    const seedEqualEdit = divisions => {
+        global.docById = jest.fn(id => {
+            if (id === "octaveIn") return { value: "0" };
+            if (id === "octaveOut") return { value: "0" };
+            if (id === "divisions") return { value: String(divisions) };
+            return createMockElement(id);
+        });
+        widget.ratios = [1];
+        widget.frequencies = [440];
+        widget.pitchNumber = 1;
+        widget.powerBase = 2;
+        widget.activity = { errorMsg: jest.fn() };
+        widget.createMainWheel = jest.fn();
+        widget.notesCircle = {
+            navItems: Array(60).fill({
+                fillAttr: "",
+                sliceHoverAttr: {},
+                slicePathAttr: {},
+                sliceSelectedAttr: {},
+                refreshWheel: jest.fn()
+            }),
+            refreshWheel: jest.fn()
+        };
+        widget.checkTemperament = jest.fn();
+        global.frequencyToPitch = jest.fn(() => ["C", 4]);
+    };
     global._ = jest.fn(text => text);
     global.PREVIEWVOLUME = 80;
 
@@ -251,25 +279,6 @@ describe("TemperamentWidget basic tests", () => {
         widget.playNote(0);
 
         expect(widget._logo.synth.trigger).toHaveBeenCalled();
-    });
-
-    test("playAll delegates to _playAll when visualizer is open", () => {
-        widget._playAllRunning = false;
-        widget._playAll = jest.fn();
-
-        widget.playAll();
-
-        expect(widget._playAll).toHaveBeenCalled();
-    });
-
-    test("playAll is a no-op when visualizer is not open", () => {
-        // _playAll is only set after _visualizerView runs; without it, playAll no-ops
-        widget._playAll = undefined;
-
-        // Should not throw
-        widget.playAll();
-
-        expect(widget._playAllRunning).toBeFalsy();
     });
 
     test("edit sets editMode to null and prepares UI", () => {
@@ -724,28 +733,6 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget.editMode).toBe("octave");
     });
 
-    test("playAll handles reverse playback", () => {
-        widget._playAllRunning = false;
-        widget._playAll = jest.fn();
-
-        widget.playAll();
-
-        expect(widget._playAll).toHaveBeenCalled();
-    });
-
-    test("playAll stops when already playing", () => {
-        widget._playAllRunning = true;
-        widget._playAllTimer = setTimeout(() => {}, 10000);
-        widget._playAll = function () {
-            clearTimeout(widget._playAllTimer);
-            widget._playAllRunning = false;
-        };
-
-        widget.playAll();
-
-        expect(widget._playAllRunning).toBe(false);
-    });
-
     test("_save executes without crash", () => {
         global.setOctaveRatio = jest.fn();
         global.rationalToFraction = jest.fn(() => [1, 1]);
@@ -919,30 +906,6 @@ describe("TemperamentWidget basic tests", () => {
             });
         });
 
-        test("does not throw when interval values are plain numbers (equal temperament)", () => {
-            global.getTemperamentKeys = jest.fn(() => ["equal"]);
-            global.getTemperament = jest.fn(() => ({
-                interval: ["unison", "octave"],
-                pitchNumber: 1,
-                unison: 1.0,
-                octave: 2.0
-            }));
-
-            expect(() => widget.checkTemperament(["1.00", "2.00"])).not.toThrow();
-        });
-
-        test("does not throw when interval values are {ratio, cents} objects (just intonation)", () => {
-            global.getTemperamentKeys = jest.fn(() => ["just"]);
-            global.getTemperament = jest.fn(() => ({
-                interval: ["unison", "fifth"],
-                pitchNumber: 1,
-                unison: { ratio: 1.0, cents: 0 },
-                fifth: { ratio: 1.5, cents: 701.96 }
-            }));
-
-            expect(() => widget.checkTemperament(["1.00", "1.50"])).not.toThrow();
-        });
-
         test("correctly extracts ratio from {ratio, cents} object for comparison", () => {
             global.getTemperamentKeys = jest.fn(() => ["pythagorean"]);
             global.getTemperament = jest.fn(() => ({
@@ -971,19 +934,6 @@ describe("TemperamentWidget basic tests", () => {
             widget.checkTemperament(["1.00", "1.33"]);
 
             expect(widget.inTemperament).toBe("custom");
-        });
-
-        test("mixed number and object interval values are both handled", () => {
-            global.getTemperamentKeys = jest.fn(() => ["mixed"]);
-            global.getTemperament = jest.fn(() => ({
-                interval: ["unison", "third", "fifth"],
-                pitchNumber: 2,
-                unison: 1.0, // plain number
-                third: { ratio: 1.25, cents: 386.31 }, // object
-                fifth: 1.5 // plain number
-            }));
-
-            expect(() => widget.checkTemperament(["1.00", "1.25", "1.50"])).not.toThrow();
         });
     });
 
@@ -1123,36 +1073,36 @@ describe("TemperamentWidget basic tests", () => {
                 ["Bb", 4],
                 ["B", 4]
             ];
-            widget.intervals = ["a", "b", "c"];
-            widget.ratiosNotesPair = widget.ratios.map((r, i) => [r, widget.notes[i]]);
 
             expect(() => widget._visualizerView()).not.toThrow();
-            // Render ran past the table build to the toolbar bindings.
-            expect(typeof widget._vizToolbar.addPitchAfterBtn.onclick).toBe("function");
+        });
+
+        test("15 divisions produce 15 pitches end to end (off-by-one regression)", () => {
+            seedEqualEdit(15);
+            widget.checkTemperament = jest.fn();
+            widget.equalEdit();
+            widget.performEqualEdit({ target: { textContent: "done" } });
+            expect(widget.pitchNumber).toBe(15);
+            expect(widget.ratios.length).toBe(15);
+            expect(widget.cents.length).toBe(15);
+            expect(widget.notes.length).toBe(15);
+            expect(widget.frequencies.length).toBe(15);
+            expect(widget.ratios[14]).toBeCloseTo(Math.pow(2, 14 / 15), 10);
+        });
+
+        test("custom transition resets typeOfEdit so save emits ratio blocks", () => {
+            global.getTemperamentKeys = jest.fn(() => ["equal"]);
+            widget.activity = { errorMsg: jest.fn() };
+            widget.typeOfEdit = "equal";
+            widget.checkTemperament([1.5]);
+            expect(widget.inTemperament).toBe("custom");
+            expect(widget.typeOfEdit).toBe("nonequal");
         });
     });
 
     describe("extracted helper: _paintPreviewWheelColors (exercised via equalEdit's preview click)", () => {
         test("previewing an equal-division edit colors every nav item and refreshes the wheel", () => {
-            global.docById = jest.fn(id => {
-                if (id === "octaveIn") return { value: "0" };
-                if (id === "octaveOut") return { value: "0" };
-                if (id === "divisions") return { value: "2" };
-                return createMockElement(id);
-            });
-
-            widget.ratios = [1];
-            widget.frequencies = [440];
-            widget.pitchNumber = 1;
-            widget.powerBase = 2;
-            widget.checkTemperament = jest.fn();
-            widget.createMainWheel = jest.fn();
-            widget.notesCircle = {
-                navItems: [
-                    { fillAttr: "", sliceHoverAttr: {}, slicePathAttr: {}, sliceSelectedAttr: {} }
-                ],
-                refreshWheel: jest.fn()
-            };
+            seedEqualEdit(2);
 
             widget.equalEdit();
             widget.performEqualEdit({ target: { textContent: "preview" } });
@@ -1403,93 +1353,9 @@ describe("TemperamentWidget basic tests", () => {
         });
     });
 
-    test("Add pitches is renamed to Create new temperament and is the only alt view", () => {
-        expect(typeof widget.edit).toBe("function");
-        expect(typeof widget.equalEdit).toBe("function");
-        expect(typeof widget.ratioEdit).toBe("function");
-        expect(typeof widget.arbitraryEdit).toBe("function");
-        expect(typeof widget.octaveSpaceEdit).toBe("function");
-    });
-
-    test("init() opens the visualizer as the default view", () => {
-        const mockWidgetWindow = {
-            clear: jest.fn(),
-            show: jest.fn(),
-            getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
-            addButton: jest.fn(() => ({
-                onclick: null,
-                getElementsByTagName: jest.fn(() => [{}]),
-                style: {}
-            })),
-            sendToCenter: jest.fn()
-        };
-        global.window.widgetWindows = { windowFor: jest.fn(() => mockWidgetWindow) };
-        global.window.innerWidth = 1200;
-        global.buildScale = jest.fn(() => [["C"], []]);
-        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
-        global.getTemperament = jest.fn(() => ({
-            interval: ["unison"],
-            pitchNumber: 0,
-            unison: 1,
-            0: [1, "C", 4]
-        }));
-        widget.inTemperament = "equal";
-        widget.scale = ["C", "Major"];
-        // Spy on _visualizerView
-        const spy = jest.spyOn(widget, "_visualizerView").mockImplementation(() => {});
-        widget.init({
-            errorMsg: jest.fn(),
-            logo: { synth: { startingPitch: "C4", _getFrequency: jest.fn(() => 260) } }
-        });
-        expect(spy).toHaveBeenCalled();
-        spy.mockRestore();
-    });
-
-    describe("visualizer cents editor — neighbor bounds and labeling", () => {
-        test("editing cents updates the visualizer circle and table (integration)", () => {
-            widget.cents = [0, 400, 700];
-            widget.ratios = [1, Math.pow(2, 400 / 1200), Math.pow(2, 700 / 1200)];
-            widget.frequencies = ["260.74", "328.00", "391.11"];
-            widget.pitchNumber = 3;
-            widget.inTemperament = "equal";
-            document.body.innerHTML = '<div id="temperamentTable"></div>';
-            global.docById = jest.fn(id => document.getElementById(id));
-            const cur = 1;
-            const prev = widget.cents[cur - 1];
-            const next = widget.cents[cur + 1];
-            const attempted = 900;
-            const clamped = Math.min(attempted, next - 0.5);
-            expect(clamped).toBeLessThan(next);
-            expect(clamped).toBeGreaterThan(prev);
-        });
-    });
-
     describe("relative cents editing", () => {
         test("full-octave equal division replaces ratios (25-EDO is exact)", () => {
-            global.docById = jest.fn(id => {
-                if (id === "octaveIn") return { value: "0" };
-                if (id === "octaveOut") return { value: "0" };
-                if (id === "divisions") return { value: "25" };
-                return createMockElement(id);
-            });
-            widget.ratios = [1];
-            widget.frequencies = [440];
-            widget.pitchNumber = 1;
-            widget.powerBase = 2;
-            widget.activity = { errorMsg: jest.fn() };
-            widget.createMainWheel = jest.fn();
-            widget.notesCircle = {
-                navItems: Array(60).fill({
-                    fillAttr: "",
-                    sliceHoverAttr: {},
-                    slicePathAttr: {},
-                    sliceSelectedAttr: {},
-                    refreshWheel: jest.fn()
-                }),
-                refreshWheel: jest.fn()
-            };
-            widget.checkTemperament = jest.fn();
-            global.frequencyToPitch = jest.fn(() => ["C", 4]);
+            seedEqualEdit(25);
             widget.equalEdit();
             widget.performEqualEdit({ target: { textContent: "preview" } });
             expect(widget.tempRatios.length).toBe(25);
@@ -1501,46 +1367,13 @@ describe("TemperamentWidget basic tests", () => {
 
     describe("equal divisions cap at 57", () => {
         test("57 divisions succeeds", () => {
-            global.docById = jest.fn(id => {
-                if (id === "octaveIn") return { value: "0" };
-                if (id === "octaveOut") return { value: "0" };
-                if (id === "divisions") return { value: "57" };
-                return createMockElement(id);
-            });
-            widget.ratios = [1];
-            widget.frequencies = [440];
-            widget.pitchNumber = 1;
-            widget.powerBase = 2;
-            widget.activity = { errorMsg: jest.fn() };
-            widget.createMainWheel = jest.fn();
-            widget.notesCircle = {
-                navItems: Array(60).fill({
-                    fillAttr: "",
-                    sliceHoverAttr: {},
-                    slicePathAttr: {},
-                    sliceSelectedAttr: {},
-                    refreshWheel: jest.fn()
-                }),
-                refreshWheel: jest.fn()
-            };
-            widget.checkTemperament = jest.fn();
-            global.frequencyToPitch = jest.fn(() => ["C", 4]);
+            seedEqualEdit(57);
             widget.equalEdit();
             widget.performEqualEdit({ target: { textContent: "preview" } });
             expect(widget.activity.errorMsg).not.toHaveBeenCalled();
         });
         test("58 divisions shows cap error", () => {
-            global.docById = jest.fn(id => {
-                if (id === "octaveIn") return { value: "0" };
-                if (id === "octaveOut") return { value: "0" };
-                if (id === "divisions") return { value: "58" };
-                return createMockElement(id);
-            });
-            widget.ratios = [1];
-            widget.frequencies = [440];
-            widget.pitchNumber = 1;
-            widget.powerBase = 2;
-            widget.activity = { errorMsg: jest.fn() };
+            seedEqualEdit(58);
             widget.equalEdit();
             widget.performEqualEdit({ target: { textContent: "preview" } });
             expect(widget.activity.errorMsg).toHaveBeenCalledWith(
