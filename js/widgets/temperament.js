@@ -1756,7 +1756,7 @@ function TemperamentWidget() {
                     return a - b;
                 });
 
-                pitchNumber = this.tempRatios.length - 1;
+                pitchNumber = this.tempRatios.length;
                 this.typeOfEdit = "equal";
                 this.divisions = numDivs;
             } else {
@@ -1955,18 +1955,18 @@ function TemperamentWidget() {
             that.tempRatios.sort(function (a, b) {
                 return a - b;
             });
-            if (that.tempRatios.length - 1 > MAX_DIVISIONS) {
+            if (that.tempRatios.length > MAX_DIVISIONS) {
                 that.activity.errorMsg(
                     _("Maximum 57 divisions. For larger, use a dedicated tool."),
                     3000
                 );
                 return;
             }
-            const pitchNumber = that.tempRatios.length - 1;
+            const pitchNumber = that.tempRatios.length;
             if (event.target.textContent === _("done")) {
                 that.ratios = that.tempRatios.slice();
                 that.typeOfEdit = "nonequal";
-                that.pitchNumber = that.ratios.length - 1;
+                that.pitchNumber = that.ratios.length;
                 const frequency1 = that.frequencies[0];
                 that.frequencies = computeFrequencies(that.ratios, frequency1, that.pitchNumber);
 
@@ -1994,7 +1994,7 @@ function TemperamentWidget() {
                 //make temperary
                 const ratios = that.tempRatios.slice();
                 that.typeOfEdit = "nonequal";
-                that.NEqTempPitchNumber = ratios.length - 1;
+                that.NEqTempPitchNumber = ratios.length;
                 const frequency1 = that.frequencies[0];
                 that.NEqTempHzs = computeFrequencies(ratios, frequency1, that.NEqTempPitchNumber);
 
@@ -2007,7 +2007,7 @@ function TemperamentWidget() {
                 docById("done_").onclick = function () {
                     //Go to main Circle of Notes
                     that.ratios = that.tempRatios.slice();
-                    that.pitchNumber = that.ratios.length - 1;
+                    that.pitchNumber = that.ratios.length;
                     const frequency1 = that.frequencies[0];
                     that.frequencies = computeFrequencies(
                         that.ratios,
@@ -2251,10 +2251,10 @@ function TemperamentWidget() {
         divAppend.onclick = function () {
             that.ratios = that.tempRatios1.slice();
             that.typeOfEdit = "nonequal";
-            that.pitchNumber = that.ratios.length - 1;
+            that.pitchNumber = that.ratios.length;
             const compareRatios = [];
             const frequency1 = that.frequencies[0];
-            that.frequencies = computeFrequencies(that.ratios, frequency1, that.ratios.length - 1);
+            that.frequencies = computeFrequencies(that.ratios, frequency1, that.ratios.length);
 
             for (let i = 0; i < that.ratios.length; i++) {
                 compareRatios[i] = that.ratios[i];
@@ -2344,12 +2344,12 @@ function TemperamentWidget() {
                 };
                 docById("done").onclick = function () {
                     that.tempRatios1 = that.tempRatios.slice();
-                    const pitchNumber = that.tempRatios1.length - 1;
+                    const pitchNumber = that.tempRatios1.length;
                     that._createOuterWheel(that.tempRatios1, pitchNumber);
                 };
                 docById("close").onclick = function () {
                     that.tempRatios = that.tempRatios1.slice();
-                    const pitchNumber = that.tempRatios.length - 1;
+                    const pitchNumber = that.tempRatios.length;
                     that._createInnerWheel(that.tempRatios, pitchNumber);
                     docById("noteInfo1").remove();
                 };
@@ -2386,7 +2386,7 @@ function TemperamentWidget() {
                 break;
             }
         }
-        const pitchNumber = this.tempRatios.length - 1;
+        const pitchNumber = this.tempRatios.length;
         this._logo.resetSynth(0);
         this._logo.synth.trigger(
             0,
