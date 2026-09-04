@@ -65,6 +65,38 @@ describe("ConnectionValidator.testConnectionType — returns false for unsupport
     });
 });
 
+describe("ConnectionValidator.testConnectionType — boolean bridges to the any sockets", () => {
+    // Boolean was the only value type with no pairing to anyin/anyout, so a
+    // boolean could not be docked into Switch/Case (argTypes: ["anyin"]) and a
+    // named box could not be docked into if/while. See #8463.
+    it.each([
+        ["booleanout", "anyin"],
+        ["anyin", "booleanout"],
+        ["booleanin", "anyout"],
+        ["anyout", "booleanin"]
+    ])("allows %s -> %s", (type1, type2) => {
+        expect(ConnectionValidator.testConnectionType(type1, type2)).toBe(true);
+    });
+
+    it("still pairs boolean with itself", () => {
+        expect(ConnectionValidator.testConnectionType("booleanout", "booleanin")).toBe(true);
+        expect(ConnectionValidator.testConnectionType("booleanin", "booleanout")).toBe(true);
+    });
+
+    it("gives boolean the same any-bridge that number, text and solfege have", () => {
+        for (const base of ["number", "text", "solfege", "boolean"]) {
+            for (const pair of [
+                `${base}in:anyout`,
+                `anyout:${base}in`,
+                `anyin:${base}out`,
+                `${base}out:anyin`
+            ]) {
+                expect(ConnectionValidator.ALLOWED_CONNECTIONS.has(pair)).toBe(true);
+            }
+        }
+    });
+});
+
 describe("ConnectionValidator.testConnectionType — edge cases", () => {
     it("is case-sensitive", () => {
         const [type1, type2] = ALLOWED_PAIRS[0];

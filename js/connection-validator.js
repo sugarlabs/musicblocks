@@ -32,6 +32,15 @@ const ALLOWED_CONNECTIONS = new Set([
     "anyout:textin",
     "booleanout:booleanin",
     "booleanin:booleanout",
+    // Boolean was the only value type with no bridge to the generic "any"
+    // sockets. Both directions are needed: a boolean output has to dock into
+    // the anyin of Switch/Case, and an any output such as a named box has to
+    // dock into the boolean input of if/while. number, text and solfege
+    // already carry all four of these pairings.
+    "booleanin:anyout",
+    "anyout:booleanin",
+    "anyin:booleanout",
+    "booleanout:anyin",
     "mediain:mediaout",
     "mediaout:mediain",
     "mediain:textout",
