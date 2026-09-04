@@ -252,4 +252,14 @@ jobs:
                   node-version: '22'
 
             - name: Run npm audit
-              run: npm audit --omit=dev --audit-level=high
+              run: |
+                  for attempt in 1 2 3; do
+                    echo "Attempt $attempt of 3..."
+                    npm audit --omit=dev --audit-level=high && exit 0
+                    if [ $attempt -lt 3 ]; then
+                      echo "npm registry unavailable, retrying in 10 seconds..."
+                      sleep 10
+                    fi
+                  done
+                  echo "npm audit failed after 3 attempts"
+                  exit 1
