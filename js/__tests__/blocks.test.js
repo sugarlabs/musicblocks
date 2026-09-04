@@ -1648,3 +1648,181 @@ describe("Blocks Foundation", () => {
         });
     });
 });
+
+// ---------------------------------------------------------------------------
+// Spatial grid key type
+//
+// The grid is a Map of cell key to a Set of block indices, plus a Map from
+// block index to the cells it occupies. Both compare keys strictly, so the
+// index a caller passes has to be the same type the grid already holds or the
+// block is registered twice and the older entry is never cleaned up, leaving
+// it listed at a position it has left.
+// ---------------------------------------------------------------------------
+
+describe("Spatial grid indexing", () => {
+    let mockActivity;
+    let blocks;
+
+    beforeEach(() => {
+        mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+        blocks.blockList = [
+            { trash: false, name: "start", container: { x: 0, y: 0 }, docks: [[0, 0]] },
+            { trash: false, name: "note", container: { x: 0, y: 0 }, docks: [[0, 0]] }
+        ];
+        blocks._rebuildSpatialGrid();
+    });
+
+    /**
+     * Reads back the cells a block currently occupies in the grid.
+     * @param {number} idx - block index
+     * @returns {string[]} Sorted cell keys holding that block.
+     */
+    function cellsHolding(idx) {
+        const found = [];
+        for (const [cellKey, members] of blocks._spatialGrid) {
+            if (members.has(idx)) {
+                found.push(cellKey);
+            }
+        }
+        return found.sort();
+    }
+
+    it("registers every block under a numeric key when first built", () => {
+        expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
+        expect(cellsHolding(0)).toEqual(["0,0"]);
+        expect(cellsHolding(1)).toEqual(["0,0"]);
+    });
+
+    it("moves a block out of its old cell and into the new one", () => {
+        blocks.blockList[1].container.x = 5000;
+        blocks.blockList[1].container.y = 5000;
+
+        blocks._updateSpatialGrid(1);
+
+        expect(cellsHolding(1)).toEqual(["100,100"]);
+        expect(blocks._getNearbyBlocks(0, 0)).not.toContain(1);
+        expect(blocks._getNearbyBlocks(5000, 5000)).toContain(1);
+    });
+
+    describe("when the index arrives as a string", () => {
+        beforeEach(() => {
+            blocks.blockList[1].container.x = 5000;
+            blocks.blockList[1].container.y = 5000;
+        });
+
+        it("does not leave the block listed at the position it left", () => {
+            blocks._updateSpatialGrid("1");
+
+            expect(blocks._getNearbyBlocks(0, 0)).not.toContain(1);
+            expect(cellsHolding(1)).toEqual(["100,100"]);
+        });
+
+        it("keeps one entry per block rather than adding a second", () => {
+            blocks._updateSpatialGrid("1");
+
+            expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
+        });
+
+        it("reports the block as a number, so the self-connection guard matches", () => {
+            blocks._updateSpatialGrid("1");
+
+            const nearby = blocks._getNearbyBlocks(5000, 5000);
+
+            // block-drag-controller skips the dragged block with `b === thisBlock`,
+            // which a string entry would slip past.
+            expect(nearby).toContain(1);
+            expect(nearby).not.toContain("1");
+            expect(nearby.every(b => typeof b === "number")).toBe(true);
+        });
+
+        it("agrees with the numeric call in every respect", () => {
+            const asString = new Blocks(mockActivity);
+            asString.blockList = blocks.blockList.map(b => ({
+                ...b,
+                container: { ...b.container }
+            }));
+            asString._rebuildSpatialGrid();
+            asString._updateSpatialGrid("1");
+
+            blocks._updateSpatialGrid(1);
+
+            expect([...asString._blockGridCell.keys()]).toEqual([...blocks._blockGridCell.keys()]);
+            expect(asString._getNearbyBlocks(0, 0)).toEqual(blocks._getNearbyBlocks(0, 0));
+            expect(asString._getNearbyBlocks(5000, 5000)).toEqual(
+                blocks._getNearbyBlocks(5000, 5000)
+            );
+        });
+    });
+
+    describe("edge cases", () => {
+        it("ignores an index that names no block", () => {
+            blocks._updateSpatialGrid(99);
+
+            expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
+        });
+
+        it("ignores a block that has no container yet", () => {
+            blocks.blockList.push({ trash: false, name: "note", container: null, docks: [[0, 0]] });
+
+            blocks._updateSpatialGrid(2);
+
+            expect(blocks._blockGridCell.has(2)).toBe(false);
+        });
+
+        it("keeps block 0 registered, rather than treating it as absent", () => {
+            blocks.blockList[0].container.x = 900;
+
+            blocks._updateSpatialGrid("0");
+
+            expect(blocks._blockGridCell.has(0)).toBe(true);
+            expect(cellsHolding(0)).toEqual(["18,0"]);
+        });
+
+        it("places a block with no docks by its container position", () => {
+            blocks.blockList[1].docks = [];
+            blocks.blockList[1].container.x = 5000;
+            blocks.blockList[1].container.y = 5000;
+
+            blocks._updateSpatialGrid("1");
+
+            expect(cellsHolding(1)).toEqual(["100,100"]);
+        });
+
+        it("registers a block in every cell its docks reach", () => {
+            blocks.blockList[1].docks = [
+                [0, 0],
+                [0, 600]
+            ];
+
+            blocks._updateSpatialGrid("1");
+
+            expect(cellsHolding(1)).toEqual(["0,0", "0,12"]);
+        });
+
+        it("does no work when the block has not left its cells", () => {
+            const before = blocks._blockGridCell.get(1);
+
+            blocks._updateSpatialGrid("1");
+
+            // The same Set object is kept, so an unchanged block is not rewritten.
+            expect(blocks._blockGridCell.get(1)).toBe(before);
+        });
+    });
+});
