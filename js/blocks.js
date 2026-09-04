@@ -307,6 +307,18 @@ class Blocks {
             const block = this.blockList[blkIdx];
             if (!block || !block.container) return;
 
+            // The grid keys a Map and a set of Sets by this index, and those
+            // compare with SameValueZero, so "1" and 1 are different keys.
+            // Callers that iterate blockList with `for...in` hand over string
+            // keys -- workspace-layout-controller does at three sites -- which
+            // registered the block a second time and left the entry under its
+            // numeric key behind, so it kept matching at a position it had
+            // left. Normalise here, where the invariant lives, so it holds for
+            // every caller rather than only the ones known today.
+            if (typeof blkIdx === "string" && blkIdx !== "" && !isNaN(blkIdx)) {
+                blkIdx = Number(blkIdx);
+            }
+
             // Compute the set of cells this block should occupy
             const newKeys = new Set();
             if (block.docks && block.docks.length > 0) {

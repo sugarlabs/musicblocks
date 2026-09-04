@@ -384,6 +384,49 @@ describe("Viewport Culling", () => {
     });
 });
 
+describe("_updateSpatialGrid index normalisation", () => {
+    // The grid keys a Map and Sets by the block index, and those compare with
+    // SameValueZero, so "1" and 1 are distinct. Callers iterating blockList
+    // with `for...in` pass strings. See #8475.
+    const build = () => {
+        const blocks = new Blocks({
+            palettes: { dict: {} },
+            refreshCanvas: jest.fn(),
+            trashcan: { stopHighlightAnimation: jest.fn() }
+        });
+        blocks.blockList = [
+            {
+                name: "start",
+                trash: false,
+                docks: [[0, 0]],
+                container: { x: 10, y: 10 },
+                width: 20,
+                height: 20
+            }
+        ];
+        return blocks;
+    };
+
+    it('keys the grid the same way whether given 0 or "0"', () => {
+        const numeric = build();
+        numeric._updateSpatialGrid(0);
+        const viaNumber = [...numeric._blockGridCell.keys()];
+
+        const stringy = build();
+        stringy._updateSpatialGrid("0");
+        const viaString = [...stringy._blockGridCell.keys()];
+
+        expect(viaString).toEqual(viaNumber);
+    });
+
+    it("does not register the same block twice when called both ways", () => {
+        const blocks = build();
+        blocks._updateSpatialGrid(0);
+        blocks._updateSpatialGrid("0");
+        expect(blocks._blockGridCell.size).toBe(1);
+    });
+});
+
 describe("Blocks Foundation", () => {
     let mockActivity;
 
