@@ -352,7 +352,9 @@ describe("Theme Switching & Inline Styles Purity", () => {
         expect(dialogSource).toContain("var(--color-widget-frame-border)");
         expect(dialogSource).toContain("var(--color-panel-bg)");
         expect(dialogSource).toContain("var(--color-text-primary)");
-        expect(dialogSource).toContain("var(--color-overlay-backdrop)");
+        expect(dialogSource).toMatch(
+            /overlay\.style\.backgroundColor\s*=\s*["']var\(--color-overlay-backdrop\)["']/
+        );
     });
 
     it("activity.js strips inline color overrides from modalBox buttons and title", () => {
