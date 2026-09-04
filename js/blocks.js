@@ -215,6 +215,8 @@ class Blocks {
         this._loadGeneration = 0;
         this._activeLoadGeneration = null;
         this._loadTimeoutId = null;
+        /** Block batches requested while another batch is loading. */
+        this._pendingBlockLoads = [];
         /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
@@ -4787,6 +4789,7 @@ class Blocks {
             this._loadGeneration += 1;
             this._activeLoadGeneration = null;
             this._loadCounter = 0;
+            this._pendingBlockLoads = [];
             this.activity._suppressRefresh = false;
         };
 
@@ -4797,6 +4800,11 @@ class Blocks {
          * return {void}
          */
         this.loadNewBlocks = blockObjs => {
+            if (this._activeLoadGeneration !== null) {
+                this._pendingBlockLoads.push(blockObjs);
+                return;
+            }
+
             this.cancelPendingLoad();
             /** Suppress intermediate canvas redraws during block loading. */
             this.activity._suppressRefresh = true;
@@ -6275,6 +6283,8 @@ class Blocks {
                 return;
             }
 
+            let pendingBlockLoads = [];
+
             try {
                 this._findDrumURLs();
 
@@ -6350,12 +6360,18 @@ class Blocks {
                     this.activity.stopLoadAnimation();
                 }
                 pubsub.emit("finishedLoading");
+                pendingBlockLoads = this._pendingBlockLoads;
+                this._pendingBlockLoads = [];
             } finally {
                 /** All blocks loaded — allow canvas redraws again. */
                 if (loadGeneration === this._activeLoadGeneration) {
                     this._activeLoadGeneration = null;
                     this.activity._suppressRefresh = false;
                     this.activity.refreshCanvas();
+
+                    for (const blockObjs of pendingBlockLoads) {
+                        this.loadNewBlocks(blockObjs);
+                    }
                 }
             }
         };
