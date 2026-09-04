@@ -33,10 +33,11 @@ class ToolbarController {
     /**
      * Clears canvas for all turtles before a fresh Run.
      * Toolbar Run paths only — not on block clicks or widgets.
+     * Preserves turtle attributes (pen properties, skin, and position).
      */
     _clearAllTurtles() {
         for (const turtle of this.activity.turtles.turtleList) {
-            turtle.painter.doClear(true, true, true);
+            turtle.painter.doClear(false, false, false);
         }
     }
 

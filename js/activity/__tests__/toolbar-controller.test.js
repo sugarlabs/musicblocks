@@ -127,7 +127,7 @@ describe("ToolbarController.runFast", () => {
 
         jest.advanceTimersByTime(500);
 
-        expect(painter.doClear).toHaveBeenCalledWith(true, true, true);
+        expect(painter.doClear).toHaveBeenCalledWith(false, false, false);
         jest.useRealTimers();
     });
 });
@@ -361,7 +361,7 @@ describe("Environment setup logic", () => {
 });
 
 describe("ToolbarController._clearAllTurtles", () => {
-    test("calls doClear on each turtle painter", () => {
+    test("calls doClear on each turtle painter without resetting pen, skin, or position", () => {
         const painter0 = { doClear: jest.fn() };
         const painter1 = { doClear: jest.fn() };
         const activity = makeMockActivity();
@@ -371,8 +371,8 @@ describe("ToolbarController._clearAllTurtles", () => {
 
         controller._clearAllTurtles();
 
-        expect(painter0.doClear).toHaveBeenCalledWith(true, true, true);
-        expect(painter1.doClear).toHaveBeenCalledWith(true, true, true);
+        expect(painter0.doClear).toHaveBeenCalledWith(false, false, false);
+        expect(painter1.doClear).toHaveBeenCalledWith(false, false, false);
     });
 
     test("is a no-op when turtleList is empty", () => {

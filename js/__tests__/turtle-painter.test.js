@@ -26,6 +26,7 @@ global.clampNumber = require("../utils/utils-logic.js").clampNumber;
 global.getcolor = jest.fn(() => [50, 100, "rgba(255,0,49,1)"]);
 global.getMunsellColor = jest.fn(() => "rgba(128,64,32,1)");
 global.hex2rgb = jest.fn(hex => "rgba(255,0,49,1)");
+global.isValidHex = require("../utils/utils-logic.js").isValidHex;
 global._ = jest.fn(x => x);
 global.STROKECOLORS = { at: jest.fn(() => "red") };
 global.FILLCOLORS = { at: jest.fn(() => "blue") };
@@ -141,7 +142,7 @@ describe("Painter Class", () => {
         });
 
         test("should initialize canvas color and alpha", () => {
-            expect(painter._canvasColor).toBe("rgba(255,0,49,1)");
+            expect(painter._canvasColor).toBe("#ff0031");
             expect(painter._canvasAlpha).toBe(1.0);
         });
 
@@ -915,6 +916,13 @@ describe("Internal Drawing Helpers and Hollow Lines", () => {
         expect(mockTurtle.ctx.strokeStyle).toBe("rgba(255,0,49,1)");
     });
 
+    test("_processColor should parse rgba color strings without resetting to black", () => {
+        painter.canvasColor = "rgba(255, 0, 104, 1)";
+        painter.canvasAlpha = 0.8;
+        painter._processColor();
+        expect(mockTurtle.ctx.strokeStyle).toBe("rgba(255, 0, 104, 0.8)");
+    });
+
     test("closeSVG should set svgPath to false and append output based on fillState", () => {
         painter._svgPath = true;
         painter._fillState = true;
@@ -1080,6 +1088,31 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         expect(painter.turtle.rename).toHaveBeenCalledWith("start");
         expect(painter.turtle.doTurtleShell).toHaveBeenCalled();
         expect(painter.turtle._bitmap.rotation).toBe(0);
+    });
+
+    test("doClear(false, false, false) should preserve turtle position, pen, and skin properties", () => {
+        painter.turtle.x = 123;
+        painter.turtle.y = 456;
+        painter.turtle.orientation = 45;
+        painter.turtle.name = "custom_turtle";
+        painter.turtle.skinChanged = false;
+        painter.color = 30;
+        painter.value = 75;
+        painter.chroma = 80;
+        painter.stroke = 12;
+
+        painter.doClear(false, false, false);
+
+        expect(painter.turtle.x).toBe(123);
+        expect(painter.turtle.y).toBe(456);
+        expect(painter.turtle.orientation).toBe(45);
+        expect(painter.turtle.name).toBe("custom_turtle");
+        expect(painter.turtle.rename).not.toHaveBeenCalled();
+        expect(painter.color).toBe(30);
+        expect(painter.value).toBe(75);
+        expect(painter.chroma).toBe(80);
+        expect(painter.stroke).toBe(12);
+        expect(painter.turtle.ctx.clearRect).toHaveBeenCalled();
     });
 
     test("doScrollXY should create canvas1 if not exists, draw under active pens", () => {
@@ -1301,5 +1334,87 @@ describe("Additional Robustness & Missing Coverage Tests", () => {
         painter._hollowState = true;
         painter._arc(0, 0, 0, 0, 100, 200, 10, 0, Math.PI, false, false);
         expect(mockTurtle.ctx.lineCap).toBe("round");
+    });
+
+    describe("regression: turtle color preservation (#8492)", () => {
+        test("_processColor handles hex canvas color and applies alpha", () => {
+            const { hex2rgb: realHex2rgb } = require("../utils/utils-logic.js");
+            global.hex2rgb.mockImplementationOnce((hex, alpha) => realHex2rgb(hex, alpha));
+            painter._canvasColor = "#00ff00";
+            painter._canvasAlpha = 0.5;
+            painter._processColor();
+            expect(mockTurtle.ctx.strokeStyle).toBe("rgba(0,255,0,0.5)");
+            expect(mockTurtle.ctx.fillStyle).toBe("rgba(0,255,0,0.5)");
+        });
+
+        test("_processColor preserves rgba canvas color and applies alpha", () => {
+            painter._canvasColor = "rgba(10,20,30,1)";
+            painter._canvasAlpha = 0.7;
+            painter._processColor();
+            expect(mockTurtle.ctx.strokeStyle).toBe("rgba(10,20,30,0.7)");
+            expect(mockTurtle.ctx.fillStyle).toBe("rgba(10,20,30,0.7)");
+        });
+
+        test("_processColor handles rgb canvas color without alpha and applies alpha", () => {
+            painter._canvasColor = "rgb(10,20,30)";
+            painter._canvasAlpha = 0.6;
+            painter._processColor();
+            expect(mockTurtle.ctx.strokeStyle).toBe("rgba(10,20,30,0.6)");
+            expect(mockTurtle.ctx.fillStyle).toBe("rgba(10,20,30,0.6)");
+        });
+
+        test("closeSVG handles rgba canvas color", () => {
+            painter._svgPath = true;
+            painter._canvasColor = "rgba(10,20,30,1)";
+            painter._canvasAlpha = 0.8;
+            painter.closeSVG();
+            expect(painter._svgOutput).toContain("rgb(10,20,30);");
+            expect(painter._svgOutput).toContain("stroke-opacity:0.8");
+        });
+
+        test("closeSVG handles rgb canvas color with trailing semicolon", () => {
+            painter._svgPath = true;
+            painter._canvasColor = "rgb(10,20,30)";
+            painter._canvasAlpha = 0.8;
+            painter.closeSVG();
+            expect(painter._svgOutput).toContain("rgb(10,20,30);");
+            expect(painter._svgOutput).toContain("stroke-opacity:0.8");
+        });
+
+        test("_processColor handles spaced rgba canvas color and normalizes invalid NaN alpha", () => {
+            painter._canvasColor = "rgba(10, 20, 30, 1)";
+            painter._canvasAlpha = NaN;
+            painter._processColor();
+            expect(mockTurtle.ctx.strokeStyle).toBe("rgba(10, 20, 30, 1)");
+            expect(mockTurtle.ctx.fillStyle).toBe("rgba(10, 20, 30, 1)");
+
+            painter._canvasAlpha = 0.4;
+            painter._processColor();
+            expect(mockTurtle.ctx.strokeStyle).toBe("rgba(10, 20, 30, 0.4)");
+        });
+
+        test("closeSVG handles spaced rgba canvas color and drops alpha", () => {
+            painter._svgPath = true;
+            painter._canvasColor = "rgba(10, 20, 30, 1)";
+            painter._canvasAlpha = 0.75;
+            painter.closeSVG();
+            expect(painter._svgOutput).toContain("rgb(10, 20, 30);");
+            expect(painter._svgOutput).toContain("stroke-opacity:0.75");
+        });
+
+        test("closeSVG normalizes invalid NaN alpha for SVG output", () => {
+            painter._svgPath = true;
+            painter._canvasColor = "rgba(10, 20, 30, 1)";
+            painter._canvasAlpha = NaN;
+            painter.closeSVG();
+            expect(painter._svgOutput).toContain("rgb(10, 20, 30);");
+            expect(painter._svgOutput).toContain("stroke-opacity:1;");
+        });
+
+        test("doClear stores Munsell color without pre-converting to rgba", () => {
+            global.getMunsellColor.mockReturnValueOnce("#123456");
+            painter.doClear(false, false, false);
+            expect(painter._canvasColor).toBe("#123456");
+        });
     });
 });
