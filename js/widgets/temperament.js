@@ -45,12 +45,15 @@ TemperamentWidget.dependencies = ["widgets/temperament"];
  * @returns {string} CSS color
  */
 const deviationColor = dev => {
-    const s =
-        typeof document !== "undefined" && document.body ? getComputedStyle(document.body) : null;
-    const g = n => (s && s.getPropertyValue(n).trim()) || "";
-    if (Math.abs(dev) <= 1) return g("--color-success") || "#4caf50";
-    return dev > 1 ? g("--color-warning") || "#ff9800" : g("--color-error") || "#f44336";
+    if (Math.abs(dev) <= 1) return _cssVar("--color-success", "#4caf50");
+    return dev > 1 ? _cssVar("--color-warning", "#ff9800") : _cssVar("--color-error", "#f44336");
 };
+
+/** Reads a CSS variable with fallback; safe outside the browser (tests). */
+const _cssVar = (n, f) =>
+    typeof document !== "undefined" && document.body
+        ? getComputedStyle(document.body).getPropertyValue(n).trim() || f
+        : f;
 
 /**
  * Deviation of a pitch (in cents) from the nearest 12-EDO step. The
@@ -90,6 +93,13 @@ const centsToAngle = cents => 270 + cents * DEG_PER_CENT;
 const angleToCents = angle => (angle - 270) / DEG_PER_CENT;
 
 const MAX_DIVISIONS = 57;
+
+/** True (after warning) when a division count exceeds what the UI can show. */
+const overDivisionCap = (activity, count) => {
+    if (count <= MAX_DIVISIONS) return false;
+    activity.errorMsg(_("Maximum 57 divisions. For larger, use a dedicated tool."), 3000);
+    return true;
+};
 
 function TemperamentWidget() {
     // Constants for button and icon sizes
@@ -412,8 +422,6 @@ function TemperamentWidget() {
         const _isLocked = i => i === 0;
         const _ref12 = j => Math.round(that.cents[j] / 100) * 100;
 
-        const _cssVar = (n, f) => getComputedStyle(document.body).getPropertyValue(n).trim() || f;
-
         const _canvasCoords = function (e, target) {
             const rect = target.getBoundingClientRect();
             return [
@@ -467,6 +475,9 @@ function TemperamentWidget() {
             // Any change to a built-in temperament (e.g. 19 EDO) makes it custom.
             if (isModified && !isCustomTemperament(that.inTemperament)) {
                 that.inTemperament = "custom";
+                // Not equally tempered anymore: save must emit ratio blocks,
+                // not the powerBase^(i/divisions) formula.
+                that.typeOfEdit = "nonequal";
                 temperLabel.textContent = _getTemperamentLabel("custom");
                 if (![...compareSelect.options].some(o => o.value === "custom")) {
                     const o = document.createElement("option");
@@ -555,7 +566,13 @@ function TemperamentWidget() {
                         return;
                     }
                 }
-                that._playAllTimer = setTimeout(step, 300);
+                // Pace the run by the project tempo factor (matches the
+                // Singer.defaultBPMFactor pattern used for note durations).
+                const gap =
+                    typeof Singer !== "undefined" && Singer.defaultBPMFactor
+                        ? 300 * Singer.defaultBPMFactor
+                        : 300;
+                that._playAllTimer = setTimeout(step, gap);
             };
             step();
         };
@@ -666,13 +683,21 @@ function TemperamentWidget() {
             return span;
         };
 
-        legendDiv.appendChild(_legendItem("#4caf50", _("active temperament"), false, true));
+        legendDiv.appendChild(
+            _legendItem(_cssVar("--color-success", "#4caf50"), _("active temperament"), false, true)
+        );
         legendDiv.appendChild(
             _legendItem("var(--color-text-tertiary, #aaa)", _("12-EDO reference"), false, false)
         );
-        legendDiv.appendChild(_legendItem("#4caf50", _("no deviation"), true, false));
-        legendDiv.appendChild(_legendItem("#ff9800", _("sharp (+cents)"), false, false));
-        legendDiv.appendChild(_legendItem("#f44336", _("flat (-cents)"), false, false));
+        legendDiv.appendChild(
+            _legendItem(_cssVar("--color-success", "#4caf50"), _("no deviation"), true, false)
+        );
+        legendDiv.appendChild(
+            _legendItem(_cssVar("--color-warning", "#ff9800"), _("sharp (+cents)"), false, false)
+        );
+        legendDiv.appendChild(
+            _legendItem(_cssVar("--color-error", "#f44336"), _("flat (-cents)"), false, false)
+        );
         temperamentTableDiv.appendChild(legendDiv);
 
         canvas.tabIndex = 0;
@@ -869,19 +894,6 @@ function TemperamentWidget() {
             el.style.borderRadius = "3px";
             el.style.textAlign = "center";
         };
-        const _doneEdit = idx => {
-            const order = that.cents
-                .map((c, j) => [c, j])
-                .sort((a, b) => a[0] - b[0])
-                .map(p => p[1]);
-            _reorderArrays(order);
-            highlightDot = order.indexOf(idx);
-            _drawCircle();
-            _buildTable();
-            if (highlightDot >= 0) _highlightTableRow(highlightDot);
-            _updateRemoveButton();
-            _checkModified();
-        };
         const _makeEditable = (td, i, getPrev, getNext, getCur, opts, onCommit) => {
             td.style.cursor = _isLocked(i) ? "default" : "text";
             td.ondblclick = ev => {
@@ -898,7 +910,10 @@ function TemperamentWidget() {
                 input.min = String(lo);
                 if (hi !== Infinity) input.max = String(hi);
                 input.value = cur.toFixed(opts.decimals);
-                input.title = opts.title(lo, hi, cur);
+                const hiStr = hi !== Infinity ? hi.toFixed(opts.decimals) : "∞";
+                input.title = opts.title
+                    ? opts.title(lo, hi, cur)
+                    : `${opts.label} (${lo.toFixed(opts.decimals)} – ${hiStr})`;
                 input.setAttribute("aria-label", opts.aria(i));
                 _styleInput(input);
                 td.textContent = "";
@@ -913,7 +928,17 @@ function TemperamentWidget() {
                     }
                     v = Math.max(lo, Math.min(hi, v));
                     onCommit(v, i);
-                    _doneEdit(i);
+                    const order = that.cents
+                        .map((c, j) => [c, j])
+                        .sort((a, b) => a[0] - b[0])
+                        .map(p => p[1]);
+                    _reorderArrays(order);
+                    highlightDot = order.indexOf(i);
+                    _drawCircle();
+                    _buildTable();
+                    if (highlightDot >= 0) _highlightTableRow(highlightDot);
+                    _updateRemoveButton();
+                    _checkModified();
                 };
                 input.onblur = commit;
                 input.onkeydown = e => {
@@ -1020,10 +1045,7 @@ function TemperamentWidget() {
                         eps: 0.01,
                         step: "0.01",
                         decimals: 2,
-                        title: (lo, hi) => {
-                            const hiStr = hi !== Infinity ? hi.toFixed(2) : "∞";
-                            return `Frequency in Hz (${lo.toFixed(2)} – ${hiStr})`;
-                        },
+                        label: "Frequency in Hz",
                         aria: j => `Frequency for pitch ${j} in Hz, between neighbors`
                     },
                     (v, j) =>
@@ -1042,20 +1064,12 @@ function TemperamentWidget() {
                         eps: 0.001,
                         step: "0.001",
                         decimals: 3,
-                        title: (lo, hi) => {
-                            const hiStr = hi !== Infinity ? hi.toFixed(3) : "∞";
-                            return `Ratio (${lo.toFixed(3)} – ${hiStr})`;
-                        },
+                        label: "Ratio",
                         aria: j => `Ratio for pitch ${j}, between neighbors`
                     },
                     (v, j) => _applyCents(j, ratioToCents(v, that.powerBase))
                 );
             }
-            _refreshTable();
-        };
-
-        /** Updates all table cell text from current state. */
-        const _refreshTable = function () {
             for (let i = 0; i < rowRefs.length; i++) {
                 _updateTableRow(i);
             }
@@ -1374,27 +1388,20 @@ function TemperamentWidget() {
                 centsInput.disabled = true;
             }
 
-            const mkBtn = function (label, fn) {
-                const b = document.createElement("button");
-                b.textContent = label;
-                b.style.fontSize = "11px";
-                b.style.textAlign = "left";
-                b.onclick = function (ev) {
-                    ev.stopPropagation();
-                    fn();
-                    _drawCircle();
-                    _buildTable();
-                    if (highlightDot >= 0) _highlightTableRow(highlightDot);
-                    _updateRemoveButton();
-                    _checkModified();
-                    _removeMenu();
-                };
-                return b;
-            };
-
-            const resetBtn = mkBtn(_("Reset to 12-EDO"), function () {
+            const resetBtn = document.createElement("button");
+            resetBtn.textContent = _("Reset to 12-EDO");
+            resetBtn.style.fontSize = "11px";
+            resetBtn.style.textAlign = "left";
+            resetBtn.onclick = function (ev) {
+                ev.stopPropagation();
                 _resetTo12(index);
-            });
+                _drawCircle();
+                _buildTable();
+                if (highlightDot >= 0) _highlightTableRow(highlightDot);
+                _updateRemoveButton();
+                _checkModified();
+                _removeMenu();
+            };
             if (_isLocked(index)) {
                 resetBtn.disabled = true;
                 resetBtn.style.opacity = "0.4";
@@ -1734,13 +1741,7 @@ function TemperamentWidget() {
                 this.activity.errorMsg(_("Please enter a valid number of divisions."), 3000);
                 return;
             }
-            if (numDivs > MAX_DIVISIONS) {
-                this.activity.errorMsg(
-                    _("Maximum 57 divisions. For larger, use a dedicated tool."),
-                    3000
-                );
-                return;
-            }
+            if (overDivisionCap(this.activity, numDivs)) return;
             this.tempRatios = this.ratios.slice();
             if (pitchNumber1 === pitchNumber2) {
                 for (let i = 0; i < numDivs; i++) {
@@ -1955,13 +1956,7 @@ function TemperamentWidget() {
             that.tempRatios.sort(function (a, b) {
                 return a - b;
             });
-            if (that.tempRatios.length > MAX_DIVISIONS) {
-                that.activity.errorMsg(
-                    _("Maximum 57 divisions. For larger, use a dedicated tool."),
-                    3000
-                );
-                return;
-            }
+            if (overDivisionCap(that.activity, that.tempRatios.length)) return;
             const pitchNumber = that.tempRatios.length;
             if (event.target.textContent === _("done")) {
                 that.ratios = that.tempRatios.slice();
@@ -2372,13 +2367,7 @@ function TemperamentWidget() {
         for (let j = 0; j < this.tempRatios.length; j++) {
             const diff = ratio - this.tempRatios[j];
             if (diff < -EPS) {
-                if (this.tempRatios.length > MAX_DIVISIONS) {
-                    this.activity.errorMsg(
-                        _("Maximum 57 divisions. For larger, use a dedicated tool."),
-                        3000
-                    );
-                    return;
-                }
+                if (overDivisionCap(this.activity, this.tempRatios.length)) return;
                 this.tempRatios.splice(j, 0, ratio);
                 break;
             } else if (Math.abs(diff) < EPS) {
@@ -2530,6 +2519,9 @@ function TemperamentWidget() {
 
         if (selectedTemperament === undefined) {
             this.inTemperament = "custom";
+            // Ratios match no known temperament: save must emit ratio blocks,
+            // not the powerBase^(i/divisions) formula.
+            this.typeOfEdit = "nonequal";
         }
     };
 
