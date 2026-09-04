@@ -95,7 +95,7 @@
         overlay.style.top = "0";
         overlay.style.width = "100vw";
         overlay.style.height = "100vh";
-        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.35)";
+        overlay.style.backgroundColor = "var(--color-overlay-backdrop)";
         overlay.style.zIndex = "10000";
 
         const frame = document.createElement("div");
