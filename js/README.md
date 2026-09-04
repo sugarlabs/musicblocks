@@ -250,7 +250,7 @@ Note: Trailing arguments can be neglected in both functions, if not needed.
 * For arg blocks value is set by using a `return` statement.
 
 * In case of flow blocks, return value should be in the form
-  `[childFlow, childFlowCount]` or `[]` if if there is no child
+  `[childFlow, childFlowCount]` or `[]` if there is no child
   flow. (A child flow is, for example, the internal flow of a clamp,
   e.g. what is repeated in a repeat block.)
 
