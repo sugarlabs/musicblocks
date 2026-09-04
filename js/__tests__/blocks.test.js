@@ -1704,6 +1704,23 @@ describe("Spatial grid indexing", () => {
         return found.sort();
     }
 
+    /**
+     * Asserts the grid is keyed only by numbers, in both directions. A string
+     * alias sitting beside the number is the failure this guards against, and
+     * checking one key by name would not catch it.
+     * @returns {void}
+     */
+    function expectNumericKeysOnly() {
+        for (const key of blocks._blockGridCell.keys()) {
+            expect(typeof key).toBe("number");
+        }
+        for (const members of blocks._spatialGrid.values()) {
+            for (const member of members) {
+                expect(typeof member).toBe("number");
+            }
+        }
+    }
+
     it("registers every block under a numeric key when first built", () => {
         expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
         expect(cellsHolding(0)).toEqual(["0,0"]);
@@ -1732,12 +1749,15 @@ describe("Spatial grid indexing", () => {
 
             expect(blocks._getNearbyBlocks(0, 0)).not.toContain(1);
             expect(cellsHolding(1)).toEqual(["100,100"]);
+            expect(cellsHolding("1")).toEqual([]);
+            expectNumericKeysOnly();
         });
 
         it("keeps one entry per block rather than adding a second", () => {
             blocks._updateSpatialGrid("1");
 
             expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
+            expectNumericKeysOnly();
         });
 
         it("reports the block as a number, so the self-connection guard matches", () => {
@@ -1793,6 +1813,7 @@ describe("Spatial grid indexing", () => {
 
             expect(blocks._blockGridCell.has(0)).toBe(true);
             expect(cellsHolding(0)).toEqual(["18,0"]);
+            expectNumericKeysOnly();
         });
 
         it("places a block with no docks by its container position", () => {
@@ -1823,6 +1844,10 @@ describe("Spatial grid indexing", () => {
 
             // The same Set object is kept, so an unchanged block is not rewritten.
             expect(blocks._blockGridCell.get(1)).toBe(before);
+            // The early return must not leave a string alias behind either.
+            expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
+            expect(cellsHolding("1")).toEqual([]);
+            expectNumericKeysOnly();
         });
     });
 });
