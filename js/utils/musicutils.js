@@ -6563,15 +6563,24 @@ const buildScale = (keySignature, edo) => {
 
     const halfSteps = getModePattern(obj[1], currentEDO);
 
+    // SHARPPREFERENCE and FLATPREFERENCE are keyed only on "<key> major" and
+    // "<key> minor", but keySignatureToMode() returns the raw mode name --
+    // "natural minor", "aeolian", "lydian", "dorian" and so on. Map the mode
+    // onto its major/minor equivalent first, exactly as getSharpFlatPreference()
+    // does, otherwise the lookup misses for every mode the pie menu offers and
+    // the scale falls through to the wrong spelling.
+    const preferenceMode = modeMapper(obj[0], obj[1]);
+    const preferenceKey = preferenceMode[0] + " " + preferenceMode[1];
+
     let thisScale;
     if (NOTESFLAT.includes(myKeySignature)) {
-        if (SHARPPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
+        if (SHARPPREFERENCE.includes(preferenceKey)) {
             thisScale = NOTESSHARP;
         } else {
             thisScale = NOTESFLAT;
         }
     } else {
-        if (FLATPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
+        if (FLATPREFERENCE.includes(preferenceKey)) {
             thisScale = NOTESFLAT;
         } else {
             thisScale = NOTESSHARP;

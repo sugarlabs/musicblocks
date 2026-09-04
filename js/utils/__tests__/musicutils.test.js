@@ -1825,6 +1825,51 @@ describe("buildScale", () => {
             [2, 2, 1, 2, 2, 2, 1]
         ]); // Default C major scale
     });
+
+    // The sharp/flat preference tables are keyed on "<key> major" / "<key> minor",
+    // so the mode has to be mapped onto its major/minor equivalent before the
+    // lookup. Without that, every mode name the mode pie menu offers misses the
+    // table and the scale is spelled with the wrong accidental.
+    const modalCases = [
+        // E natural minor and E minor are the same key and must agree.
+        { keySignature: "E natural minor", expected: ["E", "F♯", "G", "A", "B", "C", "D", "E"] },
+        { keySignature: "E aeolian", expected: ["E", "F♯", "G", "A", "B", "C", "D", "E"] },
+        { keySignature: "B natural minor", expected: ["B", "C♯", "D", "E", "F♯", "G", "A", "B"] },
+        { keySignature: "G ionian", expected: ["G", "A", "B", "C", "D", "E", "F♯", "G"] },
+        { keySignature: "C lydian", expected: ["C", "D", "E", "F♯", "G", "A", "B", "C"] },
+        { keySignature: "A dorian", expected: ["A", "B", "C", "D", "E", "F♯", "G", "A"] },
+        { keySignature: "B phrygian", expected: ["B", "C", "D", "E", "F♯", "G", "A", "B"] },
+        { keySignature: "D mixolydian", expected: ["D", "E", "F♯", "G", "A", "B", "C", "D"] }
+    ];
+
+    modalCases.forEach(({ keySignature, expected }) => {
+        it(`should spell ${keySignature} with the accidental of its relative key`, () => {
+            expect(buildScale(keySignature)[0]).toEqual(expected);
+        });
+    });
+
+    it("should spell a mode the same way as its major/minor synonym", () => {
+        expect(buildScale("E natural minor")[0]).toEqual(buildScale("E minor")[0]);
+        expect(buildScale("E aeolian")[0]).toEqual(buildScale("E minor")[0]);
+        expect(buildScale("C ionian")[0]).toEqual(buildScale("C major")[0]);
+    });
+
+    it("should not repeat a letter name in a seven-note modal scale", () => {
+        modalCases.forEach(({ keySignature }) => {
+            const letters = buildScale(keySignature)[0]
+                .slice(0, 7)
+                .map(note => note[0]);
+            expect(new Set(letters).size).toBe(7);
+        });
+    });
+
+    it("should agree with getSharpFlatPreference for modal key signatures", () => {
+        // getSharpFlatPreference already normalises through modeMapper; buildScale
+        // must not contradict it.
+        expect(getSharpFlatPreference("E natural minor")).toBe("sharp");
+        expect(buildScale("E natural minor")[0]).toContain("F♯");
+        expect(buildScale("E natural minor")[0]).not.toContain("G♭");
+    });
 });
 
 describe("scalePatternToEDO", () => {
