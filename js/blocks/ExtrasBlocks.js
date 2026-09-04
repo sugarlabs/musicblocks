@@ -192,8 +192,9 @@ function setupExtrasBlocks(activity) {
                         '" width="' +
                         logo.canvas.width +
                         '" fill="' +
-                        (getComputedStyle(document.body).getPropertyValue("--bg").trim() ||
-                            "#ffffff") +
+                        (getComputedStyle(document.body)
+                            .getPropertyValue("--color-bg-primary")
+                            .trim() || "#ffffff") +
                         '"/> ' +
                         logo.svgOutput;
                 }

@@ -343,16 +343,11 @@ class ThemeBox {
             }
         }
 
-        // Refresh floating windows
+        // Refresh floating windows: clear inline overrides so CSS tokens govern styling
         const floatingWindows = document.querySelectorAll("#floatingWindows > .windowFrame");
         floatingWindows.forEach(win => {
-            if (this._theme === "dark") {
-                win.style.backgroundColor = "#454545";
-                win.style.borderColor = "#000000";
-            } else {
-                win.style.backgroundColor = "";
-                win.style.borderColor = "";
-            }
+            win.style.backgroundColor = "";
+            win.style.borderColor = "";
         });
 
         // Refresh the activity canvas if available

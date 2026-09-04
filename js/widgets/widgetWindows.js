@@ -443,7 +443,7 @@ class WidgetWindow {
             this._overlayframe.style.width = "100vw";
             this._overlayframe.style.height = "calc(100vh - 64px)";
             this._overlayframe.style.border = "0.25vw solid black";
-            this._overlayframe.style.backgroundColor = "var(--overlay-bg)";
+            this._overlayframe.style.backgroundColor = "var(--color-overlay-backdrop)";
         } else {
             this._frame.style.zIndex = "10000";
             this._overlayframe.style.border = "0px";
