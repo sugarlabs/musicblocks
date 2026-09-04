@@ -226,6 +226,18 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             logo._timerManager.clearAll();
         });
 
+        it("accepts the maximum note count", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            logo._timerManager = new ManagedTimer();
+            rhythmBlock.flow([128, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(logo._timerManager.activeTimeoutCount).toBe(128);
+            logo._timerManager.clearAll();
+        });
+
         it("normalizes fractional note counts", () => {
             const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
             activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
@@ -418,6 +430,18 @@ describe("setupRhythmBlockPaletteBlocks", () => {
                 "Maximum number of notes is 128.",
                 "blkSTuplet"
             );
+            expect(logo._timerManager.activeTimeoutCount).toBe(128);
+            logo._timerManager.clearAll();
+        });
+
+        it("accepts the maximum note count", () => {
+            const stupletBlock = DummyFlowBlock.createdBlocks["stuplet"];
+            activity.blocks.blockList["blkSTuplet"] = { name: "stuplet" };
+            logo._timerManager = new ManagedTimer();
+
+            stupletBlock.flow([128, 0.5], logo, turtleIndex, "blkSTuplet");
+
+            expect(activity.errorMsg).not.toHaveBeenCalled();
             expect(logo._timerManager.activeTimeoutCount).toBe(128);
             logo._timerManager.clearAll();
         });
