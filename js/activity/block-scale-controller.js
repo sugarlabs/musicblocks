@@ -27,6 +27,7 @@ class BlockScaleController {
      */
     async doLargerBlocks() {
         const activity = this.activity;
+        if (!activity || !activity.blocks) return;
         activity.blocks.activeBlock = null;
 
         if (!activity.resizeDebounce) {
@@ -55,6 +56,7 @@ class BlockScaleController {
      */
     async doSmallerBlocks() {
         const activity = this.activity;
+        if (!activity || !activity.blocks) return;
         activity.blocks.activeBlock = null;
 
         if (!activity.resizeDebounce) {
