@@ -344,7 +344,9 @@ class ThemeBox {
         }
 
         // Refresh floating windows: clear inline overrides so CSS tokens govern styling
-        const floatingWindows = document.querySelectorAll("#floatingWindows > .windowFrame");
+        const floatingWindows = document.querySelectorAll(
+            "#floatingWindows > .windowFrame:not(.windowOverlay)"
+        );
         floatingWindows.forEach(win => {
             win.style.backgroundColor = "";
             win.style.borderColor = "";

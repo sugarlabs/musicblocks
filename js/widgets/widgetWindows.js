@@ -273,7 +273,7 @@ class WidgetWindow {
         this._frame = this._create("div", "windowFrame", windows);
         this._frame.setAttribute("role", "dialog");
         this._frame.setAttribute("aria-label", _(this._title));
-        this._overlayframe = this._create("div", "windowFrame", windows);
+        this._overlayframe = this._create("div", "windowFrame windowOverlay", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._drag.style.display = "flex";
         this._drag.style.justifyContent = "space-between";

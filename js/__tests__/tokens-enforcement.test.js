@@ -126,6 +126,35 @@ describe("Design Tokens Single Source of Truth", () => {
 describe("Deprecated Legacy Tokens Eradication", () => {
     const DEPRECATED_NAMES = ["--bg", "--fg", "--border", "--panel-bg", "--overlay-bg", "--accent"];
 
+    /**
+     * Detects occurrences of deprecated token names across various JS syntax patterns:
+     * - Direct usages: var(--bg)
+     * - Usages with fallbacks: var(--bg, #fff)
+     * - String literals / CSS text: style.cssText = "background: var(--bg)"
+     * - Direct style queries: getPropertyValue("--bg")
+     * - CSS declarations in text: --bg:
+     *
+     * @param {string} content JS source text
+     * @param {string[]} [deprecatedNames] List of token names to detect
+     * @returns {string[]} List of detected deprecated token names
+     */
+    const findDeprecatedTokenUsages = (content, deprecatedNames = DEPRECATED_NAMES) => {
+        const found = [];
+        deprecatedNames.forEach(depName => {
+            // 1. var(--token) with or without fallbacks, inside any string or expression
+            const varRegex = new RegExp(`var\\(\\s*${depName}\\s*[,)]`, "g");
+            // 2. getPropertyValue("--token") or direct string literal of the token
+            const literalRegex = new RegExp(`["'\`]${depName}["'\`]`, "g");
+            // 3. CSS declaration style: --token:
+            const declRegex = new RegExp(`(?:^|[;{\\s"'\`])${depName}\\s*:`, "g");
+
+            if (varRegex.test(content) || literalRegex.test(content) || declRegex.test(content)) {
+                found.push(depName);
+            }
+        });
+        return found;
+    };
+
     it("ensures no deprecated token names are declared anywhere in CSS", () => {
         const cssFiles = fs.readdirSync(CSS_DIR).filter(f => f.endsWith(".css"));
         const violations = [];
@@ -162,6 +191,8 @@ describe("Deprecated Legacy Tokens Eradication", () => {
 
     it("ensures dialogs, blocks, and widgets in JS do not use deprecated token names", () => {
         const jsFilesToCheck = [
+            path.join(JS_DIR, "activity.js"),
+            path.join(JS_DIR, "project-manager.js"),
             path.join(JS_DIR, "utils", "mb-dialog.js"),
             path.join(JS_DIR, "widgets", "widgetWindows.js"),
             path.join(JS_DIR, "blocks", "ExtrasBlocks.js"),
@@ -173,16 +204,48 @@ describe("Deprecated Legacy Tokens Eradication", () => {
         jsFilesToCheck.forEach(filePath => {
             if (!fs.existsSync(filePath)) return;
             const content = fs.readFileSync(filePath, "utf8");
-            DEPRECATED_NAMES.forEach(depName => {
-                // Match "var(--bg)", getPropertyValue("--bg"), etc.
-                const usageRegex = new RegExp(`(["'\`])(?:var\\(\\s*)?${depName}(?:\\s*\\))?\\1`, "g");
-                if (usageRegex.test(content)) {
-                    violations.push(`${path.basename(filePath)} uses deprecated token: ${depName}`);
-                }
+            const detected = findDeprecatedTokenUsages(content);
+            detected.forEach(depName => {
+                violations.push(`${path.basename(filePath)} uses deprecated token: ${depName}`);
             });
         });
 
         expect(violations).toEqual([]);
+    });
+
+    it("detects deprecated tokens in fallback syntax, string literals, and cssText snippets", () => {
+        const testSnippets = [
+            { code: 'const bg = "var(--bg, #ffffff)";', expectedToken: "--bg" },
+            {
+                code: 'win.style.cssText = "background: var(--fg); color: #000;";',
+                expectedToken: "--fg"
+            },
+            {
+                code: 'const border = el.style.getPropertyValue("--border");',
+                expectedToken: "--border"
+            },
+            {
+                code: 'const panel = "var(--panel-bg, rgba(0,0,0,0.5))";',
+                expectedToken: "--panel-bg"
+            },
+            { code: 'const overlay = "var(--overlay-bg)";', expectedToken: "--overlay-bg" },
+            { code: 'const accent = "var(--accent)";', expectedToken: "--accent" }
+        ];
+
+        testSnippets.forEach(({ code, expectedToken }) => {
+            const detected = findDeprecatedTokenUsages(code);
+            expect(detected).toContain(expectedToken);
+        });
+
+        // Ensure valid canonical tokens do not cause false positives
+        const canonicalSnippet = `
+            const valid = "var(--color-bg-primary, #fff)";
+            const frameBg = "var(--color-widget-frame-bg)";
+            const frameBorder = "var(--color-widget-frame-border)";
+            const overlay = "var(--color-overlay-backdrop)";
+            const panel = "var(--color-panel-bg)";
+        `;
+        expect(findDeprecatedTokenUsages(canonicalSnippet)).toEqual([]);
     });
 });
 
@@ -254,12 +317,32 @@ describe("Accessibility & Contrast Compliance", () => {
 });
 
 describe("Theme Switching & Inline Styles Purity", () => {
-    it("themebox.js clears inline styles instead of assigning hardcoded hex colors to windowFrame", () => {
+    it("themebox.js clears inline styles positively and excludes windowOverlay", () => {
         const themeboxSource = fs.readFileSync(path.join(JS_DIR, "themebox.js"), "utf8");
 
-        // Fails if hardcoded hex colors are assigned to win.style in themebox.js
-        expect(themeboxSource).not.toMatch(/win\.style\.backgroundColor\s*=\s*["']#[0-9a-fA-F]+/);
-        expect(themeboxSource).not.toMatch(/win\.style\.borderColor\s*=\s*["']#[0-9a-fA-F]+/);
+        // Positive check: selector must explicitly exclude .windowOverlay
+        expect(themeboxSource).toMatch(
+            /#floatingWindows\s*>\s*\.windowFrame:not\(\.windowOverlay\)/
+        );
+
+        // Positive assertion: style properties must be explicitly reset to empty string
+        expect(themeboxSource).toMatch(/win\.style\.backgroundColor\s*=\s*["']["']/);
+        expect(themeboxSource).toMatch(/win\.style\.borderColor\s*=\s*["']["']/);
+
+        // Negative check: reject any assignment of non-empty strings, hex, rgb, or named colors
+        expect(themeboxSource).not.toMatch(/win\.style\.backgroundColor\s*=\s*["'][^"'\s]+["']/);
+        expect(themeboxSource).not.toMatch(/win\.style\.borderColor\s*=\s*["'][^"'\s]+["']/);
+    });
+
+    it("widgetWindows.js marks _overlayframe with distinct windowOverlay class", () => {
+        const widgetWindowsSource = fs.readFileSync(
+            path.join(JS_DIR, "widgets", "widgetWindows.js"),
+            "utf8"
+        );
+
+        expect(widgetWindowsSource).toMatch(
+            /_overlayframe\s*=\s*this\._create\(\s*["']div["'],\s*["']windowFrame\s+windowOverlay["']/
+        );
     });
 
     it("mb-dialog.js uses canonical design tokens for frame and widget background", () => {
