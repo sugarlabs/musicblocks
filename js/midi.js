@@ -184,7 +184,10 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
             shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
         }
 
-        for (const i in sched) {
+        // Indexed loop, not `for...in`: `for...in` yields string keys, so the
+        // `i === 0` and `i === sched.length - 1` comparisons below would never
+        // be true and every note would be treated as neither first nor last.
+        for (let i = 0; i < sched.length; i++) {
             if (stopProcessing) break; // Exit inner loop if flag is set
             const { notes, start, end } = sched[i];
             const duration = end - start;
@@ -212,7 +215,9 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                     );
                     x += 2;
                 } else {
-                    for (const na in notes) {
+                    // Indexed loop for the same reason as the `sched` loop above:
+                    // `na` has to be a number for these comparisons to hold.
+                    for (let na = 0; na < notes.length; na++) {
                         const name = notes[na].name;
                         const first = na === 0;
                         const last = na === notes.length - 1;
