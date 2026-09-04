@@ -38,6 +38,9 @@ global.normalizeNoteAccidentals = jest.fn(n => n);
 global.Singer = { masterVolume: [50] };
 global.last = arr => arr[arr.length - 1];
 global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
+// Audible range, the same bounds frequencyToPitch clamps to.
+global.A0 = 27.5;
+global.C10 = 16744.04;
 
 window.innerWidth = 1200;
 window.btoa = jest.fn(s => s);
@@ -448,6 +451,21 @@ describe("PitchStaircase Widget", () => {
             expect(psc.Stairs[0][2]).toBeCloseTo(330);
             expect(psc._history).toContain(0);
             expect(psc._makeStairs).toHaveBeenCalled();
+        });
+
+        test("keeps the dissected frequency inside the audible range", () => {
+            // ratio1 > ratio2 makes the divisor < 1, so each dissect multiplies
+            // rather than divides. Repeating it used to run away past 1e11 Hz.
+            psc._musicRatio1 = { value: "3" };
+            psc._musicRatio2 = { value: "2" };
+            psc.Stairs = [["G", "", 392.0, 1, 1, 392.0, 4]];
+
+            for (let i = 0; i < 50; i++) {
+                const top = psc.Stairs[0][2];
+                psc._dissectStair(makeEvent(top));
+                expect(psc.Stairs[0][2]).toBeLessThanOrEqual(global.C10);
+                expect(psc.Stairs[0][2]).toBeGreaterThanOrEqual(global.A0);
+            }
         });
 
         test("sanitises invalid ratio inputs to their defaults", () => {

@@ -16,7 +16,7 @@
    global
 
    platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
-   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, clampNumber
+   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, clampNumber, A0, C10
  */
 
 /*
@@ -287,7 +287,13 @@ class PitchStaircase {
             return;
         }
 
-        const newFrequency = parseFloat(frequency) / inputNum;
+        // Dissecting divides by ratio2/ratio1, so entering the ratio the other
+        // way round (ratio1 > ratio2) makes the divisor less than 1 and every
+        // click multiplies the frequency instead. `frequencyToPitch` already
+        // clamps to [A0, C10], but the raw value stored on the stair, drawn in
+        // its label and handed to the synth was not, so it ran away unbounded.
+        // Clamp to the same range the pitch conversion uses.
+        const newFrequency = clampNumber(parseFloat(frequency) / inputNum, A0, C10);
         const obj = frequencyToPitch(newFrequency);
         let foundStep = false;
         let repeatStep = false;
