@@ -7957,17 +7957,24 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament
         case _("previous"):
         case "previous":
             return Math.max(changedCurrent - 1, 1);
-        default:
-            try {
-                if (changedCurrent) {
-                    return changedCurrent;
-                } else {
-                    return Math.floor(Number(arg));
-                }
-            } catch (e) {
-                // console.debug("cannot convert " + arg + " to a number");
-                return currentOctave;
+        default: {
+            // An octave can arrive here as a string: `calculateValueWithOctave`
+            // in NumberBlocks.js forwards a block value to this function
+            // precisely when that value is a string, so a text block holding
+            // "5" lands in this branch. `changedCurrent` is assigned in every
+            // branch above and is non-zero for any real octave, so testing it
+            // first made the conversion unreachable and silently replaced the
+            // requested octave with the computed one.
+            //
+            // Clamp to 1-9 to match the numeric branch at the top of this
+            // function. Anything that is not a number -- "default", an empty
+            // string, null -- still falls back to the computed octave.
+            const requested = Math.floor(Number(arg));
+            if (arg !== "" && arg !== null && !isNaN(requested)) {
+                return Math.max(1, Math.min(requested, 9));
             }
+            return changedCurrent;
+        }
     }
 };
 

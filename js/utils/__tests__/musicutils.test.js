@@ -2645,6 +2645,18 @@ describe("calcOctave", () => {
     it("should be able to handle default case", () => {
         expect(calcOctave(4, "default", ["do"], "do")).toBe(4);
     });
+
+    it("should honour an octave passed as a numeric string", () => {
+        // Text blocks reach calcOctave with a string; the requested octave
+        // must not be replaced by the computed one.
+        expect(calcOctave(4, "7", null, "C")).toBe(7);
+        expect(calcOctave(4, "2", ["C"], "C")).toBe(2);
+    });
+
+    it("should clamp a numeric string to the same 1-9 range as a number", () => {
+        expect(calcOctave(4, "12", null, "C")).toBe(9);
+        expect(calcOctave(4, "0", null, "C")).toBe(1);
+    });
 });
 
 describe("calcOctaveInterval", () => {
