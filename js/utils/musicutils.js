@@ -6502,11 +6502,9 @@ const PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * @function
  * @param {string} mode - The mode name (e.g. "major").
  * @param {number} edo - Number of steps per octave.
- * @param {string} [temperament] - Optional temperament key. When non-EDO, the
- *     result is a cents-based pattern instead of integer steps.
- * @returns {Array} Integer step pattern (EDO) or cents pattern (non-EDO).
+ * @returns {Array} Integer step pattern.
  */
-const getModePattern = (mode, edo = 12, temperament) => {
+const getModePattern = (mode, edo = 12) => {
     const overrides = PITCH_COLLECTIONS_EDO_OVERRIDES[edo];
     if (overrides && Object.prototype.hasOwnProperty.call(overrides, mode)) {
         return overrides[mode].slice();
