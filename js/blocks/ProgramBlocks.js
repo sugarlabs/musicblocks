@@ -440,8 +440,8 @@ function setupProgramBlocks(activity) {
                             for (let i = 0; i < k.length; i++) {
                                 Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                             }
-                        } else if (!(a in logo.turtleDicts[turtle])) {
-                            logo.turtleDicts[turtle][a] = {};
+                        } else {
+                            logo.turtleDicts[turtle][a] = d;
                         }
                     } catch (e) {
                         activity.errorMsg(
@@ -543,8 +543,8 @@ function setupProgramBlocks(activity) {
                         for (let i = 0; i < k.length; i++) {
                             Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                         }
-                    } else if (!(a in logo.turtleDicts[turtle])) {
-                        logo.turtleDicts[turtle][a] = {};
+                    } else {
+                        logo.turtleDicts[turtle][a] = d;
                     }
                 } catch (e) {
                     activity.errorMsg(

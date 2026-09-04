@@ -467,7 +467,9 @@ describe("ProgramBlocks", () => {
             const block = getBlock("loadDict");
             block.flow(["MyDict", [null, null]], logo, turtle, blk);
 
-            expect(logo.turtleDicts[turtle]).toHaveProperty("MyDict");
+            expect(logo.turtleDicts[turtle]).toEqual({
+                MyDict: { key1: "value1" }
+            });
         });
 
         test("handles null arguments", () => {
@@ -535,7 +537,9 @@ describe("ProgramBlocks", () => {
             const block = getBlock("setDictionary");
             block.flow(["MyDict", {}], logo, turtle, blk);
 
-            expect(logo.turtleDicts[turtle]).toHaveProperty("MyDict");
+            expect(logo.turtleDicts[turtle]).toEqual({
+                MyDict: { key1: "value1" }
+            });
         });
 
         test("handles null arguments", () => {
