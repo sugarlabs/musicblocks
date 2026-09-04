@@ -244,7 +244,7 @@ See [DevContainer README.md](./.devcontainer/README.md) for details.
 
 1. Clone and install: `git clone https://github.com/sugarlabs/musicblocks.git && npm install`
 2. Run locally: `npm run dev`
-3. Before pushing: `npm run lint && npx prettier --check . && npm test`
+3. Before pushing: `npm test`
 
 For writing tests, see [Docs/TESTING.md](./Docs/TESTING.md).
 

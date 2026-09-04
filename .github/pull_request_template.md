@@ -68,7 +68,6 @@ Please complete the sections below to help us review your changes efficiently.
 - [ ] I have added/updated tests that prove the effectiveness of these changes.
 - [ ] I have updated the documentation to reflect these changes, if applicable.
 - [ ] I have followed the project's coding style guidelines.
-- [ ] I have run `npm run lint` and `npx prettier --check .` with no errors.
 - [ ] I have addressed the code review feedback from the previous submission, if applicable.
 - [ ] I have enabled **"Allow edits from maintainers"** (required for auto-rebase; affects PR branch only).
 
