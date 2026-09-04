@@ -670,8 +670,6 @@ const saveLilypondOutput = function (activity) {
         turtleCount += 1;
     }
 
-    console.debug("saving as lilypond: " + turtleCount);
-
     activity.logo.notationOutput +=
         "% You can change the MIDI instruments below to anything on this list:\n% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n";
 
@@ -707,9 +705,6 @@ const saveLilypondOutput = function (activity) {
             if (tNumber > startDrums - 1) {
                 clef.push("percussion");
             } else if (noteCount > 0) {
-                console.debug(
-                    octaveTotal + " " + noteCount + " " + Math.floor(0.5 + octaveTotal / noteCount)
-                );
                 switch (Math.floor(0.5 + octaveTotal / noteCount)) {
                     case 0:
                     case 1:
