@@ -3493,7 +3493,12 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             /** Named dos are modified in a separate function below. */
-            for (const blk in this.blockList) {
+            for (const blkKey in this.blockList) {
+                // `for...in` yields string keys. Both comparisons below are
+                // strict against numbers -- `connections` holds numeric block
+                // indices, and `skipBlock` is passed one -- so a string key
+                // silently matched neither.
+                const blk = Number(blkKey);
                 if (blk === skipBlock) {
                     continue;
                 }

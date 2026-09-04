@@ -384,6 +384,48 @@ describe("Viewport Culling", () => {
     });
 });
 
+describe("renameDos", () => {
+    // for...in yields string keys; both comparisons in the loop are strict
+    // against numbers, so a string key matched neither. See #8477.
+    const makeBlock = (name, value, connections) => ({
+        name,
+        value,
+        connections,
+        trash: false,
+        text: { text: value },
+        container: { updateCache: jest.fn() }
+    });
+
+    const build = () => {
+        const blocks = new Blocks({
+            palettes: { dict: {} },
+            refreshCanvas: jest.fn(),
+            trashcan: { stopHighlightAnimation: jest.fn() }
+        });
+        // 0: the onbeatdo parent, holding the action name in slot 2
+        // 1: filler so slot 2 is a distinct index
+        // 2: the text block carrying the action name
+        blocks.blockList = [
+            makeBlock("onbeatdo", "unused", [null, 1, 2]),
+            makeBlock("text", "filler", [0]),
+            makeBlock("text", "oldAction", [0])
+        ];
+        return blocks;
+    };
+
+    it("renames the action name held in an onbeatdo slot", () => {
+        const blocks = build();
+        blocks.renameDos("oldAction", "newAction");
+        expect(blocks.blockList[2].value).toBe("newAction");
+    });
+
+    it("honours skipBlock", () => {
+        const blocks = build();
+        blocks.renameDos("oldAction", "newAction", 2);
+        expect(blocks.blockList[2].value).toBe("oldAction");
+    });
+});
+
 describe("Blocks Foundation", () => {
     let mockActivity;
 
