@@ -73,6 +73,7 @@ const {
     getIntervalNumber,
     getIntervalDirection,
     getIntervalRatio,
+    INTERVALVALUES,
     getModeNumbers,
     getDrumIndex,
     getDrumName,
@@ -435,6 +436,40 @@ describe("getIntervalRatio", () => {
     it("should return the ratio for a given interval", () => {
         expect(getIntervalRatio("perfect 5")).toBe(1.5);
         expect(getIntervalRatio("major 3")).toBe(1.25);
+    });
+
+    it("should return the just diminished seventh for diminished 7", () => {
+        expect(getIntervalRatio("diminished 7")).toBeCloseTo(128 / 75, 10);
+    });
+
+    it("should keep every diminished ratio the octave inversion of its augmented complement", () => {
+        // A diminished nth and an augmented (9 - n)th add up to an octave, so
+        // their ratios must multiply to 2.
+        const complements = [
+            ["diminished 2", "augmented 7"],
+            ["diminished 3", "augmented 6"],
+            ["diminished 4", "augmented 5"],
+            ["diminished 5", "augmented 4"],
+            ["diminished 6", "augmented 3"],
+            ["diminished 7", "augmented 2"],
+            ["diminished 8", "augmented 1"]
+        ];
+
+        for (const [diminished, augmented] of complements) {
+            expect(getIntervalNumber(diminished) + getIntervalNumber(augmented)).toBe(12);
+            expect(getIntervalRatio(diminished) * getIntervalRatio(augmented)).toBeCloseTo(2, 10);
+        }
+    });
+
+    it("should keep every ratio within half a semitone of its semitone count", () => {
+        // Derived from the table itself so a newly added interval is covered
+        // automatically rather than needing to be listed here.
+        const intervals = Object.keys(INTERVALVALUES);
+
+        for (const interval of intervals) {
+            const semitones = 12 * Math.log2(getIntervalRatio(interval));
+            expect(Math.abs(semitones - getIntervalNumber(interval))).toBeLessThan(0.5);
+        }
     });
 });
 
@@ -1311,20 +1346,23 @@ describe("pitchToNumber", () => {
     });
 
     it("should work with equal19 temperament", () => {
-        global.TEMPERAMENT = { equal19: [] };
         const result = pitchToNumber("C", 4, "C major", "equal19");
         // 4 * 19 + 0 (C index) - 14 (A index in 19-EDO table) = 62
         expect(result).toBe(62);
     });
 
+    it("should handle lowercase pitches in alternate tunings (equal19)", () => {
+        // Verifies that lowercase 'c' and uppercase 'C' resolve identically in equal19
+        const upperCaseResult = pitchToNumber("C", 4, "C major", "equal19");
+        expect(pitchToNumber("c", 4, "C major", "equal19")).toBe(upperCaseResult);
+    });
+
     it("should fallback to 12-EDO for undefined temperament", () => {
-        global.TEMPERAMENT = {};
         const result = pitchToNumber("C", 4, "C major", undefined);
         expect(result).toBe(39);
     });
 
     it("should fallback to 12-EDO for unknown temperament", () => {
-        global.TEMPERAMENT = {};
         const result = pitchToNumber("C", 4, "C major", "unknown");
         expect(result).toBe(39);
     });
@@ -2657,9 +2695,21 @@ describe("isInt", () => {
         expect(isInt(NaN)).toBe(false); // NaN value
     });
 
-    it("should return false for numeric strings", () => {
-        expect(isInt("1")).toBe(false); // String containing an integer
-        expect(isInt("-10")).toBe(false); // String containing a negative integer
+    it("should return true for numeric strings", () => {
+        expect(isInt("1")).toBe(true); // String containing an integer
+        expect(isInt("-10")).toBe(true); // String containing a negative integer
+        expect(isInt("3.5")).toBe(false); // String containing a decimal
+    });
+
+    it("should handle edge cases correctly", () => {
+        expect(isInt("1e21")).toBe(true); // Scientific notation integer
+        expect(isInt("1e-21")).toBe(false); // Scientific notation decimal
+        expect(isInt("")).toBe(false); // Empty string
+        expect(isInt("   ")).toBe(false); // Whitespace string
+        expect(isInt("0x10")).toBe(true); // Hexadecimal string
+        expect(isInt(null)).toBe(false); // Null
+        expect(isInt(false)).toBe(false); // Boolean
+        expect(isInt([])).toBe(false); // Empty array
     });
 });
 
@@ -2767,6 +2817,29 @@ describe("EQUIVALENTNATURALS extended mappings", () => {
 
     it("should map F♭ to E (original)", () => {
         expect(global.EQUIVALENTNATURALS["F♭"]).toBe("E");
+    });
+});
+
+describe("EQUIVALENTNATURALS double flats", () => {
+    const DOUBLEFLAT = "𝄫";
+
+    it("should spell C𝄫 and F𝄫 the way the solfege table spells them", () => {
+        // FIXEDSOLFEGE1 already maps do𝄫 to B♭ and fa𝄫 to E♭, so the Western
+        // spellings of the same two pitches must not land a semitone higher.
+        expect(convertFromSolfege("C" + DOUBLEFLAT)).toBe("B" + FLAT);
+        expect(convertFromSolfege("F" + DOUBLEFLAT)).toBe("E" + FLAT);
+        expect(convertFromSolfege("C" + FLAT + FLAT)).toBe("B" + FLAT);
+        expect(convertFromSolfege("F" + FLAT + FLAT)).toBe("E" + FLAT);
+        expect(convertFromSolfege("C" + DOUBLEFLAT)).toBe(convertFromSolfege("do" + DOUBLEFLAT));
+        expect(convertFromSolfege("F" + DOUBLEFLAT)).toBe(convertFromSolfege("fa" + DOUBLEFLAT));
+    });
+
+    it("should place every double flat a semitone below the matching single flat", () => {
+        for (const letter of NOTENAMES) {
+            const flat = _calculate_pitch_number(letter + FLAT, 4);
+            expect(_calculate_pitch_number(letter + DOUBLEFLAT, 4)).toBe(flat - 1);
+            expect(_calculate_pitch_number(letter + FLAT + FLAT, 4)).toBe(flat - 1);
+        }
     });
 });
 

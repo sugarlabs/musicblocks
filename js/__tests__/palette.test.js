@@ -1151,11 +1151,9 @@ describe("Palettes Class", () => {
         });
 
         test("_hideMenuItems hides search widget and removes palette body", () => {
-            const paletteBody = {};
-            const paletteElement = { removeChild: jest.fn() };
+            const paletteBody = { remove: jest.fn() };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody") return paletteBody;
-                if (id === "palette") return paletteElement;
                 return null;
             });
             palettes.add("search");
@@ -1164,7 +1162,7 @@ describe("Palettes Class", () => {
             palette._hideMenuItems();
 
             expect(mockActivity.hideSearchWidget).toHaveBeenCalledWith(true);
-            expect(paletteElement.removeChild).toHaveBeenCalledWith(paletteBody);
+            expect(paletteBody.remove).toHaveBeenCalled();
         });
 
         test("setupGrabScroll updates scrollTop on drag", () => {
@@ -1430,8 +1428,11 @@ describe("Palettes Class", () => {
         test("showMenu creates header and menu container", () => {
             const palDiv = {
                 childNodes: [{ style: {} }],
-                appendChild: jest.fn(),
-                removeChild: jest.fn()
+                children: [{ offsetWidth: 180 }],
+                offsetLeft: 0,
+                offsetTop: 0,
+                style: {},
+                parentNode: { appendChild: jest.fn() }
             };
             const paletteBody = {
                 insertAdjacentHTML: jest.fn(),
@@ -1450,10 +1451,12 @@ describe("Palettes Class", () => {
                     {}
                 ]
             };
+            paletteBody.childNodes[1].getBoundingClientRect = jest.fn(() => ({ top: 180 }));
             const elementFactory = tag => {
                 if (tag === "table") return paletteBody;
                 return {
                     style: {},
+                    removeAttribute: jest.fn(),
                     setAttribute: jest.fn(),
                     appendChild: jest.fn(),
                     children: [],
@@ -1464,6 +1467,7 @@ describe("Palettes Class", () => {
             global.docById = jest.fn(id => {
                 if (id === "palette") return palDiv;
                 if (id === "PaletteBody") return null;
+                if (id === "PaletteBody_items") return paletteBody.childNodes[1];
                 return null;
             });
 
@@ -1473,9 +1477,69 @@ describe("Palettes Class", () => {
 
             palette.showMenu(true);
 
-            expect(palDiv.appendChild).toHaveBeenCalledWith(paletteBody);
+            expect(palDiv.parentNode.appendChild).toHaveBeenCalledWith(paletteBody);
             expect(palette.menuContainer).toBe(paletteBody);
             expect(palette._showMenuItems).toHaveBeenCalled();
+        });
+
+        test("showMenu sizes the scrollable body from its rendered top", () => {
+            const paletteItems = {
+                style: {},
+                getBoundingClientRect: jest.fn(() => ({ top: 180 }))
+            };
+            const paletteBody = {
+                insertAdjacentHTML: jest.fn(),
+                style: {},
+                childNodes: [{ style: {} }, paletteItems],
+                children: [
+                    {
+                        insertRow: jest.fn(() => ({
+                            style: {},
+                            appendChild: jest.fn(),
+                            children: [{ style: {}, appendChild: jest.fn() }]
+                        }))
+                    }
+                ]
+            };
+            const paletteParent = { appendChild: jest.fn() };
+            const palDiv = {
+                childNodes: [{ style: {} }],
+                children: [{ offsetWidth: 180 }],
+                offsetLeft: 0,
+                offsetTop: 0,
+                style: {},
+                parentNode: paletteParent
+            };
+
+            global.document.createElement = jest.fn(tag =>
+                tag === "table"
+                    ? paletteBody
+                    : {
+                          style: {},
+                          children: [],
+                          appendChild: jest.fn(),
+                          removeAttribute: jest.fn(),
+                          setAttribute: jest.fn()
+                      }
+            );
+            global.docById = jest.fn(id => {
+                if (id === "palette") return palDiv;
+                if (id === "PaletteBody") return null;
+                if (id === "PaletteBody_items") return paletteItems;
+                return null;
+            });
+            Object.defineProperty(window, "innerHeight", { value: 900, configurable: true });
+
+            palettes.add("test");
+            const palette = palettes.dict.test;
+            palette._showMenuItems = jest.fn();
+
+            palette.showMenu(true);
+
+            expect(paletteItems.style.height).toBe("720px");
+            const insertedMarkup = paletteBody.insertAdjacentHTML.mock.calls[0][1];
+            expect(insertedMarkup).toContain("overflow: auto");
+            expect(insertedMarkup).toContain("overflow-x: hidden");
         });
 
         test("_showMenuItems renders a basic block", () => {

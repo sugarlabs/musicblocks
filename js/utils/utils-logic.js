@@ -236,25 +236,30 @@ var LCD = (a, b) => {
 
 /**
  * Convert float to its approximate fractional representation.
+ *
+ * Returns a reduced [numerator, denominator] pair with a positive denominator.
+ * Values above 1 are handled by inverting on entry and swapping back on
+ * every exit path (including the iteration-cap path); the sign of the
+ * input is carried on the numerator.
  */
 function rationalToFraction(d) {
     if (d === 0 || isNaN(d) || !isFinite(d)) {
         return [0, 1];
     }
 
-    let invert;
-    if (d > 1) {
-        invert = true;
+    const sign = Math.sign(d);
+    d = Math.abs(d);
+
+    let invert = d > 1;
+    if (invert) {
         d = 1 / d;
-    } else {
-        invert = false;
     }
 
     let df = 1.0;
     let top = 1;
+    let bot = 1;
     let iterations = 0;
     const maxIterations = 10000;
-    let bot = 1;
 
     while (Math.abs(df - d) > 0.00000001 && iterations < maxIterations) {
         if (df < d) {
@@ -268,19 +273,23 @@ function rationalToFraction(d) {
         iterations++;
     }
 
-    if (iterations === maxIterations) {
-        return [top, bot];
+    // Swap back on every exit path, including the iteration cap.
+    if (invert) {
+        const temp = top;
+        top = bot;
+        bot = temp;
     }
 
     if (bot === 0 || top === 0) {
         return [0, 1];
     }
 
-    if (invert) {
-        return [bot, top];
-    } else {
-        return [top, bot];
-    }
+    // Reduce the result so it comes back in standard musical subdivision form.
+    const divisor = GCD(top, bot);
+    top /= divisor;
+    bot /= divisor;
+
+    return [sign * top, bot];
 }
 
 /**

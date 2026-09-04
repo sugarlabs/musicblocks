@@ -728,3 +728,230 @@ describe("piemenuKey behavioral tests", () => {
         expect(mockActivity.blocks._makeNewBlockWithConnections).toHaveBeenCalled();
     });
 });
+
+describe("pie menu Escape-key dismissal", () => {
+    let elements;
+
+    const makeEl = () => ({
+        style: { display: "", position: "", opacity: "" },
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
+    });
+
+    beforeEach(() => {
+        elements = {};
+        global.docById = jest.fn(id => {
+            if (!elements[id]) elements[id] = makeEl();
+            return elements[id];
+        });
+        global.document = {
+            getElementById: global.docById,
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn()
+        };
+        // Earlier suites may leave a module-level activeExitWheel behind;
+        // dismiss once so each test starts from the no-exit-wheel state.
+        require("../piemenus").dismissActivePieMenu();
+        elements = {};
+        global.document.removeEventListener.mockClear();
+    });
+
+    test("Escape hides every visible pie-menu container and detaches listeners", () => {
+        const { handleEscapeKey } = require("../piemenus");
+        const event = { key: "Escape", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+
+        handleEscapeKey(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(elements["wheelDiv"].style.display).toBe("none");
+        expect(elements["wheelDivptm"].style.display).toBe("none");
+        expect(global.document.removeEventListener).toHaveBeenCalledWith(
+            "keydown",
+            handleEscapeKey,
+            true
+        );
+    });
+
+    test("other keys leave the menu open", () => {
+        const { handleEscapeKey } = require("../piemenus");
+        const event = { key: "a", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+
+        handleEscapeKey(event);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(elements["wheelDiv"] ? elements["wheelDiv"].style.display : "").not.toBe("none");
+    });
+
+    test("Escape does nothing when no pie menu is open", () => {
+        const { handleEscapeKey } = require("../piemenus");
+        global.docById = jest.fn(id => {
+            if (!elements[id]) {
+                elements[id] = makeEl();
+                elements[id].style.display = "none";
+            }
+            return elements[id];
+        });
+        global.document.getElementById = global.docById;
+        const event = { key: "Escape", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+
+        handleEscapeKey(event);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+    });
+
+    test("showWheelDiv registers the Escape listener alongside outside-click", () => {
+        jest.useFakeTimers();
+        const { showWheelDiv, handleEscapeKey } = require("../piemenus");
+
+        try {
+            showWheelDiv();
+            jest.advanceTimersByTime(50);
+
+            expect(global.document.addEventListener).toHaveBeenCalledWith(
+                "keydown",
+                handleEscapeKey,
+                true
+            );
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+});
+
+describe("piemenuVoices teardown on close", () => {
+    let mockBlock;
+    let synth;
+
+    const openVoiceMenu = () => {
+        const { piemenuVoices } = require("../piemenus");
+        piemenuVoices(
+            mockBlock,
+            ["guitar", "piano"],
+            ["guitar", "piano"],
+            [0, 0],
+            "guitar",
+            undefined
+        );
+    };
+
+    beforeEach(() => {
+        // Real DOM nodes here: enableWheelScroll() reaches for wheelDiv through
+        // document.getElementById, so a docById stub alone would not be seen.
+        document.body.innerHTML = "";
+        const byId = document.getElementById.bind(document);
+        global.docById = jest.fn(id => {
+            let el = byId(id);
+            if (!el) {
+                el = document.createElement("div");
+                el.id = id;
+                document.body.appendChild(el);
+            }
+            return el;
+        });
+
+        global.localStorage = {};
+        global.platformColor.piemenuVoicesColors = ["#aa0000", "#00aa00"];
+        global.getDrumName = jest.fn().mockReturnValue(null);
+        global.getVoiceSynthName = jest.fn(v => v);
+        global.getDrumSynthName = jest.fn(v => v);
+
+        synth = {
+            createDefaultSynth: jest.fn(),
+            loadSynth: jest.fn(),
+            trigger: jest.fn(),
+            start: jest.fn()
+        };
+
+        mockBlock = {
+            container: { x: 100, y: 100, setChildIndex: jest.fn(), children: [] },
+            blocks: {
+                stageClick: false,
+                blockScale: 1,
+                activeBlock: null,
+                turtles: { _canvas: { width: 1000, height: 1000 } }
+            },
+            activity: {
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { x: 0, y: 0 },
+                getStageScale: jest.fn().mockReturnValue(1),
+                turtles: {
+                    ithTurtle: jest.fn().mockReturnValue({ singer: { instrumentNames: [] } })
+                },
+                logo: { synth, errorMsg: jest.fn() }
+            },
+            updateCache: jest.fn(),
+            text: { text: "" },
+            value: "guitar"
+        };
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("the exit button removes both wheels and clears the active block", () => {
+        openVoiceMenu();
+        mockBlock.blocks.activeBlock = mockBlock;
+
+        mockBlock._exitWheel.navItems[0].navigateFunction();
+
+        // wheelnav only detaches its window keydown listener from removeWheel(),
+        // so a menu closed without this keeps answering the arrow keys.
+        expect(mockBlock._voiceWheel.removeWheel).toHaveBeenCalled();
+        expect(mockBlock._exitWheel.removeWheel).toHaveBeenCalled();
+        expect(mockBlock.blocks.activeBlock).toBeNull();
+    });
+
+    test("closing cancels a voice preview that is still waiting on the synth", () => {
+        jest.useFakeTimers();
+
+        try {
+            openVoiceMenu();
+
+            // An instrument the turtle has not loaded defers its preview by 500ms.
+            mockBlock._voiceWheel.selectedNavItemIndex = 1;
+            mockBlock._voiceWheel.navItems[1].navigateFunction();
+
+            mockBlock._exitWheel.navItems[0].navigateFunction();
+            jest.advanceTimersByTime(1000);
+
+            expect(synth.trigger).not.toHaveBeenCalled();
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
+    test("the preview still plays while the menu is open", () => {
+        jest.useFakeTimers();
+
+        try {
+            openVoiceMenu();
+
+            mockBlock._voiceWheel.selectedNavItemIndex = 1;
+            mockBlock._voiceWheel.navItems[1].navigateFunction();
+            jest.advanceTimersByTime(1000);
+
+            expect(synth.trigger).toHaveBeenCalled();
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
+    test("hiding the wheel div detaches the scroll-to-rotate listener", () => {
+        const { hideWheelDiv } = require("../piemenus");
+
+        openVoiceMenu();
+
+        const wheelDiv = document.getElementById("wheelDiv");
+        const scrollHandler = wheelDiv._scrollHandler;
+        expect(typeof scrollHandler).toBe("function");
+
+        const removeEventListener = jest.spyOn(wheelDiv, "removeEventListener");
+        hideWheelDiv();
+
+        // Left attached, the handler holds the closed menu's wheel and block alive.
+        expect(removeEventListener).toHaveBeenCalledWith("wheel", scrollHandler);
+        expect(wheelDiv._scrollHandler).toBeNull();
+    });
+});

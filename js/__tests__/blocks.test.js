@@ -209,6 +209,7 @@ describe("Viewport Culling", () => {
             container: {
                 x: 900,
                 y: 100,
+                bitmapCache: {},
                 updateCache: jest.fn(() => {
                     cachedHighlightVisible = block.highlightVisible;
                 })
@@ -234,6 +235,63 @@ describe("Viewport Culling", () => {
 
         expect(block.container.updateCache).toHaveBeenCalledTimes(1);
         expect(cachedHighlightVisible).toBe(false);
+    });
+
+    it("should not touch the cache of a block whose artwork is being rebuilt", () => {
+        // Regenerating a block's artwork uncaches the container and rebuilds it
+        // asynchronously. A block that re-enters the viewport inside that window
+        // has no bitmapCache, and createjs throws on updateCache() without one.
+        const block = {
+            trash: false,
+            container: {
+                x: 900,
+                y: 100,
+                bitmapCache: null,
+                updateCache: jest.fn(() => {
+                    throw "cache() must be called before updateCache()";
+                })
+            },
+            width: 50,
+            height: 30,
+            _viewportVisible: false
+        };
+        blocks.blockList = [block];
+
+        block.container.x = 100;
+
+        expect(() => blocks._updateViewportCulling()).not.toThrow();
+        expect(block.container.updateCache).not.toHaveBeenCalled();
+        expect(block._viewportVisible).toBe(true);
+    });
+
+    it("should keep culling the rest of the list past an uncached block", () => {
+        const rebuilding = {
+            trash: false,
+            container: {
+                x: 100,
+                y: 100,
+                bitmapCache: null,
+                updateCache: jest.fn(() => {
+                    throw "cache() must be called before updateCache()";
+                })
+            },
+            width: 50,
+            height: 30,
+            _viewportVisible: false
+        };
+        const trailing = {
+            trash: false,
+            container: { x: 2000, y: 2000 },
+            width: 50,
+            height: 30,
+            _viewportVisible: true
+        };
+        blocks.blockList = [rebuilding, trailing];
+
+        blocks._updateViewportCulling();
+
+        // The throw used to abort the loop, leaving every later block stale.
+        expect(trailing._viewportVisible).toBe(false);
     });
 
     it("should skip trashed blocks without modifying their visibility", () => {
@@ -790,6 +848,72 @@ describe("Blocks Foundation", () => {
             blocks.loadNewBlocks(blockObjs);
 
             expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Something went wrong reading JSON-encoded project data."
+            );
+        });
+
+        it("detects and rejects multi-block cycles in loadNewBlocks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+
+            // Multi-block cycle: 0 -> 1 -> 0
+            const twoBlockCycle = [
+                [0, "forward", 0, 0, [null, 1]],
+                [1, "forward", 0, 0, [null, 0]]
+            ];
+
+            mockActivity._suppressRefresh = true;
+            blocks.loadNewBlocks(twoBlockCycle);
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Something went wrong reading JSON-encoded project data."
+            );
+
+            // Three-block cycle: 0 -> 1 -> 2 -> 0
+            const threeBlockCycle = [
+                [0, "forward", 0, 0, [null, 1]],
+                [1, "forward", 0, 0, [null, 2]],
+                [2, "forward", 0, 0, [null, 0]]
+            ];
+
+            mockActivity._suppressRefresh = true;
+            mockActivity.errorMsg.mockClear();
+            blocks.loadNewBlocks(threeBlockCycle);
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Something went wrong reading JSON-encoded project data."
+            );
+        });
+
+        it("accepts valid parent-child stacks without false cycle detection", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn();
+
+            // Mimics the default project DATAOBJS structure:
+            // Block 0 (start): no parent, child at dock 1 is block 1, dock 2 is null
+            // Block 1 (settimbre): parent dock 0 = block 0, children at docks 1-3
+            // Block 3 (hidden): parent dock 0 = block 1, no children
+            // Dock 0 back-pointers form a tree, NOT a cycle.
+            const validStack = [
+                [0, "start", 100, 100, [null, 1, null]],
+                [1, "forward", 0, 0, [0, 2, 3]],
+                [2, ["number", { value: 100 }], 0, 0, [1]],
+                [3, "right", 0, 0, [1, 4, null]],
+                [4, ["number", { value: 90 }], 0, 0, [3]]
+            ];
+
+            mockActivity._suppressRefresh = true;
+            // Should NOT trigger cycle detection and abort
+            expect(() => blocks.loadNewBlocks(validStack)).not.toThrow();
+            // If cycle detection falsely trips, _suppressRefresh would be
+            // reset to false and loadNewBlocks would return early.
+            // We verify the code proceeded past cycle detection by checking
+            // that _makeNewBlockWithConnections was called (it runs after
+            // the cycle check).
+            expect(blocks._makeNewBlockWithConnections).toHaveBeenCalled();
         });
 
         it("resets _suppressRefresh after cleanupAfterLoad finishes", async () => {

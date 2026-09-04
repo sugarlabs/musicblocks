@@ -3135,6 +3135,7 @@ class Block {
         // This avoids redundant O(N) findDragGroup and O(D) rest2 chain walks
         // on every mouse move event (which fires 60+ times per second).
         let _dragHasRest2 = false;
+        let _dragSpatialGridDirty = false;
 
         /**
          * Handles the click event on the block container.
@@ -3258,6 +3259,7 @@ class Block {
             // Reset any stale hover-scaling state from prior drags.
             this._trashHoverGroupState = null;
             this._dragPointerDown = true;
+            _dragSpatialGridDirty = false;
 
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
@@ -3452,7 +3454,8 @@ class Block {
             }
 
             // Move the dragged block itself (batched — no checkBounds).
-            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy);
+            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy, true);
+            _dragSpatialGridDirty ||= dx !== 0 || dy !== 0;
 
             // If we are over the trash, warn the user.
             const overTrash = that.activity.trashcan.overTrashcan(
@@ -3476,7 +3479,7 @@ class Block {
                 for (let b = 0; b < cachedGroup.length; b++) {
                     const blk = cachedGroup[b];
                     if (blk !== thisBlock) {
-                        that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                        that.blocks.moveBlockRelativeBatched(blk, dx, dy, true);
                     }
                 }
             } else {
@@ -3486,7 +3489,7 @@ class Block {
                     for (let b = 0; b < that.blocks.dragGroup.length; b++) {
                         const blk = that.blocks.dragGroup[b];
                         if (b !== 0) {
-                            that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                            that.blocks.moveBlockRelativeBatched(blk, dx, dy, true);
                         }
                     }
                 }
@@ -3548,7 +3551,7 @@ class Block {
             that._dragPointerDown = false;
 
             if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false, true);
+                that._mouseoutCallback(event, moved, haveClick, false, true, _dragSpatialGridDirty);
             } else {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
@@ -3563,6 +3566,7 @@ class Block {
 
             // Clear cached drag state.
             _dragHasRest2 = false;
+            _dragSpatialGridDirty = false;
             moved = false;
             that._announced = false;
         });
@@ -3601,10 +3605,18 @@ class Block {
      * @param {boolean} haveClick - Indicates if a click event occurred.
      * @param {boolean} hideDOM - Indicates whether to hide DOM elements.
      * @param {boolean} dragEnded - Indicates whether this callback is from drag release.
+     * @param {boolean} spatialGridDirty - Indicates whether grid reconciliation was deferred.
      * Sets cursor style to default.
      * @returns {void}
      */
-    _mouseoutCallback(event, moved, haveClick, hideDOM, dragEnded = false) {
+    _mouseoutCallback(
+        event,
+        moved,
+        haveClick,
+        hideDOM,
+        dragEnded = false,
+        spatialGridDirty = false
+    ) {
         const thisBlock = this.blockIndex;
         if (!this.activity.logo.runningLilypond) {
             document.body.style.cursor = "default";
@@ -3613,6 +3625,10 @@ class Block {
         // Restore drag scaling only when drag interaction actually ends.
         if (dragEnded) {
             this._setDragGroupTrashHoverScale(false, 0, 0, true);
+        }
+
+        if (spatialGridDirty) {
+            this.blocks.syncDragGroupSpatialGrid();
         }
 
         // Always hide the trash when there is no block selected.

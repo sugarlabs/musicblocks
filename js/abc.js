@@ -35,9 +35,19 @@ const OCTAVE_NOTATION_MAP = {
 };
 
 const ACCIDENTAL_MAP = {
+    "𝄪": "^^",
     "♯": "^",
-    "♭": "_"
+    "#": "^",
+    "♮": "=",
+    "♭": "_",
+    "b": "_",
+    "𝄫": "__"
 };
+
+const ACCIDENTAL_SYMBOLS = Object.keys(ACCIDENTAL_MAP)
+    .map(symbol => symbol.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("");
+const PITCH_ACCIDENTAL_PATTERN = new RegExp(`^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)`, "u");
 
 /**
  * Returns the header string used for the ABC notation output.
@@ -94,9 +104,15 @@ const processABCNotes = function (logo, turtle) {
             note = pitchObj[0] + pitchObj[1];
         }
 
-        // Handle accidentals first
-        for (const [symbol, replacement] of Object.entries(ACCIDENTAL_MAP)) {
-            note = note.replace(new RegExp(symbol, "g"), replacement);
+        const pitchMatch = note.match(PITCH_ACCIDENTAL_PATTERN);
+        const accidentalSymbols = pitchMatch ? pitchMatch[2] : "";
+        const accidental = accidentalSymbols
+            ? Array.from(accidentalSymbols)
+                  .map(symbol => ACCIDENTAL_MAP[symbol])
+                  .join("")
+            : "";
+        if (accidentalSymbols) {
+            note = note.replace(accidentalSymbols, "");
         }
 
         // Handle octave notation
@@ -108,9 +124,12 @@ const processABCNotes = function (logo, turtle) {
 
         // Convert case based on octave
         if (octave !== null) {
-            return octave >= 5 ? note.toLowerCase() : note.toUpperCase();
+            return accidental + (octave >= 5 ? note.toLowerCase() : note.toUpperCase());
         } else {
-            return note.includes("'") || note === "" ? note.toLowerCase() : note.toUpperCase();
+            return (
+                accidental +
+                (note.includes("'") || note === "" ? note.toLowerCase() : note.toUpperCase())
+            );
         }
     };
 

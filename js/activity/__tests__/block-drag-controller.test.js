@@ -312,12 +312,19 @@ describe("BlockDragController", () => {
             ];
             for (const [dx, dy] of deltas) {
                 for (const blk of blocks._cachedDragGroup) {
-                    blocks.moveBlockRelativeBatched(blk, dx, dy);
+                    blocks.moveBlockRelativeBatched(blk, dx, dy, true);
                 }
             }
 
             expect(blockList[0].container).toEqual({ x: 106, y: 103 });
             expect(blockList[1].container).toEqual({ x: 106, y: 123 });
+            expect(blocks._updateSpatialGrid).not.toHaveBeenCalled();
+
+            blocks.syncDragGroupSpatialGrid();
+
+            expect(blocks._updateSpatialGrid).toHaveBeenCalledTimes(2);
+            expect(blocks._updateSpatialGrid).toHaveBeenNthCalledWith(1, 0);
+            expect(blocks._updateSpatialGrid).toHaveBeenNthCalledWith(2, 1);
         });
 
         it("moveBlockRelative schedules a checkBounds pass and updates the spatial grid", () => {
@@ -827,6 +834,7 @@ describe("BlockDragController", () => {
             ["findDragGroup", [0]],
             ["cacheDragGroup", [0]],
             ["clearCachedDragGroup", []],
+            ["syncDragGroupSpatialGrid", []],
             ["moveBlockRelative", [0, 1, 2]],
             ["moveBlockRelativeBatched", [0, 1, 2]],
             ["moveStackRelative", [0, 1, 2]]

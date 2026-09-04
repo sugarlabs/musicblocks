@@ -4,6 +4,11 @@ describe("Dark Mode E2E Integration", () => {
     beforeEach(() => {
         cy.visit("http://127.0.0.1:3000");
         cy.clearLocalStorage();
+        // Without an explicit preference the app follows prefers-color-scheme,
+        // which makes the "starts in light mode" assertions environment-dependent.
+        cy.window().then(win => {
+            win.localStorage.setItem("themePreference", "light");
+        });
         cy.visit("http://127.0.0.1:3000");
         cy.waitForAppReady();
     });

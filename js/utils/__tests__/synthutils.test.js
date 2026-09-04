@@ -2126,6 +2126,314 @@ describe("Utility Functions (logic-only)", () => {
             expect(() => stopSound(turtle, "electronic synth")).not.toThrow();
         });
     });
+
+    describe("microphone analyser and recording player lifecycle", () => {
+        let savedPlayer, savedTimeout, savedAnalyser, savedMic;
+
+        beforeEach(() => {
+            savedPlayer = Synth.player;
+            savedTimeout = Synth._recordingPlayTimeout;
+            savedAnalyser = Synth.analyser;
+            savedMic = Synth.mic;
+        });
+
+        afterEach(() => {
+            Synth.player = savedPlayer;
+            Synth._recordingPlayTimeout = savedTimeout;
+            Synth.analyser = savedAnalyser;
+            Synth.mic = savedMic;
+        });
+
+        it("cancels a pending playback timeout when recording playback is stopped", () => {
+            const clearSpy = jest.spyOn(global, "clearTimeout");
+            Synth._recordingPlayTimeout = 4242;
+            Synth.player = null;
+
+            Synth.stopPlayBackRecording();
+
+            expect(clearSpy).toHaveBeenCalledWith(4242);
+            expect(Synth._recordingPlayTimeout).toBeNull();
+            clearSpy.mockRestore();
+        });
+
+        it("stops, disposes, and releases the recording player", () => {
+            const stop = jest.fn();
+            const dispose = jest.fn();
+            Synth._recordingPlayTimeout = null;
+            Synth.player = { stop, dispose };
+
+            Synth.stopPlayBackRecording();
+
+            expect(stop).toHaveBeenCalled();
+            expect(dispose).toHaveBeenCalled();
+            expect(Synth.player).toBeNull();
+        });
+
+        it("still disposes the player when stopping it throws", () => {
+            const dispose = jest.fn();
+            Synth._recordingPlayTimeout = null;
+            Synth.player = {
+                stop: jest.fn(() => {
+                    throw new Error("already stopped");
+                }),
+                dispose
+            };
+
+            expect(() => Synth.stopPlayBackRecording()).not.toThrow();
+            expect(dispose).toHaveBeenCalled();
+            expect(Synth.player).toBeNull();
+        });
+
+        it("still releases the player when disposing it throws", () => {
+            Synth._recordingPlayTimeout = null;
+            Synth.player = {
+                stop: jest.fn(),
+                dispose: jest.fn(() => {
+                    throw new Error("already disposed");
+                })
+            };
+
+            expect(() => Synth.stopPlayBackRecording()).not.toThrow();
+            expect(Synth.player).toBeNull();
+        });
+
+        it("tolerates a player that exposes neither stop nor dispose", () => {
+            Synth._recordingPlayTimeout = null;
+            Synth.player = {};
+
+            expect(() => Synth.stopPlayBackRecording()).not.toThrow();
+            expect(Synth.player).toBeNull();
+        });
+
+        it("is a no-op when there is no recording player", () => {
+            Synth._recordingPlayTimeout = null;
+            Synth.player = null;
+
+            expect(() => Synth.stopPlayBackRecording()).not.toThrow();
+            expect(Synth.player).toBeNull();
+        });
+
+        it("connects a fresh waveform analyser to the microphone", () => {
+            const connect = jest.fn();
+            Synth.analyser = null;
+            Synth.mic = { connect, disconnect: jest.fn() };
+
+            Synth.LiveWaveForm();
+
+            expect(Synth.analyser).not.toBeNull();
+            expect(Synth.analyser.type).toBe("waveform");
+            expect(Synth.analyser.size).toBe(8192);
+            expect(connect).toHaveBeenCalledWith(Synth.analyser);
+        });
+
+        it("disconnects and disposes a previous analyser before replacing it", () => {
+            const previous = { dispose: jest.fn() };
+            const disconnect = jest.fn();
+            Synth.analyser = previous;
+            Synth.mic = { connect: jest.fn(), disconnect };
+
+            Synth.LiveWaveForm();
+
+            expect(disconnect).toHaveBeenCalledWith(previous);
+            expect(previous.dispose).toHaveBeenCalled();
+            expect(Synth.analyser).not.toBe(previous);
+        });
+
+        it("reads waveform values from the active analyser", () => {
+            const values = new Float32Array([0.1, -0.2, 0.3]);
+            Synth.analyser = { getValue: jest.fn(() => values) };
+
+            expect(Synth.getWaveFormValues()).toBe(values);
+            expect(Synth.analyser.getValue).toHaveBeenCalled();
+        });
+    });
+
+    describe("recorder setup and recording download flow", () => {
+        let savedFF, savedMBDialog, savedCreateObjectURL, savedAlert;
+
+        // setupRecorder connects every live instrument to the media-stream
+        // destination, and the Tone mocks do not implement connect(), so run
+        // it against an empty instrument table and restore afterwards.
+        const withNoInstruments = fn => {
+            const saved = {};
+            for (const key of Object.keys(instruments)) {
+                saved[key] = instruments[key];
+                delete instruments[key];
+            }
+            try {
+                return fn();
+            } finally {
+                Object.assign(instruments, saved);
+            }
+        };
+
+        beforeEach(() => {
+            savedFF = platform.FF;
+            savedMBDialog = window.MBDialog;
+            savedCreateObjectURL = global.URL.createObjectURL;
+            savedAlert = global.alert;
+            global.URL.createObjectURL = jest.fn(() => "blob:recording");
+            global.alert = jest.fn();
+            global.MediaRecorder = jest.fn(function () {
+                return this;
+            });
+        });
+
+        afterEach(() => {
+            platform.FF = savedFF;
+            window.MBDialog = savedMBDialog;
+            global.URL.createObjectURL = savedCreateObjectURL;
+            global.alert = savedAlert;
+            delete window.prompt;
+        });
+
+        const setup = () => withNoInstruments(() => Synth.setupRecorder());
+
+        it("requests a wav recorder on Firefox", () => {
+            platform.FF = true;
+            setup();
+            expect(global.MediaRecorder.mock.calls[0][1]).toEqual({ type: "audio/wav" });
+        });
+
+        it("requests a webm recorder on other browsers", () => {
+            platform.FF = false;
+            setup();
+            expect(global.MediaRecorder.mock.calls[0][1]).toEqual({ mimeType: "audio/webm" });
+        });
+
+        it("ignores data events with no payload", () => {
+            platform.FF = false;
+            setup();
+
+            expect(() => Synth.recorder.ondataavailable({})).not.toThrow();
+            Synth.recorder.onstop();
+
+            // No chunks were collected, so no object URL is ever minted.
+            expect(global.URL.createObjectURL).not.toHaveBeenCalled();
+        });
+
+        it("ignores zero-length data chunks", () => {
+            platform.FF = false;
+            setup();
+
+            Synth.recorder.ondataavailable({ data: { size: 0 } });
+            Synth.recorder.onstop();
+
+            expect(global.URL.createObjectURL).not.toHaveBeenCalled();
+        });
+
+        it("does nothing on stop when nothing was recorded", () => {
+            platform.FF = false;
+            setup();
+
+            expect(() => Synth.recorder.onstop()).not.toThrow();
+            expect(global.URL.createObjectURL).not.toHaveBeenCalled();
+        });
+
+        it("prompts through MBDialog and downloads an ogg file off Firefox", async () => {
+            platform.FF = false;
+            window.MBDialog = {
+                prompt: jest.fn(() => Promise.resolve("my song")),
+                alert: jest.fn()
+            };
+            const clicked = [];
+            jest.spyOn(document.body, "appendChild").mockImplementation(node => {
+                if (node.tagName === "A") clicked.push(node);
+                return node;
+            });
+            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+
+            setup();
+            Synth.recorder.ondataavailable({ data: { size: 12 } });
+            Synth.recorder.onstop();
+            await Promise.resolve();
+
+            expect(window.MBDialog.prompt).toHaveBeenCalled();
+            expect(global.URL.createObjectURL).toHaveBeenCalled();
+            expect(clicked).toHaveLength(1);
+            expect(clicked[0].download).toBe("my song.ogg");
+            jest.restoreAllMocks();
+        });
+
+        it("uses a wav extension on Firefox", async () => {
+            platform.FF = true;
+            window.MBDialog = {
+                prompt: jest.fn(() => Promise.resolve("take one")),
+                alert: jest.fn()
+            };
+            const clicked = [];
+            jest.spyOn(document.body, "appendChild").mockImplementation(node => {
+                if (node.tagName === "A") clicked.push(node);
+                return node;
+            });
+            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+
+            setup();
+            Synth.recorder.ondataavailable({ data: { size: 12 } });
+            Synth.recorder.onstop();
+            await Promise.resolve();
+
+            expect(clicked[0].download).toBe("take one.wav");
+            jest.restoreAllMocks();
+        });
+
+        it("falls back to the browser prompt when MBDialog is unavailable", () => {
+            platform.FF = false;
+            delete window.MBDialog;
+            window.prompt = jest.fn(() => "fallback");
+            jest.spyOn(document.body, "appendChild").mockImplementation(node => node);
+            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+
+            setup();
+            Synth.recorder.ondataavailable({ data: { size: 12 } });
+            Synth.recorder.onstop();
+
+            expect(window.prompt).toHaveBeenCalled();
+            jest.restoreAllMocks();
+        });
+
+        it("reports a cancelled download when the name is null", async () => {
+            platform.FF = false;
+            window.MBDialog = {
+                prompt: jest.fn(() => Promise.resolve(null)),
+                alert: jest.fn()
+            };
+
+            setup();
+            Synth.recorder.ondataavailable({ data: { size: 12 } });
+            Synth.recorder.onstop();
+            await Promise.resolve();
+
+            expect(window.MBDialog.alert).toHaveBeenCalled();
+        });
+
+        it("treats a whitespace-only name as a cancelled download", async () => {
+            platform.FF = false;
+            window.MBDialog = {
+                prompt: jest.fn(() => Promise.resolve("   ")),
+                alert: jest.fn()
+            };
+
+            setup();
+            Synth.recorder.ondataavailable({ data: { size: 12 } });
+            Synth.recorder.onstop();
+            await Promise.resolve();
+
+            expect(window.MBDialog.alert).toHaveBeenCalled();
+        });
+
+        it("falls back to a plain alert when MBDialog cannot report the cancel", () => {
+            platform.FF = false;
+            delete window.MBDialog;
+            window.prompt = jest.fn(() => null);
+
+            setup();
+            Synth.recorder.ondataavailable({ data: { size: 12 } });
+            Synth.recorder.onstop();
+
+            expect(global.alert).toHaveBeenCalled();
+        });
+    });
 });
 
 describe("Tuner Utilities (Audio Test Functions)", () => {

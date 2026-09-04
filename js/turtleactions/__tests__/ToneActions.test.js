@@ -43,6 +43,7 @@ describe("setupToneActions", () => {
         };
         global.CUSTOMSAMPLES = {};
         global.DEFAULTVOICE = "default-voice";
+        global.safeNumber = require("../../utils/utils-logic").safeNumber;
         global.last = array => array[array.length - 1];
         global._ = msg => msg;
         global.NOINPUTERRORMSG = "Missing input";
@@ -328,6 +329,13 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.vibratoIntensity).toContain(1);
         });
 
+        it("should accept valid numeric strings and coerce them properly", () => {
+            Singer.ToneActions.doVibrato("50", "10", 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.vibratoIntensity).toContain(0.5);
+            expect(targetTurtle.singer.vibratoRate).toContain(0.1);
+        });
+
         it("should not call setDispatchBlock when blk is not in blockList", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
@@ -336,7 +344,32 @@ describe("setupToneActions", () => {
             expect(mouse.MB.listeners).toContain("_vibrato_0");
         });
 
-        it("should show error for vibrato intensity below the lower boundary", () => {
+        it("should reject truly invalid/missing inputs (NaN, Infinity, undefined, etc)", () => {
+            const invalidInputs = [NaN, Infinity, -Infinity, undefined, null, "", "   ", "abc"];
+            invalidInputs.forEach(invalidVal => {
+                activity.errorMsg.mockClear();
+                activity.logo.stopTurtle = false;
+                Singer.ToneActions.doVibrato(invalidVal, 10, 0, 1);
+
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 1);
+                expect(activity.logo.stopTurtle).toBe(true);
+                expect(targetTurtle.singer.vibratoIntensity).toEqual([]);
+                expect(targetTurtle.singer.vibratoRate).toEqual([]);
+
+                activity.errorMsg.mockClear();
+                activity.logo.stopTurtle = false;
+                Singer.ToneActions.doVibrato(50, invalidVal, 0, 1);
+
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 1);
+                expect(activity.logo.stopTurtle).toBe(true);
+                expect(targetTurtle.singer.vibratoIntensity).toEqual([]);
+                expect(targetTurtle.singer.vibratoRate).toEqual([]);
+            });
+        });
+
+        it("should show error for vibrato intensity below the lower boundary (0)", () => {
+            activity.errorMsg.mockClear();
+            activity.logo.stopTurtle = false;
             Singer.ToneActions.doVibrato(0, 5, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Vibrato intensity must be between 1 and 100.",
@@ -347,8 +380,10 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.vibratoRate).toEqual([]);
         });
 
-        it("should show error for invalid vibrato intensity", () => {
-            Singer.ToneActions.doVibrato(150, 5, 0, 1);
+        it("should show error for vibrato intensity above the upper boundary (101)", () => {
+            activity.errorMsg.mockClear();
+            activity.logo.stopTurtle = false;
+            Singer.ToneActions.doVibrato(101, 5, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Vibrato intensity must be between 1 and 100.",
                 1
@@ -358,8 +393,23 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.vibratoRate).toEqual([]);
         });
 
-        it("should show error for invalid vibrato rate", () => {
+        it("should show error for invalid vibrato rate (0)", () => {
+            activity.errorMsg.mockClear();
+            activity.logo.stopTurtle = false;
             Singer.ToneActions.doVibrato(50, 0, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Vibrato rate must be greater than 0.",
+                1
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.vibratoIntensity).toEqual([]);
+            expect(targetTurtle.singer.vibratoRate).toEqual([]);
+        });
+
+        it("should show error for negative vibrato rate", () => {
+            activity.errorMsg.mockClear();
+            activity.logo.stopTurtle = false;
+            Singer.ToneActions.doVibrato(50, -5, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Vibrato rate must be greater than 0.",
                 1

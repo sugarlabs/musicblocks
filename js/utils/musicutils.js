@@ -350,10 +350,10 @@ const EQUIVALENTNATURALS = {
     "C𝄪": "D",
     "F𝄪": "G",
     "B𝄪": "C♯",
-    "C𝄫": "B",
+    "C𝄫": "B♭",
     "D𝄫": "C",
     "E𝄫": "D",
-    "F𝄫": "E",
+    "F𝄫": "E♭",
     "G𝄫": "F",
     "A𝄫": "G",
     "B𝄫": "A",
@@ -365,10 +365,10 @@ const EQUIVALENTNATURALS = {
     "C♯♯": "D",
     "F♯♯": "G",
     "B♯♯": "C♯",
-    "C♭♭": "B",
+    "C♭♭": "B♭",
     "D♭♭": "C",
     "E♭♭": "D",
-    "F♭♭": "E",
+    "F♭♭": "E♭",
     "G♭♭": "F",
     "A♭♭": "G",
     "B♭♭": "A"
@@ -1745,7 +1745,7 @@ const INTERVALVALUES = {
     "augmented 5": [8, 1, 25 / 16],
     "minor 6": [8, -1, 8 / 5],
     "major 6": [9, 1, 5 / 3],
-    "diminished 7": [9, -1, 9 / 5],
+    "diminished 7": [9, -1, 128 / 75],
     "augmented 6": [10, 1, 125 / 72],
     "minor 7": [10, -1, 16 / 9],
     "major 7": [11, 1, 15 / 8],
@@ -4820,7 +4820,10 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
             // Use its proportional position from 12-EDO (A is at index 9).
             aIndex = Math.round((9 / 12) * currentEDO);
         }
-        const normalizedPitch = originalPitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
+        const normalizedPitch = originalPitch
+            .replace(/^([a-g])/, (_, letter) => letter.toUpperCase())
+            .replaceAll("#", SHARP)
+            .replaceAll("b", FLAT);
         let edoPos = names.indexOf(normalizedPitch);
         if (edoPos === -1) {
             // Fallback: try the 12-EDO arrays with proportional mapping
@@ -4848,7 +4851,7 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
     }
 
     let pitchNumber = 0;
-    if (PITCHES.includes(pitch)) {
+    if (PITCHES.includes(pitch.toUpperCase())) {
         pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
     } else {
         // obj[1] is the solfege mapping for the current key/mode
@@ -8015,7 +8018,7 @@ const calcOctaveInterval = arg => {
  * @returns {boolean} True if the value is an integer, false otherwise.
  */
 const isInt = value => {
-    return !isNaN(value) && parseInt(Number(value), 10) === value && !isNaN(parseInt(value, 10));
+    return !isNaN(parseFloat(value)) && Number.isInteger(Number(value));
 };
 
 /**

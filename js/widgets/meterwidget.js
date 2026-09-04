@@ -253,6 +253,7 @@ class MeterWidget {
         if (this._meterBlock !== null && this.activity.blocks.blockList[this._meterBlock]) {
             c1 = this.activity.blocks.blockList[this._meterBlock].connections[1];
             v1 = c1 !== null ? this.activity.blocks.blockList[c1].value : 4;
+            v1 = isNaN(v1) ? 4 : clampNumber(v1, 1, 16);
             c2 = this.activity.blocks.blockList[this._meterBlock].connections[2];
             c3 =
                 c2 !== null &&

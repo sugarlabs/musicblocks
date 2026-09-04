@@ -92,20 +92,6 @@ class Notation {
     }
 
     /**
-     * @param {Object.<String[]>} notationMarkup
-     */
-    set notationMarkup(notationMarkup) {
-        this._notationMarkup = notationMarkup;
-    }
-
-    /**
-     * @returns {Object.<String[]>}
-     */
-    get notationMarkup() {
-        return this._notationMarkup;
-    }
-
-    /**
      * @returns {Object.<Boolean>}
      */
     get pickupPOW2() {
@@ -213,13 +199,14 @@ class Notation {
     }
 
     /**
-     * Adds a markup.
+     * Queues a markup so that it is attached to the next note staged by
+     * doUpdateNotation.
      *
      * @param turtle
      * @param arg
      * @returns {void}
      */
-    static notationMarkup(turtle, arg) {
+    notationMarkup(turtle, arg) {
         if (turtle in this._markup) {
             this._markup[turtle].push(arg);
         } else {
@@ -283,13 +270,13 @@ class Notation {
             const d = this._notationStaging[turtle].length - this._pickupPoint[turtle];
             const pickup = [];
 
-            for (const i in d) {
+            for (let i = 0; i < d; i++) {
                 pickup.push(this._notationStaging[turtle].pop());
             }
 
             this._notationStaging[turtle].push("meter", count, value);
 
-            for (const i in d) {
+            for (let i = 0; i < d; i++) {
                 this._notationStaging[turtle].push(pickup.pop());
             }
         } else {

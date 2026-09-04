@@ -609,17 +609,7 @@ class PhraseMaker {
         // Add the buttons to the top row.
 
         widgetWindow.onclose = () => {
-            this._rowOffset = [];
-            for (let i = 0; i < this._rowMap.length; i++) {
-                this._rowMap[i] = i;
-            }
-
-            this.activity.logo.synth.stopSound(0, this._instrumentName);
-            this.activity.logo.synth.stop();
-            this._stopOrCloseClicked = true;
-            this.activity.hideMsgs();
-            this.docById("wheelDivptm").style.display = "none";
-            widgetWindow.destroy();
+            this.handleClose();
         };
 
         this._playButton = widgetWindow.addButton(
@@ -1215,6 +1205,34 @@ class PhraseMaker {
                 item.titleSelectedAttr.cursor = "pointer";
                 item.titleHoverAttr.cursor = "pointer";
             }
+        }
+    }
+
+    /**
+     * Handles cleanup and state reset when PhraseMaker widget window is closed.
+     */
+    handleClose() {
+        this._rowOffset = [];
+        for (let i = 0; i < this._rowMap.length; i++) {
+            this._rowMap[i] = i;
+        }
+
+        if (this.activity && this.activity.logo && this.activity.logo.synth) {
+            this.activity.logo.synth.stopSound(0, this._instrumentName);
+            this.activity.logo.synth.stop();
+        }
+        this._stopOrCloseClicked = true;
+        this.playingNow = false;
+        PhraseMakerAudio.clearPlaybackTimers(this);
+        if (this.activity && typeof this.activity.hideMsgs === "function") {
+            this.activity.hideMsgs();
+        }
+        const wheelDiv = this.docById("wheelDivptm");
+        if (wheelDiv && wheelDiv.style) {
+            wheelDiv.style.display = "none";
+        }
+        if (this.widgetWindow && typeof this.widgetWindow.destroy === "function") {
+            this.widgetWindow.destroy();
         }
     }
 
