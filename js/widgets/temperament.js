@@ -55,6 +55,9 @@ const _cssVar = (n, f) =>
         ? getComputedStyle(document.body).getPropertyValue(n).trim() || f
         : f;
 
+/** Dictionary key safe for note-name lookup; stale "custom" falls back to 12-EDO. */
+const trustedKey = t => (isCustomTemperament(t) ? undefined : t);
+
 /**
  * Deviation of a pitch (in cents) from the nearest 12-EDO step. The
  * visualizer uses 12-EDO as its fixed reference ring, so a 19-EDO step at
@@ -1165,7 +1168,7 @@ function TemperamentWidget() {
             );
             // Derive note name from the temperament's own conversion, not 12-EDO labels
             const freq = Number(that.frequencies[0]) * that.ratios[index];
-            const obj = frequencyToPitch(freq, that.inTemperament);
+            const obj = frequencyToPitch(freq, trustedKey(that.inTemperament));
             that.notes.splice(index, 0, [obj[0], obj[1]]);
             that.intervals.splice(index, 0, "");
             that.ratiosNotesPair.splice(index, 0, [that.ratios[index], that.notes[index]]);
@@ -1790,7 +1793,7 @@ function TemperamentWidget() {
                 for (let k = 0; k < pitchNumber; k++) {
                     this.cents[k] = ratioToCents(this.ratios[k], this.powerBase);
                     const f = Number(this.frequencies[0]) * this.ratios[k];
-                    const o = frequencyToPitch(f, this.inTemperament);
+                    const o = frequencyToPitch(f, trustedKey(this.inTemperament));
                     this.notes[k] = [o[0], o[1]];
                     this.intervals[k] = "";
                     this.ratiosNotesPair[k] = [this.ratios[k], this.notes[k]];
@@ -1828,7 +1831,7 @@ function TemperamentWidget() {
                     for (let k = 0; k < pitchNumber; k++) {
                         that.cents[k] = ratioToCents(that.ratios[k], that.powerBase);
                         const f = Number(that.frequencies[0]) * that.ratios[k];
-                        const o = frequencyToPitch(f, that.inTemperament);
+                        const o = frequencyToPitch(f, trustedKey(that.inTemperament));
                         that.notes[k] = [o[0], o[1]];
                         that.intervals[k] = "";
                         that.ratiosNotesPair[k] = [that.ratios[k], that.notes[k]];
@@ -2533,22 +2536,21 @@ function TemperamentWidget() {
         this.notes = [];
 
         if (isCustomTemperament(this.inTemperament)) {
-            const startingPitch = this._logo.synth.startingPitch;
-            const startPitchParsed = parseNoteString(startingPitch);
-            const startPitch = pitchToFrequency(
-                startPitchParsed[0],
-                startPitchParsed[1],
-                0,
-                "C Major",
-                this.inTemperament
-            );
+            // Base frequency must match the table and the saved stack (both
+            // use frequencies[0]). Resolving through the temperament
+            // dictionary can hit a stale "custom" entry and shift every name.
+            const startPitch = Number(this.frequencies[0]);
 
             let addOctave = "";
             for (let i = 0; i < this.ratios.length; i++) {
                 const obj = frequencyToPitch(this.ratios[i] * startPitch);
                 const newPitch = obj[0];
                 const newOctave = obj[1];
-                const newCents = obj[2];
+                // Use the stored cents (same source as the table) instead of
+                // re-measuring from Hz: the hz round-trip can straddle the
+                // ±30 boundary differently (e.g. 30.03 vs 30.0 → "^^" vs "^").
+                const newCents =
+                    typeof this.cents[i] === "number" ? deviationFrom12EDO(this.cents[i]) : obj[2];
                 if (this.powerBase !== 2) {
                     addOctave = newOctave;
                 }
