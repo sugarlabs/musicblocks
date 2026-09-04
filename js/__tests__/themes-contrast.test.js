@@ -173,4 +173,27 @@ describe("themes.css colour tokens", () => {
 
         expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
     });
+
+    it.each(["dark", "highcontrast"])("keeps modal content readable in the %s theme", theme => {
+        const rule = rules.find(r => r.selector.trim() === ".modal-content");
+        expect(rule).toBeDefined();
+
+        const tokens = THEMES[theme];
+        const foreground = resolveColor(declaration(rule.body, "color"), tokens);
+        const background = resolveColor(declaration(rule.body, "background-color"), tokens);
+        expect(foreground).not.toBeNull();
+        expect(background).not.toBeNull();
+
+        expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
+    });
+
+    it("ensures themes.css does not declare or reference deleted legacy properties", () => {
+        const legacyNames = ["--bg", "--fg", "--border", "--panel-bg", "--overlay-bg", "--accent"];
+        legacyNames.forEach(depName => {
+            const declRegex = new RegExp(`(?:^|[;{\\s])${depName}\\s*:`);
+            const varRegex = new RegExp(`var\\(\\s*${depName}\\s*[,)]`);
+            expect(declRegex.test(themesCss)).toBe(false);
+            expect(varRegex.test(themesCss)).toBe(false);
+        });
+    });
 });

@@ -18,6 +18,8 @@
         <link rel="manifest" href="android_chrome_manifest.json" />
 
         <!-- Stylesheets -->
+        <link rel="stylesheet" href="css/tokens.css?v=fixed" />
+        <link rel="stylesheet" href="css/themes.css?v=fixed" />
         <link
             rel="preload"
             href="fonts/material-icons.css"
@@ -177,26 +179,6 @@
             type="font/woff2"
             crossorigin="anonymous"
         />
-        <link
-            rel="preload"
-            href="css/tokens.css?v=fixed"
-            as="style"
-            onload="
-                this.onload = null;
-                this.rel = 'stylesheet';
-            "
-        />
-        <noscript><link rel="stylesheet" href="css/tokens.css?v=fixed" /></noscript>
-        <link
-            rel="preload"
-            href="css/themes.css?v=fixed"
-            as="style"
-            onload="
-                this.onload = null;
-                this.rel = 'stylesheet';
-            "
-        />
-        <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
         <script>
             window.ast2blocklist_config_failed = false;
             window.ast2blocklist_config_ready = new Promise((resolve, reject) => {
