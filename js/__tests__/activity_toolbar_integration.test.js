@@ -189,4 +189,25 @@ describe("Activity Toolbar Integration", () => {
             expect(activity.toolbar.resetStop).toHaveBeenCalled();
         });
     });
+
+    describe("onRunTurtle", () => {
+        // Logo calls onRunTurtle() from runLogoCommands(), which is the one
+        // point every way of starting a project passes through -- including a
+        // click on a Start block, which never goes near the toolbar handlers.
+        test("shows the stop button when execution starts", () => {
+            activity.onRunTurtle();
+
+            expect(activity.toolbar.highlightStop).toHaveBeenCalledWith("red");
+        });
+
+        test("is the mirror image of onStopTurtle", () => {
+            activity.onRunTurtle();
+            expect(activity.toolbar.highlightStop).toHaveBeenCalledTimes(1);
+            expect(activity.toolbar.resetStop).not.toHaveBeenCalled();
+
+            activity.onStopTurtle();
+            expect(activity.toolbar.resetStop).toHaveBeenCalledTimes(1);
+            expect(activity.toolbar.highlightStop).toHaveBeenCalledTimes(1);
+        });
+    });
 });
