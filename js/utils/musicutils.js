@@ -4052,13 +4052,17 @@ const getTemperamentName = name => {
  * @returns {Array} An array containing the note, octave, and cents.
  */
 const noteToObj = note => {
-    let octave = parseInt(note.slice(note.length - 1), 10);
-    if (isNaN(octave)) {
-        octave = 4;
+    const match = note.match(/(-?\d+)$/);
+    let octave;
+    let pitch;
+    if (match) {
+        octave = parseInt(match[1], 10);
+        pitch = note.slice(0, note.length - match[1].length);
     } else {
-        note = note.slice(0, note.length - 1);
+        octave = 4;
+        pitch = note;
     }
-    return [note, octave];
+    return [pitch, octave];
 };
 
 /**

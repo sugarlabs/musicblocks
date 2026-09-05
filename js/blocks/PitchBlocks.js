@@ -302,9 +302,19 @@ function setupPitchBlocks(activity) {
                 let obj;
                 if (tur.singer.lastNotePlayed !== null) {
                     if (typeof tur.singer.lastNotePlayed[0] === "string") {
-                        const len = tur.singer.lastNotePlayed[0].length;
-                        const pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                        const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
+                        const match = tur.singer.lastNotePlayed[0].match(/(-?\d+)$/);
+                        let pitch;
+                        let octave;
+                        if (match) {
+                            octave = parseInt(match[1], 10);
+                            pitch = tur.singer.lastNotePlayed[0].slice(
+                                0,
+                                tur.singer.lastNotePlayed[0].length - match[1].length
+                            );
+                        } else {
+                            octave = 4;
+                            pitch = tur.singer.lastNotePlayed[0];
+                        }
                         obj = [pitch, octave];
                     } else {
                         // Hertz?
