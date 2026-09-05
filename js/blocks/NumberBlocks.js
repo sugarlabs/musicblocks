@@ -40,13 +40,13 @@ function setupNumberBlocks(activity) {
      */
     const toInteger = (logo, value, blk) => {
         if (typeof value === "string") {
-            try {
-                return parseInt(value, 10);
-            } catch (e) {
+            const result = parseInt(value, 10);
+            if (isNaN(result)) {
                 logo.stopTurtle = true;
                 activity.errorMsg(NANERRORMSG, blk);
                 return null;
             }
+            return result;
         }
         return value;
     };
