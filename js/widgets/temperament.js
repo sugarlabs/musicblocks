@@ -128,6 +128,8 @@ function TemperamentWidget() {
      */
     let temperamentTableDiv;
 
+    const _stripCents = n => n.replace(/\(.*?\)/g, "");
+
     /**
      * Reference to the temperament cell.
      * @type {HTMLElement|null}
@@ -543,17 +545,16 @@ function TemperamentWidget() {
                     return;
                 }
                 // Guard: only play valid indices
-                if (i >= 0 && i < that.pitchNumber) {
+                if (i >= 0 && i < that.frequencies.length) {
                     _playNote(i);
                 }
                 // Advance
                 if (forward) {
                     i++;
-                    if (i >= that.pitchNumber) {
+                    if (i >= that.frequencies.length) {
                         forward = false;
-                        i = that.pitchNumber - 1;
-                        // For ≤2 pitches there is no meaningful reverse pass
-                        if (i < 1) {
+                        i = that.frequencies.length - 2;
+                        if (i < 0) {
                             that._playAllRunning = false;
                             flashDot = -1;
                             _drawCircle();
@@ -562,7 +563,7 @@ function TemperamentWidget() {
                     }
                 } else {
                     i--;
-                    if (i < 1) {
+                    if (i < 0) {
                         that._playAllRunning = false;
                         flashDot = -1;
                         _drawCircle();
@@ -1305,6 +1306,22 @@ function TemperamentWidget() {
                     that.frequencies[i] = (that.frequencies[0] * that.ratios[i]).toFixed(2);
                 }
                 that.ratiosNotesPair[i] = [that.ratios[i], that.notes[i]];
+            }
+
+            // Add the octave entry (pitchNumber index) so play-all
+            // covers the full range up to and including the octave.
+            if (that.notes[0]) {
+                that.notes[that.pitchNumber] = [that.notes[0][0], that.notes[0][1] + 1];
+                that.ratios[that.pitchNumber] = that.powerBase;
+                that.frequencies[that.pitchNumber] = (that.frequencies[0] * that.powerBase).toFixed(
+                    2
+                );
+                that.cents[that.pitchNumber] = ratioToCents(that.powerBase, that.powerBase);
+                that.intervals[that.pitchNumber] = that.powerBase;
+                that.ratiosNotesPair[that.pitchNumber] = [
+                    that.powerBase,
+                    that.notes[that.pitchNumber]
+                ];
             }
 
             // Reset the "modified" snapshot for the newly loaded temperament
@@ -2694,7 +2711,7 @@ function TemperamentWidget() {
                     ]);
                     newStack.push([
                         idx + 11,
-                        ["number", { value: parseNoteString(this.notes[i])[1] }],
+                        ["number", { value: parseNoteString(_stripCents(this.notes[i]))[1] }],
                         0,
                         0,
                         [idx + 9]
@@ -2761,7 +2778,7 @@ function TemperamentWidget() {
                     ]);
                     newStack.push([
                         idx + 9,
-                        ["number", { value: parseNoteString(this.notes[i])[1] }],
+                        ["number", { value: parseNoteString(_stripCents(this.notes[i]))[1] }],
                         0,
                         0,
                         [idx + 7]
@@ -2788,7 +2805,8 @@ function TemperamentWidget() {
             const newTemperament = { pitchNumber: this.pitchNumber };
             for (let i = 0; i < this.pitchNumber; i++) {
                 const number = "" + i;
-                const noteParsed = parseNoteString(this.notes[i]);
+                const cleanName = _stripCents(this.notes[i]);
+                const noteParsed = parseNoteString(cleanName);
                 newTemperament[number] = [this.ratios[i], noteParsed[0], noteParsed[1]];
             }
             addTemperamentToDictionary(this.inTemperament, newTemperament);

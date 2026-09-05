@@ -36,9 +36,7 @@ const _b64Cache = new Map();
    SOLFEGENAMES, SOLFEGENAMES1, SOLFNOTES,
    WESTERN2EISOLFEGENAMES, PITCHES, PITCHES1, PITCHES3, SCALENOTES,
    EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES,
-   RHYTHMRULERHEIGHT, SLIDERHEIGHT, SLIDERWIDTH, MATRIXLABELCOLOR,
-   MATRIXNOTECELLCOLOR, MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR,
-   MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER, MATRIXSOLFEWIDTH,
+   MATRIXSOLFEWIDTH,
    EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
    MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
    ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
@@ -53,14 +51,14 @@ const _b64Cache = new Map();
    nthDegreeToPitch, getInterval, _parse_pitch_string, calcNoteValueToDisplay,
    durationToNoteValue, noteToFrequency, getSolfege, splitScaleDegree,
    getNumNote, calcOctave, calcOctaveInterval, isInt,
-   convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege,
+   convertFromSolfege, getPitchInfo, i18nSolfege,
    convertFactor, getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
    addTemperamentToList, getTemperament, deleteTemperamentFromList,
    addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
    DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
-    INTERVALVALUES, MUSICALMODES, getIntervalRatio, frequencyToPitch, NOTESTEP,
+   INTERVALVALUES, MUSICALMODES, getIntervalRatio, frequencyToPitch, NOTESTEP,
    GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-   SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
+   SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS,
     INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition,
     scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern,
     getNonEDOModeSteps,
@@ -1164,12 +1162,6 @@ const C10 = 16744.04;
 let octaveRatio = 2;
 
 /**
- * Height of the rhythm ruler.
- * @constant {number}
- */
-const RHYTHMRULERHEIGHT = 100;
-
-/**
  * Height of a staff note.
  * @constant {number}
  */
@@ -1180,60 +1172,6 @@ const YSTAFFNOTEHEIGHT = 12.5;
  * @constant {number}
  */
 const YSTAFFOCTAVEHEIGHT = 87.5;
-
-/**
- * Height of a slider.
- * @constant {number}
- */
-const SLIDERHEIGHT = 200;
-
-/**
- * Width of a slider.
- * @constant {number}
- */
-const SLIDERWIDTH = 50;
-
-/**
- * Color of matrix buttons.
- * @constant {string}
- */
-const MATRIXBUTTONCOLOR = "#c374e9";
-
-/**
- * Color of matrix labels.
- * @constant {string}
- */
-const MATRIXLABELCOLOR = "#90c100";
-
-/**
- * Color of matrix note cells.
- * @constant {string}
- */
-const MATRIXNOTECELLCOLOR = "#b1db00";
-
-/**
- * Color of matrix tuplet cells.
- * @constant {string}
- */
-const MATRIXTUPLETCELLCOLOR = "#57e751";
-
-/**
- * Color of matrix rhythm cells.
- * @constant {string}
- */
-const MATRIXRHYTHMCELLCOLOR = "#c8c8c8";
-
-/**
- * Hover color of matrix buttons.
- * @constant {string}
- */
-const MATRIXBUTTONCOLORHOVER = "#c894e0";
-
-/**
- * Hover color of matrix note cells.
- * @constant {string}
- */
-const MATRIXNOTECELLCOLORHOVER = "#c2e820";
 
 /**
  * Width of matrix solfege.
@@ -2281,124 +2219,6 @@ const INTERVAL_CENTS = {
     "7/5": 1200 * Math.log2(7 / 5),
     "7/4": 1200 * Math.log2(7 / 4),
     "21/16": 1200 * Math.log2(21 / 16)
-};
-
-/**
- * Centralized interval definitions with exact ratios and cents.
- * This object provides mathematically accurate interval data for all temperaments.
- * @constant {Object}
- */
-const TEMPERAMENT_INTERVALS = {
-    "perfect 1": {
-        ratio: 1 / 1,
-        cents: INTERVAL_CENTS["1/1"],
-        semitones: 0
-    },
-    "minor 2": {
-        ratio: 16 / 15,
-        cents: INTERVAL_CENTS["16/15"],
-        semitones: 1
-    },
-    "augmented 1": {
-        ratio: 25 / 24,
-        cents: INTERVAL_CENTS["25/24"],
-        semitones: 1
-    },
-    "major 2": {
-        ratio: 9 / 8,
-        cents: INTERVAL_CENTS["9/8"],
-        semitones: 2
-    },
-    "augmented 2": {
-        ratio: 75 / 64,
-        cents: INTERVAL_CENTS["75/64"],
-        semitones: 3
-    },
-    "minor 3": {
-        ratio: 6 / 5,
-        cents: INTERVAL_CENTS["6/5"],
-        semitones: 3
-    },
-    "major 3": {
-        ratio: 5 / 4,
-        cents: INTERVAL_CENTS["5/4"],
-        semitones: 4
-    },
-    "augmented 3": {
-        ratio: 125 / 96,
-        cents: INTERVAL_CENTS["125/96"],
-        semitones: 5
-    },
-    "diminished 4": {
-        ratio: 32 / 25,
-        cents: INTERVAL_CENTS["32/25"],
-        semitones: 4
-    },
-    "perfect 4": {
-        ratio: 4 / 3,
-        cents: INTERVAL_CENTS["4/3"],
-        semitones: 5
-    },
-    "augmented 4": {
-        ratio: 25 / 18,
-        cents: INTERVAL_CENTS["25/18"],
-        semitones: 6
-    },
-    "diminished 5": {
-        ratio: 36 / 25,
-        cents: INTERVAL_CENTS["36/25"],
-        semitones: 6
-    },
-    "perfect 5": {
-        ratio: 3 / 2,
-        cents: INTERVAL_CENTS["3/2"],
-        semitones: 7
-    },
-    "augmented 5": {
-        ratio: 25 / 16,
-        cents: INTERVAL_CENTS["25/16"],
-        semitones: 8
-    },
-    "minor 6": {
-        ratio: 8 / 5,
-        cents: INTERVAL_CENTS["8/5"],
-        semitones: 8
-    },
-    "major 6": {
-        ratio: 5 / 3,
-        cents: INTERVAL_CENTS["5/3"],
-        semitones: 9
-    },
-    "augmented 6": {
-        ratio: 125 / 72,
-        cents: INTERVAL_CENTS["125/72"],
-        semitones: 10
-    },
-    "minor 7": {
-        ratio: 16 / 9,
-        cents: INTERVAL_CENTS["16/9"],
-        semitones: 10
-    },
-    "major 7": {
-        ratio: 15 / 8,
-        cents: INTERVAL_CENTS["15/8"],
-        semitones: 11
-    },
-    "augmented 7": {
-        ratio: 125 / 64,
-        cents: INTERVAL_CENTS["125/64"],
-        semitones: 12
-    },
-    "diminished 8": {
-        ratio: 48 / 25,
-        cents: INTERVAL_CENTS["48/25"],
-        semitones: 11
-    },
-    "perfect 8": {
-        ratio: 2 / 1,
-        cents: INTERVAL_CENTS["2/1"],
-        semitones: 12
-    }
 };
 
 /**
@@ -8338,7 +8158,6 @@ if (typeof module !== "undefined" && module.exports) {
         normalizeNoteAccidentals,
         TEMPERAMENT,
         INTERVAL_CENTS,
-        TEMPERAMENT_INTERVALS,
         INTERVAL_ORDER,
         setOctaveRatio,
         getOctaveRatio,

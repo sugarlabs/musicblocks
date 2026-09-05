@@ -892,6 +892,11 @@ class ModeWidget {
 
     // ── Reset ─────────────────────────────────────────────────────
 
+    /**
+     * Resets the note wheel to a blank custom mode (only the root note
+     * selected) so the user can define a new mode by clicking notes.
+     * @returns {void}
+     */
     _resetToCustom() {
         this._saveState();
         this._selectedNotes = this._blankNotes(this._activeEDO);
