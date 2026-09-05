@@ -913,3 +913,842 @@ describe("TurtlesModel.removeTurtle", () => {
         expect(stage.removeChild).not.toHaveBeenCalled();
     });
 });
+
+// ---------------------------------------------------------------------------
+// TurtlesModel: the turtle list
+//
+// Every lookup in the codebase goes through these, and getTurtle throws rather
+// than returning undefined, so the callers above it rely on that. The model is
+// constructed directly because importMembers is mocked in this file, so a bare
+// new Turtles() never runs the model constructor.
+// ---------------------------------------------------------------------------
+
+describe("TurtlesModel turtle list", () => {
+    let model;
+
+    /**
+     * Builds a model with the activity fields its constructor reads.
+     * @returns {Object} A TurtlesModel with an empty turtle list.
+     */
+    function makeModel() {
+        const activity = {
+            stage: { addChild: jest.fn(), removeChild: jest.fn() },
+            turtleContainer: { addChild: jest.fn(), removeChild: jest.fn() },
+            canvas: { width: 1200, height: 900 },
+            hideAuxMenu: jest.fn(),
+            hideGrids: jest.fn(),
+            _doCartesianPolar: jest.fn(),
+            refreshCanvas: jest.fn()
+        };
+        return new Turtles.TurtlesModel(activity);
+    }
+
+    /**
+     * Builds a turtle with the fields these methods actually read.
+     * @param {Object} overrides - fields to set on the turtle
+     * @returns {Object} A turtle stand-in.
+     */
+    const makeTurtle = (overrides = {}) => ({
+        running: false,
+        companionTurtle: null,
+        container: { x: 0, y: 0 },
+        ...overrides
+    });
+
+    beforeEach(() => {
+        model = makeModel();
+    });
+
+    describe("constructor", () => {
+        it("wires the stage and the callbacks the view later calls", () => {
+            const activity = {
+                stage: { addChild: jest.fn(), removeChild: jest.fn() },
+                turtleContainer: { addChild: jest.fn(), removeChild: jest.fn() },
+                canvas: { width: 800 },
+                hideAuxMenu: jest.fn(),
+                hideGrids: jest.fn(),
+                _doCartesianPolar: jest.fn(),
+                refreshCanvas: jest.fn()
+            };
+
+            const m = new Turtles.TurtlesModel(activity);
+
+            expect(m._masterStage).toBe(activity.stage);
+            expect(m._stage).toBe(activity.turtleContainer);
+            expect(m._canvas).toBe(activity.canvas);
+            expect(m._hideMenu).toBe(activity.hideAuxMenu);
+            expect(m._hideGrids).toBe(activity.hideGrids);
+            expect(m._doGrid).toBe(activity._doCartesianPolar);
+        });
+
+        it("attaches its border container to the stage", () => {
+            const turtleContainer = { addChild: jest.fn(), removeChild: jest.fn() };
+            const activity = {
+                stage: { addChild: jest.fn(), removeChild: jest.fn() },
+                turtleContainer,
+                canvas: {},
+                hideAuxMenu: jest.fn(),
+                hideGrids: jest.fn(),
+                _doCartesianPolar: jest.fn(),
+                refreshCanvas: jest.fn()
+            };
+
+            const m = new Turtles.TurtlesModel(activity);
+
+            expect(turtleContainer.addChild).toHaveBeenCalledWith(m._borderContainer);
+        });
+
+        it("starts with an empty turtle list", () => {
+            expect(model._turtleList).toEqual([]);
+            expect(model.getTurtleCount()).toBe(0);
+        });
+    });
+
+    describe("initializeTurtleList", () => {
+        it("replaces the list with the one it is given", () => {
+            const a = makeTurtle();
+            const b = makeTurtle();
+            model.pushTurtle(makeTurtle());
+
+            model.initializeTurtleList([a, b]);
+
+            expect(model._turtleList).toEqual([a, b]);
+            expect(model.getTurtleCount()).toBe(2);
+        });
+
+        it("accepts an empty list, which is how the workspace is cleared", () => {
+            model.pushTurtle(makeTurtle());
+
+            model.initializeTurtleList([]);
+
+            expect(model._turtleList).toEqual([]);
+            expect(model.getTurtleCount()).toBe(0);
+        });
+    });
+
+    describe("pushTurtle", () => {
+        it("appends the turtle and the count follows", () => {
+            const first = makeTurtle();
+            const second = makeTurtle();
+
+            model.pushTurtle(first);
+            model.pushTurtle(second);
+
+            expect(model._turtleList).toEqual([first, second]);
+            expect(model.getTurtleCount()).toBe(2);
+        });
+
+        it("ignores a turtle that is already in the list", () => {
+            const turtle = makeTurtle();
+
+            model.pushTurtle(turtle);
+            model.pushTurtle(turtle);
+
+            expect(model._turtleList).toEqual([turtle]);
+            expect(model.getTurtleCount()).toBe(1);
+        });
+
+        it("keeps two turtles that merely look alike", () => {
+            // Membership is by identity, so equal-looking turtles are distinct.
+            model.pushTurtle(makeTurtle());
+            model.pushTurtle(makeTurtle());
+
+            expect(model.getTurtleCount()).toBe(2);
+        });
+    });
+
+    describe("getTurtle", () => {
+        it("returns the turtle at that position", () => {
+            const first = makeTurtle();
+            const second = makeTurtle();
+            model.initializeTurtleList([first, second]);
+
+            expect(model.getTurtle(0)).toBe(first);
+            expect(model.getTurtle(1)).toBe(second);
+        });
+
+        it.each([
+            ["an index past the end", 5],
+            ["a negative index", -1],
+            ["an index into an empty list", 0]
+        ])("throws for %s", (_label, index) => {
+            if (index !== 0) model.initializeTurtleList([makeTurtle()]);
+
+            expect(() => model.getTurtle(index)).toThrow(`Turtle ${index} not found`);
+        });
+
+        it("returns turtle 0 rather than treating the index as unset", () => {
+            const only = makeTurtle();
+            model.initializeTurtleList([only]);
+
+            expect(model.getTurtle(0)).toBe(only);
+        });
+    });
+
+    describe("getIndexOfTurtle", () => {
+        it("reports the position of a turtle in the list", () => {
+            const first = makeTurtle();
+            const second = makeTurtle();
+            const third = makeTurtle();
+            model.initializeTurtleList([first, second, third]);
+
+            expect(model.getIndexOfTurtle(first)).toBe(0);
+            expect(model.getIndexOfTurtle(second)).toBe(1);
+            expect(model.getIndexOfTurtle(third)).toBe(2);
+        });
+
+        it("reports minus one for a turtle that is not in the list", () => {
+            model.initializeTurtleList([makeTurtle()]);
+
+            expect(model.getIndexOfTurtle(makeTurtle())).toBe(-1);
+        });
+
+        it("reports minus one when the list is empty", () => {
+            expect(model.getIndexOfTurtle(makeTurtle())).toBe(-1);
+        });
+    });
+
+    describe("ithTurtle", () => {
+        it("resolves to the same turtle getTurtle returns", () => {
+            const first = makeTurtle();
+            const second = makeTurtle();
+            model.initializeTurtleList([first, second]);
+
+            expect(model.ithTurtle(0)).toBe(first);
+            expect(model.ithTurtle(1)).toBe(second);
+        });
+
+        it("throws on a missing index, the same as getTurtle", () => {
+            expect(() => model.ithTurtle(3)).toThrow("Turtle 3 not found");
+        });
+    });
+
+    describe("running", () => {
+        it("is false when no turtle is running", () => {
+            model.initializeTurtleList([makeTurtle(), makeTurtle()]);
+
+            expect(model.running()).toBe(false);
+        });
+
+        it("is false for an empty list", () => {
+            expect(model.running()).toBe(false);
+        });
+
+        it.each([
+            ["the first", 0],
+            ["the last", 2]
+        ])("is true when %s turtle is running", (_label, index) => {
+            const turtles = [makeTurtle(), makeTurtle(), makeTurtle()];
+            turtles[index].running = true;
+            model.initializeTurtleList(turtles);
+
+            expect(model.running()).toBe(true);
+        });
+    });
+
+    describe("companionTurtle", () => {
+        it("finds the turtle that claims the given one as its companion", () => {
+            const turtles = [
+                makeTurtle({ companionTurtle: null }),
+                makeTurtle({ companionTurtle: 0 }),
+                makeTurtle({ companionTurtle: null })
+            ];
+            model.initializeTurtleList(turtles);
+
+            expect(model.companionTurtle(0)).toBe(1);
+        });
+
+        it("returns the index unchanged when no turtle claims it", () => {
+            model.initializeTurtleList([makeTurtle(), makeTurtle()]);
+
+            expect(model.companionTurtle(1)).toBe(1);
+        });
+
+        it("returns the index unchanged for an empty list", () => {
+            expect(model.companionTurtle(4)).toBe(4);
+        });
+
+        it("matches a companion index of 0, rather than skipping it as unset", () => {
+            // 0 is a real turtle index, so a truth test here would miss it.
+            model.initializeTurtleList([makeTurtle({ companionTurtle: 0 })]);
+
+            expect(model.companionTurtle(0)).toBe(0);
+        });
+
+        it("returns the first claimer when more than one turtle claims it", () => {
+            model.initializeTurtleList([
+                makeTurtle({ companionTurtle: null }),
+                makeTurtle({ companionTurtle: 0 }),
+                makeTurtle({ companionTurtle: 0 })
+            ]);
+
+            expect(model.companionTurtle(0)).toBe(1);
+        });
+    });
+});
+
+// ---------------------------------------------------------------------------
+// TurtlesView: the stage view
+//
+// Built directly, for the same reason as the model.
+// ---------------------------------------------------------------------------
+
+describe("Turtles.TurtlesView", () => {
+    let savedPlatformColor;
+    let addEventListenerSpy;
+
+    beforeEach(() => {
+        savedPlatformColor = global.platformColor;
+        global.platformColor = { background: "#f5f5f5" };
+        addEventListenerSpy = jest.spyOn(window, "addEventListener");
+    });
+
+    afterEach(() => {
+        // The constructor attaches a resize listener, and restoring the spy
+        // does not detach it. Left behind, every view built here would keep
+        // receiving resize events for the rest of the run, so each one is
+        // removed while the spy still has the handlers on record.
+        for (const [type, handler] of addEventListenerSpy.mock.calls) {
+            if (type === "resize") {
+                window.removeEventListener("resize", handler);
+            }
+        }
+
+        global.platformColor = savedPlatformColor;
+        addEventListenerSpy.mockRestore();
+    });
+
+    describe("constructor", () => {
+        it("starts at full scale on a stage of the documented size", () => {
+            const view = new Turtles.TurtlesView();
+
+            expect(view._scale).toBe(1.0);
+            expect(view._w).toBe(1200);
+            expect(view._h).toBe(900);
+        });
+
+        it("starts expanded, unlocked, with nothing queued", () => {
+            const view = new Turtles.TurtlesView();
+
+            expect(view._isShrunk).toBe(false);
+            expect(view._locked).toBe(false);
+            expect(view._queue).toEqual([]);
+        });
+
+        it("starts with no boundaries, buttons or grid attached", () => {
+            const view = new Turtles.TurtlesView();
+
+            expect(view._expandedBoundary).toBeNull();
+            expect(view._collapsedBoundary).toBeNull();
+            expect(view._expandButton).toBeNull();
+            expect(view._collapseButton).toBeNull();
+            expect(view._clearButton).toBeNull();
+            expect(view.gridButton).toBeNull();
+            expect(view.currentGrid).toBeNull();
+            expect(view._resizeTimer).toBeNull();
+        });
+
+        it("takes its background from the platform colour", () => {
+            const view = new Turtles.TurtlesView();
+
+            expect(view._backgroundColor).toBe("#f5f5f5");
+        });
+
+        it("listens for resize so the stage can follow the window", () => {
+            new Turtles.TurtlesView();
+
+            expect(addEventListenerSpy).toHaveBeenCalledWith("resize", expect.any(Function));
+        });
+    });
+
+    describe("isShrunk", () => {
+        it("reports the collapsed state rather than a fresh value", () => {
+            const view = new Turtles.TurtlesView();
+
+            expect(view.isShrunk()).toBe(false);
+
+            view._isShrunk = true;
+
+            expect(view.isShrunk()).toBe(true);
+        });
+    });
+
+    describe("setGridLabel", () => {
+        it("stores the label it is given", () => {
+            const view = new Turtles.TurtlesView();
+
+            view.setGridLabel("Cartesian");
+
+            expect(view._gridLabel).toBe("Cartesian");
+        });
+
+        it("accepts an empty label, which clears the button text", () => {
+            const view = new Turtles.TurtlesView();
+            view.setGridLabel("Polar");
+
+            view.setGridLabel("");
+
+            expect(view._gridLabel).toBe("");
+        });
+    });
+
+    describe("deltaY", () => {
+        it("shifts the stage down by the offset", () => {
+            const view = new Turtles.TurtlesView();
+            view.stage = { y: 100 };
+
+            view.deltaY(25);
+
+            expect(view.stage.y).toBe(125);
+        });
+
+        it("shifts the stage up for a negative offset", () => {
+            const view = new Turtles.TurtlesView();
+            view.stage = { y: 100 };
+
+            view.deltaY(-40);
+
+            expect(view.stage.y).toBe(60);
+        });
+
+        it("accumulates across calls rather than replacing the offset", () => {
+            const view = new Turtles.TurtlesView();
+            view.stage = { y: 0 };
+
+            view.deltaY(10);
+            view.deltaY(10);
+            view.deltaY(5);
+
+            expect(view.stage.y).toBe(25);
+        });
+
+        it("leaves the stage where it is for an offset of zero", () => {
+            const view = new Turtles.TurtlesView();
+            view.stage = { y: 70 };
+
+            view.deltaY(0);
+
+            expect(view.stage.y).toBe(70);
+        });
+    });
+});
+
+// ---------------------------------------------------------------------------
+// The Turtles accessors
+//
+// Callers reach the stage, the canvas and the grid callbacks only through
+// these, so a setter wired to the wrong field would drop writes silently.
+// ---------------------------------------------------------------------------
+
+describe("Turtles accessors", () => {
+    let turtles;
+    let borderContainer;
+
+    beforeEach(() => {
+        const activity = {
+            stage: { addChild: jest.fn(), removeChild: jest.fn() },
+            refreshCanvas: jest.fn(),
+            turtleContainer: new createjs.Container(),
+            hideAuxMenu: jest.fn(),
+            hideGrids: jest.fn(),
+            _doCartesianPolar: jest.fn()
+        };
+        turtles = new Turtles(activity);
+        turtles.activity = activity;
+
+        // importMembers is mocked here, so the fields the model constructor
+        // would have set are supplied the same way it supplies them.
+        borderContainer = { id: "border" };
+        turtles._borderContainer = borderContainer;
+        turtles._turtleList = [];
+        turtles._scale = 1;
+    });
+
+    describe("stage", () => {
+        it("stores the stage and reads the same one back", () => {
+            const stage = { addChild: jest.fn() };
+
+            turtles.stage = stage;
+
+            expect(turtles._stage).toBe(stage);
+            expect(turtles.stage).toBe(stage);
+        });
+
+        it("attaches the border container to the incoming stage", () => {
+            const stage = { addChild: jest.fn() };
+
+            turtles.stage = stage;
+
+            expect(stage.addChild).toHaveBeenCalledWith(borderContainer);
+        });
+
+        it("attaches the border to the replacement when the stage changes", () => {
+            const first = { addChild: jest.fn() };
+            const second = { addChild: jest.fn() };
+
+            turtles.stage = first;
+            turtles.stage = second;
+
+            expect(second.addChild).toHaveBeenCalledWith(borderContainer);
+            expect(turtles.stage).toBe(second);
+        });
+    });
+
+    describe("canvas", () => {
+        it("stores the canvas and reads the same one back", () => {
+            const canvas = { width: 800, height: 600 };
+
+            turtles.canvas = canvas;
+
+            expect(turtles._canvas).toBe(canvas);
+            expect(turtles.canvas).toBe(canvas);
+        });
+
+        it("accepts null, which is how the canvas is detached", () => {
+            turtles.canvas = { width: 1 };
+
+            turtles.canvas = null;
+
+            expect(turtles.canvas).toBeNull();
+        });
+    });
+
+    describe("the grid and clear callbacks", () => {
+        it.each([
+            ["doClear", "_doClear"],
+            ["hideGrids", "_hideGrids"],
+            ["doGrid", "_doGrid"]
+        ])("%s stores the function in %s and reads it back", (accessor, field) => {
+            const fn = jest.fn();
+
+            turtles[accessor] = fn;
+
+            expect(turtles[field]).toBe(fn);
+            expect(turtles[accessor]).toBe(fn);
+        });
+
+        it.each([["doClear"], ["hideGrids"], ["doGrid"]])(
+            "%s hands back a function that is still callable",
+            accessor => {
+                const fn = jest.fn(() => "ran");
+
+                turtles[accessor] = fn;
+                const result = turtles[accessor]("arg");
+
+                expect(fn).toHaveBeenCalledWith("arg");
+                expect(result).toBe("ran");
+            }
+        );
+
+        it("keeps the three callbacks separate from one another", () => {
+            const clear = jest.fn();
+            const hide = jest.fn();
+            const grid = jest.fn();
+
+            turtles.doClear = clear;
+            turtles.hideGrids = hide;
+            turtles.doGrid = grid;
+
+            expect(turtles.doClear).toBe(clear);
+            expect(turtles.hideGrids).toBe(hide);
+            expect(turtles.doGrid).toBe(grid);
+        });
+    });
+
+    describe("turtleList and scale", () => {
+        it("turtleList reports the list the model holds", () => {
+            const list = [{ id: "a" }, { id: "b" }];
+            turtles._turtleList = list;
+
+            expect(turtles.turtleList).toBe(list);
+        });
+
+        it("turtleList reports an empty list rather than undefined", () => {
+            turtles._turtleList = [];
+
+            expect(turtles.turtleList).toEqual([]);
+        });
+
+        it("scale reports the current scale factor", () => {
+            turtles._scale = 0.75;
+
+            expect(turtles.scale).toBe(0.75);
+        });
+
+        it("scale reports a scale of 0 rather than falling back to a default", () => {
+            turtles._scale = 0;
+
+            expect(turtles.scale).toBe(0);
+        });
+    });
+});
+
+// ---------------------------------------------------------------------------
+// TurtlesModel: attaching a turtle to the stage
+//
+// These three run once per turtle as it is created. Between them they decide
+// what the turtle owns on the stage, where it starts, how big its click target
+// is, and which of the saved properties are restored.
+// ---------------------------------------------------------------------------
+
+describe("TurtlesModel stage and graphic properties", () => {
+    let model;
+    let stage;
+    let savedCreatejs;
+    let rafCallbacks;
+    let savedRaf;
+
+    beforeEach(() => {
+        savedCreatejs = global.createjs;
+        // The shared mock at the top of this file has no Shape, and its
+        // graphics calls do not chain, which createHitArea relies on.
+        global.createjs = {
+            Container: jest.fn().mockImplementation(() => ({
+                id: "container",
+                x: 0,
+                y: 0,
+                addChild: jest.fn(),
+                removeAllChildren: jest.fn(),
+                on: jest.fn(),
+                removeAllEventListeners: jest.fn()
+            })),
+            Bitmap: jest.fn().mockImplementation(() => ({ id: "bitmap" })),
+            Shape: jest.fn().mockImplementation(() => ({
+                x: 0,
+                y: 0,
+                graphics: {
+                    beginFill: jest.fn(function () {
+                        return this;
+                    }),
+                    drawEllipse: jest.fn(function () {
+                        return this;
+                    })
+                }
+            }))
+        };
+
+        // requestAnimationFrame never fires on its own here, so the callbacks
+        // are recorded and run by hand.
+        rafCallbacks = [];
+        savedRaf = global.requestAnimationFrame;
+        global.requestAnimationFrame = jest.fn(cb => {
+            rafCallbacks.push(cb);
+            return rafCallbacks.length;
+        });
+
+        stage = { addChild: jest.fn(), removeChild: jest.fn() };
+        model = new Turtles.TurtlesModel({
+            stage: { addChild: jest.fn(), removeChild: jest.fn() },
+            turtleContainer: stage,
+            canvas: { width: 1200, height: 900 },
+            hideAuxMenu: jest.fn(),
+            hideGrids: jest.fn(),
+            _doCartesianPolar: jest.fn(),
+            refreshCanvas: jest.fn()
+        });
+        stage.addChild.mockClear();
+
+        // Supplied the way importMembers supplies them on a real Turtles.
+        model.turtleX2screenX = jest.fn(x => x + 600);
+        model.turtleY2screenY = jest.fn(y => 450 - y);
+    });
+
+    afterEach(() => {
+        global.createjs = savedCreatejs;
+        global.requestAnimationFrame = savedRaf;
+    });
+
+    /**
+     * Builds a turtle shaped the way these methods expect to receive one.
+     * @returns {Object} A turtle stand-in with a painter.
+     */
+    const makeTurtle = () => ({
+        x: 0,
+        y: 0,
+        rename: jest.fn(),
+        painter: {
+            doSetHeading: jest.fn(),
+            doSetPensize: jest.fn(),
+            doSetChroma: jest.fn(),
+            doSetValue: jest.fn(),
+            doSetColor: jest.fn()
+        }
+    });
+
+    describe("addTurtleStageProps", () => {
+        it("gives the turtle its own image container, penstrokes and body", () => {
+            const turtle = makeTurtle();
+
+            model.addTurtleStageProps(turtle, false, {});
+
+            expect(turtle.imageContainer).toBeDefined();
+            expect(turtle.penstrokes).toBeDefined();
+            expect(turtle.container).toBeDefined();
+        });
+
+        it("attaches all three to the stage, so removeTurtle has three to detach", () => {
+            const turtle = makeTurtle();
+
+            model.addTurtleStageProps(turtle, false, {});
+
+            expect(stage.addChild).toHaveBeenCalledWith(turtle.imageContainer);
+            expect(stage.addChild).toHaveBeenCalledWith(turtle.penstrokes);
+            expect(stage.addChild).toHaveBeenCalledWith(turtle.container);
+            expect(stage.addChild).toHaveBeenCalledTimes(3);
+        });
+
+        it("places the body at the screen position for the turtle coordinates", () => {
+            const turtle = makeTurtle();
+
+            model.addTurtleStageProps(turtle, true, { xcor: 40, ycor: 30 });
+
+            expect(turtle.x).toBe(40);
+            expect(turtle.y).toBe(30);
+            expect(turtle.container.x).toBe(640);
+            expect(turtle.container.y).toBe(420);
+        });
+
+        it("leaves the coordinates alone when no block info is available", () => {
+            const turtle = makeTurtle();
+            turtle.x = 11;
+            turtle.y = 22;
+
+            model.addTurtleStageProps(turtle, false, { xcor: 40, ycor: 30 });
+
+            expect(turtle.x).toBe(11);
+            expect(turtle.y).toBe(22);
+        });
+
+        it.each([
+            ["only xcor", { xcor: 40 }, 40, 22],
+            ["only ycor", { ycor: 30 }, 11, 30],
+            ["neither", {}, 11, 22]
+        ])("restores %s from the saved info", (_label, infoDict, expectedX, expectedY) => {
+            const turtle = makeTurtle();
+            turtle.x = 11;
+            turtle.y = 22;
+
+            model.addTurtleStageProps(turtle, true, infoDict);
+
+            expect(turtle.x).toBe(expectedX);
+            expect(turtle.y).toBe(expectedY);
+        });
+
+        it("restores a coordinate of 0 rather than treating it as absent", () => {
+            const turtle = makeTurtle();
+            turtle.x = 11;
+            turtle.y = 22;
+
+            model.addTurtleStageProps(turtle, true, { xcor: 0, ycor: 0 });
+
+            expect(turtle.x).toBe(0);
+            expect(turtle.y).toBe(0);
+        });
+    });
+
+    describe("createHitArea", () => {
+        it("gives the turtle body a hit area", () => {
+            const turtle = makeTurtle();
+            turtle.container = { hitArea: null };
+
+            model.createHitArea(turtle);
+
+            expect(turtle.container.hitArea).not.toBeNull();
+            expect(turtle.container.hitArea.x).toBe(0);
+            expect(turtle.container.hitArea.y).toBe(0);
+        });
+
+        it("draws the sensor as the documented ellipse", () => {
+            const turtle = makeTurtle();
+            turtle.container = { hitArea: null };
+
+            model.createHitArea(turtle);
+
+            const { graphics } = turtle.container.hitArea;
+            expect(graphics.beginFill).toHaveBeenCalledWith("#FFF");
+            expect(graphics.drawEllipse).toHaveBeenCalledWith(-27, -27, 55, 55);
+        });
+
+        it("replaces a hit area that is already there", () => {
+            const turtle = makeTurtle();
+            const previous = { id: "old" };
+            turtle.container = { hitArea: previous };
+
+            model.createHitArea(turtle);
+
+            expect(turtle.container.hitArea).not.toBe(previous);
+        });
+    });
+
+    describe("addTurtleGraphicProps", () => {
+        it("defers the work to the next frame rather than doing it inline", () => {
+            const turtle = makeTurtle();
+
+            model.addTurtleGraphicProps(turtle, true, { heading: 90 });
+
+            expect(global.requestAnimationFrame).toHaveBeenCalledTimes(1);
+            expect(turtle.painter.doSetHeading).not.toHaveBeenCalled();
+        });
+
+        it("restores every saved property once the frame runs", () => {
+            const turtle = makeTurtle();
+
+            model.addTurtleGraphicProps(turtle, true, {
+                heading: 90,
+                pensize: 8,
+                grey: 70,
+                shade: 40,
+                color: 25,
+                name: "Mr. Mouse"
+            });
+            rafCallbacks[0]();
+
+            expect(turtle.painter.doSetHeading).toHaveBeenCalledWith(90);
+            expect(turtle.painter.doSetPensize).toHaveBeenCalledWith(8);
+            expect(turtle.painter.doSetChroma).toHaveBeenCalledWith(70);
+            expect(turtle.painter.doSetValue).toHaveBeenCalledWith(40);
+            expect(turtle.painter.doSetColor).toHaveBeenCalledWith(25);
+            expect(turtle.rename).toHaveBeenCalledWith("Mr. Mouse");
+        });
+
+        it("restores only the properties that were saved", () => {
+            const turtle = makeTurtle();
+
+            model.addTurtleGraphicProps(turtle, true, { heading: 90, color: 25 });
+            rafCallbacks[0]();
+
+            expect(turtle.painter.doSetHeading).toHaveBeenCalledWith(90);
+            expect(turtle.painter.doSetColor).toHaveBeenCalledWith(25);
+            expect(turtle.painter.doSetPensize).not.toHaveBeenCalled();
+            expect(turtle.painter.doSetChroma).not.toHaveBeenCalled();
+            expect(turtle.painter.doSetValue).not.toHaveBeenCalled();
+            expect(turtle.rename).not.toHaveBeenCalled();
+        });
+
+        it("restores a value of 0 rather than skipping it as unset", () => {
+            const turtle = makeTurtle();
+
+            model.addTurtleGraphicProps(turtle, true, { heading: 0, shade: 0, color: 0 });
+            rafCallbacks[0]();
+
+            expect(turtle.painter.doSetHeading).toHaveBeenCalledWith(0);
+            expect(turtle.painter.doSetValue).toHaveBeenCalledWith(0);
+            expect(turtle.painter.doSetColor).toHaveBeenCalledWith(0);
+        });
+
+        it("restores nothing when no block info is available", () => {
+            const turtle = makeTurtle();
+
+            model.addTurtleGraphicProps(turtle, false, {
+                heading: 90,
+                pensize: 8,
+                name: "Mr. Mouse"
+            });
+            rafCallbacks[0]();
+
+            expect(turtle.painter.doSetHeading).not.toHaveBeenCalled();
+            expect(turtle.painter.doSetPensize).not.toHaveBeenCalled();
+            expect(turtle.rename).not.toHaveBeenCalled();
+        });
+    });
+});
