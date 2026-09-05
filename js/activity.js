@@ -2243,23 +2243,6 @@ class Activity {
          * @param {string|HTMLElement|DocumentFragment} msg - The message to display.
          * @param {number} [duration=60000] - Duration in milliseconds before message disappears.
          */
-        /**
-         * Ensures a visually hidden aria-live region exists for screen reader announcements.
-         * @returns {HTMLElement} The live region element.
-         */
-        const __ensureA11yLiveRegion = () => {
-            let region = document.getElementById("mbA11yLiveRegion");
-            if (region) return region;
-            region = document.createElement("div");
-            region.id = "mbA11yLiveRegion";
-            region.setAttribute("role", "status");
-            region.setAttribute("aria-live", "polite");
-            region.setAttribute("aria-atomic", "true");
-            region.style.cssText =
-                "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
-            document.body.appendChild(region);
-            return region;
-        };
         this.textMsg = (msg, duration = AlertController.MSG_TIMEOUT) => {
             if (this.msgText === null) {
                 // The container may not be ready yet, so do nothing.
@@ -2269,9 +2252,10 @@ class Activity {
             const showMsg = () => {
                 this.alertRenderer.showTextMsg(msg);
             };
-            // Announce to screen readers via aria-live region
+            // textMsg() also accepts an HTMLElement or a DocumentFragment, and
+            // announcing one of those would read out "[object HTMLDivElement]".
             if (msg && typeof msg === "string") {
-                __ensureA11yLiveRegion().textContent = msg;
+                announceToScreenReader(msg);
             }
 
             const hideMsg = () => {
@@ -2298,9 +2282,10 @@ class Activity {
                 return;
             }
 
-            // Announce errors to screen readers via aria-live region
+            // textMsg() also accepts an HTMLElement or a DocumentFragment, and
+            // announcing one of those would read out "[object HTMLDivElement]".
             if (msg && typeof msg === "string") {
-                __ensureA11yLiveRegion().textContent = msg;
+                announceToScreenReader(msg);
             }
 
             const showMsg = () => {
