@@ -2316,7 +2316,7 @@ table {
 }
 
 /* ======================================================
-   FIX: Center the Welcome Modal on Mobile
+   MOBILE RESPONSIVE FIXES
    ====================================================== */
 @media screen and (max-width: 600px) {
     #helpDiv {
