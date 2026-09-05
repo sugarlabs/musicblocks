@@ -103,6 +103,11 @@ describe("Tuner Widget", () => {
             expect(typeof TunerUtils.frequencyToPitch).toBe("function");
         });
 
+        test("TunerUtils has frequencyToNote method", () => {
+            expect(TunerUtils.frequencyToNote).toBeDefined();
+            expect(typeof TunerUtils.frequencyToNote).toBe("function");
+        });
+
         test("TunerUtils has calculatePlaybackRate method", () => {
             expect(TunerUtils.calculatePlaybackRate).toBeDefined();
             expect(typeof TunerUtils.calculatePlaybackRate).toBe("function");
@@ -231,6 +236,17 @@ describe("Tuner Widget", () => {
 
                 expect(result[2]).toBe(freq);
             });
+        });
+    });
+
+    describe("TunerUtils.frequencyToNote", () => {
+        test.each([
+            [440, { note: "A", cents: 0 }],
+            [438, { note: "A", cents: -8 }],
+            [442, { note: "A", cents: 8 }],
+            [0, { note: "---", cents: 0 }]
+        ])("returns the note and cents for %d Hz", (frequency, expected) => {
+            expect(TunerUtils.frequencyToNote(frequency)).toEqual(expected);
         });
     });
 
