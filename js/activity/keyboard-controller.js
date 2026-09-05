@@ -68,6 +68,27 @@ class KeyboardController {
     __keyPressed(event) {
         const activity = this.activity;
 
+        // Alt+S (Option+S) must be able to stop a running program regardless
+        // of any other UI state. It is checked here, before every other
+        // early-return guard in this function (widget-open checks,
+        // keyboardEnableFlag, the hasKeyboard-class check, and critically
+        // the guard further down that returns early whenever
+        // activity.printText has the "show" class). That guard matters
+        // because activity.textMsg() — called by Alt+R when starting
+        // playback — keeps the printText message visible for a full 60
+        // seconds (AlertController.MSG_TIMEOUT), so pressing Alt+S anytime
+        // in that window was previously swallowed before ever reaching the
+        // Alt+S handling further below, and the browser handled the raw
+        // keydown instead of MB. preventDefault() here ensures MB — not
+        // the browser — owns this keystroke.
+        if (event.altKey && event.keyCode === 83 && activity.turtles.running()) {
+            event.preventDefault();
+            activity.textMsg("Alt-S " + _("Stop"));
+            activity.logo.doStopTurtles();
+            activity.currentKeyCode = event.keyCode;
+            return;
+        }
+
         // First, check if the pitch slider is open
         if (this._isWidgetOpen("slider")) {
             // If the event is an arrow key, let the PitchSlider handle it
@@ -192,6 +213,7 @@ class KeyboardController {
                 break;
             }
         }
+
         if (
             (event.altKey && !disableKeys) ||
             event.keyCode === 13 ||
