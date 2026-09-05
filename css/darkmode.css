@@ -94,31 +94,35 @@ body.highcontrast {
     color: var(--fg) !important;
 }
 
-/* Trash view colors for dark mode consuming design system tokens */
-.dark .trash-view {
+/* Trash view colors for dark and high-contrast modes consuming design system tokens */
+.dark .trash-view,
+.highcontrast .trash-view {
     background-color: var(--color-bg-secondary) !important;
     color: var(--color-text-primary) !important;
     border: 2px solid var(--color-border-primary) !important;
 }
 
-.dark .button-container {
+.dark .button-container,
+.highcontrast .button-container {
     background-color: var(--color-bg-tertiary) !important;
     border-bottom: 1px solid var(--color-border-primary) !important;
 }
 
-.dark .trash-item.hover {
+.dark .trash-item.hover,
+.highcontrast .trash-item.hover {
     background-color: var(--color-brand-primary-hover) !important;
     color: var(--color-text-inverse) !important;
 }
 
-.dark .trash-item.selected {
+.dark .trash-item.selected,
+.highcontrast .trash-item.selected {
     background-color: var(--color-brand-primary) !important;
     color: var(--color-text-inverse) !important;
 }
 
-
-/* Improve block icon visibility in dark mode */
-.dark .trash-item-icon {
+/* Improve block icon visibility in dark and high-contrast modes */
+.dark .trash-item-icon,
+.highcontrast .trash-item-icon {
     background-color: rgba(255, 255, 255, 0.855);
     border-radius: 3px;
     padding: 2px;
