@@ -652,6 +652,54 @@ describe("setupIntervalsActions", () => {
         expect(turtle.singer.intervals).toEqual([-2]);
     });
 
+    test("setScalarInterval rejects a value far past the bound instead of pushing it unbounded", () => {
+        Singer.IntervalsActions.setScalarInterval(999999999, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval rejects a large negative value past the bound", () => {
+        Singer.IntervalsActions.setScalarInterval(-999999999, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval rejects a value one past the positive bound", () => {
+        Singer.IntervalsActions.setScalarInterval(70, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval accepts a value exactly at the positive bound", () => {
+        Singer.IntervalsActions.setScalarInterval(69, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.intervals).toEqual([69]);
+    });
+
+    test("setScalarInterval rejects a value one past the negative bound", () => {
+        Singer.IntervalsActions.setScalarInterval(-64, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval accepts a value exactly at the negative bound", () => {
+        Singer.IntervalsActions.setScalarInterval(-63, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.intervals).toEqual([-63]);
+    });
+
     test("setScalarInterval dispatches to setDispatchBlock when blk is registered", () => {
         activity.blocks.blockList.blk = {};
         Singer.IntervalsActions.setScalarInterval(2, 0, "blk");
