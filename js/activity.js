@@ -350,6 +350,11 @@ class Activity {
         // Interval ID for the loading animation (to allow cleanup)
         this.loadAnimationIntervalId = null;
 
+        // Own the deferred trash signal so a newer trash/load operation can
+        // cancel an obsolete signal.
+        this._trashSignalTimer = null;
+        this._trashSignalGeneration = 0;
+
         // Initialize GIF animator
         if (typeof GIFAnimator !== "undefined") {
             this.gifAnimator = new GIFAnimator();
@@ -1930,6 +1935,12 @@ class Activity {
          * @param {boolean} closeAllWidgets  {if true close all open widgets}
          */
         this.sendAllToTrash = (addStartBlock, doNotSave, closeAllWidgets = true) => {
+            if (this._trashSignalTimer !== null) {
+                clearTimeout(this._trashSignalTimer);
+                this._trashSignalTimer = null;
+            }
+            const trashSignalGeneration = ++this._trashSignalGeneration;
+
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
@@ -2026,7 +2037,11 @@ class Activity {
             // Wait for palette to clear (#891)
             // We really need to signal when each palette item is deleted
             const that = this;
-            setTimeout(() => {
+            this._trashSignalTimer = setTimeout(() => {
+                if (trashSignalGeneration !== that._trashSignalGeneration) {
+                    return;
+                }
+                that._trashSignalTimer = null;
                 that.stage.dispatchEvent("trashsignal");
             }, 100 * actionBlockCounter); // 1000
 
