@@ -446,14 +446,44 @@ function setupRhythmBlocks(activity) {
          * @returns {Array} An array containing the queue block information.
          */
         flow(args, logo, turtle, blk) {
+            // Guard: nothing to do if the clamp body is empty.
+            // Matches the same guard used in MultiplyBeatFactorBlock, RhythmicDot2Block, etc.
+            if (args[1] === undefined) return;
+
+            // Validate type: skip factor must be a number.
+            if (args[0] === null || typeof args[0] !== "number") {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
+            const rawArg = args[0];
+
+            // Validate sign: negative or zero skip factors invert or disable the skip logic,
+            // corrupting singer.skipFactor across all notes for this turtle.
+            if (rawArg <= 0) {
+                activity.errorMsg(_("Skip factor must be a positive number greater than 0."), blk);
+                return;
+            }
+
+            // Enforce integer: fractional skip factors break the integer-modulo check used
+            // in Singer.processNote to decide which notes to skip. Floor and warn the user.
+            const arg = Math.floor(rawArg);
+            if (arg !== rawArg) {
+                activity.errorMsg(
+                    _("Skip factor must be a whole number. Rounded down to %s.").replace(/%s/, arg),
+                    blk
+                );
+            }
+
             const tur = activity.turtles.ithTurtle(turtle);
-            const arg = args[0] === null ? 0 : args[0];
             tur.singer.skipFactor += arg;
 
             const listenerName = "_skip_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = event => {
+            // Use the validated, floored `arg` so the listener undoes exactly
+            // what was added above — no residual drift in skipFactor.
+            const __listener = () => {
                 tur.singer.skipFactor -= arg;
             };
 
