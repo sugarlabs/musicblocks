@@ -432,6 +432,9 @@ function setupProgramBlocks(activity) {
                 } else {
                     try {
                         const d = JSON.parse(activity.blocks.blockList[c].value[1]);
+                        if (d === null || typeof d !== "object" || Array.isArray(d)) {
+                            throw new Error("is not dictionary");
+                        }
                         // Is the dictionary the same as a turtle name?
                         const target = getTargetTurtle(activity.turtles, a);
                         if (target !== null) {
@@ -440,8 +443,8 @@ function setupProgramBlocks(activity) {
                             for (let i = 0; i < k.length; i++) {
                                 Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                             }
-                        } else if (!(a in logo.turtleDicts[turtle])) {
-                            logo.turtleDicts[turtle][a] = {};
+                        } else {
+                            logo.turtleDicts[turtle][a] = d;
                         }
                     } catch (e) {
                         activity.errorMsg(
@@ -535,6 +538,9 @@ function setupProgramBlocks(activity) {
             if (c !== null) {
                 try {
                     const d = JSON.parse(activity.blocks.blockList[c].value);
+                    if (d === null || typeof d !== "object" || Array.isArray(d)) {
+                        throw new Error("is not dictionary");
+                    }
                     // Is the dictionary the same as a turtle name?
                     const target = getTargetTurtle(activity.turtles, a);
                     if (target !== null) {
@@ -543,8 +549,8 @@ function setupProgramBlocks(activity) {
                         for (let i = 0; i < k.length; i++) {
                             Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                         }
-                    } else if (!(a in logo.turtleDicts[turtle])) {
-                        logo.turtleDicts[turtle][a] = {};
+                    } else {
+                        logo.turtleDicts[turtle][a] = d;
                     }
                 } catch (e) {
                     activity.errorMsg(
