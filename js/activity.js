@@ -475,10 +475,27 @@ class Activity {
         setupContextMenuController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
-            onDelete: () => this._deletePlugin(),
+            onDelete: name => this._deletePlugin(name),
             onFileSelected: file => this.handlePluginFileSelected(file),
             closeAuxToolbar: callback => this.toolbar.closeAuxToolbar(callback),
-            showHideAuxMenu: (activity, resize) => activity._showHideAuxMenu(resize)
+            showHideAuxMenu: (activity, resize) => activity._showHideAuxMenu(resize),
+            getLoadedPlugins: () => {
+                return this.pluginObjs && this.pluginObjs["PALETTEPLUGINS"]
+                    ? Object.keys(this.pluginObjs["PALETTEPLUGINS"])
+                    : [];
+            },
+            getActivePlugin: () => {
+                const name = this.palettes.activePalette || this.palettes.lastActivePalette;
+                if (
+                    name &&
+                    this.pluginObjs &&
+                    this.pluginObjs["PALETTEPLUGINS"] &&
+                    name in this.pluginObjs["PALETTEPLUGINS"]
+                ) {
+                    return name;
+                }
+                return null;
+            }
         });
 
         /**
@@ -1073,19 +1090,88 @@ class Activity {
         };
 
         /**
-         * Deletes a plugin palette from local storage.
+         * Deletes a plugin palette from local storage and UI.
          */
-        this._deletePlugin = () => {
-            if (this.palettes.activePalette !== null) {
-                const paletteName = this.palettes.activePalette;
-                const protoList = this.palettes.dict[paletteName].protoList;
-                const deleted = this.pluginController.deletePluginFromStorage(
-                    paletteName,
-                    protoList
-                );
-                if (deleted) {
-                    this.textMsg(paletteName + " " + _("plugins will be removed upon restart."));
+        this._deletePlugin = providedName => {
+            const paletteName =
+                providedName || this.palettes.activePalette || this.palettes.lastActivePalette;
+
+            // Ensure the active palette is actually a loaded plugin
+            const isPlugin =
+                this.pluginObjs &&
+                this.pluginObjs["PALETTEPLUGINS"] &&
+                paletteName in this.pluginObjs["PALETTEPLUGINS"];
+
+            if (!paletteName || paletteName === "start" || !isPlugin) {
+                this.textMsg(_("Please open a plugin palette before clicking delete."), 3000);
+                return;
+            }
+
+            // Pass protoList if available
+            const protoList = this.palettes.dict[paletteName]
+                ? this.palettes.dict[paletteName].protoList
+                : undefined;
+            const deleted = this.pluginController.deletePluginFromStorage(paletteName, protoList);
+
+            if (deleted) {
+                // 1. Remove from session memory
+                if (this.pluginObjs && this.pluginObjs["PALETTEPLUGINS"]) {
+                    delete this.pluginObjs["PALETTEPLUGINS"][paletteName];
                 }
+
+                // 2. Remove from palettes dictionary and hide it if it's currently showing
+                if (this.palettes && this.palettes.dict) {
+                    if (this.palettes.dict[paletteName]) {
+                        this.palettes.dict[paletteName].hide();
+                        delete this.palettes.dict[paletteName];
+                    }
+                    // 3. Remove from MULTIPALETTES to ensure it is not re-rendered
+                    if (typeof MULTIPALETTES !== "undefined" && Array.isArray(MULTIPALETTES)) {
+                        for (let i = 0; i < MULTIPALETTES.length; i++) {
+                            if (Array.isArray(MULTIPALETTES[i])) {
+                                const index = MULTIPALETTES[i].indexOf(paletteName);
+                                if (index > -1) {
+                                    MULTIPALETTES[i].splice(index, 1);
+                                }
+                            }
+                        }
+                    }
+
+                    // 4. Reset active palette to start, or first available, or null
+                    const availablePalettes = Object.keys(this.palettes.dict);
+                    this.palettes.activePalette = availablePalettes.includes("start")
+                        ? "start"
+                        : availablePalettes[0];
+                    this.palettes.lastActivePalette = null;
+                }
+
+                // 5. Force UI refresh
+                if (this.palettes) {
+                    // Update the sidebar buttons
+                    if (typeof this.palettes.makePalettes === "function") {
+                        const navIndex =
+                            this.palettes._navTypeIndex !== undefined
+                                ? this.palettes._navTypeIndex
+                                : 0;
+                        this.palettes.makePalettes(navIndex);
+                    }
+                    // Update the blocks container inside
+                    if (typeof this.palettes.updatePalettes === "function") {
+                        this.palettes.updatePalettes();
+                    }
+                    if (
+                        this.palettes.dict["start"] &&
+                        typeof this.palettes.showPalette === "function"
+                    ) {
+                        this.palettes.showPalette("start");
+                    } else if (typeof this.palettes.show === "function") {
+                        this.palettes.show();
+                    }
+                }
+
+                this.textMsg(_("Plugin deleted successfully."), 3000);
+            } else {
+                this.textMsg(_("Plugin could not be deleted or was not found."), 3000);
             }
         };
 
@@ -2364,6 +2450,7 @@ class Activity {
             const that = this;
             this.pluginController.loadBuiltInPluginFromXHR(name).then(success => {
                 if (success) {
+                    that.textMsg(_("Plugin added"));
                     // Refresh the palettes.
                     setTimeout(() => {
                         if (that.palettes.visible) {
@@ -2374,6 +2461,7 @@ class Activity {
                     ErrorHandler.warn("Could not load built-in plugin: " + name, {
                         operation: "loadPlugin"
                     });
+                    that.textMsg(_("Could not load plugin: ") + name, 5000);
                 }
             });
         };
@@ -2389,6 +2477,8 @@ class Activity {
                 setTimeout(async () => {
                     const source = file.name ? "file:" + file.name : "file:local-file";
                     await that.pluginController.loadPluginFromFileContent(reader.result, source);
+
+                    that.textMsg(_("Plugin added"));
 
                     // Refresh the palettes.
                     setTimeout(() => {
