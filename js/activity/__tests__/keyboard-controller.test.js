@@ -490,17 +490,30 @@ describe("KeyboardController", () => {
     describe("palette scrolling", () => {
         it("scrolls the active palette on the up/down arrows when no block is active", () => {
             const activity = makeActivity();
-            activity.palettes.activePalette = {
-                scrollEvent: jest.fn(),
-                scrollDiff: 40
-            };
+            // Palettes.showPalette stores the open palette's *name*; the
+            // controller has to look the object up in palettes.dict.
+            const rhythm = { scrollEvent: jest.fn(), scrollDiff: 40 };
+            activity.palettes.dict = { rhythm };
+            activity.palettes.activePalette = "rhythm";
             const controller = createController(activity);
 
             controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
-            expect(activity.palettes.activePalette.scrollEvent).toHaveBeenCalledWith(20, 1);
+            expect(rhythm.scrollEvent).toHaveBeenCalledWith(20, 1);
 
             controller.__keyPressed(makeEvent({ keyCode: KEYCODE.DOWN }));
-            expect(activity.palettes.activePalette.scrollEvent).toHaveBeenCalledWith(-20, 1);
+            expect(rhythm.scrollEvent).toHaveBeenCalledWith(-20, 1);
+        });
+
+        it("does not throw on the arrows when the stored palette name has no entry", () => {
+            const activity = makeActivity();
+            activity.palettes.dict = {};
+            activity.palettes.activePalette = "rhythm";
+            const controller = createController(activity);
+
+            expect(() => controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }))).not.toThrow();
+            expect(() =>
+                controller.__keyPressed(makeEvent({ keyCode: KEYCODE.DOWN }))
+            ).not.toThrow();
         });
 
         it("scrolls the palette menu home when the mouse is over the palette", () => {
@@ -517,6 +530,18 @@ describe("KeyboardController", () => {
     });
 
     describe("stage scrolling", () => {
+        it("scrolls the open palette back to the top on HOME", () => {
+            const activity = makeActivity();
+            activity.palettes.mouseOver = false;
+            const rhythm = { scrollEvent: jest.fn(), scrollDiff: -120 };
+            activity.palettes.dict = { rhythm };
+            activity.palettes.activePalette = "rhythm";
+            const controller = createController(activity);
+
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.HOME }));
+            expect(rhythm.scrollEvent).toHaveBeenCalledWith(120, 1);
+        });
+
         it("jumps to the bottom of the page on END", () => {
             const activity = makeActivity();
             const controller = createController(activity);

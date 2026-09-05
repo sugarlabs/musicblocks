@@ -316,6 +316,14 @@ class KeyboardController {
                     activity._doFastButton();
                 }
             } else if (!disableKeys) {
+                // palettes.activePalette holds the open palette's *name*
+                // (see Palettes.showPalette); resolve it to the object.
+                const activePalette =
+                    activity.palettes.activePalette !== null &&
+                    activity.palettes.dict &&
+                    activity.palettes.dict[activity.palettes.activePalette]
+                        ? activity.palettes.dict[activity.palettes.activePalette]
+                        : null;
                 switch (event.keyCode) {
                     case END:
                         activity.textMsg("END " + _("Jumping to the bottom of the page."));
@@ -350,8 +358,8 @@ class KeyboardController {
                                 );
                                 activity.blocks.blockMoved(activity.blocks.activeBlock);
                                 activity.blocks.adjustDocks(activity.blocks.activeBlock, true);
-                            } else if (activity.palettes.activePalette !== null) {
-                                activity.palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
+                            } else if (activePalette !== null) {
+                                activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
                             } else {
                                 activity.blocksContainer.y += 20;
                             }
@@ -371,11 +379,8 @@ class KeyboardController {
                                 );
                                 activity.blocks.blockMoved(activity.blocks.activeBlock);
                                 activity.blocks.adjustDocks(activity.blocks.activeBlock, true);
-                            } else if (activity.palettes.activePalette !== null) {
-                                activity.palettes.activePalette.scrollEvent(
-                                    -STANDARDBLOCKHEIGHT,
-                                    1
-                                );
+                            } else if (activePalette !== null) {
+                                activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
                             } else {
                                 activity.blocksContainer.y -= 20;
                             }
@@ -422,11 +427,8 @@ class KeyboardController {
                             const dy = Math.max(55 - activity.palettes.buttons["rhythm"].y, 0);
                             activity.palettes.menuScrollEvent(1, dy);
                             activity.palettes.hidePaletteIconCircles();
-                        } else if (activity.palettes.activePalette !== null) {
-                            activity.palettes.activePalette.scrollEvent(
-                                -activity.palettes.activePalette.scrollDiff,
-                                1
-                            );
+                        } else if (activePalette !== null) {
+                            activePalette.scrollEvent(-activePalette.scrollDiff, 1);
                         } else {
                             // Bring all the blocks "home".
                             activity.workspaceLayoutController._findBlocks();
