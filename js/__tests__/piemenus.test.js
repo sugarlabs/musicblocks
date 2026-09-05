@@ -74,7 +74,8 @@ global.wheelnav = jest.fn().mockImplementation(function (div) {
         hoverNavTitleMin: {},
         selectedNavTitleMax: {},
         selectedNavTitleMin: {},
-        initNavTitle: {}
+        initNavTitle: {},
+        navTitle: { attr: jest.fn() }
     });
     this.navItems = Array.from({ length: 40 }, navItemTemplate);
     this.selectedNavItemIndex = 0;
@@ -675,6 +676,59 @@ describe("piemenus behavioral tests", () => {
             expect(mockBlock.value).toBe("dorian");
             expect(mockBlock.text.text).toBe("dorian");
         });
+
+        test("selecting a group in the inner ring repaints the outer mode-name ring", () => {
+            // Use the REAL updateModeWheelItems so the repaint fix is exercised
+            // (the global is normally mocked out in this file).
+            const realUpdate = require("../utils/musicutils.js").updateModeWheelItems;
+            const prevUpdate = global.updateModeWheelItems;
+            global.updateModeWheelItems = realUpdate;
+
+            const savedModes = global.MODE_PIE_MENUS;
+            global.MODE_PIE_MENUS = {
+                5: ["minor pentatonic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+                7: ["ionian", " ", "dorian", " ", " ", " ", " ", " ", " ", "aeolian", " ", " "],
+                12: [
+                    "ionian",
+                    "dorian",
+                    "phrygian",
+                    "lydian",
+                    "mixolydian",
+                    "minor",
+                    "locrian",
+                    " ",
+                    " ",
+                    " ",
+                    " ",
+                    " "
+                ],
+                custom: [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+            };
+
+            piemenuModes(mockBlock, "major");
+
+            const groupWheel = mockBlock._modeGroupWheel;
+            const nameWheel = mockBlock._modeNameWheel;
+            expect(nameWheel).toBeDefined();
+
+            // Switch from the default "7" group to the "12" group.
+            const idx = groupWheel.navItems.findIndex(n => n.title === "12");
+            expect(idx).toBeGreaterThanOrEqual(0);
+            groupWheel.selectedNavItemIndex = idx;
+            groupWheel.navItems[idx].navigateFunction();
+
+            // The visible Raphael text (navTitle.attr) must be repainted with the
+            // "12" group's labels, not frozen on the previous group's labels.
+            const expected = global.MODE_PIE_MENUS["12"].map(getModeLabel);
+            for (let i = 0; i < nameWheel.navItems.length; i++) {
+                expect(nameWheel.navItems[i].navTitle.attr).toHaveBeenCalledWith({
+                    text: expected[i]
+                });
+            }
+
+            global.updateModeWheelItems = prevUpdate;
+            global.MODE_PIE_MENUS = savedModes;
+        });
     });
 });
 
@@ -688,7 +742,8 @@ describe("piemenuKey behavioral tests", () => {
                 findStacks: jest.fn(),
                 stackList: [],
                 _makeNewBlockWithConnections: jest.fn(),
-                adjustExpandableClampBlock: jest.fn()
+                adjustExpandableClampBlock: jest.fn(),
+                updateBlockText: jest.fn()
             },
             logo: {
                 blocks: {
@@ -699,6 +754,7 @@ describe("piemenuKey behavioral tests", () => {
             KeySignatureEnv: ["C", "major", false],
             storage: {},
             textMsg: jest.fn(),
+            refreshCanvas: jest.fn(),
             turtles: { ithTurtle: jest.fn().mockReturnValue({ singer: { instrumentNames: [] } }) }
         };
         global.event = { clientX: 100, clientY: 100 };
@@ -726,6 +782,52 @@ describe("piemenuKey behavioral tests", () => {
 
         // Verify that blocks were created
         expect(mockActivity.blocks._makeNewBlockWithConnections).toHaveBeenCalled();
+    });
+
+    test("mode ring is built from MODE_PIE_MENUS, not just the 7 church modes", () => {
+        piemenuKey(mockActivity);
+
+        const modenameWheel = global.wheelnav.mock.instances.find(w => w.id === "modenameWheel");
+        expect(modenameWheel).toBeDefined();
+
+        const titles = modenameWheel.navItems.map(item => item.title);
+        // Approach A: the inner ring must expose every scale the mode widget
+        // offers, e.g. pentatonic (from the "5" group), not only the church
+        // modes. The old hardcoded list was ["major","dorian","phrygian",
+        // "lydian","mixolydian","minor","locrian"] — it could never show
+        // "minor pentatonic" and always showed "phrygian" even when absent.
+        expect(titles).toContain("minor pentatonic");
+        expect(titles).toContain("dorian");
+        expect(titles).not.toContain("phrygian");
+        // The ring is now driven by MODE_PIE_MENUS (4 real modes in this mock),
+        // not the old fixed 7.
+        expect(titles.length).toBe(4);
+    });
+
+    test("updates an existing setkey block in place instead of creating a new one", () => {
+        // Workspace already contains a setkey2 block with key/mode children.
+        // Seed storage so piemenuKey restores the desired KeySignatureEnv.
+        mockActivity.storage.KeySignatureEnv = "G,dorian,false";
+        mockActivity.blocks.blockList = {
+            0: { name: "setkey2", connections: [null, 1, 2], trash: false },
+            1: { name: "notename", value: "C" },
+            2: { name: "modename", value: "major" },
+            length: 3
+        };
+
+        piemenuKey(mockActivity);
+
+        const exitWheel = global.wheelnav.mock.instances.find(w => w.id === "exitWheel");
+        expect(exitWheel).toBeDefined();
+
+        // __exitMenu → __generateSetKeyBlocks (must take the update branch).
+        exitWheel.navItems[0].navigateFunction();
+
+        // Existing block's key/mode children are updated…
+        expect(mockActivity.blocks.blockList[1].value).toBe("G");
+        expect(mockActivity.blocks.blockList[2].value).toBe("dorian");
+        // …and no new block is created.
+        expect(mockActivity.blocks._makeNewBlockWithConnections).not.toHaveBeenCalled();
     });
 });
 

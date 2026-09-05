@@ -2271,7 +2271,10 @@ class Singer {
                     }
 
                     const notesFrequency = isCustomTemperament(activity.logo.synth.inTemperament)
-                        ? activity.logo.synth.getCustomFrequency(notes)
+                        ? activity.logo.synth.getCustomFrequency(
+                              notes,
+                              activity.logo.synth.inTemperament
+                          )
                         : activity.logo.synth.getFrequency(
                               notes,
                               activity.logo.synth.changeInTemperament

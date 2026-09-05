@@ -633,7 +633,8 @@ class ModeWidget {
         tuningGroup.appendChild(tuningIcon);
         tuningGroup.appendChild(edoSelect);
 
-        // Modes: open piemenu instead of a <select> dropdown
+        // Modes: open the regular mode pie menu (the same one used by the
+        // setKey modeName block) so mode selection is consistent everywhere.
         const modeBtn = iconButton("pie-chart.svg", _("Switch mode"), () => {
             this._onModePieButtonClick();
         });
@@ -836,6 +837,11 @@ class ModeWidget {
         this._setModeName();
     }
 
+    /**
+     * Applies a step-count pattern to _selectedNotes and updates the note wheel.
+     * @param {number[]} pattern - Array of integer step counts between active notes.
+     * @returns {void}
+     */
     _applyModePattern(pattern) {
         const n = this._activeEDO;
         this._selectedNotes = this._blankNotes(n);
@@ -898,6 +904,20 @@ class ModeWidget {
 
     // ── Reset ─────────────────────────────────────────────────────
 
+    /**
+     * Resets the note wheel to a blank custom mode (only the root note
+     * selected) so the user can define a new mode by clicking notes.
+     * @returns {void}
+     */
+    _resetToCustom() {
+        this._saveState();
+        this._selectedNotes = this._blankNotes(this._activeEDO);
+        this._selectedModeName = "";
+        this._resetNotes();
+        this._updateModeDisplay("");
+        this._syncModeBlockName();
+    }
+
     _resetNotes() {
         for (let i = 0; i < this._selectedNotes.length; i++) {
             if (this._selectedNotes[i]) {
@@ -907,18 +927,6 @@ class ModeWidget {
             }
             this._playWheel.navItems[i].navItem.hide();
         }
-    }
-
-    /**
-     * Resets the note wheel to a blank custom mode (only the root note
-     * selected) so the user can define a new mode by clicking notes.
-     * @returns {void}
-     */
-    _resetToCustom() {
-        this._saveState();
-        this._selectedNotes = this._blankNotes(this._activeEDO);
-        this._resetNotes();
-        this._updateModeDisplay("");
     }
 
     // ── Rotate ────────────────────────────────────────────────────

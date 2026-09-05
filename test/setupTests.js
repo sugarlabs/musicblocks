@@ -127,6 +127,8 @@ const mockContext = {
     ellipse: jest.fn(),
     arc: jest.fn(),
     drawImage: jest.fn(),
+    fillText: jest.fn(),
+    setLineDash: jest.fn(),
     measureText: jest.fn(() => ({
         width: 0,
         actualBoundingBoxAscent: 0,

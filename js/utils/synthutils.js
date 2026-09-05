@@ -891,12 +891,18 @@ function Synth() {
             );
             if (typeof oneNote !== "number") {
                 const thisTemperament = getTemperament(customID);
+                // Widget-saved entry names may carry cents annotations
+                // (e.g. "C(+0¢)") while playback looks up bare names
+                // (e.g. "C"): compare base names so they resolve.
+                const baseName = name =>
+                    typeof name === "string" ? name.replace(/\(.*\)/, "") : name;
+                const target = baseName(oneNote);
                 for (const pitchNumber in thisTemperament) {
                     if (pitchNumber !== "pitchNumber") {
                         if (
                             (isCustomTemperament(customID) &&
-                                oneNote === thisTemperament[pitchNumber][3]) ||
-                            oneNote === thisTemperament[pitchNumber][1]
+                                target === baseName(thisTemperament[pitchNumber][3])) ||
+                            target === baseName(thisTemperament[pitchNumber][1])
                         ) {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
@@ -1882,12 +1888,7 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            if (
-                typeof notes === "string" &&
-                (notes.search("[+]") !== -1 || notes.search("[-]") !== -1)
-            ) {
-                notes = this.getCustomFrequency(notes, this.inTemperament);
-            }
+            notes = this.getCustomFrequency(notes, this.inTemperament);
             if (notes === undefined || notes === "undefined") {
                 notes = notes1;
             }

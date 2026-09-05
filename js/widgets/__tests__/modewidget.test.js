@@ -421,6 +421,7 @@ describe("ModeWidget", () => {
 
         expect(modeWidget._selectedNotes[0]).toBe(true);
         expect(modeWidget._selectedNotes.slice(1).every(v => v === false)).toBe(true);
+        expect(modeWidget._selectedModeName).toBe("");
     });
 
     test("should translate notes to a new EDO slice count", () => {
