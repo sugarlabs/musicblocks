@@ -400,7 +400,13 @@ function setupEnsembleBlocks(activity) {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 //.TRANS: set xy position for this mouse
                 super("setxyturtle", _("set mouse"));
-                this.setHelpString();
+                this.setHelpString([
+                    _(
+                        "The Set mouse block places the specified mouse at a specific x and y coordinate."
+                    ),
+                    "documentation",
+                    ""
+                ]);
 
                 this.formBlock({
                     args: 3,
@@ -411,7 +417,13 @@ function setupEnsembleBlocks(activity) {
             } else {
                 //.TRANS: set xy position for this turtle
                 super("setxyturtle", _("set turtle"));
-                this.setHelpString();
+                this.setHelpString([
+                    _(
+                        "The Set turtle block places the specified turtle at a specific x and y coordinate."
+                    ),
+                    "documentation",
+                    ""
+                ]);
 
                 this.formBlock({
                     args: 3,
