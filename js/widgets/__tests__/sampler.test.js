@@ -29,7 +29,8 @@ global.cancelAnimationFrame = jest.fn();
 global.setTimeout = setTimeout;
 global.Tone = {
     Analyser: jest.fn(() => ({
-        connect: jest.fn()
+        connect: jest.fn(),
+        getValue: jest.fn(() => [0, 0.5, -0.5])
     }))
 };
 global.requestAnimationFrame = jest.fn(() => 1);
@@ -1027,6 +1028,107 @@ describe("Sampler Widget", () => {
             expect(widget.tunerSegments[0].setAttribute).toHaveBeenCalledWith("fill", "#0000ff");
             expect(querySelectorAll).not.toHaveBeenCalled();
             querySelectorAll.mockRestore();
+        });
+
+        const setupWaveformCanvas = (overrides = {}) => {
+            widget.widgetWindow = widgetWindow;
+            widget.drawVisualIDs = {};
+            widget.running = true;
+            widget.is_recording = false;
+            widget.isMoving = false;
+            widget.pitchAnalysers = {
+                0: { getValue: jest.fn(() => [0, 0.5]), dispose: jest.fn() },
+                1: { getValue: jest.fn(() => [0, 0.5]), dispose: jest.fn() }
+            };
+            Object.assign(widget, overrides);
+        };
+
+        const lastCanvasContext = () =>
+            HTMLCanvasElement.prototype.getContext.mock.results.at(-1).value;
+
+        test("makeCanvas does not schedule RAF when idle with no pending resize", () => {
+            setupWaveformCanvas();
+
+            widget.makeCanvas(400, 300, 0, false);
+
+            expect(requestAnimationFrame).not.toHaveBeenCalled();
+            expect(widget.drawVisualIDs[0]).toBeNull();
+            expect(lastCanvasContext().fillRect).not.toHaveBeenCalled();
+        });
+
+        test("makeCanvas draws once on resize without scheduling RAF", () => {
+            setupWaveformCanvas();
+
+            widget.makeCanvas(400, 300, 0, true);
+
+            expect(lastCanvasContext().fillRect).toHaveBeenCalled();
+            expect(requestAnimationFrame).not.toHaveBeenCalled();
+            expect(widget.drawVisualIDs[0]).toBeNull();
+        });
+
+        test("makeCanvas schedules RAF while recording", () => {
+            setupWaveformCanvas({ is_recording: true });
+
+            widget.makeCanvas(400, 300, 0, false);
+
+            expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+            expect(widget.drawVisualIDs[0]).toBe(1);
+        });
+
+        test("makeCanvas schedules RAF while playing", () => {
+            setupWaveformCanvas({ isMoving: true });
+
+            widget.makeCanvas(400, 300, 0, false);
+
+            expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+        });
+
+        test("makeCanvas schedules RAF during project playback when the widget itself is idle", () => {
+            setupWaveformCanvas({ isMoving: false, is_recording: false });
+            widget.activity = {
+                ...widget.activity,
+                turtles: { running: jest.fn(() => true) }
+            };
+
+            widget.makeCanvas(400, 300, 0, false);
+
+            expect(widget.activity.turtles.running).toHaveBeenCalled();
+            expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+            expect(widget.drawVisualIDs[0]).toBe(1);
+        });
+
+        test("makeCanvas stops scheduling RAF after project playback ends while the widget remains idle", () => {
+            setupWaveformCanvas({ isMoving: false, is_recording: false });
+            let rafCallback;
+            requestAnimationFrame.mockImplementation(cb => {
+                rafCallback = cb;
+                return 1;
+            });
+            widget.activity = {
+                ...widget.activity,
+                turtles: { running: jest.fn(() => true) }
+            };
+
+            widget.makeCanvas(400, 300, 0, false);
+            expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+
+            widget.activity.turtles.running.mockReturnValue(false);
+            rafCallback();
+
+            expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+            expect(widget.drawVisualIDs[0]).toBeNull();
+        });
+
+        test("resume restarts the waveform loop after idle", () => {
+            setupWaveformCanvas();
+
+            widget.makeCanvas(400, 300, 0, false);
+            expect(requestAnimationFrame).not.toHaveBeenCalled();
+
+            widget.resume();
+
+            expect(widget.isMoving).toBe(true);
+            expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
         });
 
         test("makeTuner builds UI and triggers pitch detection", async () => {

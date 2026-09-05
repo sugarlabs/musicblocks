@@ -1530,14 +1530,17 @@ class Logo {
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
         this.insideTemperament = false;
+        this.inStatusMatrix = false;
+        this.inOscilloscope = false;
+        this.inSample = false;
         this.rhythmRulerMeasure = null;
         this._currentDrumBlock = null;
-        this.inStatusMatrix = false;
         this.pitchBlocks = [];
         this.drumBlocks = [];
         this.tuplet = false;
         this.modeBlock = null;
         this._meterBlock = null;
+        this.oscilloscopeTurtles = [];
 
         // Remove any listeners that might be still active.
         this.clearTurtleListeners();
