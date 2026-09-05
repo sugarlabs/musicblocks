@@ -59,6 +59,7 @@ class HelpController {
             "activity/js-export/ASTutils",
             "activity/js-export/generate",
             "activity/js-export/ast2blocklist",
+            "activity/js-export/ast2blocks.config",
             "activity/js-export/API/GraphicsBlocksAPI",
             "activity/js-export/API/PenBlocksAPI",
             "activity/js-export/API/RhythmBlocksAPI",

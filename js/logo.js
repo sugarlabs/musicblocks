@@ -1616,7 +1616,7 @@ class Logo {
         this.onRunTurtle();
 
         // Make sure that there is atleast one turtle.
-        if (this.turtles.getTurtleCount() === 0) {
+        if (this.turtles.turtleCount() === 0) {
             this.turtles.addTurtle(null);
         }
 

@@ -226,6 +226,9 @@ requirejs.config({
         },
         "activity/js-export/generate": {
             deps: ["activity/js-export/ASTutils"]
+        },
+        "activity/js-export/ast2blocks.config": {
+            exports: "ast2blocklist_config"
         }
     },
     paths: {
