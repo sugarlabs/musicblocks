@@ -350,7 +350,7 @@ class PlanetInterface {
         this.getCurrentProjectName = () => {
             const projectStorage = this._getProjectStorage();
             if (!projectStorage || typeof projectStorage.getCurrentProjectName !== "function") {
-                return "";
+                return _("My Project");
             }
 
             return projectStorage.getCurrentProjectName();
