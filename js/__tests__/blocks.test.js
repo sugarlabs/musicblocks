@@ -742,6 +742,7 @@ describe("Blocks Foundation", () => {
         let loadContainer;
 
         beforeEach(() => {
+            jest.useRealTimers();
             global.pubsub = new PubSub();
             mockActivity = {
                 storage: {},
@@ -1019,13 +1020,13 @@ describe("Blocks Foundation", () => {
                 expect(jest.getTimerCount()).toBe(0);
 
                 for (let i = 0; i < oldBlockObjs.length; i++) {
-                    await blocks.cleanupAfterLoad("forward", oldGeneration);
+                    await blocks.cleanupAfterLoad(oldGeneration);
                 }
 
                 expect(blocks._processOneBlock).toHaveBeenCalledTimes(41);
                 expect(blocks._pendingBlockLoads).toEqual([]);
 
-                await blocks.cleanupAfterLoad("forward", blocks._activeLoadGeneration);
+                await blocks.cleanupAfterLoad(blocks._activeLoadGeneration);
                 expect(blocks._activeLoadGeneration).toBe(null);
             } finally {
                 jest.useRealTimers();
@@ -1112,7 +1113,7 @@ describe("Blocks Foundation", () => {
             blocks._loadCounter = 1;
 
             blocks.cancelPendingLoad();
-            await blocks.cleanupAfterLoad("forward", 1);
+            await blocks.cleanupAfterLoad(1);
 
             expect(blocks._loadCounter).toBe(0);
             expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
@@ -1129,10 +1130,298 @@ describe("Blocks Foundation", () => {
             blocks._cleanupStacks = jest.fn();
             blocks._rebuildSpatialGrid = jest.fn();
 
-            await blocks.cleanupAfterLoad("forward", 1);
+            await blocks.cleanupAfterLoad(1);
 
             expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
             expect(mockActivity._suppressRefresh).toBe(false);
+        });
+    });
+
+    describe("loadNewBlocks re-entrancy (#8392)", () => {
+        const { PubSub } = require("../pubsub");
+        let mockActivity;
+        let loadContainer;
+        let blocks;
+
+        // Block objects: [id, name, x, y, connections]. blockOffset is 0 for
+        // every one of these tests, so a batch of length N occupies indices
+        // 0..N-1 in blockList/_adjustTheseStacks.
+        const makeBatch = n =>
+            Array.from({ length: n }, (_, i) => [i, "forward", 0, 0, [null, null, null]]);
+
+        // Stands in for the real path: block.js calls cleanupAfterLoad()
+        // once a block's own artwork generation finishes, asynchronously,
+        // after _processOneBlock has already recorded the block for the
+        // finalize step.
+        const stubProcessOneBlock = () =>
+            jest.fn((b, blockObjs, blockOffset) => {
+                const thisBlock = blockOffset + b;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+        beforeEach(() => {
+            jest.useRealTimers();
+            global.pubsub = new PubSub();
+            mockActivity = {
+                storage: {},
+                trashcan: {},
+                turtles: {},
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: { synth: { loadSynth: jest.fn(), preloadProjectSamples: jest.fn() } },
+                blocksContainer: { x: 0, y: 0 },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false
+            };
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+
+            blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.customTemperamentDefined = true;
+            blocks._processOneBlock = stubProcessOneBlock();
+            // These tests are only about load serialization, not the
+            // finalize step's internals, so stub it out the same way the
+            // "cleanupAfterLoad" describe block above does.
+            blocks._findDrumURLs = jest.fn();
+            blocks.updateBlockPositions = jest.fn();
+            blocks._rebuildSpatialGrid = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+        });
+
+        afterEach(async () => {
+            jest.useRealTimers();
+            // Drain any cleanupAfterLoad callbacks still pending from a test
+            // that didn't await every scheduled block completion, so they
+            // can't fire during a later test against its fresh blocks
+            // instance.
+            await new Promise(r =>
+                setTimeout(() => {
+                    console.log("reentrancy cleanup timer fired");
+                    r();
+                }, 50)
+            );
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("does not start a second call while a first call is still processing", () => {
+            blocks.loadNewBlocks(makeBatch(25));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(20); // first CHUNK_SIZE
+
+            blocks.loadNewBlocks(makeBatch(3));
+
+            // The second call is queued, not run: _processOneBlock has not
+            // been called any additional times for it yet.
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(20);
+            expect(blocks._loadQueue).toHaveLength(1);
+        });
+
+        it("does not lose the first call's in-flight _adjustTheseStacks entries when a second call arrives mid-load", async () => {
+            blocks.loadNewBlocks(makeBatch(25));
+            // Let the first chunk's 20 synchronous _processOneBlock calls'
+            // queued cleanupAfterLoad callbacks start landing.
+            await new Promise(r => setTimeout(r, 0));
+
+            blocks.loadNewBlocks(makeBatch(3));
+
+            // Let everything settle: remaining chunks, all cleanupAfterLoad
+            // callbacks, and the queued second load running to completion.
+            await new Promise(r => setTimeout(r, 50));
+
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(28); // 25 + 3
+            expect(blocks._loadInProgress).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
+        });
+
+        it("emits finishedLoading once per queued load, not merged into a single early event", async () => {
+            const finishedLoadingCalls = [];
+            global.pubsub.on("finishedLoading", () => finishedLoadingCalls.push(Date.now()));
+
+            blocks.loadNewBlocks(makeBatch(25));
+            await new Promise(r => setTimeout(r, 0));
+            blocks.loadNewBlocks(makeBatch(3));
+
+            await new Promise(r => setTimeout(r, 50));
+
+            expect(finishedLoadingCalls).toHaveLength(2);
+        });
+
+        it("starts a queued load once an earlier load's circular-connection early return resolves", () => {
+            // Block connected to itself: connections[0] === block id.
+            const circularBatch = [[0, "forward", 0, 0, [0, null, null]]];
+            blocks.loadNewBlocks(circularBatch);
+
+            // The early return must not leave the queue stuck: a load
+            // queued behind it should still get its turn.
+            expect(blocks._loadInProgress).toBe(false);
+
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("runs a second call immediately when no load is already in progress", () => {
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadQueue).toHaveLength(0);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("loading an empty batch does not hang and still advances the queue", async () => {
+            const finishedLoadingCalls = [];
+            global.pubsub.on("finishedLoading", () => finishedLoadingCalls.push(Date.now()));
+
+            blocks.loadNewBlocks([]);
+            await new Promise(r => setTimeout(r, 0));
+
+            expect(finishedLoadingCalls).toHaveLength(1);
+            expect(blocks._loadInProgress).toBe(false);
+
+            // A load queued behind the empty one must not be stranded.
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("does not leave the queue stuck if a deferred chunk (block 21+) throws", async () => {
+            // Block 20 is the first block of the second chunk, the one
+            // processed inside the deferred setTimeout(processChunk, 0)
+            // callback rather than the first, synchronous chunk. A throw
+            // there runs outside any caller's try/catch, so it can only be
+            // observed here as a window error event, the same way a real
+            // browser would surface it.
+            let callCount = 0;
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+                if (callCount === 21) {
+                    throw new Error("deferred chunk failure");
+                }
+                const thisBlock = blockOffset + b;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+            const windowErrors = [];
+            const onWindowError = event => {
+                event.preventDefault();
+                windowErrors.push(event.error || event.message);
+            };
+            window.addEventListener("error", onWindowError);
+
+            blocks.loadNewBlocks(makeBatch(25));
+            await new Promise(r => setTimeout(r, 50));
+
+            window.removeEventListener("error", onWindowError);
+
+            expect(windowErrors.length).toBeGreaterThan(0);
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(blocks._loadInProgress).toBe(false);
+
+            // A load issued after the failure must not be stranded behind it.
+            blocks._processOneBlock = stubProcessOneBlock();
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("does not let a stale completion from a failed load corrupt the next queued load's counter", async () => {
+            // One stub shared by both loads (load B is queued while load A
+            // is still running, so swapping _processOneBlock out from under
+            // it mid-flight would mean load A's own deferred chunk never
+            // actually calls the code meant to fail). Mirrors what
+            // makeNewBlock() really does: every block created is tagged
+            // with the generation active at the moment it was made, and
+            // carries that tag to its own (possibly much later)
+            // cleanupAfterLoad() call, the same way a real Block instance
+            // carries _loadGeneration to block.js's
+            // cleanupAfterLoad(this._loadGeneration) call.
+            //
+            // Load A's chunk-1 (b < 20) completions are collected as plain
+            // functions rather than scheduled with a timer: under parallel
+            // test-worker load, real timer delays aren't a reliable way to
+            // force "arrives after load B finishes" ordering, so that
+            // ordering is enforced explicitly below instead.
+            const staleCleanups = [];
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                const thisBlock = blockOffset + b;
+                const myGeneration = blocks._activeLoadGeneration;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                if (myGeneration === 1 && b === 20) {
+                    // Load A's first block of its deferred (second) chunk.
+                    throw new Error("deferred chunk failure");
+                }
+                if (myGeneration === 1) {
+                    staleCleanups.push(() => blocks.cleanupAfterLoad(myGeneration));
+                } else {
+                    // Load B's blocks: complete promptly, like a normal load.
+                    setTimeout(() => blocks.cleanupAfterLoad(myGeneration), 0);
+                }
+            });
+
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
+
+            const finishedLoadingCalls = [];
+            const loadBFinished = new Promise(resolve => {
+                global.pubsub.on("finishedLoading", () => {
+                    finishedLoadingCalls.push(Date.now());
+                    resolve();
+                });
+            });
+
+            // Load A: 25 blocks, fails on block 20 (first of the deferred
+            // chunk, which only runs once the setTimeout(0) scheduling it
+            // fires). Load B: queued behind A, starts as soon as A's
+            // failure advances the queue.
+            blocks.loadNewBlocks(makeBatch(25));
+            blocks.loadNewBlocks(makeBatch(3));
+
+            // Wait specifically for load B to finish (not a fixed delay),
+            // so this isn't sensitive to how busy the test runner is.
+            await loadBFinished;
+
+            expect(staleCleanups).toHaveLength(20);
+
+            // Now let load A's 20 chunk-1 completions land, well after load
+            // B has already finished and _activeLoadGeneration has moved on.
+            for (const cleanup of staleCleanups) {
+                await cleanup();
+            }
+
+            // Load B's own 3 blocks are all that should count toward it. If
+            // a stale straggler from A had been accepted, B's shared
+            // _loadCounter would go negative, and every one of A's 20
+            // stragglers would independently satisfy the "<= 0" finalize
+            // check again, firing finishedLoading many more times than the
+            // one legitimate completion of load B.
+            expect(finishedLoadingCalls).toHaveLength(1);
+            expect(blocks._loadInProgress).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
+
+            window.removeEventListener("error", onWindowError);
         });
     });
 
