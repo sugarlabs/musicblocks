@@ -742,7 +742,7 @@ img.icon:hover {
 }
 
 body {
-    background-color: #92b5c8 !important;
+    background-color: var(--color-bg-primary);
     /*  2.5B 7/4 */
     padding: 0;
     margin: 0;
@@ -756,7 +756,7 @@ body.noScroll {
 
 body.samples-shown {
     overflow-y: scroll;
-    background: white !important;
+    background: white;
 }
 
 select {
