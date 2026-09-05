@@ -662,8 +662,8 @@ class Palettes {
             element.style.transition = "transform 0.3s ease";
 
             element.innerHTML = `<div style="height:fit-content">
-                    <table width="${1.5 * this.cellSize}" bgcolor="white">
-                        <thead>
+                    <table width="${1.5 * this.cellSize}" bgcolor="white" role="presentation">
+                        <thead role="presentation">
                             <tr role="tablist" aria-label="${_("Palette Categories")}"></tr>
                         </thead>
                     </table>
@@ -747,7 +747,8 @@ class Palettes {
         td.style.position = "relative";
         td.style.backgroundColor = platformColor.paletteBackground;
         td.setAttribute("role", "tab");
-        td.setAttribute("aria-label", _(MULTIPALETTES[i]));
+        td.setAttribute("aria-label", _(MULTIPALETTEICONS[i]));
+        td.setAttribute("aria-selected", i === 0 ? "true" : "false");
         td.tabIndex = i === 0 ? 0 : -1; // Make only the first tab focusable by default
 
         td.appendChild(
@@ -811,6 +812,7 @@ class Palettes {
                 );
                 tr.children[j].children[1].style.background = platformColor.paletteLabelBackground;
             }
+            tr.children[j].setAttribute("aria-selected", j === i ? "true" : "false");
             tr.children[j].children[0].src = img.src;
         }
     }
