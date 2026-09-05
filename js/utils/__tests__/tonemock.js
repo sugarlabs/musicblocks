@@ -172,6 +172,7 @@ class PolySynth {
 
 class context {
     static state = "running";
+    static sampleRate = 44100;
     static resume() {}
 }
 
@@ -228,8 +229,12 @@ class Recorder {
 class Analyser {
     constructor(type, size) {
         this.type = type;
-        this.size = size;
-        this.getValue = jest.fn().mockReturnValue(new Float32Array(128));
+        this.size = size || 2048;
+        const buf = new Float32Array(this.size);
+        for (let i = 0; i < buf.length; i++) {
+            buf[i] = Math.sin((2 * Math.PI * 440 * i) / 44100);
+        }
+        this.getValue = jest.fn().mockReturnValue(buf);
         this.connect = jest.fn().mockReturnThis();
         this.disconnect = jest.fn();
         this.dispose = jest.fn();
@@ -270,20 +275,70 @@ const Tone = {
         return new Date().getTime();
     }),
     Context: jest.fn().mockReturnThis(),
-    Loop: jest.fn((callback, interval) => ({
-        start: jest.fn(start => {
-            callback(start); // Simulate immediate execution of the callback
-            return {}; // Mocked loop instance
-        })
-    })),
+    Loop: jest.fn().mockImplementation(function (callback, interval) {
+        this.callback = callback;
+        this.interval = interval;
+        this.start = jest.fn(function (start) {
+            if (typeof callback === "function") {
+                try {
+                    callback(0);
+                } catch (_e) {
+                    // ignore
+                }
+            }
+            return {};
+        });
+        this.stop = jest.fn().mockReturnThis();
+        this.dispose = jest.fn();
+    }),
     Instrument: jest.fn().mockImplementation(() => ({
         toDestination: jest.fn()
     })),
     doNeighbor: jest.fn().mockReturnThis(),
     Destination: { volume: { rampTo: jest.fn() } },
     console: { debug: jest.fn() },
-    Vibrato: jest.fn().mockReturnThis(),
-    Distortion: jest.fn().mockReturnThis(),
+    Vibrato: jest.fn().mockImplementation(() => ({
+        toDestination: jest.fn().mockReturnThis(),
+        connect: jest.fn().mockReturnThis(),
+        disconnect: jest.fn().mockReturnThis(),
+        dispose: jest.fn()
+    })),
+    Distortion: jest.fn().mockImplementation(() => ({
+        toDestination: jest.fn().mockReturnThis(),
+        connect: jest.fn().mockReturnThis(),
+        disconnect: jest.fn().mockReturnThis(),
+        dispose: jest.fn()
+    })),
+    Filter: jest.fn().mockImplementation(() => ({
+        toDestination: jest.fn().mockReturnThis(),
+        connect: jest.fn().mockReturnThis(),
+        disconnect: jest.fn().mockReturnThis(),
+        dispose: jest.fn()
+    })),
+    Tremolo: jest.fn().mockImplementation(() => ({
+        start: jest.fn().mockReturnThis(),
+        toDestination: jest.fn().mockReturnThis(),
+        connect: jest.fn().mockReturnThis(),
+        disconnect: jest.fn().mockReturnThis(),
+        dispose: jest.fn()
+    })),
+    Phaser: jest.fn().mockImplementation(() => ({
+        toDestination: jest.fn().mockReturnThis(),
+        connect: jest.fn().mockReturnThis(),
+        disconnect: jest.fn().mockReturnThis(),
+        dispose: jest.fn()
+    })),
+    Chorus: jest.fn().mockImplementation(() => ({
+        toDestination: jest.fn().mockReturnThis(),
+        connect: jest.fn().mockReturnThis(),
+        disconnect: jest.fn().mockReturnThis(),
+        dispose: jest.fn()
+    })),
+    Part: jest.fn().mockImplementation((cb, events) => ({
+        start: jest.fn().mockReturnThis(),
+        stop: jest.fn().mockReturnThis(),
+        dispose: jest.fn()
+    })),
     Buffer: jest.fn(() => {
         return {
             onload: jest.fn().mockReturnThis()
