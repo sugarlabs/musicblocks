@@ -684,8 +684,11 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
             script.onerror = e => {
                 URL.revokeObjectURL(url);
                 document.head.removeChild(script);
-                console.error("Failed to load CSP Blob script for plugins", e);
-                reject(e);
+                const err = new Error(
+                    "Failed to load plugin script" + (e && e.message ? ": " + e.message : "")
+                );
+                console.error("Failed to load CSP Blob script for plugins", err);
+                reject(err);
             };
             document.head.appendChild(script);
         });
@@ -726,7 +729,7 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
         const sUrl = URL.createObjectURL(sBlob);
         const sScript = document.createElement("script");
         sScript.src = sUrl;
-        await new Promise(resolve => {
+        await new Promise((resolve, reject) => {
             sScript.onload = () => {
                 if (window.__mb_plugin_registry[registryName]) {
                     try {
@@ -742,12 +745,15 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                 }
                 resolve();
             };
-            sScript.onerror = () => {
+            sScript.onerror = e => {
                 URL.revokeObjectURL(sUrl);
                 if (sScript.parentNode) {
                     sScript.parentNode.removeChild(sScript);
                 }
-                resolve(); // Still resolve to let others run
+                const err = new Error(
+                    "Failed to execute plugin script" + (e && e.message ? ": " + e.message : "")
+                );
+                reject(err);
             };
             document.head.appendChild(sScript);
         });
