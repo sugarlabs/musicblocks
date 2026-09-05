@@ -324,6 +324,13 @@ class Blocks {
             const block = this.blockList[blkIdx];
             if (!block || !block.container) return;
 
+            // The grid is keyed by block index, and Map and Set compare keys
+            // strictly. A caller iterating blockList with for...in hands over
+            // a string, which would register the block a second time and
+            // orphan the entry already held under its number, leaving it
+            // listed at a position it has left. Key on the number always.
+            const idx = Number(blkIdx);
+
             // Compute the set of cells this block should occupy
             const newKeys = new Set();
             if (block.docks && block.docks.length > 0) {
@@ -342,7 +349,7 @@ class Blocks {
             }
 
             // Check if cells changed; skip update if identical
-            const oldKeys = this._blockGridCell.get(blkIdx);
+            const oldKeys = this._blockGridCell.get(idx);
             if (oldKeys && oldKeys.size === newKeys.size) {
                 let same = true;
                 for (const k of newKeys) {
@@ -359,7 +366,7 @@ class Blocks {
                 for (const oldKey of oldKeys) {
                     const oldSet = this._spatialGrid.get(oldKey);
                     if (oldSet) {
-                        oldSet.delete(blkIdx);
+                        oldSet.delete(idx);
                         if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
                     }
                 }
@@ -372,9 +379,9 @@ class Blocks {
                     cellSet = new Set();
                     this._spatialGrid.set(key, cellSet);
                 }
-                cellSet.add(blkIdx);
+                cellSet.add(idx);
             }
-            this._blockGridCell.set(blkIdx, newKeys);
+            this._blockGridCell.set(idx, newKeys);
         };
 
         /**
