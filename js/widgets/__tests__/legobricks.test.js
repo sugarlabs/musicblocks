@@ -2009,8 +2009,9 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
 });
 
 describe("_savePhrase chord block connection hierarchy", () => {
+    const originalUnderscore = global._;
     afterEach(() => {
-        delete global._;
+        global._ = originalUnderscore;
     });
 
     it("correctly chains sequential pitch blocks for a chord", () => {
