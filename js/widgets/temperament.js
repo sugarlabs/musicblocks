@@ -538,6 +538,7 @@ function TemperamentWidget() {
             that._playAllRunning = true;
             let i = 0;
             let forward = true;
+            let octaveWrap = false;
             const step = function () {
                 if (!that._playAllRunning) {
                     flashDot = -1;
@@ -545,21 +546,19 @@ function TemperamentWidget() {
                     return;
                 }
                 // Guard: only play valid indices
-                if (i >= 0 && i < that.frequencies.length) {
+                if (octaveWrap) {
+                    _playNote(0, that.frequencies[0] * that.powerBase);
+                    octaveWrap = false;
+                    forward = false;
+                    i = that.frequencies.length;
+                } else if (i >= 0 && i < that.frequencies.length) {
                     _playNote(i);
                 }
                 // Advance
                 if (forward) {
                     i++;
                     if (i >= that.frequencies.length) {
-                        forward = false;
-                        i = that.frequencies.length - 2;
-                        if (i < 0) {
-                            that._playAllRunning = false;
-                            flashDot = -1;
-                            _drawCircle();
-                            return;
-                        }
+                        octaveWrap = true;
                     }
                 } else {
                     i--;
@@ -1194,11 +1193,11 @@ function TemperamentWidget() {
             _applyCents(index, _ref12(index));
         };
 
-        const _playNote = function (index) {
+        const _playNote = function (index, freqOverride) {
             that._logo.resetSynth(0);
             that._logo.synth.trigger(
                 0,
-                Number(that.frequencies[index]),
+                freqOverride !== undefined ? freqOverride : Number(that.frequencies[index]),
                 1 / 4,
                 "electronic synth",
                 null,
