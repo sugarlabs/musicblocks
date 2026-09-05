@@ -21,6 +21,12 @@ const fs = require("fs");
 const path = require("path");
 const { TextEncoder, TextDecoder } = require("util");
 global.clampNumber = require("../utils-logic").clampNumber;
+const synthutilsModule = require("../synthutils");
+const {
+    Synth: SynthClass,
+    instruments: synthInstruments,
+    instrumentsSource: synthInstrumentsSource
+} = synthutilsModule;
 
 describe("Utility Functions (logic-only)", () => {
     let whichTemperament,
@@ -942,6 +948,17 @@ describe("Utility Functions (logic-only)", () => {
             instrumentsSource.guitar = [1, "drum"];
         });
 
+        let originalLoop, originalNow;
+        beforeEach(() => {
+            originalLoop = Tone.Loop;
+            originalNow = Tone.now;
+        });
+
+        afterEach(() => {
+            Tone.Loop = originalLoop;
+            Tone.now = originalNow;
+        });
+
         test("should create and start a loop for drum instruments", () => {
             const turtle = "turtle1";
             const instrumentName = "guitar";
@@ -992,7 +1009,7 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         test("should handle different start times", () => {
-            const mockLoop = { start: jest.fn() };
+            const mockLoop = { start: jest.fn().mockReturnValue({}) };
             Tone.Loop = jest.fn(() => mockLoop);
 
             const startTime = 2.5;
@@ -1002,7 +1019,7 @@ describe("Utility Functions (logic-only)", () => {
 
         test("should use velocity correctly for both instrument types", () => {
             // Arrange
-            const mockLoop = { start: jest.fn() };
+            const mockLoop = { start: jest.fn().mockReturnValue({}) };
             Tone.Loop = jest.fn(() => mockLoop);
             Tone.now = jest.fn(() => 100);
 
@@ -2916,5 +2933,1036 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
 
         expect(synthRef.triggers).toHaveLength(0);
         expect(synthRef.disposed).toBe(true);
+    });
+
+    describe("Synth Tuner and Pitch Detection", () => {
+        let synthInstance;
+        let mockActivity;
+        let tunerContainer;
+
+        function bufferForFrequency(freq, sampleRate = 44100) {
+            const buf = new Float32Array(2048);
+            if (freq <= 0) return buf;
+            for (let i = 0; i < 2048; i++) {
+                buf[i] = Math.sin((2 * Math.PI * freq * i) / sampleRate);
+            }
+            return buf;
+        }
+
+        beforeEach(() => {
+            synthInstance = new SynthClass();
+            document.body.innerHTML = "";
+
+            tunerContainer = document.createElement("div");
+            tunerContainer.id = "tunerContainer";
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            // Create 11 SVG path segments to simulate tuner display
+            for (let i = 0; i < 11; i++) {
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                svg.appendChild(path);
+            }
+            tunerContainer.appendChild(svg);
+            document.body.appendChild(tunerContainer);
+
+            mockActivity = {
+                logo: {
+                    synth: synthInstance,
+                    stopTurtle: false,
+                    errorMsg: jest.fn()
+                },
+                turtles: {
+                    _canvas: { width: 800, height: 600 },
+                    ithTurtle: () => ({
+                        singer: {
+                            instrumentNames: ["default"],
+                            activeVoices: new Set()
+                        }
+                    })
+                }
+            };
+            window.ActivityContext = {
+                getActivity: () => mockActivity
+            };
+            window.wheelnav = jest.fn();
+            window.Raphael = jest.fn();
+            global.wheelnav = jest.fn();
+            global.Raphael = jest.fn();
+            global.requestAnimationFrame = cb => setTimeout(cb, 0);
+            global.cancelAnimationFrame = id => clearTimeout(id);
+            global.piemenuPitches = jest.fn();
+            if (!global.instruments[0]) global.instruments[0] = {};
+            global.instruments[0]["electronic synth"] = new Tone.PolySynth();
+            global.instrumentsSource["electronic synth"] = [0, "electronic synth"];
+        });
+
+        afterEach(() => {
+            if (synthInstance) {
+                synthInstance.stopTuner();
+            }
+            document.body.innerHTML = "";
+            delete window.ActivityContext;
+        });
+
+        test("startTuner and updatePitch in chromatic mode across all pitch and cent ranges", async () => {
+            await synthInstance.startTuner();
+            expect(synthInstance._tunerActive).toBe(true);
+
+            // Test getTunerFrequency
+            const freq = synthInstance.getTunerFrequency();
+            expect(freq).toBeGreaterThan(0);
+
+            const noteText = document.getElementById("noteText");
+            const centsText = document.getElementById("centsText");
+            expect(noteText).not.toBeNull();
+            expect(centsText).not.toBeNull();
+
+            // Run through various frequencies to exercise all tuner segment coloring branches
+            const testFreqs = [
+                440, // exact A4 (center green)
+                438, // slight flat (-8 cents, yellowGreen)
+                432, // flat (-32 cents, yellowOrange)
+                425, // flat (-60 cents, orange)
+                418, // flat (-88 cents, redOrange)
+                400, // deep flat (deepRed)
+                442, // slight sharp (+8 cents, yellowGreen)
+                448, // sharp (+31 cents, yellowOrange)
+                455, // sharp (+58 cents, orange)
+                462, // sharp (+84 cents, redOrange)
+                480, // deep sharp (deepRed)
+                0 // silence
+            ];
+
+            for (const f of testFreqs) {
+                synthInstance.tunerAnalyser.getValue = jest
+                    .fn()
+                    .mockReturnValue(bufferForFrequency(f));
+                synthInstance._tunerSegments = null;
+                // Wait a cycle for updatePitch to process buffer
+                await new Promise(resolve => setTimeout(resolve, 5));
+            }
+        });
+
+        test("startTuner and updatePitch in target pitch mode with mode switching and pie menu", async () => {
+            await synthInstance.startTuner();
+
+            // Switch to target mode
+            const targetPitchButton = document.querySelector('div[title="Target pitch"]');
+            expect(targetPitchButton).not.toBeNull();
+            targetPitchButton.onclick();
+
+            // Test target mode with various offsets (>50 cents flat/sharp, within 50 cents)
+            const testFreqs = [
+                880, // 1 octave above A4 (+1200 cents, >50 cents sharp)
+                220, // 1 octave below A4 (-1200 cents, >50 cents flat)
+                445, // near target (+20 cents)
+                435, // near target (-20 cents)
+                0 // invalid/zero
+            ];
+
+            for (const f of testFreqs) {
+                synthInstance.tunerAnalyser.getValue = jest
+                    .fn()
+                    .mockReturnValue(bufferForFrequency(f));
+                await new Promise(resolve => setTimeout(resolve, 5));
+            }
+
+            // Switch back to chromatic mode
+            await new Promise(r => setTimeout(r, 250));
+            const chromaticButton = document.querySelector('div[title="Chromatic"]');
+            expect(chromaticButton).not.toBeNull();
+            chromaticButton.onclick();
+
+            // Switch to target mode again and click targetNoteSelector to open pie menu
+            await new Promise(r => setTimeout(r, 250));
+            targetPitchButton.onclick();
+            const targetNoteSelector = document.getElementById("targetNoteSelector");
+            expect(targetNoteSelector).not.toBeNull();
+
+            // Trigger hover events
+            targetNoteSelector.dispatchEvent(new Event("mouseenter"));
+            targetNoteSelector.dispatchEvent(new Event("mouseleave"));
+
+            // Set up piemenuPitches mock to simulate wheels
+            global.piemenuPitches = jest.fn(
+                (block, solfNotes, noteNotes, solfAttrs, selSolf, selAttr) => {
+                    block._pitchWheel = {
+                        navItems: [
+                            { title: "do" },
+                            { title: "re" },
+                            { title: "mi" },
+                            { title: "fa" },
+                            { title: "sol" },
+                            { title: "la" },
+                            { title: "ti" }
+                        ]
+                    };
+                    block._accidentalsWheel = {
+                        navItems: [
+                            { title: "♯" },
+                            { title: "♭" },
+                            { title: "𝄪" },
+                            { title: "𝄫" },
+                            { title: "♮" }
+                        ]
+                    };
+                    block._octavesWheel = {
+                        navItems: [{ title: "3" }, { title: "4" }, { title: "5" }]
+                    };
+                    block._exitWheel = {
+                        navItems: [
+                            {
+                                navigateFunction: jest.fn()
+                            }
+                        ],
+                        removeWheel: jest.fn()
+                    };
+                    block._pitchWheel.removeWheel = jest.fn();
+                    block._accidentalsWheel.removeWheel = jest.fn();
+                    block._octavesWheel.removeWheel = jest.fn();
+                }
+            );
+            window.piemenuPitches = global.piemenuPitches;
+
+            targetNoteSelector.click();
+            expect(global.piemenuPitches).toHaveBeenCalled();
+
+            // Exercise wheel navigation callbacks for all notes & accidentals
+            const tempBlock = global.piemenuPitches.mock.calls[0][0];
+            if (tempBlock._pitchWheel?.navItems) {
+                for (const item of tempBlock._pitchWheel.navItems) {
+                    if (item.navigateFunction) item.navigateFunction();
+                }
+            }
+            if (tempBlock._accidentalsWheel?.navItems) {
+                for (const item of tempBlock._accidentalsWheel.navItems) {
+                    if (item.navigateFunction) item.navigateFunction();
+                }
+            }
+            if (tempBlock._octavesWheel?.navItems) {
+                for (const item of tempBlock._octavesWheel.navItems) {
+                    if (item.navigateFunction) item.navigateFunction();
+                }
+            }
+            if (tempBlock._exitWheel?.navItems[0]?.navigateFunction) {
+                tempBlock._exitWheel.navItems[0].navigateFunction();
+            }
+
+            // Test stopTuner
+            synthInstance.stopTuner();
+            expect(synthInstance._tunerActive).toBe(false);
+            expect(synthInstance.tunerMic).toBeNull();
+            expect(synthInstance.tunerAnalyser).toBeNull();
+        });
+
+        test("getTunerFrequency returns 440 default when analyser is null", () => {
+            synthInstance.tunerAnalyser = null;
+            expect(synthInstance.getTunerFrequency()).toBe(440);
+        });
+    });
+
+    describe("Cents Slider Interface", () => {
+        let synthInstance;
+        let widgetBody;
+        let sliderBtn;
+
+        beforeEach(() => {
+            synthInstance = new SynthClass();
+            widgetBody = document.createElement("div");
+            const existingChild = document.createElement("p");
+            existingChild.textContent = "Previous content";
+            widgetBody.appendChild(existingChild);
+
+            sliderBtn = document.createElement("button");
+            const img = document.createElement("img");
+            sliderBtn.appendChild(img);
+
+            synthInstance.widgetWindow = {
+                getWidgetBody: () => widgetBody
+            };
+            synthInstance.centsSliderBtn = sliderBtn;
+            synthInstance.centsValue = 15;
+            synthInstance.applyCentsAdjustment = jest.fn();
+            synthInstance._calculateFrequency = jest.fn().mockReturnValue(440);
+            synthInstance.tunerDisplay = {
+                update: jest.fn()
+            };
+            global.TunerUtils = {
+                frequencyToPitch: jest.fn().mockReturnValue(["A", 0, 4])
+            };
+        });
+
+        test("creates and removes cents slider correctly, restoring prior content", () => {
+            synthInstance.createCentsSlider();
+            expect(synthInstance.sliderVisible).toBe(true);
+            expect(widgetBody.children.length).toBeGreaterThan(0);
+
+            const slider = widgetBody.querySelector('input[type="range"]');
+            expect(slider).not.toBeNull();
+            expect(slider.value).toBe("15");
+
+            // Trigger slider input
+            slider.value = "-20";
+            slider.oninput();
+            expect(synthInstance.centsValue).toBe(-20);
+            expect(synthInstance.applyCentsAdjustment).toHaveBeenCalled();
+            expect(synthInstance.tunerDisplay.update).toHaveBeenCalled();
+
+            // Remove slider and verify previous child restored
+            synthInstance.removeCentsSlider();
+            expect(synthInstance.sliderVisible).toBe(false);
+            expect(widgetBody.textContent).toContain("Previous content");
+        });
+    });
+
+    describe("Instruments, Effects, and Filters Disposal", () => {
+        test("disposeAllInstruments disposes all nodes and clears dictionaries", () => {
+            const synth = new SynthClass();
+            const mockDispose = jest.fn();
+            const mockFaultyDispose = jest.fn(() => {
+                throw new Error("Dispose failed");
+            });
+
+            global.instruments["turtleTest"] = {
+                synth1: { dispose: mockDispose },
+                synth2: { dispose: mockFaultyDispose }
+            };
+            global.instrumentsFilters["turtleTest"] = {
+                synth1: [{ dispose: mockDispose }, { dispose: mockFaultyDispose }]
+            };
+            global.instrumentsEffects["turtleTest"] = {
+                synth1: [{ dispose: mockDispose }, { dispose: mockFaultyDispose }]
+            };
+
+            synth.analyser = {
+                dispose: mockDispose
+            };
+            synth.mic = {
+                disconnect: jest.fn(),
+                close: jest.fn()
+            };
+            synth.player = {
+                stop: jest.fn(),
+                dispose: mockDispose
+            };
+            synth.audioURL = "blob:http://localhost/mock-audio";
+            global.URL.revokeObjectURL = jest.fn();
+
+            synth.disposeAllInstruments();
+
+            expect(mockDispose).toHaveBeenCalled();
+            expect(global.instruments["turtleTest"]).toEqual({});
+            expect(global.instrumentsFilters["turtleTest"]).toEqual({});
+            expect(global.instrumentsEffects["turtleTest"]).toEqual({});
+            expect(synth.analyser).toBeNull();
+        });
+    });
+
+    describe("Temperament and Frequency Variations", () => {
+        let synth;
+
+        beforeEach(() => {
+            synth = new SynthClass();
+        });
+
+        test("temperamentChanged with equal, EDO, JI, and microtonal intervals", () => {
+            // Equal temperament
+            synth.temperamentChanged("equal", "C4");
+            expect(synth.inTemperament).toBe("equal");
+
+            // Unknown temperament
+            synth.temperamentChanged("non_existent_temperament", "C4");
+
+            // Flat and sharp starting pitches (with # and ♯)
+            synth.temperamentChanged("equal", "Bb4");
+            synth.temperamentChanged("equal", "B♭4");
+            synth.temperamentChanged("equal", "F#4");
+            synth.temperamentChanged("equal", "F♯4");
+
+            // Pythagorean and Just intonation
+            synth.temperamentChanged("pythagorean", "C4");
+            expect(Object.keys(synth.noteFrequencies).length).toBeGreaterThan(0);
+
+            synth.temperamentChanged("just intonation", "C4");
+            expect(Object.keys(synth.noteFrequencies).length).toBeGreaterThan(0);
+        });
+
+        test("_getFrequency across various temperaments and input types", () => {
+            synth.inTemperament = "equal";
+            // String note
+            expect(synth._getFrequency("C4", false)).toBeCloseTo(261.63, 1);
+            // Numeric note (Hz)
+            expect(synth._getFrequency(440, false)).toBe(440);
+            // Array of notes
+            const freqs = synth._getFrequency(["C4", 440, "A4"], false);
+            expect(Array.isArray(freqs)).toBe(true);
+            expect(freqs).toHaveLength(3);
+
+            // EDO temperament (e.g. 19-EDO or 31-EDO)
+            const edoTemp = { isEDO: true, pitchNumber: 19 };
+            const origGetTemp = global.getTemperament;
+            global.getTemperament = jest.fn(name =>
+                name === "19-EDO" ? edoTemp : origGetTemp(name)
+            );
+
+            synth.inTemperament = "19-EDO";
+            expect(typeof synth._getFrequency("C4", false)).toBe("number");
+            expect(synth._getFrequency(440, false)).toBe(440);
+            expect(Array.isArray(synth._getFrequency(["C4", 440], false))).toBe(true);
+
+            // Non-equal temperament (Pythagorean)
+            synth.inTemperament = "pythagorean";
+            synth.noteFrequencies = {
+                C: [4, 261.63],
+                G: [4, 392.0]
+            };
+            expect(typeof synth._getFrequency("C4", false)).toBe("number");
+            expect(typeof synth._getFrequency("C5", false)).toBe("number"); // Octave difference
+            expect(Array.isArray(synth._getFrequency(["C4", "G4", 500], false))).toBe(true);
+            expect(synth._getFrequency(440, false)).toBe(440);
+
+            // Change in temperament flag
+            synth._getFrequency("C4", true);
+            synth._getFrequency("C4", true, "just intonation");
+            expect(synth.changeInTemperament).toBe(false);
+
+            global.getTemperament = origGetTemp;
+        });
+
+        test("getCustomFrequency for custom temperament notes", () => {
+            synth.inTemperament = "equal";
+            const res = synth.getCustomFrequency("C4", "equal");
+            expect(res).toBeDefined();
+
+            const arrRes = synth.getCustomFrequency(["C4", 440], "equal");
+            expect(Array.isArray(arrRes)).toBe(true);
+
+            const numRes = synth.getCustomFrequency(440, "equal");
+            expect(numRes).toBe(440);
+
+            // Custom temperament dictionary lookup
+            const customTemp = {
+                1: [1.05, "C♯", 4, "C♯"],
+                2: [1.12, "D", 4, "D"],
+                pitchNumber: 2
+            };
+            const origGetTemp = global.getTemperament;
+            const origIsCustom = global.isCustomTemperament;
+            global.getTemperament = jest.fn(name =>
+                name === "custom_temperament" ? customTemp : origGetTemp(name)
+            );
+            global.isCustomTemperament = jest.fn(name => name === "custom_temperament");
+
+            const customFreq = synth.getCustomFrequency("C#4", "custom_temperament");
+            expect(typeof customFreq).toBe("number");
+
+            global.getTemperament = origGetTemp;
+            global.isCustomTemperament = origIsCustom;
+        });
+    });
+
+    describe("Synth, Sampler, and Effect Node Construction", () => {
+        let synth;
+
+        beforeEach(() => {
+            synth = new SynthClass();
+            global.instruments["turtle0"] = {};
+        });
+
+        test("_createBuiltinSynth handles all builtin synth variants", () => {
+            const types = [
+                "simple 1",
+                "simple 2",
+                "simple 3",
+                "simple 4",
+                "sine",
+                "triangle",
+                "square",
+                "sawtooth",
+                "pluck",
+                "poly",
+                "noise1",
+                "noise2",
+                "noise3",
+                "unknown_default"
+            ];
+
+            types.forEach(type => {
+                const s = synth._createBuiltinSynth("turtle0", type, type, {});
+                expect(s).toBeDefined();
+            });
+        });
+
+        test("_createCustomSynth handles amsynth, fmsynth, duosynth, and default", () => {
+            ["amsynth", "fmsynth", "duosynth", "other"].forEach(type => {
+                const s = synth._createCustomSynth(type, {});
+                expect(s).toBeDefined();
+            });
+        });
+
+        test("_createSampleSynth handles voices, multipitch, drums, custom samples, and URLs", () => {
+            synth.loadSamples();
+            synth.samples.voice["piano"] = () => "piano_sample_url";
+            synth.samples.voice["mandolin"] = [
+                "mandolin_sample_url1",
+                "mandolin_sample_url2",
+                "mandolin_sample_url3"
+            ];
+            synth.samples.drum["kick drum"] = "kick_drum_url";
+
+            const pianoSynth = synth._createSampleSynth("turtle0", "piano", "piano");
+            expect(pianoSynth).toBeDefined();
+
+            const mandolinSynth = synth._createSampleSynth("turtle0", "mandolin", "mandolin");
+            expect(mandolinSynth).toBeDefined();
+
+            const drumSynth = synth._createSampleSynth("turtle0", "kick drum", "kick drum");
+            expect(drumSynth).toBeDefined();
+
+            // Custom sample with cent adjustment and initial null sampleCentAdjustments
+            synth.sampleCentAdjustments = null;
+            CUSTOMSAMPLES["custom1"] = ["sample_data", "do", 4, 1, 10];
+            const customSynth = synth._createSampleSynth("turtle0", "custom1", "custom1");
+            expect(customSynth).toBeDefined();
+            expect(synth.sampleCentAdjustments["custom1"]).toBe(10);
+
+            // Default drum fallback
+            const defaultDrumSynth = synth._createSampleSynth(
+                "turtle0",
+                "unknown_drum",
+                "unknown_drum"
+            );
+            expect(defaultDrumSynth).toBeDefined();
+        });
+
+        test("_parseSampleCenterNo handles solfege and letter notations with all accidentals", () => {
+            expect(synth._parseSampleCenterNo("do", 4)).toBe("48");
+            expect(synth._parseSampleCenterNo("do" + SHARP, 4)).toBe("49");
+            expect(synth._parseSampleCenterNo("do" + FLAT, 4)).toBe("47");
+            expect(synth._parseSampleCenterNo("do" + DOUBLESHARP, 4)).toBe("50");
+            expect(synth._parseSampleCenterNo("do" + DOUBLEFLAT, 4)).toBe("46");
+            expect(synth._parseSampleCenterNo("C", 4)).toBe("48");
+            expect(synth._parseSampleCenterNo("re", 4)).toBe("50");
+            expect(synth._parseSampleCenterNo("D", 4)).toBe("50");
+            expect(synth._parseSampleCenterNo("unknown", 4)).toBe("48");
+        });
+
+        test("resolveInstrumentName resolves translated names and internal keys", () => {
+            expect(synth.resolveInstrumentName("piano")).toBe("piano");
+            expect(synth.resolveInstrumentName("snare drum")).toBe("snare drum");
+            expect(synth.resolveInstrumentName("white noise")).toBe("noise1");
+            expect(synth.resolveInstrumentName("custom_url")).toBe("custom_url");
+            expect(synth.resolveInstrumentName(null)).toBeNull();
+        });
+
+        test("preloadProjectSamples scans and preloads instruments from block lists", async () => {
+            synth._loadSample = jest.fn().mockImplementation(name => {
+                if (name === "failing_sample")
+                    return Promise.reject(new Error("Sample preload error"));
+                return Promise.resolve();
+            });
+
+            const blockList = [
+                [0, "start", 0, 0, [1]],
+                [1, "settimbre", 0, 0, [null, 2]],
+                [2, "piano", 0, 0, [null]],
+                [3, "setinstrument", 0, 0, [null, 4]],
+                [4, "kick drum", 0, 0, [null]],
+                [5, "timbre", 0, 0, [null, 6]],
+                [6, "failing_sample", 0, 0, [null]]
+            ];
+
+            await synth.preloadProjectSamples(blockList);
+            expect(synth._loadSample).toHaveBeenCalledWith("piano");
+            expect(synth._loadSample).toHaveBeenCalledWith("kick drum");
+
+            // Empty or invalid block list
+            await synth.preloadProjectSamples(null);
+            await synth.preloadProjectSamples([]);
+        });
+
+        test("_loadSample handles already loaded, not found, and requirejs loading", async () => {
+            synth.loadSamples();
+
+            // 1. Not in SAMPLE_INFO
+            await expect(synth._loadSample("non_existent")).resolves.toBeUndefined();
+
+            // 2. Already loaded
+            synth.samples.voice["piano"] = "already_loaded";
+            await expect(synth._loadSample("piano")).resolves.toBeUndefined();
+
+            // 3. Load via requirejs
+            synth.samples.voice["violin"] = null;
+            window.VIOLIN_SAMPLE = () => "mock_violin_data";
+            global.requirejs = jest.fn((deps, cb) => cb());
+            await expect(synth._loadSample("violin")).resolves.toBeUndefined();
+            expect(synth.samples.voice["violin"]).toBe("mock_violin_data");
+
+            // 4. Requirejs failure
+            synth.samples.voice["viola"] = null;
+            global.requirejs = jest.fn((deps, cb, errCb) => errCb(new Error("Module load failed")));
+            await expect(synth._loadSample("viola")).rejects.toBeDefined();
+        });
+
+        test("___createSynth disposes previous synths on replacement", () => {
+            synth.loadSamples();
+            const mockDispose = jest.fn();
+            instruments["turtle0"] = instruments["turtle0"] || {};
+            instruments["turtle0"]["sine"] = { dispose: mockDispose };
+            global.instruments["turtle0"] = instruments["turtle0"];
+            synth.___createSynth("turtle0", "sine", "sine", {});
+            expect(mockDispose).toHaveBeenCalled();
+
+            instruments["turtle0"]["amsynth"] = { dispose: mockDispose };
+            synth.___createSynth("turtle0", "amsynth", "amsynth", {});
+            expect(mockDispose).toHaveBeenCalled();
+
+            CUSTOMSAMPLES["custom1"] = ["sample_data", "do", 4, 1, 0];
+            instruments["turtle0"]["custom1"] = { dispose: mockDispose };
+            synth.___createSynth("turtle0", "custom1", "custom1", {});
+            expect(mockDispose).toHaveBeenCalled();
+
+            // URL/file/drum source names
+            synth.___createSynth(
+                "turtle0",
+                "http://example.com/audio.wav",
+                "http://example.com/audio.wav",
+                {}
+            );
+            synth.___createSynth(
+                "turtle0",
+                "file:///local/audio.wav",
+                "file:///local/audio.wav",
+                {}
+            );
+            synth.___createSynth("turtle0", "drum", "drum", {});
+        });
+
+        test("loadSynth handles custom samples and missing instruments", async () => {
+            const s1 = await synth.loadSynth("turtle0", "customsample_piano");
+            expect(s1).toBeDefined();
+
+            // Non-existent instrument
+            const s2 = await synth.loadSynth("turtle0", "completely_unknown");
+            expect(s2).toBeNull();
+        });
+    });
+
+    describe("Performance, Note Triggers, and Effects Routing", () => {
+        let synth;
+
+        beforeEach(() => {
+            synth = new SynthClass();
+            global.instruments["turtle0"] = {};
+            global.instrumentsSource["electronic synth"] = [0, "electronic synth"];
+        });
+
+        test("_performNotes with comprehensive audio effects and fast-path properties", async () => {
+            const mockSynth = {
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn(),
+                chain: jest.fn(),
+                disconnect: jest.fn(),
+                toDestination: jest.fn().mockReturnThis(),
+                oscillator: { partials: [] },
+                portamento: 0
+            };
+
+            // 1. Fast path with oscillator property mutations
+            const fastPathEffects = {
+                doPartials: true,
+                partials: [1, 0.5],
+                doPortamento: true,
+                portamento: 0.1
+            };
+            await synth._performNotes(mockSynth, "C4", 0.25, fastPathEffects, null, false, 0);
+            expect(mockSynth.portamento).toBe(0.1);
+
+            // 2. Fast path with polyphonic synth voices
+            const mockPolySynth = {
+                triggerAttackRelease: jest.fn(),
+                voices: [
+                    { oscillator: { partials: [] }, portamento: 0 },
+                    { oscillator: { partials: [] }, portamento: 0 }
+                ],
+                chain: jest.fn(),
+                disconnect: jest.fn(),
+                toDestination: jest.fn().mockReturnThis()
+            };
+            await synth._performNotes(mockPolySynth, "C4", 0.25, fastPathEffects, null, false, 0);
+            expect(mockPolySynth.voices[0].portamento).toBe(0.1);
+
+            // 3. Full audio graph rewire with all effect nodes
+            const paramsEffects = {
+                doVibrato: true,
+                vibratoFrequency: 5,
+                vibratoIntensity: 0.5,
+                doDistortion: true,
+                distortionAmount: 0.8,
+                doTremolo: true,
+                tremoloFrequency: 4,
+                tremoloDepth: 0.5,
+                doPhaser: true,
+                rate: 2,
+                octaves: 3,
+                baseFrequency: 350,
+                doChorus: true,
+                chorusRate: 1.5,
+                delayTime: 3.5,
+                chorusDepth: 0.7,
+                doPartials: true,
+                partials: [1, 0.5, 0.25],
+                doPortamento: true,
+                portamento: 0.05,
+                doNeighbor: true,
+                neighborArgBeat: 0.25,
+                neighborArgCurrentBeat: 0.5,
+                neighborArgNote1: ["C4"],
+                neighborArgNote2: ["D4"]
+            };
+
+            const paramsFilters = [
+                { filterFrequency: 800, filterType: "lowpass", filterRolloff: -12 }
+            ];
+
+            await synth._performNotes(mockSynth, "C4", 0.5, paramsEffects, paramsFilters, false, 0);
+
+            expect(mockSynth.chain).toHaveBeenCalled();
+
+            // 4. Graph rewire with setNote: true and synth.voices
+            await synth._performNotes(
+                mockPolySynth,
+                "E4",
+                0.25,
+                paramsEffects,
+                paramsFilters,
+                true,
+                0
+            );
+
+            // 5. Error handling in _performNotes when chain throws
+            mockSynth.chain.mockImplementationOnce(() => {
+                throw new Error("Chain failure");
+            });
+            await synth._performNotes(
+                mockSynth,
+                "C4",
+                0.25,
+                paramsEffects,
+                paramsFilters,
+                false,
+                0
+            );
+        });
+
+        test("_performNotes with custom temperaments, microtones, and double accidentals", async () => {
+            const mockSynth = {
+                triggerAttackRelease: jest.fn(),
+                toDestination: jest.fn().mockReturnThis()
+            };
+
+            synth.inTemperament = "custom_temp";
+            const origIsCustom = global.isCustomTemperament;
+            global.isCustomTemperament = jest.fn(() => true);
+            synth.getCustomFrequency = jest.fn().mockReturnValue(445);
+
+            await synth._performNotes(mockSynth, "C+4", 0.25, null, null, false, 0);
+            expect(synth.getCustomFrequency).toHaveBeenCalled();
+
+            // Double accidentals normalization in _performNotes
+            synth.inTemperament = "pythagorean";
+            global.isCustomTemperament = jest.fn(() => false);
+            synth._getFrequency = jest.fn().mockReturnValue(undefined);
+
+            await synth._performNotes(
+                mockSynth,
+                "C" + DOUBLEFLAT + "4",
+                0.25,
+                null,
+                null,
+                false,
+                0
+            );
+            await synth._performNotes(
+                mockSynth,
+                "C" + DOUBLESHARP + "4",
+                0.25,
+                null,
+                null,
+                false,
+                0
+            );
+
+            global.isCustomTemperament = origIsCustom;
+        });
+
+        test("trigger with various instrument sources, audio context states, and watchdog timer", async () => {
+            const testTurtle = 0;
+            synth.createDefaultSynth(testTurtle);
+
+            // 1. Trigger default electronic synth
+            await synth.trigger(testTurtle, "C4", 0.25, "electronic synth", null, null, false, 0);
+
+            // 2. Trigger drum instrument with URL and file sources
+            global.instruments[testTurtle]["http://example.com/drum.wav"] = {
+                start: jest.fn()
+            };
+            global.instrumentsSource["http://example.com/drum.wav"] = [
+                1,
+                "http://example.com/drum.wav"
+            ];
+            await synth.trigger(
+                testTurtle,
+                "C4",
+                0.25,
+                "http://example.com/drum.wav",
+                null,
+                null,
+                false,
+                0
+            );
+            expect(
+                global.instruments[testTurtle]["http://example.com/drum.wav"].start
+            ).toHaveBeenCalled();
+
+            global.instruments[testTurtle]["file:///local/drum.wav"] = {
+                start: jest.fn()
+            };
+            global.instrumentsSource["file:///local/drum.wav"] = [1, "file:///local/drum.wav"];
+            await synth.trigger(
+                testTurtle,
+                "C4",
+                0.25,
+                "file:///local/drum.wav",
+                null,
+                null,
+                false,
+                0
+            );
+
+            // 3. Trigger voice sample instrument with cent adjustments
+            synth.sampleCentAdjustments["piano"] = 12;
+            global.instruments[testTurtle]["piano"] = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                playbackRate: { value: 1 }
+            };
+            global.instrumentsSource["piano"] = [2, "piano"];
+            await synth.trigger(testTurtle, "C4", 0.25, "piano", null, null, false, 0);
+            expect(global.instruments[testTurtle]["piano"].playbackRate.value).toBeCloseTo(
+                Math.pow(2, 12 / 1200),
+                4
+            );
+
+            // 4. Trigger builtin synth (flag 3)
+            global.instruments[testTurtle]["sine"] = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            global.instrumentsSource["sine"] = [3, "sine"];
+            await synth.trigger(testTurtle, ["C4", "E4"], 0.25, "sine", null, null, false, 0);
+
+            // 5. Trigger noise synth (flag 4)
+            global.instruments[testTurtle]["noise1"] = {
+                triggerAttackRelease: jest.fn()
+            };
+            global.instrumentsSource["noise1"] = [4, "noise1"];
+            await synth.trigger(testTurtle, "C4", 0.25, "noise1", null, null, false, 0);
+            expect(
+                global.instruments[testTurtle]["noise1"].triggerAttackRelease
+            ).toHaveBeenCalled();
+
+            // 6. Suspended audio context triggering watchdog timer
+            Tone.context.state = "suspended";
+            window.hasShownAudioWarning = false;
+            window.alert = jest.fn();
+            await synth.trigger(testTurtle, "C4", 0.25, "electronic synth", null, null, false, 0);
+            Tone.context.state = "running";
+        });
+
+        test("_trackVoice tracks active audio nodes on turtle singer", () => {
+            const mockActiveVoices = new Set();
+            synth.activity = {
+                turtles: {
+                    ithTurtle: () => ({
+                        singer: {
+                            activeVoices: mockActiveVoices
+                        }
+                    })
+                }
+            };
+
+            const mockNode = { id: "node1" };
+            synth._trackVoice(0, mockNode);
+            expect(mockActiveVoices.has(mockNode)).toBe(true);
+
+            // Null activity guard
+            synth.activity = null;
+            synth._trackVoice(0, mockNode);
+        });
+
+        test("startSound, stopSound, loop, start, stop, and resume methods", () => {
+            const testTurtle = 0;
+            const mockSynth = {
+                start: jest.fn(),
+                stop: jest.fn(),
+                triggerAttack: jest.fn(),
+                triggerRelease: jest.fn(),
+                triggerAttackRelease: jest.fn()
+            };
+            instruments[testTurtle] = {
+                synthA: mockSynth,
+                drumA: mockSynth
+            };
+            global.instruments[testTurtle] = instruments[testTurtle];
+            synthInstruments[testTurtle] = instruments[testTurtle];
+            instrumentsSource["synthA"] = [0, "synthA"];
+            instrumentsSource["drumA"] = [1, "drumA"];
+            global.instrumentsSource["synthA"] = [0, "synthA"];
+            global.instrumentsSource["drumA"] = [1, "drumA"];
+            synthInstrumentsSource["synthA"] = [0, "synthA"];
+            synthInstrumentsSource["drumA"] = [1, "drumA"];
+
+            // startSound
+            synth.startSound(testTurtle, "drumA", "C4");
+            expect(mockSynth.start).toHaveBeenCalled();
+
+            synth.startSound(testTurtle, "synthA", "C4");
+            expect(mockSynth.triggerAttack).toHaveBeenCalledWith("C4");
+
+            // stopSound
+            synth.stopSound(testTurtle, "drumA");
+            expect(mockSynth.stop).toHaveBeenCalled();
+
+            synth.stopSound(testTurtle, "synthA", "C4");
+            expect(mockSynth.triggerRelease).toHaveBeenCalledWith("C4");
+
+            synth.stopSound(testTurtle, "synthA");
+            expect(mockSynth.triggerRelease).toHaveBeenCalled();
+
+            // loop
+            const lp = synth.loop(testTurtle, "synthA", "C4", 0.25, 0, 120, 0.8);
+            expect(lp).toBeDefined();
+
+            const lpDrum = synth.loop(testTurtle, "drumA", "C4", 0.25, 0, 120, 0.8);
+            expect(lpDrum).toBeDefined();
+
+            // missing instrument loop
+            expect(
+                synth.loop(testTurtle, "unknown_instrument", "C4", 0.25, 0, 120, 0.8)
+            ).toBeNull();
+
+            // transport start/stop/resume
+            synth.start();
+            synth.stop();
+            synth.resume();
+        });
+
+        test("rampTo, setVolume, getVolume, and setMasterVolume volume scaling", () => {
+            const testTurtle = 0;
+            const mockSynth = {
+                volume: {
+                    value: 0,
+                    setValueAtTime: jest.fn(),
+                    cancelScheduledValues: jest.fn(),
+                    linearRampToValueAtTime: jest.fn()
+                }
+            };
+            instruments[testTurtle] = {
+                "electronic synth": mockSynth,
+                "piano": mockSynth,
+                "trumpet": mockSynth
+            };
+            global.instruments[testTurtle] = instruments[testTurtle];
+
+            // rampTo with instrument in DEFAULTSYNTHVOLUME (volume <= 50 and > 50)
+            synth.rampTo(testTurtle, "trumpet", 40, 30, 0.5);
+            expect(mockSynth.volume.linearRampToValueAtTime).toHaveBeenCalled();
+
+            synth.rampTo(testTurtle, "electronic synth", 50, 80, 0.5);
+
+            // rampTo ignored for percussion / string instruments
+            mockSynth.volume.linearRampToValueAtTime.mockClear();
+            synth.rampTo(testTurtle, "piano", 50, 80, 0.5);
+            expect(mockSynth.volume.linearRampToValueAtTime).not.toHaveBeenCalled();
+
+            // getVolume
+            expect(synth.getVolume(testTurtle, "electronic synth")).toBe(0);
+            expect(synth.getVolume(testTurtle, "non_existent")).toBe(50);
+
+            // setVolume
+            synth.setVolume(testTurtle, "electronic synth", 75);
+            expect(mockSynth.volume.setValueAtTime).toHaveBeenCalled();
+
+            synth.setVolume(testTurtle, "trumpet", 30);
+
+            // setMasterVolume (null connections vs explicit connections)
+            synth.setMasterVolume(80, null, null);
+            synth.setMasterVolume(60, 1, 2);
+        });
+
+        test("LiveWaveForm and getWaveFormValues", () => {
+            synth.mic = {
+                connect: jest.fn(),
+                disconnect: jest.fn()
+            };
+            synth.LiveWaveForm();
+            expect(synth.analyser).toBeDefined();
+
+            synth.analyser.getValue = jest.fn().mockReturnValue(new Float32Array(128));
+            const vals = synth.getWaveFormValues();
+            expect(vals).toHaveLength(128);
+        });
+
+        test("setupRecorder on Firefox and other platforms", () => {
+            global.MediaRecorder = jest.fn().mockImplementation((stream, options) => ({
+                stream,
+                options,
+                start: jest.fn(),
+                stop: jest.fn()
+            }));
+
+            const mockSynth = { connect: jest.fn() };
+            instruments[0] = { "electronic synth": mockSynth };
+            global.instruments[0] = instruments[0];
+
+            // Firefox
+            platform.FF = true;
+            synth.setupRecorder();
+            expect(synth.recorder).toBeDefined();
+
+            // Chrome/other
+            platform.FF = false;
+            synth.setupRecorder();
+            expect(synth.recorder).toBeDefined();
+        });
+
+        test("Recording lifecycle: startRecording, stopRecording, playRecording, and stopPlayBackRecording", async () => {
+            global.URL.createObjectURL = jest
+                .fn()
+                .mockReturnValue("blob:http://localhost/mock-rec");
+            global.URL.revokeObjectURL = jest.fn();
+
+            await synth.startRecording();
+            expect(synth.recorder).not.toBeNull();
+            expect(synth.mic).not.toBeNull();
+
+            const url = await synth.stopRecording();
+            expect(url).toBe("blob:http://localhost/mock-rec");
+
+            // playRecording when no audioURL
+            synth.audioURL = null;
+            const onEndedNoUrl = jest.fn();
+            await synth.playRecording(onEndedNoUrl);
+            expect(onEndedNoUrl).toHaveBeenCalled();
+
+            // playRecording with audioURL and player loaded
+            synth.audioURL = url;
+            const onEnded = jest.fn();
+            await synth.playRecording(onEnded);
+            expect(synth.player).not.toBeNull();
+
+            synth.stopPlayBackRecording();
+            expect(synth.player).toBeNull();
+        });
     });
 });
