@@ -565,8 +565,10 @@ function TemperamentWidget() {
                     i--;
                     if (i < 0) {
                         that._playAllRunning = false;
-                        flashDot = -1;
-                        _drawCircle();
+                        setTimeout(function () {
+                            flashDot = -1;
+                            _drawCircle();
+                        }, 200); // ponytail: 200ms hardcoded, matches _playNote flash; extract if timing becomes configurable
                         return;
                     }
                 }
