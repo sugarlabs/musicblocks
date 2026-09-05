@@ -135,17 +135,7 @@ class Turtle {
                 that.container.updateCache();
                 that.activity.refreshCanvas();
             },
-            onRetry: attempt => {
-                console.debug(
-                    "Turtle container for " +
-                        that.name +
-                        " not yet ready (attempt " +
-                        (attempt + 1) +
-                        "/" +
-                        MAX_RETRIES +
-                        ")"
-                );
-            },
+            onRetry: attempt => {},
             maxRetries: MAX_RETRIES,
             initialDelay: INITIAL_DELAY,
             errorMessage:
