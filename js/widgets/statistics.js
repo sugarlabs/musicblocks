@@ -130,9 +130,18 @@ class StatsWindow {
         document.body.style.cursor = "wait";
 
         let myRadarChart = null;
-        const scores = analyzeProject(this.activity);
-        runAnalytics(this.activity);
-        const data = scoreToChartData(scores);
+
+        // Releases the busy state entered just above. Both the success path
+        // (once the chart has finished animating) and the failure path must go
+        // through here, or the widget leaves the UI wedged: activity.loading
+        // gates the turtle and context-menu hover handlers, and _inFlight gates
+        // the Refresh button.
+        const __releaseBusyState = () => {
+            this.activity.loading = false;
+            document.body.style.cursor = "default";
+            this._inFlight = false;
+        };
+
         const __callback = () => {
             const imageData = myRadarChart.toBase64Image();
             const img = new Image();
@@ -145,11 +154,24 @@ class StatsWindow {
             this.widgetWindow.getWidgetBody().appendChild(img);
             this.activity.blocks.hideBlocks();
             this.activity.showBlocksAfterRun = false;
-            document.body.style.cursor = "default";
-            this._inFlight = false;
+            __releaseBusyState();
         };
-        const options = getChartOptions(__callback);
-        myRadarChart = new window.Chart(ctx).Radar(data, options);
+
+        // Only the analysis and chart construction are guarded: those are the
+        // steps that consume project data and can throw on a malformed or
+        // oversized project, and they are the only ones that run while the busy
+        // state is set.
+        try {
+            const scores = analyzeProject(this.activity);
+            runAnalytics(this.activity);
+            const data = scoreToChartData(scores);
+            const options = getChartOptions(__callback);
+            myRadarChart = new window.Chart(ctx).Radar(data, options);
+        } catch (err) {
+            console.error("Statistics analysis failed:", err);
+            __releaseBusyState();
+            return;
+        }
 
         this.jsonObject = document.createElement("ul");
         this.jsonObject.style.float = "left";
