@@ -48,6 +48,17 @@ const DEFAULTFONT = "sans-serif"; // also used in PenBlocks.js
 const SCROLL_CANVAS_SCALE = 3;
 
 /**
+ * Upper bound (in degrees) on the angle argument accepted by doArc().
+ * doArc() draws in chunks of 90 degrees or less, so its draw loop runs
+ * roughly `angle / 90` times; this cap bounds that loop to a few hundred
+ * iterations (125 full rotations) regardless of how the angle was supplied
+ * (block argument, embedded-in-note playback, or JS-authored code), rather
+ * than reusing Wrap Mode's canvas-distance limits, which describe something
+ * unrelated to rotation.
+ */
+const MAX_ARC_ANGLE = 45000;
+
+/**
  * Class pertaining to visual actions for each turtle.
  *
  * @class
@@ -1021,6 +1032,11 @@ class Painter {
         radius = Number(radius);
         if (!Number.isFinite(angle) || !Number.isFinite(radius)) {
             this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
+        if (Math.abs(angle) > MAX_ARC_ANGLE) {
+            this.turtles.activity.errorMsg(_("Arc angle must be within -45000 to 45000 degrees."));
             return;
         }
 
