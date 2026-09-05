@@ -139,8 +139,83 @@ const {
     makeKeyboardAccessible,
     CameraManager,
     announceToScreenReader,
+    waitForReadiness,
     _
 } = require("../utils.js");
+
+describe("waitForReadiness()", () => {
+    let elements;
+    let getElementByIdSpy;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        elements = {};
+        global.createjs = { Stage: jest.fn() };
+        global.Howler = {};
+        global.jQuery = {};
+        getElementByIdSpy = jest
+            .spyOn(document, "getElementById")
+            .mockImplementation(id => elements[id] || null);
+        global.requestAnimationFrame = jest.fn();
+    });
+
+    afterEach(() => {
+        jest.clearAllTimers();
+        jest.useRealTimers();
+        delete global.createjs;
+        delete global.Howler;
+        delete global.jQuery;
+        delete global.requestAnimationFrame;
+        getElementByIdSpy.mockRestore();
+    });
+
+    it("polls at checkInterval and does not use requestAnimationFrame", () => {
+        const callback = jest.fn();
+        waitForReadiness(callback, { minWait: 0, checkInterval: 100, maxWait: 1000 });
+
+        jest.advanceTimersByTime(99);
+        expect(callback).not.toHaveBeenCalled();
+        expect(getElementByIdSpy).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(1);
+        expect(getElementByIdSpy).toHaveBeenCalledTimes(3);
+        expect(callback).not.toHaveBeenCalled();
+        expect(global.requestAnimationFrame).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(99);
+        expect(getElementByIdSpy).toHaveBeenCalledTimes(3);
+
+        jest.advanceTimersByTime(1);
+        expect(getElementByIdSpy).toHaveBeenCalledTimes(6);
+    });
+
+    it("enforces maxWait independently of requestAnimationFrame", () => {
+        const callback = jest.fn();
+        waitForReadiness(callback, { minWait: 0, checkInterval: 1000, maxWait: 250 });
+
+        jest.advanceTimersByTime(250);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(global.requestAnimationFrame).not.toHaveBeenCalled();
+        expect(jest.getTimerCount()).toBe(0);
+    });
+
+    it("calls the callback once and clears both timers when ready", () => {
+        elements.myCanvas = {};
+        elements.loader = {};
+        elements.toolbars = {};
+        const callback = jest.fn();
+
+        waitForReadiness(callback, { minWait: 100, checkInterval: 100, maxWait: 500 });
+        jest.advanceTimersByTime(100);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(jest.getTimerCount()).toBe(0);
+
+        jest.advanceTimersByTime(500);
+        expect(callback).toHaveBeenCalledTimes(1);
+    });
+});
 
 describe("makeKeyboardAccessible()", () => {
     test("adds button semantics and activates on Enter and Space", () => {
