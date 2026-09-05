@@ -5801,6 +5801,12 @@ function getNote(
 
     octave = Math.round(octave);
 
+    const edoNames =
+        octaveLength !== 12
+            ? (TEMPERAMENT[temperament] && TEMPERAMENT[temperament].noteLabels) ||
+              generateNoteNames(octaveLength)
+            : null;
+
     if (typeof noteArg === "number") {
         // Assume it is a pitch number.
         if (!keySignature) {
@@ -5808,13 +5814,16 @@ function getNote(
         }
         let kOffset = 0;
         if (movable) {
-            kOffset = PITCHES.indexOf(keySignature.split(" ")[0]);
-            if (kOffset === -1) {
+            if (octaveLength === 12) {
                 kOffset = PITCHES.indexOf(keySignature.split(" ")[0]);
+
+                if (kOffset === -1) {
+                    kOffset = PITCHES2.indexOf(keySignature.split(" ")[0]);
+                }
+            } else {
+                kOffset = edoNames.indexOf(keySignature.split(" ")[0]);
             }
-            if (kOffset === -1) {
-                kOffset = PITCHES2.indexOf(keySignature.split(" ")[0]);
-            }
+
             if (kOffset === -1) {
                 kOffset = 0;
 
@@ -5823,13 +5832,15 @@ function getNote(
         }
         if (octaveLength === 12) {
             if (getSharpFlatPreference(keySignature) === "sharp") {
-                noteArg = PITCHES2[(noteArg + kOffset) % octaveLength];
+                noteArg =
+                    PITCHES2[(((noteArg + kOffset) % octaveLength) + octaveLength) % octaveLength];
             } else {
-                noteArg = PITCHES[(noteArg + kOffset) % octaveLength];
+                noteArg =
+                    PITCHES[(((noteArg + kOffset) % octaveLength) + octaveLength) % octaveLength];
             }
         } else {
-            const edoNames = generateNoteNames(octaveLength);
-            noteArg = edoNames[(noteArg + kOffset) % octaveLength];
+            noteArg =
+                edoNames[(((noteArg + kOffset) % octaveLength) + octaveLength) % octaveLength];
         }
     }
 
@@ -5842,6 +5853,9 @@ function getNote(
     ) {
         // Check for double flat or double sharp. Since bb and x behave
         // funny with string operations, we jump through some hoops.
+        if (/^[a-g][#b*♯♭𝄪𝄫x♮]*$/u.test(noteArg)) {
+            noteArg = noteArg[0].toUpperCase() + noteArg.slice(1);
+        }
         articulation = getArticulation(noteArg);
         noteArg = noteArg.replace(articulation, "");
 
@@ -5898,7 +5912,6 @@ function getNote(
             // are resolved without going through 12-EDO EXTRATRANSPOSITIONS, which
             // would prematurely convert them to enharmonic equivalents and corrupt
             // the octave calculation.
-            const edoNames = generateNoteNames(octaveLength);
             const normalizedName = noteArg.replaceAll("#", SHARP).replaceAll("b", FLAT);
             const edoIdx = edoNames.indexOf(normalizedName);
             if (edoIdx !== -1) {

@@ -1704,6 +1704,129 @@ describe("getNote", () => {
         expect(result[2]).toBeCloseTo(7, 0);
     });
 });
+describe("getNote with numeric noteArg", () => {
+    it("should resolve positive pitch numbers correctly", () => {
+        // 0 = C in sharp preference
+        expect(getNote(0, 4, 0, "C major", false)[0]).toBe("C");
+        // 1 = C♯ in G major (sharp preference)
+        expect(getNote(1, 4, 0, "G major", false)[0]).toBe("C♯");
+    });
+
+    it("should wrap negative pitch numbers using modulo (12-EDO, sharps)", () => {
+        // -1 should wrap to index 11 = B
+        const result = getNote(-1, 4, 0, "C major", false);
+        expect(result[0]).toBe("B");
+    });
+
+    it("should wrap negative pitch numbers using modulo (12-EDO, flats)", () => {
+        // -2 should wrap to index 10 = B♭ in flat preference
+        const result = getNote(-2, 4, 0, "F major", false);
+        expect(result[0]).toBe("B♭");
+    });
+
+    it("should handle large negative pitch numbers", () => {
+        // -13 should wrap to index 11 = B (same as -1 mod 12)
+        const result = getNote(-13, 4, 0, "C major", false);
+        expect(result[0]).toBe("B");
+    });
+
+    it("should handle negative pitch numbers with movable key offset", () => {
+        // With G major (kOffset=7), noteArg=-8 → (-8+7) = -1 → wraps to 11 = B
+        const result = getNote(-8, 4, 0, "G major", true);
+        expect(result[0]).toBe("B");
+    });
+
+    it("should handle movable-key offset for non-12 EDO (equal19)", () => {
+        // In equal19, generateNoteNames places G at index 11.
+        // With G major (movable=true) and noteArg=0, it should resolve to G, not E#.
+        const result = getNote(0, 4, 0, "G major", true, undefined, undefined, "equal19");
+        expect(result[0]).toBe("G");
+    });
+
+    it("should handle movable-key offset for non-12 EDO (1/3 comma meantone)", () => {
+        // 1/3 comma meantone uses a custom noteLabels table.
+        // A movable D♭ tonic should receive the correct offset from the noteLabels, not the fallback generator.
+        const result = getNote(
+            0,
+            4,
+            0,
+            "D♭ major",
+            true,
+            undefined,
+            undefined,
+            "1/3 comma meantone"
+        );
+        expect(result[0]).toBe("D♭");
+
+        // Also check that it selects the correct distinct label for index 1
+        const pos1 = getNote(1, 4, 0, "C major", false, undefined, undefined, "1/3 comma meantone");
+        expect(pos1[0]).toBe("D♭");
+    });
+});
+
+describe("getNote with lowercase non-12-EDO note names", () => {
+    it("should correctly resolve lowercase non-12-EDO note names", () => {
+        expect(getNote("c#", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "C♯",
+            4,
+            0
+        ]);
+        expect(getNote("eb", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "E♭",
+            4,
+            0
+        ]);
+    });
+});
+
+describe("getNote meantone and edge case tests", () => {
+    it("should correctly resolve C♭ in 1/4 comma meantone", () => {
+        // 1/4 comma meantone (21-EDO) has C♭ at index 19 of its noteLabels.
+        expect(
+            getNote(19, 4, 0, "C major", false, undefined, undefined, "1/4 comma meantone")[0]
+        ).toBe("C♭");
+        expect(
+            getNote("c♭", 4, 0, "C major", false, undefined, undefined, "1/4 comma meantone")[0]
+        ).toBe("C♭");
+        expect(
+            getNote("C♭", 4, 0, "C major", false, undefined, undefined, "1/4 comma meantone")[0]
+        ).toBe("C♭");
+    });
+
+    it("should handle 1/3-comma meantone transposition round trip", () => {
+        // 1/3 comma meantone is 19-EDO.
+        // Transposing up by 19 steps should perfectly equate to 1 octave up.
+        // getNote arguments: noteArg, octave, transposition, keySignature, movable, direction, errorMsg, temperament, isAlreadyEdoSteps
+        const resultUp = getNote(
+            "C",
+            4,
+            19,
+            "C major",
+            false,
+            undefined,
+            undefined,
+            "1/3 comma meantone",
+            true
+        );
+        expect(resultUp).toEqual(["C", 5, 0]);
+
+        // Transposing down by 19 steps should equate to 1 octave down.
+        const resultDown = getNote(
+            "C",
+            4,
+            -19,
+            "C major",
+            false,
+            undefined,
+            undefined,
+            "1/3 comma meantone",
+            true
+        );
+        expect(resultDown[0]).toBe("C");
+        expect(resultDown[1]).toBe(3);
+        expect(resultDown[2]).toBeCloseTo(0);
+    });
+});
 
 describe("getPitchInfo with frequency input", () => {
     it("should handle numeric frequency input via 1-arg form as pitch number", () => {
