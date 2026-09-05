@@ -1535,18 +1535,65 @@ describe("Blocks Foundation", () => {
             expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
         });
 
-        it("batches every block queued during a frame into a single flush", () => {
+        it("batches every block queued during a frame into a single scheduled flush", () => {
             blocks.highlight(0, false);
             blocks.highlight(1, false);
             blocks.highlight(2, false);
 
+            // One frame is scheduled no matter how many blocks were queued.
             expect(frames.length).toBe(1);
 
-            tick();
+            drain();
 
             expect(blocks.blockList[0].highlight).toHaveBeenCalledTimes(1);
             expect(blocks.blockList[1].highlight).toHaveBeenCalledTimes(1);
             expect(blocks.blockList[2].highlight).toHaveBeenCalledTimes(1);
+        });
+
+        it("lights one block per frame, handing over without ever showing two", () => {
+            blocks.highlight(0, false);
+            blocks.highlight(1, false);
+            blocks.highlight(2, false);
+
+            tick();
+            expect(blocks.blockList[0].rendered).toEqual([true]);
+            expect(blocks.blockList[1].rendered).toEqual([]);
+
+            // The outgoing block is turned off in the same frame the next one is lit,
+            // so the highlight is handed over rather than duplicated or dropped.
+            tick();
+            expect(blocks.blockList[0].rendered).toEqual([true, false]);
+            expect(blocks.blockList[1].rendered).toEqual([true]);
+
+            tick();
+            expect(blocks.blockList[1].rendered).toEqual([true, false]);
+            expect(blocks.blockList[2].rendered).toEqual([true]);
+        });
+
+        it("never leaves two blocks highlighted at the same time", () => {
+            // Several blocks running between two frames is the case that made a
+            // per-block queue light all of them at once.
+            const lit = new Set();
+            for (const [index, block] of blocks.blockList.entries()) {
+                block.highlight.mockImplementation(() => {
+                    block.rendered.push(true);
+                    lit.add(index);
+                    expect(lit.size).toBeLessThanOrEqual(1);
+                });
+                block.unhighlight.mockImplementation(() => {
+                    block.rendered.push(false);
+                    lit.delete(index);
+                });
+            }
+
+            for (let i = 0; i < 3; i++) {
+                blocks.highlight(i, true);
+                blocks.unhighlight(i);
+            }
+
+            drain();
+
+            expect(lit.size).toBe(0);
         });
 
         it("collapses repeated requests for the state a block is already heading to", () => {
@@ -1584,7 +1631,8 @@ describe("Blocks Foundation", () => {
             }
 
             // A bounded queue means the block never falls more than one frame behind.
-            expect(blocks._highlightQueue.get(0).length).toBeLessThanOrEqual(2);
+            const pendingForBlock0 = blocks._highlightQueue.filter(step => step.blk === 0);
+            expect(pendingForBlock0.length).toBeLessThanOrEqual(2);
 
             drain();
 
@@ -1631,7 +1679,7 @@ describe("Blocks Foundation", () => {
             blocks.unhighlight(0);
 
             expect(frames.length).toBe(0);
-            expect(blocks._highlightQueue.size).toBe(0);
+            expect(blocks._highlightQueue.length).toBe(0);
         });
     });
 });

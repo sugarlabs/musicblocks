@@ -75,13 +75,21 @@
  */
 
 /**
- * Maximum number of highlight state changes retained per block while the batched
- * highlight queue is being drained. One state is applied per animation frame, so a
- * cap of 2 means a block is never more than a single frame behind the run queue,
- * while still guaranteeing that a highlight requested during a frame is rendered
- * for at least one frame before it is unhighlighted.
+ * Maximum number of highlight transitions retained while the batched highlight
+ * queue is being drained. One block is lit per animation frame, so this bounds how
+ * far the highlight can trail the run queue: 24 transitions is at most 12 pending
+ * highlights, about a fifth of a second at 60fps. Bursts stay intact; a program
+ * that sustained more than one highlight per frame would drift without this.
  */
-const MAXPENDINGHIGHLIGHTS = 2;
+const MAXPENDINGHIGHLIGHTS = 24;
+
+/**
+ * Maximum number of unrendered transitions retained for any single block. A block
+ * that flashes repeatedly between two frames would otherwise strobe for as many
+ * frames as it has pending states, and hold up everything queued behind it. Two
+ * keeps the imminent state plus one more, so the flash is still drawn once.
+ */
+const MAXPENDINGPERBLOCK = 2;
 
 class Blocks {
     constructor(activityOrDeps) {
@@ -209,10 +217,14 @@ class Blocks {
         /** Which block, if any, is highlighted? */
         this.highlightedBlock = null;
 
-        /** Pending highlight states per block, keyed by block number. Each entry is an
-         * alternating queue of desired states (true = highlighted) that have not been
-         * rendered yet. */
-        this._highlightQueue = new Map();
+        /** Highlight transitions that have not been rendered yet, in the order they
+         * were requested. Each entry is { blk, state } with state true = highlighted.
+         * A single ordered queue, rather than one queue per block, is what keeps two
+         * blocks from ever being lit at the same time. */
+        this._highlightQueue = [];
+        /** Which block is currently drawn highlighted, as opposed to which block the
+         * run queue has most recently asked for. */
+        this._renderedHighlight = null;
         /** Is a flush of the highlight queue already scheduled for the next frame? */
         this._highlightScheduled = false;
         /** Which block, if any, is active? */
@@ -2551,31 +2563,60 @@ class Blocks {
          *
          * Repeated requests for the state a block is already heading to collapse into
          * one, but a highlight that is superseded within the same frame is still
-         * rendered for one frame rather than being dropped. No state is remembered
-         * once the queue drains, so nothing here can go stale against the artwork.
+         * rendered for one frame rather than being dropped.
+         *
+         * The queue itself holds nothing once it drains. What outlives it is
+         * _renderedHighlight, the block currently drawn lit, which is what lets the
+         * next highlight turn its predecessor off in the same frame. Should the
+         * artwork be regenerated under it, the worst case is one redundant
+         * unhighlight() on whatever now occupies that index.
          * @private
          * @param - blk - block number
          * @param - state - true to highlight, false to unhighlight
          * @returns {void}
          */
         this._queueHighlightState = (blk, state) => {
-            let pending = this._highlightQueue.get(blk);
-            if (pending === undefined) {
-                pending = [];
-                this._highlightQueue.set(blk, pending);
-            }
+            const queue = this._highlightQueue;
 
-            if (pending.length > 0 && pending[pending.length - 1] === state) {
-                // Already heading to this state on an upcoming frame.
+            // Where is this block headed once everything already queued has been
+            // drawn? Nowhere pending means it is wherever it is drawn right now.
+            let heading = this._renderedHighlight === blk;
+            for (let i = queue.length - 1; i >= 0; i--) {
+                if (queue[i].blk === blk) {
+                    heading = queue[i].state;
+                    break;
+                }
+            }
+            if (heading === state) {
+                // Already heading to this state, so this request adds nothing.
                 return;
             }
 
-            pending.push(state);
+            queue.push({ blk, state });
 
-            // Drop whole on/off pairs out of the middle so the backlog stays bounded
-            // without changing which state the block ends up in.
-            while (pending.length > MAXPENDINGHIGHLIGHTS) {
-                pending.splice(1, 2);
+            // Bound how far one block can run ahead. The first pending entry is left
+            // alone so the state it is about to be drawn in still gets a frame; whole
+            // on/off cycles are dropped after it, which keeps the alternation and so
+            // leaves the block ending in the state last asked for.
+            let mine = [];
+            const indices = () => {
+                mine = [];
+                for (let i = 0; i < queue.length; i++) {
+                    if (queue[i].blk === blk) mine.push(i);
+                }
+            };
+            indices();
+            while (mine.length > MAXPENDINGPERBLOCK) {
+                queue.splice(mine[2], 1);
+                queue.splice(mine[1], 1);
+                indices();
+            }
+
+            // Drop the oldest transitions rather than the newest: a highlight that
+            // is this far behind would be drawn long after the block ran, and the
+            // tail is what determines where the highlight finally rests.
+            while (queue.length > MAXPENDINGHIGHLIGHTS) {
+                queue.shift();
             }
 
             this._scheduleHighlightFlush();
@@ -2598,32 +2639,56 @@ class Blocks {
         };
 
         /**
-         * Apply one pending highlight state per block, batching all of the frame's DOM
-         * writes together. Blocks with states still pending are flushed on the
-         * following frame.
+         * Advance the highlight by one block, batching the frame's artwork writes
+         * together.
+         *
+         * Every pending unhighlight is applied, but only one block is lit per frame:
+         * a block stays lit until its successor is actually drawn, and the two are
+         * swapped within the same frame. That keeps each executed block on screen for
+         * a whole frame without ever showing two highlights at once, which is what a
+         * per-block queue does when several blocks run between two frames.
          * @private
          * @returns {void}
          */
         this._flushHighlightQueue = () => {
             this._highlightScheduled = false;
 
-            for (const [blk, pending] of this._highlightQueue) {
-                const state = pending.shift();
+            const draw = (blk, state) => {
                 const block = this.blockList[blk];
-                if (block !== undefined && !block.trash) {
-                    if (state) {
-                        block.highlight();
-                    } else {
-                        block.unhighlight();
+                if (block === undefined || block.trash) {
+                    return;
+                }
+                if (state) {
+                    block.highlight();
+                } else {
+                    block.unhighlight();
+                }
+            };
+
+            const queue = this._highlightQueue;
+            while (queue.length > 0) {
+                const next = queue[0];
+
+                if (!next.state) {
+                    queue.shift();
+                    draw(next.blk, false);
+                    if (this._renderedHighlight === next.blk) {
+                        this._renderedHighlight = null;
                     }
+                    continue;
                 }
 
-                if (pending.length === 0) {
-                    this._highlightQueue.delete(blk);
+                // One block lit per frame; the rest wait for the next one.
+                queue.shift();
+                if (this._renderedHighlight !== null && this._renderedHighlight !== next.blk) {
+                    draw(this._renderedHighlight, false);
                 }
+                draw(next.blk, true);
+                this._renderedHighlight = next.blk;
+                break;
             }
 
-            if (this._highlightQueue.size > 0) {
+            if (queue.length > 0) {
                 this._scheduleHighlightFlush();
             }
         };
