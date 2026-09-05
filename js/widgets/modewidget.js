@@ -504,6 +504,14 @@ class ModeWidget {
     }
 
     _saveCustomMode(name, pattern) {
+        // The tonic is always selected, so a single-interval pattern means
+        // nothing else is on the wheel -- the state left behind by Clear.
+        // Saving it would register a note-less mode and generate a
+        // meaningless single-pitch action block.
+        if (pattern.length < 2) {
+            this.errorMsg(_("Please select at least one note before saving."));
+            return false;
+        }
         const modes = getSavedCustomModes();
         const existing = modes.findIndex(m => m.name === name);
         // Refuse to overwrite a built-in mode; only registered customs may be updated.
