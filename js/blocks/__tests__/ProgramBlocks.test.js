@@ -472,6 +472,32 @@ describe("ProgramBlocks", () => {
             });
         });
 
+        test.each(["null", "42", "[]"])("rejects non-object JSON: %s", value => {
+            const blk = 10;
+            const turtle = 0;
+            logo.turtleDicts[turtle] = {
+                MyDict: { previous: "value" }
+            };
+            global.getTargetTurtle.mockReturnValue(null);
+
+            activity.blocks.blockList[blk] = {
+                connections: [null, null, 20]
+            };
+            activity.blocks.blockList[20] = {
+                name: "loadFile",
+                value: ["filename", value]
+            };
+
+            const block = getBlock("loadDict");
+            block.flow(["MyDict", [null, null]], logo, turtle, blk);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "The file you selected does not contain a valid dictionary.",
+                blk
+            );
+            expect(logo.turtleDicts[turtle].MyDict).toEqual({ previous: "value" });
+        });
+
         test("handles null arguments", () => {
             const block = getBlock("loadDict");
             block.flow([null, null], logo, 0, 10);
@@ -540,6 +566,31 @@ describe("ProgramBlocks", () => {
             expect(logo.turtleDicts[turtle]).toEqual({
                 MyDict: { key1: "value1" }
             });
+        });
+
+        test.each(["null", "42", "[]"])("rejects non-object JSON: %s", value => {
+            const blk = 10;
+            const turtle = 0;
+            logo.turtleDicts[turtle] = {
+                MyDict: { previous: "value" }
+            };
+            global.getTargetTurtle.mockReturnValue(null);
+
+            activity.blocks.blockList[blk] = {
+                connections: [null, null, 20]
+            };
+            activity.blocks.blockList[20] = {
+                value
+            };
+
+            const block = getBlock("setDictionary");
+            block.flow(["MyDict", {}], logo, turtle, blk);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "The block you selected does not contain a valid dictionary.",
+                blk
+            );
+            expect(logo.turtleDicts[turtle].MyDict).toEqual({ previous: "value" });
         });
 
         test("handles null arguments", () => {

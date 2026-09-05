@@ -432,6 +432,9 @@ function setupProgramBlocks(activity) {
                 } else {
                     try {
                         const d = JSON.parse(activity.blocks.blockList[c].value[1]);
+                        if (d === null || typeof d !== "object" || Array.isArray(d)) {
+                            throw new Error("is not dictionary");
+                        }
                         // Is the dictionary the same as a turtle name?
                         const target = getTargetTurtle(activity.turtles, a);
                         if (target !== null) {
@@ -535,6 +538,9 @@ function setupProgramBlocks(activity) {
             if (c !== null) {
                 try {
                     const d = JSON.parse(activity.blocks.blockList[c].value);
+                    if (d === null || typeof d !== "object" || Array.isArray(d)) {
+                        throw new Error("is not dictionary");
+                    }
                     // Is the dictionary the same as a turtle name?
                     const target = getTargetTurtle(activity.turtles, a);
                     if (target !== null) {
