@@ -121,8 +121,9 @@ function assertSafeTestPath(candidatePath, root) {
     if (!posix.split("/").includes("__tests__")) {
         throw new Error(`refusing to write outside a __tests__/ directory: "${candidatePath}"`);
     }
-    const absolute = path.resolve(root, candidatePath);
-    const contained = absolute === root || absolute.startsWith(root + path.sep);
+    const resolvedRoot = path.resolve(root);
+    const absolute = path.resolve(resolvedRoot, candidatePath);
+    const contained = absolute === resolvedRoot || absolute.startsWith(resolvedRoot + path.sep);
     if (!contained) {
         throw new Error(`refusing to write outside the repository: "${candidatePath}"`);
     }

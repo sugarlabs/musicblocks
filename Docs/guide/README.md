@@ -507,7 +507,7 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 
 The *Set key* block is used to change both the mode and key of the
 current scale. (The current scale is used to define the mapping of
-Solfege [when set Movable Do = True] to notes and also the number of half steps take by the the
+Solfege [when set Movable Do = True] to notes and also the number of half steps take by the
 *Scalar step* block.) For example, by setting the key to C Major, the
 scale is defined by starting at C (or Do) and applying the pattern of half
 steps defined by a Major mode. In this case, the pattern of steps

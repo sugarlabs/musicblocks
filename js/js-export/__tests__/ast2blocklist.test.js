@@ -1596,4 +1596,50 @@ describe("AST2BlockList Class", () => {
             ])
         );
     });
+
+    // Test duplicate name_map entries preserving initial argument configuration.
+    test("should preserve initial argument configuration when duplicate name_map entries exist", () => {
+        const customConfig = JSON.parse(JSON.stringify(config));
+
+        // Create an initial entry in body_blocks whose name_map points to "newnote" with NumberExpression
+        const initialEntry = {
+            comment: "Initial newnote mapping with number expression argument",
+            name_map: {
+                initialPlayNote: "newnote"
+            },
+            arguments: [
+                {
+                    type: "NumberExpression"
+                }
+            ]
+        };
+
+        // Find existing newnote entry and mutate its arguments to a different type ("text")
+        const existingEntry = customConfig.body_blocks.find(
+            entry => entry.name_map && entry.name_map.playNote === "newnote"
+        );
+        existingEntry.arguments = [{ type: "text" }];
+
+        // Insert initialEntry before existingEntry so it is encountered first
+        const existingIndex = customConfig.body_blocks.indexOf(existingEntry);
+        customConfig.body_blocks.splice(existingIndex, 0, initialEntry);
+
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playNote(1, async () => {
+                return mouse.ENDFLOW;
+            });
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, customConfig);
+
+        // Verify the argument block (child of newnote) was created using the initial entry ("number")
+        // rather than the subsequent overridden entry ("text")
+        const argBlock = blockList.find(b => b[0] === 2);
+        expect(argBlock).toBeDefined();
+        expect(argBlock[1]).toEqual(["number", { value: 1 }]);
+    });
 });

@@ -384,6 +384,276 @@ describe("Viewport Culling", () => {
     });
 });
 
+// ---------------------------------------------------------------------------
+// renameDos
+//
+// Called when an action is renamed, to carry the new name onto every block
+// that refers to it. Two of its checks compare the loop index against block
+// numbers: the skipBlock guard, and the slot check that only renames the
+// action-name argument of an onbeatdo or listen block. Both need the index to
+// be a number.
+// ---------------------------------------------------------------------------
+
+describe("renameDos", () => {
+    let blocks;
+
+    beforeEach(() => {
+        const mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    /**
+     * Builds a text block holding a value, as the action-name argument is.
+     * @param {string} value - the name the block carries
+     * @param {number} parent - index of the block it hangs from
+     * @returns {Object} A text block shaped the way renameDos expects.
+     */
+    function textBlock(value, parent) {
+        return {
+            name: "text",
+            value,
+            trash: false,
+            connections: [parent],
+            text: { text: value },
+            container: { updateCache: jest.fn() }
+        };
+    }
+
+    /**
+     * Builds a parent block. Connections hold block numbers, matching the
+     * real blockList, because the slot check searches them with indexOf.
+     * @param {string} name - block name, such as "do" or "onbeatdo"
+     * @param {Array} connections - [parent, ...arguments]
+     * @returns {Object} A parent block.
+     */
+    function parentBlock(name, connections) {
+        return {
+            name,
+            value: null,
+            trash: false,
+            connections,
+            text: { text: "" },
+            container: { updateCache: jest.fn() }
+        };
+    }
+
+    describe("blocks that carry an action name", () => {
+        it("renames the argument of a plain do block", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", 0)];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("newAction");
+            expect(blocks.blockList[1].text.text).toBe("newAction");
+            expect(blocks.blockList[1].container.updateCache).toHaveBeenCalled();
+        });
+
+        it.each(["do", "calc", "doArg", "calcArg", "action"])(
+            "renames the argument of a %s block",
+            name => {
+                blocks.blockList = [parentBlock(name, [null, 1]), textBlock("myAction", 0)];
+
+                blocks.renameDos("myAction", "newAction");
+
+                expect(blocks.blockList[1].value).toBe("newAction");
+            }
+        );
+
+        it("leaves a block naming a different action alone", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("otherAction", 0)];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("otherAction");
+        });
+
+        it("leaves a block whose parent refers to nothing alone", () => {
+            blocks.blockList = [parentBlock("repeat", [null, 1]), textBlock("myAction", 0)];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+        });
+    });
+
+    // onbeatdo and listen take two arguments. The first is the beat or the
+    // event name, the second is the action to run, so only slot 2 is renamed.
+    describe("onbeatdo and listen, which rename only their slot 2 argument", () => {
+        it.each(["onbeatdo", "listen"])("renames the action name of a %s block", name => {
+            blocks.blockList = [
+                parentBlock(name, [null, 1, 2]),
+                textBlock("4", 0),
+                textBlock("myAction", 0)
+            ];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[2].value).toBe("newAction");
+            expect(blocks.blockList[2].text.text).toBe("newAction");
+        });
+
+        it.each(["onbeatdo", "listen"])("leaves the slot 1 argument of a %s block alone", name => {
+            // Slot 1 is the beat or the event name, which is not an action
+            // and must keep its value even when it reads the same.
+            blocks.blockList = [
+                parentBlock(name, [null, 1, 2]),
+                textBlock("myAction", 0),
+                textBlock("somethingElse", 0)
+            ];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[2].value).toBe("somethingElse");
+        });
+
+        it("renames slot 2 and leaves slot 1 alone when both name the action", () => {
+            blocks.blockList = [
+                parentBlock("onbeatdo", [null, 1, 2]),
+                textBlock("myAction", 0),
+                textBlock("myAction", 0)
+            ];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[2].value).toBe("newAction");
+        });
+    });
+
+    describe("skipBlock", () => {
+        it("leaves the block it is asked to skip untouched", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", 0)];
+
+            blocks.renameDos("myAction", "newAction", 1);
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[1].text.text).toBe("myAction");
+            expect(blocks.blockList[1].container.updateCache).not.toHaveBeenCalled();
+        });
+
+        it("renames the others while skipping the one named", () => {
+            blocks.blockList = [
+                parentBlock("do", [null, 1]),
+                textBlock("myAction", 0),
+                parentBlock("do", [null, 3]),
+                textBlock("myAction", 2)
+            ];
+
+            blocks.renameDos("myAction", "newAction", 1);
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[3].value).toBe("newAction");
+        });
+
+        it("skips block 0 when asked, rather than treating it as absent", () => {
+            // Block 0 is falsy as an index, so a guard written as a truth test
+            // rather than a comparison would fail to skip it.
+            blocks.blockList = [textBlock("myAction", 1), parentBlock("do", [null, 0])];
+
+            blocks.renameDos("myAction", "newAction", 0);
+
+            expect(blocks.blockList[0].value).toBe("myAction");
+        });
+
+        it("renames everything when no block is named", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", 0)];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("newAction");
+        });
+    });
+
+    describe("edge cases", () => {
+        it("does nothing when the name is unchanged", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", 0)];
+
+            blocks.renameDos("myAction", "myAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[1].container.updateCache).not.toHaveBeenCalled();
+        });
+
+        it("leaves an empty block list empty", () => {
+            blocks.blockList = [];
+
+            blocks.renameDos("myAction", "newAction");
+
+            // A throw would fail the test on its own, so the postcondition is
+            // what is asserted: nothing was added to the list.
+            expect(blocks.blockList).toEqual([]);
+        });
+
+        it("leaves trashed blocks alone", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", 0)];
+            blocks.blockList[1].trash = true;
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+        });
+
+        it("skips a block whose parent connection is null", () => {
+            blocks.blockList = [parentBlock("do", [null, 1]), textBlock("myAction", null)];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[1].value).toBe("myAction");
+            expect(blocks.blockList[1].text.text).toBe("myAction");
+            expect(blocks.blockList[1].container.updateCache).not.toHaveBeenCalled();
+        });
+
+        it("renames every referring block across a larger workspace", () => {
+            blocks.blockList = [
+                parentBlock("do", [null, 1]),
+                textBlock("myAction", 0),
+                parentBlock("onbeatdo", [null, 3, 4]),
+                textBlock("4", 2),
+                textBlock("myAction", 2),
+                parentBlock("listen", [null, 6, 7]),
+                textBlock("event", 5),
+                textBlock("myAction", 5),
+                parentBlock("repeat", [null, 9]),
+                textBlock("myAction", 8)
+            ];
+
+            blocks.renameDos("myAction", "newAction");
+
+            // Everything that names the action through a do, onbeatdo or
+            // listen is renamed; the repeat argument is not an action name.
+            expect(blocks.blockList.map(b => b.value)).toEqual([
+                null,
+                "newAction",
+                null,
+                "4",
+                "newAction",
+                null,
+                "event",
+                "newAction",
+                null,
+                "myAction"
+            ]);
+        });
+    });
+});
+
 describe("Blocks Foundation", () => {
     let mockActivity;
 
@@ -975,6 +1245,287 @@ describe("Blocks Foundation", () => {
 
             expect(() => blocks.loadNewBlocks(blockObjs)).toThrow("simulated processing error");
             expect(mockActivity._suppressRefresh).toBe(false);
+        });
+    });
+
+    describe("loadNewBlocks re-entrancy (#8392)", () => {
+        const { PubSub } = require("../pubsub");
+        let mockActivity;
+        let loadContainer;
+        let blocks;
+
+        // Block objects: [id, name, x, y, connections]. blockOffset is 0 for
+        // every one of these tests, so a batch of length N occupies indices
+        // 0..N-1 in blockList/_adjustTheseStacks.
+        const makeBatch = n =>
+            Array.from({ length: n }, (_, i) => [i, "forward", 0, 0, [null, null, null]]);
+
+        // Stands in for the real path: block.js calls cleanupAfterLoad()
+        // once a block's own artwork generation finishes, asynchronously,
+        // after _processOneBlock has already recorded the block for the
+        // finalize step.
+        const stubProcessOneBlock = () =>
+            jest.fn((b, blockObjs, blockOffset) => {
+                const thisBlock = blockOffset + b;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            mockActivity = {
+                storage: {},
+                trashcan: {},
+                turtles: {},
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: { synth: { loadSynth: jest.fn(), preloadProjectSamples: jest.fn() } },
+                blocksContainer: { x: 0, y: 0 },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false
+            };
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+
+            blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.customTemperamentDefined = true;
+            blocks._processOneBlock = stubProcessOneBlock();
+            // These tests are only about load serialization, not the
+            // finalize step's internals, so stub it out the same way the
+            // "cleanupAfterLoad" describe block above does.
+            blocks._findDrumURLs = jest.fn();
+            blocks.updateBlockPositions = jest.fn();
+            blocks._rebuildSpatialGrid = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+        });
+
+        afterEach(async () => {
+            // Drain any cleanupAfterLoad callbacks still pending from a test
+            // that didn't await every scheduled block completion, so they
+            // can't fire during a later test against its fresh blocks
+            // instance.
+            await new Promise(r => setTimeout(r, 50));
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("does not start a second call while a first call is still processing", () => {
+            blocks.loadNewBlocks(makeBatch(25));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(20); // first CHUNK_SIZE
+
+            blocks.loadNewBlocks(makeBatch(3));
+
+            // The second call is queued, not run: _processOneBlock has not
+            // been called any additional times for it yet.
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(20);
+            expect(blocks._loadQueue).toHaveLength(1);
+        });
+
+        it("does not lose the first call's in-flight _adjustTheseStacks entries when a second call arrives mid-load", async () => {
+            blocks.loadNewBlocks(makeBatch(25));
+            // Let the first chunk's 20 synchronous _processOneBlock calls'
+            // queued cleanupAfterLoad callbacks start landing.
+            await new Promise(r => setTimeout(r, 0));
+
+            blocks.loadNewBlocks(makeBatch(3));
+
+            // Let everything settle: remaining chunks, all cleanupAfterLoad
+            // callbacks, and the queued second load running to completion.
+            await new Promise(r => setTimeout(r, 50));
+
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(28); // 25 + 3
+            expect(blocks._loadInProgress).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
+        });
+
+        it("emits finishedLoading once per queued load, not merged into a single early event", async () => {
+            const finishedLoadingCalls = [];
+            global.pubsub.on("finishedLoading", () => finishedLoadingCalls.push(Date.now()));
+
+            blocks.loadNewBlocks(makeBatch(25));
+            await new Promise(r => setTimeout(r, 0));
+            blocks.loadNewBlocks(makeBatch(3));
+
+            await new Promise(r => setTimeout(r, 50));
+
+            expect(finishedLoadingCalls).toHaveLength(2);
+        });
+
+        it("starts a queued load once an earlier load's circular-connection early return resolves", () => {
+            // Block connected to itself: connections[0] === block id.
+            const circularBatch = [[0, "forward", 0, 0, [0, null, null]]];
+            blocks.loadNewBlocks(circularBatch);
+
+            // The early return must not leave the queue stuck: a load
+            // queued behind it should still get its turn.
+            expect(blocks._loadInProgress).toBe(false);
+
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("runs a second call immediately when no load is already in progress", () => {
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadQueue).toHaveLength(0);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("loading an empty batch does not hang and still advances the queue", async () => {
+            const finishedLoadingCalls = [];
+            global.pubsub.on("finishedLoading", () => finishedLoadingCalls.push(Date.now()));
+
+            blocks.loadNewBlocks([]);
+            await new Promise(r => setTimeout(r, 0));
+
+            expect(finishedLoadingCalls).toHaveLength(1);
+            expect(blocks._loadInProgress).toBe(false);
+
+            // A load queued behind the empty one must not be stranded.
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("does not leave the queue stuck if a deferred chunk (block 21+) throws", async () => {
+            // Block 20 is the first block of the second chunk, the one
+            // processed inside the deferred setTimeout(processChunk, 0)
+            // callback rather than the first, synchronous chunk. A throw
+            // there runs outside any caller's try/catch, so it can only be
+            // observed here as a window error event, the same way a real
+            // browser would surface it.
+            let callCount = 0;
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+                if (callCount === 21) {
+                    throw new Error("deferred chunk failure");
+                }
+                const thisBlock = blockOffset + b;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+            const windowErrors = [];
+            const onWindowError = event => {
+                event.preventDefault();
+                windowErrors.push(event.error || event.message);
+            };
+            window.addEventListener("error", onWindowError);
+
+            blocks.loadNewBlocks(makeBatch(25));
+            await new Promise(r => setTimeout(r, 50));
+
+            window.removeEventListener("error", onWindowError);
+
+            expect(windowErrors.length).toBeGreaterThan(0);
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(blocks._loadInProgress).toBe(false);
+
+            // A load issued after the failure must not be stranded behind it.
+            blocks._processOneBlock = stubProcessOneBlock();
+            blocks.loadNewBlocks(makeBatch(2));
+
+            expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("does not let a stale completion from a failed load corrupt the next queued load's counter", async () => {
+            // One stub shared by both loads (load B is queued while load A
+            // is still running, so swapping _processOneBlock out from under
+            // it mid-flight would mean load A's own deferred chunk never
+            // actually calls the code meant to fail). Mirrors what
+            // makeNewBlock() really does: every block created is tagged
+            // with the generation active at the moment it was made, and
+            // carries that tag to its own (possibly much later)
+            // cleanupAfterLoad() call, the same way a real Block instance
+            // carries _loadGeneration to block.js's
+            // cleanupAfterLoad(this._loadGeneration) call.
+            //
+            // Load A's chunk-1 (b < 20) completions are collected as plain
+            // functions rather than scheduled with a timer: under parallel
+            // test-worker load, real timer delays aren't a reliable way to
+            // force "arrives after load B finishes" ordering, so that
+            // ordering is enforced explicitly below instead.
+            const staleCleanups = [];
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                const thisBlock = blockOffset + b;
+                const myGeneration = blocks._activeLoadGeneration;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                if (myGeneration === 1 && b === 20) {
+                    // Load A's first block of its deferred (second) chunk.
+                    throw new Error("deferred chunk failure");
+                }
+                if (myGeneration === 1) {
+                    staleCleanups.push(() => blocks.cleanupAfterLoad(myGeneration));
+                } else {
+                    // Load B's blocks: complete promptly, like a normal load.
+                    setTimeout(() => blocks.cleanupAfterLoad(myGeneration), 0);
+                }
+            });
+
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
+
+            const finishedLoadingCalls = [];
+            const loadBFinished = new Promise(resolve => {
+                global.pubsub.on("finishedLoading", () => {
+                    finishedLoadingCalls.push(Date.now());
+                    resolve();
+                });
+            });
+
+            // Load A: 25 blocks, fails on block 20 (first of the deferred
+            // chunk, which only runs once the setTimeout(0) scheduling it
+            // fires). Load B: queued behind A, starts as soon as A's
+            // failure advances the queue.
+            blocks.loadNewBlocks(makeBatch(25));
+            blocks.loadNewBlocks(makeBatch(3));
+
+            // Wait specifically for load B to finish (not a fixed delay),
+            // so this isn't sensitive to how busy the test runner is.
+            await loadBFinished;
+
+            expect(staleCleanups).toHaveLength(20);
+
+            // Now let load A's 20 chunk-1 completions land, well after load
+            // B has already finished and _activeLoadGeneration has moved on.
+            for (const cleanup of staleCleanups) {
+                await cleanup();
+            }
+
+            // Load B's own 3 blocks are all that should count toward it. If
+            // a stale straggler from A had been accepted, B's shared
+            // _loadCounter would go negative, and every one of A's 20
+            // stragglers would independently satisfy the "<= 0" finalize
+            // check again, firing finishedLoading many more times than the
+            // one legitimate completion of load B.
+            expect(finishedLoadingCalls).toHaveLength(1);
+            expect(blocks._loadInProgress).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
+
+            window.removeEventListener("error", onWindowError);
         });
     });
 
@@ -1645,6 +2196,209 @@ describe("Blocks Foundation", () => {
             expect(blocksInstance.trashStacks.length).toBe(100);
             expect(blocksInstance.trashPreviews[0]).toBeUndefined();
             expect(blocksInstance.blockList[0]).toBeNull();
+        });
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Spatial grid key type
+//
+// The grid is a Map of cell key to a Set of block indices, plus a Map from
+// block index to the cells it occupies. Both compare keys strictly, so the
+// index a caller passes has to be the same type the grid already holds or the
+// block is registered twice and the older entry is never cleaned up, leaving
+// it listed at a position it has left.
+// ---------------------------------------------------------------------------
+
+describe("Spatial grid indexing", () => {
+    let mockActivity;
+    let blocks;
+
+    beforeEach(() => {
+        mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+        blocks.blockList = [
+            { trash: false, name: "start", container: { x: 0, y: 0 }, docks: [[0, 0]] },
+            { trash: false, name: "note", container: { x: 0, y: 0 }, docks: [[0, 0]] }
+        ];
+        blocks._rebuildSpatialGrid();
+    });
+
+    /**
+     * Reads back the cells a block currently occupies in the grid.
+     * @param {number} idx - block index
+     * @returns {string[]} Sorted cell keys holding that block.
+     */
+    function cellsHolding(idx) {
+        const found = [];
+        for (const [cellKey, members] of blocks._spatialGrid) {
+            if (members.has(idx)) {
+                found.push(cellKey);
+            }
+        }
+        return found.sort();
+    }
+
+    /**
+     * Asserts the grid is keyed only by numbers, in both directions. A string
+     * alias sitting beside the number is the failure this guards against, and
+     * checking one key by name would not catch it.
+     * @returns {void}
+     */
+    function expectNumericKeysOnly() {
+        for (const key of blocks._blockGridCell.keys()) {
+            expect(typeof key).toBe("number");
+        }
+        for (const members of blocks._spatialGrid.values()) {
+            for (const member of members) {
+                expect(typeof member).toBe("number");
+            }
+        }
+    }
+
+    it("registers every block under a numeric key when first built", () => {
+        expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
+        expect(cellsHolding(0)).toEqual(["0,0"]);
+        expect(cellsHolding(1)).toEqual(["0,0"]);
+    });
+
+    it("moves a block out of its old cell and into the new one", () => {
+        blocks.blockList[1].container.x = 5000;
+        blocks.blockList[1].container.y = 5000;
+
+        blocks._updateSpatialGrid(1);
+
+        expect(cellsHolding(1)).toEqual(["100,100"]);
+        expect(blocks._getNearbyBlocks(0, 0)).not.toContain(1);
+        expect(blocks._getNearbyBlocks(5000, 5000)).toContain(1);
+    });
+
+    describe("when the index arrives as a string", () => {
+        beforeEach(() => {
+            blocks.blockList[1].container.x = 5000;
+            blocks.blockList[1].container.y = 5000;
+        });
+
+        it("does not leave the block listed at the position it left", () => {
+            blocks._updateSpatialGrid("1");
+
+            expect(blocks._getNearbyBlocks(0, 0)).not.toContain(1);
+            expect(cellsHolding(1)).toEqual(["100,100"]);
+            expect(cellsHolding("1")).toEqual([]);
+            expectNumericKeysOnly();
+        });
+
+        it("keeps one entry per block rather than adding a second", () => {
+            blocks._updateSpatialGrid("1");
+
+            expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
+            expectNumericKeysOnly();
+        });
+
+        it("reports the block as a number, so the self-connection guard matches", () => {
+            blocks._updateSpatialGrid("1");
+
+            const nearby = blocks._getNearbyBlocks(5000, 5000);
+
+            // block-drag-controller skips the dragged block with `b === thisBlock`,
+            // which a string entry would slip past.
+            expect(nearby).toContain(1);
+            expect(nearby).not.toContain("1");
+            expect(nearby.every(b => typeof b === "number")).toBe(true);
+        });
+
+        it("agrees with the numeric call in every respect", () => {
+            const asString = new Blocks(mockActivity);
+            asString.blockList = blocks.blockList.map(b => ({
+                ...b,
+                container: { ...b.container }
+            }));
+            asString._rebuildSpatialGrid();
+            asString._updateSpatialGrid("1");
+
+            blocks._updateSpatialGrid(1);
+
+            expect([...asString._blockGridCell.keys()]).toEqual([...blocks._blockGridCell.keys()]);
+            expect(asString._getNearbyBlocks(0, 0)).toEqual(blocks._getNearbyBlocks(0, 0));
+            expect(asString._getNearbyBlocks(5000, 5000)).toEqual(
+                blocks._getNearbyBlocks(5000, 5000)
+            );
+        });
+    });
+
+    describe("edge cases", () => {
+        it("ignores an index that names no block", () => {
+            blocks._updateSpatialGrid(99);
+
+            expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
+        });
+
+        it("ignores a block that has no container yet", () => {
+            blocks.blockList.push({ trash: false, name: "note", container: null, docks: [[0, 0]] });
+
+            blocks._updateSpatialGrid(2);
+
+            expect(blocks._blockGridCell.has(2)).toBe(false);
+        });
+
+        it("keeps block 0 registered, rather than treating it as absent", () => {
+            blocks.blockList[0].container.x = 900;
+
+            blocks._updateSpatialGrid("0");
+
+            expect(blocks._blockGridCell.has(0)).toBe(true);
+            expect(cellsHolding(0)).toEqual(["18,0"]);
+            expectNumericKeysOnly();
+        });
+
+        it("places a block with no docks by its container position", () => {
+            blocks.blockList[1].docks = [];
+            blocks.blockList[1].container.x = 5000;
+            blocks.blockList[1].container.y = 5000;
+
+            blocks._updateSpatialGrid("1");
+
+            expect(cellsHolding(1)).toEqual(["100,100"]);
+        });
+
+        it("registers a block in every cell its docks reach", () => {
+            blocks.blockList[1].docks = [
+                [0, 0],
+                [0, 600]
+            ];
+
+            blocks._updateSpatialGrid("1");
+
+            expect(cellsHolding(1)).toEqual(["0,0", "0,12"]);
+        });
+
+        it("does no work when the block has not left its cells", () => {
+            const before = blocks._blockGridCell.get(1);
+
+            blocks._updateSpatialGrid("1");
+
+            // The same Set object is kept, so an unchanged block is not rewritten.
+            expect(blocks._blockGridCell.get(1)).toBe(before);
+            // The early return must not leave a string alias behind either.
+            expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
+            expect(cellsHolding("1")).toEqual([]);
+            expectNumericKeysOnly();
         });
     });
 });
