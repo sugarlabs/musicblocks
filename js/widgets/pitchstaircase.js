@@ -853,7 +853,7 @@ class PitchStaircase {
                     }, 1000);
                 }
             };
-        const wfbWidget = document.getElementsByClassName("wfbWidget")[0];
+        const wfbWidget = widgetWindow.getWidgetBody();
         if (wfbWidget && wfbWidget.style) {
             wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
             wfbWidget.style.overflowY = "scroll";

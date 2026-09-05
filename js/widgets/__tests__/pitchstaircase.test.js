@@ -588,8 +588,8 @@ describe("PitchStaircase Widget", () => {
             };
             window.widgetWindows.windowFor = jest.fn(() => widgetWindow);
 
-            wfbElement = { style: {} };
-            jest.spyOn(document, "getElementsByClassName").mockReturnValue([wfbElement]);
+            wfbElement = { style: {}, append: jest.fn() };
+            widgetWindow.getWidgetBody = jest.fn(() => wfbElement);
 
             mockActivity = {
                 logo: { synth: { setMasterVolume: jest.fn(), stop: jest.fn() } },
