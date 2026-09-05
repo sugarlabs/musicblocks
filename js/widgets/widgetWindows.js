@@ -273,7 +273,7 @@ class WidgetWindow {
         this._frame = this._create("div", "windowFrame", windows);
         this._frame.setAttribute("role", "dialog");
         this._frame.setAttribute("aria-label", _(this._title));
-        this._overlayframe = this._create("div", "windowFrame", windows);
+        this._overlayframe = this._create("div", "windowFrame windowOverlay", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._drag.style.display = "flex";
         this._drag.style.justifyContent = "space-between";
@@ -443,7 +443,7 @@ class WidgetWindow {
             this._overlayframe.style.width = "100vw";
             this._overlayframe.style.height = "calc(100vh - 64px)";
             this._overlayframe.style.border = "0.25vw solid black";
-            this._overlayframe.style.backgroundColor = "var(--overlay-bg)";
+            this._overlayframe.style.backgroundColor = "var(--color-overlay-backdrop)";
         } else {
             this._frame.style.zIndex = "10000";
             this._overlayframe.style.border = "0px";

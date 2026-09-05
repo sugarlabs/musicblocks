@@ -48,6 +48,12 @@
     --color-widget-titlebar-bg: #1976d2;
     --color-widget-titlebar-text: #ffffff;
 
+    /* Widget & Modal Overlay Tokens */
+    --color-widget-frame-bg: #cccccc;
+    --color-widget-frame-border: #666666;
+    --color-overlay-backdrop: rgba(0, 0, 0, 0.35);
+    --color-panel-bg: #f5f5f5;
+
     /* =========================================================================
      Spacing (Base 4px scale)
      ========================================================================= */
@@ -131,6 +137,12 @@ body.dark {
     --color-selector-selected: #1e88e5;
     --color-label-bg: #bdbdbd;
 
+    /* Widget & Modal Overlay Tokens */
+    --color-widget-frame-bg: #1d1d20;
+    --color-widget-frame-border: #000000;
+    --color-overlay-backdrop: rgba(15, 15, 16, 0.75);
+    --color-panel-bg: #1f2937;
+
     /* Adjusted state backgrounds for dark mode */
     --color-success-bg: rgba(16, 185, 129, 0.2);
     --color-warning-bg: rgba(245, 158, 11, 0.2);
@@ -171,6 +183,12 @@ body.highcontrast {
     --color-selector-bg: #00ffff;
     --color-selector-selected: #00cccc;
     --color-label-bg: #ffffff;
+
+    /* Widget & Modal Overlay Tokens */
+    --color-widget-frame-bg: #000000;
+    --color-widget-frame-border: #ffffff;
+    --color-overlay-backdrop: rgba(0, 0, 0, 0.9);
+    --color-panel-bg: #000000;
 
     --color-success: #00ff00;
     --color-success-bg: #000000;

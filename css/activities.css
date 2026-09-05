@@ -104,7 +104,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     transform: translate(-50%, -50%);
     width: 400px;
     padding: 24px;
-    background-color: var(--color-bg-primary);
+    background-color: var(--color-panel-bg);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     z-index: 10000;
@@ -118,7 +118,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .modal-message {
-    color: black;
+    color: var(--color-text-primary);
     font-size: 16px;
     margin-bottom: 24px;
 }
@@ -135,7 +135,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     font-weight: bold;
     cursor: pointer;
     background-color: var(--color-brand-primary);
-    color: white;
+    color: var(--color-text-inverse);
     margin-right: 16px;
     transition: background-color 0.2s ease;
 }
@@ -152,11 +152,11 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     cursor: pointer;
     transition: background-color 0.2s ease;
     background-color: var(--color-bg-tertiary);
-    color: black;
+    color: var(--color-text-primary);
 }
 
 .cancel-button:hover {
-    background-color: #afafaf;
+    background-color: var(--color-border-primary);
 }
 
 .modal {
@@ -294,12 +294,12 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 .trash-view {
     position: relative;
-    background-color: white;
+    background-color: var(--color-bg-primary);
     max-width: 396px;
     max-height: 200px;
     overflow-y: auto;
     font-size: 16px;
-    color: black;
+    color: var(--color-text-primary);
     border: 2px solid var(--color-brand-secondary);
     list-style-type: none;
     margin: 0;
