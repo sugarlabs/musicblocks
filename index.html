@@ -1341,6 +1341,18 @@
                         });
                     }
                 }
+
+                if (window.globalActivity) {
+                    if (typeof window.globalActivity._onResize === "function") {
+                        window.globalActivity._onResize(true);
+                    }
+                    if (typeof window.globalActivity._handleWindowResize === "function") {
+                        window.globalActivity._handleWindowResize();
+                    }
+                    if (typeof window.globalActivity.repositionBlocks === "function") {
+                        window.globalActivity.repositionBlocks();
+                    }
+                }
             }
 
             document.addEventListener("fullscreenchange", handleFullscreenChange);
