@@ -3521,7 +3521,11 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             /** Named dos are modified in a separate function below. */
-            for (const blk in this.blockList) {
+            // Indexed numerically. Both the skipBlock check below and the
+            // connections.indexOf slot check further down compare against
+            // block numbers, and for...in would hand them a string, which is
+            // never strictly equal to the number it is matched against.
+            for (let blk = 0; blk < this.blockList.length; blk++) {
                 if (blk === skipBlock) {
                     continue;
                 }
