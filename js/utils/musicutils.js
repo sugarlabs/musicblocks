@@ -7957,17 +7957,18 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament
         case _("previous"):
         case "previous":
             return Math.max(changedCurrent - 1, 1);
-        default:
-            try {
-                if (changedCurrent) {
-                    return changedCurrent;
-                } else {
-                    return Math.floor(Number(arg));
-                }
-            } catch (e) {
-                // console.debug("cannot convert " + arg + " to a number");
-                return currentOctave;
+        default: {
+            // A "number" passed as a string (e.g. "2") is a documented argument,
+            // but changedCurrent is always >= 1, so testing it for truthiness
+            // first made the numeric conversion unreachable and silently
+            // ignored the requested octave.
+            const parsed = typeof arg === "string" && arg.trim() !== "" ? Number(arg) : NaN;
+            if (!isNaN(parsed)) {
+                return Math.max(1, Math.min(Math.floor(parsed), 9));
             }
+
+            return changedCurrent;
+        }
     }
 };
 

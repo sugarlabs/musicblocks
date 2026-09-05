@@ -2630,6 +2630,27 @@ describe("calcOctave", () => {
         expect(calcOctave(4, 5, null, "C")).toBe(5);
     });
 
+    it("should treat a number passed as a string like the same number", () => {
+        // NumberBlocks.calculateValueWithOctave forwards a block value to
+        // calcOctave only when it is a string, so "5" is a real input here.
+        expect(calcOctave(4, "5", null, "C")).toBe(calcOctave(4, 5, null, "C"));
+        expect(calcOctave(4, "2", ["C"], "C")).toBe(2);
+        expect(calcOctave(4, "7", ["C"], "C")).toBe(7);
+    });
+
+    it("should clamp a numeric string to the 1..9 octave range", () => {
+        expect(calcOctave(4, "0", ["C"], "C")).toBe(1);
+        expect(calcOctave(4, "12", ["C"], "C")).toBe(9);
+        expect(calcOctave(4, "3.7", ["C"], "C")).toBe(3);
+    });
+
+    it("should fall back to the computed octave for a non-numeric argument", () => {
+        expect(calcOctave(4, "not a number", ["C"], "C")).toBe(
+            calcOctave(4, "current", ["C"], "C")
+        );
+        expect(calcOctave(4, "", ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+    });
+
     it("should return correct octave based on currentNote and lastNotePlayed", () => {
         expect(calcOctave(4, "next", ["C"], "C")).toBe(5);
         expect(calcOctave(4, "next", ["C"], "D")).toBe(5);
