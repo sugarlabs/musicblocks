@@ -72,22 +72,42 @@ class PluginDialog {
             this.options.closeAuxToolbar(this.options.showHideAuxMenu);
         }
 
-        const rawName = prompt(
-            _("Enter the name of a built-in plugin, or leave blank to upload a plugin file:")
-        );
-        if (rawName === null) {
-            return; // User cancelled the operation
+        const modal = document.getElementById("pluginNameModal");
+        const input = document.getElementById("pluginNameInput");
+        const submitBtn = document.getElementById("submitPluginName");
+        const closeBtn = document.getElementById("pluginModalClose");
+
+        if (!modal || !input || !submitBtn) {
+            return;
         }
 
-        const name = rawName.trim().toLowerCase();
-        if (name !== "") {
-            if (typeof this.options.onLoadBuiltIn === "function") {
-                this.options.onLoadBuiltIn(name);
-            }
-        } else {
-            if (this.pluginChooser) {
+        document.getElementById("pluginNameText").textContent = _(
+            "Enter the name of a built-in plugin, or leave blank to upload a plugin file:"
+        );
+        input.value = "";
+        modal.style.display = "block";
+        input.focus();
+
+        const cleanup = () => {
+            modal.style.display = "none";
+            submitBtn.onclick = null;
+            if (closeBtn) closeBtn.onclick = null;
+        };
+
+        submitBtn.onclick = () => {
+            const name = input.value.trim().toLowerCase();
+            cleanup();
+            if (name !== "") {
+                if (typeof this.options.onLoadBuiltIn === "function") {
+                    this.options.onLoadBuiltIn(name);
+                }
+            } else if (this.pluginChooser) {
                 this.pluginChooser.click();
             }
+        };
+
+        if (closeBtn) {
+            closeBtn.onclick = () => cleanup();
         }
     }
 
