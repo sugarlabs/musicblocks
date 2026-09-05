@@ -438,6 +438,41 @@ describe("MusicKeyboard add-row submenu", () => {
         expect(keyboard._exitWheel.navItems[0].sliceSelectedAttr.cursor).toBe("pointer");
         expect(window.configureExitWheel).toHaveBeenCalledWith(keyboard._exitWheel);
     });
+
+    test("creates column pie submenu with pitchblocks condition and sets octavesWheel tooltips", () => {
+        window.configureExitWheel = jest.fn();
+        global.platformColor = {
+            accidentalsWheelcolors: [],
+            accidentalsWheelcolorspush: "#000",
+            octavesWheelcolors: []
+        };
+        document.body.innerHTML =
+            '<div id="wheelDivptm"></div><div id="_exitWheel"></div><div id="labelcol0"></div>';
+        document.getElementById("labelcol0").getBoundingClientRect = () => ({ x: 100, y: 400 });
+
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [{ connections: [null, 1, 2] }, { value: "C" }, { value: 4 }]
+            }
+        });
+        keyboard.layout = [{ noteName: "C", noteOctave: 4, blockNumber: 0 }];
+        global.wheelnav.prototype.navigateWheel = jest.fn();
+        global.wheelnav.prototype.setTooltips = jest.fn(tooltips => {
+            if (keyboard._octavesWheel) {
+                keyboard._octavesWheel.navItems = tooltips.map(t => ({ tooltip: t }));
+            }
+        });
+
+        expect(() => {
+            keyboard._createColumnPieSubmenu(0, "pitchblocks");
+        }).not.toThrow();
+
+        expect(keyboard._octavesWheel.navItems[0].tooltip).toBe(
+            "Octave 8 (Shift+↑/↓ to shift octaves)"
+        );
+    });
     test("creates keyboard without throwing and sets up idContainer", () => {
         global.PITCHES3 = ["C", "D", "E", "F", "G", "A", "B"];
         global.SHARP = "♯";
@@ -1470,6 +1505,109 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
 
         expect(keyboard._clearWidgetInterval(id)).toBe(true);
         jest.useRealTimers();
+    });
+
+    test("shiftOctave shifts octaves up and down within bounds", () => {
+        const keyboard = new MusicKeyboard({});
+        keyboard.octaves = [4, 4, 4, 5];
+        keyboard.displayLayout = [
+            { noteName: "C", noteOctave: 4 },
+            { noteName: "D", noteOctave: 5 }
+        ];
+        keyboard._createTable = jest.fn();
+
+        keyboard.shiftOctave(1);
+        expect(keyboard.octaves).toEqual([5, 5, 5, 6]);
+        expect(keyboard._createTable).toHaveBeenCalledTimes(1);
+
+        keyboard.shiftOctave(-1);
+        expect(keyboard.octaves).toEqual([4, 4, 4, 5]);
+
+        keyboard.octaves = [8, 8, 8, 8];
+        keyboard.shiftOctave(1);
+        expect(keyboard.octaves).toEqual([8, 8, 8, 8]);
+    });
+
+    test("shiftOctave ignores hertz frequency rows and updates noteMapper", () => {
+        const keyboard = new MusicKeyboard({});
+        keyboard.noteNames = ["C", "hertz"];
+        keyboard.octaves = [4, 392];
+        keyboard.displayLayout = [
+            { noteName: "C", noteOctave: 4 },
+            { noteName: "hertz", noteOctave: 392 }
+        ];
+        keyboard._createTable = jest.fn();
+
+        keyboard.shiftOctave(1);
+        expect(keyboard.octaves).toEqual([5, 392]);
+        expect(keyboard.displayLayout[0].noteOctave).toBe(5);
+        expect(keyboard.displayLayout[1].noteOctave).toBe(392);
+    });
+
+    test("triggers shiftOctave on Shift+ArrowUp and Shift+ArrowDown keydown events", () => {
+        const keyboard = new MusicKeyboard({});
+        keyboard.shiftOctave = jest.fn();
+
+        const __keyboarddown = event => {
+            if (event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
+                event.preventDefault();
+                keyboard.shiftOctave(1);
+                return;
+            }
+            if (event.shiftKey && (event.key === "ArrowDown" || event.code === "ArrowDown")) {
+                event.preventDefault();
+                keyboard.shiftOctave(-1);
+                return;
+            }
+        };
+
+        const eventUp = {
+            shiftKey: true,
+            key: "ArrowUp",
+            preventDefault: jest.fn()
+        };
+        __keyboarddown(eventUp);
+        expect(keyboard.shiftOctave).toHaveBeenCalledWith(1);
+        expect(eventUp.preventDefault).toHaveBeenCalled();
+
+        const eventDown = {
+            shiftKey: true,
+            key: "ArrowDown",
+            preventDefault: jest.fn()
+        };
+        __keyboarddown(eventDown);
+        expect(keyboard.shiftOctave).toHaveBeenCalledWith(-1);
+        expect(eventDown.preventDefault).toHaveBeenCalled();
+    });
+
+    test("shiftOctave updates DOM elements attributes and text nodes", () => {
+        const cell = document.createElement("td");
+        cell.id = "cell-0";
+        cell.setAttribute = jest.fn();
+        const textNode = document.createTextNode("C4");
+        cell.appendChild(textNode);
+
+        const origDocById = global.docById;
+        global.docById = jest.fn(id =>
+            id === "cell-0" ? cell : { style: {}, replaceChildren: jest.fn() }
+        );
+
+        const keyboard = new MusicKeyboard({});
+        keyboard.keyTable = { style: {}, replaceChildren: jest.fn(), append: jest.fn() };
+        keyboard.noteNames = ["C"];
+        keyboard.octaves = [4];
+        keyboard.displayLayout = [{ noteName: "C", noteOctave: 4 }];
+        keyboard.noteMapper = {};
+        keyboard.layout = [{ noteName: "C", noteOctave: 4 }];
+
+        keyboard.shiftOctave(1);
+
+        expect(cell.setAttribute).toHaveBeenCalledWith("alt", "C5");
+        expect(cell.setAttribute).toHaveBeenCalledWith("title", "C5");
+        expect(textNode.textContent).toBe("C5");
+        expect(keyboard.noteMapper["cell-0"]).toBe("C5");
+
+        global.docById = origDocById;
     });
 });
 

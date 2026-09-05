@@ -552,7 +552,17 @@ function MusicKeyboard(activity) {
          * Handles the keyboard key down event to start playing musical notes.
          * @param {KeyboardEvent} event - The keyboard event triggered when a key is pressed down.
          */
-        const __keyboarddown = function (event) {
+        const __keyboarddown = event => {
+            if (event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
+                event.preventDefault();
+                this.shiftOctave(1);
+                return;
+            }
+            if (event.shiftKey && (event.key === "ArrowDown" || event.code === "ArrowDown")) {
+                event.preventDefault();
+                this.shiftOctave(-1);
+                return;
+            }
             if (current.has(event.keyCode)) return;
 
             __startNote(event);
@@ -2736,13 +2746,15 @@ function MusicKeyboard(activity) {
 
             this._accidentalsWheel.animatetime = 0; // 300;
             this._accidentalsWheel.createWheel(accidentalLabels);
-            this._accidentalsWheel.setTooltips([
-                _("double sharp"),
-                _("sharp"),
-                _("natural"),
-                _("flat"),
-                _("double flat")
-            ]);
+            if (typeof this._accidentalsWheel.setTooltips === "function") {
+                this._accidentalsWheel.setTooltips([
+                    _("double sharp"),
+                    _("sharp"),
+                    _("natural"),
+                    _("flat"),
+                    _("double flat")
+                ]);
+            }
 
             this._octavesWheel.colors = platformColor.octavesWheelcolors;
             this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2753,6 +2765,18 @@ function MusicKeyboard(activity) {
             this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
             this._octavesWheel.animatetime = 0; // 300;
             this._octavesWheel.createWheel(octaveLabels);
+            if (typeof this._octavesWheel.setTooltips === "function") {
+                this._octavesWheel.setTooltips([
+                    _("Octave 8 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 7 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 6 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 5 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 4 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 3 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 2 (Shift+↑/↓ to shift octaves)"),
+                    _("Octave 1 (Shift+↑/↓ to shift octaves)")
+                ]);
+            }
         }
 
         const x = docById("labelcol" + index).getBoundingClientRect().x;
@@ -3775,6 +3799,90 @@ function MusicKeyboard(activity) {
          * @memberof MusicKeyboard
          */
         navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
+    };
+
+    /**
+     * Shifts keyboard octaves higher (+1) or lower (-1).
+     * @param {number} delta
+     */
+    this.shiftOctave = function (delta) {
+        if (!this.octaves || this.octaves.length === 0) return;
+
+        // Filter octaves for pitched notes only (exclude "hertz")
+        const pitchedOctaves = [];
+        for (let i = 0; i < this.octaves.length; i++) {
+            if (this.noteNames && this.noteNames[i] !== "hertz") {
+                pitchedOctaves.push(this.octaves[i]);
+            }
+        }
+        if (pitchedOctaves.length === 0) return;
+
+        const minOct = Math.min(...pitchedOctaves);
+        const maxOct = Math.max(...pitchedOctaves);
+
+        if (delta > 0 && maxOct >= 8) return;
+        if (delta < 0 && minOct <= 1) return;
+
+        for (let i = 0; i < this.octaves.length; i++) {
+            if (this.noteNames && this.noteNames[i] !== "hertz") {
+                this.octaves[i] += delta;
+            }
+        }
+
+        if (this.displayLayout) {
+            for (let i = 0; i < this.displayLayout.length; i++) {
+                if (
+                    this.displayLayout[i].noteName !== "hertz" &&
+                    this.displayLayout[i].noteOctave !== undefined
+                ) {
+                    this.displayLayout[i].noteOctave += delta;
+                }
+            }
+        }
+
+        if (this.layout) {
+            for (let i = 0; i < this.layout.length; i++) {
+                if (
+                    this.layout[i].noteName !== "hertz" &&
+                    this.layout[i].noteOctave !== undefined
+                ) {
+                    this.layout[i].noteOctave += delta;
+                }
+            }
+        }
+
+        // Update note mappings and key element labels
+        if (this.displayLayout && typeof docById === "function") {
+            for (let i = 0; i < this.displayLayout.length; i++) {
+                const item = this.displayLayout[i];
+                if (item.noteName !== "hertz") {
+                    const elem = docById("cell-" + i) || docById("blackRow" + i);
+                    if (elem) {
+                        const newSynthName = resolveSynthNoteName(item.noteName, item.noteOctave);
+                        if (this.noteMapper && elem.id) {
+                            this.noteMapper[elem.id] = newSynthName;
+                        }
+                        if (typeof elem.setAttribute === "function") {
+                            elem.setAttribute("alt", newSynthName);
+                            elem.setAttribute("title", newSynthName);
+                        }
+
+                        if (elem.childNodes && elem.childNodes.length > 0) {
+                            for (let j = 0; j < elem.childNodes.length; j++) {
+                                const node = elem.childNodes[j];
+                                if (node.nodeType === 3) {
+                                    node.textContent = `${item.noteName}${item.noteOctave}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (typeof this._createTable === "function") {
+            this._createTable();
+        }
     };
 }
 
