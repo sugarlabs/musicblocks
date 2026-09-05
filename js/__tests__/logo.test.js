@@ -1229,6 +1229,65 @@ describe("Logo runLogoCommands", () => {
         jest.restoreAllMocks();
     });
 
+    describe("performance mode detection from the URL", () => {
+        // window.location cannot be reassigned in this jsdom, so drive the query
+        // string through history.replaceState, which jsdom does support.
+        const withSearch = (search, fn) => {
+            const before = window.location.search;
+            window.history.replaceState({}, "", search || "/");
+            try {
+                fn();
+            } finally {
+                window.history.replaceState({}, "", before || "/");
+            }
+        };
+
+        const trackerRequestedFor = search => {
+            const requirejsSpy = jest.fn();
+            const originalRequirejs = global.requirejs;
+            const savedTracker = global.performanceTracker;
+            global.requirejs = requirejsSpy;
+            // The lazy-load branch only runs when the tracker is not yet loaded,
+            // which is the situation this URL check exists to decide.
+            delete global.performanceTracker;
+            logo._restoreConnections = jest.fn();
+            logo.runFromBlock = jest.fn();
+            logo.blockList = [];
+            try {
+                withSearch(search, () => logo.runLogoCommands(null, null));
+            } finally {
+                global.requirejs = originalRequirejs;
+                global.performanceTracker = savedTracker;
+            }
+            return requirejsSpy.mock.calls.some(
+                call => Array.isArray(call[0]) && call[0].includes("utils/performanceTracker")
+            );
+        };
+
+        test("loads the tracker for ?performance=true", () => {
+            expect(trackerRequestedFor("?performance=true")).toBe(true);
+        });
+
+        test("loads the tracker when the parameter is not first", () => {
+            expect(trackerRequestedFor("?a=1&performance=true")).toBe(true);
+        });
+
+        test("ignores a parameter that merely ends in performance=true", () => {
+            // A substring search matches "?noperformance=true", which asks for
+            // no such thing.
+            expect(trackerRequestedFor("?noperformance=true")).toBe(false);
+        });
+
+        test("ignores a value that merely starts with true", () => {
+            expect(trackerRequestedFor("?performance=truex")).toBe(false);
+        });
+
+        test("ignores performance=false and an absent parameter", () => {
+            expect(trackerRequestedFor("?performance=false")).toBe(false);
+            expect(trackerRequestedFor("")).toBe(false);
+        });
+    });
+
     test("executes startHere path", () => {
         logo._restoreConnections = jest.fn();
         logo.runFromBlock = jest.fn();
