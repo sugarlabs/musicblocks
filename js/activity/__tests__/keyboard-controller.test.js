@@ -504,16 +504,18 @@ describe("KeyboardController", () => {
             expect(rhythm.scrollEvent).toHaveBeenCalledWith(-20, 1);
         });
 
-        it("does not throw on the arrows when the stored palette name has no entry", () => {
+        it("falls back to scrolling the canvas when the stored palette name has no entry", () => {
             const activity = makeActivity();
             activity.palettes.dict = {};
             activity.palettes.activePalette = "rhythm";
+            activity.blocksContainer.y = 0;
             const controller = createController(activity);
 
-            expect(() => controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }))).not.toThrow();
-            expect(() =>
-                controller.__keyPressed(makeEvent({ keyCode: KEYCODE.DOWN }))
-            ).not.toThrow();
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
+            expect(activity.blocksContainer.y).toBe(20);
+
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.DOWN }));
+            expect(activity.blocksContainer.y).toBe(0);
         });
 
         it("scrolls the palette menu home when the mouse is over the palette", () => {
