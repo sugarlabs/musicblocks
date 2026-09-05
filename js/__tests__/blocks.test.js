@@ -1012,6 +1012,7 @@ describe("Blocks Foundation", () => {
         let loadContainer;
 
         beforeEach(() => {
+            jest.useRealTimers();
             global.pubsub = new PubSub();
             mockActivity = {
                 storage: {},
@@ -1246,6 +1247,164 @@ describe("Blocks Foundation", () => {
             expect(() => blocks.loadNewBlocks(blockObjs)).toThrow("simulated processing error");
             expect(mockActivity._suppressRefresh).toBe(false);
         });
+
+        it("queues a new load until the active chunked load finishes", async () => {
+            jest.useFakeTimers();
+
+            try {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.protoBlockDict = {};
+                blocks.newStorein2Block = jest.fn();
+                blocks.newNamedboxBlock = jest.fn();
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks.customTemperamentDefined = true;
+                blocks._processOneBlock = jest.fn();
+                blocks._findDrumURLs = jest.fn();
+                blocks.updateBlockPositions = jest.fn();
+                blocks._cleanupStacks = jest.fn();
+                blocks._rebuildSpatialGrid = jest.fn();
+
+                const oldBlockObjs = Array.from({ length: 40 }, (_, index) => [
+                    index,
+                    "forward",
+                    0,
+                    0,
+                    [null, null, null]
+                ]);
+                const newBlockObjs = [[0, "forward", 0, 0, [null, null, null]]];
+
+                blocks.loadNewBlocks(oldBlockObjs);
+                const oldGeneration = blocks._activeLoadGeneration;
+                expect(blocks._processOneBlock).toHaveBeenCalledTimes(20);
+                expect(jest.getTimerCount()).toBe(1);
+
+                blocks.loadNewBlocks(newBlockObjs);
+
+                expect(blocks._processOneBlock).toHaveBeenCalledTimes(20);
+                expect(blocks._pendingBlockLoads).toEqual([newBlockObjs]);
+                expect(jest.getTimerCount()).toBe(1);
+
+                jest.runOnlyPendingTimers();
+                expect(blocks._processOneBlock).toHaveBeenCalledTimes(40);
+                expect(jest.getTimerCount()).toBe(0);
+
+                for (let i = 0; i < oldBlockObjs.length; i++) {
+                    await blocks.cleanupAfterLoad(oldGeneration);
+                }
+
+                expect(blocks._processOneBlock).toHaveBeenCalledTimes(41);
+                expect(blocks._pendingBlockLoads).toEqual([]);
+
+                await blocks.cleanupAfterLoad(blocks._activeLoadGeneration);
+                expect(blocks._activeLoadGeneration).toBe(null);
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+
+        it("clears queued appends when the active load is explicitly cancelled", () => {
+            jest.useFakeTimers();
+
+            try {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.protoBlockDict = {};
+                blocks.newStorein2Block = jest.fn();
+                blocks.newNamedboxBlock = jest.fn();
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks.customTemperamentDefined = true;
+                blocks._processOneBlock = jest.fn();
+
+                const oldBlockObjs = Array.from({ length: 40 }, (_, index) => [
+                    index,
+                    "forward",
+                    0,
+                    0,
+                    [null, null, null]
+                ]);
+                const newBlockObjs = [[0, "forward", 0, 0, [null, null, null]]];
+
+                blocks.loadNewBlocks(oldBlockObjs);
+                blocks.loadNewBlocks(newBlockObjs);
+                blocks.cancelPendingLoad();
+
+                expect(blocks._pendingBlockLoads).toEqual([]);
+                expect(blocks._activeLoadGeneration).toBe(null);
+                expect(jest.getTimerCount()).toBe(0);
+
+                jest.runOnlyPendingTimers();
+                expect(blocks._processOneBlock).toHaveBeenCalledTimes(20);
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+
+        it("ignores a chunk callback that runs after load cancellation", () => {
+            jest.useFakeTimers();
+            const scheduledChunks = [];
+            const setTimeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(callback => {
+                scheduledChunks.push(callback);
+                return 1;
+            });
+
+            try {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.protoBlockDict = {};
+                blocks.newStorein2Block = jest.fn();
+                blocks.newNamedboxBlock = jest.fn();
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks.customTemperamentDefined = true;
+                blocks._processOneBlock = jest.fn();
+
+                const blockObjs = Array.from({ length: 40 }, (_, index) => [
+                    index,
+                    "forward",
+                    0,
+                    0,
+                    [null, null, null]
+                ]);
+
+                blocks.loadNewBlocks(blockObjs);
+                blocks.cancelPendingLoad();
+                scheduledChunks[0]();
+
+                expect(blocks._processOneBlock).toHaveBeenCalledTimes(20);
+            } finally {
+                setTimeoutSpy.mockRestore();
+                jest.useRealTimers();
+            }
+        });
+
+        it("ignores cleanup from a cancelled load", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._activeLoadGeneration = 1;
+            blocks._loadCounter = 1;
+
+            blocks.cancelPendingLoad();
+            await blocks.cleanupAfterLoad(1);
+
+            expect(blocks._loadCounter).toBe(0);
+            expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
+        });
+
+        it("does not refresh the workspace when cleanup is cancelled", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._activeLoadGeneration = 1;
+            blocks._loadCounter = 1;
+            blocks.blockList = [];
+            blocks.blocksToCollapse = [];
+            blocks._findDrumURLs = jest.fn(() => blocks.cancelPendingLoad());
+            blocks.updateBlockPositions = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+            blocks._rebuildSpatialGrid = jest.fn();
+
+            await blocks.cleanupAfterLoad(1);
+
+            expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
+            expect(mockActivity._suppressRefresh).toBe(false);
+        });
     });
 
     describe("loadNewBlocks re-entrancy (#8392)", () => {
@@ -1273,6 +1432,7 @@ describe("Blocks Foundation", () => {
             });
 
         beforeEach(() => {
+            jest.useRealTimers();
             global.pubsub = new PubSub();
             mockActivity = {
                 storage: {},
@@ -1315,11 +1475,17 @@ describe("Blocks Foundation", () => {
         });
 
         afterEach(async () => {
+            jest.useRealTimers();
             // Drain any cleanupAfterLoad callbacks still pending from a test
             // that didn't await every scheduled block completion, so they
             // can't fire during a later test against its fresh blocks
             // instance.
-            await new Promise(r => setTimeout(r, 50));
+            await new Promise(r =>
+                setTimeout(() => {
+                    console.log("reentrancy cleanup timer fired");
+                    r();
+                }, 50)
+            );
             loadContainer.remove();
             delete global.pubsub;
         });

@@ -211,6 +211,10 @@ class Blocks {
         this._expandablesList = [];
         /** Number of blocks to load */
         this._loadCounter = 0;
+        /** Generation for invalidating stale asynchronous block loads. */
+        this._loadGeneration = 0;
+        this._activeLoadGeneration = null;
+        this._loadTimeoutId = null;
         /**
          * loadNewBlocks() is not re-entrant: it tracks the in-progress load
          * on _loadCounter/_adjustTheseStacks/_adjustTheseDocks below, shared
@@ -219,15 +223,9 @@ class Blocks {
          * first (issue #8392), so calls are queued and run one at a time.
          */
         this._loadQueue = [];
+        /** Backward-compatible alias for queued block batches. */
+        this._pendingBlockLoads = this._loadQueue;
         this._loadInProgress = false;
-        /**
-         * Bumped once per load attempt (see _loadNewBlocksNow). Every block
-         * created during a load is tagged with the value active at the time,
-         * so a completion callback that lands after its own load has already
-         * been abandoned (queue advanced past it on failure) can recognize
-         * itself as stale and skip touching the next load's _loadCounter.
-         */
-        this._activeLoadGeneration = 0;
         /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
@@ -4801,9 +4799,26 @@ class Blocks {
         };
 
         /**
-         * Load new blocks. Queues the call instead of running it immediately
-         * if another load is still in progress, so the two loads' bookkeeping
-         * never overlaps (issue #8392).
+         * Cancel any pending chunk from the current block load.
+         * @public
+         * @returns {void}
+         */
+        this.cancelPendingLoad = () => {
+            if (this._loadTimeoutId !== null) {
+                clearTimeout(this._loadTimeoutId);
+                this._loadTimeoutId = null;
+            }
+
+            this._loadGeneration += 1;
+            this._activeLoadGeneration = null;
+            this._loadCounter = 0;
+            this._loadQueue.length = 0;
+            this._loadInProgress = false;
+            this.activity._suppressRefresh = false;
+        };
+
+        /**
+         * Load new blocks.
          * @param - blockObj - Block Objects
          * @public
          * return {void}
@@ -4848,7 +4863,9 @@ class Blocks {
             // completion that lands after this one has been abandoned can be
             // told apart from a completion belonging to whatever load is
             // active by the time it fires.
-            this._activeLoadGeneration += 1;
+            this._loadGeneration += 1;
+            const loadGeneration = this._loadGeneration;
+            this._activeLoadGeneration = loadGeneration;
 
             try {
                 /**
@@ -5456,7 +5473,6 @@ class Blocks {
                 this._adjustTheseStacks = [];
                 this._adjustTheseDocks = [];
                 this._loadCounter = blockObjs.length;
-
                 // Preload audio samples for instruments used in this project (background task)
                 if (this.activity && this.activity.logo && this.activity.logo.synth) {
                     this.activity.logo.synth.preloadProjectSamples(blockObjs);
@@ -5496,6 +5512,11 @@ class Blocks {
                 }
 
                 const processChunk = () => {
+                    if (loadGeneration !== this._activeLoadGeneration) {
+                        return;
+                    }
+
+                    this._loadTimeoutId = null;
                     const chunkEnd = Math.min(bIndex + CHUNK_SIZE, totalBlocks);
                     for (let b = bIndex; b < chunkEnd; b++) {
                         this._processOneBlock(b, blockObjs, blockOffset, firstBlock);
@@ -5515,12 +5536,15 @@ class Blocks {
                         // here too, a throw from block 21 onward would leave
                         // _loadInProgress stuck true forever, silently blocking
                         // every future loadNewBlocks() call.
-                        setTimeout(() => {
+                        this._loadTimeoutId = setTimeout(() => {
+                            this._loadTimeoutId = null;
                             try {
                                 processChunk();
                             } catch (e) {
-                                this.activity._suppressRefresh = false;
-                                this._advanceLoadQueue();
+                                if (loadGeneration === this._activeLoadGeneration) {
+                                    this.activity._suppressRefresh = false;
+                                    this._advanceLoadQueue();
+                                }
                                 throw e;
                             }
                         }, 0);
@@ -6493,9 +6517,15 @@ class Blocks {
                 pubsub.emit("finishedLoading");
             } finally {
                 /** All blocks loaded — allow canvas redraws again. */
-                this.activity._suppressRefresh = false;
-                this.activity.refreshCanvas();
-                this._advanceLoadQueue();
+                if (
+                    loadGeneration === undefined ||
+                    loadGeneration === this._activeLoadGeneration
+                ) {
+                    this._activeLoadGeneration = null;
+                    this.activity._suppressRefresh = false;
+                    this.activity.refreshCanvas();
+                    this._advanceLoadQueue();
+                }
             }
         };
 
