@@ -94,15 +94,17 @@ class PitchSlider {
                     const max = parseFloat(slider.max);
                     const currentValue = parseFloat(slider.value);
 
+                    const stepRatio = event.shiftKey ? Math.pow(semitone, edo) : semitone;
+
                     if (event.key === "ArrowUp" || event.key === "ArrowRight") {
-                        // Move up by a semitone
-                        slider.value = this._stepFrequency(currentValue, "up", semitone, min, max);
+                        // Move up by a semitone or an octave if Shift is pressed
+                        slider.value = this._stepFrequency(currentValue, "up", stepRatio, min, max);
                     } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
-                        // Move down by a semitone
+                        // Move down by a semitone or an octave if Shift is pressed
                         slider.value = this._stepFrequency(
                             currentValue,
                             "down",
-                            semitone,
+                            stepRatio,
                             min,
                             max
                         );
@@ -138,6 +140,9 @@ class PitchSlider {
                 this.activeSlider = id;
             }
 
+            slider.addEventListener("pointerdown", () => {
+                this.activeSlider = id;
+            });
             slider.addEventListener("mousedown", () => {
                 this.activeSlider = id;
             });
