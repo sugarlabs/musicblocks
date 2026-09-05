@@ -3927,6 +3927,47 @@ describe("mode pie menu shared helpers", () => {
             expect(getModeLabel("ionian")).toBe("major / ionian");
             expect(getModeLabel(" ")).toBe(" ");
         });
+
+        describe("with a non-identity translator", () => {
+            // A translator whose output is visibly different from its input, so
+            // a test only passes if getModeLabel actually routes the mode name
+            // through _() rather than returning a hard-coded English label.
+            const TRANSLATED = {
+                "major": "translated-major",
+                "ionian": "translated-ionian",
+                "minor": "translated-minor",
+                "aeolian": "translated-aeolian",
+                "dorian": "translated-dorian",
+                " ": "translated-space"
+            };
+
+            beforeEach(() => {
+                global._.mockImplementation(str => TRANSLATED[str] ?? str);
+            });
+            afterEach(() => {
+                global._.mockImplementation(str => str);
+            });
+
+            it("runs both halves of the major/ionian pair through the translator", () => {
+                expect(getModeLabel("major")).toBe("translated-major / translated-ionian");
+                expect(getModeLabel("ionian")).toBe("translated-major / translated-ionian");
+            });
+
+            it("runs both halves of the minor/aeolian pair through the translator", () => {
+                expect(getModeLabel("minor")).toBe("translated-minor / translated-aeolian");
+                expect(getModeLabel("aeolian")).toBe("translated-minor / translated-aeolian");
+            });
+
+            it("routes any other mode name through the translator", () => {
+                expect(getModeLabel("dorian")).toBe("translated-dorian");
+            });
+
+            it("returns the single-space placeholder verbatim, bypassing the translator", () => {
+                // Even though the translator maps " " to "translated-space",
+                // getModeLabel must short-circuit the blank slot.
+                expect(getModeLabel(" ")).toBe(" ");
+            });
+        });
     });
 
     describe("getModeNameFromLabel", () => {
@@ -3938,6 +3979,49 @@ describe("mode pie menu shared helpers", () => {
 
         it("falls back to the label itself when nothing matches", () => {
             expect(getModeNameFromLabel("unknown", modes)).toBe("unknown");
+        });
+
+        describe("with a non-identity translator", () => {
+            const TRANSLATED = {
+                major: "translated-major",
+                ionian: "translated-ionian",
+                minor: "translated-minor",
+                aeolian: "translated-aeolian",
+                dorian: "translated-dorian",
+                phrygian: "translated-phrygian",
+                lydian: "translated-lydian",
+                mixolydian: "translated-mixolydian",
+                locrian: "translated-locrian"
+            };
+
+            beforeEach(() => {
+                global._.mockImplementation(str => TRANSLATED[str] ?? str);
+            });
+            afterEach(() => {
+                global._.mockImplementation(str => str);
+            });
+
+            it("maps the translated major/ionian label back to major", () => {
+                expect(getModeNameFromLabel("translated-major / translated-ionian", modes)).toBe(
+                    "major"
+                );
+            });
+
+            it("maps the translated minor/aeolian label back to aeolian", () => {
+                expect(getModeNameFromLabel("translated-minor / translated-aeolian", modes)).toBe(
+                    "aeolian"
+                );
+            });
+
+            it("maps a plain translated label back to its canonical mode name", () => {
+                expect(getModeNameFromLabel("translated-dorian", modes)).toBe("dorian");
+            });
+
+            it("round-trips every mode name through getModeLabel and back", () => {
+                for (const mode of ["dorian", "phrygian", "lydian", "mixolydian", "locrian"]) {
+                    expect(getModeNameFromLabel(getModeLabel(mode), modes.concat(mode))).toBe(mode);
+                }
+            });
         });
     });
 
