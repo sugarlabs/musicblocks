@@ -165,6 +165,107 @@ describe("Turtles Class", () => {
     });
 });
 
+describe("addTurtleGraphicProps", () => {
+    let activityMock;
+    let turtles;
+    let mockTurtle;
+    let originalRequestAnimationFrame;
+
+    beforeEach(() => {
+        activityMock = {
+            stage: { addChild: jest.fn(), removeChild: jest.fn() },
+            refreshCanvas: jest.fn(),
+            turtleContainer: {
+                scaleX: 1,
+                scaleY: 1,
+                scale: 1,
+                addChild: jest.fn(),
+                removeChild: jest.fn()
+            },
+            hideAuxMenu: jest.fn(),
+            hideGrids: jest.fn(),
+            _doCartesianPolar: jest.fn(),
+            closeHelpfulWheel: jest.fn()
+        };
+
+        turtles = new Turtles.TurtlesModel(activityMock);
+        turtles.activity = activityMock;
+
+        mockTurtle = {
+            painter: {
+                doSetHeading: jest.fn(),
+                doSetPensize: jest.fn(),
+                doSetColor: jest.fn(),
+                doSetChroma: jest.fn(),
+                doSetValue: jest.fn(),
+                value: 50,
+                chroma: 100
+            },
+            rename: jest.fn()
+        };
+
+        originalRequestAnimationFrame = window.requestAnimationFrame;
+        window.requestAnimationFrame = jest.fn(cb => cb());
+    });
+
+    afterEach(() => {
+        window.requestAnimationFrame = originalRequestAnimationFrame;
+    });
+
+    test("should set graphic properties when blkInfoAvailable is true", () => {
+        const infoDict = {
+            heading: 90,
+            pensize: 5,
+            color: 20,
+            grey: 30,
+            shade: 40,
+            name: "MyTurtle"
+        };
+
+        turtles.addTurtleGraphicProps(mockTurtle, true, infoDict);
+
+        expect(mockTurtle.painter.doSetHeading).toHaveBeenCalledWith(90);
+        expect(mockTurtle.painter.defaultHeading).toBe(90);
+
+        expect(mockTurtle.painter.doSetPensize).toHaveBeenCalledWith(5);
+        expect(mockTurtle.painter.defaultPensize).toBe(5);
+
+        expect(mockTurtle.painter.doSetColor).toHaveBeenCalledWith(20);
+        expect(mockTurtle.painter.defaultColor).toBe(20);
+        // defaultValue is overwritten by shade below, defaultChroma by grey
+
+        expect(mockTurtle.painter.doSetChroma).toHaveBeenCalledWith(30);
+        expect(mockTurtle.painter.defaultChroma).toBe(30);
+
+        expect(mockTurtle.painter.doSetValue).toHaveBeenCalledWith(40);
+        expect(mockTurtle.painter.defaultValue).toBe(40);
+
+        expect(mockTurtle.rename).toHaveBeenCalledWith("MyTurtle");
+    });
+
+    test("should capture default color derived properties if no grey or shade provided", () => {
+        const infoDict = { color: 20 };
+        // Simulate doSetColor updating value and chroma
+        mockTurtle.painter.doSetColor.mockImplementation(() => {
+            mockTurtle.painter.value = 55;
+            mockTurtle.painter.chroma = 66;
+        });
+
+        turtles.addTurtleGraphicProps(mockTurtle, true, infoDict);
+
+        expect(mockTurtle.painter.doSetColor).toHaveBeenCalledWith(20);
+        expect(mockTurtle.painter.defaultColor).toBe(20);
+        expect(mockTurtle.painter.defaultValue).toBe(55);
+        expect(mockTurtle.painter.defaultChroma).toBe(66);
+    });
+
+    test("should do nothing if blkInfoAvailable is false", () => {
+        const infoDict = { heading: 90 };
+        turtles.addTurtleGraphicProps(mockTurtle, false, infoDict);
+        expect(mockTurtle.painter.doSetHeading).not.toHaveBeenCalled();
+    });
+});
+
 describe("markAllAsStopped", () => {
     let activityMock;
     let turtles;

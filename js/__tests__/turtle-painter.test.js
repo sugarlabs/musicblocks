@@ -1082,6 +1082,24 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         expect(painter.turtle._bitmap.rotation).toBe(0);
     });
 
+    test("doClear should use default position and heading if provided", () => {
+        painter.turtle.defaultX = 100;
+        painter.turtle.defaultY = 200;
+        painter.defaultHeading = 45;
+        painter.turtle.name = "not_start";
+        painter.turtles.c1ctx = { beginPath: jest.fn(), clearRect: jest.fn() };
+
+        const setHeadingSpy = jest.spyOn(painter, "doSetHeading");
+
+        painter.doClear(true, true, true);
+
+        expect(painter.turtle.x).toBe(100);
+        expect(painter.turtle.y).toBe(200);
+        expect(setHeadingSpy).toHaveBeenCalledWith(45);
+        expect(painter.turtle.orientation).toBe(45);
+        setHeadingSpy.mockRestore();
+    });
+
     test("doScrollXY should create canvas1 if not exists, draw under active pens", () => {
         const turtle1 = {
             inTrash: false,

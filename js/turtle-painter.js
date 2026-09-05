@@ -1334,19 +1334,36 @@ class Painter {
 
         // Reset turtle
         if (resetPosition) {
-            this.turtle.x = 0;
-            this.turtle.y = 0;
-            this.turtle.orientation = 0.0;
+            this.turtle.x = this.turtle.defaultX !== undefined ? this.turtle.defaultX : 0;
+            this.turtle.y = this.turtle.defaultY !== undefined ? this.turtle.defaultY : 0;
+            if (this.defaultHeading !== undefined) {
+                this.doSetHeading(this.defaultHeading);
+            } else {
+                this.doSetHeading(0.0);
+            }
             turtles.gx = this.turtle.ctx.canvas.width;
             turtles.gy = this.turtle.ctx.canvas.height;
         }
 
         const i = turtles.getIndexOfTurtle(this.turtle) % 10;
         if (resetPen) {
-            this.color = i * 10;
-            this.value = DEFAULTVALUE;
-            this.chroma = DEFAULTCHROMA;
-            this.stroke = DEFAULTSTROKE;
+            this.doSetColor(this.defaultColor !== undefined ? Number(this.defaultColor) : i * 10);
+
+            if (this.defaultValue !== undefined) {
+                this.doSetValue(Number(this.defaultValue));
+            } else if (this.defaultColor === undefined) {
+                this.doSetValue(DEFAULTVALUE);
+            }
+
+            if (this.defaultChroma !== undefined) {
+                this.doSetChroma(Number(this.defaultChroma));
+            } else if (this.defaultColor === undefined) {
+                this.doSetChroma(DEFAULTCHROMA);
+            }
+
+            this.doSetPensize(
+                this.defaultPensize !== undefined ? Number(this.defaultPensize) : DEFAULTSTROKE
+            );
             this._font = DEFAULTFONT;
         }
 
@@ -1395,8 +1412,6 @@ class Painter {
         this._penDown = true;
         this._fillState = false;
         this._hollowState = false;
-
-        this._canvasColor = hex2rgb(getMunsellColor(this.color, this.value, this.chroma));
 
         this._svgOutput = "";
         this._svgPath = false;

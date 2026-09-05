@@ -553,22 +553,30 @@ Turtles.TurtlesModel = class {
             if (blkInfoAvailable) {
                 if ("heading" in infoDict) {
                     turtle.painter.doSetHeading(infoDict["heading"]);
+                    turtle.painter.defaultHeading = infoDict["heading"];
                 }
 
                 if ("pensize" in infoDict) {
                     turtle.painter.doSetPensize(infoDict["pensize"]);
-                }
-
-                if ("grey" in infoDict) {
-                    turtle.painter.doSetChroma(infoDict["grey"]);
-                }
-
-                if ("shade" in infoDict) {
-                    turtle.painter.doSetValue(infoDict["shade"]);
+                    turtle.painter.defaultPensize = infoDict["pensize"];
                 }
 
                 if ("color" in infoDict) {
                     turtle.painter.doSetColor(infoDict["color"]);
+                    turtle.painter.defaultColor = infoDict["color"];
+                    // doSetColor derives value and chroma; save them as defaults
+                    turtle.painter.defaultValue = turtle.painter.value;
+                    turtle.painter.defaultChroma = turtle.painter.chroma;
+                }
+
+                if ("grey" in infoDict) {
+                    turtle.painter.doSetChroma(infoDict["grey"]);
+                    turtle.painter.defaultChroma = infoDict["grey"];
+                }
+
+                if ("shade" in infoDict) {
+                    turtle.painter.doSetValue(infoDict["shade"]);
+                    turtle.painter.defaultValue = infoDict["shade"];
                 }
 
                 if ("name" in infoDict) {
