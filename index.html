@@ -1440,6 +1440,9 @@
 
                 window.addEventListener("resize", setAppHeight);
                 document.addEventListener("fullscreenchange", setAppHeight);
+                document.addEventListener("webkitfullscreenchange", setAppHeight);
+                document.addEventListener("mozfullscreenchange", setAppHeight);
+                document.addEventListener("MSFullscreenChange", setAppHeight);
                 setAppHeight();
             })();
 
@@ -1458,6 +1461,9 @@
                 }
                 window.addEventListener("resize", resizeCanvasesToScreen);
                 document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
+                document.addEventListener("webkitfullscreenchange", resizeCanvasesToScreen);
+                document.addEventListener("mozfullscreenchange", resizeCanvasesToScreen);
+                document.addEventListener("MSFullscreenChange", resizeCanvasesToScreen);
 
                 setTimeout(resizeCanvasesToScreen, 150);
             })();
