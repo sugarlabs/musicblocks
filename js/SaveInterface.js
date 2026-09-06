@@ -214,7 +214,6 @@ class SaveInterface {
         //const self = this;
         const finishDownload = name => {
             if (name === null) {
-                console.debug("save cancelled");
                 return;
             }
 
@@ -267,7 +266,6 @@ class SaveInterface {
             filename = defaultfilename;
         }
 
-        console.debug("saving to " + filename);
         finishDownload(filename);
     }
 
