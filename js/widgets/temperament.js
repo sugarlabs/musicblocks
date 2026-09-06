@@ -91,9 +91,8 @@ const largestGapMid = centsArr => {
 
 /** Converts ratio to cents for arbitrary octave base. For base=2 this is 1200*log2(ratio). Uses log10/log10 which equals log2/log2; kept for powerBase≠2 stretched octaves. NOTE: widget powerBase vs engine getOctaveRatio() diverge — pitchToFrequency/frequencyToPitch in musicutils still hard-code base 2; full unification deferred. */
 const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
-const DEG_PER_CENT = 0.3;
-const centsToAngle = cents => 270 + cents * DEG_PER_CENT;
-const angleToCents = angle => (angle - 270) / DEG_PER_CENT;
+const centsToAngle = cents => 270 + cents * 0.3;
+const angleToCents = angle => (angle - 270) / 0.3;
 
 const MAX_DIVISIONS = 57;
 
@@ -585,50 +584,32 @@ function TemperamentWidget() {
         that._playAll = _playAll;
 
         const _addPitch = function (dir) {
-            const n = that.cents.length;
-            const s = highlightDot >= 0 && highlightDot < n ? highlightDot : -1;
+            const base = that.cents.slice(0, that.pitchNumber);
+            const nGaps = base.length;
+            const s = highlightDot >= 0 && highlightDot < that.cents.length ? highlightDot : -1;
             let cents;
-            if (s < 0) {
-                cents = largestGapMid(that.cents);
+            if (s < 0 || nGaps < 2) {
+                cents = largestGapMid(base.length ? base : that.cents);
             } else {
-                // Distribute: walk in dir from s and pick first gap >= 0.8*avgGap
-                // (avoids repeatedly halving the same tiny gap → duplicates like 200.1→200)
-                const sorted = [...that.cents].sort((a, b) => a - b);
-                const curVal = that.cents[s];
-                let curIdx = sorted.findIndex(c => Math.abs(c - curVal) < 0.5);
+                const sorted = [...base].sort((a, b) => a - b);
+                const curVal = that.cents[s] % 1200;
+                let curIdx = sorted.findIndex(c => Math.abs((c % 1200) - curVal) < 0.5);
                 if (curIdx < 0) curIdx = 0;
-                const avgGap = 1200 / n;
-                let found = false;
-                for (let step = 0; step < n; step++) {
-                    const idx = dir > 0 ? (curIdx + step) % n : (curIdx - step + n) % n;
-                    const nextIdx = dir > 0 ? (idx + 1) % n : (idx - 1 + n) % n;
-                    const a = sorted[idx];
-                    const b = sorted[nextIdx];
-                    const gap = dir > 0 ? (b - a + 1200) % 1200 : (a - b + 1200) % 1200;
-                    if (gap >= avgGap * 0.8) {
-                        let mid = dir > 0 ? a + gap / 2 : a - gap / 2;
-                        mid = ((mid % 1200) + 1200) % 1200;
-                        if (mid === 0) mid = 1;
-                        mid = Math.max(1, Math.min(1199, Math.round(mid * 10) / 10));
-                        // Avoid duplicate within 0.5¢
-                        const dup = that.cents.some(c => Math.abs(c - mid) < 0.5);
-                        if (!dup) {
-                            cents = mid;
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-                if (!found) cents = largestGapMid(that.cents);
+                const nextIdx = dir > 0 ? (curIdx + 1) % nGaps : (curIdx - 1 + nGaps) % nGaps;
+                const a = sorted[curIdx];
+                const b = sorted[nextIdx];
+                const gap = dir > 0 ? (b - a + 1200) % 1200 : (a - b + 1200) % 1200;
+                let mid = dir > 0 ? a + gap / 2 : a - gap / 2;
+                mid = ((mid % 1200) + 1200) % 1200;
+                if (mid === 0) mid = 1;
+                mid = Math.max(1, Math.min(1199, Math.round(mid * 10) / 10));
+                const dup = base.some(c => Math.abs(c - mid) < 0.5);
+                cents = dup ? largestGapMid(base) : mid;
             }
             const idx = that.cents.findIndex(c => cents < c);
             const insertAt = idx === -1 ? that.cents.length : idx;
             _insertPitch(insertAt, cents);
-            if (s >= 0) {
-                highlightDot = insertAt <= s ? s + 1 : s;
-            } else {
-                highlightDot = idx === -1 ? that.cents.length - 1 : idx;
-            }
+            highlightDot = insertAt;
             _drawCircle();
             _buildTable();
             _highlightTableRow(highlightDot);

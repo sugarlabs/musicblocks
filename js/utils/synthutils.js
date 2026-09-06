@@ -890,18 +890,17 @@ function Synth() {
             );
             if (typeof oneNote !== "number") {
                 const thisTemperament = getTemperament(customID);
-                // Widget-saved entry names may carry cents annotations
-                // (e.g. "C(+0¢)") while playback looks up bare names
-                // (e.g. "C"): compare base names so they resolve.
-                const baseName = name =>
-                    typeof name === "string" ? name.replace(/\(.*\)/, "") : name;
-                const target = baseName(oneNote);
+                const target =
+                    typeof oneNote === "string" ? oneNote.replace(/\(.*\)/, "") : oneNote;
                 for (const pitchNumber in thisTemperament) {
                     if (pitchNumber !== "pitchNumber") {
+                        const n3 = thisTemperament[pitchNumber][3];
+                        const n1 = thisTemperament[pitchNumber][1];
                         if (
                             (isCustomTemperament(customID) &&
-                                target === baseName(thisTemperament[pitchNumber][3])) ||
-                            target === baseName(thisTemperament[pitchNumber][1])
+                                target ===
+                                    (typeof n3 === "string" ? n3.replace(/\(.*\)/, "") : n3)) ||
+                            target === (typeof n1 === "string" ? n1.replace(/\(.*\)/, "") : n1)
                         ) {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
