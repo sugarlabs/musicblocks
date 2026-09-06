@@ -69,6 +69,10 @@ function setupHeapBlocks(activity) {
          * @returns {string} - The JSON string representation of the heap.
          */
         arg(logo, turtle, blk) {
+            if (!(turtle in logo.turtleHeaps)) {
+                logo.turtleHeaps[turtle] = [];
+            }
+
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
@@ -392,6 +396,10 @@ function setupHeapBlocks(activity) {
          * @param {number} turtle - The turtle number.
          */
         flow(args, logo, turtle) {
+            if (!(turtle in logo.turtleHeaps)) {
+                logo.turtleHeaps[turtle] = [];
+            }
+
             // Reverse the order of the turtle's heap
             logo.turtleHeaps[turtle] = logo.turtleHeaps[turtle].reverse();
         }

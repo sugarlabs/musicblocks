@@ -923,13 +923,39 @@ describe("setupIntervalsBlocks", () => {
             logo.runFromBlockNow = jest.fn();
         });
 
-        it("Heap absent before measurement: logo.turtleHeaps[turtle] is not set (key absent) and should be {} after cycle", () => {
+        it("Heap absent before measurement: the heap is restored as an empty array, not an object", () => {
             logo.turtleHeaps = {};
             logo.turtleDicts = { [turtleIndex]: {} };
 
             createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
 
-            expect(logo.turtleHeaps[turtleIndex]).toEqual({});
+            expect(logo.turtleHeaps[turtleIndex]).toEqual([]);
+            expect(Array.isArray(logo.turtleHeaps[turtleIndex])).toBe(true);
+
+            // The restored heap must still behave like a heap: an object fallback
+            // makes the next push block throw "push is not a function".
+            logo.turtleHeaps[turtleIndex].push(42);
+            expect(logo.turtleHeaps[turtleIndex]).toEqual([42]);
+        });
+
+        it("Heap absent before a scalar measurement: the heap is restored as an empty array", () => {
+            logo.turtleHeaps = {};
+            logo.turtleDicts = { [turtleIndex]: {} };
+
+            createdBlocks.measureintervalscalar.arg(logo, turtleIndex, "blkMeasure");
+
+            expect(logo.turtleHeaps[turtleIndex]).toEqual([]);
+            expect(Array.isArray(logo.turtleHeaps[turtleIndex])).toBe(true);
+        });
+
+        it("Empty heap before measurement: the heap stays an empty array", () => {
+            logo.turtleHeaps = { [turtleIndex]: [] };
+            logo.turtleDicts = { [turtleIndex]: {} };
+
+            createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
+
+            expect(logo.turtleHeaps[turtleIndex]).toEqual([]);
+            expect(Array.isArray(logo.turtleHeaps[turtleIndex])).toBe(true);
         });
 
         it("Heap present before measurement: logo.turtleHeaps[turtle] is [1, 2, 3] and should be deep cloned", () => {
