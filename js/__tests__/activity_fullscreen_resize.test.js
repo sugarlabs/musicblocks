@@ -131,6 +131,8 @@ describe("Activity Fullscreen and Viewport Resize Handling (Issue #8536)", () =>
         expect(overCanvas.height).toBe(1080);
         expect(canvasHolder.width).toBe(1920);
         expect(canvasHolder.height).toBe(1080);
+        expect(canvasHolder.style.width).toBe("1920px");
+        expect(canvasHolder.style.height).toBe("1080px");
         expect(mockRefreshCanvas).toHaveBeenCalled();
     });
 
@@ -148,6 +150,8 @@ describe("Activity Fullscreen and Viewport Resize Handling (Issue #8536)", () =>
         expect(canvas.height).toBe(1440);
         expect(overCanvas.width).toBe(2560);
         expect(overCanvas.height).toBe(1440);
+        expect(canvasHolder.style.width).toBe("2560px");
+        expect(canvasHolder.style.height).toBe("1440px");
     });
 
     test("dynamically resizes in standard windowed mode (1366x768)", () => {
@@ -164,6 +168,52 @@ describe("Activity Fullscreen and Viewport Resize Handling (Issue #8536)", () =>
         expect(canvas.height).toBe(768);
         expect(overCanvas.width).toBe(1366);
         expect(overCanvas.height).toBe(768);
+        expect(canvasHolder.style.width).toBe("1366px");
+        expect(canvasHolder.style.height).toBe("768px");
+    });
+
+    test("dynamically resizes using outerWidth/outerHeight on Android WebKit", () => {
+        const activityPath = path.resolve(__dirname, "../activity.js");
+        const code = fs.readFileSync(activityPath, "utf8");
+        const handleResizeMarker = "function handleResize() {";
+        const startIdx = code.indexOf(handleResizeMarker);
+        let endIdx = startIdx + handleResizeMarker.length;
+        let braceDepth = 1;
+        while (braceDepth > 0 && endIdx < code.length) {
+            if (code[endIdx] === "{") braceDepth++;
+            else if (code[endIdx] === "}") braceDepth--;
+            endIdx++;
+        }
+        const fnSource = code.substring(startIdx, endIdx);
+
+        window.innerWidth = 800;
+        window.innerHeight = 1200;
+        window.outerWidth = 1080;
+        window.outerHeight = 1920;
+
+        const androidSandbox = {
+            document,
+            window,
+            container,
+            canvas,
+            overCanvas,
+            canvasHolder,
+            platform: { androidWebkit: true },
+            that: {
+                refreshCanvas: mockRefreshCanvas
+            }
+        };
+        vm.createContext(androidSandbox);
+        vm.runInContext(`${fnSource}\nthis.handleResize = handleResize;`, androidSandbox);
+
+        androidSandbox.handleResize();
+
+        expect(container.style.width).toBe("1080px");
+        expect(container.style.height).toBe("1920px");
+        expect(canvas.width).toBe(1080);
+        expect(canvas.height).toBe(1920);
+        expect(canvasHolder.style.width).toBe("1080px");
+        expect(canvasHolder.style.height).toBe("1920px");
     });
 
     test("skips resize calculations when document is hidden to avoid zero-dimension corruption", () => {

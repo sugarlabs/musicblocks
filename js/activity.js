@@ -1806,8 +1806,14 @@ class Activity {
                 return;
             }
 
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
+            const windowWidth =
+                typeof platform !== "undefined" && platform.androidWebkit
+                    ? window.outerWidth
+                    : window.innerWidth;
+            const windowHeight =
+                typeof platform !== "undefined" && platform.androidWebkit
+                    ? window.outerHeight
+                    : window.innerHeight;
 
             // Guard against zero or invalid dimensions
             if (windowWidth <= 0 || windowHeight <= 0) {
@@ -1827,8 +1833,12 @@ class Activity {
                 overCanvas.height = canvas ? canvas.height : windowHeight;
             }
             if (canvasHolder) {
-                canvasHolder.width = canvas ? canvas.width : windowWidth;
-                canvasHolder.height = canvas ? canvas.height : windowHeight;
+                const holderWidth = canvas ? canvas.width : windowWidth;
+                const holderHeight = canvas ? canvas.height : windowHeight;
+                canvasHolder.width = holderWidth;
+                canvasHolder.height = holderHeight;
+                canvasHolder.style.width = holderWidth + "px";
+                canvasHolder.style.height = holderHeight + "px";
             }
             const hideContents = document.getElementById("hideContents");
             if (hideContents) {
