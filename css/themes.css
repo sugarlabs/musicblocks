@@ -95,7 +95,13 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 
 .dark .popupMsg {
     background-color: var(--color-brand-primary-hover);
-    color: var(--color-text-secondary);
+    /* --color-text-secondary (#d1d5db) was designed for text on the dark
+       body background, not on this popup's bright blue background — that
+       combination only reaches ~2.5:1 contrast, failing WCAG AA's 4.5:1
+       minimum for normal text. --color-text-inverse is the token meant
+       for text on light/bright surfaces in dark mode and reaches ~4.8:1
+       here. */
+    color: var(--color-text-inverse);
 }
 
 .dark #printText {
