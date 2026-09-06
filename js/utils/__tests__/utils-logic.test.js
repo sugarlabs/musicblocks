@@ -152,6 +152,29 @@ describe("Utility Logic Functions", () => {
         it("returns input if not a number", () => {
             expect(mixedNumber("abc")).toBe("abc");
         });
+
+        it("takes the whole and fractional parts from the magnitude", () => {
+            // Flooring the signed value would give "-2 1/2", which reads as -2.5.
+            expect(mixedNumber(-1.5)).toBe("-1 1/2");
+            expect(mixedNumber(-2.75)).toBe("-2 3/4");
+        });
+
+        it("does not promote a negative proper fraction to a whole number", () => {
+            expect(mixedNumber(-0.25)).toBe("-1/4");
+            expect(mixedNumber(-0.875)).toBe("-7/8");
+        });
+
+        it("signs negative integers without changing their magnitude", () => {
+            expect(mixedNumber(-2)).toBe("-2/1");
+        });
+
+        it("rounds a negative just short of a whole number to that whole number", () => {
+            expect(mixedNumber(-1.9999999999)).toBe("-2");
+        });
+
+        it("falls back to two decimals for an awkward negative denominator", () => {
+            expect(mixedNumber(-2.123456)).toBe("-2.12");
+        });
     });
 
     describe("nearestBeat()", () => {
