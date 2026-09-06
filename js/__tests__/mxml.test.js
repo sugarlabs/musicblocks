@@ -156,7 +156,7 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    0: [[["C"], 4, 1]]
+                    0: [[["C4"], 4, 1]]
                 }
             }
         };
@@ -165,13 +165,15 @@ describe("saveMxmlOutput", () => {
 
         // Quarter note (32 / 4 = 8 divisions) with one dot: 8 * 1.5 = 12.
         expect(output).toContain("<duration>12</duration>");
+        expect(output).toContain("<step>C</step>");
+        expect(output).toContain("<octave>4</octave>");
     });
 
     it("should compute duration correctly for a double-dotted note (base * 1.75, not base * 2.25)", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    0: [[["C"], 4, 2]]
+                    0: [[["C4"], 4, 2]]
                 }
             }
         };
@@ -193,8 +195,8 @@ describe("saveMxmlOutput", () => {
             notation: {
                 notationStaging: {
                     0: [
-                        [["C"], 4, 2],
-                        [["D"], 4, 2]
+                        [["C4"], 4, 2],
+                        [["D4"], 4, 2]
                     ]
                 }
             }
