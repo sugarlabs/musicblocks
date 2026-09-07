@@ -2346,6 +2346,7 @@ table {
 .pitch-staircase-btn,
 .pitch-staircase-step {
     background-color: var(--color-selector-bg);
+    color: var(--color-selector-text);
     transition: background-color 0.2s ease;
 }
 
