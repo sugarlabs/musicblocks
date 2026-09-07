@@ -1542,6 +1542,27 @@ describe("Palettes Class", () => {
             expect(insertedMarkup).toContain("overflow-x: hidden");
         });
 
+        test("scrollEvent scrolls the open block list and scrollDiff mirrors it", () => {
+            const paletteItems = { scrollTop: 0 };
+            global.docById = jest.fn(id => (id === "PaletteBody_items" ? paletteItems : null));
+            palettes.add("test");
+            const palette = palettes.dict.test;
+
+            palette.scrollEvent(-20, 1); // arrow down: list moves up
+            expect(paletteItems.scrollTop).toBe(20);
+            expect(palette.scrollDiff).toBe(-20);
+
+            palette.scrollEvent(-palette.scrollDiff, 1); // home: back to the top
+            expect(paletteItems.scrollTop).toBe(0);
+        });
+
+        test("scrollEvent is a no-op when no palette menu is open", () => {
+            global.docById = jest.fn(() => null);
+            palettes.add("test");
+            expect(() => palettes.dict.test.scrollEvent(-20, 1)).not.toThrow();
+            expect(palettes.dict.test.scrollDiff).toBe(0);
+        });
+
         test("_showMenuItems renders a basic block", () => {
             const paletteList = document.createElement("table");
 
