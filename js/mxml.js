@@ -20,11 +20,52 @@ const MXML_TUPLETVALUE = 3;
 const MXML_ROUNDDOWN = 4;
 
 const _gcd = (a, b) => (b === 0 ? a : _gcd(b, a % b));
+const _lcm = (a, b) => (a * b) / _gcd(a, b);
 
-// Tuplet durations (e.g. 32/8 * 2/3) are rarely exact in binary floating point, so
-// measure-overflow comparisons tolerate this much slop rather than misreading
-// accumulated rounding noise as the measure actually running out of room.
+// Tuplet durations can still land off an integer in extreme cases (e.g. a tuplet fine
+// enough to need more resolution than DIVISIONS_PER_WHOLE_NOTE provides), so
+// measure-overflow comparisons tolerate this much slop rather than misreading residual
+// floating-point noise as the measure actually running out of room.
 const DIVISIONS_EPSILON = 1e-6;
+
+// Base resolution (divisions per whole note) when a voice has no tuplets, matching the
+// value this file has always used. It's scaled up per voice -- see
+// _resolveDivisionsPerWholeNote -- so that a voice containing tuplets gets an exact,
+// integer <duration> for them instead of the nearest-integer approximation this
+// constant alone could represent.
+const DIVISIONS_PER_WHOLE_NOTE = 32;
+
+/**
+ * Reduces a tuplet note's staging fields to a MusicXML actual-notes/normal-notes pair.
+ * @param {[number, number]} tupletRatio - obj[MXML_TUPLETVALUE]: an
+ *   [oddFactor, powerOfTwoFactor] factoring of the note's true note-value denominator.
+ * @param {number} roundDown - obj[MXML_ROUNDDOWN]: the nearest power-of-two note value.
+ * @returns {{actualNotes: number, normalNotes: number}}
+ */
+const _tupletNotesRatio = (tupletRatio, roundDown) => {
+    const noteValue = tupletRatio[0] * tupletRatio[1];
+    const divisor = _gcd(noteValue, roundDown);
+    return { actualNotes: noteValue / divisor, normalNotes: roundDown / divisor };
+};
+
+/**
+ * Scans a voice's staged notes for tuplets and returns the smallest whole-number
+ * multiple of DIVISIONS_PER_WHOLE_NOTE that every tuplet's actual-notes count divides
+ * evenly -- so every tuplet note in the voice gets an exact <duration> instead of a
+ * rounded approximation. Returns DIVISIONS_PER_WHOLE_NOTE unchanged when there are no
+ * tuplets, so voices without tuplets are completely unaffected by this fix.
+ * @param {Array} notes - logo.notation.notationStaging[voice]
+ * @returns {number}
+ */
+const _resolveDivisionsPerWholeNote = notes => {
+    let scaleFactor = 1;
+    for (const entry of notes) {
+        if (!Array.isArray(entry) || !Array.isArray(entry[MXML_TUPLETVALUE])) continue;
+        const { actualNotes } = _tupletNotesRatio(entry[MXML_TUPLETVALUE], entry[MXML_ROUNDDOWN]);
+        scaleFactor = _lcm(scaleFactor, actualNotes);
+    }
+    return DIVISIONS_PER_WHOLE_NOTE * scaleFactor;
+};
 
 saveMxmlOutput = logo => {
     const ignore = ["voice two", "voice one", "one voice"];
@@ -82,8 +123,14 @@ saveMxmlOutput = logo => {
         add(`<part id="P${voiceNum}">`);
         indent++;
 
+        const notes = logo.notation.notationStaging[voice];
+        // Scaled once per voice so every tuplet note in it gets an exact <duration>
+        // instead of a rounded one; identical to DIVISIONS_PER_WHOLE_NOTE (32, this
+        // file's long-standing resolution) when the voice has no tuplets at all.
+        const divisionsPerWholeNote = _resolveDivisionsPerWholeNote(notes);
+
         let currMeasure = 1,
-            divisions = 32,
+            divisions = divisionsPerWholeNote,
             beats = 4,
             beatType = 4;
         let beatsChanged = false,
@@ -95,7 +142,6 @@ saveMxmlOutput = logo => {
             firstMeasure = true;
         indent++;
         let divisionsLeft = divisions;
-        const notes = logo.notation.notationStaging[voice];
 
         for (let i = 0; i < notes.length; i++) {
             const obj = notes[i];
@@ -145,7 +191,7 @@ saveMxmlOutput = logo => {
             if (obj === "meter") {
                 newBeats = notes[i + 1];
                 newBeatType = notes[i + 2];
-                newDivisions = newBeats * (1 / newBeatType / (1 / 32));
+                newDivisions = newBeats * (1 / newBeatType / (1 / divisionsPerWholeNote));
                 i += 2;
                 beatsChanged = true;
                 continue;
@@ -170,20 +216,21 @@ saveMxmlOutput = logo => {
                 let preciseDur, dur, timeModification;
 
                 if (Array.isArray(tupletRatio)) {
-                    const roundDown = obj[MXML_ROUNDDOWN];
-                    const noteValue = tupletRatio[0] * tupletRatio[1];
-                    const divisor = _gcd(noteValue, roundDown);
-                    const actualNotes = noteValue / divisor;
-                    const normalNotes = roundDown / divisor;
-                    // Exact (fractional) duration, used for measure-break accounting so
-                    // rounding error on a single note can't drift subsequent boundaries.
-                    preciseDur = (32 / roundDown) * (normalNotes / actualNotes);
-                    // <duration> must be an integer; 32 divisions per whole note isn't
-                    // evenly divisible by every tuplet ratio, so round for display only.
+                    const { actualNotes, normalNotes } = _tupletNotesRatio(
+                        tupletRatio,
+                        obj[MXML_ROUNDDOWN]
+                    );
+                    // divisionsPerWholeNote was scaled (see _resolveDivisionsPerWholeNote)
+                    // to be an exact multiple of every tuplet's actualNotes count in this
+                    // voice, so this is already a whole number, not an approximation.
+                    preciseDur =
+                        (divisionsPerWholeNote / obj[MXML_ROUNDDOWN]) * (normalNotes / actualNotes);
+                    // Rounding only guards extreme cases (e.g. a tuplet fine enough that
+                    // divisionsPerWholeNote can't represent it exactly); it's a no-op here.
                     dur = Math.max(1, Math.round(preciseDur));
                     timeModification = { actualNotes, normalNotes };
                 } else {
-                    preciseDur = (32 / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
+                    preciseDur = (divisionsPerWholeNote / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
                     dur = preciseDur;
                     timeModification = null;
                 }

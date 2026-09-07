@@ -208,7 +208,7 @@ describe("saveMxmlOutput", () => {
         expect(measureCount).toBe(1);
     });
 
-    it("should compute a real fractional duration for a tuplet note instead of a full measure", () => {
+    it("should compute an exact duration for a tuplet note instead of a full measure", () => {
         // durationToNoteValue()'s tuplet fallback for an eighth-note triplet (3 in the
         // space of 2 eighths) returns [1, 0, [3, 4], 8], which notation.js stores as
         // this staging entry. Before the fix, mxml.js read the sentinel noteValue (1)
@@ -225,11 +225,57 @@ describe("saveMxmlOutput", () => {
         const output = saveMxmlOutput(logo);
 
         expect(output).not.toContain("<duration>32</duration>");
-        // 32 / 8 (nearest power-of-two note value) * 2/3 (normal/actual notes) = 2.667,
-        // rounded to the nearest whole division for the required-integer <duration>.
-        expect(output).toContain("<duration>3</duration>");
+        // A voice containing a 3:2 tuplet gets divisions scaled to 32 * 3 = 96 (see
+        // _resolveDivisionsPerWholeNote), so this eighth-note triplet's duration is
+        // exactly (96 / 8) * (2 / 3) = 8 -- not a rounded approximation.
+        expect(output).toContain("<divisions>96</divisions>");
+        expect(output).toContain("<duration>8</duration>");
         expect(output).toContain("<step>C</step>");
         expect(output).toContain("<octave>4</octave>");
+    });
+
+    it("should still fall back to rounding when a tuplet ratio can't be represented exactly", () => {
+        // A tuplet whose actualNotes/roundDown combination can't reduce to a whole
+        // division count even at the scaled resolution still gets a sane, rounded
+        // <duration> rather than a fractional or wildly incorrect one. This only
+        // matters for note values finer than this file otherwise supports (roundDown
+        // above 32), which is already a pre-existing limitation of the plain,
+        // non-tuplet path (e.g. a dotted 128th note isn't exact either).
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 1, 0, [3, 128], 128]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+        const duration = Number(output.match(/<duration>(\d+)<\/duration>/)[1]);
+
+        expect(Number.isInteger(duration)).toBe(true);
+        expect(duration).toBeGreaterThan(0);
+    });
+
+    it("should scale divisions to satisfy every distinct tuplet ratio in a voice", () => {
+        // A note reducing to a 3:2 tuplet and one reducing to a 5:2 tuplet in the same
+        // voice both need to divide the voice's divisions-per-whole-note evenly;
+        // scaling by their LCM (15) rather than just one of them keeps both exact.
+        const tripletEighth = [["C4"], 1, 0, [3, 4], 8];
+        const quintupletEighth = [["D4"], 1, 0, [5, 4], 8];
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [tripletEighth, quintupletEighth]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain("<divisions>480</divisions>");
+        // Triplet (3:2): (480 / 8) * (2 / 3) = 40. "Quintuplet" (5:2): (480 / 8) * (2 / 5) = 24.
+        expect(output).toContain("<duration>40</duration>");
+        expect(output).toContain("<duration>24</duration>");
     });
 
     it("should emit time-modification with the reduced actual/normal notes ratio for a tuplet note", () => {
