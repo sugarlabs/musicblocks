@@ -18,6 +18,18 @@
 /* exported setupProgramBlocks */
 
 function setupProgramBlocks(activity) {
+    function isTurtleStatusKey(key) {
+        return (
+            key === _("color") ||
+            key === _("shade") ||
+            key === _("grey") ||
+            key === _("pen size") ||
+            key === _("font") ||
+            key === _("heading") ||
+            key === "x" ||
+            key === "y"
+        );
+    }
     /**
      * Represents a block that loads the heap from a web page in the logo programming language.
      * @extends {FlowBlock}
@@ -442,6 +454,17 @@ function setupProgramBlocks(activity) {
                             const k = Object.keys(d);
                             for (let i = 0; i < k.length; i++) {
                                 Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
+                                if (!isTurtleStatusKey(k[i])) {
+                                    if (
+                                        !Object.prototype.hasOwnProperty.call(
+                                            logo.turtleDicts[turtle],
+                                            target
+                                        )
+                                    ) {
+                                        logo.turtleDicts[turtle][target] = {};
+                                    }
+                                    logo.turtleDicts[turtle][target][k[i]] = d[k[i]];
+                                }
                             }
                         } else {
                             logo.turtleDicts[turtle][a] = d;
@@ -548,6 +571,17 @@ function setupProgramBlocks(activity) {
                         const k = Object.keys(d);
                         for (let i = 0; i < k.length; i++) {
                             Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
+                            if (!isTurtleStatusKey(k[i])) {
+                                if (
+                                    !Object.prototype.hasOwnProperty.call(
+                                        logo.turtleDicts[turtle],
+                                        target
+                                    )
+                                ) {
+                                    logo.turtleDicts[turtle][target] = {};
+                                }
+                                logo.turtleDicts[turtle][target][k[i]] = d[k[i]];
+                            }
                         }
                     } else {
                         logo.turtleDicts[turtle][a] = d;
@@ -711,7 +745,8 @@ function setupProgramBlocks(activity) {
             const target = getTargetTurtle(activity.turtles, a);
             if (target === null) {
                 const dictData =
-                    a in logo.turtleDicts[turtle] && logo.turtleDicts[turtle][a] !== undefined
+                    Object.prototype.hasOwnProperty.call(logo.turtleDicts[turtle], a) &&
+                    logo.turtleDicts[turtle][a] !== undefined
                         ? logo.turtleDicts[turtle][a]
                         : {};
                 activity.save.download(

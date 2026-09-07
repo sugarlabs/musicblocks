@@ -484,7 +484,7 @@ describe("ProgramBlocks", () => {
             };
             activity.blocks.blockList[20] = {
                 name: "loadFile",
-                value: ["filename", '{"color": "red"}']
+                value: ["filename", '{"color": "red", "custom": "value"}']
             };
 
             const block = getBlock("loadDict");
@@ -496,6 +496,13 @@ describe("ProgramBlocks", () => {
                 "color",
                 "red"
             );
+            expect(global.Turtle.DictActions.SetDictValue).toHaveBeenCalledWith(
+                targetTurtleIndex,
+                turtle,
+                "custom",
+                "value"
+            );
+            expect(logo.turtleDicts[turtle][targetTurtleIndex]).toEqual({ custom: "value" });
         });
 
         test("rejects non-object JSON array when loading from file", () => {
@@ -600,7 +607,7 @@ describe("ProgramBlocks", () => {
                 connections: [null, null, 20]
             };
             activity.blocks.blockList[20] = {
-                value: '{"shade": 50}'
+                value: '{"shade": 50, "custom": "value"}'
             };
 
             const block = getBlock("setDictionary");
@@ -612,6 +619,13 @@ describe("ProgramBlocks", () => {
                 "shade",
                 50
             );
+            expect(global.Turtle.DictActions.SetDictValue).toHaveBeenCalledWith(
+                targetTurtleIndex,
+                turtle,
+                "custom",
+                "value"
+            );
+            expect(logo.turtleDicts[turtle][targetTurtleIndex]).toEqual({ custom: "value" });
         });
 
         test("rejects non-object JSON array", () => {
@@ -689,6 +703,21 @@ describe("ProgramBlocks", () => {
 
             const block = getBlock("saveDict");
             block.flow(["NonExistentDict", "dict.json"], logo, turtle, 10);
+
+            expect(activity.save.download).toHaveBeenCalledWith(
+                "json",
+                "data:text/json;charset-utf-8,{}",
+                "dict.json"
+            );
+        });
+
+        test("falls back to empty dictionary if dictionary name is an inherited property", () => {
+            const turtle = 0;
+            logo.turtleDicts[turtle] = {};
+            global.getTargetTurtle.mockReturnValue(null);
+
+            const block = getBlock("saveDict");
+            block.flow(["constructor", "dict.json"], logo, turtle, 10);
 
             expect(activity.save.download).toHaveBeenCalledWith(
                 "json",
