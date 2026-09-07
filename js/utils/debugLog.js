@@ -53,12 +53,13 @@ const debugLog = (() => {
         }
 
         // 2. URL parameter: ?debug=true
-        if (
-            typeof window !== "undefined" &&
-            window.location &&
-            window.location.search.includes("debug=true")
-        ) {
-            return console.log.bind(console, "[MB]");
+        // Parsed rather than substring-matched, so that "?nodebug=true" and
+        // "?debug=truex" are not mistaken for it.
+        if (typeof window !== "undefined" && window.location && window.location.search) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get("debug") === "true") {
+                return console.log.bind(console, "[MB]");
+            }
         }
 
         // 3. Auto-enable for local development (no flag set).

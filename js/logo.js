@@ -51,6 +51,28 @@ const getPerformanceTracker = () =>
     typeof performanceTracker === "undefined" ? null : performanceTracker;
 
 /**
+ * Whether performance profiling was asked for in the URL.
+ *
+ * Parses the query string rather than searching it for a substring, so that
+ * `?noperformance=true`, `?x=performance=true` and `?performance=truex` are not
+ * mistaken for `?performance=true`. `URLSearchParams` is guarded because it is
+ * absent in very old browsers, where the answer should be "not asked for"
+ * rather than a thrown error inside runLogoCommands.
+ *
+ * @returns {boolean}
+ */
+const _performanceRequestedInURL = () => {
+    if (typeof window === "undefined" || !window.location || !window.location.search) {
+        return false;
+    }
+    try {
+        return new URLSearchParams(window.location.search).get("performance") === "true";
+    } catch (e) {
+        return false;
+    }
+};
+
+/**
  * @class
  * @classdesc Queue entry for managing running blocks.
  */
@@ -1391,8 +1413,7 @@ class Logo {
     runLogoCommands(startHere, env) {
         const performanceModeEnabled =
             typeof window !== "undefined" &&
-            (window.DEBUG_PERFORMANCE === true ||
-                (window.location && window.location.search.includes("performance=true")));
+            (window.DEBUG_PERFORMANCE === true || _performanceRequestedInURL());
 
         if (
             performanceModeEnabled &&
