@@ -4238,3 +4238,78 @@ describe("generateNoteNames EDO length contract", () => {
         }
     });
 });
+
+describe("getNote", () => {
+    // getNote is imported by piemenus, turtle-singer, synthutils, PitchBlocks
+    // and EnsembleBlocks, but had no tests of its own. It returns
+    // [name, octave, cents].
+    // getNote(noteArg, octave, transposition, keySignature, movable,
+    //         direction, errorMsg, ...) -- name the positions rather than
+    //         spreading, so a signature change fails loudly instead of
+    //         silently shifting arguments into the wrong slots.
+    const note = (noteArg, octave, transposition, keySignature) =>
+        getNote(noteArg, octave, transposition, keySignature, false, null, null);
+
+    describe("transposition within an octave", () => {
+        it("returns the note unchanged for no transposition", () => {
+            expect(note("C", 4, 0, "C major")).toEqual(["C", 4, 0]);
+        });
+
+        it("transposes up by semitones", () => {
+            expect(note("C", 4, 2, "C major")).toEqual(["D", 4, 0]);
+        });
+
+        it("transposes down by semitones", () => {
+            // A downward transposition returns -0 cents rather than 0, which
+            // toEqual distinguishes. Compare the parts so the assertion is
+            // about the note rather than the sign of a zero.
+            const [name, octave, cents] = note("D", 4, -2, "C major");
+            expect([name, octave]).toEqual(["C", 4]);
+            expect(cents).toBe(-0);
+        });
+    });
+
+    describe("octave boundaries", () => {
+        it("carries into the next octave transposing up past B", () => {
+            expect(note("B", 4, 1, "C major")).toEqual(["C", 5, 0]);
+        });
+
+        it("borrows from the previous octave transposing down past C", () => {
+            const [name, octave] = note("C", 4, -1, "C major");
+            expect([name, octave]).toEqual(["B", 3]);
+        });
+
+        it("moves a whole octave for twelve semitones", () => {
+            expect(note("C", 4, 12, "C major")).toEqual(["C", 5, 0]);
+            const [name, octave] = note("C", 4, -12, "C major");
+            expect([name, octave]).toEqual(["C", 3]);
+        });
+    });
+
+    describe("accepted note spellings", () => {
+        it("accepts a sharp", () => {
+            expect(note("F♯", 4, 0, "C major")).toEqual(["F♯", 4, 0]);
+        });
+
+        it("normalises an ASCII flat to the unicode sign", () => {
+            expect(note("Gb", 4, 0, "C major")).toEqual(["G♭", 4, 0]);
+        });
+
+        it("accepts a solfege name", () => {
+            expect(note("sol", 4, 0, "C major")).toEqual(["G", 4, 0]);
+        });
+
+        it("accepts a pitch number", () => {
+            expect(note(7, 4, 0, "C major")).toEqual(["G", 4, 0]);
+        });
+    });
+
+    describe("key signatures", () => {
+        it.each(["C major", "G major", "A minor"])(
+            "returns a natural unchanged in %s",
+            keySignature => {
+                expect(note("C", 4, 0, keySignature)).toEqual(["C", 4, 0]);
+            }
+        );
+    });
+});
