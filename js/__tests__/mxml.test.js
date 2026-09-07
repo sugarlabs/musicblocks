@@ -207,4 +207,90 @@ describe("saveMxmlOutput", () => {
 
         expect(measureCount).toBe(1);
     });
+
+    it("should compute a real fractional duration for a tuplet note instead of a full measure", () => {
+        // durationToNoteValue()'s tuplet fallback for an eighth-note triplet (3 in the
+        // space of 2 eighths) returns [1, 0, [3, 4], 8], which notation.js stores as
+        // this staging entry. Before the fix, mxml.js read the sentinel noteValue (1)
+        // and dotCount (0) as if they were real, giving 32 / 1 = 32 divisions -- a
+        // whole 4/4 measure for a single triplet eighth note.
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 1, 0, [3, 4], 8]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).not.toContain("<duration>32</duration>");
+        // 32 / 8 (nearest power-of-two note value) * 2/3 (normal/actual notes) = 2.667,
+        // rounded to the nearest whole division for the required-integer <duration>.
+        expect(output).toContain("<duration>3</duration>");
+        expect(output).toContain("<step>C</step>");
+        expect(output).toContain("<octave>4</octave>");
+    });
+
+    it("should emit time-modification with the reduced actual/normal notes ratio for a tuplet note", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 1, 0, [3, 4], 8]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain("<time-modification>");
+        expect(output).toContain("<actual-notes>3</actual-notes>");
+        expect(output).toContain("<normal-notes>2</normal-notes>");
+    });
+
+    it("should not emit time-modification for a plain, non-tuplet note", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).not.toContain("<time-modification>");
+    });
+
+    it("should keep measure-break accounting exact across a full run of tuplet notes", () => {
+        // Three eighth-note triplets (3-in-the-space-of-2) followed by six plain eighth
+        // notes together total exactly 8 eighth notes -- one full 4/4 measure. Rounding
+        // each triplet note's <duration> to 3 (instead of the exact 2.667) would drift
+        // the running total by a whole division per triplet if measure-break accounting
+        // used the rounded value, forcing a spurious extra measure for the last note.
+        const tripletEighth = [["C4"], 1, 0, [3, 4], 8];
+        const plainEighth = [["D4"], 8, 0];
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        tripletEighth,
+                        tripletEighth,
+                        tripletEighth,
+                        plainEighth,
+                        plainEighth,
+                        plainEighth,
+                        plainEighth,
+                        plainEighth,
+                        plainEighth
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+        const measureCount = (output.match(/<measure /g) || []).length;
+
+        expect(measureCount).toBe(1);
+    });
 });

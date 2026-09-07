@@ -12,6 +12,20 @@
 /* global saveMxmlOutput:writable,voiceNum:writable */
 /* exported saveMxmlOutput */
 
+// Indices into a notationStaging entry that this file cares about beyond the note-value
+// (index 1) and dot-count (index 2) it already used. These mirror NOTATIONTUPLETVALUE and
+// NOTATIONROUNDDOWN in js/logoconstants.js; they're duplicated here (rather than declared as
+// globals) because mxml.js is loaded as a standalone module in tests, without those globals.
+const MXML_TUPLETVALUE = 3;
+const MXML_ROUNDDOWN = 4;
+
+const _gcd = (a, b) => (b === 0 ? a : _gcd(b, a % b));
+
+// Tuplet durations (e.g. 32/8 * 2/3) are rarely exact in binary floating point, so
+// measure-overflow comparisons tolerate this much slop rather than misreading
+// accumulated rounding noise as the measure actually running out of room.
+const DIVISIONS_EPSILON = 1e-6;
+
 saveMxmlOutput = logo => {
     const ignore = ["voice two", "voice one", "one voice"];
     let res = "";
@@ -142,9 +156,39 @@ saveMxmlOutput = logo => {
                 // obj[2] is the dot count; 2 - 1/2^dotCount is the same multiplier
                 // durationToNoteValue() (musicutils.js) uses to derive it, so this stays
                 // consistent with how the dot count was assigned in the first place.
-                const dur = (32 / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
+                //
+                // A tuplet note (e.g. from Simple/Advanced Tuplet) doesn't have a
+                // power-of-two note value, so durationToNoteValue() can't express it as
+                // obj[1]/obj[2] and instead returns the sentinel obj[1] = 1, obj[2] = 0,
+                // carrying the note's real shape in obj[MXML_TUPLETVALUE] (an
+                // [oddFactor, powerOfTwoFactor] factoring of its note-value denominator)
+                // and obj[MXML_ROUNDDOWN] (the nearest power-of-two note value). Treating
+                // the sentinel as a real note value previously collapsed every tuplet
+                // note's duration to a full measure (32 divisions) and threw off measure
+                // boundaries for the rest of the voice -- see issue #8559.
+                const tupletRatio = obj[MXML_TUPLETVALUE];
+                let preciseDur, dur, timeModification;
 
-                if (divisionsLeft < dur && !isChordNote) {
+                if (Array.isArray(tupletRatio)) {
+                    const roundDown = obj[MXML_ROUNDDOWN];
+                    const noteValue = tupletRatio[0] * tupletRatio[1];
+                    const divisor = _gcd(noteValue, roundDown);
+                    const actualNotes = noteValue / divisor;
+                    const normalNotes = roundDown / divisor;
+                    // Exact (fractional) duration, used for measure-break accounting so
+                    // rounding error on a single note can't drift subsequent boundaries.
+                    preciseDur = (32 / roundDown) * (normalNotes / actualNotes);
+                    // <duration> must be an integer; 32 divisions per whole note isn't
+                    // evenly divisible by every tuplet ratio, so round for display only.
+                    dur = Math.max(1, Math.round(preciseDur));
+                    timeModification = { actualNotes, normalNotes };
+                } else {
+                    preciseDur = (32 / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
+                    dur = preciseDur;
+                    timeModification = null;
+                }
+
+                if (divisionsLeft < preciseDur - DIVISIONS_EPSILON && !isChordNote) {
                     if (openedMeasureTag) {
                         add("</measure>");
                         currMeasure++;
@@ -174,7 +218,7 @@ saveMxmlOutput = logo => {
                             queuedTempo = null;
                         }
                     }
-                    divisionsLeft -= dur;
+                    divisionsLeft -= preciseDur;
                 }
 
                 const alter = p[1] === "\u266d" ? -1 : p[1] === "\u266F" ? 1 : 0;
@@ -200,6 +244,14 @@ saveMxmlOutput = logo => {
                     add('<tie type="start"/>');
                 } else if (notes[i - 1] === "tie") {
                     add('<tie type="stop"/>');
+                }
+                if (timeModification) {
+                    add("<time-modification>");
+                    indent++;
+                    add(`<actual-notes>${timeModification.actualNotes}</actual-notes>`);
+                    add(`<normal-notes>${timeModification.normalNotes}</normal-notes>`);
+                    indent--;
+                    add("</time-modification>");
                 }
                 indent--;
 
