@@ -4313,3 +4313,60 @@ describe("getNote", () => {
         );
     });
 });
+
+describe("_calculate_pitch_number", () => {
+    // Exported and used by getNote and pitchToFrequency, with 19 uncovered
+    // branches. Returns a MIDI-style pitch number.
+    const pitch = (name, octave) => _calculate_pitch_number(name, octave, 0, undefined);
+
+    describe("MIDI numbering", () => {
+        it("places middle C at 60", () => {
+            expect(pitch("C", 4)).toBe(60);
+        });
+
+        it("places concert A at 69", () => {
+            expect(pitch("A", 4)).toBe(69);
+        });
+
+        it("adds twelve per octave", () => {
+            expect(pitch("C", 5) - pitch("C", 4)).toBe(12);
+            expect(pitch("C", 4) - pitch("C", 0)).toBe(48);
+        });
+
+        it("numbers B just below the next C", () => {
+            expect(pitch("B", 4)).toBe(pitch("C", 5) - 1);
+        });
+    });
+
+    describe("accidentals", () => {
+        it("raises a semitone for a sharp", () => {
+            expect(pitch("C#", 4)).toBe(pitch("C", 4) + 1);
+        });
+
+        it("lowers a semitone for a flat", () => {
+            expect(pitch("Db", 4)).toBe(pitch("D", 4) - 1);
+        });
+
+        it("gives enharmonic spellings the same number", () => {
+            expect(pitch("C#", 4)).toBe(pitch("Db", 4));
+        });
+
+        it("accepts both x and * for a double sharp", () => {
+            expect(pitch("Cx", 4)).toBe(pitch("C", 4) + 2);
+            expect(pitch("C*", 4)).toBe(pitch("Cx", 4));
+        });
+    });
+
+    describe("rejects what is not a pitch name", () => {
+        // "Invalid" and null are already covered above; these are the other
+        // shapes a caller can pass. INVALIDPITCH is a global from
+        // logoconstants.js, not a musicutils export.
+        it.each([
+            ["a number", 42],
+            ["an empty string", ""],
+            ["an unknown letter", "Q"]
+        ])("returns the invalid marker for %s", (_label, value) => {
+            expect(pitch(value, 4)).toBe(global.INVALIDPITCH);
+        });
+    });
+});
