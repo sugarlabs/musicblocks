@@ -20,6 +20,7 @@
 const fs = require("fs");
 const path = require("path");
 const { TextEncoder, TextDecoder } = require("util");
+global.Tone = require("./tonemock.js");
 global.clampNumber = require("../utils-logic").clampNumber;
 const synthutilsModule = require("../synthutils");
 const {
@@ -3016,29 +3017,46 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(noteText).not.toBeNull();
             expect(centsText).not.toBeNull();
 
-            // Run through various frequencies to exercise all tuner segment coloring branches
+            const segments = tunerContainer.querySelectorAll("svg path");
+            expect(segments.length).toBe(11);
+
+            // 1. Center in-tune (440Hz -> A4, near 0 cents, center green segment lit)
+            synthInstance.tunerAnalyser.getValue = jest
+                .fn()
+                .mockReturnValue(bufferForFrequency(440));
+            await new Promise(resolve => setTimeout(resolve, 5));
+            expect(noteText.textContent).toBe("A4");
+            expect(centsText.textContent).toMatch(/\+?[0-5] cents/);
+            expect(segments[5].getAttribute("fill")).toBe("#00FF00");
+
+            // 2. Frequency sweep across various pitches (flat, sharp, silence)
             const testFreqs = [
-                440, // exact A4 (center green)
-                438, // slight flat (-8 cents, yellowGreen)
-                432, // flat (-32 cents, yellowOrange)
-                425, // flat (-60 cents, orange)
-                418, // flat (-88 cents, redOrange)
-                400, // deep flat (deepRed)
-                442, // slight sharp (+8 cents, yellowGreen)
-                448, // sharp (+31 cents, yellowOrange)
-                455, // sharp (+58 cents, orange)
-                462, // sharp (+84 cents, redOrange)
-                480, // deep sharp (deepRed)
+                438, // slight flat
+                432, // flat
+                425, // flat
+                418, // flat
+                400, // deep flat
+                442, // slight sharp
+                448, // sharp
+                455, // sharp
+                462, // sharp
+                480, // deep sharp
                 0 // silence
             ];
-
             for (const f of testFreqs) {
                 synthInstance.tunerAnalyser.getValue = jest
                     .fn()
                     .mockReturnValue(bufferForFrequency(f));
-                synthInstance._tunerSegments = null;
-                // Wait a cycle for updatePitch to process buffer
                 await new Promise(resolve => setTimeout(resolve, 5));
+                if (f > 0) {
+                    expect(noteText.textContent).toBeTruthy();
+                    expect(centsText.textContent).toMatch(/cents/);
+                    // Verify at least one segment is active/colored
+                    const filledSegments = Array.from(segments).filter(
+                        s => s.getAttribute("fill") && s.getAttribute("fill") !== "#D3D3D3"
+                    );
+                    expect(filledSegments.length).toBeGreaterThan(0);
+                }
             }
         });
 
@@ -3050,21 +3068,47 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(targetPitchButton).not.toBeNull();
             targetPitchButton.onclick();
 
-            // Test target mode with various offsets (>50 cents flat/sharp, within 50 cents)
-            const testFreqs = [
-                880, // 1 octave above A4 (+1200 cents, >50 cents sharp)
-                220, // 1 octave below A4 (-1200 cents, >50 cents flat)
-                445, // near target (+20 cents)
-                435, // near target (-20 cents)
-                0 // invalid/zero
-            ];
+            const segments = tunerContainer.querySelectorAll("svg path");
+            const noteText = document.getElementById("noteText");
+            const centsText = document.getElementById("centsText");
 
-            for (const f of testFreqs) {
-                synthInstance.tunerAnalyser.getValue = jest
-                    .fn()
-                    .mockReturnValue(bufferForFrequency(f));
-                await new Promise(resolve => setTimeout(resolve, 5));
-            }
+            // 1 octave above (+1200 cents, >50 cents sharp -> rightmost segment deep red)
+            synthInstance.tunerAnalyser.getValue = jest
+                .fn()
+                .mockReturnValue(bufferForFrequency(880));
+            await new Promise(resolve => setTimeout(resolve, 5));
+            expect(noteText.textContent).toBe("A5");
+            expect(centsText.textContent).toContain("+1 octave");
+            expect(segments[10].getAttribute("fill")).toBe("#FF0000");
+
+            // 1 octave below (-1200 cents, >50 cents flat -> leftmost segment deep red)
+            synthInstance.tunerAnalyser.getValue = jest
+                .fn()
+                .mockReturnValue(bufferForFrequency(220));
+            await new Promise(resolve => setTimeout(resolve, 5));
+            expect(noteText.textContent).toBe("A3");
+            expect(centsText.textContent).toContain("-1 octave");
+            expect(segments[0].getAttribute("fill")).toBe("#FF0000");
+
+            // Near target sharp (+20 cents)
+            synthInstance.tunerAnalyser.getValue = jest
+                .fn()
+                .mockReturnValue(bufferForFrequency(445));
+            await new Promise(resolve => setTimeout(resolve, 5));
+            expect(noteText.textContent).toBe("A4");
+            expect(centsText.textContent).toMatch(/\+?[0-9]+ cents/);
+
+            // Near target flat (-20 cents)
+            synthInstance.tunerAnalyser.getValue = jest
+                .fn()
+                .mockReturnValue(bufferForFrequency(435));
+            await new Promise(resolve => setTimeout(resolve, 5));
+            expect(noteText.textContent).toBe("A4");
+            expect(centsText.textContent).toMatch(/-[0-9]+ cents/);
+
+            // Inactive / zero frequency
+            synthInstance.tunerAnalyser.getValue = jest.fn().mockReturnValue(bufferForFrequency(0));
+            await new Promise(resolve => setTimeout(resolve, 5));
 
             // Switch back to chromatic mode
             await new Promise(r => setTimeout(r, 250));
