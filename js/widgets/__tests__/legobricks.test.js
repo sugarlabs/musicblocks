@@ -2007,3 +2007,68 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
         });
     });
 });
+
+describe("_savePhrase chord block connection hierarchy", () => {
+    const originalUnderscore = global._;
+    afterEach(() => {
+        global._ = originalUnderscore;
+    });
+
+    it("correctly chains sequential pitch blocks for a chord", () => {
+        const legoWidget = new LegoWidget();
+
+        global._ = val => val;
+
+        legoWidget.colorData = [{ color: "red" }];
+        legoWidget._collectNotesToPlay = jest.fn();
+        legoWidget._notesToPlay = [
+            {
+                noteValue: 1,
+                pitches: [
+                    { solfege: "do", octave: 4 },
+                    { solfege: "mi", octave: 4 },
+                    { solfege: "sol", octave: 4 }
+                ],
+                isRest: false
+            }
+        ];
+
+        let generatedStack = null;
+
+        legoWidget.activity = {
+            textMsg: jest.fn(),
+            refreshCanvas: jest.fn(),
+            blocks: {
+                palettes: { dict: {} },
+                loadNewBlocks: jest.fn(stack => {
+                    generatedStack = stack;
+                })
+            }
+        };
+
+        legoWidget._savePhrase();
+
+        expect(legoWidget.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        expect(generatedStack).toBeDefined();
+
+        const pitchBlocks = generatedStack.filter(block => block[1] === "pitch");
+
+        expect(pitchBlocks).toHaveLength(3);
+
+        const vspaceBlock = generatedStack.find(block => block[1] === "vspace");
+
+        const firstPitchId = pitchBlocks[0][0];
+        const secondPitchId = pitchBlocks[1][0];
+        const thirdPitchId = pitchBlocks[2][0];
+
+        // vspace → first pitch → second pitch → third pitch
+        expect(pitchBlocks[0][4][0]).toBe(vspaceBlock[0]);
+        expect(pitchBlocks[0][4][3]).toBe(secondPitchId);
+
+        expect(pitchBlocks[1][4][0]).toBe(firstPitchId);
+        expect(pitchBlocks[1][4][3]).toBe(thirdPitchId);
+
+        expect(pitchBlocks[2][4][0]).toBe(secondPitchId);
+        expect(pitchBlocks[2][4][3]).toBeNull();
+    });
+});

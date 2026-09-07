@@ -2011,7 +2011,7 @@ function SampleWidget() {
                         if (dataArray && dataArray.length > 0) {
                             const pitch = detectPitch(dataArray);
                             if (pitch > 0) {
-                                const { note, cents } = frequencyToNote(pitch);
+                                const { note, cents } = TunerUtils.frequencyToNote(pitch);
                                 this.tunerDisplay.update(note, cents, this.centsValue);
 
                                 // Update segments
@@ -2148,19 +2148,6 @@ function SampleWidget() {
     };
 
     /**
-     * Convert frequency to note and cents
-     */
-    const frequencyToNote = (frequency, edo) => {
-        if (frequency <= 0) return { note: "---", cents: 0 };
-
-        const result = TunerUtils.frequencyToPitch(frequency, edo);
-        const noteName = result[0] + result[1];
-        const centsOffset = result[2];
-
-        return { note: noteName, cents: centsOffset };
-    };
-
-    /**
      * Stops pitch detection and releases all associated resources.
      * This prevents memory leaks from AudioContext, MediaStream, and animation frames.
      * @returns {void}
@@ -2232,7 +2219,7 @@ function SampleWidget() {
                 // Update widget-local DOM elements (passed in from makeTuner — no global query)
                 if (pitchElement && noteElement) {
                     if (pitch > 0) {
-                        const { note, cents } = frequencyToNote(pitch);
+                        const { note, cents } = TunerUtils.frequencyToNote(pitch);
                         pitchElement.textContent = pitch.toFixed(2);
                         noteElement.textContent =
                             cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;

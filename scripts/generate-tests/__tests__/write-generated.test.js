@@ -40,6 +40,22 @@ const FIXTURES = path.join(__dirname, "fixtures", "generated");
 const validSource = fs.readFileSync(path.join(FIXTURES, "valid-utils-logic.txt"), "utf8");
 const utilsLogicPlan = () => extractFile("js/utils/utils-logic.js");
 
+// Probe symlink support synchronously to use it.skip when unsupported (e.g. Windows without Dev Mode), avoiding false passes.
+const symlinkSupported = (() => {
+    const probe = fs.mkdtempSync(path.join(os.tmpdir(), "mb-symlink-probe-"));
+    try {
+        fs.symlinkSync(probe, path.join(probe, "link"), "dir");
+        return true;
+    } catch (err) {
+        if (err.code === "EPERM" || err.code === "EACCES") {
+            return false;
+        }
+        throw err;
+    } finally {
+        fs.rmSync(probe, { recursive: true, force: true });
+    }
+})();
+
 let sandbox;
 beforeEach(() => {
     sandbox = fs.mkdtempSync(path.join(os.tmpdir(), "mb-write-generated-"));
@@ -166,27 +182,30 @@ describe("safeWrite", () => {
         ).toThrow(/repo-relative/);
     });
 
-    it("refuses to write through a __tests__ symlink that escapes the repo", () => {
-        const outside = fs.mkdtempSync(path.join(os.tmpdir(), "mb-outside-"));
-        try {
-            fs.mkdirSync(path.join(sandbox, "js", "utils"), { recursive: true });
-            fs.symlinkSync(outside, path.join(sandbox, "js", "utils", "__tests__"), "dir");
-            expect(() =>
-                safeWrite(validSource, { modulePath: "js/utils/utils-logic.js", cwd: sandbox })
-            ).toThrow(/real path resolves outside the repository/);
-            // even a dry run refuses it
-            expect(() =>
-                safeWrite(validSource, {
-                    modulePath: "js/utils/utils-logic.js",
-                    cwd: sandbox,
-                    dryRun: true
-                })
-            ).toThrow(/real path resolves outside the repository/);
-            expect(fs.readdirSync(outside)).toEqual([]);
-        } finally {
-            fs.rmSync(outside, { recursive: true, force: true });
+    (symlinkSupported ? it : it.skip)(
+        "refuses to write through a __tests__ symlink that escapes the repo",
+        () => {
+            const outside = fs.mkdtempSync(path.join(os.tmpdir(), "mb-outside-"));
+            try {
+                fs.mkdirSync(path.join(sandbox, "js", "utils"), { recursive: true });
+                fs.symlinkSync(outside, path.join(sandbox, "js", "utils", "__tests__"), "dir");
+                expect(() =>
+                    safeWrite(validSource, { modulePath: "js/utils/utils-logic.js", cwd: sandbox })
+                ).toThrow(/real path resolves outside the repository/);
+                // even a dry run refuses it
+                expect(() =>
+                    safeWrite(validSource, {
+                        modulePath: "js/utils/utils-logic.js",
+                        cwd: sandbox,
+                        dryRun: true
+                    })
+                ).toThrow(/real path resolves outside the repository/);
+                expect(fs.readdirSync(outside)).toEqual([]);
+            } finally {
+                fs.rmSync(outside, { recursive: true, force: true });
+            }
         }
-    });
+    );
 });
 
 describe("writeGeneratedTest: validate-then-write", () => {

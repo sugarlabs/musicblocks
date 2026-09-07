@@ -1122,6 +1122,71 @@ describe("processNote — delayedNotes reset on zero-duration tied notes (#8176)
     });
 });
 
+describe("processNote playback path avoids discarded ratio computation", () => {
+    let turtleMock;
+    let activityMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        savedGlobals = {
+            rationalToFraction: global.rationalToFraction,
+            getOctaveRatio: global.getOctaveRatio
+        };
+        global.rationalToFraction = jest.fn(() => [3, 2]);
+        global.getOctaveRatio = jest.fn(() => 2);
+
+        const blk = "mockBlk";
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.blink = jest.fn();
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.suppressOutput = true;
+        turtleMock.singer.justCounting = [];
+        turtleMock.singer.oscList = { [blk]: [] };
+
+        activityMock = createActivityMock(turtleMock);
+        activityMock.errorMsg = jest.fn();
+        Object.assign(activityMock.logo, {
+            runningLilypond: false,
+            runningMxml: false,
+            runningAbc: false,
+            runningMIDI: false,
+            specialArgs: [],
+            dispatchTurtleSignals: jest.fn()
+        });
+        Object.assign(activityMock.logo.synth, {
+            inTemperament: "equal",
+            changeInTemperament: false,
+            startingPitch: "A0",
+            getFrequency: jest.fn(() => [261.63]),
+            getCustomFrequency: jest.fn(() => [261.63])
+        });
+        activityMock.stage = { update: jest.fn() };
+    });
+
+    afterEach(() => {
+        global.rationalToFraction = savedGlobals.rationalToFraction;
+        global.getOctaveRatio = savedGlobals.getOctaveRatio;
+    });
+
+    test("does not build per-note frequency ratios during playback", () => {
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        // Sanity: the pitched-note path actually ran.
+        expect(global.getNote).toHaveBeenCalled();
+        // The ratio/fraction results were never consumed anywhere, so the
+        // hot per-note path must not pay for computing them.
+        expect(global.rationalToFraction).not.toHaveBeenCalled();
+    });
+});
+
 describe("scalarDistance edge cases", () => {
     let turtleMock;
     let activityMock;

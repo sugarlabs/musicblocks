@@ -212,6 +212,23 @@ class Blocks {
         /** Number of blocks to load */
         this._loadCounter = 0;
         /**
+         * loadNewBlocks() is not re-entrant: it tracks the in-progress load
+         * on _loadCounter/_adjustTheseStacks/_adjustTheseDocks below, shared
+         * instance state. A second call made while one is still chunking
+         * through blocks would otherwise reset that state out from under the
+         * first (issue #8392), so calls are queued and run one at a time.
+         */
+        this._loadQueue = [];
+        this._loadInProgress = false;
+        /**
+         * Bumped once per load attempt (see _loadNewBlocksNow). Every block
+         * created during a load is tagged with the value active at the time,
+         * so a completion callback that lands after its own load has already
+         * been abandoned (queue advanced past it on failure) can recognize
+         * itself as stale and skip touching the next load's _loadCounter.
+         */
+        this._activeLoadGeneration = 0;
+        /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
          */
@@ -307,6 +324,13 @@ class Blocks {
             const block = this.blockList[blkIdx];
             if (!block || !block.container) return;
 
+            // The grid is keyed by block index, and Map and Set compare keys
+            // strictly. A caller iterating blockList with for...in hands over
+            // a string, which would register the block a second time and
+            // orphan the entry already held under its number, leaving it
+            // listed at a position it has left. Key on the number always.
+            const idx = Number(blkIdx);
+
             // Compute the set of cells this block should occupy
             const newKeys = new Set();
             if (block.docks && block.docks.length > 0) {
@@ -325,7 +349,7 @@ class Blocks {
             }
 
             // Check if cells changed; skip update if identical
-            const oldKeys = this._blockGridCell.get(blkIdx);
+            const oldKeys = this._blockGridCell.get(idx);
             if (oldKeys && oldKeys.size === newKeys.size) {
                 let same = true;
                 for (const k of newKeys) {
@@ -342,7 +366,7 @@ class Blocks {
                 for (const oldKey of oldKeys) {
                     const oldSet = this._spatialGrid.get(oldKey);
                     if (oldSet) {
-                        oldSet.delete(blkIdx);
+                        oldSet.delete(idx);
                         if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
                     }
                 }
@@ -355,9 +379,9 @@ class Blocks {
                     cellSet = new Set();
                     this._spatialGrid.set(key, cellSet);
                 }
-                cellSet.add(blkIdx);
+                cellSet.add(idx);
             }
-            this._blockGridCell.set(blkIdx, newKeys);
+            this._blockGridCell.set(idx, newKeys);
         };
 
         /**
@@ -2639,6 +2663,10 @@ class Blocks {
             // Cache the block's index for O(1) lookups instead of
             // O(N) blockList.indexOf() scans.
             myBlock.blockIndex = this.blockList.length - 1;
+            // Tag with the load this block belongs to, so a stale
+            // cleanupAfterLoad() completion from an abandoned load can be
+            // told apart from one belonging to whatever load is active now.
+            myBlock._loadGeneration = this._activeLoadGeneration;
             myBlock.copySize();
 
             /** We may need to do some postProcessing to the block */
@@ -3493,7 +3521,11 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             /** Named dos are modified in a separate function below. */
-            for (const blk in this.blockList) {
+            // Indexed numerically. Both the skipBlock check below and the
+            // connections.indexOf slot check further down compare against
+            // block numbers, and for...in would hand them a string, which is
+            // never strictly equal to the number it is matched against.
+            for (let blk = 0; blk < this.blockList.length; blk++) {
                 if (blk === skipBlock) {
                     continue;
                 }
@@ -4769,14 +4801,54 @@ class Blocks {
         };
 
         /**
-         * Load new blocks.
+         * Load new blocks. Queues the call instead of running it immediately
+         * if another load is still in progress, so the two loads' bookkeeping
+         * never overlaps (issue #8392).
          * @param - blockObj - Block Objects
          * @public
          * return {void}
          */
         this.loadNewBlocks = blockObjs => {
+            if (this._loadInProgress) {
+                this._loadQueue.push(blockObjs);
+                return;
+            }
+
+            this._loadInProgress = true;
+            this._loadNewBlocksNow(blockObjs);
+        };
+
+        /**
+         * Marks the current load as finished and, if another load was
+         * queued while it ran, starts that one.
+         * @private
+         * @returns {void}
+         */
+        this._advanceLoadQueue = () => {
+            this._loadInProgress = false;
+
+            if (this._loadQueue.length > 0) {
+                const nextBlockObjs = this._loadQueue.shift();
+                this._loadInProgress = true;
+                this._loadNewBlocksNow(nextBlockObjs);
+            }
+        };
+
+        /**
+         * Does the actual work of loading new blocks. Only ever runs for one
+         * call to loadNewBlocks at a time, see _advanceLoadQueue above.
+         * @private
+         * @param - blockObj - Block Objects
+         * @returns {void}
+         */
+        this._loadNewBlocksNow = blockObjs => {
             /** Suppress intermediate canvas redraws during block loading. */
             this.activity._suppressRefresh = true;
+            // Every load attempt gets its own generation, win or lose, so a
+            // completion that lands after this one has been abandoned can be
+            // told apart from a completion belonging to whatever load is
+            // active by the time it fires.
+            this._activeLoadGeneration += 1;
 
             try {
                 /**
@@ -4898,6 +4970,7 @@ class Blocks {
                         );
                     }
                     this.activity._suppressRefresh = false;
+                    this._advanceLoadQueue();
                     return;
                 }
 
@@ -5434,13 +5507,39 @@ class Blocks {
                         // silently stalls loading after the first chunk. setTimeout(0)
                         // still yields to the main thread but keeps running regardless
                         // of tab visibility.
-                        setTimeout(processChunk, 0);
+                        //
+                        //
+                        // A deferred chunk runs on its own event-loop turn, outside
+                        // the synchronous try/catch below that only covers the very
+                        // first, synchronous processChunk() call. Without catching
+                        // here too, a throw from block 21 onward would leave
+                        // _loadInProgress stuck true forever, silently blocking
+                        // every future loadNewBlocks() call.
+                        setTimeout(() => {
+                            try {
+                                processChunk();
+                            } catch (e) {
+                                this.activity._suppressRefresh = false;
+                                this._advanceLoadQueue();
+                                throw e;
+                            }
+                        }, 0);
                     }
                 };
 
-                processChunk();
+                if (totalBlocks === 0) {
+                    // No blocks means no per-block async completion will ever
+                    // call cleanupAfterLoad, so nothing would otherwise mark
+                    // this load finished. Route through the same finalize
+                    // path a normal load ends on so finishedLoading still
+                    // fires and the queue still advances.
+                    this.cleanupAfterLoad();
+                } else {
+                    processChunk();
+                }
             } catch (e) {
                 this.activity._suppressRefresh = false;
+                this._advanceLoadQueue();
                 throw e;
             }
         };
@@ -6294,11 +6393,21 @@ class Blocks {
 
         /**
          * If all the blocks are loaded, we can make the final adjustments.
-         * @param - name
+         * @param {Number} [loadGeneration] - the calling block's _loadGeneration
+         *  (see makeNewBlock). A load that failed mid-chunk advances the queue
+         *  immediately rather than waiting for its remaining blocks, so a
+         *  completion arriving afterward belongs to an already-abandoned
+         *  load; ignore it instead of decrementing whatever load is active
+         *  now. Callers that don't pass this (e.g. existing direct calls)
+         *  are treated as always belonging to the current load.
          * @public
          * @returns {void}
          */
-        this.cleanupAfterLoad = async () => {
+        this.cleanupAfterLoad = async loadGeneration => {
+            if (loadGeneration !== undefined && loadGeneration !== this._activeLoadGeneration) {
+                return;
+            }
+
             this._loadCounter -= 1;
             // Early return BEFORE the try block is intentional:
             // intermediate calls must not run the finally, which resets
@@ -6386,6 +6495,7 @@ class Blocks {
                 /** All blocks loaded — allow canvas redraws again. */
                 this.activity._suppressRefresh = false;
                 this.activity.refreshCanvas();
+                this._advanceLoadQueue();
             }
         };
 

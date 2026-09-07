@@ -24,6 +24,8 @@ const {
     rationalToFraction,
     GCD,
     rationalSum,
+    LCD,
+    clampNumber,
     rgbToHex,
     hexToRGB,
     hex2rgb,
@@ -567,6 +569,272 @@ describe("Utility Logic Functions", () => {
             expect(isUnsafeObjectKey("myPlugin")).toBe(false);
             expect(isUnsafeObjectKey("FLOWPLUGINS")).toBe(false);
             expect(isUnsafeObjectKey("")).toBe(false);
+        });
+    });
+
+    describe("GCD()", () => {
+        it("returns the greatest common divisor of two positive integers", () => {
+            expect(GCD(12, 18)).toBe(6);
+            expect(GCD(17, 5)).toBe(1);
+            expect(GCD(100, 10)).toBe(10);
+        });
+
+        it("is symmetric in its arguments", () => {
+            expect(GCD(48, 36)).toBe(GCD(36, 48));
+        });
+
+        it("ignores the sign of either argument", () => {
+            expect(GCD(-12, 18)).toBe(6);
+            expect(GCD(12, -18)).toBe(6);
+            expect(GCD(-12, -18)).toBe(6);
+        });
+
+        it("treats zero as the identity element", () => {
+            expect(GCD(0, 7)).toBe(7);
+            expect(GCD(7, 0)).toBe(7);
+            expect(GCD(0, 0)).toBe(0);
+        });
+
+        it("returns a value that divides both inputs exactly", () => {
+            for (const [a, b] of [
+                [24, 36],
+                [81, 27],
+                [1071, 462],
+                [13, 91]
+            ]) {
+                const g = GCD(a, b);
+                expect(a % g).toBe(0);
+                expect(b % g).toBe(0);
+            }
+        });
+    });
+
+    describe("LCD()", () => {
+        it("returns the least common multiple of two integers", () => {
+            expect(LCD(4, 6)).toBe(12);
+            expect(LCD(3, 5)).toBe(15);
+            expect(LCD(6, 6)).toBe(6);
+        });
+
+        it("ignores the sign of either argument", () => {
+            expect(LCD(-4, 6)).toBe(12);
+            expect(LCD(4, -6)).toBe(12);
+        });
+
+        it("is zero when either argument is zero", () => {
+            expect(LCD(0, 7)).toBe(0);
+        });
+
+        it("returns a value that is a multiple of both inputs", () => {
+            for (const [a, b] of [
+                [4, 6],
+                [9, 12],
+                [7, 3],
+                [10, 15]
+            ]) {
+                const m = LCD(a, b);
+                expect(m % a).toBe(0);
+                expect(m % b).toBe(0);
+            }
+        });
+
+        it("satisfies GCD(a, b) * LCD(a, b) === |a * b|", () => {
+            for (const [a, b] of [
+                [4, 6],
+                [12, 18],
+                [7, 13],
+                [21, 6]
+            ]) {
+                expect(GCD(a, b) * LCD(a, b)).toBe(Math.abs(a * b));
+            }
+        });
+    });
+
+    describe("rationalToFraction() — additional cases", () => {
+        it("approximates a fraction whose value is below one", () => {
+            expect(rationalToFraction(0.6)).toEqual([3, 5]);
+            expect(rationalToFraction(0.75)).toEqual([3, 4]);
+        });
+
+        it("approximates a fraction whose value is above one", () => {
+            expect(rationalToFraction(1.5)).toEqual([3, 2]);
+        });
+
+        it("returns numerator and denominator that approximate the input", () => {
+            for (const value of [0.2, 0.333333333, 0.875, 1.25, 2.5]) {
+                const result = rationalToFraction(value);
+                expect(Array.isArray(result)).toBe(true);
+                expect(result[1]).not.toBe(0);
+                expect(Math.abs(result[0] / result[1] - value)).toBeLessThan(1e-6);
+            }
+        });
+
+        it("returns a bounded reduced approximation for a sub-one value that never converges", () => {
+            // The existing suite already covers pi and e, which are > 1 and so
+            // take the reciprocal path. 1/pi is below one, so the iteration cap
+            // is reached without inversion. Whichever way the loop exits, the
+            // observable contract holds: a finite, fully reduced
+            // [numerator, denominator] pair with a positive denominator whose
+            // value stays close to the input.
+            const target = 1 / Math.PI;
+            const [num, den] = rationalToFraction(target);
+
+            expect(Number.isInteger(num)).toBe(true);
+            expect(Number.isInteger(den)).toBe(true);
+            expect(den).toBeGreaterThan(0);
+            expect(GCD(Math.abs(num), den)).toBe(1);
+
+            const error = Math.abs(num / den - target);
+            expect(error).toBeLessThan(1e-3);
+            // Non-zero because no integer ratio equals 1/pi — distinguishes the
+            // estimate-and-stop path from an exact match such as 0.75 -> [3, 4].
+            expect(error).toBeGreaterThan(0);
+        });
+    });
+
+    describe("rationalSum() — non-integer components", () => {
+        it("normalizes a non-integer numerator on either side before summing", () => {
+            expect(rationalSum([1.5, 2], [1, 2])).toEqual([[5, 4], null]);
+            expect(rationalSum([1, 2], [1.5, 2])).toEqual([[5, 4], null]);
+        });
+
+        it("normalizes a non-integer denominator on either side before summing", () => {
+            expect(rationalSum([1, 2.5], [1, 2])).toEqual([[9, 10], null]);
+            expect(rationalSum([1, 2], [1, 2.5])).toEqual([[9, 10], null]);
+        });
+
+        it("keeps the result unreduced for a shared denominator", () => {
+            expect(rationalSum([3, 4], [1, 4])).toEqual([[4, 4], null]);
+        });
+
+        it("is commutative in the value of the sum", () => {
+            const [[num1, den1]] = rationalSum([1, 3], [2, 7]);
+            const [[num2, den2]] = rationalSum([2, 7], [1, 3]);
+            expect(num1 / den1).toBeCloseTo(num2 / den2, 10);
+        });
+    });
+
+    describe("mixedNumber() — rounding edges", () => {
+        it("carries a fractional part that rounds up to a whole number", () => {
+            expect(mixedNumber(1.9999999999)).toBe("2");
+        });
+
+        it("falls back to a two-decimal string when the denominator is large", () => {
+            expect(mixedNumber(2.123456)).toBe("2.12");
+        });
+
+        it("returns a bare fraction when the whole part is zero", () => {
+            expect(mixedNumber(0.25)).toBe("1/4");
+        });
+    });
+
+    describe("oneHundredToFraction() — full domain", () => {
+        it("clamps values outside the 1-99 range to the extremes", () => {
+            expect(oneHundredToFraction(0)).toEqual([1, 64]);
+            expect(oneHundredToFraction(0.5)).toEqual([1, 64]);
+            expect(oneHundredToFraction(-5)).toEqual([1, 64]);
+            expect(oneHundredToFraction(99.5)).toEqual([1, 1]);
+            expect(oneHundredToFraction(100)).toEqual([1, 1]);
+        });
+
+        it("returns a defined fraction for every integer percent from 1 to 99", () => {
+            for (let d = 1; d <= 99; d++) {
+                const result = oneHundredToFraction(d);
+                expect(Array.isArray(result)).toBe(true);
+                expect(result).toHaveLength(2);
+                expect(typeof result[0]).toBe("number");
+                expect(result[1]).toBeGreaterThan(0);
+            }
+        });
+
+        it("stays within 0.06 of the requested ratio across the whole domain", () => {
+            for (let d = 1; d <= 99; d++) {
+                const result = oneHundredToFraction(d);
+                expect(Array.isArray(result)).toBe(true);
+                expect(Math.abs(result[0] / result[1] - d / 100)).toBeLessThan(0.06);
+            }
+        });
+
+        it("is monotonically non-decreasing across the domain", () => {
+            let previous = -Infinity;
+            for (let d = 1; d <= 99; d++) {
+                const result = oneHundredToFraction(d);
+                expect(Array.isArray(result)).toBe(true);
+                const value = result[0] / result[1];
+                expect(value).toBeGreaterThanOrEqual(previous);
+                previous = value;
+            }
+        });
+
+        it("returns the expected fraction at representative points", () => {
+            // A handful of anchor values spread across the domain, including
+            // the two single-value cases (1, 2), a plateau interior (85 -> 5/6)
+            // and the last in-range value (99). Not a transcription of the
+            // whole table — just enough to catch a wholesale mismapping.
+            expect(oneHundredToFraction(1)).toEqual([1, 64]);
+            expect(oneHundredToFraction(2)).toEqual([1, 48]);
+            expect(oneHundredToFraction(3)).toEqual([1, 32]);
+            expect(oneHundredToFraction(25)).toEqual([1, 4]);
+            expect(oneHundredToFraction(50)).toEqual([1, 2]);
+            expect(oneHundredToFraction(85)).toEqual([5, 6]);
+            expect(oneHundredToFraction(99)).toEqual([63, 64]);
+        });
+
+        it("holds a value constant within a plateau and steps up at its edges", () => {
+            // The 48..52 plateau maps to 1/2; the neighbours on each side are
+            // strictly smaller / larger. This pins the step structure without
+            // enumerating every case.
+            const half = oneHundredToFraction(48);
+            expect(half).toEqual([1, 2]);
+            for (let d = 48; d <= 52; d++) {
+                expect(oneHundredToFraction(d)).toEqual(half);
+            }
+
+            const below = oneHundredToFraction(47);
+            const above = oneHundredToFraction(53);
+            expect(below[0] / below[1]).toBeLessThan(half[0] / half[1]);
+            expect(above[0] / above[1]).toBeGreaterThan(half[0] / half[1]);
+        });
+    });
+
+    describe("escapeHTML() / unescapeHTML() round trip", () => {
+        it("recovers the original string after escaping", () => {
+            for (const original of [
+                "<div>\"Hello\" & 'World'</div>",
+                "a<b>c&d'e\"f",
+                "&amp;lt; already-entity-looking text",
+                "plain text with no special characters",
+                ""
+            ]) {
+                expect(unescapeHTML(escapeHTML(original))).toBe(original);
+            }
+        });
+    });
+
+    describe("resolveObject() — error handling", () => {
+        it("returns undefined when traversing a path throws", () => {
+            let getterWasCalled = false;
+            global.MbResolveThrows = new Proxy(
+                {},
+                {
+                    get() {
+                        getterWasCalled = true;
+                        throw new Error("boom");
+                    }
+                }
+            );
+            try {
+                expect(resolveObject("MbResolveThrows.value")).toBeUndefined();
+                // Guards against a regression that returns undefined without
+                // ever walking into the throwing property.
+                expect(getterWasCalled).toBe(true);
+            } finally {
+                delete global.MbResolveThrows;
+            }
+        });
+
+        it("returns undefined for an empty path", () => {
+            expect(resolveObject("")).toBeUndefined();
         });
     });
 });

@@ -686,7 +686,7 @@ LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732180386380311&run=True)
 
 The _Rhythm_ block is used to specify a series of notes of the same
 duration (e.g., three quarter notes or seven eighth notes). The number
-of notes is the top argument; the bottom argument is the the note
+of notes is the top argument; the bottom argument is the note
 duration, e.g., `1/1` for a whole note, `1/2` for a half note, `1/4`
 for a quarter note, etc. (Recall that in traditional Western notation
 all note values are (1) in powers of two, and are (2) in relation to

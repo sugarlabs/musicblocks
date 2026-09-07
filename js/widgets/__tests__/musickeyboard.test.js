@@ -924,6 +924,42 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         );
         expect(g4Item).toBeDefined();
     });
+
+    test("gives every padded key a voice when the keyboard holds a single note", () => {
+        const keyboard = new MusicKeyboard(mockActivity);
+        // A keyboard built from exactly one pitch block: G4 (sol 4).
+        keyboard.noteNames = ["sol"];
+        keyboard.octaves = [4];
+        keyboard._rowBlocks = [44];
+        keyboard.instruments = ["guitar"];
+
+        mockActivity.blocks = {
+            blockList: {
+                44: { name: "pitch", connections: [null, 45, 46, null] },
+                45: { value: "sol" },
+                46: { value: 4 }
+            },
+            adjustDocks: jest.fn(),
+            clampBlocksToCheck: [],
+            adjustExpandableClampBlock: jest.fn(),
+            sendStackToTrash: jest.fn()
+        };
+
+        keyboard.init();
+
+        // The keys generated above the single note used to be created without a
+        // voice, which made them silent and threw when they were pressed. Every
+        // key in the padded octave should carry the source note's voice.
+        expect(keyboard.displayLayout).toHaveLength(13);
+        expect(keyboard.displayLayout.every(item => item.voice === "guitar")).toBe(true);
+
+        // The padded keys should carry the voice of the note they were built from.
+        const c5Item = keyboard.displayLayout.find(
+            item => item.noteName === "C" && item.noteOctave === 5
+        );
+        expect(c5Item).toBeDefined();
+        expect(c5Item.voice).toBe("guitar");
+    });
 });
 
 describe("MusicKeyboard core logic", () => {

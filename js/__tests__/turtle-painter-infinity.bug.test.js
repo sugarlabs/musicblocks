@@ -9,6 +9,7 @@ global.NANERRORMSG = "Not a number.";
 global.getcolor = jest.fn(() => [50, 100, "rgba(255,0,49,1)"]);
 global.getMunsellColor = jest.fn(() => "rgba(128,64,32,1)");
 global.hex2rgb = jest.fn(() => "rgba(255,0,49,1)");
+global.isValidHex = require("../utils/utils-logic.js").isValidHex;
 
 const createMockTurtle = () => ({
     turtles: {

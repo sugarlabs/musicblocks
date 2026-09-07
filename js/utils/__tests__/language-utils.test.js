@@ -44,6 +44,33 @@ describe("normalizeLanguageCode", () => {
         expect(normalizeLanguageCode("")).toBe("en");
         expect(normalizeLanguageCode(undefined)).toBe("en");
         expect(normalizeLanguageCode(null)).toBe("en");
+        expect(normalizeLanguageCode(42)).toBe("en");
+        expect(normalizeLanguageCode({})).toBe("en");
+    });
+
+    it("is idempotent — normalizing an already-normalized code is a no-op", () => {
+        for (const code of [
+            "enUS",
+            "enUK",
+            "zhCN",
+            "kana",
+            "ja-kana",
+            "ja-kanji",
+            "ja",
+            "fr",
+            "de",
+            ""
+        ]) {
+            const once = normalizeLanguageCode(code);
+            expect(normalizeLanguageCode(once)).toBe(once);
+        }
+    });
+
+    it("resolves any other ja-prefixed variant to ja", () => {
+        // Independent of the explicit mapping table: the prefix rule alone
+        // handles variants that are not listed individually.
+        expect(normalizeLanguageCode("ja-Latn")).toBe("ja");
+        expect(normalizeLanguageCode("japanese")).toBe("ja");
     });
 });
 

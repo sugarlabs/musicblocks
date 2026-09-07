@@ -197,19 +197,22 @@
             "
         />
         <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
+        <script src="js/js-export/ast2blocks.config.js"></script>
         <script>
             window.ast2blocklist_config_failed = false;
-            window.ast2blocklist_config_ready = new Promise((resolve, reject) => {
-                const script = document.createElement("script");
-                script.src = "js/js-export/ast2blocks.config.js";
-                script.defer = true;
-                script.onload = resolve;
-                script.onerror = () => {
-                    window.ast2blocklist_config_failed = true;
-                    reject(new Error("ast2blocks.config.js failed to load"));
-                };
-                document.head.appendChild(script);
-            });
+            window.ast2blocklist_config_ready = window.ast2blocklist_config
+                ? Promise.resolve(window.ast2blocklist_config)
+                : new Promise((resolve, reject) => {
+                      const script = document.createElement("script");
+                      script.src = "js/js-export/ast2blocks.config.js";
+                      script.defer = true;
+                      script.onload = () => resolve(window.ast2blocklist_config);
+                      script.onerror = () => {
+                          window.ast2blocklist_config_failed = true;
+                          reject(new Error("ast2blocks.config.js failed to load"));
+                      };
+                      document.head.appendChild(script);
+                  });
         </script>
     </head>
 

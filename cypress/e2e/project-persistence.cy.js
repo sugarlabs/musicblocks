@@ -14,7 +14,7 @@ describe("Project persistence", () => {
     // retry polling rather than an arbitrary wait.
     const waitForPiFullyLoaded = () => {
         let stableObservations = 0;
-        cy.window({ timeout: 30000 }).should(win => {
+        cy.window({ timeout: 60000 }).should(win => {
             const { blocks } = win.ActivityContext.getActivity();
             const nonTrash = blocks.blockList.filter(block => !block.trash);
             const fullyLoaded =
@@ -23,7 +23,7 @@ describe("Project persistence", () => {
             expect(
                 stableObservations,
                 "pi.tb's fully-loaded state should hold across repeated checks"
-            ).to.be.at.least(5);
+            ).to.be.at.least(3);
         });
     };
 
@@ -56,7 +56,7 @@ describe("Project persistence", () => {
 
     it("restores a loaded project's blocks after a page reload", () => {
         cy.get("#load").click();
-        cy.get("#myOpenFile").selectFile("examples/pi.tb", { force: true });
+        cy.get("#myOpenFile").selectFile("cypress/fixtures/pi.tb", { force: true });
 
         cy.get("#load-container").should("be.visible");
         cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");

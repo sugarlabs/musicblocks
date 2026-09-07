@@ -1825,6 +1825,51 @@ describe("buildScale", () => {
             [2, 2, 1, 2, 2, 2, 1]
         ]); // Default C major scale
     });
+
+    // The sharp/flat preference tables are keyed on "<key> major" / "<key> minor",
+    // so the mode has to be mapped onto its major/minor equivalent before the
+    // lookup. Without that, every mode name the mode pie menu offers misses the
+    // table and the scale is spelled with the wrong accidental.
+    const modalCases = [
+        // E natural minor and E minor are the same key and must agree.
+        { keySignature: "E natural minor", expected: ["E", "F♯", "G", "A", "B", "C", "D", "E"] },
+        { keySignature: "E aeolian", expected: ["E", "F♯", "G", "A", "B", "C", "D", "E"] },
+        { keySignature: "B natural minor", expected: ["B", "C♯", "D", "E", "F♯", "G", "A", "B"] },
+        { keySignature: "G ionian", expected: ["G", "A", "B", "C", "D", "E", "F♯", "G"] },
+        { keySignature: "C lydian", expected: ["C", "D", "E", "F♯", "G", "A", "B", "C"] },
+        { keySignature: "A dorian", expected: ["A", "B", "C", "D", "E", "F♯", "G", "A"] },
+        { keySignature: "B phrygian", expected: ["B", "C", "D", "E", "F♯", "G", "A", "B"] },
+        { keySignature: "D mixolydian", expected: ["D", "E", "F♯", "G", "A", "B", "C", "D"] }
+    ];
+
+    modalCases.forEach(({ keySignature, expected }) => {
+        it(`should spell ${keySignature} with the accidental of its relative key`, () => {
+            expect(buildScale(keySignature)[0]).toEqual(expected);
+        });
+    });
+
+    it("should spell a mode the same way as its major/minor synonym", () => {
+        expect(buildScale("E natural minor")[0]).toEqual(buildScale("E minor")[0]);
+        expect(buildScale("E aeolian")[0]).toEqual(buildScale("E minor")[0]);
+        expect(buildScale("C ionian")[0]).toEqual(buildScale("C major")[0]);
+    });
+
+    it("should not repeat a letter name in a seven-note modal scale", () => {
+        modalCases.forEach(({ keySignature }) => {
+            const letters = buildScale(keySignature)[0]
+                .slice(0, 7)
+                .map(note => note[0]);
+            expect(new Set(letters).size).toBe(7);
+        });
+    });
+
+    it("should agree with getSharpFlatPreference for modal key signatures", () => {
+        // getSharpFlatPreference already normalises through modeMapper; buildScale
+        // must not contradict it.
+        expect(getSharpFlatPreference("E natural minor")).toBe("sharp");
+        expect(buildScale("E natural minor")[0]).toContain("F♯");
+        expect(buildScale("E natural minor")[0]).not.toContain("G♭");
+    });
 });
 
 describe("scalePatternToEDO", () => {
@@ -3927,6 +3972,47 @@ describe("mode pie menu shared helpers", () => {
             expect(getModeLabel("ionian")).toBe("major / ionian");
             expect(getModeLabel(" ")).toBe(" ");
         });
+
+        describe("with a non-identity translator", () => {
+            // A translator whose output is visibly different from its input, so
+            // a test only passes if getModeLabel actually routes the mode name
+            // through _() rather than returning a hard-coded English label.
+            const TRANSLATED = {
+                "major": "translated-major",
+                "ionian": "translated-ionian",
+                "minor": "translated-minor",
+                "aeolian": "translated-aeolian",
+                "dorian": "translated-dorian",
+                " ": "translated-space"
+            };
+
+            beforeEach(() => {
+                global._.mockImplementation(str => TRANSLATED[str] ?? str);
+            });
+            afterEach(() => {
+                global._.mockImplementation(str => str);
+            });
+
+            it("runs both halves of the major/ionian pair through the translator", () => {
+                expect(getModeLabel("major")).toBe("translated-major / translated-ionian");
+                expect(getModeLabel("ionian")).toBe("translated-major / translated-ionian");
+            });
+
+            it("runs both halves of the minor/aeolian pair through the translator", () => {
+                expect(getModeLabel("minor")).toBe("translated-minor / translated-aeolian");
+                expect(getModeLabel("aeolian")).toBe("translated-minor / translated-aeolian");
+            });
+
+            it("routes any other mode name through the translator", () => {
+                expect(getModeLabel("dorian")).toBe("translated-dorian");
+            });
+
+            it("returns the single-space placeholder verbatim, bypassing the translator", () => {
+                // Even though the translator maps " " to "translated-space",
+                // getModeLabel must short-circuit the blank slot.
+                expect(getModeLabel(" ")).toBe(" ");
+            });
+        });
     });
 
     describe("getModeNameFromLabel", () => {
@@ -3938,6 +4024,49 @@ describe("mode pie menu shared helpers", () => {
 
         it("falls back to the label itself when nothing matches", () => {
             expect(getModeNameFromLabel("unknown", modes)).toBe("unknown");
+        });
+
+        describe("with a non-identity translator", () => {
+            const TRANSLATED = {
+                major: "translated-major",
+                ionian: "translated-ionian",
+                minor: "translated-minor",
+                aeolian: "translated-aeolian",
+                dorian: "translated-dorian",
+                phrygian: "translated-phrygian",
+                lydian: "translated-lydian",
+                mixolydian: "translated-mixolydian",
+                locrian: "translated-locrian"
+            };
+
+            beforeEach(() => {
+                global._.mockImplementation(str => TRANSLATED[str] ?? str);
+            });
+            afterEach(() => {
+                global._.mockImplementation(str => str);
+            });
+
+            it("maps the translated major/ionian label back to major", () => {
+                expect(getModeNameFromLabel("translated-major / translated-ionian", modes)).toBe(
+                    "major"
+                );
+            });
+
+            it("maps the translated minor/aeolian label back to aeolian", () => {
+                expect(getModeNameFromLabel("translated-minor / translated-aeolian", modes)).toBe(
+                    "aeolian"
+                );
+            });
+
+            it("maps a plain translated label back to its canonical mode name", () => {
+                expect(getModeNameFromLabel("translated-dorian", modes)).toBe("dorian");
+            });
+
+            it("round-trips every mode name through getModeLabel and back", () => {
+                for (const mode of ["dorian", "phrygian", "lydian", "mixolydian", "locrian"]) {
+                    expect(getModeNameFromLabel(getModeLabel(mode), modes.concat(mode))).toBe(mode);
+                }
+            });
         });
     });
 
@@ -4065,10 +4194,14 @@ describe("generateNoteNames EDO length contract", () => {
     // EDO < 7 leaves at least one natural letter with no room. Before the fix
     // the letter was emitted regardless, so every one of these returned all
     // seven naturals.
-    it.each([1, 2, 3, 4, 6])("does not fall back to all seven naturals for %i-EDO", edo => {
-        const names = generateNoteNames(edo);
-        expect(names).toHaveLength(edo);
-        expect(names).not.toEqual(["C", "D", "E", "F", "G", "A", "B"]);
+    it.each([
+        [1, ["C"]],
+        [2, ["C", "D"]],
+        [3, ["C", "D", "F"]],
+        [4, ["C", "D", "F", "G"]],
+        [6, ["C", "D", "E", "F", "G", "A"]]
+    ])("returns the expected names for %i-EDO", (edo, expected) => {
+        expect(generateNoteNames(edo)).toEqual(expected);
     });
 
     it("keeps 12-EDO exactly as the standard chromatic table", () => {
