@@ -1,7 +1,7 @@
 # Using Music Blocks
 
 Music Blocks is a fork of [Turtle
-Blocks](href="https://turtle.sugarlabs.org). It has extensions for
+Blocks](https://turtle.sugarlabs.org). It has extensions for
 exploring music: pitch and rhythm.
 
 Music Blocks is designed to run in a browser. Most of the development
@@ -372,14 +372,14 @@ The block palettes are displayed on the left side of the screen. These
 palettes contain the blocks used to create programs.
 
 Looking for a block? Find it in the [Palette
-Tables](https://github.com/sugarlabs/musicblocks/blob/master/guide/README.md#APPENDIX_1).
+Tables](https://github.com/sugarlabs/musicblocks/blob/master/Docs/guide/README.md#6-appendix).
 
 See the
 [Turtle Blocks Programming Guide](http://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md)
 for general details on how to use the blocks.
 
 See the
-[Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
+[Music Blocks Programming Guide](https://github.com/sugarlabs/musicblocks/blob/master/Docs/guide/README.md)
 for details specific to music: _Rhythm_, _Meter_, _Pitch_, _Intervals_,
 _Tone_, _Ornament_, _Volume_, _Drum_, and _Widget_.
 
@@ -429,7 +429,7 @@ in that it lets you scroll through `C`, `D`, `E`, `F`, `G`, `A`,
 `B`. It also uses a second selector for sharps and flats.
 
 As noted, and described in more detail in the
-[Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md),
+[Music Blocks Programming Guide](https://github.com/sugarlabs/musicblocks/blob/master/Docs/guide/README.md),
 you can put as many _Pitch_ blocks inside a note as you'd like. They
 will play together as a chord. You can also insert graphics blocks
 inside a note in order to create sound-sync animations.
@@ -507,7 +507,7 @@ Actions are a powerful organizational element for your program and can
 be used in many powerful ways, e.g., an action can be associated with
 an event, such as an on beat or off beat or mouse click. See [Music
 Blocks Programming
-Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md),
+Guide](https://github.com/sugarlabs/musicblocks/blob/master/Docs/guide/README.md),
 for further details and examples.
 
 ![The Storein Box block](./storebox1_block.svg "Store in box & Add 1 to Block")
@@ -771,11 +771,11 @@ build their melodies with LEGO bricks.
 If you want to read more about the LEGO Bricks widget, including
 detailed usage instructions and educational applications, see the
 [Music Blocks Programming
-Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md#427-lego-bricks-widget).
+Guide](https://github.com/sugarlabs/musicblocks/blob/master/Docs/guide/README.md#427-lego-bricks-widget).
 
 More details about all of the widgets are available in the [Music
 Blocks Programming
-Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
+Guide](https://github.com/sugarlabs/musicblocks/blob/master/Docs/guide/README.md).
 
 ## 8. Program Palette
 
