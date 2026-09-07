@@ -184,6 +184,9 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
             innerHTML: ""
         };
         document.getElementById = jest.fn(() => mockElement);
+        // setupPaletteMenu tears down and re-initialises the bottom buttons'
+        // Materialize tooltips around the rebuild.
+        window.jQuery = jest.fn(() => ({ tooltip: jest.fn() }));
 
         activity = new Activity();
 

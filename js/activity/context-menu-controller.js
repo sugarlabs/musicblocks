@@ -202,6 +202,17 @@ class ContextMenuController {
 
         const removeButtonContainer = document.getElementById("buttoncontainerBOTTOM");
         if (removeButtonContainer) {
+            // Materialize keeps a tooltip's node in <body>, not inside the
+            // button it belongs to, so removing the container below orphans
+            // the nodes of the buttons it holds. An orphan that happened to be
+            // visible at that moment has no element left to fire mouseleave
+            // on, so it stays on screen at its old coordinates until the page
+            // is reloaded -- e.g. hovering Home and then zooming (which fires
+            // resize, which rebuilds these buttons) leaves a stray
+            // "Home [HOME]" tooltip floating over the canvas. "remove" is the
+            // only teardown Materialize recognises; the rebuilt buttons are
+            // re-initialised at the end of this function.
+            window.jQuery("#buttoncontainerBOTTOM .tooltipped").tooltip("remove");
             removeButtonContainer.parentNode.removeChild(removeButtonContainer);
         }
 
@@ -420,6 +431,17 @@ class ContextMenuController {
                 display: true,
                 fn: this._hideHelpfulSearchWidget.bind(this)
             });
+
+        // makeButton() initialises tooltips before it appends its button to
+        // the DOM, so the last button built above is still uninitialised here
+        // (and, after the teardown at the top of this function, so are any
+        // whose tooltip we just removed). Initialise the finished row once.
+        if (!(activity.toolbar && activity.toolbar.tooltipsDisabled)) {
+            window.jQuery("#buttoncontainerBOTTOM .tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
+        }
     }
 
     /*
@@ -498,10 +520,10 @@ class ContextMenuController {
                 container.blur?.();
             });
         }
-        window.jQuery(".tooltipped").tooltip({
-            html: true,
-            delay: 100
-        });
+        // No tooltip init here: the container is not in the DOM yet, so this
+        // only ever re-initialised *other* elements' tooltips (once per button
+        // built) and left the last button of a row without one. setupPaletteMenu
+        // initialises the whole row after it has been appended.
 
         container.onmouseover = () => {
             if (!activity.loading) {
