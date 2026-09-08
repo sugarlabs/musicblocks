@@ -800,24 +800,22 @@ describe("numberOfNotes — state restoration and tally logic", () => {
                 ithTurtle: jest.fn().mockReturnValue(turtleMock),
                 getTurtle: jest.fn().mockReturnValue({ queue: [] }),
                 turtleList: [turtleMock]
-            },
-            logo: {
-                runFromBlockNow: jest.fn((logo, turtle) => {
-                    const tur = turtleMock;
-                    tur.singer.tallyNotes += 5;
-                }),
-                boxes: {},
-                turtleHeaps: { 0: {} },
-                turtleDicts: { 0: {} }
             }
         };
 
+        // numberOfNotes reads the saved state off the logo it is handed and
+        // restores it onto activity.logo. Those are the same object at runtime,
+        // so the mock has to share one object too.
         logoMock = {
             activity: activityMock,
+            runFromBlockNow: jest.fn(() => {
+                turtleMock.singer.tallyNotes += 5;
+            }),
             boxes: {},
-            turtleHeaps: { 0: {} },
+            turtleHeaps: { 0: [] },
             turtleDicts: { 0: {} }
         };
+        activityMock.logo = logoMock;
     });
 
     test("should return tally difference and restore state", () => {
@@ -828,6 +826,40 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(result).toBe(5);
         expect(turtleMock.singer.tallyNotes).toBe(2);
         expect(turtleMock.painter.doPenUp).toHaveBeenCalled();
+    });
+
+    test("should restore an untouched heap as an array, not an object", () => {
+        delete logoMock.turtleHeaps[0];
+        // The counted run fills a heap the turtle did not have; restoring it
+        // must leave an empty array behind, not an object.
+        logoMock.runFromBlockNow = jest.fn(() => {
+            turtleMock.singer.tallyNotes += 5;
+            logoMock.turtleHeaps[0] = [8, 9];
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(logoMock.turtleHeaps[0]).toEqual([]);
+        expect(Array.isArray(logoMock.turtleHeaps[0])).toBe(true);
+
+        // An object fallback makes the next push block throw.
+        logoMock.turtleHeaps[0].push(7);
+        expect(logoMock.turtleHeaps[0]).toEqual([7]);
+    });
+
+    test("should undo heap mutations made during the counted run", () => {
+        logoMock.turtleHeaps[0] = [1, 2, 3];
+        // Mutate the heap in place and by reassignment so the assertion fails
+        // if restoration is skipped.
+        logoMock.runFromBlockNow = jest.fn(() => {
+            turtleMock.singer.tallyNotes += 5;
+            logoMock.turtleHeaps[0].push(99);
+            logoMock.turtleHeaps[0][0] = -1;
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(logoMock.turtleHeaps[0]).toEqual([1, 2, 3]);
     });
 });
 
@@ -909,7 +941,7 @@ describe("noteCounter regression behavior", () => {
             queue: []
         });
         logoMock.boxes = {};
-        logoMock.turtleHeaps = { 0: {} };
+        logoMock.turtleHeaps = { 0: [] };
         logoMock.turtleDicts = { 0: {} };
         activityMock.logo.runFromBlockNow = jest.fn();
         singer = turtleMock.singer;
@@ -929,6 +961,38 @@ describe("noteCounter regression behavior", () => {
         const originalLength = singer.justCounting.length;
         Singer.noteCounter(logoMock, 0, 1);
         expect(singer.justCounting.length).toBe(originalLength);
+    });
+
+    test("should restore an untouched heap as an array, not an object", () => {
+        delete logoMock.turtleHeaps[0];
+        // The counted run fills a heap the turtle did not have; restoring it
+        // must leave an empty array behind, not an object.
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            logoMock.turtleHeaps[0] = [8, 9];
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(logoMock.turtleHeaps[0]).toEqual([]);
+        expect(Array.isArray(logoMock.turtleHeaps[0])).toBe(true);
+
+        // An object fallback makes the next push block throw.
+        logoMock.turtleHeaps[0].push(7);
+        expect(logoMock.turtleHeaps[0]).toEqual([7]);
+    });
+
+    test("should undo heap mutations made during the counted run", () => {
+        logoMock.turtleHeaps[0] = [4, 5];
+        // Mutate the heap in place and by reassignment so the assertion fails
+        // if restoration is skipped.
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            logoMock.turtleHeaps[0].push(99);
+            logoMock.turtleHeaps[0][0] = -1;
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(logoMock.turtleHeaps[0]).toEqual([4, 5]);
     });
 });
 

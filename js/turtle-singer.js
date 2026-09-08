@@ -608,7 +608,7 @@ class Singer {
 
         // Restore previous state
         logo.boxes = saveBoxes ?? {};
-        logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+        logo.turtleHeaps[turtle] = saveTurtleHeaps ?? [];
         logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
         tur.painter.doPenUp();
@@ -713,7 +713,7 @@ class Singer {
         });
 
         activity.logo.boxes = saveState.boxes ?? {};
-        activity.logo.turtleHeaps[turtle] = saveState.turtleHeaps ?? {};
+        activity.logo.turtleHeaps[turtle] = saveState.turtleHeaps ?? [];
         activity.logo.turtleDicts[turtle] = saveState.turtleDicts ?? {};
 
         tur.painter.doPenUp();

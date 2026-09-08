@@ -923,23 +923,68 @@ describe("setupIntervalsBlocks", () => {
             logo.runFromBlockNow = jest.fn();
         });
 
-        it("Heap absent before measurement: logo.turtleHeaps[turtle] is not set (key absent) and should be {} after cycle", () => {
+        it("Heap absent before measurement: the heap is restored as an empty array, not an object", () => {
             logo.turtleHeaps = {};
             logo.turtleDicts = { [turtleIndex]: {} };
+            // The measured run fills a heap the turtle did not have; restoring
+            // it must leave an empty array behind, not an object.
+            logo.runFromBlockNow = jest.fn(() => {
+                logo.turtleHeaps[turtleIndex] = [8, 9];
+            });
 
             createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
 
-            expect(logo.turtleHeaps[turtleIndex]).toEqual({});
+            expect(logo.turtleHeaps[turtleIndex]).toEqual([]);
+            expect(Array.isArray(logo.turtleHeaps[turtleIndex])).toBe(true);
+
+            // The restored heap must still behave like a heap: an object fallback
+            // makes the next push block throw "push is not a function".
+            logo.turtleHeaps[turtleIndex].push(42);
+            expect(logo.turtleHeaps[turtleIndex]).toEqual([42]);
+        });
+
+        it("Heap absent before a scalar measurement: the heap is restored as an empty array", () => {
+            logo.turtleHeaps = {};
+            logo.turtleDicts = { [turtleIndex]: {} };
+            logo.runFromBlockNow = jest.fn(() => {
+                logo.turtleHeaps[turtleIndex] = [8, 9];
+            });
+
+            createdBlocks.measureintervalscalar.arg(logo, turtleIndex, "blkMeasure");
+
+            expect(logo.turtleHeaps[turtleIndex]).toEqual([]);
+            expect(Array.isArray(logo.turtleHeaps[turtleIndex])).toBe(true);
+        });
+
+        it("Empty heap before measurement: heap entries added while measuring are discarded", () => {
+            logo.turtleHeaps = { [turtleIndex]: [] };
+            logo.turtleDicts = { [turtleIndex]: {} };
+            logo.runFromBlockNow = jest.fn(() => {
+                logo.turtleHeaps[turtleIndex].push(1, 2);
+            });
+
+            createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
+
+            expect(logo.turtleHeaps[turtleIndex]).toEqual([]);
+            expect(Array.isArray(logo.turtleHeaps[turtleIndex])).toBe(true);
         });
 
         it("Heap present before measurement: logo.turtleHeaps[turtle] is [1, 2, 3] and should be deep cloned", () => {
             const originalHeap = [1, 2, 3];
             logo.turtleHeaps = { [turtleIndex]: originalHeap };
             logo.turtleDicts = { [turtleIndex]: {} };
+            // Mutate in place and by reassignment so the assertions below fail
+            // if restoration is skipped.
+            logo.runFromBlockNow = jest.fn(() => {
+                logo.turtleHeaps[turtleIndex].push(99);
+                logo.turtleHeaps[turtleIndex][0] = -1;
+            });
 
             createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
 
-            expect(logo.turtleHeaps[turtleIndex]).toEqual(originalHeap);
+            // Compared against a literal: the run above mutates originalHeap,
+            // and the restored heap must be the pre-run snapshot, not that.
+            expect(logo.turtleHeaps[turtleIndex]).toEqual([1, 2, 3]);
             expect(logo.turtleHeaps[turtleIndex]).not.toBe(originalHeap);
         });
 
