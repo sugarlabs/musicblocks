@@ -97,6 +97,126 @@ function makeActivity(protoBlocks = {}) {
 }
 
 // ---------------------------------------------------------------------------
+// drag handle
+// ---------------------------------------------------------------------------
+
+/** jsdom has no Pointer Capture API, so stand one in on the handle element. */
+function stubPointerCapture(handle) {
+    const captured = new Set();
+    handle.setPointerCapture = jest.fn(id => captured.add(id));
+    handle.releasePointerCapture = jest.fn(id => captured.delete(id));
+    handle.hasPointerCapture = jest.fn(id => captured.has(id));
+    return captured;
+}
+
+function pointerEvent(type, props) {
+    const event = new Event(type, { bubbles: true });
+    Object.assign(event, props);
+    return event;
+}
+
+describe("SearchController drag handle", () => {
+    let activity, sc;
+
+    beforeEach(() => {
+        document.body.innerHTML = "";
+        activity = makeActivity();
+        activity.searchWidget.getBoundingClientRect = jest.fn(() => ({
+            left: 200,
+            top: 120,
+            height: 50
+        }));
+        setupSearchController(activity);
+        sc = activity.searchController;
+    });
+
+    test("creates the handle once and reuses it on a second call", () => {
+        sc._addSearchDragHandle();
+        const first = document.getElementById("searchDragHandle");
+        expect(first).not.toBeNull();
+        expect(first.style.display).toBe("flex");
+
+        sc._addSearchDragHandle();
+        expect(document.querySelectorAll("#searchDragHandle")).toHaveLength(1);
+        expect(document.getElementById("searchDragHandle")).toBe(first);
+    });
+
+    test("positions the handle from the widget's bounding box", () => {
+        sc._addSearchDragHandle();
+        const handle = document.getElementById("searchDragHandle");
+        // left + 4, and centred on a 38px handle: top + (height - 38) / 2
+        expect(handle.style.left).toBe("204px");
+        expect(handle.style.top).toBe("126px");
+    });
+
+    test("dragging moves the widget by the pointer delta", () => {
+        sc._addSearchDragHandle();
+        const handle = document.getElementById("searchDragHandle");
+        stubPointerCapture(handle);
+        activity.searchWidget.style.left = "200px";
+        activity.searchWidget.style.top = "120px";
+
+        handle.dispatchEvent(
+            pointerEvent("pointerdown", { clientX: 300, clientY: 400, pointerId: 1 })
+        );
+        expect(handle.style.cursor).toBe("grabbing");
+        expect(activity.searchWidget.style.transition).toBe("none");
+
+        handle.dispatchEvent(
+            pointerEvent("pointermove", { clientX: 330, clientY: 375, pointerId: 1 })
+        );
+        expect(activity.searchWidget.style.left).toBe("230px");
+        expect(activity.searchWidget.style.top).toBe("95px");
+    });
+
+    test("ignores pointermove when the pointer was never captured", () => {
+        sc._addSearchDragHandle();
+        const handle = document.getElementById("searchDragHandle");
+        stubPointerCapture(handle);
+        activity.searchWidget.style.left = "200px";
+
+        handle.dispatchEvent(
+            pointerEvent("pointermove", { clientX: 999, clientY: 999, pointerId: 7 })
+        );
+        expect(activity.searchWidget.style.left).toBe("200px");
+    });
+
+    test("pointerup releases the capture and restores the cursor", () => {
+        sc._addSearchDragHandle();
+        const handle = document.getElementById("searchDragHandle");
+        stubPointerCapture(handle);
+
+        handle.dispatchEvent(
+            pointerEvent("pointerdown", { clientX: 10, clientY: 10, pointerId: 3 })
+        );
+        handle.dispatchEvent(pointerEvent("pointerup", { pointerId: 3 }));
+
+        expect(handle.releasePointerCapture).toHaveBeenCalledWith(3);
+        expect(handle.style.cursor).toBe("grab");
+        expect(activity.searchWidget.style.transition).toBe("");
+    });
+
+    test("_positionSearchDragHandle does nothing without a bounding box", () => {
+        sc._addSearchDragHandle();
+        const handle = document.getElementById("searchDragHandle");
+        handle.style.left = "50px";
+        delete activity.searchWidget.getBoundingClientRect;
+
+        expect(() => sc._positionSearchDragHandle()).not.toThrow();
+        expect(handle.style.left).toBe("50px");
+    });
+
+    test("_hideSearchDragHandle hides it, and is safe when absent", () => {
+        sc._addSearchDragHandle();
+        sc._hideSearchDragHandle();
+        expect(document.getElementById("searchDragHandle").style.display).toBe("none");
+
+        document.body.innerHTML = "";
+        expect(() => sc._hideSearchDragHandle()).not.toThrow();
+    });
+});
+
+// ---------------------------------------------------------------------------
 // setupSearchController
 // ---------------------------------------------------------------------------
 
