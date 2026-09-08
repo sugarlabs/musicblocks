@@ -489,6 +489,37 @@ describe("HelpWidget", () => {
             expect(helpBody.innerHTML).toContain("Welcome to Music Blocks");
         });
 
+        test("_showPage resolves a callable image source", () => {
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            jest.runAllTimers();
+
+            // An entry whose icon depends on state that is unknown when the help
+            // content is built supplies a function instead of a fixed path.
+            const resolve = jest.fn(() => "images/resolved.svg");
+            const saved = HELPCONTENT[0][2];
+            HELPCONTENT[0][2] = resolve;
+            try {
+                hw._showPage(0);
+                expect(resolve).toHaveBeenCalled();
+                expect(document.getElementById("helpBodyDiv").innerHTML).toContain(
+                    "images/resolved.svg"
+                );
+            } finally {
+                HELPCONTENT[0][2] = saved;
+            }
+        });
+
+        test("_showPage still accepts a plain image path", () => {
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            jest.runAllTimers();
+
+            hw._showPage(1);
+
+            expect(document.getElementById("helpBodyDiv").innerHTML).toContain("images/mouse.svg");
+        });
+
         test("_showPage displays page count", () => {
             const activity = createMockActivity();
             const hw = new HelpWidget(activity, false);
