@@ -96,6 +96,18 @@ class ReflectionMatrix {
          * @type {boolean}
          */
         this.isProcessingPendingMessage = false;
+
+        /**
+         * Tracks whether the widget is mounted and can still update UI safely
+         * @type {boolean}
+         */
+        this._isMounted = false;
+
+        /**
+         * Tracks in-flight fetch controllers so they can be aborted on close
+         * @type {Set<AbortController>}
+         */
+        this._pendingRequests = new Set();
     }
 
     /**
@@ -105,6 +117,7 @@ class ReflectionMatrix {
     init(activity) {
         this.activity = activity;
         this.isOpen = true;
+        this._isMounted = true;
         this.isMaximized = false;
         this.activity.isInputON = true;
         this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
@@ -118,14 +131,12 @@ class ReflectionMatrix {
 
         widgetWindow.onclose = () => {
             this.isOpen = false;
+            this._isMounted = false;
             this.activity.isInputON = false;
-            if (this.startChatTypingTimeout) {
-                clearTimeout(this.startChatTypingTimeout);
-                this.startChatTypingTimeout = null;
-            }
-            if (this.dotsInterval) {
-                clearInterval(this.dotsInterval);
-            }
+            this.hideTypingIndicator();
+            this._abortPendingRequests();
+            this.pendingMessages = [];
+            this.isProcessingPendingMessage = false;
             widgetWindow.destroy();
         };
 
@@ -236,7 +247,7 @@ class ReflectionMatrix {
      * @returns {void}
      */
     showTypingIndicator(action) {
-        if (this.typingDiv) return;
+        if (!this._isWidgetActive() || this.typingDiv) return;
 
         this.typingDiv = document.createElement("div");
         this.typingDiv.className = "typing-indicator";
@@ -278,11 +289,71 @@ class ReflectionMatrix {
     }
 
     /**
+     * Returns true if the widget is still mounted and safe to update.
+     * @returns {boolean}
+     */
+    _isWidgetActive() {
+        return Boolean(this._isMounted && this.isOpen && this.chatLog);
+    }
+
+    /**
+     * Aborts all in-flight widget requests.
+     * @returns {void}
+     */
+    _abortPendingRequests() {
+        this._pendingRequests.forEach(controller => controller.abort());
+        this._pendingRequests.clear();
+    }
+
+    /**
+     * Sends JSON to the backend while tracking the widget lifecycle.
+     * @param {string} path - Backend path suffix.
+     * @param {Object} payload - Request payload.
+     * @returns {Promise<Object|null>}
+     */
+    async _postJSON(path, payload) {
+        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+
+        if (controller) {
+            this._pendingRequests.add(controller);
+        }
+
+        try {
+            const request = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            };
+
+            if (controller) {
+                request.signal = controller.signal;
+            }
+
+            const response = await fetch(`${this.PORT}${path}`, request);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            if (error && error.name === "AbortError") {
+                return null;
+            }
+
+            console.error("Error :", error);
+            return { error: "Failed to send message" };
+        } finally {
+            if (controller) {
+                this._pendingRequests.delete(controller);
+            }
+        }
+    }
+
+    /**
      * Appends a user message to the chat log.
      * @param {string} text - The user's message.
      * @returns {void}
      */
     appendUserMessage(text) {
+        if (!this._isWidgetActive()) return;
+
         const messageContainer = document.createElement("div");
         messageContainer.classList.add("message-container", "user");
 
@@ -313,6 +384,8 @@ class ReflectionMatrix {
      * @returns {void}
      */
     appendBotReply(reply, role = this.AImentor, md = false) {
+        if (!this._isWidgetActive()) return;
+
         this.chatHistory.push({
             role: role,
             content: reply.response
@@ -358,7 +431,7 @@ class ReflectionMatrix {
 
         this.isProcessingPendingMessage = true;
 
-        while (this.pendingMessages.length > 0) {
+        while (this.pendingMessages.length > 0 && this._isWidgetActive()) {
             const nextMessage = this.pendingMessages.shift();
 
             this.chatHistory.push({
@@ -372,6 +445,10 @@ class ReflectionMatrix {
                 nextMessage.mentor,
                 nextMessage.algorithm
             );
+
+            if (!this._isWidgetActive() || !reply) {
+                continue;
+            }
 
             if (reply.error) {
                 this.hideTypingIndicator();
@@ -416,7 +493,7 @@ class ReflectionMatrix {
      *  @returns {Promise<void>}
      */
     async startChatSession() {
-        if (this.triggerFirst === true) return;
+        if (this.triggerFirst === true || !this._isWidgetActive()) return;
 
         this.triggerFirst = true;
 
@@ -435,7 +512,11 @@ class ReflectionMatrix {
 
         this.hideTypingIndicator();
 
-        if (data && !data.error) {
+        if (!this._isWidgetActive() || !data) {
+            return;
+        }
+
+        if (!data.error) {
             this.inputContainer.style.display = "flex";
             this.botReplyDiv(data, false, false);
             this.projectAlgorithm = data.algorithm;
@@ -450,6 +531,10 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async updateProjectCode() {
+        if (this.typingDiv || !this._isWidgetActive()) {
+            return;
+        }
+
         const code = await this.activity.prepareExport();
         if (code === this.code) {
             this.activity.textMsg(_("No changes were detected in your project."), 2500);
@@ -460,7 +545,11 @@ class ReflectionMatrix {
         const data = await this.generateNewAlgorithm(code);
         this.hideTypingIndicator();
 
-        if (data && !data.error) {
+        if (!this._isWidgetActive() || !data) {
+            return;
+        }
+
+        if (!data.error) {
             if (data.algorithm !== "unchanged") {
                 this.projectAlgorithm = data.algorithm; // update algorithm
                 this.code = code;
@@ -477,20 +566,9 @@ class ReflectionMatrix {
      * @returns {Promise<Object>} - The server response containing the algorithm.
      */
     async generateAlgorithm(code) {
-        try {
-            const response = await fetch(`${this.PORT}/projectcode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    code: code
-                })
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        }
+        return this._postJSON("/projectcode", {
+            code: code
+        });
     }
 
     /**
@@ -500,21 +578,10 @@ class ReflectionMatrix {
      * @returns {Promise<Object>} - The server response containing the updated algorithm.
      */
     async generateNewAlgorithm(code) {
-        try {
-            const response = await fetch(`${this.PORT}/updatecode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    oldcode: this.code,
-                    newcode: code
-                })
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        }
+        return this._postJSON("/updatecode", {
+            oldcode: this.code,
+            newcode: code
+        });
     }
 
     /**
@@ -526,37 +593,28 @@ class ReflectionMatrix {
      *  @returns {Promise<Object>} - The server response containing the bot's reply.
      */
     async generateBotReply(message, chatHistory, mentor, algorithm) {
-        try {
-            this.showTypingIndicator();
+        this.showTypingIndicator();
 
-            const safeIndex = Math.min(this.summarizedUpTo, chatHistory.length);
-            const unsummarizedMessages = chatHistory.slice(safeIndex);
+        const safeIndex = Math.min(this.summarizedUpTo, chatHistory.length);
+        const unsummarizedMessages = chatHistory.slice(safeIndex);
 
-            const response = await fetch(`${this.PORT}/chat`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    query: message,
-                    messages: unsummarizedMessages,
-                    mentor: mentor,
-                    algorithm: algorithm,
-                    conversation_summary: this.conversationSummary || null,
-                    summarized_up_to: this.summarizedUpTo
-                })
-            });
-            this.hideTypingIndicator();
-            const data = await response.json();
+        const data = await this._postJSON("/chat", {
+            query: message,
+            messages: unsummarizedMessages,
+            mentor: mentor,
+            algorithm: algorithm,
+            conversation_summary: this.conversationSummary || null,
+            summarized_up_to: this.summarizedUpTo
+        });
 
-            if (data.conversation_summary && data.summarized_up_to !== undefined) {
-                this.conversationSummary = data.conversation_summary;
-                this.summarizedUpTo = data.summarized_up_to;
-            }
+        this.hideTypingIndicator();
 
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
+        if (data && data.conversation_summary && data.summarized_up_to !== undefined) {
+            this.conversationSummary = data.conversation_summary;
+            this.summarizedUpTo = data.summarized_up_to;
         }
+
+        return data;
     }
 
     /**
@@ -564,11 +622,11 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async getAnalysis() {
-        if (this.chatHistory.length < 10) return;
+        if (this.chatHistory.length < 10 || this.typingDiv || !this._isWidgetActive()) return;
         this.showTypingIndicator("Analyzing");
         const data = await this.generateAnalysis();
         this.hideTypingIndicator();
-        if (data) {
+        if (data && this._isWidgetActive()) {
             this.botReplyDiv(data, false, true);
             // Expected errors in data.error:
             // 1. Server-side errors returned by the API (e.g., 500s or rate limits).
@@ -584,21 +642,10 @@ class ReflectionMatrix {
      *  @returns {Promise<Object>} - The server response containing the analysis.
      */
     async generateAnalysis() {
-        try {
-            const response = await fetch(`${this.PORT}/analysis`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    messages: this.chatHistory,
-                    summary: this.summary
-                })
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        }
+        return this._postJSON("/analysis", {
+            messages: this.chatHistory,
+            summary: this.summary
+        });
     }
 
     /**
@@ -608,17 +655,23 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async botReplyDiv(message, user_query = true, md = false) {
+        const replyMentor = this.AImentor;
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
+            if (!this._isWidgetActive()) return;
             reply = await this.generateBotReply(
                 message,
                 this.chatHistory,
-                this.AImentor,
+                replyMentor,
                 this.projectAlgorithm
             );
         } else {
             reply = message;
+        }
+
+        if (!this._isWidgetActive() || !reply) {
+            return;
         }
 
         if (reply.error) {
@@ -627,7 +680,7 @@ class ReflectionMatrix {
             return;
         }
 
-        this.appendBotReply(reply, this.AImentor, md);
+        this.appendBotReply(reply, replyMentor, md);
     }
 
     /**
@@ -636,7 +689,7 @@ class ReflectionMatrix {
      */
     sendMessage() {
         const text = this.input.value.trim();
-        if (text === "") return;
+        if (text === "" || !this._isWidgetActive()) return;
         this.appendUserMessage(text);
         this.pendingMessages.push({
             text: text,
