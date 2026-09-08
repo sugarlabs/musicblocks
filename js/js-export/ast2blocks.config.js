@@ -145,9 +145,10 @@ window.ast2blocklist_config = {
                 COLOR: "color",
                 BOTTOMPOS: "bottompos",
                 CAMERA: "camera",
-                BEATCOUNT: "nopValueBlock",
+                BEATCOUNT: "beatvalue",
                 MEASURECOUNT: "nopValueBlock",
-                BPM: "nopValueBlock",
+                BPM: "bpmfactor",
+                CURRENTMETER: "currentmeter",
                 WHOLENOTESPLAYED: "elapsednotes",
                 BEATFACTOR: "beatfactor",
                 NOTEVALUE: "notevalue"
