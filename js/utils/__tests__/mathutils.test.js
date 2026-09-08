@@ -246,6 +246,35 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doMinus("a", 3)).toThrow("NanError");
         });
 
+        test("throws error for null inputs", () => {
+            expect(() => MathUtility.doMinus(null, 3)).toThrow("NanError");
+        });
+
+        test("throws error for undefined inputs", () => {
+            expect(() => MathUtility.doMinus(undefined, 3)).toThrow("NanError");
+        });
+
+        test("throws error for array inputs", () => {
+            expect(() => MathUtility.doMinus([1], 3)).toThrow("NanError");
+        });
+
+        test("throws error for null as second input", () => {
+            expect(() => MathUtility.doMinus(3, null)).toThrow("NanError");
+        });
+
+        test("throws error for undefined as second input", () => {
+            expect(() => MathUtility.doMinus(3, undefined)).toThrow("NanError");
+        });
+
+        test("throws error for array as second input", () => {
+            expect(() => MathUtility.doMinus(3, [1])).toThrow("NanError");
+        });
+
+        test("throws error for NaN inputs", () => {
+            expect(() => MathUtility.doMinus(NaN, 3)).toThrow("NanError");
+            expect(() => MathUtility.doMinus(3, NaN)).toThrow("NanError");
+        });
+
         // Edge case tests
         test("handles negative result", () => {
             expect(MathUtility.doMinus(3, 5)).toBe(-2);
@@ -279,6 +308,35 @@ describe("MathUtility", () => {
 
         test("throws error for string inputs", () => {
             expect(() => MathUtility.doMultiply("a", 3)).toThrow("NanError");
+        });
+
+        test("throws error for null inputs", () => {
+            expect(() => MathUtility.doMultiply(null, 3)).toThrow("NanError");
+        });
+
+        test("throws error for undefined inputs", () => {
+            expect(() => MathUtility.doMultiply(undefined, 3)).toThrow("NanError");
+        });
+
+        test("throws error for array inputs", () => {
+            expect(() => MathUtility.doMultiply([1], 3)).toThrow("NanError");
+        });
+
+        test("throws error for null as second input", () => {
+            expect(() => MathUtility.doMultiply(3, null)).toThrow("NanError");
+        });
+
+        test("throws error for undefined as second input", () => {
+            expect(() => MathUtility.doMultiply(3, undefined)).toThrow("NanError");
+        });
+
+        test("throws error for array as second input", () => {
+            expect(() => MathUtility.doMultiply(3, [1])).toThrow("NanError");
+        });
+
+        test("throws error for NaN inputs", () => {
+            expect(() => MathUtility.doMultiply(NaN, 3)).toThrow("NanError");
+            expect(() => MathUtility.doMultiply(3, NaN)).toThrow("NanError");
         });
 
         // Edge case tests
