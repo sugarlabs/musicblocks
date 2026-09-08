@@ -13,18 +13,17 @@
 /*
    global
 
-   platformColor, docById, Singer, slicePath, wheelnav,
-   DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
-   PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS,
-   getSavedCustomModes, getModeNamesForGroup, getModeLabel,
-   getModeNameFromLabel, getModeSliceColors, updateModeWheelItems,
-   getModeGroupTitleFont, getModeSliceFont, configureWheel,
-   MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
-   INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
-   getMunsellColor, COLORS40, frequencyToPitch, pitchToFrequency,
-   TEMPERAMENT, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, instruments,
-   DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
-   FIXEDSOLFEGE, NOTENAMES, numberToPitch,
+    platformColor, docById, Singer, slicePath, wheelnav,
+    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
+    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS,
+    getSavedCustomModes, getModeNamesForGroup, getModeLabel,
+    getModeNameFromLabel, getModeSliceColors, updateModeWheelItems,
+    getModeGroupTitleFont, getModeSliceFont, configureWheel,
+    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
+    getMunsellColor, COLORS40, frequencyToPitch, pitchToFrequency,
+    TEMPERAMENT, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, instruments,
+    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
+    FIXEDSOLFEGE, NOTENAMES, numberToPitch,
     nthDegreeToPitch, SOLFEGENAMES, buildScale, getCurrentEDO, generateNoteNames,
     _THIS_IS_TURTLE_BLOCKS_,
     CHORDNAMES, Synth, Tone, activity, announceToScreenReader
@@ -3506,12 +3505,15 @@ const piemenuIntervals = (block, selectedInterval) => {
  *
  * @param {Object} block Block instance invoking the menu
  * @param {string} selectedMode Currently selected mode value
+ * @param {Function} [onSelect] Optional callback invoked with (modeName, label) when a mode is chosen
  * @returns {void}
  */
-const piemenuModes = (block, selectedMode) => {
+const piemenuModes = (block, selectedMode, onSelect) => {
     // pie menu for mode selection
 
     wheelnav.cssMode = true;
+    let isInitialized = false;
+    let isRebuilding = false;
 
     if (block.blocks.stageClick) {
         return;
@@ -3563,8 +3565,8 @@ const piemenuModes = (block, selectedMode) => {
     block._modeGroupWheel = new wheelnav("_modeGroupWheel", block._modeWheel.raphael);
     configureWheel(block._modeGroupWheel, {
         colors: platformColor.modeGroupWheelcolors,
-        minRadius: MODEPIEMENU_GROUP_RING.minRadius,
-        maxRadius: MODEPIEMENU_GROUP_RING.maxRadius,
+        minRadius: 0.15,
+        maxRadius: 0.3,
         titleFont: getModeGroupTitleFont(block._modeWheel.wheelRadius),
         selectionPaths: true
     });
@@ -3623,11 +3625,11 @@ const piemenuModes = (block, selectedMode) => {
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
+            if (isInitialized && !isRebuilding && typeof onSelect === "function") {
+                onSelect(that.value, that.text.text);
+            }
         }
     };
-
-    // Expose on block for external interception (e.g. ModeWidget).
-    block.__selectionChanged = __selectionChanged;
 
     // Add function to each main menu for show/hide sub menus
     const __setupAction = (i, activeTabs) => {
@@ -3641,13 +3643,7 @@ const piemenuModes = (block, selectedMode) => {
                 }
             }
 
-            // Route through block so external callers (e.g. ModeWidget)
-            // can intercept mode selection.
-            if (typeof block.__selectionChanged === "function") {
-                block.__selectionChanged();
-            } else {
-                __selectionChanged();
-            }
+            __selectionChanged();
         };
     };
 
@@ -3658,8 +3654,8 @@ const piemenuModes = (block, selectedMode) => {
             that._modeNameWheel = new wheelnav("_modeNameWheel", that._modeWheel.raphael);
             configureWheel(that._modeNameWheel, {
                 colors: [],
-                minRadius: MODEPIEMENU_NAME_RING.minRadius,
-                maxRadius: MODEPIEMENU_NAME_RING.maxRadius,
+                minRadius: 0.3,
+                maxRadius: 0.85,
                 selectionPaths: true
             });
             that._modeNameWheel.keynavigateEnabled = true;
@@ -3898,15 +3894,23 @@ const piemenuModes = (block, selectedMode) => {
     const __buildModeWheel = () => {
         const i = that._modeGroupWheel.selectedNavItemIndex;
         modeGroup = that._modeGroupWheel.navItems[i].title;
+        isRebuilding = true;
         __buildModeNameWheel(modeGroup);
+        isRebuilding = false;
     };
 
     for (let i = 0; i < block._modeGroupWheel.navItems.length; i++) {
         block._modeGroupWheel.navItems[i].navigateFunction = __buildModeWheel;
+    }
+
+    for (let i = 0; i < block._modeGroupWheel.navItems.length; i++) {
         if (block._modeGroupWheel.navItems[i].title === modeGroup) {
             block._modeGroupWheel.navigateWheel(i);
+            break;
         }
     }
+
+    isInitialized = true;
 
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
     block._exitWheel.navItems[1].navigateFunction = __prepScale;

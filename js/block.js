@@ -3998,7 +3998,7 @@ class Block {
                     if (temperament && typeof temperament === "object") {
                         noteLabels[keys[i]] = temperament;
                     }
-                    if (isCustomTemperament(keys[i]) && temperament && !temperament.isEDO) {
+                    if (isCustomTemperament(keys[i])) {
                         customLabels.push(keys[i]);
                     }
                 }

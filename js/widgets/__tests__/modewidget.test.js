@@ -85,8 +85,6 @@ global.MODE_PIE_MENUS = {
     custom: [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
 };
 const {
-    MODEPIEMENU_GROUP_RING,
-    MODEPIEMENU_NAME_RING,
     getSavedCustomModes,
     getModeNamesForGroup,
     getModeLabel,
@@ -103,8 +101,6 @@ const {
     isEquallyTempered,
     pitchToFrequency
 } = require("../../utils/musicutils.js");
-global.MODEPIEMENU_GROUP_RING = MODEPIEMENU_GROUP_RING;
-global.MODEPIEMENU_NAME_RING = MODEPIEMENU_NAME_RING;
 global.getSavedCustomModes = getSavedCustomModes;
 global.getModeNamesForGroup = getModeNamesForGroup;
 global.getModeLabel = getModeLabel;
@@ -114,7 +110,6 @@ global.updateModeWheelItems = updateModeWheelItems;
 global.getModeGroupTitleFont = getModeGroupTitleFont;
 global.getModeSliceFont = getModeSliceFont;
 global.configureWheel = configureWheel;
-global.configureExitWheel = jest.fn();
 global.scalePatternToEDO = scalePatternToEDO;
 global.isNonEDO = isNonEDO;
 global.getNonEDOModeSteps = getNonEDOModeSteps;
@@ -240,6 +235,7 @@ window.widgetWindows = {
             children: [{ style: {} }],
             offsetHeight: 400,
             append: jest.fn(),
+            appendChild: jest.fn(),
             getElementsByTagName: jest.fn().mockReturnValue([
                 {
                     style: {},
@@ -389,31 +385,55 @@ describe("ModeWidget", () => {
 
     test("non-EDO labeled temperament plays the octave an octave up", () => {
         const labels = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        const savedTemperament = global.TEMPERAMENT;
-        const savedSpy = global.pitchToFrequency;
-        global.TEMPERAMENT = {
-            testNonEDO: {
-                isEDO: false,
-                noteLabels: labels,
-                ratios: labels.map((_, i) => Math.pow(2, i / 12))
-            }
+        const mu = require("../../utils/musicutils");
+        const saved = mu.TEMPERAMENT.testNonEDO;
+        const savedGlobal = global.TEMPERAMENT.testNonEDO;
+        const entry = {
+            isEDO: false,
+            noteLabels: labels,
+            ratios: labels.map((_, i) => Math.pow(2, i / 12))
         };
+        mu.TEMPERAMENT.testNonEDO = entry;
+        global.TEMPERAMENT.testNonEDO = entry;
         modeWidget._activeTemperamentKey = "testNonEDO";
         modeWidget._activeEDO = labels.length;
-        const spy = jest.spyOn(global, "pitchToFrequency");
+        mockActivity.logo.synth.trigger.mockClear();
 
         // Within-octave degree stays at octave 4.
         modeWidget._triggerNote(1, labels.length);
-        expect(spy).toHaveBeenLastCalledWith(labels[1], 4, 0, ["C"], "testNonEDO");
+        const expected1 = mu.pitchToFrequency(labels[1], 4, 0, ["C"], "testNonEDO");
+        expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+            0,
+            expected1,
+            modeWidget._noteValue,
+            DEFAULTVOICE,
+            null,
+            null
+        );
 
         // The octave note (index === n) wraps to the root label but must
         // sound an octave higher (octave 5), not the starting note.
         modeWidget._triggerNote(labels.length, labels.length);
-        expect(spy).toHaveBeenLastCalledWith(labels[0], 5, 0, ["C"], "testNonEDO");
+        const expectedOct = mu.pitchToFrequency(labels[0], 5, 0, ["C"], "testNonEDO");
+        expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+            0,
+            expectedOct,
+            modeWidget._noteValue,
+            DEFAULTVOICE,
+            null,
+            null
+        );
 
-        spy.mockRestore();
-        global.pitchToFrequency = savedSpy;
-        global.TEMPERAMENT = savedTemperament;
+        if (saved) {
+            mu.TEMPERAMENT.testNonEDO = saved;
+        } else {
+            delete mu.TEMPERAMENT.testNonEDO;
+        }
+        if (savedGlobal) {
+            global.TEMPERAMENT.testNonEDO = savedGlobal;
+        } else {
+            delete global.TEMPERAMENT.testNonEDO;
+        }
     });
 
     test("should initialize a custom mode with only the root selected", () => {
@@ -679,7 +699,12 @@ describe("ModeWidget", () => {
         modeWidget._selectedNotes = Array.from({ length: 19 }, (_, i) =>
             [0, 3, 5, 8, 11, 13, 16].includes(i)
         );
-        global.getModePattern.mockReturnValue([3, 2, 3, 3, 2, 3, 3]);
+        // Return mode-specific patterns so the hash map has distinct entries.
+        global.getModePattern.mockImplementation((_mode, _edo) => {
+            if (_mode === "ionian") return [3, 2, 3, 3, 2, 3, 3];
+            return [2, 2, 1, 2, 2, 2, 1];
+        });
+        modeWidget._rebuildModeIndex();
 
         modeWidget._setModeName();
 
@@ -737,11 +762,10 @@ describe("ModeWidget", () => {
 
         test("intercept applies mode selection via _loadMode", () => {
             modeWidget._piemenuModes();
-            const mockBlock = modeWidget._mockBlock;
+            const [, , onSelect] = global.piemenuModes.mock.calls[0];
+            expect(typeof onSelect).toBe("function");
 
-            // Simulate piemenu setting a mode value
-            mockBlock.value = "major";
-            mockBlock.__selectionChanged();
+            onSelect("major", "major");
 
             expect(modeWidget._selectedModeName).toBe("major");
         });

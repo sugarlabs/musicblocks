@@ -12,13 +12,11 @@
 
 /* global
 
-   docById, _, platformColor, keySignatureToMode, MUSICALMODES,
-   getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
-   normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
-   numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
-   getSavedCustomModes, getModeNamesForGroup, getModeLabel,
-   getModeSliceColors, updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
-   configureWheel, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
+    docById, _, platformColor, keySignatureToMode, MUSICALMODES,
+    getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
+    normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
+    numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
+    getSavedCustomModes, configureWheel,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes
  */
 
@@ -82,6 +80,10 @@ class ModeWidget {
         this._activeTemperamentKey = this.logo.synth.inTemperament;
         this._selectedModeName = "major";
         this._modePiemenuOpen = false;
+        this._customModeNames = new Set();
+        this._rebuildModeIndex();
+
+        wheelnav.cssMeter = true;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "custom mode");
         this.widgetWindow.clear();
@@ -118,6 +120,11 @@ class ModeWidget {
             }
             this._locked = false;
             this.hideMsgs();
+            // Clean up an open mode piemenu so wheelDiv returns to its
+            // original parent before the widget body is destroyed.
+            if (this._modePiemenuOpen) {
+                this._closeModePiemenu();
+            }
             if (this.logo) {
                 // Release the singleton reference and the in-widget flag so a
                 // later run can open a fresh widget.
@@ -297,7 +304,6 @@ class ModeWidget {
         for (const o of this._edoOptions()) {
             const opt = document.createElement("option");
             opt.value = o.temperamentKey;
-            opt.setAttribute("data-edo", o.edo);
             opt.textContent = o.label;
             if (o.temperamentKey === inTemperament) {
                 opt.selected = true;
@@ -412,6 +418,7 @@ class ModeWidget {
         if (isEquallyTempered(this._activeTemperamentKey)) {
             this.logo.synth.inTemperament = this._temperamentKeyForEDO(edoCount);
         }
+        this._rebuildModeIndex();
         this._piemenuMode();
     }
 
@@ -534,6 +541,7 @@ class ModeWidget {
         if (name !== name.toLowerCase()) {
             MUSICALMODES[name.toLowerCase()] = pattern;
         }
+        this._rebuildModeIndex();
         return true;
     }
 
@@ -546,6 +554,7 @@ class ModeWidget {
         if (name !== name.toLowerCase()) {
             delete MUSICALMODES[name.toLowerCase()];
         }
+        this._rebuildModeIndex();
     }
 
     _getModeEDO(modeName) {
@@ -771,6 +780,10 @@ class ModeWidget {
         return getModePattern(modeName, this._activeEDO);
     }
 
+    _rebuildModeIndex() {
+        this._customModeNames = new Set(getSavedCustomModes().map(m => m.name));
+    }
+
     // ── Mode display ──────────────────────────────────────────────
 
     _setMode() {
@@ -886,7 +899,6 @@ class ModeWidget {
         }
 
         if (i === Math.floor((n - 1) / 2)) {
-            this._saveState();
             this._setModeName();
             this._locked = false;
         } else {
@@ -923,6 +935,24 @@ class ModeWidget {
 
     // ── Rotate ────────────────────────────────────────────────────
 
+    _finishRotation() {
+        if (this._selectedNotes[0]) {
+            this._setModeName();
+            this._locked = false;
+        } else {
+            // ponytail: force root on, deselect overflow instead of
+            // re-rotating (which can spin indefinitely). Ceiling:
+            // the resulting pattern may not match a named mode.
+            this._selectedNotes[0] = true;
+            this._noteWheel.navItems[0].navItem.show();
+            const last = this._activeEDO - 1;
+            this._selectedNotes[last] = false;
+            this._noteWheel.navItems[last].navItem.hide();
+            this._setModeName();
+            this._locked = false;
+        }
+    }
+
     _rotateRight() {
         if (this._locked) {
             return;
@@ -948,14 +978,7 @@ class ModeWidget {
 
         if (i === 0) {
             this._setTimeout(() => {
-                if (this._selectedNotes[0]) {
-                    this._saveState();
-                    this._setModeName();
-                    this._locked = false;
-                } else {
-                    this._locked = false;
-                    this._rotateRight();
-                }
+                this._finishRotation();
             }, ModeWidget.ROTATESPEED);
         } else {
             this._setTimeout(() => {
@@ -990,14 +1013,7 @@ class ModeWidget {
 
         if (i === 0) {
             this._setTimeout(() => {
-                if (this._selectedNotes[0]) {
-                    this._saveState();
-                    this._setModeName();
-                    this._locked = false;
-                } else {
-                    this._locked = false;
-                    this._rotateLeft();
-                }
+                this._finishRotation();
             }, ModeWidget.ROTATESPEED);
         } else {
             this._setTimeout(() => {
@@ -1092,7 +1108,7 @@ class ModeWidget {
         } else {
             // Use the active temperament directly: _temperamentKeyForEDO maps a
             // non-EDO pitch count to an EQUAL temperament (19 -> equal19), which
-            // would play the wrong tuning. ponytail: _activeTemperamentKey always
+            // would play the wrong tuning. _activeTemperamentKey always
             // holds the real temperament (equal or ratio-based).
             const freq = pitchToFrequency(
                 this._pitch,
@@ -1158,19 +1174,20 @@ class ModeWidget {
     }
 
     _setModeName() {
-        const currentMode = JSON.stringify(this._calculateMode());
+        const currentMode = this._calculateMode();
         const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
-        const customNames = new Set(getSavedCustomModes().map(m => m.name));
+        const patternKey = currentMode.join(",");
+
+        let matchedMode = null;
 
         // Check custom modes first — they take priority over built-in modes
         // when patterns match, since they are EDO-specific.
-        let matchedMode = null;
-        for (const mode of customNames) {
+        for (const mode of this._customModeNames) {
             if (!(mode in MUSICALMODES)) {
                 continue;
             }
-            const pattern = MUSICALMODES[mode];
-            if (JSON.stringify(pattern) === currentMode) {
+            const pattern = this._modeStepPattern(mode, null);
+            if (pattern && pattern.join(",") === patternKey) {
                 matchedMode = mode;
                 break;
             }
@@ -1179,21 +1196,20 @@ class ModeWidget {
         // If no custom mode matched, check built-in modes.
         if (!matchedMode) {
             for (const mode in MUSICALMODES) {
-                if (customNames.has(mode)) {
+                if (this._customModeNames.has(mode)) {
                     continue;
                 }
                 const pattern = this._modeStepPattern(mode, null);
-                if (JSON.stringify(pattern) === currentMode) {
+                if (pattern && pattern.join(",") === patternKey) {
                     matchedMode = mode;
                     break;
                 }
             }
         }
+
         if (matchedMode) {
             this._selectedModeName = matchedMode;
             if (this._modeBlock !== null) {
-                // Only update the modename block connected to the widget's
-                // setkey2 block, plus its sibling notename block.
                 const modeBlock = this.blocks.blockList[this._modeBlock];
                 if (modeBlock && modeBlock.name === "modename") {
                     modeBlock.value = matchedMode;
@@ -1419,8 +1435,6 @@ class ModeWidget {
         this._noteWheel = new wheelnav("_noteWheel", this._modeWheel.raphael);
         this._playWheel = new wheelnav("_playWheel", this._modeWheel.raphael);
 
-        wheelnav.cssMeter = true;
-
         this._createModeWheel(n);
         this._createNoteWheel(n);
         this._createPlayWheel(n);
@@ -1505,13 +1519,8 @@ class ModeWidget {
         for (let i = 0; i < n; i++) {
             this._modeWheel.navItems[i].navigateFunction = __setNote;
             this._noteWheel.navItems[i].navigateFunction = __clearNote;
-            this._noteWheel.navItems[i].navItem.hide();
-        }
-
-        // Restore visual state
-        for (let i = 0; i < n; i++) {
-            if (this._selectedNotes[i]) {
-                this._noteWheel.navItems[i].navItem.show();
+            if (!this._selectedNotes[i]) {
+                this._noteWheel.navItems[i].navItem.hide();
             }
         }
     }
@@ -1526,9 +1535,8 @@ class ModeWidget {
 
     /**
      * Opens the standard mode piemenu (same as the modeName block piemenu)
-     * via piemenus.js piemenuModes on the global wheelDiv. The intercept
-     * on block.__selectionChanged applies the selected mode to the scalar
-     * builder via _loadMode.
+     * via piemenus.js piemenuModes on the global wheelDiv. The onSelect
+     * callback applies the selected mode to the scalar builder via _loadMode.
      * @returns {void}
      */
     _piemenuModes() {
@@ -1537,6 +1545,20 @@ class ModeWidget {
 
         // Hide the note wheel while the mode piemenu is visible.
         this._meterWheelDiv.style.display = "none";
+
+        // Reparent wheelDiv into the widget body so the pie menu opens
+        // inside the ModeWidget, not floating over the canvas.
+        const wheelDiv = docById("wheelDiv");
+        if (wheelDiv && this.widgetWindow) {
+            this._wheelDivOriginalParent = wheelDiv.parentNode;
+            const body = this.widgetWindow.getWidgetBody();
+            if (body) {
+                body.appendChild(wheelDiv);
+                wheelDiv.style.position = "absolute";
+                wheelDiv.style.left = "0";
+                wheelDiv.style.top = "0";
+            }
+        }
 
         const widget = this;
         const mockBlock = {
@@ -1560,22 +1582,10 @@ class ModeWidget {
         };
         this._mockBlock = mockBlock;
 
-        // Delegate to the standard piemenuModes.
-        piemenuModes(mockBlock, this._selectedModeName);
-
-        // piemenuModes wires block.__selectionChanged; override it AFTER
-        // so our intercept runs on mode selection. The original updates
-        // block.value/text, which we then read to apply the mode.
-        const __origSelectionChanged = mockBlock.__selectionChanged;
-        mockBlock.__selectionChanged = () => {
-            if (typeof __origSelectionChanged === "function") {
-                __origSelectionChanged();
-            }
-            const modeName = mockBlock.value;
+        // Delegate to the standard piemenu with a direct callback — no monkey-patch.
+        piemenuModes(mockBlock, this._selectedModeName, modeName => {
             if (modeName) {
                 widget._selectedModeName = modeName;
-                // Built-in modes are in MUSICALMODES; custom modes carry
-                // their own EDO-specific pattern in localStorage.
                 const mode = MUSICALMODES[modeName];
                 const custom = getSavedCustomModes().find(m => m.name === modeName);
                 const pattern = mode || (custom && custom.pattern);
@@ -1584,27 +1594,31 @@ class ModeWidget {
                     widget._loadMode(modeName, pattern, widget._edoSelect);
                 }
             }
-        };
+        });
 
-        // Position wheelDiv over the ModeWidget.
-        const wheelDiv = docById("wheelDiv");
-        if (wheelDiv && this.widgetWindow && this.widgetWindow._frame) {
-            const wRect = this.widgetWindow._frame.getBoundingClientRect();
-            const pieRadius = 600;
-            wheelDiv.style.left =
-                Math.max(0, Math.round(wRect.left + wRect.width / 2 - pieRadius)) + "px";
-            wheelDiv.style.top =
-                Math.max(0, Math.round(wRect.top + wRect.height / 2 - pieRadius)) + "px";
+        // Scale the 600px pie menu to fit inside the ~350px widget body.
+        if (wheelDiv) {
+            const body = this.widgetWindow && this.widgetWindow.getWidgetBody();
+            const bodyW = body ? body.offsetWidth || 350 : 350;
+            const bodyH = body ? body.offsetHeight || 300 : 300;
+            const scale = Math.min(bodyW / 600, bodyH / 600, 0.6);
+            wheelDiv.style.transform = "scale(" + scale + ")";
+            wheelDiv.style.transformOrigin = "top left";
+            wheelDiv.style.left = Math.round((bodyW - 600 * scale) / 2) + "px";
+            wheelDiv.style.top = "0px";
         }
 
-        // Override × exit to also restore the note wheel.
+        // Disable opening animation on all wheels.
+        for (const k of ["_modeWheel", "_modeGroupWheel", "_modeNameWheel", "_exitWheel"]) {
+            if (mockBlock[k]) {
+                mockBlock[k].animatetime = 0;
+            }
+        }
+
+        // Override × exit to clean up all wheels and restore the note wheel.
         if (mockBlock._exitWheel && mockBlock._exitWheel.navItems[0]) {
-            const origExit = mockBlock._exitWheel.navItems[0].navigateFunction;
             mockBlock._exitWheel.navItems[0].navigateFunction = () => {
-                if (origExit) origExit();
-                widget._meterWheelDiv.style.display = "";
-                widget._modePiemenuOpen = false;
-                widget._mockBlock = null;
+                widget._closeModePiemenu();
             };
         }
     }
@@ -1615,17 +1629,23 @@ class ModeWidget {
      */
     _closeModePiemenu() {
         if (this._mockBlock) {
-            if (this._mockBlock._modeNameWheel) {
-                this._mockBlock._modeNameWheel.removeWheel();
-            }
-            if (this._mockBlock._modeWheel) {
-                this._mockBlock._modeWheel.removeWheel();
+            for (const k of ["_modeWheel", "_modeGroupWheel", "_modeNameWheel", "_exitWheel"]) {
+                if (this._mockBlock[k] && typeof this._mockBlock[k].removeWheel === "function") {
+                    this._mockBlock[k].removeWheel();
+                }
             }
         }
 
         const wheelDiv = docById("wheelDiv");
         if (wheelDiv) {
             wheelDiv.style.display = "none";
+            wheelDiv.style.transform = "";
+            wheelDiv.style.transformOrigin = "";
+            // Restore wheelDiv to its original parent so other piemenus work.
+            if (this._wheelDivOriginalParent) {
+                this._wheelDivOriginalParent.appendChild(wheelDiv);
+                this._wheelDivOriginalParent = null;
+            }
         }
 
         this._meterWheelDiv.style.display = "";

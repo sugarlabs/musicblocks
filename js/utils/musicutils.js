@@ -63,15 +63,14 @@ const _b64Cache = new Map();
    SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
     INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition,
     scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern,
-    MODEPIEMENU_SLOT_COUNT, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
-    MODEPIEMENU_NAME_TITLE_RADIUS, MODEPIEMENU_FONT_FAMILY,
-    MODEPIEMENU_GROUP_FONT_RATIO, MODEPIEMENU_NAME_FONT_MIN_RATIO,
-    MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
+    getSavedCustomModes, getModeNamesForGroup,
     getModeLabel, getModeNameFromLabel, getModeSliceColors,
     updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
     isNonEDO, getNonEDOModeSteps, getNonEDOFrequency,
     configureWheel
 */
+
+const stripMicrotonalPrefix = note => note.replace(/^[v^]+/, "");
 
 /**
  * Normalize Unicode accidental symbols in a note string to ASCII equivalents.
@@ -82,7 +81,7 @@ function normalizeNoteAccidentals(note) {
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
     // Strip microtonal ^ / v prefixes (temperament widget cents display)
     // so the base note can be resolved, e.g. "^C" → "C", "vvD♭" → "D♭".
-    return note.replace(/^[v^]+/, "").replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+    return stripMicrotonalPrefix(note).replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 }
 
 /**
@@ -1839,43 +1838,6 @@ const MODE_PIE_MENUS = {
 };
 
 /**
- * Fixed slot count shared by every mode pie menu ring. Both the workspace
- * piemenu (piemenus.js) and the mode widget piemenu (modewidget.js) lay the
- * mode names out on this many slots.
- * @constant {number}
- */
-const MODEPIEMENU_SLOT_COUNT = 12;
-
-/**
- * Ring geometry shared by the mode-selection pie menus so the group and name
- * rings render with identical proportions in both contexts.
- */
-const MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
-const MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
-
-/**
- * Mid-radius of the mode-name ring (0.3-0.85), used to size each label to its
- * own slice arc.
- * @constant {number}
- */
-const MODEPIEMENU_NAME_TITLE_RADIUS = 0.575;
-
-/**
- * Font family and relative group-ring font size shared by both mode pie menus.
- * Font px is computed as GROUP_FONT_RATIO * wheelRadius so the same wheel
- * renders identically regardless of the paper resolution.
- */
-const MODEPIEMENU_FONT_FAMILY = "sans-serif";
-const MODEPIEMENU_GROUP_FONT_RATIO = 0.08;
-
-/**
- * Min/max per-slice font sizes for the mode-name ring, as a fraction of the
- * wheel radius. Kept proportional so both contexts clamp identically.
- */
-const MODEPIEMENU_NAME_FONT_MIN_RATIO = 0.06;
-const MODEPIEMENU_NAME_FONT_MAX_RATIO = 0.12;
-
-/**
  * Reads the custom modes saved by the mode widget from local storage.
  * Corrupt or non-array data yields an empty list.
  * @returns {Array} Entries that look like custom modes ({name} is a string)
@@ -1904,8 +1866,8 @@ const getModeNamesForGroup = (grp, customModeNames = []) => {
     if (grp !== "custom") {
         return MODE_PIE_MENUS[grp].slice();
     }
-    const names = customModeNames.slice(0, MODEPIEMENU_SLOT_COUNT);
-    while (names.length < MODEPIEMENU_SLOT_COUNT) {
+    const names = customModeNames.slice(0, 12);
+    while (names.length < 12) {
         names.push(" ");
     }
     return names;
@@ -1995,8 +1957,7 @@ const updateModeWheelItems = (wheel, labels, colors) => {
  * @param {number} wheelRadius
  * @returns {string}
  */
-const getModeGroupTitleFont = wheelRadius =>
-    `100 ${Math.round(MODEPIEMENU_GROUP_FONT_RATIO * wheelRadius)}px ${MODEPIEMENU_FONT_FAMILY}`;
+const getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
 
 /**
  * Sizes a mode-name label to fit its own slice arc on the shared name ring.
@@ -2008,12 +1969,12 @@ const getModeGroupTitleFont = wheelRadius =>
  * @returns {string}
  */
 const getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
-    const arcPx = (2 * Math.PI * MODEPIEMENU_NAME_TITLE_RADIUS * wheelRadius) / sliceCount;
+    const arcPx = (2 * Math.PI * 0.575 * wheelRadius) / sliceCount;
     const size = Math.floor((arcPx * 0.85) / (labelLen * 0.6));
-    const minSize = Math.round(MODEPIEMENU_NAME_FONT_MIN_RATIO * wheelRadius);
-    const maxSize = Math.round(MODEPIEMENU_NAME_FONT_MAX_RATIO * wheelRadius);
+    const minSize = Math.round(0.06 * wheelRadius);
+    const maxSize = Math.round(0.12 * wheelRadius);
     const clamped = Math.min(maxSize, Math.max(minSize, size));
-    return `100 ${clamped}px ${MODEPIEMENU_FONT_FAMILY}`;
+    return `100 ${clamped}px sans-serif`;
 };
 
 /**
@@ -3973,13 +3934,9 @@ const getNonEDOModeSteps = (mode, temperament) => {
  * @returns {{ freq: number, noteName: string, octave: number } | null}
  */
 const getNonEDOFrequency = (note, baseOctave, temperamentKey, keySignature) => {
-    const runtime =
-        typeof global === "undefined"
-            ? { TEMPERAMENT, isEquallyTempered, pitchToFrequency }
-            : global;
-    const t = runtime.TEMPERAMENT && runtime.TEMPERAMENT[temperamentKey];
+    const t = TEMPERAMENT[temperamentKey];
     const labels =
-        t && Array.isArray(t.noteLabels) && !runtime.isEquallyTempered(temperamentKey)
+        t && Array.isArray(t.noteLabels) && !isEquallyTempered(temperamentKey)
             ? t.noteLabels
             : null;
     if (!labels || !labels[note % labels.length]) {
@@ -3987,7 +3944,7 @@ const getNonEDOFrequency = (note, baseOctave, temperamentKey, keySignature) => {
     }
     const idx = note % labels.length;
     const octave = baseOctave + Math.floor(note / labels.length);
-    const freq = runtime.pitchToFrequency(labels[idx], octave, 0, keySignature, temperamentKey);
+    const freq = pitchToFrequency(labels[idx], octave, 0, keySignature, temperamentKey);
     return { freq, noteName: labels[idx], octave };
 };
 
@@ -4157,8 +4114,7 @@ const frequencyToPitch = (hz, temperament) => {
  *     or the full string unchanged if no recognised prefix is found.
  */
 const getArticulation = note => {
-    // Strip microtonal ^ / v prefixes before matching so "^C" etc. resolve.
-    const stripped = note.replace(/^[v^]+/, "");
+    const stripped = stripMicrotonalPrefix(note);
     const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
     return match ? match[1] : stripped;
 };
@@ -6469,16 +6425,7 @@ const getModePattern = (mode, edo = 12) => {
         return new Array(edo).fill(1);
     }
     if (mode in MUSICALMODES) {
-        const pattern = MUSICALMODES[mode];
-        // Return a stored pattern as-is only when it is native to the requested
-        // EDO (its steps sum to the EDO). Anything else — including a native
-        // 19-EDO custom mode resolved in a 12-EDO project context — is rescaled
-        // proportionally so downstream per-degree stepping stays inside the octave.
-        const sum = pattern.reduce((a, b) => a + b, 0);
-        if (sum === edo) {
-            return pattern.slice();
-        }
-        return scalePatternToEDO(pattern, edo);
+        return scalePatternToEDO(MUSICALMODES[mode], edo);
     }
     return scalePatternToEDO(MUSICALMODES.major, edo);
 };
@@ -8403,8 +8350,6 @@ if (typeof module !== "undefined" && module.exports) {
         INTERVALVALUES,
         FIXEDSOLFEGE,
         FIXEDSOLFEGE1,
-        MODEPIEMENU_GROUP_RING,
-        MODEPIEMENU_NAME_RING,
         getSavedCustomModes,
         getModeNamesForGroup,
         getModeLabel,
