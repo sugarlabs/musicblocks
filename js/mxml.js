@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global saveMxmlOutput:writable,voiceNum:writable */
+/* global saveMxmlOutput:writable */
 /* exported saveMxmlOutput */
 
 saveMxmlOutput = logo => {
@@ -39,6 +39,12 @@ saveMxmlOutput = logo => {
         );
     };
 
+    const staging =
+        logo && logo.notation && logo.notation.notationStaging ? logo.notation.notationStaging : {};
+    const activeVoices = Object.keys(staging).filter(
+        voice => staging[voice] && staging[voice].length > 0
+    );
+
     add("<?xml version='1.0' encoding='UTF-8'?>");
     add(
         '<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">'
@@ -48,12 +54,11 @@ saveMxmlOutput = logo => {
     add("<part-list>");
     indent++;
 
-    Object.keys(logo.notation.notationStaging).forEach(voice => {
-        if (logo.notation.notationStaging[voice].length === 0) return;
-        voiceNum = parseInt(voice, 10) + 1;
-        add(`<score-part id="P${voiceNum}">`);
+    activeVoices.forEach((voice, index) => {
+        const partNum = index + 1;
+        add(`<score-part id="P${partNum}">`);
         indent++;
-        add(`<part-name> Voice #${voiceNum} </part-name>`);
+        add(`<part-name> Voice #${partNum} </part-name>`);
         indent--;
         add("</score-part>");
     });
@@ -61,11 +66,10 @@ saveMxmlOutput = logo => {
     add("</part-list>");
     indent--;
 
-    Object.keys(logo.notation.notationStaging).forEach(voice => {
-        if (logo.notation.notationStaging[voice].length === 0) return;
-        voiceNum = parseInt(voice, 10) + 1;
+    activeVoices.forEach((voice, index) => {
+        const partNum = index + 1;
         indent++;
-        add(`<part id="P${voiceNum}">`);
+        add(`<part id="P${partNum}">`);
         indent++;
 
         let currMeasure = 1,
@@ -81,7 +85,7 @@ saveMxmlOutput = logo => {
             firstMeasure = true;
         indent++;
         let divisionsLeft = divisions;
-        const notes = logo.notation.notationStaging[voice];
+        const notes = staging[voice];
 
         for (let i = 0; i < notes.length; i++) {
             const obj = notes[i];
@@ -241,21 +245,6 @@ saveMxmlOutput = logo => {
         indent--;
     });
     add("</score-partwise>");
-
-    let mi = 1e5;
-    for (let i = 0; i < res.length - 1; i++) {
-        if ((res[i] === "P" || res[i] === "#") && "123456789".includes(res[i + 1])) {
-            mi = Math.min(mi, parseInt(res[i + 1], 10));
-        }
-    }
-
-    res = res.split("");
-    for (let i = 0; i < res.length - 1; i++) {
-        if ((res[i] === "P" || res[i] === "#") && "123456789".includes(res[i + 1])) {
-            res[i + 1] = parseInt(res[i + 1], 10) - mi + 1;
-        }
-    }
-    res = res.join("");
 
     return res;
 };
