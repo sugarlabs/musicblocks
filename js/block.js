@@ -3999,6 +3999,7 @@ class Block {
                         customLabels.push(keys[i]);
                     }
                 }
+                if (!customLabels.length) return;
                 let selectedCustom;
                 if (this.customID !== null) {
                     selectedCustom = this.customID;
