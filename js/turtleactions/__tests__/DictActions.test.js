@@ -196,6 +196,11 @@ describe("setupDictActions", () => {
                 expect(targetTurtle.painter[method]).not.toHaveBeenCalled();
             });
         });
+
+        it("should support lowercase setDictValue alias", () => {
+            Turtle.DictActions.setDictValue(0, turtle, "color", "blue");
+            expect(targetTurtle.painter.doSetColor).toHaveBeenCalledWith("blue");
+        });
     });
 
     describe("SerializeDict", () => {
