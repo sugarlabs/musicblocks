@@ -372,7 +372,7 @@ describe("Theme Switching & Inline Styles Purity", () => {
         expect(pmSource).not.toMatch(/importConfirm\.style\.backgroundColor/);
     });
 
-    it("windows.css uses canonical tokens instead of hardcoded grays for window frame and topbar", () => {
+    it("windows.css uses canonical tokens instead of hardcoded raw colors for window frame, topbar, and toolbars", () => {
         const windowsCss = fs.readFileSync(
             path.join(ROOT_DIR, "dist", "css", "windows.css"),
             "utf8"
@@ -380,5 +380,15 @@ describe("Theme Switching & Inline Styles Purity", () => {
 
         expect(windowsCss).toContain("var(--color-widget-frame-border)");
         expect(windowsCss).toContain("var(--color-widget-frame-bg)");
+        expect(windowsCss).toContain("var(--color-error)");
+        expect(windowsCss).toContain("var(--color-success)");
+        expect(windowsCss).toContain("var(--color-text-inverse)");
+        expect(windowsCss).toContain("var(--color-selector-bg)");
+        expect(windowsCss).toContain("var(--color-selector-selected)");
+        expect(windowsCss).toContain("var(--color-brand-primary)");
+
+        // Strip comments before checking for raw hex values
+        const strippedCss = windowsCss.replace(/\/\*[\s\S]*?\*\//g, "");
+        expect(strippedCss).not.toMatch(/#[0-9a-fA-F]{3,6}/);
     });
 });
