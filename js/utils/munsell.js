@@ -6838,9 +6838,17 @@ let searchColors = (r, g, b) => {
     let distance = 10000000;
     for (let i = 0; i < 100; i++) {
         const color = getcolor(i);
-        const r1 = parseInt(color[2].substr(1, 2), 16);
-        const g1 = parseInt(color[2].substr(3, 2), 16);
-        const b1 = parseInt(color[2].substr(5, 2), 16);
+        let r1, g1, b1;
+        if (color[2].charAt(0) === "#") {
+            r1 = parseInt(color[2].substr(1, 2), 16);
+            g1 = parseInt(color[2].substr(3, 2), 16);
+            b1 = parseInt(color[2].substr(5, 2), 16);
+        } else {
+            const match = color[2].match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+            r1 = parseInt(match[1], 10);
+            g1 = parseInt(match[2], 10);
+            b1 = parseInt(match[3], 10);
+        }
         const distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
         if (distSquared < distance) {
             distance = distSquared;

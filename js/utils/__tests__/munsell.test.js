@@ -99,6 +99,14 @@ describe("munsell", () => {
             const nearestColor = getcolor(color);
             expect(nearestColor[2]).toMatch(/^#[0-9a-fA-F]{6}$/);
         });
+
+        it("should correctly identify a color that uses rgba format", () => {
+            // Color 37 returns an rgba string from getcolor
+            const c = getcolor(37)[2];
+            const [, r, g, b] = c.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+            const color = searchColors(+r, +g, +b);
+            expect(color).toBe(37);
+        });
     });
 });
 
