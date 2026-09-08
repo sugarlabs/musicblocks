@@ -372,23 +372,92 @@ describe("Theme Switching & Inline Styles Purity", () => {
         expect(pmSource).not.toMatch(/importConfirm\.style\.backgroundColor/);
     });
 
-    it("windows.css uses canonical tokens instead of hardcoded raw colors for window frame, topbar, and toolbars", () => {
+    it("windows.css uses canonical tokens in desktop window selectors instead of hardcoded colors", () => {
         const windowsCss = fs.readFileSync(
             path.join(ROOT_DIR, "dist", "css", "windows.css"),
             "utf8"
         );
 
-        expect(windowsCss).toContain("var(--color-widget-frame-border)");
-        expect(windowsCss).toContain("var(--color-widget-frame-bg)");
-        expect(windowsCss).toContain("var(--color-error)");
-        expect(windowsCss).toContain("var(--color-success)");
-        expect(windowsCss).toContain("var(--color-text-inverse)");
-        expect(windowsCss).toContain("var(--color-selector-bg)");
-        expect(windowsCss).toContain("var(--color-selector-selected)");
-        expect(windowsCss).toContain("var(--color-brand-primary)");
+        // Verify selector-specific declarations
+        expect(windowsCss).toMatch(
+            /#floatingWindows\s*>\s*\.windowFrame\s*\{[^}]*border:\s*2px\s+solid\s+var\(--color-widget-frame-border\);/
+        );
+        expect(windowsCss).toMatch(
+            /#floatingWindows\s*>\s*\.windowFrame\s*\{[^}]*background-color:\s*var\(--color-widget-frame-bg\);/
+        );
+        expect(windowsCss).toMatch(
+            /\.wftButton\.close:hover\s*\{[^}]*background-color:\s*var\(--color-error\);/
+        );
+        expect(windowsCss).toMatch(
+            /\.wftButton\.rollup:hover\s*\{[^}]*background-color:\s*var\(--color-success\);/
+        );
+        expect(windowsCss).toMatch(
+            /\.wftButton\.rollup::before[^}]*background-color:\s*var\(--color-text-inverse\);/
+        );
+        expect(windowsCss).toMatch(
+            /\.wftButton\.close::before[^}]*background-color:\s*var\(--color-text-inverse\);/
+        );
+        expect(windowsCss).toMatch(
+            /\.wfbtHR\s*\{[^}]*background-color:\s*var\(--color-widget-frame-border\);/
+        );
+        expect(windowsCss).toMatch(
+            /\.wfbtItem\s*\{[^}]*background-color:\s*var\(--color-selector-bg\);/
+        );
+        expect(windowsCss).toMatch(
+            /\.wfbtItem:hover\s*\{[^}]*background-color:\s*var\(--color-selector-selected\);/
+        );
+        expect(windowsCss).toMatch(
+            /\.wfbtItem:focus-visible\s*\{[^}]*outline:\s*2px\s+solid\s+var\(--color-brand-primary\);/
+        );
+        expect(windowsCss).toMatch(
+            /\.wfbtItem\s*>\s*input\s*\{[^}]*color:\s*var\(--color-selector-text\);/
+        );
 
         // Strip comments before checking for raw hex values
         const strippedCss = windowsCss.replace(/\/\*[\s\S]*?\*\//g, "");
         expect(strippedCss).not.toMatch(/#[0-9a-fA-F]{3,6}/);
+    });
+
+    it("ensures body element in index.html and activities stylesheets uses tokens without inline styles or !important", () => {
+        const indexHtml = fs.readFileSync(path.join(ROOT_DIR, "index.html"), "utf8");
+
+        // Verify body tag in index.html does not contain inline style
+        const bodyTagMatch = indexHtml.match(/<body\b([^>]*)>/i);
+        expect(bodyTagMatch).not.toBeNull();
+        expect(bodyTagMatch[1]).not.toMatch(/\bstyle\s*=/i);
+
+        const stylesheetPaths = [
+            path.join(CSS_DIR, "activities.css"),
+            path.join(ROOT_DIR, "dist", "css", "activities.css")
+        ];
+
+        for (const cssPath of stylesheetPaths) {
+            const activitiesCss = fs.readFileSync(cssPath, "utf8");
+
+            // Verify all background declarations in base body rule consume --color-bg-primary without !important
+            const bodyBlockMatch = activitiesCss.match(/(?:^|\})\s*body\s*\{([^}]*)\}/);
+            expect(bodyBlockMatch).not.toBeNull();
+            const bodyBlock = bodyBlockMatch[1];
+            const bodyBgDecls = bodyBlock.match(/background(?:-color)?\s*:[^;]+/gi) || [];
+            expect(bodyBgDecls.length).toBeGreaterThan(0);
+            for (const decl of bodyBgDecls) {
+                expect(decl).toMatch(/:\s*var\(--color-bg-primary\)$/i);
+                expect(decl).not.toMatch(/!important/i);
+            }
+
+            // Verify all background declarations in body.samples-shown consume --color-bg-primary without !important
+            const samplesShownMatch = activitiesCss.match(
+                /(?:^|\})\s*body\.samples-shown\s*\{([^}]*)\}/
+            );
+            expect(samplesShownMatch).not.toBeNull();
+            const samplesShownBlock = samplesShownMatch[1];
+            const samplesShownBgDecls =
+                samplesShownBlock.match(/background(?:-color)?\s*:[^;]+/gi) || [];
+            expect(samplesShownBgDecls.length).toBeGreaterThan(0);
+            for (const decl of samplesShownBgDecls) {
+                expect(decl).toMatch(/:\s*var\(--color-bg-primary\)$/i);
+                expect(decl).not.toMatch(/!important/i);
+            }
+        }
     });
 });
