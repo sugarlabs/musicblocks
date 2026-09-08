@@ -3360,13 +3360,6 @@ const piemenuModes = (block, selectedMode, onSelect) => {
 
             that.value = getModeNameFromLabel(that.text.text, __modesForGroup(modeGroup));
 
-            // Live-sync the open mode widget (if any) so the builder view tracks
-            // the mode chosen here.
-            const __modeWidget = that.activity.logo.modeWidget;
-            if (__modeWidget && typeof __modeWidget.onModePicked === "function") {
-                __modeWidget.onModePicked(that.value);
-            }
-
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
