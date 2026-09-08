@@ -18,6 +18,12 @@
 /* exported setupProgramBlocks */
 
 function setupProgramBlocks(activity) {
+    /**
+     * Determines whether a dictionary key is a built-in turtle status property.
+     *
+     * @param {string} key - The dictionary key to check.
+     * @returns {boolean} True if the key represents a turtle status property, false otherwise.
+     */
     function isTurtleStatusKey(key) {
         return (
             key === _("color") ||
