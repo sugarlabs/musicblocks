@@ -117,7 +117,7 @@ Guide](https://github.com/sugarlabs/turtleblocksjs/tree/master/guide),
 which reviews many programming features common to both projects.
 
 For more details on how to use Music Blocks, see [Using Music
-Blocks](https://github.com/sugarlabs/musicblocks/tree/master/documentation).
+Blocks](https://github.com/sugarlabs/musicblocks/tree/master/Docs/documentation).
 For more details on how to use Turtle Blocks, see [Using Turtle Blocks
 JS](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
@@ -1523,6 +1523,8 @@ above, the *One-of* block is used to randomly assign either `Do` or
 above, the *One-of* block is used to randomly select between `chunk1`
 and `chunk2`.
 
+<a name="musical-paint"></a>
+
 Musical Paint has been a popular activity dating back to programs such
 as Dan Franzblau's *Vidsizer* (1979) or Morwaread Farbood's
 *Hyperscore* (2002). Music Blocks can be used to create musical paint
@@ -1561,7 +1563,7 @@ stack can be copied and pasted into another composition.
 While a bit fanciful, this example, which can be run by clicking on
 the link below, takes musical paint in a novel direction.
 
-[RUN LIVE](https://sugarlabs.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
+[RUN LIVE](https://sugarlabs.github.io/musicblocks/index.html?id=1523896294964170&run=True)
 
 ### <a name="ENSEMBLE">3.8 Ensemble</a>
 
@@ -1643,7 +1645,7 @@ be used within Music Blocks to enhance your experience.
 
 Every widget has a menu with at least two buttons.
 
-![widget](../header-icons/close-button.svg "close button")
+![widget](../../header-icons/close-button.svg "close button")
 
 You can hide the widget by clicking on the *Close* button.
 
@@ -1712,13 +1714,13 @@ individual notes (or chords if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
-![widget](../header-icons/play-button.svg "play button")
+![widget](../../header-icons/play-button.svg "play button")
 
 If you click on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `Re 4`,
 `Mi 4`, `Sol 4`.
 
-![widget](../header-icons/export-chunk.svg "save button")
+![widget](../../header-icons/export-chunk.svg "save button")
 
 Once you have a group of notes (a "chunk") that you like, click on the
 *Save* button (just to the right of the *Play* button). This will
@@ -1728,12 +1730,12 @@ programmatically. (More on that below.)
 You can rearrange the selected notes in the grid and save other chunks
 as well.
 
-![widget](../header-icons/sort.svg "sort button")
+![widget](../../header-icons/sort.svg "sort button")
 
 The *Sort* button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate *Pitch* blocks.
 
-![widget](../header-icons/erase-button.svg "erase button")
+![widget](../../header-icons/erase-button.svg "erase button")
 
 There is also an Erase button that will clear the grid.
 
