@@ -734,7 +734,6 @@ class Activity {
             const title = document.createElement("h2");
             title.textContent = _("Clear workspace");
             title.classList.add("modal-title");
-            title.style.color = platformColor.headingColor;
 
             modal.appendChild(title);
             const message = document.createElement("p");
@@ -748,8 +747,6 @@ class Activity {
             const confirmBtn = document.createElement("button");
             confirmBtn.classList.add("confirm-button");
             confirmBtn.textContent = _("Confirm");
-            confirmBtn.style.backgroundColor = platformColor.blueButton;
-            confirmBtn.style.color = platformColor.blueButtonText;
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";
             confirmBtn.style.padding = "8px 16px";
@@ -764,8 +761,6 @@ class Activity {
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
             cancelBtn.textContent = _("Cancel");
-            cancelBtn.style.backgroundColor = "#f1f1f1";
-            cancelBtn.style.color = "black";
             cancelBtn.style.border = "none";
             cancelBtn.style.borderRadius = "4px";
             cancelBtn.style.padding = "8px 16px";
