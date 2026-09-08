@@ -908,8 +908,7 @@ class Logo {
                         } else {
                             const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                             if (typeof a === "number") {
-                                currentBlock.value =
-                                    a < 0 ? "-" + utils.mixedNumber(-a) : utils.mixedNumber(a);
+                                currentBlock.value = utils.mixedNumber(a);
                             } else {
                                 logo.deps.errorHandler(NANERRORMSG, blk);
                                 currentBlock.value = 0;
