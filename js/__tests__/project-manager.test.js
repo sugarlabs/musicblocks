@@ -1141,6 +1141,20 @@ describe("start() URL parameter parsing", () => {
         expect(activity.loadStartWrapper).toHaveBeenCalled();
     });
 
+    it("starts normally with a valueless URL flag", () => {
+        setURL("/?turtle");
+        const activity = makeStartActivity();
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers = jest.fn();
+        pm._loadStart = jest.fn();
+
+        expect(() => pm.start()).not.toThrow();
+        jest.advanceTimersByTime(200);
+
+        expect(activity.projectID).toBeNull();
+        expect(activity.loadStartWrapper).toHaveBeenCalled();
+    });
+
     it("parses single ?id= URL param and schedules _loadProject", () => {
         setURL("/?id=project-42");
         const activity = makeStartActivity();
