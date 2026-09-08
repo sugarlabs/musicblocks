@@ -192,13 +192,7 @@ class KeyboardController {
             pasteEl.style.visibility === "visible" ||
             wheelDiv.style.display === "" ||
             activity.turtles.running();
-        const widgetTitle = document.getElementsByClassName("wftTitle");
-        for (let i = 0; i < widgetTitle.length; i++) {
-            if (widgetTitle[i].innerHTML === "tempo") {
-                activity.inTempoWidget = true;
-                break;
-            }
-        }
+        activity.inTempoWidget = this._isWidgetOpen("tempo");
         if (
             (event.altKey && !disableKeys) ||
             event.keyCode === 13 ||
