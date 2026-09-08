@@ -23,9 +23,9 @@
 シューガー(Sugar OS)を使っている際は「ブラウズ」(Browse activity)に組み込みのミュージック・ブロックスのアップリを開きます。([組み込みミュージック・ブロックス]を読んでください(http://activities.sugarlabs.org/en-US/sugar/addon/4804)) または「ブラウズ」でミュージック・ブロックスのURLを開いて、再生します。
 
 この次のお勧めの読み物：
-[ミュージック・ブロックスの使い方(細）](http://github.com/sugarlabs/musicblocks/tree/master/documentation/README.md)
+[ミュージック・ブロックスの使い方(細）](https://github.com/sugarlabs/musicblocks/blob/master/Docs/documentation/README.md)
 または、
-[ミュージック・ブロックス案内](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md)
+[ミュージック・ブロックス案内](https://github.com/sugarlabs/musicblocks/blob/master/Docs/guide/README.md)
 
 クレジット
 ---------

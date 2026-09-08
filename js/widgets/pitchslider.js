@@ -94,22 +94,29 @@ class PitchSlider {
                     const max = parseFloat(slider.max);
                     const currentValue = parseFloat(slider.value);
 
+                    const stepRatio = event.shiftKey ? Math.pow(semitone, edo) : semitone;
+
                     if (event.key === "ArrowUp" || event.key === "ArrowRight") {
-                        // Move up by a semitone
-                        slider.value = this._stepFrequency(currentValue, "up", semitone, min, max);
+                        // Move up by a semitone or an octave if Shift is pressed
+                        slider.value = this._stepFrequency(currentValue, "up", stepRatio, min, max);
                     } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
-                        // Move down by a semitone
+                        // Move down by a semitone or an octave if Shift is pressed
                         slider.value = this._stepFrequency(
                             currentValue,
                             "down",
-                            semitone,
+                            stepRatio,
                             min,
                             max
                         );
                     }
 
-                    const inputEvent = new Event("input", { bubbles: true });
-                    slider.dispatchEvent(inputEvent);
+                    slider._fromKeyboard = true;
+                    try {
+                        const inputEvent = new Event("input", { bubbles: true });
+                        slider.dispatchEvent(inputEvent);
+                    } finally {
+                        slider._fromKeyboard = false;
+                    }
                 }
 
                 return false;
@@ -138,6 +145,9 @@ class PitchSlider {
                 this.activeSlider = id;
             }
 
+            slider.addEventListener("pointerdown", () => {
+                this.activeSlider = id;
+            });
             slider.addEventListener("mousedown", () => {
                 this.activeSlider = id;
             });
@@ -158,6 +168,11 @@ class PitchSlider {
             };
 
             slider.oninput = () => {
+                if (slider._fromKeyboard) {
+                    changeFreq();
+                    oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
+                    return;
+                }
                 oscillators[id].triggerAttack(this.frequencies[id]);
                 changeFreq();
             };

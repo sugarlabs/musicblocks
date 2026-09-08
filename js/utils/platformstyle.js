@@ -15,6 +15,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+ * Canvas / EaselJS / Block-rendering styling adapter layer.
+ *
+ * NOTE: tokens.css is the single source of truth for DOM and CSS design tokens.
+ * platformstyle.js acts strictly as the canvas and block-rendering adapter layer
+ * where HTML5 Canvas / EaselJS APIs require raw colour values. Common values
+ * (such as selector and label colors) align with the canonical tokens in tokens.css.
+ */
+
 /* global showMaterialHighlight,platform,platformColor */
 
 /* exported showButtonHighlight */

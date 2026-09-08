@@ -276,7 +276,31 @@ describe("Utility Functions (logic-only)", () => {
             expect(mixedNumber(2)).toBe("2/1");
         });
         it("handles negative fraction", () => {
-            expect(mixedNumber(-1.5)).toBe("-2 1/2");
+            // The sign is carried on the front and the whole/fractional parts
+            // come from the magnitude, so this reads as -1.5 and not -2.5.
+            expect(mixedNumber(-1.5)).toBe("-1 1/2");
+            expect(mixedNumber(-2.75)).toBe("-2 3/4");
+        });
+
+        it("keeps a negative proper fraction below one", () => {
+            expect(mixedNumber(-0.25)).toBe("-1/4");
+            expect(mixedNumber(-0.5)).toBe("-1/2");
+            expect(mixedNumber(-0.875)).toBe("-7/8");
+        });
+
+        it("handles negative integers", () => {
+            expect(mixedNumber(-2)).toBe("-2/1");
+            expect(mixedNumber(-1)).toBe("-1/1");
+        });
+
+        it("formats negatives as the mirror of their positive counterpart", () => {
+            for (const n of [0.25, 0.5, 0.875, 1.5, 2.25, 2.75, 3, 1.9999999999, 2.123456]) {
+                expect(mixedNumber(-n)).toBe("-" + mixedNumber(n));
+            }
+        });
+
+        it("treats negative zero as zero", () => {
+            expect(mixedNumber(-0)).toBe("0/1");
         });
 
         it("handles zero", () => {

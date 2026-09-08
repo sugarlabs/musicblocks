@@ -1520,6 +1520,33 @@ class Palette {
         this._hideMenuItems();
     }
 
+    /**
+     * Vertical scroll offset of the open block list, negative when scrolled
+     * down. Kept in the sign convention of the pre-HTML palette so the
+     * keyboard controller's Home handler (which passes -scrollDiff) still
+     * scrolls back to the top.
+     * @returns {number}
+     */
+    get scrollDiff() {
+        const items = docById("PaletteBody_items");
+        return items ? -items.scrollTop : 0;
+    }
+
+    /**
+     * Scroll the open block list. A positive direction moves the list down
+     * (revealing blocks above), a negative one moves it up.
+     * @param {number} direction - signed pixel amount
+     * @param {number} scrollSpeed - multiplier
+     * @returns {void}
+     */
+    scrollEvent(direction, scrollSpeed) {
+        const items = docById("PaletteBody_items");
+        if (!items) {
+            return;
+        }
+        items.scrollTop -= direction * scrollSpeed;
+    }
+
     showMenu(createHeader) {
         const palDiv = docById("palette");
         palDiv.childNodes[0].style.borderRight = "0";

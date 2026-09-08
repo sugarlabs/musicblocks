@@ -475,4 +475,158 @@ describe("FocusCycleManager module", () => {
             manager.dispose();
         });
     });
+
+    describe("zone entry and exit against a populated chrome", () => {
+        // jsdom (even v30) ships no PointerEvent constructor; the workspace-enter
+        // path constructs one directly, so stub a minimal, standards-shaped
+        // version the way toolbar.test.js already does.
+        let realPointerEvent;
+        beforeAll(() => {
+            realPointerEvent = global.PointerEvent;
+            global.PointerEvent = class PointerEvent extends Event {
+                constructor(type, init = {}) {
+                    super(type, init);
+                }
+            };
+        });
+        afterAll(() => {
+            global.PointerEvent = realPointerEvent;
+        });
+
+        let paletteModel;
+        const mountChrome = ({ rows = 0 } = {}) => {
+            document.body.insertAdjacentHTML(
+                "beforeend",
+                `<div id="toolbars"><button id="tb1" tabindex="0">A</button></div>
+                 <div id="palette" tabindex="-1">
+                   <div><div></div><div><div></div><div id="paletteListBody"></div></div></div>
+                 </div>
+                 <div id="canvasHolder"></div>
+                 <canvas id="canvas"></canvas>`
+            );
+            const listBody = document.getElementById("paletteListBody");
+            for (let i = 0; i < rows; i++) {
+                listBody.appendChild(document.createElement("div"));
+            }
+            paletteModel = { resetKeyboardNavigation: jest.fn() };
+            globalThis.ActivityContext = {
+                getActivity: () => ({ palettes: paletteModel, blocks: {} })
+            };
+        };
+
+        afterEach(() => {
+            delete globalThis.ActivityContext;
+            paletteModel = undefined;
+        });
+
+        test("entering the workspace zone focuses #canvasHolder and announces it", () => {
+            mountChrome();
+            const holder = document.getElementById("canvasHolder");
+            const focusSpy = jest.spyOn(holder, "focus");
+
+            const manager = new FocusCycleManager();
+            manager.init();
+            // workspace -> Tab -> toolbar -> Tab -> palette -> Tab -> workspace
+            pressTab(false);
+            pressTab(false);
+            pressTab(false);
+
+            expect(manager._currentZone).toBe("workspace");
+            expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+            expect(holder.getAttribute("tabindex")).toBe("-1");
+            expect(document.getElementById("fcm-announcer").textContent).toBe("Workspace active");
+
+            manager.dispose();
+        });
+
+        test("entering the toolbar zone adds the focus ring and announces it", () => {
+            mountChrome();
+            const toolbars = document.getElementById("toolbars");
+
+            const manager = new FocusCycleManager();
+            manager.init();
+            pressTab(false);
+
+            expect(manager._currentZone).toBe("toolbar");
+            expect(toolbars.classList.contains("focus-zone-active")).toBe(true);
+            expect(document.getElementById("fcm-announcer").textContent).toBe("Toolbar active");
+
+            manager.dispose();
+        });
+
+        test("entering the palette zone syncs palette.js state and pre-focuses a block row", () => {
+            mountChrome({ rows: 3 });
+
+            const manager = new FocusCycleManager();
+            manager.init();
+            pressTab(false); // toolbar
+            pressTab(false); // palette
+
+            expect(manager._currentZone).toBe("palette");
+            expect(paletteModel._keyboardNavActive).toBe(true);
+            expect(paletteModel._navSection).toBe("blocks");
+            expect(paletteModel._navBlockIndex).toBe(1);
+
+            const rows = document.getElementById("paletteListBody").children;
+            expect(rows[1].dataset.keyboardFocus).toBe("true");
+            expect(document.getElementById("fcm-announcer").textContent).toBe("Palette active");
+
+            manager.dispose();
+        });
+
+        test("leaving the palette zone resets palette keyboard navigation", () => {
+            mountChrome({ rows: 2 });
+
+            const manager = new FocusCycleManager();
+            manager.init();
+            pressTab(false); // toolbar
+            pressTab(false); // palette
+            paletteModel.resetKeyboardNavigation.mockClear();
+            pressTab(false); // palette -> workspace, leaving palette
+
+            expect(paletteModel.resetKeyboardNavigation).toHaveBeenCalledWith({
+                closeMenus: true,
+                blur: true
+            });
+
+            manager.dispose();
+        });
+
+        test("leaving the toolbar zone strips the toolbar-btn-focused class", () => {
+            mountChrome();
+            const button = document.getElementById("tb1");
+            button.classList.add("toolbar-btn-focused");
+
+            const manager = new FocusCycleManager();
+            manager.init();
+            pressTab(false); // workspace -> toolbar
+            pressTab(false); // toolbar -> palette, leaving toolbar
+
+            expect(button.classList.contains("toolbar-btn-focused")).toBe(false);
+
+            manager.dispose();
+        });
+
+        test("a mousedown on the workspace focuses the holder and clears toolbar focus", () => {
+            mountChrome();
+            const holder = document.getElementById("canvasHolder");
+            const button = document.getElementById("tb1");
+            button.classList.add("toolbar-btn-focused");
+            const focusSpy = jest.spyOn(holder, "focus");
+
+            const manager = new FocusCycleManager();
+            manager.init();
+            holder.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+            expect(button.classList.contains("toolbar-btn-focused")).toBe(false);
+            expect(manager._currentZone).toBe("workspace");
+            expect(paletteModel.resetKeyboardNavigation).toHaveBeenCalledWith({
+                closeMenus: true,
+                blur: true
+            });
+
+            manager.dispose();
+        });
+    });
 });

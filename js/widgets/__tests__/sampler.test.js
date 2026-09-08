@@ -22,7 +22,8 @@ global._ = s => s;
 global.instruments = [{}];
 global.TunerUtils = {
     calculatePlaybackRate: jest.fn(),
-    frequencyToPitch: jest.fn()
+    frequencyToPitch: jest.fn(),
+    frequencyToNote: jest.fn()
 };
 
 global.cancelAnimationFrame = jest.fn();
@@ -975,7 +976,7 @@ describe("Sampler Widget", () => {
                 0: { getValue: jest.fn(() => [0, 0.5, -0.5]), dispose: jest.fn() },
                 1: { getValue: jest.fn(() => [0, 0.5, -0.5]), dispose: jest.fn() }
             };
-            global.TunerUtils.frequencyToPitch.mockReturnValue(["A4", 0]);
+            global.TunerUtils.frequencyToNote.mockReturnValue({ note: "A", cents: 0 });
             global.detectPitch = jest.fn(() => 440);
             widget.tunerSegments = [{ setAttribute: jest.fn() }, { setAttribute: jest.fn() }];
             const querySelectorAll = jest.spyOn(document, "querySelectorAll");
@@ -983,7 +984,7 @@ describe("Sampler Widget", () => {
             widget.makeCanvas(400, 300, 0, true);
 
             expect(widget.tunerDisplay).toBeTruthy();
-            expect(widget.tunerDisplay.update).toHaveBeenCalled();
+            expect(widget.tunerDisplay.update).toHaveBeenCalledWith("A", 0, 0);
             expect(widget.tunerSegments[0].setAttribute).toHaveBeenCalledWith("fill", "#0000ff");
             expect(querySelectorAll).not.toHaveBeenCalled();
             querySelectorAll.mockRestore();
@@ -1017,13 +1018,14 @@ describe("Sampler Widget", () => {
                 100,
                 100
             );
-            global.TunerUtils.frequencyToPitch.mockReturnValue(["A4", 0]);
+            global.TunerUtils.frequencyToNote.mockReturnValue({ note: "A", cents: 0 });
             global.detectPitch = jest.fn(() => 440);
             widget.tunerSegments = [{ setAttribute: jest.fn() }];
             const querySelectorAll = jest.spyOn(document, "querySelectorAll");
 
             widget.makeCanvas(400, 300, 0, true);
             expect(widget.tunerDisplay.canvas).toBeTruthy();
+            expect(widget.tunerDisplay.update).toHaveBeenCalledWith("A", 0, 0);
             expect(widget.tunerSegments[0].setAttribute).toHaveBeenCalledWith("fill", "#0000ff");
             expect(querySelectorAll).not.toHaveBeenCalled();
             querySelectorAll.mockRestore();

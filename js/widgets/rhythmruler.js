@@ -541,6 +541,13 @@ class RhythmRuler {
          */
         this._expanded = false;
 
+        // init() builds a fresh widget window, so a canvas kept from an
+        // earlier run is detached by the time anything draws into it again.
+        // Drop it and fall back to the table view, the same pair of resets the
+        // close handler performs.
+        this._circularCanvas = null;
+        this._circularView = false;
+
         // If there are no drums, add one.
         if (this.Drums.length === 0) {
             this.Drums.push(null);
