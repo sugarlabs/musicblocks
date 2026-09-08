@@ -139,8 +139,10 @@ saveMxmlOutput = logo => {
 
             let isChordNote = false;
             for (const p of obj[0]) {
-                let dur = 32 / obj[1];
-                for (let j = 0; j < obj[2]; j++) dur += dur / 2;
+                // obj[2] is the dot count; 2 - 1/2^dotCount is the same multiplier
+                // durationToNoteValue() (musicutils.js) uses to derive it, so this stays
+                // consistent with how the dot count was assigned in the first place.
+                const dur = (32 / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
 
                 if (divisionsLeft < dur && !isChordNote) {
                     if (openedMeasureTag) {

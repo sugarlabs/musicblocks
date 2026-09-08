@@ -151,4 +151,60 @@ describe("saveMxmlOutput", () => {
         expect(output).toContain('<tie type="start"/>');
         expect(output).toContain('<tie type="stop"/>');
     });
+
+    it("should compute duration correctly for a single-dotted note (base * 1.5)", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 4, 1]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        // Quarter note (32 / 4 = 8 divisions) with one dot: 8 * 1.5 = 12.
+        expect(output).toContain("<duration>12</duration>");
+        expect(output).toContain("<step>C</step>");
+        expect(output).toContain("<octave>4</octave>");
+    });
+
+    it("should compute duration correctly for a double-dotted note (base * 1.75, not base * 2.25)", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 4, 2]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        // Quarter note (32 / 4 = 8 divisions) with two dots: 8 * 1.75 = 14.
+        // A naive loop that multiplies by 1.5 per dot instead yields 8 * 2.25 = 18.
+        expect(output).toContain("<duration>14</duration>");
+        expect(output).not.toContain("<duration>18</duration>");
+    });
+
+    it("should account for double-dotted duration when deciding measure breaks", () => {
+        // Two double-dotted quarter notes at 14 divisions each total 28, which
+        // fits in one 32-division measure. With the old, inflated duration (18
+        // each, 36 total), the second note would overflow the measure and force
+        // a premature break into a second measure.
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C4"], 4, 2],
+                        [["D4"], 4, 2]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+        const measureCount = (output.match(/<measure /g) || []).length;
+
+        expect(measureCount).toBe(1);
+    });
 });
