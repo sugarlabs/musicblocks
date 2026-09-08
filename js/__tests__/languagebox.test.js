@@ -72,7 +72,31 @@ describe("LanguageBox Class", () => {
             reloadSpy.mockRestore();
         });
 
-        it("should wait for saveLocally before reloading", async () => {
+        it("should wait for saveSessionAsync before reloading if it exists", async () => {
+            const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            let resolveSave;
+            mockActivity.saveSessionAsync = jest.fn().mockReturnValue(
+                new Promise(resolve => {
+                    resolveSave = resolve;
+                })
+            );
+
+            languageBox.reload();
+
+            expect(mockActivity.saveSessionAsync).toHaveBeenCalled();
+            expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+            expect(consoleSpy).not.toHaveBeenCalled();
+
+            resolveSave();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(consoleSpy).toHaveBeenCalled();
+            consoleSpy.mockRestore();
+            delete mockActivity.saveSessionAsync;
+        });
+
+        it("should wait for saveLocally before reloading if saveSessionAsync is missing", async () => {
             const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
             let resolveSave;
             mockActivity.saveLocally.mockReturnValue(

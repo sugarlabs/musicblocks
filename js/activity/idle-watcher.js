@@ -1,3 +1,25 @@
+/**
+ * MusicBlocks v3.4.1
+ *
+ * @author Lavjeet Kumar Rai
+ *
+ * @copyright 2026 Lavjeet Kumar Rai
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 // Copyright (c) 2026 Sugarlabs
 //
 // This program is free software; you can redistribute it and/or
@@ -130,14 +152,33 @@ const setupActivityIdleWatcher = activityInstance => {
                         return;
                     }
 
-                    if (activity.saveLocally !== null && activity.saveLocally !== undefined) {
+                    // Fix #7: Use saveSessionAsync (IndexedDB) when available;
+                    // fall back to saveLocally. In both cases, call
+                    // gitDropdownUI.onSaveLocally() so mbGitLastSavedHash is
+                    // updated and the "Mark This Moment" button stays accurate.
+                    if (typeof activity.saveSessionAsync === "function") {
+                        activity.saveSessionAsync().catch(e => {
+                            ErrorHandler.recoverable(e, { operation: "autoSaveAsync" });
+                        });
+                    } else if (
+                        activity.saveLocally !== null &&
+                        activity.saveLocally !== undefined
+                    ) {
                         activity.saveLocally();
+                    }
+
+                    // Always update the git dirty-check hash after any autosave
+                    if (
+                        activity.gitDropdownUI &&
+                        typeof activity.gitDropdownUI.onSaveLocally === "function"
+                    ) {
+                        activity.gitDropdownUI.onSaveLocally();
                     }
                 } catch (e) {
                     ErrorHandler.recoverable(e, { operation: "autoSave" });
                 }
             },
-            5 * 60 * 1000
+            15 * 1000 // 15 seconds
         );
     };
 
