@@ -28,9 +28,9 @@
 
 /* exported
 
-   createDefaultStack, createHelpContent, LOGOJA1, NUMBERBLOCKDEFAULT,
-   DEFAULTPALETTE, BUILTINPALETTES, MULTIPALETTES, SKIPPALETTES,
-   MULTIPALETTEICONS, MULTIPALETTENAMES, HELPCONTENT, DATAOBJS,
+   createDefaultStack, createHelpContent, getLanguagePreference, LOGODEFAULT, LOGOJA,
+   LOGOJA1, NUMBERBLOCKDEFAULT, DEFAULTPALETTE, BUILTINPALETTES, MULTIPALETTES,
+   SKIPPALETTES, MULTIPALETTEICONS, MULTIPALETTENAMES, HELPCONTENT, DATAOBJS,
    BUILTINPALETTESFORL23N, getMainToolbarButtonNames,
    getAuxToolbarButtonNames, TITLESTRING
  */
@@ -308,6 +308,20 @@ const getAuxToolbarButtonNames = name => {
     );
 };
 
+const getLanguagePreference = () => {
+    let language;
+    try {
+        language = localStorage.languagePreference;
+    } catch (e) {
+        // In restricted environments (e.g., Safari private browsing), localStorage may be unavailable
+        language = undefined;
+    }
+    if (language === undefined && typeof navigator !== "undefined") {
+        language = navigator.language;
+    }
+    return language;
+};
+
 const createDefaultStack = () => {
     if (_THIS_IS_TURTLE_BLOCKS_) {
         DATAOBJS = [
@@ -321,10 +335,7 @@ const createDefaultStack = () => {
             [7, ["number", { value: 90 }], 0, 0, [6]]
         ];
     } else {
-        let language = localStorage.languagePreference;
-        if (language === undefined) {
-            language = navigator.language;
-        }
+        const language = getLanguagePreference();
 
         if (language === "ja") {
             DATAOBJS = [
@@ -405,13 +416,13 @@ const createDefaultStack = () => {
             ];
         }
     }
+    if (typeof window !== "undefined") {
+        window.DATAOBJS = DATAOBJS;
+    }
 };
 
 const createHelpContent = activity => {
-    let language = localStorage.languagePreference;
-    if (language === undefined) {
-        language = navigator.language;
-    }
+    const language = getLanguagePreference();
 
     let LOGO = LOGODEFAULT;
     if (language === "ja") {
@@ -789,10 +800,17 @@ const createHelpContent = activity => {
             `data:image/svg+xml;base64,${window.btoa(base64Encode(LOGO))}`
         ]);
     }
+    if (typeof window !== "undefined") {
+        window.HELPCONTENT = HELPCONTENT;
+    }
 };
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         createDefaultStack,
+        createHelpContent,
+        getLanguagePreference,
+        LOGOJA,
+        LOGODEFAULT,
         LOGOJA1,
         NUMBERBLOCKDEFAULT,
         DEFAULTPALETTE,
@@ -801,6 +819,10 @@ if (typeof module !== "undefined" && module.exports) {
 }
 if (typeof window !== "undefined") {
     window.createDefaultStack = createDefaultStack;
+    window.createHelpContent = createHelpContent;
+    window.getLanguagePreference = getLanguagePreference;
+    window.LOGOJA = LOGOJA;
+    window.LOGODEFAULT = LOGODEFAULT;
     window.LOGOJA1 = LOGOJA1;
     window.NUMBERBLOCKDEFAULT = NUMBERBLOCKDEFAULT;
     window.DEFAULTPALETTE = DEFAULTPALETTE;
