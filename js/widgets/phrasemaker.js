@@ -600,8 +600,6 @@ class PhraseMaker {
         widgetWindow.clear();
         widgetWindow.show();
 
-        console.debug("notes " + this.rowLabels + " octave " + this.rowArgs);
-
         this._notesToPlay = [];
         this._matrixHasTuplets = false;
         this._loadDrumSynthsForRows(turtleIndex);
@@ -1393,7 +1391,6 @@ class PhraseMaker {
                     rArg = 0;
                     break;
                 default:
-                    console.debug(label + " not found");
                     break;
             }
 
@@ -2789,7 +2786,6 @@ class PhraseMaker {
             if (i === 0) {
                 this._sortedRowMap.push(0);
             } else if (i > 0 && obj[1] !== "hertz" && obj[1] === this._deps.last(this.rowLabels)) {
-                console.debug("skipping " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap));
                 if (oldColumnBlockMap[sortedList[lastObj][3]] !== undefined) {
                     setTimeout(
@@ -2809,7 +2805,6 @@ class PhraseMaker {
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
             } else {
-                console.debug("pushing " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap) + 1);
                 lastObj = i;
                 this.stylePhraseMaker();
