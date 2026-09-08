@@ -155,3 +155,112 @@ describe("Music Blocks mode (_THIS_IS_TURTLE_BLOCKS_ = false)", () => {
         expect(() => mb.createDefaultStack()).not.toThrow();
     });
 });
+
+describe("Tab Navigation help icon follows the theme", () => {
+    let mb, activity;
+
+    /** Find the entry createHelpContent pushed for Tab Navigation. */
+    const tabEntry = () => mb.HELPCONTENT.find(entry => entry[0] === "Tab Navigation");
+
+    /** Resolve that entry's icon and name the artwork constant it chose. */
+    const chosenIcon = () => atob(tabEntry()[2]().replace("data:image/svg+xml;base64,", ""));
+
+    beforeAll(() => {
+        // Every artwork constant createHelpContent reaches for; each stands in
+        // for itself so an entry's data URI names the icon it chose.
+        [
+            "ADVANCEDBUTTON",
+            "BIGGERBUTTON",
+            "BLOCKMENUBUTTON",
+            "CANVASMENUBUTTON",
+            "CARTESIANBUTTON",
+            "CLEARBUTTON",
+            "COLLAPSEBLOCKSBUTTON",
+            "COLLAPSEBUTTON",
+            "COPYBUTTON",
+            "DARKMODEBUTTON",
+            "EMPTYTRASHCONFIRMBUTTON",
+            "EXTRACTBUTTON",
+            "FULLSCREENBUTTON",
+            "GOHOMEBUTTON",
+            "HELPBUTTON",
+            "HIDEBLOCKSBUTTON",
+            "JAVASCRIPTBUTTON",
+            "LANGUAGEBUTTON",
+            "LOADBUTTON",
+            "LOGO",
+            "MENUBUTTON",
+            "MOUSEPALETTEICON",
+            "NEWBUTTON",
+            "OPENMERGEBUTTON",
+            "PITCHPREVIEWHELPBUTTON",
+            "PLANETBUTTON",
+            "PLUGINSBUTTON",
+            "PLUGINSDELETEBUTTON",
+            "RECORDHELPBUTTON",
+            "RESTORETRASHBUTTON",
+            "RHYTHMPALETTEHELPICON",
+            "RUNBUTTON",
+            "SAVEBUTTON",
+            "SCROLLUNLOCKBUTTON",
+            "SELECTHELPBUTTON",
+            "SLOWBUTTON",
+            "SMALLERBUTTON",
+            "STATSBUTTON",
+            "STEPBUTTON",
+            "STOPTURTLEBUTTON",
+            "WRAPTURTLEBUTTON"
+        ].forEach(b => {
+            global[b] = b;
+        });
+        global._ = jest.fn(str => str);
+        global.base64Encode = jest.fn(str => str);
+        global._THIS_IS_TURTLE_BLOCKS_ = false;
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        global.getSystemThemePreference = jest.fn(() => "light");
+        jest.resetModules();
+        mb = require("../turtledefs");
+    });
+
+    beforeEach(() => {
+        activity = { beginnerMode: false, storage: {} };
+        mb.createHelpContent(activity);
+    });
+
+    test("the entry exists and defers its icon to display time", () => {
+        const entry = tabEntry();
+        expect(entry).toBeDefined();
+        // Not a baked data URI: the theme is not knowable when the help content
+        // is built, so the icon has to be resolved when the page is shown.
+        expect(typeof entry[2]).toBe("function");
+    });
+
+    test("uses the dark icon under the dark theme", () => {
+        activity.storage.themePreference = "dark";
+        expect(chosenIcon()).toBe("TABBUTTON_DARK");
+    });
+
+    test("uses the dark icon under highcontrast, which is black-backgrounded", () => {
+        activity.storage.themePreference = "highcontrast";
+        expect(chosenIcon()).toBe("TABBUTTON_DARK");
+    });
+
+    test("uses the light icon under the light theme", () => {
+        activity.storage.themePreference = "light";
+        expect(chosenIcon()).toBe("TABBUTTON_LIGHT");
+    });
+
+    test("falls back to the system preference when none is stored", () => {
+        getSystemThemePreference.mockReturnValue("dark");
+        expect(chosenIcon()).toBe("TABBUTTON_DARK");
+        getSystemThemePreference.mockReturnValue("light");
+        expect(chosenIcon()).toBe("TABBUTTON_LIGHT");
+    });
+
+    test("re-reads the theme on each call, so switching while open takes effect", () => {
+        activity.storage.themePreference = "light";
+        expect(chosenIcon()).toBe("TABBUTTON_LIGHT");
+        activity.storage.themePreference = "dark";
+        expect(chosenIcon()).toBe("TABBUTTON_DARK");
+    });
+});

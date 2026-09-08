@@ -23,7 +23,8 @@
    _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON,
    PLUGINSBUTTON, OPENMERGEBUTTON, PITCHPREVIEWBUTTON, JAVASCRIPTBUTTON,
    RECORDHELPBUTTON, DARKMODEBUTTON, SELECTHELPBUTTON, BLOCKMENUBUTTON,
-   CANVASMENUBUTTON, RHYTHMPALETTEHELPICON, PITCHPREVIEWHELPBUTTON
+   CANVASMENUBUTTON, RHYTHMPALETTEHELPICON, PITCHPREVIEWHELPBUTTON,
+   getSystemThemePreference
 */
 
 /* exported
@@ -652,16 +653,22 @@ const createHelpContent = activity => {
         `data:image/svg+xml;base64,${window.btoa(base64Encode(EXTRACTBUTTON))}`
     ]);
     if (_THIS_IS_MUSIC_BLOCKS_) {
-        const tabButtonSvg =
-            activity.themebox && activity.themebox._theme === "dark"
-                ? TABBUTTON_DARK
-                : TABBUTTON_LIGHT;
         HELPCONTENT.push([
             _("Tab Navigation"),
             _(
                 "Press the Tab key on your keyboard to magically jump between the workspace, toolbar, and palette!"
             ),
-            `data:image/svg+xml;base64,${window.btoa(base64Encode(tabButtonSvg))}`
+            // Resolved when the page is shown rather than here. createHelpContent
+            // runs from setupDependencies(), which is long before activity.themeBox
+            // is constructed, and the theme can also be switched while the help
+            // widget is open. Read the preference the way ThemeBox itself does so
+            // this does not depend on ThemeBox existing yet.
+            () => {
+                const theme = activity.storage.themePreference || getSystemThemePreference();
+                // highcontrast is a black-backgrounded theme, so it wants the dark icon too.
+                const svg = theme === "light" ? TABBUTTON_LIGHT : TABBUTTON_DARK;
+                return `data:image/svg+xml;base64,${window.btoa(base64Encode(svg))}`;
+            }
         ]);
     }
     if (!activity.beginnerMode) {
@@ -793,6 +800,12 @@ const createHelpContent = activity => {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         createDefaultStack,
+        createHelpContent,
+        // A getter: createHelpContent() rebinds HELPCONTENT, so exporting the
+        // array itself would hand out whichever one existed at import time.
+        get HELPCONTENT() {
+            return HELPCONTENT;
+        },
         LOGOJA1,
         NUMBERBLOCKDEFAULT,
         DEFAULTPALETTE,
