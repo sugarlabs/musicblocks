@@ -493,19 +493,40 @@ function TemperamentWidget() {
             }
         };
 
+        const temperaments = getTemperamentsList();
+        const _selectBtnWrapper = document.createElement("div");
+        _selectBtnWrapper.style.position = "relative";
+        _selectBtnWrapper.style.display = "inline-flex";
+        _selectBtnWrapper.style.alignItems = "center";
+        _selectBtnWrapper.style.width = "32px";
+        _selectBtnWrapper.style.height = "32px";
+        _selectBtnWrapper.style.flexShrink = "0";
+
+        const _selectBtnIcon = document.createElement("img");
+        _selectBtnIcon.src = "header-icons/menu-button.svg";
+        _selectBtnIcon.alt = _("temperament");
+        _selectBtnIcon.height = 24;
+        _selectBtnIcon.width = 24;
+        _selectBtnIcon.style.pointerEvents = "none";
+        _selectBtnWrapper.appendChild(_selectBtnIcon);
+
         const compareSelect = document.createElement("select");
         compareSelect.title = _("temperament");
         compareSelect.setAttribute("aria-label", _("temperament"));
-        compareSelect.style.fontSize = "12px";
-        compareSelect.style.padding = "4px 8px";
-        compareSelect.style.border = "1px solid var(--color-border-primary, #555)";
-        compareSelect.style.borderRadius = "6px";
-        compareSelect.style.background = "var(--color-bg-tertiary, #2a2a3e)";
-        compareSelect.style.color = "var(--color-text-primary, #e0e0e0)";
-        compareSelect.style.cursor = "pointer";
-        compareSelect.style.flexShrink = "0";
+        Object.assign(compareSelect.style, {
+            position: "absolute",
+            top: "0",
+            left: "0",
+            width: "100%",
+            height: "100%",
+            opacity: "0",
+            cursor: "pointer",
+            zIndex: "1",
+            border: "none",
+            margin: "0",
+            padding: "0"
+        });
 
-        const temperaments = getTemperamentsList();
         for (const t of temperaments) {
             if (isCustomTemperament(t[1]) && t[1] !== that.inTemperament) continue;
             const opt = document.createElement("option");
@@ -519,7 +540,8 @@ function TemperamentWidget() {
             temperLabel.textContent = _getTemperamentLabel(compareSelect.value);
         };
 
-        controlsDiv.appendChild(compareSelect);
+        _selectBtnWrapper.appendChild(compareSelect);
+        controlsDiv.appendChild(_selectBtnWrapper);
 
         temperamentTableDiv.appendChild(controlsDiv);
 
@@ -566,7 +588,7 @@ function TemperamentWidget() {
                         setTimeout(function () {
                             flashDot = -1;
                             _drawCircle();
-                        }, 200); // ponytail: 200ms hardcoded, matches _playNote flash; extract if timing becomes configurable
+                        }, 200);
                         return;
                     }
                 }
@@ -2684,7 +2706,7 @@ function TemperamentWidget() {
                         [
                             "text",
                             {
-                                value: this.notes[i].substring(0, this.notes[i].length - 1)
+                                value: _stripCents(this.notes[i])
                             }
                         ],
                         0,
@@ -2751,7 +2773,7 @@ function TemperamentWidget() {
                         [
                             "text",
                             {
-                                value: this.notes[i].substring(0, this.notes[i].length - 1)
+                                value: _stripCents(this.notes[i])
                             }
                         ],
                         0,

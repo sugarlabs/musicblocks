@@ -399,7 +399,6 @@ describe("TemperamentWidget basic tests", () => {
         widget.frequencies = [440, 880];
         widget.powerBase = 2;
         widget.checkTemperament = jest.fn();
-        widget._circleOfNotes = jest.fn();
 
         const divAppends = [];
         const realCreateElement = document.createElement.bind(document);
@@ -726,7 +725,6 @@ describe("TemperamentWidget basic tests", () => {
         });
 
         widget.checkTemperament = jest.fn();
-        widget._circleOfNotes = jest.fn();
 
         widget.octaveSpaceEdit();
 
