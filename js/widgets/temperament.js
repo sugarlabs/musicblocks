@@ -253,47 +253,6 @@ function TemperamentWidget() {
     };
 
     /**
-     * Adds a button to the widget.
-     * @private
-     * @param {HTMLTableRowElement} row - The table row to which the button will be added.
-     * @param {string} icon - The icon file name.
-     * @param {number} iconSize - The size of the icon.
-     * @param {string} label - The label for the button.
-     * @returns {HTMLTableCellElement} - The created table cell.
-     */
-    this._addButton = function (row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.textContent = "\u00A0\u00A0";
-        const img = document.createElement("img");
-        img.src = `header-icons/${icon}`;
-        img.title = label;
-        img.alt = label;
-        img.setAttribute("height", iconSize);
-        img.setAttribute("width", iconSize);
-        img.setAttribute("vertical-align", "middle");
-        img.setAttribute("align-content", "center");
-        cell.appendChild(img);
-        cell.appendChild(document.createTextNode("\u00A0\u00A0"));
-        cell.style.width = BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.classList.add("temperament-selector-cell");
-
-        cell.onmouseover = function () {
-            this.classList.add("temperament-selector-hover");
-        };
-
-        cell.onmouseout = function () {
-            this.classList.remove("temperament-selector-hover");
-        };
-
-        return cell;
-    };
-
-    /**
      * Creates the main wheel for the circle of notes.
      * @param {number[]} [ratios] - The ratios for the wheel.
      * @param {number} [pitchNumber] - The pitch number.
@@ -1438,7 +1397,7 @@ function TemperamentWidget() {
             that._vizMenu = menu;
             that._vizMenuClose = _closeMenu;
             setTimeout(function () {
-                document.addEventListener("mousedown", _closeMenu);
+                if (that._vizMenu) document.addEventListener("mousedown", _closeMenu);
             }, 0);
         };
 
