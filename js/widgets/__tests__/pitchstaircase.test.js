@@ -478,9 +478,42 @@ describe("PitchStaircase Widget", () => {
             expect(psc._makeStairs).toHaveBeenCalled();
         });
 
+        test("accepts boundary frequency at exactly MAX_FREQUENCY (20000 Hz)", () => {
+            const mockTextMsg = jest.fn();
+            psc.activity = { textMsg: mockTextMsg };
+            psc.Stairs = [["A", "", 10000.0, 1, 1, 10000.0, 4]];
+            // inputNum = 1 / 2 = 0.5 => newFrequency = 10000 / 0.5 = 20000.0 === MAX_FREQUENCY
+            psc._musicRatio1 = { value: "2" };
+            psc._musicRatio2 = { value: "1" };
+
+            psc._dissectStair(makeEvent(10000));
+
+            expect(psc.Stairs).toHaveLength(2);
+            expect(psc.Stairs[0][2]).toBe(PitchStaircase.MAX_FREQUENCY);
+            expect(psc._makeStairs).toHaveBeenCalled();
+            expect(mockTextMsg).not.toHaveBeenCalled();
+        });
+
+        test("accepts boundary frequency at exactly MIN_FREQUENCY (20 Hz)", () => {
+            const mockTextMsg = jest.fn();
+            psc.activity = { textMsg: mockTextMsg };
+            psc.Stairs = [["A", "", 40.0, 1, 1, 40.0, 4]];
+            // inputNum = 2 / 1 = 2 => newFrequency = 40 / 2 = 20.0 === MIN_FREQUENCY
+            psc._musicRatio1 = { value: "1" };
+            psc._musicRatio2 = { value: "2" };
+
+            psc._dissectStair(makeEvent(40));
+
+            expect(psc.Stairs).toHaveLength(2);
+            expect(psc.Stairs[1][2]).toBe(PitchStaircase.MIN_FREQUENCY);
+            expect(psc._makeStairs).toHaveBeenCalled();
+            expect(mockTextMsg).not.toHaveBeenCalled();
+        });
+
         test("rejects frequency above MAX_FREQUENCY (20000 Hz) and notifies user", () => {
             const mockTextMsg = jest.fn();
             psc.activity = { textMsg: mockTextMsg };
+            const initialStairs = [["A", "", 15000.0, 1, 1, 15000.0, 4]];
             psc.Stairs = [["A", "", 15000.0, 1, 1, 15000.0, 4]];
             // inputNum = inputNum2 / inputNum1 = 1 / 2 => newFrequency = 15000 / 0.5 = 30000 > 20000
             psc._musicRatio1 = { value: "2" };
@@ -488,7 +521,7 @@ describe("PitchStaircase Widget", () => {
 
             psc._dissectStair(makeEvent(15000));
 
-            expect(psc.Stairs).toHaveLength(1);
+            expect(psc.Stairs).toEqual(initialStairs);
             expect(psc._makeStairs).not.toHaveBeenCalled();
             expect(mockTextMsg).toHaveBeenCalledWith(
                 "Frequency is outside audible range (20 Hz - 20000 Hz).",
@@ -499,6 +532,7 @@ describe("PitchStaircase Widget", () => {
         test("rejects frequency below MIN_FREQUENCY (20 Hz) and notifies user", () => {
             const mockTextMsg = jest.fn();
             psc.activity = { textMsg: mockTextMsg };
+            const initialStairs = [["A", "", 30.0, 1, 1, 30.0, 4]];
             psc.Stairs = [["A", "", 30.0, 1, 1, 30.0, 4]];
             // inputNum = inputNum2 / inputNum1 = 2 / 1 = 2 => newFrequency = 30 / 2 = 15 < 20
             psc._musicRatio1 = { value: "1" };
@@ -506,7 +540,7 @@ describe("PitchStaircase Widget", () => {
 
             psc._dissectStair(makeEvent(30));
 
-            expect(psc.Stairs).toHaveLength(1);
+            expect(psc.Stairs).toEqual(initialStairs);
             expect(psc._makeStairs).not.toHaveBeenCalled();
             expect(mockTextMsg).toHaveBeenCalledWith(
                 "Frequency is outside audible range (20 Hz - 20000 Hz).",
@@ -517,11 +551,17 @@ describe("PitchStaircase Widget", () => {
         test("rejects non-finite or NaN frequency and notifies user", () => {
             const mockTextMsg = jest.fn();
             psc.activity = { textMsg: mockTextMsg };
-            psc.Stairs = [["A", "", NaN, 1, 1, 220.0, 4]];
+            const initialStairs = [["A", "", Infinity, 1, 1, Infinity, 4]];
+            psc.Stairs = [["A", "", Infinity, 1, 1, Infinity, 4]];
 
-            psc._dissectStair(makeEvent(NaN));
+            psc._dissectStair(makeEvent(Infinity));
 
+            expect(psc.Stairs).toEqual(initialStairs);
             expect(psc._makeStairs).not.toHaveBeenCalled();
+            expect(mockTextMsg).toHaveBeenCalledWith(
+                "Frequency is outside audible range (20 Hz - 20000 Hz).",
+                3000
+            );
         });
     });
 
