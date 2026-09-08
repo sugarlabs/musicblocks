@@ -92,8 +92,15 @@ class KeyboardController {
         if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
             return;
         }
-        // Skip hotkeys when value bar is visible (prevents accidental block creation)
-        if (activity.printText && activity.printText.classList.contains("show")) {
+        // Skip hotkeys when the screen-dimension block value bar is visible
+        // (prevents accidental block creation, #4931). This used to check
+        // activity.printText's shared "show" class, but that class is set by
+        // every textMsg() call in the app (Alt-R "Play", scroll toggles,
+        // etc.), not just the value bar - which meant any status message
+        // silently blocked every hotkey for up to 60s (AlertController.
+        // MSG_TIMEOUT). valueBarVisible is a dedicated flag set only by the
+        // value-bar display itself (js/logo.js), scoped to a short window.
+        if (activity.valueBarVisible) {
             return;
         }
 

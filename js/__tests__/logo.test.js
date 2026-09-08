@@ -1900,6 +1900,77 @@ describe("Logo runFromBlockNow", () => {
             expect(mockActivity.textMsg).toHaveBeenCalledWith("width: 77");
             expect(logo.stopTurtle).toBe(true);
         });
+        test("a second value display within 3s extends the valueBarVisible window instead of being cut short", () => {
+            jest.useFakeTimers();
+            logo.parseArg = jest.fn(() => 77);
+            const widthBlock = {
+                name: "width",
+                value: 77,
+                protoblock: { args: 0, dockTypes: ["numberout"] },
+                connections: [],
+                isValueBlock: () => false,
+                isArgBlock: () => true
+            };
+            logo.blockList = [widthBlock];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            jest.advanceTimersByTime(2000);
+            logo.stopTurtle = false;
+            logo.runFromBlockNow(logo, 0, 0, 0, null); // second display, 2s into the first window
+
+            jest.advanceTimersByTime(2000); // 4s since first display, but only 2s since second
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            jest.advanceTimersByTime(1000); // 3s since the second display
+            expect(mockActivity.valueBarVisible).toBe(false);
+
+            jest.useRealTimers();
+        });
+
+        test("doStopTurtles resets valueBarVisible even if it interrupts the window", () => {
+            jest.useFakeTimers();
+            logo.parseArg = jest.fn(() => 77);
+            const widthBlock = {
+                name: "width",
+                value: 77,
+                protoblock: { args: 0, dockTypes: ["numberout"] },
+                connections: [],
+                isValueBlock: () => false,
+                isArgBlock: () => true
+            };
+            logo.blockList = [widthBlock];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            logo.doStopTurtles();
+            expect(mockActivity.valueBarVisible).toBe(false);
+
+            // A new value display 2s after stop starts its own 3s window,
+            // due to end at t=5000 (relative to the run above).
+            jest.advanceTimersByTime(2000);
+            logo.stopTurtle = false;
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            // t=3000: this is when the FIRST (stopped) display's original
+            // timer would have fired, if doStopTurtles() had failed to
+            // cancel it via _timerManager. If that stale callback fires here,
+            // it wrongly clears valueBarVisible mid-way through the second
+            // display's own window - this is what actually proves
+            // cancellation happened, not just that doStopTurtles() sets the
+            // flag directly.
+            jest.advanceTimersByTime(1000);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            // t=5000: the second display's own timer fires on schedule.
+            jest.advanceTimersByTime(2000);
+            expect(mockActivity.valueBarVisible).toBe(false);
+
+            jest.useRealTimers();
+        });
     });
 
     describe("profiling", () => {
