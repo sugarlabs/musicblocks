@@ -626,6 +626,47 @@ describe("widgetWindows", () => {
         });
     });
 
+    describe("ARIA dialog and state semantics", () => {
+        test("frame is a focusable dialog labelled by its title element", () => {
+            const win = createTestWindow("My Widget");
+
+            expect(win._frame.getAttribute("tabindex")).toBe("-1");
+            expect(win._frame.getAttribute("aria-labelledby")).toBe(win._key + "WidgetID");
+        });
+
+        test("title bar and widget toolbar expose distinct toolbar roles", () => {
+            const win = createTestWindow();
+
+            expect(win._drag.getAttribute("role")).toBe("toolbar");
+            expect(win._toolbar.getAttribute("role")).toBe("toolbar");
+            expect(win._drag.getAttribute("aria-label")).not.toBe(
+                win._toolbar.getAttribute("aria-label")
+            );
+        });
+
+        test("maximize/restore keep the button aria-label in sync", () => {
+            const win = createTestWindow();
+
+            win._maximize();
+            expect(win._maxminButton.getAttribute("aria-label")).toBe("Restore");
+
+            win._restore();
+            expect(win._maxminButton.getAttribute("aria-label")).toBe("Maximize window");
+        });
+
+        test("rollup/unroll toggle aria-expanded on the roll button", () => {
+            const win = createTestWindow();
+
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("true");
+
+            win._rollup();
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("false");
+
+            win.unroll();
+            expect(win._rollButton.getAttribute("aria-expanded")).toBe("true");
+        });
+    });
+
     describe("updateTitle", () => {
         test("updates the title element innerHTML", () => {
             const win = createTestWindow("Old Title");
