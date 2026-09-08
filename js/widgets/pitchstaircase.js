@@ -44,6 +44,8 @@ class PitchStaircase {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static DEFAULTFREQUENCY = 220.0;
+    static MIN_FREQUENCY = 20.0;
+    static MAX_FREQUENCY = 20000.0;
 
     /**
      * @constructor
@@ -288,6 +290,18 @@ class PitchStaircase {
         }
 
         const newFrequency = parseFloat(frequency) / inputNum;
+        if (
+            !Number.isFinite(newFrequency) ||
+            newFrequency < PitchStaircase.MIN_FREQUENCY ||
+            newFrequency > PitchStaircase.MAX_FREQUENCY
+        ) {
+            const act = this.activity || (typeof activity !== "undefined" ? activity : null);
+            if (act && typeof act.textMsg === "function") {
+                act.textMsg(_("Frequency is outside audible range (20 Hz - 20000 Hz)."), 3000);
+            }
+            return;
+        }
+
         const obj = frequencyToPitch(newFrequency);
         let foundStep = false;
         let repeatStep = false;
