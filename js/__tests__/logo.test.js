@@ -1288,6 +1288,59 @@ describe("Logo runLogoCommands", () => {
         });
     });
 
+    describe("the Stop button is shown however a project is started", () => {
+        // walterbender asked how #8494 was tested, given the many ways a run
+        // can begin. These drive runLogoCommands the way each of those ways
+        // does, and assert the activity callback that lights the Stop button
+        // actually fires -- rather than calling onRunTurtle() directly, which
+        // would prove only that the handler works when something calls it.
+        const startWith = (startHere, blockList) => {
+            logo._restoreConnections = jest.fn();
+            logo.runFromBlock = jest.fn();
+            logo.blockList = blockList;
+            logo.runLogoCommands(startHere, null);
+            return mockActivity.onRunTurtle;
+        };
+
+        test("clicking a single Start block", () => {
+            // block.js -> logo.runLogoCommands(topBlock), the path a click takes.
+            const onRun = startWith(0, [
+                { name: "start", value: 0, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("a project holding several Start blocks", () => {
+            // The case in the screenshot: more than one stack, started together.
+            const onRun = startWith(null, [
+                { name: "start", value: 0, trash: false, connections: [] },
+                { name: "start", value: 1, trash: false, connections: [] },
+                { name: "start", value: 2, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("the toolbar play button, with no block singled out", () => {
+            // toolbar-controller.js -> runLogoCommands(null, env).
+            const onRun = startWith(null, [
+                { name: "start", value: 0, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("an action stack rather than a Start block", () => {
+            const onRun = startWith(0, [
+                { name: "action", value: 0, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("a project with no blocks at all", () => {
+            const onRun = startWith(null, []);
+            expect(onRun).toHaveBeenCalled();
+        });
+    });
+
     test("executes startHere path", () => {
         logo._restoreConnections = jest.fn();
         logo.runFromBlock = jest.fn();

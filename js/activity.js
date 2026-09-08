@@ -2105,6 +2105,16 @@ class Activity {
          * When turtle starts running change stop button to running state
          */
         this.onRunTurtle = () => {
+            // Logo calls this from runLogoCommands(), so it covers every way a
+            // project can start -- the toolbar buttons and a click on a Start
+            // block alike. The toolbar handlers highlight the stop button too,
+            // but not all of them do it up front: _doFastButton highlights
+            // after runFast(), and _doStepButton only when runStep() reports
+            // "started". This is what makes the button appear for the paths
+            // that never touch the toolbar at all. Where both run, the second
+            // call is harmless: highlightStop() only assigns display and color.
+            this.toolbar.highlightStop(window.platformColor.stopIconcolor);
+
             // TODO: plugin support
         };
 
