@@ -40,6 +40,24 @@ function makeMockActivity() {
     };
 }
 
+// Mimics the real runLogoCommands(), which dispatches the start block(s)
+// asynchronously, so the stepQueue is only populated on a later tick. Returns
+// an array of the queue snapshots that step() actually observed, so a test can
+// prove the first step() ran *after* the queue was filled -- not merely that a
+// timer fired.
+function mockAsyncQueuePopulation(activity) {
+    const queueSeenByStep = [];
+    activity.logo.runLogoCommands.mockImplementation(() => {
+        setTimeout(() => {
+            activity.logo.stepQueue = { turtle0: [1] };
+        }, 0);
+    });
+    activity.logo.step.mockImplementation(() => {
+        queueSeenByStep.push(JSON.parse(JSON.stringify(activity.logo.stepQueue)));
+    });
+    return queueSeenByStep;
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -193,6 +211,8 @@ describe("ToolbarController.runStep", () => {
     });
 
     test("sets runMode to step and handles initial mode switch", () => {
+        jest.useFakeTimers();
+        const queueSeenByStep = mockAsyncQueuePopulation(activity);
         activity.logo.stepQueue = {}; // count is 0
         activity.logo.turtleDelay = 500; // not step mode
 
@@ -201,8 +221,15 @@ describe("ToolbarController.runStep", () => {
         expect(controller.runMode).toBe("step");
         expect(activity.logo.turtleDelay).toBe(-1);
         expect(activity.logo.runLogoCommands).toHaveBeenCalled();
+        // On a fresh start, step() is deferred until after runLogoCommands()
+        // has populated the step queue, so it has not run synchronously yet.
+        expect(activity.logo.step).not.toHaveBeenCalled();
+        jest.runAllTimers();
         expect(activity.logo.step).toHaveBeenCalled();
+        // ...and when it did run, the queue was already populated.
+        expect(queueSeenByStep).toEqual([{ turtle0: [1] }]);
         expect(result).toBe("started");
+        jest.useRealTimers();
     });
 
     test("returns null if turtles are already running when switching modes", () => {
@@ -216,6 +243,8 @@ describe("ToolbarController.runStep", () => {
     });
 
     test("handles non-null result if started true", () => {
+        jest.useFakeTimers();
+        const queueSeenByStep = mockAsyncQueuePopulation(activity);
         activity.logo.stepQueue = {};
         activity.logo.turtleDelay = 500;
         activity.turtles.running.mockReturnValue(false);
@@ -224,8 +253,12 @@ describe("ToolbarController.runStep", () => {
         const result = controller.runStep();
 
         expect(activity.logo.runLogoCommands).toHaveBeenCalled();
+        // step() is deferred on a fresh start; flush the timer to run it.
+        jest.runAllTimers();
         expect(activity.logo.step).toHaveBeenCalled();
+        expect(queueSeenByStep).toEqual([{ turtle0: [1] }]);
         expect(result).toBe("started");
+        jest.useRealTimers();
     });
 
     test("handles undefined synth gracefully", () => {
@@ -240,6 +273,42 @@ describe("ToolbarController.runStep", () => {
         expect(() => {
             controller.runStep();
         }).not.toThrow();
+    });
+
+    test("defers the first step() on a fresh start until the queue is populated", () => {
+        jest.useFakeTimers();
+        const queueSeenByStep = mockAsyncQueuePopulation(activity);
+        activity.logo.stepQueue = {}; // no queue yet
+        activity.logo.turtleDelay = 500; // not step mode
+        activity.turtles.running.mockReturnValue(false);
+
+        const result = controller.runStep();
+
+        // The first click only arms the run; step() must not fire synchronously
+        // while runLogoCommands() has yet to queue the start block(s).
+        expect(activity.logo.runLogoCommands).toHaveBeenCalled();
+        expect(activity.logo.step).not.toHaveBeenCalled();
+        expect(result).toBe("started");
+
+        // Once the (mocked) async dispatch settles, the deferred step runs --
+        // and it sees the queued start block, which is the whole point of the
+        // fix: before it, step() ran against an empty queue and advanced nothing.
+        jest.runAllTimers();
+        expect(activity.logo.step).toHaveBeenCalledTimes(1);
+        expect(queueSeenByStep).toEqual([{ turtle0: [1] }]);
+        jest.useRealTimers();
+    });
+
+    test("steps synchronously (no defer) when already running in step mode", () => {
+        activity.logo.stepQueue = { turtle0: [1, 2] };
+        activity.turtles.running.mockReturnValue(true);
+        activity.logo.turtleDelay = -1; // already in step mode
+
+        controller.runStep();
+
+        // No fresh start, so step() is called synchronously with no timer.
+        expect(activity.logo.runLogoCommands).not.toHaveBeenCalled();
+        expect(activity.logo.step).toHaveBeenCalledTimes(1);
     });
 
     test("just steps when already in step mode with turtles running", () => {
