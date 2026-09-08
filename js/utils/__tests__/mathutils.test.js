@@ -682,4 +682,76 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doCalculateDistance(0, 0, 3, "b")).toThrow("NanError");
         });
     });
+    describe("NaN is rejected the same way everywhere", () => {
+        // doInt is the reachable source: it is documented to hand back NaN for a
+        // non-numeric argument, and typeof NaN === "number", so any guard written
+        // as a bare typeof check accepted it and returned NaN instead of raising
+        // the NanError the block layer turns into a message for the user.
+        const nan = MathUtility.doInt("abc");
+
+        test("doInt still produces the NaN these guards have to catch", () => {
+            expect(Number.isNaN(nan)).toBe(true);
+            expect(typeof nan).toBe("number");
+        });
+
+        test.each([
+            ["doMinus", a => MathUtility.doMinus(a, 3)],
+            ["doMultiply", a => MathUtility.doMultiply(a, 3)],
+            ["doDivide", a => MathUtility.doDivide(a, 3)],
+            ["doMod", a => MathUtility.doMod(a, 3)],
+            ["doPower", a => MathUtility.doPower(a, 3)],
+            ["doSqrt", a => MathUtility.doSqrt(a)],
+            ["doAbs", a => MathUtility.doAbs(a)],
+            ["doNegate", a => MathUtility.doNegate(a)],
+            ["doCalculateDistance", a => MathUtility.doCalculateDistance(a, 0, 3, 4)],
+            ["doRandom", a => MathUtility.doRandom(a, 3)]
+        ])("%s throws NanError for a NaN first argument", (_name, call) => {
+            expect(() => call(nan)).toThrow("NanError");
+        });
+
+        test.each([
+            ["doDivide", b => MathUtility.doDivide(3, b)],
+            ["doMod", b => MathUtility.doMod(3, b)],
+            ["doPower", b => MathUtility.doPower(3, b)],
+            ["doCalculateDistance", b => MathUtility.doCalculateDistance(0, 0, 3, b)],
+            ["doRandom", b => MathUtility.doRandom(3, b)]
+        ])("%s throws NanError for a NaN second argument", (_name, call) => {
+            expect(() => call(nan)).toThrow("NanError");
+        });
+
+        test("keeps Infinity, which is a usable number", () => {
+            // Number.isNaN, not Number.isFinite: 2^Infinity is a legitimate answer.
+            expect(MathUtility.doPower(2, Infinity)).toBe(Infinity);
+            expect(MathUtility.doAbs(-Infinity)).toBe(Infinity);
+        });
+
+        test("keeps DivByZeroError ahead of the NaN check", () => {
+            // Rejecting NaN must not change which error a zero divisor raises.
+            // The block layer maps DivByZeroError and NanError to different
+            // messages, so the precedence is part of the existing contract.
+            expect(() => MathUtility.doDivide(nan, 0)).toThrow("DivByZeroError");
+            expect(() => MathUtility.doMod(nan, 0)).toThrow("DivByZeroError");
+        });
+
+        test("still reports NanError for a non-numeric operand over zero", () => {
+            // Both operands have to be typeof number for the zero-divisor
+            // branch, which is what the original guard required.
+            expect(() => MathUtility.doDivide("a", 0)).toThrow("NanError");
+            expect(() => MathUtility.doMod(null, 0)).toThrow("NanError");
+        });
+
+        test("leaves the more specific errors in front of the NaN check", () => {
+            expect(() => MathUtility.doDivide(6, 0)).toThrow("DivByZeroError");
+            expect(() => MathUtility.doSqrt(-1)).toThrow("NoSqrtError");
+            expect(() => MathUtility.doNegate({})).toThrow("NoNegError");
+        });
+
+        test("leaves the coercing operations alone", () => {
+            // doPlus concatenates and doInt reports NaN by contract; neither is
+            // part of the NanError group and neither changes here.
+            expect(MathUtility.doPlus("a", 3)).toBe("a3");
+            expect(Number.isNaN(MathUtility.doInt("abc"))).toBe(true);
+            expect(MathUtility.doNegate("abc")).toBe("cba");
+        });
+    });
 });
