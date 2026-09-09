@@ -958,6 +958,208 @@ describe("Tempo Widget", () => {
             );
         });
     });
+
+    describe("Keyboard shortcuts and fine-tuning (#8601)", () => {
+        test("speedUp() should support custom step for ±1 fine-tuning", () => {
+            tempoWidget.BPMs = [120];
+            tempoWidget.BPMInputs = [{ value: 120 }];
+            tempoWidget._intervals = [500];
+
+            tempoWidget.speedUp(0, 1);
+            expect(tempoWidget.BPMs[0]).toBe(121);
+            expect(tempoWidget.BPMInputs[0].value).toBe(121);
+        });
+
+        test("slowDown() should support custom step for ±1 fine-tuning", () => {
+            tempoWidget.BPMs = [120];
+            tempoWidget.BPMInputs = [{ value: 120 }];
+            tempoWidget._intervals = [500];
+
+            tempoWidget.slowDown(0, 1);
+            expect(tempoWidget.BPMs[0]).toBe(119);
+            expect(tempoWidget.BPMInputs[0].value).toBe(119);
+        });
+
+        test("togglePlayPause() should invoke pauseBtn.onclick when present", () => {
+            const mockClick = jest.fn();
+            tempoWidget.pauseBtn = { onclick: mockClick };
+
+            tempoWidget.togglePlayPause();
+            expect(mockClick).toHaveBeenCalledTimes(1);
+        });
+
+        test("togglePlayPause() should toggle moving state when pauseBtn is absent", () => {
+            tempoWidget.pauseBtn = null;
+            tempoWidget.isMoving = true;
+            const pauseSpy = jest.spyOn(tempoWidget, "pause").mockImplementation(() => {});
+            const resumeSpy = jest.spyOn(tempoWidget, "resume").mockImplementation(() => {});
+
+            tempoWidget.togglePlayPause();
+            expect(pauseSpy).toHaveBeenCalledTimes(1);
+            expect(tempoWidget.isMoving).toBe(false);
+
+            tempoWidget.togglePlayPause();
+            expect(resumeSpy).toHaveBeenCalledTimes(1);
+            expect(tempoWidget.isMoving).toBe(true);
+
+            pauseSpy.mockRestore();
+            resumeSpy.mockRestore();
+        });
+
+        test("init registers keydown listener on document and responds to fine/coarse shortcuts", () => {
+            const addEventSpy = jest.spyOn(document, "addEventListener");
+            const removeEventSpy = jest.spyOn(document, "removeEventListener");
+
+            tempoWidget.BPMs = [120];
+            tempoWidget.init(mockActivity);
+
+            expect(addEventSpy).toHaveBeenCalledWith("keydown", expect.any(Function), true);
+            expect(tempoWidget._keyHandler).toBeDefined();
+
+            const handler = tempoWidget._keyHandler;
+
+            // Fine speedUp with ArrowUp and ArrowRight (+1 BPM)
+            const upEvent = {
+                key: "ArrowUp",
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(upEvent);
+            expect(upEvent.preventDefault).toHaveBeenCalled();
+            expect(upEvent.stopPropagation).toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(121);
+
+            const rightEvent = {
+                key: "ArrowRight",
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(rightEvent);
+            expect(rightEvent.preventDefault).toHaveBeenCalled();
+            expect(rightEvent.stopPropagation).toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(122);
+
+            // Fine slowDown with ArrowDown and ArrowLeft (-1 BPM)
+            const downEvent = {
+                key: "ArrowDown",
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(downEvent);
+            expect(downEvent.preventDefault).toHaveBeenCalled();
+            expect(downEvent.stopPropagation).toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(121);
+
+            const leftEvent = {
+                key: "ArrowLeft",
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(leftEvent);
+            expect(leftEvent.preventDefault).toHaveBeenCalled();
+            expect(leftEvent.stopPropagation).toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(120);
+
+            // Coarse speedUp with Shift + ArrowUp (+10%)
+            // 120 + round(0.1 * 120) = 120 + 12 = 132
+            const shiftUpEvent = {
+                key: "ArrowUp",
+                shiftKey: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(shiftUpEvent);
+            expect(tempoWidget.BPMs[0]).toBe(132);
+
+            // Coarse slowDown with Shift + ArrowDown (-10%)
+            // 132 - round(0.1 * 132) = 132 - 13 = 119
+            const shiftDownEvent = {
+                key: "ArrowDown",
+                shiftKey: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(shiftDownEvent);
+            expect(tempoWidget.BPMs[0]).toBe(119);
+
+            // Spacebar toggles playback
+            const toggleSpy = jest
+                .spyOn(tempoWidget, "togglePlayPause")
+                .mockImplementation(() => {});
+            const spaceEvent = {
+                key: " ",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(spaceEvent);
+            expect(spaceEvent.preventDefault).toHaveBeenCalled();
+            expect(spaceEvent.stopPropagation).toHaveBeenCalled();
+            expect(toggleSpy).toHaveBeenCalledTimes(1);
+            toggleSpy.mockRestore();
+
+            // Closing window cleans up keydown listener
+            tempoWidget.widgetWindow.onclose();
+            expect(removeEventSpy).toHaveBeenCalledWith("keydown", handler, true);
+            expect(tempoWidget._keyHandler).toBeNull();
+
+            addEventSpy.mockRestore();
+            removeEventSpy.mockRestore();
+        });
+
+        test("keydown listener ignores events when an input element is focused", () => {
+            tempoWidget.BPMs = [120];
+            tempoWidget.init(mockActivity);
+
+            const handler = tempoWidget._keyHandler;
+            const inputEl = document.createElement("input");
+            document.body.appendChild(inputEl);
+            inputEl.focus();
+
+            const upEvent = {
+                key: "ArrowUp",
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            handler(upEvent);
+            expect(upEvent.preventDefault).not.toHaveBeenCalled();
+            expect(upEvent.stopPropagation).not.toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(120);
+
+            document.body.removeChild(inputEl);
+            tempoWidget.widgetWindow.onclose();
+        });
+
+        test("tracks activeBPMIndex on input and canvas interactions", () => {
+            tempoWidget.BPMs = [100, 200];
+            tempoWidget.BPMBlocks = [null, null];
+            tempoWidget.init(mockActivity);
+
+            expect(tempoWidget.activeBPMIndex).toBe(0);
+
+            // Simulate clicking second canvas
+            tempoWidget.tempoCanvases[1].onclick();
+            expect(tempoWidget.activeBPMIndex).toBe(1);
+
+            // Now shortcut should target index 1
+            const upEvent = {
+                key: "ArrowUp",
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            tempoWidget._keyHandler(upEvent);
+            expect(tempoWidget.BPMs[1]).toBe(201);
+            expect(tempoWidget.BPMs[0]).toBe(100);
+
+            tempoWidget.widgetWindow.onclose();
+        });
+    });
 });
 
 describe("Tempo widget cleanup on block deletion", () => {
