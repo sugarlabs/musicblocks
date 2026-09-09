@@ -409,7 +409,9 @@ class Blocks {
             if (this._spatialGrid.size === 0) {
                 const all = [];
                 for (let i = 0; i < this.blockList.length; i++) {
-                    all.push(i);
+                    if (this.blockList[i] !== null) {
+                        all.push(i);
+                    }
                 }
                 return all;
             }
