@@ -60,6 +60,7 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof require !== "undefined" ? require("./musicutils-temperament") : {});
     var {
         getCurrentEDO,
+        parseEDOTemperament,
         generateNoteNames,
         getEdoNoteNamePosition,
         INITIALTEMPERAMENTS,
@@ -253,7 +254,8 @@ if (typeof module !== "undefined" && module.exports) {
     MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
     getModeLabel, getModeNameFromLabel, getModeSliceColors,
     getModeGroupTitleFont, getModeSliceFont,
-    isNonEDO, getNonEDOModeSteps, getNonEDOFrequency
+    isNonEDO, getNonEDOModeSteps, getNonEDOFrequency,
+    parseEDOTemperament
 */
 
 // Is there a "proper" double-sharp symbol as well? I see this from wikipedia: U+1D12A 𝄪 MUSICAL SYMBOL DOUBLE SHARP (HTML &#119082;) (https://en.wikipedia.org/wiki/Double_sharp)
@@ -361,6 +363,7 @@ if (typeof module !== "undefined" && module.exports) {
         getTemperamentCents,
         getTemperamentName,
         getCurrentEDO,
+        parseEDOTemperament,
         noteToObj,
         frequencyToPitch,
         stripMicrotonalPrefix,
