@@ -123,7 +123,6 @@ function setupVolumeBlocks(activity) {
             const len = Singer.masterVolume.length;
             Singer.masterVolume[len - 1] = value;
             if (!activity.turtles.ithTurtle(turtle).singer.suppressOutput) {
-                // setMasterVolume takes (volume, turtle, blk), not (logo, value).
                 Singer.VolumeActions.setMasterVolume(value, turtle, blk);
             }
         }
