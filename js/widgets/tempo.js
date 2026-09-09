@@ -234,12 +234,53 @@ class Tempo {
         }
 
         this._keyHandler = event => {
+            if (
+                typeof window !== "undefined" &&
+                window.widgetWindows &&
+                window.widgetWindows.focused &&
+                window.widgetWindows.focused !== widgetWindow
+            ) {
+                return;
+            }
+
+            if (
+                this.activity &&
+                this.activity.blocks &&
+                this.activity.blocks.activeBlock !== null &&
+                this.activity.blocks.activeBlock !== undefined
+            ) {
+                return;
+            }
+
             const activeElement = document.activeElement;
             if (
                 activeElement &&
                 (activeElement.tagName === "INPUT" ||
                     activeElement.tagName === "TEXTAREA" ||
                     activeElement.isContentEditable)
+            ) {
+                return;
+            }
+
+            if (
+                activeElement &&
+                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT") &&
+                (event.key === " " || event.code === "Space" || event.keyCode === 32)
+            ) {
+                return;
+            }
+
+            if (
+                activeElement &&
+                activeElement.tagName === "SELECT" &&
+                (event.key === "ArrowUp" ||
+                    event.key === "ArrowDown" ||
+                    event.key === "ArrowLeft" ||
+                    event.key === "ArrowRight" ||
+                    event.keyCode === 38 ||
+                    event.keyCode === 40 ||
+                    event.keyCode === 37 ||
+                    event.keyCode === 39)
             ) {
                 return;
             }

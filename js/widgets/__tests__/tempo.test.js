@@ -1159,6 +1159,197 @@ describe("Tempo Widget", () => {
 
             tempoWidget.widgetWindow.onclose();
         });
+
+        test("keydown listener supports keyCode fallbacks and code === 'Space'", () => {
+            tempoWidget.BPMs = [120];
+            tempoWidget.init(mockActivity);
+            const handler = tempoWidget._keyHandler;
+
+            // keyCode 38 (Up)
+            const upKeyCodeEvent = {
+                keyCode: 38,
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(upKeyCodeEvent);
+            expect(upKeyCodeEvent.preventDefault).toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(121);
+
+            // keyCode 39 (Right)
+            const rightKeyCodeEvent = {
+                keyCode: 39,
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(rightKeyCodeEvent);
+            expect(rightKeyCodeEvent.preventDefault).toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(122);
+
+            // keyCode 40 (Down)
+            const downKeyCodeEvent = {
+                keyCode: 40,
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(downKeyCodeEvent);
+            expect(downKeyCodeEvent.preventDefault).toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(121);
+
+            // keyCode 37 (Left)
+            const leftKeyCodeEvent = {
+                keyCode: 37,
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(leftKeyCodeEvent);
+            expect(leftKeyCodeEvent.preventDefault).toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(120);
+
+            // code === "Space"
+            const toggleSpy = jest
+                .spyOn(tempoWidget, "togglePlayPause")
+                .mockImplementation(() => {});
+            const codeSpaceEvent = {
+                code: "Space",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(codeSpaceEvent);
+            expect(codeSpaceEvent.preventDefault).toHaveBeenCalled();
+            expect(toggleSpy).toHaveBeenCalledTimes(1);
+
+            // keyCode === 32
+            const keyCodeSpaceEvent = {
+                keyCode: 32,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(keyCodeSpaceEvent);
+            expect(keyCodeSpaceEvent.preventDefault).toHaveBeenCalled();
+            expect(toggleSpy).toHaveBeenCalledTimes(2);
+
+            toggleSpy.mockRestore();
+            tempoWidget.widgetWindow.onclose();
+        });
+
+        test("keydown listener ignores Space when a button or select element is focused", () => {
+            tempoWidget.BPMs = [120];
+            tempoWidget.init(mockActivity);
+            const handler = tempoWidget._keyHandler;
+            const toggleSpy = jest
+                .spyOn(tempoWidget, "togglePlayPause")
+                .mockImplementation(() => {});
+
+            // Button focused
+            const buttonEl = document.createElement("button");
+            document.body.appendChild(buttonEl);
+            buttonEl.focus();
+
+            const spaceEvent1 = {
+                key: " ",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(spaceEvent1);
+            expect(spaceEvent1.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+
+            document.body.removeChild(buttonEl);
+
+            // Select focused
+            const selectEl = document.createElement("select");
+            document.body.appendChild(selectEl);
+            selectEl.focus();
+
+            const spaceEvent2 = {
+                key: " ",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(spaceEvent2);
+            expect(spaceEvent2.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+
+            // ArrowUp on select should also be ignored
+            const upEvent = {
+                key: "ArrowUp",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(upEvent);
+            expect(upEvent.preventDefault).not.toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(120);
+
+            document.body.removeChild(selectEl);
+            toggleSpy.mockRestore();
+            tempoWidget.widgetWindow.onclose();
+        });
+
+        test("keydown listener ignores events when another widget is focused or activeBlock exists", () => {
+            tempoWidget.BPMs = [120];
+            tempoWidget.init(mockActivity);
+            const handler = tempoWidget._keyHandler;
+
+            // Another widget focused
+            const otherWin = { _frame: document.createElement("div") };
+            window.widgetWindows.focused = otherWin;
+
+            const upEvent1 = {
+                key: "ArrowUp",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(upEvent1);
+            expect(upEvent1.preventDefault).not.toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(120);
+
+            window.widgetWindows.focused = tempoWidget.widgetWindow;
+
+            // Active workspace block
+            mockActivity.blocks.activeBlock = 5;
+            const upEvent2 = {
+                key: "ArrowUp",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(upEvent2);
+            expect(upEvent2.preventDefault).not.toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(120);
+            mockActivity.blocks.activeBlock = null;
+
+            // Empty BPMs guard
+            tempoWidget.BPMs = [];
+            handler(upEvent2);
+            expect(upEvent2.preventDefault).not.toHaveBeenCalled();
+
+            tempoWidget.widgetWindow.onclose();
+        });
+
+        test("speedUp and slowDown with custom step respect 1000 and 30 boundaries", () => {
+            tempoWidget.BPMs = [1000];
+            tempoWidget.BPMInputs = [{ value: 1000 }];
+            tempoWidget.BPMBlocks = [null];
+            mockActivity.errorMsg = jest.fn();
+
+            tempoWidget.speedUp(0, 1);
+            expect(tempoWidget.BPMs[0]).toBe(1000);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "The beats per minute must be below 1000.",
+                3000
+            );
+
+            tempoWidget.BPMs[0] = 30;
+            tempoWidget.slowDown(0, 1);
+            expect(tempoWidget.BPMs[0]).toBe(30);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "The beats per minute must be above 30",
+                3000
+            );
+        });
     });
 });
 
