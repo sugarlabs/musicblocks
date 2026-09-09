@@ -312,7 +312,7 @@ class Tempo {
             return;
         }
 
-        this.BPMs[i] = this.BPMInputs[i].value;
+        this.BPMs[i] = Number(this.BPMInputs[i].value);
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
             this.activity.errorMsg(_("The beats per minute must be between 30 and 1000."), 3000);

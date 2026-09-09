@@ -226,12 +226,13 @@ describe("Tempo Widget", () => {
             expect(mockActivity.errorMsg).toHaveBeenCalled();
         });
 
-        test("should accept valid BPM input", () => {
-            tempoWidget.BPMInputs[0].value = 120;
+        test("should accept valid BPM input and parse to a number", () => {
+            tempoWidget.BPMInputs[0].value = "120"; // DOM inputs return strings
 
             tempoWidget._useBPM(0);
 
             expect(tempoWidget.BPMs[0]).toBe(120);
+            expect(typeof tempoWidget.BPMs[0]).toBe("number");
             expect(tempoWidget._intervals[0]).toBe(500); // 60/120 * 1000 = 500ms
         });
 
@@ -241,6 +242,15 @@ describe("Tempo Widget", () => {
             tempoWidget._useBPM(0);
 
             expect(tempoWidget.BPMInputs[0].value).toBe(150);
+        });
+
+        test("should clamp empty string input to 30", () => {
+            tempoWidget.BPMInputs[0].value = "";
+
+            tempoWidget._useBPM(0);
+
+            expect(tempoWidget.BPMs[0]).toBe(30);
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
         });
     });
 
