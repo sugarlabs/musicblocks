@@ -1798,7 +1798,6 @@ function Synth() {
      * @returns {Tone.Instrument|null} - The loaded synth or null if not loaded.
      */
     this.loadSynth = async (turtle, sourceName) => {
-        /* eslint-disable */
         sourceName = this.resolveInstrumentName(sourceName);
         if (sourceName.substring(0, 13) === "customsample_") {
             console.debug("loading custom " + sourceName);
@@ -1863,13 +1862,11 @@ function Synth() {
         }
 
         if (needsFreqConversion()) {
-            if (typeof notes === "number") {
-                notes = notes;
-            } else {
+            if (typeof notes !== "number") {
                 const notes1 = notes;
                 notes = this._getFrequency(notes, this.changeInTemperament);
                 if (notes === undefined) {
-                    if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
+                    if (notes1.substring(1, notes1.length - 1) === DOUBLEFLAT) {
                         notes = notes1.substring(0, 1) + "bb" + notes1.substring(notes1.length - 1);
                     } else if (notes1.substring(1, notes1.length - 1) === DOUBLESHARP) {
                         notes = notes1.substring(0, 1) + "x" + notes1.substring(notes1.length - 1);
@@ -2471,6 +2468,7 @@ function Synth() {
                 instruments[turtle][instrumentName].stop();
                 break;
             default:
+                // eslint-disable-next-line eqeqeq -- loose on purpose, catches null and undefined
                 if (note == undefined) {
                     instruments[turtle][instrumentName].triggerRelease();
                 } else {
@@ -2487,6 +2485,7 @@ function Synth() {
         const flag = instrumentsSource[instrumentName][0];
         const now = Tone.now();
         const loopA = new Tone.Loop(time => {
+            // eslint-disable-next-line eqeqeq -- flag comes from instrumentsSource and may be "1"
             if (flag == 1) {
                 this.setVolume(turtle, instrumentName, velocity * 100);
                 instruments[turtle][instrumentName].start();
@@ -3145,10 +3144,6 @@ function Synth() {
                                 activityProxy.logo = logo;
 
                                 const tempBlock = {
-                                    container: {
-                                        x: targetNoteSelector.offsetLeft,
-                                        y: targetNoteSelector.offsetTop
-                                    },
                                     activity: activityProxy,
                                     blocks: {
                                         blockList: [
