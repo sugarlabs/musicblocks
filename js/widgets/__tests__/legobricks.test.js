@@ -2198,4 +2198,100 @@ describe("LegoWidget — _clearPhrase and _initializeMatrix safety (Issue #8609)
         expect(legoWidget.matrixTable).toBeUndefined();
         expect(() => legoWidget._initializeMatrix()).not.toThrow();
     });
+
+    it("should cancel ongoing polyphonic playback and silence active notes when _clearPhrase is called", async () => {
+        legoWidget.synth = {
+            trigger: jest.fn(),
+            stopSound: jest.fn()
+        };
+        legoWidget.selectedInstrument = "electronic synth";
+        legoWidget.selectedBackgroundColor = { name: "green" };
+        legoWidget.colorData = [
+            {
+                note: "C4",
+                label: "C (4)",
+                colorSegments: [
+                    { color: "red", duration: 1500 },
+                    { color: "red", duration: 1500 }
+                ]
+            },
+            {
+                note: "E4",
+                label: "E (4)",
+                colorSegments: [
+                    { color: "red", duration: 1500 },
+                    { color: "red", duration: 1500 }
+                ]
+            }
+        ];
+
+        legoWidget._analyzeColumnBoundaries = () => [0, 1500, 3000];
+        legoWidget._filterSmallSegments = boundaries => boundaries;
+
+        const playbackPromise = legoWidget.playColorMusicPolyphonic(legoWidget.colorData);
+
+        // At time 0, notes start playing
+        expect(legoWidget.synth.trigger).toHaveBeenCalledWith(
+            0,
+            "C4",
+            999,
+            "electronic synth",
+            null,
+            null,
+            false,
+            0
+        );
+        expect(legoWidget._playingNotes.has("C4")).toBe(true);
+
+        const initialTriggerCount = legoWidget.synth.trigger.mock.calls.length;
+
+        // Clear while awaiting between notes
+        legoWidget._clearPhrase();
+
+        // Sound should be stopped immediately
+        expect(legoWidget.synth.stopSound).toHaveBeenCalledWith(0, "electronic synth", "C4");
+        expect(legoWidget._playingNotes.size).toBe(0);
+
+        // Playback promise should resolve cleanly without hanging
+        await playbackPromise;
+
+        // No new notes should have been triggered
+        expect(legoWidget.synth.trigger).toHaveBeenCalledTimes(initialTriggerCount);
+    });
+
+    it("should cancel ongoing polyphonic playback when _stopPlayback is called directly", async () => {
+        legoWidget.synth = {
+            trigger: jest.fn(),
+            stopSound: jest.fn()
+        };
+        legoWidget.selectedInstrument = "electronic synth";
+        legoWidget.selectedBackgroundColor = { name: "green" };
+        legoWidget.colorData = [
+            {
+                note: "G4",
+                label: "G (4)",
+                colorSegments: [{ color: "red", duration: 1500 }]
+            }
+        ];
+
+        legoWidget._analyzeColumnBoundaries = () => [0, 1500];
+        legoWidget._filterSmallSegments = boundaries => boundaries;
+
+        const playbackPromise = legoWidget.playColorMusicPolyphonic(legoWidget.colorData);
+        expect(legoWidget.synth.trigger).toHaveBeenCalledWith(
+            0,
+            "G4",
+            999,
+            "electronic synth",
+            null,
+            null,
+            false,
+            0
+        );
+
+        legoWidget._stopPlayback();
+
+        expect(legoWidget.synth.stopSound).toHaveBeenCalledWith(0, "electronic synth", "G4");
+        await playbackPromise;
+    });
 });
