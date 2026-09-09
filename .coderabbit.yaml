@@ -105,7 +105,7 @@ reviews:
                   - Visual/UI changes detected (in diff or description, e.g., CSS, SCSS, canvas rendering, palette layouts, block artwork, widget styles) -> "Visual Changes" contains at least one Before and one After screenshot or media link.
                   - Any other category checked -> "Description" and "Changes Made" contains essential details explaining the changes.
                   Fail: A required section is missing, empty, or contains only placeholder comment text.
-                  Inconclusive: No Category box is checked and no visual changes are detected in the diff.
+                  Inconclusive: No Category box is checked and no visual changes are detected in the diff or description.
     
     tools:
         eslint:
