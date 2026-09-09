@@ -449,6 +449,31 @@ describe("KeyboardController", () => {
                 -10
             );
         });
+
+        it("resets inTempoWidget and scrolls active palette on up/down arrows when tempo widget is closed and activeBlock is null", () => {
+            const activity = makeActivity();
+            activity.blocks.activeBlock = null;
+            const rhythm = { scrollEvent: jest.fn(), scrollDiff: 40 };
+            activity.palettes.dict = { rhythm };
+            activity.palettes.activePalette = "rhythm";
+            const controller = createController(activity);
+
+            // First simulate tempo widget open
+            window.widgetWindows.isOpen.mockImplementation(name => name === "tempo");
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
+            expect(activity.inTempoWidget).toBe(true);
+            expect(activity.logo.tempo.speedUp).toHaveBeenCalledWith(0);
+            expect(rhythm.scrollEvent).not.toHaveBeenCalled();
+
+            // Now simulate tempo widget closed
+            window.widgetWindows.isOpen.mockImplementation(() => false);
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
+            expect(activity.inTempoWidget).toBe(false);
+            expect(rhythm.scrollEvent).toHaveBeenCalledWith(20, 1);
+
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.DOWN }));
+            expect(rhythm.scrollEvent).toHaveBeenCalledWith(-20, 1);
+        });
     });
 
     describe("modifier keys", () => {
