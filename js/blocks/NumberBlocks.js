@@ -40,13 +40,13 @@ function setupNumberBlocks(activity) {
      */
     const toInteger = (logo, value, blk) => {
         if (typeof value === "string") {
-            try {
-                return parseInt(value);
-            } catch (e) {
+            const result = parseInt(value, 10);
+            if (isNaN(result)) {
                 logo.stopTurtle = true;
                 activity.errorMsg(NANERRORMSG, blk);
                 return null;
             }
+            return result;
         }
         return value;
     };
@@ -56,6 +56,10 @@ function setupNumberBlocks(activity) {
      */
     const handleMathError = (logo, error, blk, onError = NANERRORMSG) => {
         logo.stopTurtle = true;
+        if (error && error.message === "DivByZeroError") {
+            activity.errorMsg(ZERODIVIDEERRORMSG, blk);
+            return;
+        }
         activity.errorMsg(onError, blk);
     };
 
@@ -922,6 +926,7 @@ function setupNumberBlocks(activity) {
     class NumberBlock extends ValueBlock {
         constructor() {
             super("number", _("number"));
+            this.setCapability("valueDrivenLabel");
             this.setPalette("number", activity);
             this.beginnerBlock(true);
 

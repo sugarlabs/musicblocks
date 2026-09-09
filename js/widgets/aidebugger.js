@@ -14,6 +14,9 @@
 /* This widget provides an AI-powered debugging interface for Music Blocks projects,
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
 
+/** AMD module dependencies for lazy loading. */
+AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
+
 /**
  * Represents a AI Widget.
  * @constructor
@@ -450,7 +453,7 @@ function AIDebuggerWidget() {
             .catch(error => {
                 this._hideTypingIndicator();
                 this._isProcessing = false;
-                console.error("Backend connection error:", error.message);
+                console.error("Backend connection error:", error);
 
                 this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
 
@@ -460,7 +463,9 @@ function AIDebuggerWidget() {
 
                 const fallbackResponse = {
                     type: "bot",
-                    content: `I'm sorry, I'm having trouble connecting to the AI backend. Error: ${error.message}. Please check your connection and try again.`,
+                    content: _(
+                        "Could not reach the AI assistant. Please check your connection and try again."
+                    ),
                     timestamp: new Date().toISOString()
                 };
 
@@ -509,7 +514,7 @@ function AIDebuggerWidget() {
         typingIndicators.forEach(indicator => {
             const animationId = indicator.getAttribute("data-animation-id");
             if (animationId) {
-                clearInterval(parseInt(animationId));
+                clearInterval(parseInt(animationId, 10));
             }
             indicator.remove();
         });
@@ -549,8 +554,7 @@ function AIDebuggerWidget() {
         const body = document.createElement("div");
         body.style.marginBottom = "12px";
         body.textContent = _(
-            "The AI Debugger will send your current project data to an external server for analysis. " +
-                "Your project blocks and structure will be shared with: "
+            "The AI Debugger will send your current project data to an external server for analysis. Your project blocks and structure will be shared with: "
         );
 
         const urlSpan = document.createElement("strong");
@@ -593,8 +597,7 @@ function AIDebuggerWidget() {
             const msg = {
                 type: "system",
                 content: _(
-                    "AI analysis was not started. You can type a question below, " +
-                        "but project data will not be sent until you agree."
+                    "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
                 ),
                 timestamp: new Date().toISOString()
             };
@@ -665,8 +668,7 @@ function AIDebuggerWidget() {
             this._addMessageToUI({
                 type: "system",
                 content: _(
-                    "AI Debugger is not available on this host. " +
-                        "The backend URL could not be determined."
+                    "AI Debugger is not available on this host. The backend URL could not be determined."
                 ),
                 timestamp: new Date().toISOString()
             });
@@ -724,7 +726,7 @@ function AIDebuggerWidget() {
             })
             .catch(error => {
                 this._hideTypingIndicator();
-                console.error("Backend initialization error:", error.message);
+                console.error("Backend initialization error:", error);
                 this.activity.textMsg(_("Server error: Failed to initialize AI debugger."));
 
                 if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -733,7 +735,9 @@ function AIDebuggerWidget() {
 
                 const errorMessage = {
                     type: "system",
-                    content: `Could not connect to AI backend: ${error.message}. Please check your connection and try again.`,
+                    content: _(
+                        "Could not reach the AI assistant. Please check your connection and try again."
+                    ),
                     timestamp: new Date().toISOString()
                 };
                 this._addMessageToUI(errorMessage);
@@ -955,14 +959,12 @@ function AIDebuggerWidget() {
                 const childBlockType = Array.isArray(blockMap[childId][1])
                     ? blockMap[childId][1][0]
                     : blockMap[childId][1];
-                if (
-                    !(
-                        childBlockType === "divide" &&
-                        (parentBlockType === "newnote" ||
-                            parentBlockType === "setmasterbpm2" ||
-                            parentBlockType === "arc")
-                    )
-                ) {
+                if (!(
+                    childBlockType === "divide" &&
+                    (parentBlockType === "newnote" ||
+                        parentBlockType === "setmasterbpm2" ||
+                        parentBlockType === "arc")
+                )) {
                     output.push(
                         ...this._processBlock(
                             blockMap[childId],

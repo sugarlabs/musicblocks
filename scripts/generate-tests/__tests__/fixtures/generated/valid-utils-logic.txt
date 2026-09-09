@@ -1,0 +1,47 @@
+/**
+ * @license
+ * MusicBlocks v3.7.1
+ * Copyright (C) 2026 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+const { clampNumber, GCD, toTitleCase } = require("../utils-logic");
+
+describe("clampNumber", () => {
+    it("returns the value untouched when it is already within bounds", () => {
+        expect(clampNumber(5, 0, 10)).toBe(5);
+    });
+
+    it("clamps to the nearest bound when the value is outside the range", () => {
+        expect(clampNumber(42, 0, 10)).toBe(10);
+        expect(clampNumber(-7, 0, 10)).toBe(0);
+    });
+
+    it("falls back to min when the value is not numeric", () => {
+        expect(clampNumber("nope", 3, 9)).toBe(3);
+    });
+});
+
+describe("GCD", () => {
+    it("computes the greatest common divisor of two integers", () => {
+        expect(GCD(12, 18)).toBe(6);
+    });
+});
+
+describe("toTitleCase", () => {
+    it("capitalises the first letter of each word", () => {
+        expect(toTitleCase("hello world")).toBe("Hello World");
+    });
+});

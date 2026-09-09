@@ -33,6 +33,7 @@ class DummyFlowBlock {
     constructor(type, label) {
         this.type = type;
         this.label = label;
+        this.capabilities = Object.create(null);
     }
     setPalette(palette, activity) {
         this.palette = palette;
@@ -57,6 +58,15 @@ class DummyFlowBlock {
     }
     makeMacro(fn) {
         this.macro = fn;
+    }
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    }
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
 }
 
@@ -540,6 +550,10 @@ describe("setupToneBlocks", () => {
             // Call setup again to update extraWidth if needed.
             voiceName.setup(activity);
             expect(voiceName.extraWidth).toEqual(50);
+        });
+
+        it("declares the wideLabel capability", () => {
+            expect(getBlock("voicename").getCapability("wideLabel")).toBe(true);
         });
     });
 

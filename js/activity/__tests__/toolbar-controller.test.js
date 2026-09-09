@@ -1,0 +1,454 @@
+// Copyright (c) 2026 Sugarlabs
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+"use strict";
+
+const { setupToolbarController, ToolbarController } = require("../toolbar-controller.js");
+
+// ---------------------------------------------------------------------------
+// Helpers to create mock Activity and dependencies
+// ---------------------------------------------------------------------------
+
+function makeMockActivity() {
+    return {
+        DEFAULTDELAY: 500,
+        TURTLESTEP: -1,
+        cleanupIdleWatcher: jest.fn(),
+        turtles: {
+            running: jest.fn().mockReturnValue(false),
+            turtleList: []
+        },
+        logo: {
+            turtleDelay: 500,
+            _alreadyRunning: false,
+            runLogoCommands: jest.fn(),
+            step: jest.fn(),
+            doStopTurtles: jest.fn(),
+            stepQueue: {},
+            synth: {
+                resume: jest.fn()
+            }
+        }
+    };
+}
+
+// Mimics the real runLogoCommands(), which dispatches the start block(s)
+// asynchronously, so the stepQueue is only populated on a later tick. Returns
+// an array of the queue snapshots that step() actually observed, so a test can
+// prove the first step() ran *after* the queue was filled -- not merely that a
+// timer fired.
+function mockAsyncQueuePopulation(activity) {
+    const queueSeenByStep = [];
+    activity.logo.runLogoCommands.mockImplementation(() => {
+        setTimeout(() => {
+            activity.logo.stepQueue = { turtle0: [1] };
+        }, 0);
+    });
+    activity.logo.step.mockImplementation(() => {
+        queueSeenByStep.push(JSON.parse(JSON.stringify(activity.logo.stepQueue)));
+    });
+    return queueSeenByStep;
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+describe("setupToolbarController", () => {
+    test("attaches toolbarController instance to activity", () => {
+        const activity = makeMockActivity();
+        setupToolbarController(activity);
+
+        expect(activity.toolbarController).toBeInstanceOf(ToolbarController);
+        expect(activity.toolbarController.runMode).toBe("normal");
+    });
+});
+
+describe("ToolbarController.runFast", () => {
+    let activity;
+    let controller;
+
+    beforeEach(() => {
+        activity = makeMockActivity();
+        setupToolbarController(activity);
+        controller = activity.toolbarController;
+    });
+
+    test("sets turtleDelay to 0 and resumes synth", () => {
+        controller.runFast(null, 500);
+
+        expect(activity.logo.turtleDelay).toBe(0);
+        expect(activity.logo.synth.resume).toHaveBeenCalled();
+    });
+
+    test("handles undefined synth gracefully", () => {
+        activity.logo.synth = undefined;
+        expect(() => {
+            controller.runFast(null, 500);
+        }).not.toThrow();
+    });
+
+    test("handles synth without resume gracefully", () => {
+        activity.logo.synth = {};
+        expect(() => {
+            controller.runFast(null, 500);
+        }).not.toThrow();
+    });
+
+    test("starts logo commands when turtles are not running", () => {
+        activity.turtles.running.mockReturnValue(false);
+        const env = { run: true };
+        controller.runFast(env, 500);
+
+        expect(activity.logo.runLogoCommands).toHaveBeenCalledWith(null, env);
+    });
+
+    test("calls logo.step when turtles are running and delay is not 0", () => {
+        activity.turtles.running.mockReturnValue(true);
+        controller.runFast(null, 250); // delay is not 0
+
+        expect(activity.logo.step).toHaveBeenCalled();
+    });
+
+    test("stops turtles and triggers delayed restart when turtles are running and currentDelay is 0", () => {
+        jest.useFakeTimers();
+        activity.turtles.running.mockReturnValue(true);
+        const env = { run: true };
+        controller.runFast(env, 0); // delay is 0
+
+        expect(activity.logo.doStopTurtles).toHaveBeenCalled();
+        expect(activity.logo.runLogoCommands).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(500);
+
+        expect(activity.logo.runLogoCommands).toHaveBeenCalledWith(null, env);
+        jest.useRealTimers();
+    });
+
+    test("clears the canvas before the delayed restart when currentDelay is 0", () => {
+        jest.useFakeTimers();
+        const painter = { doClear: jest.fn() };
+        activity.turtles.turtleList = [{ painter }];
+        activity.turtles.running.mockReturnValue(true);
+        controller.runFast({ run: true }, 0);
+
+        // Stop no longer wipes the canvas, so the restart has to do it itself.
+        expect(painter.doClear).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(500);
+
+        expect(painter.doClear).toHaveBeenCalledWith(true, true, true);
+        jest.useRealTimers();
+    });
+});
+
+describe("ToolbarController.runSlow", () => {
+    let activity;
+    let controller;
+
+    beforeEach(() => {
+        activity = makeMockActivity();
+        setupToolbarController(activity);
+        controller = activity.toolbarController;
+    });
+
+    test("sets runMode to slow and configures delay to DEFAULTDELAY", () => {
+        controller.runSlow();
+
+        expect(controller.runMode).toBe("slow");
+        expect(activity.logo.turtleDelay).toBe(500);
+        expect(activity.logo.synth.resume).toHaveBeenCalled();
+        expect(activity.logo.runLogoCommands).toHaveBeenCalled();
+    });
+
+    test("handles undefined synth gracefully", () => {
+        activity.logo.synth = undefined;
+        expect(() => {
+            controller.runSlow();
+        }).not.toThrow();
+    });
+
+    test("handles synth without resume gracefully", () => {
+        activity.logo.synth = {};
+        expect(() => {
+            controller.runSlow();
+        }).not.toThrow();
+    });
+
+    test("steps logo if turtles are already running", () => {
+        activity.turtles.running.mockReturnValue(true);
+        controller.runSlow();
+
+        expect(activity.logo.step).toHaveBeenCalled();
+        expect(activity.logo.runLogoCommands).not.toHaveBeenCalled();
+    });
+
+    test("uses 500 fallback if DEFAULTDELAY is not defined", () => {
+        activity.DEFAULTDELAY = undefined;
+
+        controller.runSlow();
+
+        expect(activity.logo.turtleDelay).toBe(500);
+    });
+});
+
+describe("ToolbarController.runStep", () => {
+    let activity;
+    let controller;
+
+    beforeEach(() => {
+        activity = makeMockActivity();
+        setupToolbarController(activity);
+        controller = activity.toolbarController;
+    });
+
+    test("sets runMode to step and handles initial mode switch", () => {
+        jest.useFakeTimers();
+        const queueSeenByStep = mockAsyncQueuePopulation(activity);
+        activity.logo.stepQueue = {}; // count is 0
+        activity.logo.turtleDelay = 500; // not step mode
+
+        const result = controller.runStep();
+
+        expect(controller.runMode).toBe("step");
+        expect(activity.logo.turtleDelay).toBe(-1);
+        expect(activity.logo.runLogoCommands).toHaveBeenCalled();
+        // On a fresh start, step() is deferred until after runLogoCommands()
+        // has populated the step queue, so it has not run synchronously yet.
+        expect(activity.logo.step).not.toHaveBeenCalled();
+        jest.runAllTimers();
+        expect(activity.logo.step).toHaveBeenCalled();
+        // ...and when it did run, the queue was already populated.
+        expect(queueSeenByStep).toEqual([{ turtle0: [1] }]);
+        expect(result).toBe("started");
+        jest.useRealTimers();
+    });
+
+    test("returns null if turtles are already running when switching modes", () => {
+        activity.logo.stepQueue = {};
+        activity.logo.turtleDelay = 500;
+        activity.turtles.running.mockReturnValue(true);
+        const result = controller.runStep();
+
+        expect(activity.logo.runLogoCommands).not.toHaveBeenCalled();
+        expect(result).toBeNull();
+    });
+
+    test("handles non-null result if started true", () => {
+        jest.useFakeTimers();
+        const queueSeenByStep = mockAsyncQueuePopulation(activity);
+        activity.logo.stepQueue = {};
+        activity.logo.turtleDelay = 500;
+        activity.turtles.running.mockReturnValue(false);
+
+        // Force it to step into the started path
+        const result = controller.runStep();
+
+        expect(activity.logo.runLogoCommands).toHaveBeenCalled();
+        // step() is deferred on a fresh start; flush the timer to run it.
+        jest.runAllTimers();
+        expect(activity.logo.step).toHaveBeenCalled();
+        expect(queueSeenByStep).toEqual([{ turtle0: [1] }]);
+        expect(result).toBe("started");
+        jest.useRealTimers();
+    });
+
+    test("handles undefined synth gracefully", () => {
+        activity.logo.synth = undefined;
+        expect(() => {
+            controller.runStep();
+        }).not.toThrow();
+    });
+
+    test("handles synth without resume gracefully", () => {
+        activity.logo.synth = {};
+        expect(() => {
+            controller.runStep();
+        }).not.toThrow();
+    });
+
+    test("defers the first step() on a fresh start until the queue is populated", () => {
+        jest.useFakeTimers();
+        const queueSeenByStep = mockAsyncQueuePopulation(activity);
+        activity.logo.stepQueue = {}; // no queue yet
+        activity.logo.turtleDelay = 500; // not step mode
+        activity.turtles.running.mockReturnValue(false);
+
+        const result = controller.runStep();
+
+        // The first click only arms the run; step() must not fire synchronously
+        // while runLogoCommands() has yet to queue the start block(s).
+        expect(activity.logo.runLogoCommands).toHaveBeenCalled();
+        expect(activity.logo.step).not.toHaveBeenCalled();
+        expect(result).toBe("started");
+
+        // Once the (mocked) async dispatch settles, the deferred step runs --
+        // and it sees the queued start block, which is the whole point of the
+        // fix: before it, step() ran against an empty queue and advanced nothing.
+        jest.runAllTimers();
+        expect(activity.logo.step).toHaveBeenCalledTimes(1);
+        expect(queueSeenByStep).toEqual([{ turtle0: [1] }]);
+        jest.useRealTimers();
+    });
+
+    test("steps synchronously (no defer) when already running in step mode", () => {
+        activity.logo.stepQueue = { turtle0: [1, 2] };
+        activity.turtles.running.mockReturnValue(true);
+        activity.logo.turtleDelay = -1; // already in step mode
+
+        controller.runStep();
+
+        // No fresh start, so step() is called synchronously with no timer.
+        expect(activity.logo.runLogoCommands).not.toHaveBeenCalled();
+        expect(activity.logo.step).toHaveBeenCalledTimes(1);
+    });
+
+    test("just steps when already in step mode with turtles running", () => {
+        activity.logo.stepQueue = { turtle0: [1, 2] };
+        activity.turtles.running.mockReturnValue(true);
+        activity.logo.turtleDelay = -1; // already in step mode
+
+        const result = controller.runStep();
+
+        expect(activity.logo.runLogoCommands).not.toHaveBeenCalled();
+        expect(activity.logo.step).toHaveBeenCalled();
+        expect(result).toBeNull();
+    });
+
+    test("stops turtles and returns stopped if step queue is empty", () => {
+        activity.logo.stepQueue = { turtle0: [] };
+        activity.logo.turtleDelay = -1; // step mode
+
+        const result = controller.runStep();
+
+        expect(activity.logo.doStopTurtles).toHaveBeenCalled();
+        expect(result).toBe("stopped");
+    });
+
+    test("just steps when queue is not empty but no switch mode is needed", () => {
+        activity.logo.stepQueue = { turtle0: [1] }; // not empty
+        activity.logo.turtleDelay = -1; // already in step mode
+
+        const result = controller.runStep();
+
+        expect(result).toBeNull();
+    });
+
+    test("uses TURTLESTEP from activity if defined", () => {
+        activity.TURTLESTEP = 10;
+        activity.logo.stepQueue = {};
+        activity.logo.turtleDelay = 500;
+        controller.runStep();
+        expect(activity.logo.turtleDelay).toBe(10);
+    });
+
+    test("uses fallback TURTLESTEP if not defined in activity", () => {
+        activity.TURTLESTEP = undefined;
+        activity.logo.stepQueue = {};
+        activity.logo.turtleDelay = 500;
+        controller.runStep();
+        expect(activity.logo.turtleDelay).toBe(-1);
+    });
+});
+
+describe("ToolbarController.hardStop", () => {
+    let activity;
+    let controller;
+
+    beforeEach(() => {
+        activity = makeMockActivity();
+        setupToolbarController(activity);
+        controller = activity.toolbarController;
+    });
+
+    test("stops logo turtles and returns true", () => {
+        const result = controller.hardStop(false);
+
+        expect(activity.logo.doStopTurtles).toHaveBeenCalled();
+        expect(result).toBe(true);
+    });
+
+    test("stops logo turtles and returns true if onblur is implicitly undefined", () => {
+        const result = controller.hardStop();
+        expect(activity.logo.doStopTurtles).toHaveBeenCalled();
+        expect(result).toBe(true);
+    });
+
+    test("bypasses stop on blur if _THIS_IS_MUSIC_BLOCKS_ is true", () => {
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        const result = controller.hardStop(true);
+
+        expect(activity.logo.doStopTurtles).not.toHaveBeenCalled();
+        expect(result).toBe(false);
+        delete global._THIS_IS_MUSIC_BLOCKS_;
+    });
+
+    test("handles explicitly false _THIS_IS_MUSIC_BLOCKS_ gracefully on blur", () => {
+        global._THIS_IS_MUSIC_BLOCKS_ = false;
+        const result = controller.hardStop(true);
+        expect(result).toBe(true);
+        delete global._THIS_IS_MUSIC_BLOCKS_;
+    });
+
+    test("handles undefined _THIS_IS_MUSIC_BLOCKS_ gracefully on blur", () => {
+        delete global._THIS_IS_MUSIC_BLOCKS_;
+        const result = controller.hardStop(true);
+        expect(result).toBe(true);
+    });
+});
+
+describe("Environment setup logic", () => {
+    const { ToolbarController, setupToolbarController } = require("../toolbar-controller.js");
+
+    test("AMD environment mock check", () => {
+        const originalDefine = global.define;
+
+        global.define = jest.fn(cb => {
+            const exports = cb();
+            expect(exports.ToolbarController).toBeDefined();
+            expect(exports.setupToolbarController).toBeDefined();
+        });
+        global.define.amd = true;
+
+        jest.isolateModules(() => {
+            require("../toolbar-controller.js");
+        });
+
+        expect(global.define).toHaveBeenCalled();
+
+        global.define = originalDefine;
+        delete global.window.setupToolbarController;
+    });
+});
+
+describe("ToolbarController._clearAllTurtles", () => {
+    test("calls doClear on each turtle painter", () => {
+        const painter0 = { doClear: jest.fn() };
+        const painter1 = { doClear: jest.fn() };
+        const activity = makeMockActivity();
+        activity.turtles.turtleList = [{ painter: painter0 }, { painter: painter1 }];
+        setupToolbarController(activity);
+        const controller = activity.toolbarController;
+
+        controller._clearAllTurtles();
+
+        expect(painter0.doClear).toHaveBeenCalledWith(true, true, true);
+        expect(painter1.doClear).toHaveBeenCalledWith(true, true, true);
+    });
+
+    test("is a no-op when turtleList is empty", () => {
+        const activity = makeMockActivity();
+        setupToolbarController(activity);
+        const controller = activity.toolbarController;
+
+        expect(() => controller._clearAllTurtles()).not.toThrow();
+    });
+});

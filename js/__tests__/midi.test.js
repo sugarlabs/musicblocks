@@ -156,6 +156,115 @@ describe("transcribeMidi", () => {
         expect(drumBlocks.length).toBeGreaterThan(0);
     });
 
+    it("should keep a melodic track after percussion as pitches", async () => {
+        const mixedTrackMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "drums", percussion: true },
+                    channel: 9,
+                    notes: [{ name: "Kick Drum", midi: 36, time: 0, duration: 0.5 }]
+                },
+                {
+                    instrument: { name: "acoustic grand piano", percussion: false },
+                    channel: 0,
+                    notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await expect(transcribeMidi(mixedTrackMidi)).resolves.toBeNull();
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(loadedBlocks.filter(block => block[1] === "pitch")).toHaveLength(1);
+        expect(loadedBlocks.filter(block => block[1] === "playdrum")).toHaveLength(1);
+    });
+
+    it("should preserve each percussion note's drum sound", async () => {
+        const percussionMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "drums", percussion: true },
+                    channel: 9,
+                    notes: [
+                        { name: "Kick Drum", midi: 36, time: 0, duration: 0.5 },
+                        { name: "Snare Drum", midi: 38, time: 0.5, duration: 0.5 }
+                    ]
+                }
+            ]
+        };
+
+        await transcribeMidi(percussionMidi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        const drumNames = loadedBlocks
+            .filter(block => Array.isArray(block[1]) && block[1][0] === "drumname")
+            .map(block => block[1][1].value);
+        expect(drumNames).toEqual(["kick drum", "snare drum"]);
+    });
+
+    it("should preserve a leading rest before a note", async () => {
+        const delayedNoteMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic grand piano", percussion: false },
+                    channel: 0,
+                    notes: [{ name: "C4", midi: 60, time: 0.5, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await transcribeMidi(delayedNoteMidi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(loadedBlocks.filter(block => block[1] === "rest2")).toHaveLength(1);
+        expect(loadedBlocks.filter(block => block[1] === "pitch")).toHaveLength(1);
+    });
+
+    it("should preserve simultaneous notes as a chord", async () => {
+        const chordMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic grand piano", percussion: false },
+                    channel: 0,
+                    notes: [
+                        { name: "C4", midi: 60, time: 0, duration: 0.5 },
+                        { name: "E4", midi: 64, time: 0, duration: 0.5 }
+                    ]
+                }
+            ]
+        };
+
+        await transcribeMidi(chordMidi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(loadedBlocks.filter(block => block[1] === "pitch")).toHaveLength(2);
+    });
+
+    it("should preserve notes that overlap", async () => {
+        const overlappingNotesMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic grand piano", percussion: false },
+                    channel: 0,
+                    notes: [
+                        { name: "C4", midi: 60, time: 0, duration: 1 },
+                        { name: "E4", midi: 64, time: 0.5, duration: 0.5 }
+                    ]
+                }
+            ]
+        };
+
+        await transcribeMidi(overlappingNotesMidi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(loadedBlocks.filter(block => block[1] === "pitch")).toHaveLength(3);
+    });
+
     it("should assign correct instruments to tracks", async () => {
         await transcribeMidi(mockMidi);
         expect(loadNewBlocksSpy).toHaveBeenCalled();
@@ -200,5 +309,107 @@ describe("transcribeMidi", () => {
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
         const restBlocks = loadedBlocks.filter(block => block[1] === "rest2");
         expect(restBlocks.length).toBeGreaterThan(0);
+    });
+
+    // Regression tests for the `for...in` string-key comparisons in
+    // transcribeMidi(). `for (const i in sched)` yields string keys, so the
+    // strict comparisons `i === 0`, `i === sched.length - 1`, `na === 0` and
+    // `na === notes.length - 1` are never true. Those flags decide which block
+    // each newnote and each trailing pitch docks to, so the emitted graph ends
+    // up with connections that the target block does not reciprocate.
+    const blockName = block => (Array.isArray(block[1]) ? block[1][0] : block[1]);
+
+    /**
+     * Mirrors the integrity check Blocks.adjustDocks() performs: for every
+     * non-null connection A -> B, block B must list A among its own
+     * connections. adjustDocks() logs "Did not find match for ..." and aborts
+     * the rest of that block's docks when this does not hold.
+     */
+    const findUnreciprocatedConnections = blocks => {
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        const broken = [];
+        blocks.forEach(block => {
+            const [index, , , , connections] = block;
+            (connections || []).forEach((target, dock) => {
+                if (target === null || target === undefined) return;
+                const other = byIndex.get(target);
+                if (other === undefined) {
+                    broken.push(
+                        `${blockName(block)}(${index}).connections[${dock}] -> missing block ${target}`
+                    );
+                    return;
+                }
+                if (!(other[4] || []).includes(index)) {
+                    broken.push(
+                        `${blockName(block)}(${index}).connections[${dock}] -> ` +
+                            `${blockName(other)}(${target}), which does not connect back`
+                    );
+                }
+            });
+        });
+        return broken;
+    };
+
+    it("should emit a block graph whose connections are all reciprocated", async () => {
+        await transcribeMidi(mockMidi);
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+
+        expect(findUnreciprocatedConnections(loadedBlocks)).toEqual([]);
+    });
+
+    it("should dock the first note of an action to the action, not to its name text", async () => {
+        const singleNoteMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic grand piano", percussion: false },
+                    channel: 0,
+                    notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await transcribeMidi(singleNoteMidi);
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+
+        const actionBlock = loadedBlocks.find(block => blockName(block) === "action");
+        expect(actionBlock).toBeDefined();
+
+        // connections[1] is the action's name text, connections[2] its first child.
+        const nameText = loadedBlocks.find(block => block[0] === actionBlock[4][1]);
+        const firstChild = loadedBlocks.find(block => block[0] === actionBlock[4][2]);
+        expect(blockName(nameText)).toBe("text");
+        expect(blockName(firstChild)).toBe("newnote");
+
+        // The child has to point back at the action block.
+        expect(firstChild[4][0]).toBe(actionBlock[0]);
+        expect(firstChild[4][0]).not.toBe(nameText[0]);
+    });
+
+    it("should end the last pitch of a note rather than chaining it to the hidden block", async () => {
+        const chordMidi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic grand piano", percussion: false },
+                    channel: 0,
+                    notes: [
+                        { name: "C4", midi: 60, time: 0, duration: 0.5 },
+                        { name: "E4", midi: 64, time: 0, duration: 0.5 }
+                    ]
+                }
+            ]
+        };
+
+        await transcribeMidi(chordMidi);
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+
+        const pitchBlocks = loadedBlocks.filter(block => blockName(block) === "pitch");
+        expect(pitchBlocks).toHaveLength(2);
+
+        // connections[3] is the pitch's "next" dock. Only the last pitch of the
+        // chord ends the stack.
+        expect(pitchBlocks[0][4][3]).toBe(pitchBlocks[1][0]);
+        expect(pitchBlocks[1][4][3]).toBeNull();
     });
 });

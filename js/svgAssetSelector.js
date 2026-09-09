@@ -1,3 +1,14 @@
+// Copyright (c) 2026 Sugar Labs
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 /**
  * SVG Asset Selector
  *
@@ -48,9 +59,14 @@ function openSvgAssetSelector(onSelectBuiltIn, onUploadFromDevice) {
             // Header
             const header = document.createElement("div");
             header.className = "svg-selector-header";
-            header.innerHTML =
-                "<h3>Choose an Image</h3>" +
-                '<button class="svg-selector-close" aria-label="Close">&times;</button>';
+            const h3 = document.createElement("h3");
+            h3.textContent = _("Choose an image");
+            const closeBtn = document.createElement("button");
+            closeBtn.className = "svg-selector-close";
+            closeBtn.setAttribute("aria-label", _("Close"));
+            closeBtn.textContent = "×";
+            header.appendChild(h3);
+            header.appendChild(closeBtn);
             modal.appendChild(header);
 
             // Tabs
@@ -60,14 +76,20 @@ function openSvgAssetSelector(onSelectBuiltIn, onUploadFromDevice) {
             const tabBuiltIn = document.createElement("button");
             tabBuiltIn.className = "svg-selector-tab active";
             tabBuiltIn.id = "svgTabBuiltIn";
-            tabBuiltIn.innerHTML =
-                '<span class="tab-icon material-icons">collections</span> Built-in Images';
+            const tabBuiltInIcon = document.createElement("span");
+            tabBuiltInIcon.className = "tab-icon material-icons";
+            tabBuiltInIcon.textContent = "collections";
+            tabBuiltIn.appendChild(tabBuiltInIcon);
+            tabBuiltIn.appendChild(document.createTextNode(_(" Built-in images")));
 
             const tabUpload = document.createElement("button");
             tabUpload.className = "svg-selector-tab";
             tabUpload.id = "svgTabUpload";
-            tabUpload.innerHTML =
-                '<span class="tab-icon material-icons">file_upload</span> Upload from Device';
+            const tabUploadIcon = document.createElement("span");
+            tabUploadIcon.className = "tab-icon material-icons";
+            tabUploadIcon.textContent = "file_upload";
+            tabUpload.appendChild(tabUploadIcon);
+            tabUpload.appendChild(document.createTextNode(_(" Upload from device")));
 
             tabBar.appendChild(tabBuiltIn);
             tabBar.appendChild(tabUpload);
@@ -127,11 +149,15 @@ function openSvgAssetSelector(onSelectBuiltIn, onUploadFromDevice) {
 
             const uploadBtn = document.createElement("button");
             uploadBtn.className = "svg-upload-btn";
-            uploadBtn.innerHTML = '<span class="material-icons">cloud_upload</span> Choose File';
+            const uploadBtnIcon = document.createElement("span");
+            uploadBtnIcon.className = "material-icons";
+            uploadBtnIcon.textContent = "cloud_upload";
+            uploadBtn.appendChild(uploadBtnIcon);
+            uploadBtn.appendChild(document.createTextNode(_(" Choose file")));
 
             const uploadHint = document.createElement("span");
             uploadHint.className = "svg-upload-hint";
-            uploadHint.textContent = "Supports PNG, JPG, SVG, GIF and other image formats";
+            uploadHint.textContent = _("Supports PNG, JPG, SVG, GIF, and other image formats");
 
             uploadPanel.appendChild(uploadBtn);
             uploadPanel.appendChild(uploadHint);
@@ -143,11 +169,11 @@ function openSvgAssetSelector(onSelectBuiltIn, onUploadFromDevice) {
 
             const cancelBtn = document.createElement("button");
             cancelBtn.className = "svg-cancel-btn";
-            cancelBtn.textContent = "Cancel";
+            cancelBtn.textContent = _("Cancel");
 
             const applyBtn = document.createElement("button");
             applyBtn.className = "svg-apply-btn";
-            applyBtn.textContent = "Apply";
+            applyBtn.textContent = _("Apply");
             applyBtn.disabled = true;
 
             footer.appendChild(cancelBtn);

@@ -12,8 +12,9 @@
 /*
    global
 
-   _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, CUSTOMSAMPLES
-*/
+   _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH,
+   CUSTOMSAMPLES, globalActivity
+ */
 
 const _b64Cache = new Map();
 
@@ -28,36 +29,48 @@ const _b64Cache = new Map();
  */
 
 /*
-  exported
+   exported
 
-  SYNTHSVG, RSYMBOLS, NOTENAMES, ALLNOTENAMES, NOTENAMES1,
-  WESTERN2EISOLFEGENAMES, PITCHES1, PITCHES3, SCALENOTES,
-  EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES,
-  RHYTHMRULERHEIGHT, SLIDERHEIGHT, SLIDERWIDTH, MATRIXLABELCOLOR,
-  MATRIXNOTECELLCOLOR, MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR,
-  MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER, MATRIXSOLFEWIDTH,
-  EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
-  MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
-  ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
-  DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
-  DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL,
-  getInvertMode, getIntervalNumber, getIntervalDirection,
-  getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol,
-  getFilterTypes, getOscillatorTypes, getDrumIcon, getDrumSynthName,
-  getNoiseName, getNoiseIcon, getNoiseSynthName, getVoiceName,
-  getVoiceIcon, getVoiceSynthName, getTemperamentKeys,
-  getTemperamentName, getStepSizeUp, getStepSizeDown, getModeLength,
-  nthDegreeToPitch, getInterval, calcNoteValueToDisplay,
-  durationToNoteValue, noteToFrequency, getSolfege, splitScaleDegree,
-  getNumNote, calcOctave, calcOctaveInterval, isInt,
-  convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege,
-  convertFactor, getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
-  addTemperamentToList, getTemperament, deleteTemperamentFromList,
-  addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
-  DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
-  INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
-  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-  SEMITONES, CHROMATIC_SOLFEGE
+   SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT,
+   SYNTHSVG, RSYMBOLS, NOTENAMES, ALLNOTENAMES, NOTENAMES1,
+   SOLFEGENAMES, SOLFEGENAMES1, SOLFNOTES,
+   WESTERN2EISOLFEGENAMES, PITCHES, PITCHES1, PITCHES3, SCALENOTES,
+   EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES,
+   RHYTHMRULERHEIGHT, SLIDERHEIGHT, SLIDERWIDTH, MATRIXLABELCOLOR,
+   MATRIXNOTECELLCOLOR, MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR,
+   MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER, MATRIXSOLFEWIDTH,
+   EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
+   MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
+   ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
+   DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
+   DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL,
+   getInvertMode, getIntervalNumber, getIntervalDirection,
+   getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol,
+   getFilterTypes, getOscillatorTypes, getDrumIcon, getDrumSynthName,
+   getNoiseName, getNoiseIcon, getNoiseSynthName, getVoiceName,
+   getVoiceIcon, getVoiceSynthName, getTemperamentKeys,
+   getTemperamentName, getStepSizeUp, getStepSizeDown, getModeLength,
+   nthDegreeToPitch, getInterval, _parse_pitch_string, calcNoteValueToDisplay,
+   durationToNoteValue, noteToFrequency, getSolfege, splitScaleDegree,
+   getNumNote, calcOctave, calcOctaveInterval, isInt,
+   convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege,
+   convertFactor, getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
+   addTemperamentToList, getTemperament, deleteTemperamentFromList,
+   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
+   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
+    INTERVALVALUES, MUSICALMODES, getIntervalRatio, frequencyToPitch, NOTESTEP,
+   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+   SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
+    INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition,
+    scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern,
+    MODEPIEMENU_SLOT_COUNT, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
+    MODEPIEMENU_NAME_TITLE_RADIUS, MODEPIEMENU_FONT_FAMILY,
+    MODEPIEMENU_GROUP_FONT_RATIO, MODEPIEMENU_NAME_FONT_MIN_RATIO,
+    MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
+    getModeLabel, getModeNameFromLabel, getModeSliceColors,
+    updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
+    isNonEDO, getNonEDOModeSteps, getNonEDOFrequency,
+    configureWheel
 */
 
 /**
@@ -67,7 +80,9 @@ const _b64Cache = new Map();
  */
 function normalizeNoteAccidentals(note) {
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
-    return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+    // Strip microtonal ^ / v prefixes (temperament widget cents display)
+    // so the base note can be resolved, e.g. "^C" → "C", "vvD♭" → "D♭".
+    return note.replace(/^[v^]+/, "").replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 }
 
 /**
@@ -119,6 +134,26 @@ const SHARP = "♯";
  * @default
  */
 const FLAT = "♭";
+
+/**
+ * Symbol for cents.
+ *
+ * Cents are a logarithmic unit for measuring musical intervals:
+ *   - 1 cent = 1/1200 of an octave (12-EDO semitone = 100 cents)
+ *   - To convert a ratio to cents: cents = 1200 * log2(ratio)
+ *   - To convert cents to a frequency multiplier: multiplier = 2^(cents/1200)
+ *
+ * Examples:
+ *   12-EDO step = 100 ¢ (1200 / 12)
+ *   5-EDO  step = 240 ¢ (1200 / 5)
+ *   19-EDO step ≈ 63.16 ¢ (1200 / 19)
+ *
+ * Example: A4 = 440 Hz, A4 + 33 ¢ = 440 * 2^(33/1200) ≈ 448.17 Hz
+ *
+ * @constant {string}
+ * @default
+ */
+const CENTSSYMBOL = "\u00A2";
 
 /**
  * Symbol for a natural note.
@@ -303,7 +338,41 @@ const EQUIVALENTSHARPS = {
  * Maps from notes with specific accidentals to their equivalent natural notes.
  * @constant {Object.<string, string>}
  */
-const EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
+const EQUIVALENTNATURALS = {
+    "E♯": "F",
+    "B♯": "C",
+    "C♭": "B",
+    "F♭": "E",
+    "D𝄪": "E",
+    "A𝄪": "B",
+    "G𝄪": "A",
+    "E𝄪": "F♯",
+    "C𝄪": "D",
+    "F𝄪": "G",
+    "B𝄪": "C♯",
+    "C𝄫": "B♭",
+    "D𝄫": "C",
+    "E𝄫": "D",
+    "F𝄫": "E♭",
+    "G𝄫": "F",
+    "A𝄫": "G",
+    "B𝄫": "A",
+    // Two-character forms (from _parse_pitch_string normalization)
+    "D♯♯": "E",
+    "A♯♯": "B",
+    "G♯♯": "A",
+    "E♯♯": "F♯",
+    "C♯♯": "D",
+    "F♯♯": "G",
+    "B♯♯": "C♯",
+    "C♭♭": "B♭",
+    "D♭♭": "C",
+    "E♭♭": "D",
+    "F♭♭": "E♭",
+    "G♭♭": "F",
+    "A♭♭": "G",
+    "B♭♭": "A"
+};
 
 /**
  * Maps from natural notes to their equivalent notes with specific accidentals.
@@ -638,7 +707,7 @@ const FIXEDSOLFEGE = {
  * @constant {Object.<string, string>}
  */
 const FIXEDSOLFEGE1 = {
-    "do𝄫": "B",
+    "do𝄫": "B" + FLAT,
     "do♭": "C" + FLAT,
     "do": "C",
     "do♯": "C" + SHARP,
@@ -652,13 +721,13 @@ const FIXEDSOLFEGE1 = {
     "mi♭": "E" + FLAT,
     "mi": "E",
     "mi♯": "E" + SHARP,
-    "mi𝄪": "G",
+    "mi𝄪": "F" + SHARP,
     "fa𝄫": "E" + FLAT,
     "fa♭": "F" + FLAT,
     "fa": "F",
     "fa♯": "F" + SHARP,
-    "fa𝄪": "G" + SHARP,
-    "sol𝄫": "E",
+    "fa𝄪": "G",
+    "sol𝄫": "F",
     "sol♭": "G" + FLAT,
     "sol": "G",
     "sol♯": "G" + SHARP,
@@ -672,7 +741,7 @@ const FIXEDSOLFEGE1 = {
     "ti♭": "B" + FLAT,
     "ti": "B",
     "ti♯": "B" + SHARP,
-    "ti𝄪": "C",
+    "ti𝄪": "C" + SHARP,
     "R": _("rest")
 };
 
@@ -866,6 +935,181 @@ const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
  * @constant {string}
  */
 const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
+
+/**
+ * Returns the number of pitches in the given temperament's octave.
+ * Falls back to 12-EDO if temperament is not found.
+ * @param {string} temperament - temperament key (e.g., "equal", "equal19")
+ * @returns {number} number of pitches per octave
+ */
+const getCurrentEDO = temperament => {
+    if (!temperament) return 12;
+    const t = TEMPERAMENT[temperament];
+    return t && t.pitchNumber ? t.pitchNumber : 12;
+};
+
+const EDO_NOTE_NAMES = {};
+
+const SHARP_NAMES = [
+    "C",
+    "C" + SHARP,
+    "D",
+    "D" + SHARP,
+    "E",
+    "F",
+    "F" + SHARP,
+    "G",
+    "G" + SHARP,
+    "A",
+    "A" + SHARP,
+    "B"
+];
+
+/**
+ * Generates a note name table for any EDO.
+ *
+ * Examples:
+ *   generateNoteNames(5)  → ["C", "D", "E", "G", "A"]
+ *   generateNoteNames(7)  → ["C", "D", "E", "F", "G", "A", "B"]
+ *   generateNoteNames(12) → ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
+ *   generateNoteNames(19) → ["C", "C♯", "D♭", "D", "D♯", "E♭", "E", "E♯", "F", "F♯", "G♭", "G", "G♯", "A♭", "A", "A♯", "B♭", "B", "B♯"]
+ *
+ * For 12-EDO: returns the standard 12-tone chromatic names.
+ * For small EDOs (5, 7): returns the subset of natural letters without accidentals.
+ * For EDO > 12: interleaves sharp and flat accidentals between naturals.
+ * Results are cached in EDO_NOTE_NAMES.
+ * @param {number} edo - number of steps per octave
+ * @returns {string[]} array of note names, length = edo
+ */
+function generateNoteNames(edo) {
+    if (EDO_NOTE_NAMES[edo]) {
+        return EDO_NOTE_NAMES[edo];
+    }
+
+    const naturals = ["C", "D", "E", "F", "G", "A", "B"];
+    const naturalPos12 = [0, 2, 4, 5, 7, 9, 11];
+
+    if (edo === 12) {
+        EDO_NOTE_NAMES[edo] = SHARP_NAMES;
+        return SHARP_NAMES;
+    }
+
+    if (edo === 7) {
+        EDO_NOTE_NAMES[edo] = naturals;
+        return naturals;
+    }
+
+    if (edo === 5) {
+        const pentatonic = ["C", "D", "E", "G", "A"];
+        EDO_NOTE_NAMES[edo] = pentatonic;
+        return pentatonic;
+    }
+
+    // Compute ideal step counts for each of the 7 intervals, rounding down.
+    // Distribute remaining steps to intervals with the largest fractional part.
+    const intervals = [];
+    let totalFloor = 0;
+    for (let n = 0; n < 7; n++) {
+        const posDiff = (naturalPos12[(n + 1) % 7] - naturalPos12[n] + 12) % 12;
+        const ideal = (edo * posDiff) / 12;
+        const floored = Math.floor(ideal);
+        intervals.push({ index: n, frac: ideal - floored, steps: floored });
+        totalFloor += floored;
+    }
+
+    let remaining = edo - totalFloor;
+    intervals.sort((a, b) => b.frac - a.frac);
+    for (let i = 0; i < remaining; i++) {
+        intervals[i].steps++;
+    }
+    intervals.sort((a, b) => a.index - b.index);
+
+    const repeatChar = (ch, count) => {
+        let s = "";
+        for (let i = 0; i < count; i++) s += ch;
+        return s;
+    };
+
+    const names = [];
+    for (let n = 0; n < 7; n++) {
+        const natural = naturals[n];
+        const nextNatural = naturals[(n + 1) % 7];
+        const edoSteps = intervals[n].steps;
+
+        // A letter with zero allocated steps contributes no note names at
+        // all (not even its own natural). Pushing it unconditionally was
+        // the bug: it forced names.length to always be >= 7, even for
+        // EDOs smaller than 7 (e.g. edo=4 allocates steps to only 4 of the
+        // 7 letters, leaving 3 letters with 0 steps).
+        if (edoSteps < 1) {
+            continue;
+        }
+
+        names.push(natural);
+
+        const numAccidentals = edoSteps - 1;
+        const sharpCount = Math.ceil(numAccidentals / 2);
+        const flatCount = Math.floor(numAccidentals / 2);
+
+        for (let s = 1; s <= sharpCount; s++) {
+            names.push(natural + repeatChar(SHARP, s));
+        }
+        for (let f = flatCount; f >= 1; f--) {
+            names.push(nextNatural + repeatChar(FLAT, f));
+        }
+    }
+
+    EDO_NOTE_NAMES[edo] = names;
+    return names;
+}
+
+/**
+ * Returns the index of a note name in an EDO-specific name table.
+ *
+ * Examples:
+ *   getEdoNoteNamePosition("C♯", 12)  → 1
+ *   getEdoNoteNamePosition("D♭", 19)  → 2
+ *   getEdoNoteNamePosition("E♯", 19)  → 7
+ *   getEdoNoteNamePosition("G",   7)  → 4
+ *   getEdoNoteNamePosition("C♯",  7)  → -1 (not in 7-EDO)
+ *
+ * @param {string} name - note name (e.g., "C♯", "D♭")
+ * @param {number} edo - number of steps per octave
+ * @returns {number} position in the EDO name table, or -1 if not found
+ */
+function getEdoNoteNamePosition(name, edo) {
+    const normalizedName = name
+        .replaceAll("#", SHARP)
+        .replaceAll("b", FLAT)
+        .replaceAll(DOUBLESHARP, SHARP + SHARP)
+        .replaceAll(DOUBLEFLAT, FLAT + FLAT);
+
+    const names = generateNoteNames(edo);
+    let idx = names.indexOf(normalizedName);
+    if (idx !== -1) return idx;
+
+    // Fallback: try sharp equivalent (12-EDO only — non-12 EDO has distinct pitch classes)
+    if (edo === 12 && normalizedName in EQUIVALENTSHARPS) {
+        idx = names.indexOf(EQUIVALENTSHARPS[normalizedName]);
+        if (idx !== -1) return idx;
+    }
+    if (edo === 12 && normalizedName in EQUIVALENTFLATS) {
+        idx = names.indexOf(EQUIVALENTFLATS[normalizedName]);
+        if (idx !== -1) return idx;
+    }
+
+    // Try 12-EDO proportional fallback for notes not in the EDO name set
+    const pos12 = PITCHES2.indexOf(normalizedName);
+    if (pos12 !== -1) {
+        return Math.round((pos12 / 12) * edo) % edo;
+    }
+    const posFlat = PITCHES.indexOf(normalizedName);
+    if (posFlat !== -1) {
+        return Math.round((posFlat / 12) * edo) % edo;
+    }
+
+    return -1;
+}
 
 /**
  * Number of semitones in an octave.
@@ -1169,7 +1413,7 @@ const SELECTORSTRINGS = [
     _("double bass"),
     _("guitar"),
     _("sitar"),
-    _("harmoiunm"),
+    _("harmonium"),
     _("mandolin"),
     _("acoustic guitar"),
     _("flute"),
@@ -1502,9 +1746,9 @@ const INTERVALVALUES = {
     "augmented 5": [8, 1, 25 / 16],
     "minor 6": [8, -1, 8 / 5],
     "major 6": [9, 1, 5 / 3],
-    "diminished 7": [9, -1, 9 / 5],
+    "diminished 7": [9, -1, 128 / 75],
     "augmented 6": [10, 1, 125 / 72],
-    "minor 7": [10, -1, 9 / 5],
+    "minor 7": [10, -1, 16 / 9],
     "major 7": [11, 1, 15 / 8],
     "diminished 8": [11, -1, 48 / 25],
     "diminished octave": [11, -1, 48 / 25],
@@ -1590,7 +1834,224 @@ const MODE_PIE_MENUS = {
         " ",
         " "
     ],
-    "12": ["chromatic", " ", " ", " ", " ", " ", "custom", " ", " ", " ", " ", " "]
+    "12": ["chromatic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+    "custom": [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+};
+
+/**
+ * Fixed slot count shared by every mode pie menu ring. Both the workspace
+ * piemenu (piemenus.js) and the mode widget piemenu (modewidget.js) lay the
+ * mode names out on this many slots.
+ * @constant {number}
+ */
+const MODEPIEMENU_SLOT_COUNT = 12;
+
+/**
+ * Ring geometry shared by the mode-selection pie menus so the group and name
+ * rings render with identical proportions in both contexts.
+ */
+const MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
+const MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
+
+/**
+ * Mid-radius of the mode-name ring (0.3-0.85), used to size each label to its
+ * own slice arc.
+ * @constant {number}
+ */
+const MODEPIEMENU_NAME_TITLE_RADIUS = 0.575;
+
+/**
+ * Font family and relative group-ring font size shared by both mode pie menus.
+ * Font px is computed as GROUP_FONT_RATIO * wheelRadius so the same wheel
+ * renders identically regardless of the paper resolution.
+ */
+const MODEPIEMENU_FONT_FAMILY = "sans-serif";
+const MODEPIEMENU_GROUP_FONT_RATIO = 0.08;
+
+/**
+ * Min/max per-slice font sizes for the mode-name ring, as a fraction of the
+ * wheel radius. Kept proportional so both contexts clamp identically.
+ */
+const MODEPIEMENU_NAME_FONT_MIN_RATIO = 0.06;
+const MODEPIEMENU_NAME_FONT_MAX_RATIO = 0.12;
+
+/**
+ * Reads the custom modes saved by the mode widget from local storage.
+ * Corrupt or non-array data yields an empty list.
+ * @returns {Array} Entries that look like custom modes ({name} is a string)
+ */
+const getSavedCustomModes = () => {
+    try {
+        const customModes = JSON.parse(localStorage.getItem("customModes") || "[]");
+        return Array.isArray(customModes)
+            ? customModes.filter(m => m && typeof m.name === "string")
+            : [];
+    } catch (e) {
+        return [];
+    }
+};
+
+/**
+ * Builds the fixed 12-slot list of mode names shown for a pie menu group.
+ * Built-in groups come straight from MODE_PIE_MENUS; the "custom" group is
+ * padded with blanks. Callers may pass custom names already carrying their own
+ * sentinels (the widget prepends "+").
+ * @param {string} grp The mode group key
+ * @param {Array} [customModeNames] Custom mode names (only used for "custom")
+ * @returns {Array} A fixed-length list of mode names
+ */
+const getModeNamesForGroup = (grp, customModeNames = []) => {
+    if (grp !== "custom") {
+        return MODE_PIE_MENUS[grp].slice();
+    }
+    const names = customModeNames.slice(0, MODEPIEMENU_SLOT_COUNT);
+    while (names.length < MODEPIEMENU_SLOT_COUNT) {
+        names.push(" ");
+    }
+    return names;
+};
+
+/**
+ * Returns the display label for a mode name, translating the major/ionian and
+ * minor/aeolian pairs and leaving blank slots blank.
+ * @param {string} modename
+ * @returns {string}
+ */
+const getModeLabel = modename => {
+    switch (modename) {
+        case "ionian":
+        case "major":
+            return `${_("major")} / ${_("ionian")}`;
+        case "aeolian":
+        case "minor":
+            return `${_("minor")} / ${_("aeolian")}`;
+        default:
+            return modename === " " ? " " : _(modename);
+    }
+};
+
+/**
+ * Inverse of getModeLabel: resolves a displayed label back to its internal
+ * mode name. Falls back to the label itself when nothing matches.
+ * @param {string} label
+ * @param {Array} modes The mode names for the current group
+ * @returns {string}
+ */
+const getModeNameFromLabel = (label, modes) => {
+    if (label === `${_("major")} / ${_("ionian")}`) {
+        return "major";
+    }
+    if (label === `${_("minor")} / ${_("aeolian")}`) {
+        return "aeolian";
+    }
+    for (const m of modes) {
+        if (_(m) === label) {
+            return m;
+        }
+    }
+    return label;
+};
+
+/**
+ * Builds the per-slice colors for a mode-name ring: blank slots get the
+ * "empty" color, real modes the "filled" color.
+ * @param {Array} modes
+ * @param {Object} colors { emptyColor, filledColor }
+ * @returns {Array}
+ */
+const getModeSliceColors = (modes, colors) =>
+    modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
+
+/**
+ * Re-renders an existing mode-name wheel in place: updates every per-state
+ * title copy and the slice fill attributes, then refreshes the wheel.
+ * @param {Object} wheel wheelnav instance
+ * @param {Array} labels Display labels
+ * @param {Array} colors Per-slice colors
+ * @returns {void}
+ */
+const updateModeWheelItems = (wheel, labels, colors) => {
+    for (let i = 0; i < wheel.navItems.length; i++) {
+        const item = wheel.navItems[i];
+        item.title = labels[i];
+        item.basicNavTitleMax.title = labels[i];
+        item.basicNavTitleMin.title = labels[i];
+        item.hoverNavTitleMax.title = labels[i];
+        item.hoverNavTitleMin.title = labels[i];
+        item.selectedNavTitleMax.title = labels[i];
+        item.selectedNavTitleMin.title = labels[i];
+        item.initNavTitle.title = labels[i];
+        item.fillAttr = colors[i];
+        item.sliceHoverAttr.fill = colors[i];
+        item.slicePathAttr.fill = colors[i];
+        item.sliceSelectedAttr.fill = colors[i];
+    }
+    wheel.refreshWheel();
+};
+
+/**
+ * Shared title font for the mode-group ring, scaled to the wheel radius so it
+ * renders at the same relative size regardless of paper resolution.
+ * @param {number} wheelRadius
+ * @returns {string}
+ */
+const getModeGroupTitleFont = wheelRadius =>
+    `100 ${Math.round(MODEPIEMENU_GROUP_FONT_RATIO * wheelRadius)}px ${MODEPIEMENU_FONT_FAMILY}`;
+
+/**
+ * Sizes a mode-name label to fit its own slice arc on the shared name ring.
+ * The min/max clamps scale with the wheel radius so the same ring renders
+ * identically on any paper resolution.
+ * @param {number} wheelRadius
+ * @param {number} sliceCount
+ * @param {number} labelLen
+ * @returns {string}
+ */
+const getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
+    const arcPx = (2 * Math.PI * MODEPIEMENU_NAME_TITLE_RADIUS * wheelRadius) / sliceCount;
+    const size = Math.floor((arcPx * 0.85) / (labelLen * 0.6));
+    const minSize = Math.round(MODEPIEMENU_NAME_FONT_MIN_RATIO * wheelRadius);
+    const maxSize = Math.round(MODEPIEMENU_NAME_FONT_MAX_RATIO * wheelRadius);
+    const clamped = Math.min(maxSize, Math.max(minSize, size));
+    return `100 ${clamped}px ${MODEPIEMENU_FONT_FAMILY}`;
+};
+
+/**
+ * Applies the shared donut-slice configuration to a wheelnav instance:
+ * colors, radii, -90° start angle, zero animation, and optional selection
+ * paths, title rotation, and title font.
+ * @param {Object} wheel - The wheelnav instance to configure.
+ * @param {Object} opts - Configuration options.
+ * @param {Array} opts.colors - Slice colors.
+ * @param {number} opts.minRadius - Min radius percent (0-1).
+ * @param {number} opts.maxRadius - Max radius percent (0-1).
+ * @param {boolean} [opts.clickModeRotate] - Whether clicks rotate the wheel.
+ * @param {boolean} [opts.selectionPaths] - Whether to sync selected/init paths.
+ * @param {number} [opts.titleRotateAngle] - Title rotation angle.
+ * @param {string} [opts.titleFont] - Title font CSS string.
+ * @returns {void}
+ */
+const configureWheel = (wheel, opts) => {
+    wheel.colors = opts.colors;
+    wheel.slicePathFunction = slicePath().DonutSlice;
+    wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    wheel.slicePathCustom.minRadiusPercent = opts.minRadius;
+    wheel.slicePathCustom.maxRadiusPercent = opts.maxRadius;
+    if (opts.clickModeRotate !== undefined) {
+        wheel.clickModeRotate = opts.clickModeRotate;
+    }
+    if (opts.selectionPaths) {
+        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+        wheel.sliceInitPathCustom = wheel.slicePathCustom;
+    }
+    wheel.navAngle = -90;
+    wheel.animatetime = 0;
+    if (opts.titleRotateAngle !== undefined) {
+        wheel.titleRotateAngle = opts.titleRotateAngle;
+    }
+    if (opts.titleFont !== undefined) {
+        wheel.titleFont = opts.titleFont;
+    }
 };
 
 // The table contains the intervals that define the modes.
@@ -1629,7 +2090,7 @@ const PITCH_COLLECTIONS = {
     },
     6: {
         "minor blues": [3, 2, 1, 1, 3, 2],
-        "major blues": [2, 1, 1, 3, 2, 2],
+        "major blues": [2, 1, 1, 3, 2, 3],
         "whole tone": [2, 2, 2, 2, 2, 2]
     },
     5: {
@@ -1720,6 +2181,7 @@ const INITIALTEMPERAMENTS = [
     [_("Equal (12EDO)"), "equal", "equal"],
     [_("Equal (5EDO)"), "equal5", "equal5"],
     [_("Equal (7EDO)"), "equal7", "equal7"],
+    [_("Equal (17EDO)"), "equal17", "equal17"],
     [_("Equal (19EDO)"), "equal19", "equal19"],
     [_("Equal (31EDO)"), "equal31", "equal31"],
     [_("5-limit Just Intonation"), "just intonation", "just intonation"],
@@ -1736,12 +2198,13 @@ let TEMPERAMENTS = [
     [_("Equal (12EDO)"), "equal", "equal"],
     [_("Equal (5EDO)"), "equal5", "equal5"],
     [_("Equal (7EDO)"), "equal7", "equal7"],
+    [_("Equal (17EDO)"), "equal17", "equal17"],
     [_("Equal (19EDO)"), "equal19", "equal19"],
     [_("Equal (31EDO)"), "equal31", "equal31"],
     [_("5-limit Just Intonation"), "just intonation", "just intonation"],
     [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
-    [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-    [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
+    [`${_("Meantone")} (1/3)`, "1/3 comma meantone", "meantone (1/3)"],
+    [`${_("Meantone")} (1/4)`, "1/4 comma meantone", "meantone (1/4)"],
     [_("custom"), "custom", "custom"]
 ];
 
@@ -1753,6 +2216,7 @@ const PreDefinedTemperaments = {
     "equal": true,
     "equal5": true,
     "equal7": true,
+    "equal17": true,
     "equal19": true,
     "equal31": true,
     "just intonation": true,
@@ -1760,6 +2224,191 @@ const PreDefinedTemperaments = {
     "1/3 comma meantone": true,
     "1/4 comma meantone": true
 };
+
+/**
+ * Precise cents values for exact interval ratios.
+ * Used to calculate temperament-dependent frequencies without approximation.
+ * @constant {Object}
+ */
+const INTERVAL_CENTS = {
+    "1/1": 1200 * Math.log2(1 / 1),
+    "2/1": 1200 * Math.log2(2 / 1),
+    "3/2": 1200 * Math.log2(3 / 2),
+    "4/3": 1200 * Math.log2(4 / 3),
+    "5/4": 1200 * Math.log2(5 / 4),
+    "5/3": 1200 * Math.log2(5 / 3),
+    "6/5": 1200 * Math.log2(6 / 5),
+    "8/5": 1200 * Math.log2(8 / 5),
+    "9/8": 1200 * Math.log2(9 / 8),
+    "9/5": 1200 * Math.log2(9 / 5),
+    "15/8": 1200 * Math.log2(15 / 8),
+    "15/16": 1200 * Math.log2(15 / 16),
+    "16/15": 1200 * Math.log2(16 / 15),
+    "16/9": 1200 * Math.log2(16 / 9),
+    "24/25": 1200 * Math.log2(24 / 25),
+    "25/24": 1200 * Math.log2(25 / 24),
+    "25/18": 1200 * Math.log2(25 / 18),
+    "25/16": 1200 * Math.log2(25 / 16),
+    "32/25": 1200 * Math.log2(32 / 25),
+    "36/25": 1200 * Math.log2(36 / 25),
+    "45/32": 1200 * Math.log2(45 / 32),
+    "72/125": 1200 * Math.log2(72 / 125),
+    "75/64": 1200 * Math.log2(75 / 64),
+    "81/64": 1200 * Math.log2(81 / 64),
+    "96/125": 1200 * Math.log2(96 / 125),
+    "125/72": 1200 * Math.log2(125 / 72),
+    "125/96": 1200 * Math.log2(125 / 96),
+    "125/64": 1200 * Math.log2(125 / 64),
+    "128/81": 1200 * Math.log2(128 / 81),
+    "128/125": 1200 * Math.log2(128 / 125),
+    "144/125": 1200 * Math.log2(144 / 125),
+    "243/128": 1200 * Math.log2(243 / 128),
+    "256/243": 1200 * Math.log2(256 / 243),
+    "729/512": 1200 * Math.log2(729 / 512),
+    "1024/729": 1200 * Math.log2(1024 / 729),
+    "7/5": 1200 * Math.log2(7 / 5),
+    "7/4": 1200 * Math.log2(7 / 4),
+    "21/16": 1200 * Math.log2(21 / 16)
+};
+
+/**
+ * Centralized interval definitions with exact ratios and cents.
+ * This object provides mathematically accurate interval data for all temperaments.
+ * @constant {Object}
+ */
+const TEMPERAMENT_INTERVALS = {
+    "perfect 1": {
+        ratio: 1 / 1,
+        cents: INTERVAL_CENTS["1/1"],
+        semitones: 0
+    },
+    "minor 2": {
+        ratio: 16 / 15,
+        cents: INTERVAL_CENTS["16/15"],
+        semitones: 1
+    },
+    "augmented 1": {
+        ratio: 25 / 24,
+        cents: INTERVAL_CENTS["25/24"],
+        semitones: 1
+    },
+    "major 2": {
+        ratio: 9 / 8,
+        cents: INTERVAL_CENTS["9/8"],
+        semitones: 2
+    },
+    "augmented 2": {
+        ratio: 75 / 64,
+        cents: INTERVAL_CENTS["75/64"],
+        semitones: 3
+    },
+    "minor 3": {
+        ratio: 6 / 5,
+        cents: INTERVAL_CENTS["6/5"],
+        semitones: 3
+    },
+    "major 3": {
+        ratio: 5 / 4,
+        cents: INTERVAL_CENTS["5/4"],
+        semitones: 4
+    },
+    "augmented 3": {
+        ratio: 125 / 96,
+        cents: INTERVAL_CENTS["125/96"],
+        semitones: 5
+    },
+    "diminished 4": {
+        ratio: 32 / 25,
+        cents: INTERVAL_CENTS["32/25"],
+        semitones: 4
+    },
+    "perfect 4": {
+        ratio: 4 / 3,
+        cents: INTERVAL_CENTS["4/3"],
+        semitones: 5
+    },
+    "augmented 4": {
+        ratio: 25 / 18,
+        cents: INTERVAL_CENTS["25/18"],
+        semitones: 6
+    },
+    "diminished 5": {
+        ratio: 36 / 25,
+        cents: INTERVAL_CENTS["36/25"],
+        semitones: 6
+    },
+    "perfect 5": {
+        ratio: 3 / 2,
+        cents: INTERVAL_CENTS["3/2"],
+        semitones: 7
+    },
+    "augmented 5": {
+        ratio: 25 / 16,
+        cents: INTERVAL_CENTS["25/16"],
+        semitones: 8
+    },
+    "minor 6": {
+        ratio: 8 / 5,
+        cents: INTERVAL_CENTS["8/5"],
+        semitones: 8
+    },
+    "major 6": {
+        ratio: 5 / 3,
+        cents: INTERVAL_CENTS["5/3"],
+        semitones: 9
+    },
+    "augmented 6": {
+        ratio: 125 / 72,
+        cents: INTERVAL_CENTS["125/72"],
+        semitones: 10
+    },
+    "minor 7": {
+        ratio: 16 / 9,
+        cents: INTERVAL_CENTS["16/9"],
+        semitones: 10
+    },
+    "major 7": {
+        ratio: 15 / 8,
+        cents: INTERVAL_CENTS["15/8"],
+        semitones: 11
+    },
+    "augmented 7": {
+        ratio: 125 / 64,
+        cents: INTERVAL_CENTS["125/64"],
+        semitones: 12
+    },
+    "diminished 8": {
+        ratio: 48 / 25,
+        cents: INTERVAL_CENTS["48/25"],
+        semitones: 11
+    },
+    "perfect 8": {
+        ratio: 2 / 1,
+        cents: INTERVAL_CENTS["2/1"],
+        semitones: 12
+    }
+};
+
+/**
+ * Canonical interval ordering for consistent lookup and synthesis.
+ * All temperament objects should reference this ordering for stability.
+ * @constant {string[]}
+ */
+const INTERVAL_ORDER = [
+    "perfect 1",
+    "minor 2",
+    "major 2",
+    "minor 3",
+    "major 3",
+    "perfect 4",
+    "diminished 5",
+    "perfect 5",
+    "minor 6",
+    "major 6",
+    "minor 7",
+    "major 7",
+    "perfect 8"
+];
 
 /**
  * Temperament settings and interval ratios.
@@ -1790,25 +2439,41 @@ const TEMPERAMENT = {
         "diminished 8": Math.pow(2, 11 / 12),
         "perfect 8": Math.pow(2, 12 / 12),
         "pitchNumber": 12,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "minor 3",
-            "major 3",
-            "perfect 4",
-            "diminished 5",
-            "perfect 5",
-            "minor 6",
-            "major 6",
-            "minor 7",
-            "major 7",
-            "perfect 8"
-        ]
+        "isEDO": true,
+        "noteLabels": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+        "ratios": [
+            1,
+            Math.pow(2, 1 / 12),
+            Math.pow(2, 2 / 12),
+            Math.pow(2, 3 / 12),
+            Math.pow(2, 4 / 12),
+            Math.pow(2, 5 / 12),
+            Math.pow(2, 6 / 12),
+            Math.pow(2, 7 / 12),
+            Math.pow(2, 8 / 12),
+            Math.pow(2, 9 / 12),
+            Math.pow(2, 10 / 12),
+            Math.pow(2, 11 / 12)
+        ],
+        "octaveRatio": 2,
+        "interval": INTERVAL_ORDER
     },
     "equal5": {
-        // Equal 5EDO temperament: 5 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 5), //Unison
+        "isEDO": true,
+        "edo": 5,
+        "name": "Equal (5EDO)",
+        "description": "5 Equal Divisions of the Octave",
+        "ratios": [
+            1,
+            Math.pow(2, 1 / 5),
+            Math.pow(2, 2 / 5),
+            Math.pow(2, 3 / 5),
+            Math.pow(2, 4 / 5)
+        ],
+        "octaveRatio": 2,
+        "generator": null,
+        "pitchNumber": 5,
+        "perfect 1": Math.pow(2, 0 / 5),
         "minor 2": Math.pow(2, 1 / 5),
         "augmented 1": Math.pow(2, 1 / 5),
         "major 2": Math.pow(2, 2 / 5),
@@ -1830,12 +2495,26 @@ const TEMPERAMENT = {
         "augmented 7": Math.pow(2, 5 / 5),
         "diminished 8": Math.pow(2, 5 / 5),
         "perfect 8": Math.pow(2, 5 / 5),
-        "pitchNumber": 5,
         "interval": ["perfect 1", "minor 2", "major 2", "major 3", "augmented 4", "perfect 5"]
     },
     "equal7": {
-        // Equal 7EDO Temperament: 7 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 7), //Unison
+        "isEDO": true,
+        "edo": 7,
+        "name": "Equal (7EDO)",
+        "description": "7 Equal Divisions of the Octave",
+        "ratios": [
+            1,
+            Math.pow(2, 1 / 7),
+            Math.pow(2, 2 / 7),
+            Math.pow(2, 3 / 7),
+            Math.pow(2, 4 / 7),
+            Math.pow(2, 5 / 7),
+            Math.pow(2, 6 / 7)
+        ],
+        "octaveRatio": 2,
+        "generator": null,
+        "pitchNumber": 7,
+        "perfect 1": Math.pow(2, 0 / 7),
         "minor 2": Math.pow(2, 1 / 7),
         "augmented 1": Math.pow(2, 1 / 7),
         "major 2": Math.pow(2, 2 / 7),
@@ -1854,10 +2533,9 @@ const TEMPERAMENT = {
         "augmented 6": Math.pow(2, 7 / 7),
         "minor 7": Math.pow(2, 6 / 7),
         "major 7": Math.pow(2, 6 / 7),
-        "augmented 7": Math.pow(2, 7 / 7), // wraps around
+        "augmented 7": Math.pow(2, 7 / 7),
         "diminished 8": Math.pow(2, 7 / 7),
         "perfect 8": Math.pow(2, 7 / 7),
-        "pitchNumber": 7,
         "interval": [
             "perfect 1",
             "minor 2",
@@ -1869,8 +2547,78 @@ const TEMPERAMENT = {
             "perfect 8"
         ]
     },
+    "equal17": {
+        isEDO: true,
+        edo: 17,
+        name: "Equal (17EDO)",
+        description: "17 Equal Divisions of the Octave",
+        ratios: [
+            1,
+            Math.pow(2, 1 / 17),
+            Math.pow(2, 2 / 17),
+            Math.pow(2, 3 / 17),
+            Math.pow(2, 4 / 17),
+            Math.pow(2, 5 / 17),
+            Math.pow(2, 6 / 17),
+            Math.pow(2, 7 / 17),
+            Math.pow(2, 8 / 17),
+            Math.pow(2, 9 / 17),
+            Math.pow(2, 10 / 17),
+            Math.pow(2, 11 / 17),
+            Math.pow(2, 12 / 17),
+            Math.pow(2, 13 / 17),
+            Math.pow(2, 14 / 17),
+            Math.pow(2, 15 / 17),
+            Math.pow(2, 16 / 17)
+        ],
+        octaveRatio: 2,
+        pitchNumber: 17,
+        interval: [
+            "perfect 1",
+            "minor 2",
+            "augmented 1",
+            "minor 3",
+            "major 2",
+            "augmented 2",
+            "major 3",
+            "perfect 4",
+            "augmented 4",
+            "diminished 5",
+            "perfect 5",
+            "augmented 5",
+            "minor 6",
+            "major 6",
+            "augmented 6",
+            "minor 7",
+            "major 7",
+            "perfect 8"
+        ]
+    },
     "equal19": {
-        // Equal 19EDO Temperament: 19 Equal Divisions of the Octave
+        "isEDO": true,
+        "edo": 19,
+        "name": "Equal (19EDO)",
+        "description": "19 Equal Divisions of the Octave",
+        "ratios": [
+            1,
+            Math.pow(2, 2 / 19),
+            Math.pow(2, 3 / 19),
+            Math.pow(2, 5 / 19),
+            Math.pow(2, 6 / 19),
+            Math.pow(2, 8 / 19),
+            Math.pow(2, 9 / 19),
+            Math.pow(2, 10 / 19),
+            Math.pow(2, 11 / 19),
+            Math.pow(2, 12 / 19),
+            Math.pow(2, 13 / 19),
+            Math.pow(2, 14 / 19),
+            Math.pow(2, 15 / 19),
+            Math.pow(2, 16 / 19),
+            Math.pow(2, 18 / 19)
+        ],
+        "octaveRatio": 2,
+        "generator": null,
+        "pitchNumber": 19,
         "perfect 1": Math.pow(2, 0 / 19),
         "minor 2": Math.pow(2, 2 / 19),
         "augmented 1": Math.pow(2, 1 / 19),
@@ -1893,7 +2641,6 @@ const TEMPERAMENT = {
         "augmented 7": Math.pow(2, 17 / 19),
         "diminished 8": Math.pow(2, 18 / 19),
         "perfect 8": Math.pow(2, 19 / 19),
-        "pitchNumber": 19,
         "interval": [
             "perfect 1",
             "augmented 1",
@@ -1918,7 +2665,46 @@ const TEMPERAMENT = {
         ]
     },
     "equal31": {
-        // Equal 31EDO Temperament: 31 Equal Divisions of the Octave
+        "isEDO": true,
+        "edo": 31,
+        "name": "Equal (31EDO)",
+        "description": "31 Equal Divisions of the Octave",
+        "ratios": [
+            1,
+            Math.pow(2, 1 / 31),
+            Math.pow(2, 2 / 31),
+            Math.pow(2, 3 / 31),
+            Math.pow(2, 4 / 31),
+            Math.pow(2, 5 / 31),
+            Math.pow(2, 6 / 31),
+            Math.pow(2, 7 / 31),
+            Math.pow(2, 8 / 31),
+            Math.pow(2, 9 / 31),
+            Math.pow(2, 10 / 31),
+            Math.pow(2, 11 / 31),
+            Math.pow(2, 12 / 31),
+            Math.pow(2, 13 / 31),
+            Math.pow(2, 14 / 31),
+            Math.pow(2, 15 / 31),
+            Math.pow(2, 16 / 31),
+            Math.pow(2, 17 / 31),
+            Math.pow(2, 18 / 31),
+            Math.pow(2, 19 / 31),
+            Math.pow(2, 20 / 31),
+            Math.pow(2, 21 / 31),
+            Math.pow(2, 22 / 31),
+            Math.pow(2, 23 / 31),
+            Math.pow(2, 24 / 31),
+            Math.pow(2, 25 / 31),
+            Math.pow(2, 26 / 31),
+            Math.pow(2, 27 / 31),
+            Math.pow(2, 28 / 31),
+            Math.pow(2, 29 / 31),
+            Math.pow(2, 30 / 31)
+        ],
+        "octaveRatio": 2,
+        "generator": null,
+        "pitchNumber": 31,
         "perfect 1": Math.pow(2, 0 / 31),
         "diminished 2": Math.pow(2, 1 / 31),
         "augmented 1": Math.pow(2, 2 / 31),
@@ -1952,7 +2738,6 @@ const TEMPERAMENT = {
         "down 8": Math.pow(2, 30 / 31),
         "perfect 8": Math.pow(2, 31 / 31),
         "octave": Math.pow(2, 31 / 31),
-        "pitchNumber": 31,
         "interval": [
             "perfect 1",
             "diminished 2",
@@ -1989,87 +2774,144 @@ const TEMPERAMENT = {
         ]
     },
     "just intonation": {
-        "perfect 1": 1 / 1,
-        "minor 2": 16 / 15,
-        "augmented 1": 16 / 15,
-        "major 2": 9 / 8,
-        "augmented 2": 6 / 5,
-        "minor 3": 6 / 5,
-        "major 3": 5 / 4,
-        "augmented 3": 4 / 3,
-        "diminished 4": 5 / 4,
-        "perfect 4": 4 / 3,
-        "augmented 4": 7 / 5,
-        "diminished 5": 7 / 5,
-        "perfect 5": 3 / 2,
-        "augmented 5": 8 / 5,
-        "minor 6": 8 / 5,
-        "major 6": 5 / 3,
-        "augmented 6": 16 / 9,
-        "minor 7": 16 / 9,
-        "major 7": 15 / 8,
-        "augmented 7": 2 / 1,
-        "diminished 8": 15 / 8,
-        "perfect 8": 2 / 1,
+        "isEDO": false,
+        "edo": 12,
+        "name": "5-limit Just Intonation",
+        "description": "Pure integer ratios based on the 5-limit prime limit system",
+        // Cents are derived from ratios: cents = 1200 * log2(ratio)
+        // Example: perfect 5 = 3/2 ratio → 1200 * log2(1.5) ≈ 702 cents
+        // In 12-EDO, perfect 5 = 700 cents (slightly flat vs JI's pure 702 cents)
+        "noteLabels": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+        "ratios": [
+            1 / 1,
+            16 / 15,
+            9 / 8,
+            6 / 5,
+            5 / 4,
+            4 / 3,
+            45 / 32,
+            3 / 2,
+            8 / 5,
+            5 / 3,
+            9 / 5,
+            15 / 8
+        ],
+        "octaveRatio": 2,
+        "generator": null,
+        "perfect 1": { ratio: 1 / 1, cents: 1200 * Math.log2(1 / 1) },
+        "minor 2": { ratio: 16 / 15, cents: 1200 * Math.log2(16 / 15) },
+        "augmented 1": { ratio: 16 / 15, cents: 1200 * Math.log2(16 / 15) },
+        "major 2": { ratio: 9 / 8, cents: 1200 * Math.log2(9 / 8) },
+        "augmented 2": { ratio: 6 / 5, cents: 1200 * Math.log2(6 / 5) },
+        "minor 3": { ratio: 6 / 5, cents: 1200 * Math.log2(6 / 5) },
+        "major 3": { ratio: 5 / 4, cents: 1200 * Math.log2(5 / 4) },
+        "augmented 3": { ratio: 4 / 3, cents: 1200 * Math.log2(4 / 3) },
+        "diminished 4": { ratio: 5 / 4, cents: 1200 * Math.log2(5 / 4) },
+        "perfect 4": { ratio: 4 / 3, cents: 1200 * Math.log2(4 / 3) },
+        "augmented 4": { ratio: 45 / 32, cents: 1200 * Math.log2(45 / 32) },
+        "diminished 5": { ratio: 45 / 32, cents: 1200 * Math.log2(45 / 32) },
+        "perfect 5": { ratio: 3 / 2, cents: 1200 * Math.log2(3 / 2) },
+        "augmented 5": { ratio: 8 / 5, cents: 1200 * Math.log2(8 / 5) },
+        "minor 6": { ratio: 8 / 5, cents: 1200 * Math.log2(8 / 5) },
+        "major 6": { ratio: 5 / 3, cents: 1200 * Math.log2(5 / 3) },
+        "augmented 6": { ratio: 16 / 9, cents: 1200 * Math.log2(16 / 9) },
+        "minor 7": { ratio: 16 / 9, cents: 1200 * Math.log2(16 / 9) },
+        "major 7": { ratio: 15 / 8, cents: 1200 * Math.log2(15 / 8) },
+        "augmented 7": { ratio: 2 / 1, cents: 1200 * Math.log2(2 / 1) },
+        "diminished 8": { ratio: 15 / 8, cents: 1200 * Math.log2(15 / 8) },
+        "perfect 8": { ratio: 2 / 1, cents: 1200 * Math.log2(2 / 1) },
         "pitchNumber": 12,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "minor 3",
-            "major 3",
-            "perfect 4",
-            "diminished 5",
-            "perfect 5",
-            "minor 6",
-            "major 6",
-            "minor 7",
-            "major 7",
-            "perfect 8"
-        ]
+        "interval": INTERVAL_ORDER
     },
     "Pythagorean": {
-        "perfect 1": 1 / 1,
-        "minor 2": 256 / 243,
-        "augmented 1": 256 / 243,
-        "major 2": 9 / 8,
-        "augmented 2": 32 / 27,
-        "minor 3": 32 / 27,
-        "major 3": 81 / 64,
-        "augmented 3": 4 / 3,
-        "diminished 4": 81 / 64,
-        "perfect 4": 4 / 3,
-        "augmented 4": 729 / 512,
-        "diminished 5": 729 / 512,
-        "perfect 5": 3 / 2,
-        "augmented 5": 128 / 81,
-        "minor 6": 128 / 81,
-        "major 6": 27 / 16,
-        "augmented 6": 16 / 9,
-        "minor 7": 16 / 9,
-        "major 7": 243 / 128,
-        "augmented 7": 2 / 1,
-        "diminished 8": 243 / 128,
-        "perfect 8": 2 / 1,
+        "isEDO": false,
+        "edo": 12,
+        "name": "Pythagorean Tuning",
+        "description":
+            "Tuning system based on pure perfect fifths (3/2 ratio) from ancient Greek theory",
+        // All intervals derived by stacking 3/2 ratios (fifths).
+        // Example: major 3 = 81/64 ≈ 408 cents (vs JI's 5/4 = 386 cents, 12-EDO's 400 cents)
+        // Pythagorean major 3 is noticeably sharp compared to JI's pure major third.
+        "noteLabels": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+        "ratios": [
+            1 / 1,
+            256 / 243,
+            9 / 8,
+            32 / 27,
+            81 / 64,
+            4 / 3,
+            729 / 512,
+            3 / 2,
+            128 / 81,
+            27 / 16,
+            16 / 9,
+            243 / 128
+        ],
+        "octaveRatio": 2,
+        "generator": 3 / 2,
+        "perfect 1": { ratio: 1 / 1, cents: 1200 * Math.log2(1 / 1) },
+        "minor 2": { ratio: 256 / 243, cents: 1200 * Math.log2(256 / 243) },
+        "augmented 1": { ratio: 256 / 243, cents: 1200 * Math.log2(256 / 243) },
+        "major 2": { ratio: 9 / 8, cents: 1200 * Math.log2(9 / 8) },
+        "augmented 2": { ratio: 32 / 27, cents: 1200 * Math.log2(32 / 27) },
+        "minor 3": { ratio: 32 / 27, cents: 1200 * Math.log2(32 / 27) },
+        "major 3": { ratio: 81 / 64, cents: 1200 * Math.log2(81 / 64) },
+        "augmented 3": { ratio: 4 / 3, cents: 1200 * Math.log2(4 / 3) },
+        "diminished 4": { ratio: 81 / 64, cents: 1200 * Math.log2(81 / 64) },
+        "perfect 4": { ratio: 4 / 3, cents: 1200 * Math.log2(4 / 3) },
+        "augmented 4": { ratio: 729 / 512, cents: 1200 * Math.log2(729 / 512) },
+        "diminished 5": { ratio: 729 / 512, cents: 1200 * Math.log2(729 / 512) },
+        "perfect 5": { ratio: 3 / 2, cents: 1200 * Math.log2(3 / 2) },
+        "augmented 5": { ratio: 128 / 81, cents: 1200 * Math.log2(128 / 81) },
+        "minor 6": { ratio: 128 / 81, cents: 1200 * Math.log2(128 / 81) },
+        "major 6": { ratio: 27 / 16, cents: 1200 * Math.log2(27 / 16) },
+        "augmented 6": { ratio: 16 / 9, cents: 1200 * Math.log2(16 / 9) },
+        "minor 7": { ratio: 16 / 9, cents: 1200 * Math.log2(16 / 9) },
+        "major 7": { ratio: 243 / 128, cents: 1200 * Math.log2(243 / 128) },
+        "augmented 7": { ratio: 2 / 1, cents: 1200 * Math.log2(2 / 1) },
+        "diminished 8": { ratio: 243 / 128, cents: 1200 * Math.log2(243 / 128) },
+        "perfect 8": { ratio: 2 / 1, cents: 1200 * Math.log2(2 / 1) },
         "pitchNumber": 12,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "minor 3",
-            "major 3",
-            "perfect 4",
-            "diminished 5",
-            "perfect 5",
-            "minor 6",
-            "major 6",
-            "minor 7",
-            "major 7",
-            "perfect 8"
-        ]
+        "interval": INTERVAL_ORDER
     },
     "1/3 comma meantone": {
-        // 19-EDO
+        "isEDO": false,
+        "edo": 19,
+        "name": "1/3 Comma Meantone",
+        "description": "Meantone temperament with 1/3 syntonic comma (quarter-comma meantone)",
+        "noteLabels": [
+            "C",
+            "D" + FLAT,
+            "C" + SHARP,
+            "D",
+            "D" + SHARP,
+            "E" + FLAT,
+            "E",
+            "E" + SHARP,
+            "F",
+            "F" + SHARP,
+            "G" + FLAT,
+            "G",
+            "G" + SHARP,
+            "A" + FLAT,
+            "A",
+            "A" + SHARP,
+            "B" + FLAT,
+            "B",
+            "B" + SHARP
+        ],
+        // 1/3-comma meantone ratios (19 pitches per octave).
+        // Generated by stacking fifths tempered narrow by 1/3 of a syntonic comma (81/80):
+        //   Tempered Fifth = (3/2) * (80/81)^(1/3) ≈ 1.493762
+        // Pitch ratios are octave-reduced (1.0 to 2.0) across the 19-note circle of fifths.
+        "ratios": [
+            1, 1.037156, 1.075693, 1.115656, 1.157109, 1.200103, 1.244694, 1.290943, 1.338902,
+            1.38865, 1.440247, 1.493762, 1.549255, 1.60682, 1.666524, 1.728445, 1.792668, 1.859266,
+            1.92835
+        ],
+        "octaveRatio": 2,
+        "generator": 5 / 4,
+        "pitchNumber": 19,
         "perfect 1": 1 / 1,
         "minor 2": 1.075693,
         "augmented 1": 1.037156,
@@ -2092,7 +2934,6 @@ const TEMPERAMENT = {
         "augmented 7": 1.92835,
         "diminished 8": 1.92835,
         "perfect 8": 2 / 1,
-        "pitchNumber": 19,
         "interval": [
             "perfect 1",
             "augmented 1",
@@ -2117,7 +2958,59 @@ const TEMPERAMENT = {
         ]
     },
     "1/4 comma meantone": {
-        // 21 notes per octave
+        "isEDO": false,
+        "edo": 21,
+        "name": "1/4 Comma Meantone",
+        "description": "Meantone temperament with 1/4 syntonic comma",
+        "noteLabels": [
+            "C",
+            "D" + FLAT,
+            "C" + SHARP,
+            "D",
+            "D" + SHARP,
+            "E" + FLAT,
+            "E",
+            "E" + SHARP,
+            "F",
+            "F" + SHARP,
+            "G" + FLAT,
+            "G",
+            "G" + SHARP,
+            "A" + FLAT,
+            "A",
+            "A" + SHARP,
+            "B" + FLAT,
+            "B",
+            "B" + SHARP,
+            "C" + FLAT,
+            "C"
+        ],
+        "ratios": [
+            1,
+            16 / 15,
+            25 / 24,
+            9 / 8,
+            75 / 64,
+            6 / 5,
+            5 / 4,
+            32 / 25,
+            125 / 96,
+            4 / 3,
+            25 / 18,
+            36 / 25,
+            3 / 2,
+            25 / 16,
+            8 / 5,
+            5 / 3,
+            125 / 72,
+            9 / 5,
+            15 / 8,
+            48 / 25,
+            125 / 64
+        ],
+        "octaveRatio": 2,
+        "generator": 5 / 4,
+        "pitchNumber": 21,
         "perfect 1": 1 / 1,
         "minor 2": 16 / 15,
         "augmented 1": 25 / 24,
@@ -2140,7 +3033,6 @@ const TEMPERAMENT = {
         "diminished 8": 48 / 25,
         "augmented 7": 125 / 64,
         "perfect 8": 2 / 1,
-        "pitchNumber": 21,
         "interval": [
             "perfect 1",
             "augmented 1",
@@ -2167,20 +3059,33 @@ const TEMPERAMENT = {
         ]
     },
     "custom": {
-        0: Math.pow(2, 0 / 12),
-        1: Math.pow(2, 1 / 12),
-        2: Math.pow(2, 2 / 12),
-        3: Math.pow(2, 3 / 12),
-        4: Math.pow(2, 4 / 12),
-        5: Math.pow(2, 5 / 12),
-        6: Math.pow(2, 6 / 12),
-        7: Math.pow(2, 7 / 12),
-        8: Math.pow(2, 8 / 12),
-        9: Math.pow(2, 9 / 12),
-        10: Math.pow(2, 10 / 12),
-        11: Math.pow(2, 11 / 12),
-        pitchNumber: 12,
-        interval: [
+        "0": Math.pow(2, 0 / 12),
+        "1": Math.pow(2, 1 / 12),
+        "2": Math.pow(2, 2 / 12),
+        "3": Math.pow(2, 3 / 12),
+        "4": Math.pow(2, 4 / 12),
+        "5": Math.pow(2, 5 / 12),
+        "6": Math.pow(2, 6 / 12),
+        "7": Math.pow(2, 7 / 12),
+        "8": Math.pow(2, 8 / 12),
+        "9": Math.pow(2, 9 / 12),
+        "10": Math.pow(2, 10 / 12),
+        "11": Math.pow(2, 11 / 12),
+        "perfect 1": Math.pow(2, 0 / 12),
+        "minor 2": Math.pow(2, 1 / 12),
+        "major 2": Math.pow(2, 2 / 12),
+        "minor 3": Math.pow(2, 3 / 12),
+        "major 3": Math.pow(2, 4 / 12),
+        "perfect 4": Math.pow(2, 5 / 12),
+        "diminished 5": Math.pow(2, 6 / 12),
+        "perfect 5": Math.pow(2, 7 / 12),
+        "minor 6": Math.pow(2, 8 / 12),
+        "major 6": Math.pow(2, 9 / 12),
+        "minor 7": Math.pow(2, 10 / 12),
+        "major 7": Math.pow(2, 11 / 12),
+        "perfect 8": Math.pow(2, 12 / 12),
+        "pitchNumber": 12,
+        "interval": [
             "perfect 1",
             "minor 2",
             "major 2",
@@ -2319,6 +3224,15 @@ const setOctaveRatio = newOctaveRatio => {
 const getOctaveRatio = () => {
     return octaveRatio;
 };
+
+/**
+ * Converts a frequency ratio to a circle-of-notes wheel angle in degrees.
+ * @function
+ * @param {number} ratio - The ratio relative to the tonic.
+ * @param {number} base - The octave ratio (e.g. 2 for a 2:1 octave).
+ * @returns {number} The wheel angle in degrees.
+ */
+const ratioToWheelAngle = (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base));
 
 /**
  * Get the list of available temperaments.
@@ -2541,8 +3455,9 @@ const getModeNumbers = name => {
         return m;
     };
 
+    const lowercaseName = name.toLowerCase();
     for (const mode in MUSICALMODES) {
-        if (mode === name.toLowerCase()) {
+        if (mode.toLowerCase() === lowercaseName) {
             return __convert(MUSICALMODES[mode]);
         }
     }
@@ -2883,6 +3798,232 @@ const isCustomTemperament = temperament => {
 };
 
 /**
+ * Detect whether a temperament carries usable per-pitch ratio data.
+ *
+ * Two storage formats exist:
+ *  - EDO/derived temperaments expose a `ratios` array.
+ *  - The temperament editor saves custom temperaments with per-pitch numeric
+ *    keys such as `"0": [ratio, note, octave]` (and no `ratios` array).
+ *
+ * The scalar-step code previously only checked the `ratios` array, so
+ * editor-saved custom temperaments (which hold the ratios in numeric keys)
+ * were wrongly treated as "no ratios" and stepped by a raw offset instead of
+ * following the mode pattern. That produced degenerate playback for custom
+ * EDO temperaments with a saved mode.
+ * @function
+ * @param {string} temperament - The temperament key.
+ * @returns {boolean} True if per-pitch ratio data is available.
+ */
+const temperamentHasRatios = temperament => {
+    const t = getTemperament(temperament);
+    if (!t || typeof t !== "object") {
+        return false;
+    }
+    if (Array.isArray(t.ratios) && t.ratios.length > 0) {
+        return true;
+    }
+    // Editor-saved custom temperaments store ratios in numeric pitch keys.
+    return Boolean(t["0"] && Array.isArray(t["0"]) && typeof t["0"][0] === "number");
+};
+
+/**
+ * Check if a temperament is a true equal division of the octave (EDO).
+ * True EDOs have uniform step sizes; non-equal temperaments (JI, meantone,
+ * Pythagorean) have unequal intervals despite having a pitch count.
+ * @function
+ * @param {string} temperament - The name of the temperament.
+ * @returns {boolean} True if the temperament is a true equal division.
+ */
+const isTrueEDO = temperament => {
+    if (!temperament || typeof temperament !== "string") {
+        return false;
+    }
+    return temperament.startsWith("equal");
+};
+
+/**
+ * Detect whether a temperament is an equal division of the octave regardless of
+ * how it was registered. Unlike `isTrueEDO` (which only matches names starting
+ * with "equal") this also catches user-defined equal temperaments that the
+ * temperament editor saved under arbitrary keys such as "custom" or "custom1".
+ *
+ * A temperament is treated as equally tempered when:
+ *  - it explicitly flags `isEDO`, or
+ *  - its numeric pitch entries are arrays whose ratios match 2^(i / pitchNumber)
+ *    within tolerance (the editor stores ratios inside the numeric keys, not in a
+ *    `ratios` array).
+ *
+ * @function
+ * @param {string} temperament - The temperament key.
+ * @returns {boolean} True if the temperament is an equal division of the octave.
+ */
+const isEquallyTempered = temperament => {
+    const t = getTemperament(temperament);
+    if (!t || typeof t !== "object") {
+        return false;
+    }
+    if (t.isEDO) {
+        return true;
+    }
+    const n = t.pitchNumber;
+    if (!Number.isInteger(n) || n < 2) {
+        return false;
+    }
+    for (let i = 0; i < n; i++) {
+        const entry = t["" + i];
+        if (!Array.isArray(entry) || typeof entry[0] !== "number") {
+            return false;
+        }
+        const expected = Math.pow(2, i / n);
+        if (Math.abs(entry[0] - expected) > 1e-4) {
+            return false;
+        }
+    }
+    return true;
+};
+
+/**
+ * True when the temperament is tuned by ratios and is NOT an equal division
+ * of the octave.
+ * @function
+ * @param {string} temperament - temperament key in TEMPERAMENT
+ * @returns {boolean}
+ */
+const isNonEDO = temperament => {
+    const t = getTemperament(temperament);
+    if (!t) {
+        return false;
+    }
+    return temperamentHasRatios(temperament) && !isEquallyTempered(temperament);
+};
+
+/**
+ * Integer step pattern for a mode under a non-EDO temperament: each
+ * cumulative semitone offset of the 12-EDO mode pattern is mapped to the
+ * index of the nearest ratio, then positions are differenced. This gives
+ * the builder wheel unequal-temperament geometry (e.g. meantone major is
+ * not the proportional rescale of 12-EDO semitones).
+ * @function
+ * @param {string} mode - mode name in MUSICALMODES
+ * @param {string} temperament - temperament key in TEMPERAMENT
+ * @returns {Array|null} step counts, or null when impossible
+ */
+const getNonEDOModeSteps = (mode, temperament) => {
+    const pattern = MUSICALMODES[mode];
+    const t = getTemperament(temperament);
+    if (!pattern || !t || !Array.isArray(t.ratios) || t.ratios.length === 0) {
+        return null;
+    }
+    const n = t.pitchNumber || t.ratios.length;
+    const positions = [0];
+    let cum = 0;
+    for (let k = 0; k < pattern.length - 1; k++) {
+        cum += pattern[k];
+        const target = Math.pow(2, cum / 12);
+        let best = 0;
+        let bestDiff = Infinity;
+        for (let r = 1; r < n; r++) {
+            const ratio = Number(t.ratios[r]);
+            if (!isFinite(ratio) || ratio <= 0) {
+                continue;
+            }
+            const diff = Math.abs(Math.log2(ratio / target));
+            if (diff < bestDiff) {
+                bestDiff = diff;
+                best = r;
+            }
+        }
+        // Keep positions monotonically increasing; if the nearest ratio
+        // falls at or before the previous degree, bump forward by 1 to
+        // avoid collapsing two degrees onto the same pitch. This can
+        // produce a step of 1 that doesn't correspond to a real ratio
+        // interval — acceptable for typical ratio tables (12+ entries)
+        // where this path is rarely hit.
+        if (best <= positions[positions.length - 1]) {
+            best = positions[positions.length - 1] + 1;
+        }
+        if (best >= n) {
+            return null;
+        }
+        positions.push(best);
+    }
+    const steps = [];
+    for (let p = 1; p < positions.length; p++) {
+        steps.push(positions[p] - positions[p - 1]);
+    }
+    // Close back to the octave: the ratios table holds no octave entry, so
+    // the final mode step spans from the last mapped degree to pitchNumber.
+    const last = positions[positions.length - 1];
+    if (last >= n) {
+        return null;
+    }
+    steps.push(n - last);
+    return steps;
+};
+
+/**
+ * Compute the frequency and pitch info for a note degree under a non-EDO
+ * temperament (ratio-based: just intonation, meantone, etc.). Returns null
+ * when the temperament is equally tempered or has no note labels.
+ * @function
+ * @param {number} note - degree index (0 = root, n = octave)
+ * @param {number} baseOctave - starting octave
+ * @param {string} temperamentKey - key in TEMPERAMENT
+ * @param {string} keySignature - key signature for pitch spelling
+ * @returns {{ freq: number, noteName: string, octave: number } | null}
+ */
+const getNonEDOFrequency = (note, baseOctave, temperamentKey, keySignature) => {
+    const runtime =
+        typeof global === "undefined"
+            ? { TEMPERAMENT, isEquallyTempered, pitchToFrequency }
+            : global;
+    const t = runtime.TEMPERAMENT && runtime.TEMPERAMENT[temperamentKey];
+    const labels =
+        t && Array.isArray(t.noteLabels) && !runtime.isEquallyTempered(temperamentKey)
+            ? t.noteLabels
+            : null;
+    if (!labels || !labels[note % labels.length]) {
+        return null;
+    }
+    const idx = note % labels.length;
+    const octave = baseOctave + Math.floor(note / labels.length);
+    const freq = runtime.pitchToFrequency(labels[idx], octave, 0, keySignature, temperamentKey);
+    return { freq, noteName: labels[idx], octave };
+};
+
+/**
+ * Extract ratio from a temperament interval value.
+ * Handles both legacy numeric format and new {ratio, cents} object format.
+ * @function
+ * @param {number|Object} value - The interval value (ratio number or object with ratio property).
+ * @returns {number} The ratio value.
+ */
+const getTemperamentRatio = value => {
+    if (typeof value === "number") {
+        return value;
+    } else if (value && typeof value === "object" && typeof value.ratio === "number") {
+        return value.ratio;
+    }
+    return 1;
+};
+
+/**
+ * Extract cents from a temperament interval value.
+ * Handles both legacy numeric format and new {ratio, cents} object format.
+ * @function
+ * @param {number|Object} value - The interval value (ratio number or object with cents property).
+ * @returns {number} The cents value.
+ */
+const getTemperamentCents = value => {
+    if (typeof value === "number") {
+        return 1200 * Math.log2(value);
+    } else if (value && typeof value === "object" && typeof value.cents === "number") {
+        return value.cents;
+    }
+    return 0;
+};
+
+/**
  * Get the name of a temperament based on its identifier.
  * @function
  * @param {string} name - The identifier of the temperament.
@@ -2912,7 +4053,7 @@ const getTemperamentName = name => {
  * @returns {Array} An array containing the note, octave, and cents.
  */
 const noteToObj = note => {
-    let octave = parseInt(note.slice(note.length - 1));
+    let octave = parseInt(note.slice(note.length - 1), 10);
     if (isNaN(octave)) {
         octave = 4;
     } else {
@@ -2925,9 +4066,43 @@ const noteToObj = note => {
  * Convert a frequency to pitch, returning the note, octave, and cents.
  * @function
  * @param {number} hz - The frequency in hertz.
+ * @param {string} [temperament="equal"] - The temperament to use.
  * @returns {Array} An array containing the note, octave, and cents.
  */
-const frequencyToPitch = hz => {
+const frequencyToPitch = (hz, temperament) => {
+    const currentEDO = getCurrentEDO(temperament);
+    const t = getTemperament(temperament);
+    if (t && !t.isEDO && t.noteLabels && t.ratios) {
+        const aIdx = t.noteLabels.indexOf("A");
+        const baseRefFreq = A0 / t.ratios[aIdx];
+        const approxOctave = Math.floor(Math.log(hz / baseRefFreq) / Math.log(2));
+
+        let bestNote = t.noteLabels[0];
+        let bestOctave = 0;
+        let bestCents = Infinity;
+
+        for (let o = Math.max(0, approxOctave - 1); o <= approxOctave + 1; o++) {
+            for (let i = 0; i < t.noteLabels.length; i++) {
+                const freq = baseRefFreq * t.ratios[i] * Math.pow(2, o);
+                const centsDiff = 1200 * (Math.log(hz / freq) / Math.log(2));
+                if (Math.abs(centsDiff) < Math.abs(bestCents)) {
+                    bestCents = centsDiff;
+                    bestNote = t.noteLabels[i];
+                    bestOctave = o;
+                }
+            }
+        }
+
+        if (Math.abs(bestCents) < 0.5) {
+            bestCents = 0;
+        }
+
+        return [bestNote, bestOctave, Math.round(bestCents * 10) / 10];
+    }
+
+    // 1200 cents = one octave (constant for all temperaments)
+    const centsPerStep = 1200 / currentEDO;
+
     // Calculate the pitch and octave based on frequency, rounding to
     // the nearest cent.
 
@@ -2937,29 +4112,34 @@ const frequencyToPitch = hz => {
         return ["C", 10, 0];
     }
 
-    // Calculate cents to keep track of drift
-    let cents = 0;
-    // Standard tuning uses CENTS_PER_OCTAVE cents per octave.
-
-    for (let i = 0; i < 10 * CENTS_PER_OCTAVE; i++) {
-        const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
-        if (hz < f * 1.0003 && hz > f * 0.9997) {
-            cents = i % CENTS_PER_SEMITONE;
-            let j = Math.floor(i / CENTS_PER_SEMITONE);
-            if (cents > 50) {
-                cents -= CENTS_PER_SEMITONE;
-                j += 1;
-            }
-            return [
-                PITCHES[(j + PITCHES.indexOf("A")) % SEMITONES],
-                Math.floor((j + PITCHES.indexOf("A")) / SEMITONES),
-                cents
-            ];
-        }
+    const steps = currentEDO * (Math.log(hz / A0) / Math.log(2));
+    const roundedSteps = Math.round(steps);
+    let cents = (steps - roundedSteps) * centsPerStep;
+    if (cents > centsPerStep / 2) {
+        cents -= centsPerStep;
+    } else if (cents <= -centsPerStep / 2) {
+        cents += centsPerStep;
+    }
+    if (Math.abs(cents) < 0.5) {
+        cents = 0;
     }
 
-    // console.debug("Could not find note/octave/cents for " + hz);
-    return ["?", -1, 0];
+    const stepIndex = ((roundedSteps % currentEDO) + currentEDO) % currentEDO;
+
+    if (currentEDO !== 12) {
+        const names = generateNoteNames(currentEDO);
+        const aIndex = names.indexOf("A");
+        const tableIndex = (stepIndex + aIndex) % currentEDO;
+        const pitchName = names[tableIndex];
+        const octaveNumber = Math.floor((roundedSteps + aIndex) / currentEDO);
+        return [pitchName, octaveNumber, cents];
+    }
+
+    const nameIndex = Math.round((stepIndex / currentEDO) * 12);
+    const pitchName = PITCHES[(nameIndex + PITCHES.indexOf("A")) % PITCHES.length];
+    const octaveNumber = Math.floor((roundedSteps + PITCHES.indexOf("A")) / currentEDO);
+
+    return [pitchName, octaveNumber, cents];
 };
 
 /**
@@ -2977,12 +4157,10 @@ const frequencyToPitch = hz => {
  *     or the full string unchanged if no recognised prefix is found.
  */
 const getArticulation = note => {
-    // Match solfege names (longest first to avoid "sol" being shadowed by
-    // a later "la" replacement) or a single letter note name, anchored at
-    // the very start of the string.  Everything after the prefix is the
-    // articulation we want.
-    const match = note.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
-    return match ? match[1] : note;
+    // Strip microtonal ^ / v prefixes before matching so "^C" etc. resolve.
+    const stripped = note.replace(/^[v^]+/, "");
+    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
+    return match ? match[1] : stripped;
 };
 
 /**
@@ -3059,12 +4237,23 @@ const keySignatureToMode = keySignature => {
 
     if (mode === "") {
         mode = "major";
-    } else {
-        mode = mode.toLowerCase();
     }
 
-    if (mode in MUSICALMODES) {
-        return [key, mode];
+    // Resolve the mode name case-insensitively. Built-in modes are registered
+    // lowercase, but user-defined modes keep their original casing (e.g.
+    // "MyMode"), so lowercasing the incoming name would fail the lookup.
+    let modeKey = mode;
+    if (!(modeKey in MUSICALMODES)) {
+        for (const m in MUSICALMODES) {
+            if (m.toLowerCase() === mode.toLowerCase()) {
+                modeKey = m;
+                break;
+            }
+        }
+    }
+
+    if (modeKey in MUSICALMODES) {
+        return [key, modeKey];
     } else {
         console.debug("Invalid mode name: " + mode + " reverting to major.");
         return [key, "major"];
@@ -3083,17 +4272,23 @@ const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la"
  * Get the scale and solfege with half-steps for a given key signature.
  * @function
  * @param {string} keySignature - The key signature string.
+ * @param {number} [edo] - Number of steps per octave (defaults to 12).
  * @returns {Array} An array containing the scale notes, solfege with half-steps, key signature, and mode.
  */
-const getScaleAndHalfSteps = keySignature => {
+const getScaleAndHalfSteps = (keySignature, edo = 12) => {
     // Determine scale and half-step pattern from key signature
     const obj = keySignatureToMode(keySignature);
     let myKeySignature = obj[0];
-    let halfSteps;
-    if (obj[1] === "CUSTOM") {
-        halfSteps = customMode;
-    } else {
-        halfSteps = MUSICALMODES[obj[1]];
+    const halfSteps = getModePattern(obj[1], edo);
+
+    if (edo !== 12) {
+        // EDO-native scale: 12-EDO solfege slots are a 12-EDO-only concept, so
+        // the step pattern is returned in the solfege slot for non-12 EDO.
+        const edoNames = generateNoteNames(edo);
+        if (myKeySignature in EXTRATRANSPOSITIONS) {
+            myKeySignature = EXTRATRANSPOSITIONS[myKeySignature][0];
+        }
+        return [edoNames, halfSteps, myKeySignature, obj[1]];
     }
 
     const solfege = [];
@@ -3564,13 +4759,16 @@ const getCustomNote = note => {
  * @param {string} pitch - The pitch name (e.g., C, D, E).
  * @param {number} octave - The octave number.
  * @param {string} keySignature - The key signature.
+ * @param {string} [temperament="equal"] - The temperament to use.
  * @returns {number} The numeric representation of the pitch.
  */
-const pitchToNumber = (pitch, octave, keySignature) => {
+const pitchToNumber = (pitch, octave, keySignature, temperament) => {
+    const currentEDO = getCurrentEDO(temperament);
     // Calculate the pitch index based on pitch and octave.
     if (pitch.toUpperCase() === "R") {
         return 0;
     }
+    const originalPitch = pitch;
     // Check for flat, sharp, double flat, or double sharp.
     let transposition = 0;
     const len = pitch.length;
@@ -3612,8 +4810,49 @@ const pitchToNumber = (pitch, octave, keySignature) => {
         }
     }
 
+    // For EDO > 12, use the EDO-specific name table for ALL pitches
+    // (naturals and accidentals alike) so that the A reference is
+    // consistent with the table's natural positions.
+    if (currentEDO !== 12) {
+        const names = generateNoteNames(currentEDO);
+        let aIndex = names.indexOf("A");
+        if (aIndex === -1) {
+            // For EDO < 10, A may not appear in the note name table.
+            // Use its proportional position from 12-EDO (A is at index 9).
+            aIndex = Math.round((9 / 12) * currentEDO);
+        }
+        const normalizedPitch = originalPitch
+            .replace(/^([a-g])/, (_, letter) => letter.toUpperCase())
+            .replaceAll("#", SHARP)
+            .replaceAll("b", FLAT);
+        let edoPos = names.indexOf(normalizedPitch);
+        if (edoPos === -1) {
+            // Fallback: try the 12-EDO arrays with proportional mapping
+            const fallbackPos = PITCHES2.indexOf(normalizedPitch);
+            if (fallbackPos !== -1) {
+                edoPos = Math.round((fallbackPos / 12) * currentEDO);
+            } else {
+                const sharpPos = PITCHES.indexOf(normalizedPitch);
+                if (sharpPos !== -1) {
+                    edoPos = Math.round((sharpPos / 12) * currentEDO);
+                }
+            }
+        }
+        if (edoPos !== -1) {
+            return octave * currentEDO + edoPos - aIndex;
+        }
+    }
+
+    // 12-EDO or fallback path: use PITCHES array with transposition.
+    if (transposition !== 0) {
+        const edoPos = getEdoNoteNamePosition(originalPitch, currentEDO);
+        if (edoPos !== -1) {
+            return octave * currentEDO + edoPos - PITCHES.indexOf("A");
+        }
+    }
+
     let pitchNumber = 0;
-    if (PITCHES.includes(pitch)) {
+    if (PITCHES.includes(pitch.toUpperCase())) {
         pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
     } else {
         // obj[1] is the solfege mapping for the current key/mode
@@ -3632,7 +4871,7 @@ const pitchToNumber = (pitch, octave, keySignature) => {
         }
     }
     // We start at A0.
-    return octave * 12 + pitchNumber - PITCHES.indexOf("A") + transposition;
+    return octave * currentEDO + pitchNumber - PITCHES.indexOf("A") + transposition;
 };
 
 /**
@@ -3641,25 +4880,39 @@ const pitchToNumber = (pitch, octave, keySignature) => {
  * @param {number} i - The numeric representation of the pitch.
  * @returns {Array} An array containing the pitch and octave.
  */
-const numberToPitchSharp = i => {
-    // numbertoPitch return only flats
-    // This function will return sharps.
+const numberToPitchSharp = (i, temperament) => {
+    const currentEDO = getCurrentEDO(temperament);
+    if (currentEDO === 12) {
+        if (i < 0) {
+            let n = 0;
+            while (i < 0) {
+                i += 12;
+                n += 1;
+            }
+            const octave = Math.floor(i / 12) - n;
+            const nameIndex = Math.round(((i % 12) / 12) * 12);
+            return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
+        } else {
+            const octave = Math.floor(i / 12);
+            const nameIndex = Math.round(((i % 12) / 12) * 12);
+            return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
+        }
+    }
+    const t = TEMPERAMENT[temperament];
+    const edoNames = t && t.noteLabels ? t.noteLabels : generateNoteNames(currentEDO);
     if (i < 0) {
         let n = 0;
         while (i < 0) {
-            i += 12;
+            i += currentEDO;
             n += 1;
         }
-
-        return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12) - n
-        ];
+        const octave = Math.floor(i / currentEDO) - n;
+        const nameIndex = i % currentEDO;
+        return [edoNames[nameIndex], octave];
     } else {
-        return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12)
-        ];
+        const octave = Math.floor(i / currentEDO);
+        const nameIndex = i % currentEDO;
+        return [edoNames[nameIndex], octave];
     }
 };
 
@@ -3668,22 +4921,34 @@ const numberToPitchSharp = i => {
  * @function
  * @param {string} notename - The note name (e.g., C, D, E, etc.).
  * @param {number} octave - The octave number.
+ * @param {string} temperament - The temperament used for pitch calculation.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     temperament's EDO is used (legacy behavior).
  * @returns {number} The numeric representation of the note.
+ * @example
+ * getNumber("C", 4, "equal")     // 12-EDO: 37
+ * getNumber("C", 4, "equal", 19) // 19-EDO: 57
+ * getNumber("C", 4, "equal", 31) // 31-EDO: 93
+ * getNumber("A", 4, "equal")     // 12-EDO: 69 (MIDI A4)
  */
-const getNumber = (notename, octave) => {
+const getNumber = (notename, octave, temperament, edo) => {
     // Converts a note, e.g., C, and octave to a number
+    let currentEDO = edo;
+    if (!currentEDO) {
+        currentEDO = getCurrentEDO(temperament);
+    }
     let num;
     if (octave < 0) {
         num = 0;
     } else if (octave > 10) {
-        num = 9 * 12;
+        num = 9 * currentEDO;
     } else {
-        num = 12 * (octave - 1);
+        num = currentEDO * (octave - 1);
     }
 
     notename = String(notename);
     if (notename.substring(0, 1) in NOTESTEP) {
-        num += NOTESTEP[notename.substring(0, 1)];
+        num += Math.round((NOTESTEP[notename.substring(0, 1)] / 12) * currentEDO);
         if (notename.length >= 1) {
             const delta = notename.substring(1);
             if (delta === "bb" || delta === DOUBLEFLAT) {
@@ -3702,18 +4967,22 @@ const getNumber = (notename, octave) => {
 };
 
 /**
- * Get the note based on a given pitch and interval in the "C major" key signature.
+ * Get the note based on a given pitch and interval.
  * @function
  * @param {string} pitch - The pitch, including the note name and octave (e.g., "C4").
  * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3rd").
+ * @param {string} [temperament="equal"] - The temperament to use for pitch calculations.
  * @returns {Array} An array containing the note and octave.
  */
-const getNoteFromInterval = (pitch, interval) => {
+const getNoteFromInterval = (pitch, interval, temperament) => {
+    if (temperament === undefined) {
+        temperament = "equal";
+    }
     const pitch1 = pitch.substring(0, 1);
     const parsed = parseNoteString(pitch);
     const note1 = parsed[0];
     const octave1 = parsed[1];
-    const number = pitchToNumber(note1, octave1, "C major");
+    const number = pitchToNumber(note1, octave1, "C major", temperament);
     const pitches = ["C", "D", "E", "F", "G", "A", "B"];
     const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
 
@@ -3736,7 +5005,7 @@ const getNoteFromInterval = (pitch, interval) => {
         const halfSteps = INTERVALVALUES[interval][0];
         // const direction = INTERVALVALUES[interval][1];
 
-        let note = numberToPitch(number + halfSteps);
+        let note = numberToPitch(number + halfSteps, temperament);
         const num = interval.split(" ");
         const pitchIndex = pitches.indexOf(pitch1);
         let index = pitchIndex + Number(num[num.length - 1]) - 1;
@@ -3749,7 +5018,7 @@ const getNoteFromInterval = (pitch, interval) => {
         if (note[0].substring(0, 1) === id) {
             return [note[0], octave];
         } else if (note[0].substring(0, 1) !== id) {
-            note = numberToPitchSharp(number + halfSteps);
+            note = numberToPitchSharp(number + halfSteps, temperament);
             if (note[0] === id) {
                 return [note[0], octave];
             } else {
@@ -4012,29 +5281,52 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
     if (temperament === undefined) {
         temperament = "equal";
     }
+    const currentEDO = getCurrentEDO(temperament);
 
     let n = 0;
     let pitchNumber;
     if (i < 0) {
         while (i < 0) {
-            i += 12;
+            i += currentEDO;
             n += 1; // Count octave bump ups.
         }
 
-        if (temperament === "equal") {
-            return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12) - n
-            ];
+        if (isTrueEDO(temperament)) {
+            if (currentEDO === 12) {
+                const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
+                return [
+                    PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
+                    Math.floor((i + PITCHES.indexOf("A")) / currentEDO) - n
+                ];
+            } else {
+                const edoNames = generateNoteNames(currentEDO);
+                let aIndex = edoNames.indexOf("A");
+                if (aIndex === -1) {
+                    aIndex = Math.round((9 / 12) * currentEDO);
+                }
+                const nameIndex = (((i + aIndex) % currentEDO) + currentEDO) % currentEDO;
+                return [edoNames[nameIndex], Math.floor((i + aIndex) / currentEDO) - n];
+            }
         } else {
             pitchNumber = Math.floor(i - offset);
         }
     } else {
-        if (temperament === "equal") {
-            return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12)
-            ];
+        if (isTrueEDO(temperament)) {
+            if (currentEDO === 12) {
+                const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
+                return [
+                    PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
+                    Math.floor((i + PITCHES.indexOf("A")) / currentEDO)
+                ];
+            } else {
+                const edoNames = generateNoteNames(currentEDO);
+                let aIndex = edoNames.indexOf("A");
+                if (aIndex === -1) {
+                    aIndex = Math.round((9 / 12) * currentEDO);
+                }
+                const nameIndex = (((i + aIndex) % currentEDO) + currentEDO) % currentEDO;
+                return [edoNames[nameIndex], Math.floor((i + aIndex) / currentEDO)];
+            }
         } else {
             pitchNumber = Math.floor(i - offset);
         }
@@ -4062,11 +5354,12 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
         if (TEMPERAMENT[temperament][pitchNumber] === undefined) {
             // If custom temperament is not defined, then it will
             // store equal temperament notes.
-            for (let j = 0; j < 12; j++) {
+            for (let j = 0; j < octaveLength; j++) {
                 const number = "" + j;
-                interval = TEMPERAMENT["equal"]["interval"][j];
+                const intervalIndex = Math.round((j * 12) / octaveLength) % 12;
+                interval = TEMPERAMENT["equal"]["interval"][intervalIndex];
                 TEMPERAMENT[temperament][number] = [
-                    Math.pow(2, j / 12),
+                    Math.pow(2, j / octaveLength),
                     getNoteFromInterval(startPitch, interval)[0],
                     getNoteFromInterval(startPitch, interval)[1]
                 ];
@@ -4082,8 +5375,37 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
             return [TEMPERAMENT[temperament][pitchNumber][1], o];
         }
     } else {
-        interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
-        return getNoteFromInterval(startPitch, interval);
+        const temperamentPitchNumber = TEMPERAMENT[temperament]["pitchNumber"] || 12;
+        const t = TEMPERAMENT[temperament];
+        const noteNames =
+            t && t.noteLabels ? t.noteLabels : generateNoteNames(temperamentPitchNumber);
+
+        // Determine the starting note's position in the EDO name table.
+        let startPos = 0;
+        let baseOctave = 4;
+        if (startPitch) {
+            const octMatch = startPitch.match(/(-?\d+)$/);
+            if (octMatch) {
+                baseOctave = parseInt(octMatch[1], 10);
+                startPitch = startPitch.slice(0, -octMatch[1].length);
+            }
+            const normalized = startPitch.replace(/#/g, SHARP).replace(/b/g, FLAT);
+            const pos = noteNames.indexOf(normalized);
+            if (pos !== -1) {
+                startPos = pos;
+            }
+        }
+
+        const idx =
+            ((pitchNumber % temperamentPitchNumber) + temperamentPitchNumber) %
+            temperamentPitchNumber;
+        const octaveOffset = Math.floor(pitchNumber / temperamentPitchNumber);
+        const noteName =
+            noteNames[
+                (((startPos + idx) % temperamentPitchNumber) + temperamentPitchNumber) %
+                    temperamentPitchNumber
+            ];
+        return [noteName, baseOctave + octaveOffset];
     }
 };
 
@@ -4107,8 +5429,8 @@ const GetNotesForInterval = tur => {
             return { firstNote, secondNote: firstNote, octave };
         }
         secondNote = noteStatus[0][1].replace(/\d/g, "");
-        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""));
-        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""));
+        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""), 10);
+        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""), 10);
         octave = octaveb - octavea;
     } else if (notePitches) {
         const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
@@ -4154,16 +5476,243 @@ function base64Encode(str) {
 }
 
 /**
+ * Resolve a solfege note argument (e.g. "do", "re♯") to a note name for the
+ * given key signature and octave length. Shared by the 12-EDO and microtonal
+ * EDO paths in getNote().
+ * @function
+ * @param {string} noteArg - The note argument (expected to be solfege).
+ * @param {string} keySignature - The key signature (e.g. "C major").
+ * @param {boolean} movable - Whether movable-do solfege is in effect.
+ * @param {number} octaveLength - The number of steps in the octave.
+ * @param {number} octave - The current octave (adjusted in the return value).
+ * @param {number} transpositionFloor - The current transposition floor (adjusted in the return value).
+ * @returns {Array|null} [note, octave, transpositionFloor] on success, or null
+ *   if noteArg is not a resolvable solfege name.
+ */
+const getNoteFromSolfege = (
+    noteArg,
+    keySignature,
+    movable,
+    octaveLength,
+    octave,
+    transpositionFloor
+) => {
+    let sharpFlat = false;
+    if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
+        sharpFlat = true;
+    }
+
+    if (!keySignature) {
+        keySignature = "C major";
+    }
+
+    let obj;
+
+    if (movable) {
+        obj = getScaleAndHalfSteps(keySignature);
+    } else {
+        obj = getScaleAndHalfSteps("C major");
+    }
+
+    let thisScale = obj[0];
+    const halfSteps = obj[1];
+    const myKeySignature = obj[2];
+    const mode = obj[3];
+    let offset;
+    if (movable) {
+        // Ensure it is a valid key signature.
+        offset = thisScale.indexOf(myKeySignature);
+        if (offset === -1) {
+            console.debug(
+                "WARNING: Key " +
+                    myKeySignature +
+                    " not found in " +
+                    thisScale +
+                    ". Using default of C"
+            );
+            offset = 0;
+            thisScale = NOTESSHARP;
+        }
+
+        // We need to set the octave relative to the tonic.
+        // Starting from C_4 (note_octave)
+        // All keys C# -- F# would remain in octave four
+        // All keys Gb -- B would be in octave three (since
+        // going down is closer than going up)
+        if (offset > 5) {
+            transpositionFloor -= octaveLength; // go down one octave
+        }
+    } else {
+        offset = 0;
+    }
+
+    if (sharpFlat) {
+        if (noteArg.substr(-1) === "#") {
+            offset += 1;
+        } else if (noteArg.substr(-1) === SHARP) {
+            offset += 1;
+        } else if (noteArg.substr(-1) === FLAT) {
+            offset -= 1;
+        } else if (noteArg.substr(-1) === "b") {
+            offset -= 1;
+        }
+    }
+
+    let solfegePart;
+    if (halfSteps.includes(noteArg.substr(0, 1).toLowerCase())) {
+        solfegePart = noteArg.substr(0, 1).toLowerCase();
+    } else if (halfSteps.includes(noteArg.substr(0, 2).toLowerCase())) {
+        solfegePart = noteArg.substr(0, 2).toLowerCase();
+    } else if (halfSteps.includes(noteArg.substr(0, 3).toLowerCase())) {
+        solfegePart = noteArg.substr(0, 3).toLowerCase();
+    } else {
+        // The note should already be translated, but just in case...
+        // Reverse any i18n
+        // solfnotes_ is used in the interface for i18n
+        const i18nObj = splitI18nSolfege(noteArg);
+        if (SOLFNOTES.includes(i18nObj[0])) {
+            solfegePart = i18nObj[0];
+        } else {
+            solfegePart = noteArg.substr(0, 2).toLowerCase();
+        }
+    }
+
+    if (movable) {
+        let i;
+        switch (mode) {
+            case "dorian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 0) {
+                    transpositionFloor += octaveLength;
+                }
+
+                transpositionFloor -= octaveLength;
+                i += 6;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "phrygian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 1) {
+                    transpositionFloor += octaveLength;
+                }
+
+                i += 5;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "lydian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 2) {
+                    transpositionFloor += octaveLength;
+                }
+
+                i += 4;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "mixolydian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 3) {
+                    transpositionFloor += octaveLength;
+                }
+
+                i += 3;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "minor":
+            case "aeolian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 4) {
+                    transpositionFloor += octaveLength;
+                }
+
+                i += 2;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "locrian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 5) {
+                    transpositionFloor += octaveLength;
+                }
+
+                i += 1;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "major":
+            case "ionian":
+            default:
+                break;
+        }
+    }
+
+    let index;
+    if (halfSteps.includes(solfegePart)) {
+        index = halfSteps.indexOf(solfegePart) + offset;
+        if (index >= thisScale.length) {
+            index -= thisScale.length;
+            octave += 1;
+        } else if (index < 0) {
+            index += thisScale.length;
+            octave -= 1;
+        }
+
+        let note = thisScale[index];
+        // In non-12 EDO temperaments, enharmonic spellings are distinct
+        // pitches, so the resolved note must honor the input's accidental.
+        if (octaveLength !== 12 && sharpFlat) {
+            if (noteArg.substr(-1) === "#" || noteArg.substr(-1) === SHARP) {
+                note = NOTESSHARP[index];
+            } else {
+                note = NOTESFLAT[index];
+            }
+        }
+
+        if (octaveLength === 12 && note in EXTRATRANSPOSITIONS) {
+            octave += EXTRATRANSPOSITIONS[note][1];
+            note = EXTRATRANSPOSITIONS[note][0];
+        }
+
+        return [note, octave, transpositionFloor];
+    }
+
+    return null;
+};
+
+/**
  * Get the note based on various parameters.
  * @function
  * @param {string|number} noteArg - The note name or pitch number.
  * @param {number} octave - The octave value.
- * @param {number} transposition - The transposition value.
+ * @param {number} transposition - The transposition value (semitones, or EDO steps if isAlreadyEdoSteps is true).
  * @param {string} keySignature - The key signature (default is "C major").
  * @param {boolean} movable - Whether the key signature is movable (default is false).
  * @param {string} direction - The direction of the note (unused parameter).
  * @param {string} errorMsg - The error message (unused parameter).
  * @param {string} [temperament="equal"] - The temperament to use (default is "equal").
+ * @param {boolean} [isAlreadyEdoSteps=false] - If true, transposition is already in EDO steps; skip semitone-to-EDO conversion.
+ * @param {boolean} [clampIndex=false] - If true, clamp pitch index to 0..edo-1 instead of wrapping across octaves.
  * @returns {Array} An array containing the note, octave, and cents
  */
 function getNote(
@@ -4174,8 +5723,13 @@ function getNote(
     movable,
     direction,
     errorMsg,
-    temperament
+    temperament,
+    isAlreadyEdoSteps,
+    clampIndex
 ) {
+    if (typeof noteArg === "number") {
+        noteArg = noteArg.toString();
+    }
     if (temperament === undefined) {
         temperament = "equal";
     }
@@ -4185,7 +5739,6 @@ function getNote(
             ? TEMPERAMENT[temperament].pitchNumber
             : 12;
 
-    let sharpFlat = false;
     let rememberFlat = false;
     let rememberSharp = false;
     let transpositionFloor = 0;
@@ -4208,11 +5761,22 @@ function getNote(
         transpositionCents = (transposition - transpositionFloor) * 100;
     }
 
+    // Scale transposition from semitones to EDO steps.
+    // Use the original transposition value (not the already-floored transpositionFloor)
+    // to preserve fractional precision during conversion.
+    // Skip this conversion if transposition is already in EDO steps (non-equal temperaments).
+    if (octaveLength !== 12 && !isAlreadyEdoSteps) {
+        transpositionFloor = Math.round((transposition * octaveLength) / 12);
+    }
+
     if (typeof noteArg !== "number") {
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
         if (noteArg.substr(-1) === ">") {
             // Read octave and solfege from HTML
-            octave = parseInt(noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1));
+            octave = parseInt(
+                noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1),
+                10
+            );
             noteArg = noteArg.substr(0, noteArg.indexOf("<"));
         }
         if (
@@ -4228,9 +5792,9 @@ function getNote(
         }
         if (!isNaN(noteAsNumber)) {
             if (["#", SHARP].includes(noteArg.substr(-1))) {
-                transpositionFloor += 1;
+                transpositionFloor += Math.round(octaveLength / 12);
             } else if (["b", FLAT].includes(noteArg.substr(-1))) {
-                transpositionFloor -= 1;
+                transpositionFloor -= Math.round(octaveLength / 12);
             }
             noteArg = Number(noteAsNumber);
         }
@@ -4258,17 +5822,25 @@ function getNote(
                 console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
             }
         }
-        if (getSharpFlatPreference(keySignature) === "sharp") {
-            noteArg = PITCHES2[(noteArg + kOffset) % 12];
+        if (octaveLength === 12) {
+            if (getSharpFlatPreference(keySignature) === "sharp") {
+                noteArg = PITCHES2[(noteArg + kOffset) % octaveLength];
+            } else {
+                noteArg = PITCHES[(noteArg + kOffset) % octaveLength];
+            }
         } else {
-            noteArg = PITCHES[(noteArg + kOffset) % 12];
+            const edoNames = generateNoteNames(octaveLength);
+            noteArg = edoNames[(noteArg + kOffset) % octaveLength];
         }
     }
 
     let note;
     let articulation;
 
-    if (temperament in PreDefinedTemperaments) {
+    if (
+        temperament in PreDefinedTemperaments ||
+        (isCustomTemperament(temperament) && isEquallyTempered(temperament))
+    ) {
         // Check for double flat or double sharp. Since bb and x behave
         // funny with string operations, we jump through some hoops.
         articulation = getArticulation(noteArg);
@@ -4276,6 +5848,7 @@ function getNote(
 
         switch (articulation) {
             case "bb":
+            case "♭♭":
             case DOUBLEFLAT:
                 noteArg += "b";
                 rememberFlat = true;
@@ -4287,6 +5860,7 @@ function getNote(
                 rememberFlat = true;
                 break;
             case "##":
+            case "♯♯":
             case "*":
             case "x":
             case DOUBLESHARP:
@@ -4319,7 +5893,58 @@ function getNote(
             noteArg = STOSHARP[noteArg];
         }
 
-        if (noteArg in EXTRATRANSPOSITIONS) {
+        if (octaveLength !== 12) {
+            // For microtonal EDOs, check the EDO-specific name table first.
+            // This ensures EDO-native entries (e.g. B♯ in 19-EDO at position 18)
+            // are resolved without going through 12-EDO EXTRATRANSPOSITIONS, which
+            // would prematurely convert them to enharmonic equivalents and corrupt
+            // the octave calculation.
+            const edoNames = generateNoteNames(octaveLength);
+            const normalizedName = noteArg.replaceAll("#", SHARP).replaceAll("b", FLAT);
+            const edoIdx = edoNames.indexOf(normalizedName);
+            if (edoIdx !== -1) {
+                note = edoNames[edoIdx];
+            } else if (noteArg in EXTRATRANSPOSITIONS) {
+                octave += EXTRATRANSPOSITIONS[noteArg][1];
+                note = EXTRATRANSPOSITIONS[noteArg][0];
+            } else if (NOTESSHARP.includes(noteArg.toUpperCase())) {
+                note = noteArg.toUpperCase();
+            } else if (NOTESFLAT.includes(noteArg)) {
+                note = noteArg;
+            } else if (NOTESFLAT2.includes(noteArg)) {
+                note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
+            } else {
+                // Fall back to solfege resolution so microtonal EDOs accept
+                // solfege names (e.g. "do", "re♯") just like 12-EDO does.
+                const solfegeNote = getNoteFromSolfege(
+                    noteArg,
+                    keySignature,
+                    movable,
+                    octaveLength,
+                    octave,
+                    transpositionFloor
+                );
+                if (solfegeNote !== null && edoNames.includes(solfegeNote[0])) {
+                    note = solfegeNote[0];
+                    octave = solfegeNote[1];
+                    transpositionFloor = solfegeNote[2];
+                } else if (errorMsg !== undefined) {
+                    console.debug(
+                        "WARNING: EDO note [" +
+                            noteArg +
+                            "] (normalized: " +
+                            normalizedName +
+                            ") not found in generateNoteNames(" +
+                            octaveLength +
+                            ")"
+                    );
+                    errorMsg(INVALIDPITCH, null);
+                    return ["R", "", 0];
+                } else {
+                    return ["R", "", 0];
+                }
+            }
+        } else if (noteArg in EXTRATRANSPOSITIONS) {
             octave += EXTRATRANSPOSITIONS[noteArg][1];
             note = EXTRATRANSPOSITIONS[noteArg][0];
         } else if (NOTESSHARP.includes(noteArg.toUpperCase())) {
@@ -4330,195 +5955,17 @@ function getNote(
             // Convert to uppercase, e.g., d♭ -> D♭.
             note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
         } else {
-            if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
-                sharpFlat = true;
-            }
-
-            if (!keySignature) {
-                keySignature = "C major";
-            }
-
-            let obj;
-
-            if (movable) {
-                obj = getScaleAndHalfSteps(keySignature);
-            } else {
-                obj = getScaleAndHalfSteps("C major");
-            }
-
-            let thisScale = obj[0];
-            const halfSteps = obj[1];
-            const myKeySignature = obj[2];
-            const mode = obj[3];
-            let offset;
-            if (movable) {
-                // Ensure it is a valid key signature.
-                offset = thisScale.indexOf(myKeySignature);
-                if (offset === -1) {
-                    console.debug(
-                        "WARNING: Key " +
-                            myKeySignature +
-                            " not found in " +
-                            thisScale +
-                            ". Using default of C"
-                    );
-                    offset = 0;
-                    thisScale = NOTESSHARP;
-                }
-
-                // We need to set the octave relative to the tonic.
-                // Starting from C_4 (note_octave)
-                // All keys C# -- F# would remain in octave four
-                // All keys Gb -- B would be in octave three (since
-                // going down is closer than going up)
-                if (offset > 5) {
-                    transpositionFloor -= octaveLength; // go down one octave
-                }
-            } else {
-                offset = 0;
-            }
-
-            if (sharpFlat) {
-                if (noteArg.substr(-1) === "#") {
-                    offset += 1;
-                } else if (noteArg.substr(-1) === SHARP) {
-                    offset += 1;
-                } else if (noteArg.substr(-1) === FLAT) {
-                    offset -= 1;
-                } else if (noteArg.substr(-1) === "b") {
-                    offset -= 1;
-                }
-            }
-
-            let solfegePart;
-            if (halfSteps.includes(noteArg.substr(0, 1).toLowerCase())) {
-                solfegePart = noteArg.substr(0, 1).toLowerCase();
-            } else if (halfSteps.includes(noteArg.substr(0, 2).toLowerCase())) {
-                solfegePart = noteArg.substr(0, 2).toLowerCase();
-            } else if (halfSteps.includes(noteArg.substr(0, 3).toLowerCase())) {
-                solfegePart = noteArg.substr(0, 3).toLowerCase();
-            } else {
-                // The note should already be translated, but just in case...
-                // Reverse any i18n
-                // solfnotes_ is used in the interface for i18n
-                //.TRANS: the note names must be separated by single spaces
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
-                if (solfnotes_.includes(noteArg.substr(0, 1).toLowerCase())) {
-                    solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
-                } else if (solfnotes_.includes(noteArg.substr(0, 2).toLowerCase())) {
-                    solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
-                } else if (solfnotes_.includes(noteArg.substr(0, 3).toLowerCase())) {
-                    solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase())];
-                } else {
-                    solfegePart = noteArg.substr(0, 2).toLowerCase();
-                }
-            }
-
-            if (movable) {
-                let i;
-                switch (mode) {
-                    case "dorian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 0) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        transpositionFloor -= octaveLength;
-                        i += 6;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "phrygian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 1) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        i += 5;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "lydian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 2) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        i += 4;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "mixolydian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 3) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        i += 3;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "minor":
-                    case "aeolian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 4) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        i += 2;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "locrian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 5) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        i += 1;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "major":
-                    case "ionian":
-                    default:
-                        break;
-                }
-            }
-
-            let index;
-            if (halfSteps.includes(solfegePart)) {
-                index = halfSteps.indexOf(solfegePart) + offset;
-                if (index >= octaveLength) {
-                    index -= octaveLength;
-                    octave += 1;
-                } else if (index < 0) {
-                    index += octaveLength;
-                    octave -= 1;
-                }
-
-                note = thisScale[index];
-            } else {
+            const solfegeNote = getNoteFromSolfege(
+                noteArg,
+                keySignature,
+                movable,
+                octaveLength,
+                octave,
+                transpositionFloor
+            );
+            if (solfegeNote === null) {
                 console.debug(
-                    "WARNING: Note [" + noteArg + "] not found in " + halfSteps + ". Returning REST"
+                    "WARNING: Note [" + noteArg + "] not found in the scale. Returning REST"
                 );
                 if (errorMsg !== undefined) {
                     errorMsg(INVALIDPITCH, null);
@@ -4527,10 +5974,9 @@ function getNote(
                 return ["R", "", 0];
             }
 
-            if (note in EXTRATRANSPOSITIONS) {
-                octave += EXTRATRANSPOSITIONS[note][1];
-                note = EXTRATRANSPOSITIONS[note][0];
-            }
+            note = solfegeNote[0];
+            octave = solfegeNote[1];
+            transpositionFloor = solfegeNote[2];
         }
 
         if (transpositionFloor && transpositionFloor !== 0) {
@@ -4545,80 +5991,57 @@ function getNote(
 
             octave += deltaOctave;
 
-            if (deltaNote > 0) {
-                if (NOTESSHARP.includes(note)) {
-                    let i = NOTESSHARP.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += 12;
-                        octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
-                        octave += 1;
+            if (deltaNote !== 0) {
+                const foundIdx = getEdoNoteNamePosition(note, octaveLength);
+                if (foundIdx !== -1) {
+                    let i = foundIdx + deltaNote;
+                    const nameTableLength = generateNoteNames(octaveLength).length;
+                    if (clampIndex) {
+                        // Clamp to valid range instead of wrapping across octaves.
+                        if (i < 0 || i >= nameTableLength) {
+                            i = Math.max(0, Math.min(i, nameTableLength - 1));
+                        }
+                    } else {
+                        if (i < 0) {
+                            i += nameTableLength;
+                            octave -= 1;
+                        } else if (i >= nameTableLength) {
+                            i -= nameTableLength;
+                            octave += 1;
+                        }
                     }
-
-                    note = NOTESSHARP[i];
-                } else if (NOTESFLAT.includes(note)) {
-                    let i = NOTESFLAT.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += 12;
-                        octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
-                        octave += 1;
-                    }
-
-                    note = NOTESFLAT[i];
+                    note = generateNoteNames(octaveLength)[i];
                 } else {
-                    console.debug("note not found? " + note);
-                }
-            } else if (deltaNote < 0) {
-                if (NOTESFLAT.includes(note)) {
-                    let i = NOTESFLAT.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += 12;
-                        octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
-                        octave += 1;
-                    }
-
-                    note = NOTESFLAT[i];
-                } else if (NOTESSHARP.includes(note)) {
-                    let i = NOTESSHARP.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += 12;
-                        octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
-                        octave += 1;
-                    }
-
-                    note = NOTESSHARP[i];
-                } else {
-                    console.debug("note not found? " + note);
+                    console.debug("note not found in EDO table? " + note);
                 }
             }
         }
 
         // Try to find a note in the current keySignature
+        // When converting through EQUIVALENTNATURALS, B↔C crosses an SPN
+        // octave boundary (B♯4 = C5, C♭4 = B3). Adjust the octave so the
+        // note letter's SPN position matches the actual pitch register.
         switch (getSharpFlatPreference(keySignature)) {
             case "flat":
-                if (note in EQUIVALENTFLATS) {
+                if (octaveLength === 12 && note in EQUIVALENTFLATS) {
                     note = EQUIVALENTFLATS[note];
                 }
                 break;
             case "sharp":
-                if (note in EQUIVALENTSHARPS) {
+                if (octaveLength === 12 && note in EQUIVALENTSHARPS) {
                     note = EQUIVALENTSHARPS[note];
                 }
                 break;
             case "natural":
-                if (note in EQUIVALENTNATURALS) {
+                if (octaveLength === 12 && note in EQUIVALENTNATURALS) {
+                    const origLetter = note.charAt(0);
                     note = EQUIVALENTNATURALS[note];
+                    const newLetter = note.charAt(0);
+                    if (origLetter === "B" && newLetter === "C") {
+                        octave += 1;
+                    } else if (origLetter === "C" && newLetter === "B") {
+                        octave -= 1;
+                    }
                 }
                 break;
             default:
@@ -4629,12 +6052,12 @@ function getNote(
         if (direction !== undefined) {
             switch (direction) {
                 case -1:
-                    if (note in EQUIVALENTFLATS) {
+                    if (octaveLength === 12 && note in EQUIVALENTFLATS) {
                         note = EQUIVALENTFLATS[note];
                     }
                     break;
                 case 1:
-                    if (note in EQUIVALENTSHARPS) {
+                    if (octaveLength === 12 && note in EQUIVALENTSHARPS) {
                         note = EQUIVALENTSHARPS[note];
                     }
                     break;
@@ -4643,13 +6066,19 @@ function getNote(
             }
         }
 
-        if (rememberSharp) {
-            if (note in EQUIVALENTSHARPS) {
-                note = EQUIVALENTSHARPS[note];
-            }
-        } else if (rememberFlat) {
-            if (note in EQUIVALENTFLATS) {
-                note = EQUIVALENTFLATS[note];
+        // Preserve input accidental style only when no transposition was applied.
+        // When transpositionFloor is non-zero, EQUIVALENTSHARPS/EQUIVALENTFLATS could
+        // undo the pitch change (e.g. E♭→D♯ changes the actual pitch in microtonal
+        // temperaments where they are not enharmonically equivalent).
+        if (transpositionFloor === 0) {
+            if (rememberSharp) {
+                if (octaveLength === 12 && note in EQUIVALENTSHARPS) {
+                    note = EQUIVALENTSHARPS[note];
+                }
+            } else if (rememberFlat) {
+                if (octaveLength === 12 && note in EQUIVALENTFLATS) {
+                    note = EQUIVALENTFLATS[note];
+                }
             }
         }
     } else if (isCustomTemperament(temperament)) {
@@ -4768,7 +6197,7 @@ function getNote(
                 deltaNote = -(-transpositionFloor % octaveLength);
             } else {
                 deltaOctave = Math.floor(transpositionFloor / octaveLength);
-                deltaNote = transposition % octaveLength;
+                deltaNote = transpositionFloor % octaveLength;
             }
 
             octave += deltaOctave;
@@ -4879,27 +6308,77 @@ function _parse_pitch_string(str) {
  * Calculates a pitch number from a note name and octave.
  * @param {string} noteName - The name of the note (e.g. "C", "C#").
  * @param {number} octave - The octave number.
+ * @param {number} applyOffset - The offset to apply.
+ * @param {string} temperament - The temperament to use (default "equal").
  * @returns {number|string} The calculated pitch number or INVALIDPITCH if calculation fails.
  */
-function _calculate_pitch_number(noteName, octave, applyOffset = 0) {
+function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament) {
     if (typeof noteName !== "string") {
         return INVALIDPITCH;
     }
+    const currentEDO = getCurrentEDO(temperament);
 
-    let name = noteName.replaceAll("#", SHARP).replaceAll("b", FLAT);
+    let name = noteName
+        .replaceAll("x", DOUBLESHARP)
+        .replaceAll("*", DOUBLESHARP)
+        .replaceAll("#", SHARP)
+        .replaceAll("b", FLAT);
 
-    // Handle double accidentals (𝄪 / 𝄫) by computing offset directly from
-    // the base note letter, since they won't appear in NOTESSHARP/NOTESFLAT.
-    if (name.includes(DOUBLESHARP) || name.includes(DOUBLEFLAT)) {
-        const offset = name.includes(DOUBLESHARP) ? 2 : -2;
-        const baseLetter = name.replace(DOUBLESHARP, "").replace(DOUBLEFLAT, "");
-        let baseIndex = NOTESSHARP.indexOf(baseLetter);
-        if (baseIndex === -1) baseIndex = NOTESFLAT.indexOf(baseLetter);
-        if (baseIndex === -1) return INVALIDPITCH;
-        const rawPitch = (parseInt(octave, 10) + 1) * 12 + baseIndex + offset;
-        return rawPitch - applyOffset;
+    // Non-equal temperaments: look up directly against the temperament's own noteLabels.
+    // Do NOT use generateNoteNames() which produces EDO-specific names.
+    const t = temperament ? getTemperament(temperament) : null;
+    if (t && !isTrueEDO(temperament) && t.noteLabels && t.ratios) {
+        const noteIdx = t.noteLabels.indexOf(name);
+        if (noteIdx !== -1) {
+            const aIdx = t.noteLabels.indexOf("A");
+            const offset = aIdx !== -1 ? aIdx : 0;
+            const result =
+                (parseInt(octave, 10) + 1) * t.ratios.length + noteIdx - offset - applyOffset;
+            return result;
+        }
+        return INVALIDPITCH;
     }
 
+    // For non-12 EDO: normalize double accidentals to repeated single characters
+    // to match the EDO name table (generateNoteNames uses SHARP/FLAT repeated).
+    // Must happen before EQUIVALENT lookups so the EDO table match is tried first.
+    if (currentEDO !== 12) {
+        name = name.replaceAll(DOUBLESHARP, SHARP + SHARP).replaceAll(DOUBLEFLAT, FLAT + FLAT);
+    }
+
+    // For non-12 EDO: look up directly in the EDO-specific name table first.
+    // Do NOT use EQUIVALENTNATURALS which maps to 12-EDO enharmonic equivalents.
+    if (currentEDO !== 12) {
+        const edoNames = generateNoteNames(currentEDO);
+        let edoIndex = edoNames.indexOf(name);
+        if (edoIndex === -1) {
+            // Try EQUIVALENTSHARPS / EQUIVALENTFLATS for single-accidental aliases
+            if (EQUIVALENTSHARPS[name]) {
+                edoIndex = edoNames.indexOf(EQUIVALENTSHARPS[name]);
+            } else if (EQUIVALENTFLATS[name]) {
+                edoIndex = edoNames.indexOf(EQUIVALENTFLATS[name]);
+            }
+        }
+        if (edoIndex !== -1) {
+            const aIndex = edoNames.indexOf("A");
+            const offset = aIndex !== -1 ? aIndex : Math.round((9 / 12) * currentEDO);
+            return (parseInt(octave, 10) + 1) * currentEDO + edoIndex - offset - applyOffset;
+        }
+        // Name not found in EDO table — return INVALIDPITCH rather than
+        // falling back to 12-EDO arrays which would give wrong results.
+        console.debug(
+            "WARNING: _calculate_pitch_number: [" +
+                name +
+                '] (from input "' +
+                noteName +
+                '") not found in generateNoteNames(' +
+                currentEDO +
+                ")"
+        );
+        return INVALIDPITCH;
+    }
+
+    // 12-EDO path: use EQUIVALENT lookups then NOTESSHARP / NOTESFLAT.
     if (EQUIVALENTSHARPS[name]) {
         name = EQUIVALENTSHARPS[name];
     } else if (EQUIVALENTFLATS[name]) {
@@ -4917,16 +6396,102 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0) {
         return INVALIDPITCH;
     }
 
-    return (parseInt(octave, 10) + 1) * 12 + pitchIndex - applyOffset;
+    return (parseInt(octave, 10) + 1) * currentEDO + pitchIndex - applyOffset;
 }
+
+/**
+ * Convert a step pattern from its native EDO to steps in the given EDO.
+ *
+ * Uses cumulative positions (not per-interval rounding) so the total interval
+ * sum is preserved as closely as possible. Each step is at least 1 so stepping
+ * never gets stuck on a repeated note. When the pattern's steps already sum to
+ * the requested EDO this is the identity.
+ * @function
+ * @param {Array} pattern - The source step pattern (e.g. major [2, 2, 1, 2, 2, 2, 1]).
+ * @param {number} edo - Number of steps per octave.
+ * @returns {Array} The converted step pattern in the target EDO.
+ */
+const scalePatternToEDO = (pattern, edo) => {
+    const srcSum = pattern.reduce((a, b) => a + b, 0);
+    if (srcSum === edo) {
+        return pattern.slice();
+    }
+    const result = [];
+    let cumSrc = 0;
+    let cumDst = 0;
+    for (let i = 0; i < pattern.length; i++) {
+        cumSrc += pattern[i];
+        const newCumPos = Math.round((cumSrc * edo) / srcSum);
+        let step = newCumPos - cumDst;
+        // When EDO < scale degrees (e.g. 5-EDO major), cumulative rounding
+        // can produce 0-length intervals. Ensure minimum step of 1 so that
+        // stepping never gets stuck on a repeated note.
+        if (step < 1) {
+            step = 1;
+        }
+        result.push(step);
+        cumDst += step;
+    }
+    return result;
+};
+
+/**
+ * Optional per-EDO overrides for the standard 12-EDO mode patterns.
+ *
+ * Keyed by edo, then by mode name. When an override exists it takes priority
+ * over the naive scalePatternToEDO conversion of MUSICALMODES.
+ * @constant
+ * @type {Object}
+ */
+const PITCH_COLLECTIONS_EDO_OVERRIDES = {};
+
+/**
+ * Get the step pattern for a mode in the given EDO.
+ *
+ * Lookup order: PITCH_COLLECTIONS_EDO_OVERRIDES[edo][mode] first, then the
+ * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom"
+ * (chromatic) mode, 12-EDO uses the stored customMode pattern and non-12 EDO
+ * returns a full EDO-length step-1 pattern.
+ * @function
+ * @param {string} mode - The mode name (e.g. "major").
+ * @param {number} edo - Number of steps per octave.
+ * @returns {Array} The step pattern for the mode in the target EDO.
+ */
+const getModePattern = (mode, edo = 12) => {
+    const overrides = PITCH_COLLECTIONS_EDO_OVERRIDES[edo];
+    if (overrides && Object.prototype.hasOwnProperty.call(overrides, mode)) {
+        return overrides[mode].slice();
+    }
+    if (mode.toLowerCase() === "custom") {
+        if (edo === 12) {
+            return customMode.slice();
+        }
+        return new Array(edo).fill(1);
+    }
+    if (mode in MUSICALMODES) {
+        const pattern = MUSICALMODES[mode];
+        // Return a stored pattern as-is only when it is native to the requested
+        // EDO (its steps sum to the EDO). Anything else — including a native
+        // 19-EDO custom mode resolved in a 12-EDO project context — is rescaled
+        // proportionally so downstream per-degree stepping stays inside the octave.
+        const sum = pattern.reduce((a, b) => a + b, 0);
+        if (sum === edo) {
+            return pattern.slice();
+        }
+        return scalePatternToEDO(pattern, edo);
+    }
+    return scalePatternToEDO(MUSICALMODES.major, edo);
+};
 
 /**
  * Build the scale based on the given key signature.
  * @function
  * @param {string} keySignature - The key signature.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     current temperament's EDO is used (legacy behavior).
  * @returns {Array} An array containing the scale and the corresponding intervals.
  */
-const buildScale = keySignature => {
+const buildScale = (keySignature, edo) => {
     // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
     if (keySignature === "C♭ major") {
         const scale = [
@@ -4961,22 +6526,62 @@ const buildScale = keySignature => {
         myKeySignature = obj[0];
     }
 
-    let halfSteps;
-    if (obj[1] === "CUSTOM") {
-        halfSteps = customMode;
-    } else {
-        halfSteps = MUSICALMODES[obj[1]];
+    // Determine active EDO: an explicit parameter wins; otherwise fall back to
+    // the global temperament state so existing callers keep working unchanged.
+    // Guard on falsy (not just undefined) so null/0/NaN never leak into the
+    // non-12 EDO branch and produce a degenerate step pattern.
+    let currentEDO = edo;
+    if (!currentEDO) {
+        currentEDO = 12;
+        if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
+            currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
+        }
     }
+
+    // For non-12 EDO: convert 12-EDO semitone intervals to EDO step counts
+    // using cumulative positions to preserve the total interval sum.
+    if (currentEDO !== 12) {
+        const edoNames = generateNoteNames(currentEDO);
+        let idx = edoNames.indexOf(myKeySignature);
+        if (idx === -1) {
+            idx = 0;
+        }
+
+        // For "custom" (chromatic) mode in non-12 EDO, getModePattern returns a
+        // full EDO-length scale with step=1 for every pitch class, instead of
+        // converting the hardcoded 12-element customMode array (which would only
+        // produce ~12 notes and leave many pitch classes unreachable).
+        const edoHalfSteps = getModePattern(obj[1], currentEDO);
+
+        const scale = [myKeySignature];
+        let ii = idx;
+        for (let i = 0; i < edoHalfSteps.length; i++) {
+            ii = (ii + edoHalfSteps[i] + edoNames.length) % edoNames.length;
+            scale.push(edoNames[ii]);
+        }
+        return [scale, edoHalfSteps];
+    }
+
+    const halfSteps = getModePattern(obj[1], currentEDO);
+
+    // SHARPPREFERENCE and FLATPREFERENCE are keyed only on "<key> major" and
+    // "<key> minor", but keySignatureToMode() returns the raw mode name --
+    // "natural minor", "aeolian", "lydian", "dorian" and so on. Map the mode
+    // onto its major/minor equivalent first, exactly as getSharpFlatPreference()
+    // does, otherwise the lookup misses for every mode the pie menu offers and
+    // the scale falls through to the wrong spelling.
+    const preferenceMode = modeMapper(obj[0], obj[1]);
+    const preferenceKey = preferenceMode[0] + " " + preferenceMode[1];
 
     let thisScale;
     if (NOTESFLAT.includes(myKeySignature)) {
-        if (SHARPPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
+        if (SHARPPREFERENCE.includes(preferenceKey)) {
             thisScale = NOTESSHARP;
         } else {
             thisScale = NOTESFLAT;
         }
     } else {
-        if (FLATPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
+        if (FLATPREFERENCE.includes(preferenceKey)) {
             thisScale = NOTESFLAT;
         } else {
             thisScale = NOTESSHARP;
@@ -4992,7 +6597,7 @@ const buildScale = keySignature => {
     let ii = idx;
     for (let i = 0; i < halfSteps.length; i++) {
         ii += halfSteps[i];
-        scale.push(thisScale[ii % SEMITONES]);
+        scale.push(thisScale[ii % thisScale.length]);
     }
 
     // Make sure there are no repeated letter names for seven step scales
@@ -5057,20 +6662,44 @@ const buildScale = keySignature => {
  * @param {string} direction - The direction of the step ("up" or "down").
  * @param {number} transposition - The transposition value.
  * @param {string} temperament - The temperament used for pitch calculation.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     temperament's own EDO is used (legacy behavior).
  * @returns {number} The step size in half-steps.
+ * @example
+ * // 12-EDO: C major scale steps
+ * _getStepSize("C major", "C", "up", 0, "equal")     // 2 (C→D)
+ * _getStepSize("C major", "E", "up", 0, "equal")     // 1 (E→F)
+ * // 19-EDO: C major scale steps (wider intervals)
+ * _getStepSize("C major", "C", "up", 0, "equal", 19) // 3 (C→D)
+ * _getStepSize("C major", "E", "up", 0, "equal", 19) // 2 (E→F)
+ * // 31-EDO: C major scale steps
+ * _getStepSize("C major", "C", "up", 0, "equal", 31) // 5 (C→D)
+ * _getStepSize("C major", "E", "up", 0, "equal", 31) // 3 (E→F)
  */
-const _getStepSize = (keySignature, pitch, direction, transposition, temperament) => {
+const _getStepSize = (keySignature, pitch, direction, transposition, temperament, edo) => {
     // Returns how many half-steps to the next note in this key.
     if (temperament === undefined) {
         temperament = "equal";
     }
     if (isCustomTemperament(temperament)) {
-        //Scalar = Semitone for custom Temperament.
-        return transposition;
+        const t = getTemperament(temperament);
+        if (!t || !temperamentHasRatios(temperament)) {
+            // Scalar = Semitone for custom Temperament with no ratios.
+            return transposition;
+        }
+        // For custom temperaments with ratios, fall through to ratio-based
+        // step size calculation below.
+    }
+    let currentEDO = edo;
+    if (!currentEDO) {
+        currentEDO = getCurrentEDO(temperament);
     }
 
     let thisPitch = pitch;
-    const obj = buildScale(keySignature);
+    // Thread the EDO into the scale builder so the scale/step data always
+    // matches the temperament being measured instead of the global
+    // temperament state (12-EDO stays byte-for-byte identical).
+    const obj = buildScale(keySignature, currentEDO);
     const scale = obj[0];
     const halfSteps = obj[1];
 
@@ -5127,19 +6756,19 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
         }
     }
 
-    if (ii === -1) {
+    if (currentEDO === 12 && ii === -1) {
         if (thisPitch in EQUIVALENTFLATS) {
             ii = scale.indexOf(EQUIVALENTFLATS[thisPitch]);
         }
     }
 
-    if (ii === -1) {
+    if (currentEDO === 12 && ii === -1) {
         if (thisPitch in EQUIVALENTSHARPS) {
             ii = scale.indexOf(EQUIVALENTSHARPS[thisPitch]);
         }
     }
 
-    if (ii === -1) {
+    if (currentEDO === 12 && ii === -1) {
         if (thisPitch in EQUIVALENTNATURALS) {
             ii = scale.indexOf(EQUIVALENTNATURALS[thisPitch]);
         }
@@ -5160,56 +6789,79 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     // Pitch is not in the consonant scale of this key, so we need to
     // shift up or down to the next note in the key.
     let offset = 0;
-    let i = PITCHES.indexOf(thisPitch);
-    if (i !== -1) {
-        while (!scale.includes(thisPitch)) {
-            i = PITCHES.indexOf(thisPitch);
-            if (i === -1) {
-                i = PITCHES2.indexOf(thisPitch);
-            }
-
-            if (direction === "up") {
-                i += 1;
-                thisPitch = PITCHES[i % 12];
-                offset += 1;
-            } else {
-                i -= 1;
-                if (i < 0) {
-                    i += 12;
+    if (currentEDO === 12) {
+        let startIndex = PITCHES.indexOf(thisPitch);
+        if (startIndex !== -1) {
+            // Convert starting 12-EDO index to approximate EDO step position
+            let edoStep = Math.round((startIndex * currentEDO) / PITCHES.length);
+            let guard = 0;
+            while (!scale.some(s => logicalEquals(s, thisPitch))) {
+                if (guard++ > currentEDO + 12) {
+                    break;
                 }
-
-                thisPitch = PITCHES[i];
-                offset -= 1;
+                if (direction === "up") {
+                    edoStep += 1;
+                    offset += 1;
+                } else {
+                    edoStep -= 1;
+                    offset -= 1;
+                }
+                const posInOctave = ((edoStep % currentEDO) + currentEDO) % currentEDO;
+                const nameIndex =
+                    Math.round((posInOctave * PITCHES.length) / currentEDO) % PITCHES.length;
+                thisPitch = PITCHES[nameIndex];
             }
+
+            return offset;
         }
 
-        return offset;
-    }
-
-    i = PITCHES2.indexOf(thisPitch);
-    if (i !== -1) {
-        while (!scale.includes(thisPitch)) {
-            i = PITCHES2.indexOf(thisPitch);
-            if (i === -1) {
-                i = PITCHES.indexOf(thisPitch);
-            }
-
-            if (direction === "up") {
-                i += 1;
-                thisPitch = PITCHES2[i % 12];
-                offset += 1;
-            } else {
-                i -= 1;
-                if (i < 0) {
-                    i += 12;
+        startIndex = PITCHES2.indexOf(thisPitch);
+        if (startIndex !== -1) {
+            let edoStep = Math.round((startIndex * currentEDO) / PITCHES2.length);
+            let guard = 0;
+            while (!scale.some(s => logicalEquals(s, thisPitch))) {
+                if (guard++ > currentEDO + 12) {
+                    break;
                 }
-
-                thisPitch = PITCHES2[i];
-                offset -= 1;
+                if (direction === "up") {
+                    edoStep += 1;
+                    offset += 1;
+                } else {
+                    edoStep -= 1;
+                    offset -= 1;
+                }
+                const posInOctave = ((edoStep % currentEDO) + currentEDO) % currentEDO;
+                const nameIndex =
+                    Math.round((posInOctave * PITCHES2.length) / currentEDO) % PITCHES2.length;
+                thisPitch = PITCHES2[nameIndex];
             }
-        }
 
-        return offset;
+            return offset;
+        }
+    } else {
+        // EDO-native fallback: walk the EDO's own note positions instead of
+        // the hardcoded 12-EDO PITCHES/PITCHES2 tables.
+        const edoNames = generateNoteNames(currentEDO);
+        let edoIndex = getEdoNoteNamePosition(thisPitch, currentEDO);
+        if (edoIndex !== -1) {
+            let guard = 0;
+            while (!scale.some(s => logicalEquals(s, thisPitch))) {
+                if (guard++ > currentEDO + 12) {
+                    break;
+                }
+                if (direction === "up") {
+                    edoIndex += 1;
+                    offset += 1;
+                } else {
+                    edoIndex -= 1;
+                    offset -= 1;
+                }
+                const posInOctave = ((edoIndex % currentEDO) + currentEDO) % currentEDO;
+                thisPitch = edoNames[posInOctave];
+            }
+
+            return offset;
+        }
     }
 
     // Should never get here, but just in case.
@@ -5225,10 +6877,12 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
  * @param {string} pitch - The pitch (note name).
  * @param {number} transposition - The transposition value.
  * @param {string} temperament - The temperament used for pitch calculation.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     temperament's own EDO is used (legacy behavior).
  * @returns {number} The step size in half-steps.
  */
-const getStepSizeUp = (keySignature, pitch, transposition, temperament) => {
-    return _getStepSize(keySignature, pitch, "up", transposition, temperament);
+const getStepSizeUp = (keySignature, pitch, transposition, temperament, edo) => {
+    return _getStepSize(keySignature, pitch, "up", transposition, temperament, edo);
 };
 
 /**
@@ -5238,20 +6892,30 @@ const getStepSizeUp = (keySignature, pitch, transposition, temperament) => {
  * @param {string} pitch - The pitch (note name).
  * @param {number} transposition - The transposition value.
  * @param {string} temperament - The temperament used for pitch calculation.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     temperament's own EDO is used (legacy behavior).
  * @returns {number} The step size in half-steps.
  */
-const getStepSizeDown = (keySignature, pitch, transposition, temperament) => {
-    return _getStepSize(keySignature, pitch, "down", transposition, temperament);
+const getStepSizeDown = (keySignature, pitch, transposition, temperament, edo) => {
+    return _getStepSize(keySignature, pitch, "down", transposition, temperament, edo);
 };
 
 /**
  * Get the length of the mode (number of notes) for the given key signature.
  * @function
  * @param {string} keySignature - The key signature.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     global temperament state is used (legacy behavior).
  * @returns {number} The length of the mode.
+ * @example
+ * getModeLength("C major")          // 7 (always 7 for major)
+ * getModeLength("C major", 19)      // 7 (same mode, different EDO)
+ * getModeLength("C major", 31)      // 7
+ * getModeLength("C chromatic")      // 12 (chromatic scale)
+ * getModeLength("C chromatic", 19)  // 19 (19-note chromatic)
  */
-const getModeLength = keySignature => {
-    return buildScale(keySignature)[1].length;
+const getModeLength = (keySignature, edo) => {
+    return buildScale(keySignature, edo)[1].length;
 };
 
 /**
@@ -5261,9 +6925,18 @@ const getModeLength = keySignature => {
  * @param {number} scaleDegree - The scale degree.
  * @param {boolean} movable - Indicates if movable do is present.
  * @param {string} pitch - The pitch (note name).
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     global temperament state is used (legacy behavior).
  * @returns {string|Array} The pitch corresponding to the scale degree or vice versa.
+ * @example
+ * // 12-EDO: degree → pitch
+ * scaleDegreeToPitchMapping("C major", 3, true, null)     // "E"
+ * // 19-EDO: degree → pitch (same note names, different frequencies)
+ * scaleDegreeToPitchMapping("C major", 3, true, null, 19) // "E"
+ * // 31-EDO: degree → pitch
+ * scaleDegreeToPitchMapping("C major", 5, true, null, 31) // "G"
  */
-const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) => {
+const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo) => {
     if (pitch === null) {
         scaleDegree -= 1;
     }
@@ -5271,7 +6944,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
 
     // Info variables according to chosen mode
     const chosenMode = keySignatureToMode(keySignature);
-    const obj1 = buildScale(keySignature);
+    const obj1 = buildScale(keySignature, edo);
     const chosenModeScale = obj1[0];
     const chosenModePattern = obj1[1];
 
@@ -5288,7 +6961,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
 
     // if movable do is present just return the major/perfect tones
     if (movable) {
-        finalScale = buildScale(chosenMode[0] + " major")[0];
+        finalScale = buildScale(chosenMode[0] + " major", edo)[0];
 
         if (pitch === null) {
             return finalScale[scaleDegree];
@@ -5343,7 +7016,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
             }
         } else if (chosenModePattern.length < 7) {
             // Major scale of the choosen key is used as fallback
-            const majorScale = buildScale(chosenMode[0] + " major")[0];
+            const majorScale = buildScale(chosenMode[0] + " major", edo)[0];
 
             // according to the choosenModePattern, calculate defined scale degrees
             for (let i = 0; i < chosenModePattern.length; i++) {
@@ -5546,12 +7219,23 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
  * @function
  * @param {string} keySignature - The key signature.
  * @param {number} scaleDegree - The scale degree.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     global temperament state is used (legacy behavior).
  * @returns {string} The note corresponding to the scale degree in the current key signature.
+ * @example
+ * // 12-EDO: C major scale degrees
+ * nthDegreeToPitch("C major", 1)     // ["C", 0]
+ * nthDegreeToPitch("C major", 4)     // ["F", 0]
+ * // 19-EDO: same scale degrees, 19-EDO frequencies
+ * nthDegreeToPitch("C major", 1, 19) // ["C", 0]
+ * nthDegreeToPitch("C major", 4, 19) // ["F", 0]
+ * // 31-EDO
+ * nthDegreeToPitch("C major", 5, 31) // ["G", 0]
  */
-const nthDegreeToPitch = (keySignature, scaleDegree) => {
+const nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
     // Returns note corresponding to scale degree in current key
     // signature. Used for movable solfege.
-    const scale = buildScale(keySignature)[0];
+    const scale = buildScale(keySignature, edo)[0];
     const modeLength = scale.length - 1;
 
     // Scale degree is specified as do === 1, re === 2, etc., so we need
@@ -5572,11 +7256,20 @@ const nthDegreeToPitch = (keySignature, scaleDegree) => {
  * @param {number} interval - The interval value.
  * @param {string} keySignature - The key signature.
  * @param {string} pitch - The pitch (note name).
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     global temperament state is used (legacy behavior).
  * @returns {number} The relative interval value.
+ * @example
+ * // 12-EDO: interval from E in C major = 4 semitones (E→G#)
+ * getInterval(2, "C major", "E")     // 3 (E→F, 1 scale step)
+ * // 19-EDO: same scale step, different EDO spacing
+ * getInterval(2, "C major", "E", 19) // 2 (E→F in 19-EDO)
+ * // 31-EDO
+ * getInterval(2, "C major", "E", 31) // 3 (E→F in 31-EDO)
  */
-const getInterval = (interval, keySignature, pitch) => {
+const getInterval = (interval, keySignature, pitch, edo) => {
     // Step size interval based on the position (pitch) in the scale
-    const obj = buildScale(keySignature);
+    const obj = buildScale(keySignature, edo);
     const scale = obj[0];
     const halfSteps = obj[1];
     // Offet is used in the case that the pitch is not in the current scale.
@@ -5629,12 +7322,12 @@ const getInterval = (interval, keySignature, pitch) => {
                     let i = PITCHES.indexOf(pitch);
                     if (interval > 0) {
                         i += 1;
-                        pitch = PITCHES[i % 12];
+                        pitch = PITCHES[i % PITCHES.length];
                         // offset -= 1;
                     } else {
                         i -= 1;
                         if (i < 0) {
-                            i += 12;
+                            i += PITCHES.length;
                         }
                         pitch = PITCHES[i];
                         // offset += 1;
@@ -5652,12 +7345,12 @@ const getInterval = (interval, keySignature, pitch) => {
                         let i = PITCHES2.indexOf(pitch);
                         if (interval > 0) {
                             i += 1;
-                            pitch = PITCHES2[i % 12];
+                            pitch = PITCHES2[i % PITCHES2.length];
                             // offset -= 1;
                         } else {
                             i -= 1;
                             if (i < 0) {
-                                i += 12;
+                                i += PITCHES2.length;
                             }
                             pitch = PITCHES2[i];
                             // offset += 1;
@@ -5737,12 +7430,16 @@ const toFraction = d => {
     let top = 1;
     let bot = 1;
 
+    let iterGuard = 0;
     while (Math.abs(df - d) > 0.00000001) {
+        if (iterGuard++ > 10000) {
+            break;
+        }
         if (df < d) {
             top += 1;
         } else {
             bot += 1;
-            top = parseInt(d * bot);
+            top = parseInt(d * bot, 10);
         }
         df = top / bot;
     }
@@ -5777,8 +7474,8 @@ const calcNoteValueToDisplay = (a, b) => {
     let value;
     let obj;
     let d0, d1;
-    if (parseInt(noteValue) < noteValue) {
-        noteValueToDisplay = parseInt(noteValue * 1.5);
+    if (parseInt(noteValue, 10) < noteValue) {
+        noteValueToDisplay = parseInt(noteValue * 1.5, 10);
         if (noteValueToDisplay in NSYMBOLS) {
             value = b / a; // * noteValueToDisplay;
             obj = toFraction(value);
@@ -5794,7 +7491,7 @@ const calcNoteValueToDisplay = (a, b) => {
                 NSYMBOLS[noteValueToDisplay] +
                 ".";
         } else {
-            noteValueToDisplay = parseInt(noteValue * 1.75);
+            noteValueToDisplay = parseInt(noteValue * 1.75, 10);
             if (noteValueToDisplay in NSYMBOLS) {
                 value = b / a; // * noteValueToDisplay;
                 obj = toFraction(value);
@@ -5875,15 +7572,19 @@ const durationToNoteValue = duration => {
  * @returns {Array} An array containing [noteName, octave].
  */
 const parseNoteString = note => {
-    // Regex to match note name (letter + optional accidental) and octave (one or more digits, optional negative sign)
-    // Pattern: [A-Ga-g] for note letter, [#b♯♭]? for optional accidental, (-?\d+) for octave (multi-digit, can be negative)
-    const match = note.match(/^([A-Ga-g][#b♯♭]?)(-?\d+)$/);
+    // Regex to match note name and octave (one or more digits, optional negative sign)
+    // Matches valid note prefixes (Western, Solfege, Carnatic) and optional accidentals followed by octave
+    const match = note.match(
+        /^((?:[a-g]|do|re|mi|fa|sol|la|ti|si|ut|sa|ga|ma|pa|dha|ni)(?:[#b♯♭𝄪𝄫x♮]*))(-?\d+)$/iu
+    );
     if (match) {
         return [match[1], Number(match[2])];
     }
     // Fallback to original behavior if regex doesn't match (for edge cases)
     const len = note.length;
-    return [note.substring(0, len - 1), Number(last(note))];
+    const lastChar = note.charAt(len - 1);
+    const octave = lastChar && !isNaN(lastChar) ? Number(lastChar) : NaN;
+    return [note.substring(0, len - 1), octave];
 };
 
 /**
@@ -5903,16 +7604,36 @@ const noteToPitchOctave = note => {
  * @param {number} octave - The octave of the note.
  * @param {number} cents - The cents to adjust the frequency.
  * @param {string} keySignature - The key signature.
+ * @param {string} [temperament="equal"] - The temperament to use.
  * @returns {number} The calculated frequency.
  */
-const pitchToFrequency = (pitch, octave, cents, keySignature) => {
-    // Calculate the frequency based on pitch and octave.
-    const pitchNumber = pitchToNumber(pitch, octave, keySignature);
+const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
+    const currentEDO = getCurrentEDO(temperament);
+    const t = getTemperament(temperament);
+    if (t && !t.isEDO && t.noteLabels && t.ratios) {
+        const noteIdx = t.noteLabels.indexOf(pitch);
+        if (noteIdx !== -1) {
+            const aIdx = t.noteLabels.indexOf("A");
+            const baseRefFreq = A0 / t.ratios[aIdx];
+            let freq = baseRefFreq * t.ratios[noteIdx] * Math.pow(2, octave);
+            if (cents !== 0) {
+                freq *= Math.pow(2, cents / 1200);
+            }
+            return freq;
+        }
+    }
 
+    const pitchNumber = pitchToNumber(pitch, octave, keySignature, temperament);
+
+    // Frequency = A0 * 2^(pitchNumber / currentEDO)
+    // With cents offset: Frequency = A0 * 2^((pitchNumber * 100 + cents) / (currentEDO * 100))
+    // This works because 1 semitone = 100 cents, and 2^(1/1200) is the cents resolution.
+    // Example: 19-EDO, A4 (pitchNumber=48), 0 cents → 27.5 * 2^(48/19) ≈ 440 Hz
+    // Example: 19-EDO, A4 + 50 cents → 27.5 * 2^((48*100+50)/(19*100)) ≈ 447.8 Hz
     if (cents === 0) {
-        return A0 * Math.pow(TWELTHROOT2, pitchNumber);
+        return A0 * Math.pow(2, 1 / currentEDO) ** pitchNumber;
     } else {
-        return A0 * Math.pow(TWELVEHUNDRETHROOT2, pitchNumber * 100 + cents);
+        return A0 * Math.pow(2, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
     }
 };
 
@@ -5923,9 +7644,9 @@ const pitchToFrequency = (pitch, octave, cents, keySignature) => {
  * @param {string} keySignature - The key signature.
  * @returns {number} The calculated frequency.
  */
-const noteToFrequency = (note, keySignature) => {
+const noteToFrequency = (note, keySignature, temperament) => {
     const obj = noteToPitchOctave(note);
-    return pitchToFrequency(obj[0], obj[1], 0, keySignature);
+    return pitchToFrequency(obj[0], obj[1], 0, keySignature, temperament);
 };
 
 /**
@@ -5947,18 +7668,35 @@ const noteIsSolfege = note => {
 };
 
 /**
- * Get the solfege representation of a note string.
+ * Convert a note to its solfege representation.
  * @function
- * @param {string} note - The note string.
+ * @param {string} note - The note to convert.
+ * @param {string} keySignature - The key signature.
+ * @param {boolean} movable - Indicates if movable do is present.
+ * @param {string} temperament - The temperament used for pitch calculation.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     temperament's EDO (and the global temperament state for the scale
+ *     builder) is used (legacy behavior).
  * @returns {string} The solfege representation.
+ * @example
+ * // 12-EDO: C major
+ * getSolfege("E", "C major", true, "equal")     // "mi"
+ * // 19-EDO: same solfege names, different frequencies
+ * getSolfege("E", "C major", true, "equal", 19) // "mi"
+ * // 31-EDO
+ * getSolfege("G", "C major", true, "equal", 31) // "sol"
  */
-const getSolfege = (note, keySignature, movable) => {
+const getSolfege = (note, keySignature, movable, temperament, edo) => {
     if (noteIsSolfege(note)) {
         return note;
     }
 
     if (movable && keySignature) {
-        const scaleResult = buildScale(keySignature);
+        let currentEDO = edo;
+        if (!currentEDO) {
+            currentEDO = getCurrentEDO(temperament);
+        }
+        const scaleResult = buildScale(keySignature, currentEDO);
         if (!scaleResult) return SOLFEGECONVERSIONTABLE[note];
 
         const scale = scaleResult[0];
@@ -5990,20 +7728,23 @@ const getSolfege = (note, keySignature, movable) => {
 
         // 3) chromatic fallback (interval based)
         const tonic = scale[0];
-        const tonicPitch = pitchToNumber(tonic, 4, keySignature);
-        const notePitch = pitchToNumber(note, 4, keySignature);
+        const tonicPitch = pitchToNumber(tonic, 4, keySignature, temperament);
+        const notePitch = pitchToNumber(note, 4, keySignature, temperament);
 
-        // semitones from tonic
-        let semitones = (notePitch - tonicPitch + 12) % 12;
+        // semitones from tonic (EDO-aware)
+        let semitones = (((notePitch - tonicPitch) % currentEDO) + currentEDO) % currentEDO;
 
         if (isMinor) {
-            // For minor, relative major is 3 semitones up.
-            // We want solfege relative to the relative major.
-            // e.g. Minor tonic (La) -> +9 -> La
-            semitones = (semitones + 9) % 12;
+            // For minor, relative major is 3 semitones up in 12-EDO terms.
+            // Map to the current EDO and compute la-based offset.
+            const relativeMajorSteps = Math.round((3 * currentEDO) / 12);
+            semitones = (semitones + currentEDO - relativeMajorSteps) % currentEDO;
         }
 
-        return CHROMATIC_SOLFEGE[semitones].toLowerCase();
+        // Map EDO semitones to nearest 12-tone CHROMATIC_SOLFEGE index
+        const chromaticSize = CHROMATIC_SOLFEGE.length;
+        const solfegeIndex = Math.round((semitones * chromaticSize) / currentEDO) % chromaticSize;
+        return CHROMATIC_SOLFEGE[solfegeIndex].toLowerCase();
     }
 
     return SOLFEGECONVERSIONTABLE[note];
@@ -6044,6 +7785,40 @@ const splitSolfege = value => {
     return ["sol", ""];
 };
 
+const getI18nSolfNotes = () => {
+    //.TRANS: the note names must be separated by single spaces
+    const solfnotes = _("ti la sol fa mi re do");
+    if (typeof solfnotes !== "string") {
+        return SOLFNOTES;
+    }
+
+    const translated = solfnotes.trim().split(/\s+/);
+    if (translated.length !== SOLFNOTES.length || translated.some(note => note.length === 0)) {
+        return SOLFNOTES;
+    }
+
+    return translated;
+};
+
+const splitI18nSolfege = value => {
+    if (value !== null && typeof value === "string") {
+        const solfnotes = getI18nSolfNotes();
+        const lowerValue = value.toLowerCase();
+        const matches = solfnotes
+            .map((note, i) => ({ note, i }))
+            .sort((a, b) => b.note.length - a.note.length);
+
+        for (const match of matches) {
+            const lowerNote = match.note.toLowerCase();
+            if (lowerValue === lowerNote || lowerValue.startsWith(lowerNote)) {
+                return [SOLFNOTES[match.i], value.slice(match.note.length)];
+            }
+        }
+    }
+
+    return splitSolfege(value);
+};
+
 /**
  * Internationalize a solfege note using i18n.
  * @function
@@ -6052,8 +7827,13 @@ const splitSolfege = value => {
  */
 const i18nSolfege = note => {
     // solfnotes_ is used in the interface for i18n
-    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
-    const obj = splitSolfege(note);
+    const solfnotes_ = getI18nSolfNotes();
+    const sourceObj = splitSolfege(note);
+    const obj = splitI18nSolfege(note);
+
+    if (!SOLFNOTES.includes(sourceObj[0]) && SOLFNOTES.includes(obj[0])) {
+        return obj[0] + obj[1];
+    }
 
     const i = SOLFNOTES.indexOf(obj[0]);
     if (i !== -1) {
@@ -6092,15 +7872,24 @@ const splitScaleDegree = value => {
  * @param {number} delta - The delta to adjust the value.
  * @returns {Array} An array containing the note and octave.
  */
-const getNumNote = (value, delta) => {
-    // Converts from number to note
+const getNumNote = (value, delta, temperament) => {
+    // Converts from number to note.
+    // Respects the active temperament octave size so that non-12-EDO
+    // tuning systems wrap correctly instead of always assuming 12 semitones.
     let num = value + delta;
-    let octave = Math.floor(num / 12);
-    num = num % 12;
 
-    const note = NOTESTABLE[num];
+    const octaveSize =
+        temperament && TEMPERAMENT[temperament] && TEMPERAMENT[temperament]["pitchNumber"]
+            ? TEMPERAMENT[temperament]["pitchNumber"]
+            : 12;
 
-    if (note[num] === "ti") {
+    let octave = Math.floor(num / octaveSize);
+    num = ((num % octaveSize) + octaveSize) % octaveSize;
+
+    const tableIndex = Math.round((num / octaveSize) * 12) % 12;
+    const note = NOTESTABLE[tableIndex];
+
+    if (note === "ti") {
         octave -= 1;
     }
 
@@ -6116,7 +7905,7 @@ const getNumNote = (value, delta) => {
  * @param {string} currentNote - The current note.
  * @returns {number} The calculated octave.
  */
-const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
+const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament) => {
     // Calculate the octave based on the current Octave and the arg,
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
@@ -6124,6 +7913,8 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
     if (typeof arg === "number") {
         return Math.max(1, Math.min(Math.floor(arg), 9));
     }
+
+    const currentEDO = getCurrentEDO(temperament);
 
     // The relative octave for tritones are arbitrated as being in the
     // current octave, so we need to determine the number of half
@@ -6136,9 +7927,9 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
         note = currentNote;
     }
 
-    const stepCurrentNote = getNumber(note, currentOctave);
-    const stepUpCurrentNote = getNumber(note, currentOctave + 1);
-    const stepDownCurrentNote = getNumber(note, currentOctave - 1);
+    const stepCurrentNote = getNumber(note, currentOctave, temperament);
+    const stepUpCurrentNote = getNumber(note, currentOctave + 1, temperament);
+    const stepDownCurrentNote = getNumber(note, currentOctave - 1, temperament);
 
     if (lastNotePlayed !== null) {
         lastNotePlayed = lastNotePlayed[0];
@@ -6148,25 +7939,21 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
         lastNotePlayed = "G";
     }
 
-    const stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave);
+    const stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave, temperament);
 
     const halfSteps = Math.abs(stepLastNotePlayed - stepCurrentNote);
     const halfStepsUp = Math.abs(stepLastNotePlayed - stepUpCurrentNote);
     const halfStepsDown = Math.abs(stepLastNotePlayed - stepDownCurrentNote);
 
-    if (halfSteps <= 5 || isNaN(halfSteps)) {
+    const octaveThreshold = Math.round(currentEDO / 4);
+
+    if (halfSteps <= octaveThreshold || isNaN(halfSteps)) {
         changedCurrent = currentOctave;
-    }
-
-    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown < 5) {
+    } else if (halfStepsDown <= halfStepsUp) {
         changedCurrent = Math.max(currentOctave - 1, 1);
-    }
-
-    if (halfSteps > 5 && halfStepsUp < 5 && halfStepsDown > 5) {
+    } else if (halfStepsUp < halfStepsDown) {
         changedCurrent = Math.min(currentOctave + 1, 9);
-    }
-
-    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown > 5) {
+    } else {
         changedCurrent = currentOctave;
     }
 
@@ -6241,7 +8028,7 @@ const calcOctaveInterval = arg => {
  * @returns {boolean} True if the value is an integer, false otherwise.
  */
 const isInt = value => {
-    return !isNaN(value) && parseInt(Number(value)) === value && !isNaN(parseInt(value, 10));
+    return !isNaN(parseFloat(value)) && Number.isInteger(Number(value));
 };
 
 /**
@@ -6251,6 +8038,12 @@ const isInt = value => {
  * @returns {string} The converted note.
  */
 const convertFromSolfege = note => {
+    if (typeof note === "string") {
+        const unicodeNote = note.replace("#", SHARP).replace("b", FLAT);
+        if (unicodeNote in FIXEDSOLFEGE1) {
+            note = FIXEDSOLFEGE1[unicodeNote];
+        }
+    }
     // Convert to common letter class
     if (note in FIXEDSOLFEGE1) {
         note = FIXEDSOLFEGE1[note];
@@ -6291,7 +8084,7 @@ const convertFactor = factor => {
             return "2";
         case 0.5625: // 9/16
             return "2 16";
-        case 0.675: // 5/8
+        case 0.625: // 5/8
             return "2 8";
         case 0.6875: // 11/16
             return "2 8 16";
@@ -6313,21 +8106,38 @@ const convertFactor = factor => {
 /**
  * Get pitch information based on the note or pitch provided.
  * @function
- * @param {string|number} noteOrPitch - The note name (e.g. "C4") or a numeric pitch index.
+ * @param {string|number|Object} activity - Activity object or note/pitch (1-arg case).
+ * @param {string} [type] - The type of pitch info to return (4-arg case).
+ * @param {string|number} [currentNote] - The current note (4-arg case).
+ * @param {Object} [tur] - The turtle object (4-arg case).
  * @returns {Object|string} If called with one argument, returns { name, octave, pitchNumber }. Otherwise returns legacy values.
  */
 const getPitchInfo = function (activity, type, currentNote, tur) {
+    // Determine temperament
+    let temperament = "equal";
+    if (arguments.length === 1) {
+        // 1-arg case: try to get from global activity
+        if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
+            temperament = globalActivity.logo.synth.inTemperament;
+        }
+    } else if (arguments.length === 4 && activity?.logo?.synth?.inTemperament) {
+        // 4-arg case: get from activity
+        temperament = activity.logo.synth.inTemperament;
+    }
+
     if (arguments.length === 1) {
         const noteOrPitch = activity;
         let name, octave, pitchNumber;
 
         if (typeof noteOrPitch === "number") {
+            const currentEDO = getCurrentEDO(temperament);
             pitchNumber = noteOrPitch;
-            octave = Math.floor(pitchNumber / 12) - 1;
-            name = NOTESSHARP[pitchNumber % 12];
+            octave = Math.floor(pitchNumber / currentEDO) - 1;
+            const edoNames = generateNoteNames(currentEDO);
+            name = edoNames[pitchNumber % currentEDO];
         } else if (typeof noteOrPitch === "string") {
             [name, octave] = _parse_pitch_string(noteOrPitch);
-            pitchNumber = _calculate_pitch_number(name, octave);
+            pitchNumber = _calculate_pitch_number(name, octave, 0, temperament);
         } else {
             return INVALIDPITCH;
         }
@@ -6376,7 +8186,10 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
     }
     // Map the pitch to the current scale.
     pitch = pitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
-    if (!buildScale(tur.singer.keySignature)[0].includes(pitch)) {
+    if (
+        getCurrentEDO(temperament) === 12 &&
+        !buildScale(tur.singer.keySignature)[0].includes(pitch)
+    ) {
         if (pitch in EQUIVALENTFLATS) {
             pitch = EQUIVALENTFLATS[pitch];
         } else if (pitch in EQUIVALENTSHARPS) {
@@ -6402,7 +8215,10 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
                 }
                 return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(pitch)];
             case "pitch class":
-                return (pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) % 12;
+                return (
+                    (pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) %
+                    getCurrentEDO(temperament)
+                );
             case "scalar class":
                 return scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
@@ -6427,7 +8243,12 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
                     (octave - 4) * YSTAFFOCTAVEHEIGHT
                 );
             case "pitch number":
-                return _calculate_pitch_number(pitch, octave, tur?.singer?.pitchNumberOffset || 0);
+                return _calculate_pitch_number(
+                    pitch,
+                    octave,
+                    tur?.singer?.pitchNumberOffset || 0,
+                    temperament
+                );
             case "pitch in hertz":
                 // This function ignores cents.
                 return activity.logo.synth._getFrequency(
@@ -6455,12 +8276,14 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         updateTemperaments,
+        ratioToWheelAngle,
         scaleDegreeToPitchMapping,
         buildScale,
         getNote,
         getModeLength,
         nthDegreeToPitch,
         getInterval,
+        _parse_pitch_string,
         _calculate_pitch_number,
         _getStepSize,
         reducedFraction,
@@ -6484,6 +8307,9 @@ if (typeof module !== "undefined" && module.exports) {
         noteToFrequency,
         normalizeNoteAccidentals,
         TEMPERAMENT,
+        INTERVAL_CENTS,
+        TEMPERAMENT_INTERVALS,
+        INTERVAL_ORDER,
         setOctaveRatio,
         getOctaveRatio,
         TEMPERAMENTS,
@@ -6502,6 +8328,8 @@ if (typeof module !== "undefined" && module.exports) {
         getIntervalNumber,
         getIntervalDirection,
         getIntervalRatio,
+        generateNoteNames,
+        getEdoNoteNamePosition,
 
         getModeNumbers,
         getDrumIndex,
@@ -6518,12 +8346,21 @@ if (typeof module !== "undefined" && module.exports) {
         getVoiceIcon,
         getVoiceSynthName,
         isCustomTemperament,
+        temperamentHasRatios,
+        isTrueEDO,
+        isEquallyTempered,
+        getTemperamentRatio,
+        getTemperamentCents,
         getTemperamentName,
+        getCurrentEDO,
         noteToObj,
         frequencyToPitch,
         getArticulation,
         keySignatureToMode,
         getScaleAndHalfSteps,
+        scalePatternToEDO,
+        PITCH_COLLECTIONS_EDO_OVERRIDES,
+        getModePattern,
         modeMapper,
         getSharpFlatPreference,
         getCustomNote,
@@ -6542,14 +8379,43 @@ if (typeof module !== "undefined" && module.exports) {
         NOTESFLAT,
         NOTESSHARP,
         NOTESTEP,
+        ALLNOTESTEP,
         MUSICALMODES,
+        SEMITONES,
+        SCALENOTES,
+        PITCHES,
+        PITCHES1,
+        PITCHES3,
         SHARP,
         FLAT,
+        NATURAL,
+        DOUBLESHARP,
+        DOUBLEFLAT,
+        CENTSSYMBOL,
         NOTENAMES,
+        SOLFEGENAMES,
         SOLFEGENAMES1,
+        SOLFNOTES,
         ALLNOTENAMES,
         NOTENAMES1,
-        PITCHES1,
-        PITCHES3
+        SEMITONETOINTERVALMAP,
+        EQUIVALENTACCIDENTALS,
+        INTERVALVALUES,
+        FIXEDSOLFEGE,
+        FIXEDSOLFEGE1,
+        MODEPIEMENU_GROUP_RING,
+        MODEPIEMENU_NAME_RING,
+        getSavedCustomModes,
+        getModeNamesForGroup,
+        getModeLabel,
+        getModeNameFromLabel,
+        getModeSliceColors,
+        updateModeWheelItems,
+        getModeGroupTitleFont,
+        getModeSliceFont,
+        isNonEDO,
+        getNonEDOModeSteps,
+        getNonEDOFrequency,
+        configureWheel
     };
 }

@@ -18,6 +18,9 @@
 */
 
 /* exported Abhijeet Singh */
+/** AMD module dependencies for lazy loading. */
+AIWidget.dependencies = ["widgets/aiwidget"];
+
 /**
  * Represents a AI Widget.
  * @constructor
@@ -114,6 +117,24 @@ function AIWidget() {
     this.pitchAnalysers = {};
 
     /**
+     * Disconnects and disposes the pitch analysers.
+     * @private
+     * @returns {void}
+     */
+    this._disposePitchAnalysers = function () {
+        for (const id in this.pitchAnalysers) {
+            const analyser = this.pitchAnalysers[id];
+            if (analyser) {
+                for (const synth in instruments[0]) {
+                    instruments[0][synth].disconnect(analyser);
+                }
+                analyser.dispose();
+            }
+        }
+        this.pitchAnalysers = {};
+    };
+
+    /**
      * Pauses the sample playback.
      * @returns {void}
      */
@@ -128,14 +149,15 @@ function AIWidget() {
      * @returns {void}
      */
     this.resume = function () {
-        this.playBtn.innerHTML = `<img
-                src="header-icons/pause-button.svg" 
-                title="${_("Pause")}" 
-                alt="${_("Pause")}" 
-                height="${ICONSIZE}" 
-                width="${ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        const pauseImg = document.createElement("img");
+        pauseImg.src = "header-icons/pause-button.svg";
+        pauseImg.title = _("Pause");
+        pauseImg.alt = _("Pause");
+        pauseImg.height = ICONSIZE;
+        pauseImg.width = ICONSIZE;
+        pauseImg.style.verticalAlign = "middle";
+        this.playBtn.textContent = "";
+        this.playBtn.appendChild(pauseImg);
         this.isMoving = true;
     };
 
@@ -165,7 +187,7 @@ function AIWidget() {
      * @returns {void}
      */
     this._useOctave = function (o) {
-        this.octaveCenter = parseInt(o);
+        this.octaveCenter = parseInt(o, 10);
     };
 
     /**
@@ -229,7 +251,7 @@ function AIWidget() {
                             ],
                             [
                                 blockId + 4,
-                                ["text", { value: `Voice ${parseInt(lineId) + 1} ` }],
+                                ["text", { value: `Voice ${parseInt(lineId, 10) + 1} ` }],
                                 0,
                                 0,
                                 [blockId + 3]
@@ -371,7 +393,7 @@ function AIWidget() {
                             [
                                 "nameddo",
                                 {
-                                    value: `V: ${parseInt(lineId) + 1} Line ${
+                                    value: `V: ${parseInt(lineId, 10) + 1} Line ${
                                         baseBlocks.length + 1
                                     }`
                                 }
@@ -399,7 +421,7 @@ function AIWidget() {
                             [
                                 "text",
                                 {
-                                    value: `V: ${parseInt(lineId) + 1} Line ${
+                                    value: `V: ${parseInt(lineId, 10) + 1} Line ${
                                         baseBlocks.length + 1
                                     }`
                                 }
@@ -642,7 +664,7 @@ function AIWidget() {
 
         this.activity.blocks.loadNewBlocks(finalBlock);
 
-        this.activity.textMsg(_("New start block generated"));
+        this.activity.textMsg(_("New start block generated."));
 
         // // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
         // this.blocks.loadNewBlocks(combined_array);
@@ -695,18 +717,15 @@ function AIWidget() {
      * @returns {void}
      */
     this.init = function (activity) {
+        this._disposePitchAnalysers();
         this.activity = activity;
         this._directions = [];
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
         this._firstClickTimes = null;
         this.isMoving = false;
-        this.pitchAnalysers = {};
-
         this.activity.logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
         this.reconnectSynthsToAnalyser();
-
-        this.pitchAnalysers = {};
 
         this.running = true;
         if (this.drawVisualIDs) {
@@ -747,16 +766,7 @@ function AIWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
-            for (const id in this.pitchAnalysers) {
-                const analyser = this.pitchAnalysers[id];
-                if (analyser) {
-                    for (const synth in instruments[0]) {
-                        instruments[0][synth].disconnect(analyser);
-                    }
-                    analyser.dispose();
-                }
-            }
-            this.pitchAnalysers = {};
+            this._disposePitchAnalysers();
             widgetWindow.destroy();
         };
 
@@ -766,14 +776,15 @@ function AIWidget() {
         this.playBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
-                this.playBtn.innerHTML = `<img 
-                        src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
-                        height="${ICONSIZE}" 
-                        width="${ICONSIZE}"
-                        vertical-align="middle"
-                    >`;
+                const playImg = document.createElement("img");
+                playImg.src = "header-icons/play-button.svg";
+                playImg.title = _("Play");
+                playImg.alt = _("Play");
+                playImg.height = ICONSIZE;
+                playImg.width = ICONSIZE;
+                playImg.style.verticalAlign = "middle";
+                this.playBtn.textContent = "";
+                this.playBtn.appendChild(playImg);
                 this.isMoving = false;
             } else {
                 if (!(abcNotationSong === "")) {
@@ -799,8 +810,10 @@ function AIWidget() {
         widgetWindow.addButton("utility-button.svg", ICONSIZE, _("Set API Key"), "").onclick =
             function () {
                 const key = prompt(
-                    _("Enter your Groq API Key:"),
-                    that.activity.storage.groq_api_key || ""
+                    _("Enter your Groq API Key: %s").replace(
+                        /%s/g,
+                        that.activity.storage.groq_api_key || ""
+                    )
                 );
                 if (key !== null) {
                     that.activity.storage.groq_api_key = key.trim();
@@ -865,7 +878,7 @@ function AIWidget() {
                 this.midiBuffer.start();
             } catch (error) {
                 console.warn("synth error", error);
-                this.activity.errorMsg(_("Synth error: ") + error.message);
+                this.activity.errorMsg(_("Synth error: %s").replace(/%s/g, error.message));
             }
         } else {
             this.activity.errorMsg(_("Audio not supported in this browser."));

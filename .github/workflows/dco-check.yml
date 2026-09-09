@@ -1,0 +1,63 @@
+name: DCO Check
+
+# Verifies every commit in a pull request carries a `Signed-off-by:` trailer,
+# per the Developer Certificate of Origin (https://developercertificate.org/).
+# No third-party Action: the check is a few lines of git log parsing, so
+# there's no reason to trust an external Action's supply chain for it.
+#
+# Uses `pull_request` (NOT pull_request_target): this only reads the PR's own
+# commit history, so it stays in the unprivileged, fork-safe context alongside
+# ci.yml and pr-title-check.yml.
+
+on:
+    pull_request:
+        branches: [master]
+        types: [opened, reopened, synchronize]
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    dco-check:
+        name: Check DCO sign-off
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha }}
+                  fetch-depth: 0
+
+            - name: Check for Signed-off-by on every commit
+              run: |
+                  set -e
+                  base="${{ github.event.pull_request.base.sha }}"
+                  head="${{ github.event.pull_request.head.sha }}"
+                  missing=0
+
+                  for sha in $(git rev-list --no-merges "$base..$head"); do
+                    message=$(git log -1 --format=%B "$sha" | tr -d '\r')
+                    if ! printf '%s\n' "$message" | grep -qE '^Signed-off-by: .+ <.+>$'; then
+                      echo "::error::Commit $sha is missing a Signed-off-by trailer."
+                      missing=1
+                    fi
+                  done
+
+                  if [ "$missing" -eq 1 ]; then
+                    echo ""
+                    echo "One or more commits are missing a DCO sign-off."
+                    echo "Fix it with:"
+                    echo "  git commit -s --amend            # last commit only"
+                    echo "  git rebase --signoff <base-branch>   # whole branch"
+                    echo "then force-push: git push --force-with-lease"
+                    echo "See: https://developercertificate.org/"
+                    exit 1
+                  fi
+
+                  echo "All commits are signed off."
+                  

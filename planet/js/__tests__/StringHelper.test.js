@@ -51,14 +51,14 @@ describe("StringHelper", () => {
             expect(lastStringTurtle[1]).toBe("Open in Turtle Blocks");
         });
 
-        it("should init and append innerHTML to elements matching id", () => {
+        it("should init and append textContent to elements matching id", () => {
             document.body.innerHTML = '<div id="logo-container">Initial</div>';
             const helperObj = new StringHelper({ IsMusicBlocks: true });
 
             helperObj.init();
 
             const elem = document.getElementById("logo-container");
-            expect(elem.innerHTML).toBe("InitialPlanet");
+            expect(elem.textContent).toBe("InitialPlanet");
         });
 
         it("should init and set attribute if property is provided", () => {
@@ -138,18 +138,18 @@ describe("StringHelper", () => {
         });
 
         describe("init() improvements", () => {
-            it("should set innerHTML for elements without a third property", () => {
+            it("should set textContent for elements without a third property", () => {
                 document.body.innerHTML = '<div id="logo-container"></div>';
                 helper.init();
                 const elem = document.getElementById("logo-container");
-                expect(elem.innerHTML).toBe("Planet");
+                expect(elem.textContent).toBe("Planet");
             });
 
-            it("should append to existing innerHTML", () => {
+            it("should append to existing textContent", () => {
                 document.body.innerHTML = '<div id="logo-container">Prefix</div>';
                 helper.init();
                 const elem = document.getElementById("logo-container");
-                expect(elem.innerHTML).toBe("PrefixPlanet");
+                expect(elem.textContent).toBe("PrefixPlanet");
             });
 
             it("should set placeholder attribute for search input", () => {
@@ -163,8 +163,8 @@ describe("StringHelper", () => {
                 document.body.innerHTML =
                     '<div id="logo-container"></div><div id="localtitle"></div>';
                 helper.init();
-                expect(document.getElementById("logo-container").innerHTML).toBe("Planet");
-                expect(document.getElementById("localtitle").innerHTML).toBe("My Projects");
+                expect(document.getElementById("logo-container").textContent).toBe("Planet");
+                expect(document.getElementById("localtitle").textContent).toBe("My Projects");
             });
 
             it("should process all strings entries when all elements exist", () => {
@@ -181,8 +181,14 @@ describe("StringHelper", () => {
                     const elem = document.getElementById(entry[0]);
                     if (entry.length === 3) {
                         expect(elem.getAttribute(entry[2])).toBe(entry[1]);
+                    } else if (entry[0] === "deleter-confirm") {
+                        expect(elem.innerHTML).toContain('<span id="deleter-title"></span>');
+                    } else if (entry[0] === "deleter-paragraph") {
+                        expect(elem.innerHTML).toContain('<span id="deleter-name"></span>');
+                    } else if (entry[0] === "projectviewer-report-conduct") {
+                        expect(elem.innerHTML).toContain("<a ");
                     } else {
-                        expect(elem.innerHTML).toContain(entry[1]);
+                        expect(elem.textContent).toContain(entry[1]);
                     }
                 }
             });
@@ -199,8 +205,8 @@ describe("StringHelper", () => {
                 helper.init();
                 helper.init();
                 const elem = document.getElementById("local-tab");
-                // innerHTML is appended, so calling init twice doubles the text
-                expect(elem.innerHTML).toBe("LocalLocal");
+                // textContent is appended, so calling init twice doubles the text
+                expect(elem.textContent).toBe("LocalLocal");
             });
 
             it("should set data-tooltip for report-project and download-file entries", () => {
@@ -220,19 +226,78 @@ describe("StringHelper", () => {
                 ).toBe("Download as File");
             });
 
-            it("should inject sort option labels via innerHTML", () => {
+            it("should render sort option labels as plain text", () => {
                 document.body.innerHTML =
                     '<div id="option-recent"></div>' +
                     '<div id="option-liked"></div>' +
                     '<div id="option-downloaded"></div>' +
                     '<div id="option-alphabetical"></div>';
                 helper.init();
-                expect(document.getElementById("option-recent").innerHTML).toBe("Most recent");
-                expect(document.getElementById("option-liked").innerHTML).toBe("Most liked");
-                expect(document.getElementById("option-downloaded").innerHTML).toBe(
+                expect(document.getElementById("option-recent").textContent).toBe("Most recent");
+                expect(document.getElementById("option-liked").textContent).toBe("Most liked");
+                expect(document.getElementById("option-downloaded").textContent).toBe(
                     "Most downloaded"
                 );
-                expect(document.getElementById("option-alphabetical").innerHTML).toBe("A-Z");
+                expect(document.getElementById("option-alphabetical").textContent).toBe("A-Z");
+            });
+
+            it("should preserve safe HTML only for allowlisted strings", () => {
+                document.body.innerHTML =
+                    '<div id="deleter-confirm"></div>' +
+                    '<div id="projectviewer-report-conduct"></div>';
+
+                helper.init();
+
+                expect(document.getElementById("deleter-confirm").innerHTML).toContain(
+                    '<span id="deleter-title"></span>'
+                );
+                const reportLink = document
+                    .getElementById("projectviewer-report-conduct")
+                    .querySelector("a");
+                const reportElem = document.getElementById("projectviewer-report-conduct");
+
+                expect(reportElem.querySelector("script")).toBe(null);
+                expect(reportElem.querySelector("[onclick]")).toBe(null);
+                expect(reportElem.querySelector('a[href^="javascript:"]')).toBe(null);
+                expect(reportLink.getAttribute("href")).toBe(
+                    "https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md"
+                );
+                expect(reportLink.getAttribute("target")).toBe("_blank");
+                expect(reportLink.getAttribute("rel")).toBe("noopener noreferrer");
+            });
+
+            it("should strip unsafe HTML from allowlisted localization strings", () => {
+                document.body.innerHTML = '<div id="projectviewer-report-conduct"></div>';
+                helper.strings = [
+                    [
+                        "projectviewer-report-conduct",
+                        '<a href="javascript:alert(1)" onclick="alert(2)">Report</a><script>alert(3)</script>'
+                    ]
+                ];
+
+                helper.init();
+
+                const elem = document.getElementById("projectviewer-report-conduct");
+                expect(elem.querySelector("script")).toBe(null);
+                expect(elem.querySelector("[onclick]")).toBe(null);
+                expect(elem.querySelector('a[href^="javascript:"]')).toBe(null);
+                expect(elem.textContent).toContain("Report");
+                expect(elem.textContent).toContain("alert(3)");
+            });
+
+            it("should render non-allowlisted HTML as plain text", () => {
+                document.body.innerHTML = '<div id="logo-container"></div>';
+
+                helper.strings = [["logo-container", "<img src=x onerror=alert(1)>"]];
+
+                helper.init();
+
+                const elem = document.getElementById("logo-container");
+
+                expect(elem.querySelector("img")).toBe(null);
+                expect(elem.querySelector("script")).toBe(null);
+                expect(elem.querySelector("[onerror]")).toBe(null);
+                expect(elem.textContent).toContain("<img");
             });
         });
     });

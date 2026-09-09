@@ -44,7 +44,8 @@ global.jQuery = jest.fn(() => ({
 global.debounce = jest.fn(fn => fn);
 global.ProjectViewer = jest.fn().mockImplementation(() => ({
     init: jest.fn(),
-    open: jest.fn()
+    open: jest.fn(),
+    destroy: jest.fn()
 }));
 
 const { GlobalPlanet } = require("../GlobalPlanet");
@@ -433,6 +434,51 @@ describe("GlobalPlanet", () => {
 
             expect(special.unselect).toHaveBeenCalled();
             expect(regular.unselect).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("destroy", () => {
+        it("should call ProjectViewer.destroy() when ProjectViewer exists", () => {
+            const mockDestroy = jest.fn();
+            gp.ProjectViewer = { destroy: mockDestroy };
+
+            gp.destroy();
+
+            expect(mockDestroy).toHaveBeenCalled();
+        });
+
+        it("should not throw when ProjectViewer is null", () => {
+            gp.ProjectViewer = null;
+            expect(() => gp.destroy()).not.toThrow();
+        });
+
+        it("should remove own tracked listeners and reset listenerRefs", () => {
+            const el = document.getElementById("load-more-projects");
+            const bound = jest.fn();
+            gp.listenerRefs = [{ el, type: "click", bound }];
+            const removeSpy = jest.spyOn(el, "removeEventListener");
+
+            gp.destroy();
+
+            expect(removeSpy).toHaveBeenCalledWith("click", bound);
+            expect(gp.listenerRefs).toEqual([]);
+        });
+    });
+
+    describe("init destroy init regression", () => {
+        it("should not accumulate listeners across re-init cycles", () => {
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+
+            gp.init();
+            const countAfterFirstInit = gp.listenerRefs.length;
+            expect(countAfterFirstInit).toBeGreaterThan(0);
+
+            gp.destroy();
+            expect(gp.listenerRefs).toEqual([]);
+
+            gp.init();
+            // second init should register the same number of listeners not double them
+            expect(gp.listenerRefs.length).toBe(countAfterFirstInit);
         });
     });
 });

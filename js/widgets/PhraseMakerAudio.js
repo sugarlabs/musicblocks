@@ -18,6 +18,23 @@
 
 const PhraseMakerAudio = {
     /**
+     * Clears all pending playback and chord timers.
+     * @param {Object} pm - The PhraseMaker instance.
+     */
+    clearPlaybackTimers(pm) {
+        if (pm._playNoteTimeout) {
+            clearTimeout(pm._playNoteTimeout);
+            pm._playNoteTimeout = null;
+        }
+        if (Array.isArray(pm._chordTimeouts)) {
+            for (let i = 0; i < pm._chordTimeouts.length; i++) {
+                clearTimeout(pm._chordTimeouts[i]);
+            }
+            pm._chordTimeouts = [];
+        }
+    },
+
+    /**
      * Plays all notes in the matrix.
      * Toggles between playing and stopping notes based on the current state.
      * @param {Object} pm - The PhraseMaker instance.
@@ -27,6 +44,9 @@ const PhraseMakerAudio = {
         pm.playingNow = !pm.playingNow;
 
         if (pm.playingNow) {
+            this.clearPlaybackTimers(pm);
+            pm._stopOrCloseClicked = false;
+
             pm.widgetWindow.modifyButton(
                 0,
                 "stop-button.svg",
@@ -75,8 +95,6 @@ const PhraseMakerAudio = {
                         pitchNotes.push(normalizeNoteAccidentals(note[i]));
                     }
                 }
-
-                pm._stopOrCloseClicked = false;
             }
 
             const noteValue = pm._notesToPlay[pm._notesCounter][1];
@@ -134,6 +152,11 @@ const PhraseMakerAudio = {
             this.__playNote(pm, 0, 0);
         } else {
             pm._stopOrCloseClicked = true;
+            this.clearPlaybackTimers(pm);
+            if (pm.activity && pm.activity.logo && pm.activity.logo.synth) {
+                pm.activity.logo.synth.stop();
+            }
+            PhraseMakerUI.resetMatrix(pm);
             pm.widgetWindow.modifyButton(
                 0,
                 "play-button.svg",
@@ -334,23 +357,37 @@ const PhraseMakerAudio = {
      */
     __playNote(pm, time, noteCounter) {
         // Show lyrics while playing notes.
-        if (pm.lyricsON) {
-            activity.textMsg(pm._lyrics[noteCounter], 3000);
+        if (pm.lyricsON && pm.activity) {
+            pm.activity.textMsg(pm._lyrics[noteCounter], 3000);
         }
-        // If the widget is closed, stop playing.
-        if (!pm.widgetWindow.isVisible()) {
+        // If the widget is closed or stopped, stop playing.
+        if (!pm.widgetWindow.isVisible() || pm._stopOrCloseClicked) {
+            this.clearPlaybackTimers(pm);
             return;
         }
 
         let noteValue = pm._notesToPlay[noteCounter][1];
         time = 1 / noteValue;
 
-        setTimeout(
+        if (pm._playNoteTimeout) {
+            clearTimeout(pm._playNoteTimeout);
+            pm._playNoteTimeout = null;
+        }
+
+        pm._playNoteTimeout = setTimeout(
             () => {
+                pm._playNoteTimeout = null;
+                if (!pm.widgetWindow.isVisible() || pm._stopOrCloseClicked) {
+                    this.clearPlaybackTimers(pm);
+                    PhraseMakerUI.resetMatrix(pm);
+                    return;
+                }
+
                 let row, cell, tupletCell;
                 // Did we just play the last note?
                 if (noteCounter === pm._notesToPlay.length - 1) {
                     PhraseMakerUI.resetMatrix(pm);
+                    this.clearPlaybackTimers(pm);
 
                     pm.widgetWindow.modifyButton(
                         0,
@@ -359,14 +396,17 @@ const PhraseMakerAudio = {
                         pm._("Play")
                     );
                     pm.playingNow = false;
-                    pm._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                    src="header-icons/play-button.svg" 
-                    title="${pm._("Play")}" 
-                    alt="${pm._("Play")}" 
-                    height="${pm.constructor.ICONSIZE}" 
-                    width="${pm.constructor.ICONSIZE}" 
-                    vertical-align="middle"
-                >&nbsp;&nbsp;`;
+                    const playImg = document.createElement("img");
+                    playImg.src = "header-icons/play-button.svg";
+                    playImg.title = pm._("Play");
+                    playImg.alt = pm._("Play");
+                    playImg.height = pm.constructor.ICONSIZE;
+                    playImg.width = pm.constructor.ICONSIZE;
+                    playImg.style.verticalAlign = "middle";
+                    pm._playButton.textContent = "\u00A0\u00A0";
+                    pm._playButton.appendChild(playImg);
+                    const nbsp = document.createTextNode("\u00A0\u00A0");
+                    pm._playButton.appendChild(nbsp);
                 } else {
                     row = pm._noteValueRow;
                     cell = row.cells[pm._colIndex];
@@ -476,10 +516,11 @@ const PhraseMakerAudio = {
                 }
 
                 if (noteCounter < pm._notesToPlay.length - 1) {
-                    if (!pm._stopOrCloseClicked) {
+                    if (!pm._stopOrCloseClicked && pm.playingNow) {
                         this.__playNote(pm, time, noteCounter + 1);
                     } else {
                         PhraseMakerUI.resetMatrix(pm);
+                        this.clearPlaybackTimers(pm);
                     }
                 }
             },
@@ -494,47 +535,63 @@ const PhraseMakerAudio = {
      * @param {number} noteValue - The duration value of the chord notes.
      */
     _playChord(pm, notes, noteValue) {
-        setTimeout(() => {
-            pm.activity.logo.synth.trigger(0, notes[0], noteValue, pm._instrumentName, null, null);
-        }, 1);
-
-        if (notes.length > 1) {
+        pm._chordTimeouts = pm._chordTimeouts || [];
+        pm._chordTimeouts.push(
             setTimeout(() => {
                 pm.activity.logo.synth.trigger(
                     0,
-                    notes[1],
+                    notes[0],
                     noteValue,
                     pm._instrumentName,
                     null,
                     null
                 );
-            }, 1);
+            }, 1)
+        );
+
+        if (notes.length > 1) {
+            pm._chordTimeouts.push(
+                setTimeout(() => {
+                    pm.activity.logo.synth.trigger(
+                        0,
+                        notes[1],
+                        noteValue,
+                        pm._instrumentName,
+                        null,
+                        null
+                    );
+                }, 1)
+            );
         }
 
         if (notes.length > 2) {
-            setTimeout(() => {
-                pm.activity.logo.synth.trigger(
-                    0,
-                    notes[2],
-                    noteValue,
-                    pm._instrumentName,
-                    null,
-                    null
-                );
-            }, 1);
+            pm._chordTimeouts.push(
+                setTimeout(() => {
+                    pm.activity.logo.synth.trigger(
+                        0,
+                        notes[2],
+                        noteValue,
+                        pm._instrumentName,
+                        null,
+                        null
+                    );
+                }, 1)
+            );
         }
 
         if (notes.length > 3) {
-            setTimeout(() => {
-                pm.activity.logo.synth.trigger(
-                    0,
-                    notes[3],
-                    noteValue,
-                    pm._instrumentName,
-                    null,
-                    null
-                );
-            }, 1);
+            pm._chordTimeouts.push(
+                setTimeout(() => {
+                    pm.activity.logo.synth.trigger(
+                        0,
+                        notes[3],
+                        noteValue,
+                        pm._instrumentName,
+                        null,
+                        null
+                    );
+                }, 1)
+            );
         }
     },
 

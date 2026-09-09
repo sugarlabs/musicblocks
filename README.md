@@ -112,7 +112,7 @@ server using npm
     npm run dev
     ```
 
-6. You should see a message `Serving HTTP on 127.0.0.1 port 3000
+5. You should see a message `Serving HTTP on 127.0.0.1 port 3000
 (http://127.0.0.1:3000/) ...` since the HTTP Server is set to start
 listening on port 3000.
 

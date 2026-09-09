@@ -18,10 +18,10 @@
  */
 
 /* exported
-   deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, last,
+   deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, isUnsafeObjectKey, last,
    mixedNumber, nearestBeat, oneHundredToFraction, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, unescapeHTML, escapeHTML,
-   rationalToFraction, GCD, LCD, resolveObject
+   rationalToFraction, GCD, LCD, resolveObject, clampNumber, isValidHex, safeNumber, toArray, formatSeconds
 */
 
 /**
@@ -78,7 +78,7 @@ var fileExt = file => {
         return "";
     }
 
-    return parts.pop();
+    return parts.pop().toLowerCase();
 };
 
 /**
@@ -189,6 +189,19 @@ var safeSVG = text => {
 };
 
 /**
+ * Reserved property names that must never be used as keys when copying
+ * externally-supplied data onto a plain object. Assigning to these keys
+ * via bracket notation can reach Object.prototype (prototype pollution)
+ * or overwrite the target's own constructor reference.
+ */
+var RESERVED_OBJECT_KEYS = ["__proto__", "constructor", "prototype"];
+
+/**
+ * Checks whether a key is unsafe to assign onto a plain object.
+ */
+var isUnsafeObjectKey = key => RESERVED_OBJECT_KEYS.includes(key);
+
+/**
  * Formats a number to at most two decimal places.
  * NOTE: This function removes trailing zeros (e.g., 3.10 becomes 3.1).
  */
@@ -223,25 +236,30 @@ var LCD = (a, b) => {
 
 /**
  * Convert float to its approximate fractional representation.
+ *
+ * Returns a reduced [numerator, denominator] pair with a positive denominator.
+ * Values above 1 are handled by inverting on entry and swapping back on
+ * every exit path (including the iteration-cap path); the sign of the
+ * input is carried on the numerator.
  */
 function rationalToFraction(d) {
     if (d === 0 || isNaN(d) || !isFinite(d)) {
         return [0, 1];
     }
 
-    let invert;
-    if (d > 1) {
-        invert = true;
+    const sign = Math.sign(d);
+    d = Math.abs(d);
+
+    let invert = d > 1;
+    if (invert) {
         d = 1 / d;
-    } else {
-        invert = false;
     }
 
     let df = 1.0;
     let top = 1;
+    let bot = 1;
     let iterations = 0;
     const maxIterations = 10000;
-    let bot = 1;
 
     while (Math.abs(df - d) > 0.00000001 && iterations < maxIterations) {
         if (df < d) {
@@ -255,47 +273,59 @@ function rationalToFraction(d) {
         iterations++;
     }
 
-    if (iterations === maxIterations) {
-        return [top, bot];
+    // Swap back on every exit path, including the iteration cap.
+    if (invert) {
+        const temp = top;
+        top = bot;
+        bot = temp;
     }
 
     if (bot === 0 || top === 0) {
         return [0, 1];
     }
 
-    if (invert) {
-        return [bot, top];
-    } else {
-        return [top, bot];
-    }
+    // Reduce the result so it comes back in standard musical subdivision form.
+    const divisor = GCD(top, bot);
+    top /= divisor;
+    bot /= divisor;
+
+    return [sign * top, bot];
 }
 
 /**
  * Converts a number to a mixed fraction string.
+ *
+ * The whole and fractional parts are taken from the magnitude and the sign is
+ * carried on the front, so -1.5 reads as "-1 1/2". Working straight off the
+ * signed value instead would floor -1.5 to -2 and render "-2 1/2", which reads
+ * as -2.5.
  */
 var mixedNumber = d => {
-    if (typeof d === "number") {
-        const floor = Math.floor(d);
-        if (d > floor) {
-            const obj = rationalToFraction(d - floor);
-            if (floor === 0) {
-                return obj[0] + "/" + obj[1];
+    if (typeof d !== "number") {
+        return d;
+    }
+
+    const sign = d < 0 ? "-" : "";
+    const magnitude = Math.abs(d);
+    const floor = Math.floor(magnitude);
+
+    if (magnitude > floor) {
+        const obj = rationalToFraction(magnitude - floor);
+        if (floor === 0) {
+            return sign + obj[0] + "/" + obj[1];
+        } else {
+            if (obj[0] === 1 && obj[1] === 1) {
+                return sign + (floor + 1).toString();
             } else {
-                if (obj[0] === 1 && obj[1] === 1) {
-                    return (floor + 1).toString();
+                if (obj[1] > 99) {
+                    return sign + magnitude.toFixed(2);
                 } else {
-                    if (obj[1] > 99) {
-                        return d.toFixed(2);
-                    } else {
-                        return floor + " " + obj[0] + "/" + obj[1];
-                    }
+                    return sign + floor + " " + obj[0] + "/" + obj[1];
                 }
             }
-        } else if (floor === d) {
-            return d.toString() + "/1";
         }
-    } else {
-        return d;
+    } else if (floor === magnitude) {
+        return sign + magnitude.toString() + "/1";
     }
 };
 
@@ -305,6 +335,9 @@ var mixedNumber = d => {
  * This preserves original musical division context where explicit denominators matter.
  */
 var rationalSum = (a, b) => {
+    // Rejects non-array, wrong-length, or non-number inputs.
+    // A zero numerator ([0, n]) is valid and passes through — only the
+    // denominator (index 1) must be non-zero.
     if (
         !Array.isArray(a) ||
         a.length < 2 ||
@@ -313,14 +346,19 @@ var rationalSum = (a, b) => {
         typeof a[0] !== "number" ||
         typeof a[1] !== "number" ||
         typeof b[0] !== "number" ||
-        typeof b[1] !== "number" ||
-        a[1] === 0 ||
-        b[1] === 0
+        typeof b[1] !== "number"
     ) {
         if (typeof console !== "undefined") {
             console.warn("Invalid input passed to rationalSum:", a, b);
         }
-        return [0, 1];
+        return [[0, 1], _("Invalid input passed to rational sum")];
+    }
+
+    if (a[1] === 0 || b[1] === 0) {
+        if (typeof console !== "undefined") {
+            console.error("rationalSum: zero denominator — corrupted rhythm state", { a, b });
+        }
+        return [[0, 1], _("Note calculation failed: zero denominator")];
     }
 
     let obja0, objb0, obja1, objb1;
@@ -353,7 +391,7 @@ var rationalSum = (a, b) => {
     const b1 = objb0[1] * objb1[0];
 
     const lcd = LCD(a1, b1);
-    return [(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd];
+    return [[(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd], null];
 };
 
 /**
@@ -455,6 +493,7 @@ var oneHundredToFraction = d => {
         case 53:
         case 54:
             return [17, 32];
+        case 55:
         case 56:
         case 57:
         case 58:
@@ -508,6 +547,7 @@ var oneHundredToFraction = d => {
         case 95:
             return [15, 16];
         case 96:
+        case 97:
         case 98:
             return [31, 32];
         case 99:
@@ -515,6 +555,76 @@ var oneHundredToFraction = d => {
         default:
             return [d, 100];
     }
+};
+
+/**
+ * Clamps a numeric value between a minimum and maximum bound with fallback handling.
+ * @param {number} val - Value to clamp
+ * @param {number} min - Minimum allowed bound
+ * @param {number} max - Maximum allowed bound
+ * @param {number} [fallback=min] - Fallback value if val is non-numeric or NaN
+ * @returns {number} The clamped numeric value
+ */
+var clampNumber = (val, min, max, fallback = min) => {
+    if (typeof val !== "number" || Number.isNaN(val)) {
+        return fallback;
+    }
+    const lower = Math.min(min, max);
+    const upper = Math.max(min, max);
+    return Math.min(Math.max(val, lower), upper);
+};
+
+/**
+ * Safely parses a value into a finite number with a fallback value.
+ * @param {*} val - Value to parse into a number
+ * @param {number} [fallback=0] - Fallback numeric value if val is not finite or is NaN
+ * @returns {number} The parsed finite number or fallback value
+ */
+var safeNumber = (val, fallback = 0) => {
+    if (typeof val === "number" && Number.isFinite(val)) {
+        return val;
+    }
+    if (typeof val === "string" && val.trim() !== "") {
+        const parsed = Number(val);
+        if (Number.isFinite(parsed)) {
+            return parsed;
+        }
+    }
+    return typeof fallback === "number" && Number.isFinite(fallback) ? fallback : 0;
+};
+
+/**
+ * Safely converts a single value, array, or nullish input into an array.
+ * @param {*} val - Value to convert
+ * @returns {Array} An array containing the value, the original array if already an array, or an empty array for null/undefined
+ */
+var toArray = val => {
+    if (val === null || val === undefined) return [];
+    if (Array.isArray(val)) return val;
+    return [val];
+};
+
+/**
+ * Formats a duration in seconds into a standardized digital time display string (MM:SS or HH:MM:SS).
+ * @param {number|string} seconds - Duration in seconds
+ * @returns {string} Formatted duration string e.g. "02:05" or "01:01:05", defaulting to "00:00" for invalid inputs
+ */
+var formatSeconds = seconds => {
+    if (seconds === null || seconds === undefined) return "00:00";
+    const num = Number(seconds);
+    if (!Number.isFinite(num) || num < 0) return "00:00";
+
+    const totalSecs = Math.floor(num);
+    const hours = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+
+    const pad = n => String(n).padStart(2, "0");
+
+    if (hours > 0) {
+        return `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+    }
+    return `${pad(mins)}:${pad(secs)}`;
 };
 
 /**
@@ -528,26 +638,55 @@ var rgbToHex = (r, g, b) => {
  * Converts a hexadecimal color code to RGB values.
  */
 var hexToRGB = hex => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-        ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
-        : null;
+    if (typeof hex !== "string") return null;
+    const cleanHex = hex.trim();
+    const fullResult = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(cleanHex);
+    if (fullResult) {
+        return {
+            r: parseInt(fullResult[1], 16),
+            g: parseInt(fullResult[2], 16),
+            b: parseInt(fullResult[3], 16)
+        };
+    }
+    const shortResult = /^#?([a-f\d])([a-f\d])([a-f\d])$/i.exec(cleanHex);
+    if (shortResult) {
+        return {
+            r: parseInt(shortResult[1] + shortResult[1], 16),
+            g: parseInt(shortResult[2] + shortResult[2], 16),
+            b: parseInt(shortResult[3] + shortResult[3], 16)
+        };
+    }
+    return null;
 };
 
 /**
- * Converts a hexcode to RGBA format.
+ * Converts a hexadecimal color code to RGBA format.
+ * Supports both 3-digit shorthand (#rgb) and 6-digit (#rrggbb) formats with an optional alpha parameter.
+ * @param {string} hex - Hex color code (3-digit or 6-digit, with or without #)
+ * @param {number} [alpha=1] - Alpha transparency value (0 to 1)
+ * @returns {string} RGBA formatted string e.g. "rgba(255,0,0,1)"
  */
-var hex2rgb = hex => {
-    const bigint = parseInt(hex, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
+var hex2rgb = (hex, alpha = 1) => {
+    if (typeof hex !== "string") return "rgba(0,0,0,1)";
+    const rgb = hexToRGB(hex);
+    if (!rgb) return "rgba(0,0,0,1)";
+    const safeAlpha = clampNumber(
+        typeof alpha === "number" && !Number.isNaN(alpha) ? alpha : 1,
+        0,
+        1
+    );
+    return `rgba(${rgb.r},${rgb.g},${rgb.b},${safeAlpha})`;
+};
 
-    return "rgba(" + r + "," + g + "," + b + ",1)";
+/**
+ * Validates whether a given string is a valid 3-digit (#rgb) or 6-digit (#rrggbb) hexadecimal color code.
+ * @param {string} hex - Hex color string to validate
+ * @returns {boolean} True if string is a valid hex color code, false otherwise
+ */
+var isValidHex = hex => {
+    if (typeof hex !== "string") return false;
+    const cleanHex = hex.trim();
+    return /^#?([a-f\d]{3}|[a-f\d]{6})$/i.test(cleanHex);
 };
 
 /**
@@ -594,6 +733,7 @@ var UtilsLogic = {
     unescapeHTML,
     isSafeUrl,
     safeSVG,
+    isUnsafeObjectKey,
     toFixed2,
     rationalToFraction,
     GCD,
@@ -605,7 +745,12 @@ var UtilsLogic = {
     rgbToHex,
     hexToRGB,
     hex2rgb,
-    resolveObject
+    resolveObject,
+    clampNumber,
+    isValidHex,
+    safeNumber,
+    toArray,
+    formatSeconds
 };
 
 if (typeof module !== "undefined" && module.exports) {

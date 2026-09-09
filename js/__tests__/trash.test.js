@@ -85,7 +85,6 @@ global.Image = jest.fn(() => {
     return img;
 });
 
-jest.spyOn(global.window, "addEventListener").mockImplementation(() => {});
 jest.useFakeTimers();
 
 describe("Trashcan Class", () => {
@@ -111,11 +110,24 @@ describe("Trashcan Class", () => {
         expect(trashcan.shouldResize(100, 100)).toBe(false);
     });
 
-    it("should resize and debounce the event listener", () => {
-        trashcan.resizeEvent(1);
-        const resizeFn = window.addEventListener.mock.calls[0][1];
-        resizeFn(); // simulate resize
+    it("registers one debounced resize listener", () => {
+        const addEventListenerSpy = jest
+            .spyOn(window, "addEventListener")
+            .mockImplementation(() => {});
+        const testTrashcan = new Trashcan(mockActivity);
+        const resizeFn = addEventListenerSpy.mock.calls[0][1];
+        testTrashcan.resizeEvent(2);
+        testTrashcan.resizeEvent(1);
+
+        expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
+
+        const updateContainerPositionSpy = jest.spyOn(testTrashcan, "updateContainerPosition");
+        resizeFn();
         jest.advanceTimersByTime(300);
+        expect(updateContainerPositionSpy).toHaveBeenCalledTimes(1);
+
+        updateContainerPositionSpy.mockRestore();
+        addEventListenerSpy.mockRestore();
     });
 
     it("should hide the trashcan using animation", () => {
@@ -193,9 +205,12 @@ describe("overTrashcan edge cases", () => {
         expect(trashcan.overTrashcan(221, 200)).toBe(false);
     });
 
-    it("should return true for a point far below the trashcan (no lower y bound)", () => {
-        // overTrashcan has no lower y bound check
-        expect(trashcan.overTrashcan(150, 10000)).toBe(true);
+    it("should return true for a point exactly at the bottom edge", () => {
+        expect(trashcan.overTrashcan(150, 320)).toBe(true);
+    });
+
+    it("should return false for a point just below the bottom edge", () => {
+        expect(trashcan.overTrashcan(150, 321)).toBe(false);
     });
 
     it("should return true for a point exactly on the left edge", () => {

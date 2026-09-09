@@ -1,0 +1,69 @@
+{
+  "file": "js/utils/language-utils.js",
+  "sourceType": "script",
+  "exports": [
+    {
+      "name": "LANGUAGE_CODE_TO_LOCALE",
+      "kind": "object",
+      "via": "LanguageUtils"
+    },
+    {
+      "name": "normalizeLanguageCode",
+      "kind": "function",
+      "params": [
+        "language"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "via": "LanguageUtils"
+    }
+  ],
+  "functions": [
+    {
+      "name": "normalizeLanguageCode",
+      "params": [
+        "language"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 3,
+      "throws": 0,
+      "branches": 4
+    }
+  ],
+  "classes": [],
+  "dependencies": [],
+  "referencedGlobals": [
+    "Object",
+    "module",
+    "window"
+  ],
+  "jsdoc": [
+    {
+      "target": "LANGUAGE_CODE_TO_LOCALE",
+      "description": "The language menu identifies languages by the id of its dropdown entries (enUS, enUK, zhCN, kana, ...), but the locale files in locales/ are named after the translation codes (en, en_GB, zh_CN, ja, ...). Passing a menu code straight to i18next asks the backend for a file that does not exist, which 404s and silently falls back to English. Keep this mapping as the single place that translates between the two.",
+      "tags": []
+    },
+    {
+      "target": "normalizeLanguageCode",
+      "description": "Maps a stored language preference onto the locale file that backs it.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{string} language - a language menu code or a translation code."
+        },
+        {
+          "tag": "returns",
+          "text": "{string} the code matching a file in locales/."
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "branches": 7,
+    "returns": 3,
+    "throws": 0
+  }
+}

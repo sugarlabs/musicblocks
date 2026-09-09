@@ -42,6 +42,8 @@ global.StatusMatrix = jest.fn();
 global.getStatsFromNotation = jest.fn();
 global.delayExecution = jest.fn();
 global.DEFAULTVOICE = "default";
+global.EmbeddedGraphicsScheduler =
+    require("../embedded-graphics-scheduler").EmbeddedGraphicsScheduler;
 
 const Logo = require("../logo").Logo;
 const LogoDependencies = require("../LogoDependencies");
@@ -102,6 +104,16 @@ function createValidDeps(overrides = {}) {
         storage: { saveLocally: jest.fn() },
         config: { showBlocksAfterRun: false },
         callbacks: { onStopTurtle: jest.fn(), onRunTurtle: jest.fn() },
+        refreshCanvas: jest.fn(),
+        textMsg: jest.fn(),
+        markStageDirty: jest.fn(),
+        save: {
+            afterSaveLilypond: jest.fn(),
+            afterSaveAbc: jest.fn(),
+            afterSaveMxml: jest.fn(),
+            afterSaveMIDI: jest.fn()
+        },
+        statsWindow: { displayInfo: jest.fn() },
         instruments: {},
         Singer: { setSynthVolume: jest.fn() },
         Tone: {},
@@ -278,7 +290,7 @@ describe("LogoDependencies.fromActivity", () => {
         const activity = createMockActivity();
         const deps = LogoDependencies.fromActivity(activity);
         deps.errorHandler("boom");
-        expect(activity.errorMsg).toHaveBeenCalledWith("boom");
+        expect(activity.errorMsg).toHaveBeenCalledWith("boom", undefined);
     });
 
     test("messageHandler.hide delegates to activity.hideMsgs", () => {
@@ -340,6 +352,270 @@ describe("LogoDependencies.fromActivity", () => {
         expect(deps.classes.Notation).toBe(global.Notation);
         expect(deps.classes.Synth).toBe(global.Synth);
         expect(deps.classes.StatusMatrix).toBe(global.StatusMatrix);
+    });
+});
+
+// ─── New optional deps: refreshCanvas, textMsg, markStageDirty, save, statsWindow ─
+
+describe("LogoDependencies — new optional dependency defaults", () => {
+    test("refreshCanvas defaults to a no-op when omitted", () => {
+        const deps = new LogoDependencies(createValidDeps({ refreshCanvas: undefined }));
+        expect(deps.refreshCanvas).toBeDefined();
+        expect(() => deps.refreshCanvas()).not.toThrow();
+    });
+
+    test("textMsg defaults to a no-op when omitted", () => {
+        const deps = new LogoDependencies(createValidDeps({ textMsg: undefined }));
+        expect(deps.textMsg).toBeDefined();
+        expect(() => deps.textMsg("hello")).not.toThrow();
+    });
+
+    test("markStageDirty defaults to a no-op when omitted", () => {
+        const deps = new LogoDependencies(createValidDeps({ markStageDirty: undefined }));
+        expect(deps.markStageDirty).toBeDefined();
+        expect(() => deps.markStageDirty()).not.toThrow();
+    });
+
+    test("save defaults to no-op object when omitted", () => {
+        const deps = new LogoDependencies(createValidDeps({ save: undefined }));
+        expect(deps.save).toBeDefined();
+        expect(() => deps.save.afterSaveLilypond()).not.toThrow();
+        expect(() => deps.save.afterSaveAbc()).not.toThrow();
+        expect(() => deps.save.afterSaveMxml()).not.toThrow();
+        expect(() => deps.save.afterSaveMIDI()).not.toThrow();
+    });
+
+    test("statsWindow defaults to no-op object when omitted", () => {
+        const deps = new LogoDependencies(createValidDeps({ statsWindow: undefined }));
+        expect(deps.statsWindow).toBeDefined();
+        expect(() => deps.statsWindow.displayInfo({})).not.toThrow();
+    });
+
+    test("explicit refreshCanvas is stored and callable", () => {
+        const refreshCanvas = jest.fn();
+        const deps = new LogoDependencies(createValidDeps({ refreshCanvas }));
+        deps.refreshCanvas();
+        expect(refreshCanvas).toHaveBeenCalledTimes(1);
+    });
+
+    test("explicit textMsg is stored and callable", () => {
+        const textMsg = jest.fn();
+        const deps = new LogoDependencies(createValidDeps({ textMsg }));
+        deps.textMsg("test message");
+        expect(textMsg).toHaveBeenCalledWith("test message");
+    });
+
+    test("explicit markStageDirty is stored and callable", () => {
+        const markStageDirty = jest.fn();
+        const deps = new LogoDependencies(createValidDeps({ markStageDirty }));
+        deps.markStageDirty();
+        expect(markStageDirty).toHaveBeenCalledTimes(1);
+    });
+
+    test("explicit save callbacks are stored and callable", () => {
+        const save = {
+            afterSaveLilypond: jest.fn(),
+            afterSaveAbc: jest.fn(),
+            afterSaveMxml: jest.fn(),
+            afterSaveMIDI: jest.fn()
+        };
+        const deps = new LogoDependencies(createValidDeps({ save }));
+        deps.save.afterSaveLilypond();
+        deps.save.afterSaveAbc();
+        deps.save.afterSaveMxml();
+        deps.save.afterSaveMIDI();
+        expect(save.afterSaveLilypond).toHaveBeenCalledTimes(1);
+        expect(save.afterSaveAbc).toHaveBeenCalledTimes(1);
+        expect(save.afterSaveMxml).toHaveBeenCalledTimes(1);
+        expect(save.afterSaveMIDI).toHaveBeenCalledTimes(1);
+    });
+
+    test("explicit statsWindow.displayInfo is stored and callable", () => {
+        const statsWindow = { displayInfo: jest.fn() };
+        const deps = new LogoDependencies(createValidDeps({ statsWindow }));
+        deps.statsWindow.displayInfo({ notes: 10 });
+        expect(statsWindow.displayInfo).toHaveBeenCalledWith({ notes: 10 });
+    });
+});
+
+// ─── fromActivity — new deps delegation ──────────────────────────────────────
+
+describe("LogoDependencies.fromActivity — new dependency delegation", () => {
+    function createFullMockActivity(overrides = {}) {
+        return {
+            blocks: createMockBlocks(),
+            turtles: createMockTurtles(),
+            stage: createMockStage(),
+            errorMsg: jest.fn(),
+            hideMsgs: jest.fn(),
+            saveLocally: jest.fn(),
+            showBlocksAfterRun: false,
+            onStopTurtle: jest.fn(),
+            onRunTurtle: jest.fn(),
+            refreshCanvas: jest.fn(),
+            textMsg: jest.fn(),
+            save: {
+                afterSaveLilypond: jest.fn(),
+                afterSaveAbc: jest.fn(),
+                afterSaveMxml: jest.fn(),
+                afterSaveMIDI: jest.fn()
+            },
+            statsWindow: { displayInfo: jest.fn() },
+            ...overrides
+        };
+    }
+
+    test("refreshCanvas delegates to activity.refreshCanvas", () => {
+        const activity = createFullMockActivity();
+        const deps = LogoDependencies.fromActivity(activity);
+        deps.refreshCanvas();
+        expect(activity.refreshCanvas).toHaveBeenCalledTimes(1);
+    });
+
+    test("textMsg delegates to activity.textMsg", () => {
+        const activity = createFullMockActivity();
+        const deps = LogoDependencies.fromActivity(activity);
+        deps.textMsg("hello");
+        expect(activity.textMsg).toHaveBeenCalledWith("hello");
+    });
+
+    test("markStageDirty sets activity.stageDirty = true", () => {
+        const activity = createFullMockActivity();
+        const deps = LogoDependencies.fromActivity(activity);
+        deps.markStageDirty();
+        expect(activity.stageDirty).toBe(true);
+    });
+
+    test("save.afterSaveLilypond delegates to activity.save.afterSaveLilypond", () => {
+        const activity = createFullMockActivity();
+        const deps = LogoDependencies.fromActivity(activity);
+        deps.save.afterSaveLilypond();
+        expect(activity.save.afterSaveLilypond).toHaveBeenCalledTimes(1);
+    });
+
+    test("save.afterSaveAbc delegates to activity.save.afterSaveAbc", () => {
+        const activity = createFullMockActivity();
+        const deps = LogoDependencies.fromActivity(activity);
+        deps.save.afterSaveAbc();
+        expect(activity.save.afterSaveAbc).toHaveBeenCalledTimes(1);
+    });
+
+    test("save.afterSaveMxml delegates to activity.save.afterSaveMxml", () => {
+        const activity = createFullMockActivity();
+        const deps = LogoDependencies.fromActivity(activity);
+        deps.save.afterSaveMxml();
+        expect(activity.save.afterSaveMxml).toHaveBeenCalledTimes(1);
+    });
+
+    test("save.afterSaveMIDI delegates to activity.save.afterSaveMIDI", () => {
+        const activity = createFullMockActivity();
+        const deps = LogoDependencies.fromActivity(activity);
+        deps.save.afterSaveMIDI();
+        expect(activity.save.afterSaveMIDI).toHaveBeenCalledTimes(1);
+    });
+
+    test("statsWindow.displayInfo delegates to activity.statsWindow.displayInfo", () => {
+        const activity = createFullMockActivity();
+        const deps = LogoDependencies.fromActivity(activity);
+        deps.statsWindow.displayInfo({ count: 5 });
+        expect(activity.statsWindow.displayInfo).toHaveBeenCalledWith({ count: 5 });
+    });
+
+    test("refreshCanvas is safe when activity.refreshCanvas is missing", () => {
+        const activity = createFullMockActivity({ refreshCanvas: undefined });
+        const deps = LogoDependencies.fromActivity(activity);
+        expect(() => deps.refreshCanvas()).not.toThrow();
+    });
+
+    test("textMsg is safe when activity.textMsg is missing", () => {
+        const activity = createFullMockActivity({ textMsg: undefined });
+        const deps = LogoDependencies.fromActivity(activity);
+        expect(() => deps.textMsg("msg")).not.toThrow();
+    });
+
+    test("save callbacks are safe when activity.save is missing", () => {
+        const activity = createFullMockActivity({ save: undefined });
+        const deps = LogoDependencies.fromActivity(activity);
+        expect(() => deps.save.afterSaveLilypond()).not.toThrow();
+        expect(() => deps.save.afterSaveAbc()).not.toThrow();
+    });
+
+    test("statsWindow.displayInfo is safe when activity.statsWindow is missing", () => {
+        const activity = createFullMockActivity({ statsWindow: undefined });
+        const deps = LogoDependencies.fromActivity(activity);
+        expect(() => deps.statsWindow.displayInfo({})).not.toThrow();
+    });
+});
+
+// ─── Logo uses deps for injected operations ───────────────────────────────────
+
+describe("Logo uses injected deps (not activity facade) for operations", () => {
+    test("deps.refreshCanvas is called when logo.deps.refreshCanvas() is invoked", () => {
+        const deps = createValidDeps();
+        const logo = new Logo(new LogoDependencies(deps));
+        logo.deps.refreshCanvas();
+        expect(deps.refreshCanvas).toHaveBeenCalledTimes(1);
+    });
+
+    test("deps.textMsg is called when logo.deps.textMsg() is invoked", () => {
+        const deps = createValidDeps();
+        const logo = new Logo(new LogoDependencies(deps));
+        logo.deps.textMsg("test");
+        expect(deps.textMsg).toHaveBeenCalledWith("test");
+    });
+
+    test("deps.markStageDirty is called when logo.deps.markStageDirty() is invoked", () => {
+        const deps = createValidDeps();
+        const logo = new Logo(new LogoDependencies(deps));
+        logo.deps.markStageDirty();
+        expect(deps.markStageDirty).toHaveBeenCalledTimes(1);
+    });
+
+    test("deps.save callbacks are accessible via logo.deps.save", () => {
+        const deps = createValidDeps();
+        const logo = new Logo(new LogoDependencies(deps));
+        logo.deps.save.afterSaveLilypond();
+        expect(deps.save.afterSaveLilypond).toHaveBeenCalledTimes(1);
+    });
+
+    test("deps.statsWindow.displayInfo is accessible via logo.deps.statsWindow", () => {
+        const deps = createValidDeps();
+        const logo = new Logo(new LogoDependencies(deps));
+        logo.deps.statsWindow.displayInfo({ x: 1 });
+        expect(deps.statsWindow.displayInfo).toHaveBeenCalledWith({ x: 1 });
+    });
+
+    test("old-pattern: Activity deps.config.showBlocksAfterRun getter reads from activity", () => {
+        const mockActivity = {
+            blocks: createMockBlocks(),
+            turtles: createMockTurtles(),
+            stage: createMockStage(),
+            errorMsg: jest.fn(),
+            hideMsgs: jest.fn(),
+            saveLocally: jest.fn(),
+            showBlocksAfterRun: true,
+            onStopTurtle: jest.fn(),
+            onRunTurtle: jest.fn()
+        };
+        const logo = new Logo(mockActivity);
+        expect(logo.deps.config.showBlocksAfterRun).toBe(true);
+    });
+
+    test("old-pattern: Activity deps.config.showBlocksAfterRun setter writes to activity", () => {
+        const mockActivity = {
+            blocks: createMockBlocks(),
+            turtles: createMockTurtles(),
+            stage: createMockStage(),
+            errorMsg: jest.fn(),
+            hideMsgs: jest.fn(),
+            saveLocally: jest.fn(),
+            showBlocksAfterRun: false,
+            onStopTurtle: jest.fn(),
+            onRunTurtle: jest.fn()
+        };
+        const logo = new Logo(mockActivity);
+        logo.deps.config.showBlocksAfterRun = true;
+        expect(mockActivity.showBlocksAfterRun).toBe(true);
     });
 });
 

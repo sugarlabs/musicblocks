@@ -514,6 +514,7 @@ describe("HelpWidget", () => {
             // For known pages, the img should NOT have width/height attributes
             expect(img.getAttribute("width")).toBeNull();
             expect(img.classList.contains("help-tour-image")).toBe(true);
+            expect(img.classList.contains("help-tour-large-image")).toBe(true);
             expect(img.classList.contains("help-tour-icon")).toBe(false);
         });
 

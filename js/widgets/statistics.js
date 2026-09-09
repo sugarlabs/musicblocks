@@ -26,12 +26,17 @@ class StatsWindow {
     constructor(activity) {
         this.activity = activity;
         this.isOpen = true;
+        this._inFlight = false;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "stats", "stats");
         this.widgetWindow.clear();
         this.widgetWindow.show();
+        this.widgetWindow.addButton("reload.svg", 32, _("Refresh")).onclick = () => {
+            this.refresh();
+        };
         this.widgetWindow.onclose = () => {
             this.isOpen = false;
+            this._inFlight = false;
             this.activity.blocks.showBlocks();
             this.widgetWindow.destroy();
             this.activity.logo.statsWindow = null;
@@ -54,7 +59,7 @@ class StatsWindow {
         }
 
         this.widgetWindow.onmaximize = () => {
-            this.widgetWindow.getWidgetBody().innerHTML = "";
+            this.widgetWindow.getWidgetBody().textContent = "";
             if (this.widgetWindow.isMaximized()) {
                 this.widgetWindow.getWidgetBody().style.display = "flex";
                 this.widgetWindow.getWidgetBody().style.justifyContent = "space-between";
@@ -65,6 +70,31 @@ class StatsWindow {
             this.doAnalytics();
         };
         this.widgetWindow.sendToCenter();
+    }
+
+    /**
+     * Re-runs analytics and updates the chart display.
+     * @public
+     * @returns {void}
+     */
+    refresh() {
+        if (this._inFlight) {
+            return;
+        }
+        this._inFlight = true;
+        this.widgetWindow.getWidgetBody().replaceChildren();
+        if (typeof window.Chart !== "undefined") {
+            this.doAnalytics();
+        } else {
+            this._ensureChartLoaded()
+                .then(() => {
+                    this.doAnalytics();
+                })
+                .catch(err => {
+                    this._inFlight = false;
+                    console.error("Failed to load Chart.js:", err);
+                });
+        }
     }
 
     /**
@@ -100,9 +130,18 @@ class StatsWindow {
         document.body.style.cursor = "wait";
 
         let myRadarChart = null;
-        const scores = analyzeProject(this.activity);
-        runAnalytics(this.activity);
-        const data = scoreToChartData(scores);
+
+        // Releases the busy state entered just above. Both the success path
+        // (once the chart has finished animating) and the failure path must go
+        // through here, or the widget leaves the UI wedged: activity.loading
+        // gates the turtle and context-menu hover handlers, and _inFlight gates
+        // the Refresh button.
+        const __releaseBusyState = () => {
+            this.activity.loading = false;
+            document.body.style.cursor = "default";
+            this._inFlight = false;
+        };
+
         const __callback = () => {
             const imageData = myRadarChart.toBase64Image();
             const img = new Image();
@@ -115,10 +154,24 @@ class StatsWindow {
             this.widgetWindow.getWidgetBody().appendChild(img);
             this.activity.blocks.hideBlocks();
             this.activity.showBlocksAfterRun = false;
-            document.body.style.cursor = "default";
+            __releaseBusyState();
         };
-        const options = getChartOptions(__callback);
-        myRadarChart = new window.Chart(ctx).Radar(data, options);
+
+        // Only the analysis and chart construction are guarded: those are the
+        // steps that consume project data and can throw on a malformed or
+        // oversized project, and they are the only ones that run while the busy
+        // state is set.
+        try {
+            const scores = analyzeProject(this.activity);
+            runAnalytics(this.activity);
+            const data = scoreToChartData(scores);
+            const options = getChartOptions(__callback);
+            myRadarChart = new window.Chart(ctx).Radar(data, options);
+        } catch (err) {
+            console.error("Statistics analysis failed:", err);
+            __releaseBusyState();
+            return;
+        }
 
         this.jsonObject = document.createElement("ul");
         this.jsonObject.style.float = "left";
@@ -131,19 +184,35 @@ class StatsWindow {
      * @returns {void}
      */
     displayInfo(stats) {
-        const lowHertz = stats["lowestNote"][2] + 0.5;
-        const highHertz = stats["highestNote"][2] + 0.5;
+        const lowestNote = stats["lowestNote"];
+        const highestNote = stats["highestNote"];
+        const lowestNoteLabel = lowestNote
+            ? `${lowestNote[0]},${(lowestNote[2] + 0.5).toFixed(0)}Hz`
+            : "N/A";
+        const highestNoteLabel = highestNote
+            ? `${highestNote[0]},${(highestNote[2] + 0.5).toFixed(0)}Hz`
+            : "N/A";
         const items = [
             ["duples", stats["duples"]],
             ["triplets", stats["triplets"]],
             ["quintuplets", stats["quintuplets"]],
             ["pitch names", Array.from(stats["pitchNames"]).join(", ")],
             ["number of notes", stats["numberOfNotes"]],
-            ["lowest note", `${stats["lowestNote"][0]},${lowHertz.toFixed(0)}Hz`],
-            ["highest note", `${stats["highestNote"][0]},${highHertz.toFixed(0)}Hz`],
+            ["lowest note", lowestNoteLabel],
+            ["highest note", highestNoteLabel],
             ["rests used", stats["rests"]],
             ["ornaments used", stats["ornaments"]]
         ];
+
+        if (stats["totalSeconds"] !== undefined) {
+            const formatSecs =
+                typeof formatSeconds === "function"
+                    ? formatSeconds
+                    : typeof UtilsLogic !== "undefined" && UtilsLogic.formatSeconds
+                      ? UtilsLogic.formatSeconds
+                      : sec => sec;
+            items.push(["total duration", formatSecs(stats["totalSeconds"])]);
+        }
 
         this.jsonObject.replaceChildren(
             ...items.map(([label, value], index) => {

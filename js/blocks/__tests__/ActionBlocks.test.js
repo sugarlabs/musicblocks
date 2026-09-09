@@ -42,6 +42,15 @@ class BaseBlock {
         this.size = 1;
         this.lang = "en";
         this.hidden = false;
+        this.capabilities = {};
+    }
+
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+    }
+
+    getCapability(name) {
+        return this.capabilities[name];
     }
 
     setPalette(palette) {
@@ -113,6 +122,7 @@ global.FlowClampBlock = FlowClampBlock;
 global.StackClampBlock = StackClampBlock;
 global.LeftBlock = LeftBlock;
 global.ValueBlock = ValueBlock;
+global.isSafeUrl = require("../../utils/utils-logic").isSafeUrl;
 
 describe("ActionBlocks", () => {
     let activity;
@@ -275,6 +285,46 @@ describe("ActionBlocks", () => {
         });
     });
 
+    describe("CalcBlock - arg (new arg method)", () => {
+        test("calls errorMsg when cblk is null", () => {
+            const block = getBlock("calc");
+            activity.blocks.blockList[110] = { connections: [null, null] };
+
+            const result = block.arg(logo, 0, 110, null);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 110);
+            expect(result).toBe(0);
+        });
+
+        test("returns result when action exists", () => {
+            const block = getBlock("calc");
+            activity.blocks.blockList[110] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => "myAction");
+            logo.actions["myAction"] = [];
+            logo.returns[0] = [100];
+            activity.turtles.getTurtle = jest.fn(() => ({
+                running: false,
+                queue: []
+            }));
+
+            const result = block.arg(logo, 0, 110, null);
+
+            expect(logo.runFromBlockNow).toHaveBeenCalled();
+            expect(result).toBe(100);
+        });
+
+        test("calls errorMsg when action not found", () => {
+            const block = getBlock("calc");
+            activity.blocks.blockList[110] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => "missingAction");
+
+            const result = block.arg(logo, 0, 110, null);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 110, "missingAction");
+            expect(result).toBe(0);
+        });
+    });
+
     describe("DoBlock", () => {
         test("returns action for execution", () => {
             const block = getBlock("do");
@@ -302,7 +352,7 @@ describe("ActionBlocks", () => {
     });
 
     describe("ListenBlock", () => {
-        test("sets up listener when action exists", () => {
+        test("sets up a persistent listener when action exists (#8367: must survive stop/completion)", () => {
             const block = getBlock("listen");
             logo.actions["testAction"] = [];
 
@@ -311,7 +361,8 @@ describe("ActionBlocks", () => {
             expect(logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
                 expect.any(String),
-                expect.any(Function)
+                expect.any(Function),
+                true
             );
         });
 

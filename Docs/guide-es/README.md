@@ -21,9 +21,9 @@ su computadora.
 
 Para más detalles sobre el uso de Bloques de Música, ver [Uso de
 Bloques de Música]
-(http://github.com/sugarlabs/musicblocks/tree/master/documentation)
+(http://github.com/sugarlabs/musicblocks/tree/master/Docs/documentation)
 y para más detalles sobre cómo utilizar los bloques de la tortuga, ver
-[Uso de la tortuga bloques
+[Uso de la tortuga bloques](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation)
 
 ## ACERCA DE ESTA GUÍA
 
@@ -466,15 +466,13 @@ individual notes (or chords if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
-<img
-src='../header-icons/play-button.svg' height="36"</img>
+<img src="../../header-icons/play-button.svg" height="36" alt="Play">
 
 If you click on the _Play_ button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `Re 4`,
 `Mi 4`, `Sol 4`.
 
-<img
-src='../header-icons/export-chunk.svg' height="36"</img>
+<img src="../../header-icons/export-chunk.svg" height="36" alt="Save">
 
 Once you have a group of notes (a "chunk") that you like, click on the
 _Save_ button (just to the right of the _Play_ button). This will
@@ -484,20 +482,17 @@ programmatically. (More on that below.)
 You can rearrange the selected notes in the grid and safe other chunks
 as well.
 
-<img
-src='../header-icons/sort.svg' height="36"</img>
+<img src="../../header-icons/sort.svg" height="36" alt="Sort">
 
 The _Sort_ button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate _Pitch_ blocks.
 
-<img
-src='../header-icons/close-button.svg' height="36"</img>
+<img src="../../header-icons/close-button.svg" height="36" alt="Close">
 
 Or hide the matrix by clicking on the _Close_ button (the right-most
 button in the top row of the grid.)
 
-<img
-src='../header-icons/erase-button.svg' height="36"</img>
+<img src="../../header-icons/erase-button.svg" height="36" alt="Erase">
 
 There is also an Erase button that will clear the grid.
 

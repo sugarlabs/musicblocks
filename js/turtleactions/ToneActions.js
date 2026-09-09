@@ -20,7 +20,7 @@
    global
 
    _, Singer, VOICENAMES, MusicBlocks, Mouse, last, instrumentsEffects,
-   NOINPUTERRORMSG, CUSTOMSAMPLES, DEFAULTVOICE
+   NOINPUTERRORMSG, CUSTOMSAMPLES, DEFAULTVOICE, safeNumber
 */
 
 /*
@@ -108,7 +108,7 @@ function setupToneActions(activity) {
             const listenerName = "_settimbre_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -132,14 +132,31 @@ function setupToneActions(activity) {
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
         static doVibrato(intensity, rate, turtle, blk) {
+            const isInvalidInput = val =>
+                val === undefined ||
+                val === null ||
+                (typeof val === "string" && val.trim() === "") ||
+                !isFinite(val);
+
+            if (isInvalidInput(intensity) || isInvalidInput(rate)) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                activity.logo.stopTurtle = true;
+                return;
+            }
+
+            intensity = safeNumber(intensity);
+            rate = safeNumber(rate);
+
             if (intensity < 1 || intensity > 100) {
                 activity.errorMsg(_("Vibrato intensity must be between 1 and 100."), blk);
                 activity.logo.stopTurtle = true;
+                return;
             }
 
             if (rate <= 0) {
                 activity.errorMsg(_("Vibrato rate must be greater than 0."), blk);
                 activity.logo.stopTurtle = true;
+                return;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -150,7 +167,7 @@ function setupToneActions(activity) {
             const listenerName = "_vibrato_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -192,6 +209,7 @@ function setupToneActions(activity) {
             if (chorusDepth < 0 || chorusDepth > 1) {
                 activity.errorMsg(_("Depth is out of range."), blk);
                 activity.logo.stopTurtle = true;
+                return;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -203,7 +221,7 @@ function setupToneActions(activity) {
             const listenerName = "_chorus_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -236,7 +254,7 @@ function setupToneActions(activity) {
             const listenerName = "_phaser_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -265,6 +283,7 @@ function setupToneActions(activity) {
                 //.TRANS: Depth is the intesity of the tremolo or chorus effect.
                 activity.errorMsg(_("Depth is out of range."), blk);
                 activity.logo.stopTurtle = true;
+                return;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -275,7 +294,7 @@ function setupToneActions(activity) {
             const listenerName = "_tremolo_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -301,6 +320,7 @@ function setupToneActions(activity) {
             if (distortion < 0 || distortion > 1) {
                 activity.errorMsg(_("Distortion must be from 0 to 100."), blk);
                 activity.logo.stopTurtle = true;
+                return;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -310,7 +330,7 @@ function setupToneActions(activity) {
             const listenerName = "_distortion_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -351,7 +371,7 @@ function setupToneActions(activity) {
             const listenerName = "_harmonic_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -376,7 +396,8 @@ function setupToneActions(activity) {
             if (activity.logo.inTimbre) {
                 activity.logo.timbre.FMSynthParams = [];
                 if (activity.logo.timbre.osc.length !== 0) {
-                    activity.errorMsg(_("Unable to use synth due to existing oscillator"));
+                    activity.errorMsg(_("Unable to use synth due to existing oscillator."));
+                    return;
                 }
             }
 
@@ -415,7 +436,8 @@ function setupToneActions(activity) {
             if (activity.logo.inTimbre) {
                 activity.logo.timbre.AMSynthParams = [];
                 if (activity.logo.timbre.osc.length !== 0) {
-                    activity.errorMsg(_("Unable to use synth due to existing oscillator"));
+                    activity.errorMsg(_("Unable to use synth due to existing oscillator."));
+                    return;
                 }
             }
 
@@ -454,7 +476,8 @@ function setupToneActions(activity) {
         static defDuoSynth(synthVibratoRate, synthVibratoAmount, turtle, blk) {
             if (activity.logo.inTimbre) {
                 if (activity.logo.timbre.osc.length !== 0) {
-                    activity.errorMsg(_("Unable to use synth due to existing oscillator"));
+                    activity.errorMsg(_("Unable to use synth due to existing oscillator."));
+                    return;
                 }
                 activity.logo.timbre.duoSynthParams = [];
             }

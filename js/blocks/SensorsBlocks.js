@@ -13,7 +13,7 @@
    global
 
    _, FlowBlock, NOINPUTERRORMSG, ValueBlock, docById, toFixed2,
-   LeftBlock, BooleanSensorBlock, NANERRORMSG, hex2rgb, searchColors,
+   LeftBlock, BooleanSensorBlock, NANERRORMSG, hex2rgb, hexToRGB, isValidHex, searchColors,
    Tone, platformColor, _THIS_IS_MUSIC_BLOCKS_
  */
 
@@ -552,13 +552,13 @@ function setupSensorsBlocks(activity) {
             let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
 
             // Handle hex and rgb color formats
-            if (colorString.includes("#")) {
-                colorString = hex2rgb(colorString.split("#")[1]);
+            if (isValidHex(colorString)) {
+                colorString = hex2rgb(colorString);
             }
 
             const obj = colorString.split("(")[1].split(",");
             const component = Number(obj[this.colorIndex]);
-            return parseInt(component / 2.55);
+            return parseInt(component / 2.55, 10);
         }
     }
 
@@ -672,10 +672,23 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The background color index.
          */
         getBackgroundColor() {
-            const [r, g, b] = platformColor.background
-                .match(/\(([^)]+)\)/)[1]
-                .split(/,\s*/)
-                .map(Number);
+            let r;
+            let g;
+            let b;
+            const background = platformColor.background;
+
+            if (isValidHex(background)) {
+                const rgb = hexToRGB(background);
+                r = rgb.r;
+                g = rgb.g;
+                b = rgb.b;
+            } else {
+                [r, g, b] = background
+                    .match(/\(([^)]+)\)/)[1]
+                    .split(/,\s*/)
+                    .map(Number);
+            }
+
             return searchColors(r, g, b);
         }
 

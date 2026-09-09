@@ -35,9 +35,19 @@ const OCTAVE_NOTATION_MAP = {
 };
 
 const ACCIDENTAL_MAP = {
+    "𝄪": "^^",
     "♯": "^",
-    "♭": "_"
+    "#": "^",
+    "♮": "=",
+    "♭": "_",
+    "b": "_",
+    "𝄫": "__"
 };
+
+const ACCIDENTAL_SYMBOLS = Object.keys(ACCIDENTAL_MAP)
+    .map(symbol => symbol.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("");
+const PITCH_ACCIDENTAL_PATTERN = new RegExp(`^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)`, "u");
 
 /**
  * Returns the header string used for the ABC notation output.
@@ -94,21 +104,33 @@ const processABCNotes = function (logo, turtle) {
             note = pitchObj[0] + pitchObj[1];
         }
 
-        // Handle accidentals first
-        for (const [symbol, replacement] of Object.entries(ACCIDENTAL_MAP)) {
-            note = note.replace(new RegExp(symbol, "g"), replacement);
+        const pitchMatch = note.match(PITCH_ACCIDENTAL_PATTERN);
+        const accidentalSymbols = pitchMatch ? pitchMatch[2] : "";
+        const accidental = accidentalSymbols
+            ? Array.from(accidentalSymbols)
+                  .map(symbol => ACCIDENTAL_MAP[symbol])
+                  .join("")
+            : "";
+        if (accidentalSymbols) {
+            note = note.replace(accidentalSymbols, "");
         }
 
         // Handle octave notation
-        for (const [octave, notation] of Object.entries(OCTAVE_NOTATION_MAP)) {
-            if (note.includes(octave)) {
-                note = note.replace(new RegExp(octave, "g"), notation);
-                break; // Only one octave notation should apply
-            }
+        const match = note.match(/\d+$/);
+        const octave = match ? parseInt(match[0], 10) : null;
+        if (octave !== null && OCTAVE_NOTATION_MAP[octave] !== undefined) {
+            note = note.replace(/\d+$/, OCTAVE_NOTATION_MAP[octave]);
         }
 
         // Convert case based on octave
-        return note.includes("'") || note === "" ? note.toLowerCase() : note.toUpperCase();
+        if (octave !== null) {
+            return accidental + (octave >= 5 ? note.toLowerCase() : note.toUpperCase());
+        } else {
+            return (
+                accidental +
+                (note.includes("'") || note === "" ? note.toLowerCase() : note.toUpperCase())
+            );
+        }
     };
 
     let counter = 0;
@@ -210,7 +232,7 @@ const processABCNotes = function (logo, turtle) {
 
             // If it is a tuplet, look ahead to see if it is complete.
             // While you are at it, add up the durations.
-            if (obj[NOTATIONTUPLETVALUE] != null) {
+            if (obj[NOTATIONTUPLETVALUE] !== null) {
                 targetDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONDURATION];
                 tupletDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONROUNDDOWN];
                 let j = 1;

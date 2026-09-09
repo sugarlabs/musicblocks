@@ -1,0 +1,270 @@
+/**
+ * @license
+ * MusicBlocks v3.7.1
+ * Copyright (C) 2026 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * The provider seam between a structured generation request and generated Jest
+ * test source.
+ *
+ * A provider ("client") is any object with:
+ *
+ *     client.name                        -> string
+ *     client.generate(request)           -> { source: string, meta?: object }
+ *                                           (may return a Promise)
+ *
+ * where `request` is the object produced by ./generation-request.js. The AST
+ * extractor and the prompt builder know nothing about providers; only this file
+ * does. A real network-backed provider (OpenAI, Anthropic, ...) would be a new
+ * class registered here in a later change - this file deliberately ships only
+ * the two credential-free providers needed to exercise the pipeline:
+ *
+ *   - NoopClient   deterministic placeholder test source, for CI and unit tests.
+ *   - ManualClient returns a pre-supplied fixture, or the prompt itself for a
+ *                  human to answer by hand.
+ *
+ * Nothing here performs I/O: no file writes, no `fs`, no network. Generated
+ * output is always returned as an in-memory string.
+ */
+
+const path = require("path");
+const { buildGenerationRequest } = require("./generation-request");
+const { buildPrompt } = require("./prompt-builder");
+
+const LICENSE_HEADER = [
+    "/**",
+    " * @license",
+    " * MusicBlocks v3.7.1",
+    " * Copyright (C) 2026 Sugar Labs",
+    " *",
+    " * This program is free software: you can redistribute it and/or modify",
+    " * it under the terms of the GNU Affero General Public License as published by",
+    " * the Free Software Foundation, either version 3 of the License, or",
+    " * (at your option) any later version.",
+    " *",
+    " * This program is distributed in the hope that it will be useful,",
+    " * but WITHOUT ANY WARRANTY; without even the implied warranty of",
+    " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the",
+    " * GNU Affero General Public License for more details.",
+    " *",
+    " * You should have received a copy of the GNU Affero General Public License",
+    " * along with this program. If not, see <https://www.gnu.org/licenses/>.",
+    " */"
+].join("\n");
+
+/**
+ * The relative path from a generated test back to its module, e.g.
+ * `js/utils/utils-logic.js` + test in `js/utils/__tests__/` -> `../utils-logic`.
+ *
+ * @param {object} request - a generation request.
+ * @returns {string}
+ */
+function requirePathFor(request) {
+    const source = request.module.path || "module.js";
+    const target = request.targetTestPath || "__tests__/module.test.js";
+    const targetDirectory = path.posix.dirname(target);
+    const relative = path.posix.relative(targetDirectory, source).replace(/\.js$/, "");
+    return relative.startsWith(".") ? relative : `./${relative}`;
+}
+
+/**
+ * A deterministic provider that returns a syntactically valid Jest skeleton:
+ * one `describe` per module and an `it.todo` per exported symbol (the tests in
+ * __tests__/llm-client.test.js parse its output with the vendored Acorn). It
+ * never calls a model; it exists so the pipeline (plan -> request -> prompt ->
+ * client -> source) can be exercised end to end without credentials.
+ */
+class NoopClient {
+    /**
+     * @param {object} [options] - `{ label }` to tag `meta.label`.
+     */
+    constructor(options = {}) {
+        this.name = "noop";
+        this.label = typeof options.label === "string" ? options.label : "noop";
+    }
+
+    /**
+     * @param {object} request - a generation request.
+     * @returns {{ source: string, meta: object }}
+     */
+    generate(request) {
+        const mod = request.module;
+        const names = mod.exportNames.length > 0 ? mod.exportNames : [];
+        const body =
+            names.length > 0
+                ? names.map(
+                      name =>
+                          `    it.todo(${JSON.stringify(
+                              `${name}: describe the behaviour under test`
+                          )});`
+                  )
+                : ['    it.todo("module exposes no direct exports - test via its side effects");'];
+
+        const source = [
+            LICENSE_HEADER,
+            "",
+            `// Placeholder generated by NoopClient for ${JSON.stringify(mod.path)}.`,
+            "// Replace each it.todo with a behaviour-oriented test.",
+            "",
+            `const target = require(${JSON.stringify(requirePathFor(request))});`,
+            "",
+            `describe(${JSON.stringify(mod.path)}, () => {`,
+            '    it("is importable", () => {',
+            "        expect(target).toBeDefined();",
+            "    });",
+            "",
+            ...body,
+            "});",
+            ""
+        ].join("\n");
+
+        return {
+            source,
+            meta: {
+                client: this.name,
+                label: this.label,
+                model: null,
+                generated: false,
+                exports: names
+            }
+        };
+    }
+}
+
+/**
+ * A provider for the local / human-in-the-loop workflow. If a response was
+ * pre-registered for the module path it is returned as-is; otherwise the built
+ * prompt is returned wrapped in a block comment so a maintainer can paste it
+ * into a model of their choice and drop the answer back in.
+ */
+class ManualClient {
+    /**
+     * @param {object} [options] - `{ responses }`, a map of module path ->
+     *     canned test source.
+     */
+    constructor(options = {}) {
+        this.name = "manual";
+        this.responses =
+            options.responses && typeof options.responses === "object" ? options.responses : {};
+    }
+
+    /**
+     * @param {object} request - a generation request.
+     * @returns {{ source: string, meta: object }}
+     */
+    generate(request) {
+        const key = request.module.path;
+        if (Object.prototype.hasOwnProperty.call(this.responses, key)) {
+            return {
+                source: String(this.responses[key]),
+                meta: { client: this.name, origin: "fixture", generated: false }
+            };
+        }
+        const prompt = buildPrompt(request);
+        const escapedKey = String(key).replace(/\*\//g, "*\\/");
+        const source = [
+            `/* No canned response registered for ${escapedKey}.`,
+            " * Paste the prompt below into a model, then replace this comment with the result.",
+            " *",
+            prompt.replace(/\*\//g, "*\\/"),
+            " */",
+            ""
+        ].join("\n");
+        return { source, meta: { client: this.name, origin: "prompt", generated: false } };
+    }
+}
+
+const REGISTRY = { noop: NoopClient, manual: ManualClient };
+
+/**
+ * Provider names that are meaningful but intentionally not implemented in this
+ * change. Naming one produces a clear error rather than "unknown provider".
+ */
+const NOT_YET_IMPLEMENTED = new Set(["openai", "anthropic", "azure", "gemini", "bedrock"]);
+
+/**
+ * Creates a provider by name.
+ *
+ * @param {string} [name] - "noop" (default) or "manual".
+ * @param {object} [options] - forwarded to the provider constructor.
+ * @returns {{ name: string, generate: function }}
+ * @throws {Error} for an unknown or not-yet-implemented provider.
+ */
+function createClient(name = "noop", options = {}) {
+    const key = String(name).toLowerCase();
+    if (Object.prototype.hasOwnProperty.call(REGISTRY, key)) {
+        return new REGISTRY[key](options);
+    }
+    if (NOT_YET_IMPLEMENTED.has(key)) {
+        throw new Error(
+            `test-generation provider "${key}" is not implemented in this repository yet; ` +
+                'use "noop" or "manual"'
+        );
+    }
+    throw new Error(`unknown test-generation provider: ${name}`);
+}
+
+/**
+ * Runs the whole deterministic pipeline and then the configured provider:
+ *
+ *   plan -> generation request -> prompt -> client.generate -> { source }
+ *
+ * The provider is chosen by, in order: an explicit `options.client` instance,
+ * `options.provider` by name, otherwise NoopClient. No provider here needs
+ * credentials or a network.
+ *
+ * @param {object} plan - a ModuleTestPlan from ../extract-module.
+ * @param {object} [options] - `{ client, provider, clientOptions, ...requestOptions }`.
+ * @returns {Promise<{
+ *     request: object,
+ *     prompt: string,
+ *     client: string,
+ *     source: string,
+ *     meta: object
+ * }>}
+ */
+async function generateTests(plan, options = {}) {
+    const { client, provider, clientOptions, ...requestOptions } = options;
+    const request = buildGenerationRequest(plan, requestOptions);
+    const prompt = buildPrompt(request);
+
+    const resolved =
+        client && typeof client.generate === "function"
+            ? client
+            : createClient(provider || "noop", clientOptions || {});
+
+    const result = await resolved.generate(request);
+    if (!result || typeof result.source !== "string") {
+        throw new Error(`provider "${resolved.name}" returned no source string`);
+    }
+
+    return {
+        request,
+        prompt,
+        client: resolved.name,
+        source: result.source,
+        meta: result.meta || {}
+    };
+}
+
+module.exports = {
+    NoopClient,
+    ManualClient,
+    createClient,
+    generateTests,
+    NOT_YET_IMPLEMENTED
+};

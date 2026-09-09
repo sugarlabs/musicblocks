@@ -214,7 +214,7 @@ function setupOrnamentBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
-                name: _("neighbor") + " (+/–)",
+                name: `${_("neighbor")} (+/–)`,
                 args: 2,
                 defaults: [1, 1 / 16],
                 argLabels: [_("semi-tone interval"), _("note value")]
@@ -306,7 +306,7 @@ function setupOrnamentBlocks(activity) {
              * } - The block formation parameters.
              */
             this.formBlock({
-                name: _("neighbor") + " (+/–)",
+                name: `${_("neighbor")} (+/–)`,
                 args: 2,
                 defaults: [1, 1 / 16],
                 argLabels: [_("scalar interval"), _("note value")]

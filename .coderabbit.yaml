@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+
+reviews:
+    profile: "chill"
+    high_level_summary: true
+    collapse_walkthrough: false
+    request_changes_workflow: false
+    review_status: true
+    sequence_diagrams: true
+
+    auto_review:
+        enabled: true
+        drafts: false
+        base_branches:
+            - "master"
+
+    path_filters:
+        - "!**/node_modules/**"
+        - "!**/bower_components/**"
+        - "!**/lib/**"
+        - "!**/dist/**"
+        - "!**/coverage/**"
+        - "!**/po/**"
+        - "!**/locales/**"
+        - "!**/sounds/**"
+        - "!**/images/**"
+        - "!**/screenshots/**"
+        - "!**/fonts/**"
+        - "!**/header-icons/**"
+        - "!**/*.png"
+        - "!**/*.jpg"
+        - "!**/*.jpeg"
+        - "!**/*.mp4"
+        - "!**/*.webm"
+        - "!**/*.svg"
+        - "!package-lock.json"
+
+    path_instructions:
+        - path: "js/**/*.js"
+          instructions: |
+              Focus on correctness and reliability over style:
+              - Async flow & scheduling: Ensure Tone.js scheduling, promises, and callbacks do not race or deadlock.
+              - Cleanup: Verify event listeners and timers are properly cleaned up to prevent memory leaks across play/stop cycles.
+              - State safety: Guard against unsafe mutations to shared global/singleton state (globalActivity, Blocks, Turtles, Singer).
+              - Security: Prefer textContent or escapeHTML() for DOM insertions over un-sanitized innerHTML.
+
+        - path: "planet/js/**/*.js"
+          instructions: |
+              Focus on Planet cloud sharing subsystem reliability and security:
+              - Async API & network requests: Ensure fetch/AJAX error handling, timeouts, and state updates are robust.
+              - Data sanitization: Verify project metadata, user input, and DOM insertions are sanitized.
+              - Modularity: Maintain separation between Planet UI components and core Music Blocks execution.
+
+        - path: "js/**/__tests__/**/*.js"
+          instructions: |
+              Focus on test quality:
+              - Assertions must verify observable outcomes, not just function execution without throwing.
+              - Ensure mocks reflect realistic return structures.
+              - Flag missing edge-case coverage for empty inputs, boundary values, and error paths.
+
+        - path: "cypress/**/*.js"
+          instructions: |
+              Focus on E2E stability:
+              - Ensure DOM selectors are resilient to minor structural changes.
+              - Flag fixed timing waits (e.g., cy.wait(ms)) in favor of dynamic assertions or cy.intercept.
+
+        - path: ".github/workflows/**/*.{yml,yaml}"
+          instructions: |
+              Focus on workflow security and correctness:
+              - Quote shell variables to prevent word splitting and injection.
+              - Ensure secrets are never echoed to logs.
+              - Prefer SHA-pinned or specific version tags for GitHub Actions.
+              - Check workflow scripts for portability issues across different environments and line-ending formats.
+
+    pre_merge_checks:
+        title:
+            mode: "warning"
+            requirements: "Title must follow Conventional Commits format with a valid lowercase type and no trailing period."
+
+        issue_assessment:
+            mode: "warning"
+
+        custom_checks:
+            - name: "PR Description vs Code Changes"
+              mode: "warning"
+              instructions: |
+                  Pass: The PR description accurately reflects the code changes in the diff.
+                  Fail: The description contradicts the diff or leaves core functional changes unexplained.
+                  Inconclusive: The description is brief but not inaccurate.
+
+            - name: "Multiple Issues Linked"
+              mode: "warning"
+              instructions: |
+                  Pass: The PR references multiple closely related issues fixed together.
+                  Fail: The PR references multiple functionally unrelated issues that should be split into separate PRs.
+                  Inconclusive: Only one issue or no issue is linked.
+
+    tools:
+        eslint:
+            enabled: true
+        markdownlint:
+            enabled: true
+        yamllint:
+            enabled: true
+        actionlint:
+            enabled: true
+        gitleaks:
+            enabled: true
+        github-checks:
+            enabled: true
+        semgrep:
+            enabled: true
+
+chat:
+    auto_reply: true

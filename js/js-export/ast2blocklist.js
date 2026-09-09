@@ -29,6 +29,13 @@
  *   let blockList = AST2BlockList.toBlockList(AST, config);
  */
 class AST2BlockList {
+    /**
+     * Converts a JavaScript AST into an array of block specifications for Music Blocks.
+     *
+     * @param {Object} AST - Acorn-generated AST object representing the JavaScript code
+     * @param {Object} config - Mapping configuration between AST nodes and blocks
+     * @returns {Array} List of block specifications ready to be loaded via loadNewBlocks
+     */
     static toBlockList(AST, config) {
         let trees = _astToTree(AST, config);
         return _treeToBlockList(trees, config);
@@ -73,7 +80,6 @@ class AST2BlockList {
             for (let body of AST.body) {
                 _createNodeAndAddToTree(body, root);
             }
-            console.log(JSON.stringify(root["children"], null, 2));
             return root["children"];
 
             //
@@ -125,8 +131,8 @@ class AST2BlockList {
                                 }
                             } else if (
                                 "has_value" in identifier &&
-                                ((!identifier.has_value && value == null) ||
-                                    (identifier.has_value && value != null))
+                                ((!identifier.has_value && value === null) ||
+                                    (identifier.has_value && value !== null))
                             ) {
                                 groupMatched = true;
                                 break;
@@ -151,7 +157,6 @@ class AST2BlockList {
                                 "expression.argument.callee.property.name"
                             );
                             if (calleePropertyName && entry.name_map[calleePropertyName]) {
-                                console.log(entry.name_map[calleePropertyName]);
                                 entry.name = entry.name_map[calleePropertyName];
                             }
                         }
@@ -233,7 +238,7 @@ class AST2BlockList {
                         bodyAST,
                         pair.ast.children_properties[0]
                     )) {
-                        if (child.type != "ReturnStatement") {
+                        if (child.type !== "ReturnStatement") {
                             _createNodeAndAddToTree(child, node);
                         }
                     }
@@ -243,7 +248,7 @@ class AST2BlockList {
                             bodyAST,
                             pair.ast.children_properties[1]
                         )) {
-                            if (child.type != "ReturnStatement") {
+                            if (child.type !== "ReturnStatement") {
                                 _createNodeAndAddToTree(child, node);
                             }
                         }
@@ -541,7 +546,7 @@ class AST2BlockList {
             }
 
             function _createArgBlockAndAddToList(node, blockList, parentBlockNumber) {
-                if (node.arguments === undefined || node.arguments.length == 0) {
+                if (node.arguments === undefined || node.arguments.length === 0) {
                     return 0;
                 }
 
@@ -560,9 +565,11 @@ class AST2BlockList {
                         for (const name in entry.name_map) {
                             if (block_name === entry.name_map[name]) {
                                 blockConfig = entry;
-                                console.log(entry);
-                                console.log(block_name);
+                                break;
                             }
+                        }
+                        if (blockConfig) {
+                            break;
                         }
                     }
                 }

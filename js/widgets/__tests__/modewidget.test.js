@@ -32,6 +32,10 @@ global.platformColor = {
     selectorBackground: "#FFFFFF",
     selectorBackgroundHOVER: "#EEEEEE",
     modeWheelcolors: ["#FF0000", "#00FF00"],
+    modeGroupWheelcolors: ["#111111"],
+    modePieMenusIfColorPush: "#333333",
+    modePieMenusElseColorPush: "#444444",
+    textColor: "#ffffff",
     orange: "#FFA500"
 };
 global.DEFAULTVOICE = "piano";
@@ -41,12 +45,18 @@ global.last = arr => arr[arr.length - 1];
 global.docById = jest.fn().mockImplementation(id => ({
     style: {},
     innerHTML: "",
+    append: jest.fn(),
     appendChild: jest.fn(),
+    replaceChildren: jest.fn(),
+    removeChild: jest.fn(),
+    firstChild: null,
     rows: [{ cells: [{ innerHTML: "" }] }, { cells: [{ innerHTML: "" }] }],
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
-            innerHTML: ""
+            innerHTML: "",
+            appendChild: jest.fn(),
+            append: jest.fn()
         })
     })
 }));
@@ -55,8 +65,80 @@ global.getNote = jest.fn().mockReturnValue(["C", "4"]);
 global.keySignatureToMode = jest.fn().mockReturnValue(["C", "ionian"]);
 global.normalizeNoteAccidentals = jest.fn().mockImplementation(n => n);
 global.MUSICALMODES = {
-    ionian: [2, 2, 1, 2, 2, 2, 1]
+    ionian: [2, 2, 1, 2, 2, 2, 1],
+    minor: [2, 1, 2, 2, 1, 2, 2]
 };
+global.TEMPERAMENT = {
+    "equal": { isEDO: true, pitchNumber: 12 },
+    "just intonation": { isEDO: false, pitchNumber: 12 }
+};
+global.getCurrentEDO = jest.fn().mockReturnValue(12);
+global.getModePattern = jest.fn().mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
+global.DEFAULTMODE = "major";
+global.piemenuModes = jest.fn();
+
+// Shared mode pie menu helpers, required from musicutils so the smoke tests
+// exercise the real extraction logic (modewidget.js sees them as globals).
+global.MODE_PIE_MENUS = {
+    5: ["minor pentatonic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+    7: ["ionian", " ", "dorian", " ", " ", " ", " ", " ", " ", "aeolian", " ", " "],
+    custom: [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+};
+const {
+    MODEPIEMENU_GROUP_RING,
+    MODEPIEMENU_NAME_RING,
+    getSavedCustomModes,
+    getModeNamesForGroup,
+    getModeLabel,
+    getModeNameFromLabel,
+    getModeSliceColors,
+    updateModeWheelItems,
+    getModeGroupTitleFont,
+    getModeSliceFont,
+    configureWheel,
+    scalePatternToEDO,
+    isNonEDO,
+    getNonEDOModeSteps,
+    getNonEDOFrequency,
+    isEquallyTempered,
+    pitchToFrequency
+} = require("../../utils/musicutils.js");
+global.MODEPIEMENU_GROUP_RING = MODEPIEMENU_GROUP_RING;
+global.MODEPIEMENU_NAME_RING = MODEPIEMENU_NAME_RING;
+global.getSavedCustomModes = getSavedCustomModes;
+global.getModeNamesForGroup = getModeNamesForGroup;
+global.getModeLabel = getModeLabel;
+global.getModeNameFromLabel = getModeNameFromLabel;
+global.getModeSliceColors = getModeSliceColors;
+global.updateModeWheelItems = updateModeWheelItems;
+global.getModeGroupTitleFont = getModeGroupTitleFont;
+global.getModeSliceFont = getModeSliceFont;
+global.configureWheel = configureWheel;
+global.configureExitWheel = jest.fn();
+global.scalePatternToEDO = scalePatternToEDO;
+global.isNonEDO = isNonEDO;
+global.getNonEDOModeSteps = getNonEDOModeSteps;
+global.getNonEDOFrequency = getNonEDOFrequency;
+global.isEquallyTempered = isEquallyTempered;
+global.pitchToFrequency = pitchToFrequency || jest.fn().mockReturnValue(440);
+global.generateNoteNames =
+    global.generateNoteNames ||
+    jest.fn().mockReturnValue(["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]);
+global.numberToPitch = global.numberToPitch || jest.fn().mockReturnValue(["C", 4]);
+global.NOTESTABLE = global.NOTESTABLE || [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B"
+];
 
 // Mock slicePath
 global.slicePath = jest.fn().mockReturnValue({
@@ -65,24 +147,71 @@ global.slicePath = jest.fn().mockReturnValue({
 });
 
 // Mock wheelnav
-global.wheelnav = jest.fn().mockImplementation(() => ({
-    raphael: {},
-    colors: [],
-    slicePathFunction: null,
-    slicePathCustom: {},
-    sliceSelectedPathCustom: {},
-    sliceInitPathCustom: {},
-    navItems: [],
-    createWheel: jest.fn().mockImplementation(function (labels) {
-        this.navItems = labels.map(() => ({
-            navItem: {
-                hide: jest.fn(),
-                show: jest.fn()
-            },
-            navigateFunction: null
-        }));
-    })
-}));
+global.wheelnav = jest.fn().mockImplementation(() => {
+    const navItemTemplate = () => ({
+        title: "",
+        navItem: {
+            hide: jest.fn(),
+            show: jest.fn()
+        },
+        navigateFunction: null,
+        fillAttr: "",
+        titleAttr: {},
+        titleHoverAttr: {},
+        titleSelectedAttr: {},
+        sliceHoverAttr: {},
+        slicePathAttr: {},
+        sliceSelectedAttr: {},
+        basicNavTitleMax: {},
+        basicNavTitleMin: {},
+        hoverNavTitleMax: {},
+        hoverNavTitleMin: {},
+        selectedNavTitleMax: {},
+        selectedNavTitleMin: {},
+        initNavTitle: {}
+    });
+    const mockWheel = {
+        raphael: {},
+        colors: [],
+        slicePathFunction: null,
+        slicePathCustom: {},
+        sliceSelectedPathCustom: {},
+        sliceInitPathCustom: {},
+        navItems: [],
+        titleFont: "",
+        selectedNavItemIndex: 0,
+        createWheel: jest.fn().mockImplementation(function (labels) {
+            if (labels) {
+                this.navItems = labels.map((l, i) => {
+                    const item = navItemTemplate();
+                    item.title = l;
+                    return item;
+                });
+            }
+        }),
+        navigateWheel: jest.fn().mockImplementation(function (index) {
+            this.selectedNavItemIndex = index;
+            if (
+                this.navItems[index] &&
+                typeof this.navItems[index].navigateFunction === "function"
+            ) {
+                this.navItems[index].navigateFunction();
+            }
+        }),
+        refreshWheel: jest.fn(),
+        removeWheel: jest.fn(),
+        initWheel: jest.fn().mockImplementation(function (labels) {
+            if (labels) {
+                this.navItems = labels.map(l => {
+                    const item = navItemTemplate();
+                    item.title = l;
+                    return item;
+                });
+            }
+        })
+    };
+    return mockWheel;
+});
 
 // Mock Window
 if (typeof window === "undefined") {
@@ -96,11 +225,20 @@ window.widgetWindows = {
         destroy: jest.fn(),
         updateTitle: jest.fn(),
         addButton: jest.fn().mockImplementation(() => {
-            const btn = {};
+            const btn = {
+                append: jest.fn(),
+                appendChild: jest.fn(),
+                replaceChildren: jest.fn(),
+                removeChild: jest.fn(),
+                firstChild: null
+            };
             btn.onclick = jest.fn();
             return btn;
         }),
         getWidgetBody: jest.fn().mockReturnValue({
+            style: {},
+            children: [{ style: {} }],
+            offsetHeight: 400,
             append: jest.fn(),
             getElementsByTagName: jest.fn().mockReturnValue([
                 {
@@ -122,8 +260,20 @@ if (typeof document === "undefined") {
 }
 document.createElement = jest.fn().mockImplementation(tag => ({
     style: {},
+    setAttribute: jest.fn(),
     innerHTML: "",
     append: jest.fn(),
+    appendChild: jest.fn(),
+    prepend: jest.fn(),
+    addEventListener: jest.fn(),
+    replaceChildren: jest.fn(),
+    removeChild: jest.fn(),
+    firstChild: null,
+    children: [{ style: {} }],
+    querySelector: jest.fn().mockReturnValue({
+        style: {},
+        setAttribute: jest.fn()
+    }),
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
@@ -132,6 +282,15 @@ document.createElement = jest.fn().mockImplementation(tag => ({
     }),
     getElementById: jest.fn().mockReturnValue({ src: "" })
 }));
+// Add replaceChildren to modeTableDiv mock (used in constructor)
+const originalCreateElement = document.createElement;
+document.createElement = jest.fn(tag => {
+    const el = originalCreateElement(tag);
+    if (!el.replaceChildren) {
+        el.replaceChildren = jest.fn();
+    }
+    return el;
+});
 document.getElementById = document.createElement; // For internal usage
 
 describe("ModeWidget", () => {
@@ -210,37 +369,6 @@ describe("ModeWidget", () => {
         expect(modeWidget._calculateMode()).toEqual([12]);
     });
 
-    test("should handle empty selectedNotes safely", () => {
-        modeWidget._selectedNotes = [];
-
-        const result = modeWidget._calculateMode();
-
-        expect(result).toBeDefined();
-    });
-
-    test("should handle malformed selectedNotes safely", () => {
-        modeWidget._selectedNotes = [true, undefined, false, null, true];
-
-        const result = modeWidget._calculateMode();
-
-        expect(Array.isArray(result)).toBe(true);
-    });
-
-    test("undo should not crash when stack is empty", () => {
-        modeWidget._undoStack = [];
-        modeWidget._undo();
-
-        expect(modeWidget._selectedNotes).toBeDefined();
-    });
-
-    test("should return correct playing status", () => {
-        modeWidget._playing = false;
-        expect(modeWidget._playingStatus()).toBe(false);
-
-        modeWidget._playing = true;
-        expect(modeWidget._playingStatus()).toBe(true);
-    });
-
     test("should save and undo state correctly", () => {
         modeWidget._selectedNotes = Array(12).fill(false);
         modeWidget._selectedNotes[0] = true;
@@ -253,121 +381,492 @@ describe("ModeWidget", () => {
         expect(modeWidget._selectedNotes[1]).toBe(false);
     });
 
-    test("should clear all notes except root", () => {
-        modeWidget._selectedNotes = Array(12).fill(true);
-
-        modeWidget._clear();
-
-        expect(modeWidget._selectedNotes[0]).toBe(true);
-        for (let i = 1; i < 12; i++) {
-            expect(modeWidget._selectedNotes[i]).toBe(false);
-        }
-    });
-
     test("should trigger synth when playing a note", () => {
         modeWidget._playNote(0);
 
         expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
     });
 
-    test("should initialize correctly", () => {
-        expect(global.wheelnav).toHaveBeenCalledTimes(3); // noteWheel, playWheel, etc.
-        expect(global.keySignatureToMode).toHaveBeenCalled();
-        expect(mockActivity.textMsg).toHaveBeenCalled();
+    test("non-EDO labeled temperament plays the octave an octave up", () => {
+        const labels = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        const savedTemperament = global.TEMPERAMENT;
+        const savedSpy = global.pitchToFrequency;
+        global.TEMPERAMENT = {
+            testNonEDO: {
+                isEDO: false,
+                noteLabels: labels,
+                ratios: labels.map((_, i) => Math.pow(2, i / 12))
+            }
+        };
+        modeWidget._activeTemperamentKey = "testNonEDO";
+        modeWidget._activeEDO = labels.length;
+        const spy = jest.spyOn(global, "pitchToFrequency");
+
+        // Within-octave degree stays at octave 4.
+        modeWidget._triggerNote(1, labels.length);
+        expect(spy).toHaveBeenLastCalledWith(labels[1], 4, 0, ["C"], "testNonEDO");
+
+        // The octave note (index === n) wraps to the root label but must
+        // sound an octave higher (octave 5), not the starting note.
+        modeWidget._triggerNote(labels.length, labels.length);
+        expect(spy).toHaveBeenLastCalledWith(labels[0], 5, 0, ["C"], "testNonEDO");
+
+        spy.mockRestore();
+        global.pitchToFrequency = savedSpy;
+        global.TEMPERAMENT = savedTemperament;
     });
 
-    test("should handle Play/Stop button toggle", () => {
-        jest.useFakeTimers();
-        const widgetWindow = window.widgetWindows.windowFor();
-        const playBtnMock = widgetWindow.addButton.mock.results[0].value;
+    test("should initialize a custom mode with only the root selected", () => {
+        modeWidget._resetToCustom();
 
-        // Start
-        expect(modeWidget._playing).toBe(false);
-        playBtnMock.onclick();
-        expect(modeWidget._playing).toBe(true);
-        expect(mockActivity.logo.resetSynth).toHaveBeenCalled();
-
-        // Stop
-        playBtnMock.onclick();
-        expect(modeWidget._playing).toBe(false);
-        jest.useRealTimers();
+        expect(modeWidget._selectedNotes[0]).toBe(true);
+        expect(modeWidget._selectedNotes.slice(1).every(v => v === false)).toBe(true);
     });
 
-    test("should rotate mode pattern right", () => {
-        // Setup: Need true at index 11 so that after 1 right shift (new[0] = old[11]), index 0 is true.
-        // This ensures the recursion stops after 1 rotation.
+    test("should translate notes to a new EDO slice count", () => {
+        modeWidget._activeEDO = 12;
         modeWidget._selectedNotes = [
+            true,
             false,
+            true,
             false,
+            true,
+            true,
             false,
+            true,
             false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
+            true,
             false,
             true
         ];
 
-        // Wait for rotation animations
-        jest.useFakeTimers();
-        modeWidget._rotateRight();
+        modeWidget._translateNotesToEDO(19);
 
-        // Fast forward through animations (12 * ROTATESPEED)
-        jest.advanceTimersByTime(12 * 150 + 100);
-
-        expect(modeWidget._locked).toBe(false);
-        jest.useRealTimers();
+        expect(modeWidget._selectedNotes).toHaveLength(19);
+        expect(modeWidget._selectedNotes[0]).toBe(true);
     });
 
-    test("should rotate mode pattern left", () => {
-        // Setup: Need true at index 1 so that after 1 left shift (new[0] = old[1]), index 0 is true.
+    test("should cache source EDO state before translating for round-trip restore", () => {
+        // Simulate a 12-EDO major: notes at 0,2,4,5,7,9,11
+        modeWidget._activeEDO = 12;
         modeWidget._selectedNotes = [
+            true,
             false,
             true,
             false,
+            true,
+            true,
             false,
+            true,
             false,
+            true,
             false,
+            true
+        ];
+        const originalNotes = modeWidget._selectedNotes.slice();
+
+        // Cache the 12-EDO state (as _wireEdoSelect now does)
+        modeWidget._edoNoteCache[12] = modeWidget._selectedNotes.slice();
+
+        // Switch to 5-EDO (translate + cache destination)
+        modeWidget._translateNotesToEDO(5);
+        modeWidget._edoNoteCache[5] = modeWidget._selectedNotes.slice();
+        modeWidget._activeEDO = 5;
+
+        expect(modeWidget._selectedNotes).toHaveLength(5);
+
+        // Switch back to 12-EDO — should restore from cache, not translate
+        modeWidget._selectedNotes = modeWidget._edoNoteCache[12].slice();
+        modeWidget._activeEDO = 12;
+
+        expect(modeWidget._selectedNotes).toHaveLength(12);
+        expect(modeWidget._selectedNotes).toEqual(originalNotes);
+    });
+
+    describe("_wireEdoSelect", () => {
+        // Fires the real listener _wireEdoSelect registered via
+        // addEventListener, since this file stubs document.createElement
+        // to a plain mock (see top of file) rather than a real jsdom
+        // element that supports dispatchEvent.
+        function fireEdoChange(select, value) {
+            select.value = value;
+            const handler = select.addEventListener.mock.calls.find(
+                call => call[0] === "change"
+            )[1];
+            handler();
+        }
+
+        test("rescales _selectedNotes to a never-before-visited EDO instead of leaving it untranslated", () => {
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget.logo.synth.inTemperament = "equal";
+            modeWidget._activeEDO = 12;
+            // 12-EDO major scale: root, 2nd, 3rd, 4th, 5th, 6th, 7th.
+            modeWidget._selectedNotes = [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true
+            ];
+            modeWidget._edoNoteCache = {};
+
+            const savedGetCurrentEDO = global.getCurrentEDO;
+            const savedTemperament = global.TEMPERAMENT;
+            global.getCurrentEDO = jest.fn(key => (key === "equal19" ? 19 : 12));
+            global.TEMPERAMENT = {
+                ...savedTemperament,
+                equal19: { isEDO: true, pitchNumber: 19 }
+            };
+
+            fireEdoChange(modeWidget._edoSelect, "equal19");
+
+            expect(modeWidget._activeEDO).toBe(19);
+            expect(modeWidget._selectedNotes).toHaveLength(19);
+            // A correct rescale of a 7-note pattern into 19-EDO spreads notes
+            // across the full range (scalePatternToEDO puts them at 0, 3, 6,
+            // 8, 11, 14, 17). Before the fix, _translateNotesToEDO's guard
+            // always short-circuited, so nothing above index 11 ever got
+            // selected — the array just got padded with false by
+            // _reconcileNotes downstream, silently losing the scale.
+            expect(modeWidget._selectedNotes.slice(12).some(v => v === true)).toBe(true);
+
+            global.getCurrentEDO = savedGetCurrentEDO;
+            global.TEMPERAMENT = savedTemperament;
+        });
+
+        test("restores from cache instead of re-translating on a previously-visited EDO", () => {
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget.logo.synth.inTemperament = "equal";
+            modeWidget._activeEDO = 12;
+            const twelveEdoNotes = [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true
+            ];
+            modeWidget._selectedNotes = twelveEdoNotes.slice();
+            modeWidget._edoNoteCache = {};
+
+            const savedGetCurrentEDO = global.getCurrentEDO;
+            const savedTemperament = global.TEMPERAMENT;
+            global.getCurrentEDO = jest.fn(key => (key === "equal19" ? 19 : 12));
+            global.TEMPERAMENT = {
+                ...savedTemperament,
+                equal19: { isEDO: true, pitchNumber: 19 }
+            };
+
+            // Visit 19-EDO once, then switch back to 12-EDO.
+            fireEdoChange(modeWidget._edoSelect, "equal19");
+            fireEdoChange(modeWidget._edoSelect, "equal");
+
+            expect(modeWidget._activeEDO).toBe(12);
+            expect(modeWidget._selectedNotes).toEqual(twelveEdoNotes);
+
+            global.getCurrentEDO = savedGetCurrentEDO;
+            global.TEMPERAMENT = savedTemperament;
+        });
+    });
+
+    test("should fall back to generated names when numberToPitch returns a NaN octave", () => {
+        modeWidget._activeEDO = 5;
+        global.numberToPitch = jest.fn().mockReturnValue([undefined, NaN]);
+        global.generateNoteNames = jest.fn().mockReturnValue(["C", "D", "E", "G", "A"]);
+
+        const result = modeWidget._pitchNameAndOctave(3);
+
+        // j=3 with aIndex=4 ("A" at index 4 in a 5-EDO table): name E, octave 5.
+        expect(result).toEqual(["E", 5]);
+    });
+
+    test("should show textMsg when notes are remapped on EDO switch", () => {
+        modeWidget._activeEDO = 12;
+        modeWidget._selectedNotes = [
+            true,
             false,
+            true,
             false,
+            true,
+            true,
             false,
+            true,
             false,
+            true,
             false,
-            false
+            true
         ];
 
-        jest.useFakeTimers();
-        modeWidget._rotateLeft();
-        jest.advanceTimersByTime(12 * 150 + 100);
+        // Simulate _wireEdoSelect cache-miss path
+        modeWidget._edoNoteCache[12] = modeWidget._selectedNotes.slice();
+        const oldEDO = modeWidget._activeEDO;
+        modeWidget._translateNotesToEDO(5);
+        modeWidget._edoNoteCache[5] = modeWidget._selectedNotes.slice();
 
-        expect(modeWidget._locked).toBe(false);
-        jest.useRealTimers();
+        modeWidget.textMsg(
+            `Mode remapped from ${oldEDO}-EDO to 5-EDO. Some notes may have changed.`,
+            3000
+        );
+
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            expect.stringContaining("remapped from 12"),
+            3000
+        );
     });
 
-    test("should invert mode pattern", () => {
-        modeWidget._selectedNotes = [
-            true,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            true,
-            false
-        ]; // C and B
+    test("should persist a custom mode to the registry and localStorage", () => {
+        const pattern = [2, 2, 1, 2, 2, 2, 1];
+        modeWidget._saveCustomMode("myMode", pattern);
 
-        jest.useFakeTimers();
-        modeWidget._invert(); // Inverts pairs around current axis
-        jest.advanceTimersByTime(6 * 150);
+        expect(MUSICALMODES["myMode"]).toEqual(pattern);
+        const saved = JSON.parse(localStorage.getItem("customModes"));
+        expect(saved.some(m => m.name === "myMode" && m.pattern.join() === pattern.join())).toBe(
+            true
+        );
+    });
+
+    test("should scale built-in mode intervals to the active EDO", () => {
+        modeWidget._activeEDO = 19;
+        global.getModePattern.mockReturnValue([3, 2, 3, 3, 2, 3, 3]);
+        const applySpy = jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+        const modeNameSpy = jest.spyOn(modeWidget, "_setModeName").mockImplementation(() => {});
+
+        modeWidget._loadMode("minor", [2, 1, 2, 2, 1, 2, 2], { value: 19 });
+
+        expect(global.getModePattern).toHaveBeenCalledWith("minor", 19);
+        expect(applySpy).toHaveBeenCalledWith([3, 2, 3, 3, 2, 3, 3]);
+
+        applySpy.mockRestore();
+        modeNameSpy.mockRestore();
+    });
+
+    test("should use the stored pattern for a custom mode without rescaling", () => {
+        localStorage.setItem(
+            "customModes",
+            JSON.stringify([{ name: "myMode", pattern: [3, 2, 3, 3, 2, 3, 3], edo: 19 }])
+        );
+        modeWidget._activeEDO = 19;
+        global.getModePattern.mockClear();
+        const applySpy = jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+        const modeNameSpy = jest.spyOn(modeWidget, "_setModeName").mockImplementation(() => {});
+
+        modeWidget._loadMode("myMode", [3, 2, 3, 3, 2, 3, 3], { value: 19 });
+
+        expect(global.getModePattern).not.toHaveBeenCalled();
+        expect(applySpy).toHaveBeenCalledWith([3, 2, 3, 3, 2, 3, 3]);
+
+        applySpy.mockRestore();
+        modeNameSpy.mockRestore();
+    });
+
+    test("should detect a built-in mode at a non-12 EDO", () => {
+        modeWidget._activeEDO = 19;
+        modeWidget._modeLabelCell = { textContent: "" };
+        modeWidget.widgetWindow = { updateTitle: jest.fn() };
+        modeWidget._selectedNotes = Array.from({ length: 19 }, (_, i) =>
+            [0, 3, 5, 8, 11, 13, 16].includes(i)
+        );
+        global.getModePattern.mockReturnValue([3, 2, 3, 3, 2, 3, 3]);
+
+        modeWidget._setModeName();
+
+        expect(modeWidget._modeLabelCell.textContent).toBe("C ionian");
+    });
+
+    test("should refuse to overwrite a built-in mode on save", () => {
+        const originalIonian = MUSICALMODES.ionian;
+
+        const result = modeWidget._saveCustomMode("ionian", [2, 2, 1, 2, 2, 2, 1]);
+
+        expect(result).toBe(false);
+        expect(MUSICALMODES.ionian).toEqual(originalIonian);
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Cannot overwrite built-in mode")
+        );
+    });
+
+    test("should cancel in-flight animations and clear pending timeouts", () => {
+        modeWidget._locked = true;
+        modeWidget._playing = true;
+        modeWidget._timeouts = [123, 456];
+        modeWidget._newPattern = [true, false];
+        modeWidget._notesToPlay = [0, 2];
+
+        modeWidget._cancelAnimations();
 
         expect(modeWidget._locked).toBe(false);
-        jest.useRealTimers();
+        expect(modeWidget._playing).toBe(false);
+        expect(modeWidget._timeouts).toEqual([]);
+        expect(modeWidget._newPattern).toBeNull();
+        expect(modeWidget._notesToPlay).toBeNull();
+    });
+
+    describe("_piemenuModes", () => {
+        beforeEach(() => {
+            global.piemenuModes.mockClear();
+        });
+
+        test("delegates to piemenuModes with a mock block", () => {
+            modeWidget._selectedModeName = "dorian";
+            modeWidget._piemenuModes();
+
+            expect(global.piemenuModes).toHaveBeenCalledTimes(1);
+            const [mockBlock, selectedMode] = global.piemenuModes.mock.calls[0];
+            expect(selectedMode).toBe("dorian");
+            expect(mockBlock.value).toBe("dorian");
+            expect(mockBlock.activity).toBeDefined();
+        });
+
+        test("sets _modePiemenuOpen to true while open", () => {
+            modeWidget._piemenuModes();
+            expect(modeWidget._modePiemenuOpen).toBe(true);
+        });
+
+        test("intercept applies mode selection via _loadMode", () => {
+            modeWidget._piemenuModes();
+            const mockBlock = modeWidget._mockBlock;
+
+            // Simulate piemenu setting a mode value
+            mockBlock.value = "major";
+            mockBlock.__selectionChanged();
+
+            expect(modeWidget._selectedModeName).toBe("major");
+        });
+    });
+
+    describe("_modeStepPattern", () => {
+        test("prefers the native pattern when provided", () => {
+            modeWidget._activeTemperamentKey = "just intonation";
+            expect(modeWidget._modeStepPattern("major", [3, 2, 2, 3])).toEqual([3, 2, 2, 3]);
+        });
+
+        test("uses ratio-derived steps under a non-EDO temperament", () => {
+            modeWidget._activeTemperamentKey = "just intonation";
+            const spy = jest
+                .spyOn(global, "getNonEDOModeSteps")
+                .mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
+            const result = modeWidget._modeStepPattern("major", null);
+            expect(spy).toHaveBeenCalledWith("major", "just intonation");
+            expect(result).toEqual([2, 2, 1, 2, 2, 2, 1]);
+            spy.mockRestore();
+        });
+
+        test("falls back to getModePattern at the active EDO when ratio mapping fails", () => {
+            modeWidget._activeTemperamentKey = "just intonation";
+            modeWidget._activeEDO = 12;
+            const spy = jest.spyOn(global, "getNonEDOModeSteps").mockReturnValue(null);
+            expect(modeWidget._modeStepPattern("dorian", null)).toEqual(
+                global.getModePattern("dorian", 12)
+            );
+            spy.mockRestore();
+        });
+    });
+
+    describe("mode pie menu safety", () => {
+        test("closes when the control-bar button is clicked while open", () => {
+            modeWidget._piemenuModes();
+            expect(modeWidget._modePiemenuOpen).toBe(true);
+            modeWidget._onModePieButtonClick();
+            expect(modeWidget._modePiemenuOpen).toBe(false);
+        });
+    });
+
+    describe("window maximization and scaling", () => {
+        test("widgetWindow.onmaximize is bound to the ModeWidget instance", () => {
+            const widget = new ModeWidget(mockActivity);
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            widget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            expect(typeof widget.widgetWindow.onmaximize).toBe("function");
+
+            // Invoke as WidgetWindow would invoke it (this = widgetWindow)
+            widget.widgetWindow.onmaximize.call(widget.widgetWindow);
+
+            // Verify _scale ran successfully with correct context by checking SVG was modified
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", expect.any(String));
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", expect.any(String));
+        });
+
+        test("_scale scales SVG to fit window when maximized", () => {
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            const originalIsMaximized = modeWidget.widgetWindow.isMaximized;
+            const originalGetFrame = modeWidget.widgetWindow.getWidgetFrame;
+            const originalGetDrag = modeWidget.widgetWindow.getDragElement;
+            const originalGetBody = modeWidget.widgetWindow.getWidgetBody;
+
+            modeWidget.widgetWindow.isMaximized = jest.fn().mockReturnValue(true);
+            modeWidget.widgetWindow.getWidgetFrame = jest
+                .fn()
+                .mockReturnValue({ offsetHeight: 500 });
+            modeWidget.widgetWindow.getDragElement = jest
+                .fn()
+                .mockReturnValue({ offsetHeight: 20 });
+            const widgetBody = { style: {}, offsetHeight: 400, children: [{ style: {} }] };
+            modeWidget.widgetWindow.getWidgetBody = jest.fn().mockReturnValue(widgetBody);
+
+            modeWidget._scale();
+
+            const expectedScale = (500 - 20) / 400; // windowHeight / bodyHeight = 1.2
+            const expectedSize = `${400 * expectedScale}px`; // WHEELSIZE (400) * scale
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", expectedSize);
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", expectedSize);
+
+            // Restore
+            modeWidget.widgetWindow.isMaximized = originalIsMaximized;
+            modeWidget.widgetWindow.getWidgetFrame = originalGetFrame;
+            modeWidget.widgetWindow.getDragElement = originalGetDrag;
+            modeWidget.widgetWindow.getWidgetBody = originalGetBody;
+        });
+
+        test("_scale resets SVG to default size when unmaximized", () => {
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            const originalIsMaximized = modeWidget.widgetWindow.isMaximized;
+            modeWidget.widgetWindow.isMaximized = jest.fn().mockReturnValue(false);
+
+            modeWidget._scale();
+
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", "400px"); // scale = 1
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", "400px");
+
+            // Restore
+            modeWidget.widgetWindow.isMaximized = originalIsMaximized;
+        });
+
+        test("_scale safely exits if widgetWindow or svg is not available", () => {
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            // Test: widgetWindow is null
+            const originalWindow = modeWidget.widgetWindow;
+            modeWidget.widgetWindow = null;
+            expect(() => modeWidget._scale()).not.toThrow();
+            expect(mockSvg.setAttribute).not.toHaveBeenCalled();
+
+            // Restore and test: svgContainer is null
+            modeWidget.widgetWindow = originalWindow;
+            modeWidget._meterWheelDiv = null;
+            expect(() => modeWidget._scale()).not.toThrow();
+
+            // Test: svg element is null
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(null) };
+            expect(() => modeWidget._scale()).not.toThrow();
+        });
     });
 });

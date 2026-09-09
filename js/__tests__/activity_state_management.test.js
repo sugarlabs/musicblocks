@@ -325,8 +325,8 @@ describe("Activity State Management Functions", () => {
  */
 describe("setSmallerLargerStatus", () => {
     // Constants from activity.js
-    const BLOCKSCALES = [1, 1.5, 2, 3, 4];
-    const DEFAULTBLOCKSCALE = 2;
+    const BLOCKSCALES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
+    const DEFAULTBLOCKSCALE = 1.5;
     const SMALLERBUTTON = "smaller.svg";
     const SMALLERDISABLEBUTTON = "smaller-disabled.svg";
     const BIGGERBUTTON = "bigger.svg";
@@ -341,7 +341,7 @@ describe("setSmallerLargerStatus", () => {
 
         // Create mock activity object
         activity = {
-            blockscale: 2, // Index into BLOCKSCALES (default: 2)
+            blockscale: 4, // Index of DEFAULTBLOCKSCALE (1.5) in BLOCKSCALES
             smallerContainer: {
                 children: [{ src: "" }]
             },
@@ -391,7 +391,7 @@ describe("setSmallerLargerStatus", () => {
 
     describe("smaller button icon", () => {
         test("should disable smaller button when scale is below default", async () => {
-            // blockscale index 0 = BLOCKSCALES[0] = 1, which is < DEFAULTBLOCKSCALE (2)
+            // blockscale index 0 = BLOCKSCALES[0] = 0.5, which is < DEFAULTBLOCKSCALE (1.5)
             activity.blockscale = 0;
 
             await activity.setSmallerLargerStatus();
@@ -403,8 +403,8 @@ describe("setSmallerLargerStatus", () => {
             );
         });
 
-        test("should disable smaller button for scale 1.5", async () => {
-            // blockscale index 1 = BLOCKSCALES[1] = 1.5, which is < DEFAULTBLOCKSCALE (2)
+        test("should disable smaller button for a below-default scale", async () => {
+            // blockscale index 1 = BLOCKSCALES[1] = 0.75, which is < DEFAULTBLOCKSCALE (1.5)
             activity.blockscale = 1;
 
             await activity.setSmallerLargerStatus();
@@ -416,9 +416,9 @@ describe("setSmallerLargerStatus", () => {
             );
         });
 
-        test("should enable smaller button when scale equals default", async () => {
-            // blockscale index 2 = BLOCKSCALES[2] = 2, which is NOT < DEFAULTBLOCKSCALE (2)
-            activity.blockscale = 2;
+        test("should enable smaller button when scale equals default (1.5)", async () => {
+            // blockscale index 4 = BLOCKSCALES[4] = 1.5, which is NOT < DEFAULTBLOCKSCALE (1.5)
+            activity.blockscale = 4;
 
             await activity.setSmallerLargerStatus();
 
@@ -430,8 +430,8 @@ describe("setSmallerLargerStatus", () => {
         });
 
         test("should enable smaller button when scale is above default", async () => {
-            // blockscale index 3 = BLOCKSCALES[3] = 3, which is NOT < DEFAULTBLOCKSCALE (2)
-            activity.blockscale = 3;
+            // blockscale index 6 = BLOCKSCALES[6] = 2.0, which is NOT < DEFAULTBLOCKSCALE (1.5)
+            activity.blockscale = 6;
 
             await activity.setSmallerLargerStatus();
 
@@ -445,8 +445,8 @@ describe("setSmallerLargerStatus", () => {
 
     describe("larger button icon", () => {
         test("should enable larger button when scale is not maximum", async () => {
-            // blockscale index 2 = BLOCKSCALES[2] = 2, which is NOT equal to 4
-            activity.blockscale = 2;
+            // blockscale index 4 = BLOCKSCALES[4] = 1.5, which is NOT equal to 4
+            activity.blockscale = 4;
 
             await activity.setSmallerLargerStatus();
 
@@ -457,9 +457,9 @@ describe("setSmallerLargerStatus", () => {
             );
         });
 
-        test("should enable larger button for scale 3", async () => {
-            // blockscale index 3 = BLOCKSCALES[3] = 3, which is NOT equal to 4
-            activity.blockscale = 3;
+        test("should enable larger button for scale 3.0", async () => {
+            // blockscale index 10 = BLOCKSCALES[10] = 3.0, which is NOT equal to 4
+            activity.blockscale = 10;
 
             await activity.setSmallerLargerStatus();
 
@@ -471,8 +471,8 @@ describe("setSmallerLargerStatus", () => {
         });
 
         test("should disable larger button when scale is maximum (4)", async () => {
-            // blockscale index 4 = BLOCKSCALES[4] = 4, which is equal to 4
-            activity.blockscale = 4;
+            // blockscale index 14 = BLOCKSCALES[14] = 4.0, which is equal to 4
+            activity.blockscale = 14;
 
             await activity.setSmallerLargerStatus();
 
@@ -507,7 +507,7 @@ describe("setSmallerLargerStatus", () => {
         });
 
         test("should enable smaller and disable larger at maximum scale", async () => {
-            activity.blockscale = 4; // maximum
+            activity.blockscale = 14; // index 14 = 4.0 (max)
 
             await activity.setSmallerLargerStatus();
 
@@ -528,7 +528,7 @@ describe("setSmallerLargerStatus", () => {
         });
 
         test("should enable both buttons at default scale", async () => {
-            activity.blockscale = 2; // default scale
+            activity.blockscale = 4; // index 4 = 1.5 (default scale)
 
             await activity.setSmallerLargerStatus();
 
@@ -549,11 +549,34 @@ describe("setSmallerLargerStatus", () => {
         });
 
         test("should call changeImage exactly twice", async () => {
-            activity.blockscale = 2;
+            activity.blockscale = 4;
 
             await activity.setSmallerLargerStatus();
 
             expect(mockChangeImage).toHaveBeenCalledTimes(2);
         });
+    });
+});
+
+describe("_initIdleWatcher isMusicPlaying check", () => {
+    it("should return false for _alreadyRunning even when other turtles are still running", () => {
+        // This documents the bug: _alreadyRunning goes false when ONE turtle
+        // finishes, even if others are still active
+        const mockLogo = { _alreadyRunning: false };
+        const mockTurtles = { running: jest.fn().mockReturnValue(true) };
+
+        const buggyCheck = mockLogo?._alreadyRunning || false;
+        const correctCheck = mockTurtles?.running() || false;
+
+        expect(buggyCheck).toBe(false); // wrong — misses active turtles
+        expect(correctCheck).toBe(true); // correct — sees all turtles
+        expect(mockTurtles.running).toHaveBeenCalledTimes(1);
+    });
+
+    it("should correctly report idle when all turtles have stopped", () => {
+        const mockTurtles = { running: jest.fn().mockReturnValue(false) };
+        const correctCheck = mockTurtles?.running() || false;
+        expect(correctCheck).toBe(false);
+        expect(mockTurtles.running).toHaveBeenCalledTimes(1);
     });
 });

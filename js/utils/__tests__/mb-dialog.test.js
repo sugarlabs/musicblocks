@@ -20,6 +20,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.clampNumber = require("../utils-logic").clampNumber;
+
 // Load the file which attaches MBDialog to window
 require("../mb-dialog");
 

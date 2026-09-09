@@ -164,28 +164,42 @@ class StatusMatrix {
                     if (typeof label === "object" && label !== null && label.value) {
                         label = label.value;
                     }
+                    if (label === null || label === undefined) {
+                        label =
+                            this.activity.blocks.blockList[statusField[0]].protoblock
+                                .staticLabels[0];
+                    }
+                    label = _(label);
                     break;
-                default:
-                    label =
-                        this.activity.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
+                default: {
+                    const block = this.activity.blocks.blockList[statusField[0]];
+                    label = block?.protoblock?.staticLabels?.[0] || "";
                     break;
+                }
             }
-            let str = label;
-            str = label.charAt(0).toUpperCase() + label.slice(1);
-            // console.log(str);
+
+            const str =
+                typeof label === "string" && label.length > 0
+                    ? label.charAt(0).toUpperCase() + label.slice(1)
+                    : "";
+
+            const selectorBg = "var(--color-selector-bg)";
+            const selectorText = "var(--color-selector-text)";
             cell.textContent = "\u00A0";
             const b = document.createElement("b");
             b.textContent = str;
             cell.appendChild(b);
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = selectorBg;
+            cell.style.color = selectorText;
             cell.style.paddingLeft = "10px";
             for (const turtle of this.activity.turtles.turtleList) {
                 if (turtle.inTrash) {
                     continue;
                 }
                 cell = row.insertCell();
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = selectorBg;
+                cell.style.color = selectorText;
                 cell.style.fontSize =
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.textContent = "";
@@ -195,6 +209,8 @@ class StatusMatrix {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
+            const selectorBg = "var(--color-selector-bg)";
+            const selectorText = "var(--color-selector-text)";
             const row = header.insertRow();
             cell = row.insertCell();
             cell.style.fontSize =
@@ -206,14 +222,16 @@ class StatusMatrix {
             b.textContent = label;
             cell.appendChild(b);
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = selectorBg;
+            cell.style.color = selectorText;
             cell.style.paddingLeft = "10px";
             for (const turtle of this.activity.turtles.turtleList) {
                 if (turtle.inTrash) {
                     continue;
                 }
                 cell = row.insertCell();
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = selectorBg;
+                cell.style.color = selectorText;
                 cell.style.fontSize =
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.textContent = "";
@@ -229,6 +247,37 @@ class StatusMatrix {
      * @returns {void}
      */
     updateAll() {
+        if (!this.isOpen || !this._statusTable) {
+            return;
+        }
+
+        // The interpreter calls this after every executed block; coalesce
+        // those requests into at most one DOM render per animation frame.
+        if (this._updateQueued) {
+            return;
+        }
+        this._updateQueued = true;
+
+        const render = () => {
+            this._updateQueued = false;
+            this._renderAll();
+        };
+
+        if (typeof requestAnimationFrame === "function") {
+            requestAnimationFrame(render);
+        } else {
+            // 100 ms is still shorter than a typical 1/16th note, so no
+            // audible-note state change is skipped in rAF-less environments.
+            setTimeout(render, 100);
+        }
+    }
+
+    _renderAll() {
+        // The widget may have closed between scheduling and the frame firing.
+        if (!this.isOpen || !this._statusTable) {
+            return;
+        }
+
         // Update status of all of the voices in the matrix.
         this.activity.logo.updatingStatusMatrix = true;
 
@@ -326,9 +375,9 @@ class StatusMatrix {
 
                 this.activity.logo.inStatusMatrix = saveStatus;
 
-                cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
-                if (cell !== null) {
-                    cell.textContent = value;
+                cell = this._statusTable.rows?.[i + 1]?.cells?.[activeTurtles + 1];
+                if (cell !== null && cell !== undefined) {
+                    cell.textContent = value === "__INVALID_INPUT__" ? "" : value;
                 }
                 i++;
             }
@@ -370,8 +419,8 @@ class StatusMatrix {
                     note += obj[1] + "/" + obj[0];
                 }
 
-                cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
-                if (cell !== null) {
+                cell = this._statusTable.rows?.[i + 1]?.cells?.[activeTurtles + 1];
+                if (cell !== null && cell !== undefined) {
                     cell.textContent = note.replace(/#/g, "♯").replace(/b/g, "♭");
                 }
             }

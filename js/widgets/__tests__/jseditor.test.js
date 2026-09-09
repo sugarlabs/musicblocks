@@ -62,6 +62,22 @@ global.AST2BlockList = {
     toBlockList: jest.fn()
 };
 
+// Mock pubsub (used by _codeToBlocks to wait for finishedLoading)
+global.pubsub = {
+    _listeners: {},
+    on(event, fn) {
+        if (!this._listeners[event]) this._listeners[event] = [];
+        this._listeners[event].push(fn);
+    },
+    off(event, fn) {
+        if (!this._listeners[event]) return;
+        this._listeners[event] = this._listeners[event].filter(f => f !== fn);
+    },
+    emit(event) {
+        (this._listeners[event] || []).forEach(fn => fn());
+    }
+};
+
 /**
  * Creates a mock widgetWindow object with all required methods.
  * The widget body is appended to document.body so getElementById works.
@@ -112,6 +128,9 @@ document.body.appendChild(overlayCanvas);
 
 // Load JSEditor — it has a CommonJS export
 beforeEach(() => {
+    // Remove any codejar stylesheet links left from previous tests
+    document.head.querySelectorAll('link[href*="codejar/styles/"]').forEach(link => link.remove());
+
     document.body.innerHTML = "";
     // Re-create overlayCanvas
     const canvas = document.createElement("canvas");
@@ -150,6 +169,7 @@ const { JSEditor } = require("../jseditor.js");
  * @returns {Object} A mock activity.
  */
 function createMockActivity() {
+    const stageListeners = {};
     return {
         logo: {
             statusMatrix: null,
@@ -163,13 +183,27 @@ function createMockActivity() {
                 dict: {}
             },
             moveBlock: jest.fn(),
-            loadNewBlocks: jest.fn()
+            loadNewBlocks: jest.fn(() => {
+                // Simulate the real loadNewBlocks → cleanupAfterLoad chain
+                // which emits "finishedLoading" once all blocks are processed.
+                global.pubsub.emit("finishedLoading");
+            })
         },
         stage: {
-            removeAllEventListeners: jest.fn(),
-            addEventListener: jest.fn()
+            removeAllEventListeners: jest.fn(event => {
+                if (event) delete stageListeners[event];
+            }),
+            addEventListener: jest.fn((event, fn) => {
+                stageListeners[event] = fn;
+            }),
+            _listeners: stageListeners
         },
-        sendAllToTrash: jest.fn()
+        sendAllToTrash: jest.fn(function () {
+            // Simulate the real sendAllToTrash which dispatches "trashsignal"
+            // after a timeout. In tests we fire it synchronously.
+            const listener = stageListeners["trashsignal"];
+            if (listener) listener();
+        })
     };
 }
 
@@ -315,6 +349,31 @@ describe("JSEditor", () => {
             expect(onclose).toHaveBeenCalled();
 
             removeEventListener.mockRestore();
+        });
+
+        test("onclose removes the editor's stylesheet links from document.head", () => {
+            const editor = createEditor();
+            const links = editor._styles;
+
+            expect(links.every(link => document.head.contains(link))).toBe(true);
+
+            editor.widgetWindow.onclose();
+
+            expect(links.every(link => document.head.contains(link))).toBe(false);
+            expect(editor._styles).toBeNull();
+        });
+
+        test("repeated open/close cycles do not leak stylesheet links into document.head (#8325)", () => {
+            const countLinks = () =>
+                document.head.querySelectorAll('link[href*="codejar/styles/"]').length;
+            const baseline = countLinks();
+
+            for (let i = 0; i < 5; i++) {
+                const editor = createEditor();
+                expect(countLinks()).toBe(baseline + 4);
+                editor.widgetWindow.onclose();
+                expect(countLinks()).toBe(baseline);
+            }
         });
     });
 
@@ -556,12 +615,70 @@ describe("JSEditor", () => {
             global.ast2blocklist_config = undefined;
             window.ast2blocklist_config_ready = Promise.reject(new Error("network failed"));
 
-            await editor._codeToBlocks();
+            await expect(editor._codeToBlocks()).rejects.toThrow();
 
             expect(consoleEl.textContent).toContain(
                 "JavaScript block conversion is unavailable because its configuration file failed to load."
             );
             expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
+            expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
+        });
+
+        test("_codeToBlocks falls back to require when config is not yet on window", async () => {
+            const editor = createEditor();
+            window.ast2blocklist_config = undefined;
+            global.ast2blocklist_config = undefined;
+            window.ast2blocklist_config_ready = undefined;
+            acorn.parse.mockReturnValue(ast);
+            AST2BlockList.toBlockList.mockReturnValue([[0, "start", 0, 0, [null, null, null]]]);
+
+            window.require = jest.fn((deps, callback) => {
+                window.ast2blocklist_config = { fromRequire: true };
+                callback();
+            });
+
+            await editor._codeToBlocks();
+
+            expect(window.require).toHaveBeenCalledWith(
+                ["activity/js-export/ast2blocks.config"],
+                expect.any(Function),
+                expect.any(Function)
+            );
+            expect(AST2BlockList.toBlockList).toHaveBeenCalledWith(ast, { fromRequire: true });
+            delete window.require;
+        });
+
+        test("_codeToBlocks handles require failure gracefully and sets config_failed", async () => {
+            const editor = createEditor();
+            window.ast2blocklist_config = undefined;
+            global.ast2blocklist_config = undefined;
+            window.ast2blocklist_config_ready = undefined;
+            window.ast2blocklist_config_failed = false;
+
+            window.require = jest.fn((deps, callback, errback) => {
+                errback(new Error("require failed"));
+            });
+
+            await expect(editor._codeToBlocks()).rejects.toThrow(
+                "JavaScript block conversion is unavailable because its configuration file failed to load."
+            );
+
+            expect(window.ast2blocklist_config_failed).toBe(true);
+            expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
+            expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
+            delete window.require;
+        });
+
+        test("_codeToBlocks throws error when no valid blocks are generated", async () => {
+            const editor = createEditor();
+            global.ast2blocklist_config = { loaded: true };
+            window.ast2blocklist_config_ready = Promise.resolve(global.ast2blocklist_config);
+            acorn.parse.mockReturnValue(ast);
+            AST2BlockList.toBlockList.mockReturnValue([]);
+
+            await expect(editor._codeToBlocks()).rejects.toThrow(
+                "No valid blocks could be generated from the code."
+            );
             expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
         });
 

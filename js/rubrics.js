@@ -529,6 +529,8 @@ const PALS = [
     "micep"
 ];
 
+const PALS_INDEX_MAP = new Map(PALS.map((pal, idx) => [pal, idx]));
+
 const PALLABELS = [
     _("rhythm"),
     _("pitch"),
@@ -563,7 +565,10 @@ const analyzeProject = activity => {
             case "fill":
             case "hollowline":
             case "start":
-                if (activity.blocks.blockList[blk].connections[1] == null) {
+                if (
+                    activity.blocks.blockList[blk].connections[1] === null ||
+                    activity.blocks.blockList[blk].connections[1] === undefined
+                ) {
                     continue;
                 }
                 break;
@@ -584,24 +589,35 @@ const analyzeProject = activity => {
             case "chorus":
             case "phaser":
             case "action":
-                if (activity.blocks.blockList[blk].connections[2] == null) {
+                if (
+                    activity.blocks.blockList[blk].connections[2] === null ||
+                    activity.blocks.blockList[blk].connections[2] === undefined
+                ) {
                     continue;
                 }
                 break;
             case "tuplet2":
-                if (activity.blocks.blockList[blk].connections[3] == null) {
+                if (
+                    activity.blocks.blockList[blk].connections[3] === null ||
+                    activity.blocks.blockList[blk].connections[3] === undefined
+                ) {
                     continue;
                 }
                 break;
             case "invert":
-                if (activity.blocks.blockList[blk].connections[4] == null) {
+                if (
+                    activity.blocks.blockList[blk].connections[4] === null ||
+                    activity.blocks.blockList[blk].connections[4] === undefined
+                ) {
                     continue;
                 }
                 break;
             default:
                 if (
-                    activity.blocks.blockList[blk].connections[0] == null &&
-                    last(activity.blocks.blockList[blk].connections) == null
+                    (activity.blocks.blockList[blk].connections[0] === null ||
+                        activity.blocks.blockList[blk].connections[0] === undefined) &&
+                    (last(activity.blocks.blockList[blk].connections) === null ||
+                        last(activity.blocks.blockList[blk].connections) === undefined)
                 ) {
                     continue;
                 }
@@ -637,8 +653,8 @@ const analyzeProject = activity => {
 
     for (let c = 0; c < cats.length; c++) {
         if (cats[c] in TASCORE) {
-            const idx = PALS.indexOf(TAPAL[cats[c]]);
-            if (idx !== -1) {
+            const idx = PALS_INDEX_MAP.get(TAPAL[cats[c]]);
+            if (idx !== undefined) {
                 scores[idx] += TASCORE[cats[c]];
             } else {
                 console.warn("rubrics: TAPAL value not found in PALS:", TAPAL[cats[c]]);
@@ -648,8 +664,8 @@ const analyzeProject = activity => {
 
     for (let p = 0; p < pals.length; p++) {
         if (pals[p] in TASCORE) {
-            const idx = PALS.indexOf(pals[p]);
-            if (idx !== -1) {
+            const idx = PALS_INDEX_MAP.get(pals[p]);
+            if (idx !== undefined) {
                 scores[idx] += TASCORE[pals[p]];
             } else {
                 console.warn("rubrics: pal not found in PALS:", pals[p]);
@@ -799,7 +815,7 @@ const getStatsFromNotation = activity => {
         for (const it in notation.notationStaging[tur]) {
             const item = notation.notationStaging[tur][it];
 
-            if (typeof item == "object" && item[0].length) {
+            if (typeof item === "object" && item[0].length) {
                 for (let note of item[0]) {
                     let freq;
                     if (isCustomTemperament(activity.logo.synth.inTemperament)) {
@@ -822,7 +838,7 @@ const getStatsFromNotation = activity => {
                         projectStats["pitchNames"].add(note.slice(0, note.length - 1));
                     }
                     projectStats["pitches"].push(freq);
-                    if (projectStats["lowestNote"] == undefined) {
+                    if (projectStats["lowestNote"] === undefined) {
                         if (!isNaN(freq)) {
                             projectStats["lowestNote"] = [note, noteId, freq];
                         }
@@ -831,7 +847,7 @@ const getStatsFromNotation = activity => {
                             projectStats["lowestNote"] = [note, noteId, freq];
                         }
                     }
-                    if (projectStats["highestNote"] == undefined) {
+                    if (projectStats["highestNote"] === undefined) {
                         if (!isNaN(freq)) {
                             projectStats["highestNote"] = [note, noteId, freq];
                         }
@@ -845,18 +861,18 @@ const getStatsFromNotation = activity => {
                 }
             }
 
-            if (item[1] == 2) {
+            if (item[1] === 2) {
                 projectStats["duples"]++;
-            } else if (item[1] == 3) {
+            } else if (item[1] === 3) {
                 projectStats["triplets"]++;
-            } else if (item[1] == 5) {
+            } else if (item[1] === 5) {
                 projectStats["quintuplets"]++;
             }
 
-            if (typeof item == "string") {
-                if (item == "begin articulation") {
+            if (typeof item === "string") {
+                if (item === "begin articulation") {
                     projectStats["articulation"].begin.push(it);
-                } else if (item == "end articulation") {
+                } else if (item === "end articulation") {
                     projectStats["articulation"].begin.push(it);
                 }
             }
@@ -895,6 +911,7 @@ if (typeof module !== "undefined" && module.exports) {
         TAPAL,
         TASCORE,
         PALS,
+        PALS_INDEX_MAP,
         PALLABELS,
         analyzeProject,
         scoreToChartData,

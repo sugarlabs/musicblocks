@@ -20,8 +20,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const fs = require("fs");
+const path = require("path");
+
 // Set up globals required by widgetWindows.js before importing
 global._ = str => str;
+global.makeKeyboardAccessible = require("../../utils/dom-helpers").makeKeyboardAccessible;
 global.docById = jest.fn(id => document.getElementById(id));
 global.requestAnimationFrame = jest.fn(cb => cb());
 
@@ -68,6 +72,28 @@ function createTestWindow(title = "Test Title", fullscreen = true) {
 }
 
 beforeEach(() => {
+    if (window.widgetWindows._boundHandleGlobalKeyDown) {
+        document.removeEventListener(
+            "keydown",
+            window.widgetWindows._boundHandleGlobalKeyDown,
+            true
+        );
+        document.removeEventListener(
+            "mouseup",
+            window.widgetWindows._boundHandleGlobalMouseUp,
+            true
+        );
+        document.removeEventListener(
+            "mousemove",
+            window.widgetWindows._boundHandleGlobalMouseMove,
+            true
+        );
+        document.removeEventListener(
+            "mousedown",
+            window.widgetWindows._boundHandleGlobalMouseDown,
+            true
+        );
+    }
     // Clear the floatingWindows container but keep it in DOM
     floatingWindows.innerHTML = "";
     // Reset open windows tracking but preserve functions
@@ -161,11 +187,11 @@ describe("widgetWindows", () => {
             createTestWindow("Window 2");
             createTestWindow("Window 3");
 
-            // mouseup, mousemove, mousedown (each once)
-            const globalMouseListeners = addSpy.mock.calls.filter(call =>
-                ["mouseup", "mousemove", "mousedown"].includes(call[0])
+            // mouseup, mousemove, mousedown, keydown (each once)
+            const globalListeners = addSpy.mock.calls.filter(call =>
+                ["mouseup", "mousemove", "mousedown", "keydown"].includes(call[0])
             );
-            expect(globalMouseListeners).toHaveLength(3);
+            expect(globalListeners).toHaveLength(4);
 
             addSpy.mockRestore();
         });
@@ -278,6 +304,29 @@ describe("widgetWindows", () => {
             expect(img.getAttribute("alt")).toBe("My Label");
         });
 
+        test("makes the button keyboard accessible", () => {
+            const win = createTestWindow();
+            const btn = win.addButton("icon.svg", 24, "My Label");
+
+            expect(btn.getAttribute("role")).toBe("button");
+            expect(btn.getAttribute("tabindex")).toBe("0");
+            expect(btn.getAttribute("aria-label")).toBe("My Label");
+
+            const clickSpy = jest.spyOn(btn, "click");
+            btn.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+            expect(clickSpy).toHaveBeenCalled();
+        });
+
+        test("updates the accessible label when the button changes", () => {
+            const win = createTestWindow();
+            const btn = win.addButton("play.svg", 24, "Play");
+
+            win.modifyButton(0, "stop.svg", 24, "Stop");
+
+            expect(btn.getAttribute("aria-label")).toBe("Stop");
+            expect(btn.querySelector("img").getAttribute("alt")).toBe("Stop");
+        });
+
         test("adds button to _buttons array", () => {
             const win = createTestWindow();
             expect(win._buttons).toHaveLength(0);
@@ -308,6 +357,28 @@ describe("widgetWindows", () => {
             win.addButton("c.svg", 24, "C");
 
             expect(win._buttons).toHaveLength(3);
+        });
+
+        test("modifyButton still addresses the live buttons after a re-init", () => {
+            // A widget that re-initialises on an already open window (see
+            // Blocks.reInitWidget) calls clear() and then re-adds its buttons.
+            const win = createTestWindow();
+            win.clear();
+            win.addButton("play-button.svg", 24, "Play");
+            win.addButton("erase-button.svg", 24, "Clear");
+
+            win.clear();
+            win.addButton("play-button.svg", 24, "Play");
+            win.addButton("erase-button.svg", 24, "Clear");
+
+            expect(win._buttons).toHaveLength(2);
+
+            const target = win.modifyButton(0, "stop-button.svg", 24, "Stop");
+
+            expect(win._toolbar.contains(target)).toBe(true);
+            expect(win._toolbar.querySelector("img").getAttribute("src")).toBe(
+                "header-icons/stop-button.svg"
+            );
         });
     });
 
@@ -588,6 +659,24 @@ describe("widgetWindows", () => {
 
             expect(titleEl.innerHTML).toBe("New Title");
         });
+
+        test("keeps the frame's aria-label in sync with the new title", () => {
+            const win = createTestWindow("Old Title");
+
+            win.updateTitle("New Title");
+
+            expect(win._frame.getAttribute("aria-label")).toBe("New Title");
+        });
+    });
+
+    describe("frame accessibility", () => {
+        test("gives the window frame a dialog role and an accessible name", () => {
+            const win = createTestWindow("My Widget");
+
+            expect(win._frame.getAttribute("role")).toBe("dialog");
+            expect(win._frame.getAttribute("aria-label")).toBe("My Widget");
+            expect(win._frame.getAttribute("aria-modal")).toBeNull();
+        });
     });
 
     describe("takeFocus", () => {
@@ -752,6 +841,31 @@ describe("widgetWindows", () => {
     });
 
     describe("widgetWindows global functions", () => {
+        test("keeps floating windows above the toolbar in play-only mode", () => {
+            const style = document.createElement("style");
+            style.textContent = fs.readFileSync(
+                path.resolve(__dirname, "../../../css/play-only-mode.css"),
+                "utf8"
+            );
+            document.head.appendChild(style);
+            document.documentElement.classList.add("play-only");
+            nav.id = "toolbars";
+            nav.style.position = "fixed";
+            nav.style.zIndex = "1001";
+
+            try {
+                expect(Number(getComputedStyle(floatingWindows).zIndex)).toBeGreaterThan(
+                    Number(getComputedStyle(nav).zIndex)
+                );
+            } finally {
+                style.remove();
+                document.documentElement.classList.remove("play-only");
+                nav.removeAttribute("id");
+                nav.style.removeProperty("position");
+                nav.style.removeProperty("z-index");
+            }
+        });
+
         test("windowFor creates and returns a window", () => {
             const widget = { blockNo: 900 };
             const win = windowFor(widget, "Global Test");
@@ -791,6 +905,464 @@ describe("widgetWindows", () => {
             const win = windowFor(widget, "FallbackTitle");
 
             expect(window.widgetWindows.openWindows["FallbackTitle"]).toBe(win);
+        });
+    });
+
+    describe("_handleGlobalMouseDown and focus management", () => {
+        test("focuses clicked window and dims other windows", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+
+            // win2 was created last so it took focus initially
+            expect(window.widgetWindows.focused).toBe(win2);
+
+            // Simulate mousedown inside win1
+            const clickEvent = new MouseEvent("mousedown", { bubbles: true });
+            win1._frame.dispatchEvent(clickEvent);
+
+            expect(window.widgetWindows.focused).toBe(win1);
+            expect(win1._frame.style.opacity).toBe("1");
+            expect(win1._frame.style.zIndex).toBe("10000");
+            expect(win2._frame.style.opacity).toBe("0.7");
+            expect(win2._frame.style.zIndex).toBe("0");
+        });
+
+        test("switches focus back to another window when clicked", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+            expect(window.widgetWindows.focused).toBe(win1);
+
+            win2._widget.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+            expect(window.widgetWindows.focused).toBe(win2);
+            expect(win2._frame.style.opacity).toBe("1");
+            expect(win2._frame.style.zIndex).toBe("10000");
+            expect(win1._frame.style.opacity).toBe("0.7");
+            expect(win1._frame.style.zIndex).toBe("0");
+        });
+
+        test("clears focus and dims all windows when clicking outside all windows", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+
+            expect(window.widgetWindows.focused).toBe(win2);
+
+            // Simulate clicking on canvas / document body
+            canvas.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(window.widgetWindows.focused).toBeNull();
+            expect(win1._frame.style.opacity).toBe("0.7");
+            expect(win1._frame.style.zIndex).toBe("0");
+            expect(win2._frame.style.opacity).toBe("0.7");
+            expect(win2._frame.style.zIndex).toBe("0");
+        });
+
+        test("preserves focus when clicking inside toolbar", () => {
+            const toolbars = document.createElement("div");
+            toolbars.id = "toolbars";
+            document.body.appendChild(toolbars);
+
+            try {
+                const win1 = createTestWindow("Window 1");
+                const win2 = createTestWindow("Window 2");
+
+                win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+                expect(window.widgetWindows.focused).toBe(win1);
+
+                toolbars.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+                expect(window.widgetWindows.focused).toBe(win1);
+                expect(win1._frame.style.opacity).toBe("1");
+                expect(win1._frame.style.zIndex).toBe("10000");
+            } finally {
+                toolbars.remove();
+            }
+        });
+
+        test("Escape key closes only the currently focused window", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+
+            const closeSpy1 = jest.spyOn(win1, "onclose");
+            const closeSpy2 = jest.spyOn(win2, "onclose");
+
+            // Focus win1
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+            expect(window.widgetWindows.focused).toBe(win1);
+
+            const escEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            document.dispatchEvent(escEvent);
+
+            expect(closeSpy1).toHaveBeenCalledTimes(1);
+            expect(closeSpy2).not.toHaveBeenCalled();
+        });
+
+        test("Cmd/Ctrl+Shift+M maximizes only the currently focused window", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            document.dispatchEvent(maxEvent);
+
+            expect(win1.isMaximized()).toBe(true);
+            expect(win2.isMaximized()).toBe(false);
+        });
+
+        test("ignores shortcuts when focus is inside an input, textarea, or contenteditable element", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const input = document.createElement("input");
+            const textarea = document.createElement("textarea");
+            const contentEditable = document.createElement("div");
+            contentEditable.contentEditable = "true";
+
+            document.body.append(input, textarea, contentEditable);
+
+            [input, textarea, contentEditable].forEach(element => {
+                element.focus();
+                const event = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+                document.dispatchEvent(event);
+            });
+
+            expect(win.onclose).not.toHaveBeenCalled();
+
+            input.remove();
+            textarea.remove();
+            contentEditable.remove();
+        });
+
+        test("ignores shortcuts when event has repeat flag", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const event = new KeyboardEvent("keydown", {
+                key: "Escape",
+                repeat: true,
+                bubbles: true
+            });
+            document.dispatchEvent(event);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("window dragging and mouse handlers", () => {
+        test("sets and clears draggingWindow on mouse move and mouse up", () => {
+            const win = createTestWindow("Drag Window");
+            win._docMouseMoveHandler = jest.fn();
+            win._dragTopHandler = jest.fn();
+            window.widgetWindows.draggingWindow = win;
+
+            const moveEvent = new MouseEvent("mousemove", { clientX: 100, clientY: 150 });
+            document.dispatchEvent(moveEvent);
+            expect(win._docMouseMoveHandler).toHaveBeenCalledWith(moveEvent);
+
+            const upEvent = new MouseEvent("mouseup");
+            document.dispatchEvent(upEvent);
+            expect(win._dragTopHandler).toHaveBeenCalledWith(upEvent);
+            expect(window.widgetWindows.draggingWindow).toBeNull();
+        });
+    });
+
+    describe("window visibility and management helpers", () => {
+        test("hideAllWindows hides all frames and resets focused", () => {
+            const win1 = createTestWindow("Win 1");
+            const win2 = createTestWindow("Win 2");
+            window.widgetWindows.focused = win1;
+
+            window.widgetWindows.hideAllWindows();
+
+            expect(win1._frame.style.display).toBe("none");
+            expect(win2._frame.style.display).toBe("none");
+            expect(window.widgetWindows.focused).toBeNull();
+        });
+
+        test("hideWindow hides specific window and resets focus if focused", () => {
+            const win = createTestWindow("Target Win");
+            window.widgetWindows.focused = win;
+
+            window.widgetWindows.hideWindow(win._key);
+
+            expect(win._frame.style.display).toBe("none");
+            expect(window.widgetWindows.focused).toBeNull();
+        });
+
+        test("closeWindow calls close on the named window", () => {
+            const win = createTestWindow("Close Target");
+            win.close = jest.fn();
+
+            window.widgetWindows.closeWindow(win._key);
+
+            expect(win.close).toHaveBeenCalledTimes(1);
+        });
+
+        test("showWindows restores display block on all open windows", () => {
+            const win1 = createTestWindow("Show 1");
+            const win2 = createTestWindow("Show 2");
+            win1._frame.style.display = "none";
+            win2._frame.style.display = "none";
+
+            window.widgetWindows.showWindows();
+
+            expect(win1._frame.style.display).toBe("block");
+            expect(win2._frame.style.display).toBe("block");
+        });
+
+        test("clear calls onclose on the named window", () => {
+            const win = createTestWindow("Clear Target");
+            win.onclose = jest.fn();
+
+            window.widgetWindows.clear(win._key);
+
+            expect(win.onclose).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("locale configuration and additional widget controls", () => {
+        test("configures column layout when language is Japanese", () => {
+            window.localStorage.languagePreference = "ja";
+            const win = createTestWindow("Japanese Widget");
+
+            expect(win._body.style.flexDirection).toBe("column");
+            expect(win._toolbar.style.display).toBe("flex");
+            window.localStorage.languagePreference = "en";
+        });
+
+        test("addRangeSlider creates configured range input element", () => {
+            const win = createTestWindow();
+            const slider = win.addRangeSlider(50, null, 0, 100, "custom-slider");
+
+            expect(slider.type).toBe("range");
+            expect(slider.value).toBe("50");
+            expect(slider.min).toBe("0");
+            expect(slider.max).toBe("100");
+            expect(slider.className).toBe("custom-slider");
+        });
+
+        test("rollup button click toggles rollup and unroll state", () => {
+            const win = createTestWindow();
+            const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
+
+            win._rollButton.dispatchEvent(clickEvent);
+            expect(win._rolled).toBe(true);
+
+            win._rollButton.dispatchEvent(clickEvent);
+            expect(win._rolled).toBe(false);
+        });
+
+        test("maxminButton title updates on maximize and restore", () => {
+            const win = createTestWindow("Test Window");
+            expect(win._maxminButton).toBeDefined();
+            expect(win._maxminButton.title).toBe("Maximize window");
+
+            win._maximize();
+            expect(win._maxminButton.title).toBe("Restore");
+
+            win._restore();
+            expect(win._maxminButton.title).toBe("Maximize window");
+        });
+    });
+
+    describe("closeBlkWidgets()", () => {
+        beforeEach(() => {
+            window.widgetWindows.openWindows = {};
+            window.widgetWindows.closeWindow = jest.fn();
+            window.widgetWindows.hideAllWindows = jest.fn();
+            window.widgetWindows.hideWindow = jest.fn();
+        });
+
+        it("closes matching widget by name", () => {
+            const mockElement = { innerHTML: "TestWidget" };
+
+            document.getElementsByClassName = jest.fn(() => [mockElement]);
+
+            window.widgetWindows.closeBlkWidgets("TestWidget");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("TestWidget");
+        });
+
+        it("closes widget directly using key lookup from openWindows", () => {
+            window.widgetWindows.openWindows = {
+                "custom mode": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("custom mode");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
+        });
+
+        it("closes widget using mapped key", () => {
+            window.widgetWindows.openWindows = {
+                "pitch drum": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("pitch-drum mapper");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
+        });
+
+        it("closes widget by matching element ID when display title changes", () => {
+            const mockElement = {
+                innerHTML: "C MAJOR",
+                id: "custom modeWidgetID"
+            };
+
+            document.getElementsByClassName = jest.fn(() => [mockElement]);
+
+            window.widgetWindows.closeBlkWidgets("custom mode");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
+        });
+
+        it("does nothing if no match found", () => {
+            document.getElementsByClassName = jest.fn(() => [{ innerHTML: "OtherWidget" }]);
+
+            window.widgetWindows.closeBlkWidgets("TestWidget");
+
+            expect(window.widgetWindows.closeWindow).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("Global Keydown Listeners & Shortcuts", () => {
+        beforeEach(() => {
+            if (window.widgetWindows._handleGlobalKeyDown) {
+                document.removeEventListener(
+                    "keydown",
+                    window.widgetWindows._handleGlobalKeyDown,
+                    true
+                );
+            }
+            window.widgetWindows._globalListenersInitialized = false;
+        });
+
+        test("registers keydown event listener in _initGlobalListeners", () => {
+            const addSpy = jest.spyOn(document, "addEventListener");
+            window.widgetWindows._globalListenersInitialized = false;
+            window.widgetWindows._initGlobalListeners();
+
+            expect(addSpy).toHaveBeenCalledWith("keydown", expect.any(Function), true);
+            addSpy.mockRestore();
+        });
+
+        test("pressing Escape closes the focused window", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            document.dispatchEvent(escapeEvent);
+
+            expect(win.onclose).toHaveBeenCalledTimes(1);
+        });
+
+        test("pressing Cmd/Ctrl+Shift+M toggles maximize on focused window", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win._fullscreenEnabled = true;
+            win._maximize = jest.fn();
+            win.onmaximize = jest.fn();
+            win.takeFocus = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            document.dispatchEvent(maxEvent);
+
+            expect(win._maximize).toHaveBeenCalledTimes(1);
+            expect(win.onmaximize).toHaveBeenCalledTimes(1);
+        });
+
+        test("ignores shortcut when e.repeat is true", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const repeatEvent = new KeyboardEvent("keydown", {
+                key: "Escape",
+                repeat: true,
+                bubbles: true
+            });
+            document.dispatchEvent(repeatEvent);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+        });
+
+        test("ignores shortcut when focus is inside an input, textarea, or contenteditable element", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const inputEl = document.createElement("input");
+            document.body.appendChild(inputEl);
+            inputEl.focus();
+
+            const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            document.dispatchEvent(escapeEvent);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+
+            document.body.removeChild(inputEl);
+        });
+
+        test("does not maximize when _fullscreenEnabled is false", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win._fullscreenEnabled = false;
+            win._maximize = jest.fn();
+            win.onmaximize = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            document.dispatchEvent(maxEvent);
+
+            expect(win._maximize).not.toHaveBeenCalled();
+            expect(win.onmaximize).not.toHaveBeenCalled();
+        });
+
+        test("restores window when Cmd/Ctrl+Shift+M is pressed on maximized window", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win._fullscreenEnabled = true;
+            win._maximized = true;
+            win._restore = jest.fn();
+            win.sendToCenter = jest.fn();
+            win.takeFocus = jest.fn();
+            win.onmaximize = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                metaKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            document.dispatchEvent(maxEvent);
+
+            expect(win._restore).toHaveBeenCalledTimes(1);
+            expect(win.sendToCenter).toHaveBeenCalledTimes(1);
+            expect(win.onmaximize).toHaveBeenCalledTimes(1);
         });
     });
 });

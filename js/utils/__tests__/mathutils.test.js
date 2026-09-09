@@ -130,7 +130,7 @@ describe("MathUtility", () => {
         });
 
         test("throws error for invalid inputs", () => {
-            expect(() => MathUtility.doMod("a", 3)).toThrow("Invalid number input");
+            expect(() => MathUtility.doMod("a", 3)).toThrow("NanError");
         });
 
         // Edge case tests
@@ -159,7 +159,7 @@ describe("MathUtility", () => {
         });
 
         test("throws error when second arg is string", () => {
-            expect(() => MathUtility.doMod(10, "a")).toThrow("Invalid number input");
+            expect(() => MathUtility.doMod(10, "a")).toThrow("NanError");
         });
     });
 
@@ -246,6 +246,35 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doMinus("a", 3)).toThrow("NanError");
         });
 
+        test("throws error for null inputs", () => {
+            expect(() => MathUtility.doMinus(null, 3)).toThrow("NanError");
+        });
+
+        test("throws error for undefined inputs", () => {
+            expect(() => MathUtility.doMinus(undefined, 3)).toThrow("NanError");
+        });
+
+        test("throws error for array inputs", () => {
+            expect(() => MathUtility.doMinus([1], 3)).toThrow("NanError");
+        });
+
+        test("throws error for null as second input", () => {
+            expect(() => MathUtility.doMinus(3, null)).toThrow("NanError");
+        });
+
+        test("throws error for undefined as second input", () => {
+            expect(() => MathUtility.doMinus(3, undefined)).toThrow("NanError");
+        });
+
+        test("throws error for array as second input", () => {
+            expect(() => MathUtility.doMinus(3, [1])).toThrow("NanError");
+        });
+
+        test("throws error for NaN inputs", () => {
+            expect(() => MathUtility.doMinus(NaN, 3)).toThrow("NanError");
+            expect(() => MathUtility.doMinus(3, NaN)).toThrow("NanError");
+        });
+
         // Edge case tests
         test("handles negative result", () => {
             expect(MathUtility.doMinus(3, 5)).toBe(-2);
@@ -279,6 +308,35 @@ describe("MathUtility", () => {
 
         test("throws error for string inputs", () => {
             expect(() => MathUtility.doMultiply("a", 3)).toThrow("NanError");
+        });
+
+        test("throws error for null inputs", () => {
+            expect(() => MathUtility.doMultiply(null, 3)).toThrow("NanError");
+        });
+
+        test("throws error for undefined inputs", () => {
+            expect(() => MathUtility.doMultiply(undefined, 3)).toThrow("NanError");
+        });
+
+        test("throws error for array inputs", () => {
+            expect(() => MathUtility.doMultiply([1], 3)).toThrow("NanError");
+        });
+
+        test("throws error for null as second input", () => {
+            expect(() => MathUtility.doMultiply(3, null)).toThrow("NanError");
+        });
+
+        test("throws error for undefined as second input", () => {
+            expect(() => MathUtility.doMultiply(3, undefined)).toThrow("NanError");
+        });
+
+        test("throws error for array as second input", () => {
+            expect(() => MathUtility.doMultiply(3, [1])).toThrow("NanError");
+        });
+
+        test("throws error for NaN inputs", () => {
+            expect(() => MathUtility.doMultiply(NaN, 3)).toThrow("NanError");
+            expect(() => MathUtility.doMultiply(3, NaN)).toThrow("NanError");
         });
 
         // Edge case tests
@@ -550,14 +608,13 @@ describe("MathUtility", () => {
         });
 
         test("returns NaN for non-numeric string", () => {
-            // The function uses Math.floor(Number("abc") + 0.5) which gives NaN
             expect(MathUtility.doInt("abc")).toBeNaN();
         });
     });
 
     describe("edge cases - Infinity, NaN, and boundary values", () => {
         test("doMod throws an error when divisor is zero", () => {
-            expect(() => MathUtility.doMod(5, 0)).toThrow();
+            expect(() => MathUtility.doMod(5, 0)).toThrow("DivByZeroError");
         });
 
         test("doSqrt handles Infinity", () => {
@@ -583,6 +640,46 @@ describe("MathUtility", () => {
         test("doPlus coerces booleans via numeric branch", () => {
             // booleans are not strings, so Number(true) + Number(true) = 2
             expect(MathUtility.doPlus(true, true)).toBe(2);
+        });
+    });
+
+    describe("doCalculateDistance", () => {
+        test("returns 0 when both points are the same", () => {
+            expect(MathUtility.doCalculateDistance(3, 4, 3, 4)).toBe(0);
+        });
+
+        test("calculates distance for a 3-4-5 right triangle", () => {
+            expect(MathUtility.doCalculateDistance(0, 0, 3, 4)).toBe(5);
+        });
+
+        test("calculates distance along the x-axis", () => {
+            expect(MathUtility.doCalculateDistance(0, 0, 10, 0)).toBe(10);
+        });
+
+        test("calculates distance along the y-axis", () => {
+            expect(MathUtility.doCalculateDistance(0, 0, 0, 7)).toBe(7);
+        });
+
+        test("handles negative coordinates", () => {
+            expect(MathUtility.doCalculateDistance(-3, -4, 0, 0)).toBe(5);
+        });
+
+        test("is commutative (order of points does not matter)", () => {
+            const d1 = MathUtility.doCalculateDistance(1, 2, 4, 6);
+            const d2 = MathUtility.doCalculateDistance(4, 6, 1, 2);
+            expect(d1).toBe(d2);
+        });
+
+        test("calculates correct distance for floating-point coordinates", () => {
+            expect(MathUtility.doCalculateDistance(1.5, 2.5, 4.5, 6.5)).toBeCloseTo(5, 5);
+        });
+
+        test("throws NanError for non-numeric x1", () => {
+            expect(() => MathUtility.doCalculateDistance("a", 0, 3, 4)).toThrow("NanError");
+        });
+
+        test("throws NanError for non-numeric y2", () => {
+            expect(() => MathUtility.doCalculateDistance(0, 0, 3, "b")).toThrow("NanError");
         });
     });
 });

@@ -9,3 +9,7 @@ Docs/architecture/dev_architecture.html
 
 # Lighthouse CI
 .lighthouseci/
+
+# Stryker mutation testing
+.stryker-tmp/
+reports/

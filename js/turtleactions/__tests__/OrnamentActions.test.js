@@ -27,7 +27,8 @@ describe("OrnamentActions", () => {
         beginSlurCalls,
         endSlurCalls,
         mouseMB,
-        listenerFunctions;
+        listenerFunctions,
+        errorMsgCalls;
 
     beforeEach(() => {
         dispatchCalls = [];
@@ -46,9 +47,12 @@ describe("OrnamentActions", () => {
                 neighborNoteValue: []
             }
         };
+        global._ = msg => msg;
+        errorMsgCalls = [];
         activity = {
             turtles: { ithTurtle: () => turtle },
             blocks: { blockList: { 1: {}, 2: {} } },
+            errorMsg: (msg, blk) => errorMsgCalls.push({ msg, blk }),
             logo: {
                 setDispatchBlock: (blk, idx, name) =>
                     dispatchCalls.push({ blk, turtleIndex: idx, listenerName: name }),
@@ -100,6 +104,14 @@ describe("OrnamentActions", () => {
                 expectMouseListener: false,
                 isRun: true,
                 nullMouse: true
+            },
+            {
+                desc: "block defined but not in blockList",
+                blk: 99,
+                expectDispatch: false,
+                expectMouseListener: true,
+                isRun: true,
+                nullMouse: false
             }
         ];
 
@@ -120,6 +132,30 @@ describe("OrnamentActions", () => {
                 });
             }
         );
+
+        test("dispatches errorMsg when staccato value is zero or invalid", () => {
+            [0, null, undefined, NaN, "invalid"].forEach(val => {
+                const initialStaccato = [...turtle.singer.staccato];
+                Singer.OrnamentActions.setStaccato(val, 0, 1);
+                expect(errorMsgCalls.length).toBeGreaterThan(0);
+                expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                    "Staccato value must be non-zero."
+                );
+                expect(turtle.singer.staccato).toEqual(initialStaccato);
+            });
+        });
+
+        test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
+            const originalMusicBlocks = global.MusicBlocks;
+            delete global.MusicBlocks;
+            try {
+                expect(() => Singer.OrnamentActions.setStaccato(2, 0, undefined)).not.toThrow();
+                expect(dispatchCalls.length).toBe(0);
+                expect(mouseMB.listeners.length).toBe(0);
+            } finally {
+                global.MusicBlocks = originalMusicBlocks;
+            }
+        });
     });
 
     describe("setSlur", () => {
@@ -173,6 +209,16 @@ describe("OrnamentActions", () => {
                 nullMouse: false,
                 justCounting: true,
                 expectBeginSlur: false
+            },
+            {
+                desc: "block defined but not in blockList",
+                blk: 99,
+                expectDispatch: false,
+                expectMouseListener: true,
+                isRun: true,
+                nullMouse: false,
+                justCounting: false,
+                expectBeginSlur: true
             }
         ];
 
@@ -205,6 +251,30 @@ describe("OrnamentActions", () => {
                 });
             }
         );
+
+        test("dispatches errorMsg when slur value is zero or invalid", () => {
+            [0, null, undefined, NaN, "invalid"].forEach(val => {
+                const initialStaccato = [...turtle.singer.staccato];
+                Singer.OrnamentActions.setSlur(val, 0, 1);
+                expect(errorMsgCalls.length).toBeGreaterThan(0);
+                expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                    "Slur value must be non-zero."
+                );
+                expect(turtle.singer.staccato).toEqual(initialStaccato);
+            });
+        });
+
+        test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
+            const originalMusicBlocks = global.MusicBlocks;
+            delete global.MusicBlocks;
+            try {
+                expect(() => Singer.OrnamentActions.setSlur(2, 0, undefined)).not.toThrow();
+                expect(dispatchCalls.length).toBe(0);
+                expect(mouseMB.listeners.length).toBe(0);
+            } finally {
+                global.MusicBlocks = originalMusicBlocks;
+            }
+        });
     });
 
     describe("doNeighbor", () => {
@@ -240,6 +310,14 @@ describe("OrnamentActions", () => {
                 expectMouseListener: false,
                 isRun: true,
                 nullMouse: true
+            },
+            {
+                desc: "block defined but not in blockList",
+                blk: 99,
+                expectDispatch: false,
+                expectMouseListener: true,
+                isRun: true,
+                nullMouse: false
             }
         ];
 
@@ -264,5 +342,17 @@ describe("OrnamentActions", () => {
                 });
             }
         );
+
+        test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
+            const originalMusicBlocks = global.MusicBlocks;
+            delete global.MusicBlocks;
+            try {
+                expect(() => Singer.OrnamentActions.doNeighbor(3, 4, 0, undefined)).not.toThrow();
+                expect(dispatchCalls.length).toBe(0);
+                expect(mouseMB.listeners.length).toBe(0);
+            } finally {
+                global.MusicBlocks = originalMusicBlocks;
+            }
+        });
     });
 });

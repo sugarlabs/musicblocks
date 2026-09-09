@@ -17,6 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.clampNumber = require("../../utils/utils-logic").clampNumber;
 const setupVolumeActions = require("../VolumeActions");
 
 describe("setupVolumeActions", () => {
@@ -153,6 +154,7 @@ describe("setupVolumeActions", () => {
 
     afterEach(() => {
         jest.useRealTimers();
+        global._ = jest.fn(msg => msg);
     });
 
     describe("doCrescendo", () => {
@@ -208,6 +210,80 @@ describe("setupVolumeActions", () => {
                 expect(crescendoEndSpy).not.toHaveBeenCalled();
             }
         });
+
+        test.each([
+            ["blk registered in blockList", 1, true, { dispatch: true, mouse: false }],
+            [
+                "blk not registered in blockList",
+                "missingBlock",
+                true,
+                { dispatch: false, mouse: true }
+            ],
+            ["blk undefined while running", undefined, true, { dispatch: false, mouse: true }],
+            ["blk undefined while not running", undefined, false, { dispatch: false, mouse: false }]
+        ])("dispatch chain: %s", (_label, blk, isRun, expected) => {
+            activity.blocks.blockList[1] = {};
+            MusicBlocks.isRun = isRun;
+            const mockMouse = { MB: { listeners: [] } };
+            Mouse.getMouseFromTurtle.mockReturnValue(mockMouse);
+
+            Singer.VolumeActions.doCrescendo("crescendo", 10, 0, blk);
+
+            if (expected.dispatch) {
+                expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(blk, 0, "_crescendo_0");
+            } else {
+                expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            }
+
+            if (expected.mouse) {
+                expect(Mouse.getMouseFromTurtle).toHaveBeenCalled();
+                expect(mockMouse.MB.listeners).toContain("_crescendo_0");
+            } else {
+                expect(Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
+            }
+        });
+
+        it("does not dispatch through blockList key coercion when blk is undefined", () => {
+            activity.blocks.blockList["undefined"] = {};
+
+            Singer.VolumeActions.doCrescendo("crescendo", 10, 0, undefined);
+
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+        });
+
+        it("does not throw when the MusicBlocks global is absent", () => {
+            delete global.MusicBlocks;
+
+            expect(() => {
+                Singer.VolumeActions.doCrescendo("crescendo", 10, 0, undefined);
+            }).not.toThrow();
+        });
+
+        it("initializes crescendoInitialVolume per-synth and preserves existing entries", () => {
+            targetTurtle.singer.synthVolume = { default: [50], piano: [50] };
+            targetTurtle.singer.crescendoInitialVolume = { default: [30] };
+
+            Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
+
+            expect(targetTurtle.singer.crescendoInitialVolume.default).toEqual([30, 50]);
+            expect(targetTurtle.singer.crescendoInitialVolume.piano).toEqual([50]);
+        });
+
+        it("listener restores synthVolume to the pre-crescendo value and pops crescendoInitialVolume", () => {
+            targetTurtle.singer.synthVolume = { default: [50] };
+            targetTurtle.singer.crescendoInitialVolume = { default: [50] };
+
+            Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
+            const listener = activity.logo.setTurtleListener.mock.calls.pop()[2];
+
+            // simulate the volume having drifted during playback before the listener fires
+            targetTurtle.singer.synthVolume.default[1] = 75;
+
+            listener();
+
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50, 50]);
+            expect(targetTurtle.singer.crescendoInitialVolume.default).toEqual([50]);
+        });
     });
 
     describe("setRelativeVolume", () => {
@@ -235,14 +311,56 @@ describe("setupVolumeActions", () => {
             expect(targetTurtle.singer.synthVolume.default).toContain(100);
         });
 
-        it("should clamp relative volume to min -100", () => {
+        it("should clamp relative volume to min 0", () => {
             targetTurtle.singer.synthVolume = {
                 default: [50]
             };
 
             Singer.VolumeActions.setRelativeVolume(-300, 0, 1);
 
-            expect(targetTurtle.singer.synthVolume.default).toContain(-100);
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50, 0]);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "default", 0);
+        });
+
+        it("should keep a further decrease from raising the volume", () => {
+            targetTurtle.singer.synthVolume = {
+                default: [50]
+            };
+
+            // A decrease large enough to bottom out, then another decrease.
+            Singer.VolumeActions.setRelativeVolume(-300, 0, 1);
+            const afterFirst = last(targetTurtle.singer.synthVolume.default);
+            Singer.VolumeActions.setRelativeVolume(-150, 0, 1);
+            const afterSecond = last(targetTurtle.singer.synthVolume.default);
+
+            expect(afterFirst).toBe(0);
+            expect(afterSecond).toBe(0);
+            expect(afterSecond).toBeLessThanOrEqual(afterFirst);
+        });
+
+        it("should stay at 0 once the volume has bottomed out", () => {
+            // Guard, not a regression case: the relative change is multiplicative,
+            // so 0 is absorbing. This held before the clamp change too, and is
+            // scoped to the clamp because the listener pops the value on exit.
+            targetTurtle.singer.synthVolume = {
+                default: [0]
+            };
+
+            Singer.VolumeActions.setRelativeVolume(20, 0, 1);
+
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(0);
+        });
+
+        it("should never store a negative volume for any argument", () => {
+            for (const arg of [-1000, -300, -201, -200, -199, -100, -50, 0, 50, 1000]) {
+                targetTurtle.singer.synthVolume = { default: [50] };
+
+                Singer.VolumeActions.setRelativeVolume(arg, 0, 1);
+
+                const stored = last(targetTurtle.singer.synthVolume.default);
+                expect(stored).toBeGreaterThanOrEqual(0);
+                expect(stored).toBeLessThanOrEqual(100);
+            }
         });
 
         it("should call notationBeginArticulation when justCounting is empty", () => {
@@ -319,6 +437,40 @@ describe("setupVolumeActions", () => {
                 expect.any(Function)
             );
         });
+
+        it("falls through to the mouse listener when blk is not a valid block reference", () => {
+            const mockMouse = { MB: { listeners: [] } };
+            Mouse.getMouseFromTurtle.mockReturnValue(mockMouse);
+
+            Singer.VolumeActions.setRelativeVolume(20, 0, "missingBlock");
+
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(mockMouse.MB.listeners).toContain("_articulation_0");
+        });
+
+        it("does not dispatch through blockList key coercion when blk is undefined", () => {
+            activity.blocks.blockList["undefined"] = {};
+
+            Singer.VolumeActions.setRelativeVolume(20, 0);
+
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+        });
+
+        it("does not throw when the MusicBlocks global is absent", () => {
+            delete global.MusicBlocks;
+
+            expect(() => {
+                Singer.VolumeActions.setRelativeVolume(20, 0);
+            }).not.toThrow();
+        });
+
+        it("does not throw when the mouse listener is null", () => {
+            Mouse.getMouseFromTurtle.mockReturnValue(null);
+
+            expect(() => {
+                Singer.VolumeActions.setRelativeVolume(20, 0);
+            }).not.toThrow();
+        });
     });
 
     // setMasterVolume tests
@@ -328,6 +480,13 @@ describe("setupVolumeActions", () => {
 
             expect(Singer.masterVolume).toContain(80);
             expect(masterVolumeSpy).toHaveBeenCalledWith(activity.logo, 80, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should not pop from masterVolume when length is not 2", () => {
+            Singer.masterVolume = [42];
+            Singer.VolumeActions.setMasterVolume(80, 0, 1);
+            expect(Singer.masterVolume).toEqual([42, 80]);
         });
 
         it("should clamp master volume to min 0", () => {
@@ -404,6 +563,29 @@ describe("setupVolumeActions", () => {
 
             expect(targetTurtle.singer.synthVolume[DEFAULTVOICE]).toContain(70);
             expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, DEFAULTVOICE, 70);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(loadSynthSpy).not.toHaveBeenCalled();
+            expect(
+                targetTurtle.singer.instrumentNames.filter(name => name === DEFAULTVOICE)
+            ).toHaveLength(1);
+        });
+
+        it("matches DEFAULTVOICE via its translated string form", () => {
+            global._ = jest.fn(msg => (msg === DEFAULTVOICE ? "translated-default" : msg));
+
+            Singer.VolumeActions.setSynthVolume("translated-default", 70, 0, "testBlock");
+
+            expect(targetTurtle.singer.synthVolume[DEFAULTVOICE]).toContain(70);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("matches DEFAULTVOICE via the raw identifier even when its translation differs", () => {
+            global._ = jest.fn(msg => (msg === DEFAULTVOICE ? "some-other-translation" : msg));
+
+            Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 0, "testBlock");
+
+            expect(targetTurtle.singer.synthVolume[DEFAULTVOICE]).toContain(70);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
         it("should set volume for custom synth", () => {
@@ -411,6 +593,24 @@ describe("setupVolumeActions", () => {
 
             expect(targetTurtle.singer.synthVolume.custom).toContain(70);
             expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "custom", 70);
+        });
+
+        it("matches custom via its translated string form", () => {
+            global._ = jest.fn(msg => (msg === "custom" ? "translated-custom" : msg));
+
+            Singer.VolumeActions.setSynthVolume("translated-custom", 70, 0, "testBlock");
+
+            expect(targetTurtle.singer.synthVolume.custom).toContain(70);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("matches custom via the raw identifier even when its translation differs", () => {
+            global._ = jest.fn(msg => (msg === "custom" ? "some-other-translation" : msg));
+
+            Singer.VolumeActions.setSynthVolume("custom", 70, 0, "testBlock");
+
+            expect(targetTurtle.singer.synthVolume.custom).toContain(70);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
         it("should identify and set volume for voice type from VOICENAMES", () => {
@@ -427,6 +627,50 @@ describe("setupVolumeActions", () => {
 
             Singer.VolumeActions.setSynthVolume("snare", 60, 0, "testBlock");
             expect(targetTurtle.singer.synthVolume.snare).toContain(60);
+        });
+
+        it("matches drum names containing hyphens via the display-name comparison", () => {
+            DRUMNAMES.HiHat = ["hi-hat", "hihat"];
+            try {
+                Singer.VolumeActions.setSynthVolume("hi hat", 70, 0, "testBlock");
+                expect(targetTurtle.singer.synthVolume.hihat).toContain(70);
+                expect(activity.errorMsg).not.toHaveBeenCalled();
+            } finally {
+                delete DRUMNAMES.HiHat;
+            }
+        });
+
+        it("matches drum names containing hyphens via the internal-name comparison", () => {
+            DRUMNAMES.Test2 = ["testdrum", "test-drum"];
+            try {
+                Singer.VolumeActions.setSynthVolume("test drum", 70, 0, "testBlock");
+                expect(targetTurtle.singer.synthVolume["test drum"]).toContain(70);
+                expect(activity.errorMsg).not.toHaveBeenCalled();
+            } finally {
+                delete DRUMNAMES.Test2;
+            }
+        });
+
+        it("does not re-scan VOICENAMES when synth is already resolved", () => {
+            VOICENAMES.ShouldNotMatch = [DEFAULTVOICE, "wrong-synth"];
+            try {
+                Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 0, "testBlock");
+                expect(targetTurtle.singer.synthVolume[DEFAULTVOICE]).toContain(70);
+                expect(targetTurtle.singer.synthVolume["wrong-synth"]).toBeUndefined();
+            } finally {
+                delete VOICENAMES.ShouldNotMatch;
+            }
+        });
+
+        it("does not re-scan DRUMNAMES when synth is already resolved", () => {
+            DRUMNAMES.ShouldNotMatch = [DEFAULTVOICE, "wrong-drum"];
+            try {
+                Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 0, "testBlock");
+                expect(targetTurtle.singer.synthVolume[DEFAULTVOICE]).toContain(70);
+                expect(targetTurtle.singer.synthVolume["wrong-drum"]).toBeUndefined();
+            } finally {
+                delete DRUMNAMES.ShouldNotMatch;
+            }
         });
 
         it("should handle invalid synth name", () => {
@@ -454,12 +698,29 @@ describe("setupVolumeActions", () => {
             expect(targetTurtle.singer.crescendoInitialVolume.violin).toEqual([DEFAULTVOLUME]);
         });
 
+        it("does not reset an already-tracked synth volume when the instrument is newly added", () => {
+            targetTurtle.singer.instrumentNames = ["default"];
+            targetTurtle.singer.synthVolume.violin = [99];
+
+            Singer.VolumeActions.setSynthVolume("violin", 70, 0, "testBlock");
+
+            expect(targetTurtle.singer.synthVolume.violin).toEqual([99, 70]);
+        });
+
         it("should not call setSynthVolume when suppressOutput is true", () => {
             targetTurtle.singer.suppressOutput = true;
 
             Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 0, "testBlock");
 
             expect(synthVolumeSpy).not.toHaveBeenCalled();
+        });
+
+        it("should clamp synth volume between 0 and 100", () => {
+            Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 150, 0, "testBlock");
+            expect(last(targetTurtle.singer.synthVolume[DEFAULTVOICE])).toBe(100);
+
+            Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, -20, 0, "testBlock");
+            expect(last(targetTurtle.singer.synthVolume[DEFAULTVOICE])).toBe(0);
         });
 
         it("should trigger tone when firstConnection and lastConnection are null", () => {
@@ -480,6 +741,16 @@ describe("setupVolumeActions", () => {
 
         it("should not trigger tone when connections exist", () => {
             Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 0, "testBlock");
+
+            jest.advanceTimersByTime(250);
+
+            expect(triggerSpy).not.toHaveBeenCalled();
+        });
+
+        it("does not trigger tone when only the first connection is non-null", () => {
+            activity.logo.blockList.mixedBlock = { connections: [5, null] };
+
+            Singer.VolumeActions.setSynthVolume(DEFAULTVOICE, 70, 0, "mixedBlock");
 
             jest.advanceTimersByTime(250);
 

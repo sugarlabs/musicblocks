@@ -31,6 +31,31 @@ window.platformColor = {
     selectorSelected: "#1A8CFF"
 };
 
+// Mock platformThemes (the canonical table that themebox.js now reads from).
+// Subset stub: only the keys exercised by tests in this file. Values must
+// match js/utils/platformstyle.js:platformThemes; pulling the real file in
+// would drag the rest of the global init chain into Jest.
+global.platformThemes = {
+    light: {
+        background: "#F9F9F9",
+        header: "#4DA6FF",
+        selectorSelected: "#1A8CFF",
+        paletteColors: {}
+    },
+    dark: {
+        background: "#303030",
+        header: "#1E88E5",
+        selectorSelected: "#1E88E5",
+        paletteColors: {}
+    },
+    highcontrast: {
+        background: "#000000",
+        header: "#00FFFF",
+        selectorSelected: "#00CCCC",
+        paletteColors: {}
+    }
+};
+
 // Mock document elements
 document.body.innerHTML = `
     <meta name="theme-color" content="#4DA6FF">
@@ -40,6 +65,21 @@ document.body.innerHTML = `
     <div id="dark"><i class="material-icons">brightness_4</i></div>
     <div id="palette"><div></div></div>
 `;
+
+// Mock window.matchMedia
+Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: jest.fn().mockImplementation(query => ({
+        matches: query === "(prefers-color-scheme: dark)",
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn()
+    }))
+});
 
 const ThemeBox = require("../themebox");
 
@@ -140,5 +180,53 @@ describe("ThemeBox", () => {
         themeBox.applyThemeInstantly();
         const canvas = document.getElementById("canvas");
         expect(canvas.style.backgroundColor).toBe("rgb(249, 249, 249)");
+    });
+
+    test("initializeTheme() attaches matchMedia listener via addEventListener", () => {
+        const mockMq = {
+            matches: false,
+            addEventListener: jest.fn(),
+            addListener: jest.fn()
+        };
+        window.matchMedia = jest.fn().mockReturnValue(mockMq);
+        themeBox.initializeTheme();
+        expect(mockMq.addEventListener).toHaveBeenCalledWith("change", expect.any(Function));
+        expect(mockMq.addListener).not.toHaveBeenCalled();
+    });
+
+    test("initializeTheme() falls back to addListener when addEventListener unavailable", () => {
+        const mockMq = { matches: false, addListener: jest.fn() };
+        window.matchMedia = jest.fn().mockReturnValue(mockMq);
+        themeBox.initializeTheme();
+        expect(mockMq.addListener).toHaveBeenCalledWith(expect.any(Function));
+    });
+
+    test("OS theme change to dark updates theme correctly", () => {
+        let capturedHandler;
+        const mockMq = {
+            matches: false,
+            addEventListener: jest.fn((_, handler) => {
+                capturedHandler = handler;
+            }),
+            addListener: jest.fn()
+        };
+        window.matchMedia = jest.fn().mockReturnValue(mockMq);
+        themeBox.initializeTheme();
+        capturedHandler({ matches: true });
+        expect(themeBox._theme).toBe("dark");
+    });
+
+    // Regression test for #7172: applyThemeInstantly must read from
+    // platformThemes, not a duplicate table inside themebox.js.
+    test("applyThemeInstantly() picks up mutations to platformThemes", () => {
+        const original = global.platformThemes.dark.background;
+        global.platformThemes.dark.background = "#222222";
+        try {
+            themeBox._theme = "dark";
+            themeBox.applyThemeInstantly();
+            expect(window.platformColor.background).toBe("#222222");
+        } finally {
+            global.platformThemes.dark.background = original;
+        }
     });
 });

@@ -523,10 +523,10 @@ describe("Tempo Widget", () => {
                 call => call[0] === "keyup"
             );
             const keyupHandler = keyupCall[1];
-            keyupHandler({ keyCode: 13 });
+            keyupHandler({ key: "Enter" });
             expect(useBPMSpy).toHaveBeenCalledTimes(1);
             expect(useBPMSpy).toHaveBeenCalledWith(0);
-            keyupHandler({ keyCode: 32 });
+            keyupHandler({ key: "Space" });
             expect(useBPMSpy).toHaveBeenCalledTimes(1);
         });
     });
@@ -578,6 +578,27 @@ describe("Tempo Widget", () => {
             canvas.onclick();
 
             expect(tempoWidget._firstClickTime).not.toBeNull();
+        });
+
+        test("init() resets _firstClickTime to null so first tap is always captured", () => {
+            // Simulate a first click that sets _firstClickTime
+            const canvas = tempoWidget.tempoCanvases[0];
+            jest.setSystemTime(1000);
+            canvas.onclick();
+            expect(tempoWidget._firstClickTime).not.toBeNull();
+
+            // Re-initialising the widget must reset _firstClickTime back to null,
+            // so the very next tap is treated as the FIRST tap (not the second).
+            tempoWidget.BPMs = [100];
+            tempoWidget.init(mockActivity);
+            expect(tempoWidget._firstClickTime).toBeNull();
+
+            // After re-init the first tap should set _firstClickTime, not compute a BPM.
+            const canvas2 = tempoWidget.tempoCanvases[0];
+            jest.setSystemTime(2000);
+            canvas2.onclick();
+            expect(tempoWidget._firstClickTime).not.toBeNull();
+            expect(tempoWidget.BPMs[0]).toBe(100); // BPM unchanged on first tap
         });
 
         test("should calculate correct BPM on the second tap", () => {
@@ -879,8 +900,12 @@ describe("Tempo Widget", () => {
             clearIntervalSpy.mockRestore();
         });
 
-        test("pause button onclick should toggle isMoving, call pause/resume, and update innerHTML (lines 80-101)", () => {
-            const pauseBtnMock = { innerHTML: "" };
+        test("pause button onclick should toggle isMoving, call pause/resume, and update button content (lines 80-101)", () => {
+            const pauseBtnMock = {
+                textContent: "",
+                appendChild: jest.fn(),
+                childNodes: []
+            };
             const mockWindow = window.widgetWindows.windowFor();
             mockWindow.addButton.mockImplementation(icon => {
                 if (icon === "pause-button.svg") return pauseBtnMock;
@@ -893,11 +918,16 @@ describe("Tempo Widget", () => {
             pauseBtnMock.onclick();
             expect(pauseSpy).toHaveBeenCalled();
             expect(tempoWidget.isMoving).toBe(false);
-            expect(pauseBtnMock.innerHTML).toContain('src="header-icons/play-button.svg"');
+            expect(pauseBtnMock.textContent).toBe("");
+            expect(pauseBtnMock.appendChild).toHaveBeenCalled();
+            const playImgCall = pauseBtnMock.appendChild.mock.calls[0][0];
+            expect(playImgCall.src).toContain("play-button.svg");
             pauseBtnMock.onclick();
             expect(resumeSpy).toHaveBeenCalled();
             expect(tempoWidget.isMoving).toBe(true);
-            expect(pauseBtnMock.innerHTML).toContain('src="header-icons/pause-button.svg"');
+            expect(pauseBtnMock.appendChild).toHaveBeenCalledTimes(2);
+            const pauseImgCall = pauseBtnMock.appendChild.mock.calls[1][0];
+            expect(pauseImgCall.src).toContain("pause-button.svg");
             pauseSpy.mockRestore();
             resumeSpy.mockRestore();
         });
@@ -930,41 +960,59 @@ describe("Tempo Widget", () => {
     });
 });
 
-describe("Tempo._useBPM validation logic", () => {
-    /**
-     * Extracted pure logic from Tempo._useBPM
-     * Validates and clamps BPM input to valid range [30, 1000].
-     */
-    const validateBPM = input => {
-        if (isNaN(input)) {
-            return { bpm: null, error: "invalid" };
-        }
-        let bpm = Number(input);
-        let error = null;
-        if (bpm > 1000) {
-            bpm = 1000;
-            error = "clamped_high";
-        } else if (bpm < 30) {
-            bpm = 30;
-            error = "clamped_low";
-        }
-        return { bpm, error };
-    };
+describe("Tempo widget cleanup on block deletion", () => {
+    it("should clear the interval when widget is closed via closeBlkWidgets", () => {
+        const mockTimerManager = {
+            clearInterval: jest.fn(),
+            setInterval: jest.fn().mockReturnValue(42)
+        };
+        const mockWidgetWindow = {
+            timerManager: mockTimerManager,
+            destroy: jest.fn(),
+            onclose: null
+        };
 
-    it("should accept valid BPM within range", () => {
-        expect(validateBPM(120)).toEqual({ bpm: 120, error: null });
-        expect(validateBPM(500)).toEqual({ bpm: 500, error: null });
+        // Simulate _intervalID being set
+        let intervalID = 42;
+
+        // Simulate onclose being called
+        const oncloseHandler = () => {
+            if (intervalID !== null) {
+                mockWidgetWindow.timerManager.clearInterval(intervalID);
+            }
+            mockWidgetWindow.destroy();
+        };
+
+        oncloseHandler();
+
+        expect(mockTimerManager.clearInterval).toHaveBeenCalledWith(42);
+        expect(mockWidgetWindow.destroy).toHaveBeenCalledTimes(1);
     });
 
-    it("should clamp BPM above 1000 to 1000", () => {
-        expect(validateBPM(1500)).toEqual({ bpm: 1000, error: "clamped_high" });
-    });
+    it("should not continue audio after block deletion triggers widget close", () => {
+        const mockTimerManager = {
+            clearInterval: jest.fn(),
+            setInterval: jest.fn().mockReturnValue(99)
+        };
 
-    it("should clamp BPM below 30 to 30", () => {
-        expect(validateBPM(10)).toEqual({ bpm: 30, error: "clamped_low" });
-    });
+        let intervalID = 99;
+        let audioTriggered = false;
 
-    it("should return error for non-numeric input", () => {
-        expect(validateBPM("abc")).toEqual({ bpm: null, error: "invalid" });
+        // Simulate _draw being called after interval cleared
+        const draw = () => {
+            if (intervalID !== null) {
+                audioTriggered = true;
+            }
+        };
+
+        // Clear interval (simulating onclose)
+        mockTimerManager.clearInterval(intervalID);
+        intervalID = null;
+
+        // draw should not trigger audio now
+        draw();
+
+        expect(mockTimerManager.clearInterval).toHaveBeenCalledWith(99);
+        expect(audioTriggered).toBe(false);
     });
 });

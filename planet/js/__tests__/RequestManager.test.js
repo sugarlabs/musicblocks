@@ -168,11 +168,58 @@ describe("RequestManager", () => {
             expect(result.success).toBe(false);
         });
 
-        it("should use configured timeout in the callback wrapper", async () => {
+        it("should retry on request timeout", async () => {
+            let attempts = 0;
+            const mockRequestFn = jest.fn(callback => {
+                attempts++;
+                if (attempts < 2) {
+                    // Never call back — will time out
+                } else {
+                    callback({ success: true, data: "recovered" });
+                }
+            });
+
+            const rm = new RequestManager({
+                timeoutMs: 50,
+                maxRetries: 3,
+                baseRetryDelay: 10,
+                minDelay: 0
+            });
+
+            const result = await rm.throttledRequest({ action: "test" }, mockRequestFn);
+
+            expect(result.success).toBe(true);
+            expect(result.data).toBe("recovered");
+            expect(attempts).toBe(2);
+            expect(rm.getStats().retries).toBeGreaterThanOrEqual(1);
+        }, 10000);
+
+        it("should fail with REQUEST_TIMEOUT after exhausting retries", async () => {
+            const mockRequestFn = jest.fn(() => {
+                // Never call back — always times out
+            });
+
+            const rm = new RequestManager({
+                timeoutMs: 50,
+                maxRetries: 2,
+                baseRetryDelay: 10,
+                minDelay: 0
+            });
+
+            const result = await rm.throttledRequest({ action: "test" }, mockRequestFn);
+
+            expect(result.success).toBe(false);
+            expect(result.error).toBe("REQUEST_TIMEOUT");
+            expect(rm.getStats().failures).toBe(1);
+            expect(rm.getStats().retries).toBe(2);
+        }, 10000);
+
+        it("should resolve timeout from _withTimeout", async () => {
             jest.useFakeTimers();
 
             const rm = new RequestManager({ timeoutMs: 25 });
-            const promise = rm._promisifyRequest(() => {});
+            const neverResolves = new Promise(() => {});
+            const promise = rm._withTimeout(neverResolves, 25);
 
             jest.advanceTimersByTime(25);
 

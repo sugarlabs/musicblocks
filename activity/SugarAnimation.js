@@ -1416,7 +1416,7 @@
 
     // stage content:
     (lib.SugarAnimation = function(mode,startPosition,loop) {
-        if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
+        if (loop === null) { loop = false; } this.initialize(mode,startPosition,loop,{});
 
         // Blocks R
         this.instance = new lib.text23947();

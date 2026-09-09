@@ -22,7 +22,7 @@
  * Private members' names begin with underscore '_".
  */
 
-/* global docById, MusicBlocks, hljs, CodeJar, JSGenerate, JS_API */
+/* global docById, MusicBlocks, hljs, CodeJar, JSGenerate, JS_API, pubsub */
 
 /* exported JSEditor */
 
@@ -289,6 +289,15 @@ class JSEditor {
                 document.removeEventListener("mouseup", this._resizeHandlers.stopResize);
                 this._resizeHandlers = null;
             }
+            // Each open() adds a fresh set of theme <link> elements to
+            // document.head (see constructor); remove this instance's set
+            // on close so repeated open/close cycles don't leak them.
+            if (this._styles) {
+                for (const link of this._styles) {
+                    link.remove();
+                }
+                this._styles = null;
+            }
             this.isOpen = false;
             defaultOnClose();
         };
@@ -374,7 +383,7 @@ class JSEditor {
         helpBtn.style.fontSize = "2rem";
         helpBtn.style.background = "#2196f3";
         helpBtn.style.cursor = "pointer";
-        helpBtn.innerHTML = "help_outline";
+        helpBtn.textContent = "help_outline";
         helpBtn.onclick = this._toggleHelp.bind(this);
         menuLeft.appendChild(helpBtn);
         generateTooltip(helpBtn, _("Help"));
@@ -387,7 +396,7 @@ class JSEditor {
         generateBtn.style.fontSize = "2rem";
         generateBtn.style.background = "#2196f3";
         generateBtn.style.cursor = "pointer";
-        generateBtn.innerHTML = "autorenew";
+        generateBtn.textContent = "autorenew";
         generateBtn.onclick = this._generateCode.bind(this);
         menuLeft.appendChild(generateBtn);
         generateTooltip(generateBtn, _("Reset Code"));
@@ -400,7 +409,7 @@ class JSEditor {
         runBtn.style.fontSize = "2rem";
         runBtn.style.background = "#2196f3";
         runBtn.style.cursor = "pointer";
-        runBtn.innerHTML = "play_arrow";
+        runBtn.textContent = "play_arrow";
         runBtn.onclick = this._runCode.bind(this);
         menuLeft.appendChild(runBtn);
         menubar.appendChild(menuLeft);
@@ -414,7 +423,7 @@ class JSEditor {
         convertBtn.style.fontSize = "2rem";
         convertBtn.style.background = "#2196f3";
         convertBtn.style.cursor = "pointer";
-        convertBtn.innerHTML = "transform";
+        convertBtn.textContent = "transform";
         convertBtn.onclick = this._codeToBlocks.bind(this);
         menuLeft.appendChild(convertBtn);
         menubar.appendChild(menuLeft);
@@ -435,7 +444,7 @@ class JSEditor {
         styleBtn.style.fontSize = "2rem";
         styleBtn.style.background = "#2196f3";
         styleBtn.style.cursor = "pointer";
-        styleBtn.innerHTML = "invert_colors";
+        styleBtn.textContent = "invert_colors";
         styleBtn.onclick = this._changeStyle.bind(this);
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
@@ -538,7 +547,7 @@ class JSEditor {
         consolelabel.style.background = "white";
         consolelabel.style.display = "flex";
         consolelabel.style.justifyContent = "space-between";
-        consolelabel.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;CONSOLE";
+        consolelabel.textContent = "\u00a0\u00a0\u00a0\u00a0CONSOLE";
         this._editor.appendChild(consolelabel);
 
         const arrowBtn = document.createElement("span");
@@ -549,7 +558,7 @@ class JSEditor {
         arrowBtn.style.cursor = "pointer";
         arrowBtn.style.lineHeight = "0.75rem";
         arrowBtn.style.marginLeft = "0";
-        arrowBtn.innerHTML = "keyboard_arrow_down";
+        arrowBtn.textContent = "keyboard_arrow_down";
         arrowBtn.onclick = this._toggleConsole.bind(this);
         consolelabel.appendChild(arrowBtn);
         generateTooltip(arrowBtn, _("Toggle Console"), "left");
@@ -970,7 +979,7 @@ class JSEditor {
         JSEditor.clearConsole();
 
         try {
-            if (!ast2blocklist_config && window.ast2blocklist_config_ready) {
+            if (!window.ast2blocklist_config && window.ast2blocklist_config_ready) {
                 try {
                     await window.ast2blocklist_config_ready;
                 } catch {
@@ -978,7 +987,27 @@ class JSEditor {
                 }
             }
 
-            if (!ast2blocklist_config) {
+            if (
+                !window.ast2blocklist_config &&
+                typeof window !== "undefined" &&
+                typeof window.require === "function"
+            ) {
+                try {
+                    await new Promise((resolve, reject) => {
+                        window.require(
+                            ["activity/js-export/ast2blocks.config"],
+                            () => {
+                                resolve(window.ast2blocklist_config);
+                            },
+                            reject
+                        );
+                    });
+                } catch {
+                    window.ast2blocklist_config_failed = true;
+                }
+            }
+
+            if (!window.ast2blocklist_config) {
                 throw new Error(
                     window.ast2blocklist_config_failed
                         ? _(
@@ -989,22 +1018,37 @@ class JSEditor {
             }
 
             let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
-            let blockList = AST2BlockList.toBlockList(ast, ast2blocklist_config);
+            let blockList = AST2BlockList.toBlockList(ast, window.ast2blocklist_config);
+            if (!blockList || blockList.length === 0) {
+                throw new Error(_("No valid blocks could be generated from the code."));
+            }
             const activity = this.activity;
-            // Wait for the old blocks to be removed, then load new blocks.
-            const __listener = event => {
-                activity.blocks.loadNewBlocks(blockList);
+            // Wait for blocks to be trashed, loaded, and fully processed
+            // before returning. loadNewBlocks processes blocks in async
+            // chunks, so we must wait for the "finishedLoading" pubsub
+            // event which fires after all blocks are ready.
+            await new Promise(resolve => {
+                const __afterLoad = () => {
+                    pubsub.off("finishedLoading", __afterLoad);
+                    resolve();
+                };
+                pubsub.on("finishedLoading", __afterLoad);
+
+                const __listener = () => {
+                    activity.blocks.loadNewBlocks(blockList);
+                    activity.stage.removeAllEventListeners("trashsignal");
+                };
                 activity.stage.removeAllEventListeners("trashsignal");
-            };
-            activity.stage.removeAllEventListeners("trashsignal");
-            activity.stage.addEventListener("trashsignal", __listener, false);
-            // Clear the canvas but leave the JS editor open
-            activity.sendAllToTrash(false, false, false);
+                activity.stage.addEventListener("trashsignal", __listener, false);
+                // Clear the canvas but leave the JS editor open
+                activity.sendAllToTrash(false, false, false);
+            });
         } catch (e) {
             JSEditor.logConsole(
                 "message" in e ? e.message : e.prefix + this._code.substring(e.start, e.end),
                 "red"
             );
+            throw e;
         }
     }
 
@@ -1069,7 +1113,7 @@ class JSEditor {
             btnDiv.style.lineHeight = "20px";
 
             if (lineContent === "") {
-                btnDiv.innerHTML = "&nbsp;";
+                btnDiv.textContent = "\u00a0";
             } else if (hasDebugger) {
                 btnDiv.style.cursor = "pointer";
                 btnDiv.style.opacity = "1";
@@ -1101,7 +1145,7 @@ class JSEditor {
             fragment.appendChild(btnDiv);
         }
 
-        debugContainer.innerHTML = "";
+        debugContainer.textContent = "";
         debugContainer.appendChild(fragment);
     }
 
@@ -1254,11 +1298,11 @@ class JSEditor {
         if (this.isOpen) {
             this.isOpen = false;
             editorconsole.style.display = "none";
-            if (arrowBtn) arrowBtn.innerHTML = "keyboard_arrow_up";
+            if (arrowBtn) arrowBtn.textContent = "keyboard_arrow_up";
         } else {
             this.isOpen = true;
             editorconsole.style.display = "block";
-            if (arrowBtn) arrowBtn.innerHTML = "keyboard_arrow_down";
+            if (arrowBtn) arrowBtn.textContent = "keyboard_arrow_down";
         }
     }
 
