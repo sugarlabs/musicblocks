@@ -934,31 +934,29 @@ class ModeWidget {
     }
 
     // ── Rotate ────────────────────────────────────────────────────
-
     _finishRotation() {
         if (this._selectedNotes[0]) {
             this._setModeName();
             this._locked = false;
+            this._rotationTries = 0;
+        } else if ((this._rotationTries || 0) < this._activeEDO - 1) {
+            this._rotationTries = (this._rotationTries || 0) + 1;
+            // Preserve the rotated interval pattern and try the next
+            // root-selected rotation; leave endpoints unchanged and bound
+            // retries to activeEDO steps to avoid infinite loops.
+            if (this._rotationDir === "left") {
+                this._performLeftRotation();
+            } else {
+                this._performRightRotation();
+            }
         } else {
-            // ponytail: force root on, deselect overflow instead of
-            // re-rotating (which can spin indefinitely). Ceiling:
-            // the resulting pattern may not match a named mode.
-            this._selectedNotes[0] = true;
-            this._noteWheel.navItems[0].navItem.show();
-            const last = this._activeEDO - 1;
-            this._selectedNotes[last] = false;
-            this._noteWheel.navItems[last].navItem.hide();
             this._setModeName();
             this._locked = false;
+            this._rotationTries = 0;
         }
     }
 
-    _rotateRight() {
-        if (this._locked) {
-            return;
-        }
-        this._locked = true;
-        this._saveState();
+    _performRightRotation() {
         const n = this._activeEDO;
         this._newPattern = [];
         this._newPattern.push(this._selectedNotes[n - 1]);
@@ -966,6 +964,28 @@ class ModeWidget {
             this._newPattern.push(this._selectedNotes[i]);
         }
         this.__rotateRightOneCell(1);
+    }
+
+    _performLeftRotation() {
+        const n = this._activeEDO;
+        this._newPattern = [];
+        for (let i = 1; i < n; i++) {
+            this._newPattern.push(this._selectedNotes[i]);
+        }
+        this._newPattern.push(this._selectedNotes[0]);
+        this.__rotateLeftOneCell(n - 1);
+    }
+
+    _rotateRight() {
+        if (this._locked) {
+            return;
+        }
+
+        this._locked = true;
+        this._saveState();
+        this._rotationDir = "right";
+        this._rotationTries = 0;
+        this._performRightRotation();
     }
 
     __rotateRightOneCell(i) {
@@ -994,13 +1014,9 @@ class ModeWidget {
 
         this._locked = true;
         this._saveState();
-        const n = this._activeEDO;
-        this._newPattern = [];
-        for (let i = 1; i < n; i++) {
-            this._newPattern.push(this._selectedNotes[i]);
-        }
-        this._newPattern.push(this._selectedNotes[0]);
-        this.__rotateLeftOneCell(n - 1);
+        this._rotationDir = "left";
+        this._rotationTries = 0;
+        this._performLeftRotation();
     }
 
     __rotateLeftOneCell(i) {

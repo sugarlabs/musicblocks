@@ -372,7 +372,8 @@ class Singer {
             // offset that getNote remaps onto the temperament's ratios.
             const modeName = keySignatureToMode(tur.singer.keySignature)[1];
             const custom = getSavedCustomModes().find(m => m.name === modeName);
-            const modeEdo = (custom && custom.edo) || edo;
+            const modeEdo =
+                custom && Number.isInteger(custom.edo) && custom.edo > 0 ? custom.edo : edo;
             for (let i = 0; i < Math.abs(steps); i++) {
                 const stepCount =
                     steps > 0

@@ -395,44 +395,46 @@ describe("ModeWidget", () => {
         };
         mu.TEMPERAMENT.testNonEDO = entry;
         global.TEMPERAMENT.testNonEDO = entry;
-        modeWidget._activeTemperamentKey = "testNonEDO";
-        modeWidget._activeEDO = labels.length;
-        mockActivity.logo.synth.trigger.mockClear();
+        try {
+            modeWidget._activeTemperamentKey = "testNonEDO";
+            modeWidget._activeEDO = labels.length;
+            mockActivity.logo.synth.trigger.mockClear();
 
-        // Within-octave degree stays at octave 4.
-        modeWidget._triggerNote(1, labels.length);
-        const expected1 = mu.pitchToFrequency(labels[1], 4, 0, ["C"], "testNonEDO");
-        expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
-            0,
-            expected1,
-            modeWidget._noteValue,
-            DEFAULTVOICE,
-            null,
-            null
-        );
+            // Within-octave degree stays at octave 4.
+            modeWidget._triggerNote(1, labels.length);
+            const expected1 = mu.pitchToFrequency(labels[1], 4, 0, ["C"], "testNonEDO");
+            expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                0,
+                expected1,
+                modeWidget._noteValue,
+                DEFAULTVOICE,
+                null,
+                null
+            );
 
-        // The octave note (index === n) wraps to the root label but must
-        // sound an octave higher (octave 5), not the starting note.
-        modeWidget._triggerNote(labels.length, labels.length);
-        const expectedOct = mu.pitchToFrequency(labels[0], 5, 0, ["C"], "testNonEDO");
-        expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
-            0,
-            expectedOct,
-            modeWidget._noteValue,
-            DEFAULTVOICE,
-            null,
-            null
-        );
-
-        if (saved) {
-            mu.TEMPERAMENT.testNonEDO = saved;
-        } else {
-            delete mu.TEMPERAMENT.testNonEDO;
-        }
-        if (savedGlobal) {
-            global.TEMPERAMENT.testNonEDO = savedGlobal;
-        } else {
-            delete global.TEMPERAMENT.testNonEDO;
+            // The octave note (index === n) wraps to the root label but must
+            // sound an octave higher (octave 5), not the starting note.
+            modeWidget._triggerNote(labels.length, labels.length);
+            const expectedOct = mu.pitchToFrequency(labels[0], 5, 0, ["C"], "testNonEDO");
+            expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                0,
+                expectedOct,
+                modeWidget._noteValue,
+                DEFAULTVOICE,
+                null,
+                null
+            );
+        } finally {
+            if (saved) {
+                mu.TEMPERAMENT.testNonEDO = saved;
+            } else {
+                delete mu.TEMPERAMENT.testNonEDO;
+            }
+            if (savedGlobal) {
+                global.TEMPERAMENT.testNonEDO = savedGlobal;
+            } else {
+                delete global.TEMPERAMENT.testNonEDO;
+            }
         }
     });
 
