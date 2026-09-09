@@ -30,6 +30,7 @@ const mockGlobals = {
     isCustomTemperament: jest.fn(),
     isEquallyTempered: jest.fn().mockReturnValue(true),
     temperamentHasRatios: jest.fn().mockReturnValue(false),
+    isNonEDO: jest.fn().mockReturnValue(false),
     getStepSizeUp: jest.fn().mockReturnValue(1),
     numberToPitch: jest.fn().mockReturnValue(["C", 4]),
     pitchToNumber: jest.fn().mockReturnValue(60),
@@ -48,6 +49,7 @@ global.getNote = mockGlobals.getNote;
 global.isCustomTemperament = mockGlobals.isCustomTemperament;
 global.isEquallyTempered = mockGlobals.isEquallyTempered;
 global.temperamentHasRatios = mockGlobals.temperamentHasRatios;
+global.isNonEDO = mockGlobals.isNonEDO;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
@@ -1300,20 +1302,13 @@ describe("addScalarTransposition on non-EDO temperaments", () => {
         const getStepSizeUp = jest.fn().mockReturnValue(2);
         const getStepSizeDown = jest.fn().mockReturnValue(-2);
         const getNote = jest.fn().mockImplementation(note => [note, 4]);
-        [
-            "getStepSizeUp",
-            "getStepSizeDown",
-            "getNote",
-            "isEquallyTempered",
-            "temperamentHasRatios"
-        ].forEach(name => {
+        ["getStepSizeUp", "getStepSizeDown", "getNote", "isNonEDO"].forEach(name => {
             savedGlobals[name] = global[name];
         });
         global.getStepSizeUp = getStepSizeUp;
         global.getStepSizeDown = getStepSizeDown;
         global.getNote = getNote;
-        global.isEquallyTempered = jest.fn().mockReturnValue(false);
-        global.temperamentHasRatios = jest.fn().mockReturnValue(true);
+        global.isNonEDO = jest.fn().mockReturnValue(true);
 
         Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 3);
 

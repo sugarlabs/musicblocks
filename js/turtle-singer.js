@@ -21,7 +21,7 @@
    DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, deepClone, frequencyToPitch, last,
     pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
     getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
-    temperamentHasRatios, isEquallyTempered,
+    temperamentHasRatios, isEquallyTempered, isNonEDO,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament,
@@ -331,9 +331,7 @@ class Singer {
         // ratios step by raw semitone offsets. Everything with real ratios
         // (just intonation, meantone, ...) walks the mode's actual scale
         // degrees one at a time.
-        const useEdoSteps =
-            isEquallyTempered(temperament) ||
-            (isCustomTemperament(temperament) && !temperamentHasRatios(temperament));
+        const useEdoSteps = !isNonEDO(temperament);
 
         if (useEdoSteps) {
             for (let i = 0; i < Math.abs(steps); i++) {
@@ -374,7 +372,8 @@ class Singer {
             // offset that getNote remaps onto the temperament's ratios.
             const modeName = keySignatureToMode(tur.singer.keySignature)[1];
             const custom = getSavedCustomModes().find(m => m.name === modeName);
-            const modeEdo = (custom && custom.edo) || edo;
+            const modeEdo =
+                custom && Number.isInteger(custom.edo) && custom.edo > 0 ? custom.edo : edo;
             for (let i = 0; i < Math.abs(steps); i++) {
                 const stepCount =
                     steps > 0
@@ -394,6 +393,7 @@ class Singer {
                           );
                 // getStepSizeUp returns EDO-step counts off 12-EDO; normalize to
                 // a semitone offset (isAlreadyEdoSteps=false) so getNote remaps it.
+                // ponytail: linear 12/modeEdo rescale, per-ratio lookup if cents drift matters
                 const stepSemis = (stepCount * 12) / modeEdo;
                 noteObj = getNote(
                     noteObj[0],

@@ -140,8 +140,6 @@ global.getCurrentEDO = jest.fn().mockReturnValue(12);
 global.DEFAULTVOLUME = 0.5;
 global.SHARP = "♯";
 global.FLAT = "♭";
-global.MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
-global.MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
 global.getSavedCustomModes = () => [];
 global.getModeNamesForGroup = (grp, customModeNames = []) => {
     if (grp !== "custom") {
@@ -202,15 +200,6 @@ global.DEFAULTVOICE = "sine";
 global.PREVIEWVOLUME = 0.5;
 global.getNote = jest.fn().mockReturnValue(["C", 4]);
 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]);
-global.isNonEDO = jest.fn().mockReturnValue(false);
-global.getNonEDOModeSteps = jest.fn().mockReturnValue(null);
-global.pitchToFrequency = jest.fn().mockReturnValue(440);
-global.TEMPERAMENT = {
-    equal: {
-        pitchNumber: 12,
-        noteLabels: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-    }
-};
 
 global.DEFAULTVOLUME = 0.5;
 global.Singer = { setSynthVolume: jest.fn() };
@@ -664,11 +653,49 @@ describe("piemenus behavioral tests", () => {
     });
 
     describe("piemenuModes behavioral tests", () => {
+        beforeEach(() => {
+            global.isNonEDO = jest.fn().mockReturnValue(false);
+            global.getNonEDOModeSteps = jest.fn().mockReturnValue(null);
+        });
+
+        test("onSelect is not called during initial navigation", () => {
+            const onSelect = jest.fn();
+            piemenuModes(mockBlock, "ionian", onSelect);
+
+            // The initial navigateWheel to pre-select "ionian" must NOT
+            // trigger onSelect — otherwise the pie menu opens and closes
+            // in the same frame.
+            expect(onSelect).not.toHaveBeenCalled();
+        });
+
+        test("onSelect fires when user clicks a mode slice", () => {
+            const onSelect = jest.fn();
+            piemenuModes(mockBlock, "ionian", onSelect);
+
+            // Simulate user clicking dorian (index 2).
+            mockBlock._modeNameWheel.selectedNavItemIndex = 2;
+            mockBlock._modeNameWheel.navItems[2].navigateFunction();
+
+            expect(onSelect).toHaveBeenCalledTimes(1);
+            expect(onSelect).toHaveBeenCalledWith("dorian", "dorian");
+        });
+
+        test("onSelect is not called when switching mode groups", () => {
+            const onSelect = jest.fn();
+            piemenuModes(mockBlock, "ionian", onSelect);
+
+            // Simulate user clicking a mode group (inner circle).
+            mockBlock._modeGroupWheel.selectedNavItemIndex = 1;
+            mockBlock._modeGroupWheel.navItems[1].navigateFunction();
+
+            // Group switch must NOT fire onSelect — only mode name clicks should.
+            expect(onSelect).not.toHaveBeenCalled();
+        });
+
         test("selecting a mode slice assigns the internal mode name to the block", () => {
             piemenuModes(mockBlock, "ionian");
 
-            // Initial highlight (index 0 = ionian) already fires the selection
-            // handler; navigate to the dorian slice (index 2) explicitly.
+            // Navigate to the dorian slice (index 2) explicitly.
             mockBlock._modeNameWheel.selectedNavItemIndex = 2;
             mockBlock._modeNameWheel.navItems[2].navigateFunction();
 
