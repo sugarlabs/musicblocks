@@ -882,6 +882,24 @@ describe("Tempo Widget", () => {
 
             expect(tempoWidget.BPMs[0]).toBe(30);
         });
+
+        test("init() calls clearInterval at most once — no duplicate cleanup after _intervalID = null", () => {
+            // Set up a pre-existing interval so the first guard fires
+            const clearIntervalSpy = jest.spyOn(global, "clearInterval");
+            tempoWidget.BPMs = [100];
+            tempoWidget._intervalID = 42; // simulate a live interval
+
+            tempoWidget.init(mockActivity);
+
+            // clearInterval should have been called exactly once for ID=42.
+            // The removed dead block would have caused a second call with null; assert it did not.
+            const callsWithId42 = clearIntervalSpy.mock.calls.filter(call => call[0] === 42);
+            expect(callsWithId42).toHaveLength(1);
+
+            // _intervalID must not still be 42 — it should be a new handle from resume()
+            expect(tempoWidget._intervalID).not.toBe(42);
+            clearIntervalSpy.mockRestore();
+        });
     });
     describe("stop() / cleanup edge cases", () => {
         test("should handle stop when interval is already null", () => {
