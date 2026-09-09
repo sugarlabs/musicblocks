@@ -2140,15 +2140,20 @@ function setupPitchBlocks(activity) {
                     );
                     cents = 0;
                 } else {
+                    const [parsedNote, parsedCents] = CustomNoteBlock._parseCents(arg0);
                     octave = calcOctave(
                         tur.singer.currentOctave,
                         arg1,
                         tur.singer.lastNotePlayed,
-                        arg0
+                        parsedNote
                     );
 
                     // Octave must be an integer in [0, 9]
-                    [note, octave, cents] = [arg0, Math.floor(Math.min(9, Math.max(0, octave))), 0];
+                    [note, octave, cents] = [
+                        parsedNote,
+                        Math.floor(Math.min(9, Math.max(0, octave))),
+                        parsedCents
+                    ];
                 }
             }
 

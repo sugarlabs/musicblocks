@@ -2490,4 +2490,214 @@ describe("Spatial grid indexing", () => {
             expectNumericKeysOnly();
         });
     });
+
+    describe("adjustDocks - customNote preservation", () => {
+        it("preserves customNote name and customID when disconnecting from a pitch block", () => {
+            const blocks = new Blocks(mockActivity);
+
+            const pitchBlock = {
+                name: "pitch",
+                connections: [null, null, 99],
+                docks: [
+                    [0, 0],
+                    [0, 20],
+                    [20, 20]
+                ],
+                container: { x: 0, y: 0 },
+                isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
+                isInlineCollapsible: jest.fn().mockReturnValue(false),
+                collapsed: false
+            };
+
+            const removedCustomBlock = {
+                name: "customNote",
+                value: "C(+0¢)",
+                customID: "my_custom_temperament",
+                connections: [0, null],
+                docks: [[0, 0]],
+                container: { x: 0, y: 20 },
+                isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
+                isInlineCollapsible: jest.fn().mockReturnValue(false),
+                collapsed: false
+            };
+
+            blocks.blockList = [pitchBlock, removedCustomBlock];
+
+            let capturedPostProcess = null;
+            let capturedArgs = null;
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, type, conns, postProcess, args) => {
+                    capturedPostProcess = postProcess;
+                    capturedArgs = args;
+                    const newBlk = {
+                        name,
+                        value: null,
+                        customID: null,
+                        text: { text: "" },
+                        container: {
+                            children: [{}],
+                            setChildIndex: jest.fn(),
+                            updateCache: jest.fn()
+                        }
+                    };
+                    blocks.blockList.push(newBlk);
+                    if (postProcess) {
+                        postProcess(args);
+                    }
+                }
+            );
+
+            blocks.adjustDocks = jest.fn();
+
+            // Invoke addDefaultBlock(parentblk=0, oldBlock=1)
+            blocks.addDefaultBlock(0, 1);
+
+            expect(blocks._makeNewBlockWithConnections).toHaveBeenCalledWith(
+                "customNote",
+                0,
+                [0],
+                expect.any(Function),
+                [0, "C(+0¢)", 2, "my_custom_temperament"]
+            );
+
+            const replacementBlock = blocks.blockList[2];
+            expect(replacementBlock.name).toBe("customNote");
+            expect(replacementBlock.value).toBe("C(+0¢)");
+            expect(replacementBlock.customID).toBe("my_custom_temperament");
+            expect(pitchBlock.connections[1]).toBe(2);
+        });
+
+        it("leaves an open dock when disconnecting from a custompitch block", () => {
+            const blocks = new Blocks(mockActivity);
+
+            const customPitchBlock = {
+                name: "custompitch",
+                connections: [null, null, 99],
+                docks: [
+                    [0, 0],
+                    [0, 20],
+                    [20, 20]
+                ],
+                container: { x: 0, y: 0 },
+                isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
+                isInlineCollapsible: jest.fn().mockReturnValue(false),
+                collapsed: false
+            };
+
+            const removedCustomBlock = {
+                name: "customNote",
+                value: "C(+0¢)",
+                customID: "my_custom_temperament",
+                connections: [0, null],
+                docks: [[0, 0]],
+                container: { x: 0, y: 20 },
+                isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
+                isInlineCollapsible: jest.fn().mockReturnValue(false),
+                collapsed: false
+            };
+
+            blocks.blockList = [customPitchBlock, removedCustomBlock];
+            blocks._makeNewBlockWithConnections = jest.fn();
+
+            blocks.addDefaultBlock(0, 1);
+
+            // custompitch leaves open dock without auto-generating a replacement block
+            expect(blocks._makeNewBlockWithConnections).not.toHaveBeenCalled();
+            expect(customPitchBlock.connections[1]).toBeNull();
+        });
+
+        it("finds and sets pitch octave for custompitch blocks", () => {
+            const blocks = new Blocks(mockActivity);
+
+            const octaveBlock = {
+                name: "number",
+                value: 4,
+                text: { text: "4" },
+                container: {
+                    children: [{}, {}],
+                    setChildIndex: jest.fn(),
+                    updateCache: jest.fn()
+                }
+            };
+
+            const customPitchBlock = {
+                name: "custompitch",
+                connections: [null, 1, 2]
+            };
+
+            blocks.blockList = [customPitchBlock, null, octaveBlock];
+
+            expect(blocks.findPitchOctave(0)).toBe(4);
+
+            blocks.setPitchOctave(0, 5);
+            expect(octaveBlock.value).toBe(5);
+            expect(octaveBlock.text.text).toBe("5");
+        });
+
+        it("restores octave number block when disconnected from a custompitch block", () => {
+            const blocks = new Blocks(mockActivity);
+
+            const customPitchBlock = {
+                name: "custompitch",
+                connections: [null, 1, null],
+                docks: [
+                    [0, 0],
+                    [0, 20],
+                    [20, 20]
+                ],
+                container: { x: 0, y: 0 },
+                isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
+                isInlineCollapsible: jest.fn().mockReturnValue(false),
+                collapsed: false
+            };
+
+            const removedOctaveBlock = {
+                name: "number",
+                value: 6,
+                connections: [0, null],
+                docks: [[0, 0]],
+                container: { x: 20, y: 20 },
+                isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
+                isInlineCollapsible: jest.fn().mockReturnValue(false),
+                collapsed: false
+            };
+
+            blocks.blockList = [customPitchBlock, null, removedOctaveBlock];
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, type, conns, postProcess, args) => {
+                    const newBlk = {
+                        name,
+                        value: null,
+                        text: { text: "" },
+                        container: {
+                            children: [{}],
+                            setChildIndex: jest.fn(),
+                            updateCache: jest.fn()
+                        }
+                    };
+                    blocks.blockList.push(newBlk);
+                    if (postProcess) {
+                        postProcess(args);
+                    }
+                }
+            );
+
+            blocks.adjustDocks = jest.fn();
+
+            blocks.addDefaultBlock(0, 2);
+
+            expect(blocks._makeNewBlockWithConnections).toHaveBeenCalledWith(
+                "number",
+                0,
+                [0],
+                expect.any(Function),
+                [0, 2, 3]
+            );
+
+            const replacementOctave = blocks.blockList[3];
+            expect(replacementOctave.name).toBe("number");
+            expect(replacementOctave.value).toBe(6);
+            expect(customPitchBlock.connections[2]).toBe(3);
+        });
+    });
 });
