@@ -432,10 +432,7 @@ class ContextMenuController {
                 fn: this._hideHelpfulSearchWidget.bind(this)
             });
 
-        // makeButton() initialises tooltips before it appends its button to
-        // the DOM, so the last button built above is still uninitialised here
-        // (and, after the teardown at the top of this function, so are any
-        // whose tooltip we just removed). Initialise the finished row once.
+        // Initialize tooltips after all bottom-toolbar buttons have been appended.
         if (!(activity.toolbar && activity.toolbar.tooltipsDisabled)) {
             window.jQuery("#buttoncontainerBOTTOM .tooltipped").tooltip({
                 html: true,
@@ -520,10 +517,6 @@ class ContextMenuController {
                 container.blur?.();
             });
         }
-        // No tooltip init here: the container is not in the DOM yet, so this
-        // only ever re-initialised *other* elements' tooltips (once per button
-        // built) and left the last button of a row without one. setupPaletteMenu
-        // initialises the whole row after it has been appended.
 
         container.onmouseover = () => {
             if (!activity.loading) {

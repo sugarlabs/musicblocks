@@ -750,8 +750,6 @@ describe("ContextMenuController", () => {
         });
 
         test("re-initialises the rebuilt buttons' tooltips once the row is complete", () => {
-            // makeButton() initialises tooltips before appending its button,
-            // so the last button built is otherwise left without one.
             const calls = [];
             window.jQuery = jest.fn(selector => ({
                 tooltip: jest.fn(options => calls.push({ selector, options }))
@@ -759,9 +757,10 @@ describe("ContextMenuController", () => {
 
             controller.setupPaletteMenu();
 
-            const last = calls[calls.length - 1];
-            expect(last.selector).toBe("#buttoncontainerBOTTOM .tooltipped");
-            expect(last.options).toEqual({ html: true, delay: 100 });
+            const initializations = calls.filter(c => c.options !== "remove");
+            expect(initializations).toHaveLength(1);
+            expect(initializations[0].selector).toBe("#buttoncontainerBOTTOM .tooltipped");
+            expect(initializations[0].options).toEqual({ html: true, delay: 100 });
         });
 
         test("does not re-initialise tooltips when they are disabled", () => {
@@ -773,6 +772,10 @@ describe("ContextMenuController", () => {
 
             controller.setupPaletteMenu();
 
+            expect(calls).toContainEqual({
+                selector: "#buttoncontainerBOTTOM .tooltipped",
+                options: "remove"
+            });
             expect(
                 calls.some(
                     c =>
