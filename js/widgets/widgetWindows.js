@@ -9,13 +9,20 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global _, docById, ManagedTimer, makeKeyboardAccessible */
+/* global _, ManagedTimer, makeKeyboardAccessible */
 
 /*
 Globals location
 - js/utils/utils.js
-_, docById
+_
+- js/utils/dom-helpers.js
+docById, makeKeyboardAccessible
 */
+
+const getDocById = id =>
+    typeof window !== "undefined" && typeof window.docById === "function"
+        ? window.docById(id)
+        : document.getElementById(id);
 
 window.widgetWindows = {
     openWindows: {},
@@ -269,7 +276,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _createUIelements() {
-        const windows = docById("floatingWindows");
+        const windows = getDocById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
         this._frame.setAttribute("role", "dialog");
         this._frame.setAttribute("aria-label", _(this._title));
@@ -590,7 +597,7 @@ class WidgetWindow {
      * @returns {void}
      */
     updateTitle(title) {
-        const wftTitle = docById(this._key + "WidgetID");
+        const wftTitle = getDocById(this._key + "WidgetID");
         if (wftTitle) {
             wftTitle.textContent = title;
         }
@@ -605,7 +612,7 @@ class WidgetWindow {
      */
     takeFocus() {
         window.widgetWindows.focused = this;
-        const windows = docById("floatingWindows");
+        const windows = getDocById("floatingWindows");
         const siblings = windows.children;
         for (let i = 0; i < siblings.length; i++) {
             siblings[i].style.zIndex = "0";
@@ -634,7 +641,14 @@ class WidgetWindow {
         img.height = iconSize;
         img.width = iconSize;
         el.replaceChildren(img);
-        makeKeyboardAccessible(el, label);
+        if (typeof makeKeyboardAccessible === "function") {
+            makeKeyboardAccessible(el, label);
+        } else if (
+            typeof window !== "undefined" &&
+            typeof window.makeKeyboardAccessible === "function"
+        ) {
+            window.makeKeyboardAccessible(el, label);
+        }
         this._buttons.push(el);
         return el;
     }
@@ -644,7 +658,7 @@ class WidgetWindow {
      * @returns {WidgetWindow} this
      */
     sendToCenter() {
-        const canvas = docById("myCanvas");
+        const canvas = getDocById("myCanvas");
         const fRect = this._frame.getBoundingClientRect();
         const cRect = canvas.getBoundingClientRect();
 
