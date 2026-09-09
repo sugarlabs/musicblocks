@@ -422,6 +422,14 @@ class BlockDragController {
                 continue;
             }
 
+            /** Skip an index the spatial grid returned for a block that no
+             *  longer exists (defense in depth alongside the fix for #8610:
+             *  disposeBlock keeps the grid in sync, but this guard protects
+             *  against any future path that forgets to). */
+            if (!blocks.blockList[b]) {
+                continue;
+            }
+
             /** Don't connect to a collapsed block. */
             if (blocks.blockList[b].inCollapsed) {
                 continue;
