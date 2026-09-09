@@ -85,13 +85,6 @@ reviews:
                   Pass: The PR description accurately reflects the code changes in the diff.
                   Fail: The description contradicts the diff or leaves core functional changes unexplained.
                   Inconclusive: The description is brief but not inaccurate.
-
-            - name: "Multiple Issues Linked"
-              mode: "warning"
-              instructions: |
-                  Pass: The PR references multiple closely related issues fixed together.
-                  Fail: The PR references multiple functionally unrelated issues that should be split into separate PRs.
-                  Inconclusive: Only one issue or no issue is linked.
             
             - name: "Category-Specific Sections"
               mode: "warning"
