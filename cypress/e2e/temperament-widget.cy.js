@@ -102,6 +102,39 @@ describe("Temperament widget", () => {
         cy.get('[aria-label="temperament"]').find('img[title="table"]').should("exist");
     });
 
+    it("keeps the table of notes intact after saving the temperament", () => {
+        // Regression: _save() used to clear this.notes for every temperament
+        // while only refilling it for a custom one, so the table of notes threw
+        // reading this.notes[i][0] and rendered no rows at all.
+        loadFixtureProject("temperament-widget-minimal.tb");
+        cy.get("#play").click();
+
+        cy.get('[aria-label="temperament"]', { timeout: 30000 }).should("be.visible");
+
+        // Record how many rows the table holds before anything is saved, so the
+        // check after saving compares against the widget's own baseline rather
+        // than a hard coded count.
+        cy.get('[aria-label="temperament"]').find('img[title="table"]').click({ force: true });
+        cy.get("#tableOfNotes tr")
+            .then($rows => $rows.length)
+            .as("rowCount");
+        cy.get('[aria-label="temperament"]').find('img[title="circle"]').click({ force: true });
+
+        // Save the temperament, which is the step that used to empty the notes.
+        cy.get('[aria-label="temperament"]').find('img[title="Save"]').click({ force: true });
+
+        // The table must still render, and every row must still be populated.
+        cy.get('[aria-label="temperament"]').find('img[title="table"]').click({ force: true });
+        cy.get("#tableOfNotes").should("exist").and("be.visible");
+
+        cy.get("@rowCount").then(rowCount => {
+            cy.get("#tableOfNotes tr").should("have.length", rowCount);
+            cy.get("#tableOfNotes tr").each($row => {
+                expect($row[0].cells.length).to.be.greaterThan(0);
+            });
+        });
+    });
+
     it("closes the Temperament widget and cleans up the DOM", () => {
         loadFixtureProject("temperament-widget-minimal.tb");
         cy.get("#play").click();
