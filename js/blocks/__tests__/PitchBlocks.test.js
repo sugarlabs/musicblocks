@@ -960,7 +960,6 @@ describe("setupPitchBlocks", () => {
 
         it("CustomPitchBlock passes parsed cents to playPitch", () => {
             const cpBlock = createdBlocks["custompitch"];
-            if (cpBlock instanceof DummyFlowBlock) return;
             cpBlock.flow(["D(+25" + CENTSSYMBOL + ")", 2], logo, 0, 10);
             expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("D", 2, 25, 0, 10);
 
@@ -969,6 +968,12 @@ describe("setupPitchBlocks", () => {
 
             cpBlock.flow(["^B(+0" + CENTSSYMBOL + ")", 4], logo, 0, 12);
             expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("^B", 4, 0, 0, 12);
+        });
+
+        it("PitchBlock with custom note string passes parsed cents to playPitch", () => {
+            const pitchBlock = createdBlocks["pitch"];
+            pitchBlock.flow(["D(+25" + CENTSSYMBOL + ")", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("D", 4, 25, 0, 10);
         });
 
         it("pitch numbers >12 are scale degrees (not Hz) when EDO >12", () => {

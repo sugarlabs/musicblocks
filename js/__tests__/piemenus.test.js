@@ -141,7 +141,8 @@ global._ = jest.fn(s => s);
 global.announceToScreenReader = jest.fn();
 global.Tone = {
     start: jest.fn().mockResolvedValue(),
-    context: { state: "running" }
+    context: { state: "running" },
+    ToneAudioBuffer: { loaded: jest.fn().mockResolvedValue() }
 };
 global.last = arr => arr[arr.length - 1];
 global.MUSICALMODES = {
@@ -2805,5 +2806,466 @@ describe("shared wheel safe positioning", () => {
         expect(wheelDivMock.style.top).toBe(hiddenTop);
 
         jest.useRealTimers();
+    });
+});
+
+describe("piemenuCustomNotes preview sound and frequency resolution", () => {
+    let mockBlock;
+    let synth;
+    let mockVoice;
+
+    beforeEach(() => {
+        document.body.innerHTML = "";
+        const byId = document.getElementById.bind(document);
+        global.docById = jest.fn(id => {
+            let el = byId(id);
+            if (!el) {
+                el = document.createElement("div");
+                el.id = id;
+                document.body.appendChild(el);
+            }
+            return el;
+        });
+
+        global.platformColor.intervalNameWheelcolors = ["#111111"];
+        global.platformColor.intervalWheelcolors = ["#222222"];
+        global.platformColor.octavesWheelcolors = ["#333333"];
+        global.platformColor.exitWheelcolors = ["#444444"];
+        global.setWheelSize = jest.fn();
+        global.configureExitWheel = jest.fn();
+
+        mockVoice = {
+            triggerAttackRelease: jest.fn()
+        };
+        global.instruments = [{ [global.DEFAULTVOICE]: mockVoice }];
+
+        synth = {
+            createDefaultSynth: jest.fn(),
+            loadSynth: jest.fn().mockResolvedValue(),
+            setMasterVolume: jest.fn(),
+            setVolume: jest.fn(),
+            getCustomFrequency: jest.fn().mockReturnValue([261.63]),
+            trigger: jest.fn().mockResolvedValue(),
+            newTone: jest.fn(),
+            tone: {}
+        };
+
+        mockBlock = {
+            container: {
+                x: 100,
+                y: 100,
+                setChildIndex: jest.fn(),
+                children: [{}]
+            },
+            connections: [null],
+            blocks: {
+                stageClick: false,
+                blockScale: 1,
+                activeBlock: null,
+                turtles: { _canvas: { width: 1000, height: 1000 } },
+                setPitchOctave: jest.fn(),
+                blockList: [{ name: "flow" }]
+            },
+            activity: {
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { x: 0, y: 0 },
+                getStageScale: jest.fn().mockReturnValue(1),
+                turtles: {
+                    ithTurtle: jest.fn().mockReturnValue({
+                        singer: { instrumentNames: [global.DEFAULTVOICE] }
+                    })
+                },
+                logo: { synth, errorMsg: jest.fn() }
+            },
+            updateCache: jest.fn(),
+            text: { text: "" },
+            value: "C(+0¢)",
+            customID: null
+        };
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("plays preview and resolves customID fallback from customWheel label", async () => {
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 1,
+                0: [1, "C(+0¢)", 4]
+            }
+        };
+        const customLabels = ["my_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "C(+0¢)");
+
+        // Simulate selection change on cusNoteWheel
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "C(+0¢)";
+        mockBlock._customWheel.navItems[0].title = "my_temperament";
+
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(synth.getCustomFrequency).toHaveBeenCalledWith(["C4"], "my_temperament");
+        expect(synth.trigger).toHaveBeenCalledWith(
+            0,
+            [261.63],
+            1 / 8,
+            global.DEFAULTVOICE,
+            null,
+            null,
+            false
+        );
+    });
+
+    test("uses explicit customID when set on the block", async () => {
+        mockBlock.customID = "explicit_temperament";
+        const noteLabels = {
+            explicit_temperament: {
+                pitchNumber: 1,
+                0: [1, "D(+0¢)", 4]
+            }
+        };
+        const customLabels = ["explicit_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "explicit_temperament", "D(+0¢)");
+
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "D(+0¢)";
+        mockBlock._customWheel.navItems[0].title = "explicit_temperament";
+
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(synth.getCustomFrequency).toHaveBeenCalledWith(["D4"], "explicit_temperament");
+        expect(synth.trigger).toHaveBeenCalledWith(
+            0,
+            [261.63],
+            1 / 8,
+            global.DEFAULTVOICE,
+            null,
+            null,
+            false
+        );
+    });
+
+    test("does not attach octave wheel when connected to a block without octave, resolving octave via findPitchOctave", async () => {
+        mockBlock.connections = [0];
+        mockBlock.blocks.blockList = [{ name: "storein" }];
+        mockBlock.blocks.findPitchOctave = jest.fn().mockReturnValue(5);
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 1,
+                0: [1, "C(+0¢)", 4]
+            }
+        };
+        const customLabels = ["my_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "C(+0¢)");
+
+        expect(mockBlock._octavesWheel).toBeUndefined();
+
+        mockBlock._triggerLock = false;
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "C(+0¢)";
+        mockBlock._customWheel.navItems[0].title = "my_temperament";
+
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(mockBlock.blocks.findPitchOctave).toHaveBeenCalledWith(0);
+        expect(synth.getCustomFrequency).toHaveBeenCalledWith(["C5"], "my_temperament");
+    });
+
+    test("supports octave wheel and updates pitch octave when connected to pitch block", async () => {
+        mockBlock.connections = [0];
+        mockBlock.blocks.blockList = [{ name: "pitch" }];
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 1,
+                0: [1, "C(+0¢)", 4]
+            }
+        };
+        const customLabels = ["my_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "C(+0¢)");
+
+        expect(mockBlock._octavesWheel).toBeDefined();
+
+        mockBlock._triggerLock = false;
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._octavesWheel.selectedNavItemIndex = 2; // Octave 3 (index 2)
+        mockBlock._cusNoteWheel.navItems[0].title = "C(+0¢)";
+        mockBlock._customWheel.navItems[0].title = "my_temperament";
+        mockBlock._octavesWheel.navItems[2].title = "3";
+
+        await mockBlock._octavesWheel.navItems[2].navigateFunction();
+
+        expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith(0, 3);
+        expect(synth.getCustomFrequency).toHaveBeenCalledWith(["C3"], "my_temperament");
+    });
+
+    test("does not trigger audio preview if frequency is non-finite, zero, or negative", async () => {
+        synth.getCustomFrequency.mockReturnValue(["^^G♭"]); // unparsed string
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 1,
+                0: [1, "^^G♭(+0¢)", 4]
+            }
+        };
+        const customLabels = ["my_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "^^G♭(+0¢)");
+
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "^^G♭(+0¢)";
+        mockBlock._customWheel.navItems[0].title = "my_temperament";
+
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(synth.getCustomFrequency).toHaveBeenCalledWith(["^^G♭4"], "my_temperament");
+        expect(synth.trigger).not.toHaveBeenCalled();
+
+        synth.getCustomFrequency.mockReturnValue([0]);
+        mockBlock._triggerLock = false;
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+        expect(synth.trigger).not.toHaveBeenCalled();
+
+        synth.getCustomFrequency.mockReturnValue([-440]);
+        mockBlock._triggerLock = false;
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+        expect(synth.trigger).not.toHaveBeenCalled();
+    });
+
+    test("uses note value directly from currently selected rawNote", async () => {
+        mockBlock.value = "C(+14¢)";
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 1,
+                0: [1, "D(+30¢)", 4]
+            }
+        };
+        const customLabels = ["my_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "D(+30¢)");
+
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "D(+30¢)";
+        mockBlock._customWheel.navItems[0].title = "my_temperament";
+
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(mockBlock.value).toBe("D(+30¢)");
+        expect(mockBlock.text.text).toBe("D(+30¢)");
+        expect(synth.getCustomFrequency).toHaveBeenCalledWith(["D4"], "my_temperament");
+    });
+
+    test("handles rapid selections with delayed loadSynth by bailing out of stale requests", async () => {
+        // Start with empty instruments to force loadSynth path
+        global.instruments = [];
+
+        let resolveFirstLoad;
+        let resolveSecondLoad;
+        let loadCount = 0;
+
+        synth.loadSynth.mockImplementation(() => {
+            loadCount++;
+            if (loadCount === 1) {
+                return new Promise(resolve => {
+                    resolveFirstLoad = () => {
+                        global.instruments = [{ [global.DEFAULTVOICE]: mockVoice }];
+                        resolve();
+                    };
+                });
+            } else {
+                return new Promise(resolve => {
+                    resolveSecondLoad = () => {
+                        global.instruments = [{ [global.DEFAULTVOICE]: mockVoice }];
+                        resolve();
+                    };
+                });
+            }
+        });
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 2,
+                0: [1, "C(+0¢)", 4],
+                1: [2, "D(+0¢)", 4]
+            }
+        };
+        const customLabels = ["my_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "C(+0¢)");
+
+        synth.getCustomFrequency.mockImplementation(notes => {
+            if (notes[0] === "C4") return [261.63];
+            if (notes[0] === "D4") return [293.66];
+            return [0];
+        });
+
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.navItems[0].title = "my_temperament";
+        mockBlock._cusNoteWheel.navItems[0].title = "C(+0¢)";
+        mockBlock._cusNoteWheel.navItems[1].title = "D(+0¢)";
+
+        // Selection 1: select C(+0¢) (navItem 0)
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        const promise1 = mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        // Selection 2: immediately select D(+0¢) (navItem 1) before first loadSynth finishes
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 1;
+        const promise2 = mockBlock._cusNoteWheel.navItems[1].navigateFunction();
+
+        await Promise.resolve();
+        await Promise.resolve();
+
+        // First loadSynth finishes
+        resolveFirstLoad();
+        await promise1;
+
+        // Second loadSynth finishes
+        if (resolveSecondLoad) {
+            resolveSecondLoad();
+        }
+        await promise2;
+
+        // Verify only Selection 2 was played, and stale Selection 1 was dropped
+        expect(synth.trigger).toHaveBeenCalledTimes(1);
+        expect(synth.trigger).toHaveBeenCalledWith(
+            0,
+            [293.66],
+            1 / 8,
+            global.DEFAULTVOICE,
+            null,
+            null,
+            false
+        );
+        expect(synth.trigger).not.toHaveBeenCalledWith(
+            0,
+            [261.63],
+            1 / 8,
+            global.DEFAULTVOICE,
+            null,
+            null,
+            false
+        );
+    });
+
+    test("resets _triggerLock in finally block even when getCustomFrequency throws", async () => {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        jest.useFakeTimers();
+        try {
+            synth.getCustomFrequency.mockImplementation(() => {
+                throw new Error("Frequency resolution failure");
+            });
+            const noteLabels = {
+                my_temperament: {
+                    pitchNumber: 1,
+                    0: [1, "C(+0¢)", 4]
+                }
+            };
+            const customLabels = ["my_temperament"];
+
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "C(+0¢)");
+
+            mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+            mockBlock._customWheel.selectedNavItemIndex = 0;
+            mockBlock._cusNoteWheel.navItems[0].title = "C(+0¢)";
+            mockBlock._customWheel.navItems[0].title = "my_temperament";
+
+            await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+            expect(mockBlock._triggerLock).toBe(true);
+            jest.advanceTimersByTime(150);
+            expect(mockBlock._triggerLock).toBe(false);
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                "Error during custom note preview:",
+                expect.any(Error)
+            );
+        } finally {
+            consoleErrorSpy.mockRestore();
+            jest.useRealTimers();
+        }
+    });
+
+    test("logs warning and does not deadlock when loadSynth rejects", async () => {
+        global.instruments = [];
+        const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        synth.loadSynth.mockRejectedValue(new Error("Network sound load error"));
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 1,
+                0: [1, "C(+0¢)", 4]
+            }
+        };
+        const customLabels = ["my_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "C(+0¢)");
+
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "C(+0¢)";
+        mockBlock._customWheel.navItems[0].title = "my_temperament";
+
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(consoleWarnSpy).toHaveBeenCalledWith(
+            "Failed to load synth for preview:",
+            expect.any(Error)
+        );
+        consoleWarnSpy.mockRestore();
+    });
+
+    test("awaits audio readiness and plays sound right away on first preview after page load", async () => {
+        const mockUnloadedVoice = {
+            loaded: false,
+            triggerAttackRelease: jest.fn()
+        };
+        global.instruments = [{ [global.DEFAULTVOICE]: mockUnloadedVoice }];
+        let bufferLoadedResolved = false;
+        global.Tone.ToneAudioBuffer.loaded = jest.fn().mockImplementation(async () => {
+            bufferLoadedResolved = true;
+            mockUnloadedVoice.loaded = true;
+        });
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 1,
+                0: [1, "C(+0¢)", 4]
+            }
+        };
+        const customLabels = ["my_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "C(+0¢)");
+
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "C(+0¢)";
+        mockBlock._customWheel.navItems[0].title = "my_temperament";
+
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(global.Tone.start).toHaveBeenCalled();
+        expect(global.Tone.ToneAudioBuffer.loaded).toHaveBeenCalled();
+        expect(bufferLoadedResolved).toBe(true);
+        expect(synth.trigger).toHaveBeenCalledWith(
+            0,
+            [261.63],
+            1 / 8,
+            global.DEFAULTVOICE,
+            null,
+            null,
+            false
+        );
     });
 });
