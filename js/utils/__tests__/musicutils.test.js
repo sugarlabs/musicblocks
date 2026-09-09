@@ -1381,6 +1381,35 @@ describe("numberToPitchSharp", () => {
         expect(numberToPitchSharp(1)).toEqual(["A♯", 0]);
         expect(numberToPitchSharp(2)).toEqual(["B", 0]);
     });
+    it("round-trips all 12 pitch classes through pitchToNumber", () => {
+        const names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        for (const name of names) {
+            const pn = pitchToNumber(name, 4, "C major");
+            expect(numberToPitchSharp(pn)).toEqual([name.replace("#", SHARP), 4]);
+        }
+    });
+    it("round-trips natural notes across octaves, including negative octaves", () => {
+        for (let oct = -1; oct <= 6; oct++) {
+            expect(numberToPitchSharp(pitchToNumber("C", oct, "C major"))).toEqual(["C", oct]);
+            expect(numberToPitchSharp(pitchToNumber("A", oct, "C major"))).toEqual(["A", oct]);
+        }
+    });
+    it("round-trips through pitchToNumber in non-12-EDO and meantone temperaments", () => {
+        for (const edo of ["equal19", "equal31", "1/3 comma meantone", "1/4 comma meantone"]) {
+            expect(numberToPitchSharp(pitchToNumber("C", 4, "C major", edo), edo)).toEqual([
+                "C",
+                4
+            ]);
+            expect(numberToPitchSharp(pitchToNumber("A", 4, "C major", edo), edo)).toEqual([
+                "A",
+                4
+            ]);
+            expect(numberToPitchSharp(pitchToNumber("D", 4, "C major", edo), edo)).toEqual([
+                "D",
+                4
+            ]);
+        }
+    });
 });
 
 describe("getNumber", () => {
