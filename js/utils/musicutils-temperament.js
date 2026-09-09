@@ -18,7 +18,7 @@
 /*
    exported
 
-   getCurrentEDO, EDO_NOTE_NAMES, SHARP_NAMES, generateNoteNames,
+   getCurrentEDO, parseEDOTemperament, EDO_NOTE_NAMES, SHARP_NAMES, generateNoteNames,
    getEdoNoteNamePosition, octaveRatio, INITIALTEMPERAMENTS, TEMPERAMENTS,
    PreDefinedTemperaments, INTERVAL_CENTS, INTERVAL_ORDER, TEMPERAMENT,
    setOctaveRatio, getOctaveRatio, ratioToWheelAngle, getTemperamentsList,
@@ -49,6 +49,19 @@ if (typeof module !== "undefined" && module.exports) {
 }
 
 /**
+ * Parse an EDO division number from a temperament string (e.g. "19-EDO", "19EDO", "31-edo").
+ * @param {string} temperament - Temperament string
+ * @returns {number|null} The parsed EDO number, or null if not matching
+ */
+var parseEDOTemperament = temperament => {
+    if (typeof temperament !== "string") {
+        return null;
+    }
+    const match = temperament.match(/^(\d+)-?EDO$/i);
+    return match ? Number(match[1]) : null;
+};
+
+/**
  * Returns the number of pitches in the given temperament's octave.
  * Falls back to 12-EDO if temperament is not found.
  * @param {string} temperament - temperament key (e.g., "equal", "equal19")
@@ -57,7 +70,10 @@ if (typeof module !== "undefined" && module.exports) {
 var getCurrentEDO = temperament => {
     if (!temperament) return 12;
     const t = getTemperament(temperament);
-    return t && t.pitchNumber ? t.pitchNumber : 12;
+    if (t && t.pitchNumber) return t.pitchNumber;
+    const edo = parseEDOTemperament(temperament);
+    if (edo !== null) return edo;
+    return 12;
 };
 
 var EDO_NOTE_NAMES = {};
@@ -1019,18 +1035,18 @@ var TEMPERAMENT = {
         ]
     },
     "custom": {
-        "0": Math.pow(2, 0 / 12),
-        "1": Math.pow(2, 1 / 12),
-        "2": Math.pow(2, 2 / 12),
-        "3": Math.pow(2, 3 / 12),
-        "4": Math.pow(2, 4 / 12),
-        "5": Math.pow(2, 5 / 12),
-        "6": Math.pow(2, 6 / 12),
-        "7": Math.pow(2, 7 / 12),
-        "8": Math.pow(2, 8 / 12),
-        "9": Math.pow(2, 9 / 12),
-        "10": Math.pow(2, 10 / 12),
-        "11": Math.pow(2, 11 / 12),
+        "0": [Math.pow(2, 0 / 12), "C(+0¢)", 4],
+        "1": [Math.pow(2, 1 / 12), "C#(+0¢)", 4],
+        "2": [Math.pow(2, 2 / 12), "D(+0¢)", 4],
+        "3": [Math.pow(2, 3 / 12), "D#(+0¢)", 4],
+        "4": [Math.pow(2, 4 / 12), "E(+0¢)", 4],
+        "5": [Math.pow(2, 5 / 12), "F(+0¢)", 4],
+        "6": [Math.pow(2, 6 / 12), "F#(+0¢)", 4],
+        "7": [Math.pow(2, 7 / 12), "G(+0¢)", 4],
+        "8": [Math.pow(2, 8 / 12), "G#(+0¢)", 4],
+        "9": [Math.pow(2, 9 / 12), "A(+0¢)", 4],
+        "10": [Math.pow(2, 10 / 12), "A#(+0¢)", 4],
+        "11": [Math.pow(2, 11 / 12), "B(+0¢)", 4],
         "perfect 1": Math.pow(2, 0 / 12),
         "minor 2": Math.pow(2, 1 / 12),
         "major 2": Math.pow(2, 2 / 12),
@@ -1265,6 +1281,9 @@ var isTrueEDO = temperament => {
  * @returns {boolean} True if the temperament is an equal division of the octave.
  */
 var isEquallyTempered = temperament => {
+    if (parseEDOTemperament(temperament) !== null) {
+        return true;
+    }
     const t = getTemperament(temperament);
     if (!t || typeof t !== "object") return false;
     if (t.isEDO === true) return true;
@@ -1373,6 +1392,7 @@ var getTemperamentName = name => {
 
 var MusicUtilsTemperament = {
     getCurrentEDO,
+    parseEDOTemperament,
     EDO_NOTE_NAMES,
     SHARP_NAMES,
     generateNoteNames,
