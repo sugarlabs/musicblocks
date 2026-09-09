@@ -4204,6 +4204,55 @@ describe("non-EDO temperament helpers", () => {
         it("returns null for a temperament without usable ratios", () => {
             expect(getNonEDOModeSteps("major", "_no_ratios")).toBeNull();
         });
+
+        it("derives the textbook 19-EDO major scale", () => {
+            // In 19-EDO a whole tone is 3 steps and a diatonic semitone is 2,
+            // so major is T T S T T T S = 3,3,2,3,3,3,2 and sums to the octave.
+            const steps = getNonEDOModeSteps("major", "equal19");
+            expect(steps).toEqual([3, 3, 2, 3, 3, 3, 2]);
+            expect(steps.reduce((a, b) => a + b, 0)).toBe(19);
+        });
+
+        it("agrees with the other 19-note temperament", () => {
+            // 1/3 comma meantone also divides the octave into 19 and computes
+            // its steps from an independent ratio table, so the two must match.
+            expect(getNonEDOModeSteps("major", "equal19")).toEqual(
+                getNonEDOModeSteps("major", "1/3 comma meantone")
+            );
+        });
+    });
+
+    describe("temperament ratio tables", () => {
+        const withRatios = () =>
+            getTemperamentKeys()
+                .map(key => [key, getTemperament(key)])
+                .filter(([, t]) => t && Array.isArray(t.ratios) && t.pitchNumber);
+
+        it("gives every temperament one ratio per pitch", () => {
+            // equal19 shipped 15 ratios against a pitchNumber of 19, so anything
+            // reading ratios[pitchNumber - 1] fell off the end. Check them all
+            // rather than that one, so the next short table is caught here.
+            const mismatched = withRatios()
+                .filter(([, t]) => t.ratios.length !== t.pitchNumber)
+                .map(
+                    ([key, t]) => `${key}: ${t.ratios.length} ratios, pitchNumber ${t.pitchNumber}`
+                );
+            expect(mismatched).toEqual([]);
+        });
+
+        it("spaces every equal temperament evenly across the octave", () => {
+            for (const [key, t] of withRatios()) {
+                if (!t.isEDO) {
+                    continue;
+                }
+                const expected = [...Array(t.pitchNumber).keys()].map(i =>
+                    Math.pow(2, i / t.pitchNumber)
+                );
+                t.ratios.forEach((ratio, i) => {
+                    expect(Number(ratio)).toBeCloseTo(expected[i], 10);
+                });
+            }
+        });
     });
 });
 
