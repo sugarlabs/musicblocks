@@ -230,7 +230,18 @@ describe("processABCNotes - Tuplet Handling", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2 ");
+        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2F 2G^ 2 ");
+    });
+
+    it("should preserve each note in a tuplet", () => {
+        logo.notation.notationStaging["0"] = [
+            [["G4"], 4, 0, 3, 2, -1, false],
+            [["F4"], 4, 0, 3, 2, -1, false],
+            [["A4"], 4, 0, 3, 2, -1, false]
+        ];
+
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("(1:1G 2F 2A 2 ");
     });
 
     it("should handle array of notes (chords) inside tuplets", () => {
@@ -367,7 +378,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         };
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2 ");
+        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2F 2G^ 2 ");
     });
 });
 

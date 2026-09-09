@@ -263,25 +263,27 @@ const processABCNotes = function (logo, turtle) {
                     //     logo.notation.notationStaging[turtle][i + j][
                     //         NOTATIONDURATION];
 
-                    if (typeof notes === "object") {
-                        if (notes.length > 1) {
+                    const tupletNotes = logo.notation.notationStaging[turtle][i + j];
+
+                    if (typeof tupletNotes[NOTATIONNOTE] === "object") {
+                        if (tupletNotes[NOTATIONNOTE].length > 1) {
                             parts.push("[");
                         }
 
-                        for (let ii = 0; ii < notes.length; ii++) {
-                            parts.push(__toABCnote(notes[ii]));
+                        for (let ii = 0; ii < tupletNotes[NOTATIONNOTE].length; ii++) {
+                            parts.push(__toABCnote(tupletNotes[NOTATIONNOTE][ii]));
                             parts.push(" ");
                         }
 
-                        if (obj[NOTATIONSTACCATO]) {
+                        if (tupletNotes[NOTATIONSTACCATO]) {
                             parts.push(".");
                         }
 
-                        if (notes.length > 1) {
+                        if (tupletNotes[NOTATIONNOTE].length > 1) {
                             parts.push("]");
                         }
 
-                        parts.push(logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN]);
+                        parts.push(tupletNotes[NOTATIONROUNDDOWN]);
                     }
                     j++; // Jump to next note.
                     k++; // Increment notes in tuplet.
