@@ -1545,6 +1545,61 @@ input.timbreName {
     text-align: center;
 }
 
+/* ==========================================================================
+   PhraseMaker Widget Token-Backed Component Styles
+   ========================================================================== */
+
+.pm-widget-container {
+    position: absolute;
+    left: 55px;
+    right: 0;
+    width: -webkit-fill-available;
+    height: 100%;
+    height: -webkit-fill-available;
+}
+
+.pm-win-body {
+    position: absolute;
+    width: 100%;
+    width: -webkit-fill-available;
+    height: 100%;
+    height: -webkit-fill-available;
+    background: var(--color-widget-frame-bg);
+}
+
+.pm-lyrics-row {
+    position: sticky;
+}
+
+.pm-lyrics-label {
+    position: sticky;
+    left: 1.2px;
+    z-index: 1;
+    text-align: center;
+}
+
+.pm-lyrics-cell {
+    font-family: var(--font-family-system, sans-serif);
+    cursor: default;
+    border-spacing: 1px 1px;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    padding: 0;
+    border-radius: var(--radius-md, 6px);
+    border: none;
+}
+
+.pm-lyrics-input {
+    width: 100%;
+    font-size: inherit;
+    font-family: var(--font-family-system, sans-serif);
+    cursor: default;
+    box-sizing: border-box;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-md, 6px);
+}
+
 .popup {
     position: absolute;
     -webkit-user-select: none;

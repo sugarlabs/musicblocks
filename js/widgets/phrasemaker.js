@@ -1026,17 +1026,13 @@ class PhraseMaker {
         if (this.lyricsON) {
             const lyricsRow = ptmTable.insertRow();
             lyricsRow.setAttribute("id", "lyricRow");
-            lyricsRow.style.position = "sticky";
+            lyricsRow.classList.add("pm-lyrics-row");
 
             // Label Icon
             cell = lyricsRow.insertCell();
             cell.setAttribute("colspan", "1");
-            cell.className = "headcol";
-            cell.style.position = "sticky";
-            cell.style.left = "1.2px";
-            cell.style.zIndex = "1";
+            cell.className = "headcol pm-lyrics-label";
             cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
-            cell.style.textAlign = "center";
             cell.textContent = "";
             const penImg = document.createElement("img");
             penImg.src = "images/pen.svg";
@@ -1048,12 +1044,8 @@ class PhraseMaker {
             // Label Cell (Fixed like "note value")
             cell = lyricsRow.insertCell();
             cell.setAttribute("colspan", "1");
-            cell.className = "headcol";
-            cell.style.position = "sticky";
-            cell.style.left = "1.2px";
-            cell.style.zIndex = "1";
+            cell.className = "headcol pm-lyrics-label";
             cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
-            cell.style.textAlign = "center";
             cell.textContent = "Lyrics";
 
             // Nested Table for Input Fields
@@ -1072,36 +1064,22 @@ class PhraseMaker {
             for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 const noteValue = this.activity.logo.tupletRhythms[i][2];
                 const inputCell = inputRow.insertCell();
+                inputCell.classList.add("pm-lyrics-cell");
                 inputCell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
                 inputCell.style.width = this._noteWidth(noteValue) + "px";
                 inputCell.style.minWidth = inputCell.style.width;
                 inputCell.style.maxWidth = inputCell.style.width;
                 inputCell.style.backgroundColor = this.platformColor.lyricsInputBackground;
-                inputCell.style.fontFamily = "sans-serif";
-                inputCell.style.cursor = "default";
-                inputCell.style.borderSpacing = "1px 1px";
-                inputCell.style.borderCollapse = "collapse";
-                inputCell.style.boxSizing = "border-box";
-                inputCell.style.padding = "0";
-                inputCell.style.borderRadius = "6px";
-                inputCell.style.border = "none";
                 inputCell.setAttribute("alt", i + "__" + "graphicsblocks2");
 
                 const lyricsInput = document.createElement("input");
                 lyricsInput.type = "text";
                 lyricsInput.value = this._lyrics[i];
+                lyricsInput.classList.add("pm-lyrics-input");
 
                 lyricsInput.style.height = inputCell.style.height;
-                lyricsInput.style.width = "100%";
                 lyricsInput.style.minWidth = inputCell.style.minWidth;
                 lyricsInput.style.maxWidth = inputCell.style.maxWidth;
-                lyricsInput.style.fontSize = "inherit";
-                lyricsInput.style.fontFamily = "sans-serif";
-                lyricsInput.style.cursor = "default";
-                lyricsInput.style.boxSizing = "border-box";
-                lyricsInput.style.padding = "0";
-                lyricsInput.style.border = "none";
-                lyricsInput.style.borderRadius = "6px";
                 lyricsInput.style.backgroundColor = this.platformColor.lyricsInputBackground;
 
                 inputCell.appendChild(lyricsInput);
