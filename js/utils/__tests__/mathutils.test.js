@@ -87,6 +87,18 @@ describe("MathUtility", () => {
         test("throws error for one valid solfege and one invalid", () => {
             expect(() => MathUtility.doRandom("do", "invalid")).toThrow("NanError");
         });
+
+        test("throws error for a NaN octave rather than returning a NaN pitch", () => {
+            // Without the guard this returns something like ["mi", "NaN"], which
+            // reads as a valid solfege pair everywhere downstream.
+            expect(() => MathUtility.doRandom("do", "sol", NaN)).toThrow("NanError");
+        });
+
+        test("still accepts an undefined octave after the NaN guard", () => {
+            const result = MathUtility.doRandom("do", "mi", undefined);
+            expect(result).toHaveLength(2);
+            expect(Number(result[1])).toBeGreaterThanOrEqual(4);
+        });
     });
 
     describe("doOneOf", () => {

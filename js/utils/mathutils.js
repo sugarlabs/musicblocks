@@ -116,6 +116,15 @@ class MathUtility {
             SOLFEGENAMES.includes(a) &&
             SOLFEGENAMES.includes(b)
         ) {
+            // A NaN octave flows through GetRandomSolfege unnoticed: it builds
+            // "do NaN".."ti NaN" entries and indexOf finds them, so the caller
+            // gets a valid-looking ["mi", "NaN"] instead of an error. Typing a
+            // non-number is already rejected in js/block.js, but the project
+            // loader (js/blocks.js, case "number") assigns Number(value) with
+            // no isNaN check, so a saved project can carry one here.
+            if (Number.isNaN(c)) {
+                throw new Error("NanError");
+            }
             return GetRandomSolfege(a, b, c);
         } else {
             throw new Error("NanError");
