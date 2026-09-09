@@ -948,6 +948,47 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.promptCount).toBe(0);
             expect(loadSpy).toHaveBeenCalled();
         });
+
+        test("reset keeps the replacement typing indicator when the aborted request settles", async () => {
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.widgetWindow = mockWidgetWindow;
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.messageInput = document.createElement("input");
+            debuggerWidget._isMounted = true;
+            debuggerWidget._consentGiven = true;
+
+            let resolveFirst;
+            global.fetch.mockImplementation(() => {
+                if (resolveFirst) {
+                    return Promise.resolve({
+                        ok: true,
+                        json: jest.fn().mockResolvedValue({ response: "Replacement" })
+                    });
+                }
+
+                return new Promise(resolve => {
+                    resolveFirst = resolve;
+                });
+            });
+
+            debuggerWidget._sendToBackend("Waiting message");
+            debuggerWidget._resetConversation();
+
+            const indicators = debuggerWidget.chatLog.querySelectorAll(".typing-indicator");
+            expect(indicators.length).toBe(1);
+
+            resolveFirst({
+                ok: true,
+                json: jest.fn().mockResolvedValue({ response: "Aborted reply" })
+            });
+
+            await Promise.resolve();
+            await Promise.resolve();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(debuggerWidget.chatLog.querySelectorAll(".typing-indicator").length).toBe(1);
+        });
     });
 
     describe("_clearChat", () => {

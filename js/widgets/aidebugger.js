@@ -479,7 +479,7 @@ function AIDebuggerWidget() {
             return;
         }
 
-        this._showTypingIndicator();
+        const typingIndicator = this._showTypingIndicator();
         this.promptCount++;
         let projectData;
         try {
@@ -534,7 +534,7 @@ function AIDebuggerWidget() {
                     return;
                 }
 
-                this._hideTypingIndicator();
+                this._removeTypingIndicator(typingIndicator);
                 this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
 
                 if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -554,7 +554,7 @@ function AIDebuggerWidget() {
                 this._updateMessageCount();
             })
             .finally(() => {
-                this._hideTypingIndicator();
+                this._removeTypingIndicator(typingIndicator);
                 this._isProcessing = false;
             });
     };
@@ -565,7 +565,7 @@ function AIDebuggerWidget() {
      */
     this._showTypingIndicator = function () {
         if (!this._isWidgetActive()) {
-            return;
+            return null;
         }
 
         const typingDiv = document.createElement("div");
@@ -591,6 +591,8 @@ function AIDebuggerWidget() {
 
         this.chatLog.appendChild(typingDiv);
         this.chatLog.scrollTop = this.chatLog.scrollHeight;
+
+        return typingDiv;
     };
 
     /**
@@ -602,13 +604,31 @@ function AIDebuggerWidget() {
             return;
         }
 
+        this._removeTypingIndicator(null);
+    };
+
+    /**
+     * Removes a specific typing indicator, or all of them when none is given.
+     * A replacement indicator shown by a newer request is left alone.
+     * @param {HTMLElement|null} indicator - The indicator to remove.
+     * @private
+     */
+    this._removeTypingIndicator = function (indicator) {
+        if (!this.chatLog) {
+            return;
+        }
+
         const typingIndicators = this.chatLog.querySelectorAll(".typing-indicator");
-        typingIndicators.forEach(indicator => {
-            const animationId = indicator.getAttribute("data-animation-id");
+        typingIndicators.forEach(current => {
+            if (indicator !== null && current !== indicator) {
+                return;
+            }
+
+            const animationId = current.getAttribute("data-animation-id");
             if (animationId) {
                 clearInterval(parseInt(animationId, 10));
             }
-            indicator.remove();
+            current.remove();
         });
     };
 
@@ -781,7 +801,7 @@ function AIDebuggerWidget() {
         };
 
         // Show typing indicator during initialization
-        this._showTypingIndicator();
+        const typingIndicator = this._showTypingIndicator();
 
         this._postToBackend(initPayload)
             .then(data => {
@@ -813,7 +833,7 @@ function AIDebuggerWidget() {
                     return;
                 }
 
-                this._hideTypingIndicator();
+                this._removeTypingIndicator(typingIndicator);
                 this.activity.textMsg(_("Server error: Failed to initialize AI debugger."));
 
                 if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -832,7 +852,7 @@ function AIDebuggerWidget() {
                 this._addWelcomeMessage();
             })
             .finally(() => {
-                this._hideTypingIndicator();
+                this._removeTypingIndicator(typingIndicator);
             });
     };
 
@@ -845,7 +865,7 @@ function AIDebuggerWidget() {
         this.chatHistory = [];
         this.promptCount = 0; // Reset prompt count
         this.conversationId = this._generateConversationId();
-        this._hideTypingIndicator();
+        this._removeTypingIndicator(null);
         this.chatLog.replaceChildren();
 
         this._loadProjectAndInitialize();

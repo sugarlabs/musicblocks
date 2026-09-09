@@ -28,6 +28,7 @@ class ReflectionMatrix {
     static INNERWINDOWWIDTH = 730;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
+    static REQUEST_TIMEOUT = 30000;
 
     constructor() {
         /**
@@ -98,6 +99,12 @@ class ReflectionMatrix {
         this.isProcessingPendingMessage = false;
 
         /**
+         * Whether a project-code refresh is in flight
+         * @type {boolean}
+         */
+        this._isUpdatingProjectCode = false;
+
+        /**
          * Tracks whether the widget is mounted and can still update UI safely
          * @type {boolean}
          */
@@ -137,6 +144,7 @@ class ReflectionMatrix {
             this._abortPendingRequests();
             this.pendingMessages = [];
             this.isProcessingPendingMessage = false;
+            this._isUpdatingProjectCode = false;
             widgetWindow.destroy();
         };
 
@@ -313,6 +321,8 @@ class ReflectionMatrix {
      */
     async _postJSON(path, payload) {
         const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+        let timeoutId = null;
+        let timedOut = false;
 
         if (controller) {
             this._pendingRequests.add(controller);
@@ -327,6 +337,10 @@ class ReflectionMatrix {
 
             if (controller) {
                 request.signal = controller.signal;
+                timeoutId = setTimeout(() => {
+                    timedOut = true;
+                    controller.abort();
+                }, ReflectionMatrix.REQUEST_TIMEOUT);
             }
 
             const response = await fetch(`${this.PORT}${path}`, request);
@@ -334,12 +348,20 @@ class ReflectionMatrix {
             return data;
         } catch (error) {
             if (error && error.name === "AbortError") {
+                if (timedOut) {
+                    return { error: "Failed to send message" };
+                }
+
                 return null;
             }
 
             console.error("Error :", error);
             return { error: "Failed to send message" };
         } finally {
+            if (timeoutId !== null) {
+                clearTimeout(timeoutId);
+            }
+
             if (controller) {
                 this._pendingRequests.delete(controller);
             }
@@ -513,6 +535,7 @@ class ReflectionMatrix {
         this.hideTypingIndicator();
 
         if (!this._isWidgetActive() || !data) {
+            this.triggerFirst = false;
             return;
         }
 
@@ -531,32 +554,38 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async updateProjectCode() {
-        if (this.typingDiv || !this._isWidgetActive()) {
+        if (this.typingDiv || this._isUpdatingProjectCode || !this._isWidgetActive()) {
             return;
         }
 
-        const code = await this.activity.prepareExport();
-        if (code === this.code) {
-            this.activity.textMsg(_("No changes were detected in your project."), 2500);
-            return; // No changes in code
-        }
+        this._isUpdatingProjectCode = true;
 
-        this.showTypingIndicator("Reading code");
-        const data = await this.generateNewAlgorithm(code);
-        this.hideTypingIndicator();
-
-        if (!this._isWidgetActive() || !data) {
-            return;
-        }
-
-        if (!data.error) {
-            if (data.algorithm !== "unchanged") {
-                this.projectAlgorithm = data.algorithm; // update algorithm
-                this.code = code;
+        try {
+            const code = await this.activity.prepareExport();
+            if (code === this.code) {
+                this.activity.textMsg(_("No changes were detected in your project."), 2500);
+                return; // No changes in code
             }
-            this.botReplyDiv(data, false, false);
-        } else {
-            this.activity.errorMsg(_(data.error), 3000);
+
+            this.showTypingIndicator("Reading code");
+            const data = await this.generateNewAlgorithm(code);
+            this.hideTypingIndicator();
+
+            if (!this._isWidgetActive() || !data) {
+                return;
+            }
+
+            if (!data.error) {
+                if (data.algorithm !== "unchanged") {
+                    this.projectAlgorithm = data.algorithm; // update algorithm
+                    this.code = code;
+                }
+                this.botReplyDiv(data, false, false);
+            } else {
+                this.activity.errorMsg(_(data.error), 3000);
+            }
+        } finally {
+            this._isUpdatingProjectCode = false;
         }
     }
 

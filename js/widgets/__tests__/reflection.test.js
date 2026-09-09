@@ -158,6 +158,7 @@ describe("ReflectionMatrix", () => {
             expect(reflection._isMounted).toBe(false);
             expect(mockActivity.isInputON).toBe(false);
             expect(abortSpy).toHaveBeenCalled();
+            expect(reflection._pendingRequests.size).toBe(0);
             expect(reflection.pendingMessages).toEqual([]);
             expect(reflection.isProcessingPendingMessage).toBe(false);
             expect(mockWidgetWindow.destroy).toHaveBeenCalled();
@@ -395,6 +396,7 @@ describe("ReflectionMatrix", () => {
                 expect.objectContaining({
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
+                    signal: expect.anything(),
                     body: JSON.stringify({ code: "some_code" })
                 })
             );
@@ -718,12 +720,95 @@ describe("ReflectionMatrix", () => {
 
         test("updateProjectCode ignores repeat clicks while a request is in flight", async () => {
             reflection.code = "old_code";
-            reflection.typingDiv = document.createElement("div");
-            const generateSpy = jest.spyOn(reflection, "generateNewAlgorithm");
+            reflection.inputContainer = document.createElement("div");
+
+            let resolveExport;
+            mockActivity.prepareExport.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveExport = resolve;
+                    })
+            );
+            const generateSpy = jest
+                .spyOn(reflection, "generateNewAlgorithm")
+                .mockResolvedValue({ algorithm: "new_alg", response: "Updated" });
+
+            const first = reflection.updateProjectCode();
+            const second = reflection.updateProjectCode();
+
+            resolveExport("new_code");
+            await Promise.all([first, second]);
+
+            expect(generateSpy).toHaveBeenCalledTimes(1);
+            expect(reflection._isUpdatingProjectCode).toBe(false);
+        });
+
+        test("updateProjectCode releases the in-flight flag on error", async () => {
+            reflection.code = "old_code";
+            reflection.inputContainer = document.createElement("div");
+            mockActivity.prepareExport.mockResolvedValue("new_code");
+            jest.spyOn(reflection, "generateNewAlgorithm").mockResolvedValue(null);
 
             await reflection.updateProjectCode();
 
-            expect(generateSpy).not.toHaveBeenCalled();
+            expect(reflection._isUpdatingProjectCode).toBe(false);
+        });
+
+        test("startChatSession can start a new session after an aborted request", async () => {
+            reflection.inputContainer = document.createElement("div");
+
+            let resolveFetch;
+            mockActivity.prepareExport.mockResolvedValue("mocked_code");
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            const first = reflection.startChatSession();
+            await Promise.resolve();
+            reflection._isMounted = false;
+            reflection.isOpen = false;
+            resolveFetch({ json: jest.fn().mockResolvedValue({ response: "Late" }) });
+            await first;
+
+            expect(reflection.triggerFirst).toBe(false);
+
+            reflection._isMounted = true;
+            reflection.isOpen = true;
+            global.fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue({ algorithm: "alg", response: "Hello" })
+            });
+
+            await reflection.startChatSession();
+
+            expect(reflection.triggerFirst).toBe(true);
+            expect(reflection.projectAlgorithm).toBe("alg");
+        });
+
+        test("_postJSON aborts the request when it times out", async () => {
+            const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            global.fetch.mockImplementation(
+                (url, request) =>
+                    new Promise((resolve, reject) => {
+                        request.signal.addEventListener("abort", () => {
+                            const error = new Error("The operation was aborted");
+                            error.name = "AbortError";
+                            reject(error);
+                        });
+                    })
+            );
+
+            const dataPromise = reflection.generateAlgorithm("some_code");
+            jest.advanceTimersByTime(ReflectionMatrix.REQUEST_TIMEOUT + 1);
+            const data = await dataPromise;
+
+            expect(data).toEqual({ error: "Failed to send message" });
+            expect(reflection._pendingRequests.size).toBe(0);
+
+            consoleSpy.mockRestore();
         });
 
         test("getAnalysis ignores repeat clicks while a request is in flight", async () => {
