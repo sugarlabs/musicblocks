@@ -67,7 +67,8 @@ class StatusMatrix {
 
         cell.textContent = "\u00A0";
         // One column per mouse/turtle
-        for (const turtle of this.activity.turtles.turtleList) {
+        const turtleList = this.activity?.turtles?.turtleList || [];
+        for (const turtle of turtleList) {
             if (turtle.inTrash) {
                 continue;
             }
@@ -124,12 +125,16 @@ class StatusMatrix {
 
         // One row per field, one column per mouse (plus the labels)
         let label;
-        for (const statusField of this.activity.logo.statusFields) {
+        const statusFields = this.activity?.logo?.statusFields || [];
+        const blockList = this.activity?.blocks?.blockList || {};
+        for (const statusField of statusFields) {
             const row = header.insertRow();
 
             cell = row.insertCell(); // i + 1);
             cell.style.fontSize =
                 Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+
+            const block = blockList[statusField[0]];
 
             switch (statusField[1]) {
                 case "plus":
@@ -144,7 +149,7 @@ class StatusMatrix {
                     label = "";
                     break;
                 case "namedbox":
-                    label = this.activity.blocks.blockList[statusField[0]].privateData;
+                    label = block?.privateData || "";
                     break;
                 case "heap":
                     label = _("heap");
@@ -154,25 +159,20 @@ class StatusMatrix {
                     if (localStorage.languagePreference === "ja") {
                         label = _("beats per minute2");
                     } else {
-                        label =
-                            this.activity.blocks.blockList[statusField[0]].protoblock
-                                .staticLabels[0];
+                        label = block?.protoblock?.staticLabels?.[0] || "";
                     }
                     break;
                 case "outputtools":
-                    label = this.activity.blocks.blockList[statusField[0]].privateData;
+                    label = block?.privateData;
                     if (typeof label === "object" && label !== null && label.value) {
                         label = label.value;
                     }
                     if (label === null || label === undefined) {
-                        label =
-                            this.activity.blocks.blockList[statusField[0]].protoblock
-                                .staticLabels[0];
+                        label = block?.protoblock?.staticLabels?.[0] || "";
                     }
                     label = _(label);
                     break;
                 default: {
-                    const block = this.activity.blocks.blockList[statusField[0]];
                     label = block?.protoblock?.staticLabels?.[0] || "";
                     break;
                 }
@@ -193,7 +193,7 @@ class StatusMatrix {
             cell.style.backgroundColor = selectorBg;
             cell.style.color = selectorText;
             cell.style.paddingLeft = "10px";
-            for (const turtle of this.activity.turtles.turtleList) {
+            for (const turtle of turtleList) {
                 if (turtle.inTrash) {
                     continue;
                 }
@@ -225,7 +225,7 @@ class StatusMatrix {
             cell.style.backgroundColor = selectorBg;
             cell.style.color = selectorText;
             cell.style.paddingLeft = "10px";
-            for (const turtle of this.activity.turtles.turtleList) {
+            for (const turtle of turtleList) {
                 if (turtle.inTrash) {
                     continue;
                 }
@@ -279,15 +279,22 @@ class StatusMatrix {
         }
 
         // Update status of all of the voices in the matrix.
-        this.activity.logo.updatingStatusMatrix = true;
+        if (this.activity?.logo) {
+            this.activity.logo.updatingStatusMatrix = true;
+        }
 
         let activeTurtles = 0;
         let cell;
-        const turtleList = this.activity.turtles.turtleList;
+        const turtleList = this.activity?.turtles?.turtleList || [];
+        const blockList = this.activity?.blocks?.blockList || {};
+        const statusFields = this.activity?.logo?.statusFields || [];
+
         for (let t = 0; t < turtleList.length; t++) {
             const turtle = turtleList[t];
-            const tur = this.activity.turtles.ithTurtle(t);
-            if (turtle.inTrash) {
+            const tur = this.activity?.turtles?.ithTurtle
+                ? this.activity.turtles.ithTurtle(t)
+                : turtle;
+            if (turtle?.inTrash) {
                 continue;
             }
 
@@ -299,66 +306,92 @@ class StatusMatrix {
             let noteValue;
             let freq;
             let i = 0;
-            for (const statusField of this.activity.logo.statusFields) {
-                saveStatus = this.activity.logo.inStatusMatrix;
-                this.activity.logo.inStatusMatrix = false;
+            for (const statusField of statusFields) {
+                const block = blockList[statusField[0]];
+                if (!block) {
+                    cell = this._statusTable.rows?.[i + 1]?.cells?.[activeTurtles + 1];
+                    if (cell !== null && cell !== undefined) {
+                        cell.textContent = "";
+                    }
+                    i++;
+                    continue;
+                }
 
-                this.activity.logo.parseArg(this.activity.logo, t, statusField[0]);
-                switch (this.activity.blocks.blockList[statusField[0]].name) {
+                saveStatus = this.activity?.logo?.inStatusMatrix;
+                if (this.activity?.logo) {
+                    this.activity.logo.inStatusMatrix = false;
+                    if (typeof this.activity.logo.parseArg === "function") {
+                        this.activity.logo.parseArg(this.activity.logo, t, statusField[0]);
+                    }
+                }
+
+                switch (block.name) {
                     case "x":
                     case "y":
                     case "heading":
-                        value = this.activity.blocks.blockList[statusField[0]].value.toFixed(0);
+                        value = typeof block.value === "number" ? block.value.toFixed(0) : "";
                         break;
                     case "mynotevalue":
-                        value = mixedNumber(this.activity.blocks.blockList[statusField[0]].value);
+                        value = mixedNumber(block.value);
                         break;
                     case "elapsednotes2":
                         blk = statusField[0];
-                        cblk = this.activity.blocks.blockList[blk].connections[1];
-                        noteValue = this.activity.logo.parseArg(
-                            this.activity.logo,
-                            t,
-                            cblk,
-                            blk,
-                            null
-                        );
-                        value =
-                            mixedNumber(this.activity.blocks.blockList[statusField[0]].value) +
-                            " × " +
-                            mixedNumber(noteValue);
+                        cblk = block.connections?.[1];
+                        noteValue =
+                            cblk !== undefined &&
+                            cblk !== null &&
+                            typeof this.activity?.logo?.parseArg === "function"
+                                ? this.activity.logo.parseArg(
+                                      this.activity.logo,
+                                      t,
+                                      cblk,
+                                      blk,
+                                      null
+                                  )
+                                : 0;
+                        value = mixedNumber(block.value) + " × " + mixedNumber(noteValue);
                         break;
                     case "elapsednotes":
-                        value = mixedNumber(this.activity.blocks.blockList[statusField[0]].value);
+                        value = mixedNumber(block.value);
                         break;
                     case "namedbox":
-                        name = this.activity.blocks.blockList[statusField[0]].privateData;
-                        if (name in this.activity.logo.boxes) {
+                        name = block.privateData;
+                        if (
+                            name &&
+                            this.activity?.logo?.boxes &&
+                            name in this.activity.logo.boxes
+                        ) {
                             value = this.activity.logo.boxes[name];
                         } else {
                             value = "";
                         }
                         break;
                     case "beatvalue":
-                        value = mixedNumber(tur.singer.currentBeat);
+                        value = tur?.singer ? mixedNumber(tur.singer.currentBeat) : "";
                         break;
                     case "measurevalue":
-                        value = tur.singer.currentMeasure;
+                        value = tur?.singer?.currentMeasure ?? "";
                         break;
                     case "pitchinhertz":
                         value = "";
-                        if (tur.singer.noteStatus !== null) {
+                        if (tur?.singer?.noteStatus) {
                             notes = tur.singer.noteStatus[0];
-                            for (let j = 0; j < notes.length; j++) {
-                                if (j > 0) {
-                                    value += " ";
-                                }
-                                freq = this.activity.logo.synth.getFrequency(
-                                    notes[j],
-                                    this.activity.logo.synth.changeInTemperament
-                                );
-                                if (typeof freq === "number") {
-                                    value += freq.toFixed(2);
+                            if (Array.isArray(notes)) {
+                                for (let j = 0; j < notes.length; j++) {
+                                    if (j > 0) {
+                                        value += " ";
+                                    }
+                                    freq =
+                                        typeof this.activity?.logo?.synth?.getFrequency ===
+                                        "function"
+                                            ? this.activity.logo.synth.getFrequency(
+                                                  notes[j],
+                                                  this.activity.logo.synth.changeInTemperament
+                                              )
+                                            : null;
+                                    if (typeof freq === "number") {
+                                        value += freq.toFixed(2);
+                                    }
                                 }
                             }
                         } else {
@@ -366,18 +399,23 @@ class StatusMatrix {
                         }
                         break;
                     case "heap":
-                        value = this.activity.blocks.blockList[statusField[0]].value;
+                        value = block.value;
                         break;
                     default:
-                        value = this.activity.blocks.blockList[statusField[0]].value;
+                        value = block.value;
                         break;
                 }
 
-                this.activity.logo.inStatusMatrix = saveStatus;
+                if (this.activity?.logo) {
+                    this.activity.logo.inStatusMatrix = saveStatus;
+                }
 
                 cell = this._statusTable.rows?.[i + 1]?.cells?.[activeTurtles + 1];
                 if (cell !== null && cell !== undefined) {
-                    cell.textContent = value === "__INVALID_INPUT__" ? "" : value;
+                    cell.textContent =
+                        value === "__INVALID_INPUT__" || value === undefined || value === null
+                            ? ""
+                            : value;
                 }
                 i++;
             }
@@ -387,36 +425,42 @@ class StatusMatrix {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 note = "";
                 value = "";
-                if (tur.singer.noteStatus !== null) {
+                if (tur?.singer?.noteStatus) {
                     notes = tur.singer.noteStatus[0];
-                    const displayedNotes = [];
-                    const seenNotes = new Set();
-                    for (let j = 0; j < notes.length; j++) {
-                        const noteKey =
-                            typeof notes[j] === "number"
-                                ? "number:" + notes[j]
-                                : "note:" + notes[j];
-                        if (seenNotes.has(noteKey)) {
-                            continue;
+                    if (Array.isArray(notes)) {
+                        const displayedNotes = [];
+                        const seenNotes = new Set();
+                        for (let j = 0; j < notes.length; j++) {
+                            const noteKey =
+                                typeof notes[j] === "number"
+                                    ? "number:" + notes[j]
+                                    : "note:" + notes[j];
+                            if (seenNotes.has(noteKey)) {
+                                continue;
+                            }
+
+                            seenNotes.add(noteKey);
+                            displayedNotes.push(notes[j]);
                         }
 
-                        seenNotes.add(noteKey);
-                        displayedNotes.push(notes[j]);
-                    }
-
-                    for (let j = 0; j < displayedNotes.length; j++) {
-                        if (typeof displayedNotes[j] === "number") {
-                            note += toFixed2(displayedNotes[j]);
-                            note += "Hz ";
-                        } else {
-                            note += displayedNotes[j];
-                            note += " ";
+                        for (let j = 0; j < displayedNotes.length; j++) {
+                            if (typeof displayedNotes[j] === "number") {
+                                note += toFixed2(displayedNotes[j]);
+                                note += "Hz ";
+                            } else {
+                                note += displayedNotes[j];
+                                note += " ";
+                            }
                         }
                     }
 
                     value = tur.singer.noteStatus[1];
-                    obj = rationalToFraction(value);
-                    note += obj[1] + "/" + obj[0];
+                    if (value !== undefined && value !== null) {
+                        obj = rationalToFraction(value);
+                        if (obj && obj.length >= 2) {
+                            note += obj[1] + "/" + obj[0];
+                        }
+                    }
                 }
 
                 cell = this._statusTable.rows?.[i + 1]?.cells?.[activeTurtles + 1];
@@ -428,7 +472,9 @@ class StatusMatrix {
             activeTurtles += 1;
         }
 
-        this.activity.logo.updatingStatusMatrix = false;
+        if (this.activity?.logo) {
+            this.activity.logo.updatingStatusMatrix = false;
+        }
     }
 }
 if (typeof module !== "undefined") {
