@@ -130,7 +130,12 @@ describe("Temperament widget", () => {
         cy.get("@rowCount").then(rowCount => {
             cy.get("#tableOfNotes tr").should("have.length", rowCount);
             cy.get("#tableOfNotes tr").each($row => {
-                expect($row[0].cells.length).to.be.greaterThan(0);
+                // Cell 4 is the note name, the column fed by this.notes. A row
+                // that kept its cells but lost that text would still be the
+                // regression, so assert the note itself rather than the count.
+                const cells = $row[0].cells;
+                expect(cells.length).to.be.greaterThan(4);
+                expect(cells[4].textContent.trim()).to.not.equal("");
             });
         });
     });
