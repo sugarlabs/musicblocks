@@ -2601,10 +2601,13 @@ const TEMPERAMENT = {
         "description": "19 Equal Divisions of the Octave",
         "ratios": [
             1,
+            Math.pow(2, 1 / 19),
             Math.pow(2, 2 / 19),
             Math.pow(2, 3 / 19),
+            Math.pow(2, 4 / 19),
             Math.pow(2, 5 / 19),
             Math.pow(2, 6 / 19),
+            Math.pow(2, 7 / 19),
             Math.pow(2, 8 / 19),
             Math.pow(2, 9 / 19),
             Math.pow(2, 10 / 19),
@@ -2614,6 +2617,7 @@ const TEMPERAMENT = {
             Math.pow(2, 14 / 19),
             Math.pow(2, 15 / 19),
             Math.pow(2, 16 / 19),
+            Math.pow(2, 17 / 19),
             Math.pow(2, 18 / 19)
         ],
         "octaveRatio": 2,
@@ -4889,29 +4893,32 @@ const numberToPitchSharp = (i, temperament) => {
                 i += 12;
                 n += 1;
             }
-            const octave = Math.floor(i / 12) - n;
+            const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12) - n;
             const nameIndex = Math.round(((i % 12) / 12) * 12);
             return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
         } else {
-            const octave = Math.floor(i / 12);
+            const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12);
             const nameIndex = Math.round(((i % 12) / 12) * 12);
             return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
         }
     }
-    const t = TEMPERAMENT[temperament];
-    const edoNames = t && t.noteLabels ? t.noteLabels : generateNoteNames(currentEDO);
+    const edoNames = generateNoteNames(currentEDO);
+    let aIndex = edoNames.indexOf("A");
+    if (aIndex === -1) {
+        aIndex = Math.round((9 / 12) * currentEDO);
+    }
     if (i < 0) {
         let n = 0;
         while (i < 0) {
             i += currentEDO;
             n += 1;
         }
-        const octave = Math.floor(i / currentEDO) - n;
-        const nameIndex = i % currentEDO;
+        const octave = Math.floor((i + aIndex) / currentEDO) - n;
+        const nameIndex = (i + aIndex) % currentEDO;
         return [edoNames[nameIndex], octave];
     } else {
-        const octave = Math.floor(i / currentEDO);
-        const nameIndex = i % currentEDO;
+        const octave = Math.floor((i + aIndex) / currentEDO);
+        const nameIndex = (i + aIndex) % currentEDO;
         return [edoNames[nameIndex], octave];
     }
 };

@@ -1381,6 +1381,35 @@ describe("numberToPitchSharp", () => {
         expect(numberToPitchSharp(1)).toEqual(["A♯", 0]);
         expect(numberToPitchSharp(2)).toEqual(["B", 0]);
     });
+    it("round-trips all 12 pitch classes through pitchToNumber", () => {
+        const names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        for (const name of names) {
+            const pn = pitchToNumber(name, 4, "C major");
+            expect(numberToPitchSharp(pn)).toEqual([name.replace("#", SHARP), 4]);
+        }
+    });
+    it("round-trips natural notes across octaves, including negative octaves", () => {
+        for (let oct = -1; oct <= 6; oct++) {
+            expect(numberToPitchSharp(pitchToNumber("C", oct, "C major"))).toEqual(["C", oct]);
+            expect(numberToPitchSharp(pitchToNumber("A", oct, "C major"))).toEqual(["A", oct]);
+        }
+    });
+    it("round-trips through pitchToNumber in non-12-EDO and meantone temperaments", () => {
+        for (const edo of ["equal19", "equal31", "1/3 comma meantone", "1/4 comma meantone"]) {
+            expect(numberToPitchSharp(pitchToNumber("C", 4, "C major", edo), edo)).toEqual([
+                "C",
+                4
+            ]);
+            expect(numberToPitchSharp(pitchToNumber("A", 4, "C major", edo), edo)).toEqual([
+                "A",
+                4
+            ]);
+            expect(numberToPitchSharp(pitchToNumber("D", 4, "C major", edo), edo)).toEqual([
+                "D",
+                4
+            ]);
+        }
+    });
 });
 
 describe("getNumber", () => {
@@ -4174,6 +4203,55 @@ describe("non-EDO temperament helpers", () => {
         });
         it("returns null for a temperament without usable ratios", () => {
             expect(getNonEDOModeSteps("major", "_no_ratios")).toBeNull();
+        });
+
+        it("derives the textbook 19-EDO major scale", () => {
+            // In 19-EDO a whole tone is 3 steps and a diatonic semitone is 2,
+            // so major is T T S T T T S = 3,3,2,3,3,3,2 and sums to the octave.
+            const steps = getNonEDOModeSteps("major", "equal19");
+            expect(steps).toEqual([3, 3, 2, 3, 3, 3, 2]);
+            expect(steps.reduce((a, b) => a + b, 0)).toBe(19);
+        });
+
+        it("agrees with the other 19-note temperament", () => {
+            // 1/3 comma meantone also divides the octave into 19 and computes
+            // its steps from an independent ratio table, so the two must match.
+            expect(getNonEDOModeSteps("major", "equal19")).toEqual(
+                getNonEDOModeSteps("major", "1/3 comma meantone")
+            );
+        });
+    });
+
+    describe("temperament ratio tables", () => {
+        const withRatios = () =>
+            getTemperamentKeys()
+                .map(key => [key, getTemperament(key)])
+                .filter(([, t]) => t && Array.isArray(t.ratios) && t.pitchNumber);
+
+        it("gives every temperament one ratio per pitch", () => {
+            // equal19 shipped 15 ratios against a pitchNumber of 19, so anything
+            // reading ratios[pitchNumber - 1] fell off the end. Check them all
+            // rather than that one, so the next short table is caught here.
+            const mismatched = withRatios()
+                .filter(([, t]) => t.ratios.length !== t.pitchNumber)
+                .map(
+                    ([key, t]) => `${key}: ${t.ratios.length} ratios, pitchNumber ${t.pitchNumber}`
+                );
+            expect(mismatched).toEqual([]);
+        });
+
+        it("spaces every equal temperament evenly across the octave", () => {
+            for (const [key, t] of withRatios()) {
+                if (!t.isEDO) {
+                    continue;
+                }
+                const expected = [...Array(t.pitchNumber).keys()].map(i =>
+                    Math.pow(2, i / t.pitchNumber)
+                );
+                t.ratios.forEach((ratio, i) => {
+                    expect(Number(ratio)).toBeCloseTo(expected[i], 10);
+                });
+            }
         });
     });
 });
