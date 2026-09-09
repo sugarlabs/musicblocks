@@ -2072,3 +2072,130 @@ describe("_savePhrase chord block connection hierarchy", () => {
         expect(pitchBlocks[2][4][3]).toBeNull();
     });
 });
+
+describe("LegoWidget — _clearPhrase and _initializeMatrix safety (Issue #8609)", () => {
+    let legoWidget;
+
+    beforeEach(() => {
+        global._ = jest.fn(val => val);
+        global.platformColor = {
+            background: "#ffffff",
+            strokeColor: "#333333",
+            selectorSelected: "#0066FF",
+            textColor: "#000000",
+            selectorBackgroundHOFF: "#f8f8f8"
+        };
+        legoWidget = new LegoWidget();
+        legoWidget.activity = {
+            textMsg: jest.fn(),
+            hideMsgs: jest.fn()
+        };
+    });
+
+    afterEach(() => {
+        delete global._;
+        delete global.platformColor;
+    });
+
+    it("should execute _clearPhrase safely without throwing when matrixTable is undefined", () => {
+        expect(legoWidget.matrixTable).toBeUndefined();
+        expect(() => legoWidget._clearPhrase()).not.toThrow();
+        expect(legoWidget.activity.textMsg).toHaveBeenCalledWith("Phrase cleared");
+    });
+
+    it("should reset colorData, _notesToPlay, and hasGeneratedVisualization", () => {
+        legoWidget.colorData = [{ note: "C4", colorSegments: [{ color: "red", duration: 500 }] }];
+        legoWidget._notesToPlay = [{ noteValue: 1, pitches: [] }];
+        legoWidget.hasGeneratedVisualization = true;
+
+        legoWidget._clearPhrase();
+
+        expect(legoWidget.colorData).toEqual([]);
+        expect(legoWidget._notesToPlay).toEqual([]);
+        expect(legoWidget.hasGeneratedVisualization).toBe(false);
+    });
+
+    it("should stop active playback when isPlaying is true", () => {
+        legoWidget.isPlaying = true;
+        legoWidget._stopPlayback = jest.fn();
+
+        legoWidget._clearPhrase();
+
+        expect(legoWidget._stopPlayback).toHaveBeenCalled();
+        expect(legoWidget.hasGeneratedVisualization).toBe(false);
+    });
+
+    it("should remove column lines from gridOverlay", () => {
+        const overlay = document.createElement("div");
+        const colLine1 = document.createElement("div");
+        colLine1.className = "column-line";
+        const colLine2 = document.createElement("div");
+        colLine2.className = "column-line";
+        const otherEl = document.createElement("div");
+        otherEl.className = "grid-line";
+
+        overlay.appendChild(colLine1);
+        overlay.appendChild(colLine2);
+        overlay.appendChild(otherEl);
+
+        legoWidget.gridOverlay = overlay;
+
+        legoWidget._clearPhrase();
+
+        expect(overlay.querySelectorAll(".column-line")).toHaveLength(0);
+        expect(overlay.querySelectorAll(".grid-line")).toHaveLength(1);
+    });
+
+    it("should remove scanning lines from DOM and reset scanningLines to null", () => {
+        const parent = document.createElement("div");
+        const lineEl = document.createElement("div");
+        parent.appendChild(lineEl);
+
+        legoWidget.scanningLines = [{ element: lineEl, currentX: 10 }];
+
+        legoWidget._clearPhrase();
+
+        expect(lineEl.parentNode).toBeNull();
+        expect(legoWidget.scanningLines).toBeNull();
+    });
+
+    it("should clear matrixData.selectedCells when present", () => {
+        legoWidget.matrixData.selectedCells.add("cell-0-0");
+        expect(legoWidget.matrixData.selectedCells.size).toBe(1);
+
+        legoWidget._clearPhrase();
+
+        expect(legoWidget.matrixData.selectedCells.size).toBe(0);
+    });
+
+    it("should clear cells in matrixTable if matrixTable exists", () => {
+        const table = document.createElement("table");
+        const row = table.insertRow();
+        const cell = row.insertCell();
+        cell.setAttribute("data-cell-id", "0-0");
+        cell.style.backgroundColor = "red";
+        const dot = document.createElement("div");
+        dot.className = "cell-dot";
+        cell.appendChild(dot);
+
+        legoWidget.matrixTable = table;
+
+        legoWidget._clearPhrase();
+
+        expect(cell.style.backgroundColor).toBe("");
+        expect(cell.querySelector(".cell-dot")).toBeNull();
+    });
+
+    it("should handle missing activity and gridOverlay gracefully", () => {
+        legoWidget.activity = null;
+        legoWidget.gridOverlay = null;
+
+        expect(() => legoWidget._clearPhrase()).not.toThrow();
+        expect(legoWidget.colorData).toEqual([]);
+    });
+
+    it("should return early in _initializeMatrix without crashing when matrixTable is undefined", () => {
+        expect(legoWidget.matrixTable).toBeUndefined();
+        expect(() => legoWidget._initializeMatrix()).not.toThrow();
+    });
+});

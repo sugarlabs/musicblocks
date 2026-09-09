@@ -811,6 +811,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._initializeMatrix = function () {
+        if (!this.matrixTable) return;
         this.matrixTable.replaceChildren();
 
         this.matrixData.rows.forEach((rowData, rowIndex) => {
@@ -1213,19 +1214,50 @@ function LegoWidget() {
     };
 
     /**
-     * Clears all selected cells.
+     * Clears the current phrase, stopping playback and removing scanned data and overlay lines.
      * @private
      * @returns {void}
      */
     this._clearPhrase = function () {
-        this.matrixData.selectedCells.clear();
-        const selectedCells = this.matrixTable.querySelectorAll("[data-cell-id]");
-        selectedCells.forEach(cell => {
-            cell.style.backgroundColor = "";
-            const dot = cell.querySelector(".cell-dot");
-            if (dot) cell.removeChild(dot);
-        });
-        this.activity.textMsg(_("Phrase cleared"));
+        if (this.isPlaying) {
+            this.hasGeneratedVisualization = true;
+            this._stopPlayback();
+        }
+
+        if (this.scanningLines) {
+            this.scanningLines.forEach(line => {
+                if (line.element && line.element.parentNode) {
+                    line.element.parentNode.removeChild(line.element);
+                }
+            });
+            this.scanningLines = null;
+        }
+
+        if (this.gridOverlay) {
+            const columnLines = this.gridOverlay.querySelectorAll(".column-line");
+            columnLines.forEach(line => line.remove());
+        }
+
+        this.colorData = [];
+        this._notesToPlay = [];
+        this.hasGeneratedVisualization = false;
+
+        if (this.matrixData && this.matrixData.selectedCells) {
+            this.matrixData.selectedCells.clear();
+        }
+
+        if (this.matrixTable) {
+            const selectedCells = this.matrixTable.querySelectorAll("[data-cell-id]");
+            selectedCells.forEach(cell => {
+                cell.style.backgroundColor = "";
+                const dot = cell.querySelector(".cell-dot");
+                if (dot) cell.removeChild(dot);
+            });
+        }
+
+        if (this.activity && typeof this.activity.textMsg === "function") {
+            this.activity.textMsg(_("Phrase cleared"));
+        }
     };
 
     /**
