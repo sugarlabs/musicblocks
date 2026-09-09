@@ -177,40 +177,55 @@ const isInteractive = target => {
     return false;
 };
 
+const dismissActivePieMenu = () => {
+    if (
+        activeExitWheel &&
+        activeExitWheel.navItems &&
+        activeExitWheel.navItems[0] &&
+        typeof activeExitWheel.navItems[0].navigateFunction === "function"
+    ) {
+        activeExitWheel.navItems[0].navigateFunction();
+    } else {
+        for (let i = 0; i < PIE_MENU_CONTAINERS.length; i++) {
+            const div = docById(PIE_MENU_CONTAINERS[i]);
+            if (div && div.style && div.style.display !== "none") {
+                if (PIE_MENU_CONTAINERS[i] === "wheelDiv") {
+                    hideWheelDiv();
+                } else {
+                    div.style.display = "none";
+                }
+            }
+        }
+        const movable = docById("movable");
+        if (movable) {
+            movable.style.display = "none";
+        }
+    }
+    document.removeEventListener("mousedown", handleOutsideClick);
+    document.removeEventListener("keydown", handleEscapeKey, true);
+    activeExitWheel = null;
+};
+
 const handleOutsideClick = event => {
     if (!isAnyPieMenuVisible()) {
         return;
     }
 
     if (!isInteractive(event.target)) {
-        if (
-            activeExitWheel &&
-            activeExitWheel.navItems &&
-            activeExitWheel.navItems[0] &&
-            typeof activeExitWheel.navItems[0].navigateFunction === "function"
-        ) {
-            activeExitWheel.navItems[0].navigateFunction();
-            document.removeEventListener("mousedown", handleOutsideClick);
-            activeExitWheel = null;
-        } else {
-            for (let i = 0; i < PIE_MENU_CONTAINERS.length; i++) {
-                const div = docById(PIE_MENU_CONTAINERS[i]);
-                if (div && div.style && div.style.display !== "none") {
-                    if (PIE_MENU_CONTAINERS[i] === "wheelDiv") {
-                        hideWheelDiv();
-                    } else {
-                        div.style.display = "none";
-                    }
-                }
-            }
-            const movable = docById("movable");
-            if (movable) {
-                movable.style.display = "none";
-            }
-            document.removeEventListener("mousedown", handleOutsideClick);
-            activeExitWheel = null;
-        }
+        dismissActivePieMenu();
     }
+};
+
+// Capture-phase Escape handler: keyboard-controller disables all of its own
+// shortcuts while a pie menu is open, so without this a keyboard user has no
+// way to close the menu at all.
+const handleEscapeKey = event => {
+    if (event.key !== "Escape" || !isAnyPieMenuVisible()) {
+        return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    dismissActivePieMenu();
 };
 
 const showWheelDiv = () => {
@@ -222,6 +237,7 @@ const showWheelDiv = () => {
     setTimeout(() => {
         if (isAnyPieMenuVisible()) {
             document.addEventListener("mousedown", handleOutsideClick);
+            document.addEventListener("keydown", handleEscapeKey, true);
         }
     }, 50);
 
@@ -234,8 +250,16 @@ const hideWheelDiv = () => {
     wheelDiv.style.display = "none";
     disableWheelResizeHandling();
 
+    // enableWheelScroll() hangs this listener on the persistent wheelDiv, so it
+    // outlives the wheel and block it closes over unless we take it off here.
+    if (wheelDiv._scrollHandler) {
+        wheelDiv.removeEventListener("wheel", wheelDiv._scrollHandler);
+        wheelDiv._scrollHandler = null;
+    }
+
     if (!isAnyPieMenuVisible()) {
         document.removeEventListener("mousedown", handleOutsideClick);
+        document.removeEventListener("keydown", handleEscapeKey, true);
         activeExitWheel = null;
     }
 
@@ -319,10 +343,11 @@ const configureExitWheel = exitWheel => {
     }
     activeExitWheel = exitWheel;
 
-    // Register mousedown listener after 50ms if any pie menu is visible
+    // Register dismissal listeners after 50ms if any pie menu is visible
     setTimeout(() => {
         if (isAnyPieMenuVisible()) {
             document.addEventListener("mousedown", handleOutsideClick);
+            document.addEventListener("keydown", handleEscapeKey, true);
         }
     }, 50);
 
@@ -349,6 +374,7 @@ const configureExitWheel = exitWheel => {
             item.navigateFunction();
         }
         document.removeEventListener("mousedown", handleOutsideClick);
+        document.removeEventListener("keydown", handleEscapeKey, true);
         if (activeExitWheel === exitWheel) {
             activeExitWheel = null;
         }
@@ -3130,6 +3156,10 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
         that.updateCache();
     };
 
+    // A preview of an unloaded voice is deferred to give the synth time to
+    // load. Held here so the exit handler can cancel one that is still pending.
+    let voicePreviewTimeout = null;
+
     /*
      * Preview voice
      * @return{void}
@@ -3154,7 +3184,9 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
             timeout = 500;
         }
 
-        setTimeout(() => {
+        clearTimeout(voicePreviewTimeout);
+        voicePreviewTimeout = setTimeout(() => {
+            voicePreviewTimeout = null;
             Singer.setSynthVolume(that.activity.logo, 0, voice, DEFAULTVOLUME);
             that.activity.logo.synth.trigger(0, "G4", 1 / 4, voice, null, null, false);
             that.activity.logo.synth.start();
@@ -3215,6 +3247,19 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
         hideWheelDiv();
+        // A preview scheduled just before the menu closed would otherwise play
+        // into a dismissed menu.
+        clearTimeout(voicePreviewTimeout);
+        voicePreviewTimeout = null;
+        // Remove the wheels so wheelnav detaches the window keydown listener it
+        // installs for keynavigateEnabled. Without this the closed menu keeps
+        // responding to the arrow keys.
+        that._voiceWheel.removeWheel();
+        that._exitWheel.removeWheel();
+        // The pie menu covers the canvas, so the block never receives the
+        // mouseout that would normally clear this. Left set, the arrow keys
+        // move the block instead of doing nothing.
+        that.blocks.activeBlock = null;
     };
 };
 
@@ -4481,5 +4526,16 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches, piemenuIntervals, piemenuKey, piemenuNumber, piemenuModes };
+    module.exports = {
+        piemenuPitches,
+        piemenuIntervals,
+        piemenuKey,
+        piemenuNumber,
+        piemenuModes,
+        piemenuVoices,
+        handleEscapeKey,
+        dismissActivePieMenu,
+        showWheelDiv,
+        hideWheelDiv
+    };
 }

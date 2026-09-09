@@ -624,6 +624,64 @@ describe("JSEditor", () => {
             expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
         });
 
+        test("_codeToBlocks falls back to require when config is not yet on window", async () => {
+            const editor = createEditor();
+            window.ast2blocklist_config = undefined;
+            global.ast2blocklist_config = undefined;
+            window.ast2blocklist_config_ready = undefined;
+            acorn.parse.mockReturnValue(ast);
+            AST2BlockList.toBlockList.mockReturnValue([[0, "start", 0, 0, [null, null, null]]]);
+
+            window.require = jest.fn((deps, callback) => {
+                window.ast2blocklist_config = { fromRequire: true };
+                callback();
+            });
+
+            await editor._codeToBlocks();
+
+            expect(window.require).toHaveBeenCalledWith(
+                ["activity/js-export/ast2blocks.config"],
+                expect.any(Function),
+                expect.any(Function)
+            );
+            expect(AST2BlockList.toBlockList).toHaveBeenCalledWith(ast, { fromRequire: true });
+            delete window.require;
+        });
+
+        test("_codeToBlocks handles require failure gracefully and sets config_failed", async () => {
+            const editor = createEditor();
+            window.ast2blocklist_config = undefined;
+            global.ast2blocklist_config = undefined;
+            window.ast2blocklist_config_ready = undefined;
+            window.ast2blocklist_config_failed = false;
+
+            window.require = jest.fn((deps, callback, errback) => {
+                errback(new Error("require failed"));
+            });
+
+            await expect(editor._codeToBlocks()).rejects.toThrow(
+                "JavaScript block conversion is unavailable because its configuration file failed to load."
+            );
+
+            expect(window.ast2blocklist_config_failed).toBe(true);
+            expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
+            expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
+            delete window.require;
+        });
+
+        test("_codeToBlocks throws error when no valid blocks are generated", async () => {
+            const editor = createEditor();
+            global.ast2blocklist_config = { loaded: true };
+            window.ast2blocklist_config_ready = Promise.resolve(global.ast2blocklist_config);
+            acorn.parse.mockReturnValue(ast);
+            AST2BlockList.toBlockList.mockReturnValue([]);
+
+            await expect(editor._codeToBlocks()).rejects.toThrow(
+                "No valid blocks could be generated from the code."
+            );
+            expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
+        });
+
         test("_runCode does nothing when _showingHelp is true", async () => {
             const editor = createEditor();
             editor._showingHelp = true;

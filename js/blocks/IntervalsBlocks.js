@@ -478,7 +478,7 @@ function setupIntervalsBlocks(activity) {
 
             // Restore previous state
             logo.boxes = saveBoxes;
-            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? [];
             logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
             tur.painter.doPenUp();
@@ -599,7 +599,7 @@ function setupIntervalsBlocks(activity) {
 
             // Restore previous state
             logo.boxes = saveBoxes;
-            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? [];
             logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
             tur.painter.doPenUp();

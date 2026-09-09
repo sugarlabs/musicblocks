@@ -95,7 +95,7 @@
         overlay.style.top = "0";
         overlay.style.width = "100vw";
         overlay.style.height = "100vh";
-        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.35)";
+        overlay.style.backgroundColor = "var(--color-overlay-backdrop)";
         overlay.style.zIndex = "10000";
 
         const frame = document.createElement("div");
@@ -107,8 +107,8 @@
         frame.style.maxWidth = "640px";
         frame.style.minWidth = "320px";
         frame.style.zIndex = "10001";
-        frame.style.backgroundColor = "var(--bg)";
-        frame.style.borderColor = "var(--border)";
+        frame.style.backgroundColor = "var(--color-widget-frame-bg)";
+        frame.style.borderColor = "var(--color-widget-frame-border)";
 
         const topBar = document.createElement("div");
         topBar.className = "wfTopBar";
@@ -139,8 +139,8 @@
         widget.style.flexDirection = "column";
         widget.style.gap = "16px";
         widget.style.minWidth = "0";
-        widget.style.backgroundColor = "var(--panel-bg)";
-        widget.style.color = "var(--fg)";
+        widget.style.backgroundColor = "var(--color-panel-bg)";
+        widget.style.color = "var(--color-text-primary)";
 
         const message = document.createElement("div");
         message.textContent = options.message || "";
@@ -315,9 +315,9 @@
                 input.style.width = "100%";
                 input.style.padding = "8px";
                 input.style.borderRadius = "4px";
-                input.style.border = "1px solid var(--border)";
-                input.style.backgroundColor = "var(--bg)";
-                input.style.color = "var(--fg)";
+                input.style.border = "1px solid var(--color-border-primary)";
+                input.style.backgroundColor = "var(--color-bg-primary)";
+                input.style.color = "var(--color-text-primary)";
                 input.style.boxSizing = "border-box";
 
                 const finish = value => {

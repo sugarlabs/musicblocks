@@ -78,10 +78,48 @@ describe("base64Utils", () => {
         expect(decoded).toBe(original);
     });
 
+    test("base64Encode produces standard UTF-8 Base64 for multibyte input", () => {
+        expect(base64Utils.base64Encode("Hello 世界 🎵")).toBe("SGVsbG8g5LiW55WMIPCfjrU=");
+        expect(base64Utils.base64Encode("café")).toBe("Y2Fmw6k=");
+        expect(base64Utils.base64Encode("日本語")).toBe("5pel5pys6Kqe");
+    });
+
+    test("base64Decode is the inverse of base64Encode across representative inputs", () => {
+        const samples = [
+            "",
+            "a",
+            "ab",
+            "abc",
+            "The quick brown fox jumps over the lazy dog.",
+            "line1\nline2\ttabbed",
+            "<svg>♪</svg>",
+            "Hello 世界 🎵 こんにちは नमस्ते",
+            // Larger than the ~128KB threshold at which a spread-based byte
+            // conversion would overflow the call stack (see js/base64Utils.js).
+            "x".repeat(200000)
+        ];
+        for (const original of samples) {
+            expect(base64Utils.base64Decode(base64Utils.base64Encode(original))).toBe(original);
+        }
+    });
+
+    test("base64Encode output contains only Base64 alphabet characters", () => {
+        const encoded = base64Utils.base64Encode("Hello 世界 🎵 padding-check!!");
+        expect(encoded).toMatch(/^[A-Za-z0-9+/]*={0,2}$/);
+    });
+
     test("base64Decode delegates to window.atob for invalid input handling", () => {
         // base64Decode does not validate input itself; behavior is runtime-dependent.
         // window.atob may throw or handle invalid input differently per environment.
         const validResult = base64Utils.base64Decode("aGVsbG8=");
         expect(validResult).toBe("hello");
+    });
+
+    test("base64Decode surfaces the runtime decode error for input outside the Base64 alphabet", () => {
+        // The function performs no validation of its own, so a decode failure
+        // from the platform (jsdom's atob here) propagates to the caller
+        // rather than being swallowed or returning a bogus string.
+        expect(() => base64Utils.base64Decode("!!!!")).toThrow();
+        expect(() => base64Utils.base64Decode("not valid base64$$")).toThrow();
     });
 });

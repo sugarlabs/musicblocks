@@ -594,22 +594,31 @@ class Activity {
                         this.selectionController.isDragging || this.selectionController.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
-                        // Recompute culling when container moved.
-                        if (
-                            this.blocks &&
-                            this.blocksContainer &&
-                            (this._lastCullContainerX !== this.blocksContainer.x ||
-                                this._lastCullContainerY !== this.blocksContainer.y)
-                        ) {
-                            this.blocks._updateViewportCulling();
-                            this._lastCullContainerX = this.blocksContainer.x;
-                            this._lastCullContainerY = this.blocksContainer.y;
-                        }
+                        try {
+                            // Recompute culling when container moved.
+                            if (
+                                this.blocks &&
+                                this.blocksContainer &&
+                                (this._lastCullContainerX !== this.blocksContainer.x ||
+                                    this._lastCullContainerY !== this.blocksContainer.y)
+                            ) {
+                                this.blocks._updateViewportCulling();
+                                this._lastCullContainerX = this.blocksContainer.x;
+                                this._lastCullContainerY = this.blocksContainer.y;
+                            }
 
-                        this.stage.update();
-                        this.stageDirty = false;
-                        // Continue the loop if there's work or ongoing interaction
-                        this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                            this.stage.update();
+                        } catch (err) {
+                            // Anything thrown here used to leave _renderLoopRunning set
+                            // with no frame queued, and _startRenderLoop() refuses to
+                            // restart on that flag, so the canvas stopped repainting for
+                            // the rest of the session. Report the frame and keep going.
+                            console.error("Music Blocks: render frame failed", err);
+                        } finally {
+                            this.stageDirty = false;
+                            // Continue the loop if there's work or ongoing interaction
+                            this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                        }
                     } else {
                         // Nothing to render — let the loop go idle
                         this._renderLoopRunning = false;
@@ -725,7 +734,6 @@ class Activity {
             const title = document.createElement("h2");
             title.textContent = _("Clear workspace");
             title.classList.add("modal-title");
-            title.style.color = platformColor.headingColor;
 
             modal.appendChild(title);
             const message = document.createElement("p");
@@ -739,8 +747,6 @@ class Activity {
             const confirmBtn = document.createElement("button");
             confirmBtn.classList.add("confirm-button");
             confirmBtn.textContent = _("Confirm");
-            confirmBtn.style.backgroundColor = platformColor.blueButton;
-            confirmBtn.style.color = platformColor.blueButtonText;
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";
             confirmBtn.style.padding = "8px 16px";
@@ -755,8 +761,6 @@ class Activity {
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
             cancelBtn.textContent = _("Cancel");
-            cancelBtn.style.backgroundColor = "#f1f1f1";
-            cancelBtn.style.color = "black";
             cancelBtn.style.border = "none";
             cancelBtn.style.borderRadius = "4px";
             cancelBtn.style.padding = "8px 16px";
@@ -991,7 +995,6 @@ class Activity {
                 activity.save.savePNG.bind(activity.save),
                 activity.save.saveWAV.bind(activity.save),
                 activity.save.saveLilypond.bind(activity.save),
-                activity.save.afterSaveLilypondLY.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
                 activity.save.saveBlockArtwork.bind(activity.save),
@@ -2102,6 +2105,16 @@ class Activity {
          * When turtle starts running change stop button to running state
          */
         this.onRunTurtle = () => {
+            // Logo calls this from runLogoCommands(), so it covers every way a
+            // project can start -- the toolbar buttons and a click on a Start
+            // block alike. The toolbar handlers highlight the stop button too,
+            // but not all of them do it up front: _doFastButton highlights
+            // after runFast(), and _doStepButton only when runStep() reports
+            // "started". This is what makes the button appear for the paths
+            // that never touch the toolbar at all. Where both run, the second
+            // call is harmless: highlightStop() only assigns display and color.
+            this.toolbar.highlightStop(window.platformColor.stopIconcolor);
+
             // TODO: plugin support
         };
 
@@ -2234,23 +2247,6 @@ class Activity {
          * @param {string|HTMLElement|DocumentFragment} msg - The message to display.
          * @param {number} [duration=60000] - Duration in milliseconds before message disappears.
          */
-        /**
-         * Ensures a visually hidden aria-live region exists for screen reader announcements.
-         * @returns {HTMLElement} The live region element.
-         */
-        const __ensureA11yLiveRegion = () => {
-            let region = document.getElementById("mbA11yLiveRegion");
-            if (region) return region;
-            region = document.createElement("div");
-            region.id = "mbA11yLiveRegion";
-            region.setAttribute("role", "status");
-            region.setAttribute("aria-live", "polite");
-            region.setAttribute("aria-atomic", "true");
-            region.style.cssText =
-                "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
-            document.body.appendChild(region);
-            return region;
-        };
         this.textMsg = (msg, duration = AlertController.MSG_TIMEOUT) => {
             if (this.msgText === null) {
                 // The container may not be ready yet, so do nothing.
@@ -2260,9 +2256,10 @@ class Activity {
             const showMsg = () => {
                 this.alertRenderer.showTextMsg(msg);
             };
-            // Announce to screen readers via aria-live region
+            // textMsg() also accepts an HTMLElement or a DocumentFragment, and
+            // announcing one of those would read out "[object HTMLDivElement]".
             if (msg && typeof msg === "string") {
-                __ensureA11yLiveRegion().textContent = msg;
+                announceToScreenReader(msg);
             }
 
             const hideMsg = () => {
@@ -2289,9 +2286,10 @@ class Activity {
                 return;
             }
 
-            // Announce errors to screen readers via aria-live region
+            // textMsg() also accepts an HTMLElement or a DocumentFragment, and
+            // announcing one of those would read out "[object HTMLDivElement]".
             if (msg && typeof msg === "string") {
-                __ensureA11yLiveRegion().textContent = msg;
+                announceToScreenReader(msg);
             }
 
             const showMsg = () => {

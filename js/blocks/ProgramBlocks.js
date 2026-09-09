@@ -19,6 +19,24 @@
 
 function setupProgramBlocks(activity) {
     /**
+     * Determines whether a dictionary key is a built-in turtle status property.
+     *
+     * @param {string} key - The dictionary key to check.
+     * @returns {boolean} True if the key represents a turtle status property, false otherwise.
+     */
+    function isTurtleStatusKey(key) {
+        return (
+            key === _("color") ||
+            key === _("shade") ||
+            key === _("grey") ||
+            key === _("pen size") ||
+            key === _("font") ||
+            key === _("heading") ||
+            key === "x" ||
+            key === "y"
+        );
+    }
+    /**
      * Represents a block that loads the heap from a web page in the logo programming language.
      * @extends {FlowBlock}
      */
@@ -432,16 +450,30 @@ function setupProgramBlocks(activity) {
                 } else {
                     try {
                         const d = JSON.parse(activity.blocks.blockList[c].value[1]);
+                        if (typeof d !== "object" || d === null || Array.isArray(d)) {
+                            throw new Error("not an object");
+                        }
                         // Is the dictionary the same as a turtle name?
                         const target = getTargetTurtle(activity.turtles, a);
                         if (target !== null) {
                             // Copy any internal entries now.
                             const k = Object.keys(d);
                             for (let i = 0; i < k.length; i++) {
-                                Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
+                                Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
+                                if (!isTurtleStatusKey(k[i])) {
+                                    if (
+                                        !Object.prototype.hasOwnProperty.call(
+                                            logo.turtleDicts[turtle],
+                                            target
+                                        )
+                                    ) {
+                                        logo.turtleDicts[turtle][target] = {};
+                                    }
+                                    logo.turtleDicts[turtle][target][k[i]] = d[k[i]];
+                                }
                             }
-                        } else if (!(a in logo.turtleDicts[turtle])) {
-                            logo.turtleDicts[turtle][a] = {};
+                        } else {
+                            logo.turtleDicts[turtle][a] = d;
                         }
                     } catch (e) {
                         activity.errorMsg(
@@ -535,16 +567,30 @@ function setupProgramBlocks(activity) {
             if (c !== null) {
                 try {
                     const d = JSON.parse(activity.blocks.blockList[c].value);
+                    if (typeof d !== "object" || d === null || Array.isArray(d)) {
+                        throw new Error("not an object");
+                    }
                     // Is the dictionary the same as a turtle name?
                     const target = getTargetTurtle(activity.turtles, a);
                     if (target !== null) {
                         // Copy any internal entries now.
                         const k = Object.keys(d);
                         for (let i = 0; i < k.length; i++) {
-                            Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
+                            Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
+                            if (!isTurtleStatusKey(k[i])) {
+                                if (
+                                    !Object.prototype.hasOwnProperty.call(
+                                        logo.turtleDicts[turtle],
+                                        target
+                                    )
+                                ) {
+                                    logo.turtleDicts[turtle][target] = {};
+                                }
+                                logo.turtleDicts[turtle][target][k[i]] = d[k[i]];
+                            }
                         }
-                    } else if (!(a in logo.turtleDicts[turtle])) {
-                        logo.turtleDicts[turtle][a] = {};
+                    } else {
+                        logo.turtleDicts[turtle][a] = d;
                     }
                 } catch (e) {
                     activity.errorMsg(
@@ -704,9 +750,14 @@ function setupProgramBlocks(activity) {
             // Is the dictionary the same as a turtle name?
             const target = getTargetTurtle(activity.turtles, a);
             if (target === null) {
+                const dictData =
+                    Object.prototype.hasOwnProperty.call(logo.turtleDicts[turtle], a) &&
+                    logo.turtleDicts[turtle][a] !== undefined
+                        ? logo.turtleDicts[turtle][a]
+                        : {};
                 activity.save.download(
                     "json",
-                    "data:text/json;charset-utf-8," + JSON.stringify(logo.turtleDicts[turtle][a]),
+                    "data:text/json;charset-utf-8," + JSON.stringify(dictData),
                     args[1]
                 );
             } else {

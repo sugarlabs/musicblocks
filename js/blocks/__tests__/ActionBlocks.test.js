@@ -352,7 +352,7 @@ describe("ActionBlocks", () => {
     });
 
     describe("ListenBlock", () => {
-        test("sets up listener when action exists", () => {
+        test("sets up a persistent listener when action exists (#8367: must survive stop/completion)", () => {
             const block = getBlock("listen");
             logo.actions["testAction"] = [];
 
@@ -361,7 +361,8 @@ describe("ActionBlocks", () => {
             expect(logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
                 expect.any(String),
-                expect.any(Function)
+                expect.any(Function),
+                true
             );
         });
 

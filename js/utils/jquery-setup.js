@@ -62,3 +62,43 @@ window.fixSearchAutocompletePosition = function () {
     instance._mbPositionFixApplied = true;
     return true;
 };
+
+// Keep Materialize's tooltip re-initialisation from breaking Velocity.
+//
+// Re-initialising a tooltip (every `$(".tooltipped").tooltip({...})` call, and
+// every click on a tooltipped element) starts by destroying the existing
+// tooltip node with jQuery's .remove(). That runs jQuery.cleanData(), which
+// wipes the node's "velocity" data.
+//
+// Materialize fades a tooltip in with
+//     $tooltip.velocity({ opacity: 1 }, { duration: 300, delay: 50, queue: false })
+// and Velocity 1.2.2 defers a delayed, unqueued tween with a bare setTimeout
+// whose handle it never stores -- neither velocity("stop") nor .remove() can
+// cancel it. If the node is destroyed inside that 50 ms window, the tween
+// still fires and Velocity reads Data(element).tweensContainer unguarded:
+//     Uncaught TypeError: Cannot read properties of undefined
+//                         (reading 'tweensContainer')
+// Clicking a tooltipped button while its tooltip is fading in is enough to hit
+// this -- picking a theme from the theme dropdown does it almost every time,
+// because the pointer lands on the dropdown item an instant before the click.
+//
+// Detaching the node natively instead leaves its Velocity state intact, so the
+// orphaned tween completes harmlessly on a node that is already out of the
+// document. Materialize's own .remove() then matches nothing and is a no-op.
+// The "remove" command is passed through untouched so that disableTooltips()
+// still tears tooltips down completely.
+(function () {
+    const originalTooltip = jQuery.fn.tooltip;
+
+    jQuery.fn.tooltip = function (options) {
+        if (options !== "remove") {
+            this.each(function () {
+                const id = this.getAttribute("data-tooltip-id");
+                const node = id && document.getElementById(id);
+                // Native ChildNode.remove(): does not touch jQuery data.
+                if (node) node.remove();
+            });
+        }
+        return originalTooltip.apply(this, arguments);
+    };
+})();

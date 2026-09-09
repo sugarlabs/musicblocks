@@ -475,6 +475,20 @@ Turtles.TurtlesModel = class {
                 turtle.interval = undefined;
             }
 
+            // addTurtle() attaches three children to the stage for every
+            // turtle: imageContainer, penstrokes and container. Detach them
+            // here, otherwise a removed turtle keeps costing a display-list
+            // walk on every frame and cannot be garbage collected. Anything
+            // the turtle drew or displayed also stays on screen.
+            const turtlesStage = this._stage;
+            if (turtlesStage) {
+                for (const child of [turtle.imageContainer, turtle.penstrokes, turtle.container]) {
+                    if (child) {
+                        turtlesStage.removeChild(child);
+                    }
+                }
+            }
+
             this._turtleList.splice(index, 1);
         }
     }
@@ -1199,7 +1213,13 @@ Turtles.TurtlesView = class {
         const __makeAllButtons = () => {
             let second = false;
             if (docById("buttoncontainerTOP")) {
-                window.jQuery(".tooltipped").tooltip("close");
+                // "remove" is the only teardown Materialize recognises. It
+                // deletes the tooltip nodes and unbinds the hover handlers,
+                // which matters because the buttons below are about to be
+                // destroyed and would otherwise leave their tooltip nodes
+                // orphaned in the body. Every tooltipped element is
+                // re-initialised at the end of this function.
+                window.jQuery(".tooltipped").tooltip("remove");
                 docById("buttoncontainerTOP").parentElement.removeChild(
                     docById("buttoncontainerTOP")
                 );

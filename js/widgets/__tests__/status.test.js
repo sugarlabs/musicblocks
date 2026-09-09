@@ -14,6 +14,11 @@
 
 global._ = msg => msg;
 
+// updateAll schedules its DOM render on the next animation frame; run it
+// synchronously so the rendering tests below stay direct. The throttling
+// describe overrides this with a manual queue.
+global.requestAnimationFrame = cb => cb();
+
 global._THIS_IS_MUSIC_BLOCKS_ = true;
 global.MATRIXBUTTONHEIGHT = 40;
 global.MATRIXSOLFEHEIGHT = 30;
@@ -327,6 +332,79 @@ describe("StatusMatrix Widget", () => {
         test("resets updatingStatusMatrix to false after update", () => {
             statusMatrix.updateAll();
             expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        describe("frame throttling", () => {
+            let frameQueue;
+            const flushFrame = () => frameQueue.shift()();
+
+            beforeEach(() => {
+                frameQueue = [];
+                global.requestAnimationFrame = cb => {
+                    frameQueue.push(cb);
+                    return frameQueue.length;
+                };
+            });
+
+            afterEach(() => {
+                global.requestAnimationFrame = cb => cb();
+            });
+
+            test("coalesces repeated synchronous calls into one render per frame", () => {
+                statusMatrix.updateAll();
+                statusMatrix.updateAll();
+                statusMatrix.updateAll();
+
+                expect(frameQueue).toHaveLength(1);
+                expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+
+                flushFrame();
+
+                expect(mockActivity.logo.parseArg).toHaveBeenCalledTimes(1);
+            });
+
+            test("schedules a fresh render after the previous frame flushed", () => {
+                statusMatrix.updateAll();
+                flushFrame();
+                statusMatrix.updateAll();
+
+                expect(frameQueue).toHaveLength(1);
+
+                flushFrame();
+
+                expect(mockActivity.logo.parseArg).toHaveBeenCalledTimes(2);
+            });
+
+            test("skips the render when the widget closed before the frame fired", () => {
+                statusMatrix.updateAll();
+                statusMatrix.isOpen = false;
+
+                flushFrame();
+
+                expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+            });
+
+            test("falls back to a 100 ms timeout when requestAnimationFrame is unavailable", () => {
+                jest.useFakeTimers();
+                const savedRaf = global.requestAnimationFrame;
+                global.requestAnimationFrame = undefined;
+
+                try {
+                    statusMatrix.updateAll();
+                    statusMatrix.updateAll();
+
+                    expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+
+                    jest.advanceTimersByTime(99);
+                    expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+
+                    jest.advanceTimersByTime(1);
+                    expect(mockActivity.logo.parseArg).toHaveBeenCalledTimes(1);
+                } finally {
+                    global.requestAnimationFrame = savedRaf;
+                    jest.useRealTimers();
+                }
+            });
         });
 
         test("does not throw when a turtle is added after initialization and its column is missing", () => {

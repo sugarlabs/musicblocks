@@ -366,6 +366,204 @@ describe("PhraseMakerGrid", () => {
             expect(pm._blockMap[5]).toHaveLength(1);
         });
 
+        // A cell holds one entry per pass of a repeat. addNode builds them by
+        // counting the matches already present and storing that count as the
+        // trailing element, and removeNode matches on the other three fields,
+        // so every one of them is meant to go.
+        describe("when a cell holds more than one entry", () => {
+            test("removes both entries left by a two pass repeat", () => {
+                const pm = createMockPM();
+                pm.blockNo = 5;
+                PhraseMakerGrid.addNode(pm, 10, 100, 0, 5);
+                PhraseMakerGrid.addNode(pm, 10, 100, 0, 5);
+
+                expect(pm._blockMap[5]).toEqual([
+                    [10, [100, 0], 0],
+                    [10, [100, 0], 1]
+                ]);
+
+                PhraseMakerGrid.removeNode(pm, 10, 100, 0);
+
+                expect(pm._blockMap[5]).toEqual([]);
+            });
+
+            test.each([[2], [3], [4], [5], [6]])(
+                "clears all %i entries in a single call",
+                count => {
+                    const pm = createMockPM();
+                    pm.blockNo = 5;
+                    for (let i = 0; i < count; i++) {
+                        PhraseMakerGrid.addNode(pm, 10, 100, 0, 5);
+                    }
+
+                    PhraseMakerGrid.removeNode(pm, 10, 100, 0);
+
+                    expect(pm._blockMap[5]).toEqual([]);
+                }
+            );
+
+            test("leaves surrounding entries untouched and in order", () => {
+                const pm = createMockPM();
+                pm.blockNo = 5;
+                pm._blockMap[5] = [
+                    [10, [100, 0], 0],
+                    [20, [200, 0], 0],
+                    [20, [200, 0], 1],
+                    [30, [300, 0], 0]
+                ];
+
+                PhraseMakerGrid.removeNode(pm, 20, 200, 0);
+
+                expect(pm._blockMap[5]).toEqual([
+                    [10, [100, 0], 0],
+                    [30, [300, 0], 0]
+                ]);
+            });
+
+            test("removes adjacent duplicates sitting at the end of the list", () => {
+                const pm = createMockPM();
+                pm.blockNo = 5;
+                pm._blockMap[5] = [
+                    [30, [300, 0], 0],
+                    [10, [100, 0], 0],
+                    [10, [100, 0], 1]
+                ];
+
+                PhraseMakerGrid.removeNode(pm, 10, 100, 0);
+
+                expect(pm._blockMap[5]).toEqual([[30, [300, 0], 0]]);
+            });
+
+            test("removes duplicates that are not next to each other", () => {
+                const pm = createMockPM();
+                pm.blockNo = 5;
+                pm._blockMap[5] = [
+                    [10, [100, 0], 0],
+                    [20, [200, 0], 0],
+                    [10, [100, 0], 1],
+                    [30, [300, 0], 0],
+                    [10, [100, 0], 2]
+                ];
+
+                PhraseMakerGrid.removeNode(pm, 10, 100, 0);
+
+                expect(pm._blockMap[5]).toEqual([
+                    [20, [200, 0], 0],
+                    [30, [300, 0], 0]
+                ]);
+            });
+
+            test("keeps entries whose rhythm index differs, since those are other columns", () => {
+                const pm = createMockPM();
+                pm.blockNo = 5;
+                pm._blockMap[5] = [
+                    [10, [100, 0], 0],
+                    [10, [100, 1], 0],
+                    [10, [100, 0], 1]
+                ];
+
+                PhraseMakerGrid.removeNode(pm, 10, 100, 0);
+
+                expect(pm._blockMap[5]).toEqual([[10, [100, 1], 0]]);
+            });
+        });
+
+        // The sequence a Phrase Maker runs for repeat 2 [ pitch + note ].
+        // addRowBlock renumbers the repeated row and addColBlock indexes the
+        // repeated column, but the cell itself is recorded with the
+        // un-augmented pitch id and a fixed 0 on both passes.
+        describe("repeat block scenario", () => {
+            const PITCH = 11;
+            const NOTE = 42;
+            const MATRIX = 7;
+
+            /**
+             * Runs both passes of a repeat over one pitch and one note block.
+             * @returns {Object} The mock PhraseMaker after both passes.
+             */
+            function buildRepeatedMatrix() {
+                const pm = createMockPM();
+                pm.blockNo = MATRIX;
+                pm._rowBlocks = [];
+                pm._rowMap = [];
+                pm._rowOffset = [];
+                pm._colBlocks = [];
+
+                for (let pass = 0; pass < 2; pass++) {
+                    PhraseMakerGrid.addRowBlock(pm, PITCH);
+                    PhraseMakerGrid.addColBlock(pm, NOTE, 1);
+                    PhraseMakerGrid.addNode(pm, PITCH, NOTE, 0, MATRIX);
+                }
+
+                return pm;
+            }
+
+            test("renumbers the repeated row but tells the cells apart only by counter", () => {
+                const pm = buildRepeatedMatrix();
+
+                expect(pm._rowBlocks).toEqual([PITCH, PITCH + 1000000]);
+                expect(pm._colBlocks).toEqual([
+                    [NOTE, 0],
+                    [NOTE, 1]
+                ]);
+                expect(pm._blockMap[MATRIX]).toEqual([
+                    [PITCH, [NOTE, 0], 0],
+                    [PITCH, [NOTE, 0], 1]
+                ]);
+            });
+
+            test("clearing the cell once clears it for both passes", () => {
+                const pm = buildRepeatedMatrix();
+
+                // _setNotes resolves row 0 through _rowMap to the un-augmented
+                // id, and that is what reaches removeNode.
+                const rowBlock = pm._rowBlocks[pm._rowMap.indexOf(0 - pm._rowOffset[0])];
+                expect(rowBlock).toBe(PITCH);
+
+                PhraseMakerGrid.removeNode(pm, rowBlock, NOTE, 0);
+
+                expect(pm._blockMap[MATRIX]).toEqual([]);
+            });
+        });
+
+        describe("edge cases", () => {
+            test("leaves an empty block map empty", () => {
+                const pm = createMockPM();
+                pm.blockNo = 5;
+                pm._blockMap[5] = [];
+
+                PhraseMakerGrid.removeNode(pm, 10, 100, 0);
+
+                expect(pm._blockMap[5]).toEqual([]);
+            });
+
+            test("keeps the placeholder entries the grid marks with -1", () => {
+                const pm = createMockPM();
+                pm.blockNo = 5;
+                pm._blockMap[5] = [
+                    [-1, [100, 0], 0],
+                    [10, [100, 0], 0],
+                    [10, [100, 0], 1]
+                ];
+
+                PhraseMakerGrid.removeNode(pm, 10, 100, 0);
+
+                expect(pm._blockMap[5]).toEqual([[-1, [100, 0], 0]]);
+            });
+
+            test("changes nothing when called a second time for the same cell", () => {
+                const pm = createMockPM();
+                pm.blockNo = 5;
+                PhraseMakerGrid.addNode(pm, 10, 100, 0, 5);
+                PhraseMakerGrid.addNode(pm, 10, 100, 0, 5);
+
+                PhraseMakerGrid.removeNode(pm, 10, 100, 0);
+                PhraseMakerGrid.removeNode(pm, 10, 100, 0);
+
+                expect(pm._blockMap[5]).toEqual([]);
+            });
+        });
+
         test("does not remove nodes with different n", () => {
             const pm = createMockPM();
             pm.blockNo = 5;

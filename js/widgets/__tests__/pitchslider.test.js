@@ -539,13 +539,28 @@ describe("PitchSlider Widget", () => {
             expect(mockOscillator.triggerAttackRelease).toHaveBeenCalledWith(440, "4n");
         });
 
-        test("slider registers mousedown event listener", () => {
+        test("slider registers mousedown and pointerdown event listeners", () => {
             expect(slider.sliders[0]).toBeDefined();
             expect(slider.sliders[0].addEventListener).toHaveBeenCalledWith(
                 "mousedown",
                 expect.any(Function)
             );
+            expect(slider.sliders[0].addEventListener).toHaveBeenCalledWith(
+                "pointerdown",
+                expect.any(Function)
+            );
         });
+
+        test("pointerdown event sets activeSlider to slider id", () => {
+            const pointerdownCall = slider.sliders[0].addEventListener.mock.calls.find(
+                call => call[0] === "pointerdown"
+            );
+            const pointerdownHandler = pointerdownCall[1];
+            slider.activeSlider = null;
+            pointerdownHandler();
+            expect(slider.activeSlider).toBe("0");
+        });
+
         test("mousedown event sets activeSlider to slider id", () => {
             const mousedownCall = slider.sliders[0].addEventListener.mock.calls.find(
                 call => call[0] === "mousedown"
@@ -554,6 +569,96 @@ describe("PitchSlider Widget", () => {
             slider.activeSlider = null;
             mousedownHandler();
             expect(slider.activeSlider).toBe("0");
+        });
+
+        test("Shift + ArrowUp keydown steps frequency up by an octave", () => {
+            slider.sliders[0].value = "440";
+            slider.sliders[0].min = "220";
+            slider.sliders[0].max = "1760";
+            slider.activeSlider = "0";
+
+            const keydownCall = document.addEventListener.mock.calls.find(
+                call => call[0] === "keydown"
+            );
+            const keyHandler = keydownCall[1];
+
+            const event = {
+                key: "ArrowUp",
+                shiftKey: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            keyHandler(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(parseFloat(slider.sliders[0].value)).toBeCloseTo(880, 1);
+        });
+
+        test("Shift + ArrowDown keydown steps frequency down by an octave", () => {
+            slider.sliders[0].value = "880";
+            slider.sliders[0].min = "220";
+            slider.sliders[0].max = "1760";
+            slider.activeSlider = "0";
+
+            const keydownCall = document.addEventListener.mock.calls.find(
+                call => call[0] === "keydown"
+            );
+            const keyHandler = keydownCall[1];
+
+            const event = {
+                key: "ArrowDown",
+                shiftKey: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            keyHandler(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(parseFloat(slider.sliders[0].value)).toBeCloseTo(440, 1);
+        });
+
+        test("slider oninput from keyboard plays preview via triggerAttackRelease without drone", () => {
+            const rangeSlider = slider.sliders[0];
+            rangeSlider.value = "500";
+            rangeSlider._fromKeyboard = true;
+            rangeSlider.oninput();
+            rangeSlider._fromKeyboard = false;
+
+            expect(mockOscillator.triggerAttackRelease).toHaveBeenCalledWith(500, "4n");
+            expect(mockOscillator.triggerAttack).not.toHaveBeenCalled();
+        });
+
+        test("arrow key navigation plays preview note without endless drone", () => {
+            const rangeSlider = slider.sliders[0];
+            rangeSlider.value = "440";
+            slider.frequencies[0] = 440;
+            slider.activeSlider = "0";
+
+            // When event is dispatched in browser, oninput runs
+            rangeSlider.dispatchEvent = jest.fn(() => {
+                if (typeof rangeSlider.oninput === "function") {
+                    rangeSlider.oninput();
+                }
+            });
+
+            const keydownCall = document.addEventListener.mock.calls.find(
+                call => call[0] === "keydown"
+            );
+            const keyHandler = keydownCall[1];
+
+            const event = {
+                key: "ArrowUp",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            keyHandler(event);
+
+            const expected = 440 * Math.pow(2, 1 / 12);
+            expect(mockOscillator.triggerAttackRelease).toHaveBeenCalledWith(expected, "4n");
+            expect(mockOscillator.triggerAttack).not.toHaveBeenCalled();
         });
     });
 

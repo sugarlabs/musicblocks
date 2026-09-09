@@ -236,6 +236,9 @@ window.widgetWindows = {
             return btn;
         }),
         getWidgetBody: jest.fn().mockReturnValue({
+            style: {},
+            children: [{ style: {} }],
+            offsetHeight: 400,
             append: jest.fn(),
             getElementsByTagName: jest.fn().mockReturnValue([
                 {
@@ -266,6 +269,11 @@ document.createElement = jest.fn().mockImplementation(tag => ({
     replaceChildren: jest.fn(),
     removeChild: jest.fn(),
     firstChild: null,
+    children: [{ style: {} }],
+    querySelector: jest.fn().mockReturnValue({
+        style: {},
+        setAttribute: jest.fn()
+    }),
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
@@ -475,6 +483,105 @@ describe("ModeWidget", () => {
         expect(modeWidget._selectedNotes).toEqual(originalNotes);
     });
 
+    describe("_wireEdoSelect", () => {
+        // Fires the real listener _wireEdoSelect registered via
+        // addEventListener, since this file stubs document.createElement
+        // to a plain mock (see top of file) rather than a real jsdom
+        // element that supports dispatchEvent.
+        function fireEdoChange(select, value) {
+            select.value = value;
+            const handler = select.addEventListener.mock.calls.find(
+                call => call[0] === "change"
+            )[1];
+            handler();
+        }
+
+        test("rescales _selectedNotes to a never-before-visited EDO instead of leaving it untranslated", () => {
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget.logo.synth.inTemperament = "equal";
+            modeWidget._activeEDO = 12;
+            // 12-EDO major scale: root, 2nd, 3rd, 4th, 5th, 6th, 7th.
+            modeWidget._selectedNotes = [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true
+            ];
+            modeWidget._edoNoteCache = {};
+
+            const savedGetCurrentEDO = global.getCurrentEDO;
+            const savedTemperament = global.TEMPERAMENT;
+            global.getCurrentEDO = jest.fn(key => (key === "equal19" ? 19 : 12));
+            global.TEMPERAMENT = {
+                ...savedTemperament,
+                equal19: { isEDO: true, pitchNumber: 19 }
+            };
+
+            fireEdoChange(modeWidget._edoSelect, "equal19");
+
+            expect(modeWidget._activeEDO).toBe(19);
+            expect(modeWidget._selectedNotes).toHaveLength(19);
+            // A correct rescale of a 7-note pattern into 19-EDO spreads notes
+            // across the full range (scalePatternToEDO puts them at 0, 3, 6,
+            // 8, 11, 14, 17). Before the fix, _translateNotesToEDO's guard
+            // always short-circuited, so nothing above index 11 ever got
+            // selected — the array just got padded with false by
+            // _reconcileNotes downstream, silently losing the scale.
+            expect(modeWidget._selectedNotes.slice(12).some(v => v === true)).toBe(true);
+
+            global.getCurrentEDO = savedGetCurrentEDO;
+            global.TEMPERAMENT = savedTemperament;
+        });
+
+        test("restores from cache instead of re-translating on a previously-visited EDO", () => {
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget.logo.synth.inTemperament = "equal";
+            modeWidget._activeEDO = 12;
+            const twelveEdoNotes = [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true
+            ];
+            modeWidget._selectedNotes = twelveEdoNotes.slice();
+            modeWidget._edoNoteCache = {};
+
+            const savedGetCurrentEDO = global.getCurrentEDO;
+            const savedTemperament = global.TEMPERAMENT;
+            global.getCurrentEDO = jest.fn(key => (key === "equal19" ? 19 : 12));
+            global.TEMPERAMENT = {
+                ...savedTemperament,
+                equal19: { isEDO: true, pitchNumber: 19 }
+            };
+
+            // Visit 19-EDO once, then switch back to 12-EDO.
+            fireEdoChange(modeWidget._edoSelect, "equal19");
+            fireEdoChange(modeWidget._edoSelect, "equal");
+
+            expect(modeWidget._activeEDO).toBe(12);
+            expect(modeWidget._selectedNotes).toEqual(twelveEdoNotes);
+
+            global.getCurrentEDO = savedGetCurrentEDO;
+            global.TEMPERAMENT = savedTemperament;
+        });
+    });
+
     test("should fall back to generated names when numberToPitch returns a NaN octave", () => {
         modeWidget._activeEDO = 5;
         global.numberToPitch = jest.fn().mockReturnValue([undefined, NaN]);
@@ -674,6 +781,92 @@ describe("ModeWidget", () => {
             expect(modeWidget._modePiemenuOpen).toBe(true);
             modeWidget._onModePieButtonClick();
             expect(modeWidget._modePiemenuOpen).toBe(false);
+        });
+    });
+
+    describe("window maximization and scaling", () => {
+        test("widgetWindow.onmaximize is bound to the ModeWidget instance", () => {
+            const widget = new ModeWidget(mockActivity);
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            widget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            expect(typeof widget.widgetWindow.onmaximize).toBe("function");
+
+            // Invoke as WidgetWindow would invoke it (this = widgetWindow)
+            widget.widgetWindow.onmaximize.call(widget.widgetWindow);
+
+            // Verify _scale ran successfully with correct context by checking SVG was modified
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", expect.any(String));
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", expect.any(String));
+        });
+
+        test("_scale scales SVG to fit window when maximized", () => {
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            const originalIsMaximized = modeWidget.widgetWindow.isMaximized;
+            const originalGetFrame = modeWidget.widgetWindow.getWidgetFrame;
+            const originalGetDrag = modeWidget.widgetWindow.getDragElement;
+            const originalGetBody = modeWidget.widgetWindow.getWidgetBody;
+
+            modeWidget.widgetWindow.isMaximized = jest.fn().mockReturnValue(true);
+            modeWidget.widgetWindow.getWidgetFrame = jest
+                .fn()
+                .mockReturnValue({ offsetHeight: 500 });
+            modeWidget.widgetWindow.getDragElement = jest
+                .fn()
+                .mockReturnValue({ offsetHeight: 20 });
+            const widgetBody = { style: {}, offsetHeight: 400, children: [{ style: {} }] };
+            modeWidget.widgetWindow.getWidgetBody = jest.fn().mockReturnValue(widgetBody);
+
+            modeWidget._scale();
+
+            const expectedScale = (500 - 20) / 400; // windowHeight / bodyHeight = 1.2
+            const expectedSize = `${400 * expectedScale}px`; // WHEELSIZE (400) * scale
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", expectedSize);
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", expectedSize);
+
+            // Restore
+            modeWidget.widgetWindow.isMaximized = originalIsMaximized;
+            modeWidget.widgetWindow.getWidgetFrame = originalGetFrame;
+            modeWidget.widgetWindow.getDragElement = originalGetDrag;
+            modeWidget.widgetWindow.getWidgetBody = originalGetBody;
+        });
+
+        test("_scale resets SVG to default size when unmaximized", () => {
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            const originalIsMaximized = modeWidget.widgetWindow.isMaximized;
+            modeWidget.widgetWindow.isMaximized = jest.fn().mockReturnValue(false);
+
+            modeWidget._scale();
+
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("height", "400px"); // scale = 1
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith("width", "400px");
+
+            // Restore
+            modeWidget.widgetWindow.isMaximized = originalIsMaximized;
+        });
+
+        test("_scale safely exits if widgetWindow or svg is not available", () => {
+            const mockSvg = { style: {}, setAttribute: jest.fn() };
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(mockSvg) };
+
+            // Test: widgetWindow is null
+            const originalWindow = modeWidget.widgetWindow;
+            modeWidget.widgetWindow = null;
+            expect(() => modeWidget._scale()).not.toThrow();
+            expect(mockSvg.setAttribute).not.toHaveBeenCalled();
+
+            // Restore and test: svgContainer is null
+            modeWidget.widgetWindow = originalWindow;
+            modeWidget._meterWheelDiv = null;
+            expect(() => modeWidget._scale()).not.toThrow();
+
+            // Test: svg element is null
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(null) };
+            expect(() => modeWidget._scale()).not.toThrow();
         });
     });
 });

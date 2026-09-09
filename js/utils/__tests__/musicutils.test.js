@@ -73,6 +73,7 @@ const {
     getIntervalNumber,
     getIntervalDirection,
     getIntervalRatio,
+    INTERVALVALUES,
     getModeNumbers,
     getDrumIndex,
     getDrumName,
@@ -435,6 +436,40 @@ describe("getIntervalRatio", () => {
     it("should return the ratio for a given interval", () => {
         expect(getIntervalRatio("perfect 5")).toBe(1.5);
         expect(getIntervalRatio("major 3")).toBe(1.25);
+    });
+
+    it("should return the just diminished seventh for diminished 7", () => {
+        expect(getIntervalRatio("diminished 7")).toBeCloseTo(128 / 75, 10);
+    });
+
+    it("should keep every diminished ratio the octave inversion of its augmented complement", () => {
+        // A diminished nth and an augmented (9 - n)th add up to an octave, so
+        // their ratios must multiply to 2.
+        const complements = [
+            ["diminished 2", "augmented 7"],
+            ["diminished 3", "augmented 6"],
+            ["diminished 4", "augmented 5"],
+            ["diminished 5", "augmented 4"],
+            ["diminished 6", "augmented 3"],
+            ["diminished 7", "augmented 2"],
+            ["diminished 8", "augmented 1"]
+        ];
+
+        for (const [diminished, augmented] of complements) {
+            expect(getIntervalNumber(diminished) + getIntervalNumber(augmented)).toBe(12);
+            expect(getIntervalRatio(diminished) * getIntervalRatio(augmented)).toBeCloseTo(2, 10);
+        }
+    });
+
+    it("should keep every ratio within half a semitone of its semitone count", () => {
+        // Derived from the table itself so a newly added interval is covered
+        // automatically rather than needing to be listed here.
+        const intervals = Object.keys(INTERVALVALUES);
+
+        for (const interval of intervals) {
+            const semitones = 12 * Math.log2(getIntervalRatio(interval));
+            expect(Math.abs(semitones - getIntervalNumber(interval))).toBeLessThan(0.5);
+        }
     });
 });
 
@@ -1311,20 +1346,23 @@ describe("pitchToNumber", () => {
     });
 
     it("should work with equal19 temperament", () => {
-        global.TEMPERAMENT = { equal19: [] };
         const result = pitchToNumber("C", 4, "C major", "equal19");
         // 4 * 19 + 0 (C index) - 14 (A index in 19-EDO table) = 62
         expect(result).toBe(62);
     });
 
+    it("should handle lowercase pitches in alternate tunings (equal19)", () => {
+        // Verifies that lowercase 'c' and uppercase 'C' resolve identically in equal19
+        const upperCaseResult = pitchToNumber("C", 4, "C major", "equal19");
+        expect(pitchToNumber("c", 4, "C major", "equal19")).toBe(upperCaseResult);
+    });
+
     it("should fallback to 12-EDO for undefined temperament", () => {
-        global.TEMPERAMENT = {};
         const result = pitchToNumber("C", 4, "C major", undefined);
         expect(result).toBe(39);
     });
 
     it("should fallback to 12-EDO for unknown temperament", () => {
-        global.TEMPERAMENT = {};
         const result = pitchToNumber("C", 4, "C major", "unknown");
         expect(result).toBe(39);
     });
@@ -1342,6 +1380,35 @@ describe("numberToPitchSharp", () => {
     it("should convert positive numbers within first octave", () => {
         expect(numberToPitchSharp(1)).toEqual(["A♯", 0]);
         expect(numberToPitchSharp(2)).toEqual(["B", 0]);
+    });
+    it("round-trips all 12 pitch classes through pitchToNumber", () => {
+        const names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        for (const name of names) {
+            const pn = pitchToNumber(name, 4, "C major");
+            expect(numberToPitchSharp(pn)).toEqual([name.replace("#", SHARP), 4]);
+        }
+    });
+    it("round-trips natural notes across octaves, including negative octaves", () => {
+        for (let oct = -1; oct <= 6; oct++) {
+            expect(numberToPitchSharp(pitchToNumber("C", oct, "C major"))).toEqual(["C", oct]);
+            expect(numberToPitchSharp(pitchToNumber("A", oct, "C major"))).toEqual(["A", oct]);
+        }
+    });
+    it("round-trips through pitchToNumber in non-12-EDO and meantone temperaments", () => {
+        for (const edo of ["equal19", "equal31", "1/3 comma meantone", "1/4 comma meantone"]) {
+            expect(numberToPitchSharp(pitchToNumber("C", 4, "C major", edo), edo)).toEqual([
+                "C",
+                4
+            ]);
+            expect(numberToPitchSharp(pitchToNumber("A", 4, "C major", edo), edo)).toEqual([
+                "A",
+                4
+            ]);
+            expect(numberToPitchSharp(pitchToNumber("D", 4, "C major", edo), edo)).toEqual([
+                "D",
+                4
+            ]);
+        }
     });
 });
 
@@ -1786,6 +1853,51 @@ describe("buildScale", () => {
             ["C", "D", "E", "F", "G", "A", "B", "C"],
             [2, 2, 1, 2, 2, 2, 1]
         ]); // Default C major scale
+    });
+
+    // The sharp/flat preference tables are keyed on "<key> major" / "<key> minor",
+    // so the mode has to be mapped onto its major/minor equivalent before the
+    // lookup. Without that, every mode name the mode pie menu offers misses the
+    // table and the scale is spelled with the wrong accidental.
+    const modalCases = [
+        // E natural minor and E minor are the same key and must agree.
+        { keySignature: "E natural minor", expected: ["E", "F♯", "G", "A", "B", "C", "D", "E"] },
+        { keySignature: "E aeolian", expected: ["E", "F♯", "G", "A", "B", "C", "D", "E"] },
+        { keySignature: "B natural minor", expected: ["B", "C♯", "D", "E", "F♯", "G", "A", "B"] },
+        { keySignature: "G ionian", expected: ["G", "A", "B", "C", "D", "E", "F♯", "G"] },
+        { keySignature: "C lydian", expected: ["C", "D", "E", "F♯", "G", "A", "B", "C"] },
+        { keySignature: "A dorian", expected: ["A", "B", "C", "D", "E", "F♯", "G", "A"] },
+        { keySignature: "B phrygian", expected: ["B", "C", "D", "E", "F♯", "G", "A", "B"] },
+        { keySignature: "D mixolydian", expected: ["D", "E", "F♯", "G", "A", "B", "C", "D"] }
+    ];
+
+    modalCases.forEach(({ keySignature, expected }) => {
+        it(`should spell ${keySignature} with the accidental of its relative key`, () => {
+            expect(buildScale(keySignature)[0]).toEqual(expected);
+        });
+    });
+
+    it("should spell a mode the same way as its major/minor synonym", () => {
+        expect(buildScale("E natural minor")[0]).toEqual(buildScale("E minor")[0]);
+        expect(buildScale("E aeolian")[0]).toEqual(buildScale("E minor")[0]);
+        expect(buildScale("C ionian")[0]).toEqual(buildScale("C major")[0]);
+    });
+
+    it("should not repeat a letter name in a seven-note modal scale", () => {
+        modalCases.forEach(({ keySignature }) => {
+            const letters = buildScale(keySignature)[0]
+                .slice(0, 7)
+                .map(note => note[0]);
+            expect(new Set(letters).size).toBe(7);
+        });
+    });
+
+    it("should agree with getSharpFlatPreference for modal key signatures", () => {
+        // getSharpFlatPreference already normalises through modeMapper; buildScale
+        // must not contradict it.
+        expect(getSharpFlatPreference("E natural minor")).toBe("sharp");
+        expect(buildScale("E natural minor")[0]).toContain("F♯");
+        expect(buildScale("E natural minor")[0]).not.toContain("G♭");
     });
 });
 
@@ -2657,9 +2769,21 @@ describe("isInt", () => {
         expect(isInt(NaN)).toBe(false); // NaN value
     });
 
-    it("should return false for numeric strings", () => {
-        expect(isInt("1")).toBe(false); // String containing an integer
-        expect(isInt("-10")).toBe(false); // String containing a negative integer
+    it("should return true for numeric strings", () => {
+        expect(isInt("1")).toBe(true); // String containing an integer
+        expect(isInt("-10")).toBe(true); // String containing a negative integer
+        expect(isInt("3.5")).toBe(false); // String containing a decimal
+    });
+
+    it("should handle edge cases correctly", () => {
+        expect(isInt("1e21")).toBe(true); // Scientific notation integer
+        expect(isInt("1e-21")).toBe(false); // Scientific notation decimal
+        expect(isInt("")).toBe(false); // Empty string
+        expect(isInt("   ")).toBe(false); // Whitespace string
+        expect(isInt("0x10")).toBe(true); // Hexadecimal string
+        expect(isInt(null)).toBe(false); // Null
+        expect(isInt(false)).toBe(false); // Boolean
+        expect(isInt([])).toBe(false); // Empty array
     });
 });
 
@@ -2767,6 +2891,29 @@ describe("EQUIVALENTNATURALS extended mappings", () => {
 
     it("should map F♭ to E (original)", () => {
         expect(global.EQUIVALENTNATURALS["F♭"]).toBe("E");
+    });
+});
+
+describe("EQUIVALENTNATURALS double flats", () => {
+    const DOUBLEFLAT = "𝄫";
+
+    it("should spell C𝄫 and F𝄫 the way the solfege table spells them", () => {
+        // FIXEDSOLFEGE1 already maps do𝄫 to B♭ and fa𝄫 to E♭, so the Western
+        // spellings of the same two pitches must not land a semitone higher.
+        expect(convertFromSolfege("C" + DOUBLEFLAT)).toBe("B" + FLAT);
+        expect(convertFromSolfege("F" + DOUBLEFLAT)).toBe("E" + FLAT);
+        expect(convertFromSolfege("C" + FLAT + FLAT)).toBe("B" + FLAT);
+        expect(convertFromSolfege("F" + FLAT + FLAT)).toBe("E" + FLAT);
+        expect(convertFromSolfege("C" + DOUBLEFLAT)).toBe(convertFromSolfege("do" + DOUBLEFLAT));
+        expect(convertFromSolfege("F" + DOUBLEFLAT)).toBe(convertFromSolfege("fa" + DOUBLEFLAT));
+    });
+
+    it("should place every double flat a semitone below the matching single flat", () => {
+        for (const letter of NOTENAMES) {
+            const flat = _calculate_pitch_number(letter + FLAT, 4);
+            expect(_calculate_pitch_number(letter + DOUBLEFLAT, 4)).toBe(flat - 1);
+            expect(_calculate_pitch_number(letter + FLAT + FLAT, 4)).toBe(flat - 1);
+        }
     });
 });
 
@@ -3854,6 +4001,47 @@ describe("mode pie menu shared helpers", () => {
             expect(getModeLabel("ionian")).toBe("major / ionian");
             expect(getModeLabel(" ")).toBe(" ");
         });
+
+        describe("with a non-identity translator", () => {
+            // A translator whose output is visibly different from its input, so
+            // a test only passes if getModeLabel actually routes the mode name
+            // through _() rather than returning a hard-coded English label.
+            const TRANSLATED = {
+                "major": "translated-major",
+                "ionian": "translated-ionian",
+                "minor": "translated-minor",
+                "aeolian": "translated-aeolian",
+                "dorian": "translated-dorian",
+                " ": "translated-space"
+            };
+
+            beforeEach(() => {
+                global._.mockImplementation(str => TRANSLATED[str] ?? str);
+            });
+            afterEach(() => {
+                global._.mockImplementation(str => str);
+            });
+
+            it("runs both halves of the major/ionian pair through the translator", () => {
+                expect(getModeLabel("major")).toBe("translated-major / translated-ionian");
+                expect(getModeLabel("ionian")).toBe("translated-major / translated-ionian");
+            });
+
+            it("runs both halves of the minor/aeolian pair through the translator", () => {
+                expect(getModeLabel("minor")).toBe("translated-minor / translated-aeolian");
+                expect(getModeLabel("aeolian")).toBe("translated-minor / translated-aeolian");
+            });
+
+            it("routes any other mode name through the translator", () => {
+                expect(getModeLabel("dorian")).toBe("translated-dorian");
+            });
+
+            it("returns the single-space placeholder verbatim, bypassing the translator", () => {
+                // Even though the translator maps " " to "translated-space",
+                // getModeLabel must short-circuit the blank slot.
+                expect(getModeLabel(" ")).toBe(" ");
+            });
+        });
     });
 
     describe("getModeNameFromLabel", () => {
@@ -3865,6 +4053,49 @@ describe("mode pie menu shared helpers", () => {
 
         it("falls back to the label itself when nothing matches", () => {
             expect(getModeNameFromLabel("unknown", modes)).toBe("unknown");
+        });
+
+        describe("with a non-identity translator", () => {
+            const TRANSLATED = {
+                major: "translated-major",
+                ionian: "translated-ionian",
+                minor: "translated-minor",
+                aeolian: "translated-aeolian",
+                dorian: "translated-dorian",
+                phrygian: "translated-phrygian",
+                lydian: "translated-lydian",
+                mixolydian: "translated-mixolydian",
+                locrian: "translated-locrian"
+            };
+
+            beforeEach(() => {
+                global._.mockImplementation(str => TRANSLATED[str] ?? str);
+            });
+            afterEach(() => {
+                global._.mockImplementation(str => str);
+            });
+
+            it("maps the translated major/ionian label back to major", () => {
+                expect(getModeNameFromLabel("translated-major / translated-ionian", modes)).toBe(
+                    "major"
+                );
+            });
+
+            it("maps the translated minor/aeolian label back to aeolian", () => {
+                expect(getModeNameFromLabel("translated-minor / translated-aeolian", modes)).toBe(
+                    "aeolian"
+                );
+            });
+
+            it("maps a plain translated label back to its canonical mode name", () => {
+                expect(getModeNameFromLabel("translated-dorian", modes)).toBe("dorian");
+            });
+
+            it("round-trips every mode name through getModeLabel and back", () => {
+                for (const mode of ["dorian", "phrygian", "lydian", "mixolydian", "locrian"]) {
+                    expect(getModeNameFromLabel(getModeLabel(mode), modes.concat(mode))).toBe(mode);
+                }
+            });
         });
     });
 
@@ -3973,5 +4204,115 @@ describe("non-EDO temperament helpers", () => {
         it("returns null for a temperament without usable ratios", () => {
             expect(getNonEDOModeSteps("major", "_no_ratios")).toBeNull();
         });
+
+        it("derives the textbook 19-EDO major scale", () => {
+            // In 19-EDO a whole tone is 3 steps and a diatonic semitone is 2,
+            // so major is T T S T T T S = 3,3,2,3,3,3,2 and sums to the octave.
+            const steps = getNonEDOModeSteps("major", "equal19");
+            expect(steps).toEqual([3, 3, 2, 3, 3, 3, 2]);
+            expect(steps.reduce((a, b) => a + b, 0)).toBe(19);
+        });
+
+        it("agrees with the other 19-note temperament", () => {
+            // 1/3 comma meantone also divides the octave into 19 and computes
+            // its steps from an independent ratio table, so the two must match.
+            expect(getNonEDOModeSteps("major", "equal19")).toEqual(
+                getNonEDOModeSteps("major", "1/3 comma meantone")
+            );
+        });
+    });
+
+    describe("temperament ratio tables", () => {
+        const withRatios = () =>
+            getTemperamentKeys()
+                .map(key => [key, getTemperament(key)])
+                .filter(([, t]) => t && Array.isArray(t.ratios) && t.pitchNumber);
+
+        it("gives every temperament one ratio per pitch", () => {
+            // equal19 shipped 15 ratios against a pitchNumber of 19, so anything
+            // reading ratios[pitchNumber - 1] fell off the end. Check them all
+            // rather than that one, so the next short table is caught here.
+            const mismatched = withRatios()
+                .filter(([, t]) => t.ratios.length !== t.pitchNumber)
+                .map(
+                    ([key, t]) => `${key}: ${t.ratios.length} ratios, pitchNumber ${t.pitchNumber}`
+                );
+            expect(mismatched).toEqual([]);
+        });
+
+        it("spaces every equal temperament evenly across the octave", () => {
+            for (const [key, t] of withRatios()) {
+                if (!t.isEDO) {
+                    continue;
+                }
+                const expected = [...Array(t.pitchNumber).keys()].map(i =>
+                    Math.pow(2, i / t.pitchNumber)
+                );
+                t.ratios.forEach((ratio, i) => {
+                    expect(Number(ratio)).toBeCloseTo(expected[i], 10);
+                });
+            }
+        });
+    });
+});
+
+describe("generateNoteNames EDO length contract", () => {
+    // The table must have exactly one entry per division of the octave.
+    // Callers depend on this: transposition in getNote() derives octave
+    // arithmetic from the EDO but wraps note names on the table length, so a
+    // table longer than the EDO desynchronises the two and yields note names
+    // outside the temperament.
+    it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 19, 22, 24, 31, 41, 53])(
+        "returns exactly %i names for %i-EDO",
+        edo => {
+            expect(generateNoteNames(edo)).toHaveLength(edo);
+        }
+    );
+
+    // EDO < 7 leaves at least one natural letter with no room. Before the fix
+    // the letter was emitted regardless, so every one of these returned all
+    // seven naturals.
+    it.each([
+        [1, ["C"]],
+        [2, ["C", "D"]],
+        [3, ["C", "D", "F"]],
+        [4, ["C", "D", "F", "G"]],
+        [6, ["C", "D", "E", "F", "G", "A"]]
+    ])("returns the expected names for %i-EDO", (edo, expected) => {
+        expect(generateNoteNames(edo)).toEqual(expected);
+    });
+
+    it("keeps 12-EDO exactly as the standard chromatic table", () => {
+        expect(generateNoteNames(12)).toEqual([
+            "C",
+            "C" + SHARP,
+            "D",
+            "D" + SHARP,
+            "E",
+            "F",
+            "F" + SHARP,
+            "G",
+            "G" + SHARP,
+            "A",
+            "A" + SHARP,
+            "B"
+        ]);
+    });
+
+    it("keeps the small special-cased tables unchanged", () => {
+        expect(generateNoteNames(5)).toEqual(["C", "D", "E", "G", "A"]);
+        expect(generateNoteNames(7)).toEqual(["C", "D", "E", "F", "G", "A", "B"]);
+    });
+
+    it.each([3, 6, 12, 19, 31])("produces no duplicate names for %i-EDO", edo => {
+        const names = generateNoteNames(edo);
+        expect(new Set(names).size).toBe(names.length);
+    });
+
+    it("starts every table at C and returns cached results consistently", () => {
+        for (const edo of [3, 6, 12, 19]) {
+            expect(generateNoteNames(edo)[0]).toBe("C");
+            expect(generateNoteNames(edo)).toEqual(generateNoteNames(edo));
+        }
     });
 });

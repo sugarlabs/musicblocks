@@ -51,6 +51,28 @@ const getPerformanceTracker = () =>
     typeof performanceTracker === "undefined" ? null : performanceTracker;
 
 /**
+ * Whether performance profiling was asked for in the URL.
+ *
+ * Parses the query string rather than searching it for a substring, so that
+ * `?noperformance=true`, `?x=performance=true` and `?performance=truex` are not
+ * mistaken for `?performance=true`. `URLSearchParams` is guarded because it is
+ * absent in very old browsers, where the answer should be "not asked for"
+ * rather than a thrown error inside runLogoCommands.
+ *
+ * @returns {boolean}
+ */
+const _performanceRequestedInURL = () => {
+    if (typeof window === "undefined" || !window.location || !window.location.search) {
+        return false;
+    }
+    try {
+        return new URLSearchParams(window.location.search).get("performance") === "true";
+    } catch (e) {
+        return false;
+    }
+};
+
+/**
  * @class
  * @classdesc Queue entry for managing running blocks.
  */
@@ -200,6 +222,7 @@ class Logo {
 
         // Related to running programs
         this._lastNoteTimeout = null;
+        this._valueBarTimeout = null;
         this._alreadyRunning = false;
         this._prematureRestart = false;
         this._runningBlock = null;
@@ -722,14 +745,18 @@ class Logo {
      * @param {Number} turtle - Turtle index in turtles.turtleList
      * @param {String} listenerName
      * @param {Function} listener
+     * @param {boolean} persistent - when true, clearTurtleListeners() leaves this
+     *  listener attached on stop/completion (e.g. a Listen block's click handler
+     *  is meant to keep firing after the run that registered it has ended).
      * @returns {void}
      */
-    setTurtleListener(turtle, listenerName, listener) {
+    setTurtleListener(turtle, listenerName, listener, persistent = false) {
         const tur = this.turtles.ithTurtle(turtle);
         if (listenerName in tur.listeners) {
             this.stage.removeEventListener(listenerName, tur.listeners[listenerName], false);
         }
 
+        listener.persistent = persistent;
         tur.listeners[listenerName] = listener;
         this.stage.addEventListener(listenerName, listener, false);
     }
@@ -737,15 +764,21 @@ class Logo {
     /**
      * Removes active event listeners from all turtles and clears listener objects.
      *
+     * @param {boolean} preservePersistent - when true, listeners registered as
+     *  persistent (see setTurtleListener) are left attached instead of removed.
      * @returns {void}
      */
-    clearTurtleListeners() {
+    clearTurtleListeners(preservePersistent = false) {
         for (const turtle of this.turtles.turtleList) {
             if (turtle && turtle.listeners) {
-                for (const listener in turtle.listeners) {
-                    this.stage.removeEventListener(listener, turtle.listeners[listener], false);
+                for (const listenerName in turtle.listeners) {
+                    const listener = turtle.listeners[listenerName];
+                    if (preservePersistent && listener && listener.persistent) {
+                        continue;
+                    }
+                    this.stage.removeEventListener(listenerName, listener, false);
+                    delete turtle.listeners[listenerName];
                 }
-                turtle.listeners = {};
             }
         }
     }
@@ -876,8 +909,7 @@ class Logo {
                         } else {
                             const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                             if (typeof a === "number") {
-                                currentBlock.value =
-                                    a < 0 ? "-" + utils.mixedNumber(-a) : utils.mixedNumber(a);
+                                currentBlock.value = utils.mixedNumber(a);
                             } else {
                                 logo.deps.errorHandler(NANERRORMSG, blk);
                                 currentBlock.value = 0;
@@ -1260,7 +1292,7 @@ class Logo {
         this.synth.disposeAllInstruments();
         this._synthsInitialized = false;
 
-        this.clearTurtleListeners();
+        this.clearTurtleListeners(true);
 
         // eslint-disable-next-line eqeqeq
         if (this.cameraID != null) {
@@ -1286,11 +1318,18 @@ class Logo {
             );
         }
 
-        // Remove active stage listeners and clear listener objects across all turtles.
-        this.clearTurtleListeners();
+        // Remove active stage listeners and clear listener objects across all turtles,
+        // except ones marked persistent (e.g. a Listen block's click handler).
+        this.clearTurtleListeners(true);
 
         // Prevent stale timeout from firing cleanup on next run.
         this._lastNoteTimeout = null;
+
+        // clearAll() above cancels the value-bar timeout without running its
+        // callback, so reset both directly to avoid valueBarVisible getting
+        // stuck true (and hotkeys stuck blocked) if a stop happens mid-window.
+        this._valueBarTimeout = null;
+        if (this.activity) this.activity.valueBarVisible = false;
 
         this._cleanupAfterCompletion();
 
@@ -1380,8 +1419,7 @@ class Logo {
     runLogoCommands(startHere, env) {
         const performanceModeEnabled =
             typeof window !== "undefined" &&
-            (window.DEBUG_PERFORMANCE === true ||
-                (window.location && window.location.search.includes("performance=true")));
+            (window.DEBUG_PERFORMANCE === true || _performanceRequestedInURL());
 
         if (
             performanceModeEnabled &&
@@ -1605,7 +1643,7 @@ class Logo {
         this.onRunTurtle();
 
         // Make sure that there is atleast one turtle.
-        if (this.turtles.getTurtleCount() === 0) {
+        if (this.turtles.turtleCount() === 0) {
             this.turtles.addTurtle(null);
         }
 
@@ -2070,6 +2108,19 @@ class Logo {
                     const value = blockValue.toString();
                     const displayText = label ? label + ": " + value : value;
                     logo.deps.textMsg(displayText);
+                }
+                // Briefly block hotkeys so a hotkey press right after clicking
+                // this value display can't accidentally spawn a new block
+                // (#4931). Scoped to just this case, not every status message.
+                if (logo.activity) {
+                    logo.activity.valueBarVisible = true;
+                    if (logo._valueBarTimeout !== null) {
+                        logo._timerManager.clearTimeout(logo._valueBarTimeout);
+                    }
+                    logo._valueBarTimeout = logo._timerManager.setTimeout(() => {
+                        logo._valueBarTimeout = null;
+                        if (logo.activity) logo.activity.valueBarVisible = false;
+                    }, 3000);
                 }
             } else {
                 logo.deps.errorHandler("I do not know how to " + blockName + ".", blk);

@@ -139,17 +139,17 @@ window.widgetWindows = {
     _initGlobalListeners() {
         if (this._globalListenersInitialized) return;
 
-        this._handleGlobalMouseMove = this._handleGlobalMouseMove.bind(this);
-        this._handleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
-        this._handleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
-        this._handleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
+        this._boundHandleGlobalMouseMove = this._handleGlobalMouseMove.bind(this);
+        this._boundHandleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
+        this._boundHandleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
+        this._boundHandleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
 
-        document.addEventListener("mouseup", this._handleGlobalMouseUp, true);
-        document.addEventListener("mousemove", this._handleGlobalMouseMove, true);
-        document.addEventListener("mousedown", this._handleGlobalMouseDown, true);
+        document.addEventListener("mouseup", this._boundHandleGlobalMouseUp, true);
+        document.addEventListener("mousemove", this._boundHandleGlobalMouseMove, true);
+        document.addEventListener("mousedown", this._boundHandleGlobalMouseDown, true);
         // Use capture phase (true) to handle keyboard shortcuts before individual
         // widgets can intercept them via stopPropagation().
-        document.addEventListener("keydown", this._handleGlobalKeyDown, true);
+        document.addEventListener("keydown", this._boundHandleGlobalKeyDown, true);
 
         this._globalListenersInitialized = true;
     },
@@ -273,7 +273,7 @@ class WidgetWindow {
         this._frame = this._create("div", "windowFrame", windows);
         this._frame.setAttribute("role", "dialog");
         this._frame.setAttribute("aria-label", _(this._title));
-        this._overlayframe = this._create("div", "windowFrame", windows);
+        this._overlayframe = this._create("div", "windowFrame windowOverlay", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._drag.style.display = "flex";
         this._drag.style.justifyContent = "space-between";
@@ -443,7 +443,7 @@ class WidgetWindow {
             this._overlayframe.style.width = "100vw";
             this._overlayframe.style.height = "calc(100vh - 64px)";
             this._overlayframe.style.border = "0.25vw solid black";
-            this._overlayframe.style.backgroundColor = "var(--overlay-bg)";
+            this._overlayframe.style.backgroundColor = "var(--color-overlay-backdrop)";
         } else {
             this._frame.style.zIndex = "10000";
             this._overlayframe.style.border = "0px";

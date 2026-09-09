@@ -1502,8 +1502,16 @@ function LegoWidget() {
             return null;
         }
 
-        // Sample the pixel
-        const pixelData = ctx.getImageData(Math.floor(imageX), Math.floor(imageY), 1, 1).data;
+        // Sample the pixel. A cross-origin media element taints the canvas
+        // silently: drawImage above succeeds and the SecurityError is raised
+        // here, on the first read, so this call needs its own guard.
+        let pixelData;
+        try {
+            pixelData = ctx.getImageData(Math.floor(imageX), Math.floor(imageY), 1, 1).data;
+        } catch (e) {
+            console.warn("Could not read pixel data for color sampling:", e);
+            return null;
+        }
         const [r, g, b] = pixelData;
 
         // Convert to color family

@@ -1104,6 +1104,27 @@ describe("setupIntervalsActions", () => {
         expect(logo.synth.changeInTemperament).toBe(true);
     });
 
+    test.each([
+        ["A", 4],
+        ["C", 5]
+    ])("setTemperament flags a starting-pitch change to %s%s", (pitch, octave) => {
+        Singer.IntervalsActions.setTemperament("just intonation", "C", 4);
+        logo.synth.changeInTemperament = false;
+
+        Singer.IntervalsActions.setTemperament("just intonation", pitch, octave);
+
+        expect(logo.synth.changeInTemperament).toBe(true);
+    });
+
+    test("setTemperament does not flag an unchanged temperament and starting pitch", () => {
+        Singer.IntervalsActions.setTemperament("just intonation", "C", 4);
+        logo.synth.changeInTemperament = false;
+
+        Singer.IntervalsActions.setTemperament("just intonation", "C", 4);
+
+        expect(logo.synth.changeInTemperament).toBe(false);
+    });
+
     test("setTemperament does not flag a change on the very first call when the temperament is unset", () => {
         Singer.IntervalsActions.setTemperament(undefined, "C", 4);
         expect(logo.synth.changeInTemperament).toBe(false);

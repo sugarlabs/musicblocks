@@ -1314,7 +1314,12 @@ function MusicKeyboard(activity) {
         // Fill in any gaps
         let lastOctave = obj[1];
         let thisOctave;
-        let lastVoice;
+        // Seed the voice from the first note, the same way the left-hand
+        // padding above does. The loop below is what normally keeps this up to
+        // date, but it starts at index 1, so with a single-note keyboard it
+        // never runs and the padding added after the last note would otherwise
+        // be left without a voice.
+        let lastVoice = noteList[0].voice;
         for (let i = 1; i < noteList.length; i++) {
             if (noteList[i].noteName === "drum") {
                 drumList.push(noteList[i]);

@@ -680,6 +680,89 @@ describe("Logo setTurtleListener", () => {
             false
         );
     });
+
+    test("defaults a listener to non-persistent", () => {
+        const listener = jest.fn();
+        mockActivity.turtles.ithTurtle = jest.fn(() => ({ listeners: {} }));
+
+        logo.setTurtleListener(0, "testListener", listener);
+
+        expect(listener.persistent).toBe(false);
+    });
+
+    test("marks a listener persistent when requested", () => {
+        const listener = jest.fn();
+        mockActivity.turtles.ithTurtle = jest.fn(() => ({ listeners: {} }));
+
+        logo.setTurtleListener(0, "testListener", listener, true);
+
+        expect(listener.persistent).toBe(true);
+    });
+});
+
+// ─── Logo clearTurtleListeners ─────────────────────────────────────────────────
+
+describe("Logo clearTurtleListeners", () => {
+    let logo;
+    let mockActivity;
+    let turtle;
+
+    beforeEach(() => {
+        setupLogoEnv();
+        turtle = createMockTurtle();
+        mockActivity = createMockActivity(turtle);
+        logo = new Logo(mockActivity);
+    });
+
+    afterEach(() => jest.restoreAllMocks());
+
+    test("removes every listener when preservePersistent is not set", () => {
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        const ephemeralListener = jest.fn();
+        turtle.listeners = { clickListener: persistentListener, beatListener: ephemeralListener };
+
+        logo.clearTurtleListeners();
+
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "beatListener",
+            ephemeralListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({});
+    });
+
+    test("preserves persistent listeners when preservePersistent is true", () => {
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        const ephemeralListener = jest.fn();
+        turtle.listeners = { clickListener: persistentListener, beatListener: ephemeralListener };
+
+        logo.clearTurtleListeners(true);
+
+        expect(mockActivity.stage.removeEventListener).not.toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "beatListener",
+            ephemeralListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({ clickListener: persistentListener });
+    });
+
+    test("does nothing when a turtle has no listeners object", () => {
+        mockActivity.turtles.turtleList = [null, { listeners: null }];
+
+        expect(() => logo.clearTurtleListeners()).not.toThrow();
+    });
 });
 
 // ─── Logo initTurtle ─────────────────────────────────────────────────────────
@@ -1010,6 +1093,33 @@ describe("Logo doStopTurtles", () => {
         expect(turtle.listeners).toEqual({});
     });
 
+    test("keeps a persistent listener attached on stop (#8367)", () => {
+        // A listener set up by a Listen block is marked persistent so it keeps
+        // responding to its event (e.g. a click) after Stop is pressed, the
+        // same way it did before #8244 started sweeping all listeners here.
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        const ephemeralListener = jest.fn();
+        turtle.listeners = {
+            clickListener: persistentListener,
+            __beat_1_0__: ephemeralListener
+        };
+
+        logo.doStopTurtles();
+
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "__beat_1_0__",
+            ephemeralListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).not.toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({ clickListener: persistentListener });
+    });
+
     describe("with Transport and audio streams", () => {
         let turtle0;
         let turtle1;
@@ -1117,6 +1227,118 @@ describe("Logo runLogoCommands", () => {
             timeoutSpy = null;
         }
         jest.restoreAllMocks();
+    });
+
+    describe("performance mode detection from the URL", () => {
+        // window.location cannot be reassigned in this jsdom, so drive the query
+        // string through history.replaceState, which jsdom does support.
+        const withSearch = (search, fn) => {
+            const before = window.location.search;
+            window.history.replaceState({}, "", search || "/");
+            try {
+                fn();
+            } finally {
+                window.history.replaceState({}, "", before || "/");
+            }
+        };
+
+        const trackerRequestedFor = search => {
+            const requirejsSpy = jest.fn();
+            const originalRequirejs = global.requirejs;
+            const savedTracker = global.performanceTracker;
+            global.requirejs = requirejsSpy;
+            // The lazy-load branch only runs when the tracker is not yet loaded,
+            // which is the situation this URL check exists to decide.
+            delete global.performanceTracker;
+            logo._restoreConnections = jest.fn();
+            logo.runFromBlock = jest.fn();
+            logo.blockList = [];
+            try {
+                withSearch(search, () => logo.runLogoCommands(null, null));
+            } finally {
+                global.requirejs = originalRequirejs;
+                global.performanceTracker = savedTracker;
+            }
+            return requirejsSpy.mock.calls.some(
+                call => Array.isArray(call[0]) && call[0].includes("utils/performanceTracker")
+            );
+        };
+
+        test("loads the tracker for ?performance=true", () => {
+            expect(trackerRequestedFor("?performance=true")).toBe(true);
+        });
+
+        test("loads the tracker when the parameter is not first", () => {
+            expect(trackerRequestedFor("?a=1&performance=true")).toBe(true);
+        });
+
+        test("ignores a parameter that merely ends in performance=true", () => {
+            // A substring search matches "?noperformance=true", which asks for
+            // no such thing.
+            expect(trackerRequestedFor("?noperformance=true")).toBe(false);
+        });
+
+        test("ignores a value that merely starts with true", () => {
+            expect(trackerRequestedFor("?performance=truex")).toBe(false);
+        });
+
+        test("ignores performance=false and an absent parameter", () => {
+            expect(trackerRequestedFor("?performance=false")).toBe(false);
+            expect(trackerRequestedFor("")).toBe(false);
+        });
+    });
+
+    describe("the Stop button is shown however a project is started", () => {
+        // walterbender asked how #8494 was tested, given the many ways a run
+        // can begin. These drive runLogoCommands the way each of those ways
+        // does, and assert the activity callback that lights the Stop button
+        // actually fires -- rather than calling onRunTurtle() directly, which
+        // would prove only that the handler works when something calls it.
+        const startWith = (startHere, blockList) => {
+            logo._restoreConnections = jest.fn();
+            logo.runFromBlock = jest.fn();
+            logo.blockList = blockList;
+            logo.runLogoCommands(startHere, null);
+            return mockActivity.onRunTurtle;
+        };
+
+        test("clicking a single Start block", () => {
+            // block.js -> logo.runLogoCommands(topBlock), the path a click takes.
+            const onRun = startWith(0, [
+                { name: "start", value: 0, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("a project holding several Start blocks", () => {
+            // The case in the screenshot: more than one stack, started together.
+            const onRun = startWith(null, [
+                { name: "start", value: 0, trash: false, connections: [] },
+                { name: "start", value: 1, trash: false, connections: [] },
+                { name: "start", value: 2, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("the toolbar play button, with no block singled out", () => {
+            // toolbar-controller.js -> runLogoCommands(null, env).
+            const onRun = startWith(null, [
+                { name: "start", value: 0, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("an action stack rather than a Start block", () => {
+            const onRun = startWith(0, [
+                { name: "action", value: 0, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("a project with no blocks at all", () => {
+            const onRun = startWith(null, []);
+            expect(onRun).toHaveBeenCalled();
+        });
     });
 
     test("executes startHere path", () => {
@@ -1319,6 +1541,25 @@ describe("Logo runLogoCommands", () => {
         expect(disposeSpy).toHaveBeenCalledTimes(1);
 
         global.Tone = savedTone;
+    });
+
+    test("keeps a persistent listener attached after natural playback completion (#8367)", () => {
+        // Before #8244, a Listen block's click listener stayed on the stage once
+        // a project finished playing on its own. _cleanupAfterCompletion() now
+        // runs clearTurtleListeners() automatically, so listeners marked
+        // persistent must survive this path too, not just an explicit Stop.
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        turtle0.listeners = { clickListener: persistentListener };
+
+        logo._cleanupAfterCompletion();
+
+        expect(mockActivity.stage.removeEventListener).not.toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(turtle0.listeners).toEqual({ clickListener: persistentListener });
     });
 
     describe("performance instrumentation", () => {
@@ -1711,6 +1952,77 @@ describe("Logo runFromBlockNow", () => {
 
             expect(mockActivity.textMsg).toHaveBeenCalledWith("width: 77");
             expect(logo.stopTurtle).toBe(true);
+        });
+        test("a second value display within 3s extends the valueBarVisible window instead of being cut short", () => {
+            jest.useFakeTimers();
+            logo.parseArg = jest.fn(() => 77);
+            const widthBlock = {
+                name: "width",
+                value: 77,
+                protoblock: { args: 0, dockTypes: ["numberout"] },
+                connections: [],
+                isValueBlock: () => false,
+                isArgBlock: () => true
+            };
+            logo.blockList = [widthBlock];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            jest.advanceTimersByTime(2000);
+            logo.stopTurtle = false;
+            logo.runFromBlockNow(logo, 0, 0, 0, null); // second display, 2s into the first window
+
+            jest.advanceTimersByTime(2000); // 4s since first display, but only 2s since second
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            jest.advanceTimersByTime(1000); // 3s since the second display
+            expect(mockActivity.valueBarVisible).toBe(false);
+
+            jest.useRealTimers();
+        });
+
+        test("doStopTurtles resets valueBarVisible even if it interrupts the window", () => {
+            jest.useFakeTimers();
+            logo.parseArg = jest.fn(() => 77);
+            const widthBlock = {
+                name: "width",
+                value: 77,
+                protoblock: { args: 0, dockTypes: ["numberout"] },
+                connections: [],
+                isValueBlock: () => false,
+                isArgBlock: () => true
+            };
+            logo.blockList = [widthBlock];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            logo.doStopTurtles();
+            expect(mockActivity.valueBarVisible).toBe(false);
+
+            // A new value display 2s after stop starts its own 3s window,
+            // due to end at t=5000 (relative to the run above).
+            jest.advanceTimersByTime(2000);
+            logo.stopTurtle = false;
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            // t=3000: this is when the FIRST (stopped) display's original
+            // timer would have fired, if doStopTurtles() had failed to
+            // cancel it via _timerManager. If that stale callback fires here,
+            // it wrongly clears valueBarVisible mid-way through the second
+            // display's own window - this is what actually proves
+            // cancellation happened, not just that doStopTurtles() sets the
+            // flag directly.
+            jest.advanceTimersByTime(1000);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            // t=5000: the second display's own timer fires on schedule.
+            jest.advanceTimersByTime(2000);
+            expect(mockActivity.valueBarVisible).toBe(false);
+
+            jest.useRealTimers();
         });
     });
 

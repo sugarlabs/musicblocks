@@ -33,7 +33,7 @@ describe("Block palette drag-and-drop", () => {
         // (js/palette.js _showMenuItems: itemRow.setAttribute("aria-label", ...)),
         // which is a stable way to find the plain "pitch" block among the
         // Pitch category's many blocks (pitch, pitch2, steppitch, hertz, ...).
-        cy.get('#palette tbody tr[aria-label="pitch"] img', { timeout: 15000 })
+        cy.get('#PaletteBody tbody tr[aria-label="pitch"] img', { timeout: 15000 })
             .scrollIntoView()
             .should("be.visible");
 
@@ -76,7 +76,7 @@ describe("Block palette drag-and-drop", () => {
         });
 
         cy.get("@dropPlan").then(plan => {
-            cy.get('#palette tbody tr[aria-label="pitch"] img').then($img => {
+            cy.get('#PaletteBody tbody tr[aria-label="pitch"] img').then($img => {
                 const rect = $img[0].getBoundingClientRect();
                 const startX = rect.x + rect.width / 2;
                 const startY = rect.y + rect.height / 2;
@@ -90,7 +90,7 @@ describe("Block palette drag-and-drop", () => {
                 const endX = plan.targetContainerX + rect.width / 2;
                 const endY = plan.targetContainerY + rect.height / 2;
 
-                cy.get('#palette tbody tr[aria-label="pitch"] img')
+                cy.get('#PaletteBody tbody tr[aria-label="pitch"] img')
                     .trigger("mousedown", { which: 1, pageX: startX, pageY: startY, force: true })
                     .then($draggedImg => {
                         // The real handler listens for mousemove on document

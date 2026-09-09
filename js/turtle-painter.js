@@ -16,8 +16,8 @@
  */
 
 /*
-   global _, getMunsellColor, getcolor, hex2rgb, STROKECOLORS, FILLCOLORS,
-   TURTLESVG, WRAP, clampNumber
+   global _, getMunsellColor, getcolor, hex2rgb, isValidHex, STROKECOLORS,
+   FILLCOLORS, TURTLESVG, WRAP, clampNumber
  */
 
 /*
@@ -27,7 +27,7 @@
    - js/utils/munsell.js
         getMunsellColor, getcolor
    - js/utils/utils.js
-        hex2rgb
+        hex2rgb, isValidHex
    - js/artwork.js
         STROKECOLORS, FILLCOLORS, TURTLESVG
    - js/toolbar.js
@@ -95,7 +95,9 @@ class Painter {
         this.cp2x = 100;
         this.cp2y = 100;
 
-        this._canvasColor = "rgba(255,0,49,1)"; // '#ff0031';
+        // Kept as a Munsell hex string: _processColor() converts it on every
+        // stroke, and converting an already-converted rgba string yields black.
+        this._canvasColor = "#ff0031";
         this._canvasAlpha = 1.0;
         this._fillState = false;
         this._hollowState = false;
@@ -775,7 +777,13 @@ class Painter {
      * @private
      */
     _processColor() {
-        const color = hex2rgb(this._canvasColor, this._canvasAlpha);
+        // _canvasColor is normally a Munsell hex string. Tolerate an
+        // already-converted "rgba(...)" string as well: hex2rgb() fails closed
+        // to black on anything that is not hex, so without this guard a single
+        // stray rgba write turns every later stroke black with no error.
+        const color = isValidHex(this._canvasColor)
+            ? hex2rgb(this._canvasColor, this._canvasAlpha)
+            : this._canvasColor.replace(/,[\d.]+\)$/, `,${this._canvasAlpha})`);
         this.turtle.ctx.strokeStyle = color;
         this.turtle.ctx.fillStyle = color;
     }
@@ -788,8 +796,13 @@ class Painter {
             // For the SVG output, we need to replace rgba() with
             // rgb();fill-opacity:1 and rgb();stroke-opacity:1
 
-            let svgColor = this._canvasColor.replace(/rgba/g, "rgb");
-            svgColor = svgColor.substr(0, this._canvasColor.length - 4) + ");";
+            // The opacity travels separately in fill-opacity/stroke-opacity
+            // below, so the color itself is emitted as rgb(...) with the alpha
+            // channel dropped. Accepts either representation of _canvasColor.
+            const rgba = isValidHex(this._canvasColor)
+                ? hex2rgb(this._canvasColor)
+                : this._canvasColor;
+            const svgColor = rgba.replace("rgba(", "rgb(").replace(/,[\d.]+\)$/, ");");
 
             this._svgOutput += '" style="stroke-linecap:round;fill:';
             this._svgOutput += this._fillState
@@ -1396,7 +1409,10 @@ class Painter {
         this._fillState = false;
         this._hollowState = false;
 
-        this._canvasColor = hex2rgb(getMunsellColor(this.color, this.value, this.chroma));
+        // Store the hex string, exactly as doSetColor/doSetChroma/doSetValue/
+        // doSetHue do. Pre-converting to rgba here made _processColor() convert
+        // it a second time, which yields black for every stroke after a clear.
+        this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
 
         this._svgOutput = "";
         this._svgPath = false;

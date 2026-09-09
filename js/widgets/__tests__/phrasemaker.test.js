@@ -74,7 +74,8 @@ global.PhraseMakerAudio = {
     collectNotesToPlay: jest.fn(),
     __playNote: jest.fn(),
     _playChord: jest.fn(),
-    _processGraphics: jest.fn()
+    _processGraphics: jest.fn(),
+    clearPlaybackTimers: jest.fn()
 };
 window.PhraseMakerAudio = global.PhraseMakerAudio;
 global.DEFAULTVOICE = "electronic synth";
@@ -1200,7 +1201,8 @@ describe("PhraseMaker Widget", () => {
             collectNotesToPlay: jest.fn(),
             __playNote: jest.fn(),
             _playChord: jest.fn(),
-            _processGraphics: jest.fn()
+            _processGraphics: jest.fn(),
+            clearPlaybackTimers: jest.fn()
         };
 
         global.PhraseMakerUI = {
@@ -1282,7 +1284,10 @@ describe("PhraseMaker Widget", () => {
         expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalled();
     });
     test("_save wires lastConnection identically across all block types (characterization)", () => {
-        global.PhraseMakerAudio = { collectNotesToPlay: jest.fn() };
+        global.PhraseMakerAudio = {
+            collectNotesToPlay: jest.fn(),
+            clearPlaybackTimers: jest.fn()
+        };
 
         phraseMaker._rows = [];
         phraseMaker._rowBlocks = [];
@@ -1514,7 +1519,9 @@ describe("PhraseMaker Widget", () => {
             resetMatrix: jest.fn()
         };
         phraseMaker.init(mockActivity);
+        phraseMaker.widgetWindow.onclose();
 
+        expect(phraseMaker._stopOrCloseClicked).toBe(true);
         expect(mockActivity.textMsg).toHaveBeenCalled();
     });
     test("isInitial ensures the first-open message fires only once across repeated init() calls", () => {
@@ -2394,7 +2401,8 @@ describe("PhraseMaker Widget", () => {
                 collectNotesToPlay: jest.fn(),
                 __playNote: jest.fn(),
                 _playChord: jest.fn(),
-                _processGraphics: jest.fn()
+                _processGraphics: jest.fn(),
+                clearPlaybackTimers: jest.fn()
             };
             global.PhraseMakerUI = {
                 resetMatrix: jest.fn(),
@@ -2940,6 +2948,41 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker._history.length).toBe(2);
             expect(phraseMaker._history.pop()).toEqual({ note: "la4", beat: 2 });
             expect(phraseMaker._history.length).toBe(1);
+        });
+    });
+
+    describe("handleClose", () => {
+        test("cleans up state and calls PhraseMakerAudio.clearPlaybackTimers on close", () => {
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                hideMsgs: jest.fn()
+            };
+            phraseMaker.playingNow = true;
+            phraseMaker._instrumentName = "piano";
+            phraseMaker._rowOffset = [1];
+            phraseMaker._rowMap = [2, 0, 1];
+            phraseMaker.widgetWindow = {
+                destroy: jest.fn()
+            };
+
+            global.PhraseMakerAudio.clearPlaybackTimers.mockClear();
+
+            phraseMaker.handleClose();
+
+            expect(phraseMaker._stopOrCloseClicked).toBe(true);
+            expect(phraseMaker.playingNow).toBe(false);
+            expect(phraseMaker._rowOffset).toEqual([]);
+            expect(phraseMaker._rowMap).toEqual([0, 1, 2]);
+            expect(phraseMaker.activity.hideMsgs).toHaveBeenCalled();
+            expect(global.PhraseMakerAudio.clearPlaybackTimers).toHaveBeenCalledWith(phraseMaker);
+            expect(phraseMaker.activity.logo.synth.stop).toHaveBeenCalled();
+            expect(phraseMaker.activity.logo.synth.stopSound).toHaveBeenCalledWith(0, "piano");
+            expect(phraseMaker.widgetWindow.destroy).toHaveBeenCalled();
         });
     });
 });

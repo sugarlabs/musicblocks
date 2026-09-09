@@ -80,6 +80,13 @@ jobs:
                 pattern: /-\s*\[x\]\s*Chore/i,
               },
               {
+                label: 'ui/ux',
+                color: 'F59E0B',
+                description: 'Changes to the user interface or user experience',
+                displayName: 'UI/UX',
+                pattern: /-\s*\[x\]\s*UI\/UX/i,
+              },
+              {
                 label: 'i18n',
                 color: '0D9488',
                 description: 'Internationalization and localization changes',
@@ -112,6 +119,7 @@ jobs:
                 '| Tests | Adds or updates test coverage |',
                 '| Documentation | Updates to docs, comments, or README |',
                 '| CI/CD | Changes to CI/CD workflows and automation |',
+                '| UI/UX | Changes to the user interface or user experience |',
                 '| i18n | Internationalization and localization changes |',
                 '',
                 'Example: Change `- [ ] Bug Fix` to `- [x] Bug Fix`',

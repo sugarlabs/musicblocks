@@ -121,3 +121,579 @@ describe("ProtoBlock", () => {
         expect(block.getCapability("missing")).toBeUndefined();
     });
 });
+
+// ---------------------------------------------------------------------------
+// Block shape definitions
+//
+// Each of these configures the geometry that every block of that shape
+// inherits: how many arguments it takes, the sequence of dock types that
+// decides what can connect where, whether it stretches, and which generator
+// draws it. The values are asserted exactly, because a wrong dock type is the
+// difference between a block that accepts a number and one that accepts a
+// whole stack.
+// ---------------------------------------------------------------------------
+
+describe("ProtoBlock shape definitions", () => {
+    let pb;
+
+    beforeEach(() => {
+        pb = new ProtoBlock("shape");
+        pb.staticLabels = ["label"];
+    });
+
+    describe("blocks with no arguments", () => {
+        it("hiddenBlockNoFlow takes up no space and cannot be followed", () => {
+            pb.hiddenBlockNoFlow();
+
+            expect(pb.args).toBe(0);
+            expect(pb.size).toBe(0);
+            expect(pb.dockTypes).toEqual(["out", "unavailable"]);
+            expect(pb.generator).toBe(pb.hiddenBlockFlowGenerator);
+        });
+
+        it("basicBlockNoFlow accepts a parent but nothing after it", () => {
+            pb.basicBlockNoFlow();
+
+            expect(pb.args).toBe(0);
+            expect(pb.dockTypes).toEqual(["out", "unavailable"]);
+            expect(pb.generator).toBe(pb.basicBlockNoFlowGenerator);
+        });
+
+        it("basicBlockCollapsed accepts nothing on either end", () => {
+            pb.basicBlockCollapsed();
+
+            expect(pb.args).toBe(0);
+            expect(pb.dockTypes).toEqual(["unavailable", "unavailable"]);
+            expect(pb.generator).toBe(pb.basicBlockCollapsedGenerator);
+        });
+    });
+
+    describe("blocks with arguments", () => {
+        it("oneBooleanArgBlock takes a boolean rather than a number", () => {
+            pb.oneBooleanArgBlock();
+
+            expect(pb.args).toBe(1);
+            expect(pb.size).toBe(1);
+            expect(pb.dockTypes).toEqual(["out", "booleanin", "in"]);
+            expect(pb.generator).toBe(pb.oneBooleanArgBlockGenerator);
+        });
+
+        it("threeArgBlock stretches and takes three numbers", () => {
+            pb.threeArgBlock();
+
+            expect(pb.args).toBe(3);
+            expect(pb.size).toBe(3);
+            expect(pb.style).toBe("twoarg");
+            expect(pb.expandable).toBe(true);
+            expect(pb.dockTypes).toEqual(["out", "numberin", "numberin", "numberin", "in"]);
+        });
+
+        it("fourArgBlock takes four numbers and is one size larger", () => {
+            pb.fourArgBlock();
+
+            expect(pb.args).toBe(4);
+            expect(pb.size).toBe(4);
+            expect(pb.style).toBe("twoarg");
+            expect(pb.expandable).toBe(true);
+            expect(pb.dockTypes).toEqual([
+                "out",
+                "numberin",
+                "numberin",
+                "numberin",
+                "numberin",
+                "in"
+            ]);
+        });
+    });
+
+    // The math blocks report a value rather than passing flow along, so they
+    // open with "numberout" and never carry an "in" dock.
+    describe("math blocks", () => {
+        it("oneArgMathBlock reports a value and is not expandable", () => {
+            pb.oneArgMathBlock();
+
+            expect(pb.args).toBe(1);
+            expect(pb.size).toBe(1);
+            expect(pb.style).toBe("arg");
+            expect(pb.parameter).toBe(true);
+            expect(pb.dockTypes).toEqual(["numberout", "numberin"]);
+        });
+
+        it.each([
+            ["twoArgMathBlock", 2],
+            ["threeArgMathBlock", 3],
+            ["fourArgMathBlock", 4]
+        ])("%s takes %i numbers and stretches", (method, count) => {
+            pb[method]();
+
+            expect(pb.args).toBe(count);
+            expect(pb.size).toBe(count);
+            expect(pb.style).toBe("arg");
+            expect(pb.parameter).toBe(true);
+            expect(pb.expandable).toBe(true);
+            expect(pb.dockTypes).toEqual(["numberout", ...Array(count).fill("numberin")]);
+        });
+
+        it("every math block reports out and never accepts flow", () => {
+            for (const method of [
+                "oneArgMathBlock",
+                "twoArgMathBlock",
+                "threeArgMathBlock",
+                "fourArgMathBlock"
+            ]) {
+                const block = new ProtoBlock(method);
+                block[method]();
+
+                expect(block.dockTypes[0]).toBe("numberout");
+                expect(block.dockTypes).not.toContain("in");
+                expect(block.dockTypes).not.toContain("out");
+            }
+        });
+    });
+
+    describe("value and media blocks", () => {
+        it("valueBlock reports a number and takes no arguments", () => {
+            pb.valueBlock();
+
+            expect(pb.style).toBe("value");
+            expect(pb.size).toBe(1);
+            expect(pb.args).toBe(0);
+            expect(pb.dockTypes).toEqual(["numberout"]);
+            expect(pb.generator).toBe(pb.valueBlockGenerator);
+        });
+
+        it("mediaBlock reports media and is twice the height", () => {
+            pb.mediaBlock();
+
+            expect(pb.style).toBe("value");
+            expect(pb.size).toBe(2);
+            expect(pb.args).toBe(0);
+            expect(pb.dockTypes).toEqual(["mediaout"]);
+            expect(pb.generator).toBe(pb.mediaBlockGenerator);
+        });
+    });
+
+    // Clamps wrap a stack of other blocks, so they always carry a second "in"
+    // dock for the contained stack on top of their own connections.
+    describe("clamp blocks", () => {
+        it("stackClampZeroArgBlock is detached at both ends and holds a stack", () => {
+            pb.stackClampZeroArgBlock();
+
+            expect(pb.style).toBe("clamp");
+            expect(pb.expandable).toBe(true);
+            expect(pb.size).toBe(3);
+            expect(pb.args).toBe(1);
+            expect(pb.dockTypes).toEqual(["unavailable", "in", "unavailable"]);
+        });
+
+        it("flowClampBlock connects to a parent and holds a stack", () => {
+            pb.flowClampBlock();
+
+            expect(pb.style).toBe("clamp");
+            expect(pb.expandable).toBe(true);
+            expect(pb.size).toBe(2);
+            expect(pb.args).toBe(1);
+            expect(pb.dockTypes).toEqual(["out", "in", "in"]);
+        });
+
+        it("flowClampOneArgBlock adds a number slot before the clamp", () => {
+            pb.flowClampOneArgBlock();
+
+            expect(pb.size).toBe(2);
+            expect(pb.args).toBe(2);
+            expect(pb.dockTypes).toEqual(["out", "numberin", "in", "in"]);
+        });
+
+        it("flowClampTwoArgBlock adds two number slots before the clamp", () => {
+            pb.flowClampTwoArgBlock();
+
+            expect(pb.size).toBe(3);
+            expect(pb.args).toBe(3);
+            expect(pb.dockTypes).toEqual(["out", "numberin", "numberin", "in", "in"]);
+        });
+
+        it("every flow clamp ends with two in docks, its own and the clamp's", () => {
+            for (const method of [
+                "flowClampBlock",
+                "flowClampOneArgBlock",
+                "flowClampTwoArgBlock"
+            ]) {
+                const block = new ProtoBlock(method);
+                block[method]();
+
+                expect(block.style).toBe("clamp");
+                expect(block.expandable).toBe(true);
+                expect(block.dockTypes[0]).toBe("out");
+                expect(block.dockTypes.slice(-2)).toEqual(["in", "in"]);
+            }
+        });
+    });
+
+    // Arg clamps hold a stack but report a value, so they take a text name
+    // first and then an "anyin" for the contained stack.
+    describe("argument clamp blocks", () => {
+        it("argClampOneArgBlock connects to flow and names its clamp", () => {
+            pb.argClampOneArgBlock();
+
+            expect(pb.style).toBe("argclamp");
+            expect(pb.expandable).toBe(true);
+            expect(pb.size).toBe(3);
+            expect(pb.args).toBe(2);
+            expect(pb.dockTypes).toEqual(["out", "textin", "anyin", "in"]);
+        });
+
+        it("argClampOneArgMathBlock reports a value instead of carrying flow", () => {
+            pb.argClampOneArgMathBlock();
+
+            expect(pb.style).toBe("argclamparg");
+            expect(pb.size).toBe(3);
+            expect(pb.args).toBe(2);
+            expect(pb.dockTypes).toEqual(["anyout", "textin", "anyin"]);
+            expect(pb.dockTypes).not.toContain("out");
+        });
+    });
+
+    // A shape method is only half the definition. The other half is the
+    // generator it installs, which is what actually draws the block.
+    describe("generator wiring", () => {
+        it.each([
+            ["basicBlockNoFlow", "basicBlockNoFlowGenerator"],
+            ["basicBlockCollapsed", "basicBlockCollapsedGenerator"],
+            ["oneBooleanArgBlock", "oneBooleanArgBlockGenerator"],
+            ["threeArgBlock", "threeArgBlockGenerator"],
+            ["fourArgBlock", "fourArgBlockGenerator"],
+            ["oneArgMathBlock", "oneArgMathBlockGenerator"],
+            ["twoArgMathBlock", "twoArgMathBlockGenerator"],
+            ["threeArgMathBlock", "threeArgMathBlockGenerator"],
+            ["fourArgMathBlock", "fourArgMathBlockGenerator"],
+            ["valueBlock", "valueBlockGenerator"],
+            ["mediaBlock", "mediaBlockGenerator"],
+            ["stackClampZeroArgBlock", "stackClampZeroArgBlockGenerator"],
+            ["flowClampBlock", "flowClampBlockGenerator"],
+            ["flowClampOneArgBlock", "flowClampOneArgBlockGenerator"],
+            ["flowClampTwoArgBlock", "flowClampTwoArgBlockGenerator"],
+            ["argClampOneArgBlock", "argClampOneArgBlockGenerator"],
+            ["argClampOneArgMathBlock", "argClampOneArgMathBlockGenerator"]
+        ])("%s installs %s", (method, generator) => {
+            const block = new ProtoBlock(method);
+            block.staticLabels = ["label"];
+            block[method]();
+
+            expect(block.generator).toBe(block[generator]);
+        });
+    });
+
+    describe("dock count matches the declared argument count", () => {
+        // A block that declares three arguments but only offers two input
+        // docks would silently drop the third, so the two are checked against
+        // each other rather than asserted independently.
+        it.each([
+            ["oneBooleanArgBlock", 1],
+            ["threeArgBlock", 3],
+            ["fourArgBlock", 4],
+            ["oneArgMathBlock", 1],
+            ["twoArgMathBlock", 2],
+            ["threeArgMathBlock", 3],
+            ["fourArgMathBlock", 4]
+        ])("%s offers %i input docks", (method, expected) => {
+            const block = new ProtoBlock(method);
+            block[method]();
+
+            const inputDocks = block.dockTypes.filter(d => /in$/.test(d) && d !== "in");
+
+            expect(inputDocks).toHaveLength(expected);
+            expect(block.args).toBe(expected);
+        });
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Generators
+//
+// The shape method is only half a block definition. The generator is what
+// actually draws it, and the clamp generators branch on how many slots the
+// caller asks for. The suite above pins the geometry; this one pins the
+// drawing calls that geometry turns into.
+// ---------------------------------------------------------------------------
+
+describe("ProtoBlock generators", () => {
+    let svgCalls;
+    let originalSVG;
+
+    // The renderer hands its docks and dimensions straight back to the caller,
+    // so the stub's geometry is named once here and asserted against by name.
+    const STUB_DOCKS = [
+        [0, 0],
+        [10, 20],
+        [10, 40],
+        [10, 60],
+        [10, 80]
+    ];
+    const STUB_WIDTH = 120;
+    const STUB_HEIGHT = 60;
+
+    // The shared SVG stub at the top of this file covers the simpler blocks.
+    // Clamp and boolean generators reach for more of the drawing API, so this
+    // records every call and returns predictable geometry.
+    beforeEach(() => {
+        svgCalls = [];
+        originalSVG = global.SVG;
+        const record = name => jest.fn((...args) => svgCalls.push([name, ...args]));
+        global.SVG = jest.fn(() => ({
+            setScale: record("setScale"),
+            setTab: record("setTab"),
+            setSlot: record("setSlot"),
+            setCap: record("setCap"),
+            setTail: record("setTail"),
+            setInnies: record("setInnies"),
+            setOutie: record("setOutie"),
+            setBoolean: record("setBoolean"),
+            setFontSize: record("setFontSize"),
+            setExpand: record("setExpand"),
+            setLabelOffset: record("setLabelOffset"),
+            setClampSlots: record("setClampSlots"),
+            setClampCount: record("setClampCount"),
+            basicBlock: jest.fn(() => "<svg>basic</svg>"),
+            basicBox: jest.fn(() => "<svg>box</svg>"),
+            basicClamp: jest.fn(() => "<svg>clamp</svg>"),
+            argClamp: jest.fn(() => "<svg>argclamp</svg>"),
+            booleanNot: jest.fn(() => "<svg>not</svg>"),
+            booleanAndOr: jest.fn(() => "<svg>andor</svg>"),
+            booleanCompare: jest.fn(() => "<svg>compare</svg>"),
+            // Wide enough for every generator here. The two-argument clamp
+            // reads docks[3] for its clamp offset, so a shorter list throws.
+            // Copied per instance so one test cannot mutate another's docks.
+            docks: STUB_DOCKS.map(dock => [...dock]),
+            getWidth: jest.fn(() => STUB_WIDTH),
+            getHeight: jest.fn(() => STUB_HEIGHT)
+        }));
+    });
+
+    afterEach(() => {
+        global.SVG = originalSVG;
+    });
+
+    const callsTo = name => svgCalls.filter(c => c[0] === name);
+
+    const build = method => {
+        const block = new ProtoBlock(method);
+        block.staticLabels = ["label"];
+        block[method]();
+        return block;
+    };
+
+    describe("clamp slot handling", () => {
+        it.each([
+            "flowClampBlockGenerator",
+            "flowClampOneArgBlockGenerator",
+            "flowClampTwoArgBlockGenerator",
+            "stackClampZeroArgBlockGenerator"
+        ])("%s defaults to a single slot when none is given", generator => {
+            const shape = generator.replace("Generator", "");
+            const block = build(shape);
+
+            block.generator();
+
+            expect(callsTo("setClampSlots")).toContainEqual(["setClampSlots", 0, 1]);
+        });
+
+        it.each([
+            ["flowClampBlockGenerator", 3],
+            ["flowClampOneArgBlockGenerator", 5],
+            ["flowClampTwoArgBlockGenerator", 2],
+            ["stackClampZeroArgBlockGenerator", 4]
+        ])("%s honours an explicit slot count of %i", (generator, slots) => {
+            const shape = generator.replace("Generator", "");
+            const block = build(shape);
+
+            block.generator(slots);
+
+            expect(callsTo("setClampSlots")).toContainEqual(["setClampSlots", 0, slots]);
+        });
+    });
+
+    describe("font size", () => {
+        it("is left to the default when the block sets none", () => {
+            const block = build("flowClampBlock");
+
+            block.generator();
+
+            expect(callsTo("setFontSize")).toHaveLength(0);
+        });
+
+        it("is applied when the block sets one", () => {
+            const block = build("flowClampBlock");
+            block.fontsize = 14;
+
+            block.generator();
+
+            expect(callsTo("setFontSize")).toContainEqual(["setFontSize", 14]);
+        });
+    });
+
+    describe("returned artwork", () => {
+        it("clamp generators return the clamp artwork with docks and size", () => {
+            const block = build("flowClampBlock");
+
+            const [artwork, docks, width, height] = block.generator();
+
+            expect(artwork).toBe("<svg>clamp</svg>");
+            expect(docks).toEqual(STUB_DOCKS);
+            expect(width).toBe(STUB_WIDTH);
+            expect(height).toBe(STUB_HEIGHT);
+        });
+
+        it("argument clamp generators return the arg clamp artwork", () => {
+            const block = build("argClampOneArgBlock");
+
+            const [artwork] = block.generator();
+
+            expect(artwork).toBe("<svg>argclamp</svg>");
+        });
+
+        // Each shape is pinned to the primitive that draws it and to the calls
+        // that separate it from its neighbours, so a shape wired to the wrong
+        // generator cannot pass. Innies are the argument slots along the left
+        // edge, an outie is the plug a reporter hands its value back through,
+        // and the tab and slot are the connections a block that carries flow
+        // makes above and below itself.
+        const SHAPES = [
+            {
+                shape: "threeArgBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setTab", true],
+                    ["setSlot", true],
+                    ["setInnies", [true, true, true]],
+                    ["setExpand", 30, 0, 0, 0]
+                ]
+            },
+            {
+                shape: "fourArgBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setTab", true],
+                    ["setSlot", true],
+                    ["setInnies", [true, true, true, true]]
+                ]
+            },
+            {
+                shape: "oneBooleanArgBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setBoolean", true],
+                    ["setClampCount", 0]
+                ]
+            },
+            {
+                shape: "oneArgMathBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setSlot", false],
+                    ["setTab", false],
+                    ["setOutie", true],
+                    ["setInnies", [true]]
+                ]
+            },
+            {
+                shape: "twoArgMathBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setOutie", true],
+                    ["setInnies", [true, true]]
+                ]
+            },
+            {
+                shape: "threeArgMathBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setOutie", true],
+                    ["setInnies", [true, true, true]]
+                ]
+            },
+            {
+                shape: "fourArgMathBlock",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setOutie", true],
+                    ["setInnies", [true, true, true, true]]
+                ]
+            },
+            {
+                shape: "valueBlock",
+                artwork: "<svg>box</svg>",
+                calls: [
+                    ["setOutie", true],
+                    ["setExpand", 60, 0, 0, 0]
+                ]
+            },
+            {
+                // The one shape that opens vertically, by the 23 it expands by.
+                shape: "mediaBlock",
+                artwork: "<svg>box</svg>",
+                calls: [
+                    ["setOutie", true],
+                    ["setExpand", 60, 23, 0, 0]
+                ]
+            },
+            {
+                shape: "basicBlockNoFlow",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setSlot", true],
+                    ["setTail", true]
+                ]
+            },
+            {
+                shape: "basicBlockCollapsed",
+                artwork: "<svg>basic</svg>",
+                calls: [
+                    ["setCap", true],
+                    ["setTail", true]
+                ]
+            }
+        ];
+
+        it.each(SHAPES)("$shape draws $artwork", ({ shape, artwork, calls }) => {
+            const block = build(shape);
+
+            const [drawn, docks, width, height] = block.generator();
+
+            expect(drawn).toBe(artwork);
+            expect(docks).toEqual(STUB_DOCKS);
+            expect(width).toBe(STUB_WIDTH);
+            expect(height).toBe(STUB_HEIGHT);
+            for (const call of calls) {
+                expect(svgCalls).toContainEqual(call);
+            }
+        });
+
+        it("no two shapes issue the same set of drawing calls", () => {
+            const signatures = SHAPES.map(({ shape }) => {
+                svgCalls = [];
+                build(shape).generator();
+                return JSON.stringify(svgCalls);
+            });
+
+            expect(new Set(signatures).size).toBe(SHAPES.length);
+        });
+    });
+
+    describe("scale is always applied first", () => {
+        it.each(["flowClampBlock", "threeArgBlock", "valueBlock", "argClampOneArgBlock"])(
+            "%s passes its scale to the renderer",
+            shape => {
+                const block = build(shape);
+                block.scale = 2.5;
+
+                block.generator();
+
+                // Asserted by position, not by presence. Scale has to be set
+                // before any geometry call, because the renderer multiplies
+                // the geometry it is given by whatever scale it holds.
+                expect(svgCalls[0]).toEqual(["setScale", 2.5]);
+                expect(callsTo("setScale")).toHaveLength(1);
+            }
+        );
+    });
+});

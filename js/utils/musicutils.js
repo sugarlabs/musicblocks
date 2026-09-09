@@ -350,10 +350,10 @@ const EQUIVALENTNATURALS = {
     "C𝄪": "D",
     "F𝄪": "G",
     "B𝄪": "C♯",
-    "C𝄫": "B",
+    "C𝄫": "B♭",
     "D𝄫": "C",
     "E𝄫": "D",
-    "F𝄫": "E",
+    "F𝄫": "E♭",
     "G𝄫": "F",
     "A𝄫": "G",
     "B𝄫": "A",
@@ -365,10 +365,10 @@ const EQUIVALENTNATURALS = {
     "C♯♯": "D",
     "F♯♯": "G",
     "B♯♯": "C♯",
-    "C♭♭": "B",
+    "C♭♭": "B♭",
     "D♭♭": "C",
     "E♭♭": "D",
-    "F♭♭": "E",
+    "F♭♭": "E♭",
     "G♭♭": "F",
     "A♭♭": "G",
     "B♭♭": "A"
@@ -1035,6 +1035,15 @@ function generateNoteNames(edo) {
         const natural = naturals[n];
         const nextNatural = naturals[(n + 1) % 7];
         const edoSteps = intervals[n].steps;
+
+        // A letter with zero allocated steps contributes no note names at
+        // all (not even its own natural). Pushing it unconditionally was
+        // the bug: it forced names.length to always be >= 7, even for
+        // EDOs smaller than 7 (e.g. edo=4 allocates steps to only 4 of the
+        // 7 letters, leaving 3 letters with 0 steps).
+        if (edoSteps < 1) {
+            continue;
+        }
 
         names.push(natural);
 
@@ -1737,7 +1746,7 @@ const INTERVALVALUES = {
     "augmented 5": [8, 1, 25 / 16],
     "minor 6": [8, -1, 8 / 5],
     "major 6": [9, 1, 5 / 3],
-    "diminished 7": [9, -1, 9 / 5],
+    "diminished 7": [9, -1, 128 / 75],
     "augmented 6": [10, 1, 125 / 72],
     "minor 7": [10, -1, 16 / 9],
     "major 7": [11, 1, 15 / 8],
@@ -2592,10 +2601,13 @@ const TEMPERAMENT = {
         "description": "19 Equal Divisions of the Octave",
         "ratios": [
             1,
+            Math.pow(2, 1 / 19),
             Math.pow(2, 2 / 19),
             Math.pow(2, 3 / 19),
+            Math.pow(2, 4 / 19),
             Math.pow(2, 5 / 19),
             Math.pow(2, 6 / 19),
+            Math.pow(2, 7 / 19),
             Math.pow(2, 8 / 19),
             Math.pow(2, 9 / 19),
             Math.pow(2, 10 / 19),
@@ -2605,6 +2617,7 @@ const TEMPERAMENT = {
             Math.pow(2, 14 / 19),
             Math.pow(2, 15 / 19),
             Math.pow(2, 16 / 19),
+            Math.pow(2, 17 / 19),
             Math.pow(2, 18 / 19)
         ],
         "octaveRatio": 2,
@@ -4812,7 +4825,10 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
             // Use its proportional position from 12-EDO (A is at index 9).
             aIndex = Math.round((9 / 12) * currentEDO);
         }
-        const normalizedPitch = originalPitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
+        const normalizedPitch = originalPitch
+            .replace(/^([a-g])/, (_, letter) => letter.toUpperCase())
+            .replaceAll("#", SHARP)
+            .replaceAll("b", FLAT);
         let edoPos = names.indexOf(normalizedPitch);
         if (edoPos === -1) {
             // Fallback: try the 12-EDO arrays with proportional mapping
@@ -4840,7 +4856,7 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
     }
 
     let pitchNumber = 0;
-    if (PITCHES.includes(pitch)) {
+    if (PITCHES.includes(pitch.toUpperCase())) {
         pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
     } else {
         // obj[1] is the solfege mapping for the current key/mode
@@ -4877,29 +4893,32 @@ const numberToPitchSharp = (i, temperament) => {
                 i += 12;
                 n += 1;
             }
-            const octave = Math.floor(i / 12) - n;
+            const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12) - n;
             const nameIndex = Math.round(((i % 12) / 12) * 12);
             return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
         } else {
-            const octave = Math.floor(i / 12);
+            const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12);
             const nameIndex = Math.round(((i % 12) / 12) * 12);
             return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
         }
     }
-    const t = TEMPERAMENT[temperament];
-    const edoNames = t && t.noteLabels ? t.noteLabels : generateNoteNames(currentEDO);
+    const edoNames = generateNoteNames(currentEDO);
+    let aIndex = edoNames.indexOf("A");
+    if (aIndex === -1) {
+        aIndex = Math.round((9 / 12) * currentEDO);
+    }
     if (i < 0) {
         let n = 0;
         while (i < 0) {
             i += currentEDO;
             n += 1;
         }
-        const octave = Math.floor(i / currentEDO) - n;
-        const nameIndex = i % currentEDO;
+        const octave = Math.floor((i + aIndex) / currentEDO) - n;
+        const nameIndex = (i + aIndex) % currentEDO;
         return [edoNames[nameIndex], octave];
     } else {
-        const octave = Math.floor(i / currentEDO);
-        const nameIndex = i % currentEDO;
+        const octave = Math.floor((i + aIndex) / currentEDO);
+        const nameIndex = (i + aIndex) % currentEDO;
         return [edoNames[nameIndex], octave];
     }
 };
@@ -6552,15 +6571,24 @@ const buildScale = (keySignature, edo) => {
 
     const halfSteps = getModePattern(obj[1], currentEDO);
 
+    // SHARPPREFERENCE and FLATPREFERENCE are keyed only on "<key> major" and
+    // "<key> minor", but keySignatureToMode() returns the raw mode name --
+    // "natural minor", "aeolian", "lydian", "dorian" and so on. Map the mode
+    // onto its major/minor equivalent first, exactly as getSharpFlatPreference()
+    // does, otherwise the lookup misses for every mode the pie menu offers and
+    // the scale falls through to the wrong spelling.
+    const preferenceMode = modeMapper(obj[0], obj[1]);
+    const preferenceKey = preferenceMode[0] + " " + preferenceMode[1];
+
     let thisScale;
     if (NOTESFLAT.includes(myKeySignature)) {
-        if (SHARPPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
+        if (SHARPPREFERENCE.includes(preferenceKey)) {
             thisScale = NOTESSHARP;
         } else {
             thisScale = NOTESFLAT;
         }
     } else {
-        if (FLATPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
+        if (FLATPREFERENCE.includes(preferenceKey)) {
             thisScale = NOTESFLAT;
         } else {
             thisScale = NOTESSHARP;
@@ -8007,7 +8035,7 @@ const calcOctaveInterval = arg => {
  * @returns {boolean} True if the value is an integer, false otherwise.
  */
 const isInt = value => {
-    return !isNaN(value) && parseInt(Number(value), 10) === value && !isNaN(parseInt(value, 10));
+    return !isNaN(parseFloat(value)) && Number.isInteger(Number(value));
 };
 
 /**

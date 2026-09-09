@@ -27,6 +27,7 @@ global._ = msg => msg;
 global.platformColor = {
     labelColor: "#90c100",
     selectorBackground: "#f0f0f0",
+    selectorSelected: "#d0d0d0",
     selectorBackgroundHOVER: "#e0e0e0"
 };
 const defaultDocByIdImpl = () => ({
@@ -802,6 +803,414 @@ describe("PitchDrumMatrix Widget", () => {
             jest.useRealTimers();
             pdm.widgetWindow.destroy.mockReset();
             delete Singer.defaultBPMFactor;
+        });
+    });
+
+    // --- Additional Coverage Tests for init, DOM callbacks, _addDrum, makeClickable, _save, _scale, _setCellPitchDrum ---
+    describe("init & full DOM table setup", () => {
+        let mockActivity;
+        let createdElements;
+        let elementsByIdMap;
+
+        beforeEach(() => {
+            createdElements = [];
+            elementsByIdMap = {};
+
+            const createMockDOMElement = tagName => {
+                const el = {
+                    tagName: tagName.toUpperCase(),
+                    style: {},
+                    dataset: {},
+                    children: [],
+                    rows: [],
+                    cells: [],
+                    textContent: "",
+                    className: "",
+                    setAttribute: jest.fn((key, val) => {
+                        el[key] = val;
+                        if (key === "id") elementsByIdMap[val] = el;
+                    }),
+                    getAttribute: jest.fn(key => el[key]),
+                    appendChild: jest.fn(child => {
+                        if (child) {
+                            el.children.push(child);
+                            if (child.tagName === "TR") el.rows.push(child);
+                            if (child.tagName === "TD" || child.tagName === "TH")
+                                el.cells.push(child);
+                        }
+                        return child;
+                    }),
+                    append: jest.fn((...args) => {
+                        args.forEach(arg => {
+                            if (arg && typeof arg === "object") {
+                                el.children.push(arg);
+                                if (arg.tagName === "TR") el.rows.push(arg);
+                                if (arg.tagName === "TD" || arg.tagName === "TH")
+                                    el.cells.push(arg);
+                            }
+                        });
+                    }),
+                    querySelector: jest.fn(selector => {
+                        if (selector === "img") {
+                            return el.children.find(c => c && c.tagName === "IMG") || null;
+                        }
+                        return null;
+                    }),
+                    getElementsByTagName: jest.fn(tag => {
+                        if (tag.toLowerCase() === "svg")
+                            return [{ setAttribute: jest.fn(), style: {} }];
+                        return [];
+                    }),
+                    insertRow: jest.fn(() => {
+                        const row = createMockDOMElement("tr");
+                        el.rows.push(row);
+                        return row;
+                    }),
+                    insertCell: jest.fn(() => {
+                        const cell = createMockDOMElement("td");
+                        el.cells.push(cell);
+                        return cell;
+                    })
+                };
+                Object.defineProperty(el, "id", {
+                    get() {
+                        return el._id || "";
+                    },
+                    set(val) {
+                        el._id = val;
+                        elementsByIdMap[val] = el;
+                    }
+                });
+                return el;
+            };
+
+            global.document.createElement = jest.fn(tag => createMockDOMElement(tag));
+            global.docById = jest.fn(id => elementsByIdMap[id] || createMockDOMElement("div"));
+
+            mockActivity = {
+                logo: {
+                    synth: { stop: jest.fn(), trigger: jest.fn() },
+                    turtleDelay: 0
+                },
+                blocks: {
+                    palettes: {
+                        dict: {
+                            music: { hideMenu: jest.fn() }
+                        }
+                    },
+                    loadNewBlocks: jest.fn()
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({ singer: { keySignature: "C major" } }))
+                },
+                refreshCanvas: jest.fn(),
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn(),
+                errorMsg: jest.fn()
+            };
+        });
+
+        test("should build tables, note rows, rests, and drum columns during init", () => {
+            pdm.rowLabels = ["sol", "rest", "snare"];
+            pdm.rowArgs = [4, 4, 0];
+
+            global.getDrumName.mockImplementation(name => (name === "snare" ? "snare drum" : null));
+
+            const buttons = {};
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn((icon, size, label) => {
+                    const btn = {
+                        onclick: null,
+                        icon,
+                        label,
+                        appendChild: jest.fn(),
+                        textContent: ""
+                    };
+                    buttons[label] = btn;
+                    return btn;
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    appendChild: jest.fn(),
+                    style: {}
+                }),
+                sendToCenter: jest.fn(),
+                onclose: null,
+                onmaximize: null,
+                timerManager: {
+                    setTimeout: (callback, delay) => setTimeout(callback, delay)
+                },
+                destroy: jest.fn()
+            };
+            window.widgetWindows.windowFor.mockReturnValue(mockWidgetWindow);
+
+            pdm.init(mockActivity);
+
+            expect(pdm._rests).toBe(1);
+            expect(pdm.drums).toEqual(["snare drum"]);
+            expect(buttons["Play"]).toBeDefined();
+            expect(buttons["Save"]).toBeDefined();
+            expect(buttons["Clear"]).toBeDefined();
+
+            // Test Play button click handler
+            buttons["Play"].onclick();
+            expect(pdm._playing).toBe(true);
+
+            buttons["Play"].onclick();
+            expect(pdm._playing).toBe(false);
+
+            // Test Clear button click handler
+            buttons["Clear"].onclick();
+
+            // Test Save button click handler and debounce lock
+            jest.useFakeTimers();
+            buttons["Save"].onclick();
+            expect(pdm._save_lock).toBe(true);
+
+            // Second click while locked is ignored
+            buttons["Save"].onclick();
+
+            jest.advanceTimersByTime(1000);
+            expect(pdm._save_lock).toBe(false);
+            jest.useRealTimers();
+
+            // Test onmaximize handler when maximized is true and false
+            mockWidgetWindow._maximized = true;
+            mockWidgetWindow.onmaximize();
+            expect(mockWidgetWindow.getWidgetBody().style.position).toBe("absolute");
+
+            mockWidgetWindow._maximized = false;
+            mockWidgetWindow.onmaximize();
+            expect(mockWidgetWindow.getWidgetBody().style.position).toBe("relative");
+        });
+
+        test("should handle mouseover and mouseout events on drum cells", () => {
+            pdm.rowLabels = ["sol"];
+            pdm.rowArgs = [4];
+            global.getDrumName.mockImplementation(name => (name === "snare" ? "snare drum" : null));
+            pdm.drums = ["snare drum"];
+
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest
+                    .fn()
+                    .mockReturnValue({ onclick: null, appendChild: jest.fn(), textContent: "" }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    style: {}
+                }),
+                onclose: null,
+                onmaximize: null,
+                timerManager: { setTimeout: jest.fn() },
+                destroy: jest.fn()
+            };
+            window.widgetWindows.windowFor.mockReturnValue(mockWidgetWindow);
+
+            pdm.init(mockActivity);
+
+            const rowCells = pdm._pdmCellTables[0].rows[0].cells;
+            const cell = rowCells[0];
+            expect(cell).toBeDefined();
+            expect(typeof cell.onmouseover).toBe("function");
+            expect(typeof cell.onmouseout).toBe("function");
+
+            cell.onmouseover();
+            cell.onmouseout();
+        });
+
+        test("makeClickable sets up click listeners and restores blockMap entries", () => {
+            pdm.rowLabels = ["sol", "la"];
+            pdm.rowArgs = [4, 4];
+            global.getDrumName.mockReturnValue(null);
+
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest
+                    .fn()
+                    .mockReturnValue({ onclick: null, appendChild: jest.fn(), textContent: "" }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    style: {}
+                }),
+                onclose: null,
+                onmaximize: null,
+                timerManager: { setTimeout: jest.fn() },
+                destroy: jest.fn()
+            };
+            window.widgetWindows.windowFor.mockReturnValue(mockWidgetWindow);
+
+            pdm.init(mockActivity);
+
+            // Manually add drum cells
+            pdm.drums = ["snare drum"];
+            pdm._addDrum(0);
+
+            // Setup _rowBlocks, _colBlocks, and _blockMap
+            pdm._rowBlocks = [101, 102];
+            pdm._colBlocks = [201];
+            pdm.addNode(101, 201);
+
+            pdm.makeClickable();
+
+            const cell = pdm._pdmCellTables[0].rows[0].cells[0];
+            expect(cell.style.backgroundColor).toBe("black");
+
+            // Click cell to toggle off (black -> selectorBackground)
+            cell.onclick({ target: cell });
+            expect(cell.style.backgroundColor).toBe(platformColor.selectorBackground);
+
+            // Click cell to toggle on (selectorBackground -> black)
+            cell.onclick({ target: cell });
+            expect(cell.style.backgroundColor).toBe("black");
+        });
+
+        test("_setCellPitchDrum replaces old selected drum in row when playNote is true", () => {
+            pdm.rowLabels = ["sol"];
+            pdm.rowArgs = [4];
+            pdm.drums = ["snare drum", "kick drum"];
+
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest
+                    .fn()
+                    .mockReturnValue({ onclick: null, appendChild: jest.fn(), textContent: "" }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    style: {}
+                }),
+                onclose: null,
+                onmaximize: null,
+                timerManager: { setTimeout: jest.fn() },
+                destroy: jest.fn()
+            };
+            window.widgetWindows.windowFor.mockReturnValue(mockWidgetWindow);
+
+            pdm.init(mockActivity);
+
+            pdm._rowBlocks = [10];
+            pdm._colBlocks = [100, 200];
+
+            const cell0 = pdm._pdmCellTables[0].rows[0].cells[0];
+            const cell1 = pdm._pdmCellTables[0].rows[0].cells[1];
+            cell0.style.backgroundColor = "black";
+            cell0.id = "0,0";
+            cell1.id = "0,1";
+
+            pdm.addNode(10, 100);
+
+            // Selecting column 1 should clear column 0
+            pdm._setCellPitchDrum(1, 0, true);
+
+            expect(cell0.style.backgroundColor).toBe(platformColor.selectorBackground);
+            expect(pdm._blockMap).toEqual([
+                [-1, -1],
+                [10, 200]
+            ]);
+        });
+
+        test("_save creates and loads action stack when grid has selections", () => {
+            pdm.rowLabels = ["sol"];
+            pdm.rowArgs = [4];
+            pdm.drums = ["snare drum"];
+
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn().mockReturnValue({ onclick: null }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    style: {}
+                }),
+                onclose: null,
+                onmaximize: null,
+                timerManager: { setTimeout: jest.fn() },
+                destroy: jest.fn()
+            };
+            window.widgetWindows.windowFor.mockReturnValue(mockWidgetWindow);
+
+            pdm.init(mockActivity);
+
+            const cell = pdm._pdmCellTables[0].rows[0].cells[0];
+            cell.style.backgroundColor = "black";
+
+            global.getDrumSynthName.mockReturnValue("snare");
+            global.SOLFEGECONVERSIONTABLE = { C: "do", G: "sol" };
+
+            pdm._save();
+
+            expect(mockActivity.blocks.palettes.dict.music.hideMenu).toHaveBeenCalledWith(true);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalled();
+            const stack = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(stack[0]).toEqual([
+                0,
+                ["action", { collapsed: true }],
+                100,
+                100,
+                [null, 1, 2, null]
+            ]);
+        });
+
+        test("_save returns early if no cells are selected", () => {
+            pdm.rowLabels = ["sol"];
+            pdm.rowArgs = [4];
+            pdm.drums = ["snare drum"];
+
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn().mockReturnValue({ onclick: null }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    style: {}
+                }),
+                onclose: null,
+                onmaximize: null,
+                timerManager: { setTimeout: jest.fn() },
+                destroy: jest.fn()
+            };
+            window.widgetWindows.windowFor.mockReturnValue(mockWidgetWindow);
+
+            pdm.init(mockActivity);
+
+            pdm._save();
+
+            expect(mockActivity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        });
+
+        test("_scale handles widget scaling and SVG dimensions", () => {
+            jest.useFakeTimers();
+
+            const svgElement = { setAttribute: jest.fn(), style: {} };
+            const widgetBody = {
+                style: {},
+                children: [{ style: {} }],
+                getElementsByTagName: jest.fn().mockReturnValue([svgElement]),
+                offsetHeight: 400
+            };
+
+            pdm.getWidgetFrame = jest.fn().mockReturnValue({ offsetHeight: 800 });
+            pdm.getDragElement = jest.fn().mockReturnValue({ offsetHeight: 50 });
+            pdm.getWidgetBody = jest.fn().mockReturnValue(widgetBody);
+            pdm.isMaximized = jest.fn().mockReturnValue(true);
+
+            pdm._scale();
+
+            expect(svgElement.style.pointerEvents).toBe("none");
+            expect(svgElement.setAttribute).toHaveBeenCalledWith(
+                "height",
+                expect.stringContaining("px")
+            );
+
+            jest.advanceTimersByTime(100);
+            expect(svgElement.style.pointerEvents).toBe("auto");
+
+            jest.useRealTimers();
         });
     });
 });

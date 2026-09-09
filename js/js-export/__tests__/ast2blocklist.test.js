@@ -1165,13 +1165,13 @@ describe("AST2BlockList Class", () => {
             [25, ["text", { value: "action" }], 0, 0, [24]],
             [26, "drift", 0, 0, [24, 27, null]],
             [27, "onbeatdo", 0, 0, [26, 28, 29, 30]],
-            [28, "nopValueBlock", 0, 0, [27]],
+            [28, "beatvalue", 0, 0, [27]],
             [29, ["text", { value: "action" }], 0, 0, [27]],
             [30, "onbeatdo", 0, 0, [27, 31, 32, 33]],
             [31, "nopValueBlock", 0, 0, [30]],
             [32, ["text", { value: "action" }], 0, 0, [30]],
             [33, "onbeatdo", 0, 0, [30, 34, 35, 36]],
-            [34, "nopValueBlock", 0, 0, [33]],
+            [34, "bpmfactor", 0, 0, [33]],
             [35, ["text", { value: "action" }], 0, 0, [33]],
             [36, "onbeatdo", 0, 0, [33, 37, 38, 39]],
             [37, "beatfactor", 0, 0, [36]],
@@ -1185,6 +1185,25 @@ describe("AST2BlockList Class", () => {
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
+    });
+
+    test("should convert the current meter getter", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.onStrongBeatDo(mouse.CURRENTMETER, "action");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "onbeatdo", 0, 0, [0, 2, 3, null]],
+            [2, "currentmeter", 0, 0, [1]],
+            [3, ["text", { value: "action" }], 0, 0, [1]]
+        ]);
     });
 
     // Test all Pitch Blocks.
@@ -1595,5 +1614,51 @@ describe("AST2BlockList Class", () => {
                 "setHeapEntry"
             ])
         );
+    });
+
+    // Test duplicate name_map entries preserving initial argument configuration.
+    test("should preserve initial argument configuration when duplicate name_map entries exist", () => {
+        const customConfig = JSON.parse(JSON.stringify(config));
+
+        // Create an initial entry in body_blocks whose name_map points to "newnote" with NumberExpression
+        const initialEntry = {
+            comment: "Initial newnote mapping with number expression argument",
+            name_map: {
+                initialPlayNote: "newnote"
+            },
+            arguments: [
+                {
+                    type: "NumberExpression"
+                }
+            ]
+        };
+
+        // Find existing newnote entry and mutate its arguments to a different type ("text")
+        const existingEntry = customConfig.body_blocks.find(
+            entry => entry.name_map && entry.name_map.playNote === "newnote"
+        );
+        existingEntry.arguments = [{ type: "text" }];
+
+        // Insert initialEntry before existingEntry so it is encountered first
+        const existingIndex = customConfig.body_blocks.indexOf(existingEntry);
+        customConfig.body_blocks.splice(existingIndex, 0, initialEntry);
+
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playNote(1, async () => {
+                return mouse.ENDFLOW;
+            });
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, customConfig);
+
+        // Verify the argument block (child of newnote) was created using the initial entry ("number")
+        // rather than the subsequent overridden entry ("text")
+        const argBlock = blockList.find(b => b[0] === 2);
+        expect(argBlock).toBeDefined();
+        expect(argBlock[1]).toEqual(["number", { value: 1 }]);
     });
 });

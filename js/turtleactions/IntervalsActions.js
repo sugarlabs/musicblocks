@@ -520,6 +520,7 @@ function setupIntervalsActions(activity) {
          * @returns {void}
          */
         static setTemperament(temperament, pitch, octave) {
+            const previousStartingPitch = activity.logo.synth.startingPitch;
             activity.logo.synth.inTemperament = temperament;
             activity.logo._userTemperament = temperament;
             activity.logo.synth.startingPitch = pitch + "" + octave;
@@ -529,7 +530,8 @@ function setupIntervalsActions(activity) {
 
             if (
                 activity.logo.temperamentSelected[len - 1] !==
-                activity.logo.temperamentSelected[len - 2]
+                    activity.logo.temperamentSelected[len - 2] ||
+                (len > 1 && activity.logo.synth.startingPitch !== previousStartingPitch)
             ) {
                 activity.logo.synth.changeInTemperament = true;
             }

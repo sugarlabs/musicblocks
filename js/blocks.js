@@ -27,7 +27,8 @@
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
     docById, define, BlocksDependencies, deepClone, pubsub,
     MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
-    CAMERAVALUE, VIDEOVALUE, setupBlockDragController
+    CAMERAVALUE, VIDEOVALUE, setupBlockDragController,
+    announceToScreenReader
 */
 
 /* global showZoomOverlay */
@@ -212,6 +213,23 @@ class Blocks {
         /** Number of blocks to load */
         this._loadCounter = 0;
         /**
+         * loadNewBlocks() is not re-entrant: it tracks the in-progress load
+         * on _loadCounter/_adjustTheseStacks/_adjustTheseDocks below, shared
+         * instance state. A second call made while one is still chunking
+         * through blocks would otherwise reset that state out from under the
+         * first (issue #8392), so calls are queued and run one at a time.
+         */
+        this._loadQueue = [];
+        this._loadInProgress = false;
+        /**
+         * Bumped once per load attempt (see _loadNewBlocksNow). Every block
+         * created during a load is tagged with the value active at the time,
+         * so a completion callback that lands after its own load has already
+         * been abandoned (queue advanced past it on failure) can recognize
+         * itself as stale and skip touching the next load's _loadCounter.
+         */
+        this._activeLoadGeneration = 0;
+        /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
          */
@@ -307,6 +325,13 @@ class Blocks {
             const block = this.blockList[blkIdx];
             if (!block || !block.container) return;
 
+            // The grid is keyed by block index, and Map and Set compare keys
+            // strictly. A caller iterating blockList with for...in hands over
+            // a string, which would register the block a second time and
+            // orphan the entry already held under its number, leaving it
+            // listed at a position it has left. Key on the number always.
+            const idx = Number(blkIdx);
+
             // Compute the set of cells this block should occupy
             const newKeys = new Set();
             if (block.docks && block.docks.length > 0) {
@@ -325,7 +350,7 @@ class Blocks {
             }
 
             // Check if cells changed; skip update if identical
-            const oldKeys = this._blockGridCell.get(blkIdx);
+            const oldKeys = this._blockGridCell.get(idx);
             if (oldKeys && oldKeys.size === newKeys.size) {
                 let same = true;
                 for (const k of newKeys) {
@@ -342,7 +367,7 @@ class Blocks {
                 for (const oldKey of oldKeys) {
                     const oldSet = this._spatialGrid.get(oldKey);
                     if (oldSet) {
-                        oldSet.delete(blkIdx);
+                        oldSet.delete(idx);
                         if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
                     }
                 }
@@ -355,9 +380,9 @@ class Blocks {
                     cellSet = new Set();
                     this._spatialGrid.set(key, cellSet);
                 }
-                cellSet.add(blkIdx);
+                cellSet.add(idx);
             }
-            this._blockGridCell.set(blkIdx, newKeys);
+            this._blockGridCell.set(idx, newKeys);
         };
 
         /**
@@ -2639,6 +2664,10 @@ class Blocks {
             // Cache the block's index for O(1) lookups instead of
             // O(N) blockList.indexOf() scans.
             myBlock.blockIndex = this.blockList.length - 1;
+            // Tag with the load this block belongs to, so a stale
+            // cleanupAfterLoad() completion from an abandoned load can be
+            // told apart from one belonging to whatever load is active now.
+            myBlock._loadGeneration = this._activeLoadGeneration;
             myBlock.copySize();
 
             /** We may need to do some postProcessing to the block */
@@ -3493,7 +3522,11 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             /** Named dos are modified in a separate function below. */
-            for (const blk in this.blockList) {
+            // Indexed numerically. Both the skipBlock check below and the
+            // connections.indexOf slot check further down compare against
+            // block numbers, and for...in would hand them a string, which is
+            // never strictly equal to the number it is matched against.
+            for (let blk = 0; blk < this.blockList.length; blk++) {
                 if (blk === skipBlock) {
                     continue;
                 }
@@ -4769,14 +4802,54 @@ class Blocks {
         };
 
         /**
-         * Load new blocks.
+         * Load new blocks. Queues the call instead of running it immediately
+         * if another load is still in progress, so the two loads' bookkeeping
+         * never overlaps (issue #8392).
          * @param - blockObj - Block Objects
          * @public
          * return {void}
          */
         this.loadNewBlocks = blockObjs => {
+            if (this._loadInProgress) {
+                this._loadQueue.push(blockObjs);
+                return;
+            }
+
+            this._loadInProgress = true;
+            this._loadNewBlocksNow(blockObjs);
+        };
+
+        /**
+         * Marks the current load as finished and, if another load was
+         * queued while it ran, starts that one.
+         * @private
+         * @returns {void}
+         */
+        this._advanceLoadQueue = () => {
+            this._loadInProgress = false;
+
+            if (this._loadQueue.length > 0) {
+                const nextBlockObjs = this._loadQueue.shift();
+                this._loadInProgress = true;
+                this._loadNewBlocksNow(nextBlockObjs);
+            }
+        };
+
+        /**
+         * Does the actual work of loading new blocks. Only ever runs for one
+         * call to loadNewBlocks at a time, see _advanceLoadQueue above.
+         * @private
+         * @param - blockObj - Block Objects
+         * @returns {void}
+         */
+        this._loadNewBlocksNow = blockObjs => {
             /** Suppress intermediate canvas redraws during block loading. */
             this.activity._suppressRefresh = true;
+            // Every load attempt gets its own generation, win or lose, so a
+            // completion that lands after this one has been abandoned can be
+            // told apart from a completion belonging to whatever load is
+            // active by the time it fires.
+            this._activeLoadGeneration += 1;
 
             try {
                 /**
@@ -4817,22 +4890,89 @@ class Blocks {
                     blockObjs.pop();
                 }
 
-                /** Check for blocks connected to themselves, */
-                /** and for action blocks not connected to text blocks. */
-                for (let b = 0; b < blockObjs.length; b++) {
-                    const blkData = blockObjs[b];
+                /** Check for circular connections in block data using iterative DFS. */
+                const hasCycle = () => {
+                    const adj = new Map();
+                    for (let b = 0; b < blockObjs.length; b++) {
+                        const blkData = blockObjs[b];
+                        const id = blkData[0];
+                        const connections = blkData[4] || [];
 
-                    for (const c in blkData[4]) {
-                        if (blkData[4][c] === blkData[0]) {
-                            console.debug("Circular connection in block data: " + blkData);
+                        // Self-loop check: reject if any dock points to the block itself.
+                        for (let c = 0; c < connections.length; c++) {
+                            if (connections[c] === id) {
+                                return true;
+                            }
+                        }
 
-                            console.debug("Punting loading of new blocks!");
+                        // Build directed adjacency from child docks only (index >= 1).
+                        // Dock 0 is the parent back-pointer and must be excluded
+                        // to avoid false cycles in normal parent-child trees.
+                        const children = [];
+                        for (let c = 1; c < connections.length; c++) {
+                            const connId = connections[c];
+                            if (connId !== null && connId !== undefined) {
+                                children.push(connId);
+                            }
+                        }
+                        adj.set(id, children);
+                    }
 
-                            console.debug(blockObjs);
-                            this.activity._suppressRefresh = false;
-                            return;
+                    const visited = new Set();
+                    const activeStack = new Set();
+
+                    for (let b = 0; b < blockObjs.length; b++) {
+                        const startId = blockObjs[b][0];
+                        if (visited.has(startId)) {
+                            continue;
+                        }
+
+                        // Stack stores tuple: [nodeId, neighborIndex]
+                        const stack = [[startId, 0]];
+                        visited.add(startId);
+                        activeStack.add(startId);
+
+                        while (stack.length > 0) {
+                            const top = stack[stack.length - 1];
+                            const nodeId = top[0];
+                            const neighborIndex = top[1];
+                            const neighbors = adj.get(nodeId) || [];
+
+                            if (neighborIndex < neighbors.length) {
+                                top[1]++;
+                                const neighborId = neighbors[neighborIndex];
+
+                                if (activeStack.has(neighborId)) {
+                                    return true;
+                                }
+
+                                if (!visited.has(neighborId)) {
+                                    visited.add(neighborId);
+                                    activeStack.add(neighborId);
+                                    stack.push([neighborId, 0]);
+                                }
+                            } else {
+                                activeStack.delete(nodeId);
+                                stack.pop();
+                            }
                         }
                     }
+                    return false;
+                };
+
+                if (hasCycle()) {
+                    console.warn(
+                        "Circular connection detected in block data. Punting loading of new blocks!"
+                    );
+                    console.debug("Circular block data:", blockObjs);
+                    if (this.activity && typeof this.activity.errorMsg === "function") {
+                        this.activity.errorMsg(
+                            _("Something went wrong reading JSON-encoded project data.")
+                        );
+                    }
+                    this.activity._suppressRefresh = false;
+                    this._advanceLoadQueue();
+                    return;
                 }
 
                 /** We'll need a list of existing storein and action names. */
@@ -5368,13 +5508,39 @@ class Blocks {
                         // silently stalls loading after the first chunk. setTimeout(0)
                         // still yields to the main thread but keeps running regardless
                         // of tab visibility.
-                        setTimeout(processChunk, 0);
+                        //
+                        //
+                        // A deferred chunk runs on its own event-loop turn, outside
+                        // the synchronous try/catch below that only covers the very
+                        // first, synchronous processChunk() call. Without catching
+                        // here too, a throw from block 21 onward would leave
+                        // _loadInProgress stuck true forever, silently blocking
+                        // every future loadNewBlocks() call.
+                        setTimeout(() => {
+                            try {
+                                processChunk();
+                            } catch (e) {
+                                this.activity._suppressRefresh = false;
+                                this._advanceLoadQueue();
+                                throw e;
+                            }
+                        }, 0);
                     }
                 };
 
-                processChunk();
+                if (totalBlocks === 0) {
+                    // No blocks means no per-block async completion will ever
+                    // call cleanupAfterLoad, so nothing would otherwise mark
+                    // this load finished. Route through the same finalize
+                    // path a normal load ends on so finishedLoading still
+                    // fires and the queue still advances.
+                    this.cleanupAfterLoad();
+                } else {
+                    processChunk();
+                }
             } catch (e) {
                 this.activity._suppressRefresh = false;
+                this._advanceLoadQueue();
                 throw e;
             }
         };
@@ -6228,11 +6394,21 @@ class Blocks {
 
         /**
          * If all the blocks are loaded, we can make the final adjustments.
-         * @param - name
+         * @param {Number} [loadGeneration] - the calling block's _loadGeneration
+         *  (see makeNewBlock). A load that failed mid-chunk advances the queue
+         *  immediately rather than waiting for its remaining blocks, so a
+         *  completion arriving afterward belongs to an already-abandoned
+         *  load; ignore it instead of decrementing whatever load is active
+         *  now. Callers that don't pass this (e.g. existing direct calls)
+         *  are treated as always belonging to the current load.
          * @public
          * @returns {void}
          */
-        this.cleanupAfterLoad = async () => {
+        this.cleanupAfterLoad = async loadGeneration => {
+            if (loadGeneration !== undefined && loadGeneration !== this._activeLoadGeneration) {
+                return;
+            }
+
             this._loadCounter -= 1;
             // Early return BEFORE the try block is intentional:
             // intermediate calls must not run the finally, which resets
@@ -6320,6 +6496,7 @@ class Blocks {
                 /** All blocks loaded — allow canvas redraws again. */
                 this.activity._suppressRefresh = false;
                 this.activity.refreshCanvas();
+                this._advanceLoadQueue();
             }
         };
 
@@ -6763,20 +6940,7 @@ class Blocks {
             const blockLabel =
                 (myBlock.protoblock.staticLabels && myBlock.protoblock.staticLabels[0]) ||
                 myBlock.name;
-            const liveRegion =
-                document.getElementById("mbA11yLiveRegion") ||
-                (() => {
-                    const r = document.createElement("div");
-                    r.id = "mbA11yLiveRegion";
-                    r.setAttribute("role", "status");
-                    r.setAttribute("aria-live", "polite");
-                    r.setAttribute("aria-atomic", "true");
-                    r.style.cssText =
-                        "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
-                    document.body.appendChild(r);
-                    return r;
-                })();
-            liveRegion.textContent = blockLabel + " " + _("block sent to trash");
+            announceToScreenReader(blockLabel + " " + _("block sent to trash"));
 
             /** Adjust the stack from which we just deleted blocks. */
             if (parentBlock !== null) {
@@ -6968,12 +7132,20 @@ class Blocks {
                     block._viewportVisible = true;
                     continue;
                 }
+                const wasViewportVisible = block._viewportVisible;
                 block._viewportVisible = !(
                     c.x + block.width <= vpLeft ||
                     c.x >= vpRight ||
                     c.y + block.height <= vpTop ||
                     c.y >= vpBottom
                 );
+                if (wasViewportVisible === false && block._viewportVisible && c.bitmapCache) {
+                    // Visual state may have changed while its cache update was culled.
+                    // The bitmap cache can legitimately be missing here: regenerating a
+                    // block's artwork uncaches the container and rebuilds it
+                    // asynchronously, and updateCache() throws if we land in that window.
+                    c.updateCache();
+                }
             }
         };
 

@@ -305,13 +305,13 @@ img.icon:hover {
   z-index: 89999;
 }
 body {
-  background-color: #92b5c8 !important;
+  background-color: var(--color-bg-primary);
   padding: 0;
   margin: 0;
 }
 body.samples-shown {
   overflow-y: scroll;
-  background: #fff !important;
+  background: var(--color-bg-primary);
 }
 select {
   background-color: #88e20a;

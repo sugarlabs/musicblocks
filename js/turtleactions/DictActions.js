@@ -153,6 +153,20 @@ function setupDictActions(activity) {
         }
 
         /**
+         * Alias for SetDictValue for backward compatibility.
+         *
+         * @static
+         * @param {Number} target - target Turtle index in turtle.turtleList
+         * @param {Number} turtle - Turtle index in turtle.turtleList
+         * @param {String} key - key
+         * @param {*} value - value
+         * @returns {void}
+         */
+        static setDictValue(target, turtle, key, value) {
+            Turtle.DictActions.SetDictValue(target, turtle, key, value);
+        }
+
+        /**
          * Utility function to display dictionary as JSON.
          *
          * @static
