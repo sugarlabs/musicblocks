@@ -2048,19 +2048,20 @@ example below);
 
 The bottom row contains:
 
-*Mode menu* (hamburger icon), which will open the mode selection
-pie menu;
+*Temperament* (hamburger icon), which opens the EDO/Temperament
+dropdown to control how the octave is divided;
 
-*Save*, which will save the current mode as a custom mode and export
-an *Action* block and a *Define Mode* block to the workspace;
+*Mode menu* (pie-chart icon), which will open the mode selection
+pie menu;
 
 *Name field*, where you can type a name for a custom mode before
 saving;
 
-*Delete*, which will remove the currently loaded custom mode from
-saved modes; and
+*Save*, which will save the current mode as a custom mode and export
+an *Action* block and a *Define Mode* block to the workspace; and
 
-*EDO/Temperament dropdown*, which controls how the octave is divided.
+*Delete*, which will remove the currently loaded custom mode from
+saved modes.
 
 ![widget](./mode_scalar_edo_dropdown.svg "EDO/Temperament dropdown")
 
