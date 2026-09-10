@@ -3349,11 +3349,17 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             );
 
             synth.inTemperament = "19-EDO";
-            expect(typeof synth._getFrequency("C4", false)).toBe("number");
-            expect(synth._getFrequency(440, false)).toBe(440);
-            expect(Array.isArray(synth._getFrequency(["C4", 440], false))).toBe(true);
-
-            delete global.TEMPERAMENT["19-EDO"];
+            try {
+                const c4Freq = synth._getFrequency("C4", false);
+                // 19-EDO C4 freq is approx 264.02 Hz
+                expect(c4Freq).toBeCloseTo(264.02, 2);
+                expect(synth._getFrequency(440, false)).toBe(440);
+                const arr = synth._getFrequency(["C4", 440], false);
+                expect(Array.isArray(arr)).toBe(true);
+                expect(arr[0]).toBeCloseTo(264.02, 2);
+            } finally {
+                delete global.TEMPERAMENT["19-EDO"];
+            }
 
             // Non-equal temperament (Pythagorean)
             synth.inTemperament = "pythagorean";
