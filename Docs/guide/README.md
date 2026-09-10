@@ -2025,13 +2025,16 @@ by the protruding sectors with 'X's, which are arrayed in a circular
 pattern. The number of slices in the wheel matches the current EDO
 setting (12 by default).
 
-Since the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`, the
-notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`, and `12` (one octave
-above `0`).
+In 12-EDO, the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2,
+1` (half-steps), so the notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`,
+and `12` (one octave above `0`). Other EDOs use different step counts
+that sum to their respective division count.
 
 The widget controls are arranged in two areas. The left column contains:
 
 *Play*, which will play a scale using the current mode;
+
+*Clear*, which will reset all notes to blank;
 
 *Rotate counter-clockwise*, which will rotate the mode
 counter-clockwise (See the example below);
@@ -2052,27 +2055,32 @@ pie menu;
 an *Action* block and a *Define Mode* block to the workspace;
 
 *Name field*, where you can type a name for a custom mode before
-saving; and
+saving;
 
 *Delete*, which will remove the currently loaded custom mode from
-saved modes.
+saved modes; and
+
+*EDO/Temperament dropdown*, which controls how the octave is divided.
 
 ![widget](./mode_scalar_edo_dropdown.svg "EDO/Temperament dropdown")
 
 The *EDO/Temperament* dropdown lets you select how many equal
 divisions the octave is split into. The default is `12-EDO` (standard
 Western tuning). Selecting a different EDO (such as `5`, `17`, `19`,
-or `31`) redraws the pie wheel with that many slices; the note labels
-update accordingly.
+or `31`) redraws the pie wheel with that many slices. The mode wheel
+shows numeric indices (`0`, `1`, `2`, ...) while the note wheel uses
+`x` markers to indicate selected scale degrees.
 
 Non-EDO temperaments (*5-limit Just Intonation*, *Pythagorean
 Tuning*, *1/3 Comma Meantone*, *1/4 Comma Meantone*) use ratio-based
 tuning rather than equal divisions. The pie wheel shows the closest
 scale degrees for the selected temperament.
 
-State is cached per-EDO, so switching back to a previous EDO restores
-your previous notes. When playing under non-EDO temperaments,
-frequencies are computed from the temperament's ratios rather than
+State is cached per-EDO when switching between equally-tempered
+settings, so switching back to a previous EDO restores your previous
+notes. Selecting a non-EDO temperament replaces the current tuning
+state entirely. When playing under non-EDO temperaments, frequencies
+are computed from the temperament's ratios rather than
 equal-temperament formulas.
 
 ![widget](./mode_scalar_21edo.svg "widget with 21-EDO selected")
@@ -2092,8 +2100,7 @@ The inner ring shows mode categories grouped by note count: `5`, `6`,
 `7`, `7a`, `7b`, `8`, `12`, and `custom` (your saved modes). The
 outer ring shows the modes within the selected category, with names
 like *major*, *minor*, *Dorian*, etc. Clicking a mode applies it to
-the wheel instantly and plays the scale so you can hear it before
-committing.
+the wheel immediately. Use the *Play* button to hear the scale.
 
 To save a custom mode, type a name in the *Name* field, adjust the
 notes on the wheel, then click *Save*. Saving exports two blocks to
