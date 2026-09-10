@@ -27,7 +27,8 @@
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
     docById, define, BlocksDependencies, deepClone, pubsub,
     MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
-    CAMERAVALUE, VIDEOVALUE, setupBlockDragController
+    CAMERAVALUE, VIDEOVALUE, setupBlockDragController,
+    announceToScreenReader
 */
 
 /* global showZoomOverlay */
@@ -6939,20 +6940,7 @@ class Blocks {
             const blockLabel =
                 (myBlock.protoblock.staticLabels && myBlock.protoblock.staticLabels[0]) ||
                 myBlock.name;
-            const liveRegion =
-                document.getElementById("mbA11yLiveRegion") ||
-                (() => {
-                    const r = document.createElement("div");
-                    r.id = "mbA11yLiveRegion";
-                    r.setAttribute("role", "status");
-                    r.setAttribute("aria-live", "polite");
-                    r.setAttribute("aria-atomic", "true");
-                    r.style.cssText =
-                        "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
-                    document.body.appendChild(r);
-                    return r;
-                })();
-            liveRegion.textContent = blockLabel + " " + _("block sent to trash");
+            announceToScreenReader(blockLabel + " " + _("block sent to trash"));
 
             /** Adjust the stack from which we just deleted blocks. */
             if (parentBlock !== null) {

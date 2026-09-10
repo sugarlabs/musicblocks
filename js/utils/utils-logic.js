@@ -294,30 +294,38 @@ function rationalToFraction(d) {
 
 /**
  * Converts a number to a mixed fraction string.
+ *
+ * The whole and fractional parts are taken from the magnitude and the sign is
+ * carried on the front, so -1.5 reads as "-1 1/2". Working straight off the
+ * signed value instead would floor -1.5 to -2 and render "-2 1/2", which reads
+ * as -2.5.
  */
 var mixedNumber = d => {
-    if (typeof d === "number") {
-        const floor = Math.floor(d);
-        if (d > floor) {
-            const obj = rationalToFraction(d - floor);
-            if (floor === 0) {
-                return obj[0] + "/" + obj[1];
+    if (typeof d !== "number") {
+        return d;
+    }
+
+    const sign = d < 0 ? "-" : "";
+    const magnitude = Math.abs(d);
+    const floor = Math.floor(magnitude);
+
+    if (magnitude > floor) {
+        const obj = rationalToFraction(magnitude - floor);
+        if (floor === 0) {
+            return sign + obj[0] + "/" + obj[1];
+        } else {
+            if (obj[0] === 1 && obj[1] === 1) {
+                return sign + (floor + 1).toString();
             } else {
-                if (obj[0] === 1 && obj[1] === 1) {
-                    return (floor + 1).toString();
+                if (obj[1] > 99) {
+                    return sign + magnitude.toFixed(2);
                 } else {
-                    if (obj[1] > 99) {
-                        return d.toFixed(2);
-                    } else {
-                        return floor + " " + obj[0] + "/" + obj[1];
-                    }
+                    return sign + floor + " " + obj[0] + "/" + obj[1];
                 }
             }
-        } else if (floor === d) {
-            return d.toString() + "/1";
         }
-    } else {
-        return d;
+    } else if (floor === magnitude) {
+        return sign + magnitude.toString() + "/1";
     }
 };
 

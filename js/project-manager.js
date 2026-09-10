@@ -664,7 +664,6 @@ class ProjectManager {
         const title = document.createElement("h2");
         title.textContent = _("Import MIDI");
         title.classList.add("modal-title");
-        title.style.color = platformColor.headingColor;
         modal.appendChild(title);
 
         const container = document.createElement("div");
@@ -690,8 +689,6 @@ class ProjectManager {
         const importConfirm = document.createElement("button");
         importConfirm.classList.add("confirm-button");
         importConfirm.textContent = _("Confirm");
-        importConfirm.style.backgroundColor = platformColor.blueButton;
-        importConfirm.style.color = platformColor.blueButtonText;
         importConfirm.style.border = "none";
         importConfirm.style.borderRadius = "4px";
         importConfirm.style.padding = "8px 16px";

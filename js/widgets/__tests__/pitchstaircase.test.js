@@ -563,9 +563,16 @@ describe("PitchStaircase Widget", () => {
         let buttons;
         let widgetWindow;
         let wfbElement;
+        let widgetBodyElement;
+        const originalWindowFor = window.widgetWindows.windowFor;
+
+        afterEach(() => {
+            window.widgetWindows.windowFor = originalWindowFor;
+        });
 
         beforeEach(() => {
             buttons = {};
+            widgetBodyElement = { append: jest.fn(), style: {} };
             widgetWindow = {
                 clear: jest.fn(),
                 show: jest.fn(),
@@ -580,11 +587,12 @@ describe("PitchStaircase Widget", () => {
                 }),
                 addInputButton: jest.fn(value => ({ value, addEventListener: jest.fn() })),
                 addDivider: jest.fn(),
-                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                getWidgetBody: jest.fn(() => widgetBodyElement),
                 destroy: jest.fn(),
                 onclose: null,
                 onmaximize: null,
-                _maximized: false
+                _maximized: false,
+                isMaximized: jest.fn(() => widgetWindow._maximized)
             };
             window.widgetWindows.windowFor = jest.fn(() => widgetWindow);
 
@@ -618,12 +626,12 @@ describe("PitchStaircase Widget", () => {
             expect(psc._undo).toHaveBeenCalled();
         });
 
-        test("Clear button repeatedly undoes until exhausted", () => {
-            psc._undo = jest
-                .fn()
-                .mockReturnValueOnce(true)
-                .mockReturnValueOnce(true)
-                .mockReturnValue(false);
+        test("Clear button calls _undo until false", () => {
+            let count = 0;
+            psc._undo = jest.fn(() => {
+                count++;
+                return count < 3;
+            });
             buttons["Clear"].onclick();
             expect(psc._undo).toHaveBeenCalledTimes(3);
         });
@@ -670,11 +678,32 @@ describe("PitchStaircase Widget", () => {
         test("onmaximize grows the widget body when maximized", () => {
             widgetWindow._maximized = true;
             widgetWindow.onmaximize();
-            expect(wfbElement.style.maxHeight).toBe(16 * PitchStaircase.BUTTONSIZE + "px");
+            expect(widgetBodyElement.style.maxHeight).toBe(16 * PitchStaircase.BUTTONSIZE + "px");
 
             widgetWindow._maximized = false;
             widgetWindow.onmaximize();
-            expect(wfbElement.style.maxHeight).toBe(10 * PitchStaircase.BUTTONSIZE + "px");
+            expect(widgetBodyElement.style.maxHeight).toBe(10 * PitchStaircase.BUTTONSIZE + "px");
+        });
+
+        test("onmaximize scopes to getWidgetBody and does not mutate foreign document elements", () => {
+            const foreignWfb = { style: { maxHeight: "50px" } };
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([foreignWfb]);
+
+            widgetWindow._maximized = true;
+            widgetWindow.onmaximize();
+
+            // Foreign element was untouched
+            expect(foreignWfb.style.maxHeight).toBe("50px");
+            // Own widget body was updated
+            expect(widgetBodyElement.style.maxHeight).toBe(16 * PitchStaircase.BUTTONSIZE + "px");
+        });
+
+        test("onmaximize safely exits if widgetBody or style is missing", () => {
+            widgetWindow.getWidgetBody = jest.fn(() => null);
+            expect(() => widgetWindow.onmaximize()).not.toThrow();
+
+            widgetWindow.getWidgetBody = jest.fn(() => ({}));
+            expect(() => widgetWindow.onmaximize()).not.toThrow();
         });
     });
 

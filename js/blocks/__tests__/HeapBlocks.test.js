@@ -154,6 +154,16 @@ describe("setupHeapBlocks", () => {
             expect(result).toBeUndefined();
             expect(logo.statusFields).toContainEqual([blk, "heap"]);
         });
+
+        it("should create an empty heap and return '[]' if the turtle heap is undefined", () => {
+            const turtle = 1;
+            delete logo.turtleHeaps[turtle];
+            const heapBlock = createdBlocks["heap"];
+            logo.inStatusMatrix = false;
+            const result = heapBlock.arg(logo, turtle, 99);
+            expect(result).toBe("[]");
+            expect(logo.turtleHeaps[turtle]).toEqual([]);
+        });
     });
 
     describe("ShowHeapBlock", () => {
@@ -240,6 +250,23 @@ describe("setupHeapBlocks", () => {
             const reverseHeapBlock = createdBlocks["reverseHeap"];
             reverseHeapBlock.flow([], logo, turtle);
             expect(logo.turtleHeaps[turtle]).toEqual([4, 3, 2, 1]);
+        });
+
+        it("should create an empty heap if the turtle heap is undefined", () => {
+            const turtle = 1;
+            delete logo.turtleHeaps[turtle];
+            const reverseHeapBlock = createdBlocks["reverseHeap"];
+            reverseHeapBlock.flow([], logo, turtle);
+            expect(logo.turtleHeaps[turtle]).toEqual([]);
+            expect(Array.isArray(logo.turtleHeaps[turtle])).toBe(true);
+        });
+
+        it("should leave a single-entry heap unchanged", () => {
+            const turtle = 0;
+            setTurtleHeap(turtle, [9]);
+            const reverseHeapBlock = createdBlocks["reverseHeap"];
+            reverseHeapBlock.flow([], logo, turtle);
+            expect(logo.turtleHeaps[turtle]).toEqual([9]);
         });
     });
 

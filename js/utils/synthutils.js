@@ -15,7 +15,7 @@
 
    last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
-   getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
+   getOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
    DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber
@@ -692,7 +692,7 @@ function Synth() {
         // and never use noteFrequencies, so skip building the table.
         // This also avoids crashing on microtonal interval names (e.g. "mid 2")
         // that exist in the temperament definition but not in INTERVALVALUES.
-        if (t && (t.isEDO || isEquallyTempered(temperament))) {
+        if (isEquallyTempered(temperament)) {
             this.changeInTemperament = false;
             return;
         }
@@ -808,8 +808,7 @@ function Synth() {
             }
         }
 
-        const t = getTemperament(this.inTemperament);
-        if (t && (t.isEDO || isEquallyTempered(this.inTemperament))) {
+        if (isEquallyTempered(this.inTemperament)) {
             if (typeof notes === "string") {
                 const parsed = parseNoteString(notes);
                 return pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament);

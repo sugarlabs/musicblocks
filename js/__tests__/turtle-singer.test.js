@@ -30,6 +30,7 @@ const mockGlobals = {
     isCustomTemperament: jest.fn(),
     isEquallyTempered: jest.fn().mockReturnValue(true),
     temperamentHasRatios: jest.fn().mockReturnValue(false),
+    isNonEDO: jest.fn().mockReturnValue(false),
     getStepSizeUp: jest.fn().mockReturnValue(1),
     numberToPitch: jest.fn().mockReturnValue(["C", 4]),
     pitchToNumber: jest.fn().mockReturnValue(60),
@@ -48,6 +49,7 @@ global.getNote = mockGlobals.getNote;
 global.isCustomTemperament = mockGlobals.isCustomTemperament;
 global.isEquallyTempered = mockGlobals.isEquallyTempered;
 global.temperamentHasRatios = mockGlobals.temperamentHasRatios;
+global.isNonEDO = mockGlobals.isNonEDO;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
@@ -800,24 +802,22 @@ describe("numberOfNotes — state restoration and tally logic", () => {
                 ithTurtle: jest.fn().mockReturnValue(turtleMock),
                 getTurtle: jest.fn().mockReturnValue({ queue: [] }),
                 turtleList: [turtleMock]
-            },
-            logo: {
-                runFromBlockNow: jest.fn((logo, turtle) => {
-                    const tur = turtleMock;
-                    tur.singer.tallyNotes += 5;
-                }),
-                boxes: {},
-                turtleHeaps: { 0: {} },
-                turtleDicts: { 0: {} }
             }
         };
 
+        // numberOfNotes reads the saved state off the logo it is handed and
+        // restores it onto activity.logo. Those are the same object at runtime,
+        // so the mock has to share one object too.
         logoMock = {
             activity: activityMock,
+            runFromBlockNow: jest.fn(() => {
+                turtleMock.singer.tallyNotes += 5;
+            }),
             boxes: {},
-            turtleHeaps: { 0: {} },
+            turtleHeaps: { 0: [] },
             turtleDicts: { 0: {} }
         };
+        activityMock.logo = logoMock;
     });
 
     test("should return tally difference and restore state", () => {
@@ -828,6 +828,40 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(result).toBe(5);
         expect(turtleMock.singer.tallyNotes).toBe(2);
         expect(turtleMock.painter.doPenUp).toHaveBeenCalled();
+    });
+
+    test("should restore an untouched heap as an array, not an object", () => {
+        delete logoMock.turtleHeaps[0];
+        // The counted run fills a heap the turtle did not have; restoring it
+        // must leave an empty array behind, not an object.
+        logoMock.runFromBlockNow = jest.fn(() => {
+            turtleMock.singer.tallyNotes += 5;
+            logoMock.turtleHeaps[0] = [8, 9];
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(logoMock.turtleHeaps[0]).toEqual([]);
+        expect(Array.isArray(logoMock.turtleHeaps[0])).toBe(true);
+
+        // An object fallback makes the next push block throw.
+        logoMock.turtleHeaps[0].push(7);
+        expect(logoMock.turtleHeaps[0]).toEqual([7]);
+    });
+
+    test("should undo heap mutations made during the counted run", () => {
+        logoMock.turtleHeaps[0] = [1, 2, 3];
+        // Mutate the heap in place and by reassignment so the assertion fails
+        // if restoration is skipped.
+        logoMock.runFromBlockNow = jest.fn(() => {
+            turtleMock.singer.tallyNotes += 5;
+            logoMock.turtleHeaps[0].push(99);
+            logoMock.turtleHeaps[0][0] = -1;
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(logoMock.turtleHeaps[0]).toEqual([1, 2, 3]);
     });
 });
 
@@ -909,7 +943,7 @@ describe("noteCounter regression behavior", () => {
             queue: []
         });
         logoMock.boxes = {};
-        logoMock.turtleHeaps = { 0: {} };
+        logoMock.turtleHeaps = { 0: [] };
         logoMock.turtleDicts = { 0: {} };
         activityMock.logo.runFromBlockNow = jest.fn();
         singer = turtleMock.singer;
@@ -929,6 +963,38 @@ describe("noteCounter regression behavior", () => {
         const originalLength = singer.justCounting.length;
         Singer.noteCounter(logoMock, 0, 1);
         expect(singer.justCounting.length).toBe(originalLength);
+    });
+
+    test("should restore an untouched heap as an array, not an object", () => {
+        delete logoMock.turtleHeaps[0];
+        // The counted run fills a heap the turtle did not have; restoring it
+        // must leave an empty array behind, not an object.
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            logoMock.turtleHeaps[0] = [8, 9];
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(logoMock.turtleHeaps[0]).toEqual([]);
+        expect(Array.isArray(logoMock.turtleHeaps[0])).toBe(true);
+
+        // An object fallback makes the next push block throw.
+        logoMock.turtleHeaps[0].push(7);
+        expect(logoMock.turtleHeaps[0]).toEqual([7]);
+    });
+
+    test("should undo heap mutations made during the counted run", () => {
+        logoMock.turtleHeaps[0] = [4, 5];
+        // Mutate the heap in place and by reassignment so the assertion fails
+        // if restoration is skipped.
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            logoMock.turtleHeaps[0].push(99);
+            logoMock.turtleHeaps[0][0] = -1;
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(logoMock.turtleHeaps[0]).toEqual([4, 5]);
     });
 });
 
@@ -1122,6 +1188,71 @@ describe("processNote — delayedNotes reset on zero-duration tied notes (#8176)
     });
 });
 
+describe("processNote playback path avoids discarded ratio computation", () => {
+    let turtleMock;
+    let activityMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        savedGlobals = {
+            rationalToFraction: global.rationalToFraction,
+            getOctaveRatio: global.getOctaveRatio
+        };
+        global.rationalToFraction = jest.fn(() => [3, 2]);
+        global.getOctaveRatio = jest.fn(() => 2);
+
+        const blk = "mockBlk";
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.blink = jest.fn();
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.suppressOutput = true;
+        turtleMock.singer.justCounting = [];
+        turtleMock.singer.oscList = { [blk]: [] };
+
+        activityMock = createActivityMock(turtleMock);
+        activityMock.errorMsg = jest.fn();
+        Object.assign(activityMock.logo, {
+            runningLilypond: false,
+            runningMxml: false,
+            runningAbc: false,
+            runningMIDI: false,
+            specialArgs: [],
+            dispatchTurtleSignals: jest.fn()
+        });
+        Object.assign(activityMock.logo.synth, {
+            inTemperament: "equal",
+            changeInTemperament: false,
+            startingPitch: "A0",
+            getFrequency: jest.fn(() => [261.63]),
+            getCustomFrequency: jest.fn(() => [261.63])
+        });
+        activityMock.stage = { update: jest.fn() };
+    });
+
+    afterEach(() => {
+        global.rationalToFraction = savedGlobals.rationalToFraction;
+        global.getOctaveRatio = savedGlobals.getOctaveRatio;
+    });
+
+    test("does not build per-note frequency ratios during playback", () => {
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        // Sanity: the pitched-note path actually ran.
+        expect(global.getNote).toHaveBeenCalled();
+        // The ratio/fraction results were never consumed anywhere, so the
+        // hot per-note path must not pay for computing them.
+        expect(global.rationalToFraction).not.toHaveBeenCalled();
+    });
+});
+
 describe("scalarDistance edge cases", () => {
     let turtleMock;
     let activityMock;
@@ -1171,20 +1302,13 @@ describe("addScalarTransposition on non-EDO temperaments", () => {
         const getStepSizeUp = jest.fn().mockReturnValue(2);
         const getStepSizeDown = jest.fn().mockReturnValue(-2);
         const getNote = jest.fn().mockImplementation(note => [note, 4]);
-        [
-            "getStepSizeUp",
-            "getStepSizeDown",
-            "getNote",
-            "isEquallyTempered",
-            "temperamentHasRatios"
-        ].forEach(name => {
+        ["getStepSizeUp", "getStepSizeDown", "getNote", "isNonEDO"].forEach(name => {
             savedGlobals[name] = global[name];
         });
         global.getStepSizeUp = getStepSizeUp;
         global.getStepSizeDown = getStepSizeDown;
         global.getNote = getNote;
-        global.isEquallyTempered = jest.fn().mockReturnValue(false);
-        global.temperamentHasRatios = jest.fn().mockReturnValue(true);
+        global.isNonEDO = jest.fn().mockReturnValue(true);
 
         Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 3);
 

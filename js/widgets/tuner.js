@@ -233,6 +233,19 @@ const TunerUtils = {
     },
 
     /**
+     * Converts a detected frequency to a note and cents offset.
+     * @param {number} frequency - The frequency to convert.
+     * @param {number} [edo] - The equal division of the octave.
+     * @returns {{note: string, cents: number}}
+     */
+    frequencyToNote: function (frequency, edo) {
+        if (frequency <= 0) return { note: "---", cents: 0 };
+
+        const result = this.frequencyToPitch(frequency, edo);
+        return { note: result[0], cents: result[1] };
+    },
+
+    /**
      * Calculates the playback rate for a given cents adjustment
      * @param {number} baseCents - The base cents value
      * @param {number} adjustment - The cents adjustment to apply

@@ -98,6 +98,7 @@ function setupVolumeActions(activity) {
                     );
                     tur.singer.crescendoInitialVolume[synth].pop();
                 }
+                tur.singer.inCrescendo.pop();
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
@@ -117,7 +118,11 @@ function setupVolumeActions(activity) {
 
             for (const synth of synthList) {
                 let newVolume = (last(tur.singer.synthVolume[synth]) * (100 + volume)) / 100;
-                newVolume = clampNumber(newVolume, -100, 100);
+                // Clamp to 0 rather than -100, matching doCrescendo, setMasterVolume and
+                // setSynthVolume. A stored negative volume is not just unplayable: the
+                // next relative change multiplies by it, so a further decrease turns
+                // into an increase.
+                newVolume = clampNumber(newVolume, 0, 100);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     tur.singer.synthVolume[synth] = [newVolume];

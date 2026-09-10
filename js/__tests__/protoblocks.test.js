@@ -697,3 +697,266 @@ describe("ProtoBlock generators", () => {
         );
     });
 });
+
+// ---------------------------------------------------------------------------
+// Boolean shapes
+//
+// Boolean blocks report through a booleanout dock rather than a numberout one,
+// and which of them take boolean inputs decides what can be plugged in. A
+// numberin where a booleanin belongs lets a number dock into a logic block.
+// ---------------------------------------------------------------------------
+
+describe("ProtoBlock boolean shape definitions", () => {
+    it.each([
+        ["booleanOneArgBlock", 1, ["booleanout", "textin"], 2, false],
+        ["booleanOneBooleanArgBlock", 1, ["booleanout", "booleanin"], 2, false],
+        ["booleanTwoBooleanArgBlock", 2, ["booleanout", "booleanin", "booleanin"], 3, false],
+        ["booleanTwoArgBlock", 2, ["booleanout", "numberin", "numberin"], 2, true]
+    ])("%s", (method, args, dockTypes, size, expandable) => {
+        const block = new ProtoBlock(method);
+        block[method]();
+
+        expect(block.style).toBe("arg");
+        expect(block.args).toBe(args);
+        expect(block.dockTypes).toEqual(dockTypes);
+        expect(block.size).toBe(size);
+        expect(block.expandable).toBe(expandable);
+        // Every boolean shape reports a value, so all four are parameters.
+        expect(block.parameter).toBe(true);
+        expect(typeof block.generator).toBe("function");
+    });
+
+    it("reports through booleanout, never numberout", () => {
+        for (const method of [
+            "booleanOneArgBlock",
+            "booleanOneBooleanArgBlock",
+            "booleanTwoBooleanArgBlock",
+            "booleanTwoArgBlock"
+        ]) {
+            const block = new ProtoBlock(method);
+            block[method]();
+            expect(block.dockTypes[0]).toBe("booleanout");
+            expect(block.dockTypes).not.toContain("numberout");
+        }
+    });
+});
+
+// ---------------------------------------------------------------------------
+// BaseBlock
+//
+// formBlock is the declarative half of the block API: js/blocks/*.js hand it a
+// style object and it works out the visual style, the dock sequence and the
+// arg and size arithmetic. Everything below pins that translation.
+// ---------------------------------------------------------------------------
+
+describe("BaseBlock small mutators", () => {
+    let block;
+    beforeEach(() => {
+        block = new ProtoBlock.BaseBlock("Original");
+    });
+
+    it("stores a help string", () => {
+        block.setHelpString(["text", "image", "label"]);
+        expect(block.helpString).toEqual(["text", "image", "label"]);
+    });
+
+    it("stores a macro function", () => {
+        const macro = jest.fn();
+        block.makeMacro(macro);
+        expect(block.macroFunc).toBe(macro);
+    });
+
+    it("renames the block", () => {
+        block.changeName("Renamed");
+        expect(block.name).toBe("Renamed");
+    });
+
+    it("flags beginner mode both ways", () => {
+        expect(block.beginnerModeBlock).toBe(false);
+        block.beginnerBlock(true);
+        expect(block.beginnerModeBlock).toBe(true);
+        block.beginnerBlock(false);
+        expect(block.beginnerModeBlock).toBe(false);
+    });
+
+    it("replaces one dock without disturbing its neighbours", () => {
+        block.twoArgBlock();
+        const before = [...block.dockTypes];
+        block.updateDockValue(1, "textin");
+
+        expect(block.dockTypes[1]).toBe("textin");
+        expect(block.dockTypes[0]).toBe(before[0]);
+        expect(block.dockTypes[2]).toBe(before[2]);
+        expect(block.dockTypes).toHaveLength(before.length);
+    });
+
+    it("resolves a palette by name through the activity", () => {
+        const rhythm = { name: "rhythm" };
+        const activity = { palettes: { dict: { rhythm } } };
+        block.setPalette("rhythm", activity);
+        expect(block.palette).toBe(rhythm);
+    });
+});
+
+describe("BaseBlock.formBlock", () => {
+    const form = style => {
+        const block = new ProtoBlock.BaseBlock("blk");
+        block.formBlock(style);
+        return block;
+    };
+
+    describe("chooses the visual style", () => {
+        it("leaves a plain one-argument block unstyled", () => {
+            expect(
+                form({ name: "one", args: 1, flows: { top: true, bottom: true } }).style
+            ).toBeNull();
+        });
+
+        it("calls two arguments a twoarg", () => {
+            expect(form({ name: "two", args: 2, flows: { top: true, bottom: true } }).style).toBe(
+                "twoarg"
+            );
+        });
+
+        it("calls a left-flowing block an arg, and marks it a parameter", () => {
+            const block = form({ name: "p", flows: { left: true } });
+            expect(block.style).toBe("arg");
+            expect(block.parameter).toBe(true);
+        });
+
+        it("calls one clamp label a clamp and two a doubleclamp", () => {
+            expect(
+                form({ name: "c", flows: { top: true, bottom: true, labels: ["do"] } }).style
+            ).toBe("clamp");
+            expect(
+                form({ name: "d", flows: { top: true, bottom: true, labels: ["a", "b"] } }).style
+            ).toBe("doubleclamp");
+        });
+
+        it("lets an arg flow win over the label count", () => {
+            // flows.type is checked before the two-label doubleclamp case, so an
+            // arg flow stays an argclamp however many labels it carries.
+            const block = form({
+                name: "ac",
+                flows: {
+                    type: "arg",
+                    labels: ["a", "b"],
+                    types: ["numberin"],
+                    top: true,
+                    bottom: true
+                }
+            });
+            expect(block.style).toBe("argclamp");
+        });
+
+        it("lets a value flow win too", () => {
+            expect(
+                form({ name: "v", args: 1, flows: { type: "value", labels: ["x"] } }).style
+            ).toBe("value");
+        });
+    });
+
+    describe("expands when it has to", () => {
+        it("expands for more than one argument", () => {
+            expect(form({ args: 1, flows: {} }).expandable).toBe(false);
+            expect(form({ args: 2, flows: {} }).expandable).toBe(true);
+        });
+
+        it("expands for any clamp", () => {
+            expect(form({ flows: { labels: ["do"] } }).expandable).toBe(true);
+        });
+    });
+
+    describe("builds the dock sequence in order", () => {
+        it("puts the output dock first and the bottom dock last", () => {
+            const block = form({ name: "one", args: 1, flows: { top: true, bottom: true } });
+            expect(block.dockTypes).toEqual(["out", "numberin", "in"]);
+        });
+
+        it("uses outType for a left-flowing block, defaulting to numberout", () => {
+            expect(form({ flows: { left: true } }).dockTypes).toEqual(["numberout"]);
+            expect(form({ outType: "booleanout", flows: { left: true } }).dockTypes).toEqual([
+                "booleanout"
+            ]);
+        });
+
+        it("honours argTypes and falls back to numberin", () => {
+            const block = form({
+                args: 2,
+                argTypes: ["textin", "booleanin"],
+                flows: { top: true, bottom: true }
+            });
+            expect(block.dockTypes).toEqual(["out", "textin", "booleanin", "in"]);
+        });
+
+        it("marks a cap and a tail unavailable so nothing docks there", () => {
+            // A cap block takes no block above it and a tail takes none below.
+            expect(form({ flows: { top: "cap", bottom: "tail" } }).dockTypes).toEqual([
+                "unavailable",
+                "unavailable"
+            ]);
+        });
+
+        it("adds one in dock per clamp label", () => {
+            const block = form({ flows: { top: true, bottom: true, labels: ["a", "b"] } });
+            expect(block.dockTypes.filter(d => d === "in")).toHaveLength(3); // two clamps + bottom
+        });
+    });
+
+    describe("counts arguments and rows", () => {
+        it("counts clamp labels as arguments alongside declared args", () => {
+            const block = form({ args: 1, flows: { top: true, bottom: true, labels: ["do"] } });
+            expect(block.args).toBe(2);
+        });
+
+        it("grows a row per clamp label", () => {
+            expect(form({ flows: { top: true, bottom: true } }).size).toBe(1);
+            expect(form({ flows: { top: true, bottom: true, labels: ["a"] } }).size).toBe(2);
+            expect(form({ flows: { top: true, bottom: true, labels: ["a", "b"] } }).size).toBe(3);
+        });
+
+        it("grows a row for an image", () => {
+            const plain = form({ flows: { top: true, bottom: true } });
+            const withImage = form({ image: "note.svg", flows: { top: true, bottom: true } });
+            expect(withImage.size).toBe(plain.size + 1);
+            expect(withImage.image).toBe("note.svg");
+        });
+    });
+
+    describe("carries labels, defaults and capabilities across", () => {
+        it("puts the block name first, then arg labels, then flow labels", () => {
+            const block = form({
+                name: "t",
+                args: 2,
+                argLabels: ["L1", "L2"],
+                flows: { top: true, bottom: true, labels: ["do"] }
+            });
+            expect(block.staticLabels).toEqual(["t", "L1", "L2", "do"]);
+        });
+
+        it("uses an empty name rather than dropping the slot", () => {
+            expect(form({}).staticLabels).toEqual([""]);
+        });
+
+        it("keeps defaults", () => {
+            const block = form({
+                args: 2,
+                defaults: ["hi", true],
+                flows: { top: true, bottom: true }
+            });
+            expect(block.defaults).toEqual(["hi", true]);
+        });
+
+        it("applies declared capabilities", () => {
+            const block = form({ capabilities: { collapsible: true }, flows: {} });
+            expect(block.hasCapability("collapsible")).toBe(true);
+        });
+
+        it("survives a style object with nothing in it", () => {
+            const block = form({});
+            expect(block.args).toBe(0);
+            expect(block.dockTypes).toEqual([]);
+            expect(block.defaults).toEqual([]);
+        });
+    });
+});

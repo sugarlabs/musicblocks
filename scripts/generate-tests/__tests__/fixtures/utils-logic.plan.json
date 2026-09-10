@@ -495,7 +495,7 @@
       "isGenerator": false,
       "returns": 6,
       "throws": 0,
-      "branches": 7
+      "branches": 8
     },
     {
       "name": "nearestBeat",
@@ -819,7 +819,7 @@
     },
     {
       "target": "mixedNumber",
-      "description": "Converts a number to a mixed fraction string.",
+      "description": "Converts a number to a mixed fraction string. The whole and fractional parts are taken from the magnitude and the sign is carried on the front, so -1.5 reads as \"-1 1/2\". Working straight off the signed value instead would floor -1.5 to -2 and render \"-2 1/2\", which reads as -2.5.",
       "tags": []
     },
     {
@@ -921,7 +921,7 @@
     }
   ],
   "totals": {
-    "branches": 195,
+    "branches": 196,
     "returns": 105,
     "throws": 0
   }

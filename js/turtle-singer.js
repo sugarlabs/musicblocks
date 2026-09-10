@@ -21,10 +21,10 @@
    DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, deepClone, frequencyToPitch, last,
     pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
     getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
-    temperamentHasRatios, isEquallyTempered,
+    temperamentHasRatios, isEquallyTempered, isNonEDO,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
-   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
+   noteToFrequency, getTemperament,
    SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO,
    keySignatureToMode, getSavedCustomModes,
    clampNumber
@@ -37,10 +37,10 @@
     js/utils/musicutils.js
         frequencyToPitch, pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1,
-        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament, getOctaveRatio,
+        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament,
         getCurrentEDO, isEquallyTempered
     js/utils/utils.js
-        rationalSum, _, rationalToFraction
+        rationalSum, _
     js/utils/synthutils.js
         instrumentsEffects, instrumentsFilters
  */
@@ -331,9 +331,7 @@ class Singer {
         // ratios step by raw semitone offsets. Everything with real ratios
         // (just intonation, meantone, ...) walks the mode's actual scale
         // degrees one at a time.
-        const useEdoSteps =
-            isEquallyTempered(temperament) ||
-            (isCustomTemperament(temperament) && !temperamentHasRatios(temperament));
+        const useEdoSteps = !isNonEDO(temperament);
 
         if (useEdoSteps) {
             for (let i = 0; i < Math.abs(steps); i++) {
@@ -374,7 +372,8 @@ class Singer {
             // offset that getNote remaps onto the temperament's ratios.
             const modeName = keySignatureToMode(tur.singer.keySignature)[1];
             const custom = getSavedCustomModes().find(m => m.name === modeName);
-            const modeEdo = (custom && custom.edo) || edo;
+            const modeEdo =
+                custom && Number.isInteger(custom.edo) && custom.edo > 0 ? custom.edo : edo;
             for (let i = 0; i < Math.abs(steps); i++) {
                 const stepCount =
                     steps > 0
@@ -394,6 +393,7 @@ class Singer {
                           );
                 // getStepSizeUp returns EDO-step counts off 12-EDO; normalize to
                 // a semitone offset (isAlreadyEdoSteps=false) so getNote remaps it.
+                // ponytail: linear 12/modeEdo rescale, per-ratio lookup if cents drift matters
                 const stepSemis = (stepCount * 12) / modeEdo;
                 noteObj = getNote(
                     noteObj[0],
@@ -608,7 +608,7 @@ class Singer {
 
         // Restore previous state
         logo.boxes = saveBoxes ?? {};
-        logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+        logo.turtleHeaps[turtle] = saveTurtleHeaps ?? [];
         logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
         tur.painter.doPenUp();
@@ -713,7 +713,7 @@ class Singer {
         });
 
         activity.logo.boxes = saveState.boxes ?? {};
-        activity.logo.turtleHeaps[turtle] = saveState.turtleHeaps ?? {};
+        activity.logo.turtleHeaps[turtle] = saveState.turtleHeaps ?? [];
         activity.logo.turtleDicts[turtle] = saveState.turtleDicts ?? {};
 
         tur.painter.doPenUp();
@@ -2267,43 +2267,6 @@ class Singer {
                                 );
                                 activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
-                        }
-                    }
-
-                    const notesFrequency = isCustomTemperament(activity.logo.synth.inTemperament)
-                        ? activity.logo.synth.getCustomFrequency(notes)
-                        : activity.logo.synth.getFrequency(
-                              notes,
-                              activity.logo.synth.changeInTemperament
-                          );
-                    const startingPitch = activity.logo.synth.startingPitch;
-                    const startPitchParsed = parseNoteString(startingPitch);
-                    const frequency = getCachedPitchToFrequency(
-                        startPitchParsed[0],
-                        startPitchParsed[1],
-                        0,
-                        null,
-                        activity.logo.synth.inTemperament
-                    );
-                    const pitchNumber = getTemperament(
-                        activity.logo.synth.inTemperament
-                    ).pitchNumber;
-                    const ratio = [];
-                    const number = [];
-                    const numerator = [];
-                    const denominator = [];
-
-                    for (let k = 0; k < notesFrequency.length; k++) {
-                        if (notesFrequency[k] !== undefined) {
-                            ratio[k] = notesFrequency[k] / frequency;
-                            number[k] = (
-                                pitchNumber *
-                                (Math.log10(ratio[k]) / Math.log10(getOctaveRatio()))
-                            ).toFixed(0);
-                            // Cache rationalToFraction result to avoid duplicate calls
-                            const fraction = rationalToFraction(ratio[k]);
-                            numerator[k] = fraction[0];
-                            denominator[k] = fraction[1];
                         }
                     }
 

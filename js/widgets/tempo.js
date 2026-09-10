@@ -56,7 +56,7 @@ class Tempo {
         this._directions = [];
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
-        this._firstClickTimes = null;
+        this._firstClickTime = null;
         this._intervals = [];
         this.isMoving = true;
         if (this._intervalID !== undefined && this._intervalID !== null) {

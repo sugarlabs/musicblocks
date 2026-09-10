@@ -92,8 +92,15 @@ class KeyboardController {
         if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
             return;
         }
-        // Skip hotkeys when value bar is visible (prevents accidental block creation)
-        if (activity.printText && activity.printText.classList.contains("show")) {
+        // Skip hotkeys when the screen-dimension block value bar is visible
+        // (prevents accidental block creation, #4931). This used to check
+        // activity.printText's shared "show" class, but that class is set by
+        // every textMsg() call in the app (Alt-R "Play", scroll toggles,
+        // etc.), not just the value bar - which meant any status message
+        // silently blocked every hotkey for up to 60s (AlertController.
+        // MSG_TIMEOUT). valueBarVisible is a dedicated flag set only by the
+        // value-bar display itself (js/logo.js), scoped to a short window.
+        if (activity.valueBarVisible) {
             return;
         }
 
@@ -185,13 +192,7 @@ class KeyboardController {
             pasteEl.style.visibility === "visible" ||
             wheelDiv.style.display === "" ||
             activity.turtles.running();
-        const widgetTitle = document.getElementsByClassName("wftTitle");
-        for (let i = 0; i < widgetTitle.length; i++) {
-            if (widgetTitle[i].innerHTML === "tempo") {
-                activity.inTempoWidget = true;
-                break;
-            }
-        }
+        activity.inTempoWidget = this._isWidgetOpen("tempo");
         if (
             (event.altKey && !disableKeys) ||
             event.keyCode === 13 ||
@@ -316,6 +317,14 @@ class KeyboardController {
                     activity._doFastButton();
                 }
             } else if (!disableKeys) {
+                // palettes.activePalette holds the open palette's *name*
+                // (see Palettes.showPalette); resolve it to the object.
+                const activePalette =
+                    activity.palettes.activePalette !== null &&
+                    activity.palettes.dict &&
+                    activity.palettes.dict[activity.palettes.activePalette]
+                        ? activity.palettes.dict[activity.palettes.activePalette]
+                        : null;
                 switch (event.keyCode) {
                     case END:
                         activity.textMsg("END " + _("Jumping to the bottom of the page."));
@@ -350,8 +359,8 @@ class KeyboardController {
                                 );
                                 activity.blocks.blockMoved(activity.blocks.activeBlock);
                                 activity.blocks.adjustDocks(activity.blocks.activeBlock, true);
-                            } else if (activity.palettes.activePalette !== null) {
-                                activity.palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
+                            } else if (activePalette !== null) {
+                                activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
                             } else {
                                 activity.blocksContainer.y += 20;
                             }
@@ -371,11 +380,8 @@ class KeyboardController {
                                 );
                                 activity.blocks.blockMoved(activity.blocks.activeBlock);
                                 activity.blocks.adjustDocks(activity.blocks.activeBlock, true);
-                            } else if (activity.palettes.activePalette !== null) {
-                                activity.palettes.activePalette.scrollEvent(
-                                    -STANDARDBLOCKHEIGHT,
-                                    1
-                                );
+                            } else if (activePalette !== null) {
+                                activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
                             } else {
                                 activity.blocksContainer.y -= 20;
                             }
@@ -422,11 +428,8 @@ class KeyboardController {
                             const dy = Math.max(55 - activity.palettes.buttons["rhythm"].y, 0);
                             activity.palettes.menuScrollEvent(1, dy);
                             activity.palettes.hidePaletteIconCircles();
-                        } else if (activity.palettes.activePalette !== null) {
-                            activity.palettes.activePalette.scrollEvent(
-                                -activity.palettes.activePalette.scrollDiff,
-                                1
-                            );
+                        } else if (activePalette !== null) {
+                            activePalette.scrollEvent(-activePalette.scrollDiff, 1);
                         } else {
                             // Bring all the blocks "home".
                             activity.workspaceLayoutController._findBlocks();

@@ -853,7 +853,7 @@ class PitchStaircase {
                     }, 1000);
                 }
             };
-        const wfbWidget = document.getElementsByClassName("wfbWidget")[0];
+        const wfbWidget = widgetWindow.getWidgetBody();
         if (wfbWidget && wfbWidget.style) {
             wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
             wfbWidget.style.overflowY = "scroll";
@@ -880,10 +880,17 @@ class PitchStaircase {
         activity.textMsg(_("Click on a note to create a new step."), 3000);
 
         widgetWindow.onmaximize = () => {
-            if (widgetWindow._maximized) {
-                wfbWidget.style.maxHeight = 16 * PitchStaircase.BUTTONSIZE + "px";
-            } else {
-                wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
+            const body = widgetWindow.getWidgetBody();
+            if (body && body.style) {
+                const isMax =
+                    typeof widgetWindow.isMaximized === "function"
+                        ? widgetWindow.isMaximized()
+                        : widgetWindow._maximized;
+                if (isMax) {
+                    body.style.maxHeight = 16 * PitchStaircase.BUTTONSIZE + "px";
+                } else {
+                    body.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
+                }
             }
         };
     }
