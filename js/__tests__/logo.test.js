@@ -2442,6 +2442,13 @@ describe("Logo runFromBlockNow iteration budget is per turtle", () => {
 
         expect(mockActivity.errorMsg).toHaveBeenCalled();
         expect(logo.stopTurtle).toBe(true);
+
+        // Observable outcome, not just the flag: runFromBlock() refuses to
+        // schedule anything while stopTurtle is set, so trying to queue
+        // turtle1's next block after this is a no-op -- its flow() is
+        // never reached.
+        logo.runFromBlock(logo, 1, 0, 0, null);
+        expect(logo.blockList[0].protoblock.flow).not.toHaveBeenCalled();
     });
 
     test("combined block executions across turtles do not trip either turtle's guard", () => {
