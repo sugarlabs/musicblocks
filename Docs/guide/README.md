@@ -370,7 +370,9 @@ recent note played.
 
 In this example, we are using the *Mode length* block, which returns
 the number of scalar steps in the current mode (7 for Major and Minor
-modes). [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733192676935416&run=True)
+modes). Note that the number of scalar steps depends on the current
+EDO setting — modes in higher-EDO temperaments may have more steps.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733192676935416&run=True)
 
 #### <a name="SHARPS-AND-FLATS">3.2.2 Sharps And Flats</a>
 
@@ -2015,24 +2017,21 @@ modes. You invoke the widget with the *Custom mode* block. The mode
 specified in the *Set key* block will be the default mode when the
 widget launches.
 
-![widget](./mode2.svg "launching widget with Major mode")
+![widget](./mode_scalar_overview.svg "mode widget overview")
 
 In the above example, the widget has been launched with *Major* mode
 (the default). Note that the notes included in the mode are indicated
 by the protruding sectors with 'X's, which are arrayed in a circular
-pattern of twelve half-steps to complete the octave.
+pattern. The number of slices in the wheel matches the current EDO
+setting (12 by default).
 
 Since the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`, the
 notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`, and `12` (one octave
 above `0`).
 
-The widget controls run along the toolbar at the top. From left to
-right are:
+The widget controls are arranged in two areas. The left column contains:
 
-*Play all*, which will play a scale using the current mode;
-
-*Save*, which will save the current mode as the *Custom* mode and save
-a stack of *Pitch* blocks that can be used with the *Phrase Maker* block;
+*Play*, which will play a scale using the current mode;
 
 *Rotate counter-clockwise*, which will rotate the mode
 counter-clockwise (See the example below);
@@ -2040,13 +2039,69 @@ counter-clockwise (See the example below);
 *Rotate clockwise*, which will rotate the mode clockwise (See the
 example below);
 
-*Invert*, which will invert the mode (See the example below);
+*Invert*, which will invert the mode (See the example below); and
 
-*Undo*, which will restore the mode to the previous version; and
+*Undo*, which will restore the mode to the previous version.
 
-*Close*, which will close the widget.
+The bottom row contains:
+
+*Mode menu* (hamburger icon), which will open the mode selection
+pie menu;
+
+*Save*, which will save the current mode as a custom mode and export
+an *Action* block and a *Define Mode* block to the workspace;
+
+*Name field*, where you can type a name for a custom mode before
+saving; and
+
+*Delete*, which will remove the currently loaded custom mode from
+saved modes.
+
+![widget](./mode_scalar_edo_dropdown.svg "EDO/Temperament dropdown")
+
+The *EDO/Temperament* dropdown lets you select how many equal
+divisions the octave is split into. The default is `12-EDO` (standard
+Western tuning). Selecting a different EDO (such as `5`, `17`, `19`,
+or `31`) redraws the pie wheel with that many slices; the note labels
+update accordingly.
+
+Non-EDO temperaments (*5-limit Just Intonation*, *Pythagorean
+Tuning*, *1/3 Comma Meantone*, *1/4 Comma Meantone*) use ratio-based
+tuning rather than equal divisions. The pie wheel shows the closest
+scale degrees for the selected temperament.
+
+State is cached per-EDO, so switching back to a previous EDO restores
+your previous notes. When playing under non-EDO temperaments,
+frequencies are computed from the temperament's ratios rather than
+equal-temperament formulas.
+
+![widget](./mode_scalar_21edo.svg "widget with 21-EDO selected")
+
+In the above example, the widget has been switched to a higher EDO.
+The pie wheel now shows more slices, allowing finer-grained mode
+construction.
 
 You can also click on individual notes to activate or deactivate them.
+
+The *Mode menu* button opens a two-ring pie menu for selecting
+built-in modes:
+
+![widget](./mode_scalar_pie_menu.svg "mode pie menu")
+
+The inner ring shows mode categories grouped by note count: `5`, `6`,
+`7`, `7a`, `7b`, `8`, `12`, and `custom` (your saved modes). The
+outer ring shows the modes within the selected category, with names
+like *major*, *minor*, *Dorian*, etc. Clicking a mode applies it to
+the wheel instantly and plays the scale so you can hear it before
+committing.
+
+To save a custom mode, type a name in the *Name* field, adjust the
+notes on the wheel, then click *Save*. Saving exports two blocks to
+the workspace: an *Action* block containing the mode pattern and a
+*Define Mode* block that registers it. Saved custom modes appear in
+the mode pie menu under the `custom` category in the inner ring. To
+delete a saved custom mode, load it via the pie menu and click
+*Delete*.
 
 Note that the mode inside the *Custom mode* block is updated whenever
 the mode is changed inside the widget.
@@ -2071,8 +2126,11 @@ Note: The build-in modes in Music Blocks can be found in
 
 ![widget](./mode6.svg "phrase maker block")
 
-The *Save* button exports a stack of blocks representing the mode that
-can be used inside the *Phrase maker* block.
+The *Save* button creates an *Action* block (with the mode name) and a
+*Define Mode* block on the workspace. The *Action* block contains the
+mode pattern and can be used with the *Phrase Maker* block or any
+pitch stack. The *Define Mode* block registers the custom mode so it
+can be used with the *Set Key* block.
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725877046734200&run=True)
 
 ### <a name="meters">4.5 Meters</a>
