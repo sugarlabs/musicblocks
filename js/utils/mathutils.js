@@ -48,6 +48,22 @@ class MathUtility {
      * @returns {number|array} - A random number between a and b (both inclusive) or a random solfege array.
      * @throws {string} NAN error if the arguments are not valid.
      */
+    /**
+     * Whether a value is a number this class can compute with.
+     *
+     * `typeof NaN === "number"`, so a bare typeof check admits NaN and the
+     * caller gets a silent NaN back instead of the NanError the block layer
+     * shows the user. doMinus and doMultiply already excluded it; this is the
+     * same test, named once so every operation agrees.
+     *
+     * @static
+     * @param {*} a
+     * @returns {boolean}
+     */
+    static _isNumber(a) {
+        return typeof a === "number" && !Number.isNaN(a);
+    }
+
     static doRandom(a, b, c) {
         /**
          * Returns a random number between n1 and n2 (both inclusive).
@@ -92,7 +108,7 @@ class MathUtility {
             return broadScale[GetRandom(n11, n22)].split(" ");
         };
 
-        if (typeof a === "number" && typeof b === "number") {
+        if (MathUtility._isNumber(a) && MathUtility._isNumber(b)) {
             return GetRandom(a, b);
         } else if (
             typeof a === "string" &&
@@ -100,6 +116,15 @@ class MathUtility {
             SOLFEGENAMES.includes(a) &&
             SOLFEGENAMES.includes(b)
         ) {
+            // A NaN octave flows through GetRandomSolfege unnoticed: it builds
+            // "do NaN".."ti NaN" entries and indexOf finds them, so the caller
+            // gets a valid-looking ["mi", "NaN"] instead of an error. Typing a
+            // non-number is already rejected in js/block.js, but the project
+            // loader (js/blocks.js, case "number") assigns Number(value) with
+            // no isNaN check, so a saved project can carry one here.
+            if (Number.isNaN(c)) {
+                throw new Error("NanError");
+            }
             return GetRandomSolfege(a, b, c);
         } else {
             throw new Error("NanError");
@@ -128,10 +153,11 @@ class MathUtility {
      * @throws {string} DivByZeroError if divisor is zero, or NanError if arguments are not valid numbers.
      */
     static doMod(a, b) {
-        if (typeof a === "number" && typeof b === "number") {
-            if (Number(b) === 0) {
-                throw new Error("DivByZeroError");
-            }
+        // Zero divisor first, for the same reason as doDivide.
+        if (typeof a === "number" && typeof b === "number" && Number(b) === 0) {
+            throw new Error("DivByZeroError");
+        }
+        if (MathUtility._isNumber(a) && MathUtility._isNumber(b)) {
             return Number(a) % Number(b);
         } else {
             throw new Error("NanError");
@@ -147,7 +173,7 @@ class MathUtility {
      * @throws {string} No square root error, NAN error if the arguments are not valid.
      */
     static doSqrt(a) {
-        if (typeof a === "number") {
+        if (MathUtility._isNumber(a)) {
             if (a < 0) {
                 throw new Error("NoSqrtError");
             }
@@ -187,7 +213,7 @@ class MathUtility {
      * @throws {string} NAN error if the arguments are not valid.
      */
     static doMinus(a, b) {
-        if (typeof a !== "number" || typeof b !== "number" || Number.isNaN(a) || Number.isNaN(b)) {
+        if (!MathUtility._isNumber(a) || !MathUtility._isNumber(b)) {
             throw new Error("NanError");
         }
 
@@ -204,7 +230,7 @@ class MathUtility {
      * @throws {string} NAN error if the arguments are not valid.
      */
     static doMultiply(a, b) {
-        if (typeof a !== "number" || typeof b !== "number" || Number.isNaN(a) || Number.isNaN(b)) {
+        if (!MathUtility._isNumber(a) || !MathUtility._isNumber(b)) {
             throw new Error("NanError");
         }
 
@@ -221,11 +247,15 @@ class MathUtility {
      * @throws {string} Divide by Zero error, NAN error if the arguments are not valid.
      */
     static doDivide(a, b) {
-        if (typeof a === "number" && typeof b === "number") {
-            if (Number(b) === 0) {
-                throw new Error("DivByZeroError");
-            }
-
+        // Zero divisor first, so a NaN numerator over zero still reports
+        // DivByZeroError as it did before NaN was rejected. Both operands must
+        // be typeof number, which is exactly what the original guard required,
+        // so a non-numeric operand still reports NanError. The block layer maps
+        // the two errors to different user-facing messages.
+        if (typeof a === "number" && typeof b === "number" && Number(b) === 0) {
+            throw new Error("DivByZeroError");
+        }
+        if (MathUtility._isNumber(a) && MathUtility._isNumber(b)) {
             return Number(a) / Number(b);
         } else {
             throw new Error("NanError");
@@ -245,10 +275,10 @@ class MathUtility {
      */
     static doCalculateDistance(x1, y1, x2, y2) {
         if (
-            typeof x1 === "number" &&
-            typeof y1 === "number" &&
-            typeof x2 === "number" &&
-            typeof y2 === "number"
+            MathUtility._isNumber(x1) &&
+            MathUtility._isNumber(y1) &&
+            MathUtility._isNumber(x2) &&
+            MathUtility._isNumber(y2)
         ) {
             if (x1 === x2 && y1 === y2) {
                 return 0;
@@ -270,7 +300,7 @@ class MathUtility {
      * @throws {string} NAN error if the arguments are not valid.
      */
     static doPower(a, b) {
-        if (typeof a === "number" && typeof b === "number") {
+        if (MathUtility._isNumber(a) && MathUtility._isNumber(b)) {
             return Math.pow(a, b);
         } else {
             throw new Error("NanError");
@@ -286,7 +316,7 @@ class MathUtility {
      * @throws {string} NAN error if the argument is not valid.
      */
     static doAbs(a) {
-        if (typeof a === "number") {
+        if (MathUtility._isNumber(a)) {
             return Math.abs(a);
         } else {
             throw new Error("NanError");
@@ -302,6 +332,8 @@ class MathUtility {
      * @throws {string} No Negation error if the argument is not valid.
      */
     static doNegate(a) {
+        // Deliberately a bare typeof: NaN falls through to doMinus below, which
+        // raises NanError. Rejecting it here would report the vaguer NoNegError.
         if (typeof a === "number") {
             return MathUtility.doMinus(0, a);
         } else if (typeof a === "string") {
