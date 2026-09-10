@@ -213,7 +213,7 @@ class KeyboardController {
             pasteEl.style.visibility === "visible" ||
             wheelDiv.style.display === "" ||
             activity.turtles.running();
-            activity.inTempoWidget = this._isWidgetOpen("tempo");
+        activity.inTempoWidget = this._isWidgetOpen("tempo");
         if (
             (event.altKey && !disableKeys) ||
             event.keyCode === 13 ||
