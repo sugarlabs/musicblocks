@@ -399,23 +399,80 @@ describe("KeyboardController", () => {
     describe("tempo widget integration", () => {
         it("speeds up tempo on the up arrow while the tempo widget is active", () => {
             const activity = makeActivity();
-            activity.inTempoWidget = true;
+            window.widgetWindows.isOpen.mockImplementation(name => name === "tempo");
             const controller = createController(activity);
 
             controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
 
+            expect(activity.inTempoWidget).toBe(true);
             expect(activity.logo.tempo.speedUp).toHaveBeenCalledWith(0);
             expect(activity.blocks.moveStackRelative).not.toHaveBeenCalled();
         });
 
         it("slows down tempo on the down arrow while the tempo widget is active", () => {
             const activity = makeActivity();
-            activity.inTempoWidget = true;
+            window.widgetWindows.isOpen.mockImplementation(name => name === "tempo");
             const controller = createController(activity);
 
             controller.__keyPressed(makeEvent({ keyCode: KEYCODE.DOWN }));
 
+            expect(activity.inTempoWidget).toBe(true);
             expect(activity.logo.tempo.slowDown).toHaveBeenCalledWith(0);
+        });
+
+        it("resets inTempoWidget and moves blocks when tempo widget is closed", () => {
+            const activity = makeActivity();
+            activity.blocks.activeBlock = { id: "block-1" };
+            const controller = createController(activity);
+
+            // First simulate tempo widget open
+            window.widgetWindows.isOpen.mockImplementation(name => name === "tempo");
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
+            expect(activity.inTempoWidget).toBe(true);
+            expect(activity.logo.tempo.speedUp).toHaveBeenCalledWith(0);
+            expect(activity.blocks.moveStackRelative).not.toHaveBeenCalled();
+
+            // Now simulate tempo widget closed
+            window.widgetWindows.isOpen.mockImplementation(() => false);
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.LEFT }));
+            expect(activity.inTempoWidget).toBe(false);
+            expect(activity.blocks.moveStackRelative).toHaveBeenCalledWith(
+                activity.blocks.activeBlock,
+                -10,
+                0
+            );
+
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
+            expect(activity.blocks.moveStackRelative).toHaveBeenCalledWith(
+                activity.blocks.activeBlock,
+                0,
+                -10
+            );
+        });
+
+        it("resets inTempoWidget and scrolls active palette on up/down arrows when tempo widget is closed and activeBlock is null", () => {
+            const activity = makeActivity();
+            activity.blocks.activeBlock = null;
+            const rhythm = { scrollEvent: jest.fn(), scrollDiff: 40 };
+            activity.palettes.dict = { rhythm };
+            activity.palettes.activePalette = "rhythm";
+            const controller = createController(activity);
+
+            // First simulate tempo widget open
+            window.widgetWindows.isOpen.mockImplementation(name => name === "tempo");
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
+            expect(activity.inTempoWidget).toBe(true);
+            expect(activity.logo.tempo.speedUp).toHaveBeenCalledWith(0);
+            expect(rhythm.scrollEvent).not.toHaveBeenCalled();
+
+            // Now simulate tempo widget closed
+            window.widgetWindows.isOpen.mockImplementation(() => false);
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
+            expect(activity.inTempoWidget).toBe(false);
+            expect(rhythm.scrollEvent).toHaveBeenCalledWith(20, 1);
+
+            controller.__keyPressed(makeEvent({ keyCode: KEYCODE.DOWN }));
+            expect(rhythm.scrollEvent).toHaveBeenCalledWith(-20, 1);
         });
     });
 
