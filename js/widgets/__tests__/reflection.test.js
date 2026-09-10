@@ -106,8 +106,8 @@ describe("ReflectionMatrix", () => {
             expect(reflection.code).toBe("");
             expect(reflection.pendingMessages).toEqual([]);
             expect(reflection.isProcessingPendingMessage).toBe(false);
-            expect(reflection._isMounted).toBe(false);
-            expect(reflection._pendingRequests.size).toBe(0);
+            expect(reflection._lifecycle.isMounted).toBe(false);
+            expect(reflection._lifecycle.pendingRequests.size).toBe(0);
         });
     });
 
@@ -151,14 +151,14 @@ describe("ReflectionMatrix", () => {
             // Trigger close
             reflection.dotsInterval = setInterval(() => {}, 1000);
             const abortSpy = jest.fn();
-            reflection._pendingRequests.add({ abort: abortSpy });
+            reflection._lifecycle.pendingRequests.add({ abort: abortSpy });
             mockWidgetWindow.onclose();
 
             expect(reflection.isOpen).toBe(false);
-            expect(reflection._isMounted).toBe(false);
+            expect(reflection._lifecycle.isMounted).toBe(false);
             expect(mockActivity.isInputON).toBe(false);
             expect(abortSpy).toHaveBeenCalled();
-            expect(reflection._pendingRequests.size).toBe(0);
+            expect(reflection._lifecycle.pendingRequests.size).toBe(0);
             expect(reflection.pendingMessages).toEqual([]);
             expect(reflection.isProcessingPendingMessage).toBe(false);
             expect(mockWidgetWindow.destroy).toHaveBeenCalled();
@@ -244,7 +244,7 @@ describe("ReflectionMatrix", () => {
         test("showTypingIndicator creates indicator and animates dots", () => {
             const reflection = new ReflectionMatrix();
             reflection.chatLog = document.createElement("div");
-            reflection._isMounted = true;
+            reflection._lifecycle.isMounted = true;
             reflection.isOpen = true;
 
             reflection.showTypingIndicator("Thinking");
@@ -267,7 +267,7 @@ describe("ReflectionMatrix", () => {
         test("hideTypingIndicator removes indicator and clears interval", () => {
             const reflection = new ReflectionMatrix();
             reflection.chatLog = document.createElement("div");
-            reflection._isMounted = true;
+            reflection._lifecycle.isMounted = true;
             reflection.isOpen = true;
 
             reflection.showTypingIndicator("Thinking");
@@ -309,7 +309,7 @@ describe("ReflectionMatrix", () => {
             reflection.chatLog = document.createElement("div");
             reflection.input = document.createElement("input");
             reflection.summaryButton = document.createElement("button");
-            reflection._isMounted = true;
+            reflection._lifecycle.isMounted = true;
             reflection.isOpen = true;
 
             jest.spyOn(reflection, "showTypingIndicator").mockImplementation(() => {});
@@ -644,13 +644,13 @@ describe("ReflectionMatrix", () => {
             reflection.activity = mockActivity;
             reflection.chatLog = document.createElement("div");
             reflection.input = document.createElement("input");
-            reflection._isMounted = true;
+            reflection._lifecycle.isMounted = true;
             reflection.isOpen = true;
         });
 
         test("sendMessage ignores input after the widget is closed", () => {
             reflection.input.value = "Hello AI";
-            reflection._isMounted = false;
+            reflection._lifecycle.isMounted = false;
 
             reflection.sendMessage();
 
@@ -663,7 +663,7 @@ describe("ReflectionMatrix", () => {
                 { text: "First", mentor: "meta", algorithm: "alg-1" },
                 { text: "Second", mentor: "code", algorithm: "alg-2" }
             ];
-            reflection._isMounted = false;
+            reflection._lifecycle.isMounted = false;
 
             await reflection.processPendingMessages();
 
@@ -684,7 +684,7 @@ describe("ReflectionMatrix", () => {
             );
 
             const processing = reflection.processPendingMessages();
-            reflection._isMounted = false;
+            reflection._lifecycle.isMounted = false;
 
             resolveFetch({ json: jest.fn().mockResolvedValue({ response: "Late reply" }) });
             await processing;
@@ -768,14 +768,14 @@ describe("ReflectionMatrix", () => {
 
             const first = reflection.startChatSession();
             await Promise.resolve();
-            reflection._isMounted = false;
+            reflection._lifecycle.isMounted = false;
             reflection.isOpen = false;
             resolveFetch({ json: jest.fn().mockResolvedValue({ response: "Late" }) });
             await first;
 
             expect(reflection.triggerFirst).toBe(false);
 
-            reflection._isMounted = true;
+            reflection._lifecycle.isMounted = true;
             reflection.isOpen = true;
             global.fetch.mockResolvedValue({
                 json: jest.fn().mockResolvedValue({ algorithm: "alg", response: "Hello" })
@@ -806,7 +806,7 @@ describe("ReflectionMatrix", () => {
             const data = await dataPromise;
 
             expect(data).toEqual({ error: "Failed to send message" });
-            expect(reflection._pendingRequests.size).toBe(0);
+            expect(reflection._lifecycle.pendingRequests.size).toBe(0);
 
             consoleSpy.mockRestore();
         });

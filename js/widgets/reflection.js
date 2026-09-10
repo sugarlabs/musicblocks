@@ -13,6 +13,12 @@
 
 /* global _, escapeHTML, isSafeUrl, DOMPurify */
 
+var createWidgetLifecycle =
+    (typeof window !== "undefined" && window.createWidgetLifecycle) ||
+    (typeof require !== "undefined"
+        ? require("../utils/ai-widget-lifecycle").createWidgetLifecycle
+        : null);
+
 /**
  * Represents Reflection Widget.
  * @constructor
@@ -20,7 +26,7 @@
 
 class ReflectionMatrix {
     /** AMD module dependencies for lazy loading. */
-    static dependencies = ["widgets/reflection"];
+    static dependencies = ["utils/ai-widget-lifecycle", "widgets/reflection"];
 
     static BUTTONDIVWIDTH = 535;
     static OUTERWINDOWWIDTH = "858px";
@@ -29,7 +35,6 @@ class ReflectionMatrix {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static REQUEST_TIMEOUT = 30000;
-
     constructor() {
         /**
          * Chat history array to store the conversation
@@ -105,16 +110,10 @@ class ReflectionMatrix {
         this._isUpdatingProjectCode = false;
 
         /**
-         * Tracks whether the widget is mounted and can still update UI safely
-         * @type {boolean}
+         * Shared mount state and request tracking
+         * @type {Object}
          */
-        this._isMounted = false;
-
-        /**
-         * Tracks in-flight fetch controllers so they can be aborted on close
-         * @type {Set<AbortController>}
-         */
-        this._pendingRequests = new Set();
+        this._lifecycle = createWidgetLifecycle(this, () => this.isOpen && this.chatLog);
     }
 
     /**
@@ -124,7 +123,7 @@ class ReflectionMatrix {
     init(activity) {
         this.activity = activity;
         this.isOpen = true;
-        this._isMounted = true;
+        this._lifecycle.isMounted = true;
         this.isMaximized = false;
         this.activity.isInputON = true;
         this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
@@ -138,10 +137,10 @@ class ReflectionMatrix {
 
         widgetWindow.onclose = () => {
             this.isOpen = false;
-            this._isMounted = false;
+            this._lifecycle.isMounted = false;
             this.activity.isInputON = false;
             this.hideTypingIndicator();
-            this._abortPendingRequests();
+            this._lifecycle.abortPendingRequests();
             this.pendingMessages = [];
             this.isProcessingPendingMessage = false;
             this._isUpdatingProjectCode = false;
@@ -301,71 +300,7 @@ class ReflectionMatrix {
      * @returns {boolean}
      */
     _isWidgetActive() {
-        return Boolean(this._isMounted && this.isOpen && this.chatLog);
-    }
-
-    /**
-     * Aborts all in-flight widget requests.
-     * @returns {void}
-     */
-    _abortPendingRequests() {
-        this._pendingRequests.forEach(controller => controller.abort());
-        this._pendingRequests.clear();
-    }
-
-    /**
-     * Sends JSON to the backend while tracking the widget lifecycle.
-     * @param {string} path - Backend path suffix.
-     * @param {Object} payload - Request payload.
-     * @returns {Promise<Object|null>}
-     */
-    async _postJSON(path, payload) {
-        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
-        let timeoutId = null;
-        let timedOut = false;
-
-        if (controller) {
-            this._pendingRequests.add(controller);
-        }
-
-        try {
-            const request = {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            };
-
-            if (controller) {
-                request.signal = controller.signal;
-                timeoutId = setTimeout(() => {
-                    timedOut = true;
-                    controller.abort();
-                }, ReflectionMatrix.REQUEST_TIMEOUT);
-            }
-
-            const response = await fetch(`${this.PORT}${path}`, request);
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            if (error && error.name === "AbortError") {
-                if (timedOut) {
-                    return { error: "Failed to send message" };
-                }
-
-                return null;
-            }
-
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        } finally {
-            if (timeoutId !== null) {
-                clearTimeout(timeoutId);
-            }
-
-            if (controller) {
-                this._pendingRequests.delete(controller);
-            }
-        }
+        return this._lifecycle.isWidgetActive();
     }
 
     /**
@@ -587,6 +522,21 @@ class ReflectionMatrix {
         } finally {
             this._isUpdatingProjectCode = false;
         }
+    }
+
+    /**
+     * Sends JSON to the backend through the shared lifecycle tracker.
+     * @param {string} path - Backend path suffix.
+     * @param {Object} payload - Request payload.
+     * @returns {Promise<Object|null>}
+     */
+    _postJSON(path, payload) {
+        return this._lifecycle.postJSON(
+            `${this.PORT}${path}`,
+            payload,
+            ReflectionMatrix.REQUEST_TIMEOUT,
+            "Failed to send message"
+        );
     }
 
     /**

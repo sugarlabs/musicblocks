@@ -41,8 +41,8 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.chatLog).toBeNull();
             expect(debuggerWidget.messageInput).toBeNull();
             expect(debuggerWidget.sendButton).toBeNull();
-            expect(debuggerWidget._isMounted).toBe(false);
-            expect(debuggerWidget._pendingRequests.size).toBe(0);
+            expect(debuggerWidget._lifecycle.isMounted).toBe(false);
+            expect(debuggerWidget._lifecycle.pendingRequests.size).toBe(0);
         });
 
         test("_generateConversationId returns unique IDs", () => {
@@ -670,7 +670,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget = new AIDebuggerWidget();
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.widgetWindow = {};
-            debuggerWidget._isMounted = true;
+            debuggerWidget._lifecycle.isMounted = true;
         });
 
         test("adds user message with correct styling", () => {
@@ -718,7 +718,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.messageInput = document.createElement("input");
             debuggerWidget.widgetWindow = {};
-            debuggerWidget._isMounted = true;
+            debuggerWidget._lifecycle.isMounted = true;
             debuggerWidget._sendToBackend = jest.fn();
             debuggerWidget._updateMessageCount = jest.fn();
             debuggerWidget._consentGiven = true;
@@ -792,7 +792,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget = new AIDebuggerWidget();
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.widgetWindow = {};
-            debuggerWidget._isMounted = true;
+            debuggerWidget._lifecycle.isMounted = true;
         });
 
         test("shows and hides typing indicator", () => {
@@ -844,10 +844,10 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.init(mockActivity);
 
             const abortSpy = jest.fn();
-            debuggerWidget._pendingRequests.add({ abort: abortSpy });
+            debuggerWidget._lifecycle.pendingRequests.add({ abort: abortSpy });
             mockWidgetWindow.onclose();
 
-            expect(debuggerWidget._isMounted).toBe(false);
+            expect(debuggerWidget._lifecycle.isMounted).toBe(false);
             expect(abortSpy).toHaveBeenCalled();
             expect(mockWidgetWindow.destroy).toHaveBeenCalled();
             expect(mockActivity.isInputON).toBe(false);
@@ -859,7 +859,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.messageInput = document.createElement("input");
             debuggerWidget.messageInput.value = "Help me debug";
-            debuggerWidget._isMounted = false;
+            debuggerWidget._lifecycle.isMounted = false;
             debuggerWidget._consentGiven = true;
 
             const sendSpy = jest.spyOn(debuggerWidget, "_sendToBackend");
@@ -875,7 +875,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.widgetWindow = mockWidgetWindow;
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.messageInput = document.createElement("input");
-            debuggerWidget._isMounted = true;
+            debuggerWidget._lifecycle.isMounted = true;
 
             let resolveFetch;
             global.fetch.mockImplementation(
@@ -886,7 +886,7 @@ describe("AIDebuggerWidget", () => {
             );
 
             debuggerWidget._sendToBackend("Why is this broken?");
-            debuggerWidget._isMounted = false;
+            debuggerWidget._lifecycle.isMounted = false;
 
             resolveFetch({
                 ok: true,
@@ -905,7 +905,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.widgetWindow = mockWidgetWindow;
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.messageInput = document.createElement("input");
-            debuggerWidget._isMounted = true;
+            debuggerWidget._lifecycle.isMounted = true;
 
             let resolveFetch;
             global.fetch.mockImplementation(
@@ -916,7 +916,7 @@ describe("AIDebuggerWidget", () => {
             );
 
             debuggerWidget._initializeBackendWithProject("[]");
-            debuggerWidget._isMounted = false;
+            debuggerWidget._lifecycle.isMounted = false;
 
             resolveFetch({ ok: true, json: jest.fn().mockResolvedValue({ response: "Analysis" }) });
 
@@ -931,12 +931,12 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.activity = mockActivity;
             debuggerWidget.widgetWindow = mockWidgetWindow;
             debuggerWidget.chatLog = document.createElement("div");
-            debuggerWidget._isMounted = true;
+            debuggerWidget._lifecycle.isMounted = true;
             debuggerWidget.chatHistory = [{ type: "user", content: "hello" }];
             debuggerWidget.promptCount = 3;
 
             const abortSpy = jest.fn();
-            debuggerWidget._pendingRequests.add({ abort: abortSpy });
+            debuggerWidget._lifecycle.pendingRequests.add({ abort: abortSpy });
             const loadSpy = jest
                 .spyOn(debuggerWidget, "_loadProjectAndInitialize")
                 .mockImplementation(() => {});
@@ -954,7 +954,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.widgetWindow = mockWidgetWindow;
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.messageInput = document.createElement("input");
-            debuggerWidget._isMounted = true;
+            debuggerWidget._lifecycle.isMounted = true;
             debuggerWidget._consentGiven = true;
 
             let resolveFirst;

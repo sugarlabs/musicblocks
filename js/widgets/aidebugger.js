@@ -11,11 +11,17 @@
 
 /* global _THIS_IS_MUSIC_BLOCKS_ */
 
+var createWidgetLifecycle =
+    (typeof window !== "undefined" && window.createWidgetLifecycle) ||
+    (typeof require !== "undefined"
+        ? require("../utils/ai-widget-lifecycle").createWidgetLifecycle
+        : null);
+
 /* This widget provides an AI-powered debugging interface for Music Blocks projects,
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
 
 /** AMD module dependencies for lazy loading. */
-AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
+AIDebuggerWidget.dependencies = ["utils/ai-widget-lifecycle", "widgets/aidebugger"];
 
 /**
  * Represents a AI Widget.
@@ -123,16 +129,10 @@ function AIDebuggerWidget() {
     this._consentGiven = false;
 
     /**
-     * Tracks whether the widget is still mounted and safe to update
-     * @type {boolean}
+     * Shared mount tracking and request cancellation for chat widgets
+     * @type {object}
      */
-    this._isMounted = false;
-
-    /**
-     * Tracks fetch controllers so pending requests can be aborted on close/reset
-     * @type {Set<AbortController>}
-     */
-    this._pendingRequests = new Set();
+    this._lifecycle = createWidgetLifecycle(this, () => this.widgetWindow && this.chatLog);
 
     /**
      * Generates a unique conversation ID
@@ -153,7 +153,7 @@ function AIDebuggerWidget() {
     this.init = function (activity) {
         this.activity = activity;
         this.activity.isInputON = true;
-        this._isMounted = true;
+        this._lifecycle.isMounted = true;
 
         if (!this.conversationId) {
             this.conversationId = this._generateConversationId();
@@ -168,8 +168,8 @@ function AIDebuggerWidget() {
         widgetWindow.getWidgetBody().style.height = CHATHEIGHT + "px";
 
         widgetWindow.onclose = () => {
-            this._isMounted = false;
-            this._abortPendingRequests();
+            this._lifecycle.isMounted = false;
+            this._lifecycle.abortPendingRequests();
             this._hideTypingIndicator();
             widgetWindow.destroy();
             this.activity.isInputON = false;
@@ -199,17 +199,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._isWidgetActive = function () {
-        return Boolean(this._isMounted && this.widgetWindow && this.chatLog);
-    };
-
-    /**
-     * Aborts all active backend requests
-     * @returns {void}
-     * @private
-     */
-    this._abortPendingRequests = function () {
-        this._pendingRequests.forEach(controller => controller.abort());
-        this._pendingRequests.clear();
+        return this._lifecycle.isWidgetActive();
     };
 
     /**
@@ -218,48 +208,14 @@ function AIDebuggerWidget() {
      * @returns {Promise<object|null>}
      * @private
      */
-    this._postToBackend = async function (payload) {
-        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
-
-        if (controller) {
-            this._pendingRequests.add(controller);
-        }
-
-        try {
-            const request = {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            };
-
-            if (controller) {
-                request.signal = controller.signal;
-            }
-
-            const response = await fetch(
-                `${BACKEND_CONFIG.BASE_URL}${BACKEND_CONFIG.ENDPOINTS.ANALYZE}`,
-                request
-            );
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            if (error && error.name === "AbortError") {
-                return null;
-            }
-
-            throw error;
-        } finally {
-            if (controller) {
-                this._pendingRequests.delete(controller);
-            }
-        }
+    this._postToBackend = function (payload) {
+        return this._lifecycle.postJSON(
+            `${BACKEND_CONFIG.BASE_URL}${BACKEND_CONFIG.ENDPOINTS.ANALYZE}`,
+            payload,
+            BACKEND_CONFIG.TIMEOUT,
+            null,
+            true
+        );
     };
 
     /**
@@ -861,7 +817,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._resetConversation = function () {
-        this._abortPendingRequests();
+        this._lifecycle.abortPendingRequests();
         this.chatHistory = [];
         this.promptCount = 0; // Reset prompt count
         this.conversationId = this._generateConversationId();
