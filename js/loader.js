@@ -359,6 +359,36 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         };
     })();
 
+    /**
+     * Fetch the pie-menu drawing libraries in the background.
+     *
+     * These used to be defer scripts in index.html, which meant they had to be
+     * fetched, parsed and run before DOMContentLoaded -- and therefore before
+     * Music Blocks could paint -- despite neither of them executing a single
+     * line until someone opens a pie menu.
+     *
+     * Nothing waits on this. Block.piemenuOKtoLaunch() already reports "not
+     * right now" while a pie menu is settling, and it now reports the same
+     * thing in the very short window before wheelnav has arrived, so an early
+     * interaction is declined rather than throwing.
+     */
+    const loadPieMenuLibs = () => {
+        const inject = src =>
+            new Promise((resolve, reject) => {
+                const el = document.createElement("script");
+                el.src = src;
+                el.async = false;
+                el.onload = resolve;
+                el.onerror = () => reject(new Error(`could not load ${src}`));
+                document.head.appendChild(el);
+            });
+
+        // wheelnav draws through raphael, so raphael has to land first.
+        inject("lib/raphael.min.js")
+            .then(() => inject("lib/wheelnav.js"))
+            .catch(err => console.error("Pie menu libraries failed to load:", err));
+    };
+
     perfTracker.mark("loader.main.start");
 
     // Use globally-loaded jQuery and Materialize (avoids AMD conflicts)
@@ -568,6 +598,13 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         ["activity/activity"],
                         function () {
                             perfTracker.mark("loader.activity_module.ready");
+
+                            // Pie-menu drawing libraries. They cannot be needed
+                            // until a block is interacted with, so they are
+                            // fetched here rather than as defer scripts in
+                            // index.html, where they delayed first paint.
+                            // wheelnav draws through raphael, so order matters.
+                            loadPieMenuLibs();
                             perfTracker.measure(
                                 "loader.core_modules_to_activity_module_ready",
                                 "loader.core_modules.ready",
