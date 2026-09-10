@@ -725,5 +725,64 @@ describe("ContextMenuController", () => {
 
             expect(after).toEqual(before);
         });
+
+        test("tears down the old buttons' tooltips before removing their container", () => {
+            // Materialize parks each tooltip node in <body>, so removing
+            // #buttoncontainerBOTTOM without a "remove" first strands them
+            // there -- a tooltip that was visible at that moment never gets a
+            // mouseleave and stays on screen until the page is reloaded.
+            const calls = [];
+            window.jQuery = jest.fn(selector => ({
+                tooltip: jest.fn(options => calls.push({ selector, options }))
+            }));
+            mockElement.parentNode.removeChild = jest.fn(() =>
+                calls.push({ selector: "REMOVED_CONTAINER" })
+            );
+
+            controller.setupPaletteMenu();
+
+            const teardown = calls.findIndex(
+                c => c.selector === "#buttoncontainerBOTTOM .tooltipped" && c.options === "remove"
+            );
+            const removal = calls.findIndex(c => c.selector === "REMOVED_CONTAINER");
+            expect(teardown).toBeGreaterThanOrEqual(0);
+            expect(removal).toBeGreaterThan(teardown);
+        });
+
+        test("re-initialises the rebuilt buttons' tooltips once the row is complete", () => {
+            const calls = [];
+            window.jQuery = jest.fn(selector => ({
+                tooltip: jest.fn(options => calls.push({ selector, options }))
+            }));
+
+            controller.setupPaletteMenu();
+
+            const initializations = calls.filter(c => c.options !== "remove");
+            expect(initializations).toHaveLength(1);
+            expect(initializations[0].selector).toBe("#buttoncontainerBOTTOM .tooltipped");
+            expect(initializations[0].options).toEqual({ html: true, delay: 100 });
+        });
+
+        test("does not re-initialise tooltips when they are disabled", () => {
+            const calls = [];
+            window.jQuery = jest.fn(selector => ({
+                tooltip: jest.fn(options => calls.push({ selector, options }))
+            }));
+            activity.toolbar.tooltipsDisabled = true;
+
+            controller.setupPaletteMenu();
+
+            expect(calls).toContainEqual({
+                selector: "#buttoncontainerBOTTOM .tooltipped",
+                options: "remove"
+            });
+            expect(
+                calls.some(
+                    c =>
+                        c.selector === "#buttoncontainerBOTTOM .tooltipped" &&
+                        c.options !== "remove"
+                )
+            ).toBe(false);
+        });
     });
 });

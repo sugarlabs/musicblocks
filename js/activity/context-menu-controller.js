@@ -202,6 +202,17 @@ class ContextMenuController {
 
         const removeButtonContainer = document.getElementById("buttoncontainerBOTTOM");
         if (removeButtonContainer) {
+            // Materialize keeps a tooltip's node in <body>, not inside the
+            // button it belongs to, so removing the container below orphans
+            // the nodes of the buttons it holds. An orphan that happened to be
+            // visible at that moment has no element left to fire mouseleave
+            // on, so it stays on screen at its old coordinates until the page
+            // is reloaded -- e.g. hovering Home and then zooming (which fires
+            // resize, which rebuilds these buttons) leaves a stray
+            // "Home [HOME]" tooltip floating over the canvas. "remove" is the
+            // only teardown Materialize recognises; the rebuilt buttons are
+            // re-initialised at the end of this function.
+            window.jQuery("#buttoncontainerBOTTOM .tooltipped").tooltip("remove");
             removeButtonContainer.parentNode.removeChild(removeButtonContainer);
         }
 
@@ -420,6 +431,14 @@ class ContextMenuController {
                 display: true,
                 fn: this._hideHelpfulSearchWidget.bind(this)
             });
+
+        // Initialize tooltips after all bottom-toolbar buttons have been appended.
+        if (!(activity.toolbar && activity.toolbar.tooltipsDisabled)) {
+            window.jQuery("#buttoncontainerBOTTOM .tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
+        }
     }
 
     /*
@@ -498,10 +517,6 @@ class ContextMenuController {
                 container.blur?.();
             });
         }
-        window.jQuery(".tooltipped").tooltip({
-            html: true,
-            delay: 100
-        });
 
         container.onmouseover = () => {
             if (!activity.loading) {
