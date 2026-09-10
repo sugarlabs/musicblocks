@@ -865,6 +865,7 @@ Turtles.TurtlesView = class {
      */
     makeBackground(setCollapsed) {
         const activity = this.activity;
+        const topButtonY = 70 + LEADING + 6 + activity.toolbarHeight;
 
         const _doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
@@ -1011,7 +1012,7 @@ Turtles.TurtlesView = class {
                     label: _("Grid")
                 },
                 this._w - 10 - 3 * 55,
-                70 + LEADING + 6
+                topButtonY
             );
             const that = this;
             this.gridButton.onclick = () => {
@@ -1028,7 +1029,7 @@ Turtles.TurtlesView = class {
                     label: _("Clear")
                 },
                 this._w - 5 - 2 * 55,
-                70 + LEADING + 6
+                topButtonY
             );
 
             // Assign click listener to the Clear button
@@ -1049,7 +1050,7 @@ Turtles.TurtlesView = class {
                     label: _("Collapse")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                topButtonY
             );
 
             this._collapseButton.onclick = () => {
@@ -1116,7 +1117,7 @@ Turtles.TurtlesView = class {
                     label: _("Expand")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                topButtonY
             );
             if (this._expandButton !== null) {
                 this._expandButton.style.visibility = "hidden";
