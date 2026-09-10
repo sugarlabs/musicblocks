@@ -1936,6 +1936,11 @@ class Logo {
             logo._syncCounter = 0;
             if (!logo.turtles.running() && queueStart === 0) {
                 logo.onStopTurtle();
+                // This is an abort, not a graceful finish, so tear down
+                // audio/transport/listeners immediately rather than waiting
+                // on the natural-completion path's "last note" timeout --
+                // the same pattern doStopTurtles() uses for the Stop button.
+                logo._cleanupAfterCompletion();
             }
             if (profilingEnabled) {
                 Logo._recordBlockTiming(logo, blk, profilingStart);

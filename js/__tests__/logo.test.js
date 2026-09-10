@@ -246,6 +246,7 @@ function createMockTurtle(overrides = {}) {
         doWait: jest.fn(),
         delayTimeout: null,
         delayParameters: null,
+        iterationBudget: null,
         _transportTime: null,
         _transportEventId: null,
         container: { x: 0, y: 0 },
@@ -2416,12 +2417,12 @@ describe("Logo runFromBlockNow iteration budget is per turtle", () => {
     });
 
     test("a turtle's first block execution lazily starts its own full budget", () => {
-        expect(turtle0.iterationBudget).toBeUndefined();
+        expect(turtle0.iterationBudget).toBeNull();
 
         logo.runFromBlockNow(logo, 0, 0, 0, null);
 
         expect(turtle0.iterationBudget).toBe(logo._MAX_ITERATIONS);
-        expect(turtle1.iterationBudget).toBeUndefined();
+        expect(turtle1.iterationBudget).toBeNull();
     });
 
     test("exhausting one turtle's budget does not decrement another turtle's budget", () => {
@@ -2462,6 +2463,23 @@ describe("Logo runFromBlockNow iteration budget is per turtle", () => {
 
         expect(turtle0.queue).toEqual([]);
         expect(turtle1.queue).toEqual([{ blk: 2 }]);
+    });
+
+    test("tears down audio/transport/listeners when the exhausted turtle was the last one running", () => {
+        // Regression: an early version of this fix called onStopTurtle() but
+        // skipped _cleanupAfterCompletion(), which is what actually kills
+        // active audio voices, cancels the transport, and disposes
+        // instruments -- leaving zombie audio behind after an infinite-loop
+        // abort. doStopTurtles() (the Stop button) calls it synchronously
+        // for the same reason: this is an abort, not a graceful finish.
+        turtle1.running = false;
+        turtle0.iterationBudget = 1;
+        const cleanupSpy = jest.spyOn(logo, "_cleanupAfterCompletion");
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(mockActivity.onStopTurtle).toHaveBeenCalled();
+        expect(cleanupSpy).toHaveBeenCalled();
     });
 
     test("combined block executions across turtles do not trip either turtle's guard", () => {
