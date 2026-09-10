@@ -2365,6 +2365,17 @@ describe("Spatial grid indexing", () => {
             expect(cellsHolding(0)).toEqual(["0,0"]);
             expect(blocks._getNearbyBlocks(0, 0)).toEqual([0]);
         });
+
+        it("empty-grid fallback also skips an undefined slot, not just a disposed (null) one", () => {
+            // The fallback used to test `!== null`, which would still return
+            // a hole/undefined slot -- only disposeBlock's exact `null`
+            // assignment happened to be caught. Use a truthiness check
+            // instead so any missing entry is excluded.
+            blocks._spatialGrid.clear();
+            blocks.blockList[1] = undefined;
+
+            expect(blocks._getNearbyBlocks(0, 0)).toEqual([0]);
+        });
     });
 
     describe("when the index arrives as a string", () => {
