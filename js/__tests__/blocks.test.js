@@ -1726,6 +1726,47 @@ describe("Blocks Foundation", () => {
             expect(blocks.blockList[0].connections[1]).toBeNull();
         });
 
+        it("does not throw when the spatial grid holds a stale index for a disposed block (#8610)", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                })
+            ];
+            blocks._rebuildSpatialGrid();
+
+            // Simulate a grid left out of sync with blockList by some path other
+            // than disposeBlock (which is now fixed to clean up after itself) --
+            // this is the defense-in-depth guard's own regression case.
+            blocks.blockList[2] = null;
+            let cellSet = blocks._spatialGrid.get("0,0");
+            if (!cellSet) {
+                cellSet = new Set();
+                blocks._spatialGrid.set("0,0", cellSet);
+            }
+            cellSet.add(2);
+
+            // Would throw TypeError: Cannot read properties of null (reading
+            // 'inCollapsed') without the guard in block-drag-controller.js.
+            await blocks.blockMoved(1);
+
+            // The real, live target block should still be found and connected to.
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+        });
+
         it("exposes the same BlockDragController instance to every delegated method", () => {
             expect(blocks.blockDragController).toBeDefined();
             expect(blocks.findDragGroup).not.toBe(blocks.blockDragController.findDragGroup);
@@ -2287,6 +2328,54 @@ describe("Spatial grid indexing", () => {
         expect(cellsHolding(1)).toEqual(["100,100"]);
         expect(blocks._getNearbyBlocks(0, 0)).not.toContain(1);
         expect(blocks._getNearbyBlocks(5000, 5000)).toContain(1);
+    });
+
+    describe("disposeBlock (#8610)", () => {
+        it("removes the disposed block from the spatial grid, not just blockList", () => {
+            blocks.blockList[1].dispose = jest.fn();
+
+            // Sanity check: before disposal, both blocks share the (0,0) cell.
+            expect(blocks._getNearbyBlocks(0, 0)).toEqual(expect.arrayContaining([0, 1]));
+
+            blocks.disposeBlock(1);
+
+            expect(blocks.blockList[1]).toBeNull();
+            expect(cellsHolding(1)).toEqual([]);
+            expect(blocks._blockGridCell.has(1)).toBe(false);
+            expect(blocks._getNearbyBlocks(0, 0)).not.toContain(1);
+        });
+
+        it("leaves the grid alone when the target has already been disposed", () => {
+            blocks.blockList[1].dispose = jest.fn();
+            blocks.disposeBlock(1);
+            const gridSizeAfterFirstDispose = blocks._spatialGrid.size;
+
+            // A second call on the same (now-null) index must be a no-op --
+            // it should not throw and should not touch the other block's entry.
+            expect(() => blocks.disposeBlock(1)).not.toThrow();
+            expect(blocks._spatialGrid.size).toBe(gridSizeAfterFirstDispose);
+            expect(cellsHolding(0)).toEqual(["0,0"]);
+        });
+
+        it("does not disturb the grid entry of a block left in the same cell", () => {
+            blocks.blockList[1].dispose = jest.fn();
+
+            blocks.disposeBlock(1);
+
+            expect(cellsHolding(0)).toEqual(["0,0"]);
+            expect(blocks._getNearbyBlocks(0, 0)).toEqual([0]);
+        });
+
+        it("empty-grid fallback also skips an undefined slot, not just a disposed (null) one", () => {
+            // The fallback used to test `!== null`, which would still return
+            // a hole/undefined slot -- only disposeBlock's exact `null`
+            // assignment happened to be caught. Use a truthiness check
+            // instead so any missing entry is excluded.
+            blocks._spatialGrid.clear();
+            blocks.blockList[1] = undefined;
+
+            expect(blocks._getNearbyBlocks(0, 0)).toEqual([0]);
+        });
     });
 
     describe("when the index arrives as a string", () => {

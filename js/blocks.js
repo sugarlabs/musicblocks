@@ -315,6 +315,27 @@ class Blocks {
         };
 
         /**
+         * Removes a block index from every spatial-grid cell it currently
+         * occupies, per _blockGridCell. Leaves the _blockGridCell entry
+         * itself untouched; callers that are relocating the block overwrite
+         * it with the new cells right after, callers that are removing the
+         * block for good (e.g. disposeBlock) delete it explicitly.
+         * @param {number} idx - Block index, already normalized to a number
+         * @returns {void}
+         */
+        this._removeFromSpatialGrid = idx => {
+            const oldKeys = this._blockGridCell.get(idx);
+            if (!oldKeys) return;
+            for (const oldKey of oldKeys) {
+                const oldSet = this._spatialGrid.get(oldKey);
+                if (oldSet) {
+                    oldSet.delete(idx);
+                    if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
+                }
+            }
+        };
+
+        /**
          * Updates the spatial grid position for a given block index.
          * Registers the block in every cell that any of its dock
          * positions falls into, so that nearby-dock searches always
@@ -362,16 +383,7 @@ class Blocks {
                 if (same) return;
             }
 
-            // Remove from all old cells
-            if (oldKeys) {
-                for (const oldKey of oldKeys) {
-                    const oldSet = this._spatialGrid.get(oldKey);
-                    if (oldSet) {
-                        oldSet.delete(idx);
-                        if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
-                    }
-                }
-            }
+            this._removeFromSpatialGrid(idx);
 
             // Add to all new cells
             for (const key of newKeys) {
@@ -397,7 +409,9 @@ class Blocks {
             if (this._spatialGrid.size === 0) {
                 const all = [];
                 for (let i = 0; i < this.blockList.length; i++) {
-                    all.push(i);
+                    if (this.blockList[i]) {
+                        all.push(i);
+                    }
                 }
                 return all;
             }
@@ -6823,6 +6837,12 @@ class Blocks {
             if (this.blockCollapseArt && this.blockCollapseArt[blkIdx]) {
                 delete this.blockCollapseArt[blkIdx];
             }
+            // The block is gone for good, so drop it from the spatial grid too --
+            // otherwise _getNearbyBlocks keeps handing out this index after
+            // blockList[blkIdx] has been nulled out below (issue #8610).
+            const idx = Number(blkIdx);
+            this._removeFromSpatialGrid(idx);
+            this._blockGridCell.delete(idx);
             this.blockList[blkIdx] = null;
         };
 
