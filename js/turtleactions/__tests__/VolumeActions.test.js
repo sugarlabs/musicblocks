@@ -202,8 +202,10 @@ describe("setupVolumeActions", () => {
         ])("listener execution with justCounting %p", (justCounting, noCall) => {
             targetTurtle.singer.justCounting = justCounting;
             Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
+            expect(targetTurtle.singer.inCrescendo.length).toBe(1);
             const listener = activity.logo.setTurtleListener.mock.calls.pop()[2];
             listener();
+            expect(targetTurtle.singer.inCrescendo.length).toBe(0);
             if (!noCall) {
                 expect(crescendoEndSpy).toHaveBeenCalledWith(0, 10);
             } else {
