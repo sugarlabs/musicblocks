@@ -3341,11 +3341,19 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(Array.isArray(freqs)).toBe(true);
             expect(freqs).toHaveLength(3);
 
-            // EDO temperament (equal19 is a real key in the TEMPERAMENT table)
-            synth.inTemperament = "equal19";
+            // EDO temperament (e.g. 19-EDO or 31-EDO)
+            const edoTemp = { isEDO: true, pitchNumber: 19 };
+            const origGetTemp = global.getTemperament;
+            global.getTemperament = jest.fn(name =>
+                name === "19-EDO" ? edoTemp : origGetTemp(name)
+            );
+
+            synth.inTemperament = "19-EDO";
             expect(typeof synth._getFrequency("C4", false)).toBe("number");
             expect(synth._getFrequency(440, false)).toBe(440);
             expect(Array.isArray(synth._getFrequency(["C4", 440], false))).toBe(true);
+
+            delete global.TEMPERAMENT["19-EDO"];
 
             // Non-equal temperament (Pythagorean)
             synth.inTemperament = "pythagorean";
