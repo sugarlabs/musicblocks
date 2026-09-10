@@ -124,6 +124,23 @@ describe("AIWidget Utilities", () => {
             expect(searchIndexForMusicBlock(array, 30)).toBe(0);
             expect(searchIndexForMusicBlock(array, 10)).toBe(1);
         });
+
+        it("should handle null elements during stale cache rebuild", () => {
+            const array = [
+                [10, "start"],
+                [20, "pitch"]
+            ];
+
+            // Prime the cache
+            expect(searchIndexForMusicBlock(array, 20)).toBe(1);
+
+            // Stale: replace with null element
+            array[1] = null;
+
+            // Should handle null gracefully during rebuild
+            expect(searchIndexForMusicBlock(array, 20)).toBe(-1);
+            expect(searchIndexForMusicBlock(array, 10)).toBe(0);
+        });
     });
 
     describe("createPitchBlocks", () => {
