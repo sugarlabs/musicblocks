@@ -163,6 +163,8 @@ class StatusMatrix {
                     }
                     break;
                 case "outputtools":
+                    // Do not add || "" here; label must stay undefined/null if unset
+                    // so the staticLabels fallback below remains reachable.
                     label = block?.privateData;
                     if (typeof label === "object" && label !== null && label.value) {
                         label = label.value;
