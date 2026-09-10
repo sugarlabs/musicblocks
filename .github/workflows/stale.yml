@@ -5,6 +5,10 @@ on:
     - cron: '30 19 * * *' # Schedule for 7:30 PM every day
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   stale:
     runs-on: ubuntu-latest
