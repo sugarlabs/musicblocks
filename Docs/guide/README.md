@@ -2084,11 +2084,12 @@ state entirely. When playing under non-EDO temperaments, frequencies
 are computed from the temperament's ratios rather than
 equal-temperament formulas.
 
-![widget](./mode_scalar_21edo.svg "widget with 21-EDO selected")
+![widget](./mode_scalar_21edo.svg "widget with 1/4 Comma Meantone selected")
 
-In the above example, the widget has been switched to a higher EDO.
-The pie wheel now shows more slices, allowing finer-grained mode
-construction.
+In the above example, the widget has been switched to the *1/4 Comma
+Meantone* temperament, which uses 21 pitches per octave based on
+ratio-based tuning. The pie wheel now shows more slices, allowing
+finer-grained mode construction.
 
 You can also click on individual notes to activate or deactivate them.
 
