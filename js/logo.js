@@ -331,7 +331,7 @@ class Logo {
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
         this._EXPORT_YIELD_AFTER_SYNC_RUNS = 100; // Sync yield threshold during exports.
-        this._iterationBudget = this._MAX_ITERATIONS + 1;
+        // Per-turtle infinite-loop guard budget; see Turtle#iterationBudget.
         this._MAX_ITERATIONS = 1000000;
 
         // When running in step-by-step mode, the next command to run
@@ -1477,7 +1477,11 @@ class Logo {
         this.stopTurtle = false;
 
         this._syncCounter = 0;
-        this._iterationBudget = this._MAX_ITERATIONS + 1;
+        // Give every turtle its own fresh infinite-loop budget for this run
+        // so one turtle's workload cannot exhaust another's (see #8627).
+        for (const turtle of this.turtles.turtleList) {
+            turtle.iterationBudget = this._MAX_ITERATIONS + 1;
+        }
 
         this.blocks.unhighlightAll();
         this.blocks.bringToTop(); // Draw under the blocks.
@@ -1906,15 +1910,33 @@ class Logo {
 
         this.receivedArg = receivedArg;
 
-        if (--logo._iterationBudget <= 0) {
+        // Sometimes we don't want to unwind the entire queue.
+        if (queueStart === undefined) queueStart = 0;
+
+        const tur = logo.turtles.ithTurtle(turtle);
+
+        // Lazily initialize so a turtle created mid-run (e.g. "new turtle")
+        // starts with a full budget instead of inheriting another turtle's.
+        // eslint-disable-next-line eqeqeq
+        if (tur.iterationBudget == null) {
+            tur.iterationBudget = logo._MAX_ITERATIONS + 1;
+        }
+
+        if (--tur.iterationBudget <= 0) {
             logo.deps.errorHandler(
                 _("Infinite loop detected. Execution stopped to prevent browser freeze."),
                 blk
             );
-            logo.stopTurtle = true;
+            // Halt only this turtle; other turtles in the project keep running.
+            tur.queue = [];
+            tur.parentFlowQueue = [];
+            tur.running = false;
+            tur.iterationBudget = logo._MAX_ITERATIONS + 1;
             logo._alreadyRunning = false;
             logo._syncCounter = 0;
-            logo._iterationBudget = logo._MAX_ITERATIONS + 1;
+            if (!logo.turtles.running() && queueStart === 0) {
+                logo.onStopTurtle();
+            }
             if (profilingEnabled) {
                 Logo._recordBlockTiming(logo, blk, profilingStart);
                 performanceTracker.exitBlock();
@@ -1922,8 +1944,6 @@ class Logo {
             return;
         }
 
-        // Sometimes we don't want to unwind the entire queue.
-        if (queueStart === undefined) queueStart = 0;
         const currentBlock = logo.blockList[blk];
         const blockName = currentBlock.name;
         const proto = currentBlock.protoblock;
@@ -1935,7 +1955,6 @@ class Logo {
 (1) Evaluate any arguments (beginning with connection[1]).
 ===========================================================================
 */
-        const tur = logo.turtles.ithTurtle(turtle);
         const args = [];
 
         if (proto.args > 0) {

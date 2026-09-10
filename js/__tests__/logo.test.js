@@ -2117,7 +2117,7 @@ describe("Logo runFromBlockNow", () => {
                 })
             };
 
-            logo._iterationBudget = 1;
+            turtle0.iterationBudget = 1;
             logo.blockList = [makeFlowBlock("noop")];
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
@@ -2158,14 +2158,16 @@ describe("Logo runFromBlockNow", () => {
     });
 
     describe("limits and plugin dispatch", () => {
-        test("stops execution and reports error when MAX_ITERATIONS exceeded", () => {
-            logo._iterationBudget = 1;
+        test("stops the offending turtle and reports error when its budget is exceeded", () => {
+            turtle0.iterationBudget = 1;
             logo.blockList = [makeFlowBlock("noop")];
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
 
             expect(mockActivity.errorMsg).toHaveBeenCalled();
-            expect(logo.stopTurtle).toBe(true);
+            expect(turtle0.running).toBe(false);
+            // The guard must not halt the whole run — only the exhausted turtle.
+            expect(logo.stopTurtle).toBe(false);
         });
 
         test("evalFlowDict plugin executes when block name matches", () => {
@@ -2381,6 +2383,138 @@ describe("Logo runFromBlockNow", () => {
 
         expect(mockActivity.blocks.updateParameterBlock).toHaveBeenCalledWith(logo, 0, 10);
         expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(1);
+    });
+});
+
+// ─── Logo runFromBlockNow — per-turtle iteration budget (#8627) ──────────────
+// The infinite-loop guard used to share one _iterationBudget counter across
+// every turtle in the project, so one turtle's workload could exhaust the
+// budget and abort every other (well-behaved) turtle in the same run, with
+// the error blamed on whichever turtle happened to be executing at that
+// moment. These tests cover the fix: each turtle now has its own budget,
+// and exhausting it stops only that turtle.
+
+describe("Logo runFromBlockNow iteration budget is per turtle", () => {
+    let logo;
+    let mockActivity;
+    let turtle0;
+    let turtle1;
+
+    beforeEach(() => {
+        setupLogoEnv({ withFlute: true });
+        turtle0 = createMockTurtle();
+        turtle1 = createMockTurtle();
+        mockActivity = createTwoTurtleActivity(turtle0, turtle1);
+        mockActivity.turtles.running = jest.fn(() => turtle0.running || turtle1.running);
+        logo = new Logo(mockActivity);
+        mockActivity.logo = logo;
+        logo.blockList = [makeFlowBlock("noop")];
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("a turtle's first block execution lazily starts its own full budget", () => {
+        expect(turtle0.iterationBudget).toBeUndefined();
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(turtle0.iterationBudget).toBe(logo._MAX_ITERATIONS);
+        expect(turtle1.iterationBudget).toBeUndefined();
+    });
+
+    test("exhausting one turtle's budget does not decrement another turtle's budget", () => {
+        turtle0.iterationBudget = 1;
+        turtle1.iterationBudget = 5;
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(mockActivity.errorMsg).toHaveBeenCalled();
+        expect(turtle1.iterationBudget).toBe(5);
+    });
+
+    test("exhausting one turtle's budget stops only that turtle, not the whole run", () => {
+        turtle0.running = true;
+        turtle1.running = true;
+        turtle0.iterationBudget = 1;
+        turtle1.iterationBudget = 100;
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(mockActivity.errorMsg).toHaveBeenCalled();
+        expect(turtle0.running).toBe(false);
+        expect(turtle1.running).toBe(true);
+        // The old global stopTurtle flag halted every turtle; it must not
+        // be used for a single turtle's budget exhaustion any more.
+        expect(logo.stopTurtle).toBe(false);
+        // Turtle 1 is still running, so the "all turtles finished" callback
+        // must not fire yet.
+        expect(mockActivity.onStopTurtle).not.toHaveBeenCalled();
+    });
+
+    test("exhausting the budget clears only the offending turtle's queue", () => {
+        turtle0.queue = [{ blk: 1 }];
+        turtle1.queue = [{ blk: 2 }];
+        turtle0.iterationBudget = 1;
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(turtle0.queue).toEqual([]);
+        expect(turtle1.queue).toEqual([{ blk: 2 }]);
+    });
+
+    test("combined block executions across turtles do not trip either turtle's guard", () => {
+        // Under the old shared counter, these four combined calls against a
+        // budget of 3 would have tripped "Infinite loop detected" on the
+        // third call even though neither turtle individually reached 3.
+        turtle0.iterationBudget = 3;
+        turtle1.iterationBudget = 3;
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+        logo.runFromBlockNow(logo, 1, 0, 0, null);
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+        logo.runFromBlockNow(logo, 1, 0, 0, null);
+
+        expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle0.iterationBudget).toBe(1);
+        expect(turtle1.iterationBudget).toBe(1);
+    });
+});
+
+// ─── Logo runLogoCommands resets per-turtle budgets (#8627) ──────────────────
+
+describe("Logo runLogoCommands resets every turtle's iteration budget", () => {
+    let logo;
+    let mockActivity;
+    let turtle0;
+    let turtle1;
+
+    beforeEach(() => {
+        setupLogoEnv({ withFlute: true });
+        turtle0 = createMockTurtle();
+        turtle1 = createMockTurtle();
+        mockActivity = createTwoTurtleActivity(turtle0, turtle1);
+        logo = new Logo(mockActivity);
+        mockActivity.logo = logo;
+        logo.prepSynths = jest.fn();
+        logo.initTurtle = jest.fn();
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("gives every existing turtle a fresh budget when a run starts", () => {
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+        turtle0.iterationBudget = 3;
+        turtle1.iterationBudget = logo._MAX_ITERATIONS + 1;
+
+        logo.runLogoCommands(null, null);
+
+        expect(turtle0.iterationBudget).toBe(logo._MAX_ITERATIONS + 1);
+        expect(turtle1.iterationBudget).toBe(logo._MAX_ITERATIONS + 1);
     });
 });
 
