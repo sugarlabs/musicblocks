@@ -3191,6 +3191,35 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
                 tempBlock._exitWheel.navItems[0].navigateFunction();
             }
 
+            // Exercise fallback and catch branches when frequency computation fails or throws
+            const origCompute = global.computeTargetPitchFrequency;
+            const navFn = tempBlock._pitchWheel.navItems[0].navigateFunction;
+            expect(typeof navFn).toBe("function");
+
+            // 1. computeTargetPitchFrequency returns NaN -> falls back to 440 Hz
+            global.computeTargetPitchFrequency = jest.fn().mockReturnValue(NaN);
+            navFn();
+            expect(targetNoteSelector.textContent).toBe("C5");
+            synthInstance.tunerAnalyser.getValue = jest
+                .fn()
+                .mockReturnValue(bufferForFrequency(440));
+            await new Promise(resolve => setTimeout(resolve, 5));
+            expect(segments[5].getAttribute("fill")).toBe("#00FF00");
+
+            // 2. computeTargetPitchFrequency throws error -> falls back to 440 Hz
+            global.computeTargetPitchFrequency = jest.fn().mockImplementation(() => {
+                throw new Error("tuner calculation error");
+            });
+            navFn();
+            expect(targetNoteSelector.textContent).toBe("C5");
+            synthInstance.tunerAnalyser.getValue = jest
+                .fn()
+                .mockReturnValue(bufferForFrequency(440));
+            await new Promise(resolve => setTimeout(resolve, 5));
+            expect(segments[5].getAttribute("fill")).toBe("#00FF00");
+
+            global.computeTargetPitchFrequency = origCompute;
+
             // Test stopTuner
             synthInstance.stopTuner();
             expect(synthInstance._tunerActive).toBe(false);
