@@ -1780,13 +1780,6 @@ class Block {
                             platformColor.blockText
                         );
                         break;
-                    case "rhythmruler":
-                        that.collapseText = new createjs.Text(
-                            _("ruler"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
                     case "timbre":
                         that.collapseText = new createjs.Text(
                             _("timbre"),
