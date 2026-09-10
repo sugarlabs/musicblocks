@@ -1910,9 +1910,6 @@ class Logo {
 
         this.receivedArg = receivedArg;
 
-        // Sometimes we don't want to unwind the entire queue.
-        if (queueStart === undefined) queueStart = 0;
-
         const tur = logo.turtles.ithTurtle(turtle);
 
         // Lazily initialize so a turtle created mid-run (e.g. "new turtle")
@@ -1927,21 +1924,15 @@ class Logo {
                 _("Infinite loop detected. Execution stopped to prevent browser freeze."),
                 blk
             );
-            // Halt only this turtle; other turtles in the project keep running.
-            tur.queue = [];
-            tur.parentFlowQueue = [];
-            tur.running = false;
-            tur.iterationBudget = logo._MAX_ITERATIONS + 1;
+            // A real infinite loop is a whole-run problem, not just this
+            // turtle's -- stop everything, same as before. What's fixed is
+            // *whose* budget triggered this: each turtle now has its own,
+            // so this only fires when this turtle itself did the looping,
+            // not because some other turtle's work used up a shared pool.
+            logo.stopTurtle = true;
             logo._alreadyRunning = false;
             logo._syncCounter = 0;
-            if (!logo.turtles.running() && queueStart === 0) {
-                logo.onStopTurtle();
-                // This is an abort, not a graceful finish, so tear down
-                // audio/transport/listeners immediately rather than waiting
-                // on the natural-completion path's "last note" timeout --
-                // the same pattern doStopTurtles() uses for the Stop button.
-                logo._cleanupAfterCompletion();
-            }
+            tur.iterationBudget = logo._MAX_ITERATIONS + 1;
             if (profilingEnabled) {
                 Logo._recordBlockTiming(logo, blk, profilingStart);
                 performanceTracker.exitBlock();
@@ -1949,6 +1940,8 @@ class Logo {
             return;
         }
 
+        // Sometimes we don't want to unwind the entire queue.
+        if (queueStart === undefined) queueStart = 0;
         const currentBlock = logo.blockList[blk];
         const blockName = currentBlock.name;
         const proto = currentBlock.protoblock;

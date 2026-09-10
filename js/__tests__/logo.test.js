@@ -2159,16 +2159,14 @@ describe("Logo runFromBlockNow", () => {
     });
 
     describe("limits and plugin dispatch", () => {
-        test("stops the offending turtle and reports error when its budget is exceeded", () => {
+        test("stops execution and reports error when MAX_ITERATIONS exceeded", () => {
             turtle0.iterationBudget = 1;
             logo.blockList = [makeFlowBlock("noop")];
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
 
             expect(mockActivity.errorMsg).toHaveBeenCalled();
-            expect(turtle0.running).toBe(false);
-            // The guard must not halt the whole run — only the exhausted turtle.
-            expect(logo.stopTurtle).toBe(false);
+            expect(logo.stopTurtle).toBe(true);
         });
 
         test("evalFlowDict plugin executes when block name matches", () => {
@@ -2390,10 +2388,12 @@ describe("Logo runFromBlockNow", () => {
 // ─── Logo runFromBlockNow — per-turtle iteration budget (#8627) ──────────────
 // The infinite-loop guard used to share one _iterationBudget counter across
 // every turtle in the project, so one turtle's workload could exhaust the
-// budget and abort every other (well-behaved) turtle in the same run, with
-// the error blamed on whichever turtle happened to be executing at that
-// moment. These tests cover the fix: each turtle now has its own budget,
-// and exhausting it stops only that turtle.
+// budget even though no single turtle was actually looping forever, and the
+// error was blamed on whichever turtle happened to be executing at that
+// moment. These tests cover the fix: each turtle now has its own budget, so
+// the guard only fires when a turtle's own work exhausts it. The guard still
+// stops the whole run when it fires -- an infinite loop is a whole-run
+// problem -- only the source of exhaustion changed, not the response to it.
 
 describe("Logo runFromBlockNow iteration budget is per turtle", () => {
     let logo;
@@ -2406,7 +2406,6 @@ describe("Logo runFromBlockNow iteration budget is per turtle", () => {
         turtle0 = createMockTurtle();
         turtle1 = createMockTurtle();
         mockActivity = createTwoTurtleActivity(turtle0, turtle1);
-        mockActivity.turtles.running = jest.fn(() => turtle0.running || turtle1.running);
         logo = new Logo(mockActivity);
         mockActivity.logo = logo;
         logo.blockList = [makeFlowBlock("noop")];
@@ -2435,51 +2434,14 @@ describe("Logo runFromBlockNow iteration budget is per turtle", () => {
         expect(turtle1.iterationBudget).toBe(5);
     });
 
-    test("exhausting one turtle's budget stops only that turtle, not the whole run", () => {
-        turtle0.running = true;
-        turtle1.running = true;
+    test("exhausting a turtle's own budget still stops the whole run", () => {
         turtle0.iterationBudget = 1;
         turtle1.iterationBudget = 100;
 
         logo.runFromBlockNow(logo, 0, 0, 0, null);
 
         expect(mockActivity.errorMsg).toHaveBeenCalled();
-        expect(turtle0.running).toBe(false);
-        expect(turtle1.running).toBe(true);
-        // The old global stopTurtle flag halted every turtle; it must not
-        // be used for a single turtle's budget exhaustion any more.
-        expect(logo.stopTurtle).toBe(false);
-        // Turtle 1 is still running, so the "all turtles finished" callback
-        // must not fire yet.
-        expect(mockActivity.onStopTurtle).not.toHaveBeenCalled();
-    });
-
-    test("exhausting the budget clears only the offending turtle's queue", () => {
-        turtle0.queue = [{ blk: 1 }];
-        turtle1.queue = [{ blk: 2 }];
-        turtle0.iterationBudget = 1;
-
-        logo.runFromBlockNow(logo, 0, 0, 0, null);
-
-        expect(turtle0.queue).toEqual([]);
-        expect(turtle1.queue).toEqual([{ blk: 2 }]);
-    });
-
-    test("tears down audio/transport/listeners when the exhausted turtle was the last one running", () => {
-        // Regression: an early version of this fix called onStopTurtle() but
-        // skipped _cleanupAfterCompletion(), which is what actually kills
-        // active audio voices, cancels the transport, and disposes
-        // instruments -- leaving zombie audio behind after an infinite-loop
-        // abort. doStopTurtles() (the Stop button) calls it synchronously
-        // for the same reason: this is an abort, not a graceful finish.
-        turtle1.running = false;
-        turtle0.iterationBudget = 1;
-        const cleanupSpy = jest.spyOn(logo, "_cleanupAfterCompletion");
-
-        logo.runFromBlockNow(logo, 0, 0, 0, null);
-
-        expect(mockActivity.onStopTurtle).toHaveBeenCalled();
-        expect(cleanupSpy).toHaveBeenCalled();
+        expect(logo.stopTurtle).toBe(true);
     });
 
     test("combined block executions across turtles do not trip either turtle's guard", () => {
@@ -2495,6 +2457,7 @@ describe("Logo runFromBlockNow iteration budget is per turtle", () => {
         logo.runFromBlockNow(logo, 1, 0, 0, null);
 
         expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+        expect(logo.stopTurtle).toBe(false);
         expect(turtle0.iterationBudget).toBe(1);
         expect(turtle1.iterationBudget).toBe(1);
     });
