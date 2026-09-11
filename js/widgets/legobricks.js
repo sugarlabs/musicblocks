@@ -1224,6 +1224,8 @@ function LegoWidget() {
      */
     this._clearPhrase = function () {
         if (this.isPlaying) {
+            // Temporarily set flag to suppress automatic PNG visualization download
+            // triggered by _stopPlayback() during cancellation of an active phrase.
             this.hasGeneratedVisualization = true;
             this._stopPlayback();
         }
