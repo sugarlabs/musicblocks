@@ -2801,8 +2801,8 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this._exportScl = function () {
-        const t = getTemperament(this.inTemperament);
-        if (!t || !t.ratios || t.ratios.length === 0) {
+        const that = this;
+        if (!this.ratios || this.ratios.length === 0) {
             that.activity.errorMsg(_("No ratios to export."), 3000);
             return;
         }
@@ -2812,11 +2812,11 @@ function TemperamentWidget() {
         lines.push("!");
         lines.push(this.inTemperament + " - exported from Music Blocks");
         // .scl convention: reference pitch (1/1) is implicit, skip it
-        lines.push(String(t.ratios.length - 1));
+        lines.push(String(this.ratios.length - 1));
 
         try {
-            for (let i = 1; i < t.ratios.length; i++) {
-                lines.push(ratioToSclString(t.ratios[i]));
+            for (let i = 1; i < this.ratios.length; i++) {
+                lines.push(ratioToSclString(this.ratios[i]));
             }
         } catch (e) {
             that.activity.errorMsg(_("Export failed: " + e.message), 3000);
@@ -2832,6 +2832,7 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this._importScl = function () {
+        const that = this;
         readSclFile("mySclFile", function (err, data) {
             if (err) {
                 that.activity.errorMsg(err.message, 3000);
@@ -2866,6 +2867,7 @@ function TemperamentWidget() {
                 allRatios.push(result.pitches[i].ratio);
             }
             temperamentData.ratios = allRatios;
+            temperamentData.pitchNumber = allRatios.length - 1;
 
             temperamentData.interval = Array(allRatios.length).fill("perfect 1");
 
