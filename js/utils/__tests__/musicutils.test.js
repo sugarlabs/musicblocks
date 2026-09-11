@@ -321,9 +321,42 @@ describe("Temperament Functions", () => {
             expect(equal5Temperament).toHaveProperty("pitchNumber", 5);
         });
 
+        it("should return the correct temperament for equal17 key", () => {
+            const equal17Temperament = getTemperament("equal17");
+            expect(equal17Temperament).toHaveProperty("perfect 1");
+            expect(equal17Temperament).toHaveProperty("minor 2");
+            expect(equal17Temperament).toHaveProperty("pitchNumber", 17);
+        });
+
         it("should return undefined for an invalid key", () => {
             const invalidTemperament = getTemperament("invalid");
             expect(invalidTemperament).toBeUndefined();
+        });
+    });
+
+    describe("named interval lookups", () => {
+        // The temperament widget fills its ratio, cents, and frequency columns
+        // with getTemperamentRatio(t[t.interval[i]]). When a temperament omits
+        // the named interval keys, every lookup is undefined and the widget
+        // silently falls back to a ratio of 1 for every pitch.
+        const widgetRatios = key => {
+            const t = getTemperament(key);
+            return t.interval.map(name => getTemperamentRatio(t[name]));
+        };
+
+        it.each(["equal", "equal5", "equal7", "equal17", "equal19", "equal31"])(
+            "%s resolves every name in its interval array to a distinct ratio",
+            key => {
+                const ratios = widgetRatios(key);
+                expect(new Set(ratios).size).toBe(ratios.length);
+            }
+        );
+
+        it("equal17 named intervals match its ratios table and close the octave", () => {
+            const t = getTemperament("equal17");
+            const ratios = widgetRatios("equal17");
+            expect(ratios.slice(0, t.ratios.length)).toEqual(t.ratios);
+            expect(ratios[ratios.length - 1]).toBe(2);
         });
     });
 

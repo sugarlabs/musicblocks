@@ -2509,11 +2509,11 @@ const TEMPERAMENT = {
         ]
     },
     "equal17": {
-        isEDO: true,
-        edo: 17,
-        name: "Equal (17EDO)",
-        description: "17 Equal Divisions of the Octave",
-        ratios: [
+        "isEDO": true,
+        "edo": 17,
+        "name": "Equal (17EDO)",
+        "description": "17 Equal Divisions of the Octave",
+        "ratios": [
             1,
             Math.pow(2, 1 / 17),
             Math.pow(2, 2 / 17),
@@ -2532,9 +2532,27 @@ const TEMPERAMENT = {
             Math.pow(2, 15 / 17),
             Math.pow(2, 16 / 17)
         ],
-        octaveRatio: 2,
-        pitchNumber: 17,
-        interval: [
+        "octaveRatio": 2,
+        "pitchNumber": 17,
+        "perfect 1": Math.pow(2, 0 / 17),
+        "minor 2": Math.pow(2, 1 / 17),
+        "augmented 1": Math.pow(2, 2 / 17),
+        "minor 3": Math.pow(2, 3 / 17),
+        "major 2": Math.pow(2, 4 / 17),
+        "augmented 2": Math.pow(2, 5 / 17),
+        "major 3": Math.pow(2, 6 / 17),
+        "perfect 4": Math.pow(2, 7 / 17),
+        "augmented 4": Math.pow(2, 8 / 17),
+        "diminished 5": Math.pow(2, 9 / 17),
+        "perfect 5": Math.pow(2, 10 / 17),
+        "augmented 5": Math.pow(2, 11 / 17),
+        "minor 6": Math.pow(2, 12 / 17),
+        "major 6": Math.pow(2, 13 / 17),
+        "augmented 6": Math.pow(2, 14 / 17),
+        "minor 7": Math.pow(2, 15 / 17),
+        "major 7": Math.pow(2, 16 / 17),
+        "perfect 8": Math.pow(2, 17 / 17),
+        "interval": [
             "perfect 1",
             "minor 2",
             "augmented 1",
