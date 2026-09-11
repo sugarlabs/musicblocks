@@ -13,10 +13,10 @@
 /* global
 
     docById, _, platformColor, keySignatureToMode, MUSICALMODES,
-    getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
+    createSclSharePopup, downloadScl, getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
     normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
-    getSavedCustomModes, configureWheel,
+    getSavedCustomModes, configureWheel, parseSclFile, readSclFile,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes
  */
 
@@ -175,6 +175,15 @@ class ModeWidget {
 
         this.widgetWindow.addButton("restore-button.svg", ModeWidget.ICONSIZE, _("Undo")).onclick =
             this._undo.bind(this);
+
+        const shareBtn = this.widgetWindow.addButton("share.svg", ModeWidget.ICONSIZE, _("Share"));
+        shareBtn.onclick = () => {
+            createSclSharePopup(
+                shareBtn,
+                () => this._exportScl(),
+                () => this._importScl()
+            );
+        };
 
         this._piemenuMode();
 
@@ -1347,6 +1356,106 @@ class ModeWidget {
             return [edoNames[nameIndex], Math.floor((j + aIndex) / this._activeEDO) + 4];
         }
         return [name, octave + 4];
+    }
+
+    _exportScl() {
+        const pattern = this._calculateMode();
+        const edo = this._activeEDO;
+        if (!pattern || pattern.length === 0) {
+            this.errorMsg(_("No mode to export."));
+            return;
+        }
+
+        const lines = [];
+        lines.push("! mode.scl");
+        lines.push("!");
+        lines.push("Mode (" + edo + "EDO) - exported from Music Blocks");
+        lines.push(String(pattern.length));
+
+        let cumulativeCents = 0;
+        for (let i = 0; i < pattern.length; i++) {
+            cumulativeCents += pattern[i] * (1200 / edo);
+            lines.push(cumulativeCents.toFixed(2));
+        }
+
+        const content = lines.join("\n") + "\n";
+        downloadScl(content, "mode-" + edo + "edo.scl");
+    }
+
+    _importScl() {
+        readSclFile("myModeSclFile", (err, data) => {
+            if (err) {
+                this.errorMsg(err.message);
+                return;
+            }
+            if (!data) {
+                return;
+            }
+
+            let result;
+            try {
+                result = parseSclFile(data.text);
+            } catch (e) {
+                this.errorMsg(_("Error reading .scl file: ") + e.message);
+                return;
+            }
+
+            // Try EDO values from 5 to 55 to find a clean step pattern
+            let foundEdo = null;
+            let foundPattern = null;
+
+            for (let edo = 5; edo <= 55; edo++) {
+                const step = 1200 / edo;
+                const steps = [];
+                let prevStepCount = 0;
+                let valid = true;
+
+                for (let i = 0; i < result.pitches.length; i++) {
+                    // Each pitch must land on an EDO step boundary
+                    const stepCount = Math.round(result.pitches[i].cents / step);
+                    if (Math.abs(result.pitches[i].cents - stepCount * step) > 0.5) {
+                        valid = false;
+                        break;
+                    }
+                    steps.push(stepCount - prevStepCount);
+                    prevStepCount = stepCount;
+                }
+
+                if (valid && steps.length === result.pitchCount) {
+                    foundEdo = edo;
+                    foundPattern = steps;
+                    break;
+                }
+            }
+
+            if (!foundEdo) {
+                this.errorMsg(
+                    _("Not a valid EDO mode. Use the temperament widget for non-equal scales.")
+                );
+                return;
+            }
+
+            const name = result.description || data.file.name.replace(/\.scl$/i, "");
+            if (!this._saveCustomMode(name, foundPattern)) {
+                return;
+            }
+
+            this._selectedModeName = name;
+            this._activeEDO = foundEdo;
+            this.errorMsg(_("Mode imported: ") + name);
+            // Sync the mode block and display so the imported mode is
+            // visible without re-opening the widget.
+            this._updateModeDisplay(name);
+            if (this._modeBlock !== null) {
+                const modeBlock = this.blocks.blockList[this._modeBlock];
+                if (modeBlock && modeBlock.name === "modename") {
+                    modeBlock.value = name;
+                    modeBlock.text.text = _(name);
+                    modeBlock.updateCache();
+                }
+                this.refreshCanvas();
+            }
+        });
     }
 
     _save() {

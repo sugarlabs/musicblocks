@@ -26,6 +26,7 @@ global._ = jest.fn(str => str);
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
+global.rationalToFraction = require("../utils-logic").rationalToFraction;
 
 const {
     scaleDegreeToPitchMapping,
@@ -137,7 +138,9 @@ const {
     getModeNameFromLabel,
     getModeSliceColors,
     updateModeWheelItems,
-    getModeGroupTitleFont
+    getModeGroupTitleFont,
+    ratioToSclString,
+    parseSclFile
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -4313,6 +4316,61 @@ describe("generateNoteNames EDO length contract", () => {
         for (const edo of [3, 6, 12, 19]) {
             expect(generateNoteNames(edo)[0]).toBe("C");
             expect(generateNoteNames(edo)).toEqual(generateNoteNames(edo));
+        }
+    });
+});
+
+describe("ratioToSclString", () => {
+    it("converts common ratios to fractions", () => {
+        expect(ratioToSclString(1.5)).toBe("3/2");
+        expect(ratioToSclString(2)).toBe("2/1");
+    });
+
+    it("falls back to cents for irrational ratios", () => {
+        const result = ratioToSclString(Math.pow(2, 1 / 12));
+        expect(result).toMatch(/^\d+\.\d+$/);
+    });
+
+    it("throws on non-positive or infinite ratios", () => {
+        expect(() => ratioToSclString(0)).toThrow("Invalid ratio");
+        expect(() => ratioToSclString(-1)).toThrow("Invalid ratio");
+        expect(() => ratioToSclString(Infinity)).toThrow("Invalid ratio");
+        expect(() => ratioToSclString(NaN)).toThrow("Invalid ratio");
+    });
+});
+
+describe("parseSclFile", () => {
+    it("parses a .scl file with mixed ratios and cents", () => {
+        const content = [
+            "! meanquar.scl",
+            "!",
+            "1/4-comma meantone scale",
+            "3",
+            "76.04900",
+            "5/4",
+            "2/1"
+        ].join("\n");
+
+        const result = parseSclFile(content);
+        expect(result.description).toBe("1/4-comma meantone scale");
+        expect(result.pitchCount).toBe(3);
+        expect(result.pitches[0].cents).toBeCloseTo(76.049, 1);
+        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 4);
+    });
+
+    it("throws on empty content", () => {
+        expect(() => parseSclFile("")).toThrow();
+    });
+
+    it("round-trips ratioToSclString -> parseSclFile", () => {
+        const ratios = [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8, 2];
+        const sclLines = ratios.map(r => ratioToSclString(r));
+        const sclContent = ["! roundtrip.scl", "!", "Test scale", "8"].concat(sclLines).join("\n");
+
+        const result = parseSclFile(sclContent);
+        expect(result.pitchCount).toBe(8);
+        for (let i = 0; i < ratios.length; i++) {
+            expect(result.pitches[i].ratio).toBeCloseTo(ratios[i], 4);
         }
     });
 });

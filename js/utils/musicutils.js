@@ -13,7 +13,7 @@
    global
 
    _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH,
-   CUSTOMSAMPLES, globalActivity
+   CUSTOMSAMPLES, globalActivity, rationalToFraction
  */
 
 const _b64Cache = new Map();
@@ -3198,6 +3198,124 @@ const getOctaveRatio = () => {
  * @returns {number} The wheel angle in degrees.
  */
 const ratioToWheelAngle = (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base));
+
+/**
+ * Convert a frequency ratio to a .scl-compatible string.
+ * Returns an exact fraction (e.g. "3/2") when the ratio is close
+ * to a rational number, otherwise falls back to cents (e.g. "701.96").
+ * @function
+ * @param {number} ratio - The frequency ratio (e.g. 1.5 for a perfect fifth).
+ * @returns {string} A .scl-compatible pitch string.
+ */
+const ratioToSclString = ratio => {
+    if (ratio <= 0 || !isFinite(ratio)) {
+        throw new Error("Invalid ratio: " + ratio);
+    }
+
+    const [num, den] = rationalToFraction(ratio);
+    // Cap denominator at 128 as a safety net against irrational approximations
+    // with large denominators, even though the tolerance check catches most cases.
+    if (den !== 0 && den <= 128 && Math.abs(num / den - ratio) < 0.0001) {
+        return num + "/" + den;
+    }
+
+    const cents = 1200 * Math.log2(ratio);
+    return cents.toFixed(2);
+};
+
+/**
+ * Parse a Scala (.scl) file content string.
+ * Format: comment lines (!), description line, pitch count, then pitch lines
+ * (ratios as "num/den" or integers, or cents as decimal numbers).
+ * @function
+ * @param {string} content - The raw text content of a .scl file.
+ * @returns {{ description: string, pitchCount: number, pitches: Array<{ratio: number, cents: number}> }}
+ * @throws {Error} If the content is invalid or missing required fields.
+ */
+const parseSclFile = content => {
+    if (typeof content !== "string" || content.trim().length === 0) {
+        throw new Error("Invalid .scl file: empty content");
+    }
+
+    const lines = content
+        .split("\n")
+        .map(l => l.trim())
+        .filter(l => l.length > 0);
+
+    let idx = 0;
+    while (idx < lines.length && lines[idx].startsWith("!")) {
+        idx++;
+    }
+
+    if (idx >= lines.length) {
+        throw new Error("Invalid .scl file: no description or pitch count found");
+    }
+
+    let description = "";
+    let pitchCountIdx = idx;
+
+    if (!/^\d+$/.test(lines[idx])) {
+        description = lines[idx];
+        pitchCountIdx = idx + 1;
+    }
+
+    if (pitchCountIdx >= lines.length) {
+        throw new Error("Invalid .scl file: missing pitch count");
+    }
+
+    const pitchCount = parseInt(lines[pitchCountIdx], 10);
+    if (isNaN(pitchCount) || pitchCount < 1) {
+        throw new Error("Invalid .scl file: invalid pitch count");
+    }
+    idx = pitchCountIdx + 1;
+
+    const pitches = [];
+    while (idx < lines.length && pitches.length < pitchCount) {
+        const line = lines[idx];
+        idx++;
+
+        if (line.startsWith("!")) {
+            continue;
+        }
+
+        const cleaned = line.replace(/\s*cents?\s*$/i, "").trim();
+
+        let ratio, cents;
+        if (cleaned.includes(".")) {
+            cents = parseFloat(cleaned);
+            if (isNaN(cents) || !isFinite(cents)) {
+                throw new Error("Invalid .scl file: invalid cents value: " + cleaned);
+            }
+            ratio = Math.pow(2, cents / 1200);
+        } else if (cleaned.includes("/")) {
+            const parts = cleaned.split("/");
+            const num = parseInt(parts[0], 10);
+            const den = parseInt(parts[1], 10);
+            if (isNaN(num) || isNaN(den) || num <= 0 || den <= 0) {
+                throw new Error("Invalid .scl file: invalid ratio: " + cleaned);
+            }
+            ratio = num / den;
+            cents = 1200 * Math.log2(ratio);
+        } else {
+            const val = parseInt(cleaned, 10);
+            if (isNaN(val) || val <= 0 || !isFinite(val)) {
+                throw new Error("Invalid .scl file: invalid pitch value: " + cleaned);
+            }
+            ratio = val;
+            cents = 1200 * Math.log2(val);
+        }
+
+        pitches.push({ ratio, cents });
+    }
+
+    if (pitches.length !== pitchCount) {
+        throw new Error(
+            "Invalid .scl file: expected " + pitchCount + " pitches, got " + pitches.length
+        );
+    }
+
+    return { description, pitchCount, pitches };
+};
 
 /**
  * Get the list of available temperaments.
@@ -8368,6 +8486,8 @@ if (typeof module !== "undefined" && module.exports) {
         isNonEDO,
         getNonEDOModeSteps,
         getNonEDOFrequency,
-        configureWheel
+        configureWheel,
+        ratioToSclString,
+        parseSclFile
     };
 }

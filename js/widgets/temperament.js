@@ -20,11 +20,12 @@
    global
 
    _, addTemperamentToDictionary, buildScale,
-   deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
+   createSclSharePopup, deleteTemperamentFromList, docById, downloadScl, FLAT, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
-   isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber
+   isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, parseSclFile, pitchToFrequency,
+   platformColor, PREVIEWVOLUME, ratioToSclString, ratioToWheelAngle, rationalToFraction, readSclFile,
+   setOctaveRatio, setOctaveRatio, SHARP, Singer, slicePath, updateTemperaments, wheelnav, frequencyToPitch,
+   clampNumber
  */
 
 /* exported TemperamentWidget */
@@ -2192,6 +2193,93 @@ function TemperamentWidget() {
     };
 
     /**
+     * Export the current temperament as a .scl file.
+     * @returns {void}
+     */
+    this._exportScl = function () {
+        const t = getTemperament(this.inTemperament);
+        if (!t || !t.ratios || t.ratios.length === 0) {
+            that.activity.errorMsg(_("No ratios to export."), 3000);
+            return;
+        }
+
+        const lines = [];
+        lines.push("! " + this.inTemperament + ".scl");
+        lines.push("!");
+        lines.push(this.inTemperament + " - exported from Music Blocks");
+        // .scl convention: reference pitch (1/1) is implicit, skip it
+        lines.push(String(t.ratios.length - 1));
+
+        try {
+            for (let i = 1; i < t.ratios.length; i++) {
+                lines.push(ratioToSclString(t.ratios[i]));
+            }
+        } catch (e) {
+            that.activity.errorMsg(_("Export failed: " + e.message), 3000);
+            return;
+        }
+
+        const content = lines.join("\n") + "\n";
+        downloadScl(content, this.inTemperament + ".scl");
+    };
+
+    /**
+     * Import a temperament from a .scl file.
+     * @returns {void}
+     */
+    this._importScl = function () {
+        readSclFile("mySclFile", function (err, data) {
+            if (err) {
+                that.activity.errorMsg(err.message, 3000);
+                return;
+            }
+            if (!data) {
+                return;
+            }
+
+            let result;
+            try {
+                result = parseSclFile(data.text);
+            } catch (e) {
+                that.activity.errorMsg(_("Error reading .scl file: ") + e.message, 5000);
+                return;
+            }
+
+            const temperamentData = {
+                pitchNumber: result.pitchCount,
+                octaveRatio: 2,
+                isEDO: false,
+                ratios: [],
+                interval: []
+            };
+
+            const allRatios = [1];
+            for (let i = 0; i < result.pitches.length; i++) {
+                // Skip tonic if .scl file includes it (some files do)
+                if (i === 0 && Math.abs(result.pitches[i].ratio - 1) < 0.0001) {
+                    continue;
+                }
+                allRatios.push(result.pitches[i].ratio);
+            }
+            temperamentData.ratios = allRatios;
+
+            temperamentData.interval = Array(allRatios.length).fill("perfect 1");
+
+            const sclName = result.description || data.file.name.replace(/\.scl$/i, "");
+            const uniqueName = that.activity.blocks.findUniqueTemperamentName(sclName);
+
+            addTemperamentToDictionary(uniqueName, temperamentData);
+            addTemperamentToList([_(uniqueName), uniqueName, uniqueName]);
+            updateTemperaments();
+
+            that.inTemperament = uniqueName;
+            that.activity.errorMsg(_("Temperament imported: ") + uniqueName, 3000);
+
+            that.init(that.activity);
+        });
+    };
+
+    /**
      * Plays the note at the specified pitch number.
      * @param {number} pitchNumber - The pitch number of the note to play.
      * @returns {void}
@@ -2583,6 +2671,15 @@ function TemperamentWidget() {
 
         widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save")).onclick = function () {
             that._save();
+        };
+
+        const shareBtn = widgetWindow.addButton("share.svg", ICONSIZE, _("Share"));
+        shareBtn.onclick = function () {
+            createSclSharePopup(
+                shareBtn,
+                () => that._exportScl(),
+                () => that._importScl()
+            );
         };
 
         const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));

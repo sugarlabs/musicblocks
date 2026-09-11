@@ -1282,6 +1282,114 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     addMembers(obj, resolveObject(cname + "." + cname + "View"), viewArgs);
 };
 
+/**
+ * Create or toggle a share popup with Export/Import .scl options.
+ * Used by temperament and mode widgets to avoid duplicating popup logic.
+ * @param {HTMLElement} anchor - element to position the popup below
+ * @param {Function} onExport - called when Export .scl is clicked
+ * @param {Function} onImport - called when Import .scl is clicked
+ * @returns {void}
+ */
+const createSclSharePopup = (anchor, onExport, onImport) => {
+    const existing = document.getElementById("sclSharePopup");
+    if (existing) {
+        existing.remove();
+        return;
+    }
+
+    const popup = document.createElement("div");
+    popup.id = "sclSharePopup";
+    popup.style.cssText =
+        "position:fixed;z-index:99999;background:var(--color-bg-primary);" +
+        "color:var(--color-text-primary);border:1px solid var(--color-border-primary);" +
+        "border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:4px 0;" +
+        "min-width:140px;";
+    const rect = anchor.getBoundingClientRect();
+    popup.style.top = rect.bottom + 4 + "px";
+    popup.style.left = rect.left + "px";
+
+    const addItem = (label, handler) => {
+        const item = document.createElement("div");
+        item.textContent = label;
+        item.style.cssText = "padding:6px 16px;cursor:pointer;";
+        item.onmouseenter = () => {
+            item.style.background = "var(--color-bg-tertiary)";
+        };
+        item.onmouseleave = () => {
+            item.style.background = "";
+        };
+        item.onclick = () => {
+            popup.remove();
+            handler();
+        };
+        return item;
+    };
+
+    popup.appendChild(addItem(_("Export .scl"), onExport));
+    popup.appendChild(addItem(_("Import .scl"), onImport));
+    document.body.appendChild(popup);
+
+    const closeHandler = e => {
+        if (!popup.contains(e.target)) {
+            popup.remove();
+            document.removeEventListener("mousedown", closeHandler);
+        }
+    };
+    setTimeout(() => {
+        document.addEventListener("mousedown", closeHandler);
+    }, 0);
+};
+
+/**
+ * Download a string as a .scl file.
+ * @param {string} content - file content
+ * @param {string} filename - download filename (e.g. "my-scale.scl")
+ * @returns {void}
+ */
+const downloadScl = (content, filename) => {
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
+
+/**
+ * Open a file picker for .scl files and read the selected file as text.
+ * @param {string} inputId - id of the hidden file input element
+ * @param {Function} callback - called with (error, {text, file}) on completion
+ * @returns {void}
+ */
+const readSclFile = (inputId, callback) => {
+    const fileInput = docById(inputId);
+    if (!fileInput) {
+        callback(new Error(_("File input not found.")));
+        return;
+    }
+
+    fileInput.value = "";
+    fileInput.onchange = function () {
+        const file = fileInput.files[0];
+        if (!file) {
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            callback(null, { text: e.target.result, file });
+        };
+        reader.onerror = function () {
+            callback(new Error(_("Failed to read file.")));
+        };
+        reader.readAsText(file);
+    };
+    fileInput.click();
+};
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         ...UtilsLogic,
@@ -1306,7 +1414,10 @@ if (typeof module !== "undefined" && module.exports) {
         announceToScreenReader,
         doUseCamera,
         doStopVideoCam,
-        CameraManager
+        CameraManager,
+        createSclSharePopup,
+        downloadScl,
+        readSclFile
     };
 }
 
