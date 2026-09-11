@@ -1417,11 +1417,15 @@ class ModeWidget {
                         valid = false;
                         break;
                     }
+                    if (stepCount <= prevStepCount) {
+                        valid = false;
+                        break;
+                    }
                     steps.push(stepCount - prevStepCount);
                     prevStepCount = stepCount;
                 }
 
-                if (valid && steps.length === result.pitchCount) {
+                if (valid && steps.length === result.pitchCount && prevStepCount === edo) {
                     foundEdo = edo;
                     foundPattern = steps;
                     break;
@@ -1436,12 +1440,17 @@ class ModeWidget {
             }
 
             const name = result.description || data.file.name.replace(/\.scl$/i, "");
+            const key = this._temperamentKeyForEDO(foundEdo);
+            this._cacheState(this._activeEDO);
+            this.logo.synth.inTemperament = key;
+            this._activeTemperamentKey = key;
+            this._rebuildWheel(foundEdo);
+            this._applyModePattern(foundPattern);
             if (!this._saveCustomMode(name, foundPattern)) {
                 return;
             }
 
             this._selectedModeName = name;
-            this._activeEDO = foundEdo;
             this.errorMsg(_("Mode imported: ") + name);
             // Sync the mode block and display so the imported mode is
             // visible without re-opening the widget.

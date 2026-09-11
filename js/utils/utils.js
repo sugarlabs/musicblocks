@@ -1293,6 +1293,9 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 const createSclSharePopup = (anchor, onExport, onImport) => {
     const existing = document.getElementById("sclSharePopup");
     if (existing) {
+        if (existing._closeHandler) {
+            document.removeEventListener("mousedown", existing._closeHandler);
+        }
         existing.remove();
         return;
     }
@@ -1319,7 +1322,7 @@ const createSclSharePopup = (anchor, onExport, onImport) => {
             item.style.background = "";
         };
         item.onclick = () => {
-            popup.remove();
+            cleanup();
             handler();
         };
         return item;
@@ -1329,12 +1332,17 @@ const createSclSharePopup = (anchor, onExport, onImport) => {
     popup.appendChild(addItem(_("Import .scl"), onImport));
     document.body.appendChild(popup);
 
+    function cleanup() {
+        popup.remove();
+        document.removeEventListener("mousedown", closeHandler);
+    }
+
     const closeHandler = e => {
         if (!popup.contains(e.target)) {
-            popup.remove();
-            document.removeEventListener("mousedown", closeHandler);
+            cleanup();
         }
     };
+    popup._closeHandler = closeHandler;
     setTimeout(() => {
         document.addEventListener("mousedown", closeHandler);
     }, 0);

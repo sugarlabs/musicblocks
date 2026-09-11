@@ -3282,7 +3282,7 @@ const parseSclFile = content => {
     }
 
     const pitchCount = parseInt(lines[pitchCountIdx], 10);
-    if (isNaN(pitchCount) || pitchCount < 1) {
+    if (!/^\d+$/.test(lines[pitchCountIdx]) || isNaN(pitchCount) || pitchCount < 1) {
         throw new Error("Invalid .scl file: invalid pitch count");
     }
     idx = pitchCountIdx + 1;
@@ -3300,6 +3300,9 @@ const parseSclFile = content => {
 
         let ratio, cents;
         if (cleaned.includes(".")) {
+            if (!/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(cleaned)) {
+                throw new Error("Invalid .scl file: invalid cents value: " + cleaned);
+            }
             cents = parseFloat(cleaned);
             if (isNaN(cents) || !isFinite(cents)) {
                 throw new Error("Invalid .scl file: invalid cents value: " + cleaned);
@@ -3307,6 +3310,9 @@ const parseSclFile = content => {
             ratio = Math.pow(2, cents / 1200);
         } else if (cleaned.includes("/")) {
             const parts = cleaned.split("/");
+            if (parts.length !== 2 || !/^\d+$/.test(parts[0]) || !/^\d+$/.test(parts[1])) {
+                throw new Error("Invalid .scl file: invalid ratio: " + cleaned);
+            }
             const num = parseInt(parts[0], 10);
             const den = parseInt(parts[1], 10);
             if (isNaN(num) || isNaN(den) || num <= 0 || den <= 0) {
@@ -3315,6 +3321,9 @@ const parseSclFile = content => {
             ratio = num / den;
             cents = 1200 * Math.log2(ratio);
         } else {
+            if (!/^\d+$/.test(cleaned)) {
+                throw new Error("Invalid .scl file: invalid pitch value: " + cleaned);
+            }
             const val = parseInt(cleaned, 10);
             if (isNaN(val) || val <= 0 || !isFinite(val)) {
                 throw new Error("Invalid .scl file: invalid pitch value: " + cleaned);
@@ -3324,6 +3333,12 @@ const parseSclFile = content => {
         }
 
         pitches.push({ ratio, cents });
+    }
+
+    for (let j = idx; j < lines.length; j++) {
+        if (!lines[j].startsWith("!")) {
+            throw new Error("Invalid .scl file: expected " + pitchCount + " pitches, got more");
+        }
     }
 
     if (pitches.length !== pitchCount) {

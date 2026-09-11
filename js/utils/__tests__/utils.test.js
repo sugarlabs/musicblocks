@@ -1688,6 +1688,33 @@ describe("readSclFile", () => {
         expect(cb).toHaveBeenCalledWith(null, { text: "file content", file: mockFile });
     });
 
+    it("calls callback with error when file read fails", () => {
+        const { readSclFile } = require("../utils");
+
+        const mockFile = { name: "test.scl" };
+        const mockReader = {
+            onload: null,
+            onerror: null,
+            readAsText: jest.fn(function () {
+                this.onerror(new Error("read failed"));
+            })
+        };
+        global.FileReader = jest.fn(() => mockReader);
+
+        const mockInput = { value: "", onchange: null, click: jest.fn() };
+        global.docById = jest.fn(() => mockInput);
+
+        const cb = jest.fn();
+        readSclFile("mySclFile", cb);
+
+        Object.defineProperty(mockInput, "files", { value: [mockFile], configurable: true });
+        mockInput.onchange();
+
+        expect(cb).toHaveBeenCalledTimes(1);
+        expect(cb.mock.calls[0][0]).toBeInstanceOf(Error);
+        expect(cb.mock.calls[0][1]).toBeUndefined();
+    });
+
     it("does not call callback when no file is selected", () => {
         const { readSclFile } = require("../utils");
 
