@@ -295,10 +295,30 @@ class StatusMatrix {
             let i = 0;
             for (const statusField of this.activity.logo.statusFields) {
                 saveStatus = this.activity.logo.inStatusMatrix;
+
+                const block = this.activity.blocks.blockList[statusField[0]];
+
+                if (!block) {
+                    cell = this._statusTable.rows?.[i + 1]?.cells?.[activeTurtles + 1];
+
+                    if (cell !== null && cell !== undefined) {
+                        cell.textContent = "";
+                    }
+
+                    i++;
+                    continue;
+                }
                 this.activity.logo.inStatusMatrix = false;
 
                 this.activity.logo.parseArg(this.activity.logo, t, statusField[0]);
-                switch (this.activity.blocks.blockList[statusField[0]].name) {
+
+                switch (block.name) {
+                    // for (const statusField of this.activity.logo.statusFields) {
+                    //     saveStatus = this.activity.logo.inStatusMatrix;
+                    //     this.activity.logo.inStatusMatrix = false;
+
+                    //     this.activity.logo.parseArg(this.activity.logo, t, statusField[0]);
+                    //     switch (this.activity.blocks.blockList[statusField[0]].name) {
                     case "x":
                     case "y":
                     case "heading":
