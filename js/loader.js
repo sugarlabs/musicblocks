@@ -39,6 +39,13 @@ requirejs.config({
     // connections. The loading splash remains visible until initialization completes.
     waitSeconds: 0,
     shim: {
+        // raphael is AMD -- it checks define.amd -- so it is deliberately not
+        // shimmed; RequireJS loads it as a module. wheelnav is a plain global
+        // that reaches for Raphael, so it is shimmed onto it.
+        "wheelnav": {
+            deps: ["raphael"],
+            exports: "wheelnav"
+        },
         "easeljs.min": {
             exports: "createjs"
         },
@@ -258,6 +265,8 @@ requirejs.config({
         "project-manager": "js/project-manager",
         "activity/keyboard-controller": "js/activity/keyboard-controller",
         "activity/pubsub": "js/pubsub",
+        "raphael": "lib/raphael.min",
+        "wheelnav": "lib/wheelnav",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",
@@ -362,31 +371,29 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
     /**
      * Fetch the pie-menu drawing libraries in the background.
      *
-     * These used to be defer scripts in index.html, which meant they had to be
-     * fetched, parsed and run before DOMContentLoaded -- and therefore before
-     * Music Blocks could paint -- despite neither of them executing a single
-     * line until someone opens a pie menu.
+     * These used to be defer scripts in index.html, so both had to be fetched,
+     * parsed and executed before DOMContentLoaded -- and therefore before
+     * Music Blocks could paint -- despite neither executing a line until
+     * someone opens a pie menu.
+     *
+     * Loaded through RequireJS rather than as injected script tags. raphael is
+     * UMD: appended as a plain <script> while require.js is present it takes
+     * the anonymous define() branch, and RequireJS has no requested module to
+     * attribute that define to, so the page dies with "Mismatched anonymous
+     * define() module". Asking RequireJS for it attributes the define
+     * correctly. wheelnav is a plain global and is shimmed onto raphael.
      *
      * Nothing waits on this. Block.piemenuOKtoLaunch() already reports "not
-     * right now" while a pie menu is settling, and it now reports the same
-     * thing in the very short window before wheelnav has arrived, so an early
-     * interaction is declined rather than throwing.
+     * right now" while a pie menu is settling, and now reports the same in the
+     * short window before wheelnav arrives, so an early interaction is
+     * declined rather than throwing.
      */
     const loadPieMenuLibs = () => {
-        const inject = src =>
-            new Promise((resolve, reject) => {
-                const el = document.createElement("script");
-                el.src = src;
-                el.async = false;
-                el.onload = resolve;
-                el.onerror = () => reject(new Error(`could not load ${src}`));
-                document.head.appendChild(el);
-            });
-
-        // wheelnav draws through raphael, so raphael has to land first.
-        inject("lib/raphael.min.js")
-            .then(() => inject("lib/wheelnav.js"))
-            .catch(err => console.error("Pie menu libraries failed to load:", err));
+        requirejs(
+            ["wheelnav"],
+            () => {},
+            err => console.error("Pie menu libraries failed to load:", err)
+        );
     };
 
     perfTracker.mark("loader.main.start");
