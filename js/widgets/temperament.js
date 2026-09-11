@@ -2801,9 +2801,8 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this._exportScl = function () {
-        const that = this;
         if (!this.ratios || this.ratios.length === 0) {
-            that.activity.errorMsg(_("No ratios to export."), 3000);
+            this.activity.errorMsg(_("No ratios to export."), 3000);
             return;
         }
 
@@ -2819,7 +2818,7 @@ function TemperamentWidget() {
                 lines.push(ratioToSclString(this.ratios[i]));
             }
         } catch (e) {
-            that.activity.errorMsg(_("Export failed: " + e.message), 3000);
+            this.activity.errorMsg(_("Export failed: " + e.message), 3000);
             return;
         }
 

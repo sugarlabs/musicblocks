@@ -1635,7 +1635,7 @@ describe("readSclFile", () => {
             onload: null,
             onerror: null,
             readAsText: jest.fn(function () {
-                this.onerror(new Error("read failed"));
+                this.onerror({ type: "error" });
             })
         };
         global.FileReader = jest.fn(() => mockReader);
