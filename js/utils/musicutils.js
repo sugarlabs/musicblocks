@@ -3282,7 +3282,7 @@ const parseSclFile = content => {
     }
 
     const pitchCount = parseInt(lines[pitchCountIdx], 10);
-    if (!/^\d+$/.test(lines[pitchCountIdx]) || isNaN(pitchCount) || pitchCount < 1) {
+    if (!/^\d+$/.test(lines[pitchCountIdx]) || pitchCount < 1) {
         throw new Error("Invalid .scl file: invalid pitch count");
     }
     idx = pitchCountIdx + 1;
@@ -3304,7 +3304,7 @@ const parseSclFile = content => {
                 throw new Error("Invalid .scl file: invalid cents value: " + cleaned);
             }
             cents = parseFloat(cleaned);
-            if (isNaN(cents) || !isFinite(cents)) {
+            if (!isFinite(cents)) {
                 throw new Error("Invalid .scl file: invalid cents value: " + cleaned);
             }
             ratio = Math.pow(2, cents / 1200);
@@ -3315,7 +3315,7 @@ const parseSclFile = content => {
             }
             const num = parseInt(parts[0], 10);
             const den = parseInt(parts[1], 10);
-            if (isNaN(num) || isNaN(den) || num <= 0 || den <= 0) {
+            if (num <= 0 || den <= 0) {
                 throw new Error("Invalid .scl file: invalid ratio: " + cleaned);
             }
             ratio = num / den;
@@ -3325,7 +3325,7 @@ const parseSclFile = content => {
                 throw new Error("Invalid .scl file: invalid pitch value: " + cleaned);
             }
             const val = parseInt(cleaned, 10);
-            if (isNaN(val) || val <= 0 || !isFinite(val)) {
+            if (val <= 0) {
                 throw new Error("Invalid .scl file: invalid pitch value: " + cleaned);
             }
             ratio = val;
