@@ -26,35 +26,43 @@ const Tempo = require("../tempo.js");
 global._ = msg => msg; // Mock translation function
 global.getDrumSynthName = jest.fn();
 
-// Mock the Window Manager
-window.widgetWindows = {
-    windowFor: jest.fn().mockReturnValue({
-        clear: jest.fn(),
-        show: jest.fn(),
-        timerManager: {
-            setInterval: jest.fn().mockImplementation((cb, t) => setInterval(cb, t)),
-            clearInterval: jest.fn().mockImplementation(id => clearInterval(id)),
-            setTimeout: jest.fn().mockImplementation((cb, t) => setTimeout(cb, t)),
-            clearTimeout: jest.fn().mockImplementation(id => clearTimeout(id)),
-            clearAll: jest.fn()
-        },
-        addButton: jest.fn().mockReturnValue({ onclick: () => {} }),
-        addInputButton: jest.fn().mockImplementation(val => ({
-            value: val,
-            addEventListener: jest.fn()
-        })),
-        getWidgetBody: jest.fn().mockReturnValue({
-            appendChild: jest.fn(),
-            insertRow: jest.fn().mockReturnValue({
-                insertCell: jest.fn().mockReturnValue({
-                    appendChild: jest.fn(),
-                    setAttribute: jest.fn()
-                })
+const mockWidgetWindowInstance = {
+    clear: jest.fn(),
+    show: jest.fn(),
+    takeFocus: jest.fn().mockImplementation(function () {
+        window.widgetWindows.focused = mockWidgetWindowInstance;
+    }),
+    timerManager: {
+        setInterval: jest.fn().mockImplementation((cb, t) => setInterval(cb, t)),
+        clearInterval: jest.fn().mockImplementation(id => clearInterval(id)),
+        setTimeout: jest.fn().mockImplementation((cb, t) => setTimeout(cb, t)),
+        clearTimeout: jest.fn().mockImplementation(id => clearTimeout(id)),
+        clearAll: jest.fn()
+    },
+    addButton: jest.fn().mockReturnValue({ onclick: () => {} }),
+    addInputButton: jest.fn().mockImplementation(val => ({
+        value: val,
+        addEventListener: jest.fn()
+    })),
+    getWidgetBody: jest.fn().mockReturnValue({
+        appendChild: jest.fn(),
+        insertRow: jest.fn().mockReturnValue({
+            insertCell: jest.fn().mockReturnValue({
+                appendChild: jest.fn(),
+                setAttribute: jest.fn()
             })
-        }),
-        sendToCenter: jest.fn(),
-        onclose: jest.fn(),
-        destroy: jest.fn()
+        })
+    }),
+    sendToCenter: jest.fn(),
+    onclose: jest.fn(),
+    destroy: jest.fn()
+};
+
+window.widgetWindows = {
+    focused: mockWidgetWindowInstance,
+    windowFor: jest.fn().mockImplementation(() => {
+        window.widgetWindows.focused = mockWidgetWindowInstance;
+        return mockWidgetWindowInstance;
     })
 };
 // Mock Document (for creating the canvas)
@@ -73,6 +81,7 @@ describe("Tempo Widget", () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.useFakeTimers();
+        window.widgetWindows.focused = mockWidgetWindowInstance;
         tempoWidget = new Tempo();
 
         // Mock the Music Blocks Activity object
@@ -1018,7 +1027,7 @@ describe("Tempo Widget", () => {
 
             const handler = tempoWidget._keyHandler;
 
-            // Fine speedUp with ArrowUp and ArrowRight (+1 BPM)
+            // Fine speedUp with ArrowUp (+1 BPM)
             const upEvent = {
                 key: "ArrowUp",
                 shiftKey: false,
@@ -1030,6 +1039,7 @@ describe("Tempo Widget", () => {
             expect(upEvent.stopPropagation).toHaveBeenCalled();
             expect(tempoWidget.BPMs[0]).toBe(121);
 
+            // ArrowRight should NOT adjust tempo (left/right disabled per review)
             const rightEvent = {
                 key: "ArrowRight",
                 shiftKey: false,
@@ -1037,11 +1047,11 @@ describe("Tempo Widget", () => {
                 stopPropagation: jest.fn()
             };
             handler(rightEvent);
-            expect(rightEvent.preventDefault).toHaveBeenCalled();
-            expect(rightEvent.stopPropagation).toHaveBeenCalled();
-            expect(tempoWidget.BPMs[0]).toBe(122);
+            expect(rightEvent.preventDefault).not.toHaveBeenCalled();
+            expect(rightEvent.stopPropagation).not.toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(121);
 
-            // Fine slowDown with ArrowDown and ArrowLeft (-1 BPM)
+            // Fine slowDown with ArrowDown (-1 BPM)
             const downEvent = {
                 key: "ArrowDown",
                 shiftKey: false,
@@ -1051,8 +1061,9 @@ describe("Tempo Widget", () => {
             handler(downEvent);
             expect(downEvent.preventDefault).toHaveBeenCalled();
             expect(downEvent.stopPropagation).toHaveBeenCalled();
-            expect(tempoWidget.BPMs[0]).toBe(121);
+            expect(tempoWidget.BPMs[0]).toBe(120);
 
+            // ArrowLeft should NOT adjust tempo (left/right disabled per review)
             const leftEvent = {
                 key: "ArrowLeft",
                 shiftKey: false,
@@ -1060,8 +1071,8 @@ describe("Tempo Widget", () => {
                 stopPropagation: jest.fn()
             };
             handler(leftEvent);
-            expect(leftEvent.preventDefault).toHaveBeenCalled();
-            expect(leftEvent.stopPropagation).toHaveBeenCalled();
+            expect(leftEvent.preventDefault).not.toHaveBeenCalled();
+            expect(leftEvent.stopPropagation).not.toHaveBeenCalled();
             expect(tempoWidget.BPMs[0]).toBe(120);
 
             // Coarse speedUp with Shift + ArrowUp (+10%)
@@ -1160,7 +1171,7 @@ describe("Tempo Widget", () => {
             tempoWidget.widgetWindow.onclose();
         });
 
-        test("keydown listener supports keyCode fallbacks and code === 'Space'", () => {
+        test("keydown listener supports keyCode fallbacks, event.code, and code === 'Space'", () => {
             tempoWidget.BPMs = [120];
             tempoWidget.init(mockActivity);
             const handler = tempoWidget._keyHandler;
@@ -1176,7 +1187,7 @@ describe("Tempo Widget", () => {
             expect(upKeyCodeEvent.preventDefault).toHaveBeenCalled();
             expect(tempoWidget.BPMs[0]).toBe(121);
 
-            // keyCode 39 (Right)
+            // keyCode 39 (Right) should not be handled
             const rightKeyCodeEvent = {
                 keyCode: 39,
                 shiftKey: false,
@@ -1184,8 +1195,8 @@ describe("Tempo Widget", () => {
                 stopPropagation: jest.fn()
             };
             handler(rightKeyCodeEvent);
-            expect(rightKeyCodeEvent.preventDefault).toHaveBeenCalled();
-            expect(tempoWidget.BPMs[0]).toBe(122);
+            expect(rightKeyCodeEvent.preventDefault).not.toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(121);
 
             // keyCode 40 (Down)
             const downKeyCodeEvent = {
@@ -1196,9 +1207,9 @@ describe("Tempo Widget", () => {
             };
             handler(downKeyCodeEvent);
             expect(downKeyCodeEvent.preventDefault).toHaveBeenCalled();
-            expect(tempoWidget.BPMs[0]).toBe(121);
+            expect(tempoWidget.BPMs[0]).toBe(120);
 
-            // keyCode 37 (Left)
+            // keyCode 37 (Left) should not be handled
             const leftKeyCodeEvent = {
                 keyCode: 37,
                 shiftKey: false,
@@ -1206,7 +1217,26 @@ describe("Tempo Widget", () => {
                 stopPropagation: jest.fn()
             };
             handler(leftKeyCodeEvent);
-            expect(leftKeyCodeEvent.preventDefault).toHaveBeenCalled();
+            expect(leftKeyCodeEvent.preventDefault).not.toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(120);
+
+            // code === "ArrowUp" and code === "ArrowDown"
+            const codeUpEvent = {
+                code: "ArrowUp",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(codeUpEvent);
+            expect(codeUpEvent.preventDefault).toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(121);
+
+            const codeDownEvent = {
+                code: "ArrowDown",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(codeDownEvent);
+            expect(codeDownEvent.preventDefault).toHaveBeenCalled();
             expect(tempoWidget.BPMs[0]).toBe(120);
 
             // code === "Space"
@@ -1236,7 +1266,7 @@ describe("Tempo Widget", () => {
             tempoWidget.widgetWindow.onclose();
         });
 
-        test("keydown listener ignores Space when a button or select element is focused", () => {
+        test("keydown listener ignores Space and Arrow keys when a button or select element is focused", () => {
             tempoWidget.BPMs = [120];
             tempoWidget.init(mockActivity);
             const handler = tempoWidget._keyHandler;
@@ -1244,7 +1274,7 @@ describe("Tempo Widget", () => {
                 .spyOn(tempoWidget, "togglePlayPause")
                 .mockImplementation(() => {});
 
-            // Button focused
+            // Button focused: neither Space nor ArrowUp should trigger
             const buttonEl = document.createElement("button");
             document.body.appendChild(buttonEl);
             buttonEl.focus();
@@ -1258,9 +1288,18 @@ describe("Tempo Widget", () => {
             expect(spaceEvent1.preventDefault).not.toHaveBeenCalled();
             expect(toggleSpy).not.toHaveBeenCalled();
 
+            const upEventButton = {
+                key: "ArrowUp",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(upEventButton);
+            expect(upEventButton.preventDefault).not.toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(120);
+
             document.body.removeChild(buttonEl);
 
-            // Select focused
+            // Select focused: neither Space nor ArrowUp should trigger
             const selectEl = document.createElement("select");
             document.body.appendChild(selectEl);
             selectEl.focus();
@@ -1274,14 +1313,13 @@ describe("Tempo Widget", () => {
             expect(spaceEvent2.preventDefault).not.toHaveBeenCalled();
             expect(toggleSpy).not.toHaveBeenCalled();
 
-            // ArrowUp on select should also be ignored
-            const upEvent = {
+            const upEventSelect = {
                 key: "ArrowUp",
                 preventDefault: jest.fn(),
                 stopPropagation: jest.fn()
             };
-            handler(upEvent);
-            expect(upEvent.preventDefault).not.toHaveBeenCalled();
+            handler(upEventSelect);
+            expect(upEventSelect.preventDefault).not.toHaveBeenCalled();
             expect(tempoWidget.BPMs[0]).toBe(120);
 
             document.body.removeChild(selectEl);
@@ -1289,10 +1327,21 @@ describe("Tempo Widget", () => {
             tempoWidget.widgetWindow.onclose();
         });
 
-        test("keydown listener ignores events when another widget is focused or activeBlock exists", () => {
+        test("keydown listener ignores events when focus is null, another widget is focused, or activeBlock exists", () => {
             tempoWidget.BPMs = [120];
             tempoWidget.init(mockActivity);
             const handler = tempoWidget._keyHandler;
+
+            // Focus is null (e.g. user clicked on canvas or workspace)
+            window.widgetWindows.focused = null;
+            const upEvent0 = {
+                key: "ArrowUp",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            handler(upEvent0);
+            expect(upEvent0.preventDefault).not.toHaveBeenCalled();
+            expect(tempoWidget.BPMs[0]).toBe(120);
 
             // Another widget focused
             const otherWin = { _frame: document.createElement("div") };
@@ -1342,6 +1391,10 @@ describe("Tempo Widget", () => {
                 3000
             );
 
+            // Default 10% coarse speedUp at boundary
+            tempoWidget.speedUp(0);
+            expect(tempoWidget.BPMs[0]).toBe(1000);
+
             tempoWidget.BPMs[0] = 30;
             tempoWidget.slowDown(0, 1);
             expect(tempoWidget.BPMs[0]).toBe(30);
@@ -1349,6 +1402,10 @@ describe("Tempo Widget", () => {
                 "The beats per minute must be above 30",
                 3000
             );
+
+            // Default 10% coarse slowDown at boundary
+            tempoWidget.slowDown(0);
+            expect(tempoWidget.BPMs[0]).toBe(30);
         });
     });
 });

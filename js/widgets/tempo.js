@@ -90,6 +90,9 @@ class Tempo {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        if (typeof widgetWindow.takeFocus === "function") {
+            widgetWindow.takeFocus();
+        }
 
         widgetWindow.onclose = () => {
             if (this._keyHandler) {
@@ -235,9 +238,8 @@ class Tempo {
 
         this._keyHandler = event => {
             if (
-                typeof window !== "undefined" &&
-                window.widgetWindows &&
-                window.widgetWindows.focused &&
+                typeof window === "undefined" ||
+                !window.widgetWindows ||
                 window.widgetWindows.focused !== widgetWindow
             ) {
                 return;
@@ -264,23 +266,7 @@ class Tempo {
 
             if (
                 activeElement &&
-                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT") &&
-                (event.key === " " || event.code === "Space" || event.keyCode === 32)
-            ) {
-                return;
-            }
-
-            if (
-                activeElement &&
-                activeElement.tagName === "SELECT" &&
-                (event.key === "ArrowUp" ||
-                    event.key === "ArrowDown" ||
-                    event.key === "ArrowLeft" ||
-                    event.key === "ArrowRight" ||
-                    event.keyCode === 38 ||
-                    event.keyCode === 40 ||
-                    event.keyCode === 37 ||
-                    event.keyCode === 39)
+                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT")
             ) {
                 return;
             }
@@ -294,12 +280,7 @@ class Tempo {
                     ? this.activeBPMIndex
                     : 0;
 
-            if (
-                event.key === "ArrowUp" ||
-                event.key === "ArrowRight" ||
-                event.keyCode === 38 ||
-                event.keyCode === 39
-            ) {
+            if (event.key === "ArrowUp" || event.code === "ArrowUp" || event.keyCode === 38) {
                 event.preventDefault();
                 event.stopPropagation();
                 if (event.shiftKey) {
@@ -310,12 +291,7 @@ class Tempo {
                 return;
             }
 
-            if (
-                event.key === "ArrowDown" ||
-                event.key === "ArrowLeft" ||
-                event.keyCode === 40 ||
-                event.keyCode === 37
-            ) {
+            if (event.key === "ArrowDown" || event.code === "ArrowDown" || event.keyCode === 40) {
                 event.preventDefault();
                 event.stopPropagation();
                 if (event.shiftKey) {
