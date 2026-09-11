@@ -495,7 +495,9 @@ function setupPitchBlocks(activity) {
                 if (cblk1 !== null) {
                     arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 }
-                if (activity.blocks.blockList[cblk1].name === "notename") {
+                if (cblk1 === null) {
+                    notePlayed = "G4";
+                } else if (activity.blocks.blockList[cblk1].name === "notename") {
                     notePlayed = arg1 + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else if (
                     activity.blocks.blockList[cblk1].name === "solfege" ||
