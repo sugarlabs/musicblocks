@@ -1323,7 +1323,30 @@ function searchIndexForMusicBlock(array, x) {
         _indexMaps.set(array, map);
     }
     const index = map.get(x);
-    return index !== undefined ? index : -1;
+
+    if (index === undefined) {
+        for (let i = 0; i < array.length; i++) {
+            if (array[i]?.[0] === x) {
+                map.set(x, i);
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    if (array[index]?.[0] === x) {
+        return index;
+    }
+
+    // Cache is stale — rebuild and retry
+    map = new Map();
+    for (let i = 0; i < array.length; i++) {
+        if (array[i] && array[i][0] !== undefined) {
+            map.set(array[i][0], i);
+        }
+    }
+    _indexMaps.set(array, map);
+    return map.get(x) ?? -1;
 }
 
 if (typeof module !== "undefined" && module.exports) {
