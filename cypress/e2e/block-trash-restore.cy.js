@@ -22,7 +22,9 @@ describe("Block trash and restore", () => {
     it("deletes a palette block to trash and restores it", () => {
         // Use the visible category label and the block's aria-label rather
         // than relying on palette row positions.
-        cy.contains('[width="126"] tbody tr', "Pitch").find("img").click();
+        cy.contains("#palette tbody tr", /^Pitch$/)
+            .find("img")
+            .click();
         cy.get("#palette", { timeout: 15000 }).should("be.visible");
 
         cy.get('#PaletteBody tbody tr[aria-label="pitch"] img', { timeout: 15000 })
@@ -96,8 +98,6 @@ describe("Block trash and restore", () => {
         });
 
         // The trash highlight must finish before production accepts a release.
-        // Cypress's clock advances that real animation without an arbitrary wait.
-        cy.clock();
         cy.get("@blockPlan").then(({ blockId }) => {
             cy.window().then(win => {
                 const activity = win.ActivityContext.getActivity();
@@ -109,7 +109,10 @@ describe("Block trash and restore", () => {
                 const stageScale = activity.getStageScale();
                 expect(activity.trashcan.overTrashcan(endX, endY)).to.be.true;
                 activity.trashcan.startHighlightAnimation();
-                cy.tick(600);
+                cy.window().should(win => {
+                    const activity = win.ActivityContext.getActivity();
+                    expect(activity.trashcan.isVisible).to.be.true;
+                });
                 cy.wrap({ block, blockId, endX, endY, stageScale }).as("trashDrag");
             });
         });
