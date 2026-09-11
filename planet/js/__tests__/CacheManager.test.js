@@ -104,14 +104,20 @@ describe("CacheManager", () => {
             expect(cacheManager._isExpired(pastTime)).toBe(true);
         });
 
-        it("should return true when expiry equals current time (exact boundary)", () => {
-            const now = Date.now();
-            expect(cacheManager._isExpired(now)).toBe(true);
-        });
-
         it("should return false for future timestamps", () => {
             const futureTime = Date.now() + 1000;
             expect(cacheManager._isExpired(futureTime)).toBe(false);
+        });
+
+        it("should return true when expiry equals current time (exact boundary)", () => {
+            const now = 1700000000000;
+            jest.spyOn(Date, "now").mockReturnValue(now);
+
+            try {
+                expect(cacheManager._isExpired(now)).toBe(true);
+            } finally {
+                Date.now.mockRestore();
+            }
         });
     });
 
