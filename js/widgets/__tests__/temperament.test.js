@@ -1079,6 +1079,107 @@ describe("TemperamentWidget basic tests", () => {
             expect(() => widget._visualizerView()).not.toThrow();
         });
 
+        test("ratioEdit shows error toast when ratioOut is 0", () => {
+            const inputValues = { ratioIn: "5", ratioOut: "0", recursion: "1" };
+            let capturedDivAppend;
+
+            global.docById = jest.fn(id => {
+                if (id in inputValues) {
+                    return { value: inputValues[id] };
+                }
+                if (id === "userEdit") {
+                    return {
+                        textContent: "",
+                        style: {},
+                        appendChild: jest.fn(),
+                        append: jest.fn(el => {
+                            capturedDivAppend = el;
+                        })
+                    };
+                }
+                return createMockElement(id);
+            });
+
+            widget.ratioEdit();
+            capturedDivAppend.onclick({ target: { textContent: "done" } });
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("valid ratio"),
+                3000
+            );
+        });
+    });
+
+    describe("playAll play loop visual wheel coverage", () => {
+        let originalDocById;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            originalDocById = global.docById;
+
+            global.window.widgetWindows = {
+                windowFor: jest.fn(() => ({
+                    clear: jest.fn(),
+                    show: jest.fn(),
+                    getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                    addButton: jest.fn(() => ({
+                        onclick: null,
+                        getElementsByTagName: jest.fn(() => [createMockElement("img")])
+                    })),
+                    sendToCenter: jest.fn()
+                }))
+            };
+            global.window.innerWidth = 1200;
+            global.buildScale = jest.fn(() => [["C"], []]);
+            global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+            global.getTemperamentsList = jest.fn(() => [
+                ["Equal (12EDO)", "equal"],
+                ["Just intonation", "just"]
+            ]);
+            global.isCustomTemperament = jest.fn(() => false);
+
+            widget.inTemperament = "equal";
+            widget.scale = ["C", "Major"];
+            widget.init({
+                errorMsg: jest.fn(),
+                logo: {
+                    synth: {
+                        startingPitch: "C4",
+                        _getFrequency: jest.fn(() => 440),
+                        setMasterVolume: jest.fn(),
+                        stop: jest.fn(),
+                        trigger: jest.fn()
+                    },
+                    resetSynth: jest.fn()
+                }
+            });
+
+            widget._logo = {
+                resetSynth: jest.fn(),
+                setUserTemperament: jest.fn(function (t) {
+                    this.synth.inTemperament = t;
+                    this.synth.changeInTemperament = true;
+                }),
+                synth: {
+                    trigger: jest.fn(),
+                    stop: jest.fn(),
+                    setMasterVolume: jest.fn(),
+                    startingPitch: "C4"
+                }
+            };
+            widget.playButton = createMockElement("play");
+            widget.tempRatios1 = [1, 2, 3];
+            widget.frequencies = [440, 880, 1320];
+            widget.ratios = [1, 2, 3];
+            widget.notes = [
+                ["A", 4],
+                ["Bb", 4],
+                ["B", 4]
+            ];
+
+            expect(() => widget._visualizerView()).not.toThrow();
+        });
+
         test("15 divisions produce 15 pitches end to end (off-by-one regression)", () => {
             seedEqualEdit(15);
             widget.checkTemperament = jest.fn();
