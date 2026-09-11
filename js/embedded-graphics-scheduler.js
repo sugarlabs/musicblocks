@@ -69,6 +69,11 @@ class EmbeddedGraphicsScheduler {
             delay += 0.1;
         }
 
+        // Remember which generation this call belongs to, so that if a
+        // turtle/run reset happens before this call finishes, its eventual
+        // completion does not decrement a count that has moved on to a
+        // different generation of work (see #8639 follow-up).
+        const generation = tur.embeddedGraphicsGeneration;
         tur.embeddedGraphicsPending += 1;
 
         const suppressOutput = tur.singer.suppressOutput;
@@ -228,7 +233,12 @@ class EmbeddedGraphicsScheduler {
         // decrement this call's own share of the count, rather than setting
         // it back to zero outright, since another call may still be pending.
         await logo.deps.utils.delayExecution(beatValue * 1000);
-        tur.embeddedGraphicsPending -= 1;
+        if (tur.embeddedGraphicsGeneration === generation) {
+            tur.embeddedGraphicsPending -= 1;
+        }
+        // else: a turtle/run reset happened while this call was pending.
+        // The count already belongs to a new generation of work that this
+        // stale call knows nothing about, so leave it alone.
     }
 
     _pen(tur, suppressOutput, turtle, name, b, timeout) {

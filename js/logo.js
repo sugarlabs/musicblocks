@@ -1504,6 +1504,7 @@ class Logo {
 
         for (const turtle of this.turtles.turtleList) {
             turtle.embeddedGraphicsPending = 0;
+            turtle.embeddedGraphicsGeneration += 1;
         }
 
         this.prepSynths();

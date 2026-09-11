@@ -240,6 +240,7 @@ function createMockTurtle(overrides = {}) {
         endOfClampSignals: {},
         butNotThese: {},
         embeddedGraphicsPending: 0,
+        embeddedGraphicsGeneration: 0,
         running: false,
         inTrash: false,
         waitTime: 0,

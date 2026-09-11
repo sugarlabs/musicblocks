@@ -52,6 +52,7 @@ const buildTurtle = () => ({
         embeddedGraphics: {}
     },
     embeddedGraphicsPending: 0,
+    embeddedGraphicsGeneration: 0,
     painter: buildPainter()
 });
 
@@ -299,6 +300,56 @@ describe("EmbeddedGraphicsScheduler", () => {
         // Only once note N+1's own call resolves does the count return to 0.
         resolveSecond();
         await secondCall;
+        expect(turtle0.embeddedGraphicsPending).toBe(0);
+    });
+
+    test("a stale call's completion does not corrupt the count after a turtle/run reset (#8639 follow-up)", async () => {
+        // runLogoCommands()/Turtle.initTurtle() reset embeddedGraphicsPending
+        // to 0 (Stop button, or a "run" block restarting this turtle), but a
+        // schedule() call already in flight at that moment does not know
+        // about the reset. Without tracking a generation, that stale call's
+        // eventual decrement would corrupt the fresh generation's count
+        // instead of being ignored.
+        turtle0.singer.suppressOutput = false;
+        mockLogo.parseArg = jest.fn(() => 5);
+        mockLogo.blockList = [null, { name: "setcolor", connections: [null, 1] }];
+        turtle0.singer.embeddedGraphics = { 9: [1], 10: [1] };
+
+        let resolveStale;
+        let resolveFresh;
+        const delays = [
+            new Promise(resolve => {
+                resolveStale = resolve;
+            }),
+            new Promise(resolve => {
+                resolveFresh = resolve;
+            })
+        ];
+        let callIndex = 0;
+        mockLogo.deps.utils.delayExecution = jest.fn(() => delays[callIndex++]);
+
+        // Note N's call starts and is still pending when a reset happens.
+        const staleCall = scheduler.schedule(0, 0.5, 9, 0);
+        expect(turtle0.embeddedGraphicsPending).toBe(1);
+
+        // Simulate the reset performed by runLogoCommands()/initTurtle().
+        turtle0.embeddedGraphicsPending = 0;
+        turtle0.embeddedGraphicsGeneration += 1;
+
+        // A genuinely new call starts in the new generation. It sees no
+        // pending work (the reset cleared it), so no compensating delay.
+        const freshCall = scheduler.schedule(0, 0.5, 10, 0);
+        expect(turtle0.embeddedGraphicsPending).toBe(1);
+
+        // The stale call from before the reset finally resolves. It must
+        // not touch the new generation's count.
+        resolveStale();
+        await staleCall;
+        expect(turtle0.embeddedGraphicsPending).toBe(1);
+
+        // The fresh call resolving does decrement its own generation's count.
+        resolveFresh();
+        await freshCall;
         expect(turtle0.embeddedGraphicsPending).toBe(0);
     });
 });

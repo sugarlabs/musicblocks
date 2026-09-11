@@ -62,6 +62,11 @@ class Turtle {
         // Number of EmbeddedGraphicsScheduler.schedule() calls for this
         // turtle that are still in flight (0 means none are pending).
         this.embeddedGraphicsPending = 0;
+        // Bumped whenever embeddedGraphicsPending is reset (turtle init,
+        // run start). A schedule() call started in an earlier generation
+        // that is still running when a reset happens must not decrement
+        // the new generation's count when it eventually finishes.
+        this.embeddedGraphicsGeneration = 0;
 
         // Widget-related attributes
         this.inSetTimbre = false;
@@ -202,6 +207,7 @@ class Turtle {
         this.butNotThese = {};
 
         this.embeddedGraphicsPending = 0;
+        this.embeddedGraphicsGeneration += 1;
 
         this.inSetTimbre = false;
 
