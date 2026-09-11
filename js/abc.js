@@ -329,6 +329,10 @@ const processABCNotes = function (logo, turtle) {
                 tupletDuration = 0;
             } else {
                 if (typeof notes === "object") {
+                    if (obj[NOTATIONSTACCATO]) {
+                        parts.push(".");
+                    }
+
                     if (notes.length > 1) {
                         parts.push("[");
                     }
@@ -341,16 +345,10 @@ const processABCNotes = function (logo, turtle) {
                         parts.push("]");
                     }
 
-                    parts.push(obj[NOTATIONDURATION]);
+                    parts.push(__convertDuration(obj[NOTATIONDURATION]));
                     for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
                         parts.push(".");
                     }
-
-                    parts.push(" ");
-                }
-
-                if (obj[NOTATIONSTACCATO]) {
-                    parts.push(".");
                 }
 
                 if (obj[NOTATIONINSIDECHORD] > 0) {
@@ -385,20 +383,6 @@ const processABCNotes = function (logo, turtle) {
 
                         parts.push(" ");
                     }
-                } else {
-                    parts.push(note);
-                    parts.push(__convertDuration(obj[NOTATIONDURATION]));
-                    for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                        parts.push(".");
-                    }
-
-                    if (articulation) {
-                        parts.push("");
-                    }
-                }
-
-                if (obj[NOTATIONSTACCATO]) {
-                    parts.push(".");
                 }
 
                 targetDuration = 0;
