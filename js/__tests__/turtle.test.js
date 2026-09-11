@@ -166,10 +166,10 @@ describe("Turtle", () => {
             expect(turtle._waitTime).toBe(0);
         });
 
-        it("should set embeddedGraphicsFinished to true", () => {
-            turtle.embeddedGraphicsFinished = false;
+        it("should reset embeddedGraphicsPending to 0", () => {
+            turtle.embeddedGraphicsPending = 2;
             turtle.initTurtle(false);
-            expect(turtle.embeddedGraphicsFinished).toBe(true);
+            expect(turtle.embeddedGraphicsPending).toBe(0);
         });
 
         it("should set inSetTimbre to false", () => {

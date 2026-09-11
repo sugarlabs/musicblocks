@@ -59,7 +59,9 @@ class Turtle {
         this.painter = new Painter(this); // for drawing logic
 
         this._waitTime = 0;
-        this.embeddedGraphicsFinished = true;
+        // Number of EmbeddedGraphicsScheduler.schedule() calls for this
+        // turtle that are still in flight (0 means none are pending).
+        this.embeddedGraphicsPending = 0;
 
         // Widget-related attributes
         this.inSetTimbre = false;
@@ -199,7 +201,7 @@ class Turtle {
         this.endOfClampSignals = {};
         this.butNotThese = {};
 
-        this.embeddedGraphicsFinished = true;
+        this.embeddedGraphicsPending = 0;
 
         this.inSetTimbre = false;
 

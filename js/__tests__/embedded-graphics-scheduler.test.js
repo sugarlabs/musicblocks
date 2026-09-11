@@ -51,7 +51,7 @@ const buildTurtle = () => ({
         dispatchFactor: 1,
         embeddedGraphics: {}
     },
-    embeddedGraphicsFinished: true,
+    embeddedGraphicsPending: 0,
     painter: buildPainter()
 });
 
@@ -118,14 +118,14 @@ describe("EmbeddedGraphicsScheduler", () => {
         expect(turtle0.painter.doSetHeading).toHaveBeenCalledWith(0);
         expect(turtle0.painter.doSetXY).toHaveBeenCalledWith(0, 0);
         expect(mockLogo.deps.utils.delayExecution).toHaveBeenCalledWith(500);
-        expect(turtle0.embeddedGraphicsFinished).toBe(true);
+        expect(turtle0.embeddedGraphicsPending).toBe(0);
     });
 
     test("schedule covers broad graphics switch with deterministic timers", async () => {
         mockLogo.deps.utils.delayExecution = jest.fn(() => Promise.resolve());
 
         turtle0.singer.suppressOutput = false;
-        turtle0.embeddedGraphicsFinished = false;
+        turtle0.embeddedGraphicsPending = 1;
 
         mockLogo.blockList = [];
         const names = [
@@ -233,8 +233,8 @@ describe("EmbeddedGraphicsScheduler", () => {
     test("schedule adds 0.1s delay when previous graphics not yet finished", async () => {
         mockLogo.deps.utils.delayExecution = jest.fn(() => Promise.resolve());
         turtle0.singer.suppressOutput = false;
-        // Simulate prior note's graphics still in-flight.
-        turtle0.embeddedGraphicsFinished = false;
+        // Simulate a prior note's graphics still in-flight.
+        turtle0.embeddedGraphicsPending = 1;
         mockLogo.parseArg = jest.fn(() => 5);
         mockLogo.blockList = [null, { name: "setcolor", connections: [null, 1] }];
         turtle0.singer.embeddedGraphics = { 9: [1] };
@@ -247,6 +247,58 @@ describe("EmbeddedGraphicsScheduler", () => {
             100,
             expect.any(Function)
         );
-        expect(turtle0.embeddedGraphicsFinished).toBe(true);
+        // This call's own share of the count is cleared, but the prior
+        // note's pending call (simulated above) is still outstanding.
+        expect(turtle0.embeddedGraphicsPending).toBe(1);
+    });
+
+    test("an earlier call resolving does not clear a later, still-running call's pending count (#8639)", async () => {
+        // turtle-singer.js never awaits dispatchTurtleSignals(), so it is
+        // routine for one note's schedule() call to still be pending when
+        // the next note's call starts. Under the old shared boolean, the
+        // earlier call resolving would unconditionally mark all graphics as
+        // finished, even while the later call's were still running.
+        turtle0.singer.suppressOutput = false;
+        mockLogo.parseArg = jest.fn(() => 5);
+        mockLogo.blockList = [null, { name: "setcolor", connections: [null, 1] }];
+        turtle0.singer.embeddedGraphics = { 9: [1], 10: [1] };
+
+        let resolveFirst;
+        let resolveSecond;
+        const delays = [
+            new Promise(resolve => {
+                resolveFirst = resolve;
+            }),
+            new Promise(resolve => {
+                resolveSecond = resolve;
+            })
+        ];
+        let callIndex = 0;
+        mockLogo.deps.utils.delayExecution = jest.fn(() => delays[callIndex++]);
+
+        // Note N starts; nothing pending yet, so no compensating delay.
+        const firstCall = scheduler.schedule(0, 0.5, 9, 0);
+        expect(turtle0.embeddedGraphicsPending).toBe(1);
+
+        // Note N+1 starts while N is still pending, so it must see that
+        // and add the 0.1s compensating delay (delay 0 becomes waitTime 100ms).
+        const secondCall = scheduler.schedule(0, 0.5, 10, 0);
+        expect(turtle0.embeddedGraphicsPending).toBe(2);
+        expect(mockLogo._timerManager.setGuardedTimeout).toHaveBeenLastCalledWith(
+            expect.any(Function),
+            100,
+            expect.any(Function)
+        );
+
+        // Note N's call resolves first. This must not mark everything as
+        // finished, since note N+1's graphics are still in flight.
+        resolveFirst();
+        await firstCall;
+        expect(turtle0.embeddedGraphicsPending).toBe(1);
+
+        // Only once note N+1's own call resolves does the count return to 0.
+        resolveSecond();
+        await secondCall;
+        expect(turtle0.embeddedGraphicsPending).toBe(0);
     });
 });
