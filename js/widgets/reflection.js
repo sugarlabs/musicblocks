@@ -13,6 +13,14 @@
 
 /* global _, escapeHTML, isSafeUrl, DOMPurify */
 
+if (typeof module !== "undefined" && module.exports) {
+    // Under Jest the shared helper resolves through CommonJS. In the browser it
+    // arrives as window.createWidgetLifecycle, loaded first by the RequireJS
+    // shim in js/loader.js. Calling require() there would be a synchronous
+    // RequireJS lookup for a module that may not have been evaluated yet.
+    var { createWidgetLifecycle } = require("../utils/ai-widget-lifecycle");
+}
+
 /**
  * Represents Reflection Widget.
  * @constructor
@@ -20,7 +28,7 @@
 
 class ReflectionMatrix {
     /** AMD module dependencies for lazy loading. */
-    static dependencies = ["widgets/reflection"];
+    static dependencies = ["utils/ai-widget-lifecycle", "widgets/reflection"];
 
     static BUTTONDIVWIDTH = 535;
     static OUTERWINDOWWIDTH = "858px";
@@ -28,7 +36,7 @@ class ReflectionMatrix {
     static INNERWINDOWWIDTH = 730;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
-
+    static REQUEST_TIMEOUT = 30000;
     constructor() {
         /**
          * Chat history array to store the conversation
@@ -96,6 +104,22 @@ class ReflectionMatrix {
          * @type {boolean}
          */
         this.isProcessingPendingMessage = false;
+
+        /**
+         * Whether a project-code refresh is in flight
+         * @type {boolean}
+         */
+        this._isUpdatingProjectCode = false;
+
+        /**
+         * Shared mount state and request tracking
+         * @type {Object}
+         */
+        const createLifecycle =
+            (typeof createWidgetLifecycle !== "undefined" && createWidgetLifecycle) ||
+            window.createWidgetLifecycle;
+
+        this._lifecycle = createLifecycle(this, () => this.isOpen && this.chatLog);
     }
 
     /**
@@ -105,6 +129,7 @@ class ReflectionMatrix {
     init(activity) {
         this.activity = activity;
         this.isOpen = true;
+        this._lifecycle.mount();
         this.isMaximized = false;
         this.activity.isInputON = true;
         this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
@@ -118,14 +143,13 @@ class ReflectionMatrix {
 
         widgetWindow.onclose = () => {
             this.isOpen = false;
+            this._lifecycle.unmount();
             this.activity.isInputON = false;
-            if (this.startChatTypingTimeout) {
-                clearTimeout(this.startChatTypingTimeout);
-                this.startChatTypingTimeout = null;
-            }
-            if (this.dotsInterval) {
-                clearInterval(this.dotsInterval);
-            }
+            this.hideTypingIndicator();
+            this._lifecycle.abortPendingRequests();
+            this.pendingMessages = [];
+            this.isProcessingPendingMessage = false;
+            this._isUpdatingProjectCode = false;
             widgetWindow.destroy();
         };
 
@@ -236,7 +260,7 @@ class ReflectionMatrix {
      * @returns {void}
      */
     showTypingIndicator(action) {
-        if (this.typingDiv) return;
+        if (!this._isWidgetActive() || this.typingDiv) return;
 
         this.typingDiv = document.createElement("div");
         this.typingDiv.className = "typing-indicator";
@@ -278,11 +302,33 @@ class ReflectionMatrix {
     }
 
     /**
+     * Returns true if the widget is still mounted and safe to update.
+     * @returns {boolean}
+     */
+    _isWidgetActive() {
+        return this._lifecycle.isWidgetActive();
+    }
+
+    /**
+     * Returns true if the caller still belongs to the mount it started in.
+     * Async work captures the generation before awaiting and passes it back
+     * here, so a continuation from a previous open never touches a reopened
+     * widget.
+     * @param {number} generation - Generation captured before the await.
+     * @returns {boolean}
+     */
+    _isSameMount(generation) {
+        return this._lifecycle.isSameMount(generation);
+    }
+
+    /**
      * Appends a user message to the chat log.
      * @param {string} text - The user's message.
      * @returns {void}
      */
     appendUserMessage(text) {
+        if (!this._isWidgetActive()) return;
+
         const messageContainer = document.createElement("div");
         messageContainer.classList.add("message-container", "user");
 
@@ -313,6 +359,8 @@ class ReflectionMatrix {
      * @returns {void}
      */
     appendBotReply(reply, role = this.AImentor, md = false) {
+        if (!this._isWidgetActive()) return;
+
         this.chatHistory.push({
             role: role,
             content: reply.response
@@ -356,9 +404,10 @@ class ReflectionMatrix {
     async processPendingMessages() {
         if (this.isProcessingPendingMessage) return;
 
+        const generation = this._lifecycle.generation;
         this.isProcessingPendingMessage = true;
 
-        while (this.pendingMessages.length > 0) {
+        while (this.pendingMessages.length > 0 && this._isWidgetActive()) {
             const nextMessage = this.pendingMessages.shift();
 
             this.chatHistory.push({
@@ -372,6 +421,14 @@ class ReflectionMatrix {
                 nextMessage.mentor,
                 nextMessage.algorithm
             );
+
+            // The widget was reopened while this reply was in flight. Its queue
+            // and flag belong to the new session now, so leave both alone.
+            if (!this._isSameMount(generation)) return;
+
+            if (!this._isWidgetActive() || !reply) {
+                continue;
+            }
 
             if (reply.error) {
                 this.hideTypingIndicator();
@@ -416,8 +473,9 @@ class ReflectionMatrix {
      *  @returns {Promise<void>}
      */
     async startChatSession() {
-        if (this.triggerFirst === true) return;
+        if (this.triggerFirst === true || !this._isWidgetActive()) return;
 
+        const generation = this._lifecycle.generation;
         this.triggerFirst = true;
 
         // Reset summarization state for a fresh session
@@ -433,9 +491,18 @@ class ReflectionMatrix {
         const code = await this.activity.prepareExport();
         const data = await this.generateAlgorithm(code);
 
+        // Belongs to a previous open: the indicator and triggerFirst below are
+        // the reopened session's state, not ours.
+        if (!this._isSameMount(generation)) return;
+
         this.hideTypingIndicator();
 
-        if (data && !data.error) {
+        if (!this._isWidgetActive() || !data) {
+            this.triggerFirst = false;
+            return;
+        }
+
+        if (!data.error) {
             this.inputContainer.style.display = "flex";
             this.botReplyDiv(data, false, false);
             this.projectAlgorithm = data.algorithm;
@@ -450,25 +517,63 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async updateProjectCode() {
-        const code = await this.activity.prepareExport();
-        if (code === this.code) {
-            this.activity.textMsg(_("No changes were detected in your project."), 2500);
-            return; // No changes in code
+        if (this.typingDiv || this._isUpdatingProjectCode || !this._isWidgetActive()) {
+            return;
         }
 
-        this.showTypingIndicator("Reading code");
-        const data = await this.generateNewAlgorithm(code);
-        this.hideTypingIndicator();
+        const generation = this._lifecycle.generation;
+        this._isUpdatingProjectCode = true;
 
-        if (data && !data.error) {
-            if (data.algorithm !== "unchanged") {
-                this.projectAlgorithm = data.algorithm; // update algorithm
-                this.code = code;
+        try {
+            const code = await this.activity.prepareExport();
+            if (!this._isSameMount(generation)) return;
+
+            if (code === this.code) {
+                this.activity.textMsg(_("No changes were detected in your project."), 2500);
+                return; // No changes in code
             }
-            this.botReplyDiv(data, false, false);
-        } else {
-            this.activity.errorMsg(_(data.error), 3000);
+
+            this.showTypingIndicator("Reading code");
+            const data = await this.generateNewAlgorithm(code);
+            if (!this._isSameMount(generation)) return;
+
+            this.hideTypingIndicator();
+
+            if (!this._isWidgetActive() || !data) {
+                return;
+            }
+
+            if (!data.error) {
+                if (data.algorithm !== "unchanged") {
+                    this.projectAlgorithm = data.algorithm; // update algorithm
+                    this.code = code;
+                }
+                this.botReplyDiv(data, false, false);
+            } else {
+                this.activity.errorMsg(_(data.error), 3000);
+            }
+        } finally {
+            // A reopened widget owns this flag now; releasing it here would let
+            // its own refresh run twice.
+            if (this._isSameMount(generation)) {
+                this._isUpdatingProjectCode = false;
+            }
         }
+    }
+
+    /**
+     * Sends JSON to the backend through the shared lifecycle tracker.
+     * @param {string} path - Backend path suffix.
+     * @param {Object} payload - Request payload.
+     * @returns {Promise<Object|null>}
+     */
+    _postJSON(path, payload) {
+        return this._lifecycle.postJSON(
+            `${this.PORT}${path}`,
+            payload,
+            ReflectionMatrix.REQUEST_TIMEOUT,
+            "Failed to send message"
+        );
     }
 
     /**
@@ -477,20 +582,9 @@ class ReflectionMatrix {
      * @returns {Promise<Object>} - The server response containing the algorithm.
      */
     async generateAlgorithm(code) {
-        try {
-            const response = await fetch(`${this.PORT}/projectcode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    code: code
-                })
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        }
+        return this._postJSON("/projectcode", {
+            code: code
+        });
     }
 
     /**
@@ -500,21 +594,10 @@ class ReflectionMatrix {
      * @returns {Promise<Object>} - The server response containing the updated algorithm.
      */
     async generateNewAlgorithm(code) {
-        try {
-            const response = await fetch(`${this.PORT}/updatecode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    oldcode: this.code,
-                    newcode: code
-                })
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        }
+        return this._postJSON("/updatecode", {
+            oldcode: this.code,
+            newcode: code
+        });
     }
 
     /**
@@ -526,37 +609,32 @@ class ReflectionMatrix {
      *  @returns {Promise<Object>} - The server response containing the bot's reply.
      */
     async generateBotReply(message, chatHistory, mentor, algorithm) {
-        try {
-            this.showTypingIndicator();
+        const generation = this._lifecycle.generation;
+        this.showTypingIndicator();
 
-            const safeIndex = Math.min(this.summarizedUpTo, chatHistory.length);
-            const unsummarizedMessages = chatHistory.slice(safeIndex);
+        const safeIndex = Math.min(this.summarizedUpTo, chatHistory.length);
+        const unsummarizedMessages = chatHistory.slice(safeIndex);
 
-            const response = await fetch(`${this.PORT}/chat`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    query: message,
-                    messages: unsummarizedMessages,
-                    mentor: mentor,
-                    algorithm: algorithm,
-                    conversation_summary: this.conversationSummary || null,
-                    summarized_up_to: this.summarizedUpTo
-                })
-            });
-            this.hideTypingIndicator();
-            const data = await response.json();
+        const data = await this._postJSON("/chat", {
+            query: message,
+            messages: unsummarizedMessages,
+            mentor: mentor,
+            algorithm: algorithm,
+            conversation_summary: this.conversationSummary || null,
+            summarized_up_to: this.summarizedUpTo
+        });
 
-            if (data.conversation_summary && data.summarized_up_to !== undefined) {
-                this.conversationSummary = data.conversation_summary;
-                this.summarizedUpTo = data.summarized_up_to;
-            }
+        // Summary state and the typing indicator belong to the current mount.
+        if (!this._isSameMount(generation)) return null;
 
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
+        this.hideTypingIndicator();
+
+        if (data && data.conversation_summary && data.summarized_up_to !== undefined) {
+            this.conversationSummary = data.conversation_summary;
+            this.summarizedUpTo = data.summarized_up_to;
         }
+
+        return data;
     }
 
     /**
@@ -564,11 +642,14 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async getAnalysis() {
-        if (this.chatHistory.length < 10) return;
+        if (this.chatHistory.length < 10 || this.typingDiv || !this._isWidgetActive()) return;
+        const generation = this._lifecycle.generation;
         this.showTypingIndicator("Analyzing");
         const data = await this.generateAnalysis();
+        if (!this._isSameMount(generation)) return;
+
         this.hideTypingIndicator();
-        if (data) {
+        if (data && this._isWidgetActive()) {
             this.botReplyDiv(data, false, true);
             // Expected errors in data.error:
             // 1. Server-side errors returned by the API (e.g., 500s or rate limits).
@@ -584,21 +665,10 @@ class ReflectionMatrix {
      *  @returns {Promise<Object>} - The server response containing the analysis.
      */
     async generateAnalysis() {
-        try {
-            const response = await fetch(`${this.PORT}/analysis`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    messages: this.chatHistory,
-                    summary: this.summary
-                })
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        }
+        return this._postJSON("/analysis", {
+            messages: this.chatHistory,
+            summary: this.summary
+        });
     }
 
     /**
@@ -608,17 +678,26 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async botReplyDiv(message, user_query = true, md = false) {
+        const replyMentor = this.AImentor;
+        const generation = this._lifecycle.generation;
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
+            if (!this._isWidgetActive()) return;
             reply = await this.generateBotReply(
                 message,
                 this.chatHistory,
-                this.AImentor,
+                replyMentor,
                 this.projectAlgorithm
             );
+
+            if (!this._isSameMount(generation)) return;
         } else {
             reply = message;
+        }
+
+        if (!this._isWidgetActive() || !reply) {
+            return;
         }
 
         if (reply.error) {
@@ -627,7 +706,7 @@ class ReflectionMatrix {
             return;
         }
 
-        this.appendBotReply(reply, this.AImentor, md);
+        this.appendBotReply(reply, replyMentor, md);
     }
 
     /**
@@ -636,7 +715,7 @@ class ReflectionMatrix {
      */
     sendMessage() {
         const text = this.input.value.trim();
-        if (text === "") return;
+        if (text === "" || !this._isWidgetActive()) return;
         this.appendUserMessage(text);
         this.pendingMessages.push({
             text: text,

@@ -11,11 +11,19 @@
 
 /* global _THIS_IS_MUSIC_BLOCKS_ */
 
+if (typeof module !== "undefined" && module.exports) {
+    // Under Jest the shared helper resolves through CommonJS. In the browser it
+    // arrives as window.createWidgetLifecycle, loaded first by the RequireJS
+    // shim in js/loader.js. Calling require() there would be a synchronous
+    // RequireJS lookup for a module that may not have been evaluated yet.
+    var { createWidgetLifecycle } = require("../utils/ai-widget-lifecycle");
+}
+
 /* This widget provides an AI-powered debugging interface for Music Blocks projects,
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
 
 /** AMD module dependencies for lazy loading. */
-AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
+AIDebuggerWidget.dependencies = ["utils/ai-widget-lifecycle", "widgets/aidebugger"];
 
 /**
  * Represents a AI Widget.
@@ -123,6 +131,16 @@ function AIDebuggerWidget() {
     this._consentGiven = false;
 
     /**
+     * Shared mount tracking and request cancellation for chat widgets
+     * @type {object}
+     */
+    const createLifecycle =
+        (typeof createWidgetLifecycle !== "undefined" && createWidgetLifecycle) ||
+        window.createWidgetLifecycle;
+
+    this._lifecycle = createLifecycle(this, () => this.widgetWindow && this.chatLog);
+
+    /**
      * Generates a unique conversation ID
      * @returns {string} Unique conversation identifier
      * @private
@@ -141,6 +159,7 @@ function AIDebuggerWidget() {
     this.init = function (activity) {
         this.activity = activity;
         this.activity.isInputON = true;
+        this._lifecycle.mount();
 
         if (!this.conversationId) {
             this.conversationId = this._generateConversationId();
@@ -155,6 +174,9 @@ function AIDebuggerWidget() {
         widgetWindow.getWidgetBody().style.height = CHATHEIGHT + "px";
 
         widgetWindow.onclose = () => {
+            this._lifecycle.unmount();
+            this._lifecycle.abortPendingRequests();
+            this._isProcessing = false;
             this._hideTypingIndicator();
             widgetWindow.destroy();
             this.activity.isInputON = false;
@@ -176,6 +198,44 @@ function AIDebuggerWidget() {
         this._showConsentBanner();
         widgetWindow.sendToCenter();
         this.activity.textMsg(_("Debugger initialized"));
+    };
+
+    /**
+     * Returns true if the widget is still mounted and can safely update UI
+     * @returns {boolean}
+     * @private
+     */
+    this._isWidgetActive = function () {
+        return this._lifecycle.isWidgetActive();
+    };
+
+    /**
+     * Returns true if the caller still belongs to the mount it started in.
+     * Async work captures the generation before awaiting and passes it back
+     * here, so a continuation from a previous open never touches a reopened
+     * widget.
+     * @param {number} generation - Generation captured before the request
+     * @returns {boolean}
+     * @private
+     */
+    this._isSameMount = function (generation) {
+        return this._lifecycle.isSameMount(generation);
+    };
+
+    /**
+     * Sends a backend request while tracking widget lifecycle and cancellation
+     * @param {object} payload
+     * @returns {Promise<object|null>}
+     * @private
+     */
+    this._postToBackend = function (payload) {
+        return this._lifecycle.postJSON(
+            `${BACKEND_CONFIG.BASE_URL}${BACKEND_CONFIG.ENDPOINTS.ANALYZE}`,
+            payload,
+            BACKEND_CONFIG.TIMEOUT,
+            null,
+            true
+        );
     };
 
     /**
@@ -306,7 +366,7 @@ function AIDebuggerWidget() {
     this._sendMessage = function () {
         const messageText = this.messageInput.value.trim();
         if (messageText === "") return;
-        if (this._isProcessing) return;
+        if (!this._isWidgetActive() || this._isProcessing) return;
 
         if (!this._consentGiven) {
             this._showConsentBanner();
@@ -334,6 +394,10 @@ function AIDebuggerWidget() {
      * @private
      */
     this._addMessageToUI = function (message) {
+        if (!this._isWidgetActive()) {
+            return;
+        }
+
         const messageDiv = document.createElement("div");
         messageDiv.style.maxWidth = "80%";
         messageDiv.style.padding = "12px 16px";
@@ -391,7 +455,8 @@ function AIDebuggerWidget() {
             return;
         }
 
-        this._showTypingIndicator();
+        const typingIndicator = this._showTypingIndicator();
+        const generation = this._lifecycle.generation;
         this.promptCount++;
         let projectData;
         try {
@@ -418,24 +483,13 @@ function AIDebuggerWidget() {
             prompt_count: this.promptCount
         };
 
-        fetch(`${BACKEND_CONFIG.BASE_URL}${BACKEND_CONFIG.ENDPOINTS.ANALYZE}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return response.json();
-            })
+        this._postToBackend(payload)
             .then(data => {
-                this._hideTypingIndicator();
-                this._isProcessing = false;
+                if (!this._isSameMount(generation) || !this._isWidgetActive() || !data) {
+                    return;
+                }
 
-                if (data && data.response) {
+                if (data.response) {
                     const botResponse = {
                         type: "bot",
                         content: data.response,
@@ -451,10 +505,13 @@ function AIDebuggerWidget() {
                 }
             })
             .catch(error => {
-                this._hideTypingIndicator();
-                this._isProcessing = false;
                 console.error("Backend connection error:", error);
 
+                if (!this._isSameMount(generation) || !this._isWidgetActive()) {
+                    return;
+                }
+
+                this._removeTypingIndicator(typingIndicator);
                 this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
 
                 if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -472,6 +529,15 @@ function AIDebuggerWidget() {
                 this.chatHistory.push(fallbackResponse);
                 this._addMessageToUI(fallbackResponse);
                 this._updateMessageCount();
+            })
+            .finally(() => {
+                // A reopened widget owns the indicator and the processing flag now.
+                if (!this._isSameMount(generation)) {
+                    return;
+                }
+
+                this._removeTypingIndicator(typingIndicator);
+                this._isProcessing = false;
             });
     };
 
@@ -480,6 +546,10 @@ function AIDebuggerWidget() {
      * @private
      */
     this._showTypingIndicator = function () {
+        if (!this._isWidgetActive()) {
+            return null;
+        }
+
         const typingDiv = document.createElement("div");
         typingDiv.className = "typing-indicator";
         typingDiv.style.alignSelf = "flex-start";
@@ -503,6 +573,8 @@ function AIDebuggerWidget() {
 
         this.chatLog.appendChild(typingDiv);
         this.chatLog.scrollTop = this.chatLog.scrollHeight;
+
+        return typingDiv;
     };
 
     /**
@@ -510,13 +582,35 @@ function AIDebuggerWidget() {
      * @private
      */
     this._hideTypingIndicator = function () {
+        if (!this.chatLog) {
+            return;
+        }
+
+        this._removeTypingIndicator(null);
+    };
+
+    /**
+     * Removes a specific typing indicator, or all of them when none is given.
+     * A replacement indicator shown by a newer request is left alone.
+     * @param {HTMLElement|null} indicator - The indicator to remove.
+     * @private
+     */
+    this._removeTypingIndicator = function (indicator) {
+        if (!this.chatLog) {
+            return;
+        }
+
         const typingIndicators = this.chatLog.querySelectorAll(".typing-indicator");
-        typingIndicators.forEach(indicator => {
-            const animationId = indicator.getAttribute("data-animation-id");
+        typingIndicators.forEach(current => {
+            if (indicator !== null && current !== indicator) {
+                return;
+            }
+
+            const animationId = current.getAttribute("data-animation-id");
             if (animationId) {
                 clearInterval(parseInt(animationId, 10));
             }
-            indicator.remove();
+            current.remove();
         });
     };
 
@@ -689,23 +783,14 @@ function AIDebuggerWidget() {
         };
 
         // Show typing indicator during initialization
-        this._showTypingIndicator();
+        const typingIndicator = this._showTypingIndicator();
+        const generation = this._lifecycle.generation;
 
-        fetch(`${BACKEND_CONFIG.BASE_URL}${BACKEND_CONFIG.ENDPOINTS.ANALYZE}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(initPayload)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return response.json();
-            })
+        this._postToBackend(initPayload)
             .then(data => {
-                this._hideTypingIndicator();
+                if (!this._isSameMount(generation) || !this._isWidgetActive() || !data) {
+                    return;
+                }
 
                 if (data.response) {
                     // Add the backend's initial response
@@ -725,8 +810,13 @@ function AIDebuggerWidget() {
                 }
             })
             .catch(error => {
-                this._hideTypingIndicator();
                 console.error("Backend initialization error:", error);
+
+                if (!this._isSameMount(generation) || !this._isWidgetActive()) {
+                    return;
+                }
+
+                this._removeTypingIndicator(typingIndicator);
                 this.activity.textMsg(_("Server error: Failed to initialize AI debugger."));
 
                 if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -743,6 +833,12 @@ function AIDebuggerWidget() {
                 this._addMessageToUI(errorMessage);
 
                 this._addWelcomeMessage();
+            })
+            .finally(() => {
+                // A reopened widget owns the indicator now.
+                if (this._isSameMount(generation)) {
+                    this._removeTypingIndicator(typingIndicator);
+                }
             });
     };
 
@@ -751,10 +847,11 @@ function AIDebuggerWidget() {
      * @private
      */
     this._resetConversation = function () {
+        this._lifecycle.abortPendingRequests();
         this.chatHistory = [];
         this.promptCount = 0; // Reset prompt count
         this.conversationId = this._generateConversationId();
-        this._hideTypingIndicator();
+        this._removeTypingIndicator(null);
         this.chatLog.replaceChildren();
 
         this._loadProjectAndInitialize();
