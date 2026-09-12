@@ -808,20 +808,43 @@ class ToolbarUI {
         const icon = docById("themeSelectIcon");
         if (!icon) return;
 
-        themes.forEach(theme => {
-            if (safeStorageGet("themePreference") === theme) {
-                icon.textContent = "";
-                Array.from(docById(theme).childNodes).forEach(node =>
-                    icon.appendChild(node.cloneNode(true))
-                );
-            }
-        });
+        const updateThemeIcon = theme => {
+            const option = docById(theme);
+            if (!option) return;
 
-        icon.onclick = () => {
+            icon.textContent = "";
+            Array.from(option.childNodes).forEach(node => icon.appendChild(node.cloneNode(true)));
+        };
+
+        const updateThemeOptions = () => {
             themes.forEach(theme => {
-                docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
+                const option = docById(theme);
+                if (!option) return;
+
+                const listItem = option.parentElement;
+                if (listItem) {
+                    listItem.style.display = theme === themeBox._theme ? "none" : "";
+                }
             });
         };
+
+        themes.forEach(theme => {
+            const option = docById(theme);
+            if (!option) return;
+
+            if (themeBox._theme === theme || safeStorageGet("themePreference") === theme) {
+                updateThemeIcon(theme);
+            }
+
+            option.onclick = () => {
+                themeBox[`${theme}_onclick`](this.activity);
+                updateThemeIcon(theme);
+                updateThemeOptions();
+                $j(icon).dropdown("close");
+            };
+        });
+
+        icon.onclick = updateThemeOptions;
     }
 
     /**
