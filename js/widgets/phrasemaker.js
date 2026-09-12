@@ -835,8 +835,13 @@ class PhraseMaker {
                 } else if (["C", "do"].includes(noteName) && this.rowArgs[i] === 5) {
                     const img = document.createElement("img");
                     img.src = "images/8_bellset_key_8.svg";
-                    img.title = this._("bell") + " C";
-                    img.alt = this._("bell") + " C";
+                    const displayNote =
+                        this._deps.noteIsSolfege(noteName) &&
+                        !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
+                            ? this._deps.i18nSolfege(noteName)
+                            : noteName;
+                    img.title = this._("bell") + " " + displayNote;
+                    img.alt = this._("bell") + " " + displayNote;
                     img.setAttribute("width", cell.style.width);
                     img.setAttribute("vertical-align", "middle");
                     cell.appendChild(img);
