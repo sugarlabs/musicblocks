@@ -55,6 +55,13 @@ function makeBar(type = "bar_thin") {
     return { el_type: "bar", type };
 }
 
+function makeRest(duration = 0.25) {
+    return {
+        el_type: "note",
+        duration,
+        rest: { type: "rest" }
+    };
+}
 /**
  * Build a minimal tune matching the shape that ABCJS.parseOnly returns.
  * `staves` is an array — one entry per staff/voice.
@@ -508,5 +515,35 @@ describe("Test 6: Empty-voice and degenerate input guard", () => {
             b => (Array.isArray(b[1]) ? b[1][0] : b[1]) === "newnote"
         );
         expect(newnotes).toHaveLength(2);
+    });
+});
+
+describe("Test 7: ABC rests", () => {
+    const tune = makeTune({
+        title: "Rest import",
+        staves: [
+            {
+                meter: { value: [{ num: 4, den: 4 }] },
+                key: { root: "C", mode: "major", accidentals: [] },
+                voices: [[makeNote("C", 0, 0.25), makeRest(0.5), makeNote("D", 1, 0.25)]]
+            }
+        ]
+    });
+
+    test("does not throw when a voice contains a rest", async () => {
+        const activity = makeActivity();
+        await expect(activity.parseABC(tune)).resolves.toBeNull();
+    });
+
+    test("result contains exactly one rest2 (Silence) block", async () => {
+        const blocks = await parseAndCapture(tune);
+        const rest2Blocks = blocksOfType(blocks, "rest2");
+        expect(rest2Blocks).toHaveLength(1);
+    });
+
+    test("pitch blocks are only created for the actual notes, not the rest", async () => {
+        const blocks = await parseAndCapture(tune);
+        const pitchBlocks = blocksOfType(blocks, "pitch");
+        expect(pitchBlocks).toHaveLength(2);
     });
 });

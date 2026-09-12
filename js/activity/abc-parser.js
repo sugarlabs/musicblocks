@@ -79,6 +79,35 @@ function _createPitchBlocks(
     );
 }
 
+// Creates the block chain for an ABC rest. Mirrors _createPitchBlocks'
+// newnote/divide/vspace/hidden wiring, but swaps the pitch/notename/number
+// trio for a single rest2 ("Silence") block. Music Blocks' loader indexes
+// blockObjs by literal block ID (blockObjs[id]), so this MUST consume a
+// contiguous run of IDs with no gaps — it uses exactly blockId..blockId+6
+// (7 blocks) and the caller must advance blockId by 7, not 9.
+function _createRestBlocks(blockId, restDuration, actionBlock, triplet, meterDen) {
+    const duration = toFraction(restDuration);
+    if (triplet !== null) {
+        duration[1] = meterDen * triplet;
+    }
+
+    actionBlock.push(
+        [
+            blockId,
+            ["newnote", { collapsed: true }],
+            0,
+            0,
+            [blockId - 1, blockId + 1, blockId + 4, blockId + 6]
+        ],
+        [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+        [blockId + 2, ["number", { value: duration[0] }], 0, 0, [blockId + 1]],
+        [blockId + 3, ["number", { value: duration[1] }], 0, 0, [blockId + 1]],
+        [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
+        [blockId + 5, "rest2", 0, 0, [blockId + 4, null]],
+        [blockId + 6, "hidden", 0, 0, [blockId, blockId + 7]]
+    );
+}
+
 // Function to search index for particular type of block
 // mainly used to find nammeddo block in repeat block.
 function _searchIndexForMusicBlock(array, x) {
@@ -205,12 +234,7 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
     const actionBlock = [];
 
     voice.forEach(element => {
-        if (element.el_type === "note") {
-            //check if triplet exists
-            if (element?.startTriplet !== null && element?.startTriplet !== undefined) {
-                tripletFinder = element.startTriplet;
-            }
-
+        if (element.pitches && element.pitches.length > 0) {
             _createPitchBlocks(
                 element.pitches[0],
                 blockId,
@@ -220,14 +244,16 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
                 tripletFinder,
                 staffRecord.meterDen
             );
-
-            // Check and set tripletFinder to null if element?.endTriplet exists.
-            if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
-                tripletFinder = null;
-            }
             blockId = blockId + 9;
-        } else if (element.el_type === "bar") {
-            _handleBarElement(element, staffRecord.repeatArray, staffRecord.baseBlocks.length);
+        } else {
+            _createRestBlocks(
+                blockId,
+                element.duration,
+                actionBlock,
+                tripletFinder,
+                staffRecord.meterDen
+            );
+            blockId = blockId + 7;
         }
     });
 
