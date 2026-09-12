@@ -1206,6 +1206,33 @@ describe("AST2BlockList Class", () => {
         ]);
     });
 
+    test("should convert heading, key, and note volume getters", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.onStrongBeatDo(mouse.HEADING, "action");
+            await mouse.onStrongBeatDo(mouse.CURRENTKEY, "action");
+            await mouse.onStrongBeatDo(mouse.MASTERVOLUME, "action");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "onbeatdo", 0, 0, [0, 2, 3, 4]],
+            [2, "heading", 0, 0, [1]],
+            [3, ["text", { value: "action" }], 0, 0, [1]],
+            [4, "onbeatdo", 0, 0, [1, 5, 6, 7]],
+            [5, "key", 0, 0, [4]],
+            [6, ["text", { value: "action" }], 0, 0, [4]],
+            [7, "onbeatdo", 0, 0, [4, 8, 9, null]],
+            [8, "notevolumefactor", 0, 0, [7]],
+            [9, ["text", { value: "action" }], 0, 0, [7]]
+        ]);
+    });
+
     // Test all Pitch Blocks.
     test("should generate correct blockList for all pitch blocks", () => {
         const code = `
