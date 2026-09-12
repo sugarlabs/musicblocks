@@ -294,6 +294,7 @@ function SampleWidget() {
             this.playBtn.appendChild(pauseImg);
         }
         this.isMoving = true;
+        this._ensureWaveformLoop();
     };
 
     /**
@@ -923,6 +924,7 @@ function SampleWidget() {
             if (!this.is_recording) {
                 await this.activity.logo.synth.startRecording();
                 this.is_recording = true;
+                this._ensureWaveformLoop();
                 this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
                 this.displayRecordingStartMessage();
                 this.activity.logo.synth.LiveWaveForm();
@@ -1873,6 +1875,25 @@ function SampleWidget() {
         this.reconnectSynthsToAnalyser();
     };
 
+    this._isWaveformActive = function () {
+        const projectPlaybackActive =
+            this.activity &&
+            this.activity.turtles &&
+            typeof this.activity.turtles.running === "function" &&
+            this.activity.turtles.running();
+
+        return Boolean(this.is_recording || this.isMoving || projectPlaybackActive);
+    };
+
+    this._ensureWaveformLoop = function () {
+        if (this.drawVisualIDs && this.drawVisualIDs[0]) {
+            return;
+        }
+        if (typeof this._drawWaveform === "function") {
+            this._drawWaveform();
+        }
+    };
+
     /**
      * Creates a canvas element and draws visual representations of sample data and reference tones.
      * @param {number} width - The width of the canvas.
@@ -1943,16 +1964,14 @@ function SampleWidget() {
             this.tunerDisplay = null;
         }
 
+        let needsRedraw = Boolean(resized);
+
         const draw = () => {
-            // Only continue the RAF loop when there is active work to render.
-            // Scheduling inside the condition stops the loop naturally when idle
-            // (not recording and no active analyser) instead of spinning at ~60fps
-            // unconditionally — matching the lifecycle pattern of the Oscilloscope widget.
-            if (
-                this.is_recording ||
-                (this.pitchAnalysers[turtleIdx] && (this.running || resized))
-            ) {
-                this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
+            const hasActiveWork = this._isWaveformActive();
+            const canDraw =
+                this.is_recording || (this.pitchAnalysers && this.pitchAnalysers[turtleIdx]);
+
+            if (this.running && canDraw && (hasActiveWork || needsRedraw)) {
                 canvasCtx.fillStyle = platformColor.background || "#FFFFFF";
                 canvasCtx.font = "10px Verdana";
                 this.verticalOffset = -canvas.height / 4;
@@ -2029,11 +2048,17 @@ function SampleWidget() {
                         }
                     }
                 }
+                needsRedraw = false;
+                if (this.running && this._isWaveformActive()) {
+                    this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
+                } else {
+                    this.drawVisualIDs[turtleIdx] = null;
+                }
             } else {
-                // No active work — clear the stored RAF id so the loop is fully stopped.
                 this.drawVisualIDs[turtleIdx] = null;
             }
         };
+        this._drawWaveform = draw;
         draw();
     };
 
