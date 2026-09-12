@@ -1337,7 +1337,6 @@ class ModeWidget {
             12: "equal",
             17: "equal17",
             19: "equal19",
-            21: "1/4 comma meantone",
             31: "equal31"
         };
         if (map[edo]) {
