@@ -16,8 +16,11 @@
     createSclSharePopup, downloadScl, getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
     normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
-    getSavedCustomModes, configureWheel, parseSclFile, readSclFile,
-    scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes
+    getSavedCustomModes, configureWheel, parseSclFile, parseModeJson,
+    readSclFile,
+    modeToJson, importFileKind,
+    scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
+    EDO_MIN, EDO_MAX
  */
 
 /*
@@ -181,7 +184,8 @@ class ModeWidget {
             createSclSharePopup(
                 shareBtn,
                 () => this._exportScl(),
-                () => this._importScl()
+                () => this._exportJson(),
+                () => this._importFile()
             );
         };
 
@@ -519,7 +523,11 @@ class ModeWidget {
         }
     }
 
-    _saveCustomMode(name, pattern) {
+    _saveCustomMode(name, pattern, edo = this._activeEDO) {
+        if (["__proto__", "constructor", "prototype"].includes(name)) {
+            this.errorMsg(_("Invalid mode name."));
+            return false;
+        }
         const modes = getSavedCustomModes();
         const existing = modes.findIndex(m => m.name === name);
         // Refuse to overwrite a built-in mode; only registered customs may be updated.
@@ -536,7 +544,7 @@ class ModeWidget {
                 return false;
             }
         }
-        const entry = { name, pattern, edo: this._activeEDO };
+        const entry = { name, pattern, edo };
         if (existing >= 0) {
             modes[existing] = entry;
         } else {
@@ -1382,7 +1390,19 @@ class ModeWidget {
         downloadScl(content, "mode-" + edo + "edo.scl");
     }
 
-    _importScl() {
+    _exportJson() {
+        const pattern = this._calculateMode();
+        const edo = this._activeEDO;
+        if (!pattern || pattern.length === 0) {
+            this.errorMsg(_("No mode to export."));
+            return;
+        }
+
+        const content = modeToJson(this._selectedModeName || "custom", edo, pattern);
+        downloadScl(content, "mode-" + edo + "edo.json");
+    }
+
+    _importFile() {
         readSclFile("myModeSclFile", (err, data) => {
             if (err) {
                 this.errorMsg(err.message);
@@ -1392,61 +1412,90 @@ class ModeWidget {
                 return;
             }
 
-            let result;
-            try {
-                result = parseSclFile(data.text);
-            } catch (e) {
-                this.errorMsg(_("Error reading .scl file: ") + e.message);
-                return;
-            }
-
-            // Try EDO values from 5 to 55 to find a clean step pattern
             let foundEdo = null;
             let foundPattern = null;
+            let name = "";
+            let saved = false;
 
-            for (let edo = 5; edo <= 55; edo++) {
-                const step = 1200 / edo;
-                const steps = [];
-                let prevStepCount = 0;
-                let valid = true;
+            // Brute-force EDO 5-55 from pitch cents. Returns {edo, pattern} or null.
+            const findEdoPattern = pitches => {
+                for (let edo = EDO_MIN; edo <= EDO_MAX; edo++) {
+                    const step = 1200 / edo;
+                    const steps = [];
+                    let prevStepCount = 0;
+                    let valid = true;
+                    for (let i = 0; i < pitches.length; i++) {
+                        const stepCount = Math.round(pitches[i].cents / step);
+                        if (Math.abs(pitches[i].cents - stepCount * step) > 0.5) {
+                            valid = false;
+                            break;
+                        }
+                        if (stepCount <= prevStepCount) {
+                            valid = false;
+                            break;
+                        }
+                        steps.push(stepCount - prevStepCount);
+                        prevStepCount = stepCount;
+                    }
+                    if (valid && steps.length === pitches.length && prevStepCount === edo) {
+                        return { edo, pattern: steps };
+                    }
+                }
+                return null;
+            };
 
-                for (let i = 0; i < result.pitches.length; i++) {
-                    // Each pitch must land on an EDO step boundary
-                    const stepCount = Math.round(result.pitches[i].cents / step);
-                    if (Math.abs(result.pitches[i].cents - stepCount * step) > 0.5) {
-                        valid = false;
-                        break;
-                    }
-                    if (stepCount <= prevStepCount) {
-                        valid = false;
-                        break;
-                    }
-                    steps.push(stepCount - prevStepCount);
-                    prevStepCount = stepCount;
+            const kind = importFileKind(data.file.name);
+            if (kind === "json") {
+                let def;
+                try {
+                    def = parseModeJson(data.text);
+                } catch (e) {
+                    this.errorMsg(_("Error reading JSON file: ") + e.message);
+                    return;
+                }
+                foundEdo = def.edo;
+                foundPattern = def.pattern;
+                name = def.name || data.file.name.replace(/\.json$/i, "");
+                // Save before touching widget/synth so a refused name changes nothing.
+                if (!this._saveCustomMode(name, foundPattern, foundEdo)) {
+                    return;
+                }
+                saved = true;
+            } else if (kind === "scl") {
+                let result;
+                try {
+                    result = parseSclFile(data.text);
+                } catch (e) {
+                    this.errorMsg(_("Error reading .scl file: ") + e.message);
+                    return;
                 }
 
-                if (valid && steps.length === result.pitchCount && prevStepCount === edo) {
-                    foundEdo = edo;
-                    foundPattern = steps;
-                    break;
+                const edoResult = findEdoPattern(result.pitches);
+                if (!edoResult) {
+                    this.errorMsg(
+                        _("Not a valid EDO mode. Use the temperament widget for non-equal scales.")
+                    );
+                    return;
                 }
-            }
-
-            if (!foundEdo) {
-                this.errorMsg(
-                    _("Not a valid EDO mode. Use the temperament widget for non-equal scales.")
-                );
+                foundEdo = edoResult.edo;
+                foundPattern = edoResult.pattern;
+                name = result.description || data.file.name.replace(/\.scl$/i, "");
+                // Save before touching widget/synth so a refused name changes nothing.
+                if (!this._saveCustomMode(name, foundPattern, foundEdo)) {
+                    return;
+                }
+                saved = true;
+            } else {
+                this.errorMsg(_("Unsupported file type. Use .json or .scl."));
                 return;
             }
-
-            const name = result.description || data.file.name.replace(/\.scl$/i, "");
             const key = this._temperamentKeyForEDO(foundEdo);
             this._cacheState(this._activeEDO);
             this.logo.synth.inTemperament = key;
             this._activeTemperamentKey = key;
             this._rebuildWheel(foundEdo);
             this._applyModePattern(foundPattern);
-            if (!this._saveCustomMode(name, foundPattern)) {
+            if (!saved && !this._saveCustomMode(name, foundPattern)) {
                 return;
             }
 

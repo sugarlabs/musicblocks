@@ -3282,7 +3282,7 @@ const parseSclFile = content => {
     }
 
     const pitchCount = parseInt(lines[pitchCountIdx], 10);
-    if (!/^\d+$/.test(lines[pitchCountIdx]) || pitchCount < 1) {
+    if (!/^\d+$/.test(lines[pitchCountIdx]) || pitchCount < 1 || pitchCount > 500) {
         throw new Error("Invalid .scl file: invalid pitch count");
     }
     idx = pitchCountIdx + 1;
@@ -3351,6 +3351,148 @@ const parseSclFile = content => {
 };
 
 /**
+ * Serialize a temperament definition to JSON.
+ * @function
+ * @param {string} name - The temperament name.
+ * @param {Object} data - The temperament definition (pitchNumber, octaveRatio, isEDO, ratios, interval).
+ * @param {string} referencePitch - The global starting pitch at export time (metadata only).
+ * @returns {string} The JSON text.
+ */
+const temperamentToJson = (name, data, referencePitch) => {
+    return JSON.stringify(
+        {
+            name,
+            pitchNumber: data.pitchNumber,
+            octaveRatio: data.octaveRatio,
+            isEDO: data.isEDO,
+            ratios: data.ratios,
+            interval: data.interval,
+            referencePitch
+        },
+        null,
+        2
+    );
+};
+
+/**
+ * Parse and strictly validate a temperament JSON file.
+ * @function
+ * @param {string} text - The raw JSON text.
+ * @returns {Object} The validated temperament definition.
+ * @throws {Error} If the structure is invalid.
+ */
+const parseTemperamentJson = text => {
+    let obj;
+    try {
+        obj = JSON.parse(text);
+    } catch (e) {
+        throw new Error("Invalid JSON file: " + e.message);
+    }
+    if (typeof obj !== "object" || obj === null || Array.isArray(obj)) {
+        throw new Error("Invalid temperament JSON: expected an object");
+    }
+    const { pitchNumber, octaveRatio, isEDO, ratios, interval } = obj;
+    if (
+        !Array.isArray(ratios) ||
+        ratios.length < 1 ||
+        !ratios.every(r => typeof r === "number" && r > 0 && isFinite(r))
+    ) {
+        throw new Error("Invalid temperament JSON: invalid ratios");
+    }
+    if (
+        !Array.isArray(interval) ||
+        interval.length !== ratios.length ||
+        !interval.every(i => typeof i === "string")
+    ) {
+        throw new Error("Invalid temperament JSON: invalid interval names");
+    }
+    if (pitchNumber !== ratios.length - 1) {
+        throw new Error("Invalid temperament JSON: pitchNumber mismatch");
+    }
+    if (typeof octaveRatio !== "number" || !(octaveRatio > 0) || !isFinite(octaveRatio)) {
+        throw new Error("Invalid temperament JSON: invalid octaveRatio");
+    }
+    if (typeof isEDO !== "boolean") {
+        throw new Error("Invalid temperament JSON: invalid isEDO");
+    }
+    return {
+        name: typeof obj.name === "string" ? obj.name : "",
+        pitchNumber,
+        octaveRatio,
+        isEDO,
+        ratios,
+        interval,
+        referencePitch: obj.referencePitch
+    };
+};
+
+/**
+ * Serialize a mode definition to JSON.
+ * @function
+ * @param {string} name - The mode name.
+ * @param {number} edo - The EDO divisions.
+ * @param {Array<number>} pattern - The step pattern.
+ * @returns {string} The JSON text.
+ */
+const modeToJson = (name, edo, pattern) => {
+    return JSON.stringify({ name, edo, pattern }, null, 2);
+};
+
+/**
+ * Parse and strictly validate a mode JSON file.
+ * @function
+ * @param {string} text - The raw JSON text.
+ * @returns {Object} The validated mode definition.
+ * @throws {Error} If the structure is invalid.
+ */
+const parseModeJson = text => {
+    let obj;
+    try {
+        obj = JSON.parse(text);
+    } catch (e) {
+        throw new Error("Invalid JSON file: " + e.message);
+    }
+    if (typeof obj !== "object" || obj === null || Array.isArray(obj)) {
+        throw new Error("Invalid mode JSON: expected an object");
+    }
+    const { edo, pattern } = obj;
+    // ponytail: EDO 5-55 duplicates the _importScl search bounds in modewidget.js; pass bounds in if they ever diverge.
+    if (!Number.isInteger(edo) || edo < EDO_MIN || edo > EDO_MAX) {
+        throw new Error("Invalid mode JSON: invalid edo");
+    }
+    if (
+        !Array.isArray(pattern) ||
+        pattern.length < 1 ||
+        !pattern.every(s => Number.isInteger(s) && s > 0)
+    ) {
+        throw new Error("Invalid mode JSON: invalid pattern");
+    }
+    if (pattern.reduce((a, b) => a + b, 0) !== edo) {
+        throw new Error("Invalid mode JSON: pattern does not sum to edo");
+    }
+    return { name: typeof obj.name === "string" ? obj.name : "", edo, pattern };
+};
+
+/**
+ * Convert a ratios array (tonic 1 through octave) to the numeric-keyed
+ * per-pitch entries the temperament editor uses for custom temperaments:
+ * `"i": [ratio, note, octave]`. Imported scales stored this way render
+ * through the widget's custom branch and resolve in getCustomFrequency.
+ * @function
+ * @param {Array<number>} ratios - Ratios from tonic (1) through the octave.
+ * @returns {Object} Numeric-keyed entries for degrees below the octave.
+ */
+const ratiosToNumericKeys = ratios => {
+    const keys = {};
+    for (let i = 0; i < ratios.length - 1; i++) {
+        // ponytail: imports carry no note names (Scala files don't have them);
+        // degree labels stay distinct and parseable so every degree resolves.
+        keys["" + i] = [ratios[i], "P" + i, 4];
+    }
+    return keys;
+};
+
+/**
  * Get the list of available temperaments.
  * @function
  * @returns {Array<Array<string>>} The list of available temperaments.
@@ -3416,6 +3558,7 @@ const deleteTemperamentFromList = oldEntry => {
  * @returns {void}
  */
 const addTemperamentToDictionary = (entryName, entryValue) => {
+    if (["__proto__", "constructor", "prototype"].includes(entryName)) return;
     TEMPERAMENT[entryName] = entryValue;
 };
 
@@ -3468,6 +3611,8 @@ const DEFAULTEFFECT = "duck";
  * @constant {string}
  */
 const DEFAULTMODE = "major";
+const EDO_MIN = 5;
+const EDO_MAX = 55;
 /**
  * Default temperament.
  * @constant {string}
@@ -8522,6 +8667,13 @@ if (typeof module !== "undefined" && module.exports) {
         getNonEDOFrequency,
         configureWheel,
         ratioToSclString,
-        parseSclFile
+        parseSclFile,
+        temperamentToJson,
+        parseTemperamentJson,
+        modeToJson,
+        parseModeJson,
+        ratiosToNumericKeys,
+        EDO_MIN,
+        EDO_MAX
     };
 }

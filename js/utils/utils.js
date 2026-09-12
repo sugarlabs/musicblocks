@@ -1283,14 +1283,15 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 };
 
 /**
- * Create or toggle a share popup with Export/Import .scl options.
+ * Create or toggle a share popup with Export/Import options.
  * Used by temperament and mode widgets to avoid duplicating popup logic.
  * @param {HTMLElement} anchor - element to position the popup below
  * @param {Function} onExport - called when Export .scl is clicked
- * @param {Function} onImport - called when Import .scl is clicked
+ * @param {Function} onExportJson - called when Export JSON is clicked
+ * @param {Function} onImport - called when Import is clicked (accepts .scl or .json)
  * @returns {void}
  */
-const createSclSharePopup = (anchor, onExport, onImport) => {
+const createSclSharePopup = (anchor, onExport, onExportJson, onImport) => {
     const existing = document.getElementById("sclSharePopup");
     if (existing) {
         if (existing._closeHandler) {
@@ -1329,7 +1330,8 @@ const createSclSharePopup = (anchor, onExport, onImport) => {
     };
 
     popup.appendChild(addItem(_("Export .scl"), onExport));
-    popup.appendChild(addItem(_("Import .scl"), onImport));
+    popup.appendChild(addItem(_("Export JSON"), onExportJson));
+    popup.appendChild(addItem(_("Import"), onImport));
     document.body.appendChild(popup);
 
     function cleanup() {
@@ -1349,7 +1351,7 @@ const createSclSharePopup = (anchor, onExport, onImport) => {
 };
 
 /**
- * Download a string as a .scl file.
+ * Download a string as a file.
  * @param {string} content - file content
  * @param {string} filename - download filename (e.g. "my-scale.scl")
  * @returns {void}
@@ -1367,7 +1369,23 @@ const downloadScl = (content, filename) => {
 };
 
 /**
- * Open a file picker for .scl files and read the selected file as text.
+ * Classify an import file by extension: "json", "scl", or "" (unsupported).
+ * @param {string} filename - the selected file name
+ * @returns {string} The file kind.
+ */
+const importFileKind = filename => {
+    const name = (filename || "").toLowerCase();
+    if (name.endsWith(".json")) {
+        return "json";
+    }
+    if (name.endsWith(".scl")) {
+        return "scl";
+    }
+    return "";
+};
+
+/**
+ * Open a file picker and read the selected file as text.
  * @param {string} inputId - id of the hidden file input element
  * @param {Function} callback - called with (error, {text, file}) on completion
  * @returns {void}
@@ -1383,6 +1401,12 @@ const readSclFile = (inputId, callback) => {
     fileInput.onchange = function () {
         const file = fileInput.files[0];
         if (!file) {
+            return;
+        }
+
+        const MAX_IMPORT_SIZE = 1024 * 1024;
+        if (file.size > MAX_IMPORT_SIZE) {
+            callback(new Error(_("File too large. Maximum is 1 MB.")));
             return;
         }
 
@@ -1425,7 +1449,8 @@ if (typeof module !== "undefined" && module.exports) {
         CameraManager,
         createSclSharePopup,
         downloadScl,
-        readSclFile
+        readSclFile,
+        importFileKind
     };
 }
 
