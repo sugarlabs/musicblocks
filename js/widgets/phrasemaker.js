@@ -3907,7 +3907,7 @@ class PhraseMaker {
         let k = 0;
         let l;
         if (oldTupletValue < newTupletValue) {
-            for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }
@@ -3943,7 +3943,7 @@ class PhraseMaker {
             }
         } else {
             k = 0;
-            for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }
