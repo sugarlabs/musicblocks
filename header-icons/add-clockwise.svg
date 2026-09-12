@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" viewBox="0 0 55 55">
+  <g transform="matrix(0,-0.80912683,-0.80912683,0,59.444727,50.248965)">
+    <g transform="matrix(1.5627187,0,0,1.5627187,-4.216064,-11.390395)" stroke="#000" stroke-opacity="1">
+      <polyline fill="none" stroke-width="2.9867" stroke-linecap="round" stroke-linejoin="round" points="22.903,27.523 15.091,20.935 22.903,14.344"/>
+      <path fill="none" stroke-width="2.9867" stroke-linecap="round" d="m17.650642,20.935c0,0-2.575084,-0.05668 3.175971,0 9.251947,0.09118 13.562104,6.960978 13.653283,16.212925"/>
+    </g>
+    <text x="-4.158031" y="32.660622" font-weight="bold" font-size="32" font-family="sans-serif" fill="#000">+</text>
+    <circle fill="none" stroke="#000" stroke-width="4" cx="50.012955" cy="61.269432" r="7"/>
+  </g>
+</svg>

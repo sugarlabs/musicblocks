@@ -876,6 +876,7 @@ function Synth() {
      * @returns {number|number[]} - The frequency or frequencies.
      */
     this.getCustomFrequency = (notes, customID) => {
+        const _stripCents = n => (typeof n === "string" ? n.replace(/\(.*\)/, "") : n);
         const __getCustomFrequency = (oneNote, startingPitch) => {
             const parsed = parseNoteString(oneNote);
             const octave = parsed[1];
@@ -890,12 +891,14 @@ function Synth() {
             );
             if (typeof oneNote !== "number") {
                 const thisTemperament = getTemperament(customID);
+                const target = _stripCents(oneNote);
                 for (const pitchNumber in thisTemperament) {
                     if (pitchNumber !== "pitchNumber") {
+                        const n3 = thisTemperament[pitchNumber][3];
+                        const n1 = thisTemperament[pitchNumber][1];
                         if (
-                            (isCustomTemperament(customID) &&
-                                oneNote === thisTemperament[pitchNumber][3]) ||
-                            oneNote === thisTemperament[pitchNumber][1]
+                            (isCustomTemperament(customID) && target === _stripCents(n3)) ||
+                            target === _stripCents(n1)
                         ) {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
@@ -1881,12 +1884,7 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            if (
-                typeof notes === "string" &&
-                (notes.search("[+]") !== -1 || notes.search("[-]") !== -1)
-            ) {
-                notes = this.getCustomFrequency(notes, this.inTemperament);
-            }
+            notes = this.getCustomFrequency(notes, this.inTemperament);
             if (notes === undefined || notes === "undefined") {
                 notes = notes1;
             }
