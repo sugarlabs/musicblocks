@@ -80,6 +80,7 @@ class ProjectViewer {
                 proj.ProjectIsMusicBlocks === 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
 
         document.getElementById("projectviewer-image").src = img;
+        document.getElementById("projectviewer-image").alt = _("Project thumbnail");
         document.getElementById("projectviewer-description").textContent = proj.ProjectDescription;
         const tagcontainer = document.getElementById("projectviewer-tags");
         tagcontainer.innerHTML = "";
