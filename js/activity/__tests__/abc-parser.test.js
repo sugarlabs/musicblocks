@@ -447,6 +447,23 @@ describe("Test 5: Key signature accidentals (F major)", () => {
 // Test 6 — Empty-voice / degenerate input guard (issue: actionBlock[0] crash)
 // ---------------------------------------------------------------------------
 describe("Test 6: Empty-voice and degenerate input guard", () => {
+    test("ABC rest creates a rest block inside a note", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [[{ el_type: "note", rest: { type: "rest" }, duration: 0.25 }]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(1);
+        expect(blocksOfType(blocks, "rest2")).toHaveLength(1);
+        expect(blocksOfType(blocks, "pitch")).toHaveLength(0);
+    });
+
     test("tune with no lines resolves without throwing and passes empty array to loadNewBlocks", async () => {
         const activity = makeActivity();
         const emptyTune = { metaText: { title: "Empty" }, lines: [] };

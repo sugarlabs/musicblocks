@@ -49,12 +49,11 @@ function _createPitchBlocks(
     meterDen
 ) {
     const duration = toFraction(pitchDuration);
-    const adjustedNote = _adjustPitch(pitches.name, keySignature).toUpperCase();
     if (triplet !== null) {
         duration[1] = meterDen * triplet;
     }
 
-    actionBlock.push(
+    const noteBlocks = [
         [
             blockId,
             ["newnote", { collapsed: true }],
@@ -65,18 +64,28 @@ function _createPitchBlocks(
         [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
         [blockId + 2, ["number", { value: duration[0] }], 0, 0, [blockId + 1]],
         [blockId + 3, ["number", { value: duration[1] }], 0, 0, [blockId + 1]],
-        [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
-        [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-        [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
-        [
-            blockId + 7,
-            ["number", { value: _abcToStandardValue(pitches.pitch) }],
-            0,
-            0,
-            [blockId + 5]
-        ],
-        [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]]
-    );
+        [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]]
+    ];
+
+    if (pitches) {
+        const adjustedNote = _adjustPitch(pitches.name, keySignature).toUpperCase();
+        noteBlocks.push(
+            [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
+            [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
+            [
+                blockId + 7,
+                ["number", { value: _abcToStandardValue(pitches.pitch) }],
+                0,
+                0,
+                [blockId + 5]
+            ]
+        );
+    } else {
+        noteBlocks.push([blockId + 5, "rest2", 0, 0, [blockId + 4, null]]);
+    }
+
+    noteBlocks.push([blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]]);
+    actionBlock.push(...noteBlocks);
 }
 
 // Function to search index for particular type of block
@@ -212,7 +221,7 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
             }
 
             _createPitchBlocks(
-                element.pitches[0],
+                element.pitches?.[0],
                 blockId,
                 element.duration,
                 staff.key,
