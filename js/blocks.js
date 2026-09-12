@@ -4429,10 +4429,7 @@ class Blocks {
                     case "meter":
                         this.blockList[blk]._check_meter_block = cblk;
                         if (this.blockList[cblk].connections[2] === dblk) {
-                            if (this.blockList[cblk].connections[1] === dblk) {
-                                return denominatorValue();
-                            }
-                            return 1;
+                            return denominatorValue();
                         }
                         return 1;
                     case "setbpm3":
@@ -4445,10 +4442,7 @@ class Blocks {
                     case "neighbor":
                     case "neighbor2":
                         if (this.blockList[cblk].connections[2] === dblk) {
-                            if (this.blockList[cblk].connections[1] === dblk) {
-                                return denominatorValue();
-                            }
-                            return 1;
+                            return denominatorValue();
                         }
                         return 1;
                     default:

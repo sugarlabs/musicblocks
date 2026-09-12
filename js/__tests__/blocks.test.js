@@ -2537,6 +2537,23 @@ describe("noteValueValue", () => {
         ];
     }
 
+    /**
+     * Builds the same fraction under a block that holds its note value in the
+     * second slot, the way meter and the rhythm family do.
+     * @param {string} parentName - the block the divide hangs from
+     * @param {number|null} denominator - index of the denominator block, or
+     *     null for the empty slot left behind when it is dragged out
+     * @returns {void}
+     */
+    function buildMeterStyleNote(parentName, denominator) {
+        blocks.blockList = [
+            { name: parentName, connections: [null, null, 1] },
+            { name: "divide", connections: [0, 2, denominator] },
+            { name: "number", value: 1, connections: [1] },
+            { name: "number", value: 4, connections: [1] }
+        ];
+    }
+
     it("reads the denominator of a complete fraction", () => {
         buildNote("newnote", 3);
 
@@ -2550,9 +2567,27 @@ describe("noteValueValue", () => {
         expect(blocks.noteValueValue(2)).toBe(1);
     });
 
-    it("falls back to the default for the other note value blocks too", () => {
-        buildNote("rhythm2", null);
-        blocks.blockList[0].connections = [null, 1, 1];
+    it("reads the denominator under meter, which carries the fraction in its second slot", () => {
+        buildMeterStyleNote("meter", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when meter's denominator slot is empty", () => {
+        buildMeterStyleNote("meter", null);
+
+        expect(() => blocks.noteValueValue(2)).not.toThrow();
+        expect(blocks.noteValueValue(2)).toBe(1);
+    });
+
+    it("reads the denominator under rhythm, which carries the fraction the same way", () => {
+        buildMeterStyleNote("rhythm2", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when rhythm's denominator slot is empty", () => {
+        buildMeterStyleNote("rhythm2", null);
 
         expect(() => blocks.noteValueValue(2)).not.toThrow();
         expect(blocks.noteValueValue(2)).toBe(1);
