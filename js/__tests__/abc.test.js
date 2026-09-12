@@ -239,9 +239,7 @@ describe("processABCNotes - Chords", () => {
 
         processABCNotes(logo, "0");
         const out = logo.notationNotes["0"];
-        expect(out).toContain("C4[C");
-        expect(out).toContain("E4");
-        expect(out).toContain("G4G]4");
+        expect(out).toBe("[C E G]4  [A]4  ");
     });
 
     it("should handle articulation inside chords", () => {
@@ -254,7 +252,7 @@ describe("processABCNotes - Chords", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain("C4[C");
+        expect(logo.notationNotes["0"]).toBe("[C E]4   ");
     });
 });
 

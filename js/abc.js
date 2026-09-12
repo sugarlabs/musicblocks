@@ -324,7 +324,7 @@ const processABCNotes = function (logo, turtle) {
                 targetDuration = 0;
                 tupletDuration = 0;
             } else {
-                if (typeof notes === "object") {
+                if (obj[NOTATIONINSIDECHORD] <= 0) {
                     if (obj[NOTATIONSTACCATO]) {
                         parts.push(".");
                     }
@@ -355,6 +355,10 @@ const processABCNotes = function (logo, turtle) {
                             obj[NOTATIONINSIDECHORD]
                     ) {
                         // Open the chord.
+                        if (obj[NOTATIONSTACCATO]) {
+                            parts.push(".");
+                        }
+
                         parts.push("[");
                     }
 
