@@ -68,7 +68,7 @@ describe("processABCNotes - Basic Note Processing", () => {
 
     it("should process notes and update notationNotes correctly", () => {
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("^G4 ^G4 F4 F4 ^G2 ^G8 ");
+        expect(logo.notationNotes["0"]).toBe("^G4 F4 ^G8 ");
     });
 
     it("should handle octaves 5 and above correctly (lowercase and proper octave markers)", () => {
@@ -77,7 +77,7 @@ describe("processABCNotes - Basic Note Processing", () => {
             [["C8"], 4, 0, null, null, -1, false]
         ];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("g4 g4 c'''4 c'''4 ");
+        expect(logo.notationNotes["0"]).toBe("g4 c'''4 ");
     });
 
     it("should insert a newline after every 8 notes", () => {
@@ -112,8 +112,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
     it("should handle staccato and dots", () => {
         logo.notation.notationStaging["0"] = [[["C4"], 4, 2, null, null, -1, true]];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain("C4..");
-        expect(logo.notationNotes["0"]).toContain(".");
+        expect(logo.notationNotes["0"]).toBe(".C4.. ");
     });
 
     it("should convert durations using the map and fallback to string", () => {
@@ -142,7 +141,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
 
         processABCNotes(logo, "0");
 
-        expect(logo.notationNotes["0"]).toBe("^^C4 ^^C4 ^D4 ^D4 =E4 =E4 _F4 _F4 __G4 __G4 ");
+        expect(logo.notationNotes["0"]).toBe("^^C4 ^D4 =E4 _F4 __G4 ");
     });
 
     it("should support ASCII accidentals without changing lowercase B notes", () => {
@@ -154,7 +153,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
 
         processABCNotes(logo, "0");
 
-        expect(logo.notationNotes["0"]).toBe("^G4 ^G4 _B4 _B4 B4 B4 ");
+        expect(logo.notationNotes["0"]).toBe("^G4 _B4 B4 ");
     });
 
     it("should preserve rests without accidental matching", () => {
@@ -162,7 +161,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
 
         processABCNotes(logo, "0");
 
-        expect(logo.notationNotes["0"]).toBe("R4 R4 ");
+        expect(logo.notationNotes["0"]).toBe("R4 ");
     });
 });
 describe("processABCNotes - Control Strings", () => {
@@ -240,9 +239,7 @@ describe("processABCNotes - Chords", () => {
 
         processABCNotes(logo, "0");
         const out = logo.notationNotes["0"];
-        expect(out).toContain("C4 [C");
-        expect(out).toContain("E4");
-        expect(out).toContain("G4 G]4");
+        expect(out).toBe("[C E G]4  [A]4  ");
     });
 
     it("should handle articulation inside chords", () => {
@@ -255,7 +252,7 @@ describe("processABCNotes - Chords", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain("C4 [C");
+        expect(logo.notationNotes["0"]).toBe("[C E]4   ");
     });
 });
 
@@ -331,7 +328,16 @@ describe("processABCNotes - Edge Cases for 100% Coverage", () => {
     it("should handle array of notes in NOTATIONNOTE field", () => {
         logo.notation.notationStaging["0"] = [[["C4", "E4"], 4, 0, null, null, -1, false]];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain("C4");
+        expect(logo.notationNotes["0"]).toContain("[CE]4");
+    });
+
+    it("should write a string note that follows an array note", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C4", "E4"], 4, 0, null, null, -1, false],
+            ["G4", 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("[CE]4 G4 ");
     });
     it("should handle incomplete tuplets with different tuplet values", () => {
         logo.notation.notationStaging["0"] = [
@@ -437,7 +443,7 @@ describe("processABCNotes - Octave Conversion", () => {
             [["B4"], 4, 0, null, null, -1, false]
         ];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("C4 C4 B4 B4 ");
+        expect(logo.notationNotes["0"]).toBe("C4 B4 ");
     });
 
     it("should write octave 5 notes in lowercase without octave marks", () => {
@@ -446,7 +452,7 @@ describe("processABCNotes - Octave Conversion", () => {
             [["B5"], 4, 0, null, null, -1, false]
         ];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("c4 c4 b4 b4 ");
+        expect(logo.notationNotes["0"]).toBe("c4 b4 ");
     });
 
     it("should mark octaves above 5 with apostrophes and lowercase letters", () => {
@@ -455,7 +461,7 @@ describe("processABCNotes - Octave Conversion", () => {
             [["C7"], 4, 0, null, null, -1, false]
         ];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("c'4 c'4 c''4 c''4 ");
+        expect(logo.notationNotes["0"]).toBe("c'4 c''4 ");
     });
 
     it("should mark octaves below 4 with commas and uppercase letters", () => {
@@ -464,7 +470,7 @@ describe("processABCNotes - Octave Conversion", () => {
             [["C2"], 4, 0, null, null, -1, false]
         ];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("C,4 C,4 C,,4 C,,4 ");
+        expect(logo.notationNotes["0"]).toBe("C,4 C,,4 ");
     });
 });
 
