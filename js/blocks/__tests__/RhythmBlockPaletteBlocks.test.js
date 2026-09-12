@@ -186,6 +186,68 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             expect(Singer.processNote).not.toHaveBeenCalled();
             jest.useRealTimers();
         });
+
+        it("rejects non-finite note counts", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            logo._timerManager = new ManagedTimer();
+            rhythmBlock.flow([NaN, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(activity.errorMsg).toHaveBeenCalledWith("No input provided", "blkRhythm");
+            expect(logo._timerManager.activeTimeoutCount).toBe(3);
+            logo._timerManager.clearAll();
+        });
+
+        it("rejects Infinity note counts", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            logo._timerManager = new ManagedTimer();
+            rhythmBlock.flow([Infinity, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(activity.errorMsg).toHaveBeenCalledWith("No input provided", "blkRhythm");
+            expect(logo._timerManager.activeTimeoutCount).toBe(3);
+            logo._timerManager.clearAll();
+        });
+
+        it("caps oversized note counts", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            logo._timerManager = new ManagedTimer();
+            rhythmBlock.flow([129, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Maximum number of notes is 128.",
+                "blkRhythm"
+            );
+            expect(logo._timerManager.activeTimeoutCount).toBe(128);
+            logo._timerManager.clearAll();
+        });
+
+        it("accepts the maximum note count", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            logo._timerManager = new ManagedTimer();
+            rhythmBlock.flow([128, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(logo._timerManager.activeTimeoutCount).toBe(128);
+            logo._timerManager.clearAll();
+        });
+
+        it("normalizes fractional note counts", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            logo._timerManager = new ManagedTimer();
+            rhythmBlock.flow([2.5, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(logo._timerManager.activeTimeoutCount).toBe(2);
+            logo._timerManager.clearAll();
+        });
     });
 
     describe("Rhythm2Block", () => {
@@ -355,6 +417,33 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             const ret = stupletBlock.flow([3, 0.5], logo, turtleIndex, "blkSTuplet");
             expect(logo.tupletRhythms.length).toBeGreaterThan(0);
             expect(ret).toBeUndefined();
+        });
+
+        it("caps oversized note counts before scheduling notes", () => {
+            const stupletBlock = DummyFlowBlock.createdBlocks["stuplet"];
+            activity.blocks.blockList["blkSTuplet"] = { name: "stuplet" };
+            logo._timerManager = new ManagedTimer();
+
+            stupletBlock.flow([129, 0.5], logo, turtleIndex, "blkSTuplet");
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Maximum number of notes is 128.",
+                "blkSTuplet"
+            );
+            expect(logo._timerManager.activeTimeoutCount).toBe(128);
+            logo._timerManager.clearAll();
+        });
+
+        it("accepts the maximum note count", () => {
+            const stupletBlock = DummyFlowBlock.createdBlocks["stuplet"];
+            activity.blocks.blockList["blkSTuplet"] = { name: "stuplet" };
+            logo._timerManager = new ManagedTimer();
+
+            stupletBlock.flow([128, 0.5], logo, turtleIndex, "blkSTuplet");
+
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(logo._timerManager.activeTimeoutCount).toBe(128);
+            logo._timerManager.clearAll();
         });
     });
 });

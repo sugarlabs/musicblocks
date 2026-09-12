@@ -32,6 +32,25 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 }
 
 function setupRhythmBlockPaletteBlocks(activity) {
+    const MAX_RHYTHM_NOTES = 128;
+
+    const getNoteCount = (value, defaultValue, blk) => {
+        if (value === null || typeof value !== "number" || !Number.isFinite(value) || value < 1) {
+            activity.errorMsg(NOINPUTERRORMSG, blk);
+            return defaultValue;
+        }
+
+        if (value > MAX_RHYTHM_NOTES) {
+            activity.errorMsg(
+                _("Maximum number of notes is %s.").replace(/%s/g, MAX_RHYTHM_NOTES),
+                blk
+            );
+            return MAX_RHYTHM_NOTES;
+        }
+
+        return Math.floor(value);
+    };
+
     /**
      * Schedules a note to be played after a timeout.
      * @param {object} logo - The Logo execution engine.
@@ -115,12 +134,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             let noteBeatValue, arg0, arg1;
-            if (args[0] === null || typeof args[0] !== "number" || args[0] < 1) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 3;
-            } else {
-                arg0 = args[0];
-            }
+            arg0 = getNoteCount(args[0], 3, blk);
 
             if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -154,7 +168,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     }
                 }
 
-                for (let i = 0; i < args[0]; i++) {
+                for (let i = 0; i < arg0; i++) {
                     Singer.processNote(activity, noteBeatValue, false, blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
@@ -943,12 +957,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             let arg0, arg1;
-            if (args[0] === null || typeof args[0] !== "number" || args[0] <= 0) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 3;
-            } else {
-                arg0 = args[0];
-            }
+            arg0 = getNoteCount(args[0], 3, blk);
 
             if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
