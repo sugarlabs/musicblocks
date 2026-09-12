@@ -472,6 +472,58 @@ describe("PitchStaircase Widget", () => {
             expect(psc.Stairs).toHaveLength(2);
             expect(psc._makeStairs).toHaveBeenCalled();
         });
+
+        test("rejects the dissection and reports an error when the result would exceed the audible maximum", () => {
+            psc.activity = { errorMsg: jest.fn() };
+            // 19000 * 1.5 (default 3:2 ratio) = 28500, well above MAXFREQUENCY (20000).
+            psc.Stairs = [["A", "", 19000.0, 1, 1, 19000.0, 8]];
+
+            psc._dissectStair(makeEvent(19000));
+
+            expect(psc.Stairs).toHaveLength(1);
+            expect(psc._history).toHaveLength(0);
+            expect(psc._makeStairs).not.toHaveBeenCalled();
+            expect(psc.activity.errorMsg).toHaveBeenCalledTimes(1);
+            expect(psc.activity.errorMsg.mock.calls[0][0]).toMatch(/maximum/i);
+        });
+
+        test("rejects the dissection and reports an error when the result would drop below the audible minimum", () => {
+            psc.activity = { errorMsg: jest.fn() };
+            // Ratio order 2:3 divides the frequency: 25 / 1.5 = 16.67, below MINFREQUENCY (20).
+            psc._musicRatio1 = { value: "2" };
+            psc._musicRatio2 = { value: "3" };
+            psc.Stairs = [["A", "", 25.0, 1, 1, 25.0, 1]];
+
+            psc._dissectStair(makeEvent(25));
+
+            expect(psc.Stairs).toHaveLength(1);
+            expect(psc._history).toHaveLength(0);
+            expect(psc._makeStairs).not.toHaveBeenCalled();
+            expect(psc.activity.errorMsg).toHaveBeenCalledTimes(1);
+            expect(psc.activity.errorMsg.mock.calls[0][0]).toMatch(/minimum/i);
+        });
+
+        test("does not reject a dissection that stays within the audible range", () => {
+            psc.activity = { errorMsg: jest.fn() };
+            psc.Stairs = [["A", "", 220.0, 1, 1, 220.0, 4]];
+
+            psc._dissectStair(makeEvent(220));
+
+            expect(psc.activity.errorMsg).not.toHaveBeenCalled();
+            expect(psc._makeStairs).toHaveBeenCalled();
+        });
+
+        test("leaves a step at the boundary permanently un-dividable on repeated clicks", () => {
+            psc.activity = { errorMsg: jest.fn() };
+            psc.Stairs = [["A", "", 19000.0, 1, 1, 19000.0, 8]];
+
+            // Click the same step twice in a row.
+            psc._dissectStair(makeEvent(19000));
+            psc._dissectStair(makeEvent(19000));
+
+            expect(psc.Stairs).toHaveLength(1);
+            expect(psc.activity.errorMsg).toHaveBeenCalledTimes(2);
+        });
     });
 
     // --- _makeStairs Tests ---
