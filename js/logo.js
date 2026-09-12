@@ -1503,7 +1503,8 @@ class Logo {
         this._exportNotationFinished = false;
 
         for (const turtle of this.turtles.turtleList) {
-            turtle.embeddedGraphicsFinished = true;
+            turtle.embeddedGraphicsPending = 0;
+            turtle.embeddedGraphicsGeneration += 1;
         }
 
         this.prepSynths();
