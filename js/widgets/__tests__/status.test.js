@@ -274,6 +274,32 @@ describe("StatusMatrix Widget", () => {
             statusMatrix.init(mockActivity);
             expect(statusMatrix._statusTable).toBeDefined();
         });
+
+        test("handles missing or undefined blocks in statusFields without throwing", () => {
+            mockActivity.blocks.blockList = {};
+            mockActivity.logo.statusFields = [
+                [99, "namedbox"],
+                [100, "bpm"],
+                [101, "bpmfactor"],
+                [102, "outputtools"],
+                [103, "customblock"]
+            ];
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+            expect(statusMatrix._statusTable).toBeDefined();
+        });
+
+        test("handles missing protoblock in bpm and outputtools blocks", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "bpm" },
+                1: { name: "outputtools", privateData: null }
+            };
+            mockActivity.logo.statusFields = [
+                [0, "bpm"],
+                [1, "outputtools"]
+            ];
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+            expect(statusMatrix._statusTable).toBeDefined();
+        });
     });
 
     describe("Turtle Display", () => {
@@ -914,6 +940,64 @@ describe("StatusMatrix Widget", () => {
         test("increments activeTurtles count correctly", () => {
             statusMatrix.updateAll();
             expect(statusMatrix._statusTable).toBeDefined();
+        });
+    });
+
+    describe("Robustness and Null-Safety in _renderAll", () => {
+        beforeEach(() => {
+            statusMatrix.init(mockActivity);
+            statusMatrix._statusTable.rows = [
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] }
+            ];
+        });
+
+        test("handles missing block from blockList during _renderAll without throwing", () => {
+            mockActivity.blocks.blockList = {};
+            mockActivity.logo.statusFields = [
+                [999, "x"],
+                [1000, "namedbox"]
+            ];
+            expect(() => statusMatrix._renderAll()).not.toThrow();
+            expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe("");
+        });
+
+        test("handles elapsednotes2 with missing connections array", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "elapsednotes2", value: 2 }
+            };
+            mockActivity.logo.statusFields = [[0, "elapsednotes2"]];
+            expect(() => statusMatrix._renderAll()).not.toThrow();
+        });
+
+        test("handles turtle with missing or undefined singer", () => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                name: "turtleWithoutSinger",
+                singer: null,
+                inTrash: false
+            });
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", value: null },
+                1: { name: "measurevalue", value: null },
+                2: { name: "pitchinhertz", value: null }
+            };
+            mockActivity.logo.statusFields = [
+                [0, "beatvalue"],
+                [1, "measurevalue"],
+                [2, "pitchinhertz"]
+            ];
+            expect(() => statusMatrix._renderAll()).not.toThrow();
+        });
+
+        test("handles namedbox when box key does not exist in boxes", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "namedbox", privateData: "nonexistentBox" }
+            };
+            mockActivity.logo.boxes = {};
+            mockActivity.logo.statusFields = [[0, "namedbox"]];
+            expect(() => statusMatrix._renderAll()).not.toThrow();
+            expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe("");
         });
     });
 });
