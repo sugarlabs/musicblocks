@@ -760,7 +760,7 @@ class ASTUtils {
                 continue;
             }
             if (flow[0] === "if") {
-                ASTs.push(ASTUtils._getIfAST(flow[1], flow[2], iterMax));
+                ASTs.push(ASTUtils._getIfAST(flow[1], flow[2], undefined, iterMax));
             } else if (flow[0] === "ifthenelse") {
                 ASTs.push(ASTUtils._getIfAST(flow[1], flow[2], flow[3], iterMax));
             } else if (flow[0] === "repeat") {
