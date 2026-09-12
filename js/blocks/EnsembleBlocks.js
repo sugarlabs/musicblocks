@@ -17,7 +17,7 @@
    TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor, pubsub
 */
 
-/* exported setupEnsembleBlocks, getTargetTurtle */
+/* exported setupEnsembleBlocks, getTargetTurtle, _blockFindTurtle */
 
 /**
  * The target-turtle name can be a string or an int. Makes sure there is a turtle by this name and then finds the associated start block.
@@ -56,6 +56,7 @@ function _blockFindTurtle(activity, turtle, blk, receivedArg) {
     }
     const targetTurtleId = getTargetTurtle(activity.turtles, targetTurtle);
     if (targetTurtleId === null) {
+        activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
         return null;
     }
     return activity.turtles.getTurtle(targetTurtleId);
@@ -1361,5 +1362,5 @@ function setupEnsembleBlocks(activity) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { setupEnsembleBlocks, getTargetTurtle };
+    module.exports = { setupEnsembleBlocks, getTargetTurtle, _blockFindTurtle };
 }
