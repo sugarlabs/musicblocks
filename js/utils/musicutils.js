@@ -72,10 +72,10 @@ const _b64Cache = new Map();
     configureWheel
 */
 
-const stripMicrotonalPrefix = note => note.replace(/^[v^]+/, "");
-
 /**
- * Normalize Unicode accidental symbols in a note string to ASCII equivalents.
+ * Strip at most two leading microtonal ^ / v prefixes (the temperament
+ * widget uses them for cents display, e.g. "^C" or "vvD♭"). Limiting to
+ * two keeps any accidental real articulation prefix from being removed.
  * @param {string} note
  * @returns {string}
  */
