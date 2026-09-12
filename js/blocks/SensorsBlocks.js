@@ -556,7 +556,11 @@ function setupSensorsBlocks(activity) {
                 colorString = hex2rgb(colorString);
             }
 
-            const obj = colorString.split("(")[1].split(",");
+            const parts = colorString.split("(");
+            if (parts.length < 2) {
+                return 0;
+            }
+            const obj = parts[1].split(",");
             const component = Number(obj[this.colorIndex]);
             return parseInt(component / 2.55, 10);
         }
@@ -683,10 +687,13 @@ function setupSensorsBlocks(activity) {
                 g = rgb.g;
                 b = rgb.b;
             } else {
-                [r, g, b] = background
-                    .match(/\(([^)]+)\)/)[1]
-                    .split(/,\s*/)
-                    .map(Number);
+                const match = background.match(/\(([^)]+)\)/);
+                if (match) {
+                    [r, g, b] = match[1].split(/,\s*/).map(Number);
+                } else {
+                    // Named CSS color or unexpected format; fall back to gray.
+                    return searchColors(128, 128, 128);
+                }
             }
 
             return searchColors(r, g, b);
@@ -920,10 +927,12 @@ function setupSensorsBlocks(activity) {
          * @returns {string|number} - The converted letter or 0 in case of an error.
          */
         arg(logo, turtle, blk, receivedArg) {
+            const parentBlk = activity.blocks.blockList[blk].connections[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentBlk !== null &&
+                activity.blocks.blockList[parentBlk] &&
+                activity.blocks.blockList[parentBlk].name === "print"
             ) {
                 logo.statusFields.push([blk, "toascii"]);
             } else {
