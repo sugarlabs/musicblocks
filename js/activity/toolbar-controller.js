@@ -65,16 +65,12 @@ class ToolbarController {
                 this.activity.logo.doStopTurtles();
 
                 const that = this;
-                this.activity.logo._timerManager.setGuardedTimeout(
-                    () => {
-                        // Stop leaves the drawing in place, so clear here the way
-                        // every other Run path does before starting fresh.
-                        that._clearAllTurtles();
-                        that.activity.logo.runLogoCommands(null, env);
-                    },
-                    500,
-                    () => this.activity.logo.stopTurtle
-                );
+                this.activity.logo._timerManager.setTimeout(() => {
+                    // Stop leaves the drawing in place, so clear here the way
+                    // every other Run path does before starting fresh.
+                    that._clearAllTurtles();
+                    that.activity.logo.runLogoCommands(null, env);
+                }, 500);
             }
         }
     }
