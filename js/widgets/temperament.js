@@ -2208,6 +2208,12 @@ function TemperamentWidget() {
             for (let i = 0; data["" + i] !== undefined; i++) {
                 ratios.push(data["" + i][0]);
             }
+            // Numeric keys store pitches below the octave; append the
+            // terminal period so the ratios array spans 1/1 → octave.
+            const period = data.octaveRatio || 2;
+            if (ratios.length === 0 || Math.abs(ratios[ratios.length - 1] - period) > 0.0001) {
+                ratios.push(period);
+            }
         }
         return ratios.length > 0 ? ratios : null;
     };
@@ -2346,6 +2352,9 @@ function TemperamentWidget() {
                     }
                     allRatios.push(result.pitches[i].ratio);
                 }
+                // Derive octaveRatio from the terminal period in the .scl data
+                // rather than hardcoding 2, so non-2:1 periods are preserved.
+                temperamentData.octaveRatio = allRatios[allRatios.length - 1];
                 temperamentData.ratios = allRatios;
                 temperamentData.pitchNumber = allRatios.length - 1;
 
@@ -2799,7 +2808,7 @@ function TemperamentWidget() {
         this.scale = this.scale[0] + " " + this.scale[1];
         this.scaleNotes = buildScale(this.scale);
         this.scaleNotes = this.scaleNotes[0];
-        this.powerBase = 2;
+        this.powerBase = t.octaveRatio || 2;
         const startingPitch = this._logo.synth.startingPitch;
         const str = [];
         const note = [];

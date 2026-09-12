@@ -1315,6 +1315,8 @@ const createSclSharePopup = (anchor, onExport, onExportJson, onImport) => {
     const addItem = (label, handler) => {
         const item = document.createElement("div");
         item.textContent = label;
+        item.setAttribute("role", "button");
+        item.setAttribute("tabindex", "0");
         item.style.cssText = "padding:6px 16px;cursor:pointer;";
         item.onmouseenter = () => {
             item.style.background = "var(--color-bg-tertiary)";
@@ -1325,6 +1327,13 @@ const createSclSharePopup = (anchor, onExport, onExportJson, onImport) => {
         item.onclick = () => {
             cleanup();
             handler();
+        };
+        item.onkeydown = e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                cleanup();
+                handler();
+            }
         };
         return item;
     };

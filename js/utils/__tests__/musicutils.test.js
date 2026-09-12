@@ -4437,11 +4437,11 @@ describe("parseSclFile", () => {
 
 describe("temperament JSON", () => {
     const data = {
-        pitchNumber: 2,
+        pitchNumber: 3,
         octaveRatio: 2,
         isEDO: false,
-        ratios: [1, 1.25, 1.5],
-        interval: ["perfect 1", "major 3", "perfect 5"]
+        ratios: [1, 1.25, 1.5, 2],
+        interval: ["perfect 1", "major 3", "perfect 5", "perfect 8"]
     };
 
     it("round-trips exactly", () => {
@@ -4467,6 +4467,11 @@ describe("temperament JSON", () => {
         expect(() => parseTemperamentJson(JSON.stringify({ ...data, isEDO: "yes" }))).toThrow(
             "invalid isEDO"
         );
+        expect(() =>
+            parseTemperamentJson(
+                JSON.stringify({ ...data, ratios: [1, 1.25, 1.5, 3], octaveRatio: 2 })
+            )
+        ).toThrow("does not match octaveRatio");
     });
 
     it("round-trips editor-saved custom (numeric keys, no ratios array)", () => {
@@ -4485,6 +4490,9 @@ describe("temperament JSON", () => {
             ratios.push(editorSaved["" + i][0]);
             interval.push("perfect 1");
         }
+        // Append terminal octave ratio so the last entry matches octaveRatio
+        ratios.push(2);
+        interval.push("perfect 8");
         const exportData = {
             pitchNumber: ratios.length - 1,
             ratios,
@@ -4498,7 +4506,7 @@ describe("temperament JSON", () => {
         expect(def.interval).toEqual(interval);
         expect(def.octaveRatio).toBe(2);
         expect(def.isEDO).toBe(false);
-        expect(def.pitchNumber).toBe(2);
+        expect(def.pitchNumber).toBe(3);
     });
 });
 

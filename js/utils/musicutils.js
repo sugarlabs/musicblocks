@@ -3412,6 +3412,14 @@ const parseTemperamentJson = text => {
     if (typeof octaveRatio !== "number" || !(octaveRatio > 0) || !isFinite(octaveRatio)) {
         throw new Error("Invalid temperament JSON: invalid octaveRatio");
     }
+    if (Math.abs(ratios[ratios.length - 1] - octaveRatio) > 0.0001) {
+        throw new Error(
+            "Invalid temperament JSON: final ratio " +
+                ratios[ratios.length - 1] +
+                " does not match octaveRatio " +
+                octaveRatio
+        );
+    }
     if (typeof isEDO !== "boolean") {
         throw new Error("Invalid temperament JSON: invalid isEDO");
     }
