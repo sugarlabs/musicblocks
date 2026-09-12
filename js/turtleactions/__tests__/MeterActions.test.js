@@ -56,6 +56,11 @@ describe("setupMeterActions", () => {
                 initTurtle: jest.fn(),
                 prepSynths: jest.fn(),
                 runFromBlockNow: jest.fn(),
+                stopTurtle: false,
+                _timerManager: {
+                    clearInterval: jest.fn(() => true),
+                    setGuardedInterval: jest.fn(() => "guarded-id")
+                },
                 notation: {
                     notationMeter: jest.fn(),
                     notationPickup: jest.fn()
@@ -292,13 +297,13 @@ describe("setupMeterActions", () => {
             return id === 0 ? targetTurtle : companionTurtle;
         });
 
-        global.clearInterval = jest.fn();
-        global.setInterval = jest.fn(() => 54321);
+        activity.logo._timerManager.clearInterval = jest.fn(() => true);
+        activity.logo._timerManager.setGuardedInterval = jest.fn(() => 54321);
 
         Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
 
-        expect(clearInterval).toHaveBeenCalledWith(12345);
-        expect(setInterval).toHaveBeenCalled();
+        expect(activity.logo._timerManager.clearInterval).toHaveBeenCalledWith(12345);
+        expect(activity.logo._timerManager.setGuardedInterval).toHaveBeenCalled();
     });
 
     it("should not attempt to clear an interval before one has been set", () => {
@@ -398,18 +403,17 @@ describe("setupMeterActions", () => {
     });
 
     it("should fall back to masterBPM for the interval duration when no turtle-specific BPM is set", () => {
-        let intervalMs;
-        global.setInterval = jest.fn((cb, ms) => {
-            intervalMs = ms;
-            return 1;
-        });
         targetTurtle.singer.noteValuePerBeat = 1;
         targetTurtle.singer.bpm = [];
         Singer.masterBPM = 60;
 
         Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
 
-        expect(intervalMs).toBe(4000);
+        expect(activity.logo._timerManager.setGuardedInterval).toHaveBeenCalledWith(
+            expect.any(Function),
+            4000,
+            expect.any(Function)
+        );
     });
 
     it("should set a listener for every note", () => {
@@ -719,7 +723,7 @@ describe("setupMeterActions", () => {
 
     it("should dispatch event on every‑beat interval callback", () => {
         let intervalCallback;
-        global.setInterval = jest.fn((cb, ms) => {
+        activity.logo._timerManager.setGuardedInterval = jest.fn((cb, ms, guard) => {
             intervalCallback = cb;
             return 555;
         });
@@ -728,7 +732,7 @@ describe("setupMeterActions", () => {
         delete activity.turtles.getTurtle(0).companionTurtle;
         Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
         expect(activity.stage.dispatchEvent).toHaveBeenCalledTimes(1);
-        expect(setInterval).toHaveBeenCalled();
+        expect(activity.logo._timerManager.setGuardedInterval).toHaveBeenCalled();
         activity.stage.dispatchEvent.mockClear();
         intervalCallback();
         const turbo = activity.turtles.getTurtle(0).companionTurtle;
@@ -738,7 +742,7 @@ describe("setupMeterActions", () => {
 
     it("should use turtle-specific BPM for interval timer", () => {
         let intervalMs;
-        global.setInterval = jest.fn((cb, ms) => {
+        activity.logo._timerManager.setGuardedInterval = jest.fn((cb, ms, guard) => {
             intervalMs = ms;
             return 999;
         });

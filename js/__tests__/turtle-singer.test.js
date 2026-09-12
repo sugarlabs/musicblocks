@@ -20,6 +20,8 @@
 global.DEFAULTVOLUME = 100;
 global.TARGETBPM = 120;
 global.TONEBPM = 60;
+global.DEFAULTVOICE = "DEFAULTVOICE";
+global.DEFAULTVOICES = ["DEFAULTVOICE"];
 global.MIN_HIGHLIGHT_DURATION_MS = 100;
 global.clampNumber = require("../utils/utils-logic").clampNumber;
 
@@ -67,7 +69,7 @@ global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
 const musicUtils = require("../utils/musicutils");
 global.keySignatureToMode = musicUtils.keySignatureToMode;
 global.getSavedCustomModes = musicUtils.getSavedCustomModes;
-global.last = jest.fn(array => array[array.length - 1]);
+global.last = array => (array && array.length > 0 ? array[array.length - 1] : null);
 global.deepClone = value => {
     if (typeof structuredClone === "function") {
         return structuredClone(value);
@@ -92,33 +94,76 @@ const createTurtleMock = () => ({
     noteHertz: { 0: [] }
 });
 
-const createActivityMock = turtleMock => ({
-    turtles: {
-        ithTurtle: jest.fn().mockReturnValue(turtleMock),
-        turtleList: [turtleMock]
-    },
-    blocks: {
-        blockList: {
-            mockBlk: {
-                connections: [0, 0]
-            }
-        }
-    },
-    logo: {
-        synth: {
-            setMasterVolume: jest.fn(),
-            setVolume: jest.fn(),
-            rampTo: jest.fn()
+const createActivityMock = turtleMock => {
+    const activeHandles = new Set();
+    return {
+        stageDirty: false,
+        stage: {},
+        turtles: {
+            ithTurtle: jest.fn().mockReturnValue(turtleMock),
+            turtleList: [turtleMock]
         },
-        pitchDrumMatrix: { addRowBlock: jest.fn() },
-        notation: { notationInsertTie: jest.fn(), notationRemoveTie: jest.fn() },
-        firstNoteTime: null,
-        stopTurtle: false,
-        inPitchDrumMatrix: false,
-        inMatrix: false,
-        clearNoteParams: jest.fn()
-    }
-});
+        blocks: {
+            visible: true,
+            unhighlight: jest.fn(),
+            blockList: {
+                mockBlk: {
+                    connections: [0, 0]
+                }
+            }
+        },
+        logo: {
+            synth: {
+                setMasterVolume: jest.fn(),
+                setVolume: jest.fn(),
+                rampTo: jest.fn(),
+                trigger: jest.fn()
+            },
+            pitchDrumMatrix: { addRowBlock: jest.fn() },
+            notation: { notationInsertTie: jest.fn(), notationRemoveTie: jest.fn() },
+            firstNoteTime: null,
+            stopTurtle: false,
+            _timerManager: {
+                _handles: activeHandles,
+                setGuardedTimeout: jest.fn((cb, delay, guard) => {
+                    let id;
+                    id = setTimeout(() => {
+                        activeHandles.delete(id);
+                        if (!guard || !guard()) cb();
+                    }, delay);
+                    activeHandles.add(id);
+                    return id;
+                }),
+                setTimeout: jest.fn((cb, delay) => {
+                    let id;
+                    id = setTimeout(() => {
+                        activeHandles.delete(id);
+                        cb();
+                    }, delay);
+                    activeHandles.add(id);
+                    return id;
+                }),
+                clearTimeout: jest.fn(id => {
+                    activeHandles.delete(id);
+                    clearTimeout(id);
+                }),
+                clearAll: jest.fn(() => {
+                    let count = 0;
+                    for (const id of activeHandles) {
+                        clearTimeout(id);
+                        count++;
+                    }
+                    activeHandles.clear();
+                    return count;
+                })
+            },
+            inPitchDrumMatrix: false,
+            inMatrix: false,
+            clearNoteParams: jest.fn(),
+            specialArgs: []
+        }
+    };
+};
 
 const createLogoMock = activityMock => ({
     activity: activityMock,
@@ -1422,5 +1467,86 @@ describe("processPitch internal addPitch behavior", () => {
         // regression guard: previous data should not be overwritten unexpectedly
         expect(firstState.length).toBe(1);
         expect(turtleMock.singer.notePitches[blk].length).toBe(2);
+    });
+});
+
+describe("processNote unhighlight timers", () => {
+    let act;
+    let tur;
+    const blk = "mockBlk";
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        tur = createTurtleMock();
+        tur.singer = new Singer(tur);
+        tur.blink = jest.fn();
+        tur.singer.inNoteBlock = [blk];
+        tur.singer.notePitches = { [blk]: ["C"] };
+        tur.singer.noteOctaves = { [blk]: [4] };
+        tur.singer.noteCents = { [blk]: [0] };
+        tur.singer.noteHertz = { [blk]: [0] };
+        tur.singer.noteDrums = { [blk]: [] };
+        tur.singer.noteBeatValues = { [blk]: [1] };
+        tur.singer.keySignature = "C major";
+        tur.singer.suppressOutput = true;
+        tur.singer.justCounting = [];
+        tur.singer.oscList = { [blk]: [] };
+
+        act = createActivityMock(tur);
+        act.errorMsg = jest.fn();
+        Object.assign(act.logo, {
+            runningLilypond: false,
+            runningMxml: false,
+            runningAbc: false,
+            runningMIDI: false,
+            specialArgs: [],
+            dispatchTurtleSignals: jest.fn()
+        });
+        Object.assign(act.logo.synth, {
+            inTemperament: "equal",
+            changeInTemperament: false,
+            startingPitch: "A0",
+            getFrequency: jest.fn(() => [261.63]),
+            getCustomFrequency: jest.fn(() => [261.63])
+        });
+        act.stage = { update: jest.fn() };
+        tur.activity = act;
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    test("schedules unhighlight with setTimeout and unhighlights on fire", () => {
+        Singer.processNote(act, 4, false, blk, 0, jest.fn());
+
+        expect(act.logo._timerManager.setTimeout).toHaveBeenCalled();
+        expect(tur.singer._unhighlightTimers[blk]).toBeDefined();
+
+        // Advance timers past highlight duration
+        jest.advanceTimersByTime(200);
+
+        expect(act.blocks.unhighlight).toHaveBeenCalledWith(blk);
+        expect(tur.singer._unhighlightTimers[blk]).toBeUndefined();
+        expect(act.stageDirty).toBe(true);
+    });
+
+    test("cancels previously pending unhighlight timer for the same block", () => {
+        Singer.processNote(act, 4, false, blk, 0, jest.fn());
+        const firstTimer = tur.singer._unhighlightTimers[blk];
+
+        Singer.processNote(act, 4, false, blk, 0, jest.fn());
+        expect(act.logo._timerManager.clearTimeout).toHaveBeenCalledWith(firstTimer);
+    });
+
+    test("suppresses unhighlight but cleans up timer entry when stopTurtle is true", () => {
+        Singer.processNote(act, 4, false, blk, 0, jest.fn());
+        expect(tur.singer._unhighlightTimers[blk]).toBeDefined();
+
+        act.logo.stopTurtle = true;
+        jest.advanceTimersByTime(200);
+
+        expect(act.blocks.unhighlight).not.toHaveBeenCalled();
+        expect(tur.singer._unhighlightTimers[blk]).toBeUndefined();
     });
 });

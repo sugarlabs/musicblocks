@@ -18,7 +18,7 @@ const { setupToolbarController, ToolbarController } = require("../toolbar-contro
 // ---------------------------------------------------------------------------
 
 function makeMockActivity() {
-    return {
+    const activity = {
         DEFAULTDELAY: 500,
         TURTLESTEP: -1,
         cleanupIdleWatcher: jest.fn(),
@@ -29,15 +29,56 @@ function makeMockActivity() {
         logo: {
             turtleDelay: 500,
             _alreadyRunning: false,
-            runLogoCommands: jest.fn(),
+            stopTurtle: false,
+            runLogoCommands: jest.fn(() => {
+                activity.logo.stopTurtle = false;
+            }),
             step: jest.fn(),
-            doStopTurtles: jest.fn(),
+            doStopTurtles: jest.fn(() => {
+                activity.logo.stopTurtle = true;
+                activity.logo._timerManager.clearAll();
+            }),
             stepQueue: {},
+            _timerManager: {
+                activeTimers: new Set(),
+                setGuardedTimeout: jest.fn((cb, delay, guard) => {
+                    let id;
+                    id = setTimeout(() => {
+                        activity.logo._timerManager.activeTimers.delete(id);
+                        if (!guard()) cb();
+                    }, delay);
+                    activity.logo._timerManager.activeTimers.add(id);
+                    return id;
+                }),
+                setTimeout: jest.fn((cb, delay) => {
+                    let id;
+                    id = setTimeout(() => {
+                        activity.logo._timerManager.activeTimers.delete(id);
+                        cb();
+                    }, delay);
+                    activity.logo._timerManager.activeTimers.add(id);
+                    return id;
+                }),
+                clearTimeout: jest.fn(id => {
+                    activity.logo._timerManager.activeTimers.delete(id);
+                    return clearTimeout(id);
+                }),
+                clearAll: jest.fn(() => {
+                    let count = 0;
+                    for (const id of activity.logo._timerManager.activeTimers) {
+                        clearTimeout(id);
+                        count++;
+                    }
+                    activity.logo._timerManager.activeTimers.clear();
+                    return count;
+                })
+            },
             synth: {
                 resume: jest.fn()
             }
         }
     };
+    return activity;
 }
 
 // Mimics the real runLogoCommands(), which dispatches the start block(s)
@@ -125,11 +166,31 @@ describe("ToolbarController.runFast", () => {
         controller.runFast(env, 0); // delay is 0
 
         expect(activity.logo.doStopTurtles).toHaveBeenCalled();
+        expect(activity.logo.stopTurtle).toBe(true);
         expect(activity.logo.runLogoCommands).not.toHaveBeenCalled();
 
         jest.advanceTimersByTime(500);
 
         expect(activity.logo.runLogoCommands).toHaveBeenCalledWith(null, env);
+        expect(activity.logo.stopTurtle).toBe(false);
+        jest.useRealTimers();
+    });
+
+    test("cancels delayed restart if user stops during the 500ms restart window", () => {
+        jest.useFakeTimers();
+        activity.turtles.running.mockReturnValue(true);
+        const env = { run: true };
+        controller.runFast(env, 0);
+
+        expect(activity.logo.doStopTurtles).toHaveBeenCalledTimes(1);
+        expect(activity.logo._timerManager.activeTimers.size).toBe(1);
+
+        controller.hardStop();
+        expect(activity.logo.doStopTurtles).toHaveBeenCalledTimes(2);
+        expect(activity.logo._timerManager.activeTimers.size).toBe(0);
+
+        jest.advanceTimersByTime(500);
+        expect(activity.logo.runLogoCommands).not.toHaveBeenCalled();
         jest.useRealTimers();
     });
 
