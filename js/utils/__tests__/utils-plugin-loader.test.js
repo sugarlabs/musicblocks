@@ -128,22 +128,60 @@ describe("processPluginData script cleanup", () => {
         const originalAppendChild = document.head.appendChild.bind(document.head);
         appendChildSpy = jest.spyOn(document.head, "appendChild").mockImplementation(script => {
             originalAppendChild(script);
-            script.onerror(new Error("load failed"));
+            script.onerror({ type: "error" });
             return script;
         });
 
-        await processPluginData(
-            createActivity(),
-            JSON.stringify({
-                BLOCKPLUGINS: {
-                    testBlock: "globalThis.pluginSetupLoaded = true;"
-                }
-            }),
-            "plugins/test.json"
-        );
+        let err;
+        try {
+            await processPluginData(
+                createActivity(),
+                JSON.stringify({
+                    BLOCKPLUGINS: {
+                        testBlock: "globalThis.pluginSetupLoaded = true;"
+                    }
+                }),
+                "plugins/test.json"
+            );
+        } catch (e) {
+            err = e;
+        }
+
+        expect(err).toBeInstanceOf(Error);
+        expect(err.message).toBe("Failed to execute plugin script");
 
         expect(document.head.querySelectorAll("script[src^='blob:plugin-setup']")).toHaveLength(0);
         expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup-0");
+    });
+
+    it("rejects when main blob script fails to load", async () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        const originalAppendChild = document.head.appendChild.bind(document.head);
+        appendChildSpy = jest.spyOn(document.head, "appendChild").mockImplementation(script => {
+            originalAppendChild(script);
+            script.onerror({ type: "error" });
+            return script;
+        });
+
+        let err;
+        try {
+            await processPluginData(
+                createActivity(),
+                JSON.stringify({
+                    FLOWPLUGINS: {
+                        testFlow: "return true;"
+                    }
+                }),
+                "plugins/test.json"
+            );
+        } catch (e) {
+            err = e;
+        }
+
+        expect(err).toBeInstanceOf(Error);
+        expect(err.message).toBe("Failed to load plugin script");
+
+        errorSpy.mockRestore();
     });
 
     it("returns null and logs error when plugin data is invalid JSON", async () => {
