@@ -920,9 +920,8 @@ class Painter {
             this._scheduleCanvasUpdate();
         }
         // Update media positions
-        const view = this.turtle._view;
-        if (view && typeof view._updateMediaPositions === "function") {
-            view._updateMediaPositions();
+        if (typeof this.turtle._updateMediaPositions === "function") {
+            this.turtle._updateMediaPositions();
         }
     }
 
@@ -989,9 +988,8 @@ class Painter {
 
         this._move(ox, oy, nx, ny, true);
         this._scheduleCanvasUpdate();
-        const view = this.turtle._view;
-        if (view && typeof view._updateMediaPositions === "function") {
-            view._updateMediaPositions();
+        if (typeof this.turtle._updateMediaPositions === "function") {
+            this.turtle._updateMediaPositions();
         }
     }
 
