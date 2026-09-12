@@ -425,6 +425,42 @@ describe("GraphicsBlocks", () => {
         });
     });
 
+    // ── ArcBlock Out of Bounds & Error Handling ────────
+    describe("ArcBlock Out of Bounds & Error Handling", () => {
+        test("ArcBlock reports error when radius > 5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow([90, 6000], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock reports error when radius > 20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.arc();
+            block.flow([90, 25000], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+            expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock forwards a large angle to doArc() unmodified — bounding it is doArc()'s responsibility", () => {
+            // The angle argument is not validated at the block-dispatch level: an
+            // embedded Arc-in-Note block re-reads its angle from block connections
+            // at playback time (see embedded-graphics-scheduler.js), independent of
+            // whatever value flowed through here, so the only safe place to cap the
+            // draw-loop's iteration count is inside doArc() itself.
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow([9000000, 100], logo, turtle, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(9000000, 100);
+        });
+    });
+
     // ── SuppressOutput Behavior ────────────────────────
     describe("SuppressOutput Behavior (Pen State Isolation)", () => {
         test("ForwardBlock suppresses output by lifting pen temporarily during execution", () => {
