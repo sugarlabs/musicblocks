@@ -84,7 +84,8 @@ class ProjectStorage {
 
     getCurrentProjectName() {
         const c = this.data.CurrentProject;
-        return this.data.Projects[c]?.ProjectName ?? this.defaultProjectName;
+        const name = this.data.Projects[c]?.ProjectName;
+        return typeof name === "string" && name.trim().length > 0 ? name : this.defaultProjectName;
     }
 
     getCurrentProjectDescription() {
