@@ -2491,3 +2491,105 @@ describe("Spatial grid indexing", () => {
         });
     });
 });
+
+// ---------------------------------------------------------------------------
+// noteValueValue — the number in a note's fraction
+// ---------------------------------------------------------------------------
+
+describe("noteValueValue", () => {
+    let blocks;
+
+    beforeEach(() => {
+        const mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    /**
+     * Builds "note 1 / 4", the shape the default project ships with.
+     * Block 2 is the numerator, which is the one the user clicks.
+     * @param {string} parentName - the block the divide hangs from
+     * @param {number|null} denominator - index of the denominator block, or
+     *     null for the empty slot left behind when it is dragged out
+     * @returns {void}
+     */
+    function buildNote(parentName, denominator) {
+        blocks.blockList = [
+            { name: parentName, connections: [null, 1, null] },
+            { name: "divide", connections: [0, 2, denominator] },
+            { name: "number", value: 1, connections: [1] },
+            { name: "number", value: 4, connections: [1] }
+        ];
+    }
+
+    /**
+     * Builds the same fraction under a block that holds its note value in the
+     * second slot, the way meter and the rhythm family do.
+     * @param {string} parentName - the block the divide hangs from
+     * @param {number|null} denominator - index of the denominator block, or
+     *     null for the empty slot left behind when it is dragged out
+     * @returns {void}
+     */
+    function buildMeterStyleNote(parentName, denominator) {
+        blocks.blockList = [
+            { name: parentName, connections: [null, null, 1] },
+            { name: "divide", connections: [0, 2, denominator] },
+            { name: "number", value: 1, connections: [1] },
+            { name: "number", value: 4, connections: [1] }
+        ];
+    }
+
+    it("reads the denominator of a complete fraction", () => {
+        buildNote("newnote", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when the denominator slot is empty", () => {
+        buildNote("newnote", null);
+
+        expect(() => blocks.noteValueValue(2)).not.toThrow();
+        expect(blocks.noteValueValue(2)).toBe(1);
+    });
+
+    it("reads the denominator under meter, which carries the fraction in its second slot", () => {
+        buildMeterStyleNote("meter", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when meter's denominator slot is empty", () => {
+        buildMeterStyleNote("meter", null);
+
+        expect(() => blocks.noteValueValue(2)).not.toThrow();
+        expect(blocks.noteValueValue(2)).toBe(1);
+    });
+
+    it("reads the denominator under rhythm, which carries the fraction the same way", () => {
+        buildMeterStyleNote("rhythm2", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when rhythm's denominator slot is empty", () => {
+        buildMeterStyleNote("rhythm2", null);
+
+        expect(() => blocks.noteValueValue(2)).not.toThrow();
+        expect(blocks.noteValueValue(2)).toBe(1);
+    });
+});

@@ -4395,6 +4395,21 @@ class Blocks {
 
             const myBlock = this.blockList[blk];
             const dblk = myBlock.connections[0];
+
+            /**
+             * Read the number in the divide block's denominator slot. The
+             * slot is empty whenever the user pulls that block out, so fall
+             * back to the same default the rest of this function returns.
+             */
+            const denominatorValue = () => {
+                const nblk = this.blockList[dblk].connections[2];
+                if (nblk === null || nblk === undefined || !this.blockList[nblk]) {
+                    return 1;
+                }
+
+                return this.blockList[nblk].value;
+            };
+
             /** We are connected to a divide block. */
             /** Is the divide block connected to a note value block? */
             let cblk = this.blockList[dblk].connections[0];
@@ -4408,18 +4423,13 @@ class Blocks {
                     case "newslur":
                     case "elapsednotes2":
                         if (this.blockList[cblk].connections[1] === dblk) {
-                            cblk = this.blockList[dblk].connections[2];
-                            return this.blockList[cblk].value;
+                            return denominatorValue();
                         }
                         return 1;
                     case "meter":
                         this.blockList[blk]._check_meter_block = cblk;
                         if (this.blockList[cblk].connections[2] === dblk) {
-                            if (this.blockList[cblk].connections[1] === dblk) {
-                                cblk = this.blockList[dblk].connections[2];
-                                return this.blockList[cblk].value;
-                            }
-                            return 1;
+                            return denominatorValue();
                         }
                         return 1;
                     case "setbpm3":
@@ -4432,11 +4442,7 @@ class Blocks {
                     case "neighbor":
                     case "neighbor2":
                         if (this.blockList[cblk].connections[2] === dblk) {
-                            if (this.blockList[cblk].connections[1] === dblk) {
-                                cblk = this.blockList[dblk].connections[2];
-                                return this.blockList[cblk].value;
-                            }
-                            return 1;
+                            return denominatorValue();
                         }
                         return 1;
                     default:
