@@ -13,11 +13,13 @@
 
 /* global _, escapeHTML, isSafeUrl, DOMPurify */
 
-var createWidgetLifecycle =
-    (typeof window !== "undefined" && window.createWidgetLifecycle) ||
-    (typeof require !== "undefined"
-        ? require("../utils/ai-widget-lifecycle").createWidgetLifecycle
-        : null);
+if (typeof module !== "undefined" && module.exports) {
+    // Under Jest the shared helper resolves through CommonJS. In the browser it
+    // arrives as window.createWidgetLifecycle, loaded first by the RequireJS
+    // shim in js/loader.js. Calling require() there would be a synchronous
+    // RequireJS lookup for a module that may not have been evaluated yet.
+    var { createWidgetLifecycle } = require("../utils/ai-widget-lifecycle");
+}
 
 /**
  * Represents Reflection Widget.
@@ -113,7 +115,11 @@ class ReflectionMatrix {
          * Shared mount state and request tracking
          * @type {Object}
          */
-        this._lifecycle = createWidgetLifecycle(this, () => this.isOpen && this.chatLog);
+        const createLifecycle =
+            (typeof createWidgetLifecycle !== "undefined" && createWidgetLifecycle) ||
+            window.createWidgetLifecycle;
+
+        this._lifecycle = createLifecycle(this, () => this.isOpen && this.chatLog);
     }
 
     /**
@@ -123,7 +129,7 @@ class ReflectionMatrix {
     init(activity) {
         this.activity = activity;
         this.isOpen = true;
-        this._lifecycle.isMounted = true;
+        this._lifecycle.mount();
         this.isMaximized = false;
         this.activity.isInputON = true;
         this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
@@ -137,7 +143,7 @@ class ReflectionMatrix {
 
         widgetWindow.onclose = () => {
             this.isOpen = false;
-            this._lifecycle.isMounted = false;
+            this._lifecycle.unmount();
             this.activity.isInputON = false;
             this.hideTypingIndicator();
             this._lifecycle.abortPendingRequests();
@@ -304,6 +310,18 @@ class ReflectionMatrix {
     }
 
     /**
+     * Returns true if the caller still belongs to the mount it started in.
+     * Async work captures the generation before awaiting and passes it back
+     * here, so a continuation from a previous open never touches a reopened
+     * widget.
+     * @param {number} generation - Generation captured before the await.
+     * @returns {boolean}
+     */
+    _isSameMount(generation) {
+        return this._lifecycle.isSameMount(generation);
+    }
+
+    /**
      * Appends a user message to the chat log.
      * @param {string} text - The user's message.
      * @returns {void}
@@ -386,6 +404,7 @@ class ReflectionMatrix {
     async processPendingMessages() {
         if (this.isProcessingPendingMessage) return;
 
+        const generation = this._lifecycle.generation;
         this.isProcessingPendingMessage = true;
 
         while (this.pendingMessages.length > 0 && this._isWidgetActive()) {
@@ -402,6 +421,10 @@ class ReflectionMatrix {
                 nextMessage.mentor,
                 nextMessage.algorithm
             );
+
+            // The widget was reopened while this reply was in flight. Its queue
+            // and flag belong to the new session now, so leave both alone.
+            if (!this._isSameMount(generation)) return;
 
             if (!this._isWidgetActive() || !reply) {
                 continue;
@@ -452,6 +475,7 @@ class ReflectionMatrix {
     async startChatSession() {
         if (this.triggerFirst === true || !this._isWidgetActive()) return;
 
+        const generation = this._lifecycle.generation;
         this.triggerFirst = true;
 
         // Reset summarization state for a fresh session
@@ -466,6 +490,10 @@ class ReflectionMatrix {
 
         const code = await this.activity.prepareExport();
         const data = await this.generateAlgorithm(code);
+
+        // Belongs to a previous open: the indicator and triggerFirst below are
+        // the reopened session's state, not ours.
+        if (!this._isSameMount(generation)) return;
 
         this.hideTypingIndicator();
 
@@ -493,10 +521,13 @@ class ReflectionMatrix {
             return;
         }
 
+        const generation = this._lifecycle.generation;
         this._isUpdatingProjectCode = true;
 
         try {
             const code = await this.activity.prepareExport();
+            if (!this._isSameMount(generation)) return;
+
             if (code === this.code) {
                 this.activity.textMsg(_("No changes were detected in your project."), 2500);
                 return; // No changes in code
@@ -504,6 +535,8 @@ class ReflectionMatrix {
 
             this.showTypingIndicator("Reading code");
             const data = await this.generateNewAlgorithm(code);
+            if (!this._isSameMount(generation)) return;
+
             this.hideTypingIndicator();
 
             if (!this._isWidgetActive() || !data) {
@@ -520,7 +553,11 @@ class ReflectionMatrix {
                 this.activity.errorMsg(_(data.error), 3000);
             }
         } finally {
-            this._isUpdatingProjectCode = false;
+            // A reopened widget owns this flag now; releasing it here would let
+            // its own refresh run twice.
+            if (this._isSameMount(generation)) {
+                this._isUpdatingProjectCode = false;
+            }
         }
     }
 
@@ -572,6 +609,7 @@ class ReflectionMatrix {
      *  @returns {Promise<Object>} - The server response containing the bot's reply.
      */
     async generateBotReply(message, chatHistory, mentor, algorithm) {
+        const generation = this._lifecycle.generation;
         this.showTypingIndicator();
 
         const safeIndex = Math.min(this.summarizedUpTo, chatHistory.length);
@@ -585,6 +623,9 @@ class ReflectionMatrix {
             conversation_summary: this.conversationSummary || null,
             summarized_up_to: this.summarizedUpTo
         });
+
+        // Summary state and the typing indicator belong to the current mount.
+        if (!this._isSameMount(generation)) return null;
 
         this.hideTypingIndicator();
 
@@ -602,8 +643,11 @@ class ReflectionMatrix {
      */
     async getAnalysis() {
         if (this.chatHistory.length < 10 || this.typingDiv || !this._isWidgetActive()) return;
+        const generation = this._lifecycle.generation;
         this.showTypingIndicator("Analyzing");
         const data = await this.generateAnalysis();
+        if (!this._isSameMount(generation)) return;
+
         this.hideTypingIndicator();
         if (data && this._isWidgetActive()) {
             this.botReplyDiv(data, false, true);
@@ -635,6 +679,7 @@ class ReflectionMatrix {
      */
     async botReplyDiv(message, user_query = true, md = false) {
         const replyMentor = this.AImentor;
+        const generation = this._lifecycle.generation;
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
@@ -645,6 +690,8 @@ class ReflectionMatrix {
                 replyMentor,
                 this.projectAlgorithm
             );
+
+            if (!this._isSameMount(generation)) return;
         } else {
             reply = message;
         }

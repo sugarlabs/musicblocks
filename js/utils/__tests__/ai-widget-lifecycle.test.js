@@ -28,6 +28,44 @@ describe("ai-widget-lifecycle", () => {
         expect(lifecycle.isWidgetActive()).toBe(false);
     });
 
+    describe("mount generations", () => {
+        it("starts a new generation on every mount", () => {
+            const first = lifecycle.mount();
+            expect(lifecycle.isMounted).toBe(true);
+
+            lifecycle.unmount();
+            expect(lifecycle.isMounted).toBe(false);
+
+            const second = lifecycle.mount();
+            expect(second).not.toBe(first);
+        });
+
+        it("recognizes the generation of the current mount", () => {
+            const generation = lifecycle.mount();
+
+            expect(lifecycle.isSameMount(generation)).toBe(true);
+        });
+
+        it("rejects a generation captured before a close and reopen", () => {
+            const generation = lifecycle.mount();
+
+            lifecycle.unmount();
+            lifecycle.mount();
+
+            // The widget looks active again, but the captured generation is stale.
+            expect(lifecycle.isWidgetActive()).toBe(true);
+            expect(lifecycle.isSameMount(generation)).toBe(false);
+        });
+
+        it("rejects a generation captured before a close that has no reopen", () => {
+            const generation = lifecycle.mount();
+
+            lifecycle.unmount();
+
+            expect(lifecycle.isSameMount(generation)).toBe(false);
+        });
+    });
+
     it("aborts and clears pending requests", () => {
         const abortSpy = jest.fn();
         lifecycle.pendingRequests.add({ abort: abortSpy });

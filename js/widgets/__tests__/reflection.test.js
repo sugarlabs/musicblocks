@@ -787,6 +787,65 @@ describe("ReflectionMatrix", () => {
             expect(reflection.projectAlgorithm).toBe("alg");
         });
 
+        test("startChatSession ignores a response that lands after a close and reopen", async () => {
+            reflection.inputContainer = document.createElement("div");
+            reflection.projectAlgorithm = "current_alg";
+            const replySpy = jest.spyOn(reflection, "botReplyDiv").mockResolvedValue(undefined);
+
+            let resolveFetch;
+            mockActivity.prepareExport.mockResolvedValue("mocked_code");
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            const stale = reflection.startChatSession();
+            await Promise.resolve();
+
+            // The widget is closed and opened again while the request is in flight.
+            reflection._lifecycle.unmount();
+            reflection._lifecycle.mount();
+            reflection.triggerFirst = false;
+
+            resolveFetch({
+                json: jest.fn().mockResolvedValue({ algorithm: "stale_alg", response: "Late" })
+            });
+            await stale;
+
+            expect(replySpy).not.toHaveBeenCalled();
+            expect(reflection.projectAlgorithm).toBe("current_alg");
+            expect(reflection.triggerFirst).toBe(false);
+        });
+
+        test("updateProjectCode leaves the refresh flag of a reopened widget alone", async () => {
+            reflection.code = "old_code";
+            reflection.inputContainer = document.createElement("div");
+
+            let resolveExport;
+            mockActivity.prepareExport.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveExport = resolve;
+                    })
+            );
+            const generateSpy = jest.spyOn(reflection, "generateNewAlgorithm");
+
+            const stale = reflection.updateProjectCode();
+
+            reflection._lifecycle.unmount();
+            reflection._lifecycle.mount();
+            // The reopened widget has started a refresh of its own.
+            reflection._isUpdatingProjectCode = true;
+
+            resolveExport("new_code");
+            await stale;
+
+            expect(generateSpy).not.toHaveBeenCalled();
+            expect(reflection._isUpdatingProjectCode).toBe(true);
+        });
+
         test("_postJSON aborts the request when it times out", async () => {
             const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 

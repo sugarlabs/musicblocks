@@ -23,6 +23,11 @@
  * responses never update a closed widget, and pending requests are aborted
  * on close or reset. Both widgets delegate their cleanup here instead of
  * duplicating the same machinery.
+ *
+ * Mount state alone is not enough: these widgets are reused across opens, so
+ * a request started before a close can settle after the widget reopens and
+ * find the lifecycle active again. Each mount therefore gets a generation
+ * number that async work captures before it awaits and rechecks afterwards.
  */
 
 /* global module, window */
@@ -48,6 +53,43 @@ function createWidgetLifecycle(widget, isActive) {
          * @type {boolean}
          */
         isMounted: false,
+
+        /**
+         * Identifies the current mount. Bumped on every mount and unmount so
+         * work started by an earlier mount can tell it no longer owns the widget.
+         * @type {number}
+         */
+        generation: 0,
+
+        /**
+         * Marks the widget as mounted and starts a new generation.
+         * @returns {number} The generation of this mount.
+         */
+        mount() {
+            this.generation += 1;
+            this.isMounted = true;
+            return this.generation;
+        },
+
+        /**
+         * Marks the widget as unmounted and retires the current generation.
+         * @returns {void}
+         */
+        unmount() {
+            this.generation += 1;
+            this.isMounted = false;
+        },
+
+        /**
+         * Returns true while the caller still belongs to the mount it started in.
+         * Callers capture the generation before awaiting and pass it back here
+         * afterwards, so a reopened widget is left alone.
+         * @param {number} generation - Generation captured before the await.
+         * @returns {boolean}
+         */
+        isSameMount(generation) {
+            return this.generation === generation;
+        },
 
         /**
          * Returns true while the widget is mounted and can safely update UI.

@@ -11,11 +11,13 @@
 
 /* global _THIS_IS_MUSIC_BLOCKS_ */
 
-var createWidgetLifecycle =
-    (typeof window !== "undefined" && window.createWidgetLifecycle) ||
-    (typeof require !== "undefined"
-        ? require("../utils/ai-widget-lifecycle").createWidgetLifecycle
-        : null);
+if (typeof module !== "undefined" && module.exports) {
+    // Under Jest the shared helper resolves through CommonJS. In the browser it
+    // arrives as window.createWidgetLifecycle, loaded first by the RequireJS
+    // shim in js/loader.js. Calling require() there would be a synchronous
+    // RequireJS lookup for a module that may not have been evaluated yet.
+    var { createWidgetLifecycle } = require("../utils/ai-widget-lifecycle");
+}
 
 /* This widget provides an AI-powered debugging interface for Music Blocks projects,
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
@@ -132,7 +134,11 @@ function AIDebuggerWidget() {
      * Shared mount tracking and request cancellation for chat widgets
      * @type {object}
      */
-    this._lifecycle = createWidgetLifecycle(this, () => this.widgetWindow && this.chatLog);
+    const createLifecycle =
+        (typeof createWidgetLifecycle !== "undefined" && createWidgetLifecycle) ||
+        window.createWidgetLifecycle;
+
+    this._lifecycle = createLifecycle(this, () => this.widgetWindow && this.chatLog);
 
     /**
      * Generates a unique conversation ID
@@ -153,7 +159,7 @@ function AIDebuggerWidget() {
     this.init = function (activity) {
         this.activity = activity;
         this.activity.isInputON = true;
-        this._lifecycle.isMounted = true;
+        this._lifecycle.mount();
 
         if (!this.conversationId) {
             this.conversationId = this._generateConversationId();
@@ -168,8 +174,9 @@ function AIDebuggerWidget() {
         widgetWindow.getWidgetBody().style.height = CHATHEIGHT + "px";
 
         widgetWindow.onclose = () => {
-            this._lifecycle.isMounted = false;
+            this._lifecycle.unmount();
             this._lifecycle.abortPendingRequests();
+            this._isProcessing = false;
             this._hideTypingIndicator();
             widgetWindow.destroy();
             this.activity.isInputON = false;
@@ -200,6 +207,19 @@ function AIDebuggerWidget() {
      */
     this._isWidgetActive = function () {
         return this._lifecycle.isWidgetActive();
+    };
+
+    /**
+     * Returns true if the caller still belongs to the mount it started in.
+     * Async work captures the generation before awaiting and passes it back
+     * here, so a continuation from a previous open never touches a reopened
+     * widget.
+     * @param {number} generation - Generation captured before the request
+     * @returns {boolean}
+     * @private
+     */
+    this._isSameMount = function (generation) {
+        return this._lifecycle.isSameMount(generation);
     };
 
     /**
@@ -436,6 +456,7 @@ function AIDebuggerWidget() {
         }
 
         const typingIndicator = this._showTypingIndicator();
+        const generation = this._lifecycle.generation;
         this.promptCount++;
         let projectData;
         try {
@@ -464,7 +485,7 @@ function AIDebuggerWidget() {
 
         this._postToBackend(payload)
             .then(data => {
-                if (!this._isWidgetActive() || !data) {
+                if (!this._isSameMount(generation) || !this._isWidgetActive() || !data) {
                     return;
                 }
 
@@ -486,7 +507,7 @@ function AIDebuggerWidget() {
             .catch(error => {
                 console.error("Backend connection error:", error);
 
-                if (!this._isWidgetActive()) {
+                if (!this._isSameMount(generation) || !this._isWidgetActive()) {
                     return;
                 }
 
@@ -510,6 +531,11 @@ function AIDebuggerWidget() {
                 this._updateMessageCount();
             })
             .finally(() => {
+                // A reopened widget owns the indicator and the processing flag now.
+                if (!this._isSameMount(generation)) {
+                    return;
+                }
+
                 this._removeTypingIndicator(typingIndicator);
                 this._isProcessing = false;
             });
@@ -758,10 +784,11 @@ function AIDebuggerWidget() {
 
         // Show typing indicator during initialization
         const typingIndicator = this._showTypingIndicator();
+        const generation = this._lifecycle.generation;
 
         this._postToBackend(initPayload)
             .then(data => {
-                if (!this._isWidgetActive() || !data) {
+                if (!this._isSameMount(generation) || !this._isWidgetActive() || !data) {
                     return;
                 }
 
@@ -785,7 +812,7 @@ function AIDebuggerWidget() {
             .catch(error => {
                 console.error("Backend initialization error:", error);
 
-                if (!this._isWidgetActive()) {
+                if (!this._isSameMount(generation) || !this._isWidgetActive()) {
                     return;
                 }
 
@@ -808,7 +835,10 @@ function AIDebuggerWidget() {
                 this._addWelcomeMessage();
             })
             .finally(() => {
-                this._removeTypingIndicator(typingIndicator);
+                // A reopened widget owns the indicator now.
+                if (this._isSameMount(generation)) {
+                    this._removeTypingIndicator(typingIndicator);
+                }
             });
     };
 

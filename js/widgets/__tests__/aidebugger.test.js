@@ -900,6 +900,44 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.chatHistory).toEqual([]);
         });
 
+        test("_sendToBackend leaves a reopened widget untouched", async () => {
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.widgetWindow = mockWidgetWindow;
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.messageInput = document.createElement("input");
+            debuggerWidget._lifecycle.mount();
+
+            let resolveFetch;
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            debuggerWidget._sendToBackend("Why is this broken?");
+
+            // Closed and opened again before the response arrives.
+            debuggerWidget._lifecycle.unmount();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget._isProcessing = true;
+
+            resolveFetch({
+                ok: true,
+                json: jest.fn().mockResolvedValue({ response: "Late reply" })
+            });
+
+            await Promise.resolve();
+            await Promise.resolve();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(debuggerWidget.chatHistory).toEqual([]);
+            expect(debuggerWidget.chatLog.children.length).toBe(0);
+            expect(debuggerWidget._isProcessing).toBe(true);
+        });
+
         test("_initializeBackendWithProject ignores late responses after widget unmount", async () => {
             debuggerWidget.activity = mockActivity;
             debuggerWidget.widgetWindow = mockWidgetWindow;
