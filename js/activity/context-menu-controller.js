@@ -607,6 +607,7 @@ class ContextMenuController {
     _showHideAuxMenu(resize) {
         const activity = this.activity;
         const cellsize = 55;
+        const auxToolbar = document.getElementById("aux-toolbar");
         let dy;
 
         // function to increase or decrease the "top" property of the top-right corner buttons
@@ -622,7 +623,8 @@ class ContextMenuController {
         };
 
         if (!resize && activity.toolbarHeight === 0) {
-            dy = cellsize + LEADING + 5;
+            auxToolbar.style.display = "block";
+            dy = auxToolbar.offsetHeight || cellsize + LEADING + 5;
 
             activity.toolbarHeight = dy;
             activity.palettes.deltaY(dy);
