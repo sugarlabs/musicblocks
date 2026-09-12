@@ -240,7 +240,8 @@ describe("Sampler Widget", () => {
                 },
                 canvas: { width: 1000, height: 800 },
                 getStageScale: () => 1,
-                textMsg: jest.fn()
+                textMsg: jest.fn(),
+                errorMsg: jest.fn()
             };
             global.activity = mockActivity;
             widget.activity = mockActivity;
@@ -725,6 +726,20 @@ describe("Sampler Widget", () => {
 
             await widget._recordBtn.onclick();
             expect(widget.is_recording).toBe(true);
+
+            // Reset for mic denial test
+            widget.is_recording = false;
+            mockActivity.logo.synth.startRecording.mockRejectedValueOnce(
+                new Error("Permission denied")
+            );
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(_("Microphone access denied."));
+
+            // Resume normal recording for subsequent tests
+            mockActivity.logo.synth.startRecording.mockResolvedValue();
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording).toBe(true);
             await widget._recordBtn.onclick();
             expect(widget.is_recording).toBe(false);
 
@@ -1072,6 +1087,7 @@ describe("Sampler Widget", () => {
         test("startPitchDetection handles getUserMedia failure", async () => {
             widget.widgetWindow = widgetWindow;
             mockActivity.errorMsg = jest.fn();
+            widget.activity = mockActivity;
             const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
             global.AudioContext = jest.fn(() => ({
                 sampleRate: 44100,

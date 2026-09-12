@@ -921,11 +921,16 @@ function SampleWidget() {
         this._recordBtn.onclick = async () => {
             stopTuner();
             if (!this.is_recording) {
-                await this.activity.logo.synth.startRecording();
-                this.is_recording = true;
-                this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
-                this.displayRecordingStartMessage();
-                this.activity.logo.synth.LiveWaveForm();
+                try {
+                    await this.activity.logo.synth.startRecording();
+                    this.is_recording = true;
+                    this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
+                    this.displayRecordingStartMessage();
+                    this.activity.logo.synth.LiveWaveForm();
+                } catch (err) {
+                    console.error(err);
+                    this.activity.errorMsg(_("Microphone access denied."));
+                }
             } else {
                 this.recordingURL = await this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
