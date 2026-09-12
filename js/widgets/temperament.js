@@ -2290,11 +2290,10 @@ function TemperamentWidget() {
      * Import a temperament from a .json or .scl file.
      * @returns {void}
      */
-    this._importFile = function () {
-        const that = this;
-        readSclFile("mySclFile", function (err, data) {
+    this._importFile = () => {
+        readSclFile("mySclFile", (err, data) => {
             if (err) {
-                that.activity.errorMsg(err.message, 3000);
+                this.activity.errorMsg(err.message, 3000);
                 return;
             }
             if (!data) {
@@ -2309,7 +2308,7 @@ function TemperamentWidget() {
                 try {
                     def = parseTemperamentJson(data.text);
                 } catch (e) {
-                    that.activity.errorMsg(_("Error reading JSON file: ") + e.message, 5000);
+                    this.activity.errorMsg(_("Error reading JSON file: ") + e.message, 5000);
                     return;
                 }
                 temperamentData = {
@@ -2320,7 +2319,6 @@ function TemperamentWidget() {
                     interval: def.interval,
                     ...ratiosToNumericKeys(def.ratios)
                 };
-                // Store each ratio under its interval name so init reads correct values
                 for (let i = 0; i < def.ratios.length; i++) {
                     if (["__proto__", "constructor", "prototype"].includes(def.interval[i]))
                         continue;
@@ -2332,59 +2330,48 @@ function TemperamentWidget() {
                 try {
                     result = parseSclFile(data.text);
                 } catch (e) {
-                    that.activity.errorMsg(_("Error reading .scl file: ") + e.message, 5000);
+                    this.activity.errorMsg(_("Error reading .scl file: ") + e.message, 5000);
                     return;
                 }
 
-                temperamentData = {
-                    pitchNumber: result.pitchCount,
-                    octaveRatio: 2,
-                    isEDO: false,
-                    ratios: [],
-                    interval: []
-                };
-
                 const allRatios = [1];
                 for (let i = 0; i < result.pitches.length; i++) {
-                    // Skip tonic if .scl file includes it (some files do)
                     if (i === 0 && Math.abs(result.pitches[i].ratio - 1) < 0.0001) {
                         continue;
                     }
                     allRatios.push(result.pitches[i].ratio);
                 }
-                // Derive octaveRatio from the terminal period in the .scl data
-                // rather than hardcoding 2, so non-2:1 periods are preserved.
-                temperamentData.octaveRatio = allRatios[allRatios.length - 1];
-                temperamentData.ratios = allRatios;
-                temperamentData.pitchNumber = allRatios.length - 1;
 
-                // Generate unique interval names and store each ratio under its name
-                // so init reads correct values via t[interval[i]]
                 const intervals = [];
                 for (let i = 0; i < allRatios.length; i++) {
                     const name = "degree " + i;
                     intervals.push(name);
-                    temperamentData[name] = allRatios[i];
                 }
-                temperamentData.interval = intervals;
 
+                temperamentData = {
+                    pitchNumber: allRatios.length - 1,
+                    octaveRatio: allRatios[allRatios.length - 1],
+                    isEDO: false,
+                    ratios: allRatios,
+                    interval: intervals
+                };
                 Object.assign(temperamentData, ratiosToNumericKeys(allRatios));
 
                 sclName = result.description || data.file.name.replace(/\.scl$/i, "");
             } else {
-                that.activity.errorMsg(_("Unsupported file type. Use .json or .scl."), 3000);
+                this.activity.errorMsg(_("Unsupported file type. Use .json or .scl."), 3000);
                 return;
             }
 
-            const uniqueName = that.activity.blocks.findUniqueTemperamentName(sclName);
+            const uniqueName = this.activity.blocks.findUniqueTemperamentName(sclName);
             addTemperamentToDictionary(uniqueName, temperamentData);
             addTemperamentToList([_(uniqueName), uniqueName, uniqueName]);
             updateTemperaments();
 
-            that.inTemperament = uniqueName;
-            that.activity.errorMsg(_("Temperament imported: ") + uniqueName, 3000);
+            this.inTemperament = uniqueName;
+            this.activity.errorMsg(_("Temperament imported: ") + uniqueName, 3000);
 
-            that.init(that.activity);
+            this.init(this.activity);
         });
     };
 
