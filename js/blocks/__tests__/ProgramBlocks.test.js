@@ -21,9 +21,11 @@
  */
 
 const { setupProgramBlocks } = jest.requireActual("../ProgramBlocks");
+const { isUnsafeObjectKey } = jest.requireActual("../../utils/utils-logic");
 
 global._ = s => s;
 global.NOINPUTERRORMSG = "NO_INPUT";
+global.isUnsafeObjectKey = isUnsafeObjectKey;
 global.XMLHttpRequest = jest.fn();
 global.getTargetTurtle = jest.fn();
 global.isSafeUrl = function (urlString) {
@@ -472,6 +474,34 @@ describe("ProgramBlocks", () => {
             expect(logo.turtleDicts[turtle]["MyDict"]).toEqual({ key1: "value1" });
         });
 
+        test.each(["__proto__", "constructor", "prototype"])(
+            "rejects unsafe dictionary name %s when loading from file",
+            dictionaryName => {
+                const blk = 10;
+                const turtle = 0;
+                logo.turtleDicts[turtle] = {};
+                const registryPrototype = Object.getPrototypeOf(logo.turtleDicts[turtle]);
+                global.getTargetTurtle.mockReturnValue(null);
+
+                activity.blocks.blockList[blk] = {
+                    connections: [null, null, 20]
+                };
+                activity.blocks.blockList[20] = {
+                    name: "loadFile",
+                    value: ["filename", '{"key1": "value1"}']
+                };
+
+                getBlock("loadDict").flow([dictionaryName, [null, null]], logo, turtle, blk);
+
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "The dictionary name is reserved.",
+                    blk
+                );
+                expect(Object.hasOwn(logo.turtleDicts[turtle], dictionaryName)).toBe(false);
+                expect(Object.getPrototypeOf(logo.turtleDicts[turtle])).toBe(registryPrototype);
+            }
+        );
+
         test("loads dictionary onto target turtle", () => {
             const blk = 10;
             const turtle = 0;
@@ -595,6 +625,33 @@ describe("ProgramBlocks", () => {
             expect(logo.turtleDicts[turtle]).toHaveProperty("MyDict");
             expect(logo.turtleDicts[turtle]["MyDict"]).toEqual({ key1: "value1" });
         });
+
+        test.each(["__proto__", "constructor", "prototype"])(
+            "rejects unsafe dictionary name %s when setting from JSON",
+            dictionaryName => {
+                const blk = 10;
+                const turtle = 0;
+                logo.turtleDicts[turtle] = {};
+                const registryPrototype = Object.getPrototypeOf(logo.turtleDicts[turtle]);
+                global.getTargetTurtle.mockReturnValue(null);
+
+                activity.blocks.blockList[blk] = {
+                    connections: [null, null, 20]
+                };
+                activity.blocks.blockList[20] = {
+                    value: '{"key1": "value1"}'
+                };
+
+                getBlock("setDictionary").flow([dictionaryName, {}], logo, turtle, blk);
+
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "The dictionary name is reserved.",
+                    blk
+                );
+                expect(Object.hasOwn(logo.turtleDicts[turtle], dictionaryName)).toBe(false);
+                expect(Object.getPrototypeOf(logo.turtleDicts[turtle])).toBe(registryPrototype);
+            }
+        );
 
         test("sets dictionary onto target turtle", () => {
             const blk = 10;

@@ -12,7 +12,7 @@
 /*
    global
 
-   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl
+   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl, isUnsafeObjectKey
  */
 
 /* exported setupProgramBlocks */
@@ -435,6 +435,10 @@ function setupProgramBlocks(activity) {
             }
 
             const a = args[0];
+            if (isUnsafeObjectKey(a)) {
+                activity.errorMsg(_("The dictionary name is reserved."), blk);
+                return;
+            }
             // Not sure this can happen.
             if (!(turtle in logo.turtleDicts)) {
                 logo.turtleDicts[turtle] = {};
@@ -555,6 +559,10 @@ function setupProgramBlocks(activity) {
             }
 
             const a = args[0];
+            if (isUnsafeObjectKey(a)) {
+                activity.errorMsg(_("The dictionary name is reserved."), blk);
+                return;
+            }
             // Not sure this can happen.
             if (!(turtle in logo.turtleDicts)) {
                 logo.turtleDicts[turtle] = {};
