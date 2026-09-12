@@ -78,8 +78,8 @@ window.widgetWindows = {
         for (let i = 0; i < widgetTitle.length; i++) {
             const titleEl = widgetTitle[i];
             if (
-                titleEl.innerHTML === name ||
-                titleEl.innerHTML === searchKey ||
+                titleEl.textContent.trim() === name ||
+                titleEl.textContent.trim() === searchKey ||
                 titleEl.id === `${searchKey}WidgetID`
             ) {
                 const winKey =
