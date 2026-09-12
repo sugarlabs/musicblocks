@@ -778,6 +778,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/synth2.svg";
+                img.title = this._(this.rowLabels[i]);
+                img.alt = this._(this.rowLabels[i]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -2054,6 +2056,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/synth2.svg";
+                img.title = this._(this.rowLabels[blockIndex]);
+                img.alt = this._(this.rowLabels[blockIndex]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
