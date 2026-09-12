@@ -36,7 +36,9 @@ class GlobalCard {
                 <div class="card" style="height:95%;"> 
                 
                     <div class="card-image"> 
-                        <img class="project-image project-card-image" id="global-project-image-{ID}" src="images/planetgraphic.png"> 
+                        <img class="project-image project-card-image" alt="${_(
+                            "Project thumbnail"
+                        )}" id="global-project-image-{ID}" src="images/planetgraphic.png"> 
                     </div> 
 
                     <div class="card-content"> 
