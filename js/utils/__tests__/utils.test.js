@@ -139,7 +139,8 @@ const {
     makeKeyboardAccessible,
     CameraManager,
     announceToScreenReader,
-    _
+    _,
+    importFileKind
 } = require("../utils.js");
 
 describe("makeKeyboardAccessible()", () => {
@@ -1604,5 +1605,148 @@ describe("UtilsLogic re-exports in utils.js", () => {
         expect(utils.formatSeconds(125)).toBe("02:05");
         expect(utils.formatSeconds(3665)).toBe("01:01:05");
         expect(utils.formatSeconds(null)).toBe("00:00");
+    });
+});
+
+describe("downloadScl", () => {
+    it("creates a blob link, clicks it, and revokes the URL", () => {
+        const { downloadScl } = require("../utils");
+        const mockRevoke = jest.fn();
+        global.URL.createObjectURL = jest.fn(() => "blob:mock");
+        global.URL.revokeObjectURL = mockRevoke;
+
+        const mockLink = {
+            href: "",
+            download: "",
+            style: {},
+            click: jest.fn()
+        };
+        document.createElement = jest.fn(() => mockLink);
+        document.body.appendChild = jest.fn();
+        document.body.removeChild = jest.fn();
+
+        downloadScl("test content", "test.scl");
+
+        expect(document.createElement).toHaveBeenCalledWith("a");
+        expect(mockLink.href).toBe("blob:mock");
+        expect(mockLink.download).toBe("test.scl");
+        expect(document.body.appendChild).toHaveBeenCalledWith(mockLink);
+        expect(mockLink.click).toHaveBeenCalled();
+        expect(document.body.removeChild).toHaveBeenCalledWith(mockLink);
+        expect(mockRevoke).toHaveBeenCalledWith("blob:mock");
+    });
+});
+
+describe("readSclFile", () => {
+    it("calls callback with error when input element not found", () => {
+        const { readSclFile } = require("../utils");
+        global.docById = jest.fn(() => null);
+
+        const cb = jest.fn();
+        readSclFile("nonexistent", cb);
+
+        expect(cb).toHaveBeenCalledTimes(1);
+        expect(cb.mock.calls[0][0]).toBeInstanceOf(Error);
+    });
+
+    it("sets up onchange handler and triggers file input click", () => {
+        const { readSclFile } = require("../utils");
+        const mockClick = jest.fn();
+        const mockInput = { value: "", onchange: null, click: mockClick };
+        global.docById = jest.fn(() => mockInput);
+
+        const cb = jest.fn();
+        readSclFile("mySclFile", cb);
+
+        expect(mockInput.value).toBe("");
+        expect(typeof mockInput.onchange).toBe("function");
+        expect(mockClick).toHaveBeenCalled();
+    });
+
+    it("reads file and calls callback with text and file on success", () => {
+        const { readSclFile } = require("../utils");
+
+        const mockFile = { name: "test.scl" };
+        const mockReader = {
+            onload: null,
+            onerror: null,
+            readAsText: jest.fn(function () {
+                this.onload({ target: { result: "file content" } });
+            })
+        };
+        global.FileReader = jest.fn(() => mockReader);
+
+        const mockInput = { value: "", onchange: null, click: jest.fn() };
+        global.docById = jest.fn(() => mockInput);
+
+        const cb = jest.fn();
+        readSclFile("mySclFile", cb);
+
+        // Simulate file selection
+        Object.defineProperty(mockInput, "files", { value: [mockFile], configurable: true });
+        mockInput.onchange();
+
+        expect(cb).toHaveBeenCalledWith(null, { text: "file content", file: mockFile });
+    });
+
+    it("calls callback with error when file read fails", () => {
+        const { readSclFile } = require("../utils");
+
+        const mockFile = { name: "test.scl" };
+        const mockReader = {
+            onload: null,
+            onerror: null,
+            readAsText: jest.fn(function () {
+                this.onerror({ type: "error" });
+            })
+        };
+        global.FileReader = jest.fn(() => mockReader);
+
+        const mockInput = { value: "", onchange: null, click: jest.fn() };
+        global.docById = jest.fn(() => mockInput);
+
+        const cb = jest.fn();
+        readSclFile("mySclFile", cb);
+
+        Object.defineProperty(mockInput, "files", { value: [mockFile], configurable: true });
+        mockInput.onchange();
+
+        expect(cb).toHaveBeenCalledTimes(1);
+        expect(cb.mock.calls[0][0]).toBeInstanceOf(Error);
+        expect(cb.mock.calls[0][1]).toBeUndefined();
+    });
+
+    it("does not call callback when no file is selected", () => {
+        const { readSclFile } = require("../utils");
+
+        const mockReader = {
+            onload: null,
+            onerror: null,
+            readAsText: jest.fn()
+        };
+        global.FileReader = jest.fn(() => mockReader);
+
+        const mockInput = { value: "", onchange: null, click: jest.fn(), files: [] };
+        global.docById = jest.fn(() => mockInput);
+
+        const cb = jest.fn();
+        readSclFile("mySclFile", cb);
+
+        mockInput.onchange();
+
+        expect(cb).not.toHaveBeenCalled();
+        expect(mockReader.readAsText).not.toHaveBeenCalled();
+    });
+});
+
+describe("importFileKind", () => {
+    it("classifies by extension", () => {
+        expect(importFileKind("scale.scl")).toBe("scl");
+        expect(importFileKind("SCALE.SCL")).toBe("scl");
+        expect(importFileKind("temperament.json")).toBe("json");
+        expect(importFileKind("TEMPERAMENT.JSON")).toBe("json");
+        expect(importFileKind("notes.txt")).toBe("");
+        expect(importFileKind("noext")).toBe("");
+        expect(importFileKind("")).toBe("");
     });
 });

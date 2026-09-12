@@ -26,6 +26,7 @@ global._ = jest.fn(str => str);
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
+global.rationalToFraction = require("../utils-logic").rationalToFraction;
 
 const {
     scaleDegreeToPitchMapping,
@@ -101,6 +102,7 @@ const {
     getSharpFlatPreference,
     getCustomNote,
     pitchToNumber,
+    parseNoteString,
     numberToPitchSharp,
     getNumber,
     getNoteFromInterval,
@@ -137,7 +139,14 @@ const {
     getModeNameFromLabel,
     getModeSliceColors,
     updateModeWheelItems,
-    getModeGroupTitleFont
+    getModeGroupTitleFont,
+    ratioToSclString,
+    parseSclFile,
+    temperamentToJson,
+    parseTemperamentJson,
+    modeToJson,
+    parseModeJson,
+    ratiosToNumericKeys
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -4367,6 +4376,212 @@ describe("generateNoteNames EDO length contract", () => {
         for (const edo of [3, 6, 12, 19]) {
             expect(generateNoteNames(edo)[0]).toBe("C");
             expect(generateNoteNames(edo)).toEqual(generateNoteNames(edo));
+        }
+    });
+});
+
+describe("ratioToSclString", () => {
+    it("converts common ratios to fractions", () => {
+        expect(ratioToSclString(1.5)).toBe("3/2");
+        expect(ratioToSclString(2)).toBe("2/1");
+    });
+
+    it("falls back to cents for irrational ratios", () => {
+        const result = ratioToSclString(Math.pow(2, 1 / 12));
+        expect(result).toMatch(/^\d+\.\d+$/);
+    });
+
+    it("throws on non-positive or infinite ratios", () => {
+        expect(() => ratioToSclString(0)).toThrow("Invalid ratio");
+        expect(() => ratioToSclString(-1)).toThrow("Invalid ratio");
+        expect(() => ratioToSclString(Infinity)).toThrow("Invalid ratio");
+        expect(() => ratioToSclString(NaN)).toThrow("Invalid ratio");
+    });
+});
+
+describe("parseSclFile", () => {
+    it("parses a .scl file with mixed ratios and cents", () => {
+        const content = [
+            "! meanquar.scl",
+            "!",
+            "1/4-comma meantone scale",
+            "3",
+            "76.04900",
+            "5/4",
+            "2/1"
+        ].join("\n");
+
+        const result = parseSclFile(content);
+        expect(result.description).toBe("1/4-comma meantone scale");
+        expect(result.pitchCount).toBe(3);
+        expect(result.pitches[0].cents).toBeCloseTo(76.049, 1);
+        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 4);
+    });
+
+    it("throws on empty content", () => {
+        expect(() => parseSclFile("")).toThrow();
+    });
+
+    it("round-trips ratioToSclString -> parseSclFile", () => {
+        const ratios = [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8, 2];
+        const sclLines = ratios.map(r => ratioToSclString(r));
+        const sclContent = ["! roundtrip.scl", "!", "Test scale", "8"].concat(sclLines).join("\n");
+
+        const result = parseSclFile(sclContent);
+        expect(result.pitchCount).toBe(8);
+        for (let i = 0; i < ratios.length; i++) {
+            expect(result.pitches[i].ratio).toBeCloseTo(ratios[i], 4);
+        }
+    });
+});
+
+describe("temperament JSON", () => {
+    const data = {
+        pitchNumber: 3,
+        octaveRatio: 2,
+        isEDO: false,
+        ratios: [1, 1.25, 1.5, 2],
+        interval: ["perfect 1", "major 3", "perfect 5", "perfect 8"]
+    };
+
+    it("round-trips exactly", () => {
+        const def = parseTemperamentJson(temperamentToJson("test", data, "C4"));
+        expect(def).toEqual({ ...data, name: "test", referencePitch: "C4" });
+    });
+
+    it("strict-rejects bad structure", () => {
+        expect(() => parseTemperamentJson("not json")).toThrow("Invalid JSON");
+        expect(() => parseTemperamentJson("[1,2]")).toThrow("expected an object");
+        expect(() => parseTemperamentJson(JSON.stringify({ ...data, pitchNumber: 5 }))).toThrow(
+            "pitchNumber mismatch"
+        );
+        expect(() => parseTemperamentJson(JSON.stringify({ ...data, ratios: [1, -2, 0] }))).toThrow(
+            "invalid ratios"
+        );
+        expect(() =>
+            parseTemperamentJson(JSON.stringify({ ...data, interval: ["perfect 1"] }))
+        ).toThrow("invalid interval names");
+        expect(() => parseTemperamentJson(JSON.stringify({ ...data, octaveRatio: 0 }))).toThrow(
+            "invalid octaveRatio"
+        );
+        expect(() => parseTemperamentJson(JSON.stringify({ ...data, isEDO: "yes" }))).toThrow(
+            "invalid isEDO"
+        );
+        expect(() =>
+            parseTemperamentJson(
+                JSON.stringify({ ...data, ratios: [1, 1.25, 1.5, 3], octaveRatio: 2 })
+            )
+        ).toThrow("does not match octaveRatio");
+    });
+
+    it("round-trips editor-saved custom (numeric keys, no ratios array)", () => {
+        // Editor-saved customs have numeric keys like "0": [ratio, note, oct]
+        // with no ratios/interval/octaveRatio/isEDO fields.
+        // The widget export must derive these before calling temperamentToJson.
+        const editorSaved = {
+            pitchNumber: 3,
+            0: [1, "C", 4],
+            1: [1.25, "E", 4],
+            2: [1.5, "G", 4]
+        };
+        const ratios = [];
+        const interval = [];
+        for (let i = 0; editorSaved["" + i] !== undefined; i++) {
+            ratios.push(editorSaved["" + i][0]);
+            interval.push("perfect 1");
+        }
+        // Append terminal octave ratio so the last entry matches octaveRatio
+        ratios.push(2);
+        interval.push("perfect 8");
+        const exportData = {
+            pitchNumber: ratios.length - 1,
+            ratios,
+            interval,
+            octaveRatio: 2,
+            isEDO: false
+        };
+        const json = temperamentToJson("custom", exportData, "C4");
+        const def = parseTemperamentJson(json);
+        expect(def.ratios).toEqual(ratios);
+        expect(def.interval).toEqual(interval);
+        expect(def.octaveRatio).toBe(2);
+        expect(def.isEDO).toBe(false);
+        expect(def.pitchNumber).toBe(3);
+    });
+});
+
+describe("mode JSON", () => {
+    it("round-trips exactly", () => {
+        const pattern = [2, 2, 1, 2, 2, 2, 1];
+        const def = parseModeJson(modeToJson("major", 12, pattern));
+        expect(def).toEqual({ name: "major", edo: 12, pattern });
+    });
+
+    it("strict-rejects bad structure", () => {
+        expect(() => parseModeJson("not json")).toThrow("Invalid JSON");
+        expect(() => parseModeJson(modeToJson("bad", 12, [2, 2, 1]))).toThrow(
+            "does not sum to edo"
+        );
+        expect(() => parseModeJson(modeToJson("bad", 4, [2, 2]))).toThrow("invalid edo");
+        expect(() => parseModeJson(modeToJson("bad", 12, [2, 0, 10]))).toThrow("invalid pattern");
+    });
+
+    it("mode→temperament ratio conversion matches expected ratios", () => {
+        // Simulates what the temperament widget does when importing a mode JSON
+        const modeDef = parseModeJson(modeToJson("major", 12, [2, 2, 1, 2, 2, 2, 1]));
+        const ratios = [1];
+        let cumCents = 0;
+        for (const step of modeDef.pattern) {
+            cumCents += step * (1200 / modeDef.edo);
+            ratios.push(Math.pow(2, cumCents / 1200));
+        }
+        const intervals = ratios.map((_, i) => "degree " + i);
+        expect(ratios).toHaveLength(8);
+        expect(intervals).toHaveLength(8);
+        expect(intervals[0]).toBe("degree 0");
+        expect(ratios[0]).toBe(1);
+        expect(ratios[7]).toBeCloseTo(2, 10);
+        // Major scale: W W H W W W H → 200 400 500 700 900 1100 1200 cents
+        expect(1200 * Math.log2(ratios[1])).toBeCloseTo(200, 5);
+        expect(1200 * Math.log2(ratios[3])).toBeCloseTo(500, 5);
+        expect(1200 * Math.log2(ratios[4])).toBeCloseTo(700, 5);
+    });
+});
+
+describe("ratiosToNumericKeys", () => {
+    // Contract required by the temperament widget init custom branch:
+    // t["0"] defined with t["0"][1] defined, and a finite ratio for every
+    // degree below the octave (the octave itself uses powerBase).
+    it("satisfies the widget custom-branch contract for any pitch count", () => {
+        for (const n of [3, 13, 22, 50]) {
+            const ratios = Array.from({ length: n }, (_, i) => Math.pow(2, i / (n - 1)));
+            const entry = {
+                pitchNumber: n - 1,
+                ...ratiosToNumericKeys(ratios)
+            };
+            expect(entry["0"]).toBeDefined();
+            expect(entry["0"][1]).toBeDefined();
+            for (let i = 0; i < entry.pitchNumber; i++) {
+                const ratio = entry["" + i][0];
+                expect(typeof ratio).toBe("number");
+                expect(isFinite(ratio)).toBe(true);
+            }
+            // Labels must be distinct so getCustomFrequency resolves each degree.
+            const labels = Object.keys(entry)
+                .filter(k => k !== "pitchNumber")
+                .map(k => entry[k][1]);
+            expect(new Set(labels).size).toBe(n - 1);
+            // Labels must survive the note lookup path the widget uses:
+            // parseNoteString(label + octave) -> getCustomNote -> original label.
+            for (const [key, triple] of Object.entries(entry)) {
+                if (key === "pitchNumber") {
+                    continue;
+                }
+                const [, label, octave] = triple;
+                const [parsed, parsedOctave] = parseNoteString(label + octave);
+                expect(parsedOctave).toBe(octave);
+                expect(getCustomNote(parsed)).toBe(label);
+            }
         }
     });
 });

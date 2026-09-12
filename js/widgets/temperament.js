@@ -19,12 +19,16 @@
 /*
    global
 
-   _, addTemperamentToDictionary, buildScale,
-   deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
-   getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
-   isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber
+    _, addTemperamentToDictionary, buildScale,
+    createSclSharePopup, deleteTemperamentFromList, docById, downloadScl, FLAT, getNoteFromInterval,
+    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio, importFileKind,
+    isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, parseSclFile,
+    parseTemperamentJson, pitchToFrequency,
+    platformColor, PREVIEWVOLUME, ratioToSclString, ratioToWheelAngle, rationalToFraction,
+    ratiosToNumericKeys, readSclFile,
+    setOctaveRatio, setOctaveRatio, SHARP, Singer, slicePath, temperamentToJson, updateTemperaments,
+    wheelnav, frequencyToPitch,
+    clampNumber
  */
 
 /* exported TemperamentWidget */
@@ -2192,6 +2196,186 @@ function TemperamentWidget() {
     };
 
     /**
+     * Derive ratios array from temperament data, handling editor-saved customs
+     * that store pitches as numeric keys without a ratios array.
+     * @param {Object} data - temperament entry from getTemperament()
+     * @returns {Array<number>|null} ratios or null if empty
+     */
+    this._getExportRatios = function (data) {
+        let ratios = data.ratios;
+        if (!Array.isArray(ratios) || ratios.length === 0) {
+            ratios = [];
+            for (let i = 0; data["" + i] !== undefined; i++) {
+                ratios.push(data["" + i][0]);
+            }
+            // Numeric keys store pitches below the octave; append the
+            // terminal period so the ratios array spans 1/1 → octave.
+            const period = data.octaveRatio || 2;
+            if (ratios.length === 0 || Math.abs(ratios[ratios.length - 1] - period) > 0.0001) {
+                ratios.push(period);
+            }
+        }
+        return ratios.length > 0 ? ratios : null;
+    };
+
+    /**
+     * Export the current temperament as a .scl file.
+     * @returns {void}
+     */
+    this._exportScl = function () {
+        const data = getTemperament(this.inTemperament);
+        if (!data) {
+            this.activity.errorMsg(_("No temperament to export."), 3000);
+            return;
+        }
+
+        const ratios = this._getExportRatios(data);
+        if (!ratios) {
+            this.activity.errorMsg(_("No ratios to export."), 3000);
+            return;
+        }
+
+        const lines = [];
+        lines.push("! " + this.inTemperament + ".scl");
+        lines.push("!");
+        lines.push(this.inTemperament + " - exported from Music Blocks");
+        // .scl convention: reference pitch (1/1) is implicit, skip it
+        lines.push(String(ratios.length - 1));
+
+        try {
+            for (let i = 1; i < ratios.length; i++) {
+                lines.push(ratioToSclString(ratios[i]));
+            }
+        } catch (e) {
+            this.activity.errorMsg(_("Export failed: ") + e.message, 3000);
+            return;
+        }
+
+        const content = lines.join("\n") + "\n";
+        downloadScl(content, this.inTemperament + ".scl");
+    };
+
+    /**
+     * Export the current temperament as a JSON file.
+     * @returns {void}
+     */
+    this._exportJson = function () {
+        const data = getTemperament(this.inTemperament);
+        if (!data) {
+            this.activity.errorMsg(_("No temperament to export."), 3000);
+            return;
+        }
+
+        const exportData = { ...data };
+        const ratios = this._getExportRatios(exportData);
+        if (!ratios) {
+            this.activity.errorMsg(_("No temperament to export."), 3000);
+            return;
+        }
+        exportData.ratios = ratios;
+        exportData.interval = ratios.map(() => "perfect 1");
+        exportData.pitchNumber = ratios.length - 1;
+        exportData.octaveRatio = exportData.octaveRatio || 2;
+        exportData.isEDO = false;
+
+        const content = temperamentToJson(
+            this.inTemperament,
+            exportData,
+            this._logo.synth.startingPitch
+        );
+        downloadScl(content, this.inTemperament + ".json");
+    };
+
+    /**
+     * Import a temperament from a .json or .scl file.
+     * @returns {void}
+     */
+    this._importFile = () => {
+        readSclFile("mySclFile", (err, data) => {
+            if (err) {
+                this.activity.errorMsg(err.message, 3000);
+                return;
+            }
+            if (!data) {
+                return;
+            }
+
+            let temperamentData;
+            let sclName;
+            const kind = importFileKind(data.file.name);
+            if (kind === "json") {
+                let def;
+                try {
+                    def = parseTemperamentJson(data.text);
+                } catch (e) {
+                    this.activity.errorMsg(_("Error reading JSON file: ") + e.message, 5000);
+                    return;
+                }
+                temperamentData = {
+                    pitchNumber: def.pitchNumber,
+                    octaveRatio: def.octaveRatio,
+                    isEDO: def.isEDO,
+                    ratios: def.ratios,
+                    interval: def.interval,
+                    ...ratiosToNumericKeys(def.ratios)
+                };
+                for (let i = 0; i < def.ratios.length; i++) {
+                    if (["__proto__", "constructor", "prototype"].includes(def.interval[i]))
+                        continue;
+                    temperamentData[def.interval[i]] = def.ratios[i];
+                }
+                sclName = def.name || data.file.name.replace(/\.json$/i, "");
+            } else if (kind === "scl") {
+                let result;
+                try {
+                    result = parseSclFile(data.text);
+                } catch (e) {
+                    this.activity.errorMsg(_("Error reading .scl file: ") + e.message, 5000);
+                    return;
+                }
+
+                const allRatios = [1];
+                for (let i = 0; i < result.pitches.length; i++) {
+                    if (i === 0 && Math.abs(result.pitches[i].ratio - 1) < 0.0001) {
+                        continue;
+                    }
+                    allRatios.push(result.pitches[i].ratio);
+                }
+
+                const intervals = [];
+                for (let i = 0; i < allRatios.length; i++) {
+                    const name = "degree " + i;
+                    intervals.push(name);
+                }
+
+                temperamentData = {
+                    pitchNumber: allRatios.length - 1,
+                    octaveRatio: allRatios[allRatios.length - 1],
+                    isEDO: false,
+                    ratios: allRatios,
+                    interval: intervals
+                };
+                Object.assign(temperamentData, ratiosToNumericKeys(allRatios));
+
+                sclName = result.description || data.file.name.replace(/\.scl$/i, "");
+            } else {
+                this.activity.errorMsg(_("Unsupported file type. Use .json or .scl."), 3000);
+                return;
+            }
+
+            const uniqueName = this.activity.blocks.findUniqueTemperamentName(sclName);
+            addTemperamentToDictionary(uniqueName, temperamentData);
+            addTemperamentToList([_(uniqueName), uniqueName, uniqueName]);
+            updateTemperaments();
+
+            this.inTemperament = uniqueName;
+            this.activity.errorMsg(_("Temperament imported: ") + uniqueName, 3000);
+
+            this.init(this.activity);
+        });
+    };
+
+    /**
      * Plays the note at the specified pitch number.
      * @param {number} pitchNumber - The pitch number of the note to play.
      * @returns {void}
@@ -2585,6 +2769,16 @@ function TemperamentWidget() {
             that._save();
         };
 
+        const shareBtn = widgetWindow.addButton("share.svg", ICONSIZE, _("Share"));
+        shareBtn.onclick = function () {
+            createSclSharePopup(
+                shareBtn,
+                () => that._exportScl(),
+                () => that._exportJson(),
+                () => that._importFile()
+            );
+        };
+
         const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
 
         let t = getTemperament(this.inTemperament);
@@ -2601,7 +2795,7 @@ function TemperamentWidget() {
         this.scale = this.scale[0] + " " + this.scale[1];
         this.scaleNotes = buildScale(this.scale);
         this.scaleNotes = this.scaleNotes[0];
-        this.powerBase = 2;
+        this.powerBase = t.octaveRatio || 2;
         const startingPitch = this._logo.synth.startingPitch;
         const str = [];
         const note = [];

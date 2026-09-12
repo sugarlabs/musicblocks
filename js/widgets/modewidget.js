@@ -13,11 +13,14 @@
 /* global
 
     docById, _, platformColor, keySignatureToMode, MUSICALMODES,
-    getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
+    createSclSharePopup, downloadScl, getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
     normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
-    getSavedCustomModes, configureWheel,
-    scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes
+    getSavedCustomModes, configureWheel, parseSclFile, parseModeJson,
+    readSclFile,
+    modeToJson, importFileKind,
+    scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
+    EDO_MIN, EDO_MAX
  */
 
 /*
@@ -175,6 +178,16 @@ class ModeWidget {
 
         this.widgetWindow.addButton("restore-button.svg", ModeWidget.ICONSIZE, _("Undo")).onclick =
             this._undo.bind(this);
+
+        const shareBtn = this.widgetWindow.addButton("share.svg", ModeWidget.ICONSIZE, _("Share"));
+        shareBtn.onclick = () => {
+            createSclSharePopup(
+                shareBtn,
+                () => this._exportScl(),
+                () => this._exportJson(),
+                () => this._importFile()
+            );
+        };
 
         this._piemenuMode();
 
@@ -510,7 +523,11 @@ class ModeWidget {
         }
     }
 
-    _saveCustomMode(name, pattern) {
+    _saveCustomMode(name, pattern, edo = this._activeEDO) {
+        if (["__proto__", "constructor", "prototype"].includes(name)) {
+            this.errorMsg(_("Invalid mode name."));
+            return false;
+        }
         const modes = getSavedCustomModes();
         const existing = modes.findIndex(m => m.name === name);
         // Refuse to overwrite a built-in mode; only registered customs may be updated.
@@ -527,7 +544,7 @@ class ModeWidget {
                 return false;
             }
         }
-        const entry = { name, pattern, edo: this._activeEDO };
+        const entry = { name, pattern, edo };
         if (existing >= 0) {
             modes[existing] = entry;
         } else {
@@ -1317,7 +1334,6 @@ class ModeWidget {
             12: "equal",
             17: "equal17",
             19: "equal19",
-            21: "1/4 comma meantone",
             31: "equal31"
         };
         if (map[edo]) {
@@ -1347,6 +1363,156 @@ class ModeWidget {
             return [edoNames[nameIndex], Math.floor((j + aIndex) / this._activeEDO) + 4];
         }
         return [name, octave + 4];
+    }
+
+    _exportScl() {
+        const pattern = this._calculateMode();
+        const edo = this._activeEDO;
+        if (!pattern || pattern.length === 0) {
+            this.errorMsg(_("No mode to export."));
+            return;
+        }
+
+        const lines = [];
+        lines.push("! mode.scl");
+        lines.push("!");
+        lines.push("Mode (" + edo + "EDO) - exported from Music Blocks");
+        lines.push(String(pattern.length));
+
+        let cumulativeCents = 0;
+        for (let i = 0; i < pattern.length; i++) {
+            cumulativeCents += pattern[i] * (1200 / edo);
+            lines.push(cumulativeCents.toFixed(2));
+        }
+
+        const content = lines.join("\n") + "\n";
+        downloadScl(content, "mode-" + edo + "edo.scl");
+    }
+
+    _exportJson() {
+        const pattern = this._calculateMode();
+        const edo = this._activeEDO;
+        if (!pattern || pattern.length === 0) {
+            this.errorMsg(_("No mode to export."));
+            return;
+        }
+
+        const content = modeToJson(this._selectedModeName || "custom", edo, pattern);
+        downloadScl(content, "mode-" + edo + "edo.json");
+    }
+
+    _importFile() {
+        readSclFile("myModeSclFile", (err, data) => {
+            if (err) {
+                this.errorMsg(err.message);
+                return;
+            }
+            if (!data) {
+                return;
+            }
+
+            let foundEdo = null;
+            let foundPattern = null;
+            let name = "";
+            let saved = false;
+
+            // Brute-force EDO 5-55 from pitch cents. Returns {edo, pattern} or null.
+            const findEdoPattern = pitches => {
+                for (let edo = EDO_MIN; edo <= EDO_MAX; edo++) {
+                    const step = 1200 / edo;
+                    const steps = [];
+                    let prevStepCount = 0;
+                    let valid = true;
+                    for (let i = 0; i < pitches.length; i++) {
+                        const stepCount = Math.round(pitches[i].cents / step);
+                        if (Math.abs(pitches[i].cents - stepCount * step) > 0.5) {
+                            valid = false;
+                            break;
+                        }
+                        if (stepCount <= prevStepCount) {
+                            valid = false;
+                            break;
+                        }
+                        steps.push(stepCount - prevStepCount);
+                        prevStepCount = stepCount;
+                    }
+                    if (valid && steps.length === pitches.length && prevStepCount === edo) {
+                        return { edo, pattern: steps };
+                    }
+                }
+                return null;
+            };
+
+            const kind = importFileKind(data.file.name);
+            if (kind === "json") {
+                let def;
+                try {
+                    def = parseModeJson(data.text);
+                } catch (e) {
+                    this.errorMsg(_("Error reading JSON file: ") + e.message);
+                    return;
+                }
+                foundEdo = def.edo;
+                foundPattern = def.pattern;
+                name = def.name || data.file.name.replace(/\.json$/i, "");
+                // Save before touching widget/synth so a refused name changes nothing.
+                if (!this._saveCustomMode(name, foundPattern, foundEdo)) {
+                    return;
+                }
+                saved = true;
+            } else if (kind === "scl") {
+                let result;
+                try {
+                    result = parseSclFile(data.text);
+                } catch (e) {
+                    this.errorMsg(_("Error reading .scl file: ") + e.message);
+                    return;
+                }
+
+                const edoResult = findEdoPattern(result.pitches);
+                if (!edoResult) {
+                    this.errorMsg(
+                        _("Not a valid EDO mode. Use the temperament widget for non-equal scales.")
+                    );
+                    return;
+                }
+                foundEdo = edoResult.edo;
+                foundPattern = edoResult.pattern;
+                name = result.description || data.file.name.replace(/\.scl$/i, "");
+                // Save before touching widget/synth so a refused name changes nothing.
+                if (!this._saveCustomMode(name, foundPattern, foundEdo)) {
+                    return;
+                }
+                saved = true;
+            } else {
+                this.errorMsg(_("Unsupported file type. Use .json or .scl."));
+                return;
+            }
+            const key = this._temperamentKeyForEDO(foundEdo);
+            this._cacheState(this._activeEDO);
+            this.logo.synth.inTemperament = key;
+            this._activeTemperamentKey = key;
+            this._rebuildWheel(foundEdo);
+            this._applyModePattern(foundPattern);
+            if (!saved && !this._saveCustomMode(name, foundPattern)) {
+                return;
+            }
+
+            this._selectedModeName = name;
+            this.errorMsg(_("Mode imported: ") + name);
+            // Sync the mode block and display so the imported mode is
+            // visible without re-opening the widget.
+            this._updateModeDisplay(name);
+            if (this._modeBlock !== null) {
+                const modeBlock = this.blocks.blockList[this._modeBlock];
+                if (modeBlock && modeBlock.name === "modename") {
+                    modeBlock.value = name;
+                    modeBlock.text.text = _(name);
+                    modeBlock.updateCache();
+                }
+                this.refreshCanvas();
+            }
+        });
     }
 
     _save() {
