@@ -87,7 +87,8 @@ describe("Arpeggio Widget", () => {
                 synth: {
                     whichTemperament: jest.fn(() => "12-TET"),
                     stop: jest.fn(),
-                    trigger: jest.fn()
+                    trigger: jest.fn(),
+                    setMasterVolume: jest.fn()
                 },
                 turtleDelay: 100
             },
@@ -763,6 +764,183 @@ describe("Arpeggio Widget", () => {
             expect(activityMock.logo.synth.setMasterVolume).toHaveBeenCalledWith(0.8);
             expect(arpeggio._playing).toBe(false);
             expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+        });
+
+        describe("Keyboard navigation", () => {
+            beforeEach(() => {
+                global.window.widgetWindows.focused = mockWidgetWindow;
+            });
+
+            test("Space key toggles playback via playButton.onclick", () => {
+                arpeggio.playButton.onclick = jest.fn();
+                const spaceEvent = new KeyboardEvent("keydown", {
+                    key: " ",
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(spaceEvent);
+
+                expect(arpeggio.playButton.onclick).toHaveBeenCalledTimes(1);
+            });
+
+            test("Space key code fallback triggers playback when playButton.onclick is absent", () => {
+                arpeggio.playButton = null;
+                arpeggio._playAll = jest.fn();
+                const spaceEvent = new KeyboardEvent("keydown", {
+                    code: "Space",
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(spaceEvent);
+
+                expect(arpeggio._playing).toBe(true);
+                expect(arpeggio._playAll).toHaveBeenCalledTimes(1);
+            });
+
+            test("ArrowUp and Shift+ArrowUp shift octave up", () => {
+                arpeggio.addNode(1, 1);
+                expect(arpeggio._blockMap).toContainEqual([1, 1]);
+
+                // ArrowUp
+                const arrowUpEvent = new KeyboardEvent("keydown", {
+                    key: "ArrowUp",
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(arrowUpEvent);
+                expect(arpeggio._blockMap).toContainEqual([0, 1]);
+
+                // Shift+ArrowUp
+                const shiftArrowUpEvent = new KeyboardEvent("keydown", {
+                    key: "ArrowUp",
+                    shiftKey: true,
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(shiftArrowUpEvent);
+                expect(arpeggio._blockMap).toContainEqual([12, 1]);
+            });
+
+            test("ArrowDown and Shift+ArrowDown shift octave down", () => {
+                arpeggio.addNode(0, 1);
+                expect(arpeggio._blockMap).toContainEqual([0, 1]);
+
+                // ArrowDown
+                const arrowDownEvent = new KeyboardEvent("keydown", {
+                    key: "ArrowDown",
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(arrowDownEvent);
+                expect(arpeggio._blockMap).toContainEqual([1, 1]);
+
+                // Shift+ArrowDown
+                const shiftArrowDownEvent = new KeyboardEvent("keydown", {
+                    key: "ArrowDown",
+                    shiftKey: true,
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(shiftArrowDownEvent);
+                expect(arpeggio._blockMap).toContainEqual([2, 1]);
+            });
+
+            test("keyCode fallbacks trigger octave shift and play toggle", () => {
+                arpeggio.addNode(1, 1);
+                arpeggio.playButton.onclick = jest.fn();
+
+                // keyCode 38 (Up)
+                const upEvent = {
+                    keyCode: 38,
+                    preventDefault: jest.fn(),
+                    stopPropagation: jest.fn()
+                };
+                arpeggio._keyHandler(upEvent);
+                expect(arpeggio._blockMap).toContainEqual([0, 1]);
+                expect(upEvent.preventDefault).toHaveBeenCalled();
+
+                // keyCode 40 (Down)
+                const downEvent = {
+                    keyCode: 40,
+                    preventDefault: jest.fn(),
+                    stopPropagation: jest.fn()
+                };
+                arpeggio._keyHandler(downEvent);
+                expect(arpeggio._blockMap).toContainEqual([1, 1]);
+                expect(downEvent.preventDefault).toHaveBeenCalled();
+
+                // keyCode 32 (Space)
+                const spaceEvent = {
+                    keyCode: 32,
+                    preventDefault: jest.fn(),
+                    stopPropagation: jest.fn()
+                };
+                arpeggio._keyHandler(spaceEvent);
+                expect(arpeggio.playButton.onclick).toHaveBeenCalled();
+                expect(spaceEvent.preventDefault).toHaveBeenCalled();
+            });
+
+            test("keyboard shortcuts are ignored when widget is not focused", () => {
+                global.window.widgetWindows.focused = {}; // different widget
+                arpeggio.playButton.onclick = jest.fn();
+
+                const spaceEvent = new KeyboardEvent("keydown", {
+                    key: " ",
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(spaceEvent);
+
+                expect(arpeggio.playButton.onclick).not.toHaveBeenCalled();
+            });
+
+            test("keyboard shortcuts are ignored when an active block is present", () => {
+                activityMock.blocks = { activeBlock: "block1" };
+                arpeggio.playButton.onclick = jest.fn();
+
+                const spaceEvent = new KeyboardEvent("keydown", {
+                    key: " ",
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(spaceEvent);
+
+                expect(arpeggio.playButton.onclick).not.toHaveBeenCalled();
+            });
+
+            test("keyboard shortcuts are ignored when typing in input, textarea, or button", () => {
+                arpeggio.playButton.onclick = jest.fn();
+
+                const input = document.createElement("input");
+                document.body.appendChild(input);
+                input.focus();
+
+                const spaceEvent = new KeyboardEvent("keydown", {
+                    key: " ",
+                    bubbles: true,
+                    cancelable: true
+                });
+                document.dispatchEvent(spaceEvent);
+
+                expect(arpeggio.playButton.onclick).not.toHaveBeenCalled();
+
+                const btn = document.createElement("button");
+                document.body.appendChild(btn);
+                btn.focus();
+
+                document.dispatchEvent(spaceEvent);
+                expect(arpeggio.playButton.onclick).not.toHaveBeenCalled();
+            });
+
+            test("widgetWindow.onclose removes the keydown listener", () => {
+                const removeSpy = jest.spyOn(document, "removeEventListener");
+
+                mockWidgetWindow.onclose();
+
+                expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function), true);
+                expect(arpeggio._keyHandler).toBeNull();
+                removeSpy.mockRestore();
+            });
         });
     });
 });

@@ -49,6 +49,7 @@ class Arpeggio {
         this._playTimeout = null;
         this._arpeggioCellTables = []; // cached arpeggioCellTable elements
         this._arpeggioTable = null; // cached arpeggioTable element
+        this._keyHandler = null;
     }
 
     /**
@@ -81,10 +82,18 @@ class Arpeggio {
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
+        if (this._keyHandler) {
+            document.removeEventListener("keydown", this._keyHandler, true);
+            this._keyHandler = null;
+        }
+
         const widgetWindow = window.widgetWindows.windowFor(this, "arpeggio");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        if (typeof widgetWindow.takeFocus === "function") {
+            widgetWindow.takeFocus();
+        }
 
         this.playButton = widgetWindow.addButton("play-button.svg", Arpeggio.ICONSIZE, _("Play"));
 
@@ -131,6 +140,10 @@ class Arpeggio {
 
         // For the button callbacks
         widgetWindow.onclose = () => {
+            if (this._keyHandler) {
+                document.removeEventListener("keydown", this._keyHandler, true);
+                this._keyHandler = null;
+            }
             if (this._playTimeout) {
                 clearTimeout(this._playTimeout);
                 this._playTimeout = null;
@@ -140,7 +153,11 @@ class Arpeggio {
             if (
                 typeof Singer !== "undefined" &&
                 Singer.masterVolume &&
-                Singer.masterVolume.length > 0
+                Singer.masterVolume.length > 0 &&
+                this._activity &&
+                this._activity.logo &&
+                this._activity.logo.synth &&
+                typeof this._activity.logo.synth.setMasterVolume === "function"
             ) {
                 const vol =
                     typeof last === "function"
@@ -153,6 +170,70 @@ class Arpeggio {
             this._activity.hideMsgs();
             widgetWindow.destroy();
         };
+
+        this._keyHandler = event => {
+            if (
+                typeof window === "undefined" ||
+                !window.widgetWindows ||
+                window.widgetWindows.focused !== widgetWindow
+            ) {
+                return;
+            }
+
+            if (
+                this._activity &&
+                this._activity.blocks &&
+                this._activity.blocks.activeBlock !== null &&
+                this._activity.blocks.activeBlock !== undefined
+            ) {
+                return;
+            }
+
+            const activeElement = document.activeElement;
+            if (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.isContentEditable)
+            ) {
+                return;
+            }
+
+            if (
+                activeElement &&
+                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT")
+            ) {
+                return;
+            }
+
+            if (event.key === " " || event.code === "Space" || event.keyCode === 32) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (this.playButton && typeof this.playButton.onclick === "function") {
+                    this.playButton.onclick();
+                } else {
+                    this._playing = !this._playing;
+                    this._activity.logo.turtleDelay = 0;
+                    this._playAll();
+                }
+                return;
+            }
+
+            if (event.key === "ArrowUp" || event.code === "ArrowUp" || event.keyCode === 38) {
+                event.preventDefault();
+                event.stopPropagation();
+                this._shiftOctave(-1);
+                return;
+            }
+
+            if (event.key === "ArrowDown" || event.code === "ArrowDown" || event.keyCode === 40) {
+                event.preventDefault();
+                event.stopPropagation();
+                this._shiftOctave(1);
+            }
+        };
+
+        document.addEventListener("keydown", this._keyHandler, true);
 
         this.widgetWindow.onmaximize = this._scale;
 
