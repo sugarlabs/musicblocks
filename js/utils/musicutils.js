@@ -67,7 +67,7 @@ const _b64Cache = new Map();
     getModeLabel, getModeNameFromLabel, getModeSliceColors,
     updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
     isNonEDO, getNonEDOModeSteps, getNonEDOFrequency,
-    configureWheel
+    configureWheel, parseEDOTemperament
 */
 
 const stripMicrotonalPrefix = note => note.replace(/^[v^]+/, "");
@@ -936,6 +936,19 @@ const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
 const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
 
 /**
+ * Parse an EDO division number from a temperament string (e.g. "19-EDO", "19EDO", "31-edo").
+ * @param {string} temperament - Temperament string
+ * @returns {number|null} The parsed EDO number, or null if not matching
+ */
+const parseEDOTemperament = temperament => {
+    if (typeof temperament !== "string") {
+        return null;
+    }
+    const match = temperament.match(/^(\d+)-?EDO$/i);
+    return match ? Number(match[1]) : null;
+};
+
+/**
  * Returns the number of pitches in the given temperament's octave.
  * Falls back to 12-EDO if temperament is not found.
  * @param {string} temperament - temperament key (e.g., "equal", "equal19")
@@ -944,7 +957,10 @@ const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
 const getCurrentEDO = temperament => {
     if (!temperament) return 12;
     const t = TEMPERAMENT[temperament];
-    return t && t.pitchNumber ? t.pitchNumber : 12;
+    if (t && t.pitchNumber) return t.pitchNumber;
+    const edo = parseEDOTemperament(temperament);
+    if (edo !== null) return edo;
+    return 12;
 };
 
 const EDO_NOTE_NAMES = {};
@@ -3841,6 +3857,9 @@ const isTrueEDO = temperament => {
  * @returns {boolean} True if the temperament is an equal division of the octave.
  */
 const isEquallyTempered = temperament => {
+    if (parseEDOTemperament(temperament) !== null) {
+        return true;
+    }
     const t = getTemperament(temperament);
     if (!t || typeof t !== "object") {
         return false;
@@ -7552,6 +7571,11 @@ const parseNoteString = note => {
     if (match) {
         return [match[1], Number(match[2])];
     }
+    // Match custom/microtonal notes with cents and an octave (e.g. "^^G♭(+0¢)4", "C(+14¢)4")
+    const centsMatch = note.match(/^(.*\([+-]?\d+¢\))(-?\d+)$/);
+    if (centsMatch) {
+        return [centsMatch[1], Number(centsMatch[2])];
+    }
     // Fallback to original behavior if regex doesn't match (for edge cases)
     const len = note.length;
     const lastChar = note.charAt(len - 1);
@@ -8326,6 +8350,7 @@ if (typeof module !== "undefined" && module.exports) {
         getTemperamentCents,
         getTemperamentName,
         getCurrentEDO,
+        parseEDOTemperament,
         noteToObj,
         frequencyToPitch,
         getArticulation,

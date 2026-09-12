@@ -41,6 +41,7 @@ const {
     durationToNoteValue,
     calcNoteValueToDisplay,
     noteToPitchOctave,
+    parseNoteString,
     pitchToFrequency,
     noteIsSolfege,
     getSolfege,
@@ -125,6 +126,7 @@ const {
     PITCHES3,
     normalizeNoteAccidentals,
     getCurrentEDO,
+    parseEDOTemperament,
     scalePatternToEDO,
     PITCH_COLLECTIONS_EDO_OVERRIDES,
     getModePattern,
@@ -247,6 +249,47 @@ describe("getCurrentEDO", () => {
 
     it("should return 12 for nonexistent temperament", () => {
         expect(getCurrentEDO("nonexistent")).toBe(12);
+    });
+
+    it("should return parsed EDO number for hyphenated EDO string", () => {
+        expect(getCurrentEDO("19-EDO")).toBe(19);
+    });
+
+    it("should return parsed EDO number for non-hyphenated EDO string", () => {
+        expect(getCurrentEDO("19EDO")).toBe(19);
+    });
+});
+
+describe("parseEDOTemperament", () => {
+    it("should parse hyphenated EDO strings (e.g. '19-EDO')", () => {
+        expect(parseEDOTemperament("19-EDO")).toBe(19);
+        expect(parseEDOTemperament("12-EDO")).toBe(12);
+        expect(parseEDOTemperament("31-EDO")).toBe(31);
+    });
+
+    it("should parse non-hyphenated EDO strings (e.g. '19EDO')", () => {
+        expect(parseEDOTemperament("19EDO")).toBe(19);
+        expect(parseEDOTemperament("7EDO")).toBe(7);
+    });
+
+    it("should be case-insensitive (e.g. '31-edo', '24edo')", () => {
+        expect(parseEDOTemperament("31-edo")).toBe(31);
+        expect(parseEDOTemperament("24edo")).toBe(24);
+    });
+
+    it("should return null for non-EDO temperament names", () => {
+        expect(parseEDOTemperament("equal")).toBeNull();
+        expect(parseEDOTemperament("just intonation")).toBeNull();
+        expect(parseEDOTemperament("Pythagorean")).toBeNull();
+        expect(parseEDOTemperament("")).toBeNull();
+    });
+
+    it("should return null for non-string values", () => {
+        expect(parseEDOTemperament(null)).toBeNull();
+        expect(parseEDOTemperament(undefined)).toBeNull();
+        expect(parseEDOTemperament(19)).toBeNull();
+        expect(parseEDOTemperament(true)).toBeNull();
+        expect(parseEDOTemperament({})).toBeNull();
     });
 });
 
@@ -4368,5 +4411,27 @@ describe("generateNoteNames EDO length contract", () => {
             expect(generateNoteNames(edo)[0]).toBe("C");
             expect(generateNoteNames(edo)).toEqual(generateNoteNames(edo));
         }
+    });
+});
+
+describe("parseNoteString", () => {
+    it("parses standard notes and octaves correctly", () => {
+        expect(parseNoteString("C4")).toEqual(["C", 4]);
+        expect(parseNoteString("A#3")).toEqual(["A#", 3]);
+        expect(parseNoteString("Bb2")).toEqual(["Bb", 2]);
+        expect(parseNoteString("sol4")).toEqual(["sol", 4]);
+        expect(parseNoteString("sa1")).toEqual(["sa", 1]);
+    });
+
+    it("parses microtonal notes with cents offsets and octaves", () => {
+        expect(parseNoteString("C(+0¢)4")).toEqual(["C(+0¢)", 4]);
+        expect(parseNoteString("C(+14¢)4")).toEqual(["C(+14¢)", 4]);
+        expect(parseNoteString("^^G♭(+0¢)4")).toEqual(["^^G♭(+0¢)", 4]);
+        expect(parseNoteString("D(-25¢)2")).toEqual(["D(-25¢)", 2]);
+    });
+
+    it("handles negative octaves", () => {
+        expect(parseNoteString("C-1")).toEqual(["C", -1]);
+        expect(parseNoteString("A(+10¢)-2")).toEqual(["A(+10¢)", -2]);
     });
 });
