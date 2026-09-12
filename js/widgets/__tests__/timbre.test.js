@@ -1188,4 +1188,1101 @@ describe("TimbreWidget", () => {
             expect(timbre.synthVals["envelope"]["release"]).toBe(0.25);
         });
     });
+
+    describe("Deep Unit Coverage for TimbreWidget", () => {
+        let mockDocument;
+        let mockDocById;
+        let mockDocByName;
+        let mockBlocks;
+        let mockActivity;
+
+        const createBlock = (name, connections = [null, null, null], value = undefined) => ({
+            name,
+            connections: [...connections],
+            value,
+            text: { text: value === undefined ? "" : value.toString() },
+            updateCache: jest.fn(),
+            isClampBlock: jest.fn(() => name === "clamp" || name === "settimbre")
+        });
+
+        beforeEach(() => {
+            mockDocument = global.document;
+            mockDocById = global.docById;
+            mockDocByName = global.docByName;
+
+            global.document = jsdomDocument;
+            global.docById = id => jsdomDocument.getElementById(id);
+            global.docByName = name => jsdomDocument.getElementsByName(name);
+            global.Singer = {
+                masterVolume: [0.8],
+                defaultBPMFactor: 1,
+                RhythmActions: { getNoteValue: jest.fn(() => 0.25) }
+            };
+            global.FILTERTYPES = [
+                ["", "lowpass"],
+                ["", "highpass"],
+                ["bandpass", "bandpass"]
+            ];
+            global.OSCTYPES = [
+                ["", "sine"],
+                ["triangle", "triangle"],
+                ["sawtooth", "sawtooth"],
+                ["square", "square"]
+            ];
+
+            jsdomDocument.body.textContent = "";
+
+            mockBlocks = {
+                blockList: [
+                    createBlock("settimbre", [null, null, 1]),
+                    createBlock("number", [0], 10),
+                    createBlock("text", [0], "custom")
+                ],
+                clampBlocksToCheck: [],
+                findBottomBlock: jest.fn(id => id),
+                adjustDocks: jest.fn(),
+                adjustExpandableClampBlock: jest.fn(),
+                sendStackToTrash: jest.fn(),
+                loadNewBlocks: jest.fn(blockObjs => {
+                    const blockOffset = mockBlocks.blockList.length;
+                    for (const blockObj of blockObjs) {
+                        const blockName = Array.isArray(blockObj[1]) ? blockObj[1][0] : blockObj[1];
+                        const value = Array.isArray(blockObj[1]) ? blockObj[1][1].value : undefined;
+                        const connections = blockObj[4].map(c =>
+                            c === null ? null : c + blockOffset
+                        );
+                        mockBlocks.blockList.push(createBlock(blockName, connections, value));
+                    }
+                })
+            };
+
+            mockActivity = {
+                blocks: mockBlocks,
+                logo: {
+                    synth: {
+                        createSynth: jest.fn(),
+                        setMasterVolume: jest.fn(),
+                        trigger: jest.fn(),
+                        stop: jest.fn()
+                    },
+                    resetSynth: jest.fn(),
+                    parseArg: jest.fn(() => 0.0625)
+                },
+                refreshCanvas: jest.fn(),
+                saveLocally: jest.fn(),
+                errorMsg: jest.fn(),
+                textMsg: jest.fn(),
+                hideMsgs: jest.fn()
+            };
+
+            global.instrumentsFilters = [{ custom: [] }];
+            global.instrumentsEffects = [{ custom: {} }];
+
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn((icon, size, label) => {
+                    const btn = jsdomDocument.createElement("div");
+                    btn.title = label;
+                    btn.style = {};
+                    jsdomDocument.body.appendChild(btn);
+                    return btn;
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn(),
+                    appendChild: jest.fn(),
+                    style: {}
+                }),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn()
+            };
+
+            const mockWidgetWindows = {
+                windowFor: jest.fn().mockReturnValue(mockWidgetWindow)
+            };
+
+            window.widgetWindows = mockWidgetWindows;
+            if (typeof global.window !== "undefined") {
+                global.window.widgetWindows = mockWidgetWindows;
+            }
+
+            const buttonIds = [
+                "synthButtonCell",
+                "oscillatorButtonCell",
+                "envelopeButtonCell",
+                "effectsButtonCell",
+                "filterButtonCell"
+            ];
+            for (const bId of buttonIds) {
+                const btn = jsdomDocument.createElement("div");
+                btn.id = bId;
+                btn.style = {};
+                jsdomDocument.body.appendChild(btn);
+            }
+
+            timbre = new TimbreWidget();
+            timbre.activity = mockActivity;
+            timbre.blockNo = 0;
+            jsdomDocument.body.appendChild(timbre.timbreTableDiv);
+        });
+
+        afterEach(() => {
+            if (timbre && typeof timbre._clearWidgetTimers === "function") {
+                timbre._clearWidgetTimers();
+            }
+            jsdomDocument.body.textContent = "";
+            global.document = mockDocument;
+            global.docById = mockDocById;
+            global.docByName = mockDocByName;
+            jest.useRealTimers();
+        });
+
+        describe("_update method across all active modules", () => {
+            test("updates envelope connections with numeric value", async () => {
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("envelope", [
+                        null,
+                        bOffset + 1,
+                        bOffset + 2,
+                        bOffset + 3,
+                        bOffset + 4
+                    ]),
+                    createBlock("number", [bOffset], 1),
+                    createBlock("number", [bOffset], 50),
+                    createBlock("number", [bOffset], 60),
+                    createBlock("number", [bOffset], 1)
+                );
+                timbre.env = [bOffset];
+                timbre.isActive["envelope"] = true;
+
+                await timbre._update(0, 0.45, 1);
+
+                expect(mockBlocks.blockList[bOffset + 2].value).toBe(0.45);
+                expect(mockBlocks.blockList[bOffset + 2].text.text).toBe("0.45");
+                expect(mockBlocks.blockList[bOffset + 2].updateCache).toHaveBeenCalled();
+                expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+                expect(mockActivity.saveLocally).toHaveBeenCalled();
+            });
+
+            test("updates filter connections with string and numeric values", async () => {
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("filter", [null, bOffset + 1, bOffset + 2, bOffset + 3]),
+                    createBlock("filtertype", [bOffset], "lowpass"),
+                    createBlock("number", [bOffset], -12),
+                    createBlock("number", [bOffset], 392)
+                );
+                timbre.fil = [bOffset];
+                timbre.isActive["filter"] = true;
+
+                await timbre._update(0, "highpass", 0);
+                expect(mockBlocks.blockList[bOffset + 1].value).toBe("highpass");
+
+                await timbre._update(0, -24, 1);
+                expect(mockBlocks.blockList[bOffset + 2].value).toBe(-24);
+            });
+
+            test("updates oscillator connections", async () => {
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("oscillator", [null, bOffset + 1, bOffset + 2]),
+                    createBlock("oscillatortype", [bOffset], "sine"),
+                    createBlock("number", [bOffset], 6)
+                );
+                timbre.osc = [bOffset];
+                timbre.isActive["oscillator"] = true;
+
+                await timbre._update(0, "sawtooth", 0);
+                expect(mockBlocks.blockList[bOffset + 1].value).toBe("sawtooth");
+
+                await timbre._update(0, 8, 1);
+                expect(mockBlocks.blockList[bOffset + 2].value).toBe(8);
+            });
+
+            test("updates amsynth, fmsynth, noisesynth, and duosynth", async () => {
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("amsynth", [null, bOffset + 1]),
+                    createBlock("number", [bOffset], 3),
+                    createBlock("fmsynth", [null, bOffset + 3]),
+                    createBlock("number", [bOffset + 2], 10),
+                    createBlock("noisesynth", [null, bOffset + 5]),
+                    createBlock("text", [bOffset + 4], "white"),
+                    createBlock("duosynth", [null, bOffset + 7, bOffset + 8]),
+                    createBlock("number", [bOffset + 6], 10),
+                    createBlock("number", [bOffset + 6], 6)
+                );
+
+                timbre.AMSynthesizer = [bOffset];
+                timbre.isActive["amsynth"] = true;
+                await timbre._update(0, 5, 0);
+                expect(mockBlocks.blockList[bOffset + 1].value).toBe(5);
+
+                timbre.isActive["amsynth"] = false;
+                timbre.FMSynthesizer = [bOffset + 2];
+                timbre.isActive["fmsynth"] = true;
+                await timbre._update(0, 15, 0);
+                expect(mockBlocks.blockList[bOffset + 3].value).toBe(15);
+
+                timbre.isActive["fmsynth"] = false;
+                timbre.NoiseSynthesizer = [bOffset + 4];
+                timbre.isActive["noisesynth"] = true;
+                await timbre._update(0, "pink", 0);
+                expect(mockBlocks.blockList[bOffset + 5].value).toBe("pink");
+
+                timbre.isActive["noisesynth"] = false;
+                timbre.duoSynthesizer = [bOffset + 6];
+                timbre.isActive["duosynth"] = true;
+                await timbre._update(0, 8, 1);
+                expect(mockBlocks.blockList[bOffset + 8].value).toBe(8);
+            });
+
+            test("updates tremolo, chorus, phaser, and distortion", async () => {
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("tremolo", [null, bOffset + 1, bOffset + 2]),
+                    createBlock("number", [bOffset], 10),
+                    createBlock("number", [bOffset], 50),
+                    createBlock("chorus", [null, bOffset + 4, bOffset + 5, bOffset + 6]),
+                    createBlock("number", [bOffset + 3], 2),
+                    createBlock("number", [bOffset + 3], 4),
+                    createBlock("number", [bOffset + 3], 70),
+                    createBlock("phaser", [null, bOffset + 8, bOffset + 9, bOffset + 10]),
+                    createBlock("number", [bOffset + 7], 5),
+                    createBlock("number", [bOffset + 7], 3),
+                    createBlock("number", [bOffset + 7], 100),
+                    createBlock("dis", [null, bOffset + 12]),
+                    createBlock("number", [bOffset + 11], 40)
+                );
+
+                timbre.tremoloEffect = [bOffset];
+                timbre.isActive["tremolo"] = true;
+                await timbre._update(0, 20, 0);
+                expect(mockBlocks.blockList[bOffset + 1].value).toBe(20);
+
+                timbre.isActive["tremolo"] = false;
+                timbre.chorusEffect = [bOffset + 3];
+                timbre.isActive["chorus"] = true;
+                await timbre._update(0, 3, 0);
+                expect(mockBlocks.blockList[bOffset + 4].value).toBe(3);
+
+                timbre.isActive["chorus"] = false;
+                timbre.phaserEffect = [bOffset + 7];
+                timbre.isActive["phaser"] = true;
+                await timbre._update(0, 300, 2);
+                expect(mockBlocks.blockList[bOffset + 10].value).toBe(300);
+
+                timbre.isActive["phaser"] = false;
+                timbre.distortionEffect = [bOffset + 11];
+                timbre.isActive["distortion"] = true;
+                await timbre._update(0, 80, 0);
+                expect(mockBlocks.blockList[bOffset + 12].value).toBe(80);
+            });
+
+            test("updates vibrato when divBlock is divide with number children", async () => {
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("vibrato", [null, bOffset + 1, bOffset + 2]),
+                    createBlock("number", [bOffset], 5),
+                    createBlock("divide", [bOffset, bOffset + 3, bOffset + 4]),
+                    createBlock("number", [bOffset + 2], 1),
+                    createBlock("number", [bOffset + 2], 16)
+                );
+                timbre.vibratoEffect = [bOffset];
+                timbre.isActive["vibrato"] = true;
+
+                await timbre._update(0, 10, 0);
+                expect(mockBlocks.blockList[bOffset + 1].value).toBe(10);
+            });
+
+            test("updates vibrato when divBlock needs conversion via rationalToFraction", async () => {
+                jest.useFakeTimers();
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("vibrato", [null, bOffset + 1, bOffset + 2]),
+                    createBlock("number", [bOffset], 5),
+                    createBlock("other", [bOffset])
+                );
+                timbre.vibratoEffect = [bOffset];
+                timbre.isActive["vibrato"] = true;
+
+                const promise = timbre._update(0, 8, 1);
+                jest.runAllTimers();
+                await promise;
+
+                expect(mockBlocks.loadNewBlocks).toHaveBeenCalled();
+            });
+        });
+
+        describe("_playNote and _play playback lifecycle", () => {
+            test("_playNote triggers with all effect options when active", () => {
+                global.instrumentsEffects[0]["custom"] = {
+                    vibratoActive: true,
+                    vibratoFrequency: 0.1,
+                    vibratoIntensity: 0.08,
+                    distortionActive: true,
+                    distortionAmount: 0.6,
+                    tremoloActive: true,
+                    tremoloFrequency: 12,
+                    tremoloDepth: 0.7,
+                    phaserActive: true,
+                    rate: 4,
+                    octaves: 2,
+                    baseFrequency: 450,
+                    chorusActive: true,
+                    chorusRate: 3,
+                    delayTime: 5,
+                    chorusDepth: 0.8
+                };
+                global.instrumentsFilters[0]["custom"] = [
+                    { filterType: "lowpass", filterRolloff: -12, filterFrequency: 400 }
+                ];
+
+                timbre._playNote("C4", 0.5);
+
+                expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalledWith(0.8);
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                    0,
+                    "C4",
+                    0.5,
+                    "custom",
+                    expect.objectContaining({
+                        doVibrato: true,
+                        vibratoFrequency: 0.1,
+                        vibratoIntensity: 0.08,
+                        doDistortion: true,
+                        distortionAmount: 0.6,
+                        doTremolo: true,
+                        tremoloFrequency: 12,
+                        tremoloDepth: 0.7,
+                        doPhaser: true,
+                        rate: 4,
+                        octaves: 2,
+                        baseFrequency: 450,
+                        doChorus: true,
+                        chorusRate: 3,
+                        delayTime: 5,
+                        chorusDepth: 0.8
+                    }),
+                    global.instrumentsFilters[0]["custom"]
+                );
+            });
+
+            test("_playNote handles effect fallbacks when custom properties are omitted", () => {
+                global.instrumentsEffects[0]["custom"] = {
+                    vibratoActive: true,
+                    distortionActive: true,
+                    tremoloActive: true,
+                    phaserActive: true,
+                    chorusActive: true
+                };
+                timbre.vibratoParams = [8, 16];
+                timbre.distortionParams = [70];
+                timbre.tremoloParams = [15, 60];
+                timbre.phaserParams = [6, 4, 500];
+                timbre.chorusParams = [2.5, 4.5, 80];
+
+                timbre._playNote("D4", 0.25);
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                    0,
+                    "D4",
+                    0.25,
+                    "custom",
+                    expect.objectContaining({
+                        doVibrato: true,
+                        vibratoIntensity: 0.08,
+                        doDistortion: true,
+                        distortionAmount: 0.7,
+                        doTremolo: true,
+                        tremoloFrequency: 15,
+                        tremoloDepth: 0.6,
+                        doPhaser: true,
+                        rate: 6,
+                        octaves: 4,
+                        baseFrequency: 500,
+                        doChorus: true,
+                        chorusRate: 2.5,
+                        delayTime: 4.5,
+                        chorusDepth: 80
+                    }),
+                    expect.any(Array)
+                );
+            });
+
+            test("_playNote falls back when instrument is not in instrumentsFilters", () => {
+                delete global.instrumentsFilters[0]["custom"];
+                timbre._playNote("E4", 0.5);
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                    0,
+                    "E4",
+                    0.5,
+                    "custom",
+                    null,
+                    null
+                );
+            });
+
+            test("_play starts playback, runs play loop, and completes when all notes finish", () => {
+                jest.useFakeTimers();
+                timbre.playButton = jsdomDocument.createElement("div");
+                timbre.notesToPlay = [
+                    ["C4", 0.25],
+                    ["D4", 0.25]
+                ];
+
+                timbre._play();
+                expect(timbre._playing).toBe(true);
+                expect(mockActivity.logo.resetSynth).toHaveBeenCalledWith(0);
+
+                // Run timers to advance to note 2
+                jest.runOnlyPendingTimers();
+                // Run timers to finish playback
+                jest.runOnlyPendingTimers();
+
+                expect(timbre._playing).toBe(false);
+            });
+
+            test("_play stops playback when clicked again during playing", () => {
+                jest.useFakeTimers();
+                timbre.playButton = jsdomDocument.createElement("div");
+                timbre.notesToPlay = [
+                    ["C4", 0.25],
+                    ["D4", 0.25]
+                ];
+
+                timbre._play();
+                expect(timbre._playing).toBe(true);
+
+                // Click again to stop
+                timbre._play();
+                expect(timbre._playing).toBe(false);
+                expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalledWith(0);
+                expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
+            });
+        });
+
+        describe("_save and _undo methods", () => {
+            test("_save loads new settimbre blocks and increments delta", () => {
+                timbre._delta = 0;
+                timbre._save();
+                expect(mockBlocks.loadNewBlocks).toHaveBeenCalled();
+                expect(timbre._delta).toBe(42);
+            });
+
+            test("_undo for envelope", () => {
+                timbre._update = jest.fn();
+                timbre.ENVs = [1, 50, 60, 1];
+                timbre._envelope(false);
+                timbre.isActive["envelope"] = true;
+                timbre._undo();
+                expect(timbre.synthVals["envelope"]["attack"]).toBe(0.01);
+                expect(mockActivity.logo.synth.createSynth).toHaveBeenCalled();
+            });
+
+            test("_undo for amsynth, fmsynth, noisesynth, and duosynth", async () => {
+                timbre._update = jest.fn();
+                timbre._synth();
+
+                const amRadio = jsdomDocument.querySelector('input[value="AMSynth"]');
+                await amRadio.onclick({ target: amRadio });
+                timbre.isActive["amsynth"] = true;
+                timbre.AMSynthParams = ["4"];
+                timbre._undo();
+                expect(timbre.amSynthParamvals["harmonicity"]).toBe(4);
+                expect(mockActivity.logo.synth.createSynth).toHaveBeenCalledWith(
+                    0,
+                    "custom",
+                    "amsynth",
+                    expect.any(Object)
+                );
+
+                const fmRadio = jsdomDocument.querySelector('input[value="FMSynth"]');
+                await fmRadio.onclick({ target: fmRadio });
+                timbre.isActive["fmsynth"] = true;
+                timbre.FMSynthParams = ["12"];
+                timbre._undo();
+                expect(timbre.fmSynthParamvals["modulationIndex"]).toBe(12);
+
+                const duoRadio = jsdomDocument.querySelector('input[value="DuoSynth"]');
+                await duoRadio.onclick({ target: duoRadio });
+                timbre.isActive["duosynth"] = true;
+                timbre.duoSynthParams = ["8", "15"];
+                timbre._undo();
+                expect(timbre.duoSynthParamVals["vibratoRate"]).toBe(8);
+            });
+
+            test("_undo for oscillator", () => {
+                timbre._update = jest.fn();
+                timbre.oscParams = ["sine", 6];
+                timbre._oscillator(false);
+                timbre.isActive["oscillator"] = true;
+                timbre.oscParams = ["triangle", 4];
+                timbre._undo();
+                expect(timbre.synthVals["oscillator"]["source"]).toBe("sine");
+                expect(mockActivity.logo.synth.createSynth).toHaveBeenCalled();
+            });
+
+            test("_undo for filter", () => {
+                timbre.fil = [1];
+                timbre.filterParams = ["highpass", -24, 500];
+                global.instrumentsFilters[0]["custom"] = [
+                    { filterType: "highpass", filterRolloff: -24, filterFrequency: 500 }
+                ];
+                timbre._update = jest.fn();
+                timbre._filter();
+                timbre.isActive["filter"] = true;
+
+                timbre._undo();
+                expect(global.instrumentsFilters[0]["custom"][0]["filterType"]).toBe("highpass");
+                expect(global.instrumentsFilters[0]["custom"][0]["filterRolloff"]).toBe(-24);
+                expect(global.instrumentsFilters[0]["custom"][0]["filterFrequency"]).toBe(500);
+            });
+
+            test("_undo for tremolo, vibrato, phaser, chorus, and distortion", async () => {
+                timbre._update = jest.fn();
+                timbre._effects();
+
+                const tremoloRadio = jsdomDocument.querySelector('input[value="Tremolo"]');
+                await tremoloRadio.onclick({ target: tremoloRadio });
+                timbre.isActive["tremolo"] = true;
+                timbre.tremoloParams = [12, 45];
+                timbre._undo();
+
+                const vibratoRadio = jsdomDocument.querySelector('input[value="Vibrato"]');
+                await vibratoRadio.onclick({ target: vibratoRadio });
+                timbre.isActive["vibrato"] = true;
+                timbre.vibratoParams = [8, 20];
+                timbre._undo();
+
+                const phaserRadio = jsdomDocument.querySelector('input[value="Phaser"]');
+                await phaserRadio.onclick({ target: phaserRadio });
+                timbre.isActive["phaser"] = true;
+                timbre.phaserParams = [6, 4, 300];
+                timbre._undo();
+
+                const chorusRadio = jsdomDocument.querySelector('input[value="Chorus"]');
+                await chorusRadio.onclick({ target: chorusRadio });
+                timbre.isActive["chorus"] = true;
+                timbre.chorusParams = [3, 5, 60];
+                timbre._undo();
+
+                const distortionRadio = jsdomDocument.querySelector('input[value="Distortion"]');
+                await distortionRadio.onclick({ target: distortionRadio });
+                timbre.isActive["distortion"] = true;
+                timbre.distortionParams = [80];
+                timbre._undo();
+
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+            });
+        });
+
+        describe("Clamp, block connections, and replacement", () => {
+            test("clampConnection and clampConnectionVspace connect blocks and adjust clamps", async () => {
+                jest.useFakeTimers();
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("clampBlk", [null, null, null, null]),
+                    createBlock("vspaceBlk", [null, null])
+                );
+
+                const promise1 = timbre.clampConnection(bOffset, 2, 1);
+                jest.runAllTimers();
+                await promise1;
+                expect(mockBlocks.blockList[0].connections[2]).toBe(bOffset);
+                expect(mockBlocks.blockList[1].connections[0]).toBe(bOffset);
+
+                const promise2 = timbre.clampConnectionVspace(bOffset, bOffset + 1, 1);
+                jest.runAllTimers();
+                await promise2;
+                expect(mockBlocks.blockList[bOffset + 1].connections[1]).toBe(1);
+            });
+
+            test("_blockReplace connects new block, adjusts docks, and trashes old block", () => {
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("oldBlk", [0, null]),
+                    createBlock("newBlk", [null, null])
+                );
+                mockBlocks.blockList[0].connections[2] = bOffset;
+
+                timbre._blockReplace(bOffset, bOffset + 1);
+
+                expect(mockBlocks.blockList[bOffset + 1].connections[0]).toBe(0);
+                expect(mockBlocks.sendStackToTrash).toHaveBeenCalledWith(
+                    mockBlocks.blockList[bOffset]
+                );
+                expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+            });
+
+            test("blockConnection connects to bottomOfClamp and handles nested hidden blocks", async () => {
+                jest.useFakeTimers();
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("hidden", [0, null]),
+                    createBlock("newnote", [0, null])
+                );
+
+                const promise = timbre.blockConnection(1, bOffset);
+                jest.runAllTimers();
+                await promise;
+
+                expect(mockBlocks.adjustExpandableClampBlock).toHaveBeenCalled();
+                expect(mockBlocks.adjustDocks).toHaveBeenCalled();
+            });
+        });
+
+        describe("Synth Panel and Slider Interactions", () => {
+            test("AMSynth selection and slider change", async () => {
+                timbre._update = jest.fn();
+                timbre._synth();
+                const amRadio = jsdomDocument.querySelector('input[value="AMSynth"]');
+                expect(amRadio).not.toBeNull();
+                amRadio.checked = true;
+                await amRadio.onclick({ target: amRadio });
+
+                const slider = jsdomDocument.getElementById("myRangeS0");
+                expect(slider).not.toBeNull();
+
+                slider.value = "5";
+                slider.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre.amSynthParamvals["harmonicity"]).toBe(5);
+            });
+
+            test("FMSynth selection and slider change", async () => {
+                timbre._update = jest.fn();
+                timbre._synth();
+                const fmRadio = jsdomDocument.querySelector('input[value="FMSynth"]');
+                fmRadio.checked = true;
+                await fmRadio.onclick({ target: fmRadio });
+
+                const slider = jsdomDocument.getElementById("myRangeS0");
+                slider.value = "20";
+                slider.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre.fmSynthParamvals["modulationIndex"]).toBe(20);
+            });
+
+            test("NoiseSynth selection and slider change", async () => {
+                timbre._update = jest.fn();
+                timbre._synth();
+                const noiseRadio = jsdomDocument.createElement("input");
+                noiseRadio.type = "radio";
+                noiseRadio.name = "synthsName";
+                noiseRadio.value = "NoiseSynth";
+                jsdomDocument.body.appendChild(noiseRadio);
+
+                timbre._synth();
+                const synths = jsdomDocument.getElementsByName("synthsName");
+                for (let i = 0; i < synths.length; i++) {
+                    if (synths[i].value === "NoiseSynth") {
+                        await synths[i].onclick({ target: synths[i] });
+                    }
+                }
+            });
+
+            test("DuoSynth selection and slider changes", async () => {
+                timbre._update = jest.fn();
+                timbre._synth();
+                const duoRadio = jsdomDocument.querySelector('input[value="DuoSynth"]');
+                duoRadio.checked = true;
+                await duoRadio.onclick({ target: duoRadio });
+
+                const slider0 = jsdomDocument.getElementById("myRangeS0");
+                slider0.value = "12";
+                slider0.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre.duoSynthParams[0]).toBe("12");
+
+                const slider1 = jsdomDocument.getElementById("myRangeS1");
+                slider1.value = "8";
+                slider1.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre.duoSynthParams[1]).toBe("8");
+            });
+        });
+
+        describe("Oscillator and Envelope UI Interactions", () => {
+            test("Oscillator dropdown and partials slider changes", () => {
+                timbre._update = jest.fn();
+                timbre.oscParams = ["sine", 6];
+                timbre._oscillator(true);
+
+                const select = jsdomDocument.getElementById("selOsc1");
+                select.value = "sawtooth";
+                select.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre.synthVals["oscillator"]["source"]).toBe("sawtooth");
+
+                const slider = jsdomDocument.getElementById("myRangeO0");
+                slider.value = "12";
+                slider.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre.oscParams[1]).toBe("12");
+            });
+
+            test("Envelope all 4 ADSR slider changes", () => {
+                timbre._update = jest.fn();
+                timbre.ENVs = [1, 50, 60, 1];
+                timbre._envelope(true);
+
+                for (let i = 0; i < 4; i++) {
+                    const slider = jsdomDocument.getElementById("myRange" + i);
+                    slider.value = (20 * (i + 1)).toString();
+                    slider.dispatchEvent(
+                        new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                    );
+                }
+
+                expect(timbre.synthVals["envelope"]["attack"]).toBe(0.2);
+                expect(timbre.synthVals["envelope"]["decay"]).toBe(0.4);
+                expect(timbre.synthVals["envelope"]["sustain"]).toBe(0.6);
+                expect(timbre.synthVals["envelope"]["release"]).toBe(0.8);
+            });
+        });
+
+        describe("Filter and Add Filter UI Interactions", () => {
+            test("Filter panel creation and event delegation", () => {
+                timbre.fil = [1];
+                timbre.filterParams = ["lowpass", -12, 392];
+                global.instrumentsFilters[0]["custom"] = [
+                    { filterType: "lowpass", filterRolloff: -12, filterFrequency: 392 }
+                ];
+                timbre._update = jest.fn();
+
+                timbre._filter();
+
+                // Change filter select
+                const select = jsdomDocument.getElementById("sel0");
+                select.value = "bandpass";
+                select.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsFilters[0]["custom"][0]["filterType"]).toBe("bandpass");
+
+                // Click rolloff radio -24
+                const radio1 = jsdomDocument.getElementById("radio1");
+                radio1.value = "-24";
+                radio1.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("click", { bubbles: true })
+                );
+                expect(global.instrumentsFilters[0]["custom"][0]["filterRolloff"]).toBe(-24);
+
+                // Change frequency slider
+                const slider = jsdomDocument.getElementById("myRangeF0");
+                slider.value = "800";
+                slider.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsFilters[0]["custom"][0]["filterFrequency"]).toBe(800);
+            });
+
+            test("_addFilter appends new filter and updates UI", async () => {
+                jest.useFakeTimers();
+                timbre.fil = [1];
+                timbre.filterParams = ["lowpass", -12, 392];
+                global.instrumentsFilters[0]["custom"] = [
+                    { filterType: "lowpass", filterRolloff: -12, filterFrequency: 392 }
+                ];
+                timbre._update = jest.fn();
+                timbre._filter();
+
+                const promise = timbre._addFilter();
+                jest.runAllTimers();
+                await promise;
+
+                expect(timbre.fil.length).toBe(2);
+            });
+        });
+
+        describe("Effects Panel Sub-effect Interactions", () => {
+            test("Tremolo effect creation and slider changes", async () => {
+                timbre._update = jest.fn();
+                timbre._effects();
+                const tremoloRadio = jsdomDocument.querySelector('input[value="Tremolo"]');
+                tremoloRadio.checked = true;
+                await tremoloRadio.onclick({ target: tremoloRadio });
+
+                const slider0 = jsdomDocument.getElementById("myRangeFx0");
+                slider0.value = "18";
+                slider0.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsEffects[0]["custom"]["tremoloFrequency"]).toBe(18);
+
+                const slider1 = jsdomDocument.getElementById("myRangeFx1");
+                slider1.value = "65";
+                slider1.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsEffects[0]["custom"]["tremoloDepth"]).toBe(0.65);
+            });
+
+            test("Vibrato effect creation and slider changes", async () => {
+                timbre._update = jest.fn();
+                timbre._effects();
+                const vibratoRadio = jsdomDocument.querySelector('input[value="Vibrato"]');
+                vibratoRadio.checked = true;
+                await vibratoRadio.onclick({ target: vibratoRadio });
+
+                const slider0 = jsdomDocument.getElementById("myRangeFx0");
+                slider0.value = "10";
+                slider0.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.1);
+
+                const slider1 = jsdomDocument.getElementById("myRangeFx1");
+                slider1.value = "8";
+                slider1.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsEffects[0]["custom"]["vibratoFrequency"]).toBeDefined();
+            });
+
+            test("Chorus effect creation and slider changes", async () => {
+                timbre._update = jest.fn();
+                timbre._effects();
+                const chorusRadio = jsdomDocument.querySelector('input[value="Chorus"]');
+                chorusRadio.checked = true;
+                await chorusRadio.onclick({ target: chorusRadio });
+
+                const slider0 = jsdomDocument.getElementById("myRangeFx0");
+                slider0.value = "4";
+                slider0.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsEffects[0]["custom"]["chorusRate"]).toBe(4);
+
+                const slider1 = jsdomDocument.getElementById("myRangeFx1");
+                slider1.value = "8";
+                slider1.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsEffects[0]["custom"]["delayTime"]).toBe(8);
+
+                const slider2 = jsdomDocument.getElementById("myRangeFx2");
+                slider2.value = "85";
+                slider2.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsEffects[0]["custom"]["chorusDepth"]).toBe(0.85);
+            });
+
+            test("Phaser effect creation and slider changes", async () => {
+                timbre._update = jest.fn();
+                timbre._effects();
+                const phaserRadio = jsdomDocument.querySelector('input[value="Phaser"]');
+                phaserRadio.checked = true;
+                await phaserRadio.onclick({ target: phaserRadio });
+
+                const slider0 = jsdomDocument.getElementById("myRangeFx0");
+                slider0.value = "8";
+                slider0.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsEffects[0]["custom"]["rate"]).toBe(8);
+
+                const slider1 = jsdomDocument.getElementById("myRangeFx1");
+                slider1.value = "5";
+                slider1.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsEffects[0]["custom"]["octaves"]).toBe(5);
+
+                const slider2 = jsdomDocument.getElementById("myRangeFx2");
+                slider2.value = "450";
+                slider2.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(global.instrumentsEffects[0]["custom"]["baseFrequency"]).toBe(450);
+            });
+        });
+
+        describe("Toolbar button click flows in full widget window", () => {
+            test("Toolbar button clicks toggle active panels and trigger block connection flows", async () => {
+                jest.useFakeTimers();
+                timbre.init(mockActivity);
+
+                // Click envelope button with env.length === 0
+                const envBtn = jsdomDocument.getElementById("envelopeButtonCell");
+                if (envBtn && envBtn.onclick) {
+                    const promise = envBtn.onclick();
+                    jest.runAllTimers();
+                    await promise;
+                    expect(timbre.isActive["envelope"]).toBe(true);
+                }
+
+                // Click oscillator button with osc.length === 0
+                const oscBtn = jsdomDocument.getElementById("oscillatorButtonCell");
+                if (oscBtn && oscBtn.onclick) {
+                    const promise = oscBtn.onclick();
+                    jest.runAllTimers();
+                    await promise;
+                    expect(timbre.isActive["oscillator"]).toBe(true);
+                }
+
+                // Click filter button with fil.length === 0
+                const filBtn = jsdomDocument.getElementById("filterButtonCell");
+                if (filBtn && filBtn.onclick) {
+                    const promise = filBtn.onclick();
+                    jest.runAllTimers();
+                    await promise;
+                    expect(timbre.isActive["filter"]).toBe(true);
+                }
+
+                // Click effects button
+                const fxBtn = jsdomDocument.getElementById("effectsButtonCell");
+                if (fxBtn && fxBtn.onclick) {
+                    fxBtn.onclick();
+                    expect(timbre.isActive["effects"]).toBe(true);
+                }
+
+                // Click undo button
+                const undoBtn = jsdomDocument.querySelector("[title='Undo']");
+                if (undoBtn && undoBtn.onclick) {
+                    undoBtn.onclick();
+                }
+            });
+        });
+
+        describe("Edge Cases and Remaining Branches", () => {
+            test("_undo for noisesynth", () => {
+                timbre._update = jest.fn();
+                timbre._synth();
+                const r = jsdomDocument.createElement("input");
+                r.id = "myRangeS0";
+                r.value = "pink";
+                const s = jsdomDocument.createElement("span");
+                s.id = "myspanS0";
+                jsdomDocument.body.appendChild(r);
+                jsdomDocument.body.appendChild(s);
+
+                timbre.isActive["noisesynth"] = true;
+                timbre.NoiseSynthParams = ["pink"];
+                timbre._undo();
+                expect(timbre.noiseSynthParamvals["noise.type"]).toBe("pink");
+            });
+
+            test("_blockReplace traverses multiple clamp ancestors", () => {
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("clamp", [0, bOffset + 1]),
+                    createBlock("middleClamp", [bOffset, bOffset + 2]),
+                    createBlock("oldBlk", [bOffset + 1, null]),
+                    createBlock("newBlk", [null, null])
+                );
+                mockBlocks.blockList[bOffset].isClampBlock = () => true;
+                mockBlocks.blockList[bOffset + 1].isClampBlock = () => true;
+
+                timbre.blockNo = 0;
+                timbre._blockReplace(bOffset + 2, bOffset + 3);
+
+                expect(mockBlocks.blockList[bOffset + 3].connections[0]).toBe(bOffset + 1);
+                expect(mockBlocks.sendStackToTrash).toHaveBeenCalledWith(
+                    mockBlocks.blockList[bOffset + 2]
+                );
+            });
+
+            test("blockConnection traverses nested stack to bottom block", async () => {
+                jest.useFakeTimers();
+                const bOffset = mockBlocks.blockList.length;
+                mockBlocks.blockList.push(
+                    createBlock("hidden", [bOffset + 1, null]),
+                    createBlock("clamp", [0, null, bOffset + 2]),
+                    createBlock("childBlk", [bOffset + 1, null])
+                );
+
+                mockBlocks.findBottomBlock = jest.fn(() => bOffset + 2);
+
+                const promise = timbre.blockConnection(1, bOffset);
+                jest.runAllTimers();
+                await promise;
+
+                expect(mockBlocks.adjustExpandableClampBlock).toHaveBeenCalled();
+            });
+
+            test("_setRolloffRadioChecked covers -48 and -96", () => {
+                for (let i = 0; i < 4; i++) {
+                    const r = jsdomDocument.createElement("input");
+                    r.type = "radio";
+                    r.id = "radio" + i;
+                    jsdomDocument.body.appendChild(r);
+                }
+
+                timbre._setRolloffRadioChecked([0, 1, 2, 3], -48);
+                expect(jsdomDocument.getElementById("radio2").checked).toBe(true);
+
+                timbre._setRolloffRadioChecked([0, 1, 2, 3], -96);
+                expect(jsdomDocument.getElementById("radio3").checked).toBe(true);
+            });
+
+            test("_addFilter falls back to DEFAULTFILTERTYPE when all filter types are used", async () => {
+                jest.useFakeTimers();
+                timbre.fil = [1, 2, 3];
+                timbre.filterParams = [
+                    "lowpass",
+                    -12,
+                    392,
+                    "highpass",
+                    -24,
+                    500,
+                    "bandpass",
+                    -48,
+                    800
+                ];
+                global.instrumentsFilters[0]["custom"] = [
+                    { filterType: "lowpass" },
+                    { filterType: "highpass" },
+                    { filterType: "bandpass" }
+                ];
+                timbre._update = jest.fn();
+                timbre._filter();
+
+                const promise = timbre._addFilter();
+                jest.runAllTimers();
+                await promise;
+
+                expect(timbre.filterParams).toContain(DEFAULTFILTERTYPE);
+            });
+
+            test("Distortion and Vibrato effects reuse existing effect blocks", async () => {
+                timbre._update = jest.fn();
+                timbre.distortionEffect = [1];
+                timbre.distortionParams = [60];
+                timbre.vibratoEffect = [2];
+                timbre.vibratoParams = [8, 25];
+
+                timbre._effects();
+
+                const disRadio = jsdomDocument.querySelector('input[value="Distortion"]');
+                await disRadio.onclick({ target: disRadio });
+                expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("60");
+
+                const vibRadio = jsdomDocument.querySelector('input[value="Vibrato"]');
+                await vibRadio.onclick({ target: vibRadio });
+                expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("8");
+            });
+
+            test("_cleanupEventListeners unbinds listeners and resets eventListeners", () => {
+                const dummyDiv = jsdomDocument.createElement("div");
+                const removeSpy = jest.spyOn(dummyDiv, "removeEventListener");
+                timbre._eventListeners = {
+                    element: dummyDiv,
+                    listeners: [{ type: "change", handler: jest.fn() }]
+                };
+
+                timbre._cleanupEventListeners();
+                expect(removeSpy).toHaveBeenCalledWith("change", expect.any(Function));
+                expect(timbre._eventListeners).toEqual({});
+            });
+        });
+    });
 });
