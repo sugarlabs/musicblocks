@@ -23,8 +23,8 @@
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
    isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber
+   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, SHARP, Singer,
+   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber, makeKeyboardAccessible
  */
 
 /* exported TemperamentWidget */
@@ -172,6 +172,8 @@ function TemperamentWidget() {
         doneDiv.id = "done_";
         doneDiv.style.cssFloat = "right";
         doneDiv.textContent = _("done");
+        makeKeyboardAccessible(previewDiv, preview ? _("back") : _("preview"));
+        makeKeyboardAccessible(doneDiv, _("done"));
         divAppend.appendChild(previewDiv);
         divAppend.appendChild(doneDiv);
         divAppend.style.textAlign = "center";
@@ -223,6 +225,8 @@ function TemperamentWidget() {
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
         cell.classList.add("temperament-selector-cell");
+
+        makeKeyboardAccessible(cell, label);
 
         cell.onmouseover = function () {
             this.classList.add("temperament-selector-hover");
@@ -389,6 +393,8 @@ function TemperamentWidget() {
             standardOctaveDiv.id = "standardOctave";
             standardOctaveDiv.style.cssFloat = "right";
             standardOctaveDiv.textContent = _("back to 2:1 octave space");
+            makeKeyboardAccessible(clearNotesDiv, _("Clear"));
+            makeKeyboardAccessible(standardOctaveDiv, _("back to 2:1 octave space"));
             divAppend.appendChild(clearNotesDiv);
             divAppend.appendChild(standardOctaveDiv);
             divAppend.style.textAlign = "center";
@@ -406,16 +412,19 @@ function TemperamentWidget() {
             divAppend1.style.marginLeft = "3px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
             divAppend1.style.width = "212px";
+            divAppend1.style.cursor = "pointer";
 
             divAppend2 = docById("standardOctave");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
             divAppend2.style.width = BUTTONDIVWIDTH / 2 - 8 + "px";
+            divAppend2.style.cursor = "pointer";
         } else {
             divAppend1 = document.createElement("div");
             divAppend1.id = "divAppend";
             divAppend1.textContent = _("Clear");
+            makeKeyboardAccessible(divAppend1, _("Clear"));
             divAppend1.style.textAlign = "center";
             divAppend1.style.position = "absolute";
             divAppend1.style.zIndex = 2;
@@ -425,6 +434,7 @@ function TemperamentWidget() {
             divAppend1.style.width = docById("wheelDiv2").style.width;
             divAppend1.style.marginTop = docById("wheelDiv2").style.height;
             divAppend1.style.overflow = "auto";
+            divAppend1.style.cursor = "pointer";
             docById("temperamentTable").append(divAppend1);
         }
 
@@ -536,6 +546,8 @@ function TemperamentWidget() {
                     editImg.setAttribute("height", "20px");
                     editImg.setAttribute("width", "20px");
                     editImg.setAttribute("data-message", i);
+                    editImg.style.cursor = "pointer";
+                    makeKeyboardAccessible(editImg, _("edit"));
                     noteInfoDiv.appendChild(editImg);
                 }
 
@@ -547,6 +559,8 @@ function TemperamentWidget() {
                 closeImg.setAttribute("height", "20px");
                 closeImg.setAttribute("width", "20px");
                 closeImg.setAttribute("align", "right");
+                closeImg.style.cursor = "pointer";
+                makeKeyboardAccessible(closeImg, _("Close"));
                 noteInfoDiv.appendChild(closeImg);
 
                 noteInfoDiv.appendChild(document.createElement("br"));
@@ -648,6 +662,7 @@ function TemperamentWidget() {
         slider.style.border = "0";
         slider.setAttribute("min", this.frequencies[i - 1]);
         slider.setAttribute("max", this.frequencies[i + 1]);
+        slider.setAttribute("aria-label", _("frequency"));
         center.appendChild(slider);
         noteInfo.appendChild(center);
 
@@ -669,6 +684,7 @@ function TemperamentWidget() {
         centsInput.id = "centsInput1";
         centsInput.value = "0";
         centsInput.step = "1";
+        centsInput.setAttribute("aria-label", _("cents"));
         // Match the frequency display styling: blue text on grey rounded pill.
         centsInput.className = "rangeslidervalue";
         centsInput.style.width = "60px";
@@ -685,6 +701,7 @@ function TemperamentWidget() {
         doneDiv.style.marginTop = "8px";
         doneDiv.style.borderRadius = "4px";
         doneDiv.style.cursor = "pointer";
+        makeKeyboardAccessible(doneDiv, _("done"));
         const doneCenter = document.createElement("center");
         doneCenter.textContent = _("done");
         doneCenter.style.color = "white";
@@ -882,12 +899,14 @@ function TemperamentWidget() {
             notesCell[i][0].textContent = "\u00A0\u00A0";
             const playImg = document.createElement("img");
             playImg.src = "header-icons/play-button.svg";
-            playImg.title = _("Play");
-            playImg.alt = _("Play");
+            playImg.id = "play_" + i;
+            playImg.title = _("play");
+            playImg.alt = "play";
             playImg.setAttribute("height", "20px");
             playImg.setAttribute("width", "20px");
-            playImg.id = "play_" + i;
             playImg.setAttribute("data-id", i);
+            playImg.style.cursor = "pointer";
+            makeKeyboardAccessible(playImg, `${_("play")} ${this.notes[i] || i}`);
             notesCell[i][0].appendChild(playImg);
             notesCell[i][0].appendChild(document.createTextNode("\u00A0\u00A0"));
             notesCell[i][0].style.width = 40 + "px";
@@ -1013,6 +1032,8 @@ function TemperamentWidget() {
             td.style.height = 30 + "px";
             td.style.textAlign = "center";
             td.style.fontWeight = "bold";
+            td.style.cursor = "pointer";
+            makeKeyboardAccessible(td, editMenus[i]);
             menuItems.push(td);
             editOctaveTr.appendChild(td);
         }
@@ -1085,6 +1106,7 @@ function TemperamentWidget() {
         octaveIn.type = "text";
         octaveIn.id = "octaveIn";
         octaveIn.value = "0";
+        octaveIn.setAttribute("aria-label", _("starting pitch number"));
         equalEdit.appendChild(octaveIn);
         equalEdit.appendChild(
             document.createTextNode(" \u00A0\u00A0 " + _("to") + "\u00A0\u00A0 ")
@@ -1093,6 +1115,7 @@ function TemperamentWidget() {
         octaveOut.type = "text";
         octaveOut.id = "octaveOut";
         octaveOut.value = "0";
+        octaveOut.setAttribute("aria-label", _("ending pitch number"));
         equalEdit.appendChild(octaveOut);
         equalEdit.appendChild(document.createElement("br"));
         equalEdit.appendChild(document.createElement("br"));
@@ -1103,6 +1126,7 @@ function TemperamentWidget() {
         divisions.type = "text";
         divisions.id = "divisions";
         divisions.value = this.pitchNumber;
+        divisions.setAttribute("aria-label", _("number of divisions"));
         equalEdit.appendChild(divisions);
         equalEdit.style.paddingLeft = "80px";
         const that = this;
@@ -1257,12 +1281,14 @@ function TemperamentWidget() {
         ratioIn.type = "text";
         ratioIn.id = "ratioIn";
         ratioIn.value = "1";
+        ratioIn.setAttribute("aria-label", _("ratio numerator"));
         ratioEdit.appendChild(ratioIn);
         ratioEdit.appendChild(document.createTextNode(" \u00A0\u00A0 : \u00A0\u00A0 "));
         const ratioOut = document.createElement("input");
         ratioOut.type = "text";
         ratioOut.id = "ratioOut";
         ratioOut.value = "1";
+        ratioOut.setAttribute("aria-label", _("ratio denominator"));
         ratioEdit.appendChild(ratioOut);
         ratioEdit.appendChild(document.createElement("br"));
         ratioEdit.appendChild(document.createElement("br"));
@@ -1273,6 +1299,7 @@ function TemperamentWidget() {
         recursion.type = "text";
         recursion.id = "recursion";
         recursion.value = "1";
+        recursion.setAttribute("aria-label", _("recursion"));
         ratioEdit.appendChild(recursion);
         ratioEdit.style.paddingLeft = "100px";
         const that = this;
@@ -1628,6 +1655,8 @@ function TemperamentWidget() {
         divAppend.style.height = "25px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
+        divAppend.style.cursor = "pointer";
+        makeKeyboardAccessible(divAppend, _("done"));
         arbitraryEdit.append(divAppend);
 
         divAppend.onmouseover = function () {
@@ -1688,6 +1717,8 @@ function TemperamentWidget() {
                 closeImg.setAttribute("height", "20px");
                 closeImg.setAttribute("width", "20px");
                 closeImg.setAttribute("align", "right");
+                closeImg.style.cursor = "pointer";
+                makeKeyboardAccessible(closeImg, _("Close"));
                 noteInfo1.appendChild(closeImg);
 
                 noteInfo1.appendChild(document.createElement("br"));
@@ -1702,6 +1733,7 @@ function TemperamentWidget() {
                 slider.setAttribute("min", frequencies[i]);
                 slider.setAttribute("max", frequencies[i + 1]);
                 slider.setAttribute("value", "30");
+                slider.setAttribute("aria-label", _("frequency"));
                 centerNode.appendChild(slider);
                 noteInfo1.appendChild(centerNode);
 
@@ -1717,6 +1749,8 @@ function TemperamentWidget() {
                 const doneDiv = document.createElement("div");
                 doneDiv.id = "done";
                 doneDiv.style.background = "rgb(196, 196, 196)";
+                doneDiv.style.cursor = "pointer";
+                makeKeyboardAccessible(doneDiv, _("done"));
                 const doneCenter = document.createElement("center");
                 doneCenter.textContent = _("done");
                 doneDiv.appendChild(doneCenter);
@@ -1803,6 +1837,7 @@ function TemperamentWidget() {
         startNote.id = "startNote";
         startNote.value = octaveRatio;
         startNote.style.width = "50px";
+        startNote.setAttribute("aria-label", _("octave space start"));
         octaveSpaceEdit.appendChild(startNote);
         octaveSpaceEdit.appendChild(document.createTextNode(" \u00A0\u00A0 : \u00A0\u00A0 "));
         const endNote = document.createElement("input");
@@ -1810,6 +1845,7 @@ function TemperamentWidget() {
         endNote.id = "endNote";
         endNote.value = "1";
         endNote.style.width = "50px";
+        endNote.setAttribute("aria-label", _("octave space end"));
         octaveSpaceEdit.appendChild(endNote);
         octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.appendChild(document.createElement("br"));
@@ -1826,6 +1862,8 @@ function TemperamentWidget() {
         divAppend.style.height = "25px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
+        divAppend.style.cursor = "pointer";
+        makeKeyboardAccessible(divAppend, _("done"));
         octaveSpaceEdit.append(divAppend);
 
         divAppend.onmouseover = function () {

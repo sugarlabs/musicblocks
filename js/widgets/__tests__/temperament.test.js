@@ -1,3 +1,6 @@
+const { makeKeyboardAccessible } = require("../../utils/dom-helpers");
+global.makeKeyboardAccessible = makeKeyboardAccessible;
+
 const TemperamentWidget = require("../temperament");
 describe("TemperamentWidget basic tests", () => {
     let widget;
@@ -7,6 +10,12 @@ describe("TemperamentWidget basic tests", () => {
         textContent: "",
         appendChild: jest.fn(),
         setAttribute: jest.fn(),
+        getAttribute: jest.fn(() => ""),
+        classList: {
+            add: jest.fn(),
+            remove: jest.fn(),
+            contains: jest.fn()
+        },
         style: {},
         width: 100,
         height: 100,
@@ -1862,6 +1871,243 @@ describe("TemperamentWidget basic tests", () => {
             expect(mockEditBtn1.removeEventListener).toHaveBeenCalledWith("click", handler3);
             expect(widget._editBtn).toBeNull();
             expect(widget._editClickHandler).toBeNull();
+        });
+    });
+
+    describe("TemperamentWidget keyboard accessibility and ARIA support", () => {
+        beforeEach(() => {
+            global.docById = jest.fn(id => document.getElementById(id) || createMockElement(id));
+        });
+
+        test("_addButton sets role, tabindex, and aria-label", () => {
+            const mockRow = {
+                insertCell: jest.fn(() => document.createElement("td"))
+            };
+            const cell = widget._addButton(mockRow, "play-button.svg", 32, "Play");
+            expect(cell.getAttribute("role")).toBe("button");
+            expect(cell.getAttribute("tabindex")).toBe("0");
+            expect(cell.getAttribute("aria-label")).toBe("Play");
+        });
+
+        test("edit() sets keyboard accessibility on all navigation tabs", () => {
+            global.window.widgetWindows = {
+                windowFor: jest.fn(() => ({
+                    clear: jest.fn(),
+                    show: jest.fn(),
+                    getWidgetBody: jest.fn(() => document.body),
+                    addButton: jest.fn(() => ({
+                        onclick: null,
+                        getElementsByTagName: jest.fn(() => [{}])
+                    })),
+                    sendToCenter: jest.fn()
+                }))
+            };
+            const origGetTemperament = global.getTemperament;
+            const origBuildScale = global.buildScale;
+            const origGetNoteFromInterval = global.getNoteFromInterval;
+
+            global.buildScale = jest.fn(() => [["C"], []]);
+            global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+            global.getTemperament = jest.fn(() => ({
+                interval: [],
+                pitchNumber: 1,
+                0: 1,
+                1: 2
+            }));
+
+            widget.inTemperament = "equal";
+            widget.scale = ["C", "Major"];
+            widget.init({
+                errorMsg: jest.fn(),
+                logo: {
+                    synth: {
+                        startingPitch: "C4",
+                        _getFrequency: jest.fn(() => 440),
+                        setMasterVolume: jest.fn(),
+                        stop: jest.fn()
+                    }
+                }
+            });
+
+            widget.notesCircle = { removeWheel: jest.fn() };
+            widget.equalEdit = jest.fn();
+            widget.edit();
+
+            const menuTr = document.getElementById("menu");
+            expect(menuTr).not.toBeNull();
+            const tabs = menuTr.querySelectorAll("td.editMenus");
+            expect(tabs.length).toBe(4);
+
+            const expectedLabels = ["equal", "ratios", "arbitrary", "octave space"];
+            tabs.forEach((tab, index) => {
+                expect(tab.getAttribute("role")).toBe("button");
+                expect(tab.getAttribute("tabindex")).toBe("0");
+                expect(tab.getAttribute("aria-label")).toBe(expectedLabels[index]);
+            });
+
+            global.getTemperament = origGetTemperament;
+            global.buildScale = origBuildScale;
+            global.getNoteFromInterval = origGetNoteFromInterval;
+        });
+
+        test("equalEdit() assigns aria-label to numeric inputs and accessibility to preview/done buttons", () => {
+            widget.ratios = [1, 2];
+            widget.equalEdit();
+
+            const octaveIn = document.getElementById("octaveIn");
+            const octaveOut = document.getElementById("octaveOut");
+            const divisions = document.getElementById("divisions");
+            expect(octaveIn.getAttribute("aria-label")).toBe("starting pitch number");
+            expect(octaveOut.getAttribute("aria-label")).toBe("ending pitch number");
+            expect(divisions.getAttribute("aria-label")).toBe("number of divisions");
+
+            const preview = document.getElementById("preview");
+            const done = document.getElementById("done_");
+            expect(preview.getAttribute("role")).toBe("button");
+            expect(preview.getAttribute("tabindex")).toBe("0");
+            expect(done.getAttribute("role")).toBe("button");
+            expect(done.getAttribute("tabindex")).toBe("0");
+        });
+
+        test("ratioEdit() assigns aria-label to ratio inputs and recursion", () => {
+            widget.ratioEdit();
+
+            const ratioIn = document.getElementById("ratioIn");
+            const ratioOut = document.getElementById("ratioOut");
+            const recursion = document.getElementById("recursion");
+            expect(ratioIn.getAttribute("aria-label")).toBe("ratio numerator");
+            expect(ratioOut.getAttribute("aria-label")).toBe("ratio denominator");
+            expect(recursion.getAttribute("aria-label")).toBe("recursion");
+        });
+
+        test("octaveSpaceEdit() assigns aria-label to octave inputs and accessibility to done button", () => {
+            widget.ratios = [1, 2];
+            widget.octaveSpaceEdit();
+
+            const startNote = document.getElementById("startNote");
+            const endNote = document.getElementById("endNote");
+            expect(startNote.getAttribute("aria-label")).toBe("octave space start");
+            expect(endNote.getAttribute("aria-label")).toBe("octave space end");
+
+            const doneBtn = document.getElementById("divAppend");
+            expect(doneBtn.getAttribute("role")).toBe("button");
+            expect(doneBtn.getAttribute("tabindex")).toBe("0");
+            expect(doneBtn.getAttribute("aria-label")).toBe("done");
+        });
+
+        test("editFrequency() assigns aria-label to inputs and accessibility to done button", () => {
+            const noteInfo = document.createElement("div");
+            noteInfo.id = "noteInfo";
+            document.body.appendChild(noteInfo);
+
+            widget.frequencies = ["261.63", "293.66", "329.63"];
+            widget.ratios = [1, 1.12, 1.25];
+
+            widget.editFrequency({ target: { dataset: { message: "1" } } });
+
+            const slider = document.getElementById("frequencySlider1");
+            const centsInput = document.getElementById("centsInput1");
+            const done = document.getElementById("done");
+
+            expect(slider.getAttribute("aria-label")).toBe("frequency");
+            expect(centsInput.getAttribute("aria-label")).toBe("cents");
+            expect(done.getAttribute("role")).toBe("button");
+            expect(done.getAttribute("tabindex")).toBe("0");
+            expect(done.getAttribute("aria-label")).toBe("done");
+        });
+
+        test("_graphOfNotes() sets keyboard accessibility on note play buttons", () => {
+            const origQuerySelectorAll = document.querySelectorAll.bind(document);
+            document.querySelectorAll = jest.fn(selector => {
+                if (selector === "#menuLabels") {
+                    return Array.from({ length: 7 }, () => ({ style: {} }));
+                }
+                return origQuerySelectorAll(selector);
+            });
+
+            global.window.widgetWindows = {
+                windowFor: jest.fn(() => ({
+                    clear: jest.fn(),
+                    show: jest.fn(),
+                    getWidgetBody: jest.fn(() => document.body),
+                    addButton: jest.fn(() => ({
+                        onclick: null,
+                        getElementsByTagName: jest.fn(() => [{}])
+                    })),
+                    sendToCenter: jest.fn()
+                }))
+            };
+            const origGetTemperament = global.getTemperament;
+            const origBuildScale = global.buildScale;
+            const origGetNoteFromInterval = global.getNoteFromInterval;
+
+            global.buildScale = jest.fn(() => [["C"], []]);
+            global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+            global.getTemperament = jest.fn(() => ({
+                interval: [],
+                pitchNumber: 1,
+                0: 1,
+                1: 2
+            }));
+
+            widget.inTemperament = "equal";
+            widget.scale = ["C", "Major"];
+            widget.init({
+                errorMsg: jest.fn(),
+                logo: {
+                    synth: {
+                        startingPitch: "C4",
+                        _getFrequency: jest.fn(() => 440)
+                    }
+                }
+            });
+
+            widget.toggleNotesButton = jest.fn();
+            widget.notesCircle = { removeWheel: jest.fn() };
+            widget.pitchNumber = 1;
+            widget.ratios = [1, 2];
+            widget.frequencies = [440, 880];
+            widget.intervals = ["0", "1"];
+            widget.notes = [
+                ["C", 4],
+                ["C", 5]
+            ];
+            widget.scaleNotes = ["C"];
+            widget.circleIsVisible = false;
+
+            widget._graphOfNotes();
+
+            for (let i = 0; i <= 1; i++) {
+                const playBtn = document.getElementById("play_" + i);
+                expect(playBtn).not.toBeNull();
+                expect(playBtn.getAttribute("role")).toBe("button");
+                expect(playBtn.getAttribute("tabindex")).toBe("0");
+                expect(playBtn.getAttribute("aria-label")).toContain("play");
+            }
+
+            document.querySelectorAll = origQuerySelectorAll;
+            global.getTemperament = origGetTemperament;
+            global.buildScale = origBuildScale;
+            global.getNoteFromInterval = origGetNoteFromInterval;
+        });
+
+        test("keyboard activation via Enter and Space triggers click handler", () => {
+            const mockRow = {
+                insertCell: jest.fn(() => document.createElement("td"))
+            };
+            const cell = widget._addButton(mockRow, "play-button.svg", 32, "Play");
+            const clickSpy = jest.fn();
+            cell.addEventListener("click", clickSpy);
+
+            cell.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+            expect(clickSpy).toHaveBeenCalledTimes(1);
+
+            cell.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+            expect(clickSpy).toHaveBeenCalledTimes(2);
+
+            // Other keys should not activate
+            cell.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+            expect(clickSpy).toHaveBeenCalledTimes(2);
         });
     });
 });
