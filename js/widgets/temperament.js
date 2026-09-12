@@ -797,9 +797,7 @@ function TemperamentWidget() {
         const el = docById(divId);
         if (el !== null) {
             el.style.display = "none";
-            if (wheel && typeof wheel.removeWheel === "function") {
-                wheel.removeWheel();
-            }
+            wheel.removeWheel();
         }
     };
 
@@ -1108,7 +1106,7 @@ function TemperamentWidget() {
         octaveIn.type = "text";
         octaveIn.id = "octaveIn";
         octaveIn.value = "0";
-        octaveIn.setAttribute("aria-label", _("pitch number"));
+        octaveIn.setAttribute("aria-label", _("starting pitch number"));
         equalEdit.appendChild(octaveIn);
         equalEdit.appendChild(
             document.createTextNode(" \u00A0\u00A0 " + _("to") + "\u00A0\u00A0 ")
@@ -1117,7 +1115,7 @@ function TemperamentWidget() {
         octaveOut.type = "text";
         octaveOut.id = "octaveOut";
         octaveOut.value = "0";
-        octaveOut.setAttribute("aria-label", _("to"));
+        octaveOut.setAttribute("aria-label", _("ending pitch number"));
         equalEdit.appendChild(octaveOut);
         equalEdit.appendChild(document.createElement("br"));
         equalEdit.appendChild(document.createElement("br"));

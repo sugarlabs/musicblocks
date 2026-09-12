@@ -1902,6 +1902,10 @@ describe("TemperamentWidget basic tests", () => {
                     sendToCenter: jest.fn()
                 }))
             };
+            const origGetTemperament = global.getTemperament;
+            const origBuildScale = global.buildScale;
+            const origGetNoteFromInterval = global.getNoteFromInterval;
+
             global.buildScale = jest.fn(() => [["C"], []]);
             global.getNoteFromInterval = jest.fn(() => ["C", 4]);
             global.getTemperament = jest.fn(() => ({
@@ -1940,6 +1944,10 @@ describe("TemperamentWidget basic tests", () => {
                 expect(tab.getAttribute("tabindex")).toBe("0");
                 expect(tab.getAttribute("aria-label")).toBe(expectedLabels[index]);
             });
+
+            global.getTemperament = origGetTemperament;
+            global.buildScale = origBuildScale;
+            global.getNoteFromInterval = origGetNoteFromInterval;
         });
 
         test("equalEdit() assigns aria-label to numeric inputs and accessibility to preview/done buttons", () => {
@@ -1949,8 +1957,8 @@ describe("TemperamentWidget basic tests", () => {
             const octaveIn = document.getElementById("octaveIn");
             const octaveOut = document.getElementById("octaveOut");
             const divisions = document.getElementById("divisions");
-            expect(octaveIn.getAttribute("aria-label")).toBe("pitch number");
-            expect(octaveOut.getAttribute("aria-label")).toBe("to");
+            expect(octaveIn.getAttribute("aria-label")).toBe("starting pitch number");
+            expect(octaveOut.getAttribute("aria-label")).toBe("ending pitch number");
             expect(divisions.getAttribute("aria-label")).toBe("number of divisions");
 
             const preview = document.getElementById("preview");
@@ -2029,6 +2037,10 @@ describe("TemperamentWidget basic tests", () => {
                     sendToCenter: jest.fn()
                 }))
             };
+            const origGetTemperament = global.getTemperament;
+            const origBuildScale = global.buildScale;
+            const origGetNoteFromInterval = global.getNoteFromInterval;
+
             global.buildScale = jest.fn(() => [["C"], []]);
             global.getNoteFromInterval = jest.fn(() => ["C", 4]);
             global.getTemperament = jest.fn(() => ({
@@ -2074,6 +2086,9 @@ describe("TemperamentWidget basic tests", () => {
             }
 
             document.querySelectorAll = origQuerySelectorAll;
+            global.getTemperament = origGetTemperament;
+            global.buildScale = origBuildScale;
+            global.getNoteFromInterval = origGetNoteFromInterval;
         });
 
         test("keyboard activation via Enter and Space triggers click handler", () => {
