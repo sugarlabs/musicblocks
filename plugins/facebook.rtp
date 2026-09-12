@@ -22,8 +22,8 @@ if (args.length == 1) {
 
 //* block:publish *//
 var pubBlock = new ProtoBlock('publish');
-pubBlock.palette = palettes.dict['facebook'];
-blocks.protoBlockDict['publish'] = pubBlock;
+pubBlock.palette = globalActivity.palettes.dict['facebook'];
+globalActivity.blocks.protoBlockDict['publish'] = pubBlock;
 pubBlock.staticLabels.push(_('publish'));
 pubBlock.adjustWidthToLabel();
 pubBlock.oneArgBlock();

@@ -713,11 +713,13 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
 
     // Finally, execute safeEvals by creating new Blob scripts for each setup logic block.
     // This is because even setup logic can be blocked by CSP if it contains unsafe-eval.
+    window.__mb_plugin_registry = window.__mb_plugin_registry || {};
     for (const item of pendingSafeEvals) {
         const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random()
             .toString(36)
             .substr(2, 9)}`;
         const setupScript = `
+window.__mb_plugin_registry = window.__mb_plugin_registry || {};
 window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivity) {
     ${item.code}
 };
