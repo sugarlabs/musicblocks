@@ -4652,6 +4652,14 @@ class Block {
      * @returns {boolean} - True if pie menu is okay to launch, false otherwise.
      */
     piemenuOKtoLaunch() {
+        // The drawing libraries are fetched in the background once the app is
+        // up (see loadPieMenuLibs in loader.js). Declining here for the short
+        // window before they land keeps an early click harmless: this method
+        // already exists to say "not right now".
+        if (typeof wheelnav === "undefined" || typeof Raphael === "undefined") {
+            return false;
+        }
+
         if (this._piemenuExitTime === null) {
             return true;
         }

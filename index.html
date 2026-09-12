@@ -126,8 +126,10 @@
         <script src="js/utils/jquery-setup.js" defer></script>
         <script src="js/utils/abcLoader.js" defer></script>
         <script src="lib/midi.js" defer></script>
-        <script src="lib/raphael.min.js" defer></script>
-        <script src="lib/wheelnav.js" defer></script>
+        <!-- raphael and wheelnav are loaded from loader.js once the app is up,
+             not here. They are only used to draw the pie menus, which need a
+             block interaction to exist, and as defer scripts they had to run
+             before DOMContentLoaded and so before anything could be painted. -->
         <script src="lib/codejar/codejar.min.js" defer></script>
         <script src="lib/codejar/highlight.pack.js" defer></script>
         <link

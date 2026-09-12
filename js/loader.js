@@ -39,6 +39,13 @@ requirejs.config({
     // connections. The loading splash remains visible until initialization completes.
     waitSeconds: 0,
     shim: {
+        // raphael is AMD -- it checks define.amd -- so it is deliberately not
+        // shimmed; RequireJS loads it as a module. wheelnav is a plain global
+        // that reaches for Raphael, so it is shimmed onto it.
+        "wheelnav": {
+            deps: ["raphael"],
+            exports: "wheelnav"
+        },
         "easeljs.min": {
             exports: "createjs"
         },
@@ -258,6 +265,8 @@ requirejs.config({
         "project-manager": "js/project-manager",
         "activity/keyboard-controller": "js/activity/keyboard-controller",
         "activity/pubsub": "js/pubsub",
+        "raphael": "lib/raphael.min",
+        "wheelnav": "lib/wheelnav",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",
@@ -358,6 +367,34 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             report
         };
     })();
+
+    /**
+     * Fetch the pie-menu drawing libraries in the background.
+     *
+     * These used to be defer scripts in index.html, so both had to be fetched,
+     * parsed and executed before DOMContentLoaded -- and therefore before
+     * Music Blocks could paint -- despite neither executing a line until
+     * someone opens a pie menu.
+     *
+     * Loaded through RequireJS rather than as injected script tags. raphael is
+     * UMD: appended as a plain <script> while require.js is present it takes
+     * the anonymous define() branch, and RequireJS has no requested module to
+     * attribute that define to, so the page dies with "Mismatched anonymous
+     * define() module". Asking RequireJS for it attributes the define
+     * correctly. wheelnav is a plain global and is shimmed onto raphael.
+     *
+     * Nothing waits on this. Block.piemenuOKtoLaunch() already reports "not
+     * right now" while a pie menu is settling, and now reports the same in the
+     * short window before wheelnav arrives, so an early interaction is
+     * declined rather than throwing.
+     */
+    const loadPieMenuLibs = () => {
+        requirejs(
+            ["wheelnav"],
+            () => {},
+            err => console.error("Pie menu libraries failed to load:", err)
+        );
+    };
 
     perfTracker.mark("loader.main.start");
 
@@ -568,6 +605,13 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         ["activity/activity"],
                         function () {
                             perfTracker.mark("loader.activity_module.ready");
+
+                            // Pie-menu drawing libraries. They cannot be needed
+                            // until a block is interacted with, so they are
+                            // fetched here rather than as defer scripts in
+                            // index.html, where they delayed first paint.
+                            // wheelnav draws through raphael, so order matters.
+                            loadPieMenuLibs();
                             perfTracker.measure(
                                 "loader.core_modules_to_activity_module_ready",
                                 "loader.core_modules.ready",
