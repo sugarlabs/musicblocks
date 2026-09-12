@@ -129,7 +129,8 @@
             "postcss": "^8.4.31"
         },
         "body-parser": "2.3.0",
-        "qs": "6.15.3"
+        "browserslist": "4.28.8",
+        "qs": "6.16.0"
     },
     "lint-staged": {
         "*.{js,mjs}": [
