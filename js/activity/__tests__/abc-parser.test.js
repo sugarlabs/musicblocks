@@ -464,6 +464,28 @@ describe("Test 6: Empty-voice and degenerate input guard", () => {
         expect(blocksOfType(blocks, "pitch")).toHaveLength(0);
     });
 
+    test("ABC rest keeps block ids contiguous for following notes", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [
+                            { el_type: "note", rest: { type: "rest" }, duration: 0.25 },
+                            makeNote("D", 1)
+                        ]
+                    ]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+
+        expect(blocks.map(block => block[0])).toEqual(
+            Array.from({ length: blocks.length }, (_, index) => index)
+        );
+    });
+
     test("tune with no lines resolves without throwing and passes empty array to loadNewBlocks", async () => {
         const activity = makeActivity();
         const emptyTune = { metaText: { title: "Empty" }, lines: [] };

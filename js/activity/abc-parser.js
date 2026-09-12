@@ -49,6 +49,7 @@ function _createPitchBlocks(
     meterDen
 ) {
     const duration = toFraction(pitchDuration);
+    const hiddenBlockId = blockId + (pitches ? 8 : 6);
     if (triplet !== null) {
         duration[1] = meterDen * triplet;
     }
@@ -59,7 +60,7 @@ function _createPitchBlocks(
             ["newnote", { collapsed: true }],
             0,
             0,
-            [blockId - 1, blockId + 1, blockId + 4, blockId + 8]
+            [blockId - 1, blockId + 1, blockId + 4, hiddenBlockId]
         ],
         [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
         [blockId + 2, ["number", { value: duration[0] }], 0, 0, [blockId + 1]],
@@ -84,8 +85,9 @@ function _createPitchBlocks(
         noteBlocks.push([blockId + 5, "rest2", 0, 0, [blockId + 4, null]]);
     }
 
-    noteBlocks.push([blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]]);
+    noteBlocks.push([hiddenBlockId, "hidden", 0, 0, [blockId, hiddenBlockId + 1]]);
     actionBlock.push(...noteBlocks);
+    return noteBlocks.length;
 }
 
 // Function to search index for particular type of block
@@ -220,7 +222,7 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
                 tripletFinder = element.startTriplet;
             }
 
-            _createPitchBlocks(
+            blockId += _createPitchBlocks(
                 element.pitches?.[0],
                 blockId,
                 element.duration,
@@ -234,7 +236,6 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
             if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
                 tripletFinder = null;
             }
-            blockId = blockId + 9;
         } else if (element.el_type === "bar") {
             _handleBarElement(element, staffRecord.repeatArray, staffRecord.baseBlocks.length);
         }
