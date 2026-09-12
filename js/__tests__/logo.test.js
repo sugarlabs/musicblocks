@@ -246,6 +246,7 @@ function createMockTurtle(overrides = {}) {
         doWait: jest.fn(),
         delayTimeout: null,
         delayParameters: null,
+        iterationBudget: null,
         _transportTime: null,
         _transportEventId: null,
         container: { x: 0, y: 0 },
@@ -2117,7 +2118,7 @@ describe("Logo runFromBlockNow", () => {
                 })
             };
 
-            logo._iterationBudget = 1;
+            turtle0.iterationBudget = 1;
             logo.blockList = [makeFlowBlock("noop")];
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
@@ -2159,7 +2160,7 @@ describe("Logo runFromBlockNow", () => {
 
     describe("limits and plugin dispatch", () => {
         test("stops execution and reports error when MAX_ITERATIONS exceeded", () => {
-            logo._iterationBudget = 1;
+            turtle0.iterationBudget = 1;
             logo.blockList = [makeFlowBlock("noop")];
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
@@ -2381,6 +2382,127 @@ describe("Logo runFromBlockNow", () => {
 
         expect(mockActivity.blocks.updateParameterBlock).toHaveBeenCalledWith(logo, 0, 10);
         expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(1);
+    });
+});
+
+// ─── Logo runFromBlockNow — per-turtle iteration budget (#8627) ──────────────
+// The infinite-loop guard used to share one _iterationBudget counter across
+// every turtle in the project, so one turtle's workload could exhaust the
+// budget even though no single turtle was actually looping forever, and the
+// error was blamed on whichever turtle happened to be executing at that
+// moment. These tests cover the fix: each turtle now has its own budget, so
+// the guard only fires when a turtle's own work exhausts it. The guard still
+// stops the whole run when it fires -- an infinite loop is a whole-run
+// problem -- only the source of exhaustion changed, not the response to it.
+
+describe("Logo runFromBlockNow iteration budget is per turtle", () => {
+    let logo;
+    let mockActivity;
+    let turtle0;
+    let turtle1;
+
+    beforeEach(() => {
+        setupLogoEnv({ withFlute: true });
+        turtle0 = createMockTurtle();
+        turtle1 = createMockTurtle();
+        mockActivity = createTwoTurtleActivity(turtle0, turtle1);
+        logo = new Logo(mockActivity);
+        mockActivity.logo = logo;
+        logo.blockList = [makeFlowBlock("noop")];
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("a turtle's first block execution lazily starts its own full budget", () => {
+        expect(turtle0.iterationBudget).toBeNull();
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(turtle0.iterationBudget).toBe(logo._MAX_ITERATIONS);
+        expect(turtle1.iterationBudget).toBeNull();
+    });
+
+    test("exhausting one turtle's budget does not decrement another turtle's budget", () => {
+        turtle0.iterationBudget = 1;
+        turtle1.iterationBudget = 5;
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(mockActivity.errorMsg).toHaveBeenCalled();
+        expect(turtle1.iterationBudget).toBe(5);
+    });
+
+    test("exhausting a turtle's own budget still stops the whole run", () => {
+        turtle0.iterationBudget = 1;
+        turtle1.iterationBudget = 100;
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(mockActivity.errorMsg).toHaveBeenCalled();
+        expect(logo.stopTurtle).toBe(true);
+
+        // Observable outcome, not just the flag: runFromBlock() refuses to
+        // schedule anything while stopTurtle is set, so trying to queue
+        // turtle1's next block after this is a no-op -- its flow() is
+        // never reached.
+        logo.runFromBlock(logo, 1, 0, 0, null);
+        expect(logo.blockList[0].protoblock.flow).not.toHaveBeenCalled();
+    });
+
+    test("combined block executions across turtles do not trip either turtle's guard", () => {
+        // Under the old shared counter, these four combined calls against a
+        // budget of 3 would have tripped "Infinite loop detected" on the
+        // third call even though neither turtle individually reached 3.
+        turtle0.iterationBudget = 3;
+        turtle1.iterationBudget = 3;
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+        logo.runFromBlockNow(logo, 1, 0, 0, null);
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+        logo.runFromBlockNow(logo, 1, 0, 0, null);
+
+        expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+        expect(logo.stopTurtle).toBe(false);
+        expect(turtle0.iterationBudget).toBe(1);
+        expect(turtle1.iterationBudget).toBe(1);
+    });
+});
+
+// ─── Logo runLogoCommands resets per-turtle budgets (#8627) ──────────────────
+
+describe("Logo runLogoCommands resets every turtle's iteration budget", () => {
+    let logo;
+    let mockActivity;
+    let turtle0;
+    let turtle1;
+
+    beforeEach(() => {
+        setupLogoEnv({ withFlute: true });
+        turtle0 = createMockTurtle();
+        turtle1 = createMockTurtle();
+        mockActivity = createTwoTurtleActivity(turtle0, turtle1);
+        logo = new Logo(mockActivity);
+        mockActivity.logo = logo;
+        logo.prepSynths = jest.fn();
+        logo.initTurtle = jest.fn();
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("gives every existing turtle a fresh budget when a run starts", () => {
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+        turtle0.iterationBudget = 3;
+        turtle1.iterationBudget = logo._MAX_ITERATIONS + 1;
+
+        logo.runLogoCommands(null, null);
+
+        expect(turtle0.iterationBudget).toBe(logo._MAX_ITERATIONS + 1);
+        expect(turtle1.iterationBudget).toBe(logo._MAX_ITERATIONS + 1);
     });
 });
 

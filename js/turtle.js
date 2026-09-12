@@ -657,6 +657,12 @@ Turtle.TurtleModel = class {
         this.delayTimeout = null;
         this.delayParameters = {};
 
+        // Remaining block-execution budget for this turtle's infinite-loop
+        // guard (see Logo.runFromBlockNow). Lazily set to Logo._MAX_ITERATIONS
+        // the first time this turtle executes a block, so each turtle is
+        // judged on its own work rather than sharing one project-wide budget.
+        this.iterationBudget = null;
+
         this._media = []; // media (text, images) we need to remove on clear
 
         this._x = 0; // x coordinate

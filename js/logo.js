@@ -331,7 +331,7 @@ class Logo {
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
         this._EXPORT_YIELD_AFTER_SYNC_RUNS = 100; // Sync yield threshold during exports.
-        this._iterationBudget = this._MAX_ITERATIONS + 1;
+        // Per-turtle infinite-loop guard budget; see Turtle#iterationBudget.
         this._MAX_ITERATIONS = 1000000;
 
         // When running in step-by-step mode, the next command to run
@@ -1477,7 +1477,11 @@ class Logo {
         this.stopTurtle = false;
 
         this._syncCounter = 0;
-        this._iterationBudget = this._MAX_ITERATIONS + 1;
+        // Give every turtle its own fresh infinite-loop budget for this run
+        // so one turtle's workload cannot exhaust another's (see #8627).
+        for (const turtle of this.turtles.turtleList) {
+            turtle.iterationBudget = this._MAX_ITERATIONS + 1;
+        }
 
         this.blocks.unhighlightAll();
         this.blocks.bringToTop(); // Draw under the blocks.
@@ -1906,15 +1910,29 @@ class Logo {
 
         this.receivedArg = receivedArg;
 
-        if (--logo._iterationBudget <= 0) {
+        const tur = logo.turtles.ithTurtle(turtle);
+
+        // Lazily initialize so a turtle created mid-run (e.g. "new turtle")
+        // starts with a full budget instead of inheriting another turtle's.
+        // eslint-disable-next-line eqeqeq
+        if (tur.iterationBudget == null) {
+            tur.iterationBudget = logo._MAX_ITERATIONS + 1;
+        }
+
+        if (--tur.iterationBudget <= 0) {
             logo.deps.errorHandler(
                 _("Infinite loop detected. Execution stopped to prevent browser freeze."),
                 blk
             );
+            // A real infinite loop is a whole-run problem, not just this
+            // turtle's -- stop everything, same as before. What's fixed is
+            // *whose* budget triggered this: each turtle now has its own,
+            // so this only fires when this turtle itself did the looping,
+            // not because some other turtle's work used up a shared pool.
             logo.stopTurtle = true;
             logo._alreadyRunning = false;
             logo._syncCounter = 0;
-            logo._iterationBudget = logo._MAX_ITERATIONS + 1;
+            tur.iterationBudget = logo._MAX_ITERATIONS + 1;
             if (profilingEnabled) {
                 Logo._recordBlockTiming(logo, blk, profilingStart);
                 performanceTracker.exitBlock();
@@ -1935,7 +1953,6 @@ class Logo {
 (1) Evaluate any arguments (beginning with connection[1]).
 ===========================================================================
 */
-        const tur = logo.turtles.ithTurtle(turtle);
         const args = [];
 
         if (proto.args > 0) {
