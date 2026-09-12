@@ -258,8 +258,8 @@ class Logo {
         // pitch-rhythm matrix
         this.inMatrix = false;
         this.inLegoWidget = false;
-        this.tupletRhythms = [];
-        this.addingNotesToTuplet = false;
+        this.tupletRhythms = {};
+        this.addingNotesToTuplet = {};
         this.drumBlocks = [];
         this.pitchBlocks = [];
 
@@ -268,8 +268,8 @@ class Logo {
         this.connectionStoreLock = false;
 
         // tuplet
-        this.tuplet = false;
-        this.tupletParams = [];
+        this.tuplet = {};
+        this.tupletParams = {};
 
         // object that deals with notations
         this._notation = new this.deps.classes.Notation(this.activity);
@@ -1562,7 +1562,10 @@ class Logo {
         this.inStatusMatrix = false;
         this.pitchBlocks = [];
         this.drumBlocks = [];
-        this.tuplet = false;
+        this.tuplet = {};
+        this.tupletParams = {};
+        this.tupletRhythms = {};
+        this.addingNotesToTuplet = {};
         this.modeBlock = null;
         this._meterBlock = null;
 
