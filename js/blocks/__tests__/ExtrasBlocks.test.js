@@ -699,4 +699,12 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         instances["CommentBlock"].flow(["a comment"], logo, turtle, blk);
         expect(activity.textMsg).toHaveBeenCalledWith("a comment");
     });
+
+    test("real HSpaceBlock arg() returns 0 when connection is null", () => {
+        activity.blocks.blockList[blk].connections[1] = null;
+        const result = instances["HSpaceBlock"].arg(logo, turtle, blk, null);
+        expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, blk);
+        expect(logo.parseArg).not.toHaveBeenCalled();
+        expect(result).toBe(0);
+    });
 });

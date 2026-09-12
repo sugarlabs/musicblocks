@@ -357,6 +357,10 @@ function setupExtrasBlocks(activity) {
          */
         arg(logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            }
             return logo.parseArg(logo, turtle, cblk, blk, receivedArg);
         }
     }
