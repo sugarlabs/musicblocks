@@ -495,18 +495,19 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
 
             i18next.on("languageChanged", updateContent);
 
-            // Two-phase bootstrap: load core modules first, then application modules
-            const waitForGlobals = async (retryCount = 0) => {
-                if (typeof window.createjs === "undefined" && retryCount < 50) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    return waitForGlobals(retryCount + 1);
-                }
-            };
+            // Two-phase bootstrap: load core modules first, then application modules.
+            //
+            // Nothing is awaited here for createjs. index.html has no easeljs or
+            // tweenjs script tag, so window.createjs is not set before this point;
+            // it appears only once RequireJS resolves easeljs.min, which happens
+            // below as part of CORE_BOOTSTRAP_MODULES. Polling for it first meant
+            // every page load sat through the full retry budget before starting
+            // the work that actually defines it.
 
-            await waitForGlobals();
-
-            // Only pre-define modules that are loaded via script tags in index.html
-            // These modules are already available as globals before RequireJS loads them
+            // Pre-define anything that a script tag did happen to put on window,
+            // so RequireJS reuses the global instead of fetching it again. Each
+            // entry is skipped when its global is absent, and the module is then
+            // loaded normally from its configured path.
             const PRELOADED_SCRIPTS = [
                 { name: "easeljs.min", export: () => window.createjs },
                 { name: "tweenjs.min", export: () => window.createjs },
