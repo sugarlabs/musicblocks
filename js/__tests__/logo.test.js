@@ -449,6 +449,11 @@ describe("Logo constructor", () => {
         expect(freshLogo.activity).toBe(mockActivity);
     });
 
+    test("supports Activity initialization before saveLocally is available", () => {
+        mockActivity.saveLocally = null;
+        expect(() => new Logo(mockActivity)).not.toThrow();
+    });
+
     test("initializes default volume-related properties", () => {
         expect(logo.stopTurtle).toBe(false);
         expect(logo.time).toBe(0);
@@ -528,6 +533,39 @@ describe("Logo constructor", () => {
         expect(depLogo.activity.blocks).toBe(mockActivity.blocks);
         expect(depLogo.activity.turtles).toBe(mockActivity.turtles);
         expect(depLogo.activity.stage).toBe(mockActivity.stage);
+    });
+
+    test("rejects incomplete explicit dependencies before initialization", () => {
+        expect(() => new Logo({ blocks: {}, turtles: {} })).toThrow(
+            "LogoDependencies: 'stage' is required"
+        );
+    });
+
+    test("rejects malformed explicit dependencies before initialization", () => {
+        expect(
+            () =>
+                new Logo({
+                    blocks: {},
+                    turtles: {},
+                    stage: { addEventListener: jest.fn() },
+                    errorHandler: jest.fn()
+                })
+        ).toThrow("LogoDependencies: 'blocks.blockList' must be an array");
+    });
+
+    test("rejects missing error handlers instead of treating deps as Activity", () => {
+        expect(
+            () =>
+                new Logo({
+                    blocks: { blockList: [] },
+                    turtles: { turtleList: [] },
+                    stage: { addEventListener: jest.fn() }
+                })
+        ).toThrow("LogoDependencies: 'errorHandler' is required");
+    });
+
+    test("rejects null constructor input with a dependency error", () => {
+        expect(() => new Logo(null)).toThrow("LogoDependencies: dependencies must be an object");
     });
 });
 
