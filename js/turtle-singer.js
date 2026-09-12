@@ -2622,19 +2622,24 @@ class Singer {
                     activity.logo._timerManager.clearTimeout(tur.singer._unhighlightTimers[blk]);
                 }
                 const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
-                tur.singer._unhighlightTimers[blk] = activity.logo._timerManager.setGuardedTimeout(
-                    () => {
-                        if (activity.blocks.visible && blk in activity.blocks.blockList) {
+                tur.singer._unhighlightTimers[blk] = activity.logo._timerManager.setTimeout(() => {
+                    try {
+                        if (
+                            !activity.logo.stopTurtle &&
+                            activity.blocks.visible &&
+                            blk in activity.blocks.blockList
+                        ) {
                             activity.blocks.unhighlight(blk);
                             if (activity.stage) {
                                 activity.stageDirty = true;
                             }
                         }
-                        delete tur.singer._unhighlightTimers[blk];
-                    },
-                    highlightDurationMs,
-                    () => activity.logo.stopTurtle
-                );
+                    } finally {
+                        if (tur.singer && tur.singer._unhighlightTimers) {
+                            delete tur.singer._unhighlightTimers[blk];
+                        }
+                    }
+                }, highlightDurationMs);
             };
 
             if (last(tur.singer.inNoteBlock) !== null || noteInNote) {
