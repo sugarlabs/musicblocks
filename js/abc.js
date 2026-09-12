@@ -221,12 +221,8 @@ const processABCNotes = function (logo, turtle) {
             }
             counter += 1;
 
-            if (typeof obj[NOTATIONNOTE] === "string") {
-                note = __toABCnote(obj[NOTATIONNOTE]);
-            } else {
-                notes = obj[NOTATIONNOTE];
-                note = __toABCnote(notes[0]);
-            }
+            notes = typeof obj[NOTATIONNOTE] === "string" ? [obj[NOTATIONNOTE]] : obj[NOTATIONNOTE];
+            note = __toABCnote(notes[0]);
 
             let incompleteTuplet = 0; // An incomplete tuplet
 

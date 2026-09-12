@@ -332,6 +332,15 @@ describe("processABCNotes - Edge Cases for 100% Coverage", () => {
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).toContain("[CE]4");
     });
+
+    it("should write a string note that follows an array note", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C4", "E4"], 4, 0, null, null, -1, false],
+            ["G4", 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("[CE]4 G4 ");
+    });
     it("should handle incomplete tuplets with different tuplet values", () => {
         logo.notation.notationStaging["0"] = [
             [["A4"], 4, 0, 3, 2, -1, false],
