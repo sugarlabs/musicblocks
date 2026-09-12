@@ -642,6 +642,24 @@ describe("Utility Functions (logic-only)", () => {
             delete global.TEMPERAMENT[customTempName];
             Synth.inTemperament = originalInTemp;
         });
+
+        it("should early-return and reset changeInTemperament for custom EDO temperaments (t.isEDO)", () => {
+            const customEdoName = "custom19EDO";
+            global.TEMPERAMENT[customEdoName] = {
+                isEDO: true,
+                pitchNumber: 19
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = customEdoName;
+            Synth.changeInTemperament = true;
+
+            expect(() => temperamentChanged(customEdoName, "C4")).not.toThrow();
+            expect(Synth.changeInTemperament).toBe(false);
+            expect(whichTemperament()).toBe(customEdoName);
+
+            delete global.TEMPERAMENT[customEdoName];
+            Synth.inTemperament = originalInTemp;
+        });
     });
 
     describe("resume", () => {
@@ -1241,6 +1259,23 @@ describe("Utility Functions (logic-only)", () => {
             expect(_getFrequency("Bb2", false, "equal")).toBe(116.54094037952261);
             expect(_getFrequency("Bb3", false, "equal")).toBe(233.0818807590453);
             expect(_getFrequency("A4", false, "equal")).toBe(440.00000000000085);
+        });
+
+        it("should return frequency for custom EDO temperament via t.isEDO", () => {
+            const customEdoName = "custom19EDO";
+            global.TEMPERAMENT[customEdoName] = {
+                isEDO: true,
+                pitchNumber: 19
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = customEdoName;
+
+            const freq = _getFrequency("C4", false, customEdoName);
+            expect(typeof freq).toBe("number");
+            expect(freq).toBeGreaterThan(0);
+
+            delete global.TEMPERAMENT[customEdoName];
+            Synth.inTemperament = originalInTemp;
         });
     });
     describe("getCustomFrequency", () => {
@@ -3328,6 +3363,19 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
 
             synth.temperamentChanged("just intonation", "C4");
             expect(Object.keys(synth.noteFrequencies).length).toBeGreaterThan(0);
+
+            // Custom EDO temperament (t.isEDO path)
+            const customEdoTemp = { isEDO: true, pitchNumber: 19 };
+            const origGetTemp = global.getTemperament;
+            global.getTemperament = jest.fn(name =>
+                name === "custom-19-edo" ? customEdoTemp : origGetTemp(name)
+            );
+            synth.inTemperament = "custom-19-edo";
+            synth.changeInTemperament = true;
+            synth.temperamentChanged("custom-19-edo", "C4");
+            expect(synth.inTemperament).toBe("custom-19-edo");
+            expect(synth.changeInTemperament).toBe(false);
+            global.getTemperament = origGetTemp;
         });
 
         test("_getFrequency across various temperaments and input types", () => {
