@@ -1128,7 +1128,6 @@
         <!-- Loading Dialog Script -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                window._ = window._ || (x => x);
                 const readStorage = key => {
                     try {
                         return localStorage.getItem(key);
@@ -1171,6 +1170,7 @@
 
                 loadL10nSplashScreen();
 
+                requirejs(["utils/utils"], function (_) {
                 setTimeout(function () {
                     const loadingText = document.getElementById("loadingText");
                     const texts = [
@@ -1185,6 +1185,7 @@
                         index = (index + 1) % texts.length;
                     }, 1500);
                 }, 3000);
+            });
 
                 const languageDropdown = document.getElementById("languagedropdown");
                 if (languageDropdown) {
