@@ -138,7 +138,8 @@ const {
     displayMsg,
     makeKeyboardAccessible,
     announceToScreenReader,
-    _
+    _,
+    importFileKind
 } = require("../utils.js");
 
 describe("makeKeyboardAccessible()", () => {
@@ -1674,5 +1675,17 @@ describe("readSclFile", () => {
 
         expect(cb).not.toHaveBeenCalled();
         expect(mockReader.readAsText).not.toHaveBeenCalled();
+    });
+});
+
+describe("importFileKind", () => {
+    it("classifies by extension", () => {
+        expect(importFileKind("scale.scl")).toBe("scl");
+        expect(importFileKind("SCALE.SCL")).toBe("scl");
+        expect(importFileKind("temperament.json")).toBe("json");
+        expect(importFileKind("TEMPERAMENT.JSON")).toBe("json");
+        expect(importFileKind("notes.txt")).toBe("");
+        expect(importFileKind("noext")).toBe("");
+        expect(importFileKind("")).toBe("");
     });
 });
