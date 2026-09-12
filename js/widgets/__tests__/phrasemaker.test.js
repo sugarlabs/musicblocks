@@ -2951,6 +2951,66 @@ describe("PhraseMaker Widget", () => {
         });
     });
 
+    describe("_export", () => {
+        afterEach(() => {
+            delete global.window.open;
+        });
+
+        test("shows an error and returns safely when the popup is blocked", () => {
+            global.window.open = jest.fn().mockReturnValue(null);
+            phraseMaker.activity = { errorMsg: jest.fn() };
+
+            expect(() => phraseMaker._export()).not.toThrow();
+
+            expect(phraseMaker.activity.errorMsg).toHaveBeenCalledTimes(1);
+        });
+
+        test("builds the export document without an error when the popup opens", () => {
+            const makeCell = () => ({
+                style: {},
+                width: "",
+                colSpan: 1,
+                childNodes: [],
+                appendChild: jest.fn(),
+                setAttribute: jest.fn()
+            });
+            const makeRow = () => ({ insertCell: jest.fn(makeCell) });
+            const exportTableMock = {
+                createTHead: jest.fn(() => ({ insertRow: jest.fn(makeRow) }))
+            };
+            const elements = [];
+            const exportDocumentMock = {
+                createElement: jest.fn(() => {
+                    const el = {
+                        style: {},
+                        appendChild: jest.fn(),
+                        setAttribute: jest.fn()
+                    };
+                    elements.push(el);
+                    return el;
+                }),
+                getElementById: jest.fn(id =>
+                    id === "exportTable" ? exportTableMock : { download: "", href: "" }
+                ),
+                head: { appendChild: jest.fn() },
+                body: { appendChild: jest.fn() },
+                documentElement: { outerHTML: "<html></html>" },
+                close: jest.fn()
+            };
+            global.window.open = jest.fn().mockReturnValue({ document: exportDocumentMock });
+            phraseMaker.activity = { errorMsg: jest.fn() };
+            phraseMaker.rowLabels = [];
+            phraseMaker._matrixHasTuplets = false;
+            phraseMaker._noteValueRow = { cells: [] };
+            global.PhraseMakerUtils.generateDataURI = jest.fn(() => "data:text/html;base64,mock");
+
+            expect(() => phraseMaker._export()).not.toThrow();
+
+            expect(phraseMaker.activity.errorMsg).not.toHaveBeenCalled();
+            expect(exportDocumentMock.close).toHaveBeenCalled();
+        });
+    });
+
     describe("handleClose", () => {
         test("cleans up state and calls PhraseMakerAudio.clearPlaybackTimers on close", () => {
             phraseMaker.activity = {

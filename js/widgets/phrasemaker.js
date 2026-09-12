@@ -2852,11 +2852,13 @@ class PhraseMaker {
      */
     _export() {
         const exportWindow = window.open("");
-        const exportDocument = exportWindow.document;
-        if (exportDocument === undefined) {
-            console.debug("Could not create export window");
+        if (!exportWindow) {
+            this.activity.errorMsg(
+                this._("Could not open the export window. A pop-up blocker may have blocked it.")
+            );
             return;
         }
+        const exportDocument = exportWindow.document;
 
         const title = exportDocument.createElement("title");
         title.textContent = "Music Matrix";
