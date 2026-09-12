@@ -157,74 +157,116 @@ describe("PluginDialog", () => {
     });
 
     describe("openPlugin", () => {
+        let mockModal, mockInput, mockSubmitBtn, mockCloseBtn, mockText;
+
+        beforeEach(() => {
+            mockModal = document.createElement("div");
+            mockModal.id = "pluginNameModal";
+            document.body.appendChild(mockModal);
+
+            mockText = document.createElement("div");
+            mockText.id = "pluginNameText";
+            document.body.appendChild(mockText);
+
+            mockInput = document.createElement("input");
+            mockInput.id = "pluginNameInput";
+            document.body.appendChild(mockInput);
+
+            mockSubmitBtn = document.createElement("button");
+            mockSubmitBtn.id = "submitPluginName";
+            document.body.appendChild(mockSubmitBtn);
+
+            mockCloseBtn = document.createElement("span");
+            mockCloseBtn.id = "pluginModalClose";
+            document.body.appendChild(mockCloseBtn);
+        });
+
+        afterEach(() => {
+            [mockModal, mockText, mockInput, mockSubmitBtn, mockCloseBtn].forEach(el => {
+                if (el.parentNode) el.parentNode.removeChild(el);
+            });
+        });
+
         it("calls closeAuxToolbar with showHideAuxMenu if closeAuxToolbar is a function", () => {
             const closeAuxToolbar = jest.fn();
             const showHideAuxMenu = jest.fn();
             const dialog = new PluginDialog({ closeAuxToolbar, showHideAuxMenu });
-
-            window.prompt.mockReturnValue(null);
 
             dialog.openPlugin();
 
             expect(closeAuxToolbar).toHaveBeenCalledWith(showHideAuxMenu);
         });
 
-        it("stops execution if prompt returns null", () => {
-            const onLoadBuiltIn = jest.fn();
-            const dialog = new PluginDialog({ onLoadBuiltIn });
-
-            window.prompt.mockReturnValue(null);
-
-            const clickSpy = jest.spyOn(mockPluginChooser, "click");
-
-            dialog.openPlugin();
-
-            expect(onLoadBuiltIn).not.toHaveBeenCalled();
-            expect(clickSpy).not.toHaveBeenCalled();
-        });
-
-        it("calls onLoadBuiltIn with trimmed lowercase name if prompt input is not empty", () => {
-            const onLoadBuiltIn = jest.fn();
-            const dialog = new PluginDialog({ onLoadBuiltIn });
-
-            window.prompt.mockReturnValue("  MyPlugin  ");
-
-            dialog.openPlugin();
-
-            expect(onLoadBuiltIn).toHaveBeenCalledWith("myplugin");
-        });
-
-        it("does not call onLoadBuiltIn if input is not empty but onLoadBuiltIn is not a function", () => {
-            const dialog = new PluginDialog({ onLoadBuiltIn: "not a function" });
-
-            window.prompt.mockReturnValue("  MyPlugin  ");
-
-            const clickSpy = jest.spyOn(mockPluginChooser, "click");
-
-            dialog.openPlugin();
-
-            expect(clickSpy).not.toHaveBeenCalled(); // Make sure it also didn't fall through to the else branch
-        });
-
-        it("clicks pluginChooser if prompt input is empty string", () => {
+        it("shows the modal when opened", () => {
             const dialog = new PluginDialog();
-            window.prompt.mockReturnValue("   ");
-
-            const clickSpy = jest.spyOn(mockPluginChooser, "click");
-
             dialog.openPlugin();
 
-            expect(clickSpy).toHaveBeenCalled();
+            expect(mockModal.style.display).toBe("block");
         });
 
-        it("does not crash if prompt input is empty string and pluginChooser is null", () => {
-            document.body.removeChild(mockPluginChooser);
+        it("does not crash if required modal elements are missing", () => {
+            document.body.removeChild(mockModal);
             const dialog = new PluginDialog();
-            window.prompt.mockReturnValue("");
 
             expect(() => {
                 dialog.openPlugin();
             }).not.toThrow();
+        });
+
+        it("calls onLoadBuiltIn with trimmed lowercase name on submit if input is not empty", () => {
+            const onLoadBuiltIn = jest.fn();
+            const dialog = new PluginDialog({ onLoadBuiltIn });
+
+            dialog.openPlugin();
+            mockInput.value = "  MyPlugin  ";
+            mockSubmitBtn.onclick();
+
+            expect(onLoadBuiltIn).toHaveBeenCalledWith("myplugin");
+            expect(mockModal.style.display).toBe("none");
+        });
+
+        it("does not call onLoadBuiltIn on submit if onLoadBuiltIn is not a function", () => {
+            const dialog = new PluginDialog({ onLoadBuiltIn: "not a function" });
+            dialog.openPlugin();
+            mockInput.value = "MyPlugin";
+
+            const clickSpy = jest.spyOn(mockPluginChooser, "click");
+            mockSubmitBtn.onclick();
+
+            expect(clickSpy).not.toHaveBeenCalled();
+        });
+
+        it("clicks pluginChooser on submit if input is empty string", () => {
+            const dialog = new PluginDialog();
+            dialog.openPlugin();
+            mockInput.value = "   ";
+
+            const clickSpy = jest.spyOn(mockPluginChooser, "click");
+            mockSubmitBtn.onclick();
+
+            expect(clickSpy).toHaveBeenCalled();
+        });
+
+        it("does not crash on submit with empty input if pluginChooser is null", () => {
+            document.body.removeChild(mockPluginChooser);
+            const dialog = new PluginDialog();
+            dialog.openPlugin();
+            mockInput.value = "";
+
+            expect(() => {
+                mockSubmitBtn.onclick();
+            }).not.toThrow();
+        });
+
+        it("closes the modal without side effects when close button is clicked", () => {
+            const onLoadBuiltIn = jest.fn();
+            const dialog = new PluginDialog({ onLoadBuiltIn });
+            dialog.openPlugin();
+
+            mockCloseBtn.onclick();
+
+            expect(mockModal.style.display).toBe("none");
+            expect(onLoadBuiltIn).not.toHaveBeenCalled();
         });
     });
 
