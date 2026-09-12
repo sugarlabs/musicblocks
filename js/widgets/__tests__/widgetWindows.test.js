@@ -649,7 +649,7 @@ describe("widgetWindows", () => {
     });
 
     describe("updateTitle", () => {
-        test("updates the title element innerHTML", () => {
+        test("updates the title element textContent", () => {
             const win = createTestWindow("Old Title");
             const key = win._key;
             const titleEl = document.getElementById(key + "WidgetID");
@@ -657,7 +657,7 @@ describe("widgetWindows", () => {
 
             win.updateTitle("New Title");
 
-            expect(titleEl.innerHTML).toBe("New Title");
+            expect(titleEl.textContent).toBe("New Title");
         });
 
         test("keeps the frame's aria-label in sync with the new title", () => {
@@ -1182,7 +1182,7 @@ describe("widgetWindows", () => {
         });
 
         it("closes matching widget by name", () => {
-            const mockElement = { innerHTML: "TestWidget" };
+            const mockElement = { textContent: "TestWidget", id: "" };
 
             document.getElementsByClassName = jest.fn(() => [mockElement]);
 
@@ -1213,7 +1213,7 @@ describe("widgetWindows", () => {
 
         it("closes widget by matching element ID when display title changes", () => {
             const mockElement = {
-                innerHTML: "C MAJOR",
+                textContent: "C MAJOR",
                 id: "custom modeWidgetID"
             };
 
@@ -1225,7 +1225,9 @@ describe("widgetWindows", () => {
         });
 
         it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [{ innerHTML: "OtherWidget" }]);
+            document.getElementsByClassName = jest.fn(() => [
+                { textContent: "OtherWidget", id: "" }
+            ]);
 
             window.widgetWindows.closeBlkWidgets("TestWidget");
 
