@@ -1005,7 +1005,6 @@ function setupActionBlocks(activity) {
                 return [logo.actions[args[0]], 1];
             }
 
-            console.debug("action " + args[0] + " not found");
             activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
     }
@@ -1389,7 +1388,6 @@ function setupActionBlocks(activity) {
                 return [logo.actions[args[0]], 1];
             }
 
-            console.debug("action " + args[0] + " not found");
             activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
     }
