@@ -52,6 +52,33 @@ const _lilypondDurationToWholeNotes = duration => {
     return wholeNotes;
 };
 
+// How many arguments notation.js stages after each marker that takes any.
+const MXML_MARKER_ARGUMENTS = new Map([
+    ["key", 2],
+    ["meter", 2],
+    ["tempo", 2],
+    ["pickup", 1],
+    ["markup", 1],
+    ["markdown", 1]
+]);
+
+/**
+ * Lists the markers staged from `start` up to the next note. Each marker's arguments are
+ * skipped, so an argument (such as print text reading "tie") is never taken for a marker.
+ * @param {Array} notes - logo.notation.notationStaging[voice]
+ * @param {number} start - index of the first entry after a note, or 0
+ * @returns {string[]}
+ */
+const _markersUntilNextNote = (notes, start) => {
+    const markers = [];
+    let k = start;
+    while (k < notes.length && !Array.isArray(notes[k])) {
+        markers.push(notes[k]);
+        k += 1 + (MXML_MARKER_ARGUMENTS.get(notes[k]) || 0);
+    }
+    return markers;
+};
+
 /**
  * Escapes free text for a <words> element. "P" or "#" followed by a digit is also written
  * as a character reference, because the voice renumbering pass at the end of
@@ -206,6 +233,8 @@ saveMxmlOutput = logo => {
         // Nesting depth of the relative-volume and harmonic blocks around the current note.
         let articulationDepth = 0,
             harmonicsDepth = 0;
+        // Index of the last staged note, or -1 before the first.
+        let previousNote = -1;
         // <direction> and <sound> belong inside a <measure>, at the note they precede.
         // Markers are staged before it's known whether that note still fits the current
         // measure, so they're held here and written just ahead of the next note.
@@ -245,7 +274,9 @@ saveMxmlOutput = logo => {
                 const bpm = notes[i + 1];
                 // The beat is staged as a LilyPond duration ("4", "4.", "4 16"), not a number.
                 const beatWholeNotes = _lilypondDurationToWholeNotes(notes[i + 2]);
-                const bpmAdjusted = Math.floor(bpm * beatWholeNotes * 4);
+                // MusicXML tempo is a decimal, so a dotted beat can give e.g. 67.5; rounding
+                // only trims floating-point noise.
+                const bpmAdjusted = Math.round(bpm * beatWholeNotes * 4 * 1000) / 1000;
                 if (Number.isFinite(bpmAdjusted) && bpmAdjusted > 0) {
                     pendingDirections.push(() => add(`<sound tempo="${bpmAdjusted}"/>`));
                 }
@@ -315,7 +346,7 @@ saveMxmlOutput = logo => {
             if (!Array.isArray(obj)) continue;
 
             // Notation.doUpdateNotation stages a note's markup (a Hertz value, or print
-            // block text) immediately after the note, ahead of any tie or end slur.
+            // block text) immediately after the note.
             const attachedWords = [];
             let next = i + 1;
             while (notes[next] === "markup" || notes[next] === "markdown") {
@@ -325,6 +356,17 @@ saveMxmlOutput = logo => {
                 }
                 next += 2;
             }
+
+            // Ties and slurs are markers staged between notes, in whatever order the blocks
+            // produced them and possibly among other markers, so every marker in the gap is
+            // read rather than only the adjacent entry.
+            const markersBefore = _markersUntilNextNote(notes, previousNote + 1);
+            const markersAfter = _markersUntilNextNote(notes, i + 1);
+            const tieStop = markersBefore.includes("tie");
+            const slurStart = markersBefore.includes("begin slur");
+            const tieStart = markersAfter.includes("tie");
+            const slurStop = markersAfter.includes("end slur");
+            previousNote = i;
 
             let isChordNote = false;
             for (const p of obj[0]) {
@@ -435,11 +477,9 @@ saveMxmlOutput = logo => {
                 }
 
                 add(`<duration>${dur}</duration>`);
-                if (notes[next] === "tie") {
-                    add('<tie type="start"/>');
-                } else if (notes[i - 1] === "tie") {
-                    add('<tie type="stop"/>');
-                }
+                // The middle of three tied notes both stops one tie and starts the next.
+                if (tieStop) add('<tie type="stop"/>');
+                if (tieStart) add('<tie type="start"/>');
                 if (timeModification) {
                     add("<time-modification>");
                     indent++;
@@ -466,12 +506,12 @@ saveMxmlOutput = logo => {
                     add("</technical>");
                 }
                 indent--;
-                if (notes[i - 1] === "begin slur") {
+                if (slurStart) {
                     indent++;
                     add('<slur type="start"/>');
                     indent--;
                 }
-                if (notes[next] === "end slur") {
+                if (slurStop) {
                     indent++;
                     add('<slur type="stop"/>');
                     indent--;
