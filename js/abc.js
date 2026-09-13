@@ -221,12 +221,8 @@ const processABCNotes = function (logo, turtle) {
             }
             counter += 1;
 
-            if (typeof obj[NOTATIONNOTE] === "string") {
-                note = __toABCnote(obj[NOTATIONNOTE]);
-            } else {
-                notes = obj[NOTATIONNOTE];
-                note = __toABCnote(notes[0]);
-            }
+            notes = typeof obj[NOTATIONNOTE] === "string" ? [obj[NOTATIONNOTE]] : obj[NOTATIONNOTE];
+            note = __toABCnote(notes[0]);
 
             let incompleteTuplet = 0; // An incomplete tuplet
 
@@ -328,7 +324,11 @@ const processABCNotes = function (logo, turtle) {
                 targetDuration = 0;
                 tupletDuration = 0;
             } else {
-                if (typeof notes === "object") {
+                if (obj[NOTATIONINSIDECHORD] <= 0) {
+                    if (obj[NOTATIONSTACCATO]) {
+                        parts.push(".");
+                    }
+
                     if (notes.length > 1) {
                         parts.push("[");
                     }
@@ -341,16 +341,10 @@ const processABCNotes = function (logo, turtle) {
                         parts.push("]");
                     }
 
-                    parts.push(obj[NOTATIONDURATION]);
+                    parts.push(__convertDuration(obj[NOTATIONDURATION]));
                     for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
                         parts.push(".");
                     }
-
-                    parts.push(" ");
-                }
-
-                if (obj[NOTATIONSTACCATO]) {
-                    parts.push(".");
                 }
 
                 if (obj[NOTATIONINSIDECHORD] > 0) {
@@ -361,6 +355,10 @@ const processABCNotes = function (logo, turtle) {
                             obj[NOTATIONINSIDECHORD]
                     ) {
                         // Open the chord.
+                        if (obj[NOTATIONSTACCATO]) {
+                            parts.push(".");
+                        }
+
                         parts.push("[");
                     }
 
@@ -385,20 +383,6 @@ const processABCNotes = function (logo, turtle) {
 
                         parts.push(" ");
                     }
-                } else {
-                    parts.push(note);
-                    parts.push(__convertDuration(obj[NOTATIONDURATION]));
-                    for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                        parts.push(".");
-                    }
-
-                    if (articulation) {
-                        parts.push("");
-                    }
-                }
-
-                if (obj[NOTATIONSTACCATO]) {
-                    parts.push(".");
                 }
 
                 targetDuration = 0;
