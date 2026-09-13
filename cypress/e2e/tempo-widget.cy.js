@@ -24,6 +24,7 @@ const loadFixtureProject = fixtureName => {
 };
 
 const tempoDialog = '[role="dialog"][aria-label="tempo"]';
+const helpDialog = '[role="dialog"][aria-label="help"]';
 
 // The real number block wired to setmasterbpm2's second connection, kept in
 // sync by Tempo._updateBPM() whenever a BPM edit is applied through the widget.
@@ -41,12 +42,13 @@ describe("Tempo widget", () => {
         cy.visit("http://127.0.0.1:3000");
         cy.waitForAppReady();
 
+        // A first-time visit auto-opens the "help" tour widget (activity.js
+        // showHelp() on firstTimeUser); dismiss only that dialog, not every
+        // open window, so unrelated leftover widget state stays visible.
         cy.get("body").then($body => {
-            const closeButtons = $body.find(".windowFrame .wftButton.close");
-            if (closeButtons.length) {
-                cy.wrap(closeButtons).each($btn => {
-                    cy.wrap($btn).click({ force: true });
-                });
+            const closeButton = $body.find(`${helpDialog} .wftButton.close`);
+            if (closeButton.length) {
+                cy.wrap(closeButton).click({ force: true });
             }
         });
     });
