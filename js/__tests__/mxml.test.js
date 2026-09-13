@@ -715,6 +715,16 @@ describe("saveMxmlOutput notation markers", () => {
         expect(sounds[0].parentNode.tagName).toBe("measure");
     });
 
+    it.each([
+        [90, "8.", "67.5"],
+        [90, "16", "22.5"],
+        [75, "8", "37.5"]
+    ])("keeps a fractional tempo: %i beats per %s note is %s per minute", (bpm, beat, tempo) => {
+        const doc = parseScore(exportVoice(["tempo", bpm, beat, note("C4")]));
+
+        expect(doc.getElementsByTagName("sound")[0].getAttribute("tempo")).toBe(tempo);
+    });
+
     describe("direction placement", () => {
         const childTags = measure => Array.from(measure.children).map(c => c.tagName);
 
@@ -826,6 +836,55 @@ describe("saveMxmlOutput notation markers", () => {
         expect(words).toHaveLength(1);
         expect(words[0].textContent).toBe("440");
         expect(stepsOf(words[0].parentNode.parentNode.nextElementSibling)).toEqual(["C"]);
+    });
+
+    describe("ties and slurs between notes", () => {
+        const marksOf = n =>
+            ["tie", "slur"].flatMap(tag =>
+                Array.from(n.getElementsByTagName(tag)).map(
+                    el => `${tag} ${el.getAttribute("type")}`
+                )
+            );
+
+        it.each([
+            ["tie", "end slur"],
+            ["end slur", "tie"]
+        ])("starts a tie and ends a slur on one note when staged as %s, %s", (first, second) => {
+            const doc = parseScore(
+                exportVoice(["begin slur", note("C4"), first, second, note("C4")])
+            );
+            const [tied, continuation] = notesOf(doc);
+
+            expect(marksOf(tied).sort()).toEqual(["slur start", "slur stop", "tie start"]);
+            expect(marksOf(continuation)).toEqual(["tie stop"]);
+        });
+
+        it("keeps a tie when a direction is staged between the tied notes", () => {
+            const doc = parseScore(
+                exportVoice([note("C4"), "tie", "begin crescendo", note("C4"), "end crescendo"])
+            );
+
+            expect(notesOf(doc).map(marksOf)).toEqual([["tie start"], ["tie stop"]]);
+        });
+
+        it("both stops and starts a tie on the middle of three tied notes", () => {
+            // A note split across two barlines is staged as three tied notes.
+            const doc = parseScore(exportVoice([note("C4"), "tie", note("C4"), "tie", note("C4")]));
+
+            expect(notesOf(doc).map(marksOf)).toEqual([
+                ["tie start"],
+                ["tie stop", "tie start"],
+                ["tie stop"]
+            ]);
+        });
+
+        it("does not mistake a marker's argument for a tie or slur", () => {
+            const doc = parseScore(
+                exportVoice([note("C4"), "markdown", "tie", note("D4"), "markdown", "end slur"])
+            );
+
+            expect(notesOf(doc).map(marksOf)).toEqual([[], []]);
+        });
     });
 
     it("still ties and slurs notes that carry markup", () => {
