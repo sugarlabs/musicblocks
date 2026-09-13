@@ -39,6 +39,22 @@ describe("saveMxmlOutput", () => {
         expect(output).toContain('<part id="P1">');
     });
 
+    it("should express a quarter note using divisions per quarter note", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+        const divisions = Number(output.match(/<divisions>(\d+)<\/divisions>/)[1]);
+        const duration = Number(output.match(/<duration>(\d+)<\/duration>/)[1]);
+
+        expect(duration / divisions).toBe(1);
+    });
+
     it("should handle multiple voices", () => {
         const logo = {
             notation: {
@@ -97,19 +113,29 @@ describe("saveMxmlOutput", () => {
     });
 
     it("should handle meter changes", () => {
+        const quarterNote = [["C4"], 4, 0];
         const logo = {
             notation: {
                 notationStaging: {
-                    0: ["meter", 3, 4, [["C"], 4, 0]]
+                    0: [
+                        quarterNote,
+                        quarterNote,
+                        quarterNote,
+                        quarterNote,
+                        "meter",
+                        3,
+                        4,
+                        quarterNote
+                    ]
                 }
             }
         };
 
         const output = saveMxmlOutput(logo);
 
-        expect(output).toContain("<time>");
+        expect(output).toContain("<beats>3</beats>");
         expect(output).toContain("<beat-type>4</beat-type>");
-        expect(output).toContain("<step>C</step>");
+        expect(output.match(/<divisions>8<\/divisions>/g)).toHaveLength(2);
     });
 
     it("should handle crescendo and decrescendo markings", () => {
@@ -225,10 +251,9 @@ describe("saveMxmlOutput", () => {
         const output = saveMxmlOutput(logo);
 
         expect(output).not.toContain("<duration>32</duration>");
-        // A voice containing a 3:2 tuplet gets divisions scaled to 32 * 3 = 96 (see
-        // _resolveDivisionsPerWholeNote), so this eighth-note triplet's duration is
-        // exactly (96 / 8) * (2 / 3) = 8 -- not a rounded approximation.
-        expect(output).toContain("<divisions>96</divisions>");
+        // The internal divisions-per-whole-note resolution scales to 96, which MusicXML
+        // represents as 24 divisions per quarter note. The exact duration remains 8.
+        expect(output).toContain("<divisions>24</divisions>");
         expect(output).toContain("<duration>8</duration>");
         expect(output).toContain("<step>C</step>");
         expect(output).toContain("<octave>4</octave>");
@@ -272,7 +297,7 @@ describe("saveMxmlOutput", () => {
 
         const output = saveMxmlOutput(logo);
 
-        expect(output).toContain("<divisions>480</divisions>");
+        expect(output).toContain("<divisions>120</divisions>");
         // Triplet (3:2): (480 / 8) * (2 / 3) = 40. "Quintuplet" (5:2): (480 / 8) * (2 / 5) = 24.
         expect(output).toContain("<duration>40</duration>");
         expect(output).toContain("<duration>24</duration>");

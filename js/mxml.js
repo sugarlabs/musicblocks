@@ -128,6 +128,7 @@ saveMxmlOutput = logo => {
         // instead of a rounded one; identical to DIVISIONS_PER_WHOLE_NOTE (32, this
         // file's long-standing resolution) when the voice has no tuplets at all.
         const divisionsPerWholeNote = _resolveDivisionsPerWholeNote(notes);
+        const divisionsPerQuarterNote = divisionsPerWholeNote / 4;
 
         let currMeasure = 1,
             divisions = divisionsPerWholeNote,
@@ -247,14 +248,24 @@ saveMxmlOutput = logo => {
                 if (!isChordNote) {
                     if (divisionsLeft === divisions) {
                         if (firstMeasure) {
-                            addMeasureAttributes(currMeasure, divisions, beats, beatType);
+                            addMeasureAttributes(
+                                currMeasure,
+                                divisionsPerQuarterNote,
+                                beats,
+                                beatType
+                            );
                             firstMeasure = false;
                         } else if (beatsChanged) {
                             beats = newBeats;
                             beatType = newBeatType;
                             divisions = newDivisions;
                             divisionsLeft = divisions;
-                            addMeasureAttributes(currMeasure, newDivisions, newBeats, newBeatType);
+                            addMeasureAttributes(
+                                currMeasure,
+                                divisionsPerQuarterNote,
+                                newBeats,
+                                newBeatType
+                            );
                             beatsChanged = false;
                         } else {
                             add(`<measure number="${currMeasure}">`);
