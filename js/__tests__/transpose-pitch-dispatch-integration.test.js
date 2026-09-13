@@ -18,21 +18,16 @@
  */
 
 /**
- * Integration test: the real, registered `newnote`, `settransposition` and `pitch` blocks
- * (js/blocks/RhythmBlocks.js, js/blocks/PitchBlocks.js) dispatch through their own real `flow()`
- * via the real `Logo.runFromBlockNow` (js/logo.js). A `pitch` nested inside a semi-tone transpose
- * clamp resolves through the real `PitchActions.playPitch` -> `Singer.processPitch` -> `getNote`
- * (js/utils/musicutils.js) *with the clamp's shift in effect*, and the clamp's real end-of-clamp
- * signal reverts it on exit. `pitch-note-dispatch-integration.test.js` never places a transpose
- * clamp in its program, so this is the one seam it doesn't reach.
+ * Integration test: the real `newnote`, `settransposition` and `pitch` blocks dispatch through
+ * `Logo.runFromBlockNow`. A `pitch` nested inside a semi-tone transpose clamp resolves through
+ * `PitchActions.playPitch` -> `Singer.processPitch` -> `getNote` with the clamp's shift applied,
+ * and the clamp's own end-of-clamp signal reverts it on exit - the one seam
+ * `pitch-note-dispatch-integration.test.js` doesn't reach.
  *
- * Only the `number`/`solfege` value blocks and `hidden` end-of-clamp markers are synthetic plain
- * data. Mocked: `Singer.processNote` (the Tone.js hand-off, covered elsewhere; also the
- * observation point, since `playNote` deletes the resolved pitch right after handing it off) and
- * `Singer.addScalarTransposition` (an unrelated scalar transform, stays 0 throughout).
- * `Singer.processPitch` stays real but is spied on to record the live transposition at resolution
- * time. Every Singer method this file replaces gets a fresh mock per test, restored in
- * `afterEach` so nothing outlives the test that installed it.
+ * Mocked: `Singer.processNote` (the Tone.js hand-off boundary - also the only place the resolved
+ * pitch survives, since `playNote` deletes it right after) and `Singer.addScalarTransposition`
+ * (an unrelated transform, stays 0). `Singer.processPitch` stays real but is spied on to record
+ * the live transposition at resolution time.
  */
 
 // Globals RhythmBlocks/PitchBlocks/logo/turtle-singer need, set before requiring them.
@@ -128,8 +123,7 @@ global.EmbeddedGraphicsScheduler =
 const logoconstants = require("../logoconstants");
 Object.assign(global, logoconstants);
 
-// Real note-name resolution pipeline, so the real pitch/transpose flows resolve through the
-// genuine musicutils implementation instead of a stand-in.
+// Real musicutils exports, so pitch/transpose resolution runs through the genuine pipeline.
 const musicUtils = require("../utils/musicutils");
 Object.assign(global, {
     pitchToNumber: musicUtils.pitchToNumber,
@@ -174,8 +168,7 @@ Object.assign(global, {
 
 const { Logo } = require("../logo");
 
-// The real Singer class (js/turtle-singer.js), not a stand-in. Captured before any test mocks it,
-// so afterEach can always hand the real implementation back.
+// Real Singer class, captured before any test mocks it so afterEach can restore it.
 global.Singer = require("../turtle-singer");
 Singer.masterBPM = 90;
 Singer.defaultBPMFactor = 1;
@@ -184,13 +177,10 @@ const realAddScalarTransposition = Singer.addScalarTransposition;
 
 const setupRhythmActions = require("../turtleactions/RhythmActions");
 const setupPitchActions = require("../turtleactions/PitchActions");
-// Registers the real blocks into activity.blocks.protoBlockDict (js/protoblocks.js), the same
-// path the palette itself uses.
 const { setupPitchBlocks } = require("../blocks/PitchBlocks");
 const { setupRhythmBlocks } = require("../blocks/RhythmBlocks");
 
-// Only the turtle/activity fields the real newnote -> settransposition -> pitch path reads (found
-// empirically with a property-access-tracking Proxy, then confirmed by dropping each in turn).
+// Only the fields the real newnote -> settransposition -> pitch path reads, confirmed empirically.
 function createTurtle() {
     return {
         id: 0,
@@ -228,7 +218,6 @@ function createTurtle() {
             chordIntervals: [],
             ratioIntervals: [],
             transpositionRatios: [],
-            // The shift stack setSemitoneTranspose's end-of-clamp listener pops on clamp exit.
             transposition: 0,
             transpositionValues: [],
             scalarTransposition: 0,
@@ -251,7 +240,6 @@ function createActivity(turtle) {
     return {
         beginnerMode: false,
         palettes: {
-            // setPalette() only needs `.add` on whichever palette a block asks for.
             dict: new Proxy({}, { get: () => ({ add: jest.fn() }) })
         },
         blocks: {
@@ -280,7 +268,6 @@ function createActivity(turtle) {
     };
 }
 
-// Synthetic value block (number / solfege): parseArg returns `.value` for any isValueBlock().
 function makeValueBlock(name, value) {
     return {
         name,
@@ -292,7 +279,6 @@ function makeValueBlock(name, value) {
     };
 }
 
-// Synthetic end-of-clamp signal target - carries no behavior.
 function makeHidden(prev) {
     return {
         name: "hidden",
@@ -338,9 +324,7 @@ describe("real newnote/settransposition/pitch blocks dispatch through Logo into 
         scheduledForBlk = null;
         transpositionWhilePitchResolved = null;
 
-        // playNote deletes tur.singer.notePitches[blk] right after handing off, so capture the
-        // resolved pitch here. `blk` is the newnote's id when the pitch resolved inside the real
-        // clamp, or the pitch block's own id if processPitch fell back to its stand-alone path.
+        // playNote deletes tur.singer.notePitches[blk] right after handing off, so capture here.
         Singer.processNote = jest.fn((_activity, _noteValue, _isOsc, blk, t) => {
             const tur = _activity.turtles.ithTurtle(t);
             scheduledForBlk = blk;
@@ -348,7 +332,6 @@ describe("real newnote/settransposition/pitch blocks dispatch through Logo into 
             noteOctavesAtSchedule = [...tur.singer.noteOctaves[blk]];
         });
 
-        // Unrelated scalar (not semi-tone) transform; stays 0 throughout.
         Singer.addScalarTransposition = jest.fn((_logo, _turtle, note, octave) => [note, octave]);
 
         // Real processPitch, spied to record the live transposition at resolution time.
@@ -365,15 +348,14 @@ describe("real newnote/settransposition/pitch blocks dispatch through Logo into 
         protos = activity.blocks.protoBlockDict;
     });
 
-    // Puts every mocked Singer method back to its real implementation.
     afterEach(() => {
         Singer.processNote = realProcessNote;
         Singer.addScalarTransposition = realAddScalarTransposition;
         Singer.processPitch = realProcessPitch;
     });
 
-    // Builds `newnote 1/4 { <one real settransposition clamp per shift, nested> { pitch sol/4 } }`
-    // from the real registered protoblocks. Block ids are the array indices.
+    // Builds `newnote 1/4 { <one settransposition clamp per shift, nested> { pitch sol/4 } }` from
+    // the real registered protoblocks. Block ids are the array indices.
     function installProgram(shifts) {
         const newnote = makeRealBlock("newnote", [null, 1, null, 2], protos.newnote);
         const blocks = [newnote, makeValueBlock("number", 1 / 4), makeHidden(0)];
@@ -395,13 +377,11 @@ describe("real newnote/settransposition/pitch blocks dispatch through Logo into 
             prev = clampId;
         });
 
-        // pitch sol/4 inside the innermost clamp.
         const pitchId = blocks.length;
         blocks.push(makeRealBlock("pitch", [prev, pitchId + 1, pitchId + 2, null], protos.pitch));
         blocks.push(makeValueBlock("solfege", "sol"));
         blocks.push(makeValueBlock("number", 4));
 
-        // Wire each clamp's entry to whatever nests directly inside it.
         newnote.connections[2] = clampIds.length > 0 ? clampIds[0] : pitchId;
         clampIds.forEach((clampId, i) => {
             blocks[clampId].connections[2] = i + 1 < clampIds.length ? clampIds[i + 1] : pitchId;
@@ -416,14 +396,11 @@ describe("real newnote/settransposition/pitch blocks dispatch through Logo into 
 
         logo.runFromBlockNow(logo, 0, 0, 1, null);
 
-        // Resolved inside the real newnote clamp, while the transpose clamp was open, so bare
-        // "sol"/4 (G4) became A4 - the real getNote() output for a transposition of 2.
         expect(scheduledForBlk).toBe(0);
         expect(transpositionWhilePitchResolved).toBe(2);
         expect(notePitchesAtSchedule).toEqual(["A"]);
         expect(noteOctavesAtSchedule).toEqual([4]);
         expect(Singer.processNote).toHaveBeenCalledTimes(1);
-        // The real end-of-clamp signal reverted the shift once the clamp closed.
         expect(turtle.singer.transposition).toBe(0);
         expect(turtle.singer.transpositionValues).toEqual([]);
     });
@@ -445,13 +422,11 @@ describe("real newnote/settransposition/pitch blocks dispatch through Logo into 
 
         logo.runFromBlockNow(logo, 0, 0, 1, null);
 
-        // Both clamps were open together while the pitch resolved: G4 + 2 + 3 semitones = C5.
         expect(scheduledForBlk).toBe(0);
         expect(transpositionWhilePitchResolved).toBe(5);
         expect(notePitchesAtSchedule).toEqual(["C"]);
         expect(noteOctavesAtSchedule).toEqual([5]);
         expect(Singer.processNote).toHaveBeenCalledTimes(1);
-        // Each clamp's own end-of-clamp listener popped its own shift, back to nothing.
         expect(turtle.singer.transposition).toBe(0);
         expect(turtle.singer.transpositionValues).toEqual([]);
     });
