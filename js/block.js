@@ -3461,15 +3461,19 @@ class Block {
                 that.activity.trashcan.stopHighlightAnimation();
             }
 
-            // Visual dock snap indicator
+            // Visual dock snap indicator (throttled to ~60fps)
             if (!overTrash && typeof that.blocks.findDockCandidate === "function") {
-                const candidate = that.blocks.findDockCandidate(thisBlock);
-                if (candidate && typeof that.blocks.showSnapIndicator === "function") {
-                    that.blocks.showSnapIndicator(candidate);
-                } else if (typeof that.blocks.hideSnapIndicator === "function") {
-                    that.blocks.hideSnapIndicator();
+                if (!that.blocks._lastSnapCheckTime || now - that.blocks._lastSnapCheckTime >= 16) {
+                    that.blocks._lastSnapCheckTime = now;
+                    const candidate = that.blocks.findDockCandidate(thisBlock);
+                    if (candidate && typeof that.blocks.showSnapIndicator === "function") {
+                        that.blocks.showSnapIndicator(candidate);
+                    } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                        that.blocks.hideSnapIndicator();
+                    }
                 }
             } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks._lastSnapCheckTime = 0;
                 that.blocks.hideSnapIndicator();
             }
 
@@ -3526,7 +3530,7 @@ class Block {
                 return;
             }
 
-            if (typeof that.blocks.hideSnapIndicator === "function") {
+            if (!that.blocks.isBlockMoving && typeof that.blocks.hideSnapIndicator === "function") {
                 that.blocks.hideSnapIndicator();
             }
 
@@ -3559,6 +3563,7 @@ class Block {
          */
         this.container.on("pressup", event => {
             that._dragPointerDown = false;
+            that.blocks._lastSnapCheckTime = 0;
 
             if (typeof that.blocks.hideSnapIndicator === "function") {
                 that.blocks.hideSnapIndicator();

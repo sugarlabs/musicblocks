@@ -306,6 +306,8 @@ class BlockDragController {
                 }
             }
 
+            if (!targetBlock.connections || !targetBlock.docks) continue;
+
             let start = 1;
             if (
                 typeof targetBlock.isInlineCollapsible === "function" &&
@@ -314,8 +316,6 @@ class BlockDragController {
             ) {
                 start = targetBlock.connections.length - 1;
             }
-
-            if (!targetBlock.connections || !targetBlock.docks) continue;
 
             for (let i = start; i < targetBlock.connections.length; i++) {
                 if (i >= targetBlock.docks.length) break;

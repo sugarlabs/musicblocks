@@ -2582,11 +2582,13 @@ class Blocks {
 
             // Highlight target block
             if (this._snapTargetBlock !== candidate.targetBlock) {
-                if (this._snapTargetBlock !== null) {
-                    this.unhighlight(this._snapTargetBlock);
+                if (this._snapTargetBlock !== null && this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
                 }
                 this._snapTargetBlock = candidate.targetBlock;
-                this.highlight(candidate.targetBlock, true);
+                if (this.blockList[candidate.targetBlock]) {
+                    this.blockList[candidate.targetBlock].highlight();
+                }
             }
 
             // Create or position glowing docking indicator circle
@@ -2631,7 +2633,9 @@ class Blocks {
          */
         this.hideSnapIndicator = () => {
             if (this._snapTargetBlock !== null) {
-                this.unhighlight(this._snapTargetBlock);
+                if (this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
                 this._snapTargetBlock = null;
             }
             if (this._snapIndicatorShape) {
