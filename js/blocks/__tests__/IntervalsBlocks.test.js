@@ -652,6 +652,13 @@ describe("setupIntervalsBlocks", () => {
             createdBlocks.setkey2.flow(["C"], logo, turtleIndex, "blkKey2");
             expect(Singer.IntervalsActions.setKey).not.toHaveBeenCalled();
         });
+
+        it("reports missing input instead of setting a key when the key slot is empty", () => {
+            activity.blocks.blockList.blkKey2 = { connections: [null, null, "modeConn"] };
+            createdBlocks.setkey2.flow([null, "major"], logo, turtleIndex, "blkKey2");
+            expect(activity.errorMsg).toHaveBeenCalledWith("No input", "blkKey2");
+            expect(Singer.IntervalsActions.setKey).not.toHaveBeenCalled();
+        });
     });
 
     describe("DefineModeBlock", () => {
