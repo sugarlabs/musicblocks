@@ -115,7 +115,9 @@ function makeBlocks(blockList) {
         deletePreviousDefault: jest.fn(),
         deleteNextDefault: jest.fn(),
         reInitWidget: jest.fn(),
-        _getBlockSize: jest.fn(() => 1)
+        _getBlockSize: jest.fn(() => 1),
+        hideSnapIndicator: jest.fn(),
+        showSnapIndicator: jest.fn()
     };
 
     setupBlockDragController(blocks);
@@ -207,6 +209,7 @@ describe("BlockDragController", () => {
             expect(typeof blocks.moveBlockRelative).toBe("function");
             expect(typeof blocks.moveBlockRelativeBatched).toBe("function");
             expect(typeof blocks.moveStackRelative).toBe("function");
+            expect(typeof blocks.findDockCandidate).toBe("function");
             expect(typeof blocks.blockMoved).toBe("function");
         });
     });
@@ -383,6 +386,102 @@ describe("BlockDragController", () => {
         });
     });
 
+    describe("findDockCandidate (visual dock snap indicator)", () => {
+        it("returns null when no blocks are within snapping range", () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null]
+            });
+            const moving = makeFlowBlock({
+                x: 500,
+                y: 500,
+                docks: [[0, 0, "in"]],
+                connections: [null]
+            });
+            const blocks = makeBlocks([target, moving]);
+
+            const candidate = blocks.findDockCandidate(1);
+            expect(candidate).toBeNull();
+        });
+
+        it("returns the closest compatible dock candidate within snapping range", () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null]
+            });
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null]
+            });
+            const blocks = makeBlocks([target, moving]);
+
+            const candidate = blocks.findDockCandidate(1);
+            expect(candidate).not.toBeNull();
+            expect(candidate.targetBlock).toBe(0);
+            expect(candidate.connectionIndex).toBe(1);
+            expect(candidate.dockX).toBe(0);
+            expect(candidate.dockY).toBe(20);
+        });
+
+        it("returns null when a nearby dock has an incompatible connection type", () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "numberin"]
+                ],
+                connections: [null, null]
+            });
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null]
+            });
+            const blocks = makeBlocks([target, moving]);
+
+            const candidate = blocks.findDockCandidate(1);
+            expect(candidate).toBeNull();
+        });
+
+        it("ignores blocks that are in trash or in the moving block's stack", () => {
+            const trashedTarget = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null]
+            });
+            trashedTarget.trash = true;
+
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null]
+            });
+            const blocks = makeBlocks([trashedTarget, moving]);
+
+            const candidate = blocks.findDockCandidate(1);
+            expect(candidate).toBeNull();
+        });
+    });
+
     describe("dock snapping (blockMoved)", () => {
         it("connects a block to a compatible dock within snapping range", async () => {
             const target = makeFlowBlock({
@@ -411,6 +510,7 @@ describe("BlockDragController", () => {
 
             expect(moving.connections[0]).toBe(0);
             expect(target.connections[1]).toBe(1);
+            expect(blocks.hideSnapIndicator).toHaveBeenCalled();
         });
 
         it("does not connect to an incompatible dock type even when very close", async () => {

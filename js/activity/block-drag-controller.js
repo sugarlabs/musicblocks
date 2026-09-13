@@ -249,6 +249,123 @@ class BlockDragController {
     }
 
     /**
+     * Find candidate block and connection to snap to while dragging thisBlock.
+     * Returns candidate details or null if no compatible dock is in range.
+     * @param {number} thisBlock - index of dragged block
+     * @returns {{ targetBlock: number, connectionIndex: number, dockX: number, dockY: number } | null}
+     */
+    findDockCandidate(thisBlock) {
+        const blocks = this.blocks;
+        if (thisBlock === null || !blocks.blockList || !blocks.blockList[thisBlock]) {
+            return null;
+        }
+
+        const myBlock = blocks.blockList[thisBlock];
+        if (
+            !myBlock.docks ||
+            myBlock.docks.length === 0 ||
+            !myBlock.docks[0] ||
+            !myBlock.container
+        ) {
+            return null;
+        }
+
+        const x1 = myBlock.container.x + myBlock.docks[0][0];
+        const y1 = myBlock.container.y + myBlock.docks[0][1];
+
+        let min = (MINIMUMDOCKDISTANCE / DEFAULTBLOCKSCALE) * blocks.blockScale;
+        const blkType = myBlock.docks[0][2];
+
+        let candidate = null;
+
+        const nearby =
+            typeof blocks._getNearbyBlocks === "function"
+                ? blocks._getNearbyBlocks(x1, y1)
+                : Object.keys(blocks.blockList).map(Number);
+
+        for (let bi = 0; bi < nearby.length; bi++) {
+            const b = nearby[bi];
+            if (b === thisBlock) continue;
+
+            const targetBlock = blocks.blockList[b];
+            if (
+                !targetBlock ||
+                targetBlock.trash ||
+                targetBlock.inCollapsed ||
+                !targetBlock.container
+            ) {
+                continue;
+            }
+
+            if (typeof targetBlock.isCollapsible === "function" && targetBlock.isCollapsible()) {
+                if (
+                    typeof targetBlock.isInlineCollapsible === "function" &&
+                    !targetBlock.isInlineCollapsible()
+                ) {
+                    if (targetBlock.collapsed) continue;
+                }
+            }
+
+            let start = 1;
+            if (
+                typeof targetBlock.isInlineCollapsible === "function" &&
+                targetBlock.isInlineCollapsible() &&
+                targetBlock.collapsed
+            ) {
+                start = targetBlock.connections.length - 1;
+            }
+
+            if (!targetBlock.connections || !targetBlock.docks) continue;
+
+            for (let i = start; i < targetBlock.connections.length; i++) {
+                if (i >= targetBlock.docks.length) break;
+
+                if (
+                    i === targetBlock.connections.length - 1 &&
+                    targetBlock.connections[i] !== null &&
+                    blocks.blockList[targetBlock.connections[i]] &&
+                    blocks.blockList[targetBlock.connections[i]].isNoHitBlock()
+                ) {
+                    continue;
+                } else if (
+                    ["backward", "status"].includes(targetBlock.name) &&
+                    i === 1 &&
+                    targetBlock.connections[1] !== null &&
+                    blocks.blockList[targetBlock.connections[1]] &&
+                    blocks.blockList[targetBlock.connections[1]].isNoHitBlock()
+                ) {
+                    continue;
+                } else if (
+                    targetBlock.name === "action" &&
+                    i === 2 &&
+                    targetBlock.connections[2] !== null &&
+                    blocks.blockList[targetBlock.connections[2]] &&
+                    blocks.blockList[targetBlock.connections[2]].isNoHitBlock()
+                ) {
+                    continue;
+                }
+
+                if (blocks._testConnectionType(blkType, targetBlock.docks[i][2])) {
+                    const x2 = targetBlock.container.x + targetBlock.docks[i][0];
+                    const y2 = targetBlock.container.y + targetBlock.docks[i][1];
+                    const dist = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+                    if (dist < min) {
+                        min = dist;
+                        candidate = {
+                            targetBlock: b,
+                            connectionIndex: i,
+                            dockX: x2,
+                            dockY: y2
+                        };
+                    }
+                }
+            }
+        }
+
+        return candidate;
+    }
+
+    /**
      * Handle connections when blocks are moved.
      * @param - thisBlock -new variable
      * @public
@@ -256,6 +373,9 @@ class BlockDragController {
      */
     async blockMoved(thisBlock) {
         const blocks = this.blocks;
+        if (typeof blocks.hideSnapIndicator === "function") {
+            blocks.hideSnapIndicator();
+        }
         /**
          * When a block is moved, we have to check the following:
          * (0) Is it inside of a expandable block?
@@ -1052,6 +1172,7 @@ const setupBlockDragController = blocks => {
     blocks.moveBlockRelative = (...args) => controller.moveBlockRelative(...args);
     blocks.moveBlockRelativeBatched = (...args) => controller.moveBlockRelativeBatched(...args);
     blocks.moveStackRelative = (...args) => controller.moveStackRelative(...args);
+    blocks.findDockCandidate = (...args) => controller.findDockCandidate(...args);
 
     return controller;
 };

@@ -3460,6 +3460,19 @@ class Block {
             } else {
                 that.activity.trashcan.stopHighlightAnimation();
             }
+
+            // Visual dock snap indicator
+            if (!overTrash && typeof that.blocks.findDockCandidate === "function") {
+                const candidate = that.blocks.findDockCandidate(thisBlock);
+                if (candidate && typeof that.blocks.showSnapIndicator === "function") {
+                    that.blocks.showSnapIndicator(candidate);
+                } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                    that.blocks.hideSnapIndicator();
+                }
+            } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
+            }
+
             if (that.isValueBlock() && that.name !== "media") {
                 // Ensure text is on top
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -3513,6 +3526,10 @@ class Block {
                 return;
             }
 
+            if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
+            }
+
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false, false);
             } else {
@@ -3542,6 +3559,10 @@ class Block {
          */
         this.container.on("pressup", event => {
             that._dragPointerDown = false;
+
+            if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
+            }
 
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false, true, _dragSpatialGridDirty);
