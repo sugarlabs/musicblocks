@@ -79,6 +79,7 @@ function setupHeapBlocks(activity) {
                     "print"
             ) {
                 logo.statusFields.push([blk, "heap"]);
+                return JSON.stringify([]);
             } else {
                 return JSON.stringify(logo.turtleHeaps[turtle]);
             }
@@ -220,6 +221,7 @@ function setupHeapBlocks(activity) {
                     "print"
             ) {
                 logo.statusFields.push([blk, "heapLength"]);
+                return 0;
             } else {
                 // Return the length of the heap
                 return logo.turtleHeaps[turtle].length;
@@ -566,7 +568,7 @@ function setupHeapBlocks(activity) {
                 return;
             }
 
-            if (typeof args[0] !== "number" || typeof args[1] !== "number") {
+            if (typeof args[0] !== "number") {
                 activity.errorMsg(NANERRORMSG, blk);
                 return;
             }
