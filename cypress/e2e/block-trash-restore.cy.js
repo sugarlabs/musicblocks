@@ -103,7 +103,6 @@ describe("Block trash and restore", () => {
                 const activity = win.ActivityContext.getActivity();
                 const block = activity.blocks.blockList[blockId];
                 const trash = activity.trashcan._container;
-                win.hasMouse = true;
                 const endX = trash.x + 10;
                 const endY = trash.y + 10;
                 const stageScale = activity.getStageScale();
