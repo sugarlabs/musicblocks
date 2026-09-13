@@ -13,7 +13,7 @@
    global
 
    _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH,
-   CUSTOMSAMPLES, globalActivity, rationalToFraction
+   CUSTOMSAMPLES, globalActivity
  */
 
 const _b64Cache = new Map();
@@ -3006,30 +3006,6 @@ const getOctaveRatio = () => {
 const ratioToWheelAngle = (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base));
 
 /**
- * Convert a frequency ratio to a .scl-compatible string.
- * Returns an exact fraction (e.g. "3/2") when the ratio is close
- * to a rational number, otherwise falls back to cents (e.g. "701.96").
- * @function
- * @param {number} ratio - The frequency ratio (e.g. 1.5 for a perfect fifth).
- * @returns {string} A .scl-compatible pitch string.
- */
-const ratioToSclString = ratio => {
-    if (ratio <= 0 || !isFinite(ratio)) {
-        throw new Error("Invalid ratio: " + ratio);
-    }
-
-    const [num, den] = rationalToFraction(ratio);
-    // Cap denominator at 128 as a safety net against irrational approximations
-    // with large denominators, even though the tolerance check catches most cases.
-    if (den !== 0 && den <= 128 && Math.abs(num / den - ratio) < 0.0001) {
-        return num + "/" + den;
-    }
-
-    const cents = 1200 * Math.log2(ratio);
-    return cents.toFixed(2);
-};
-
-/**
  * Parse a Scala (.scl) file content string.
  * Format: comment lines (!), description line, pitch count, then pitch lines
  * (ratios as "num/den" or integers, or cents as decimal numbers).
@@ -3079,10 +3055,6 @@ const parseSclFile = content => {
     while (idx < lines.length && pitches.length < pitchCount) {
         const line = lines[idx];
         idx++;
-
-        if (line.startsWith("!")) {
-            continue;
-        }
 
         const cleaned = line.replace(/\s*cents?\s*$/i, "").trim();
 
@@ -3139,90 +3111,6 @@ const parseSclFile = content => {
 };
 
 /**
- * Serialize a temperament definition to JSON.
- * @function
- * @param {string} name - The temperament name.
- * @param {Object} data - The temperament definition (pitchNumber, octaveRatio, isEDO, ratios, interval).
- * @param {string} referencePitch - The global starting pitch at export time (metadata only).
- * @returns {string} The JSON text.
- */
-const temperamentToJson = (name, data, referencePitch) => {
-    return JSON.stringify(
-        {
-            name,
-            pitchNumber: data.pitchNumber,
-            octaveRatio: data.octaveRatio,
-            isEDO: data.isEDO,
-            ratios: data.ratios,
-            interval: data.interval,
-            referencePitch
-        },
-        null,
-        2
-    );
-};
-
-/**
- * Parse and strictly validate a temperament JSON file.
- * @function
- * @param {string} text - The raw JSON text.
- * @returns {Object} The validated temperament definition.
- * @throws {Error} If the structure is invalid.
- */
-const parseTemperamentJson = text => {
-    let obj;
-    try {
-        obj = JSON.parse(text);
-    } catch (e) {
-        throw new Error("Invalid JSON file: " + e.message);
-    }
-    if (typeof obj !== "object" || obj === null || Array.isArray(obj)) {
-        throw new Error("Invalid temperament JSON: expected an object");
-    }
-    const { pitchNumber, octaveRatio, isEDO, ratios, interval } = obj;
-    if (
-        !Array.isArray(ratios) ||
-        ratios.length < 1 ||
-        !ratios.every(r => typeof r === "number" && r > 0 && isFinite(r))
-    ) {
-        throw new Error("Invalid temperament JSON: invalid ratios");
-    }
-    if (
-        !Array.isArray(interval) ||
-        interval.length !== ratios.length ||
-        !interval.every(i => typeof i === "string")
-    ) {
-        throw new Error("Invalid temperament JSON: invalid interval names");
-    }
-    if (pitchNumber !== ratios.length - 1) {
-        throw new Error("Invalid temperament JSON: pitchNumber mismatch");
-    }
-    if (typeof octaveRatio !== "number" || !(octaveRatio > 0) || !isFinite(octaveRatio)) {
-        throw new Error("Invalid temperament JSON: invalid octaveRatio");
-    }
-    if (Math.abs(ratios[ratios.length - 1] - octaveRatio) > 0.0001) {
-        throw new Error(
-            "Invalid temperament JSON: final ratio " +
-                ratios[ratios.length - 1] +
-                " does not match octaveRatio " +
-                octaveRatio
-        );
-    }
-    if (typeof isEDO !== "boolean") {
-        throw new Error("Invalid temperament JSON: invalid isEDO");
-    }
-    return {
-        name: typeof obj.name === "string" ? obj.name : "",
-        pitchNumber,
-        octaveRatio,
-        isEDO,
-        ratios,
-        interval,
-        referencePitch: obj.referencePitch
-    };
-};
-
-/**
  * Serialize a mode definition to JSON.
  * @function
  * @param {string} name - The mode name.
@@ -3252,7 +3140,6 @@ const parseModeJson = text => {
         throw new Error("Invalid mode JSON: expected an object");
     }
     const { edo, pattern } = obj;
-    // ponytail: EDO 5-55 duplicates the _importScl search bounds in modewidget.js; pass bounds in if they ever diverge.
     if (!Number.isInteger(edo) || edo < EDO_MIN || edo > EDO_MAX) {
         throw new Error("Invalid mode JSON: invalid edo");
     }
@@ -3267,25 +3154,6 @@ const parseModeJson = text => {
         throw new Error("Invalid mode JSON: pattern does not sum to edo");
     }
     return { name: typeof obj.name === "string" ? obj.name : "", edo, pattern };
-};
-
-/**
- * Convert a ratios array (tonic 1 through octave) to the numeric-keyed
- * per-pitch entries the temperament editor uses for custom temperaments:
- * `"i": [ratio, note, octave]`. Imported scales stored this way render
- * through the widget's custom branch and resolve in getCustomFrequency.
- * @function
- * @param {Array<number>} ratios - Ratios from tonic (1) through the octave.
- * @returns {Object} Numeric-keyed entries for degrees below the octave.
- */
-const ratiosToNumericKeys = ratios => {
-    const keys = {};
-    for (let i = 0; i < ratios.length - 1; i++) {
-        // ponytail: imports carry no note names (Scala files don't have them);
-        // degree labels stay distinct and parseable so every degree resolves.
-        keys["" + i] = [ratios[i], "P" + i, 4];
-    }
-    return keys;
 };
 
 /**
@@ -8525,13 +8393,9 @@ if (typeof module !== "undefined" && module.exports) {
         getModeSliceFont,
         getNonEDOFrequency,
         configureWheel,
-        ratioToSclString,
         parseSclFile,
-        temperamentToJson,
-        parseTemperamentJson,
         modeToJson,
         parseModeJson,
-        ratiosToNumericKeys,
         EDO_MIN,
         EDO_MAX
     };

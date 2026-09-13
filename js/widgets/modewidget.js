@@ -1368,13 +1368,46 @@ class ModeWidget {
         return [name, octave + 4];
     }
 
-    _exportScl() {
+    _findEdoPattern(pitches) {
+        for (let edo = EDO_MIN; edo <= EDO_MAX; edo++) {
+            const step = 1200 / edo;
+            const steps = [];
+            let prevStepCount = 0;
+            let valid = true;
+            for (let i = 0; i < pitches.length; i++) {
+                const stepCount = Math.round(pitches[i].cents / step);
+                if (Math.abs(pitches[i].cents - stepCount * step) > 0.5) {
+                    valid = false;
+                    break;
+                }
+                if (stepCount <= prevStepCount) {
+                    valid = false;
+                    break;
+                }
+                steps.push(stepCount - prevStepCount);
+                prevStepCount = stepCount;
+            }
+            if (valid && steps.length === pitches.length && prevStepCount === edo) {
+                return { edo, pattern: steps };
+            }
+        }
+        return null;
+    }
+
+    _modeExportData() {
         const pattern = this._calculateMode();
         const edo = this._activeEDO;
         if (!pattern || pattern.length === 0) {
             this.errorMsg(_("No mode to export."));
-            return;
+            return null;
         }
+        return { pattern, edo };
+    }
+
+    _exportScl() {
+        const data = this._modeExportData();
+        if (!data) return;
+        const { pattern, edo } = data;
 
         const lines = [];
         lines.push("! mode.scl");
@@ -1393,12 +1426,9 @@ class ModeWidget {
     }
 
     _exportJson() {
-        const pattern = this._calculateMode();
-        const edo = this._activeEDO;
-        if (!pattern || pattern.length === 0) {
-            this.errorMsg(_("No mode to export."));
-            return;
-        }
+        const data = this._modeExportData();
+        if (!data) return;
+        const { pattern, edo } = data;
 
         const content = modeToJson(this._selectedModeName || "custom", edo, pattern);
         downloadScl(content, "mode-" + edo + "edo.json");
@@ -1418,33 +1448,6 @@ class ModeWidget {
             let foundPattern = null;
             let name = "";
             let saved = false;
-
-            // Brute-force EDO 5-55 from pitch cents. Returns {edo, pattern} or null.
-            const findEdoPattern = pitches => {
-                for (let edo = EDO_MIN; edo <= EDO_MAX; edo++) {
-                    const step = 1200 / edo;
-                    const steps = [];
-                    let prevStepCount = 0;
-                    let valid = true;
-                    for (let i = 0; i < pitches.length; i++) {
-                        const stepCount = Math.round(pitches[i].cents / step);
-                        if (Math.abs(pitches[i].cents - stepCount * step) > 0.5) {
-                            valid = false;
-                            break;
-                        }
-                        if (stepCount <= prevStepCount) {
-                            valid = false;
-                            break;
-                        }
-                        steps.push(stepCount - prevStepCount);
-                        prevStepCount = stepCount;
-                    }
-                    if (valid && steps.length === pitches.length && prevStepCount === edo) {
-                        return { edo, pattern: steps };
-                    }
-                }
-                return null;
-            };
 
             const kind = importFileKind(data.file.name);
             if (kind === "json") {
@@ -1472,7 +1475,7 @@ class ModeWidget {
                     return;
                 }
 
-                const edoResult = findEdoPattern(result.pitches);
+                const edoResult = this._findEdoPattern(result.pitches);
                 if (!edoResult) {
                     this.errorMsg(
                         _("Not a valid EDO mode. Use the temperament widget for non-equal scales.")
