@@ -24,10 +24,12 @@ function setupNumberBlocks(activity) {
      * Check if block is in status matrix print context
      */
     const isInStatusMatrix = (logo, blk, fieldName) => {
+        const parentId = activity.blocks.blockList[blk].connections[0];
         if (
             logo.inStatusMatrix &&
-            activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                "print"
+            parentId !== null &&
+            activity.blocks.blockList[parentId] &&
+            activity.blocks.blockList[parentId].name === "print"
         ) {
             logo.statusFields.push([blk, fieldName]);
             return true;
@@ -77,11 +79,17 @@ function setupNumberBlocks(activity) {
         if (cblk0 === null) return undefined;
         let par = activity.blocks.blockList[cblk0];
         while (par.name === "hspace") {
+            if (par.connections[0] === null) return undefined;
             par = activity.blocks.blockList[par.connections[0]];
         }
-        return par.name === "pitch"
-            ? activity.blocks.blockList[par.connections[2]].value
-            : undefined;
+        if (
+            par.name === "pitch" &&
+            par.connections[2] !== null &&
+            par.connections[2] !== undefined
+        ) {
+            return activity.blocks.blockList[par.connections[2]].value;
+        }
+        return undefined;
     };
 
     /**
