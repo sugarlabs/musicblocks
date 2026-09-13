@@ -3643,15 +3643,13 @@ class Block {
                     event.stageY / this.activity.getStageScale()
                 )
             ) {
-                if (this.activity.trashcan.isVisible) {
-                    this.blocks.sendStackToTrash(this);
-                    this.activity.textMsg(
-                        _(
-                            "You can restore deleted blocks from the trash with the Restore From Trash button."
-                        ),
-                        3000
-                    );
-                }
+                this.blocks.sendStackToTrash(this);
+                this.activity.textMsg(
+                    _(
+                        "You can restore deleted blocks from the trash with the Restore From Trash button."
+                    ),
+                    3000
+                );
             } else {
                 // Otherwise, process move.
                 // Also, keep track of the time of the last move.
