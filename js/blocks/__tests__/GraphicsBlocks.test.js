@@ -553,8 +553,9 @@ describe("GraphicsBlocks", () => {
                 1: { name: "print" }
             };
             const block = new activity.blocks.heading();
-            block.arg(logo, turtle, 0);
+            const res = block.arg(logo, turtle, 0);
             expect(logo.statusFields).toContainEqual([0, "heading"]);
+            expect(res).toBe(0);
         });
 
         test("XBlock pushes statusField when parent is print in status matrix", () => {
@@ -564,8 +565,9 @@ describe("GraphicsBlocks", () => {
                 1: { name: "print" }
             };
             const block = new activity.blocks.x();
-            block.arg(logo, turtle, 0);
+            const res = block.arg(logo, turtle, 0);
             expect(logo.statusFields).toContainEqual([0, "x"]);
+            expect(res).toBe(0);
         });
 
         test("YBlock pushes statusField when parent is print in status matrix", () => {
@@ -575,8 +577,9 @@ describe("GraphicsBlocks", () => {
                 1: { name: "print" }
             };
             const block = new activity.blocks.y();
-            block.arg(logo, turtle, 0);
+            const res = block.arg(logo, turtle, 0);
             expect(logo.statusFields).toContainEqual([0, "y"]);
+            expect(res).toBe(0);
         });
     });
 
