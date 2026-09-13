@@ -501,11 +501,15 @@ describe("Drawing - doForward", () => {
         expect(mockTurtle.container.x).toBe(startX + 20);
     });
 
-    test("doForward should trigger view media position updates if view exists", () => {
-        const mockView = { _updateMediaPositions: jest.fn() };
-        mockTurtle._view = mockView;
+    test("doForward repositions the turtle's media", () => {
+        mockTurtle._updateMediaPositions = jest.fn();
         painter.doForward(10);
-        expect(mockView._updateMediaPositions).toHaveBeenCalled();
+        expect(mockTurtle._updateMediaPositions).toHaveBeenCalled();
+    });
+
+    test("doForward does not throw when the turtle has no media hook", () => {
+        delete mockTurtle._updateMediaPositions;
+        expect(() => painter.doForward(10)).not.toThrow();
     });
 });
 
@@ -964,11 +968,15 @@ describe("doSetXY operations", () => {
         expect(mockTurtle.ctx.beginPath).not.toHaveBeenCalled();
     });
 
-    test("doSetXY should trigger view update if view exists", () => {
-        const mockView = { _updateMediaPositions: jest.fn() };
-        mockTurtle._view = mockView;
+    test("doSetXY repositions the turtle's media", () => {
+        mockTurtle._updateMediaPositions = jest.fn();
         painter.doSetXY(100, 200);
-        expect(mockView._updateMediaPositions).toHaveBeenCalled();
+        expect(mockTurtle._updateMediaPositions).toHaveBeenCalled();
+    });
+
+    test("doSetXY does not throw when the turtle has no media hook", () => {
+        delete mockTurtle._updateMediaPositions;
+        expect(() => painter.doSetXY(100, 200)).not.toThrow();
     });
 
     test("doSetXY should handle NaN or Infinity gracefully", () => {
