@@ -2565,6 +2565,84 @@ class Blocks {
             }
         };
 
+        this._snapTargetBlock = null;
+        this._snapIndicatorShape = null;
+
+        /**
+         * Show visual snap indicator on target block and connection point.
+         * @param {object} candidate - { targetBlock, connectionIndex, dockX, dockY }
+         * @public
+         * @returns {void}
+         */
+        this.showSnapIndicator = candidate => {
+            if (!candidate) {
+                this.hideSnapIndicator();
+                return;
+            }
+
+            // Highlight target block
+            if (this._snapTargetBlock !== candidate.targetBlock) {
+                if (this._snapTargetBlock !== null && this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
+                this._snapTargetBlock = candidate.targetBlock;
+                if (this.blockList[candidate.targetBlock]) {
+                    this.blockList[candidate.targetBlock].highlight();
+                }
+            }
+
+            // Create or position glowing docking indicator circle
+            if (!this._snapIndicatorShape && typeof createjs !== "undefined" && createjs.Shape) {
+                this._snapIndicatorShape = new createjs.Shape();
+                this._snapIndicatorShape.graphics
+                    .setStrokeStyle(3)
+                    .beginStroke("rgba(255, 215, 0, 0.95)")
+                    .beginFill("rgba(255, 215, 0, 0.35)")
+                    .drawCircle(0, 0, 10);
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.addChild === "function"
+                ) {
+                    this.activity.blocksContainer.addChild(this._snapIndicatorShape);
+                }
+            }
+
+            if (this._snapIndicatorShape) {
+                this._snapIndicatorShape.x = candidate.dockX;
+                this._snapIndicatorShape.y = candidate.dockY;
+                this._snapIndicatorShape.visible = true;
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.setChildIndex === "function" &&
+                    Array.isArray(this.activity.blocksContainer.children)
+                ) {
+                    this.activity.blocksContainer.setChildIndex(
+                        this._snapIndicatorShape,
+                        this.activity.blocksContainer.children.length - 1
+                    );
+                }
+            }
+        };
+
+        /**
+         * Hide visual snap indicator and unhighlight target block.
+         * @public
+         * @returns {void}
+         */
+        this.hideSnapIndicator = () => {
+            if (this._snapTargetBlock !== null) {
+                if (this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
+                this._snapTargetBlock = null;
+            }
+            if (this._snapIndicatorShape) {
+                this._snapIndicatorShape.visible = false;
+            }
+        };
+
         /**
          * Hide all of the blocks.
          * @public

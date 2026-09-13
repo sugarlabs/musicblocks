@@ -53,8 +53,14 @@ global.createjs = {
         graphics: {
             beginFill: jest.fn().mockReturnThis(),
             drawRect: jest.fn().mockReturnThis(),
-            drawEllipse: jest.fn().mockReturnThis()
-        }
+            drawEllipse: jest.fn().mockReturnThis(),
+            setStrokeStyle: jest.fn().mockReturnThis(),
+            beginStroke: jest.fn().mockReturnThis(),
+            drawCircle: jest.fn().mockReturnThis()
+        },
+        x: 0,
+        y: 0,
+        visible: false
     })),
     Bitmap: jest.fn().mockImplementation(() => ({
         getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 50, height: 50 })
@@ -141,7 +147,14 @@ describe("Viewport Culling", () => {
             macroDict: {},
             palettes: { dict: {}, show: jest.fn() },
             logo: { synth: { loadSynth: jest.fn() } },
-            blocksContainer: { x: 0, y: 0 },
+            blocksContainer: {
+                x: 0,
+                y: 0,
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                setChildIndex: jest.fn(),
+                children: []
+            },
             canvas: { width: 800, height: 600 },
             refreshCanvas: jest.fn(),
             errorMsg: jest.fn(),
@@ -2488,6 +2501,129 @@ describe("Spatial grid indexing", () => {
             expect([...blocks._blockGridCell.keys()]).toEqual([0, 1]);
             expect(cellsHolding("1")).toEqual([]);
             expectNumericKeysOnly();
+        });
+    });
+
+    describe("Snap indicator (showSnapIndicator & hideSnapIndicator)", () => {
+        let block0;
+        let block1;
+
+        let children;
+
+        beforeEach(() => {
+            children = [];
+            blocks.activity = {
+                blocksContainer: {
+                    addChild: jest.fn(child => children.push(child)),
+                    setChildIndex: jest.fn(),
+                    children
+                }
+            };
+            block0 = {
+                trash: false,
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            };
+            block1 = {
+                trash: false,
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            };
+            blocks.blockList = [block0, block1];
+        });
+
+        it("shows indicator shape and highlights target block on candidate", () => {
+            const candidate = {
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 120,
+                dockY: 250
+            };
+
+            blocks.showSnapIndicator(candidate);
+
+            expect(block0.highlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBe(0);
+            expect(blocks._snapIndicatorShape).not.toBeNull();
+            expect(blocks._snapIndicatorShape.x).toBe(120);
+            expect(blocks._snapIndicatorShape.y).toBe(250);
+            expect(blocks._snapIndicatorShape.visible).toBe(true);
+            expect(blocks.activity.blocksContainer.addChild).toHaveBeenCalledWith(
+                blocks._snapIndicatorShape
+            );
+            expect(blocks.activity.blocksContainer.setChildIndex).toHaveBeenCalledWith(
+                blocks._snapIndicatorShape,
+                0
+            );
+        });
+
+        it("preserves snap target block even if a competing hover highlight occurs", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+            expect(block0.highlight).toHaveBeenCalledTimes(1);
+
+            // Simulate hover highlight on block 1
+            blocks.highlight(1, true);
+
+            // Active snap target block remains intact
+            expect(blocks._snapTargetBlock).toBe(0);
+        });
+
+        it("switches highlighted block when candidate changes", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+            expect(block0.highlight).toHaveBeenCalled();
+
+            blocks.showSnapIndicator({
+                targetBlock: 1,
+                connectionIndex: 0,
+                dockX: 200,
+                dockY: 200
+            });
+            expect(block0.unhighlight).toHaveBeenCalled();
+            expect(block1.highlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBe(1);
+            expect(blocks._snapIndicatorShape.x).toBe(200);
+            expect(blocks._snapIndicatorShape.y).toBe(200);
+        });
+
+        it("hides indicator and unhighlights block when hideSnapIndicator is called", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+            expect(blocks._snapIndicatorShape.visible).toBe(true);
+
+            blocks.hideSnapIndicator();
+
+            expect(block0.unhighlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBeNull();
+            expect(blocks._snapIndicatorShape.visible).toBe(false);
+        });
+
+        it("hides indicator if showSnapIndicator is called with null", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+
+            blocks.showSnapIndicator(null);
+
+            expect(block0.unhighlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBeNull();
+            expect(blocks._snapIndicatorShape.visible).toBe(false);
         });
     });
 });
