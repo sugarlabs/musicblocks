@@ -289,6 +289,13 @@ describe("MusicBlocks Class", () => {
             globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [];
             musicBlocks.setHeapEntry(2, 5);
             expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([0, 5]);
+
+            musicBlocks.setHeapEntry(3, "testString");
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([
+                0,
+                5,
+                "testString"
+            ]);
         });
 
         test("should push to heap", () => {

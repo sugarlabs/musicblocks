@@ -434,8 +434,8 @@ class MusicBlocks {
             return;
         }
 
-        if (typeof index !== "number" || typeof value !== "number") {
-            JSEditor.logConsole("Heap index and value must be numbers.", "maroon");
+        if (typeof index !== "number") {
+            JSEditor.logConsole("Heap index must be a number.", "maroon");
             return;
         }
 
