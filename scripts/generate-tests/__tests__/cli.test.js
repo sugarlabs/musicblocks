@@ -135,6 +135,18 @@ describe("module selection: --module vs the positional form", () => {
         );
     });
 
+    it("rejects a repeated --module instead of silently keeping the last one", () => {
+        expect(() => cli.parseArgs(["--module", "a.js", "--module", "b.js"])).toThrow(
+            /--module given twice \("a\.js" and "b\.js"\)/
+        );
+        expect(() => cli.parseArgs(["--module=a.js", "--module=b.js"])).toThrow(
+            /--module given twice \("a\.js" and "b\.js"\)/
+        );
+        expect(() => cli.parseArgs(["--module", "a.js", "--module=b.js"])).toThrow(
+            /--module given twice \("a\.js" and "b\.js"\)/
+        );
+    });
+
     it("requires a value after --module", () => {
         expect(() => cli.parseArgs(["--module"])).toThrow(/--module requires a path/);
         expect(() => cli.parseArgs(["--module", "--emit"])).toThrow(/--module requires a path/);

@@ -145,11 +145,22 @@ function parseArgs(argv) {
             if (!next || next.startsWith("--")) {
                 throw new Error("--module requires a path, e.g. --module js/utils/example.js");
             }
+            if (moduleOption !== null) {
+                throw new Error(
+                    `--module given twice ("${moduleOption}" and "${next}"); pass it only once`
+                );
+            }
             moduleOption = next;
             i += 1;
         } else if (arg.startsWith("--module=")) {
-            moduleOption = arg.slice("--module=".length);
-            if (moduleOption === "") throw new Error("--module= requires a path");
+            const value = arg.slice("--module=".length);
+            if (value === "") throw new Error("--module= requires a path");
+            if (moduleOption !== null) {
+                throw new Error(
+                    `--module given twice ("${moduleOption}" and "${value}"); pass it only once`
+                );
+            }
+            moduleOption = value;
         } else if (arg === "--write") {
             write = true;
         } else if (arg === "--emit") {
