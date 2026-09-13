@@ -247,14 +247,31 @@ saveMxmlOutput = logo => {
                 if (!isChordNote) {
                     if (divisionsLeft === divisions) {
                         if (firstMeasure) {
-                            addMeasureAttributes(currMeasure, divisions, beats, beatType);
+                            if (beatsChanged) {
+                                beats = newBeats;
+                                beatType = newBeatType;
+                                divisions = newDivisions;
+                                divisionsLeft = divisions;
+                                beatsChanged = false;
+                            }
+                            addMeasureAttributes(
+                                currMeasure,
+                                divisionsPerWholeNote / 4,
+                                beats,
+                                beatType
+                            );
                             firstMeasure = false;
                         } else if (beatsChanged) {
                             beats = newBeats;
                             beatType = newBeatType;
                             divisions = newDivisions;
                             divisionsLeft = divisions;
-                            addMeasureAttributes(currMeasure, newDivisions, newBeats, newBeatType);
+                            addMeasureAttributes(
+                                currMeasure,
+                                divisionsPerWholeNote / 4,
+                                beats,
+                                beatType
+                            );
                             beatsChanged = false;
                         } else {
                             add(`<measure number="${currMeasure}">`);
