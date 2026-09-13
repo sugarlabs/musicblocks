@@ -166,10 +166,12 @@ describe("Turtle", () => {
             expect(turtle._waitTime).toBe(0);
         });
 
-        it("should set embeddedGraphicsFinished to true", () => {
-            turtle.embeddedGraphicsFinished = false;
+        it("should reset embeddedGraphicsPending to 0 and bump embeddedGraphicsGeneration", () => {
+            turtle.embeddedGraphicsPending = 2;
+            const generationBefore = turtle.embeddedGraphicsGeneration;
             turtle.initTurtle(false);
-            expect(turtle.embeddedGraphicsFinished).toBe(true);
+            expect(turtle.embeddedGraphicsPending).toBe(0);
+            expect(turtle.embeddedGraphicsGeneration).toBe(generationBefore + 1);
         });
 
         it("should set inSetTimbre to false", () => {

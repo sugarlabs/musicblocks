@@ -60,13 +60,21 @@ class EmbeddedGraphicsScheduler {
 
         if (tur.singer.embeddedGraphics[blk].length === 0) return;
 
-        // If the previous note's graphics are not complete, add a
-        // slight delay before drawing any new graphics.
-        if (!tur.embeddedGraphicsFinished) {
+        // If an earlier note's graphics are still in flight, add a slight
+        // delay before drawing any new graphics. schedule() is async and
+        // callers do not await it, so consecutive notes routinely overlap;
+        // a counter (rather than a boolean) ensures a call that finishes
+        // early cannot mark a still-running later call as done.
+        if (tur.embeddedGraphicsPending > 0) {
             delay += 0.1;
         }
 
-        tur.embeddedGraphicsFinished = false;
+        // Remember which generation this call belongs to, so that if a
+        // turtle/run reset happens before this call finishes, its eventual
+        // completion does not decrement a count that has moved on to a
+        // different generation of work (see #8639 follow-up).
+        const generation = tur.embeddedGraphicsGeneration;
+        tur.embeddedGraphicsPending += 1;
 
         const suppressOutput = tur.singer.suppressOutput;
 
@@ -221,9 +229,16 @@ class EmbeddedGraphicsScheduler {
             }
         }
 
-        // Mark the end time of this note's graphics operations.
+        // Mark the end time of this note's graphics operations. Only
+        // decrement this call's own share of the count, rather than setting
+        // it back to zero outright, since another call may still be pending.
         await logo.deps.utils.delayExecution(beatValue * 1000);
-        tur.embeddedGraphicsFinished = true;
+        if (tur.embeddedGraphicsGeneration === generation) {
+            tur.embeddedGraphicsPending -= 1;
+        }
+        // else: a turtle/run reset happened while this call was pending.
+        // The count already belongs to a new generation of work that this
+        // stale call knows nothing about, so leave it alone.
     }
 
     _pen(tur, suppressOutput, turtle, name, b, timeout) {
