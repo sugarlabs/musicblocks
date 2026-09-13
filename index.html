@@ -1142,12 +1142,21 @@
                     }
 
                     const container = document.getElementById("loading-media");
-                    const content = lang.startsWith("ja")
-                        ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
-                        : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
+                    let content;
+                    if (typeof THIS_IS_TURTLE_BLOCKS !== "undefined" && THIS_IS_TURTLE_BLOCKS) {
+                        const splashSrc =
+                            typeof getSplashScreenSrc === "function"
+                                ? getSplashScreenSrc(true)
+                                : "images/logo.svg";
+                        content = `<img src="${splashSrc}" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Turtle Blocks animation">`;
+                    } else if (lang.startsWith("ja")) {
+                        content = `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`;
+                    } else {
+                        content = `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">
                        </video>`;
+                    }
                     container.innerHTML = `<div class="media-wrapper" style="width: 100%; aspect-ratio: 16/9; max-height: 500px; display: flex; justify-content: center; align-items: center;">${content}</div>`;
                 };
 
@@ -1155,16 +1164,31 @@
 
                 setTimeout(function () {
                     const loadingText = document.getElementById("loadingText");
-                    const texts = [
-                        _("Do, Re, Mi, Fa, Sol, La, Ti, Do"),
-                        _("Loading Music Blocks..."),
-                        _("Reading Music...")
-                    ];
+                    const rawTexts =
+                        typeof LOADING_TEXTS !== "undefined" && Array.isArray(LOADING_TEXTS)
+                            ? LOADING_TEXTS
+                            : [
+                                  "Do, Re, Mi, Fa, Sol, La, Ti, Do",
+                                  "Loading Music Blocks...",
+                                  "Reading Music..."
+                              ];
                     let index = 0;
 
+                    const getTranslatedText = function (text) {
+                        if (
+                            typeof window !== "undefined" &&
+                            window.i18next &&
+                            window.i18next.isInitialized &&
+                            typeof _ === "function"
+                        ) {
+                            return _(text);
+                        }
+                        return text;
+                    };
+
                     window.intervalId = setInterval(function () {
-                        loadingText.textContent = texts[index];
-                        index = (index + 1) % texts.length;
+                        loadingText.textContent = getTranslatedText(rawTexts[index]);
+                        index = (index + 1) % rawTexts.length;
                     }, 1500);
                 }, 3000);
 
