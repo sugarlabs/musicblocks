@@ -2597,7 +2597,11 @@ class Blocks {
                     .beginStroke("rgba(255, 215, 0, 0.95)")
                     .beginFill("rgba(255, 215, 0, 0.35)")
                     .drawCircle(0, 0, 10);
-                if (this.activity && this.activity.blocksContainer) {
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.addChild === "function"
+                ) {
                     this.activity.blocksContainer.addChild(this._snapIndicatorShape);
                 }
             }
@@ -2606,7 +2610,12 @@ class Blocks {
                 this._snapIndicatorShape.x = candidate.dockX;
                 this._snapIndicatorShape.y = candidate.dockY;
                 this._snapIndicatorShape.visible = true;
-                if (this.activity && this.activity.blocksContainer) {
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.setChildIndex === "function" &&
+                    Array.isArray(this.activity.blocksContainer.children)
+                ) {
                     this.activity.blocksContainer.setChildIndex(
                         this._snapIndicatorShape,
                         this.activity.blocksContainer.children.length - 1

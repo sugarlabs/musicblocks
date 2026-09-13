@@ -480,6 +480,69 @@ describe("BlockDragController", () => {
             const candidate = blocks.findDockCandidate(1);
             expect(candidate).toBeNull();
         });
+
+        it("returns null if thisBlock is null or block has no docks/container", () => {
+            const blocks = makeBlocks([]);
+            expect(blocks.findDockCandidate(null)).toBeNull();
+            expect(blocks.findDockCandidate(99)).toBeNull();
+
+            const blockWithoutDocks = { docks: [], container: { x: 0, y: 0 } };
+            const blocks2 = makeBlocks([blockWithoutDocks]);
+            expect(blocks2.findDockCandidate(0)).toBeNull();
+        });
+
+        it("handles collapsible target blocks appropriately", () => {
+            const collapsibleTarget = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null]
+            });
+            collapsibleTarget.isCollapsible = () => true;
+            collapsibleTarget.isInlineCollapsible = () => false;
+            collapsibleTarget.collapsed = true;
+
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null]
+            });
+            const blocks = makeBlocks([collapsibleTarget, moving]);
+
+            expect(blocks.findDockCandidate(1)).toBeNull();
+        });
+
+        it("skips docks connected to a noHitBlock", () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, 2]
+            });
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null]
+            });
+            const noHit = makeFlowBlock({
+                x: 0,
+                y: 20,
+                docks: [[0, 0, "in"]],
+                connections: [0]
+            });
+            noHit.isNoHitBlock = () => true;
+
+            const blocks = makeBlocks([target, moving, noHit]);
+            expect(blocks.findDockCandidate(1)).toBeNull();
+        });
     });
 
     describe("dock snapping (blockMoved)", () => {
