@@ -489,6 +489,10 @@ describe("BlockDragController", () => {
             const blockWithoutDocks = { docks: [], container: { x: 0, y: 0 } };
             const blocks2 = makeBlocks([blockWithoutDocks]);
             expect(blocks2.findDockCandidate(0)).toBeNull();
+
+            const blockWithoutContainer = { docks: [[0, 0, "in"]] };
+            const blocks3 = makeBlocks([blockWithoutContainer]);
+            expect(blocks3.findDockCandidate(0)).toBeNull();
         });
 
         it("handles collapsible target blocks appropriately", () => {

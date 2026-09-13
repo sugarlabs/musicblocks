@@ -2508,12 +2508,15 @@ describe("Spatial grid indexing", () => {
         let block0;
         let block1;
 
+        let children;
+
         beforeEach(() => {
+            children = [];
             blocks.activity = {
                 blocksContainer: {
-                    addChild: jest.fn(),
+                    addChild: jest.fn(child => children.push(child)),
                     setChildIndex: jest.fn(),
-                    children: []
+                    children
                 }
             };
             block0 = {
@@ -2548,6 +2551,26 @@ describe("Spatial grid indexing", () => {
             expect(blocks.activity.blocksContainer.addChild).toHaveBeenCalledWith(
                 blocks._snapIndicatorShape
             );
+            expect(blocks.activity.blocksContainer.setChildIndex).toHaveBeenCalledWith(
+                blocks._snapIndicatorShape,
+                0
+            );
+        });
+
+        it("preserves snap target block even if a competing hover highlight occurs", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+            expect(block0.highlight).toHaveBeenCalledTimes(1);
+
+            // Simulate hover highlight on block 1
+            blocks.highlight(1, true);
+
+            // Active snap target block remains intact
+            expect(blocks._snapTargetBlock).toBe(0);
         });
 
         it("switches highlighted block when candidate changes", () => {
