@@ -67,6 +67,22 @@ const _resolveDivisionsPerWholeNote = notes => {
     return DIVISIONS_PER_WHOLE_NOTE * scaleFactor;
 };
 
+const _musicXmlPitch = note => {
+    const match = /^([A-G])([#b♯♭♮𝄪𝄫]*)(-?\d+)?$/u.exec(note);
+    if (!match) return null;
+
+    let alter = 0;
+    for (const accidental of match[2]) {
+        if (accidental === "#" || accidental === "♯") alter++;
+        else if (accidental === "b" || accidental === "♭") alter--;
+        else if (accidental === "𝄪") alter += 2;
+        else if (accidental === "𝄫") alter -= 2;
+        else if (accidental === "♮") alter = 0;
+    }
+
+    return { step: match[1], alter, octave: match[3] ?? "4" };
+};
+
 saveMxmlOutput = logo => {
     const ignore = ["voice two", "voice one", "one voice"];
     let res = "";
@@ -268,7 +284,11 @@ saveMxmlOutput = logo => {
                     divisionsLeft -= preciseDur;
                 }
 
-                const alter = p[1] === "\u266d" ? -1 : p[1] === "\u266F" ? 1 : 0;
+                const pitch = _musicXmlPitch(p) ?? {
+                    step: p[0],
+                    alter: p[1] === "\u266d" ? -1 : p[1] === "\u266F" ? 1 : 0,
+                    octave: p[p.length - 1]
+                };
 
                 add("<note>");
                 indent++;
@@ -279,9 +299,9 @@ saveMxmlOutput = logo => {
                 } else {
                     add("<pitch>");
                     indent++;
-                    add(`<step>${p[0]}</step>`);
-                    if (alter !== 0) add(`<alter>${alter}</alter>`);
-                    add(`<octave>${p[p.length - 1]}</octave>`);
+                    add(`<step>${pitch.step}</step>`);
+                    if (pitch.alter !== 0) add(`<alter>${pitch.alter}</alter>`);
+                    add(`<octave>${pitch.octave}</octave>`);
                     indent--;
                     add("</pitch>");
                 }
