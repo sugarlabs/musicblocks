@@ -724,6 +724,37 @@ describe("saveMxmlOutput", () => {
         expect(measure2.match(/<note>/g) || []).toHaveLength(1);
         expect(measure2).toContain("<step>F</step>");
     });
+
+    it.each([
+        ["C♯4", "C", "1", "4"],
+        ["D♭4", "D", "-1", "4"],
+        ["C𝄪4", "C", "2", "4"],
+        ["D𝄫4", "D", "-2", "4"],
+        ["F♯♯10", "F", "2", "10"],
+        ["G♭♭-1", "G", "-2", "-1"],
+        ["A##5", "A", "2", "5"],
+        ["Cx4", "C", "2", "4"],
+        ["C*4", "C", "2", "4"],
+        ["Bbb3", "B", "-2", "3"],
+        ["C♮4", "C", null, "4"],
+        ["C", "C", null, "4"]
+    ])("should preserve %s accidentals and octave in MusicXML", (note, step, alter, octave) => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [[[note], 4, 0]]
+                }
+            }
+        });
+
+        expect(output).toContain(`<step>${step}</step>`);
+        expect(output).toContain(`<octave>${octave}</octave>`);
+        if (alter === null) {
+            expect(output).not.toContain("<alter>");
+        } else {
+            expect(output).toContain(`<alter>${alter}</alter>`);
+        }
+    });
 });
 
 describe("saveMxmlOutput notation markers", () => {
