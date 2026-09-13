@@ -1656,7 +1656,7 @@ describe("readSclFile", () => {
         global.docById = jest.fn(() => mockInput);
 
         const cb = jest.fn();
-        readSclFile("mySclFile", cb);
+        readSclFile("myModeSclFile", cb);
 
         expect(mockInput.value).toBe("");
         expect(typeof mockInput.onchange).toBe("function");
@@ -1680,7 +1680,7 @@ describe("readSclFile", () => {
         global.docById = jest.fn(() => mockInput);
 
         const cb = jest.fn();
-        readSclFile("mySclFile", cb);
+        readSclFile("myModeSclFile", cb);
 
         // Simulate file selection
         Object.defineProperty(mockInput, "files", { value: [mockFile], configurable: true });
@@ -1706,7 +1706,7 @@ describe("readSclFile", () => {
         global.docById = jest.fn(() => mockInput);
 
         const cb = jest.fn();
-        readSclFile("mySclFile", cb);
+        readSclFile("myModeSclFile", cb);
 
         Object.defineProperty(mockInput, "files", { value: [mockFile], configurable: true });
         mockInput.onchange();
@@ -1730,7 +1730,7 @@ describe("readSclFile", () => {
         global.docById = jest.fn(() => mockInput);
 
         const cb = jest.fn();
-        readSclFile("mySclFile", cb);
+        readSclFile("myModeSclFile", cb);
 
         mockInput.onchange();
 
