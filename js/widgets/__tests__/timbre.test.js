@@ -1675,6 +1675,9 @@ describe("TimbreWidget", () => {
                 timbre.ENVs = [1, 50, 60, 1];
                 timbre._envelope(false);
                 timbre.isActive["envelope"] = true;
+                timbre.synthVals["envelope"]["attack"] = 0.99;
+                mockActivity.logo.synth.createSynth.mockClear();
+
                 timbre._undo();
                 expect(timbre.synthVals["envelope"]["attack"]).toBe(0.01);
                 expect(mockActivity.logo.synth.createSynth).toHaveBeenCalled();
@@ -1732,6 +1735,9 @@ describe("TimbreWidget", () => {
                 timbre._update = jest.fn();
                 timbre._filter();
                 timbre.isActive["filter"] = true;
+                global.instrumentsFilters[0]["custom"] = [
+                    { filterType: "lowpass", filterRolloff: -12, filterFrequency: 100 }
+                ];
 
                 timbre._undo();
                 expect(global.instrumentsFilters[0]["custom"][0]["filterType"]).toBe("highpass");
@@ -1747,33 +1753,52 @@ describe("TimbreWidget", () => {
                 await tremoloRadio.onclick({ target: tremoloRadio });
                 timbre.isActive["tremolo"] = true;
                 timbre.tremoloParams = [12, 45];
+                mockActivity.logo.synth.trigger.mockClear();
                 timbre._undo();
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+                expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("12");
+                expect(jsdomDocument.getElementById("myRangeFx1").value).toBe("45");
 
                 const vibratoRadio = jsdomDocument.querySelector('input[value="Vibrato"]');
                 await vibratoRadio.onclick({ target: vibratoRadio });
                 timbre.isActive["vibrato"] = true;
                 timbre.vibratoParams = [8, 20];
+                mockActivity.logo.synth.trigger.mockClear();
                 timbre._undo();
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+                expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("8");
+                expect(jsdomDocument.getElementById("myRangeFx1").value).toBe("20");
 
                 const phaserRadio = jsdomDocument.querySelector('input[value="Phaser"]');
                 await phaserRadio.onclick({ target: phaserRadio });
                 timbre.isActive["phaser"] = true;
                 timbre.phaserParams = [6, 4, 300];
+                mockActivity.logo.synth.trigger.mockClear();
                 timbre._undo();
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+                expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("6");
+                expect(jsdomDocument.getElementById("myRangeFx1").value).toBe("4");
+                expect(jsdomDocument.getElementById("myRangeFx2").value).toBe("300");
 
                 const chorusRadio = jsdomDocument.querySelector('input[value="Chorus"]');
                 await chorusRadio.onclick({ target: chorusRadio });
                 timbre.isActive["chorus"] = true;
                 timbre.chorusParams = [3, 5, 60];
+                mockActivity.logo.synth.trigger.mockClear();
                 timbre._undo();
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+                expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("3");
+                expect(jsdomDocument.getElementById("myRangeFx1").value).toBe("5");
+                expect(jsdomDocument.getElementById("myRangeFx2").value).toBe("60");
 
                 const distortionRadio = jsdomDocument.querySelector('input[value="Distortion"]');
                 await distortionRadio.onclick({ target: distortionRadio });
                 timbre.isActive["distortion"] = true;
                 timbre.distortionParams = [80];
+                mockActivity.logo.synth.trigger.mockClear();
                 timbre._undo();
-
                 expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+                expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("80");
             });
         });
 
@@ -1882,6 +1907,20 @@ describe("TimbreWidget", () => {
                         await synths[i].onclick({ target: synths[i] });
                     }
                 }
+                expect(timbre.isActive["noisesynth"]).toBe(true);
+                expect(mockActivity.logo.synth.createSynth).toHaveBeenCalledWith(
+                    0,
+                    timbre.instrumentName,
+                    "noisesynth",
+                    expect.any(Object)
+                );
+
+                const slider = jsdomDocument.getElementById("myRangeS0");
+                slider.value = "20";
+                slider.dispatchEvent(
+                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
+                );
+                expect(timbre.noiseSynthParamvals["noise.type"]).toBe(20);
             });
 
             test("DuoSynth selection and slider changes", async () => {
@@ -2112,44 +2151,46 @@ describe("TimbreWidget", () => {
                 timbre.init(mockActivity);
 
                 // Click envelope button with env.length === 0
-                const envBtn = jsdomDocument.getElementById("envelopeButtonCell");
-                if (envBtn && envBtn.onclick) {
-                    const promise = envBtn.onclick();
-                    jest.runAllTimers();
-                    await promise;
-                    expect(timbre.isActive["envelope"]).toBe(true);
-                }
+                const envBtn = jsdomDocument.querySelector("[title='Envelope']");
+                expect(envBtn).not.toBeNull();
+                expect(typeof envBtn.onclick).toBe("function");
+                const envPromise = envBtn.onclick();
+                jest.runAllTimers();
+                await envPromise;
+                expect(timbre.isActive["envelope"]).toBe(true);
 
                 // Click oscillator button with osc.length === 0
-                const oscBtn = jsdomDocument.getElementById("oscillatorButtonCell");
-                if (oscBtn && oscBtn.onclick) {
-                    const promise = oscBtn.onclick();
-                    jest.runAllTimers();
-                    await promise;
-                    expect(timbre.isActive["oscillator"]).toBe(true);
-                }
+                const oscBtn = jsdomDocument.querySelector("[title='Oscillator']");
+                expect(oscBtn).not.toBeNull();
+                expect(typeof oscBtn.onclick).toBe("function");
+                const oscPromise = oscBtn.onclick();
+                jest.runAllTimers();
+                await oscPromise;
+                expect(timbre.isActive["oscillator"]).toBe(true);
 
                 // Click filter button with fil.length === 0
-                const filBtn = jsdomDocument.getElementById("filterButtonCell");
-                if (filBtn && filBtn.onclick) {
-                    const promise = filBtn.onclick();
-                    jest.runAllTimers();
-                    await promise;
-                    expect(timbre.isActive["filter"]).toBe(true);
-                }
+                const filBtn = jsdomDocument.querySelector("[title='Filter']");
+                expect(filBtn).not.toBeNull();
+                expect(typeof filBtn.onclick).toBe("function");
+                const filPromise = filBtn.onclick();
+                jest.runAllTimers();
+                await filPromise;
+                expect(timbre.isActive["filter"]).toBe(true);
 
                 // Click effects button
-                const fxBtn = jsdomDocument.getElementById("effectsButtonCell");
-                if (fxBtn && fxBtn.onclick) {
-                    fxBtn.onclick();
-                    expect(timbre.isActive["effects"]).toBe(true);
-                }
+                const fxBtn = jsdomDocument.querySelector("[title='Effects']");
+                expect(fxBtn).not.toBeNull();
+                expect(typeof fxBtn.onclick).toBe("function");
+                fxBtn.onclick();
+                expect(timbre.isActive["effects"]).toBe(true);
 
                 // Click undo button
                 const undoBtn = jsdomDocument.querySelector("[title='Undo']");
-                if (undoBtn && undoBtn.onclick) {
-                    undoBtn.onclick();
-                }
+                expect(undoBtn).not.toBeNull();
+                expect(typeof undoBtn.onclick).toBe("function");
+                const undoSpy = jest.spyOn(timbre, "_undo");
+                undoBtn.onclick();
+                expect(undoSpy).toHaveBeenCalled();
             });
         });
 
@@ -2183,8 +2224,14 @@ describe("TimbreWidget", () => {
                 mockBlocks.blockList[bOffset + 1].isClampBlock = () => true;
 
                 timbre.blockNo = 0;
+                mockBlocks.clampBlocksToCheck = [];
                 timbre._blockReplace(bOffset + 2, bOffset + 3);
 
+                expect(mockBlocks.clampBlocksToCheck).toEqual([
+                    [bOffset + 1, 0],
+                    [bOffset, 0],
+                    [0, 0]
+                ]);
                 expect(mockBlocks.blockList[bOffset + 3].connections[0]).toBe(bOffset + 1);
                 expect(mockBlocks.sendStackToTrash).toHaveBeenCalledWith(
                     mockBlocks.blockList[bOffset + 2]
@@ -2201,11 +2248,18 @@ describe("TimbreWidget", () => {
                 );
 
                 mockBlocks.findBottomBlock = jest.fn(() => bOffset + 2);
+                mockBlocks.clampBlocksToCheck = [];
 
                 const promise = timbre.blockConnection(1, bOffset);
                 jest.runAllTimers();
                 await promise;
 
+                expect(mockBlocks.blockList[bOffset + 1].connections[1]).toBe(bOffset + 2);
+                expect(mockBlocks.blockList[bOffset + 2].connections[0]).toBe(bOffset + 1);
+                expect(mockBlocks.clampBlocksToCheck).toEqual([
+                    [bOffset + 1, 0],
+                    [timbre.blockNo, 0]
+                ]);
                 expect(mockBlocks.adjustExpandableClampBlock).toHaveBeenCalled();
             });
 
@@ -2246,11 +2300,18 @@ describe("TimbreWidget", () => {
                 timbre._update = jest.fn();
                 timbre._filter();
 
+                const prevFilLength = timbre.fil.length;
+                const prevParamsLength = timbre.filterParams.length;
+
                 const promise = timbre._addFilter();
                 jest.runAllTimers();
                 await promise;
 
-                expect(timbre.filterParams).toContain(DEFAULTFILTERTYPE);
+                expect(timbre.fil.length).toBe(prevFilLength + 1);
+                expect(timbre.filterParams.length).toBe(prevParamsLength + 3);
+                expect(timbre.filterParams[prevParamsLength]).toBe(DEFAULTFILTERTYPE);
+                expect(timbre.filterParams[prevParamsLength + 1]).toBe(-12);
+                expect(timbre.filterParams[prevParamsLength + 2]).toBe(392);
             });
 
             test("Distortion and Vibrato effects reuse existing effect blocks", async () => {
@@ -2260,15 +2321,21 @@ describe("TimbreWidget", () => {
                 timbre.vibratoEffect = [2];
                 timbre.vibratoParams = [8, 25];
 
+                mockBlocks.loadNewBlocks.mockClear();
+
                 timbre._effects();
 
                 const disRadio = jsdomDocument.querySelector('input[value="Distortion"]');
                 await disRadio.onclick({ target: disRadio });
                 expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("60");
+                expect(timbre.distortionEffect.length).toBe(1);
+                expect(mockBlocks.loadNewBlocks).not.toHaveBeenCalled();
 
                 const vibRadio = jsdomDocument.querySelector('input[value="Vibrato"]');
                 await vibRadio.onclick({ target: vibRadio });
                 expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("8");
+                expect(timbre.vibratoEffect.length).toBe(1);
+                expect(mockBlocks.loadNewBlocks).not.toHaveBeenCalled();
             });
 
             test("_cleanupEventListeners unbinds listeners and resets eventListeners", () => {
