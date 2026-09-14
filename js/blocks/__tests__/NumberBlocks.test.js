@@ -249,7 +249,8 @@ describe("setupNumberBlocks", () => {
             logo.inStatusMatrix = true;
             logo.statusFields = [];
             const intBlock = createdBlocks["int"];
-            intBlock.arg(logo, 0, 300, null);
+            const result = intBlock.arg(logo, 0, 300, null);
+            expect(result).toBe(0);
             expect(logo.statusFields.length).toBe(0);
             logo.inStatusMatrix = false;
         });
@@ -720,9 +721,12 @@ describe("setupNumberBlocks", () => {
                 if (c === "c1") return 0;
                 if (c === "c2") return 12;
             });
-            global.MathUtility.doRandom = (a, b, octave) => (octave !== undefined ? octave : a);
+            global.MathUtility.doRandom = jest.fn((a, b, octave) =>
+                octave !== undefined ? octave : a
+            );
             const randomBlock = createdBlocks["random"];
             const result = randomBlock.arg(logo, 0, 220, null);
+            expect(global.MathUtility.doRandom).toHaveBeenCalledWith(0, 12, undefined);
             expect(result).toEqual(0);
             global.MathUtility.doRandom = (a, b, octave) => a;
         });
@@ -739,9 +743,12 @@ describe("setupNumberBlocks", () => {
                 if (c === "c1") return 0;
                 if (c === "c2") return 12;
             });
-            global.MathUtility.doRandom = (a, b, octave) => (octave !== undefined ? octave : a);
+            global.MathUtility.doRandom = jest.fn((a, b, octave) =>
+                octave !== undefined ? octave : a
+            );
             const randomBlock = createdBlocks["random"];
             const result = randomBlock.arg(logo, 0, 220, null);
+            expect(global.MathUtility.doRandom).toHaveBeenCalledWith(0, 12, undefined);
             expect(result).toEqual(0);
             global.MathUtility.doRandom = (a, b, octave) => a;
         });
