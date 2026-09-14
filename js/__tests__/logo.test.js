@@ -3284,11 +3284,23 @@ describe("Logo.processSpeak", () => {
             installSpeechSynthesis();
             const engine = enableKokoroFromURL();
             const textMsg = jest.spyOn(logo.deps, "textMsg");
+            const originalTranslate = global._;
+            const translate = jest.fn(message =>
+                message === "Downloading Kokoro voice: %s"
+                    ? "Descargando la voz de Kokoro: %s"
+                    : message
+            );
+            global._ = translate;
 
-            logo.processSpeak("hello world");
-            engine.onProgress({ progress: 42 });
+            try {
+                logo.processSpeak("hello world");
+                engine.onProgress({ progress: 42 });
 
-            expect(textMsg).toHaveBeenCalledWith("Downloading Kokoro voice: 42%");
+                expect(translate).toHaveBeenCalledWith("Downloading Kokoro voice: %s");
+                expect(textMsg).toHaveBeenCalledWith("Descargando la voz de Kokoro: 42%");
+            } finally {
+                global._ = originalTranslate;
+            }
         });
 
         test("is off unless it has been explicitly switched on", () => {

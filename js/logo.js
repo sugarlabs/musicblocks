@@ -767,7 +767,7 @@ class Logo {
         }
 
         const percent = Math.max(0, Math.min(100, Math.round(progress.progress)));
-        this.deps.textMsg(`Downloading Kokoro voice: ${percent}%`);
+        this.deps.textMsg(_("Downloading Kokoro voice: %s").replace(/%s/g, `${percent}%`));
     }
 
     /**
