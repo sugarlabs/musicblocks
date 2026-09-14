@@ -270,7 +270,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2^G2F2^G2 ");
+        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 ");
     });
 
     it("should preserve each note in a tuplet", () => {
@@ -281,14 +281,14 @@ describe("processABCNotes - Tuplet Handling", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2G2F2A2 ");
+        expect(logo.notationNotes["0"]).toBe("(3:2G8F8A8 ");
     });
 
     it("should handle array of notes (chords) inside tuplets", () => {
         logo.notation.notationStaging["0"] = [[["C4", "E4"], 1, 0, [3, 1], 2, -1, false]];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2:1[CE]2 ");
+        expect(logo.notationNotes["0"]).toBe("(3:2:1[CE]8 ");
     });
 
     it("should handle staccato inside tuplets", () => {
@@ -305,7 +305,7 @@ describe("processABCNotes - Tuplet Handling", () => {
             ")"
         ];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2:2A2B2 )");
+        expect(logo.notationNotes["0"]).toBe("(3:2:2A8B8 )");
     });
 
     it("should handle incomplete/mixed tuplets logic", () => {
@@ -437,7 +437,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         };
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2^G2F2^G2 ");
+        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 ");
     });
 });
 

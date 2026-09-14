@@ -298,7 +298,7 @@ const processABCNotes = function (logo, turtle) {
                             parts.push("]");
                         }
 
-                        parts.push(tupletNotes[NOTATIONROUNDDOWN]);
+                        parts.push(__convertDuration(tupletNotes[NOTATIONROUNDDOWN]));
                     }
                     j++; // Jump to next note.
                     k++; // Increment notes in tuplet.
