@@ -504,6 +504,40 @@ describe("FlowBlocks integration", () => {
         expect(turtle.queue).toHaveLength(1);
     });
 
+    test("WaitForBlock's requeue carries receivedArg forward so a later re-check can still resolve an arg block (#8696)", () => {
+        const block = getBlock("waitFor");
+        const blk = 6;
+        activity.blocks.blockList[blk] = { connections: [60] };
+
+        const receivedArg = ["fromAction"];
+        block.flow([false], logo, 0, blk, receivedArg);
+
+        const turtle = activity.turtles.ithTurtle(0);
+        expect(turtle.queue[0].receivedArg).toBe(receivedArg);
+    });
+
+    test("UntilBlock's requeue carries receivedArg forward so a later re-check can still resolve an arg block (#8696)", () => {
+        const block = getBlock("until");
+        const blk = 7;
+        activity.blocks.blockList[blk] = { connections: [70] };
+
+        const receivedArg = ["fromAction"];
+        block.flow([false, 71], logo, 0, blk, receivedArg);
+
+        expect(activity.turtles.ithTurtle(0).queue.pop().receivedArg).toBe(receivedArg);
+    });
+
+    test("WhileBlock's requeue carries receivedArg forward so a later re-check can still resolve an arg block (#8696)", () => {
+        const block = getBlock("while");
+        const blk = 8;
+        activity.blocks.blockList[blk] = { connections: [80] };
+
+        const receivedArg = ["fromAction"];
+        block.flow([true, 81], logo, 0, blk, receivedArg);
+
+        expect(activity.turtles.ithTurtle(0).queue.pop().receivedArg).toBe(receivedArg);
+    });
+
     test("IfThenElseBlock chooses correct branch", () => {
         const block = getBlock("ifthenelse");
         expect(block.flow([true, 1, 2])).toEqual([1, 1]);
