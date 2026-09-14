@@ -1835,4 +1835,436 @@ describe("AIDebuggerWidget", () => {
             spy.mockRestore();
         });
     });
+
+    describe("Comprehensive Fallbacks and Edge Cases", () => {
+        let debuggerWidget;
+        let mockActivity;
+        let originalFetch;
+        const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
+
+        beforeEach(() => {
+            originalFetch = global.fetch;
+            global.fetch = jest.fn();
+
+            mockActivity = {
+                textMsg: jest.fn(),
+                prepareExport: jest.fn(() => JSON.stringify([["b1", "start", null, null, []]]))
+            };
+
+            debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.chatLog = document.createElement("div");
+        });
+
+        afterEach(() => {
+            global.fetch = originalFetch;
+        });
+
+        test("re-prompts with consent banner if message submitted when consent was declined", () => {
+            debuggerWidget._showConsentBanner();
+            const declineBtn = debuggerWidget.chatLog.querySelectorAll("button")[1];
+            declineBtn.onclick();
+
+            expect(debuggerWidget._consentGiven).toBe(false);
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
+            );
+
+            // User types message and sends
+            const sendToBackendSpy = jest.spyOn(debuggerWidget, "_sendToBackend");
+            debuggerWidget.messageInput = document.createElement("input");
+            debuggerWidget.messageInput.value = "Can you help me?";
+            debuggerWidget._sendMessage();
+
+            // Must NOT send to backend without consent
+            expect(sendToBackendSpy).not.toHaveBeenCalled();
+            // Re-shows consent banner
+            expect(debuggerWidget.chatLog.textContent).toContain("Before we start");
+        });
+
+        test("handles backend failure with full fallback: resets _isProcessing, hides indicator, and displays fallback message", async () => {
+            debuggerWidget._isProcessing = true;
+            global.fetch.mockResolvedValueOnce({
+                ok: false,
+                status: 502,
+                statusText: "Bad Gateway"
+            });
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            debuggerWidget._sendToBackend("Explain project");
+            await flushPromises();
+
+            expect(debuggerWidget._isProcessing).toBe(false);
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Server error: Unable to connect to AI backend."
+            );
+            expect(debuggerWidget.chatHistory[debuggerWidget.chatHistory.length - 1]).toEqual({
+                type: "bot",
+                content:
+                    "Could not reach the AI assistant. Please check your connection and try again.",
+                timestamp: expect.any(String)
+            });
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Could not reach the AI assistant. Please check your connection and try again."
+            );
+            errorSpy.mockRestore();
+        });
+
+        test("falls back to welcome message when _initializeBackendWithProject fails", async () => {
+            global.fetch.mockRejectedValueOnce(new Error("Connection refused"));
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            const welcomeSpy = jest.spyOn(debuggerWidget, "_addWelcomeMessage");
+
+            debuggerWidget._initializeBackendWithProject("[]");
+            await flushPromises();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Server error: Failed to initialize AI debugger."
+            );
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Could not reach the AI assistant. Please check your connection and try again."
+            );
+            expect(welcomeSpy).toHaveBeenCalled();
+
+            errorSpy.mockRestore();
+            welcomeSpy.mockRestore();
+        });
+
+        test("falls back to welcome message when _loadProjectAndInitialize fails during prepareExport", () => {
+            mockActivity.prepareExport = jest.fn(() => {
+                throw new Error("Filesystem locked");
+            });
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            const welcomeSpy = jest.spyOn(debuggerWidget, "_addWelcomeMessage");
+
+            debuggerWidget._loadProjectAndInitialize();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Debugger error: Could not load project data."
+            );
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Could not load project data. Starting with basic assistant..."
+            );
+            expect(welcomeSpy).toHaveBeenCalled();
+
+            errorSpy.mockRestore();
+            welcomeSpy.mockRestore();
+        });
+
+        test("handles chat export when prepareExport throws error by inserting readable fallback string", () => {
+            const originalCreateObjectURL = global.URL.createObjectURL;
+            const originalRevokeObjectURL = global.URL.revokeObjectURL;
+            global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
+            global.URL.revokeObjectURL = jest.fn();
+
+            const clickMock = jest.fn();
+            const originalCreateElement = document.createElement.bind(document);
+            const createElementSpy = jest
+                .spyOn(document, "createElement")
+                .mockImplementation(tag => {
+                    const el = originalCreateElement(tag);
+                    if (tag === "a") {
+                        el.click = clickMock;
+                    }
+                    return el;
+                });
+
+            debuggerWidget.chatHistory = [{ type: "user", content: "Need help" }];
+            debuggerWidget.activity.prepareExport = jest.fn(() => {
+                throw new Error("Export failure");
+            });
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            debuggerWidget._exportChat();
+
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Debugger error: Could not retrieve project data for export."
+            );
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Chat exported successfully."
+            );
+            expect(global.URL.createObjectURL).toHaveBeenCalled();
+
+            errorSpy.mockRestore();
+            createElementSpy.mockRestore();
+            global.URL.createObjectURL = originalCreateObjectURL;
+            global.URL.revokeObjectURL = originalRevokeObjectURL;
+        });
+
+        test("handles division by zero fallbacks in AST block representations", () => {
+            // setmasterbpm2 with divide having denominator 0
+            const bpmBlockMap = {
+                bpm1: ["bpm1", "setmasterbpm2", null, null, ["prev", "num1", "div1"]],
+                num1: ["num1", ["number", { value: 120 }]],
+                div1: ["div1", "divide", null, null, ["prev", "n1", "d0"]],
+                n1: ["n1", ["number", { value: 1 }]],
+                d0: ["d0", ["number", { value: 0 }]]
+            };
+            const bpmRepr = debuggerWidget._getBlockRepresentation(
+                "setmasterbpm2",
+                null,
+                bpmBlockMap.bpm1,
+                bpmBlockMap,
+                1,
+                false,
+                null
+            );
+            expect(bpmRepr).toBe("Set Master BPM → 120 BPM");
+
+            // divide with denominator 0 standalone
+            const divBlockMap = {
+                div1: ["div1", "divide", null, null, ["prev", "n1", "d0"]],
+                n1: ["n1", ["number", { value: 4 }]],
+                d0: ["d0", ["number", { value: 0 }]]
+            };
+            const divRepr = debuggerWidget._getBlockRepresentation(
+                "divide",
+                null,
+                divBlockMap.div1,
+                divBlockMap,
+                1,
+                false,
+                null
+            );
+            expect(divRepr).toBe("Divide Block --> 4/? = ?");
+
+            // divide with denominator 0 in newnote
+            const noteDivRepr = debuggerWidget._getBlockRepresentation(
+                "divide",
+                null,
+                divBlockMap.div1,
+                divBlockMap,
+                1,
+                false,
+                "newnote"
+            );
+            expect(noteDivRepr).toBe("Duration --> 4/? = ?");
+
+            // repeat with divide having denominator 0
+            const repBlockMap = {
+                r1: ["r1", "repeat", null, null, ["prev", "div0"]],
+                div0: ["div0", ["divide"], null, null, ["prev", "n1", "d0"]],
+                n1: ["n1", ["number", { value: 8 }]],
+                d0: ["d0", ["number", { value: 0 }]]
+            };
+            const repRepr = debuggerWidget._getBlockRepresentation(
+                "repeat",
+                null,
+                repBlockMap.r1,
+                repBlockMap,
+                1,
+                false,
+                null
+            );
+            expect(repRepr).toBe("Repeat (?) Times");
+
+            // arc with divide having denominator 0
+            const arcBlockMap = {
+                arc1: ["arc1", "arc", null, null, ["prev", null, "rad1", "div0"]],
+                rad1: ["rad1", ["number", { value: 50 }]],
+                div0: ["div0", ["divide"], null, null, ["prev", "n1", "d0"]],
+                n1: ["n1", ["number", { value: 90 }]],
+                d0: ["d0", ["number", { value: 0 }]]
+            };
+            const arcRepr = debuggerWidget._getBlockRepresentation(
+                "arc",
+                null,
+                arcBlockMap.arc1,
+                arcBlockMap,
+                1,
+                false,
+                null
+            );
+            expect(arcRepr).toBe("Draw Arc --> Angle: ?°, Radius: 50");
+        });
+
+        test("handles missing arguments and connections fallbacks in AST block representations", () => {
+            const emptyBlockMap = {
+                s1: ["s1", "storein2", null, null, ["prev", null]],
+                box1: ["box1", "namedbox", null, null, []],
+                do1: ["do1", "nameddo", null, null, []],
+                act1: ["act1", "action", null, null, ["prev", null]],
+                head1: ["head1", "setheading", null, null, ["prev", null]],
+                sh1: ["sh1", "show", null, null, ["prev", null, null]],
+                inc1: ["inc1", "increment", null, null, ["prev", null, null]],
+                incone1: ["incone1", "incrementOne", null, null, ["prev", null]],
+                drum1: ["drum1", "playdrum", null, null, ["prev", null]],
+                plus1: ["plus1", "plus", null, null, ["prev", null, null]],
+                pitch1: ["pitch1", "pitch", null, null, ["prev", null, null]],
+                print1: ["print1", "print", null, null, ["prev", null, null]]
+            };
+
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "storein2",
+                    null,
+                    emptyBlockMap.s1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe('Store Variable "unnamed" → ?');
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "namedbox",
+                    null,
+                    emptyBlockMap.box1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe('Variable: "unnamed"');
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "nameddo",
+                    null,
+                    emptyBlockMap.do1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe('Do action --> "unnamed"');
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "action",
+                    null,
+                    emptyBlockMap.act1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe('Action: "unnamed"');
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "setheading",
+                    null,
+                    emptyBlockMap.head1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe("Set Heading → 0°");
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "show",
+                    null,
+                    emptyBlockMap.sh1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe("Show Number: ?");
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "increment",
+                    null,
+                    emptyBlockMap.inc1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe("Increment --> Color: ?, Amount: ?");
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "incrementOne",
+                    null,
+                    emptyBlockMap.incone1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe('Increment Variable: "?"');
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "playdrum",
+                    null,
+                    emptyBlockMap.drum1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe("Play Drum → ?");
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "plus",
+                    null,
+                    emptyBlockMap.plus1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe("Add --> ? + ? = ?");
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "pitch",
+                    null,
+                    emptyBlockMap.pitch1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe("Pitch --> Solfege: ?, Octave: ?");
+            expect(
+                debuggerWidget._getBlockRepresentation(
+                    "print",
+                    null,
+                    emptyBlockMap.print1,
+                    emptyBlockMap,
+                    1,
+                    false,
+                    null
+                )
+            ).toBe('Print: ""');
+        });
+
+        test("handles _getDrumName and _getNamedBoxValue when block type is string format", () => {
+            const blockMap = {
+                d1: ["d1", "drumname"],
+                n1: ["n1", "namedbox"],
+                o1: ["o1", "other"]
+            };
+            expect(debuggerWidget._getDrumName("d1", blockMap)).toBeNull();
+            expect(debuggerWidget._getDrumName("o1", blockMap)).toBeNull();
+            expect(debuggerWidget._getNamedBoxValue("n1", blockMap)).toBeNull();
+            expect(debuggerWidget._getNamedBoxValue("o1", blockMap)).toBeNull();
+        });
+
+        test("formats project fallback when no start block is present and handles missing connections", () => {
+            const projectWithoutStart = [["f1", "forward", null, null, ["missingChild"]]];
+            const text = debuggerWidget._convertProjectToLLMFormat(projectWithoutStart);
+            expect(text).toContain("Forward");
+        });
+
+        test("safely removes typing indicator without data-animation-id attribute", () => {
+            const indicator = document.createElement("div");
+            indicator.className = "typing-indicator";
+            debuggerWidget.chatLog.appendChild(indicator);
+
+            expect(debuggerWidget.chatLog.children.length).toBe(1);
+            debuggerWidget._hideTypingIndicator();
+            expect(debuggerWidget.chatLog.children.length).toBe(0);
+        });
+
+        test("safely appends message with unrecognized message type", () => {
+            const customMessage = {
+                type: "custom_alert",
+                content: "A custom notice",
+                timestamp: new Date().toISOString()
+            };
+            debuggerWidget._addMessageToUI(customMessage);
+
+            expect(debuggerWidget.chatLog.children.length).toBe(1);
+        });
+    });
 });
