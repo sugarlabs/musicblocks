@@ -158,6 +158,7 @@ describe("setupEnsembleBlocks", () => {
         global.getMunsellColor = jest.fn((hue, chroma, value) => `#${hue}${chroma}${value}`);
         global.TURTLESVG = "<svg>fill_color stroke_color</svg>";
         global.base64Encode = jest.fn(str => str);
+        global.noteToObj = require("../../utils/musicutils").noteToObj;
 
         const mockTurtles = [0, 1, 2].map(index => ({
             name: index === 0 ? "Yertle" : index === 1 ? "Turtle1" : "Turtle2",
@@ -1075,6 +1076,40 @@ describe("setupEnsembleBlocks", () => {
             logo.parseArg.mockReturnValue("Yertle");
             turtlePitchBlock.arg(logo, 0, blk, null);
             expect(pitchToNumber).toHaveBeenCalled();
+        });
+
+        it("should parse multi-digit and negative octaves correctly for matched turtle", () => {
+            const turtlePitchBlock = createdBlocks["turtlepitch"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100], value: null };
+            activity.blocks.blockList[100] = { name: "text", value: "Yertle" };
+            const tur = turtles.ithTurtle(0);
+            logo.parseArg.mockReturnValue("Yertle");
+
+            tur.singer.lastNotePlayed = ["C10", 0.25];
+            turtlePitchBlock.arg(logo, 0, blk, null);
+            expect(pitchToNumber).toHaveBeenCalledWith("C", 10, "C");
+
+            tur.singer.lastNotePlayed = ["A-1", 0.25];
+            turtlePitchBlock.arg(logo, 0, blk, null);
+            expect(pitchToNumber).toHaveBeenCalledWith("A", -1, "C");
+        });
+
+        it("should parse multi-digit and negative octaves correctly in fallback path", () => {
+            const turtlePitchBlock = createdBlocks["turtlepitch"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100], value: null };
+            activity.blocks.blockList[100] = { name: "text", value: "UnknownTurtle" };
+            const tur = turtles.ithTurtle(0);
+            logo.parseArg.mockReturnValue("UnknownTurtle");
+
+            tur.singer.lastNotePlayed = ["Gb12", 0.25];
+            turtlePitchBlock.arg(logo, 0, blk, null);
+            expect(pitchToNumber).toHaveBeenCalledWith("Gb", 12, "C");
+
+            tur.singer.lastNotePlayed = ["F#-2", 0.25];
+            turtlePitchBlock.arg(logo, 0, blk, null);
+            expect(pitchToNumber).toHaveBeenCalledWith("F#", -2, "C");
         });
     });
 });

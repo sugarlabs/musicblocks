@@ -4026,19 +4026,20 @@ const getTemperamentName = name => {
 };
 
 /**
- * Convert a note string to an object containing the note, octave, and cents.
+ * Convert a note string to an object containing the note and octave.
  * @function
  * @param {string} note - The note string.
- * @returns {Array} An array containing the note, octave, and cents.
+ * @returns {Array} An array containing the note and octave.
  */
 const noteToObj = note => {
-    let octave = parseInt(note.slice(note.length - 1), 10);
-    if (isNaN(octave)) {
-        octave = 4;
-    } else {
-        note = note.slice(0, note.length - 1);
+    if (typeof note !== "string" || note.length === 0) {
+        return [note, 4];
     }
-    return [note, octave];
+    const match = note.match(/^(.*?)(-?\d+)$/);
+    if (match) {
+        return [match[1], parseInt(match[2], 10)];
+    }
+    return [note, 4];
 };
 
 /**
@@ -7904,9 +7905,7 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament
     const stepDownCurrentNote = getNumber(note, currentOctave - 1, temperament);
 
     if (lastNotePlayed !== null) {
-        lastNotePlayed = lastNotePlayed[0];
-        // strip off octave from end of note
-        lastNotePlayed = lastNotePlayed.substring(0, lastNotePlayed.length - 1);
+        lastNotePlayed = noteToObj(lastNotePlayed[0])[0];
     } else {
         lastNotePlayed = "G";
     }
