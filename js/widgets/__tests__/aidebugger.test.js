@@ -794,6 +794,22 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget._hideTypingIndicator();
             expect(debuggerWidget.chatLog.querySelectorAll(".typing-indicator").length).toBe(0);
         });
+
+        test("animates typing indicator dots over time", () => {
+            jest.useFakeTimers();
+            debuggerWidget._showTypingIndicator();
+            const indicator = debuggerWidget.chatLog.querySelector(".typing-indicator");
+            expect(indicator.textContent).toBe("Debugger is typing...");
+
+            jest.advanceTimersByTime(500);
+            expect(indicator.textContent).toBe("Debugger is typing.");
+
+            jest.advanceTimersByTime(500);
+            expect(indicator.textContent).toBe("Debugger is typing..");
+
+            debuggerWidget._hideTypingIndicator();
+            jest.useRealTimers();
+        });
     });
 
     describe("_clearChat", () => {
@@ -833,6 +849,990 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
                 "No conversation to export."
             );
+        });
+
+        test("exports full chat history and project representation when messages exist", () => {
+            const originalCreateObjectURL = global.URL.createObjectURL;
+            const originalRevokeObjectURL = global.URL.revokeObjectURL;
+            global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
+            global.URL.revokeObjectURL = jest.fn();
+
+            const clickMock = jest.fn();
+            const originalCreateElement = document.createElement.bind(document);
+            const createElementSpy = jest
+                .spyOn(document, "createElement")
+                .mockImplementation(tag => {
+                    const el = originalCreateElement(tag);
+                    if (tag === "a") {
+                        el.click = clickMock;
+                    }
+                    return el;
+                });
+
+            debuggerWidget.chatHistory = [
+                { type: "user", content: "How does repeat work?" },
+                { type: "bot", content: "Repeat repeats blocks." }
+            ];
+            debuggerWidget.activity.prepareExport = jest.fn(() =>
+                JSON.stringify([
+                    ["b1", "start", null, null, ["b2"]],
+                    ["b2", "forward", null, null, []]
+                ])
+            );
+
+            debuggerWidget._exportChat();
+
+            expect(global.URL.createObjectURL).toHaveBeenCalled();
+            expect(clickMock).toHaveBeenCalled();
+            expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-export-url");
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Chat exported successfully."
+            );
+
+            createElementSpy.mockRestore();
+            global.URL.createObjectURL = originalCreateObjectURL;
+            global.URL.revokeObjectURL = originalRevokeObjectURL;
+        });
+
+        test("handles prepareExport JSON parse error during chat export gracefully", () => {
+            const originalCreateObjectURL = global.URL.createObjectURL;
+            const originalRevokeObjectURL = global.URL.revokeObjectURL;
+            global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
+            global.URL.revokeObjectURL = jest.fn();
+
+            const clickMock = jest.fn();
+            const originalCreateElement = document.createElement.bind(document);
+            const createElementSpy = jest
+                .spyOn(document, "createElement")
+                .mockImplementation(tag => {
+                    const el = originalCreateElement(tag);
+                    if (tag === "a") {
+                        el.click = clickMock;
+                    }
+                    return el;
+                });
+
+            debuggerWidget.chatHistory = [{ type: "user", content: "Hello" }];
+            debuggerWidget.activity.prepareExport = jest.fn(() => "invalid json {{");
+
+            debuggerWidget._exportChat();
+
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Chat exported successfully."
+            );
+
+            createElementSpy.mockRestore();
+            global.URL.createObjectURL = originalCreateObjectURL;
+            global.URL.revokeObjectURL = originalRevokeObjectURL;
+        });
+
+        test("handles prepareExport exception during chat export gracefully", () => {
+            const originalCreateObjectURL = global.URL.createObjectURL;
+            const originalRevokeObjectURL = global.URL.revokeObjectURL;
+            global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
+            global.URL.revokeObjectURL = jest.fn();
+
+            const clickMock = jest.fn();
+            const originalCreateElement = document.createElement.bind(document);
+            const createElementSpy = jest
+                .spyOn(document, "createElement")
+                .mockImplementation(tag => {
+                    const el = originalCreateElement(tag);
+                    if (tag === "a") {
+                        el.click = clickMock;
+                    }
+                    return el;
+                });
+
+            debuggerWidget.chatHistory = [{ type: "user", content: "Hello" }];
+            debuggerWidget.activity.prepareExport = jest.fn(() => {
+                throw new Error("Export failed");
+            });
+
+            debuggerWidget._exportChat();
+
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Debugger error: Could not retrieve project data for export."
+            );
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Chat exported successfully."
+            );
+
+            createElementSpy.mockRestore();
+            global.URL.createObjectURL = originalCreateObjectURL;
+            global.URL.revokeObjectURL = originalRevokeObjectURL;
+        });
+
+        test("exports using Turtle Blocks branding when _THIS_IS_MUSIC_BLOCKS_ is false", () => {
+            const originalCreateObjectURL = global.URL.createObjectURL;
+            const originalRevokeObjectURL = global.URL.revokeObjectURL;
+            global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
+            global.URL.revokeObjectURL = jest.fn();
+
+            const clickMock = jest.fn();
+            const originalCreateElement = document.createElement.bind(document);
+            const createElementSpy = jest
+                .spyOn(document, "createElement")
+                .mockImplementation(tag => {
+                    const el = originalCreateElement(tag);
+                    if (tag === "a") {
+                        el.click = clickMock;
+                    }
+                    return el;
+                });
+
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+            debuggerWidget.chatHistory = [{ type: "user", content: "Hi" }];
+
+            debuggerWidget._exportChat();
+
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Chat exported successfully."
+            );
+
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            createElementSpy.mockRestore();
+            global.URL.createObjectURL = originalCreateObjectURL;
+            global.URL.revokeObjectURL = originalRevokeObjectURL;
+        });
+    });
+
+    describe("Backend URL and Hostname Resolution", () => {
+        test("resolves localhost backend URL", () => {
+            const w = new AIDebuggerWidget();
+            w.chatLog = document.createElement("div");
+            w._showConsentBanner();
+            expect(w.chatLog.querySelector("strong").textContent).toBe("http://localhost:8000");
+        });
+    });
+
+    describe("init and Widget Window Lifecycle", () => {
+        let debuggerWidget;
+        let mockActivity;
+        let mockWidgetWindow;
+        let originalWidgetWindows;
+
+        beforeEach(() => {
+            mockActivity = {
+                isInputON: false,
+                textMsg: jest.fn(),
+                prepareExport: jest.fn(() => "[]")
+            };
+
+            const body = document.createElement("div");
+            let maximized = false;
+            mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                sendToCenter: jest.fn(),
+                isMaximized: jest.fn(() => maximized),
+                setMaximized: val => {
+                    maximized = val;
+                },
+                getWidgetBody: jest.fn(() => body),
+                addButton: jest.fn((icon, size, title) => {
+                    const btn = document.createElement("button");
+                    btn.title = title;
+                    return btn;
+                }),
+                onclose: null,
+                onmaximize: null
+            };
+
+            originalWidgetWindows = window.widgetWindows;
+            window.widgetWindows = {
+                windowFor: jest.fn(() => mockWidgetWindow)
+            };
+
+            debuggerWidget = new AIDebuggerWidget();
+        });
+
+        afterEach(() => {
+            window.widgetWindows = originalWidgetWindows;
+        });
+
+        test("initializes window, sets dimensions, event handlers, and buttons", () => {
+            debuggerWidget.init(mockActivity);
+
+            expect(mockActivity.isInputON).toBe(true);
+            expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(debuggerWidget, "Debugger");
+            expect(mockWidgetWindow.clear).toHaveBeenCalled();
+            expect(mockWidgetWindow.show).toHaveBeenCalled();
+            expect(mockWidgetWindow.sendToCenter).toHaveBeenCalled();
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("Debugger initialized");
+
+            expect(mockWidgetWindow.getWidgetBody().style.width).toBe("900px");
+            expect(mockWidgetWindow.getWidgetBody().style.height).toBe("600px");
+
+            expect(mockWidgetWindow.addButton).toHaveBeenCalledWith(
+                "reload.svg",
+                32,
+                "Reset conversation"
+            );
+            expect(mockWidgetWindow.addButton).toHaveBeenCalledWith(
+                "download.svg",
+                32,
+                "Export chat"
+            );
+
+            // Verify reset button click triggers _resetConversation
+            const resetSpy = jest
+                .spyOn(debuggerWidget, "_resetConversation")
+                .mockImplementation(() => {});
+            debuggerWidget._resetButton.onclick();
+            expect(resetSpy).toHaveBeenCalled();
+            resetSpy.mockRestore();
+
+            // Verify export button click triggers _exportChat
+            const exportSpy = jest
+                .spyOn(debuggerWidget, "_exportChat")
+                .mockImplementation(() => {});
+            debuggerWidget._exportButton.onclick();
+            expect(exportSpy).toHaveBeenCalled();
+            exportSpy.mockRestore();
+
+            // Verify onclose handler
+            const hideTypingSpy = jest.spyOn(debuggerWidget, "_hideTypingIndicator");
+            mockWidgetWindow.onclose();
+            expect(hideTypingSpy).toHaveBeenCalled();
+            expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+            expect(mockActivity.isInputON).toBe(false);
+
+            // Verify onmaximize handler binds to _scale
+            expect(typeof mockWidgetWindow.onmaximize).toBe("function");
+        });
+
+        test("preserves existing conversationId if already generated", () => {
+            debuggerWidget.conversationId = "conv_pre_existing_id";
+            debuggerWidget.init(mockActivity);
+            expect(debuggerWidget.conversationId).toBe("conv_pre_existing_id");
+        });
+
+        test("generates new conversationId if null when initializing", () => {
+            debuggerWidget.conversationId = null;
+            debuggerWidget.init(mockActivity);
+            expect(debuggerWidget.conversationId).not.toBeNull();
+            expect(debuggerWidget.conversationId.startsWith("conv_")).toBe(true);
+        });
+    });
+
+    describe("Layout & Chat UI Elements", () => {
+        let debuggerWidget;
+
+        beforeEach(() => {
+            debuggerWidget = new AIDebuggerWidget();
+            const body = document.createElement("div");
+            debuggerWidget.widgetWindow = {
+                getWidgetBody: () => body
+            };
+            debuggerWidget._createLayout();
+        });
+
+        test("sets up messageInput focus and blur styling", () => {
+            expect(debuggerWidget.messageInput).not.toBeNull();
+
+            debuggerWidget.messageInput.onfocus();
+            expect(["#2196F3", "rgb(33, 150, 243)"]).toContain(
+                debuggerWidget.messageInput.style.borderColor
+            );
+            expect(debuggerWidget.messageInput.style.boxShadow).toBe(
+                "0 0 5px rgba(33, 150, 243, 0.3)"
+            );
+
+            debuggerWidget.messageInput.onblur();
+            expect(["#ddd", "rgb(221, 221, 221)"]).toContain(
+                debuggerWidget.messageInput.style.borderColor
+            );
+            expect(debuggerWidget.messageInput.style.boxShadow).toBe("none");
+        });
+
+        test("sets up sendButton mouseover and mouseout styling", () => {
+            expect(debuggerWidget.sendButton).not.toBeNull();
+
+            debuggerWidget.sendButton.onmouseover();
+            expect(["#1976D2", "rgb(25, 118, 210)"]).toContain(
+                debuggerWidget.sendButton.style.backgroundColor
+            );
+
+            debuggerWidget.sendButton.onmouseout();
+            expect(["#2196F3", "rgb(33, 150, 243)"]).toContain(
+                debuggerWidget.sendButton.style.backgroundColor
+            );
+        });
+
+        test("clicking sendButton triggers _sendMessage", () => {
+            const sendSpy = jest.spyOn(debuggerWidget, "_sendMessage").mockImplementation(() => {});
+            debuggerWidget.sendButton.onclick();
+            expect(sendSpy).toHaveBeenCalled();
+            sendSpy.mockRestore();
+        });
+
+        test("Enter keypress on messageInput triggers _sendMessage, other keys do not", () => {
+            const sendSpy = jest.spyOn(debuggerWidget, "_sendMessage").mockImplementation(() => {});
+
+            debuggerWidget.messageInput.onkeypress({ key: "a" });
+            expect(sendSpy).not.toHaveBeenCalled();
+
+            debuggerWidget.messageInput.onkeypress({ key: "Enter" });
+            expect(sendSpy).toHaveBeenCalled();
+            sendSpy.mockRestore();
+        });
+
+        test("_addWelcomeMessage respects _THIS_IS_MUSIC_BLOCKS_ flag", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            debuggerWidget._addWelcomeMessage();
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Welcome to Music Blocks Debugger!"
+            );
+
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+            debuggerWidget._addWelcomeMessage();
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Welcome to Turtle Blocks Debugger!"
+            );
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+        });
+    });
+
+    describe("Privacy Consent Banner Lifecycle", () => {
+        let debuggerWidget;
+
+        beforeEach(() => {
+            debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget.chatLog = document.createElement("div");
+        });
+
+        test("renders consent banner with title, description, and action buttons", () => {
+            debuggerWidget._showConsentBanner();
+            const banner = debuggerWidget.chatLog.querySelector("div");
+            expect(banner).not.toBeNull();
+            expect(banner.textContent).toContain("Before we start");
+            expect(banner.textContent).toContain(
+                "The AI Debugger will send your current project data"
+            );
+            const buttons = banner.querySelectorAll("button");
+            expect(buttons.length).toBe(2);
+            expect(buttons[0].textContent).toBe("Analyze my project");
+            expect(buttons[1].textContent).toBe("Cancel");
+        });
+
+        test("accepting banner sets consent, removes banner, and loads project", () => {
+            const loadProjectSpy = jest
+                .spyOn(debuggerWidget, "_loadProjectAndInitialize")
+                .mockImplementation(() => {});
+
+            debuggerWidget._showConsentBanner();
+            const acceptBtn = debuggerWidget.chatLog.querySelectorAll("button")[0];
+            acceptBtn.onclick();
+
+            expect(debuggerWidget._consentGiven).toBe(true);
+            expect(debuggerWidget.chatLog.querySelector("button")).toBeNull();
+            expect(loadProjectSpy).toHaveBeenCalled();
+            loadProjectSpy.mockRestore();
+        });
+
+        test("canceling banner removes banner and adds system decline message", () => {
+            debuggerWidget._showConsentBanner();
+            const declineBtn = debuggerWidget.chatLog.querySelectorAll("button")[1];
+            declineBtn.onclick();
+
+            expect(debuggerWidget._consentGiven).toBe(false);
+            expect(debuggerWidget.chatLog.querySelector("button")).toBeNull();
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
+            );
+        });
+    });
+
+    describe("Project Loading and Backend Initialization", () => {
+        let debuggerWidget;
+        let mockActivity;
+        let originalFetch;
+        const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
+
+        beforeEach(() => {
+            originalFetch = global.fetch;
+            global.fetch = jest.fn();
+
+            mockActivity = {
+                textMsg: jest.fn(),
+                prepareExport: jest.fn(() => JSON.stringify([["b1", "start", null, null, []]]))
+            };
+
+            debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.chatLog = document.createElement("div");
+        });
+
+        afterEach(() => {
+            global.fetch = originalFetch;
+        });
+
+        test("_loadProjectAndInitialize initiates backend initialization with project data", () => {
+            const initBackendSpy = jest
+                .spyOn(debuggerWidget, "_initializeBackendWithProject")
+                .mockImplementation(() => {});
+
+            debuggerWidget._loadProjectAndInitialize();
+
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Loading your current project and initializing AI assistant..."
+            );
+            expect(initBackendSpy).toHaveBeenCalledWith(
+                JSON.stringify([["b1", "start", null, null, []]])
+            );
+            initBackendSpy.mockRestore();
+        });
+
+        test("_loadProjectAndInitialize catches invalid JSON format in prepareExport", () => {
+            mockActivity.prepareExport = jest.fn(() => "invalid json {");
+            const initBackendSpy = jest
+                .spyOn(debuggerWidget, "_initializeBackendWithProject")
+                .mockImplementation(() => {});
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            debuggerWidget._loadProjectAndInitialize();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Debugger error: Invalid project data format."
+            );
+            expect(initBackendSpy).toHaveBeenCalledWith("invalid json {");
+
+            errorSpy.mockRestore();
+            initBackendSpy.mockRestore();
+        });
+
+        test("_loadProjectAndInitialize handles general throw from prepareExport", () => {
+            mockActivity.prepareExport = jest.fn(() => {
+                throw new Error("Disk read error");
+            });
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            const welcomeSpy = jest.spyOn(debuggerWidget, "_addWelcomeMessage");
+
+            debuggerWidget._loadProjectAndInitialize();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Debugger error: Could not load project data."
+            );
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Could not load project data. Starting with basic assistant..."
+            );
+            expect(welcomeSpy).toHaveBeenCalled();
+
+            errorSpy.mockRestore();
+            welcomeSpy.mockRestore();
+        });
+
+        test("_initializeBackendWithProject sends project data and processes successful response", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "Hello! I see your start block." })
+            });
+
+            debuggerWidget.chatHistory = [{ type: "user", content: "Previous note" }];
+            debuggerWidget._initializeBackendWithProject("[]");
+
+            expect(global.fetch).toHaveBeenCalledWith(
+                "http://localhost:8000/analyze",
+                expect.objectContaining({
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                })
+            );
+
+            await flushPromises();
+
+            expect(debuggerWidget.promptCount).toBe(1);
+            expect(debuggerWidget.chatHistory.length).toBe(2);
+            expect(debuggerWidget.chatHistory[1].content).toBe("Hello! I see your start block.");
+            expect(debuggerWidget.chatLog.textContent).toContain("Hello! I see your start block.");
+        });
+
+        test("_initializeBackendWithProject handles missing response field from backend", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({})
+            });
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            debuggerWidget._initializeBackendWithProject("[]");
+
+            await flushPromises();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Server error: No initial response from AI backend."
+            );
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Server error: Failed to initialize AI debugger."
+            );
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Could not reach the AI assistant. Please check your connection and try again."
+            );
+            errorSpy.mockRestore();
+        });
+
+        test("_initializeBackendWithProject handles non-OK HTTP response", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: false,
+                status: 503,
+                statusText: "Service Unavailable"
+            });
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            debuggerWidget._initializeBackendWithProject("[]");
+
+            await flushPromises();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Server error: Failed to initialize AI debugger."
+            );
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Could not reach the AI assistant. Please check your connection and try again."
+            );
+            errorSpy.mockRestore();
+        });
+
+        test("_initializeBackendWithProject handles network/fetch TypeError", async () => {
+            global.fetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            debuggerWidget._initializeBackendWithProject("[]");
+
+            await flushPromises();
+
+            expect(errorSpy).toHaveBeenCalledWith("Network/CORS error. Backend connection failed");
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Server error: Failed to initialize AI debugger."
+            );
+            errorSpy.mockRestore();
+        });
+    });
+
+    describe("Backend Message Dispatching (_sendToBackend)", () => {
+        let debuggerWidget;
+        let mockActivity;
+        let originalFetch;
+        const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
+
+        beforeEach(() => {
+            originalFetch = global.fetch;
+            global.fetch = jest.fn();
+
+            mockActivity = {
+                textMsg: jest.fn(),
+                prepareExport: jest.fn(() => JSON.stringify([["b1", "start", null, null, []]]))
+            };
+
+            debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget._isProcessing = true;
+        });
+
+        afterEach(() => {
+            global.fetch = originalFetch;
+        });
+
+        test("handles prepareExport error by defaulting projectData to empty array string", async () => {
+            mockActivity.prepareExport = jest.fn(() => {
+                throw new Error("Export error");
+            });
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "Bot answer" })
+            });
+
+            debuggerWidget._sendToBackend("Explain project");
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Debugger error: Could not prepare project data."
+            );
+            expect(global.fetch).toHaveBeenCalledWith(
+                "http://localhost:8000/analyze",
+                expect.objectContaining({
+                    body: expect.stringContaining('"code":"[]"')
+                })
+            );
+
+            await flushPromises();
+
+            expect(debuggerWidget._isProcessing).toBe(false);
+            errorSpy.mockRestore();
+        });
+
+        test("filters system messages and maps user/assistant history correctly in payload", async () => {
+            debuggerWidget.chatHistory = [
+                { type: "system", content: "System message" },
+                { type: "user", content: "User question" },
+                { type: "bot", content: "Bot answer" }
+            ];
+
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ response: "Next answer" })
+            });
+
+            debuggerWidget._sendToBackend("Follow-up question");
+
+            const requestBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+            expect(requestBody.history).toEqual([
+                { role: "user", content: "User question" },
+                { role: "assistant", content: "Bot answer" }
+            ]);
+            expect(requestBody.prompt).toBe("Follow-up question");
+            expect(requestBody.prompt_count).toBe(1);
+
+            await flushPromises();
+
+            expect(debuggerWidget._isProcessing).toBe(false);
+            expect(debuggerWidget.chatHistory[debuggerWidget.chatHistory.length - 1].content).toBe(
+                "Next answer"
+            );
+        });
+
+        test("handles missing response property from backend", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({})
+            });
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            debuggerWidget._sendToBackend("Prompt");
+
+            await flushPromises();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Server error: Invalid response from AI backend."
+            );
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Server error: Unable to connect to AI backend."
+            );
+            expect(debuggerWidget._isProcessing).toBe(false);
+            errorSpy.mockRestore();
+        });
+
+        test("handles non-200 HTTP response and displays fallback response", async () => {
+            global.fetch.mockResolvedValueOnce({
+                ok: false,
+                status: 500,
+                statusText: "Internal Server Error"
+            });
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            debuggerWidget._sendToBackend("Prompt");
+
+            await flushPromises();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Server error: Unable to connect to AI backend."
+            );
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Could not reach the AI assistant. Please check your connection and try again."
+            );
+            expect(debuggerWidget._isProcessing).toBe(false);
+            errorSpy.mockRestore();
+        });
+
+        test("handles network fetch TypeError and logs CORS warning", async () => {
+            global.fetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            debuggerWidget._sendToBackend("Prompt");
+
+            await flushPromises();
+
+            expect(errorSpy).toHaveBeenCalledWith("Network/CORS error. Backend connection failed");
+            expect(debuggerWidget.chatLog.textContent).toContain(
+                "Could not reach the AI assistant. Please check your connection and try again."
+            );
+            expect(debuggerWidget._isProcessing).toBe(false);
+            errorSpy.mockRestore();
+        });
+    });
+
+    describe("Window Scaling (_scale)", () => {
+        let debuggerWidget;
+        let mockWidgetWindow;
+        let isMax;
+
+        beforeEach(() => {
+            isMax = false;
+            const body = document.createElement("div");
+            mockWidgetWindow = {
+                isMaximized: () => isMax,
+                getWidgetBody: () => body
+            };
+            debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget.widgetWindow = mockWidgetWindow;
+        });
+
+        test("scales to 100% when maximized", () => {
+            isMax = true;
+            debuggerWidget._scale();
+            expect(mockWidgetWindow.getWidgetBody().style.width).toBe("100%");
+            expect(mockWidgetWindow.getWidgetBody().style.height).toBe("100%");
+        });
+
+        test("scales to fixed dimensions when not maximized", () => {
+            isMax = false;
+            debuggerWidget._scale();
+            expect(mockWidgetWindow.getWidgetBody().style.width).toBe("900px");
+            expect(mockWidgetWindow.getWidgetBody().style.height).toBe("600px");
+        });
+    });
+
+    describe("Advanced Block AST & LLM Representation Branches", () => {
+        let debuggerWidget;
+        const defaultTurtleArgs = {
+            id: 0,
+            xcor: 0,
+            ycor: 0,
+            heading: 0,
+            color: 0,
+            shade: 50,
+            pensize: 5,
+            grey: 100
+        };
+
+        beforeEach(() => {
+            debuggerWidget = new AIDebuggerWidget();
+        });
+
+        test("sanitizes base64 data in block args to 'data'", () => {
+            const projectData = [
+                ["b1", ["start", defaultTurtleArgs], null, null, ["b2"]],
+                [
+                    "b2",
+                    [
+                        "text",
+                        {
+                            value: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+                        }
+                    ],
+                    null,
+                    null,
+                    []
+                ]
+            ];
+            const text = debuggerWidget._convertProjectToLLMFormat(projectData);
+            expect(text).toContain('"data"');
+        });
+
+        test("traverses vspace and hidden blocks correctly", () => {
+            const projectData = [
+                ["b1", ["start", defaultTurtleArgs], null, null, ["v1"]],
+                ["v1", "vspace", null, null, ["h1"]],
+                ["h1", "hidden", null, null, ["f1"]],
+                ["f1", "forward", null, null, []]
+            ];
+            const text = debuggerWidget._convertProjectToLLMFormat(projectData);
+            expect(text).toContain("Forward");
+        });
+
+        test("formats disconnected unvisited blocks in projectData", () => {
+            const projectData = [
+                ["b1", ["start", defaultTurtleArgs], null, null, []],
+                ["d1", "forward", null, null, []],
+                ["v_skip", "vspace", null, null, []],
+                ["h_skip", "hidden", null, null, []]
+            ];
+            const text = debuggerWidget._convertProjectToLLMFormat(projectData);
+            expect(text).toContain("Start Block");
+            expect(text).toContain("Forward");
+        });
+
+        test("formats setmasterbpm2 with nested divide block for beat value", () => {
+            const blockMap = {
+                bpm1: ["bpm1", "setmasterbpm2", null, null, ["prev", "num1", "div1"]],
+                num1: ["num1", ["number", { value: 120 }]],
+                div1: ["div1", "divide", null, null, ["prev", "n1", "d1"]],
+                n1: ["n1", ["number", { value: 1 }]],
+                d1: ["d1", ["number", { value: 4 }]]
+            };
+            const repr = debuggerWidget._getBlockRepresentation(
+                "setmasterbpm2",
+                null,
+                blockMap.bpm1,
+                blockMap,
+                1,
+                false,
+                null
+            );
+            expect(repr).toContain("Set Master BPM → 120 BPM");
+            expect(repr).toContain("beat value --> 1/4 = 0.25");
+        });
+
+        test("formats repeat block with nested divide count block", () => {
+            const blockMap = {
+                rep1: ["rep1", "repeat", null, null, ["prev", "div1"]],
+                div1: ["div1", ["divide"], null, null, ["prev", "n1", "d1"]],
+                n1: ["n1", ["number", { value: 8 }]],
+                d1: ["d1", ["number", { value: 2 }]]
+            };
+            const repr = debuggerWidget._getBlockRepresentation(
+                "repeat",
+                null,
+                blockMap.rep1,
+                blockMap,
+                1,
+                false,
+                null
+            );
+            expect(repr).toBe("Repeat (8/2 = 4.00) Times");
+        });
+
+        test("formats show block", () => {
+            const blockMap = {
+                s1: ["s1", "show", null, null, ["prev", null, "num1"]],
+                num1: ["num1", ["number", { value: 99 }]]
+            };
+            const repr = debuggerWidget._getBlockRepresentation(
+                "show",
+                null,
+                blockMap.s1,
+                blockMap,
+                1,
+                false,
+                null
+            );
+            expect(repr).toBe("Show Number: 99");
+        });
+
+        test("formats increment block", () => {
+            const blockMap = {
+                inc1: ["inc1", "increment", null, null, ["prev", "c1", "a1"]],
+                c1: ["c1", ["number", { value: 10 }]],
+                a1: ["a1", ["number", { value: 5 }]]
+            };
+            const repr = debuggerWidget._getBlockRepresentation(
+                "increment",
+                null,
+                blockMap.inc1,
+                blockMap,
+                1,
+                false,
+                null
+            );
+            expect(repr).toBe("Increment --> Color: 10, Amount: 5");
+        });
+
+        test("formats incrementOne block", () => {
+            const blockMap = {
+                incOne1: ["incOne1", "incrementOne", null, null, ["prev", "box1"]],
+                box1: ["box1", ["namedbox", { value: "counter" }]]
+            };
+            const repr = debuggerWidget._getBlockRepresentation(
+                "incrementOne",
+                null,
+                blockMap.incOne1,
+                blockMap,
+                1,
+                false,
+                null
+            );
+            expect(repr).toBe('Increment Variable: "counter"');
+        });
+
+        test("formats arc block with divide block and simple number for angle", () => {
+            const blockMapDivide = {
+                arc1: ["arc1", "arc", null, null, ["prev", null, "rad1", "div1"]],
+                rad1: ["rad1", ["number", { value: 50 }]],
+                div1: ["div1", ["divide"], null, null, ["prev", "n1", "d1"]],
+                n1: ["n1", ["number", { value: 180 }]],
+                d1: ["d1", ["number", { value: 2 }]]
+            };
+            const repr1 = debuggerWidget._getBlockRepresentation(
+                "arc",
+                null,
+                blockMapDivide.arc1,
+                blockMapDivide,
+                1,
+                false,
+                null
+            );
+            expect(repr1).toBe("Draw Arc --> Angle: 90.00°, Radius: 50");
+
+            const blockMapSimple = {
+                arc2: ["arc2", "arc", null, null, ["prev", null, "rad2", "ang2"]],
+                rad2: ["rad2", ["number", { value: 25 }]],
+                ang2: ["ang2", ["number", { value: 45 }]]
+            };
+            const repr2 = debuggerWidget._getBlockRepresentation(
+                "arc",
+                null,
+                blockMapSimple.arc2,
+                blockMapSimple,
+                1,
+                false,
+                null
+            );
+            expect(repr2).toBe("Draw Arc --> Angle: 45°, Radius: 25");
+        });
+
+        test("formats print block", () => {
+            const blockMap = {
+                p1: ["p1", "print", null, null, ["prev", null, "t1"]],
+                t1: ["t1", ["text", { value: "MusicBlocks Rocks" }]]
+            };
+            const repr = debuggerWidget._getBlockRepresentation(
+                "print",
+                null,
+                blockMap.p1,
+                blockMap,
+                1,
+                false,
+                null
+            );
+            expect(repr).toBe('Print: "MusicBlocks Rocks"');
+        });
+
+        test("formats pitch block with text solfege and solfege block", () => {
+            const blockMapText = {
+                pitch1: ["pitch1", "pitch", null, null, ["prev", "solfText", "oct1"]],
+                solfText: ["solfText", ["text", { value: "do" }]],
+                oct1: ["oct1", ["number", { value: 4 }]]
+            };
+            const repr1 = debuggerWidget._getBlockRepresentation(
+                "pitch",
+                null,
+                blockMapText.pitch1,
+                blockMapText,
+                1,
+                false,
+                null
+            );
+            expect(repr1).toBe("Pitch --> Solfege: do, Octave: 4");
+
+            const blockMapSolfege = {
+                pitch2: ["pitch2", "pitch", null, null, ["prev", "solfBlock", "oct2"]],
+                solfBlock: ["solfBlock", ["solfege", { value: "re" }]],
+                oct2: ["oct2", ["number", { value: 5 }]]
+            };
+            const repr2 = debuggerWidget._getBlockRepresentation(
+                "pitch",
+                null,
+                blockMapSolfege.pitch2,
+                blockMapSolfege,
+                1,
+                false,
+                null
+            );
+            expect(repr2).toBe("Pitch --> Solfege: re, Octave: 5");
+        });
+
+        test("returns early from _processBlock when block representation is null", () => {
+            const block = ["b1", "custom", null, null, []];
+            const blockMap = { b1: block };
+            const visited = new Set();
+            const spy = jest
+                .spyOn(debuggerWidget, "_getBlockRepresentation")
+                .mockReturnValueOnce(null);
+            const res = debuggerWidget._processBlock(block, blockMap, visited, 1);
+            expect(res).toEqual([]);
+            spy.mockRestore();
         });
     });
 });
