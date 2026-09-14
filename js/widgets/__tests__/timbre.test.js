@@ -1581,7 +1581,7 @@ describe("TimbreWidget", () => {
                 timbre.distortionParams = [70];
                 timbre.tremoloParams = [15, 60];
                 timbre.phaserParams = [6, 4, 500];
-                timbre.chorusParams = [2.5, 4.5, 80];
+                timbre.chorusParams = [2.5, 4.5];
 
                 timbre._playNote("D4", 0.25);
                 expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
@@ -1604,6 +1604,20 @@ describe("TimbreWidget", () => {
                         doChorus: true,
                         chorusRate: 2.5,
                         delayTime: 4.5,
+                        chorusDepth: 0.7
+                    }),
+                    expect.any(Array)
+                );
+
+                timbre.chorusParams = [2.5, 4.5, 80];
+                timbre._playNote("D4", 0.25);
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                    0,
+                    "D4",
+                    0.25,
+                    "custom",
+                    expect.objectContaining({
+                        doChorus: true,
                         chorusDepth: 80
                     }),
                     expect.any(Array)
@@ -1753,9 +1767,12 @@ describe("TimbreWidget", () => {
                 await tremoloRadio.onclick({ target: tremoloRadio });
                 timbre.isActive["tremolo"] = true;
                 timbre.tremoloParams = [12, 45];
+                timbre._update.mockClear();
                 mockActivity.logo.synth.trigger.mockClear();
                 timbre._undo();
                 expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 12, 0);
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 45, 1);
                 expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("12");
                 expect(jsdomDocument.getElementById("myRangeFx1").value).toBe("45");
 
@@ -1763,9 +1780,12 @@ describe("TimbreWidget", () => {
                 await vibratoRadio.onclick({ target: vibratoRadio });
                 timbre.isActive["vibrato"] = true;
                 timbre.vibratoParams = [8, 20];
+                timbre._update.mockClear();
                 mockActivity.logo.synth.trigger.mockClear();
                 timbre._undo();
                 expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 8, 0);
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 20, 1);
                 expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("8");
                 expect(jsdomDocument.getElementById("myRangeFx1").value).toBe("20");
 
@@ -1773,9 +1793,13 @@ describe("TimbreWidget", () => {
                 await phaserRadio.onclick({ target: phaserRadio });
                 timbre.isActive["phaser"] = true;
                 timbre.phaserParams = [6, 4, 300];
+                timbre._update.mockClear();
                 mockActivity.logo.synth.trigger.mockClear();
                 timbre._undo();
                 expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 6, 0);
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 4, 1);
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 300, 2);
                 expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("6");
                 expect(jsdomDocument.getElementById("myRangeFx1").value).toBe("4");
                 expect(jsdomDocument.getElementById("myRangeFx2").value).toBe("300");
@@ -1784,9 +1808,13 @@ describe("TimbreWidget", () => {
                 await chorusRadio.onclick({ target: chorusRadio });
                 timbre.isActive["chorus"] = true;
                 timbre.chorusParams = [3, 5, 60];
+                timbre._update.mockClear();
                 mockActivity.logo.synth.trigger.mockClear();
                 timbre._undo();
                 expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 3, 0);
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 5, 1);
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 60, 2);
                 expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("3");
                 expect(jsdomDocument.getElementById("myRangeFx1").value).toBe("5");
                 expect(jsdomDocument.getElementById("myRangeFx2").value).toBe("60");
@@ -1795,9 +1823,11 @@ describe("TimbreWidget", () => {
                 await distortionRadio.onclick({ target: distortionRadio });
                 timbre.isActive["distortion"] = true;
                 timbre.distortionParams = [80];
+                timbre._update.mockClear();
                 mockActivity.logo.synth.trigger.mockClear();
                 timbre._undo();
                 expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+                expect(timbre._update).toHaveBeenCalledWith(expect.any(Number), 80, 0);
                 expect(jsdomDocument.getElementById("myRangeFx0").value).toBe("80");
             });
         });
@@ -1921,6 +1951,7 @@ describe("TimbreWidget", () => {
                     new jsdomDocument.defaultView.Event("change", { bubbles: true })
                 );
                 expect(timbre.noiseSynthParamvals["noise.type"]).toBe(20);
+                expect(timbre._update).toHaveBeenCalledWith(0, "20", 0);
             });
 
             test("DuoSynth selection and slider changes", async () => {
@@ -2208,8 +2239,20 @@ describe("TimbreWidget", () => {
 
                 timbre.isActive["noisesynth"] = true;
                 timbre.NoiseSynthParams = ["pink"];
+                timbre.noiseSynthParamvals["noise.type"] = "white";
+                mockActivity.logo.synth.createSynth.mockClear();
+
                 timbre._undo();
                 expect(timbre.noiseSynthParamvals["noise.type"]).toBe("pink");
+                expect(timbre._update).toHaveBeenCalledWith(0, "pink", 0);
+                expect(mockActivity.logo.synth.createSynth).toHaveBeenCalledWith(
+                    0,
+                    timbre.instrumentName,
+                    "noisesynth",
+                    timbre.noiseSynthParamvals
+                );
+                expect(jsdomDocument.getElementById("myRangeS0").value).toBe("pink");
+                expect(jsdomDocument.getElementById("myspanS0").textContent).toBe("pink");
             });
 
             test("_blockReplace traverses multiple clamp ancestors", () => {
