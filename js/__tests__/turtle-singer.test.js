@@ -160,6 +160,9 @@ const createActivityMock = turtleMock => {
             inPitchDrumMatrix: false,
             inMatrix: false,
             clearNoteParams: jest.fn(),
+            doStopTurtles: jest.fn(() => {
+                turtleMock.singer._unhighlightTimers = {};
+            }),
             specialArgs: []
         }
     };
@@ -1548,5 +1551,13 @@ describe("processNote unhighlight timers", () => {
 
         expect(act.blocks.unhighlight).not.toHaveBeenCalled();
         expect(tur.singer._unhighlightTimers[blk]).toBeUndefined();
+    });
+
+    test("clears unhighlight timers when doStopTurtles is called", () => {
+        Singer.processNote(act, 4, false, blk, 0, jest.fn());
+        expect(tur.singer._unhighlightTimers[blk]).toBeDefined();
+
+        act.logo.doStopTurtles();
+        expect(tur.singer._unhighlightTimers).toEqual({});
     });
 });

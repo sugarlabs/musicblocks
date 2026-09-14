@@ -1079,6 +1079,14 @@ describe("Logo doStopTurtles", () => {
         expect(clearAllSpy).toHaveBeenCalled();
     });
 
+    test("clears unhighlight timers on turtle.singer on stop", () => {
+        turtle.singer = { _unhighlightTimers: { blk1: 123 } };
+
+        logo.doStopTurtles();
+
+        expect(turtle.singer._unhighlightTimers).toEqual({});
+    });
+
     test("removes active turtle listeners from stage and clears listeners object on stop", () => {
         const mockListener = jest.fn();
         turtle.listeners = { __beat_1_0__: mockListener };
