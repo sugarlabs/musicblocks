@@ -1156,6 +1156,70 @@ describe("Blocks Foundation", () => {
             );
         });
 
+        it.each(["vibrato", "tuplet2", "staccato", "setbpm"])(
+            "rejects a %s block whose connections array is truncated (#8679)",
+            name => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks._makeNewBlockWithConnections = jest.fn();
+
+                // A corrupt project file: dock 0 is the parent, so a single
+                // connection leaves no next-block dock to repair. Repairing it
+                // anyway used to overwrite the parent and build a loop, which
+                // overflowed the stack in insideExpandableBlock.
+                const truncated = [[0, name, 200, 200, [null]]];
+
+                mockActivity._suppressRefresh = true;
+                mockActivity.errorMsg.mockClear();
+
+                expect(() => blocks.loadNewBlocks(truncated)).not.toThrow();
+                expect(mockActivity._suppressRefresh).toBe(false);
+                expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                    "Something went wrong reading JSON-encoded project data."
+                );
+                // The load is abandoned before any block is built.
+                expect(blocks._makeNewBlockWithConnections).not.toHaveBeenCalled();
+            }
+        );
+
+        it("rejects a block whose next connection is not in the project (#8679)", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn();
+
+            // Dock 1 points at block 99, which this project does not contain.
+            const danglingNext = [[0, "vibrato", 200, 200, [null, 99]]];
+
+            mockActivity._suppressRefresh = true;
+            mockActivity.errorMsg.mockClear();
+
+            expect(() => blocks.loadNewBlocks(danglingNext)).not.toThrow();
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Something went wrong reading JSON-encoded project data."
+            );
+        });
+
+        it("still repairs a vibrato block that has a full connections array", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn();
+
+            // Parent, argument, clamp and next docks, with no next block: the
+            // loader should add the missing hidden block and carry on.
+            const wellFormed = [[0, "vibrato", 200, 200, [null, null, null, null]]];
+
+            mockActivity._suppressRefresh = true;
+            mockActivity.errorMsg.mockClear();
+
+            expect(() => blocks.loadNewBlocks(wellFormed)).not.toThrow();
+            expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+            expect(blocks._makeNewBlockWithConnections).toHaveBeenCalled();
+        });
+
         it("accepts valid parent-child stacks without false cycle detection", () => {
             const blocks = new Blocks(mockActivity);
             blocks.blockList = [];

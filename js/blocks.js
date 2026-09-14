@@ -4980,18 +4980,39 @@ class Blocks {
                     return false;
                 };
 
-                if (hasCycle()) {
-                    console.warn(
-                        "Circular connection detected in block data. Punting loading of new blocks!"
-                    );
-                    console.debug("Circular block data:", blockObjs);
+                /**
+                 * Abandon a project we cannot load safely, telling the user
+                 * rather than crashing partway through the load.
+                 * @param - warning - console warning describing the problem
+                 * @param - data - the offending block data
+                 * @returns {void}
+                 */
+                const abortLoad = (warning, data) => {
+                    console.warn(warning);
+                    console.debug(data);
                     if (this.activity && typeof this.activity.errorMsg === "function") {
                         this.activity.errorMsg(
                             _("Something went wrong reading JSON-encoded project data.")
                         );
                     }
                     this.activity._suppressRefresh = false;
+                    /**
+                     * The load queue cleared the workspace and started the
+                     * loading animation, so put the UI back the way the
+                     * successful path leaves it.
+                     */
+                    document.body.style.cursor = "default";
+                    if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
+                        this.activity.stopLoadAnimation();
+                    }
                     this._advanceLoadQueue();
+                };
+
+                if (hasCycle()) {
+                    abortLoad(
+                        "Circular connection detected in block data. Punting loading of new blocks!",
+                        blockObjs
+                    );
                     return;
                 }
 
@@ -5280,6 +5301,25 @@ class Blocks {
                         case "tuplet2":
                         case "vibrato":
                             len = blockObjs[b][4].length;
+                            /**
+                             * Dock 0 is the parent and the last dock is the next
+                             * block, so these blocks always have at least two
+                             * connections. With fewer, the repairs below would
+                             * write the hidden block into the parent slot, leaving
+                             * the block and its hidden block pointing at each
+                             * other -- a loop that overflows the stack the next
+                             * time anything walks up the parents (#8679).
+                             */
+                            if (len < 2) {
+                                abortLoad(
+                                    "Too few connections for " +
+                                        name +
+                                        ": punting loading of new blocks!",
+                                    blockObjs[b]
+                                );
+                                return;
+                            }
+
                             if (last(blockObjs[b][4]) === null) {
                                 /** If there is no next block, add a hidden block; */
 
@@ -5299,6 +5339,16 @@ class Blocks {
                                 extraBlocksLength += 1;
                             } else {
                                 const nextBlock = blockObjs[b][4][len - 1];
+                                if (blockObjs[nextBlock] === undefined) {
+                                    abortLoad(
+                                        "Last connection of " +
+                                            name +
+                                            " is not a block in this project: punting loading of new blocks!",
+                                        blockObjs[b]
+                                    );
+                                    return;
+                                }
+
                                 let nextName;
                                 if (typeof blockObjs[nextBlock][1] === "object") {
                                     nextName = blockObjs[nextBlock][1][0];
@@ -5330,6 +5380,20 @@ class Blocks {
                             }
 
                             if (["note", "slur", "staccato", "swing"].includes(name)) {
+                                /**
+                                 * The conversion below reads the argument and
+                                 * clamp docks, so it needs three connections.
+                                 */
+                                if (len < 3) {
+                                    abortLoad(
+                                        "Too few connections to convert " +
+                                            name +
+                                            " to newnote style: punting loading of new blocks!",
+                                        blockObjs[b]
+                                    );
+                                    return;
+                                }
+
                                 /** We need to convert to newnote style: */
                                 /** (1) add a vspace to the start of the clamp of a note block. */
                                 const clampBlock = blockObjs[b][4][2];
