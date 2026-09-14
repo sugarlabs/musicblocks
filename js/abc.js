@@ -14,7 +14,7 @@
 
    frequencyToPitch, NOTATIONNOTE, NOTATIONTUPLETVALUE, NOTATIONDURATION,
    NOTATIONROUNDDOWN, NOTATIONINSIDECHORD, NOTATIONDOTCOUNT,
-   NOTATIONSTACCATO, toFraction
+   NOTATIONSTACCATO
 */
 
 /* exported saveAbcOutput */
@@ -68,6 +68,11 @@ const processABCNotes = function (logo, turtle) {
     // obj = [[notes], duration, dotCount, tupletValue, roundDown,
     //        insideChord, staccato]
     const parts = [];
+
+    const __sameTuplet = (a, b) =>
+        Array.isArray(a) && Array.isArray(b) && a[0] === b[0] && a[1] === b[1];
+
+    const __tupletTime = count => 2 ** Math.floor(Math.log2(Math.max(2, count)));
 
     const __convertDuration = function (duration) {
         const durationMap = {
@@ -136,8 +141,6 @@ const processABCNotes = function (logo, turtle) {
     let counter = 0;
     let queueSlur = false;
     let articulation = false;
-    let targetDuration = 0;
-    let tupletDuration = 0;
     let notes, note;
 
     for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
@@ -227,13 +230,10 @@ const processABCNotes = function (logo, turtle) {
             let incompleteTuplet = 0; // An incomplete tuplet
 
             // If it is a tuplet, look ahead to see if it is complete.
-            // While you are at it, add up the durations.
             if (obj[NOTATIONTUPLETVALUE] !== null) {
-                targetDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONDURATION];
-                tupletDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONROUNDDOWN];
                 let j = 1;
                 let k = 1;
-                while (k < obj[NOTATIONTUPLETVALUE]) {
+                while (k < obj[NOTATIONTUPLETVALUE][0]) {
                     if (i + j >= logo.notation.notationStaging[turtle].length) {
                         incompleteTuplet = j;
                         break;
@@ -247,16 +247,14 @@ const processABCNotes = function (logo, turtle) {
                         // In a chord, so jump to next note.
                         j++;
                     } else if (
-                        logo.notation.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE] !==
-                        obj[NOTATIONTUPLETVALUE]
+                        !__sameTuplet(
+                            logo.notation.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE],
+                            obj[NOTATIONTUPLETVALUE]
+                        )
                     ) {
                         incompleteTuplet = j;
                         break;
                     } else {
-                        targetDuration +=
-                            1 / logo.notation.notationStaging[turtle][i + j][NOTATIONDURATION];
-                        tupletDuration +=
-                            1 / logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
                         j++; // Jump to next note.
                         k++; // Increment notes in tuplet.
                     }
@@ -284,24 +282,23 @@ const processABCNotes = function (logo, turtle) {
                     const tupletNotes = logo.notation.notationStaging[turtle][i + j];
 
                     if (typeof tupletNotes[NOTATIONNOTE] === "object") {
+                        if (tupletNotes[NOTATIONSTACCATO]) {
+                            parts.push(".");
+                        }
+
                         if (tupletNotes[NOTATIONNOTE].length > 1) {
                             parts.push("[");
                         }
 
                         for (let ii = 0; ii < tupletNotes[NOTATIONNOTE].length; ii++) {
                             parts.push(__toABCnote(tupletNotes[NOTATIONNOTE][ii]));
-                            parts.push(" ");
-                        }
-
-                        if (tupletNotes[NOTATIONSTACCATO]) {
-                            parts.push(".");
                         }
 
                         if (tupletNotes[NOTATIONNOTE].length > 1) {
                             parts.push("]");
                         }
 
-                        parts.push(tupletNotes[NOTATIONROUNDDOWN]);
+                        parts.push(__convertDuration(tupletNotes[NOTATIONROUNDDOWN]));
                     }
                     j++; // Jump to next note.
                     k++; // Increment notes in tuplet.
@@ -310,19 +307,19 @@ const processABCNotes = function (logo, turtle) {
                 return j;
             };
 
-            if (obj[NOTATIONTUPLETVALUE] > 0) {
-                if (incompleteTuplet === 0) {
-                    const tupletFraction = toFraction(tupletDuration / targetDuration);
-                    parts.push("(" + tupletFraction[0] + ":" + tupletFraction[1] + "");
-                    i += __processTuplet(logo, turtle, i, obj[NOTATIONTUPLETVALUE]) - 1;
-                } else {
-                    const tupletFraction = toFraction(obj[NOTATIONTUPLETVALUE] / incompleteTuplet);
-                    parts.push("(" + tupletFraction[0] + ":" + tupletFraction[1] + "");
-                    i += __processTuplet(logo, turtle, i, incompleteTuplet) - 1;
-                }
+            if (obj[NOTATIONTUPLETVALUE] !== null) {
+                const inTuplet = obj[NOTATIONTUPLETVALUE][0];
+                const count = incompleteTuplet === 0 ? inTuplet : incompleteTuplet;
 
-                targetDuration = 0;
-                tupletDuration = 0;
+                parts.push(
+                    "(" +
+                        inTuplet +
+                        ":" +
+                        __tupletTime(inTuplet) +
+                        (count === inTuplet ? "" : ":" + count)
+                );
+
+                i += Math.max(1, __processTuplet(logo, turtle, i, count)) - 1;
             } else {
                 if (obj[NOTATIONINSIDECHORD] <= 0) {
                     if (obj[NOTATIONSTACCATO]) {
@@ -384,9 +381,6 @@ const processABCNotes = function (logo, turtle) {
                         parts.push(" ");
                     }
                 }
-
-                targetDuration = 0;
-                tupletDuration = 0;
             }
 
             parts.push(" ");
