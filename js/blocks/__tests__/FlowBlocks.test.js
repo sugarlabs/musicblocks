@@ -108,12 +108,14 @@ global.BaseBlock = BaseBlock;
 global.FlowBlock = FlowBlock;
 global.FlowClampBlock = FlowClampBlock;
 global.ValueBlock = ValueBlock;
+// Field names match the runtime Queue class (js/logo.js): blk, count,
+// parentBlk, args - not child/factor/receivedArg.
 global.Queue = class Queue {
-    constructor(child, factor, parentBlk, receivedArg) {
-        this.child = child;
-        this.factor = factor;
+    constructor(blk, count, parentBlk, args) {
+        this.blk = blk;
+        this.count = count;
         this.parentBlk = parentBlk;
-        this.receivedArg = receivedArg;
+        this.args = args;
     }
 };
 
@@ -383,7 +385,7 @@ describe("FlowBlocks integration", () => {
         ];
         logo.parseArg.mockReturnValue("match");
         listener();
-        expect(activity.turtles.ithTurtle(0).queue[0].child).toBe(12);
+        expect(activity.turtles.ithTurtle(0).queue[0].blk).toBe(12);
 
         // Default path when no case matches
         logo.switchBlocks[0] = [blk];
@@ -395,7 +397,7 @@ describe("FlowBlocks integration", () => {
         ];
         logo.parseArg.mockReturnValue("unknown");
         listener();
-        expect(activity.turtles.ithTurtle(0).queue.pop().child).toBe(77);
+        expect(activity.turtles.ithTurtle(0).queue.pop().blk).toBe(77);
     });
 
     test("SwitchBlock resolves an arg-block selector using the receivedArg it was called with (#8690)", () => {
@@ -427,10 +429,10 @@ describe("FlowBlocks integration", () => {
 
         expect(logo.parseArg).toHaveBeenCalledWith(logo, 0, argBlk, blk, receivedArg);
         const queued = activity.turtles.ithTurtle(0).queue.pop();
-        expect(queued.child).toBe(30);
+        expect(queued.blk).toBe(30);
         // The matched case's own body must also receive receivedArg, so any
         // arg block nested inside it can resolve the action's argument too.
-        expect(queued.receivedArg).toBe(receivedArg);
+        expect(queued.args).toBe(receivedArg);
     });
 
     test("ClampBlock simply forwards flow", () => {
