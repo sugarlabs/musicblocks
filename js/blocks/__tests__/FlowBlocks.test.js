@@ -398,6 +398,41 @@ describe("FlowBlocks integration", () => {
         expect(activity.turtles.ithTurtle(0).queue.pop().child).toBe(77);
     });
 
+    test("SwitchBlock resolves an arg-block selector using the receivedArg it was called with (#8690)", () => {
+        const block = getBlock("switch");
+        const blk = 5;
+        const argBlk = 21;
+        activity.blocks.blockList[blk] = { connections: [null, argBlk] };
+        logo.switchBlocks[0] = [];
+        logo.switchCases[0] = {};
+
+        // Simulate this switch running inside an action call: receivedArg is
+        // the actionArgs array threaded down from the enclosing "do with arg".
+        const receivedArg = ["fromAction"];
+        block.flow([null, 9], logo, 0, blk, receivedArg);
+        const listener = logo.setTurtleListener.mock.calls.pop()[2];
+
+        logo.switchBlocks[0] = [blk];
+        logo.switchCases[0][blk] = [
+            [
+                ["fromAction", 30],
+                ["__default__", 31]
+            ]
+        ];
+        // The mock parseArg only resolves to the 5th (receivedArg) argument,
+        // so this only matches if flow()'s receivedArg reached the listener
+        // and was passed to parseArg in the correct position.
+        logo.parseArg.mockImplementation((...args) => args[4]?.[0] ?? "match");
+        listener();
+
+        expect(logo.parseArg).toHaveBeenCalledWith(logo, 0, argBlk, blk, receivedArg);
+        const queued = activity.turtles.ithTurtle(0).queue.pop();
+        expect(queued.child).toBe(30);
+        // The matched case's own body must also receive receivedArg, so any
+        // arg block nested inside it can resolve the action's argument too.
+        expect(queued.receivedArg).toBe(receivedArg);
+    });
+
     test("ClampBlock simply forwards flow", () => {
         const block = getBlock("clamp");
         expect(block.flow([15])).toEqual([15, 1]);
