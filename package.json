@@ -44,7 +44,7 @@
         "cross-env": "^7.0.3",
         "cypress": "^15.15.0",
         "electron": "41.10.3",
-        "electron-builder": "26.8.1",
+        "electron-builder": "26.15.3",
         "eslint": "^9.0.0",
         "eslint-config-prettier": "^9.0.0",
         "fake-indexeddb": "6.2.5",
@@ -79,7 +79,7 @@
         "jquery": "3.7.1",
         "jquery-ui-dist": "1.12.1",
         "materialize-css": "0.100.2",
-        "postcss": "8.5.18",
+        "postcss": "8.5.28",
         "sass": "1.101.0",
         "tone": "^15.1.22"
     },
@@ -103,11 +103,11 @@
         "electron": "41.10.3",
         "flatted": "3.4.2",
         "lodash": "4.18.1",
-        "brace-expansion": "2.0.3",
+        "brace-expansion": "2.1.4",
         "minimatch@^10.0.0": {
             "brace-expansion": "^5.0.5"
         },
-        "tar": "^7.5.10",
+        "tar": "7.5.22",
         "path-to-regexp": "^8.4.0",
         "picomatch": "^4.0.4",
         "yaml": "^2.8.3",
@@ -123,13 +123,18 @@
         },
         "@isaacs/brace-expansion": "^5.0.1",
         "immutable": "5.1.9",
-        "svgo": "^4.1.0",
-        "@xmldom/xmldom": "^0.8.13",
+        "svgo": "4.1.0",
+        "@xmldom/xmldom": "0.8.15",
         "@gulp-sourcemaps/identity-map": {
-            "postcss": "^8.4.31"
+            "postcss": "8.5.28"
         },
         "body-parser": "2.3.0",
-        "qs": "6.15.3"
+        "qs": "6.16.0",
+        "browserslist": "4.28.9",
+        "baseline-browser-mapping": "2.11.22",
+        "decode-uri-component": "0.5.0",
+        "postcss-selector-parser": "7.1.6",
+        "fast-uri": "3.1.7"
     },
     "lint-staged": {
         "*.{js,mjs}": [
