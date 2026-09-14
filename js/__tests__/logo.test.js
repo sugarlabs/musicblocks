@@ -1954,6 +1954,36 @@ describe("Logo runFromBlockNow", () => {
             expect(mockActivity.textMsg).toHaveBeenCalledWith("width: 77");
             expect(logo.stopTurtle).toBe(true);
         });
+
+        test("standalone arg-block echo forwards the real receivedArg, not a stale logo.receivedArg (#8690)", () => {
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 6;
+            });
+            // logo.receivedArg is left holding a leftover value from some
+            // earlier, unrelated call so a bug that reads that field instead
+            // of the receivedArg passed into this call would be caught.
+            logo.receivedArg = ["stale"];
+            const argSpy = jest.fn((_, __, ___, receivedArg) =>
+                receivedArg ? receivedArg[0] : "MISSING"
+            );
+            logo.blockList = [
+                {
+                    name: "myarg",
+                    value: null,
+                    protoblock: { args: 0, dockTypes: ["anyout"], arg: argSpy },
+                    connections: [],
+                    isValueBlock: () => false,
+                    isArgBlock: () => true
+                }
+            ];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, ["fresh"]);
+
+            expect(argSpy).toHaveBeenCalledWith(logo, 0, 0, ["fresh"]);
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("fresh");
+        });
+
         test("a second value display within 3s extends the valueBarVisible window instead of being cut short", () => {
             jest.useFakeTimers();
             logo.parseArg = jest.fn(() => 77);

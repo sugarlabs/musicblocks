@@ -2089,7 +2089,7 @@ class Logo {
                 currentBlock.isArgBlock() ||
                 ["anyout", "numberout", "textout", "booleanout"].includes(proto.dockTypes[0])
             ) {
-                args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
+                args.push(logo.parseArg(logo, turtle, blk, blk, receivedArg));
 
                 const blockLabels = {
                     width: _("width"),
