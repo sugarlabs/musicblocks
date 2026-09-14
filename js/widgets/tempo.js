@@ -73,19 +73,10 @@ class Tempo {
         this._intervalID = null;
         this.activity.logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
 
-        if (this._intervalID !== null) {
-            if (this.widgetWindow && this.widgetWindow.timerManager) {
-                this.widgetWindow.timerManager.clearInterval(this._intervalID);
-            } else {
-                clearInterval(this._intervalID);
-            }
-        }
-
         if (this._keyHandler) {
             document.removeEventListener("keydown", this._keyHandler, true);
             this._keyHandler = null;
         }
-
         const widgetWindow = window.widgetWindows.windowFor(this, "tempo", "tempo", true);
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
