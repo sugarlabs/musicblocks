@@ -513,7 +513,7 @@ describe("FlowBlocks integration", () => {
         block.flow([false], logo, 0, blk, receivedArg);
 
         const turtle = activity.turtles.ithTurtle(0);
-        expect(turtle.queue[0].receivedArg).toBe(receivedArg);
+        expect(turtle.queue[0].args).toBe(receivedArg);
     });
 
     test("UntilBlock's requeue carries receivedArg forward so a later re-check can still resolve an arg block (#8696)", () => {
@@ -524,7 +524,7 @@ describe("FlowBlocks integration", () => {
         const receivedArg = ["fromAction"];
         block.flow([false, 71], logo, 0, blk, receivedArg);
 
-        expect(activity.turtles.ithTurtle(0).queue.pop().receivedArg).toBe(receivedArg);
+        expect(activity.turtles.ithTurtle(0).queue.pop().args).toBe(receivedArg);
     });
 
     test("WhileBlock's requeue carries receivedArg forward so a later re-check can still resolve an arg block (#8696)", () => {
@@ -535,7 +535,7 @@ describe("FlowBlocks integration", () => {
         const receivedArg = ["fromAction"];
         block.flow([true, 81], logo, 0, blk, receivedArg);
 
-        expect(activity.turtles.ithTurtle(0).queue.pop().receivedArg).toBe(receivedArg);
+        expect(activity.turtles.ithTurtle(0).queue.pop().args).toBe(receivedArg);
     });
 
     test("IfThenElseBlock chooses correct branch", () => {
