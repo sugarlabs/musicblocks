@@ -720,12 +720,13 @@ class Arpeggio {
             if (obj && obj[0] !== -1) {
                 const oldRow = this._rowBlocks.indexOf(obj[0]);
                 const oldCol = this._colBlocks.indexOf(obj[1]);
-                if (oldRow >= 0 && oldCol >= 0) {
-                    const table = docById("arpeggioCellTable" + oldRow);
-                    if (table && table.rows && table.rows[0] && table.rows[0].cells[oldCol]) {
-                        table.rows[0].cells[oldCol].style.backgroundColor =
-                            this._getBackgroundColor(oldRow);
-                    }
+                if (oldRow < 0 || oldCol < 0) {
+                    continue;
+                }
+                const table = docById("arpeggioCellTable" + oldRow);
+                if (table && table.rows && table.rows[0] && table.rows[0].cells[oldCol]) {
+                    table.rows[0].cells[oldCol].style.backgroundColor =
+                        this._getBackgroundColor(oldRow);
                 }
 
                 const numRows = this._rowBlocks.length;
