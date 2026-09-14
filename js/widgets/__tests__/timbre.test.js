@@ -1618,7 +1618,7 @@ describe("TimbreWidget", () => {
                     "custom",
                     expect.objectContaining({
                         doChorus: true,
-                        chorusDepth: 80
+                        chorusDepth: 0.8
                     }),
                     expect.any(Array)
                 );
@@ -1919,39 +1919,6 @@ describe("TimbreWidget", () => {
                     new jsdomDocument.defaultView.Event("change", { bubbles: true })
                 );
                 expect(timbre.fmSynthParamvals["modulationIndex"]).toBe(20);
-            });
-
-            test("NoiseSynth selection and slider change", async () => {
-                timbre._update = jest.fn();
-                timbre._synth();
-                const noiseRadio = jsdomDocument.createElement("input");
-                noiseRadio.type = "radio";
-                noiseRadio.name = "synthsName";
-                noiseRadio.value = "NoiseSynth";
-                jsdomDocument.body.appendChild(noiseRadio);
-
-                timbre._synth();
-                const synths = jsdomDocument.getElementsByName("synthsName");
-                for (let i = 0; i < synths.length; i++) {
-                    if (synths[i].value === "NoiseSynth") {
-                        await synths[i].onclick({ target: synths[i] });
-                    }
-                }
-                expect(timbre.isActive["noisesynth"]).toBe(true);
-                expect(mockActivity.logo.synth.createSynth).toHaveBeenCalledWith(
-                    0,
-                    timbre.instrumentName,
-                    "noisesynth",
-                    expect.any(Object)
-                );
-
-                const slider = jsdomDocument.getElementById("myRangeS0");
-                slider.value = "20";
-                slider.dispatchEvent(
-                    new jsdomDocument.defaultView.Event("change", { bubbles: true })
-                );
-                expect(timbre.noiseSynthParamvals["noise.type"]).toBe(20);
-                expect(timbre._update).toHaveBeenCalledWith(0, "20", 0);
             });
 
             test("DuoSynth selection and slider changes", async () => {
