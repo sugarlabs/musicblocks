@@ -55,6 +55,10 @@ describe("Project persistence", () => {
     });
 
     it("restores a loaded project's blocks after a page reload", () => {
+        // In CI/headless mode the toolbar container (#hideContents) sometimes
+        // stays display:none after a reload, causing clicks on toolbar children
+        // like #load to fail.  Ensure it is visible before interacting.
+        cy.get("#hideContents", { timeout: 10000 }).should("be.visible");
         cy.get("#load").click();
         cy.get("#myOpenFile").selectFile("cypress/fixtures/pi.tb", { force: true });
 
