@@ -46,7 +46,9 @@ describe("Tempo widget", () => {
         // showHelp() on firstTimeUser); dismiss only that dialog, not every
         // open window, so unrelated leftover widget state stays visible.
         cy.get("body").then($body => {
-            const closeButton = $body.find(`${helpDialog} .wftButton.close`);
+            const closeButton = $body.find(
+                `${helpDialog} [role="button"][aria-label="Close window"]`
+            );
             if (closeButton.length) {
                 cy.wrap(closeButton).click({ force: true });
             }
@@ -58,7 +60,9 @@ describe("Tempo widget", () => {
             if ($body.find("#stop").length) {
                 cy.get("#stop").click({ force: true });
             }
-            const closeButton = $body.find(`${tempoDialog} .wftButton.close`);
+            const closeButton = $body.find(
+                `${tempoDialog} [role="button"][aria-label="Close window"]`
+            );
             if (closeButton.length) {
                 cy.wrap(closeButton).click({ force: true });
             }
