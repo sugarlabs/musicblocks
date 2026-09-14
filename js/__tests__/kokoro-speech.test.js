@@ -54,6 +54,23 @@ function fakeAudio() {
     return { audio: new Float32Array(8), sampling_rate: 24000 };
 }
 
+function overrideProperty(target, name, value) {
+    const descriptor = Object.getOwnPropertyDescriptor(target, name);
+    Object.defineProperty(target, name, {
+        configurable: true,
+        enumerable: descriptor ? descriptor.enumerable : true,
+        value,
+        writable: true
+    });
+    return () => {
+        if (descriptor) {
+            Object.defineProperty(target, name, descriptor);
+        } else {
+            delete target[name];
+        }
+    };
+}
+
 // Lets the queue pump run between assertions.
 const settle = () => new Promise(resolve => setTimeout(resolve, 0));
 
@@ -136,6 +153,92 @@ describe("KokoroSpeech", () => {
 
         expect(load).toHaveBeenCalledTimes(1);
         expect(audio.started).toHaveLength(2);
+    });
+
+    test("creates the engine from the verified Kokoro module", async () => {
+        const speech = new KokoroSpeech();
+        const fromPretrained = jest.fn().mockResolvedValue({ generate: jest.fn() });
+        jest.spyOn(speech, "_loadVerifiedModule").mockResolvedValue({
+            KokoroTTS: { from_pretrained: fromPretrained }
+        });
+
+        await speech._ensureEngine();
+
+        expect(fromPretrained).toHaveBeenCalledWith(KokoroSpeech.MODEL_ID, {
+            dtype: KokoroSpeech.DTYPE,
+            device: "wasm",
+            progress_callback: expect.any(Function)
+        });
+    });
+
+    test("verifies every executable asset before importing Kokoro", async () => {
+        const speech = new KokoroSpeech();
+        const assets = KokoroSpeech.ASSETS;
+        const bytes = new ArrayBuffer(8);
+        const fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            arrayBuffer: async () => bytes
+        });
+        const digest = jest
+            .spyOn(KokoroSpeech, "_sha384Hex")
+            .mockResolvedValueOnce(assets.bundle.sha384)
+            .mockResolvedValueOnce(assets.ortModule.sha384)
+            .mockResolvedValueOnce(assets.ortWasm.sha384);
+        const createObjectURL = jest.fn(
+            (blob, index) => `blob:kokoro-${createObjectURL.mock.calls.length}`
+        );
+        const revokeObjectURL = jest.fn();
+        const imported = { KokoroTTS: jest.fn(), env: {} };
+        const importModule = jest
+            .spyOn(speech, "_importVerifiedModule")
+            .mockResolvedValue(imported);
+        const restore = [
+            overrideProperty(globalThis, "fetch", fetch),
+            overrideProperty(globalThis, "crypto", { subtle: {} }),
+            overrideProperty(URL, "createObjectURL", createObjectURL),
+            overrideProperty(URL, "revokeObjectURL", revokeObjectURL)
+        ];
+
+        try {
+            const result = await speech._loadVerifiedModule();
+
+            expect(fetch.mock.calls.map(call => call[0])).toEqual([
+                assets.bundle.url,
+                assets.ortModule.url,
+                assets.ortWasm.url
+            ]);
+            expect(digest).toHaveBeenCalledTimes(3);
+            expect(importModule).toHaveBeenCalledWith("blob:kokoro-1");
+            expect(result.env.wasmPaths).toEqual({
+                mjs: "blob:kokoro-2",
+                wasm: "blob:kokoro-3"
+            });
+        } finally {
+            speech._revokeAssetURLs();
+            restore.reverse().forEach(restoreProperty => restoreProperty());
+        }
+    });
+
+    test("rejects an executable asset whose digest does not match", async () => {
+        const speech = new KokoroSpeech();
+        const asset = KokoroSpeech.ASSETS.bundle;
+        const fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            arrayBuffer: async () => new ArrayBuffer(4)
+        });
+        jest.spyOn(KokoroSpeech, "_sha384Hex").mockResolvedValue("bad-digest");
+        const restore = [
+            overrideProperty(globalThis, "fetch", fetch),
+            overrideProperty(globalThis, "crypto", { subtle: {} })
+        ];
+
+        try {
+            await expect(speech._fetchVerifiedAsset(asset)).rejects.toThrow(
+                "Kokoro asset integrity check failed"
+            );
+        } finally {
+            restore.reverse().forEach(restoreProperty => restoreProperty());
+        }
     });
 
     test("cancel drops everything still queued", async () => {

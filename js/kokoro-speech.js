@@ -19,20 +19,43 @@
  * Speech for the Speak block, using Kokoro, an 82M-parameter neural
  * text-to-speech model that runs entirely in the browser.
  *
- * Nothing here is bundled. kokoro-js is pulled in with a dynamic import the
- * first time a project actually speaks, and the weights are fetched straight
- * from Hugging Face, so dist/ and the service-worker precache are untouched and
- * a child who never uses the Speak block never downloads any of it. The q8
- * build is about 92 MB; Transformers.js parks it in the Cache Storage API, so
- * it is a one-time cost per browser rather than per run.
+ * Nothing here is bundled. The static kokoro-js browser bundle and its ONNX
+ * runtime assets are fetched and verified the first time a project actually
+ * speaks, while the model weights are fetched straight from Hugging Face. This
+ * keeps dist/ and the service-worker precache untouched, and a child who never
+ * uses the Speak block never downloads any of it. The q8 build is about 92 MB;
+ * Transformers.js parks it in the Cache Storage API, so it is a one-time cost
+ * per browser rather than per run.
  *
  * Phrases are queued rather than overlapped: synthesis is slow enough that two
  * Speak blocks in a row would otherwise start talking on top of each other.
  */
 class KokoroSpeech {
-    /** npm package that wraps the model. Pinned so a bad release can't land silently. */
-    static get CDN() {
-        return "https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/+esm";
+    /**
+     * Immutable, hashed browser assets required by kokoro-js.
+     *
+     * The generated jsDelivr +esm entry point has transitive CDN imports, so it
+     * cannot be protected by one digest. These static files are self-contained
+     * and each executable asset is verified before it is imported or configured.
+     */
+    static get ASSETS() {
+        return {
+            bundle: {
+                url: "https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js",
+                sha384: "b2e4754de29ee857bc7d3d27fee4d6a288673c9ae9d73bb7cf46e3e151f66a79a6abbdfdc259854a7305272318b33002",
+                type: "text/javascript"
+            },
+            ortModule: {
+                url: "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1/dist/ort-wasm-simd-threaded.jsep.mjs",
+                sha384: "ec626a1f9bdcf3762ded51f0acc5d333c6cd0abb7f7bff1e0ada24f33941daee5dc2a9a1cd26a4cc29105ab7d8191378",
+                type: "text/javascript"
+            },
+            ortWasm: {
+                url: "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1/dist/ort-wasm-simd-threaded.jsep.wasm",
+                sha384: "bbf6c3b31dfd73ec2dd0b6c798e0b2771b787f28a2837d75f214203937cebeb7e481270ce21468d88c13b65c72a08d36",
+                type: "application/wasm"
+            }
+        };
     }
 
     /** The published ONNX conversion of Kokoro v1.0. */
@@ -75,6 +98,7 @@ class KokoroSpeech {
         this._audioCtx = null;
         this._source = null;
         this._cancelResume = null;
+        this._assetURLs = [];
     }
 
     /**
@@ -99,17 +123,127 @@ class KokoroSpeech {
     _ensureEngine() {
         if (this._enginePromise === null) {
             this._enginePromise = (async () => {
-                // Written this way so bundlers and the AMD loader leave it
-                // alone and the browser resolves the URL at runtime.
-                const { KokoroTTS } = await import(/* webpackIgnore: true */ KokoroSpeech.CDN);
-                return KokoroTTS.from_pretrained(KokoroSpeech.MODEL_ID, {
-                    dtype: KokoroSpeech.DTYPE,
-                    device: "wasm",
-                    progress_callback: progress => this._reportProgress(progress)
-                });
+                const { KokoroTTS } = await this._loadVerifiedModule();
+                try {
+                    return await KokoroTTS.from_pretrained(KokoroSpeech.MODEL_ID, {
+                        dtype: KokoroSpeech.DTYPE,
+                        device: "wasm",
+                        progress_callback: progress => this._reportProgress(progress)
+                    });
+                } catch (e) {
+                    this._revokeAssetURLs();
+                    throw e;
+                }
             })();
         }
         return this._enginePromise;
+    }
+
+    /**
+     * Calculates a SHA-384 digest in the browser's Web Crypto implementation.
+     *
+     * @param {ArrayBuffer} bytes
+     * @returns {Promise<string>} lowercase hexadecimal digest
+     */
+    static async _sha384Hex(bytes) {
+        const digest = await globalThis.crypto.subtle.digest("SHA-384", bytes);
+        return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join(
+            ""
+        );
+    }
+
+    /**
+     * Fetches one executable asset and verifies it before returning its bytes.
+     *
+     * @param {{url: string, sha384: string}} asset
+     * @returns {Promise<ArrayBuffer>}
+     */
+    async _fetchVerifiedAsset(asset) {
+        if (
+            typeof globalThis.fetch !== "function" ||
+            !globalThis.crypto ||
+            !globalThis.crypto.subtle
+        ) {
+            throw new Error("Web Crypto is unavailable; cannot verify the Kokoro voice.");
+        }
+
+        const response = await globalThis.fetch(asset.url, {
+            cache: "force-cache",
+            credentials: "omit"
+        });
+        if (!response.ok) {
+            throw new Error(`Could not download Kokoro asset (${response.status}).`);
+        }
+
+        const bytes = await response.arrayBuffer();
+        const digest = await KokoroSpeech._sha384Hex(bytes);
+        if (digest !== asset.sha384) {
+            throw new Error(`Kokoro asset integrity check failed for ${asset.url}.`);
+        }
+        return bytes;
+    }
+
+    /**
+     * Imports the verified static bundle through a Blob URL. Keeping the URL
+     * alive is required because the bundle may load the ONNX runtime later.
+     *
+     * @param {string} url
+     * @returns {Promise<object>}
+     */
+    _importVerifiedModule(url) {
+        // This URL was created only after _fetchVerifiedAsset checked its digest.
+        return import(/* webpackIgnore: true */ url);
+    }
+
+    /**
+     * Verifies all executable assets, then imports and configures Kokoro.
+     *
+     * @returns {Promise<{KokoroTTS: Function, env: object}>}
+     */
+    async _loadVerifiedModule() {
+        const assets = KokoroSpeech.ASSETS;
+        const [bundleBytes, ortModuleBytes, ortWasmBytes] = await Promise.all([
+            this._fetchVerifiedAsset(assets.bundle),
+            this._fetchVerifiedAsset(assets.ortModule),
+            this._fetchVerifiedAsset(assets.ortWasm)
+        ]);
+        const urls = [];
+
+        try {
+            urls.push(URL.createObjectURL(new Blob([bundleBytes], { type: assets.bundle.type })));
+            urls.push(
+                URL.createObjectURL(new Blob([ortModuleBytes], { type: assets.ortModule.type }))
+            );
+            urls.push(URL.createObjectURL(new Blob([ortWasmBytes], { type: assets.ortWasm.type })));
+            this._assetURLs = urls;
+
+            const module = await this._importVerifiedModule(urls[0]);
+            if (!module || typeof module.KokoroTTS !== "function" || !module.env) {
+                throw new Error("The verified Kokoro bundle has an unexpected API.");
+            }
+            module.env.wasmPaths = { mjs: urls[1], wasm: urls[2] };
+            return module;
+        } catch (e) {
+            this._revokeAssetURLs(urls);
+            throw e;
+        }
+    }
+
+    /**
+     * Releases Blob URLs after a failed engine initialization.
+     *
+     * @param {string[]} [urls]
+     * @returns {void}
+     */
+    _revokeAssetURLs(urls = this._assetURLs) {
+        if (typeof URL.revokeObjectURL === "function") {
+            for (const url of urls) {
+                URL.revokeObjectURL(url);
+            }
+        }
+        if (urls === this._assetURLs) {
+            this._assetURLs = [];
+        }
     }
 
     /**
