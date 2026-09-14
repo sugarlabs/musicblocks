@@ -49,6 +49,9 @@ class Tempo {
         this.BPMInputs = [];
         this.BPMBlocks = [];
         this.tempoCanvases = [];
+        this.activeBPMIndex = 0;
+        this._keyHandler = null;
+        this.pauseBtn = null;
     }
 
     init(activity) {
@@ -78,12 +81,24 @@ class Tempo {
             }
         }
 
+        if (this._keyHandler) {
+            document.removeEventListener("keydown", this._keyHandler, true);
+            this._keyHandler = null;
+        }
+
         const widgetWindow = window.widgetWindows.windowFor(this, "tempo", "tempo", true);
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        if (typeof widgetWindow.takeFocus === "function") {
+            widgetWindow.takeFocus();
+        }
 
         widgetWindow.onclose = () => {
+            if (this._keyHandler) {
+                document.removeEventListener("keydown", this._keyHandler, true);
+                this._keyHandler = null;
+            }
             if (this._intervalID !== null) {
                 widgetWindow.timerManager.clearInterval(this._intervalID);
             }
@@ -91,6 +106,7 @@ class Tempo {
         };
 
         const pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, _("Pause"));
+        this.pauseBtn = pauseBtn;
         pauseBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
@@ -176,6 +192,9 @@ class Tempo {
             )(i);
 
             this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
+            this.BPMInputs[i].addEventListener("focus", () => {
+                this.activeBPMIndex = i;
+            });
             this.tempoCanvases[i] = document.createElement("canvas");
             this.tempoCanvases[i].style.width = Tempo.TEMPOWIDTH + "px";
             this.tempoCanvases[i].style.height = Tempo.TEMPOHEIGHT + "px";
@@ -187,6 +206,7 @@ class Tempo {
 
             // The tempo can be set from the interval between successive clicks on the canvas.
             this.tempoCanvases[i].onclick = (id => () => {
+                this.activeBPMIndex = id;
                 const d = new Date();
                 let newBPM, BPMInput;
                 if (this._firstClickTime === null) {
@@ -208,12 +228,88 @@ class Tempo {
             this.BPMInputs[i].addEventListener(
                 "keyup",
                 (id => e => {
+                    this.activeBPMIndex = id;
                     if (e.key === "Enter") {
                         this._useBPM(id);
                     }
                 })(i)
             );
         }
+
+        this._keyHandler = event => {
+            if (
+                typeof window === "undefined" ||
+                !window.widgetWindows ||
+                window.widgetWindows.focused !== widgetWindow
+            ) {
+                return;
+            }
+
+            if (
+                this.activity &&
+                this.activity.blocks &&
+                this.activity.blocks.activeBlock !== null &&
+                this.activity.blocks.activeBlock !== undefined
+            ) {
+                return;
+            }
+
+            const activeElement = document.activeElement;
+            if (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.isContentEditable)
+            ) {
+                return;
+            }
+
+            if (
+                activeElement &&
+                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT")
+            ) {
+                return;
+            }
+
+            if (!this.BPMs || this.BPMs.length === 0) {
+                return;
+            }
+
+            const id =
+                this.activeBPMIndex >= 0 && this.activeBPMIndex < this.BPMs.length
+                    ? this.activeBPMIndex
+                    : 0;
+
+            if (event.key === "ArrowUp" || event.code === "ArrowUp" || event.keyCode === 38) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.shiftKey) {
+                    this.speedUp(id);
+                } else {
+                    this.speedUp(id, 1);
+                }
+                return;
+            }
+
+            if (event.key === "ArrowDown" || event.code === "ArrowDown" || event.keyCode === 40) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.shiftKey) {
+                    this.slowDown(id);
+                } else {
+                    this.slowDown(id, 1);
+                }
+                return;
+            }
+
+            if (event.key === " " || event.code === "Space" || event.keyCode === 32) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.togglePlayPause();
+            }
+        };
+
+        document.addEventListener("keydown", this._keyHandler, true);
 
         this.activity.textMsg(_("Adjust the tempo with the buttons."), 3000);
         this.resume();
@@ -229,9 +325,12 @@ class Tempo {
     _updateBPM(i) {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
-        if (this.BPMBlocks[i] === null) return;
+        if (!this.BPMBlocks || this.BPMBlocks[i] === null || this.BPMBlocks[i] === undefined) {
+            return;
+        }
 
         const bpmBlock = this.activity.blocks.blockList[this.BPMBlocks[i]];
+        if (!bpmBlock) return;
         const blockNumber = bpmBlock.connections[1];
         if (blockNumber !== null) {
             this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
@@ -327,11 +426,29 @@ class Tempo {
 
     /**
      * @public
-     * @param {number} i
      * @returns {void}
      */
-    speedUp(i) {
-        this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
+    togglePlayPause() {
+        if (this.pauseBtn && typeof this.pauseBtn.onclick === "function") {
+            this.pauseBtn.onclick();
+        } else if (this.isMoving) {
+            this.pause();
+            this.isMoving = false;
+        } else {
+            this.resume();
+            this.isMoving = true;
+        }
+    }
+
+    /**
+     * @public
+     * @param {number} i
+     * @param {number} [step]
+     * @returns {void}
+     */
+    speedUp(i, step) {
+        const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
+        this.BPMs[i] = parseFloat(this.BPMs[i]) + delta;
 
         if (this.BPMs[i] > 1000) {
             this.activity.errorMsg(_("The beats per minute must be below 1000."), 3000);
@@ -345,10 +462,12 @@ class Tempo {
     /**
      * @public
      * @param {number} i
+     * @param {number} [step]
      * @returns {void}
      */
-    slowDown(i) {
-        this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
+    slowDown(i, step) {
+        const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
+        this.BPMs[i] = parseFloat(this.BPMs[i]) - delta;
         if (this.BPMs[i] < 30) {
             this.activity.errorMsg(_("The beats per minute must be above 30"), 3000);
             this.BPMs[i] = 30;

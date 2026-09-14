@@ -675,6 +675,14 @@ describe("setupPitchBlocks", () => {
         });
     });
 
+    describe("OutputToolsBlocks null-connection repro", () => {
+        it("arg does not crash when the note input is unconnected", () => {
+            const block = createdBlocks["outputtools"];
+            activity.blocks.blockList[10].connections[1] = null;
+            expect(block.arg(logo, 0, 10)).toBe("G4");
+        });
+    });
+
     describe("StaffYToPitch", () => {
         it("arg with all connection combinations", () => {
             const block = createdBlocks["ytopitch"];
