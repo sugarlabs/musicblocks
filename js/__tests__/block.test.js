@@ -1010,6 +1010,28 @@ describe("Block Foundation", () => {
             expect(order).toEqual(["restore", "sync-grid", "query-trash", "dock", "adjust"]);
         });
 
+        it("sends a moved block to trash without waiting for the highlight", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.textMsg = jest.fn();
+            block.activity.trashcan = {
+                hide: jest.fn(),
+                isVisible: false,
+                overTrashcan: jest.fn().mockReturnValue(true)
+            };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.sendStackToTrash = jest.fn();
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+
+            block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true);
+
+            expect(mockBlocks.sendStackToTrash).toHaveBeenCalledWith(block);
+        });
+
         it("does not reconcile a clean grid", () => {
             const block = new Block(mockProtoBlock, mockBlocks);
             block.blockIndex = 0;

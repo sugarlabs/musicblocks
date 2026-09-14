@@ -192,25 +192,8 @@ class Trashcan {
         }
 
         this._inAnimation = true;
-
-        this._animationInterval = setInterval(() => {
-            this._animationLevel += 20;
-            if (this._animationLevel >= this.animationTime) {
-                this.isVisible = true;
-                this._makeBorderHighlight(true); // Make it active.
-                this.activity.refreshCanvas();
-                clearInterval(this._animationInterval); // Autostop animation.
-                return;
-            }
-
-            this._highlightPower = parseInt(
-                255 - 255 * (this._animationLevel / this.animationTime),
-                10
-            );
-            this._makeBorderHighlight(false);
-            this.activity.refreshCanvas();
-        }, 20);
-
+        this.isVisible = true;
+        this._makeBorderHighlight(true);
         this._switchHighlightVisibility(true);
     }
 
