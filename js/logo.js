@@ -1539,6 +1539,9 @@ class Logo {
         this.stepQueue = {};
         for (const turtle of this.turtles.turtleList) {
             turtle.unhighlightQueue = [];
+            if (turtle.singer) {
+                turtle.singer._unhighlightTimers = {};
+            }
             if (turtle.delayTimeout !== null) {
                 clearTimeout(turtle.delayTimeout);
                 turtle.delayTimeout = null;
