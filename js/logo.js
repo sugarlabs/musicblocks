@@ -1607,6 +1607,10 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        // Drop any speech the previous run left queued immediately, including
+        // while the optional performance tracker is still loading.
+        this._cancelSpeech();
+
         const performanceModeEnabled =
             typeof window !== "undefined" &&
             (window.DEBUG_PERFORMANCE === true || _performanceRequestedInURL());
@@ -1648,10 +1652,6 @@ class Logo {
         // Reset run-state flags for the new execution.
         this._alreadyRunning = false;
         this._prematureRestart = false;
-
-        // Drop any speech the previous run left queued, so pressing Run twice
-        // doesn't leave the old phrases talking over the new ones.
-        this._cancelSpeech();
 
         // eslint-disable-next-line eqeqeq
         if (this._lastNoteTimeout != null) {

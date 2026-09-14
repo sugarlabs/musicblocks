@@ -3172,13 +3172,39 @@ describe("Logo.processSpeak", () => {
             expect(utterances.map(u => u.text)).toEqual(["first", "second"]);
         });
 
-        test("clears queued speech when a run starts or Stop is pressed", () => {
+        test("clears queued speech when Stop is pressed", () => {
             installSpeechSynthesis();
             logo.processSpeak("left over from the last run");
             expect(cancelMock).not.toHaveBeenCalled();
 
-            logo._cancelSpeech();
+            logo.doStopTurtles();
+
             expect(cancelMock).toHaveBeenCalledTimes(1);
+        });
+
+        test("cancels speech before waiting for the performance tracker", () => {
+            installSpeechSynthesis();
+            logo.processSpeak("left over from the last run");
+            const requirejsSpy = jest.fn();
+            const originalRequirejs = global.requirejs;
+            const savedTracker = global.performanceTracker;
+            global.requirejs = requirejsSpy;
+            delete global.performanceTracker;
+            window.history.pushState({}, "", "/?performance=true");
+
+            try {
+                logo.runLogoCommands(null, null);
+
+                expect(cancelMock).toHaveBeenCalledTimes(1);
+                expect(requirejsSpy).toHaveBeenCalledWith(
+                    ["utils/performanceTracker"],
+                    expect.any(Function),
+                    expect.any(Function)
+                );
+            } finally {
+                global.requirejs = originalRequirejs;
+                global.performanceTracker = savedTracker;
+            }
         });
 
         test("cancelling speech is safe when the API is unavailable", () => {

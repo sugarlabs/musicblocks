@@ -74,6 +74,7 @@ class KokoroSpeech {
 
         this._audioCtx = null;
         this._source = null;
+        this._cancelResume = null;
     }
 
     /**
@@ -153,6 +154,11 @@ class KokoroSpeech {
     cancel() {
         this._token += 1;
         this._queue.length = 0;
+
+        if (this._cancelResume !== null) {
+            this._cancelResume();
+            this._cancelResume = null;
+        }
 
         if (this._source !== null) {
             try {
@@ -249,27 +255,46 @@ class KokoroSpeech {
      * @param {number} token - the cancel token this phrase belongs to
      * @returns {Promise<void>}
      */
-    _play(audio, token) {
+    async _play(audio, token) {
         const samples = audio.audio;
         const rate = audio.sampling_rate;
         if (!samples || !samples.length) {
-            return Promise.resolve();
+            return;
         }
 
         if (this._audioCtx === null) {
             const Ctx = window.AudioContext || window.webkitAudioContext;
             if (!Ctx) {
                 this._unavailable = true;
-                return Promise.resolve();
+                return;
             }
             this._audioCtx = new Ctx();
         }
         const ctx = this._audioCtx;
 
-        // Autoplay policy parks the context until a gesture; pressing Run is
-        // one, so this resolves in practice.
         if (ctx.state === "suspended" && typeof ctx.resume === "function") {
-            ctx.resume();
+            let cancelResume;
+            const cancelled = new Promise(resolve => {
+                cancelResume = () => resolve(false);
+            });
+            this._cancelResume = cancelResume;
+
+            const resumed = Promise.resolve()
+                .then(() => ctx.resume())
+                .then(
+                    () => true,
+                    () => false
+                );
+            const canPlay = await Promise.race([resumed, cancelled]);
+
+            if (this._cancelResume === cancelResume) {
+                this._cancelResume = null;
+            }
+            if (!canPlay || token !== this._token) {
+                return;
+            }
+        } else if (token !== this._token) {
+            return;
         }
 
         const buffer = ctx.createBuffer(1, samples.length, rate);
@@ -291,7 +316,14 @@ class KokoroSpeech {
                 resolve();
                 return;
             }
-            source.start();
+            try {
+                source.start();
+            } catch (e) {
+                if (this._source === source) {
+                    this._source = null;
+                }
+                resolve();
+            }
         });
     }
 }

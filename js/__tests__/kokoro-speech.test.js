@@ -10,13 +10,13 @@ const { KokoroSpeech } = require("../kokoro-speech");
 
 // A fake Web Audio graph. Sources record when they start and let the test decide
 // when playback "finishes".
-function installAudio() {
+function installAudio({ state = "running", resume = jest.fn() } = {}) {
     const started = [];
     const pending = [];
 
     global.window.AudioContext = function () {
-        this.state = "running";
-        this.resume = jest.fn();
+        this.state = state;
+        this.resume = resume;
         this.destination = {};
         this.createBuffer = (channels, length, rate) => ({
             length,
@@ -170,6 +170,66 @@ describe("KokoroSpeech", () => {
 
         speech.cancel();
         expect(source.stop).toHaveBeenCalled();
+    });
+
+    test("waits for a suspended audio context before starting playback", async () => {
+        let finishResume;
+        const resume = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    finishResume = resolve;
+                })
+        );
+        audio = installAudio({ state: "suspended", resume });
+        const speech = new KokoroSpeech();
+        jest.spyOn(speech, "_ensureEngine").mockResolvedValue({
+            generate: async () => fakeAudio()
+        });
+
+        speech.speak("wait for audio");
+        await settle();
+
+        expect(resume).toHaveBeenCalledTimes(1);
+        expect(audio.started).toHaveLength(0);
+
+        finishResume();
+        await settle();
+
+        expect(audio.started).toHaveLength(1);
+    });
+
+    test("cancel settles playback while the audio context is resuming", async () => {
+        const resume = jest.fn(() => new Promise(() => {}));
+        audio = installAudio({ state: "suspended", resume });
+        const speech = new KokoroSpeech();
+        jest.spyOn(speech, "_ensureEngine").mockResolvedValue({
+            generate: async () => fakeAudio()
+        });
+
+        speech.speak("do not play this");
+        await settle();
+        speech.cancel();
+        await settle();
+
+        expect(resume).toHaveBeenCalledTimes(1);
+        expect(audio.started).toHaveLength(0);
+        expect(speech._pumping).toBe(false);
+    });
+
+    test("ends cleanly when a suspended audio context cannot resume", async () => {
+        const resume = jest.fn(() => Promise.reject(new Error("blocked")));
+        audio = installAudio({ state: "suspended", resume });
+        const speech = new KokoroSpeech();
+        jest.spyOn(speech, "_ensureEngine").mockResolvedValue({
+            generate: async () => fakeAudio()
+        });
+
+        speech.speak("browser blocked audio");
+        await settle();
+
+        expect(resume).toHaveBeenCalledTimes(1);
+        expect(audio.started).toHaveLength(0);
+        expect(speech._pumping).toBe(false);
     });
 
     test("cancel is safe when nothing has been spoken", () => {
