@@ -1639,6 +1639,29 @@ describe("Tap Tempo feature", () => {
         expect(tempoWidget.BPMs[1]).toBe(150);
     });
 
+    test("clicking different pendulum canvases resets _firstClickTime per track", () => {
+        tempoWidget.BPMs = [90, 90];
+        tempoWidget.init(mockActivity);
+
+        jest.setSystemTime(1000);
+        tempoWidget.tempoCanvases[0].onclick();
+        expect(tempoWidget._firstClickTime).toBe(1000);
+        expect(tempoWidget._lastCanvasIndex).toBe(0);
+
+        // Clicking canvas 1 resets _firstClickTime and captures its own time
+        jest.setSystemTime(1500);
+        tempoWidget.tempoCanvases[1].onclick();
+        expect(tempoWidget._firstClickTime).toBe(1500);
+        expect(tempoWidget._lastCanvasIndex).toBe(1);
+        expect(tempoWidget.BPMs[1]).toBe(90);
+
+        // Second click on canvas 1 calculates BPM normally
+        jest.setSystemTime(2000);
+        tempoWidget.tempoCanvases[1].onclick();
+        expect(tempoWidget.BPMs[1]).toBe(120);
+        expect(tempoWidget._firstClickTime).toBeNull();
+    });
+
     test("clamps BPM to upper limit of 1000 for extremely fast taps", () => {
         jest.setSystemTime(1000);
         tempoWidget.tapTempo(0);

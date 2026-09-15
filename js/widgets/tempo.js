@@ -56,6 +56,7 @@ class Tempo {
         this._tapTimes = [];
         this._tapTimeout = null;
         this._lastTapIndex = null;
+        this._lastCanvasIndex = null;
     }
 
     init(activity) {
@@ -67,6 +68,7 @@ class Tempo {
         this._intervals = [];
         this._tapTimes = [];
         this._lastTapIndex = null;
+        this._lastCanvasIndex = null;
         if (this._tapTimeout) {
             clearTimeout(this._tapTimeout);
             this._tapTimeout = null;
@@ -229,6 +231,10 @@ class Tempo {
             this.tempoCanvases[i].style.cursor = "pointer";
             this.tempoCanvases[i].title = _("Click to tap tempo");
             this.tempoCanvases[i].onclick = (id => () => {
+                if (this._lastCanvasIndex !== id) {
+                    this._firstClickTime = null;
+                    this._lastCanvasIndex = id;
+                }
                 this.activeBPMIndex = id;
                 const d = new Date();
                 let newBPM, BPMInput;
