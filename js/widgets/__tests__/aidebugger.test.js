@@ -93,7 +93,16 @@ describe("AIDebuggerWidget", () => {
         test("resolves BACKEND_CONFIG for subdomain match", () => {
             withHostname("app.musicblocks.sugarlabs.org", () => {
                 const widget = new AIDebuggerWidget();
-                expect(widget.chatHistory).toBeDefined();
+                widget.activity = { textMsg: jest.fn(), prepareExport: jest.fn(() => "[]") };
+                widget.chatLog = document.createElement("div");
+                global.fetch.mockImplementation(() =>
+                    Promise.resolve({ ok: true, json: () => Promise.resolve({ response: "ok" }) })
+                );
+                widget._sendToBackend("test");
+                expect(global.fetch).toHaveBeenCalledWith(
+                    expect.stringContaining("https://api.musicblocks.sugarlabs.org"),
+                    expect.anything()
+                );
             });
         });
 
@@ -669,6 +678,7 @@ describe("AIDebuggerWidget", () => {
 
             debuggerWidget._hideTypingIndicator();
             expect(debuggerWidget.chatLog.querySelector(".typing-indicator")).toBeNull();
+            expect(jest.getTimerCount()).toBe(0);
         });
     });
 
