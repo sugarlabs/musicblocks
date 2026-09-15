@@ -18,8 +18,85 @@
  */
 
 const saveMxmlOutput = require("../mxml");
+global.getMidiDrum = () => ({ "snare drum": 38, "kick drum": 36 });
 
 describe("saveMxmlOutput", () => {
+    it("exports a drum-only note as unpitched percussion rather than only a rest", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: { 0: [[["R"], 4, 0, null, null, false, false, "snare drum"]] }
+            }
+        });
+
+        expect(output).toContain('<score-part id="D1">');
+        expect(output).toContain('<part id="D1">');
+        expect(output).not.toContain('<part id="P1">');
+        expect(output).toContain("<sign>percussion</sign>");
+        expect(output).toContain("<instrument-name>snare drum</instrument-name>");
+        expect(output).toContain("<midi-unpitched>39</midi-unpitched>");
+        expect(output).toMatch(
+            /<unpitched\/>\s*<duration>8<\/duration>\s*<instrument id="D1-X1"\/>/
+        );
+    });
+
+    it("keeps pitched notes and sequential drum identities in separate aligned parts", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C4"], 4, 0, null, null, false, false, "snare drum"],
+                        [["D4"], 4, 0, null, null, false, false, "kick drum"]
+                    ]
+                }
+            }
+        });
+
+        const pitched = output.split('<part id="P1">')[1].split("</part>")[0];
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+        expect(pitched).toContain("<step>C</step>");
+        expect(pitched).toContain("<step>D</step>");
+        expect(pitched).not.toContain("<unpitched/>");
+        expect(percussion.match(/<unpitched\/>/g)).toHaveLength(2);
+        expect(percussion).toContain('<instrument id="D1-X1"/>');
+        expect(percussion).toContain('<instrument id="D1-X2"/>');
+        expect(output).toContain("<midi-unpitched>37</midi-unpitched>");
+        expect(output.indexOf('<score-instrument id="D1-X2">')).toBeLessThan(
+            output.indexOf('<midi-instrument id="D1-X1">')
+        );
+    });
+
+    it("keeps a silent interval before a later drum hit", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["R"], 4, 0, null, null, false, false, null],
+                        [["R"], 4, 0, null, null, false, false, "snare drum"]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(percussion).toMatch(/<rest\/>\s*<duration>8<\/duration>/);
+        expect(percussion).toMatch(/<unpitched\/>\s*<duration>8<\/duration>/);
+    });
+
+    it("exports an unmapped custom drum without an invalid MIDI assignment", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [[["R"], 4, 0, null, null, false, false, "https://example.org/#12&x"]]
+                }
+            }
+        });
+
+        expect(output).toContain("<unpitched/>");
+        expect(output).toContain("<instrument-name>Percussion</instrument-name>");
+        expect(output).not.toContain("<midi-unpitched>");
+        expect(output).not.toContain("example.org");
+    });
+
     it("should return a valid XML string for a basic input", () => {
         const logo = {
             notation: {

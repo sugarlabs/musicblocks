@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global saveMxmlOutput:writable,voiceNum:writable */
+/* global getMidiDrum,saveMxmlOutput:writable,voiceNum:writable */
 /* exported saveMxmlOutput */
 
 // Indices into a notationStaging entry that this file cares about beyond the note-value
@@ -18,6 +18,7 @@
 // globals) because mxml.js is loaded as a standalone module in tests, without those globals.
 const MXML_TUPLETVALUE = 3;
 const MXML_ROUNDDOWN = 4;
+const MXML_DRUM = 7;
 
 const _gcd = (a, b) => (b === 0 ? a : _gcd(b, a % b));
 const _lcm = (a, b) => (a * b) / _gcd(a, b);
@@ -88,11 +89,45 @@ saveMxmlOutput = logo => {
         add("</direction>");
     };
 
-    const addMeasureAttributes = (measure, div, beats, beatType) => {
+    const addMeasureAttributes = (measure, div, beats, beatType, isPercussion) => {
         add(
-            `<measure number="${measure}"> <attributes> <divisions>${div}</divisions> <key> <fifths>0</fifths> </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
+            isPercussion
+                ? `<measure number="${measure}"> <attributes> <divisions>${div}</divisions> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef> <sign>percussion</sign> </clef> </attributes>`
+                : `<measure number="${measure}"> <attributes> <divisions>${div}</divisions> <key> <fifths>0</fifths> </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
         );
     };
+
+    const parts = [];
+    Object.keys(logo.notation.notationStaging).forEach(voice => {
+        const notes = logo.notation.notationStaging[voice];
+        if (notes.length === 0) return;
+        voiceNum = parseInt(voice, 10) + 1;
+        const drums = [
+            ...new Set(
+                notes
+                    .filter(Array.isArray)
+                    .map(entry => entry[MXML_DRUM])
+                    .filter(Boolean)
+            )
+        ];
+        if (
+            drums.length === 0 ||
+            notes.some(entry => Array.isArray(entry) && entry[0].some(pitch => pitch[0] !== "R"))
+        ) {
+            parts.push({ id: `P${voiceNum}`, notes, isPercussion: false });
+        }
+        if (drums.length === 0) return;
+        const instruments = new Map(
+            drums.map((name, index) => [name, `D${voiceNum}-X${index + 1}`])
+        );
+        const drumNotes = notes.map(entry => {
+            if (!Array.isArray(entry)) return entry;
+            const drumEntry = entry.slice();
+            drumEntry[0] = [entry[MXML_DRUM] || "R"];
+            return drumEntry;
+        });
+        parts.push({ id: `D${voiceNum}`, notes: drumNotes, isPercussion: true, instruments });
+    });
 
     add("<?xml version='1.0' encoding='UTF-8'?>");
     add(
@@ -103,12 +138,37 @@ saveMxmlOutput = logo => {
     add("<part-list>");
     indent++;
 
-    Object.keys(logo.notation.notationStaging).forEach(voice => {
-        if (logo.notation.notationStaging[voice].length === 0) return;
-        voiceNum = parseInt(voice, 10) + 1;
-        add(`<score-part id="P${voiceNum}">`);
+    parts.forEach(part => {
+        add(`<score-part id="${part.id}">`);
         indent++;
-        add(`<part-name> Voice #${voiceNum} </part-name>`);
+        add(
+            part.isPercussion
+                ? "<part-name>Percussion</part-name>"
+                : `<part-name> Voice #${part.id.slice(1)} </part-name>`
+        );
+        if (part.isPercussion) {
+            part.instruments.forEach((id, name) => {
+                const midiNote = getMidiDrum()[name];
+                add(`<score-instrument id="${id}">`);
+                indent++;
+                add(
+                    `<instrument-name>${Number.isInteger(midiNote) ? name : "Percussion"}</instrument-name>`
+                );
+                indent--;
+                add("</score-instrument>");
+            });
+            part.instruments.forEach((id, name) => {
+                const midiNote = getMidiDrum()[name];
+                if (Number.isInteger(midiNote)) {
+                    add(`<midi-instrument id="${id}">`);
+                    indent++;
+                    add("<midi-channel>10</midi-channel>");
+                    add(`<midi-unpitched>${midiNote + 1}</midi-unpitched>`);
+                    indent--;
+                    add("</midi-instrument>");
+                }
+            });
+        }
         indent--;
         add("</score-part>");
     });
@@ -116,14 +176,12 @@ saveMxmlOutput = logo => {
     add("</part-list>");
     indent--;
 
-    Object.keys(logo.notation.notationStaging).forEach(voice => {
-        if (logo.notation.notationStaging[voice].length === 0) return;
-        voiceNum = parseInt(voice, 10) + 1;
+    parts.forEach(part => {
         indent++;
-        add(`<part id="P${voiceNum}">`);
+        add(`<part id="${part.id}">`);
         indent++;
 
-        const notes = logo.notation.notationStaging[voice];
+        const notes = part.notes;
         // Scaled once per voice so every tuplet note in it gets an exact <duration>
         // instead of a rounded one; identical to DIVISIONS_PER_WHOLE_NOTE (32, this
         // file's long-standing resolution) when the voice has no tuplets at all.
@@ -252,7 +310,8 @@ saveMxmlOutput = logo => {
                                 currMeasure,
                                 divisionsPerQuarterNote,
                                 beats,
-                                beatType
+                                beatType,
+                                part.isPercussion
                             );
                             firstMeasure = false;
                         } else if (beatsChanged) {
@@ -264,7 +323,8 @@ saveMxmlOutput = logo => {
                                 currMeasure,
                                 divisionsPerQuarterNote,
                                 newBeats,
-                                newBeatType
+                                newBeatType,
+                                part.isPercussion
                             );
                             beatsChanged = false;
                         } else {
@@ -285,8 +345,10 @@ saveMxmlOutput = logo => {
                 indent++;
                 if (isChordNote) add("<chord/>");
 
-                if (p[0] === "R") {
+                if (part.isPercussion ? !obj[MXML_DRUM] : p[0] === "R") {
                     add("<rest/>");
+                } else if (part.isPercussion) {
+                    add("<unpitched/>");
                 } else {
                     add("<pitch>");
                     indent++;
@@ -298,6 +360,9 @@ saveMxmlOutput = logo => {
                 }
 
                 add(`<duration>${dur}</duration>`);
+                if (part.isPercussion && obj[MXML_DRUM]) {
+                    add(`<instrument id="${part.instruments.get(p)}"/>`);
+                }
                 if (notes[i + 1] === "tie") {
                     add('<tie type="start"/>');
                 } else if (notes[i - 1] === "tie") {

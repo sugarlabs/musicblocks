@@ -143,6 +143,8 @@ class Notation {
         const obj = durationToNoteValue(duration);
 
         const tur = this.activity.turtles.ithTurtle(turtle);
+        const drumName = drum[0];
+        const isNotatedDrum = drumName && !["noise1", "noise2", "noise3"].includes(drumName);
 
         this._notationStaging[turtle].push([
             note,
@@ -151,7 +153,8 @@ class Notation {
             obj[2],
             obj[3],
             insideChord,
-            tur.singer.staccato.length > 0 && last(tur.singer.staccato) > 0
+            tur.singer.staccato.length > 0 && last(tur.singer.staccato) > 0,
+            isNotatedDrum ? drumName : null
         ]);
 
         // If no drum is specified, add a rest to the drum line.
@@ -166,8 +169,8 @@ class Notation {
                 insideChord,
                 false
             ]);
-        } else if (!["noise1", "noise2", "noise3"].includes(drum[0])) {
-            const drumSymbol = getDrumSymbol(drum[0]);
+        } else if (isNotatedDrum) {
+            const drumSymbol = getDrumSymbol(drumName);
             this._notationDrumStaging[turtle].push([
                 [drumSymbol],
                 obj[0],
