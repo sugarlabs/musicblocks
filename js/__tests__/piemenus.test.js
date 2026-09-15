@@ -247,6 +247,28 @@ describe("piemenus behavioral tests", () => {
         expect(mockBlock._exitWheel).toBeDefined();
     });
 
+    test("piemenuPitches works for a note name block with no parent", async () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        // A note name block dragged out on its own has a null parent.
+        mockBlock.connections = [null];
+
+        expect(() =>
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "G", "")
+        ).not.toThrow();
+
+        mockBlock._pitchWheel.selectedNavItemIndex = 0;
+        mockBlock._pitchWheel.navItems[0].title = "C";
+        await mockBlock._pitchWheel.navItems[0].navigateFunction();
+
+        mockBlock._accidentalsWheel.selectedNavItemIndex = 0;
+        mockBlock._accidentalsWheel.navItems[0].title = "♮";
+
+        expect(() => mockBlock._exitWheel.navItems[0].navigateFunction()).not.toThrow();
+        expect(mockBlock.value).toBe("C");
+    });
+
     test("pitch wrapping logic generic application (7 notes)", async () => {
         const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
         const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
