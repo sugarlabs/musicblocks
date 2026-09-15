@@ -137,11 +137,13 @@ const createBaseSandbox = () => ({
  */
 const loadActivitySandbox = ({ overrides = {}, prependCode = "" } = {}) => {
     const sandbox = { ...createBaseSandbox(), ...overrides };
-    const code = instrumentForCoverage(
-        fs.readFileSync(ACTIVITY_PATH, "utf8") +
-            "\nthis.activity = activity;\nthis.Activity = Activity;",
-        ACTIVITY_PATH
-    );
+    // Instrument the source on its own, then append the bootstrap statements.
+    // Concatenating them first would hand them to the instrumenter as part of
+    // activity.js, and they would be counted — and always reported as covered —
+    // against a file they are not in.
+    const code =
+        instrumentForCoverage(fs.readFileSync(ACTIVITY_PATH, "utf8"), ACTIVITY_PATH) +
+        "\nthis.activity = activity;\nthis.Activity = Activity;";
 
     // The instrumented code increments counters on __coverage__. Point the
     // context at jest's own global so the reporter reads the same object.
