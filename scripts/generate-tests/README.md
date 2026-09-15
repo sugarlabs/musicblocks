@@ -68,7 +68,7 @@ write                  (write-generated.js - one path, never overwrites; --write
 Jest                   (npm test - the candidate becomes a real test only once it runs green)
 ```
 
-**Generate → Review → Validate → Write → Run Jest**, in the order they actually
+**Generate → Validate → Review → Write → Run Jest**, in the order they actually
 run (validation happens before the report is built, since the report only
 describes what the validator already decided):
 
