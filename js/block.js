@@ -32,7 +32,7 @@
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
    retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
-    topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
+    updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
  */
 
@@ -3149,6 +3149,7 @@ class Block {
                     piemenuBlockContext(that);
                     return;
                 } else if ("shiftKey" in event.nativeEvent && event.nativeEvent.shiftKey) {
+                    const topBlock = that.blocks.findTopBlock(thisBlock);
                     if (that.activity.turtles.running()) {
                         that.activity.logo.doStopTurtles();
 
