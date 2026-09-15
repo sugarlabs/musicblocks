@@ -282,7 +282,7 @@ requirejs.config({
         "materialize": "lib/materialize.min",
         "libgif": "https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif",
         "Tone": "lib/Tone",
-        "highlight": "//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min",
+        "highlight": "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min",
         "i18next": [
             "lib/i18next.min",
             "https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min"
