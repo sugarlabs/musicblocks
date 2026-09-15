@@ -18,7 +18,8 @@
    getOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
-   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber
+   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber,
+   computeTargetPitchFrequency
 */
 
 /*
@@ -28,7 +29,8 @@
     - js/utils/musicutils.js
         pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
         isCustomTemperament, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
-        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE, parseNoteString
+        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE, parseNoteString,
+        computeTargetPitchFrequency
     - js/turtle-singer.js
         Singer
     - js/utils/platformstyle.js
@@ -3313,55 +3315,11 @@ function Synth() {
 
                                     // Calculate the frequency for the target pitch
                                     try {
-                                        // Define base frequencies for each note (C4 = 261.63 Hz)
-                                        const baseFrequencies = {
-                                            "C": 261.63,
-                                            "C#": 277.18,
-                                            "D": 293.66,
-                                            "D#": 311.13,
-                                            "E": 329.63,
-                                            "F": 349.23,
-                                            "F#": 369.99,
-                                            "G": 392.0,
-                                            "G#": 415.3,
-                                            "A": 440.0,
-                                            "A#": 466.16,
-                                            "B": 493.88
-                                        };
-
-                                        // Extract note and octave
-                                        const noteMatch = noteWithOctave.match(/([A-G][#b]?)(\d+)/);
-                                        if (!noteMatch) {
-                                            throw new Error("Invalid note format");
-                                        }
-
-                                        const [, note, octave] = noteMatch;
-                                        // Convert flats to sharps for lookup
-                                        const lookupNote = note
-                                            .replace("b", "#")
-                                            .replace("bb", "##");
-
-                                        // Get base frequency for the note
-                                        let freq = baseFrequencies[lookupNote];
-                                        if (!freq) {
-                                            throw new Error("Invalid note");
-                                        }
-
-                                        // Adjust for octave (C4 is the reference octave)
-                                        const octaveDiff = parseInt(octave, 10) - 4;
-                                        freq *= Math.pow(2, octaveDiff);
-
-                                        targetPitch.frequency = freq;
-
-                                        // Validate frequency
-                                        if (
-                                            isNaN(targetPitch.frequency) ||
-                                            targetPitch.frequency <= 0
-                                        ) {
-                                            console.error(
-                                                "Invalid frequency calculated:",
-                                                targetPitch.frequency
-                                            );
+                                        const freq = computeTargetPitchFrequency(noteWithOctave);
+                                        if (!isNaN(freq) && freq > 0) {
+                                            targetPitch.frequency = freq;
+                                        } else {
+                                            console.error("Invalid frequency calculated:", freq);
                                             targetPitch.frequency = 440; // Default to A4 if calculation fails
                                         }
                                     } catch (error) {

@@ -55,6 +55,7 @@ const {
     convertFactor,
     getPitchInfo,
     noteToFrequency,
+    computeTargetPitchFrequency,
     setOctaveRatio,
     getOctaveRatio,
     ratioToWheelAngle,
@@ -62,6 +63,7 @@ const {
     getTemperamentsList,
     getTemperament,
     getTemperamentKeys,
+    isEquallyTempered,
     addTemperamentToList,
     addTemperamentToDictionary,
     updateTemperaments,
@@ -326,6 +328,15 @@ describe("Temperament Functions", () => {
             expect(equal17Temperament).toHaveProperty("perfect 1");
             expect(equal17Temperament).toHaveProperty("minor 2");
             expect(equal17Temperament).toHaveProperty("pitchNumber", 17);
+        });
+
+        it("should return the correct temperament for EDO aliases like 12-EDO and 19-EDO", () => {
+            expect(getTemperament("12-EDO")).toBe(getTemperament("equal"));
+            expect(getTemperament("12EDO")).toBe(getTemperament("equal"));
+            expect(getTemperament("19-EDO")).toBe(getTemperament("equal19"));
+            expect(getTemperament("19EDO")).toBe(getTemperament("equal19"));
+            expect(isEquallyTempered("12-EDO")).toBe(true);
+            expect(isEquallyTempered("19-EDO")).toBe(true);
         });
 
         it("should return undefined for an invalid key", () => {
@@ -2426,6 +2437,124 @@ describe("noteToFrequency", () => {
 
     it("handles invalid note input gracefully", () => {
         expect(noteToFrequency("X9", "C")).toBe(A0 * Math.pow(TWELTHROOT2, 99));
+    });
+});
+
+describe("computeTargetPitchFrequency", () => {
+    it("computes correct frequencies for natural notes", () => {
+        expect(computeTargetPitchFrequency("A4")).toBeCloseTo(440, 2);
+        expect(computeTargetPitchFrequency("C4")).toBeCloseTo(261.63, 2);
+    });
+
+    it("computes correct frequencies for flat accidentals", () => {
+        expect(computeTargetPitchFrequency("Db4")).toBeCloseTo(277.18, 2);
+        expect(computeTargetPitchFrequency("Eb4")).toBeCloseTo(311.13, 2);
+        expect(computeTargetPitchFrequency("Gb4")).toBeCloseTo(369.99, 2);
+        expect(computeTargetPitchFrequency("Ab4")).toBeCloseTo(415.3, 2);
+        expect(computeTargetPitchFrequency("Bb4")).toBeCloseTo(466.16, 2);
+    });
+
+    it("verifies enharmonic equivalence between flats and sharps", () => {
+        expect(computeTargetPitchFrequency("Db4")).toBeCloseTo(
+            computeTargetPitchFrequency("C#4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("Eb4")).toBeCloseTo(
+            computeTargetPitchFrequency("D#4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("Gb4")).toBeCloseTo(
+            computeTargetPitchFrequency("F#4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("Ab4")).toBeCloseTo(
+            computeTargetPitchFrequency("G#4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("Bb4")).toBeCloseTo(
+            computeTargetPitchFrequency("A#4"),
+            6
+        );
+    });
+
+    it("handles ASCII double-sharp and double-flat accidentals", () => {
+        expect(computeTargetPitchFrequency("C##4")).toBeCloseTo(
+            computeTargetPitchFrequency("D4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("Dbb4")).toBeCloseTo(
+            computeTargetPitchFrequency("C4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("Cx4")).toBeCloseTo(
+            computeTargetPitchFrequency("D4"),
+            6
+        );
+    });
+
+    it("handles Unicode accidentals", () => {
+        expect(computeTargetPitchFrequency("D♭4")).toBeCloseTo(
+            computeTargetPitchFrequency("C#4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("C♯4")).toBeCloseTo(
+            computeTargetPitchFrequency("C#4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("C𝄪4")).toBeCloseTo(
+            computeTargetPitchFrequency("D4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("D𝄫4")).toBeCloseTo(
+            computeTargetPitchFrequency("C4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("D♮4")).toBeCloseTo(293.66, 2);
+        expect(computeTargetPitchFrequency("D♮4")).toBeCloseTo(
+            computeTargetPitchFrequency("D4"),
+            6
+        );
+        expect(computeTargetPitchFrequency("C♮4")).toBeCloseTo(
+            computeTargetPitchFrequency("C4"),
+            6
+        );
+    });
+
+    it("handles octave shifts accurately", () => {
+        expect(computeTargetPitchFrequency("A3")).toBeCloseTo(220, 2);
+        expect(computeTargetPitchFrequency("A4")).toBeCloseTo(440, 2);
+        expect(computeTargetPitchFrequency("A5")).toBeCloseTo(880, 2);
+        expect(computeTargetPitchFrequency("B#4")).toBeCloseTo(
+            computeTargetPitchFrequency("C5"),
+            6
+        );
+        expect(computeTargetPitchFrequency("Cb4")).toBeCloseTo(
+            computeTargetPitchFrequency("B3"),
+            6
+        );
+        expect(computeTargetPitchFrequency("B##4")).toBeCloseTo(
+            computeTargetPitchFrequency("C#5"),
+            6
+        );
+        expect(computeTargetPitchFrequency("Cbb4")).toBeCloseTo(
+            computeTargetPitchFrequency("Bb3"),
+            6
+        );
+    });
+
+    it("returns NaN for invalid or unparseable note inputs", () => {
+        expect(Number.isNaN(computeTargetPitchFrequency(""))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency("C"))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency("H4"))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency("invalid4"))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency("invalid"))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency("C#b4"))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency("Cb#4"))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency("C###4"))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency("Cbbb4"))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency(null))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency(undefined))).toBe(true);
+        expect(Number.isNaN(computeTargetPitchFrequency(440))).toBe(true);
     });
 });
 
