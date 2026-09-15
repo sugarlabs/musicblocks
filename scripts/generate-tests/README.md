@@ -1,5 +1,9 @@
 # Module test-plan extractor and test-generation bridge
 
+New to this tool? Jump to [Contributor workflow](#contributor-workflow) for a
+five-minute walkthrough built around `npm run generate-tests`, finishing with
+`npx jest` on the file it writes.
+
 A small, deterministic AST analysis utility. Given a JavaScript source file it
 produces a JSON description of what the module exposes and what is therefore
 worth testing: exported functions and classes, their parameters, shallow
@@ -35,11 +39,99 @@ file inside the module's own `__tests__/` directory and never overwrites
 anything. `write-generated.js` is the only file here that touches the
 filesystem, and only under the guards described below.
 
+## Contributor workflow
+
+You do not need to know the AST internals to use this tool. The diagram below
+is the complete pipeline, run through `npm run generate-tests -- <options>`;
+a given invocation only executes the stages its mode calls for - `--generate`
+stops before validation, `--emit` without `--write` stops before writing, and
+only `--emit --write` performs the final write:
+
+```text
+module
+  ↓
+AST extraction        (extract-module.js / module-test-plan.js - read & parse only)
+  ↓
+ModuleTestPlan         (JSON: exports, functions, classes, dependencies, ...)
+  ↓
+candidate generation   (llm-client.js - offline, credential-free providers only)
+  ↓
+static validation      (validate-generated.js - parses the candidate, never runs it)
+  ↓
+human review           (you - read the candidate before trusting it)
+  ↓
+write                  (write-generated.js - one path, never overwrites)
+  ↓
+Jest                   (npm test - the candidate becomes a real test only once it runs green)
+```
+
+A **generated test is a candidate**, not a finished test: it is a syntactically
+valid, heuristically-screened starting point for a human to read, edit and run.
+Nothing in this pipeline promises the candidate is _correct_ - only that it is
+safe to look at and, once you accept it, safe to add to the repository at a
+single predictable path.
+
+**Why the validator never executes the candidate.** Running arbitrary
+generated code - even to "just see if it passes" - would mean executing
+untrusted output on your machine and against the real module. The validator
+is a static, heuristic filter instead: it parses the candidate and rejects
+known-unsafe or known-meaningless _patterns_ (filesystem access, mocking the
+module under test, disallowed imports, no-op assertions, ...). See
+[Validation and safe writing](#validation-and-safe-writing) below for the full
+rule list and its limits - it is a filter, not a sandbox. The only thing that
+ever actually _runs_ a generated test is `npm test`, on a file you have
+already read.
+
+Five commands cover the whole workflow for one module:
+
+```sh
+# 1-2. Select a module and inspect what the AST pipeline discovered.
+npm run generate-tests -- --module js/utils/utils-logic.js
+
+# 3-4. Generate a candidate and see it, unvalidated, for a quick look.
+npm run generate-tests -- --module js/utils/utils-logic.js --generate
+
+# 5. Preview: generate + validate, with no file written. Reports the module,
+#    how many exports/functions/classes were considered, whether the one
+#    candidate was accepted or rejected (with reasons), and the exact path
+#    a write would use.
+npm run generate-tests -- --module js/utils/utils-logic.js --emit
+
+# 6. Write: only after you are satisfied with the preview above. Still fails
+#    (and writes nothing) if the candidate is invalid, or if a file already
+#    exists at the target path.
+npm run generate-tests -- --module js/utils/utils-logic.js --emit --write
+
+# 7. The written file is a normal Jest spec - read it, then run it for real.
+npx jest js/utils/__tests__/utils-logic.generated.test.js
+```
+
+`--module <path>` and a bare positional path (`... cli.js js/utils/x.js`) are
+equivalent ways to select the module; use whichever reads more clearly, but
+not both in the same command. `node scripts/generate-tests/cli.js --help`
+prints this same summary from the terminal.
+
+**Safety guarantees you can rely on, end to end:**
+
+- the target module is only ever read and parsed - never required, imported,
+  or executed, at any stage, with or without `--module`;
+- a candidate that fails static validation is never written, `--write` or not;
+- the writer creates exactly one deterministic path per module and refuses to
+  overwrite an existing file there, generated or hand-written;
+- nothing is written anywhere until you explicitly pass `--emit --write`.
+
+This tool intentionally generates tests for **one module at a time**, on
+request. It does not scan the repository, does not run automatically, and
+does not modify any existing test file - see
+[Deliberate limitations](#deliberate-limitations) for the rest of what is out
+of scope by design.
+
 ## Usage
 
 ```sh
 # Print the plan as JSON
 node scripts/generate-tests/cli.js js/utils/utils-logic.js
+node scripts/generate-tests/cli.js --module js/utils/utils-logic.js
 
 # Compare against a committed expected plan without writing anything.
 # Exit 0 on match, 1 on mismatch. The expected file defaults to the source
@@ -63,8 +155,9 @@ node scripts/generate-tests/cli.js js/utils/utils-logic.js --emit --write
 ```
 
 `--check`, `--prompt`, `--generate` and `--emit` are mutually exclusive;
-`--write` only applies together with `--emit`. `node cli.js --help` prints the
-same summary.
+`--write` only applies together with `--emit`. The module may be given as a
+bare positional path or as `--module <path>` (equivalent; combining both is a
+deterministic argument error). `node cli.js --help` prints the same summary.
 
 `--generate` vs `--emit` (easy to confuse):
 
@@ -109,17 +202,17 @@ if (result.valid) {
 
 ## Files
 
-| File                    | Responsibility                                                                               |
-| ----------------------- | -------------------------------------------------------------------------------------------- |
-| `extract-module.js`     | Reads a file, parses it with the vendored Acorn (`lib/acorn.min.js`), returns a plan.        |
-| `module-test-plan.js`   | Pure AST walker that builds the plan structure.                                              |
-| `generation-request.js` | Turns a plan into a structured `{ module, plan, instructions, ... }` request.                |
-| `prompt-builder.js`     | Renders a request as one deterministic prompt string.                                        |
-| `llm-client.js`         | Provider seam: `NoopClient`, `ManualClient`, `createClient`, `generateTests`.                |
-| `validate-generated.js` | Deterministic safety checks on a generated candidate; returns `{ valid, errors, warnings }`. |
-| `write-generated.js`    | Safe writer: one deterministic `*.generated.test.js` path, never overwrites, no traversal.   |
-| `cli.js`                | Command-line wrapper: `--check`, `--prompt`, `--generate`, `--emit [--write]`.               |
-| `__tests__/`            | Jest tests plus fixtures and their committed `.plan.json` plans.                             |
+| File                    | Responsibility                                                                                        |
+| ----------------------- | ----------------------------------------------------------------------------------------------------- |
+| `extract-module.js`     | Reads a file, parses it with the vendored Acorn (`lib/acorn.min.js`), returns a plan.                 |
+| `module-test-plan.js`   | Pure AST walker that builds the plan structure.                                                       |
+| `generation-request.js` | Turns a plan into a structured `{ module, plan, instructions, ... }` request.                         |
+| `prompt-builder.js`     | Renders a request as one deterministic prompt string.                                                 |
+| `llm-client.js`         | Provider seam: `NoopClient`, `ManualClient`, `createClient`, `generateTests`.                         |
+| `validate-generated.js` | Deterministic safety checks on a generated candidate; returns `{ valid, errors, warnings }`.          |
+| `write-generated.js`    | Safe writer: one deterministic `*.generated.test.js` path, never overwrites, no traversal.            |
+| `cli.js`                | Command-line wrapper: `--module`/positional, `--check`, `--prompt`, `--generate`, `--emit [--write]`. |
+| `__tests__/`            | Jest tests plus fixtures and their committed `.plan.json` plans.                                      |
 
 ## Generation layer
 
