@@ -2512,7 +2512,13 @@ class Activity {
              * increasing/decreasing volume on Firefox)
              */
 
-            doBrowserCheck();
+            // doBrowserCheck (js/utils/browser-utils.js) is a classic-script
+            // global; on a slow RequireJS resolution it can still be pending
+            // here despite the shimmed dependency, so guard the call rather
+            // than let it throw and abort the rest of init().
+            if (typeof doBrowserCheck === "function") {
+                doBrowserCheck();
+            }
 
             const that = this;
 
@@ -2915,7 +2921,7 @@ class Activity {
      * @param {Function} doHardStopButton - Shared stop action callback.
      */
     setupWindowBlurHandler(doHardStopButton) {
-        if (jQuery.browser.mozilla) {
+        if (jQuery.browser && jQuery.browser.mozilla) {
             return;
         }
 
