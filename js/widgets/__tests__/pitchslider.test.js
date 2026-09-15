@@ -485,7 +485,7 @@ describe("PitchSlider Widget", () => {
             const upBtn = slider.widgetWindow.getButtons().find(b => b.tip === "Move up");
             upBtn.onclick();
 
-            const expected = 440 * Math.pow(2, 1 / 12);
+            const expected = (392 / 2) * Math.pow(Math.pow(2, 1 / 12), 15);
             expect(parseFloat(rangeSlider.value)).toBeCloseTo(expected, 2);
         });
 
@@ -657,7 +657,9 @@ describe("PitchSlider Widget", () => {
             keyHandler(event);
 
             const expected = 440 * Math.pow(2, 1 / 12);
-            expect(mockOscillator.triggerAttackRelease).toHaveBeenCalledWith(expected, "4n");
+            const callArgs = mockOscillator.triggerAttackRelease.mock.calls[0];
+            expect(callArgs[0]).toBeCloseTo(expected, 2);
+            expect(callArgs[1]).toBe("4n");
             expect(mockOscillator.triggerAttack).not.toHaveBeenCalled();
         });
     });
@@ -763,29 +765,29 @@ describe("PitchSlider Widget", () => {
     describe("Frequency Stepping (_stepFrequency)", () => {
         const semitone = Math.pow(2, 1 / 12);
 
-        test("steps up by semitone ratio", () => {
-            const result = slider._stepFrequency(440, "up", semitone, 220, 880);
-            expect(result).toBeCloseTo(440 * semitone, 2);
+        test("steps up by semitone steps", () => {
+            const result = slider._stepFrequency(440, 1, semitone, 220, 880);
+            expect(result).toBeCloseTo(220 * Math.pow(semitone, 13), 2);
         });
 
-        test("steps down by semitone ratio", () => {
-            const result = slider._stepFrequency(440, "down", semitone, 220, 880);
-            expect(result).toBeCloseTo(440 / semitone, 2);
+        test("steps down by semitone steps", () => {
+            const result = slider._stepFrequency(440, -1, semitone, 220, 880);
+            expect(result).toBeCloseTo(220 * Math.pow(semitone, 11), 2);
         });
 
         test("clamps upper bound to max", () => {
-            const result = slider._stepFrequency(870, "up", semitone, 220, 880);
+            const result = slider._stepFrequency(870, 1, semitone, 220, 880);
             expect(result).toBe(880);
         });
 
         test("clamps lower bound to min", () => {
-            const result = slider._stepFrequency(225, "down", semitone, 220, 880);
+            const result = slider._stepFrequency(225, -1, semitone, 220, 880);
             expect(result).toBe(220);
         });
 
         test("parses numeric string inputs correctly", () => {
-            const result = slider._stepFrequency("440", "up", semitone, 220, 880);
-            expect(result).toBeCloseTo(440 * semitone, 2);
+            const result = slider._stepFrequency("440", 1, semitone, 220, 880);
+            expect(result).toBeCloseTo(220 * Math.pow(semitone, 13), 2);
         });
     });
 });
