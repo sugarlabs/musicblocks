@@ -2530,7 +2530,18 @@ class Activity {
              * increasing/decreasing volume on Firefox)
              */
 
-            doBrowserCheck();
+            // doBrowserCheck (js/utils/browser-utils.js) is a classic-script
+            // global; on a slow RequireJS resolution it can still be pending
+            // here despite the shimmed dependency, so guard the call rather
+            // than let it throw and abort the rest of init(). Exercised
+            // directly in activity_blur_handler.test.js; this whole file is
+            // browser-only and inaccessible from Jest's require(), so
+            // Istanbul/Codecov can never see that coverage - see
+            // Activity constructor's own istanbul-ignore a few lines below.
+            /* istanbul ignore next -- see comment above */
+            if (typeof doBrowserCheck === "function") {
+                doBrowserCheck();
+            }
 
             const that = this;
 
@@ -2933,7 +2944,12 @@ class Activity {
      * @param {Function} doHardStopButton - Shared stop action callback.
      */
     setupWindowBlurHandler(doHardStopButton) {
-        if (jQuery.browser.mozilla) {
+        // jQuery.browser can be unset by the same RequireJS timing race
+        // doBrowserCheck's own guard above documents. Exercised directly in
+        // activity_blur_handler.test.js; Istanbul/Codecov can't see that
+        // coverage for the same browser-only-file reason noted there.
+        /* istanbul ignore next -- see comment above */
+        if (jQuery.browser && jQuery.browser.mozilla) {
             return;
         }
 

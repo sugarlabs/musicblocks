@@ -649,7 +649,7 @@ describe("widgetWindows", () => {
     });
 
     describe("updateTitle", () => {
-        test("updates the title element innerHTML", () => {
+        test("updates the title element textContent", () => {
             const win = createTestWindow("Old Title");
             const key = win._key;
             const titleEl = document.getElementById(key + "WidgetID");
@@ -657,7 +657,7 @@ describe("widgetWindows", () => {
 
             win.updateTitle("New Title");
 
-            expect(titleEl.innerHTML).toBe("New Title");
+            expect(titleEl.textContent).toBe("New Title");
         });
 
         test("keeps the frame's aria-label in sync with the new title", () => {
@@ -1072,6 +1072,24 @@ describe("widgetWindows", () => {
             expect(win._dragTopHandler).toHaveBeenCalledWith(upEvent);
             expect(window.widgetWindows.draggingWindow).toBeNull();
         });
+
+        test("recalculates _dx and _dy after restoring a maximized window during drag", () => {
+            const win = createTestWindow("MaxDrag Window");
+            win._maximize();
+
+            // Stale offsets from the maximized state
+            win._dx = 999;
+            win._dy = 999;
+
+            const moveEvent = { clientX: 200, clientY: 300, preventDefault: jest.fn() };
+            win._docMouseMoveHandler(moveEvent);
+
+            // After restore, _maximized should be false
+            expect(win._maximized).toBe(false);
+            // _dx and _dy should have been recalculated (no longer 999)
+            expect(win._dx).not.toBe(999);
+            expect(win._dy).not.toBe(999);
+        });
     });
 
     describe("window visibility and management helpers", () => {
@@ -1182,7 +1200,7 @@ describe("widgetWindows", () => {
         });
 
         it("closes matching widget by name", () => {
-            const mockElement = { innerHTML: "TestWidget" };
+            const mockElement = { textContent: "TestWidget", id: "" };
 
             document.getElementsByClassName = jest.fn(() => [mockElement]);
 
@@ -1213,7 +1231,7 @@ describe("widgetWindows", () => {
 
         it("closes widget by matching element ID when display title changes", () => {
             const mockElement = {
-                innerHTML: "C MAJOR",
+                textContent: "C MAJOR",
                 id: "custom modeWidgetID"
             };
 
@@ -1225,7 +1243,9 @@ describe("widgetWindows", () => {
         });
 
         it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [{ innerHTML: "OtherWidget" }]);
+            document.getElementsByClassName = jest.fn(() => [
+                { textContent: "OtherWidget", id: "" }
+            ]);
 
             window.widgetWindows.closeBlkWidgets("TestWidget");
 

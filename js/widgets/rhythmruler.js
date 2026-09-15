@@ -1282,7 +1282,6 @@ class RhythmRuler {
     __endTapping(event) {
         const cell = event.currentTarget || event.target;
         if (cell.parentNode === null) {
-            // console.debug("Null parent node in endTapping");
             return;
         }
 
@@ -2112,7 +2111,6 @@ class RhythmRuler {
             this._elapsedTimes[this._rulerSelected] = 0;
             this._offsets[this._rulerSelected] = 0;
         }
-        // console.debug("this._rulerSelected " + this._rulerSelected);
 
         this.__loop(0, this._rulerSelected, 0);
     }

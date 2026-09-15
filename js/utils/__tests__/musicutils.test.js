@@ -360,6 +360,73 @@ describe("Temperament Functions", () => {
         });
     });
 
+    describe("interval tables agree with playback", () => {
+        // The temperament widget labels each row with
+        // getNoteFromInterval(startingPitch, t.interval[i]) and prices it with
+        // getTemperamentRatio(t[t.interval[i]]). Those two must describe the same
+        // pitch, otherwise the widget displays a frequency the synth will not play.
+        //
+        // Excluded, and why:
+        //   equal5 / equal7 - their interval arrays name notes outside the scale
+        //   equal31         - uses microtonal names ("mid 2") absent from INTERVALVALUES
+        //   just intonation / Pythagorean - C# vs D-flat spelling only, same ratio
+        const ALIGNED = ["equal", "equal17", "equal19", "1/3 comma meantone", "1/4 comma meantone"];
+
+        const rowsOf = key => {
+            const t = getTemperament(key);
+            const root = pitchToFrequency("C", 4, 0, "C major", key);
+            // the closing octave entry has no pitch of its own
+            return t.interval.slice(0, -1).map(name => {
+                const spelled = getNoteFromInterval("C4", name);
+                const note = Array.isArray(spelled) ? spelled[0] : String(spelled);
+                return {
+                    name,
+                    note,
+                    widget: root * getTemperamentRatio(t[name]),
+                    synth: pitchToFrequency(note, 4, 0, "C major", key)
+                };
+            });
+        };
+
+        it.each(ALIGNED)("%s prices every interval at the pitch it names", key => {
+            rowsOf(key).forEach(row => {
+                const drift = 1200 * Math.log2(row.widget / row.synth);
+                expect({ note: row.note, drift: Math.abs(Math.round(drift)) }).toEqual({
+                    note: row.note,
+                    drift: 0
+                });
+            });
+        });
+
+        it("equal19 spells the step between augmented 4 and perfect 5", () => {
+            // A missing "diminished 5" shifted every later name down one step.
+            const interval = getTemperament("equal19").interval;
+            expect(interval[9]).toBe("augmented 4");
+            expect(interval[10]).toBe("diminished 5");
+            expect(interval[11]).toBe("perfect 5");
+            expect(getTemperament("equal19")["perfect 5"]).toBeCloseTo(Math.pow(2, 11 / 19), 12);
+        });
+
+        it("equal17 orders its first chromatic steps sharp before flat", () => {
+            expect(getTemperament("equal17").interval.slice(0, 6)).toEqual([
+                "perfect 1",
+                "augmented 1",
+                "minor 2",
+                "major 2",
+                "augmented 2",
+                "minor 3"
+            ]);
+        });
+
+        it("1/4 comma meantone labels each ratio with a distinct note", () => {
+            const t = getTemperament("1/4 comma meantone");
+            expect(new Set(t.noteLabels).size).toBe(t.noteLabels.length);
+            // the perfect fifth must be the 3/2 the table already stores
+            const g = t.noteLabels.indexOf("G");
+            expect(1200 * Math.log2(t.ratios[g])).toBeCloseTo(701.955, 2);
+        });
+    });
+
     describe("getTemperamentKeys", () => {
         it("should return an array with the correct length", () => {
             const keys = getTemperamentKeys();

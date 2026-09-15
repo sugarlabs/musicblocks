@@ -854,4 +854,168 @@ describe("JSEditor", () => {
             expect(editor._currentStyle).toBe(0);
         });
     });
+    // -----------------------------------------------------------------------
+    // Syntax error highlighting
+    //
+    // _highlightErrors runs the buffer through acorn and, when it throws,
+    // widens the reported character position out to the whole token so the
+    // marker covers something the user can see rather than one character.
+    // -----------------------------------------------------------------------
+
+    describe("syntax error highlighting", () => {
+        /** An editor element whose textContent is `code`. */
+        const editorWith = code => {
+            const el = document.createElement("div");
+            el.textContent = code;
+            document.body.appendChild(el);
+            return el;
+        };
+
+        /** Run _markErrorAtPosition and report the span it asked for. */
+        const spanFor = (editor, code, position) => {
+            const el = editorWith(code);
+            const spy = jest.spyOn(editor, "_markErrorSpan").mockImplementation(() => {});
+            editor._markErrorAtPosition(el, position, "boom");
+            const call = spy.mock.calls[0];
+            spy.mockRestore();
+            return { start: call[1], end: call[2], text: code.slice(call[1], call[2]) };
+        };
+
+        beforeEach(() => {
+            // The outer beforeEach rebuilds document.body (including the
+            // overlayCanvas the constructor reads), so only the injected
+            // stylesheet needs clearing here.
+            const existing = document.getElementById("js-error-styles");
+            if (existing) existing.remove();
+        });
+
+        describe("_addErrorStyles", () => {
+            test("injects the stylesheet once", () => {
+                const editor = createEditor();
+
+                editor._addErrorStyles();
+                const first = document.getElementById("js-error-styles");
+                expect(first).not.toBeNull();
+                expect(first.tagName).toBe("STYLE");
+
+                editor._addErrorStyles();
+                expect(document.querySelectorAll("#js-error-styles")).toHaveLength(1);
+                expect(document.getElementById("js-error-styles")).toBe(first);
+            });
+
+            test("defines the .error rule the markers rely on", () => {
+                const editor = createEditor();
+                editor._addErrorStyles();
+
+                expect(document.getElementById("js-error-styles").textContent).toContain(".error");
+            });
+        });
+
+        describe("_markErrorAtPosition widens to the whole token", () => {
+            test("expands both ways from inside a word", () => {
+                const editor = createEditor();
+                // position 8 is the "r" of "varx"; the marker should cover the word.
+                expect(spanFor(editor, "let a = varx;", 10).text).toBe("varx");
+            });
+
+            test("stops at the start of the string", () => {
+                const editor = createEditor();
+                const span = spanFor(editor, "banana", 3);
+                expect(span.start).toBe(0);
+                expect(span.end).toBe(6);
+            });
+
+            test.each([
+                [" ", "space"],
+                ["\n", "newline"],
+                ["\t", "tab"],
+                [";", "semicolon"],
+                ["{", "open brace"],
+                ["}", "close brace"],
+                ["(", "open paren"],
+                [")", "close paren"],
+                [",", "comma"]
+            ])("treats %s as a token boundary (%s)", delimiter => {
+                const editor = createEditor();
+                const code = `aa${delimiter}target${delimiter}bb`;
+                // Start inside "target" and check the delimiters bound it.
+                expect(spanFor(editor, code, 5).text).toBe("target");
+            });
+
+            test("falls back to a single character when the position is on a delimiter", () => {
+                const editor = createEditor();
+                // Delimiters on both sides: the left scan sees ";" before the
+                // position and the right scan sees ";" at it, so both stop
+                // immediately and the span would be zero width. It is widened
+                // to one character instead.
+                const span = spanFor(editor, "a;;b", 2);
+                expect(span.start).toBe(2);
+                expect(span.end).toBe(3);
+            });
+
+            test("does not run past the end of the buffer", () => {
+                const editor = createEditor();
+                // The delimiter is the last character, so the one-character
+                // fallback has nothing to widen into.
+                const span = spanFor(editor, "ab;", 3);
+                expect(span.end).toBeLessThanOrEqual(3);
+            });
+        });
+
+        describe("_highlightErrors", () => {
+            test("clears markers from a previous run before re-parsing", () => {
+                const editor = createEditor();
+                const el = editorWith("");
+                el.innerHTML = 'ok <span class="error">bad</span> tail';
+                acorn.parse.mockImplementation(() => {});
+
+                editor._highlightErrors(el);
+
+                expect(el.querySelectorAll(".error")).toHaveLength(0);
+                // The text survives; only the wrapper goes.
+                expect(el.textContent).toContain("bad");
+            });
+
+            test("marks the token when acorn reports a position", () => {
+                const editor = createEditor();
+                const el = editorWith("let a = ;");
+                const spy = jest.spyOn(editor, "_markErrorAtPosition").mockImplementation(() => {});
+                acorn.parse.mockImplementation(() => {
+                    const e = new Error("Unexpected token");
+                    e.pos = 8;
+                    throw e;
+                });
+
+                editor._highlightErrors(el);
+
+                expect(spy).toHaveBeenCalledWith(el, 8, "Unexpected token");
+                spy.mockRestore();
+            });
+
+            test("marks nothing when the error carries no position", () => {
+                const editor = createEditor();
+                const el = editorWith("let a = ;");
+                const spy = jest.spyOn(editor, "_markErrorAtPosition").mockImplementation(() => {});
+                acorn.parse.mockImplementation(() => {
+                    throw new Error("no position on this one");
+                });
+
+                expect(() => editor._highlightErrors(el)).not.toThrow();
+                expect(spy).not.toHaveBeenCalled();
+                spy.mockRestore();
+            });
+
+            test("leaves a clean buffer alone", () => {
+                const editor = createEditor();
+                const el = editorWith("let a = 1;");
+                const spy = jest.spyOn(editor, "_markErrorAtPosition").mockImplementation(() => {});
+                acorn.parse.mockImplementation(() => {});
+
+                editor._highlightErrors(el);
+
+                expect(spy).not.toHaveBeenCalled();
+                spy.mockRestore();
+            });
+        });
+    });
 });

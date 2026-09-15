@@ -51,10 +51,17 @@ global.createjs = {
     })),
     Shape: jest.fn().mockImplementation(() => ({
         graphics: {
+            clear: jest.fn().mockReturnThis(),
             beginFill: jest.fn().mockReturnThis(),
             drawRect: jest.fn().mockReturnThis(),
-            drawEllipse: jest.fn().mockReturnThis()
-        }
+            drawEllipse: jest.fn().mockReturnThis(),
+            setStrokeStyle: jest.fn().mockReturnThis(),
+            beginStroke: jest.fn().mockReturnThis(),
+            drawCircle: jest.fn().mockReturnThis()
+        },
+        x: 0,
+        y: 0,
+        visible: false
     })),
     Bitmap: jest.fn().mockImplementation(() => ({
         getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 50, height: 50 })
@@ -141,7 +148,14 @@ describe("Viewport Culling", () => {
             macroDict: {},
             palettes: { dict: {}, show: jest.fn() },
             logo: { synth: { loadSynth: jest.fn() } },
-            blocksContainer: { x: 0, y: 0 },
+            blocksContainer: {
+                x: 0,
+                y: 0,
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                setChildIndex: jest.fn(),
+                children: []
+            },
             canvas: { width: 800, height: 600 },
             refreshCanvas: jest.fn(),
             errorMsg: jest.fn(),
@@ -1154,6 +1168,70 @@ describe("Blocks Foundation", () => {
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "Something went wrong reading JSON-encoded project data."
             );
+        });
+
+        it.each(["vibrato", "tuplet2", "staccato", "setbpm"])(
+            "rejects a %s block whose connections array is truncated (#8679)",
+            name => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks._makeNewBlockWithConnections = jest.fn();
+
+                // A corrupt project file: dock 0 is the parent, so a single
+                // connection leaves no next-block dock to repair. Repairing it
+                // anyway used to overwrite the parent and build a loop, which
+                // overflowed the stack in insideExpandableBlock.
+                const truncated = [[0, name, 200, 200, [null]]];
+
+                mockActivity._suppressRefresh = true;
+                mockActivity.errorMsg.mockClear();
+
+                expect(() => blocks.loadNewBlocks(truncated)).not.toThrow();
+                expect(mockActivity._suppressRefresh).toBe(false);
+                expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                    "Something went wrong reading JSON-encoded project data."
+                );
+                // The load is abandoned before any block is built.
+                expect(blocks._makeNewBlockWithConnections).not.toHaveBeenCalled();
+            }
+        );
+
+        it("rejects a block whose next connection is not in the project (#8679)", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn();
+
+            // Dock 1 points at block 99, which this project does not contain.
+            const danglingNext = [[0, "vibrato", 200, 200, [null, 99]]];
+
+            mockActivity._suppressRefresh = true;
+            mockActivity.errorMsg.mockClear();
+
+            expect(() => blocks.loadNewBlocks(danglingNext)).not.toThrow();
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Something went wrong reading JSON-encoded project data."
+            );
+        });
+
+        it("still repairs a vibrato block that has a full connections array", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn();
+
+            // Parent, argument, clamp and next docks, with no next block: the
+            // loader should add the missing hidden block and carry on.
+            const wellFormed = [[0, "vibrato", 200, 200, [null, null, null, null]]];
+
+            mockActivity._suppressRefresh = true;
+            mockActivity.errorMsg.mockClear();
+
+            expect(() => blocks.loadNewBlocks(wellFormed)).not.toThrow();
+            expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+            expect(blocks._makeNewBlockWithConnections).toHaveBeenCalled();
         });
 
         it("accepts valid parent-child stacks without false cycle detection", () => {
@@ -2489,5 +2567,301 @@ describe("Spatial grid indexing", () => {
             expect(cellsHolding("1")).toEqual([]);
             expectNumericKeysOnly();
         });
+    });
+
+    describe("Snap indicator (showSnapIndicator & hideSnapIndicator)", () => {
+        let block0;
+        let block1;
+
+        let children;
+
+        beforeEach(() => {
+            children = [];
+            blocks.activity = {
+                blocksContainer: {
+                    addChild: jest.fn(child => children.push(child)),
+                    setChildIndex: jest.fn(),
+                    children
+                }
+            };
+            block0 = {
+                trash: false,
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            };
+            block1 = {
+                trash: false,
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            };
+            blocks.blockList = [block0, block1];
+        });
+
+        it("shows indicator shape and highlights target block on candidate", () => {
+            const candidate = {
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 120,
+                dockY: 250
+            };
+
+            blocks.showSnapIndicator(candidate);
+
+            expect(block0.highlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBe(0);
+            expect(blocks._snapIndicatorShape).not.toBeNull();
+            expect(blocks._snapIndicatorShape.x).toBe(120);
+            expect(blocks._snapIndicatorShape.y).toBe(250);
+            expect(blocks._snapIndicatorShape.visible).toBe(true);
+            expect(blocks.activity.blocksContainer.addChild).toHaveBeenCalledWith(
+                blocks._snapIndicatorShape
+            );
+            expect(blocks.activity.blocksContainer.setChildIndex).toHaveBeenCalledWith(
+                blocks._snapIndicatorShape,
+                0
+            );
+        });
+
+        it("preserves snap target block even if a competing hover highlight occurs", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+            expect(block0.highlight).toHaveBeenCalledTimes(1);
+
+            // Simulate hover highlight on block 1
+            blocks.highlight(1, true);
+
+            // Active snap target block remains intact
+            expect(blocks._snapTargetBlock).toBe(0);
+        });
+
+        it("switches highlighted block when candidate changes", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+            expect(block0.highlight).toHaveBeenCalled();
+
+            blocks.showSnapIndicator({
+                targetBlock: 1,
+                connectionIndex: 0,
+                dockX: 200,
+                dockY: 200
+            });
+            expect(block0.unhighlight).toHaveBeenCalled();
+            expect(block1.highlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBe(1);
+            expect(blocks._snapIndicatorShape.x).toBe(200);
+            expect(blocks._snapIndicatorShape.y).toBe(200);
+        });
+
+        it("hides indicator and unhighlights block when hideSnapIndicator is called", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+            expect(blocks._snapIndicatorShape.visible).toBe(true);
+
+            blocks.hideSnapIndicator();
+
+            expect(block0.unhighlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBeNull();
+            expect(blocks._snapIndicatorShape.visible).toBe(false);
+        });
+
+        it("hides indicator if showSnapIndicator is called with null", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+
+            blocks.showSnapIndicator(null);
+
+            expect(block0.unhighlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBeNull();
+            expect(blocks._snapIndicatorShape.visible).toBe(false);
+        });
+
+        it("resolves default snap indicator colors when computed styles are unavailable", () => {
+            const colors = blocks._getSnapIndicatorColors();
+            expect(colors.stroke).toBe("rgba(255, 215, 0, 0.95)");
+            expect(colors.fill).toBe("rgba(255, 215, 0, 0.35)");
+        });
+
+        it("resolves snap indicator colors from CSS tokens when available", () => {
+            const originalGetComputedStyle = global.getComputedStyle;
+            global.getComputedStyle = jest.fn().mockReturnValue({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-snap-indicator-stroke") return "#ffff00";
+                    if (prop === "--color-snap-indicator-fill") return "rgba(255, 255, 0, 0.5)";
+                    return "";
+                })
+            });
+
+            const colors = blocks._getSnapIndicatorColors();
+            expect(colors.stroke).toBe("#ffff00");
+            expect(colors.fill).toBe("rgba(255, 255, 0, 0.5)");
+
+            global.getComputedStyle = originalGetComputedStyle;
+        });
+
+        it("redraws indicator graphics when candidate is shown after a theme change", () => {
+            const originalGetComputedStyle = global.getComputedStyle;
+
+            // Initial theme: light
+            global.getComputedStyle = jest.fn().mockReturnValue({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-snap-indicator-stroke") return "rgba(255, 215, 0, 0.95)";
+                    if (prop === "--color-snap-indicator-fill") return "rgba(255, 215, 0, 0.35)";
+                    return "";
+                })
+            });
+
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+
+            expect(blocks._snapIndicatorShape.graphics.beginStroke).toHaveBeenCalledWith(
+                "rgba(255, 215, 0, 0.95)"
+            );
+
+            // User switches theme: e.g. high contrast
+            global.getComputedStyle = jest.fn().mockReturnValue({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-snap-indicator-stroke") return "#ffff00";
+                    if (prop === "--color-snap-indicator-fill") return "rgba(255, 255, 0, 0.35)";
+                    return "";
+                })
+            });
+
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 110,
+                dockY: 110
+            });
+
+            expect(blocks._snapIndicatorShape.graphics.clear).toHaveBeenCalled();
+            expect(blocks._snapIndicatorShape.graphics.beginStroke).toHaveBeenCalledWith("#ffff00");
+            expect(blocks._snapIndicatorShape.graphics.beginFill).toHaveBeenCalledWith(
+                "rgba(255, 255, 0, 0.35)"
+            );
+
+            global.getComputedStyle = originalGetComputedStyle;
+        });
+    });
+});
+
+// ---------------------------------------------------------------------------
+// noteValueValue — the number in a note's fraction
+// ---------------------------------------------------------------------------
+
+describe("noteValueValue", () => {
+    let blocks;
+
+    beforeEach(() => {
+        const mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    /**
+     * Builds "note 1 / 4", the shape the default project ships with.
+     * Block 2 is the numerator, which is the one the user clicks.
+     * @param {string} parentName - the block the divide hangs from
+     * @param {number|null} denominator - index of the denominator block, or
+     *     null for the empty slot left behind when it is dragged out
+     * @returns {void}
+     */
+    function buildNote(parentName, denominator) {
+        blocks.blockList = [
+            { name: parentName, connections: [null, 1, null] },
+            { name: "divide", connections: [0, 2, denominator] },
+            { name: "number", value: 1, connections: [1] },
+            { name: "number", value: 4, connections: [1] }
+        ];
+    }
+
+    /**
+     * Builds the same fraction under a block that holds its note value in the
+     * second slot, the way meter and the rhythm family do.
+     * @param {string} parentName - the block the divide hangs from
+     * @param {number|null} denominator - index of the denominator block, or
+     *     null for the empty slot left behind when it is dragged out
+     * @returns {void}
+     */
+    function buildMeterStyleNote(parentName, denominator) {
+        blocks.blockList = [
+            { name: parentName, connections: [null, null, 1] },
+            { name: "divide", connections: [0, 2, denominator] },
+            { name: "number", value: 1, connections: [1] },
+            { name: "number", value: 4, connections: [1] }
+        ];
+    }
+
+    it("reads the denominator of a complete fraction", () => {
+        buildNote("newnote", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when the denominator slot is empty", () => {
+        buildNote("newnote", null);
+
+        expect(() => blocks.noteValueValue(2)).not.toThrow();
+        expect(blocks.noteValueValue(2)).toBe(1);
+    });
+
+    it("reads the denominator under meter, which carries the fraction in its second slot", () => {
+        buildMeterStyleNote("meter", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when meter's denominator slot is empty", () => {
+        buildMeterStyleNote("meter", null);
+
+        expect(() => blocks.noteValueValue(2)).not.toThrow();
+        expect(blocks.noteValueValue(2)).toBe(1);
+    });
+
+    it("reads the denominator under rhythm, which carries the fraction the same way", () => {
+        buildMeterStyleNote("rhythm2", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when rhythm's denominator slot is empty", () => {
+        buildMeterStyleNote("rhythm2", null);
+
+        expect(() => blocks.noteValueValue(2)).not.toThrow();
+        expect(blocks.noteValueValue(2)).toBe(1);
     });
 });

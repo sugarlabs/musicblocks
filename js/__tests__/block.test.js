@@ -1010,6 +1010,28 @@ describe("Block Foundation", () => {
             expect(order).toEqual(["restore", "sync-grid", "query-trash", "dock", "adjust"]);
         });
 
+        it("sends a moved block to trash without waiting for the highlight", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.textMsg = jest.fn();
+            block.activity.trashcan = {
+                hide: jest.fn(),
+                isVisible: false,
+                overTrashcan: jest.fn().mockReturnValue(true)
+            };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.sendStackToTrash = jest.fn();
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+
+            block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true);
+
+            expect(mockBlocks.sendStackToTrash).toHaveBeenCalledWith(block);
+        });
+
         it("does not reconcile a clean grid", () => {
             const block = new Block(mockProtoBlock, mockBlocks);
             block.blockIndex = 0;
@@ -1023,6 +1045,66 @@ describe("Block Foundation", () => {
             block._mouseoutCallback({}, false, false, false, true, false);
 
             expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("shift+click", () => {
+        const makeClickBlock = running => {
+            const handlers = {};
+            const block = new Block(mockProtoBlock, mockBlocks);
+
+            block.blockIndex = 3;
+            block.connections = [null, null];
+            block.container = {
+                x: 100,
+                y: 100,
+                children: [],
+                on: jest.fn((type, handler) => {
+                    handlers[type] = handler;
+                }),
+                setChildIndex: jest.fn()
+            };
+            block._calculateBlockHitArea = jest.fn();
+
+            mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            block.activity.closeHelpfulWheel = jest.fn();
+            block.activity.turtles = { running: jest.fn().mockReturnValue(running) };
+            block.activity.logo.runLogoCommands = jest.fn();
+            block.activity.logo.doStopTurtles = jest.fn();
+            block.activity.toolbar = { highlightStop: jest.fn() };
+
+            block._loadEventHandlers();
+            return { block, handlers };
+        };
+
+        it("runs the stack from its top block", () => {
+            const { block, handlers } = makeClickBlock(false);
+
+            expect(() =>
+                handlers.click({ nativeEvent: { button: 0, shiftKey: true } })
+            ).not.toThrow();
+
+            expect(mockBlocks.findTopBlock).toHaveBeenCalledWith(3);
+            expect(block.activity.logo.runLogoCommands).toHaveBeenCalledWith(0);
+            expect(block.activity.toolbar.highlightStop).toHaveBeenCalled();
+        });
+
+        it("stops the running project and restarts it from the top block", () => {
+            jest.useFakeTimers();
+            try {
+                const { block, handlers } = makeClickBlock(true);
+
+                handlers.click({ nativeEvent: { button: 0, shiftKey: true } });
+
+                expect(block.activity.logo.doStopTurtles).toHaveBeenCalled();
+                expect(block.activity.logo.runLogoCommands).not.toHaveBeenCalled();
+
+                jest.advanceTimersByTime(250);
+
+                expect(block.activity.logo.runLogoCommands).toHaveBeenCalledWith(0);
+            } finally {
+                jest.useRealTimers();
+            }
         });
     });
 
