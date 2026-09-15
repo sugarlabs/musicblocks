@@ -179,10 +179,12 @@ saveMxmlOutput = logo => {
 
     const staging =
         logo && logo.notation && logo.notation.notationStaging ? logo.notation.notationStaging : {};
-    // A part needs at least one measure, so a voice is only written when it stages a
-    // note with a pitch: one with only markers, or only drum hits (whose pitch list is
-    // empty), would otherwise produce an empty <part>.
-    const writesNotes = staged => staged.some(entry => Array.isArray(entry) && entry[0].length > 0);
+    // A voice is only written when it stages a pitched note. One with only markers, or
+    // only drum hits (whose pitch list is empty), would produce an empty <part>; one with
+    // only rests, or drum hits and rests, would produce a staff of rests with the drum
+    // hits missing.
+    const writesNotes = staged =>
+        staged.some(entry => Array.isArray(entry) && entry[0].some(pitch => pitch[0] !== "R"));
     const activeVoices = Object.keys(staging).filter(
         voice => Array.isArray(staging[voice]) && writesNotes(staging[voice])
     );
