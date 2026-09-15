@@ -1424,3 +1424,162 @@ describe("processPitch internal addPitch behavior", () => {
         expect(turtleMock.singer.notePitches[blk].length).toBe(2);
     });
 });
+
+describe("Singer.processNote tuplet and legoWidget handling", () => {
+    let turtleMock;
+    let activityMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.beatFactor = 1;
+        activityMock = createActivityMock(turtleMock);
+    });
+
+    it("should not duplicate or mutate tupletRhythms when rhythm block calls processNote in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.tupletParams = { 0: [[1, 0.5]] };
+        activityMock.logo.tupletRhythms = { 0: [["notes", 0, 4]] };
+        activityMock.blocks.blockList["blkRhythm"] = { name: "rhythm" };
+        turtleMock.singer.inNoteBlock = ["blkRhythm"];
+
+        Singer.processNote(activityMock, 4, false, "blkRhythm", 0, jest.fn());
+
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["notes", 0, 4]]);
+    });
+
+    it("should accumulate tupletRhythms for non-rhythm note producers (e.g. STupletBlock) in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.tupletParams = { 0: [[1, 0.5]] };
+        activityMock.logo.tupletRhythms = { 0: [["notes", 0]] };
+        activityMock.logo.addingNotesToTuplet = { 0: true };
+        activityMock.blocks.blockList["blkSTuplet"] = { name: "stuplet" };
+        turtleMock.singer.inNoteBlock = ["blkSTuplet"];
+
+        Singer.processNote(activityMock, 4, false, "blkSTuplet", 0, jest.fn());
+
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["notes", 0, 4]]);
+    });
+
+    it("should not apply beatFactor twice for STupletBlock with non-default beatFactor in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.tupletParams = { 0: [[1, 0.5]] };
+        activityMock.logo.tupletRhythms = { 0: [["notes", 0]] };
+        activityMock.logo.addingNotesToTuplet = { 0: true };
+        activityMock.blocks.blockList["blkSTuplet"] = { name: "stuplet" };
+        turtleMock.singer.inNoteBlock = ["blkSTuplet"];
+        turtleMock.singer.beatFactor = 2.5;
+
+        // NoteBeatValue was already scaled by beatFactor (4) by STupletBlock.flow before calling Singer.processNote
+        Singer.processNote(activityMock, 4, false, "blkSTuplet", 0, jest.fn());
+
+        // Value should remain 4, NOT 4 * 2.5 = 10
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["notes", 0, 4]]);
+    });
+
+    it("should scale noteBeatValue by beatFactor for non-stuplet note blocks with non-default beatFactor in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.tupletParams = { 0: [[1, 0.5]] };
+        activityMock.logo.tupletRhythms = { 0: [["notes", 0]] };
+        activityMock.logo.addingNotesToTuplet = { 0: true };
+        activityMock.blocks.blockList["blkNote"] = { name: "note" };
+        turtleMock.singer.inNoteBlock = ["blkNote"];
+        turtleMock.singer.beatFactor = 2;
+
+        Singer.processNote(activityMock, 3, false, "blkNote", 0, jest.fn());
+
+        // Standard note blocks do not pre-scale, so 3 is scaled by beatFactor 2 -> 6
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["notes", 0, 6]]);
+    });
+
+    it("should create new tuplet entry when addingNotesToTuplet is false in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.tupletParams = { 0: [[1, 0.5]] };
+        activityMock.logo.tupletRhythms = { 0: [] };
+        activityMock.logo.addingNotesToTuplet = { 0: false };
+        activityMock.blocks.blockList["blkNote"] = { name: "note" };
+        turtleMock.singer.inNoteBlock = ["blkNote"];
+
+        Singer.processNote(activityMock, 2, false, "blkNote", 0, jest.fn());
+
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["notes", 0, 2]]);
+        expect(activityMock.logo.addingNotesToTuplet[0]).toBe(true);
+
+        // Also test legacy boolean format
+        activityMock.logo.tuplet = true;
+        activityMock.logo.addingNotesToTuplet = false;
+        activityMock.logo.tupletParams = [[1, 0.5]];
+        activityMock.logo.tupletRhythms = [];
+
+        Singer.processNote(activityMock, 3, false, "blkNote", 0, jest.fn());
+        expect(activityMock.logo.tupletRhythms).toEqual([["notes", 0, 3]]);
+        expect(activityMock.logo.addingNotesToTuplet).toBe(true);
+    });
+
+    it("should push individual rhythm when isTuplet is false in inLegoWidget mode", () => {
+        activityMock.logo.inLegoWidget = true;
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.tuplet = { 0: false };
+        activityMock.logo.tupletRhythms = { 0: [] };
+        activityMock.blocks.blockList["blkNote"] = { name: "note" };
+        turtleMock.singer.inNoteBlock = ["blkNote"];
+
+        Singer.processNote(activityMock, 2, false, "blkNote", 0, jest.fn());
+
+        expect(activityMock.logo.tupletRhythms[0]).toEqual([["", 1, 2]]);
+
+        // Also test legacy array format
+        activityMock.logo.tuplet = false;
+        activityMock.logo.tupletRhythms = [];
+        Singer.processNote(activityMock, 3, false, "blkNote", 0, jest.fn());
+        expect(activityMock.logo.tupletRhythms).toEqual([["", 1, 3]]);
+    });
+
+    it("should handle tuplet in phraseMaker when tuplet is active per turtle", () => {
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.inLegoWidget = false;
+        activityMock.logo.tuplet = { 0: true };
+        activityMock.logo.pitchBlocks = ["pb1"];
+        activityMock.logo.drumBlocks = ["db1"];
+        activityMock.logo.phraseMaker = {
+            addColBlock: jest.fn(),
+            addNode: jest.fn(),
+            blockNo: 5
+        };
+        turtleMock.singer.inNoteBlock = ["mockBlk"];
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(activityMock.logo.phraseMaker.addColBlock).toHaveBeenCalledWith("mockBlk", 1);
+        expect(activityMock.logo.phraseMaker.addNode).toHaveBeenCalledWith("pb1", "mockBlk", 0, 5);
+        expect(activityMock.logo.phraseMaker.addNode).toHaveBeenCalledWith("db1", "mockBlk", 0, 5);
+    });
+
+    it("should handle tuplet in phraseMaker when tuplet is legacy boolean", () => {
+        activityMock.logo.inMatrix = false;
+        activityMock.logo.inLegoWidget = false;
+        activityMock.logo.tuplet = true;
+        activityMock.logo.pitchBlocks = [];
+        activityMock.logo.drumBlocks = [];
+        activityMock.logo.phraseMaker = {
+            addColBlock: jest.fn(),
+            addNode: jest.fn(),
+            blockNo: 5
+        };
+        turtleMock.singer.inNoteBlock = ["mockBlk"];
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(activityMock.logo.phraseMaker.addColBlock).toHaveBeenCalledWith("mockBlk", 1);
+    });
+});

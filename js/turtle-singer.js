@@ -1667,7 +1667,85 @@ class Singer {
             activity.logo.arpeggio.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], noteBeatValue];
-        } else if (activity.logo.inMatrix || activity.logo.tuplet) {
+        } else if (activity.logo.inLegoWidget && !activity.logo.inMatrix) {
+            // For LEGO widget, we don't need to handle rhythm blocks currently
+            // Just store the note information
+            if (tur.singer.inNoteBlock.length > 0) {
+                // Could add timing information here if needed in the future
+            }
+
+            const blkName =
+                activity.blocks &&
+                activity.blocks.blockList &&
+                activity.blocks.blockList[blk] &&
+                activity.blocks.blockList[blk].name;
+            const isRhythmBlock = blkName === "rhythm" || blkName === "rhythm2";
+
+            if (!isRhythmBlock) {
+                if (blkName !== "stuplet") {
+                    noteBeatValue *= tur.singer.beatFactor;
+                }
+                const isTuplet =
+                    typeof activity.logo.tuplet === "object" &&
+                    activity.logo.tuplet !== null &&
+                    !Array.isArray(activity.logo.tuplet)
+                        ? Boolean(activity.logo.tuplet[turtle])
+                        : Boolean(activity.logo.tuplet);
+
+                const tRhythms =
+                    typeof activity.logo.tupletRhythms === "object" &&
+                    activity.logo.tupletRhythms !== null &&
+                    !Array.isArray(activity.logo.tupletRhythms)
+                        ? (activity.logo.tupletRhythms[turtle] =
+                              activity.logo.tupletRhythms[turtle] || [])
+                        : activity.logo.tupletRhythms;
+
+                if (isTuplet) {
+                    const tParams =
+                        typeof activity.logo.tupletParams === "object" &&
+                        activity.logo.tupletParams !== null &&
+                        !Array.isArray(activity.logo.tupletParams)
+                            ? (activity.logo.tupletParams[turtle] =
+                                  activity.logo.tupletParams[turtle] || [])
+                            : activity.logo.tupletParams;
+                    const addingNotes =
+                        typeof activity.logo.addingNotesToTuplet === "object" &&
+                        activity.logo.addingNotesToTuplet !== null
+                            ? Boolean(activity.logo.addingNotesToTuplet[turtle])
+                            : Boolean(activity.logo.addingNotesToTuplet);
+
+                    const i = tRhythms.length - 1;
+                    if (addingNotes && i >= 0 && Array.isArray(tRhythms[i])) {
+                        tRhythms[i].push(noteBeatValue);
+                    } else {
+                        tRhythms.push([
+                            "notes",
+                            tParams.length > 0 ? tParams.length - 1 : 0,
+                            noteBeatValue
+                        ]);
+                        if (
+                            typeof activity.logo.addingNotesToTuplet === "object" &&
+                            activity.logo.addingNotesToTuplet !== null
+                        ) {
+                            activity.logo.addingNotesToTuplet[turtle] = true;
+                        } else {
+                            activity.logo.addingNotesToTuplet = true;
+                        }
+                    }
+                } else {
+                    if (Array.isArray(tRhythms)) {
+                        tRhythms.push(["", 1, noteBeatValue]);
+                    }
+                }
+            }
+        } else if (
+            activity.logo.inMatrix ||
+            (typeof activity.logo.tuplet === "object" &&
+            activity.logo.tuplet !== null &&
+            !Array.isArray(activity.logo.tuplet)
+                ? Boolean(activity.logo.tuplet[turtle])
+                : Boolean(activity.logo.tuplet))
+        ) {
             if (tur.singer.inNoteBlock.length > 0) {
                 activity.logo.phraseMaker.addColBlock(blk, 1);
 
@@ -1693,29 +1771,6 @@ class Singer {
                 }
             }
             // Note: tupletRhythms will be populated by the rhythm blocks themselves
-        } else if (activity.logo.inLegoWidget && !activity.logo.inMatrix) {
-            // For LEGO widget, we don't need to handle rhythm blocks currently
-            // Just store the note information
-            if (tur.singer.inNoteBlock.length > 0) {
-                // Could add timing information here if needed in the future
-            }
-
-            noteBeatValue *= tur.singer.beatFactor;
-            if (activity.logo.tuplet) {
-                if (activity.logo.addingNotesToTuplet) {
-                    const i = activity.logo.tupletRhythms.length - 1;
-                    activity.logo.tupletRhythms[i].push(noteBeatValue);
-                } else {
-                    activity.logo.tupletRhythms.push([
-                        "notes",
-                        activity.logo.tupletParams.length - 1,
-                        noteBeatValue
-                    ]);
-                    activity.logo.addingNotesToTuplet = true;
-                }
-            } else {
-                activity.logo.tupletRhythms.push(["", 1, noteBeatValue]);
-            }
         } else {
             // We start the music clock as the first note is being played
             if (activity.logo.firstNoteTime === null) {
