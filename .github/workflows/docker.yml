@@ -22,21 +22,21 @@ on:
     push:
         branches: [master]
         paths:
-            - 'dockerfile'
-            - '.dockerignore'
-            - 'package.json'
-            - 'package-lock.json'
-            - 'index.js'
-            - '.github/workflows/docker.yml'
+            - "dockerfile"
+            - ".dockerignore"
+            - "package.json"
+            - "package-lock.json"
+            - "index.js"
+            - ".github/workflows/docker.yml"
     pull_request:
         branches: [master]
         paths:
-            - 'dockerfile'
-            - '.dockerignore'
-            - 'package.json'
-            - 'package-lock.json'
-            - 'index.js'
-            - '.github/workflows/docker.yml'
+            - "dockerfile"
+            - ".dockerignore"
+            - "package.json"
+            - "package-lock.json"
+            - "index.js"
+            - ".github/workflows/docker.yml"
     workflow_dispatch:
 
 # One in-flight run per PR / ref; newer pushes cancel older runs.
