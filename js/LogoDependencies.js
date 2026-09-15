@@ -77,44 +77,34 @@ class LogoDependencies {
      * @param {Object} [deps.statsWindow] - Stats display handler
      * @param {Function} [deps.statsWindow.displayInfo]
      */
-    constructor({
-        blocks,
-        turtles,
-        stage,
-        errorHandler,
-        messageHandler,
-        storage,
-        config,
-        callbacks,
+    constructor(deps = {}) {
+        LogoDependencies.validate(deps);
 
-        refreshCanvas = null,
-        textMsg = null,
-        markStageDirty = null,
-        save = null,
-        statsWindow = null,
+        const {
+            blocks,
+            turtles,
+            stage,
+            errorHandler,
+            messageHandler,
+            storage,
+            config,
+            callbacks,
 
-        instruments = null,
-        instrumentsFilters = null,
-        instrumentsEffects = null,
-        widgetWindows = null,
-        utils = null,
-        Singer = null,
-        Tone = null,
-        classes = null
-    }) {
-        // Validate required dependencies
-        if (!blocks) {
-            throw new Error("LogoDependencies: 'blocks' is required");
-        }
-        if (!turtles) {
-            throw new Error("LogoDependencies: 'turtles' is required");
-        }
-        if (!stage) {
-            throw new Error("LogoDependencies: 'stage' is required");
-        }
-        if (!errorHandler) {
-            throw new Error("LogoDependencies: 'errorHandler' is required");
-        }
+            refreshCanvas = null,
+            textMsg = null,
+            markStageDirty = null,
+            save = null,
+            statsWindow = null,
+
+            instruments = null,
+            instrumentsFilters = null,
+            instrumentsEffects = null,
+            widgetWindows = null,
+            utils = null,
+            Singer = null,
+            Tone = null,
+            classes = null
+        } = deps;
 
         /**
          * Blocks subsystem - manages program structure and visual feedback
@@ -333,6 +323,55 @@ class LogoDependencies {
      */
     static isLogoDependencies(obj) {
         return obj instanceof LogoDependencies;
+    }
+
+    /**
+     * Validate the dependencies required by the Logo execution engine.
+     *
+     * This is intentionally shared by the constructor and Logo's explicit
+     * dependency path so plain objects receive the same validation as class
+     * instances.
+     *
+     * @param {*} deps - Dependency object to validate
+     * @throws {Error} When a required dependency is missing or malformed
+     */
+    static validate(deps) {
+        if (deps === null || typeof deps !== "object" || Array.isArray(deps)) {
+            throw new Error("LogoDependencies: dependencies must be an object");
+        }
+
+        const required = ["blocks", "turtles", "stage", "errorHandler"];
+        for (const key of required) {
+            if (deps[key] === null || deps[key] === undefined) {
+                throw new Error(`LogoDependencies: '${key}' is required`);
+            }
+        }
+
+        if (typeof deps.blocks !== "object" || Array.isArray(deps.blocks)) {
+            throw new Error("LogoDependencies: 'blocks' must be an object");
+        }
+        if (!Array.isArray(deps.blocks.blockList)) {
+            throw new Error("LogoDependencies: 'blocks.blockList' must be an array");
+        }
+
+        if (typeof deps.turtles !== "object" || Array.isArray(deps.turtles)) {
+            throw new Error("LogoDependencies: 'turtles' must be an object");
+        }
+        if (!Array.isArray(deps.turtles.turtleList)) {
+            throw new Error("LogoDependencies: 'turtles.turtleList' must be an array");
+        }
+
+        if (
+            typeof deps.stage !== "object" ||
+            Array.isArray(deps.stage) ||
+            typeof deps.stage.addEventListener !== "function"
+        ) {
+            throw new Error("LogoDependencies: 'stage.addEventListener' must be a function");
+        }
+
+        if (typeof deps.errorHandler !== "function") {
+            throw new Error("LogoDependencies: 'errorHandler' must be a function");
+        }
     }
 }
 
