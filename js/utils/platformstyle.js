@@ -45,6 +45,11 @@ window.platform = {
 platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform.android;
 
+function getToken(varName) {
+    const source = document.body || document.documentElement;
+    return getComputedStyle(source).getPropertyValue(varName).trim() || null;
+}
+
 const platformThemes = {
     dark: {
         textColor: "#E2E2E2",
@@ -107,9 +112,9 @@ const platformThemes = {
         paletteLabelSelected: "#01143b",
         paletteText: "#BDBDBD",
         rulerHighlight: "#FFEB3B",
-        selectorBackground: "#64B5F6",
-        selectorSelected: "#1E88E5",
-        labelColor: "#BDBDBD",
+        selectorBackground: getToken("--color-selector-bg") || "#64B5F6",
+        selectorSelected: getToken("--color-selector-selected") || "#1E88E5",
+        labelColor: getToken("--color-label-bg") || "#BDBDBD",
         lyricsLabelBackground: "#C7225D",
         lyricsInputBackground: "#D15A84",
         tupletBackground: "#424242",
@@ -270,9 +275,9 @@ const platformThemes = {
         paletteLabelSelected: "#1A8CFF",
         paletteText: "#666666",
         rulerHighlight: "#FFBF00",
-        selectorBackground: "#8CC6FF",
-        selectorSelected: "#1A8CFF",
-        labelColor: "#a0a0a0",
+        selectorBackground: getToken("--color-selector-bg") || "#8CC6FF",
+        selectorSelected: getToken("--color-selector-selected") || "#1A8CFF",
+        labelColor: getToken("--color-label-bg") || "#a0a0a0",
         lyricsLabelBackground: "#FF2B77",
         lyricsInputBackground: "#FF6EA1",
         tupletBackground: "#c0c0c0",
@@ -429,9 +434,9 @@ const platformThemes = {
         paletteLabelSelected: "#0000FF",
         paletteText: "#FFFFFF",
         rulerHighlight: "#FFFF00",
-        selectorBackground: "#00FFFF",
-        selectorSelected: "#00CCCC",
-        labelColor: "#FFFFFF",
+        selectorBackground: getToken("--color-selector-bg") || "#00FFFF",
+        selectorSelected: getToken("--color-selector-selected") || "#00CCCC",
+        labelColor: getToken("--color-label-bg") || "#FFFFFF",
         lyricsLabelBackground: "#FF00FF",
         lyricsInputBackground: "#FF66FF",
         tupletBackground: "#333333",
