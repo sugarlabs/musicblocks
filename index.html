@@ -124,13 +124,15 @@
         <script src="js/utils/jquery-setup.js" defer></script>
         <script src="js/utils/abcLoader.js" defer></script>
         <script src="lib/midi.js" defer></script>
-        <script src="lib/raphael.min.js" defer></script>
-        <script src="lib/wheelnav.js" defer></script>
+        <!-- raphael and wheelnav are loaded from loader.js once the app is up,
+             not here. They are only used to draw the pie menus, which need a
+             block interaction to exist, and as defer scripts they had to run
+             before DOMContentLoaded and so before anything could be painted. -->
         <script src="lib/codejar/codejar.min.js" defer></script>
         <script src="lib/codejar/highlight.pack.js" defer></script>
         <link
             rel="preload"
-            href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
             as="style"
             integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
             crossorigin="anonymous"
@@ -142,7 +144,7 @@
         <noscript
             ><link
                 rel="stylesheet"
-                href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+                href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
                 integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
                 crossorigin="anonymous"
         /></noscript>
@@ -172,7 +174,7 @@
         <script data-main="js/loader" src="lib/require.js" defer></script>
         <link
             rel="preload"
-            href="/fonts/material-icons.woff2"
+            href="fonts/material-icons.woff2"
             as="font"
             type="font/woff2"
             crossorigin="anonymous"

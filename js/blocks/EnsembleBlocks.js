@@ -606,7 +606,7 @@ function setupEnsembleBlocks(activity) {
                 });
             } else {
                 //.TRANS: notes played by this turtle
-                super("turtlelapsednotes", _("turtle notes played"));
+                super("turtleelapsednotes", _("turtle notes played"));
                 this.setHelpString([
                     _(
                         "The Turtle elapse notes block returns the number of notes played by the specified turtle."

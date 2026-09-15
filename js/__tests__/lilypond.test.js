@@ -99,6 +99,17 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("4");
     });
 
+    test("should raise each octave by exactly one", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G7"], 4, 0, null, 0, -1, false],
+            [["G8"], 4, 0, null, 0, -1, false],
+            [["G9"], 4, 0, null, 0, -1, false],
+            [["G10"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("g''''4 g'''''4 g''''''4 g'''''''4 ");
+    });
+
     test("should process a key signature correctly", () => {
         logo.notation.notationStaging[turtle] = ["key", "C", "major"];
         processLilypondNotes(lilypond, logo, turtle);

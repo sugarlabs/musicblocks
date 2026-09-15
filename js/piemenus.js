@@ -629,11 +629,10 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         !pitchHasAccidental &&
         ((!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
             (block.name === "notename" &&
-                (block.connections[0] !== undefined
-                    ? !["setkey", "setkey2"].includes(
-                          block.blocks.blockList[block.connections[0]].name
-                      )
-                    : true)))
+                // A note name block on its own has a null parent, not undefined.
+                !["setkey", "setkey2"].includes(
+                    block.blocks.blockList[block.connections[0]]?.name
+                )))
     ) {
         if (
             scale[scale.length - 1 - i][0] === FIXEDSOLFEGE[note] ||
@@ -873,11 +872,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         if (
             (!block.activity.KeySignatureEnv[2] && that.name === "solfege") ||
             (that.name === "notename" &&
-                (that.connections[0] !== undefined
-                    ? !["setkey", "setkey2"].includes(
-                          that.blocks.blockList[that.connections[0]].name
-                      )
-                    : true))
+                !["setkey", "setkey2"].includes(that.blocks.blockList[that.connections[0]]?.name))
         ) {
             let i = scale.indexOf(selection["note"]);
             if (i === -1) {

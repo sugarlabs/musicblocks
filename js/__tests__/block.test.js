@@ -1048,6 +1048,66 @@ describe("Block Foundation", () => {
         });
     });
 
+    describe("shift+click", () => {
+        const makeClickBlock = running => {
+            const handlers = {};
+            const block = new Block(mockProtoBlock, mockBlocks);
+
+            block.blockIndex = 3;
+            block.connections = [null, null];
+            block.container = {
+                x: 100,
+                y: 100,
+                children: [],
+                on: jest.fn((type, handler) => {
+                    handlers[type] = handler;
+                }),
+                setChildIndex: jest.fn()
+            };
+            block._calculateBlockHitArea = jest.fn();
+
+            mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            block.activity.closeHelpfulWheel = jest.fn();
+            block.activity.turtles = { running: jest.fn().mockReturnValue(running) };
+            block.activity.logo.runLogoCommands = jest.fn();
+            block.activity.logo.doStopTurtles = jest.fn();
+            block.activity.toolbar = { highlightStop: jest.fn() };
+
+            block._loadEventHandlers();
+            return { block, handlers };
+        };
+
+        it("runs the stack from its top block", () => {
+            const { block, handlers } = makeClickBlock(false);
+
+            expect(() =>
+                handlers.click({ nativeEvent: { button: 0, shiftKey: true } })
+            ).not.toThrow();
+
+            expect(mockBlocks.findTopBlock).toHaveBeenCalledWith(3);
+            expect(block.activity.logo.runLogoCommands).toHaveBeenCalledWith(0);
+            expect(block.activity.toolbar.highlightStop).toHaveBeenCalled();
+        });
+
+        it("stops the running project and restarts it from the top block", () => {
+            jest.useFakeTimers();
+            try {
+                const { block, handlers } = makeClickBlock(true);
+
+                handlers.click({ nativeEvent: { button: 0, shiftKey: true } });
+
+                expect(block.activity.logo.doStopTurtles).toHaveBeenCalled();
+                expect(block.activity.logo.runLogoCommands).not.toHaveBeenCalled();
+
+                jest.advanceTimersByTime(250);
+
+                expect(block.activity.logo.runLogoCommands).toHaveBeenCalledWith(0);
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+    });
+
     describe("dispose()", () => {
         it("should clean up connections, DOM nodes, containers, bitmaps, and parent pointers", () => {
             const block = new Block(mockProtoBlock, mockBlocks);
