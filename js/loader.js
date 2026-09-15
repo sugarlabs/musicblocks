@@ -233,6 +233,9 @@ requirejs.config({
         },
         "activity/js-export/ast2blocks.config": {
             exports: "ast2blocklist_config"
+        },
+        "widgets/widgetWindows": {
+            deps: ["utils/utils"]
         }
     },
     paths: {
