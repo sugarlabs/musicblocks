@@ -393,7 +393,6 @@ class Singer {
                           );
                 // getStepSizeUp returns EDO-step counts off 12-EDO; normalize to
                 // a semitone offset (isAlreadyEdoSteps=false) so getNote remaps it.
-                // ponytail: linear 12/modeEdo rescale, per-ratio lookup if cents drift matters
                 const stepSemis = (stepCount * 12) / modeEdo;
                 noteObj = getNote(
                     noteObj[0],

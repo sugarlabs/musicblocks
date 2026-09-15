@@ -26,7 +26,6 @@ global._ = jest.fn(str => str);
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
-
 const {
     scaleDegreeToPitchMapping,
     buildScale,
@@ -137,7 +136,10 @@ const {
     getModeNameFromLabel,
     getModeSliceColors,
     updateModeWheelItems,
-    getModeGroupTitleFont
+    getModeGroupTitleFont,
+    parseSclFile,
+    modeToJson,
+    parseModeJson
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -4368,5 +4370,54 @@ describe("generateNoteNames EDO length contract", () => {
             expect(generateNoteNames(edo)[0]).toBe("C");
             expect(generateNoteNames(edo)).toEqual(generateNoteNames(edo));
         }
+    });
+});
+
+describe("parseSclFile", () => {
+    it("parses a .scl file with mixed ratios and cents", () => {
+        const content = [
+            "! meanquar.scl",
+            "!",
+            "1/4-comma meantone scale",
+            "3",
+            "76.04900",
+            "5/4",
+            "2/1"
+        ].join("\n");
+
+        const result = parseSclFile(content);
+        expect(result.description).toBe("1/4-comma meantone scale");
+        expect(result.pitchCount).toBe(3);
+        expect(result.pitches[0].cents).toBeCloseTo(76.049, 1);
+        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 4);
+    });
+
+    it("throws on empty content", () => {
+        expect(() => parseSclFile("")).toThrow();
+    });
+
+    it("parses .scl with integer ratios", () => {
+        const content = ["! test.scl", "!", "Test", "3", "3/2", "5/4", "2/1"].join("\n");
+        const result = parseSclFile(content);
+        expect(result.pitchCount).toBe(3);
+        expect(result.pitches[0].ratio).toBeCloseTo(1.5, 4);
+        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 4);
+    });
+});
+
+describe("mode JSON", () => {
+    it("round-trips exactly", () => {
+        const pattern = [2, 2, 1, 2, 2, 2, 1];
+        const def = parseModeJson(modeToJson("major", 12, pattern));
+        expect(def).toEqual({ name: "major", edo: 12, pattern });
+    });
+
+    it("strict-rejects bad structure", () => {
+        expect(() => parseModeJson("not json")).toThrow("Invalid JSON");
+        expect(() => parseModeJson(modeToJson("bad", 12, [2, 2, 1]))).toThrow(
+            "does not sum to edo"
+        );
+        expect(() => parseModeJson(modeToJson("bad", 4, [2, 2]))).toThrow("invalid edo");
+        expect(() => parseModeJson(modeToJson("bad", 12, [2, 0, 10]))).toThrow("invalid pattern");
     });
 });
