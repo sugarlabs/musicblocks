@@ -2733,7 +2733,7 @@ class Activity {
 
             // Load custom modes saved in local storage so they survive a reload.
             try {
-                const savedModes = getSavedCustomModes();
+                const savedModes = JSON.parse(localStorage.getItem("customModes") || "[]");
                 for (const mode of savedModes) {
                     if (mode && mode.name && Array.isArray(mode.pattern)) {
                         MUSICALMODES[mode.name] = mode.pattern;

@@ -850,8 +850,7 @@ function setupWidgetBlocks(activity) {
                     _getWidgetDependencies(typeof ModeWidget !== "undefined" ? ModeWidget : null, [
                         "widgets/modewidget"
                     ]),
-                    () => new ModeWidget(activity),
-                    resetFlag
+                    () => new ModeWidget(activity)
                 );
             };
 
