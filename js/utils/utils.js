@@ -180,18 +180,21 @@ let format = (str, data) => {
 
 /**
  * Wait for critical dependencies to be ready before calling callback.
- * Uses polling with exponential backoff and maximum timeout.
+ * Uses timer-based polling and a separate maximum timeout.
  * This replaces the arbitrary 5-second delay for Firefox with actual readiness checks.
  *
  * @param {Function} callback - The function to call when ready
  * @param {Object} options - Configuration options
  * @param {number} options.maxWait - Maximum wait time in ms (default: 10000)
  * @param {number} options.minWait - Minimum wait time in ms (default: 500)
- * @param {number} options.checkInterval - Initial check interval in ms (default: 100)
+ * @param {number} options.checkInterval - Check interval in ms (default: 100)
  */
 function waitForReadiness(callback, options = {}) {
     const { maxWait = 10000, minWait = 500, checkInterval = 100 } = options;
     const startTime = Date.now();
+    let pollTimerId = null;
+    let timeoutId = null;
+    let completed = false;
 
     /**
      * Check if critical dependencies and DOM elements are ready
@@ -215,29 +218,42 @@ function waitForReadiness(callback, options = {}) {
     /**
      * Polling function that checks readiness and calls callback when ready
      */
+    const complete = timedOut => {
+        if (completed) return;
+
+        completed = true;
+        clearTimeout(pollTimerId);
+        clearTimeout(timeoutId);
+
+        if (timedOut) {
+            // Timeout - initialize anyway as fallback
+            console.warn(
+                `[Firefox] Initialization timed out after ${maxWait}ms, proceeding anyway`
+            );
+        }
+
+        callback();
+    };
+
     const check = () => {
+        if (completed) return;
+
         const elapsed = Date.now() - startTime;
 
         if (elapsed >= minWait && isReady()) {
             // Ready! Initialize the app
 
             console.log(`[Firefox] Initialized in ${elapsed}ms (readiness-based)`);
-            callback();
-        } else if (elapsed >= maxWait) {
-            // Timeout - initialize anyway as fallback
-
-            console.warn(
-                `[Firefox] Initialization timed out after ${maxWait}ms, proceeding anyway`
-            );
-            callback();
+            complete(false);
         } else {
-            // Not ready yet, check again on next animation frame
-            requestAnimationFrame(check);
+            // Not ready yet, check again after the configured interval
+            pollTimerId = setTimeout(check, checkInterval);
         }
     };
 
-    // Start the readiness check loop
-    requestAnimationFrame(check);
+    // Start polling and timeout independently so timeout does not depend on RAF.
+    pollTimerId = setTimeout(check, checkInterval);
+    timeoutId = setTimeout(() => complete(true), maxWait);
 }
 
 // docByClass(), docByTagName(), docById(), docByName(), docBySelector()
@@ -1302,6 +1318,7 @@ if (typeof module !== "undefined" && module.exports) {
         processRawPluginData,
         preparePluginExports,
         processMacroData,
+        waitForReadiness,
         updatePluginObj,
         announceToScreenReader,
         doUseCamera,
