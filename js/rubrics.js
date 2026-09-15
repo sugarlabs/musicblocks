@@ -631,7 +631,7 @@ const analyzeProject = activity => {
             if (!(TACAT[blockList[b]] in cats)) {
                 cats.push(TACAT[blockList[b]]);
             }
-            } else {
+        } else {
             console.debug(blockList[b] + " not in catalog");
         }
     }
