@@ -2565,6 +2565,114 @@ class Blocks {
             }
         };
 
+        this._snapTargetBlock = null;
+        this._snapIndicatorShape = null;
+
+        /**
+         * Resolves snap indicator colors from CSS tokens in tokens.css,
+         * falling back to default golden values if tokens or computed styles are unavailable.
+         * @private
+         * @returns {{ stroke: string, fill: string }}
+         */
+        this._getSnapIndicatorColors = () => {
+            let stroke = "";
+            let fill = "";
+            if (
+                typeof getComputedStyle !== "undefined" &&
+                typeof document !== "undefined" &&
+                document.body
+            ) {
+                const style = getComputedStyle(document.body);
+                stroke = style.getPropertyValue("--color-snap-indicator-stroke").trim();
+                fill = style.getPropertyValue("--color-snap-indicator-fill").trim();
+            }
+            // Primary values come from tokens.css; fallback for headless test environments
+            return {
+                stroke: stroke || "rgba(255, 215, 0, 0.95)",
+                fill: fill || "rgba(255, 215, 0, 0.35)"
+            };
+        };
+
+        /**
+         * Show visual snap indicator on target block and connection point.
+         * @param {object} candidate - { targetBlock, connectionIndex, dockX, dockY }
+         * @public
+         * @returns {void}
+         */
+        this.showSnapIndicator = candidate => {
+            if (!candidate) {
+                this.hideSnapIndicator();
+                return;
+            }
+
+            // Highlight target block
+            if (this._snapTargetBlock !== candidate.targetBlock) {
+                if (this._snapTargetBlock !== null && this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
+                this._snapTargetBlock = candidate.targetBlock;
+                if (this.blockList[candidate.targetBlock]) {
+                    this.blockList[candidate.targetBlock].highlight();
+                }
+            }
+
+            // Create or position glowing docking indicator circle
+            if (!this._snapIndicatorShape && typeof createjs !== "undefined" && createjs.Shape) {
+                this._snapIndicatorShape = new createjs.Shape();
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.addChild === "function"
+                ) {
+                    this.activity.blocksContainer.addChild(this._snapIndicatorShape);
+                }
+            }
+
+            if (this._snapIndicatorShape) {
+                const colors = this._getSnapIndicatorColors();
+                if (typeof this._snapIndicatorShape.graphics.clear === "function") {
+                    this._snapIndicatorShape.graphics.clear();
+                }
+                this._snapIndicatorShape.graphics
+                    .setStrokeStyle(3)
+                    .beginStroke(colors.stroke)
+                    .beginFill(colors.fill)
+                    .drawCircle(0, 0, 10);
+
+                this._snapIndicatorShape.x = candidate.dockX;
+                this._snapIndicatorShape.y = candidate.dockY;
+                this._snapIndicatorShape.visible = true;
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.setChildIndex === "function" &&
+                    Array.isArray(this.activity.blocksContainer.children)
+                ) {
+                    this.activity.blocksContainer.setChildIndex(
+                        this._snapIndicatorShape,
+                        this.activity.blocksContainer.children.length - 1
+                    );
+                }
+            }
+        };
+
+        /**
+         * Hide visual snap indicator and unhighlight target block.
+         * @public
+         * @returns {void}
+         */
+        this.hideSnapIndicator = () => {
+            if (this._snapTargetBlock !== null) {
+                if (this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
+                this._snapTargetBlock = null;
+            }
+            if (this._snapIndicatorShape) {
+                this._snapIndicatorShape.visible = false;
+            }
+        };
+
         /**
          * Hide all of the blocks.
          * @public

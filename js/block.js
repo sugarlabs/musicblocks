@@ -3461,6 +3461,29 @@ class Block {
             } else {
                 that.activity.trashcan.stopHighlightAnimation();
             }
+
+            // Visual dock snap indicator (throttled to ~60fps).
+            // 16ms corresponds to one frame at ~60fps (1000ms / 60 ≈ 16.6ms), preventing
+            // expensive spatial dock candidate scans on every high-frequency pointer move event.
+            const SNAP_CHECK_INTERVAL_MS = 16;
+            if (!overTrash && typeof that.blocks.findDockCandidate === "function") {
+                if (
+                    !that.blocks._lastSnapCheckTime ||
+                    now - that.blocks._lastSnapCheckTime >= SNAP_CHECK_INTERVAL_MS
+                ) {
+                    that.blocks._lastSnapCheckTime = now;
+                    const candidate = that.blocks.findDockCandidate(thisBlock);
+                    if (candidate && typeof that.blocks.showSnapIndicator === "function") {
+                        that.blocks.showSnapIndicator(candidate);
+                    } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                        that.blocks.hideSnapIndicator();
+                    }
+                }
+            } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks._lastSnapCheckTime = 0;
+                that.blocks.hideSnapIndicator();
+            }
+
             if (that.isValueBlock() && that.name !== "media") {
                 // Ensure text is on top
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -3514,6 +3537,10 @@ class Block {
                 return;
             }
 
+            if (!that.blocks.isBlockMoving && typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
+            }
+
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false, false);
             } else {
@@ -3543,6 +3570,11 @@ class Block {
          */
         this.container.on("pressup", event => {
             that._dragPointerDown = false;
+            that.blocks._lastSnapCheckTime = 0;
+
+            if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
+            }
 
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false, true, _dragSpatialGridDirty);
