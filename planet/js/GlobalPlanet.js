@@ -534,6 +534,12 @@ class GlobalPlanet {
                 this.sortBy = document.getElementById("sort-select").value;
                 this.refreshProjects();
             });
+            const sortByLabel = document.getElementById("option-sort-by");
+            if (sortByLabel) {
+                jQuery("#sort-select")
+                    .siblings("input.select-dropdown")
+                    .attr("aria-label", sortByLabel.textContent);
+            }
 
             jQuery("#sort-select")
                 .siblings(".select-dropdown, .caret")
