@@ -1072,6 +1072,24 @@ describe("widgetWindows", () => {
             expect(win._dragTopHandler).toHaveBeenCalledWith(upEvent);
             expect(window.widgetWindows.draggingWindow).toBeNull();
         });
+
+        test("recalculates _dx and _dy after restoring a maximized window during drag", () => {
+            const win = createTestWindow("MaxDrag Window");
+            win._maximize();
+
+            // Stale offsets from the maximized state
+            win._dx = 999;
+            win._dy = 999;
+
+            const moveEvent = { clientX: 200, clientY: 300, preventDefault: jest.fn() };
+            win._docMouseMoveHandler(moveEvent);
+
+            // After restore, _maximized should be false
+            expect(win._maximized).toBe(false);
+            // _dx and _dy should have been recalculated (no longer 999)
+            expect(win._dx).not.toBe(999);
+            expect(win._dy).not.toBe(999);
+        });
     });
 
     describe("window visibility and management helpers", () => {

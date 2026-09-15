@@ -415,6 +415,12 @@ class WidgetWindow {
 
             const newBcr = this._drag.getBoundingClientRect();
             this.setPosition(e.clientX + dxRatio * (newBcr.right - newBcr.left), e.clientY + dy);
+
+            // Recalculate drag offsets from the restored frame so the rAF
+            // callback below does not overwrite the position with stale values.
+            const restoredBcr = this._drag.getBoundingClientRect();
+            this._dx = e.clientX - restoredBcr.left;
+            this._dy = e.clientY - restoredBcr.top;
         }
         // Throttle using requestAnimationFrame to prevent layout thrashing
         if (this._rafTicking) return;
