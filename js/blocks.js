@@ -2575,24 +2575,22 @@ class Blocks {
          * @returns {{ stroke: string, fill: string }}
          */
         this._getSnapIndicatorColors = () => {
-            let stroke = "rgba(255, 215, 0, 0.95)";
-            let fill = "rgba(255, 215, 0, 0.35)";
+            let stroke = "";
+            let fill = "";
             if (
                 typeof getComputedStyle !== "undefined" &&
                 typeof document !== "undefined" &&
                 document.body
             ) {
                 const style = getComputedStyle(document.body);
-                const tokenStroke = style.getPropertyValue("--color-snap-indicator-stroke").trim();
-                const tokenFill = style.getPropertyValue("--color-snap-indicator-fill").trim();
-                if (tokenStroke) {
-                    stroke = tokenStroke;
-                }
-                if (tokenFill) {
-                    fill = tokenFill;
-                }
+                stroke = style.getPropertyValue("--color-snap-indicator-stroke").trim();
+                fill = style.getPropertyValue("--color-snap-indicator-fill").trim();
             }
-            return { stroke, fill };
+            // Primary values come from tokens.css; fallback for headless test environments
+            return {
+                stroke: stroke || "rgba(255, 215, 0, 0.95)",
+                fill: fill || "rgba(255, 215, 0, 0.35)"
+            };
         };
 
         /**
