@@ -47,14 +47,16 @@
  *
  *   ... --emit[=provider] [--write]
  *       Generates one candidate, runs it through the deterministic validator
- *       (./validate-generated.js), and reports a summary: the module, how
- *       many exports/functions/classes the plan found, whether the candidate
- *       was accepted or rejected (with reasons), and the exact path the safe
- *       writer would use. This is the dry-run / preview step - without
- *       --write nothing is ever written. With --write, a valid candidate is
- *       written to `<dir>/__tests__/<module>.generated.test.js` (an existing
- *       file - generated or hand-written - is never overwritten). Exits
- *       non-zero when the candidate is invalid or cannot be written.
+ *       (./validate-generated.js), and prints a review report (built by
+ *       ./review-report.js): what the plan discovered, the candidate's status
+ *       - ACCEPTED, WARNING (safe to write, but read the warning first) or
+ *       REJECTED (with the validator's own reasons) - and the exact path the
+ *       safe writer would use. This is the dry-run / preview step - without
+ *       --write nothing is ever written. With --write, an ACCEPTED or WARNING
+ *       candidate is written to `<dir>/__tests__/<module>.generated.test.js`
+ *       (an existing file - generated or hand-written - is never
+ *       overwritten). Exits non-zero when the candidate is rejected or cannot
+ *       be written.
  *
  * Every mode above reads and parses the target file; only `--emit --write`
  * writes anything - creating the one generated file described above - and
@@ -70,6 +72,7 @@ const { buildPrompt } = require("./prompt-builder");
 const { createClient } = require("./llm-client");
 const { validateGeneratedTest } = require("./validate-generated");
 const { writeGeneratedTest, generatedTestPathFor } = require("./write-generated");
+const { STATUS, buildReviewReport, formatReviewReport } = require("./review-report");
 
 const USAGE =
     "usage: node scripts/generate-tests/cli.js (<module.js> | --module <module.js>) " +
@@ -96,11 +99,12 @@ const HELP = [
     "  --prompt            print the deterministic generation prompt; no provider is run",
     "  --generate[=prov]   run the pipeline through a provider and print the RAW candidate source.",
     "                      No validation, no file path, nothing written. For eyeballing output.",
-    "  --emit[=prov]       generate one candidate, VALIDATE it, and print a summary: module,",
-    "                      exports/functions/classes considered, accepted/rejected (with reasons",
-    "                      when rejected), and the exact path the safe writer would use.",
+    "  --emit[=prov]       generate one candidate, VALIDATE it, and print a review report: what",
+    "                      the plan discovered, the candidate's status - ACCEPTED, WARNING (safe",
+    "                      to write, but read the warning) or REJECTED (with the validator's own",
+    "                      reasons) - and the exact path the safe writer would use.",
     "                      This is the dry-run / preview step - nothing is written yet.",
-    "                      Exit 1 if the candidate is invalid.",
+    "                      Exit 1 if the candidate is rejected.",
     "    --write           with --emit only: actually write a valid candidate to",
     "                      <dir>/__tests__/<module>.generated.test.js. Never overwrites an",
     "                      existing file (generated or hand-written), never traverses out of",
@@ -301,22 +305,19 @@ function main(argv) {
             return 1;
         }
         const validation = validateGeneratedTest(source, { plan });
+        const report = buildReviewReport(plan, [{ provider: args.emit, validation, outPath }]);
+        const [candidate] = report.candidates;
 
-        // Dry-run / preview summary: printed for both --emit and --emit --write,
-        // so a contributor sees the same picture of what the pipeline found and
-        // decided before anything is ever written.
-        process.stdout.write(
-            `module: ${plan.file} ` +
-                `(exports: ${plan.exports.length}, functions: ${plan.functions.length}, ` +
-                `classes: ${plan.classes.length})\n` +
-                `provider: ${args.emit}; candidates generated: 1, ` +
-                `accepted: ${validation.valid ? 1 : 0}, rejected: ${validation.valid ? 0 : 1}\n`
-        );
+        // Review report: printed for both --emit and --emit --write, so a
+        // contributor sees the same picture of what the pipeline found and
+        // decided before anything is ever written. It only ever reads the
+        // validator's own result - see ./review-report.js.
+        process.stdout.write(formatReviewReport(report));
 
         for (const warning of validation.warnings) {
             process.stderr.write(`warning: ${warning}\n`);
         }
-        if (!validation.valid) {
+        if (candidate.status === STATUS.REJECTED) {
             for (const error of validation.errors) {
                 process.stderr.write(`invalid: ${error}\n`);
             }

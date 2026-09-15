@@ -44,6 +44,10 @@ const VALID_SOURCE = fs.readFileSync(
     path.join(__dirname, "fixtures", "generated", "valid-utils-logic.txt"),
     "utf8"
 );
+const WARNING_SOURCE = fs.readFileSync(
+    path.join(__dirname, "fixtures", "generated", "warning-utils-logic.txt"),
+    "utf8"
+);
 
 /**
  * Runs `fn` with process.stdout.write / process.stderr.write captured instead
@@ -83,6 +87,27 @@ function withValidProviderCli(fn) {
             createClient: () => ({
                 name: "fixture",
                 generate: () => ({ source: VALID_SOURCE })
+            })
+        }));
+        result = fn(require("../cli"));
+    });
+    return result;
+}
+
+/**
+ * Same as {@link withValidProviderCli}, but the mocked provider returns a
+ * candidate that is valid yet triggers exactly one validator *warning*
+ * (an uncontrolled `new Date()`) - for exercising the WARNING status, which
+ * must behave like an accepted candidate (write succeeds) while still
+ * surfacing the warning text.
+ */
+function withWarningProviderCli(fn) {
+    let result;
+    jest.isolateModules(() => {
+        jest.doMock("../llm-client", () => ({
+            createClient: () => ({
+                name: "fixture",
+                generate: () => ({ source: WARNING_SOURCE })
             })
         }));
         result = fn(require("../cli"));
@@ -200,9 +225,11 @@ describe("dry-run / preview (--emit without --write)", () => {
         );
 
         expect(result).toBe(1);
-        expect(stdout).toMatch(/module: js\/utils\/utils-logic\.js/);
-        expect(stdout).toMatch(/exports: \d+, functions: \d+, classes: \d+/);
-        expect(stdout).toMatch(/candidates generated: 1, accepted: 0, rejected: 1/);
+        expect(stdout).toMatch(/review report: js\/utils\/utils-logic\.js/);
+        expect(stdout).toMatch(/discovered: \d+ export\(s\), \d+ function\(s\), \d+ class\(es\)/);
+        expect(stdout).toMatch(/candidate 1 \(provider: noop\): REJECTED/);
+        expect(stdout).toMatch(/summary: 0 accepted, 0 warning, 1 rejected \(of 1\)/);
+        expect(stdout).toMatch(/note: validation is static and heuristic/);
         expect(stderr).toMatch(/invalid: .*no meaningful assertions/);
         expect(stderr).toMatch(
             /candidate rejected; nothing written \(intended path: js\/utils\/__tests__\/utils-logic\.generated\.test\.js\)/
@@ -262,7 +289,8 @@ describe("write path behavior (mocked provider seam, real validator + writer)", 
             );
 
             expect(result).toBe(0);
-            expect(stdout).toMatch(/accepted: 1, rejected: 0/);
+            expect(stdout).toMatch(/candidate 1 \(provider: noop\): ACCEPTED/);
+            expect(stdout).toMatch(/summary: 1 accepted, 0 warning, 0 rejected \(of 1\)/);
             expect(stdout).toMatch(/wrote js\/utils\/__tests__\/utils-logic\.generated\.test\.js/);
             expect(fs.existsSync(written)).toBe(true);
             expect(fs.readFileSync(written, "utf8")).toBe(VALID_SOURCE);
@@ -316,10 +344,57 @@ describe("write path behavior (mocked provider seam, real validator + writer)", 
             );
 
             expect(result).toBe(0);
-            expect(stdout).toMatch(/accepted: 1, rejected: 0/);
+            expect(stdout).toMatch(/candidate 1 \(provider: noop\): ACCEPTED/);
+            expect(stdout).toMatch(/summary: 1 accepted, 0 warning, 0 rejected \(of 1\)/);
             expect(stdout).toMatch(/candidate is valid; would write/);
             expect(stdout).toMatch(/pass --write to create it/);
             expect(fs.existsSync(wouldBeWritten)).toBe(false);
+        } finally {
+            process.chdir(cwd);
+            fs.rmSync(sandbox, { recursive: true, force: true });
+        }
+    });
+
+    it("a WARNING candidate previews with its warning text and is not blocked from writing", () => {
+        const sandbox = makeSandboxWithUtilsLogic();
+        const cwd = process.cwd();
+        try {
+            process.chdir(sandbox);
+            const preview = captureStreams(() =>
+                withWarningProviderCli(isolated =>
+                    isolated.main(["--module", "js/utils/utils-logic.js", "--emit"])
+                )
+            );
+
+            // A warning must never turn into a failure: exit 0, same as ACCEPTED.
+            expect(preview.result).toBe(0);
+            expect(preview.stdout).toMatch(/candidate 1 \(provider: noop\): WARNING/);
+            expect(preview.stdout).toMatch(/warnings:/);
+            expect(preview.stdout).toMatch(/constructs `new Date\(\)` with no argument/);
+            expect(preview.stdout).toMatch(/summary: 0 accepted, 1 warning, 0 rejected \(of 1\)/);
+            expect(preview.stdout).toMatch(/candidate is valid; would write/);
+
+            const written = path.join(
+                sandbox,
+                "js",
+                "utils",
+                "__tests__",
+                "utils-logic.generated.test.js"
+            );
+            expect(fs.existsSync(written)).toBe(false);
+
+            const write = captureStreams(() =>
+                withWarningProviderCli(isolated =>
+                    isolated.main(["--module", "js/utils/utils-logic.js", "--emit", "--write"])
+                )
+            );
+            expect(write.result).toBe(0);
+            expect(write.stdout).toMatch(/candidate 1 \(provider: noop\): WARNING/);
+            expect(write.stdout).toMatch(
+                /wrote js\/utils\/__tests__\/utils-logic\.generated\.test\.js/
+            );
+            expect(fs.existsSync(written)).toBe(true);
+            expect(fs.readFileSync(written, "utf8")).toBe(WARNING_SOURCE);
         } finally {
             process.chdir(cwd);
             fs.rmSync(sandbox, { recursive: true, force: true });
@@ -358,6 +433,13 @@ describe("deterministic output", () => {
         const firstPrompt = captureStreams(() => cli.main(["--module", UTILS_LOGIC, "--prompt"]));
         const secondPrompt = captureStreams(() => cli.main(["--module", UTILS_LOGIC, "--prompt"]));
         expect(firstPrompt.stdout).toBe(secondPrompt.stdout);
+    });
+
+    it("running --emit twice yields an identical review report on stdout", () => {
+        const first = captureStreams(() => cli.main(["--module", UTILS_LOGIC, "--emit"]));
+        const second = captureStreams(() => cli.main(["--module", UTILS_LOGIC, "--emit"]));
+        expect(first.result).toBe(second.result);
+        expect(first.stdout).toBe(second.stdout);
     });
 });
 
