@@ -56,9 +56,10 @@
  *       file - generated or hand-written - is never overwritten). Exits
  *       non-zero when the candidate is invalid or cannot be written.
  *
- * Every mode above only reads and parses the target file; only `--emit
- * --write` touches disk, and only to add the one file described above. The
- * target module is never required, imported or executed.
+ * Every mode above reads and parses the target file; only `--emit --write`
+ * writes anything - creating the one generated file described above - and
+ * no other mode modifies the repository. The target module is never
+ * required, imported or executed.
  */
 
 const fs = require("fs");

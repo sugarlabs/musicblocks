@@ -1,7 +1,8 @@
 # Module test-plan extractor and test-generation bridge
 
 New to this tool? Jump to [Contributor workflow](#contributor-workflow) for a
-five-minute walkthrough that only uses `npm run generate-tests`.
+five-minute walkthrough built around `npm run generate-tests`, finishing with
+`npx jest` on the file it writes.
 
 A small, deterministic AST analysis utility. Given a JavaScript source file it
 produces a JSON description of what the module exposes and what is therefore
@@ -40,9 +41,11 @@ filesystem, and only under the guards described below.
 
 ## Contributor workflow
 
-You do not need to know the AST internals to use this tool. The whole pipeline
-is one command, `npm run generate-tests -- <options>`, walking the same seven
-stages every time:
+You do not need to know the AST internals to use this tool. The diagram below
+is the complete pipeline, run through `npm run generate-tests -- <options>`;
+a given invocation only executes the stages its mode calls for - `--generate`
+stops before validation, `--emit` without `--write` stops before writing, and
+only `--emit --write` performs the final write:
 
 ```text
 module
