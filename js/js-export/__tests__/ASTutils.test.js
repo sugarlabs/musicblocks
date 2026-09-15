@@ -18,6 +18,7 @@
  */
 
 const ASTUtils = require("../ASTutils");
+const astring = require("../../../lib/astring.min.js");
 
 global.last = jest.fn(array => array[array.length - 1]);
 global.JSInterface = {
@@ -918,6 +919,39 @@ describe("ASTUtils", () => {
                     ]
                 }
             });
+        });
+
+        it("should export a repeat containing an if with a nested repeat", async () => {
+            const tree = [
+                [
+                    "repeat",
+                    [2],
+                    [
+                        ["if", [["less", [1, 2]]], [["repeat", [3], [["print", ["hello"]]]]]],
+                        ["if", [["less", [2, 1]]], [["print", ["never"]]]]
+                    ]
+                ]
+            ];
+
+            JSInterface.isSetter.mockReturnValue(false);
+            JSInterface.isMethod.mockReturnValue(true);
+            JSInterface.isClampBlock.mockReturnValue(false);
+            JSInterface.isGetter.mockReturnValue(false);
+            JSInterface.methodReturns.mockReturnValue(false);
+            JSInterface.getMethodName.mockImplementation(methodName => methodName);
+            JSInterface.rearrangeMethodArgs.mockImplementation((methodName, args) => args);
+
+            const code = astring.generate(ASTUtils.getMouseAST(tree));
+            expect(code).toContain("let i0 = 0");
+            expect(code).toContain("let i1 = 0");
+
+            const printed = [];
+            let flow;
+            new Function("Mouse", code)(function Mouse(mouseFlow) {
+                flow = mouseFlow;
+            });
+            await flow({ print: value => printed.push(value) });
+            expect(printed).toEqual(["hello", "hello", "hello", "hello", "hello", "hello"]);
         });
     });
 });
