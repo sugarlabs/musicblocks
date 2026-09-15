@@ -767,6 +767,31 @@ describe("saveMxmlOutput notation markers", () => {
         expect(stepsOf(doc)).toEqual(["C", "D"]);
     });
 
+    it.each([
+        ["rests", [note("R"), note("R")]],
+        [
+            "drum hits and rests",
+            [
+                [[], 4, 0, null, null, false, false],
+                note("R"),
+                [[], 4, 0, null, null, false, false],
+                note("R")
+            ]
+        ]
+    ])("omits a voice with no pitched note: only %s", (_label, staged) => {
+        const doc = parseScore(exportVoices({ 0: [note("C4"), note("D4")], 1: staged }));
+
+        expect(doc.getElementsByTagName("part")).toHaveLength(1);
+        expect(doc.getElementsByTagName("rest")).toHaveLength(0);
+    });
+
+    it("keeps rests in a voice that also has pitched notes", () => {
+        const doc = parseScore(exportVoice([note("C4"), note("R"), note("D4")]));
+
+        expect(doc.getElementsByTagName("rest")).toHaveLength(1);
+        expect(stepsOf(doc)).toEqual(["C", "D"]);
+    });
+
     it("omits a voice that stages markers but no notes", () => {
         const doc = parseScore(
             exportVoices({

@@ -177,10 +177,12 @@ saveMxmlOutput = logo => {
         );
     };
 
-    // A part needs at least one measure, so a voice is only written when it stages a
-    // note with a pitch: one with only markers, or only drum hits (whose pitch list is
-    // empty), would otherwise produce an empty <part>.
-    const writesNotes = staged => staged.some(entry => Array.isArray(entry) && entry[0].length > 0);
+    // A voice is only written when it stages a pitched note. One with only markers, or
+    // only drum hits (whose pitch list is empty), would produce an empty <part>; one with
+    // only rests, or drum hits and rests, would produce a staff of rests with the drum
+    // hits missing.
+    const writesNotes = staged =>
+        staged.some(entry => Array.isArray(entry) && entry[0].some(pitch => pitch[0] !== "R"));
 
     add("<?xml version='1.0' encoding='UTF-8'?>");
     add(
