@@ -55,6 +55,7 @@ class Tempo {
         this.tapBtn = null;
         this._tapTimes = [];
         this._tapTimeout = null;
+        this._lastTapIndex = null;
     }
 
     init(activity) {
@@ -65,6 +66,7 @@ class Tempo {
         this._firstClickTime = null;
         this._intervals = [];
         this._tapTimes = [];
+        this._lastTapIndex = null;
         if (this._tapTimeout) {
             clearTimeout(this._tapTimeout);
             this._tapTimeout = null;
@@ -107,6 +109,7 @@ class Tempo {
                 this._tapTimeout = null;
             }
             this._tapTimes = [];
+            this._lastTapIndex = null;
             if (this._intervalID !== null) {
                 widgetWindow.timerManager.clearInterval(this._intervalID);
             }
@@ -523,11 +526,12 @@ class Tempo {
         const resetCallback = () => {
             this._tapTimes = [];
             this._tapTimeout = null;
+            this._lastTapIndex = null;
         };
         if (this.widgetWindow && this.widgetWindow.timerManager) {
-            this._tapTimeout = this.widgetWindow.timerManager.setTimeout(resetCallback, 2000);
+            this._tapTimeout = this.widgetWindow.timerManager.setTimeout(resetCallback, 2001);
         } else {
-            this._tapTimeout = setTimeout(resetCallback, 2000);
+            this._tapTimeout = setTimeout(resetCallback, 2001);
         }
     }
 
@@ -547,6 +551,11 @@ class Tempo {
             id = 0;
         }
         this.activeBPMIndex = id;
+
+        if (this._lastTapIndex !== id) {
+            this._tapTimes = [];
+            this._lastTapIndex = id;
+        }
 
         const now = Date.now();
         this._flashTapButton();

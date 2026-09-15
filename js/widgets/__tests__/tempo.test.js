@@ -1609,11 +1609,34 @@ describe("Tap Tempo feature", () => {
         tempoWidget.tapTempo(0);
 
         // 2000ms interval -> 60000 / 2000 = 30 BPM
-        jest.setSystemTime(3000);
+        jest.advanceTimersByTime(2000);
         const result = tempoWidget.tapTempo(0);
 
         expect(result).toBe(30);
         expect(tempoWidget.BPMs[0]).toBe(30);
+    });
+
+    test("resets tap history when active BPM index changes across multiple indices", () => {
+        tempoWidget.BPMs = [100, 120];
+        tempoWidget.BPMInputs = [{ value: 100 }, { value: 120 }];
+
+        jest.setSystemTime(1000);
+        const result0 = tempoWidget.tapTempo(0);
+        expect(result0).toBeNull();
+        expect(tempoWidget._tapTimes).toEqual([1000]);
+
+        // Second tap on a different index within 500ms starts fresh for index 1
+        jest.advanceTimersByTime(500);
+        const result1 = tempoWidget.tapTempo(1);
+        expect(result1).toBeNull();
+        expect(tempoWidget.BPMs[1]).toBe(120);
+        expect(tempoWidget._tapTimes).toEqual([1500]);
+
+        // Subsequent tap on index 1 calculates its BPM normally
+        jest.advanceTimersByTime(400);
+        const result1Second = tempoWidget.tapTempo(1);
+        expect(result1Second).toBe(150);
+        expect(tempoWidget.BPMs[1]).toBe(150);
     });
 
     test("clamps BPM to upper limit of 1000 for extremely fast taps", () => {
