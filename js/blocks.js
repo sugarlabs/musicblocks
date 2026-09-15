@@ -2569,6 +2569,33 @@ class Blocks {
         this._snapIndicatorShape = null;
 
         /**
+         * Resolves snap indicator colors from CSS tokens in tokens.css,
+         * falling back to default golden values if tokens or computed styles are unavailable.
+         * @private
+         * @returns {{ stroke: string, fill: string }}
+         */
+        this._getSnapIndicatorColors = () => {
+            let stroke = "rgba(255, 215, 0, 0.95)";
+            let fill = "rgba(255, 215, 0, 0.35)";
+            if (
+                typeof getComputedStyle !== "undefined" &&
+                typeof document !== "undefined" &&
+                document.body
+            ) {
+                const style = getComputedStyle(document.body);
+                const tokenStroke = style.getPropertyValue("--color-snap-indicator-stroke").trim();
+                const tokenFill = style.getPropertyValue("--color-snap-indicator-fill").trim();
+                if (tokenStroke) {
+                    stroke = tokenStroke;
+                }
+                if (tokenFill) {
+                    fill = tokenFill;
+                }
+            }
+            return { stroke, fill };
+        };
+
+        /**
          * Show visual snap indicator on target block and connection point.
          * @param {object} candidate - { targetBlock, connectionIndex, dockX, dockY }
          * @public
@@ -2593,11 +2620,12 @@ class Blocks {
 
             // Create or position glowing docking indicator circle
             if (!this._snapIndicatorShape && typeof createjs !== "undefined" && createjs.Shape) {
+                const colors = this._getSnapIndicatorColors();
                 this._snapIndicatorShape = new createjs.Shape();
                 this._snapIndicatorShape.graphics
                     .setStrokeStyle(3)
-                    .beginStroke("rgba(255, 215, 0, 0.95)")
-                    .beginFill("rgba(255, 215, 0, 0.35)")
+                    .beginStroke(colors.stroke)
+                    .beginFill(colors.fill)
                     .drawCircle(0, 0, 10);
                 if (
                     this.activity &&

@@ -55,6 +55,10 @@
     --color-overlay-backdrop: rgba(0, 0, 0, 0.35);
     --color-panel-bg: #f5f5f5;
 
+    /* Snap Indicator (Visual dock snap indicator during block drag) */
+    --color-snap-indicator-stroke: rgba(255, 215, 0, 0.95);
+    --color-snap-indicator-fill: rgba(255, 215, 0, 0.35);
+
     /* =========================================================================
      Spacing (Base 4px scale)
      ========================================================================= */
@@ -145,6 +149,10 @@ body.dark {
     --color-overlay-backdrop: rgba(15, 15, 16, 0.75);
     --color-panel-bg: #1f2937;
 
+    /* Snap Indicator (Visual dock snap indicator during block drag) */
+    --color-snap-indicator-stroke: rgba(255, 215, 0, 0.95);
+    --color-snap-indicator-fill: rgba(255, 215, 0, 0.35);
+
     /* Adjusted state backgrounds for dark mode */
     --color-success-bg: rgba(16, 185, 129, 0.2);
     --color-warning-bg: rgba(245, 158, 11, 0.2);
@@ -192,6 +200,10 @@ body.highcontrast {
     --color-widget-frame-border: #ffffff;
     --color-overlay-backdrop: rgba(0, 0, 0, 0.9);
     --color-panel-bg: #000000;
+
+    /* Snap Indicator (Visual dock snap indicator during block drag) */
+    --color-snap-indicator-stroke: #ffff00;
+    --color-snap-indicator-fill: rgba(255, 255, 0, 0.35);
 
     --color-success: #00ff00;
     --color-success-bg: #000000;

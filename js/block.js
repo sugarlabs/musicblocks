@@ -3461,9 +3461,15 @@ class Block {
                 that.activity.trashcan.stopHighlightAnimation();
             }
 
-            // Visual dock snap indicator (throttled to ~60fps)
+            // Visual dock snap indicator (throttled to ~60fps).
+            // 16ms corresponds to one frame at ~60fps (1000ms / 60 ≈ 16.6ms), preventing
+            // expensive spatial dock candidate scans on every high-frequency pointer move event.
+            const SNAP_CHECK_INTERVAL_MS = 16;
             if (!overTrash && typeof that.blocks.findDockCandidate === "function") {
-                if (!that.blocks._lastSnapCheckTime || now - that.blocks._lastSnapCheckTime >= 16) {
+                if (
+                    !that.blocks._lastSnapCheckTime ||
+                    now - that.blocks._lastSnapCheckTime >= SNAP_CHECK_INTERVAL_MS
+                ) {
                     that.blocks._lastSnapCheckTime = now;
                     const candidate = that.blocks.findDockCandidate(thisBlock);
                     if (candidate && typeof that.blocks.showSnapIndicator === "function") {

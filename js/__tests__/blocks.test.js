@@ -2625,5 +2625,28 @@ describe("Spatial grid indexing", () => {
             expect(blocks._snapTargetBlock).toBeNull();
             expect(blocks._snapIndicatorShape.visible).toBe(false);
         });
+
+        it("resolves default snap indicator colors when computed styles are unavailable", () => {
+            const colors = blocks._getSnapIndicatorColors();
+            expect(colors.stroke).toBe("rgba(255, 215, 0, 0.95)");
+            expect(colors.fill).toBe("rgba(255, 215, 0, 0.35)");
+        });
+
+        it("resolves snap indicator colors from CSS tokens when available", () => {
+            const originalGetComputedStyle = global.getComputedStyle;
+            global.getComputedStyle = jest.fn().mockReturnValue({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-snap-indicator-stroke") return "#ffff00";
+                    if (prop === "--color-snap-indicator-fill") return "rgba(255, 255, 0, 0.5)";
+                    return "";
+                })
+            });
+
+            const colors = blocks._getSnapIndicatorColors();
+            expect(colors.stroke).toBe("#ffff00");
+            expect(colors.fill).toBe("rgba(255, 255, 0, 0.5)");
+
+            global.getComputedStyle = originalGetComputedStyle;
+        });
     });
 });
