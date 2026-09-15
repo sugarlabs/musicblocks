@@ -15,7 +15,8 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor, TunerDisplay, TunerUtils
+   instruments, slicePath, platformColor, TunerDisplay, TunerUtils,
+   ManagedTimer
 */
 
 /* exported SampleWidget, resolveBackendURL */
@@ -174,6 +175,173 @@ function SampleWidget() {
     this.pitchDetectionStream = null;
     this.pitchDetectionAnimationId = null;
     this.isPitchDetectionRunning = false;
+
+    /**
+     * Tracks timers owned by this widget so they can be cancelled when the widget closes.
+     * @type {ManagedTimer|null}
+     * @private
+     */
+    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+    /**
+     * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeTimeouts = new Set();
+
+    /**
+     * Fallback interval tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeIntervals = new Set();
+
+    /**
+     * Interval ID for blinking status message during prompt generation.
+     * @type {number|null}
+     * @private
+     */
+    this._promptBlinkInterval = null;
+
+    /**
+     * Timeout ID for debouncing the save sample button.
+     * @type {number|null}
+     * @private
+     */
+    this._saveTimeout = null;
+
+    /**
+     * Timeout ID for debouncing tuner mode toggle.
+     * @type {number|null}
+     * @private
+     */
+    this._tunerModeTimeout = null;
+
+    /**
+     * Timeout ID for restarting reference pitch after cent adjustment.
+     * @type {number|null}
+     * @private
+     */
+    this._restartPitchTimeout = null;
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    this._setWidgetTimeout = function (callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    };
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    this._clearWidgetTimeout = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Schedules an interval owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run repeatedly.
+     * @param {number} interval - Interval in milliseconds.
+     * @returns {number} Interval ID.
+     */
+    this._setWidgetInterval = function (callback, interval) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setInterval(callback, interval);
+        }
+
+        const id = setInterval(callback, interval);
+        this._activeIntervals.add(id);
+        return id;
+    };
+
+    /**
+     * Clears an interval owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Interval ID returned by _setWidgetInterval.
+     * @returns {boolean} Whether the interval was tracked and cleared.
+     */
+    this._clearWidgetInterval = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearInterval(id)) {
+            return true;
+        }
+
+        if (this._activeIntervals.has(id)) {
+            clearInterval(id);
+            this._activeIntervals.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers and intervals cleared.
+     */
+    this._clearWidgetTimers = function () {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        for (const id of this._activeIntervals) {
+            clearInterval(id);
+            count++;
+        }
+        this._activeIntervals.clear();
+
+        this._promptBlinkInterval = null;
+        this._saveTimeout = null;
+        this._tunerModeTimeout = null;
+        this._restartPitchTimeout = null;
+
+        return count;
+    };
 
     /**
      * Updates the blocks related to the sample.
@@ -366,7 +534,7 @@ function SampleWidget() {
      */
     this.__save = function () {
         const that = this;
-        setTimeout(function () {
+        this._setWidgetTimeout(function () {
             that._addSample();
 
             // Include the cent adjustment value in the sample block
@@ -529,6 +697,8 @@ function SampleWidget() {
         };
 
         widgetWindow.onclose = () => {
+            this._clearWidgetTimers();
+
             if (this.drawVisualIDs) {
                 for (const id of Object.keys(this.drawVisualIDs)) {
                     cancelAnimationFrame(this.drawVisualIDs[id]);
@@ -697,8 +867,10 @@ function SampleWidget() {
                 if (!that._get_save_lock()) {
                     that._save_lock = true;
                     that._saveSample();
-                    setTimeout(function () {
+                    that._clearWidgetTimeout(that._saveTimeout);
+                    that._saveTimeout = that._setWidgetTimeout(function () {
                         that._save_lock = false;
+                        that._saveTimeout = null;
                     }, 1000);
                 }
             };
@@ -835,20 +1007,20 @@ function SampleWidget() {
                 const encodedPrompt = encodeURIComponent(prompt);
                 const url = `${aiSampleEndpoint}/generate?prompt=${encodedPrompt}`;
 
-                let blinkInterval;
-
                 try {
                     generating = true;
                     activity.textMsg(_("Generating audio... (It may take up to 1 minute)"), 2500);
 
-                    blinkInterval = setInterval(() => {
+                    that._clearWidgetInterval(that._promptBlinkInterval);
+                    that._promptBlinkInterval = that._setWidgetInterval(() => {
                         activity.textMsg(_("Generating audio..."), 1000);
                     }, 5000);
 
                     const response = await fetch(url);
                     const result = await response.json();
 
-                    clearInterval(blinkInterval);
+                    that._clearWidgetInterval(that._promptBlinkInterval);
+                    that._promptBlinkInterval = null;
 
                     if (result.status === "success") {
                         generating = false;
@@ -862,7 +1034,8 @@ function SampleWidget() {
                     }
                 } catch (error) {
                     generating = false;
-                    clearInterval(blinkInterval);
+                    that._clearWidgetInterval(that._promptBlinkInterval);
+                    that._promptBlinkInterval = null;
                     activity.textMsg(_("An error occurred."), 3000);
                     setPromptBtnState(submit, false);
                 }
@@ -1123,8 +1296,10 @@ function SampleWidget() {
                     isClickable = false;
                     tunerMode = mode;
                     updateButtonStyles();
-                    setTimeout(() => {
+                    that._clearWidgetTimeout(that._tunerModeTimeout);
+                    that._tunerModeTimeout = that._setWidgetTimeout(() => {
                         isClickable = true;
+                        that._tunerModeTimeout = null;
                     }, 200);
                 };
 
@@ -1572,7 +1747,7 @@ function SampleWidget() {
      */
     this._waitAndPlaySample = function () {
         return new Promise(resolve => {
-            setTimeout(() => {
+            this._setWidgetTimeout(() => {
                 this._playSample();
                 resolve("played");
                 this._endPlaying();
@@ -1594,7 +1769,7 @@ function SampleWidget() {
      */
     this._waitAndEndPlaying = function () {
         return new Promise(resolve => {
-            setTimeout(() => {
+            this._setWidgetTimeout(() => {
                 this.pause();
                 resolve("ended");
             }, this.sampleLength);
@@ -2342,8 +2517,10 @@ function SampleWidget() {
         // If we're currently playing, restart with the new adjustment
         if (this.isMoving) {
             this.pause();
-            setTimeout(() => {
+            this._clearWidgetTimeout(this._restartPitchTimeout);
+            this._restartPitchTimeout = this._setWidgetTimeout(() => {
                 this._playReferencePitch();
+                this._restartPitchTimeout = null;
             }, 100);
         }
     };
