@@ -617,6 +617,22 @@ nav {
     color: white;
 }
 
+/* Auxiliary (secondary) toolbar opened by the 3-dot menu.
+   Its icon groups (ul.aux.left / ul.aux.right) are floated, and the toolbar
+   otherwise inherits the fixed 64px nav height, so when the icons wrap to a
+   second row (e.g. in advanced mode at some browser-zoom widths) that row
+   spilled below the blue background into the workspace. Contain the floated
+   rows and let the blue band grow to cover them, while keeping a single 64px
+   row when the icons fit. */
+#aux-toolbar,
+#aux-toolbar .nav-wrapper {
+    height: auto;
+    min-height: 64px;
+}
+#aux-toolbar .nav-wrapper {
+    display: flow-root;
+}
+
 nav .nav-container {
     padding: 0 0px;
 }
