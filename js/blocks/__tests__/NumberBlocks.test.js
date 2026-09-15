@@ -241,6 +241,20 @@ describe("setupNumberBlocks", () => {
             logo.inStatusMatrix = false;
         });
 
+        it("should return safely when status-matrix parent is missing (isInStatusMatrix safety)", () => {
+            activity.blocks.blockList[300] = {
+                connections: [null, 302],
+                name: "int"
+            };
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const intBlock = createdBlocks["int"];
+            const result = intBlock.arg(logo, 0, 300, null);
+            expect(result).toBe(0);
+            expect(logo.statusFields.length).toBe(0);
+            logo.inStatusMatrix = false;
+        });
+
         it("should call errorMsg and return 0 when MathUtility.doInt throws", () => {
             activity.blocks.blockList[100] = { connections: [null, "c1"] };
             logo.parseArg = jest.fn(() => "not-a-number");
@@ -692,6 +706,50 @@ describe("setupNumberBlocks", () => {
             const randomBlock = createdBlocks["random"];
             const result = randomBlock.arg(logo, 0, 220, null);
             expect(result).toEqual(5);
+            global.MathUtility.doRandom = (a, b, octave) => a;
+        });
+
+        it("should handle hspace block with missing parent connection (null hspace parent)", () => {
+            activity.blocks.blockList[220] = {
+                connections: ["hspace_blk", "c1", "c2"]
+            };
+            activity.blocks.blockList["hspace_blk"] = {
+                name: "hspace",
+                connections: [null]
+            };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 0;
+                if (c === "c2") return 12;
+            });
+            global.MathUtility.doRandom = jest.fn((a, b, octave) =>
+                octave !== undefined ? octave : a
+            );
+            const randomBlock = createdBlocks["random"];
+            const result = randomBlock.arg(logo, 0, 220, null);
+            expect(global.MathUtility.doRandom).toHaveBeenCalledWith(0, 12, undefined);
+            expect(result).toEqual(0);
+            global.MathUtility.doRandom = (a, b, octave) => a;
+        });
+
+        it("should handle pitch block with no octave connection", () => {
+            activity.blocks.blockList[220] = {
+                connections: ["pitch_blk", "c1", "c2"]
+            };
+            activity.blocks.blockList["pitch_blk"] = {
+                name: "pitch",
+                connections: [null, null, null]
+            };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 0;
+                if (c === "c2") return 12;
+            });
+            global.MathUtility.doRandom = jest.fn((a, b, octave) =>
+                octave !== undefined ? octave : a
+            );
+            const randomBlock = createdBlocks["random"];
+            const result = randomBlock.arg(logo, 0, 220, null);
+            expect(global.MathUtility.doRandom).toHaveBeenCalledWith(0, 12, undefined);
+            expect(result).toEqual(0);
             global.MathUtility.doRandom = (a, b, octave) => a;
         });
 
