@@ -1403,6 +1403,17 @@ describe("Blocks Foundation", () => {
         });
 
         it("does not lose the first call's in-flight _adjustTheseStacks entries when a second call arrives mid-load", async () => {
+            // Both the first load and the queued second load fire their own
+            // finishedLoading event; wait for both instead of a fixed delay
+            // so this isn't sensitive to how busy the test runner is.
+            const bothLoadsFinished = new Promise(resolve => {
+                let count = 0;
+                global.pubsub.on("finishedLoading", () => {
+                    count += 1;
+                    if (count === 2) resolve();
+                });
+            });
+
             blocks.loadNewBlocks(makeBatch(25));
             // Let the first chunk's 20 synchronous _processOneBlock calls'
             // queued cleanupAfterLoad callbacks start landing.
@@ -1410,9 +1421,7 @@ describe("Blocks Foundation", () => {
 
             blocks.loadNewBlocks(makeBatch(3));
 
-            // Let everything settle: remaining chunks, all cleanupAfterLoad
-            // callbacks, and the queued second load running to completion.
-            await new Promise(r => setTimeout(r, 50));
+            await bothLoadsFinished;
 
             expect(blocks._processOneBlock).toHaveBeenCalledTimes(28); // 25 + 3
             expect(blocks._loadInProgress).toBe(false);
@@ -1421,13 +1430,18 @@ describe("Blocks Foundation", () => {
 
         it("emits finishedLoading once per queued load, not merged into a single early event", async () => {
             const finishedLoadingCalls = [];
-            global.pubsub.on("finishedLoading", () => finishedLoadingCalls.push(Date.now()));
+            const bothLoadsFinished = new Promise(resolve => {
+                global.pubsub.on("finishedLoading", () => {
+                    finishedLoadingCalls.push(Date.now());
+                    if (finishedLoadingCalls.length === 2) resolve();
+                });
+            });
 
             blocks.loadNewBlocks(makeBatch(25));
             await new Promise(r => setTimeout(r, 0));
             blocks.loadNewBlocks(makeBatch(3));
 
-            await new Promise(r => setTimeout(r, 50));
+            await bothLoadsFinished;
 
             expect(finishedLoadingCalls).toHaveLength(2);
         });
@@ -1552,44 +1566,46 @@ describe("Blocks Foundation", () => {
             const onWindowError = event => event.preventDefault();
             window.addEventListener("error", onWindowError);
 
-            const finishedLoadingCalls = [];
-            const loadBFinished = new Promise(resolve => {
-                global.pubsub.on("finishedLoading", () => {
-                    finishedLoadingCalls.push(Date.now());
-                    resolve();
+            try {
+                const finishedLoadingCalls = [];
+                const loadBFinished = new Promise(resolve => {
+                    global.pubsub.on("finishedLoading", () => {
+                        finishedLoadingCalls.push(Date.now());
+                        resolve();
+                    });
                 });
-            });
 
-            // Load A: 25 blocks, fails on block 20 (first of the deferred
-            // chunk, which only runs once the setTimeout(0) scheduling it
-            // fires). Load B: queued behind A, starts as soon as A's
-            // failure advances the queue.
-            blocks.loadNewBlocks(makeBatch(25));
-            blocks.loadNewBlocks(makeBatch(3));
+                // Load A: 25 blocks, fails on block 20 (first of the deferred
+                // chunk, which only runs once the setTimeout(0) scheduling it
+                // fires). Load B: queued behind A, starts as soon as A's
+                // failure advances the queue.
+                blocks.loadNewBlocks(makeBatch(25));
+                blocks.loadNewBlocks(makeBatch(3));
 
-            // Wait specifically for load B to finish (not a fixed delay),
-            // so this isn't sensitive to how busy the test runner is.
-            await loadBFinished;
+                // Wait specifically for load B to finish (not a fixed delay),
+                // so this isn't sensitive to how busy the test runner is.
+                await loadBFinished;
 
-            expect(staleCleanups).toHaveLength(20);
+                expect(staleCleanups).toHaveLength(20);
 
-            // Now let load A's 20 chunk-1 completions land, well after load
-            // B has already finished and _activeLoadGeneration has moved on.
-            for (const cleanup of staleCleanups) {
-                await cleanup();
+                // Now let load A's 20 chunk-1 completions land, well after load
+                // B has already finished and _activeLoadGeneration has moved on.
+                for (const cleanup of staleCleanups) {
+                    await cleanup();
+                }
+
+                // Load B's own 3 blocks are all that should count toward it. If
+                // a stale straggler from A had been accepted, B's shared
+                // _loadCounter would go negative, and every one of A's 20
+                // stragglers would independently satisfy the "<= 0" finalize
+                // check again, firing finishedLoading many more times than the
+                // one legitimate completion of load B.
+                expect(finishedLoadingCalls).toHaveLength(1);
+                expect(blocks._loadInProgress).toBe(false);
+                expect(blocks._loadQueue).toHaveLength(0);
+            } finally {
+                window.removeEventListener("error", onWindowError);
             }
-
-            // Load B's own 3 blocks are all that should count toward it. If
-            // a stale straggler from A had been accepted, B's shared
-            // _loadCounter would go negative, and every one of A's 20
-            // stragglers would independently satisfy the "<= 0" finalize
-            // check again, firing finishedLoading many more times than the
-            // one legitimate completion of load B.
-            expect(finishedLoadingCalls).toHaveLength(1);
-            expect(blocks._loadInProgress).toBe(false);
-            expect(blocks._loadQueue).toHaveLength(0);
-
-            window.removeEventListener("error", onWindowError);
         });
     });
 
@@ -1692,7 +1708,7 @@ describe("Blocks Foundation", () => {
             blocks._insideNoteBlock = jest.fn(() => null);
         });
 
-        function makeRealFlowBlock({ x, y, docks, connections, name = "flow" }) {
+        function makeRealFlowBlock({ x, y, docks, connections, name = "flow", ...overrides }) {
             return {
                 name,
                 trash: false,
@@ -1709,7 +1725,8 @@ describe("Blocks Foundation", () => {
                 isNoHitBlock: () => false,
                 isTwoArgBooleanBlock: () => false,
                 highlight: jest.fn(),
-                unhighlight: jest.fn()
+                unhighlight: jest.fn(),
+                ...overrides
             };
         }
 
@@ -1829,6 +1846,63 @@ describe("Blocks Foundation", () => {
 
             // The real, live target block should still be found and connected to.
             expect(blocks.blockList[1].connections[0]).toBe(0);
+        });
+
+        it("snaps a booleanout block (e.g. And/Or/Not) onto an anyin dock, like Switch/Case (#8463)", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "anyin"]
+                    ],
+                    connections: [null, null],
+                    name: "switch"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "booleanout"]],
+                    connections: [null],
+                    name: "and",
+                    isArgBlock: () => true,
+                    isTwoArgBooleanBlock: () => true
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[0].connections[1]).toBe(1);
+        });
+
+        it("snaps an anyout block (e.g. namedbox) onto a booleanin dock, like If/While (#8463)", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "booleanin"]
+                    ],
+                    connections: [null, null],
+                    name: "if"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "anyout"]],
+                    connections: [null],
+                    name: "namedbox",
+                    isArgBlock: () => true
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[0].connections[1]).toBe(1);
         });
 
         it("exposes the same BlockDragController instance to every delegated method", () => {
