@@ -2620,13 +2620,7 @@ class Blocks {
 
             // Create or position glowing docking indicator circle
             if (!this._snapIndicatorShape && typeof createjs !== "undefined" && createjs.Shape) {
-                const colors = this._getSnapIndicatorColors();
                 this._snapIndicatorShape = new createjs.Shape();
-                this._snapIndicatorShape.graphics
-                    .setStrokeStyle(3)
-                    .beginStroke(colors.stroke)
-                    .beginFill(colors.fill)
-                    .drawCircle(0, 0, 10);
                 if (
                     this.activity &&
                     this.activity.blocksContainer &&
@@ -2637,6 +2631,16 @@ class Blocks {
             }
 
             if (this._snapIndicatorShape) {
+                const colors = this._getSnapIndicatorColors();
+                if (typeof this._snapIndicatorShape.graphics.clear === "function") {
+                    this._snapIndicatorShape.graphics.clear();
+                }
+                this._snapIndicatorShape.graphics
+                    .setStrokeStyle(3)
+                    .beginStroke(colors.stroke)
+                    .beginFill(colors.fill)
+                    .drawCircle(0, 0, 10);
+
                 this._snapIndicatorShape.x = candidate.dockX;
                 this._snapIndicatorShape.y = candidate.dockY;
                 this._snapIndicatorShape.visible = true;

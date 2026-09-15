@@ -51,6 +51,7 @@ global.createjs = {
     })),
     Shape: jest.fn().mockImplementation(() => ({
         graphics: {
+            clear: jest.fn().mockReturnThis(),
             beginFill: jest.fn().mockReturnThis(),
             drawRect: jest.fn().mockReturnThis(),
             drawEllipse: jest.fn().mockReturnThis(),
@@ -2645,6 +2646,54 @@ describe("Spatial grid indexing", () => {
             const colors = blocks._getSnapIndicatorColors();
             expect(colors.stroke).toBe("#ffff00");
             expect(colors.fill).toBe("rgba(255, 255, 0, 0.5)");
+
+            global.getComputedStyle = originalGetComputedStyle;
+        });
+
+        it("redraws indicator graphics when candidate is shown after a theme change", () => {
+            const originalGetComputedStyle = global.getComputedStyle;
+
+            // Initial theme: light
+            global.getComputedStyle = jest.fn().mockReturnValue({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-snap-indicator-stroke") return "rgba(255, 215, 0, 0.95)";
+                    if (prop === "--color-snap-indicator-fill") return "rgba(255, 215, 0, 0.35)";
+                    return "";
+                })
+            });
+
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+
+            expect(blocks._snapIndicatorShape.graphics.beginStroke).toHaveBeenCalledWith(
+                "rgba(255, 215, 0, 0.95)"
+            );
+
+            // User switches theme: e.g. high contrast
+            global.getComputedStyle = jest.fn().mockReturnValue({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-snap-indicator-stroke") return "#ffff00";
+                    if (prop === "--color-snap-indicator-fill") return "rgba(255, 255, 0, 0.35)";
+                    return "";
+                })
+            });
+
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 110,
+                dockY: 110
+            });
+
+            expect(blocks._snapIndicatorShape.graphics.clear).toHaveBeenCalled();
+            expect(blocks._snapIndicatorShape.graphics.beginStroke).toHaveBeenCalledWith("#ffff00");
+            expect(blocks._snapIndicatorShape.graphics.beginFill).toHaveBeenCalledWith(
+                "rgba(255, 255, 0, 0.35)"
+            );
 
             global.getComputedStyle = originalGetComputedStyle;
         });
