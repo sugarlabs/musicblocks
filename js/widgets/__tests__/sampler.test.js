@@ -950,6 +950,7 @@ describe("Sampler Widget", () => {
         });
 
         test("tuner toggle handles maximized mode and mode toggle clicks", async () => {
+            jest.useFakeTimers();
             widget.init(mockActivity, 1);
             widget.widgetWindow.isMaximized.mockReturnValue(true);
             const tunerContainer = document.createElement("div");
@@ -960,7 +961,10 @@ describe("Sampler Widget", () => {
             const toggle = docById("modeToggle");
             const buttons = Array.from(toggle.querySelectorAll("div"));
             buttons[0].onclick();
+            jest.advanceTimersByTime(200);
             buttons[1].onclick();
+            jest.advanceTimersByTime(200);
+            jest.useRealTimers();
         });
 
         test("makeCanvas draws waveform and updates tuner when enabled", () => {
@@ -1273,6 +1277,7 @@ describe("Sampler Widget", () => {
             const widgetFrame = document.createElement("div");
             widgetBody.getBoundingClientRect = () => ({ width: 800, height: 500 });
             widgetFrame.getBoundingClientRect = () => ({ height: 500 });
+            document.body.appendChild(widgetBody);
             const toolbar = document.createElement("div");
             const buttons = [];
             widgetWindow = {
@@ -1323,13 +1328,48 @@ describe("Sampler Widget", () => {
             expect(clearSpy).toHaveBeenCalled();
         });
 
-        it("clears active prompt interval if widget is closed during AI generation", () => {
+        it("clears active prompt interval if widget is closed during AI generation", async () => {
+            jest.useFakeTimers();
+            window.AI_SAMPLE_ENDPOINT = "https://samples.example";
+
             widget.init(mockActivity, 1);
-            widget._setWidgetInterval(jest.fn(), 5000);
-            expect(widget._timerManager.activeCount).toBeGreaterThan(0);
+            widget._promptBtn.onclick();
+
+            const container = docById("samplerPrompt");
+            const textArea = container.querySelector("textarea");
+            const buttons = Array.from(container.querySelectorAll("button"));
+            const submit = buttons.find(btn => btn.innerHTML === "Submit");
+
+            textArea.value = "synth sound";
+
+            let resolveFetch;
+            global.fetch = jest.fn(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            const submitPromise = submit.onclick();
+
+            expect(widget._promptBlinkInterval).not.toBeNull();
+            expect(widget._timerManager.activeCount).toBe(1);
+
+            jest.advanceTimersByTime(5000);
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("Generating audio...", 1000);
 
             widgetWindow.onclose();
+
+            expect(widget._promptBlinkInterval).toBeNull();
             expect(widget._timerManager.activeCount).toBe(0);
+
+            resolveFetch({
+                json: () => Promise.resolve({ status: "success" })
+            });
+            await submitPromise;
+
+            delete window.AI_SAMPLE_ENDPOINT;
+            jest.useRealTimers();
         });
     });
 });
