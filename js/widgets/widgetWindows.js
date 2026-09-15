@@ -17,6 +17,18 @@ Globals location
 _, docById
 */
 
+const _getDocById = id => {
+    if (typeof docById === "function") {
+        return docById(id);
+    }
+    if (typeof window !== "undefined" && typeof window.docById === "function") {
+        return window.docById(id);
+    }
+    return typeof document !== "undefined" && typeof document.getElementById === "function"
+        ? document.getElementById(id)
+        : null;
+};
+
 window.widgetWindows = {
     openWindows: {},
     _posCache: {},
@@ -269,7 +281,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _createUIelements() {
-        const windows = docById("floatingWindows");
+        const windows = _getDocById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
         this._frame.setAttribute("role", "dialog");
         this._frame.setAttribute("aria-label", _(this._title));
@@ -584,8 +596,10 @@ class WidgetWindow {
      * @returns {void}
      */
     updateTitle(title) {
-        const wftTitle = docById(this._key + "WidgetID");
-        wftTitle.textContent = title;
+        const wftTitle = _getDocById(this._key + "WidgetID");
+        if (wftTitle) {
+            wftTitle.textContent = title;
+        }
         this._frame.setAttribute("aria-label", title);
     }
 
@@ -595,11 +609,13 @@ class WidgetWindow {
      */
     takeFocus() {
         window.widgetWindows.focused = this;
-        const windows = docById("floatingWindows");
-        const siblings = windows.children;
-        for (let i = 0; i < siblings.length; i++) {
-            siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = "0.7";
+        const windows = _getDocById("floatingWindows");
+        if (windows && windows.children) {
+            const siblings = windows.children;
+            for (let i = 0; i < siblings.length; i++) {
+                siblings[i].style.zIndex = "0";
+                siblings[i].style.opacity = "0.7";
+            }
         }
 
         // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block
@@ -634,7 +650,11 @@ class WidgetWindow {
      * @returns {WidgetWindow} this
      */
     sendToCenter() {
-        const canvas = docById("myCanvas");
+        const canvas = _getDocById("myCanvas");
+        if (!canvas) {
+            this.setPosition(200, 140);
+            return this;
+        }
         const fRect = this._frame.getBoundingClientRect();
         const cRect = canvas.getBoundingClientRect();
 
