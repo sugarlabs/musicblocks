@@ -117,6 +117,7 @@ describe("ThemeBox", () => {
     });
 
     test("light_onclick() sets theme to light", () => {
+        document.body.classList.add("light");
         themeBox.light_onclick();
         expect(themeBox._theme).toBe("light");
         expect(localStorage.getItem).toHaveBeenCalledWith("themePreference");
@@ -153,6 +154,7 @@ describe("ThemeBox", () => {
 
     test("setPreference() does not change if theme is unchanged", () => {
         const reloadSpy = jest.spyOn(themeBox, "reload").mockImplementation(() => {});
+        document.body.classList.add("light");
         themeBox.light_onclick();
         expect(reloadSpy).not.toHaveBeenCalled();
         expect(mockActivity.textMsg).toHaveBeenCalledWith(
@@ -214,6 +216,26 @@ describe("ThemeBox", () => {
         themeBox.initializeTheme();
         capturedHandler({ matches: true });
         expect(themeBox._theme).toBe("dark");
+    });
+
+    test("saved light preference can be reapplied after an OS theme change", () => {
+        let capturedHandler;
+        const mockMq = {
+            matches: false,
+            addEventListener: jest.fn((_, handler) => {
+                capturedHandler = handler;
+            }),
+            addListener: jest.fn()
+        };
+        window.matchMedia = jest.fn().mockReturnValue(mockMq);
+        themeBox.initializeTheme();
+
+        capturedHandler({ matches: true });
+        expect(document.body.classList.contains("dark")).toBe(true);
+
+        themeBox.light_onclick();
+        expect(document.body.classList.contains("light")).toBe(true);
+        expect(document.body.classList.contains("dark")).toBe(false);
     });
 
     // Regression test for #7172: applyThemeInstantly must read from
