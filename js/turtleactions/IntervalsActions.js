@@ -106,10 +106,13 @@ function setupIntervalsActions(activity) {
             // Handle octave boundary wrap-around for enharmonic equivalents
             // For cases like B (12) to B#/Cb (0), the raw difference is 12 but should be 1
             // Calculate forward distance across octave boundary using modular arithmetic
-            const forwardDiff = (secondStep - firstStep + temperamentLength) % temperamentLength;
-            // When notes are at octave boundary (forwardDiff === 0), use 1 semitone
-            // Otherwise use the shorter of raw difference or forward distance
-            totalIntervals = forwardDiff === 0 ? 1 : Math.min(totalIntervals, forwardDiff);
+            if (totalIntervals !== 0) {
+                const forwardDiff =
+                    (secondStep - firstStep + temperamentLength) % temperamentLength;
+                // When notes are at octave boundary (forwardDiff === 0), use 1 semitone
+                // Otherwise use the shorter of raw difference or forward distance
+                totalIntervals = forwardDiff === 0 ? 1 : Math.min(totalIntervals, forwardDiff);
+            }
 
             if (octave < 0 && totalIntervals !== 0 && totalIntervals !== temperamentLength)
                 totalIntervals = temperamentLength - totalIntervals;
@@ -164,7 +167,7 @@ function setupIntervalsActions(activity) {
             if (totalIntervals % temperamentLength === 0 && letterGap === 0) {
                 if (octave < 0) {
                     if (octave === -1) os = "";
-                    const a = `${os} ${_("perfect")} ${plural} ${_("below")}`;
+                    const a = `${os ? `${os} ` : ""}${_("perfect")} ${plural} ${_("below")}`;
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
                 if (octave > 1) {
