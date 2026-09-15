@@ -927,11 +927,17 @@ class Palettes {
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
+        img.style.flexShrink = "0";
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
         row.style.borderBottom = "1px solid #0CAFFF";
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
+        label.style.overflow = "hidden";
+        label.style.textOverflow = "ellipsis";
+        label.style.whiteSpace = "nowrap";
+        label.style.maxWidth = "75px";
+        label.style.display = "inline-block";
         row.style.display = "flex";
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
@@ -968,10 +974,16 @@ class Palettes {
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
+        img.style.flexShrink = "0";
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
+        label.style.overflow = "hidden";
+        label.style.textOverflow = "ellipsis";
+        label.style.whiteSpace = "nowrap";
+        label.style.maxWidth = "75px";
+        label.style.display = "inline-block";
         row.style.display = "flex";
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
@@ -1019,6 +1031,9 @@ class Palettes {
         // Hide the menu buttons and the palettes themselves.
 
         this.activity.hideSearchWidget(true);
+        if (this.activePalette !== null) {
+            this.lastActivePalette = this.activePalette;
+        }
         this.activePalette = null;
 
         if (docById("PaletteBody"))
