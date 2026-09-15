@@ -52,6 +52,9 @@ class Tempo {
         this.activeBPMIndex = 0;
         this._keyHandler = null;
         this.pauseBtn = null;
+        this.tapBtn = null;
+        this._tapTimes = [];
+        this._tapTimeout = null;
     }
 
     init(activity) {
@@ -61,6 +64,11 @@ class Tempo {
         this._widgetNextTimes = [];
         this._firstClickTime = null;
         this._intervals = [];
+        this._tapTimes = [];
+        if (this._tapTimeout) {
+            clearTimeout(this._tapTimeout);
+            this._tapTimeout = null;
+        }
         this.isMoving = true;
         if (this._intervalID !== undefined && this._intervalID !== null) {
             if (this.widgetWindow && this.widgetWindow.timerManager) {
@@ -90,6 +98,15 @@ class Tempo {
                 document.removeEventListener("keydown", this._keyHandler, true);
                 this._keyHandler = null;
             }
+            if (this._tapTimeout) {
+                if (widgetWindow.timerManager) {
+                    widgetWindow.timerManager.clearTimeout(this._tapTimeout);
+                } else {
+                    clearTimeout(this._tapTimeout);
+                }
+                this._tapTimeout = null;
+            }
+            this._tapTimes = [];
             if (this._intervalID !== null) {
                 widgetWindow.timerManager.clearInterval(this._intervalID);
             }
@@ -146,6 +163,16 @@ class Tempo {
                 }
             };
 
+        const tapBtn = widgetWindow.addButton("tap-button.svg", Tempo.ICONSIZE, _("Tap tempo"));
+        this.tapBtn = tapBtn;
+        tapBtn.onclick = () => {
+            const id =
+                this.activeBPMIndex >= 0 && this.activeBPMIndex < this.BPMs.length
+                    ? this.activeBPMIndex
+                    : 0;
+            this.tapTempo(id);
+        };
+
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
 
@@ -196,6 +223,8 @@ class Tempo {
             tcCell.setAttribute("rowspan", "3");
 
             // The tempo can be set from the interval between successive clicks on the canvas.
+            this.tempoCanvases[i].style.cursor = "pointer";
+            this.tempoCanvases[i].title = _("Click to tap tempo");
             this.tempoCanvases[i].onclick = (id => () => {
                 this.activeBPMIndex = id;
                 const d = new Date();
@@ -297,6 +326,13 @@ class Tempo {
                 event.preventDefault();
                 event.stopPropagation();
                 this.togglePlayPause();
+                return;
+            }
+
+            if (event.key === "t" || event.key === "T" || event.code === "KeyT") {
+                event.preventDefault();
+                event.stopPropagation();
+                this.tapTempo(id);
             }
         };
 
@@ -429,6 +465,142 @@ class Tempo {
             this.resume();
             this.isMoving = true;
         }
+    }
+
+    /**
+     * @private
+     * @returns {void}
+     */
+    _flashTapButton() {
+        if (!this.tapBtn) return;
+        const activeImg = document.createElement("img");
+        activeImg.src = "header-icons/tap-active-button.svg";
+        activeImg.title = _("Tap tempo");
+        activeImg.alt = _("Tap tempo");
+        activeImg.height = Tempo.ICONSIZE;
+        activeImg.width = Tempo.ICONSIZE;
+        activeImg.style.verticalAlign = "middle";
+        if (typeof this.tapBtn.replaceChildren === "function") {
+            this.tapBtn.replaceChildren(activeImg);
+        } else {
+            this.tapBtn.textContent = "";
+            if (typeof this.tapBtn.appendChild === "function") {
+                this.tapBtn.appendChild(activeImg);
+            }
+        }
+
+        const reset = () => {
+            if (!this.tapBtn) return;
+            const normalImg = document.createElement("img");
+            normalImg.src = "header-icons/tap-button.svg";
+            normalImg.title = _("Tap tempo");
+            normalImg.alt = _("Tap tempo");
+            normalImg.height = Tempo.ICONSIZE;
+            normalImg.width = Tempo.ICONSIZE;
+            normalImg.style.verticalAlign = "middle";
+            if (typeof this.tapBtn.replaceChildren === "function") {
+                this.tapBtn.replaceChildren(normalImg);
+            } else {
+                this.tapBtn.textContent = "";
+                if (typeof this.tapBtn.appendChild === "function") {
+                    this.tapBtn.appendChild(normalImg);
+                }
+            }
+        };
+
+        if (this.widgetWindow && this.widgetWindow.timerManager) {
+            this.widgetWindow.timerManager.setTimeout(reset, 150);
+        } else {
+            setTimeout(reset, 150);
+        }
+    }
+
+    /**
+     * @private
+     * @returns {void}
+     */
+    _scheduleTapReset() {
+        const resetCallback = () => {
+            this._tapTimes = [];
+            this._tapTimeout = null;
+        };
+        if (this.widgetWindow && this.widgetWindow.timerManager) {
+            this._tapTimeout = this.widgetWindow.timerManager.setTimeout(resetCallback, 2000);
+        } else {
+            this._tapTimeout = setTimeout(resetCallback, 2000);
+        }
+    }
+
+    /**
+     * Sets or adjusts BPM using a rolling average of successive taps.
+     *
+     * @public
+     * @param {number} [id=0] - The index of the BPM to update.
+     * @returns {number|null} The newly calculated BPM, or null on first tap.
+     */
+    tapTempo(id = 0) {
+        if (!this.BPMs || this.BPMs.length === 0) {
+            return null;
+        }
+
+        if (id < 0 || id >= this.BPMs.length) {
+            id = 0;
+        }
+        this.activeBPMIndex = id;
+
+        const now = Date.now();
+        this._flashTapButton();
+
+        if (this._tapTimeout) {
+            if (this.widgetWindow && this.widgetWindow.timerManager) {
+                this.widgetWindow.timerManager.clearTimeout(this._tapTimeout);
+            } else {
+                clearTimeout(this._tapTimeout);
+            }
+            this._tapTimeout = null;
+        }
+
+        const lastTap = this._tapTimes[this._tapTimes.length - 1];
+        if (!lastTap || now - lastTap > 2000) {
+            this._tapTimes = [now];
+            if (this.activity && typeof this.activity.textMsg === "function") {
+                this.activity.textMsg(_("Tap again to set tempo"), 1500);
+            }
+            this._scheduleTapReset();
+            return null;
+        }
+
+        this._tapTimes.push(now);
+        if (this._tapTimes.length > 5) {
+            this._tapTimes.shift();
+        }
+
+        let totalInterval = 0;
+        for (let j = 1; j < this._tapTimes.length; j++) {
+            totalInterval += this._tapTimes[j] - this._tapTimes[j - 1];
+        }
+        const avgInterval = totalInterval / (this._tapTimes.length - 1);
+
+        if (avgInterval <= 0) {
+            this._scheduleTapReset();
+            return null;
+        }
+
+        let newBPM = Math.round((60 * 1000) / avgInterval);
+        if (newBPM < 30) {
+            newBPM = 30;
+        } else if (newBPM > 1000) {
+            newBPM = 1000;
+        }
+
+        this.BPMs[id] = newBPM;
+        this._updateBPM(id);
+        if (this.BPMInputs[id]) {
+            this.BPMInputs[id].value = newBPM;
+        }
+
+        this._scheduleTapReset();
+        return newBPM;
     }
 
     /**
