@@ -131,7 +131,17 @@ const dummyLogo = {
     setDispatchBlock: jest.fn(),
     setTurtleListener: jest.fn(),
     addingNotesToTuplet: false,
-    _currentDrumBlock: "dummyDrum"
+    _currentDrumBlock: "dummyDrum",
+    stopTurtle: false,
+    _timerManager: {
+        setGuardedTimeout: jest.fn((cb, delay, guard) => {
+            return setTimeout(() => {
+                if (!guard()) cb();
+            }, delay);
+        }),
+        clearTimeout: jest.fn(id => clearTimeout(id)),
+        clearAll: jest.fn(() => 0)
+    }
 };
 
 describe("setupRhythmBlockPaletteBlocks", () => {
