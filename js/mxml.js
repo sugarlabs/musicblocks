@@ -360,13 +360,13 @@ saveMxmlOutput = logo => {
                 }
 
                 add(`<duration>${dur}</duration>`);
-                if (part.isPercussion && obj[MXML_DRUM]) {
-                    add(`<instrument id="${part.instruments.get(p)}"/>`);
-                }
                 if (notes[i + 1] === "tie") {
                     add('<tie type="start"/>');
                 } else if (notes[i - 1] === "tie") {
                     add('<tie type="stop"/>');
+                }
+                if (part.isPercussion && obj[MXML_DRUM]) {
+                    add(`<instrument id="${part.instruments.get(p)}"/>`);
                 }
                 if (timeModification) {
                     add("<time-modification>");

@@ -39,6 +39,31 @@ describe("saveMxmlOutput", () => {
         );
     });
 
+    it("writes instrument after each tie in a barline-split drum note", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C4"], 4, 0, null, null, false, false, null],
+                        [["C4"], 4, 0, null, null, false, false, null],
+                        [["C4"], 2, 0, null, null, false, false, "snare drum"],
+                        "tie",
+                        [["C4"], 2, 0, null, null, false, false, "snare drum"]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(percussion).toMatch(
+            /<unpitched\/>\s*<duration>16<\/duration>\s*<tie type="start"\/>\s*<instrument id="D1-X1"\/>/
+        );
+        expect(percussion).toMatch(
+            /<unpitched\/>\s*<duration>16<\/duration>\s*<tie type="stop"\/>\s*<instrument id="D1-X1"\/>/
+        );
+        expect(percussion).toContain('<measure number="2">');
+    });
+
     it("keeps pitched notes and sequential drum identities in separate aligned parts", () => {
         const output = saveMxmlOutput({
             notation: {
