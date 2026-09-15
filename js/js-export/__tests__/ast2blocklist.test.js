@@ -1233,6 +1233,88 @@ describe("AST2BlockList Class", () => {
         ]);
     });
 
+    test("should convert sharp, flat, and octave pitch values", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.onStrongBeatDo(mouse.SHARP, "action");
+            await mouse.onStrongBeatDo(mouse.FLAT, "action");
+            await mouse.onStrongBeatDo(mouse.OCTAVE, "action");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "onbeatdo", 0, 0, [0, 2, 3, 4]],
+            [2, "sharp", 0, 0, [1]],
+            [3, ["text", { value: "action" }], 0, 0, [1]],
+            [4, "onbeatdo", 0, 0, [1, 5, 6, 7]],
+            [5, "flat", 0, 0, [4]],
+            [6, ["text", { value: "action" }], 0, 0, [4]],
+            [7, "onbeatdo", 0, 0, [4, 8, 9, null]],
+            [8, "octave", 0, 0, [7]],
+            [9, ["text", { value: "action" }], 0, 0, [7]]
+        ]);
+    });
+
+    test("should round-trip sharp, flat, and octave pitch values as argument blocks", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.print(mouse.SHARP);
+            await mouse.print(mouse.FLAT);
+            await mouse.print(mouse.OCTAVE);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "print", 0, 0, [0, 2, 3]],
+            [2, "sharp", 0, 0, [1]],
+            [3, "print", 0, 0, [1, 4, 5]],
+            [4, "flat", 0, 0, [3]],
+            [5, "print", 0, 0, [3, 6, null]],
+            [6, "octave", 0, 0, [5]]
+        ]);
+    });
+
+    test("should not convert unison or second pitch values", () => {
+        const unisonCode = `
+        new Mouse(async mouse => {
+            await mouse.print(mouse.UNISON);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+        const secondCode = `
+        new Mouse(async mouse => {
+            await mouse.print(mouse.SECOND);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        let unisonError;
+        try {
+            AST2BlockList.toBlockList(acorn.parse(unisonCode, { ecmaVersion: 2020 }), config);
+        } catch (e) {
+            unisonError = e;
+        }
+        let secondError;
+        try {
+            AST2BlockList.toBlockList(acorn.parse(secondCode, { ecmaVersion: 2020 }), config);
+        } catch (e) {
+            secondError = e;
+        }
+
+        expect(unisonError.prefix).toEqual("Unsupported operator UNISON: ");
+        expect(secondError.prefix).toEqual("Unsupported operator SECOND: ");
+    });
+
     // Test all Pitch Blocks.
     test("should generate correct blockList for all pitch blocks", () => {
         const code = `
