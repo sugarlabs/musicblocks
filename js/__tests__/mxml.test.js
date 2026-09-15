@@ -364,4 +364,48 @@ describe("saveMxmlOutput", () => {
 
         expect(measureCount).toBe(1);
     });
+
+    it("should accurately capture double accidentals, multi-digit octaves, and negative octaves", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C𝄪4"], 4, 0],
+                        [["D𝄫4"], 4, 0],
+                        [["F♯♯10"], 4, 0],
+                        [["G♭♭-1"], 4, 0],
+                        [["E5"], 4, 0]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        // C𝄪4
+        expect(output).toMatch(
+            /<pitch>\s*<step>C<\/step>\s*<alter>2<\/alter>\s*<octave>4<\/octave>\s*<\/pitch>/
+        );
+
+        // D𝄫4
+        expect(output).toMatch(
+            /<pitch>\s*<step>D<\/step>\s*<alter>-2<\/alter>\s*<octave>4<\/octave>\s*<\/pitch>/
+        );
+
+        // F♯♯10
+        expect(output).toMatch(
+            /<pitch>\s*<step>F<\/step>\s*<alter>2<\/alter>\s*<octave>10<\/octave>\s*<\/pitch>/
+        );
+
+        // G♭♭-1
+        expect(output).toMatch(
+            /<pitch>\s*<step>G<\/step>\s*<alter>-2<\/alter>\s*<octave>-1<\/octave>\s*<\/pitch>/
+        );
+
+        // E5
+        expect(output).toMatch(/<pitch>\s*<step>E<\/step>\s*<octave>5<\/octave>\s*<\/pitch>/);
+        expect(output).not.toMatch(
+            /<pitch>\s*<step>E<\/step>\s*<alter>.*?<\/alter>\s*<octave>5<\/octave>\s*<\/pitch>/
+        );
+    });
 });
