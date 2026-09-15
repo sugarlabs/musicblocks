@@ -114,6 +114,12 @@ function setupDictActions(activity) {
                     pitchToNumber(obj[0], obj[1], targetTur.singer.keySignature) -
                     targetTur.singer.pitchNumberOffset
                 );
+            } else {
+                activity.errorMsg(
+                    _("Unknown key: %s").replace(/%s/g, () => key),
+                    blk
+                );
+                return 0;
             }
         }
 
