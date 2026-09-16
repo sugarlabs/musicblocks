@@ -1,20 +1,4 @@
-/* global cy, Cypress, describe, it, before, beforeEach, afterEach, after, expect */
-
-// Suppress only known non-critical uncaught exceptions that arise from async
-// audio/widget teardowns or RequireJS timing variances.  Unknown errors are
-// allowed to propagate so the spec fails on genuine regressions.
-Cypress.on("uncaught:exception", err => {
-    const ignored = [
-        "ResizeObserver loop limit exceeded",
-        "Cannot read properties of undefined",
-        "Cannot read properties of null",
-        "Cannot set properties of null",
-        "Cannot set properties of undefined",
-        "_ is not defined",
-        "Permissions check failed"
-    ];
-    return !ignored.some(msg => err.message.includes(msg));
-});
+/* global cy, describe, it, before, beforeEach, afterEach, after, expect */
 
 /**
  * Helper to resolve a CSS custom property into its computed color format.
