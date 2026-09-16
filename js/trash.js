@@ -14,7 +14,7 @@
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
 
-/* global createjs, platformColor, BORDER, TRASHICON, last */
+/* global createjs, platformColor, BORDER, TRASHICON, TRASH_LID_ICON, TRASH_BODY_ICON, last, base64Encode */
 
 /* exported Trashcan */
 
@@ -31,6 +31,22 @@ class Trashcan {
         this._scale = 1;
         this._iconsize = 55; // default value
         this._container = new createjs.Container();
+        this._hoverBgShape = null;
+        if (typeof createjs !== "undefined" && typeof createjs.Shape === "function") {
+            this._hoverBgShape = new createjs.Shape();
+            this._hoverBgShape.alpha = 0;
+            this._hoverBgShape.visible = false;
+            if (
+                this.activity &&
+                this.activity.trashContainer &&
+                typeof this.activity.trashContainer.addChild === "function"
+            ) {
+                this.activity.trashContainer.addChild(this._hoverBgShape);
+                if (typeof this.activity.trashContainer.setChildIndex === "function") {
+                    this.activity.trashContainer.setChildIndex(this._hoverBgShape, 0);
+                }
+            }
+        }
         this._borderHighlightBitmap = null;
         this._isHighlightInitialized = false;
         this._inAnimation = false;
@@ -38,6 +54,12 @@ class Trashcan {
         this._highlightPower = 255;
         this._animationLevel = 0;
         this.animationTime = 500;
+        this._lidContainer = null;
+        this._lidBitmap = null;
+        this._bodyBitmap = null;
+        this._trashBitmap = null;
+        this._lidOriginalX = 0;
+        this._lidOriginalY = 0;
         this._resizeTimeout = null;
         this._handleResize = () => {
             clearTimeout(this._resizeTimeout);
@@ -56,6 +78,64 @@ class Trashcan {
         window.addEventListener("resize", this._handleResize);
         this.resizeEvent(1);
         this._makeTrash();
+    }
+
+    /**
+     * Resolve semantic colors for trash idle and active hover states from tokens.css.
+     * @private
+     * @returns {{ hoverBorder: string, hoverBg: string, border: string }}
+     */
+    _getTrashColors() {
+        let hoverBorder = "";
+        let hoverBg = "";
+        let border = "";
+        if (
+            typeof getComputedStyle !== "undefined" &&
+            typeof document !== "undefined" &&
+            document.body
+        ) {
+            const style = getComputedStyle(document.body);
+            hoverBorder = style.getPropertyValue("--color-trash-hover-border").trim();
+            hoverBg = style.getPropertyValue("--color-trash-hover-bg").trim();
+            border = style.getPropertyValue("--color-trash-border").trim();
+        }
+        const isValidColor = val =>
+            Boolean(val && /^(#[0-9a-f]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\))$/i.test(val));
+
+        return {
+            hoverBorder:
+                (isValidColor(hoverBorder) && hoverBorder) ||
+                (typeof platformColor !== "undefined" && platformColor.trashActive) ||
+                "#ef4444",
+            hoverBg: (isValidColor(hoverBg) && hoverBg) || "rgba(239, 68, 68, 0.25)",
+            border:
+                (isValidColor(border) && border) ||
+                (typeof platformColor !== "undefined" && platformColor.trashBorder) ||
+                "#666666"
+        };
+    }
+
+    /**
+     * Update delete glow background shape geometry and style.
+     * @private
+     * @returns {void}
+     */
+    _updateHoverBg() {
+        if (!this._hoverBgShape || !this._hoverBgShape.graphics) {
+            return;
+        }
+        const colors = this._getTrashColors();
+        if (typeof this._hoverBgShape.graphics.clear === "function") {
+            this._hoverBgShape.graphics.clear();
+        }
+        if (typeof this._hoverBgShape.graphics.beginFill === "function") {
+            this._hoverBgShape.graphics.beginFill(colors.hoverBg);
+        }
+        if (typeof this._hoverBgShape.graphics.drawRoundRect === "function") {
+            this._hoverBgShape.graphics.drawRoundRect(2.5, 2.5, 115, 115, 10);
+        } else if (typeof this._hoverBgShape.graphics.drawRect === "function") {
+            this._hoverBgShape.graphics.drawRect(2.5, 2.5, 115, 115);
+        }
     }
 
     /**
@@ -81,6 +161,7 @@ class Trashcan {
             this._borderHighlightBitmap.visible = true;
         };
 
+        const colors = this._getTrashColors();
         let highlightString =
             "rgb(" +
             this._highlightPower +
@@ -90,8 +171,8 @@ class Trashcan {
             this._highlightPower +
             ")";
         if (isActive) {
-            // When trash is activated, warn the user with red highlight.
-            highlightString = platformColor.trashActive;
+            // When trash is activated, warn the user with red highlight from tokens.css
+            highlightString = colors.hoverBorder;
         }
 
         img.src =
@@ -114,9 +195,10 @@ class Trashcan {
             this._makeBorderHighlight(false);
         };
 
+        const colors = this._getTrashColors();
         img.src =
             "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(BORDER.replace("stroke_color", platformColor.trashBorder)));
+            window.btoa(base64Encode(BORDER.replace("stroke_color", colors.border)));
     }
 
     /**
@@ -124,22 +206,73 @@ class Trashcan {
      * @returns {void}
      */
     _makeTrash() {
-        const img = new Image();
+        const colors = this._getTrashColors();
+        const borderColor = colors.border;
 
-        img.onload = () => {
-            const bitmap = new createjs.Bitmap(img);
-            this._container.addChild(bitmap);
-            this._iconsize = bitmap.getBounds().width;
-            bitmap.scaleX = this.activity.cellSize / this._iconsize;
-            bitmap.scaleY = this.activity.cellSize / this._iconsize;
-            bitmap.x = ((Trashcan.TRASHWIDTH - this.activity.cellSize) / 2) * bitmap.scaleX;
-            bitmap.y = ((Trashcan.TRASHHEIGHT - this.activity.cellSize) / 2) * bitmap.scaleY;
-            this._makeBorder();
-        };
+        if (typeof TRASH_LID_ICON !== "undefined" && typeof TRASH_BODY_ICON !== "undefined") {
+            const bodyImg = new Image();
+            bodyImg.onload = () => {
+                const bodyBitmap = new createjs.Bitmap(bodyImg);
+                this._iconsize = bodyBitmap.getBounds ? bodyBitmap.getBounds().width : 55;
+                const scale = this.activity.cellSize / this._iconsize;
+                bodyBitmap.scaleX = scale;
+                bodyBitmap.scaleY = scale;
+                bodyBitmap.x = ((Trashcan.TRASHWIDTH - this.activity.cellSize) / 2) * scale;
+                bodyBitmap.y = ((Trashcan.TRASHHEIGHT - this.activity.cellSize) / 2) * scale;
+                this._bodyBitmap = bodyBitmap;
 
-        img.src =
-            "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(TRASHICON.replace(/fill_color/g, platformColor.trashBorder)));
+                const lidImg = new Image();
+                lidImg.onload = () => {
+                    const lidBitmap = new createjs.Bitmap(lidImg);
+                    lidBitmap.scaleX = scale;
+                    lidBitmap.scaleY = scale;
+
+                    this._lidContainer = new createjs.Container();
+                    const hingeX = 15 * scale;
+                    const hingeY = 11 * scale;
+                    this._lidContainer.regX = hingeX;
+                    this._lidContainer.regY = hingeY;
+                    this._lidContainer.x = bodyBitmap.x + hingeX;
+                    this._lidContainer.y = bodyBitmap.y + hingeY;
+                    this._lidOriginalX = this._lidContainer.x;
+                    this._lidOriginalY = this._lidContainer.y;
+
+                    this._lidContainer.addChild(lidBitmap);
+                    this._lidBitmap = lidBitmap;
+
+                    const trashGroup = new createjs.Container();
+                    trashGroup.addChild(bodyBitmap);
+                    trashGroup.addChild(this._lidContainer);
+                    this._trashBitmap = trashGroup;
+                    this._container.addChild(trashGroup);
+
+                    this._makeBorder();
+                };
+                lidImg.src =
+                    "data:image/svg+xml;base64," +
+                    window.btoa(base64Encode(TRASH_LID_ICON.replace(/fill_color/g, borderColor)));
+            };
+            bodyImg.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(base64Encode(TRASH_BODY_ICON.replace(/fill_color/g, borderColor)));
+        } else {
+            const img = new Image();
+            img.onload = () => {
+                const bitmap = new createjs.Bitmap(img);
+                this._container.addChild(bitmap);
+                this._iconsize = bitmap.getBounds ? bitmap.getBounds().width : 55;
+                bitmap.scaleX = this.activity.cellSize / this._iconsize;
+                bitmap.scaleY = this.activity.cellSize / this._iconsize;
+                bitmap.x = ((Trashcan.TRASHWIDTH - this.activity.cellSize) / 2) * bitmap.scaleX;
+                bitmap.y = ((Trashcan.TRASHHEIGHT - this.activity.cellSize) / 2) * bitmap.scaleY;
+                this._trashBitmap = bitmap;
+                this._makeBorder();
+            };
+
+            img.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(base64Encode(TRASHICON.replace(/fill_color/g, borderColor)));
+        }
     }
 
     /**
@@ -152,6 +285,10 @@ class Trashcan {
             window.innerWidth / this._scale - Trashcan.TRASHWIDTH - 2 * this._iconsize;
         this._container.y =
             window.innerHeight / this._scale - Trashcan.TRASHHEIGHT - (5 / 4) * this._iconsize;
+        if (this._hoverBgShape) {
+            this._hoverBgShape.x = this._container.x;
+            this._hoverBgShape.y = this._container.y;
+        }
     }
 
     shouldResize(newWidth, newHeight) {
@@ -168,6 +305,10 @@ class Trashcan {
      * @returns {void}
      */
     hide() {
+        if (this._hoverBgShape) {
+            this._hoverBgShape.visible = false;
+            this._hoverBgShape.alpha = 0;
+        }
         createjs.Tween.get(this._container).to({ alpha: 0 }, 200).set({ visible: false });
     }
 
@@ -193,6 +334,24 @@ class Trashcan {
 
         this._inAnimation = true;
         this.isVisible = true;
+
+        if (this._hoverBgShape) {
+            this._updateHoverBg();
+            this._hoverBgShape.visible = true;
+            if (typeof createjs !== "undefined" && createjs.Tween) {
+                createjs.Tween.get(this._hoverBgShape, { override: true }).to({ alpha: 1.0 }, 150);
+            } else {
+                this._hoverBgShape.alpha = 1.0;
+            }
+        }
+
+        if (this._lidContainer && typeof createjs !== "undefined" && createjs.Tween) {
+            createjs.Tween.get(this._lidContainer, { override: true }).to(
+                { rotation: -20, y: (this._lidOriginalY ?? 0) - 5 },
+                180
+            );
+        }
+
         this._makeBorderHighlight(true);
         this._switchHighlightVisibility(true);
     }
@@ -211,6 +370,25 @@ class Trashcan {
         this.isVisible = false;
         this._animationLevel = 0;
         this._highlightPower = 255;
+
+        if (this._hoverBgShape) {
+            if (typeof createjs !== "undefined" && createjs.Tween) {
+                createjs.Tween.get(this._hoverBgShape, { override: true })
+                    .to({ alpha: 0.0 }, 150)
+                    .set({ visible: false });
+            } else {
+                this._hoverBgShape.alpha = 0.0;
+                this._hoverBgShape.visible = false;
+            }
+        }
+
+        if (this._lidContainer && typeof createjs !== "undefined" && createjs.Tween) {
+            createjs.Tween.get(this._lidContainer, { override: true }).to(
+                { rotation: 0, y: this._lidOriginalY ?? 0 },
+                150
+            );
+        }
+
         this._makeBorderHighlight(false);
         this._switchHighlightVisibility(false);
     }
