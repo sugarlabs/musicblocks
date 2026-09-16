@@ -19,6 +19,7 @@ describe("AIDebuggerWidget Unknown Host Handling", () => {
 
     afterEach(() => {
         warnSpy.mockRestore();
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
     });
 
     test("logs warning, sets null BASE_URL, and disables network actions", () => {

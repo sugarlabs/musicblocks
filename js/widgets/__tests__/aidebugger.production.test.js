@@ -1,8 +1,8 @@
 /**
- * Test AIDebuggerWidget hostname resolution for musicblocks.sugarlabs.org subdomains.
+ * Test AIDebuggerWidget hostname resolution for apex musicblocks.sugarlabs.org domain.
  *
  * @jest-environment jsdom
- * @jest-environment-options {"url": "https://dev.musicblocks.sugarlabs.org/"}
+ * @jest-environment-options {"url": "https://musicblocks.sugarlabs.org/"}
  */
 
 const AIDebuggerWidget = require("../aidebugger.js");
@@ -10,12 +10,12 @@ const AIDebuggerWidget = require("../aidebugger.js");
 global._ = str => str;
 global._THIS_IS_MUSIC_BLOCKS_ = true;
 
-describe("AIDebuggerWidget Subdomain Backend Resolution", () => {
+describe("AIDebuggerWidget Production Apex Backend Resolution", () => {
     afterEach(() => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
     });
 
-    test("resolves subdomain.musicblocks.sugarlabs.org to production API", () => {
+    test("resolves musicblocks.sugarlabs.org to production API", () => {
         const w = new AIDebuggerWidget();
         w.chatLog = document.createElement("div");
         w._showConsentBanner();

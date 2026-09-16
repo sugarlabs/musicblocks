@@ -26,7 +26,24 @@ const AIDebuggerWidget = require("../aidebugger.js");
 global._ = str => str;
 global._THIS_IS_MUSIC_BLOCKS_ = true;
 
+// Polyfill Blob.prototype.text for jsdom if absent
+if (typeof Blob !== "undefined" && !Blob.prototype.text) {
+    Blob.prototype.text = function () {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsText(this);
+        });
+    };
+}
+
 describe("AIDebuggerWidget", () => {
+    afterEach(() => {
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        jest.useRealTimers();
+    });
+
     describe("Constructor", () => {
         test("initializes basic properties", () => {
             const debuggerWidget = new AIDebuggerWidget();
@@ -787,6 +804,10 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.chatLog = document.createElement("div");
         });
 
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
         test("shows and hides typing indicator", () => {
             debuggerWidget._showTypingIndicator();
             expect(debuggerWidget.chatLog.querySelectorAll(".typing-indicator").length).toBe(1);
@@ -808,7 +829,6 @@ describe("AIDebuggerWidget", () => {
             expect(indicator.textContent).toBe("Debugger is typing..");
 
             debuggerWidget._hideTypingIndicator();
-            jest.useRealTimers();
         });
     });
 
@@ -834,6 +854,10 @@ describe("AIDebuggerWidget", () => {
 
     describe("_exportChat", () => {
         let debuggerWidget;
+        let originalCreateObjectURL;
+        let originalRevokeObjectURL;
+        let createElementSpy;
+        let clickMock;
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
@@ -841,6 +865,28 @@ describe("AIDebuggerWidget", () => {
                 textMsg: jest.fn(),
                 prepareExport: jest.fn(() => "[]")
             };
+
+            originalCreateObjectURL = global.URL.createObjectURL;
+            originalRevokeObjectURL = global.URL.revokeObjectURL;
+            global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
+            global.URL.revokeObjectURL = jest.fn();
+
+            clickMock = jest.fn();
+            const originalCreateElement = document.createElement.bind(document);
+            createElementSpy = jest.spyOn(document, "createElement").mockImplementation(tag => {
+                const el = originalCreateElement(tag);
+                if (tag === "a") {
+                    el.click = clickMock;
+                }
+                return el;
+            });
+        });
+
+        afterEach(() => {
+            createElementSpy.mockRestore();
+            global.URL.createObjectURL = originalCreateObjectURL;
+            global.URL.revokeObjectURL = originalRevokeObjectURL;
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
         });
 
         test("shows message when no conversation to export", () => {
@@ -851,24 +897,7 @@ describe("AIDebuggerWidget", () => {
             );
         });
 
-        test("exports full chat history and project representation when messages exist", () => {
-            const originalCreateObjectURL = global.URL.createObjectURL;
-            const originalRevokeObjectURL = global.URL.revokeObjectURL;
-            global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
-            global.URL.revokeObjectURL = jest.fn();
-
-            const clickMock = jest.fn();
-            const originalCreateElement = document.createElement.bind(document);
-            const createElementSpy = jest
-                .spyOn(document, "createElement")
-                .mockImplementation(tag => {
-                    const el = originalCreateElement(tag);
-                    if (tag === "a") {
-                        el.click = clickMock;
-                    }
-                    return el;
-                });
-
+        test("exports full chat history and project representation when messages exist", async () => {
             debuggerWidget.chatHistory = [
                 { type: "user", content: "How does repeat work?" },
                 { type: "bot", content: "Repeat repeats blocks." }
@@ -889,29 +918,19 @@ describe("AIDebuggerWidget", () => {
                 "Chat exported successfully."
             );
 
-            createElementSpy.mockRestore();
-            global.URL.createObjectURL = originalCreateObjectURL;
-            global.URL.revokeObjectURL = originalRevokeObjectURL;
+            const blob = global.URL.createObjectURL.mock.calls[0][0];
+            expect(blob).toBeInstanceOf(Blob);
+            expect(blob.type).toBe("text/plain");
+            const text = await blob.text();
+            expect(text).toContain("Music Blocks Debugger Chat Export\n");
+            expect(text).toContain("Generated at: ");
+            expect(text).toContain("Project Code (Human Readable Format):\n");
+            expect(text).toContain("Chat History:\n\n");
+            expect(text).toContain("User:\nHow does repeat work?\n\n");
+            expect(text).toContain("Music Blocks Debugger:\nRepeat repeats blocks.\n\n");
         });
 
-        test("handles prepareExport JSON parse error during chat export gracefully", () => {
-            const originalCreateObjectURL = global.URL.createObjectURL;
-            const originalRevokeObjectURL = global.URL.revokeObjectURL;
-            global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
-            global.URL.revokeObjectURL = jest.fn();
-
-            const clickMock = jest.fn();
-            const originalCreateElement = document.createElement.bind(document);
-            const createElementSpy = jest
-                .spyOn(document, "createElement")
-                .mockImplementation(tag => {
-                    const el = originalCreateElement(tag);
-                    if (tag === "a") {
-                        el.click = clickMock;
-                    }
-                    return el;
-                });
-
+        test("handles prepareExport JSON parse error during chat export gracefully", async () => {
             debuggerWidget.chatHistory = [{ type: "user", content: "Hello" }];
             debuggerWidget.activity.prepareExport = jest.fn(() => "invalid json {{");
 
@@ -921,29 +940,15 @@ describe("AIDebuggerWidget", () => {
                 "Chat exported successfully."
             );
 
-            createElementSpy.mockRestore();
-            global.URL.createObjectURL = originalCreateObjectURL;
-            global.URL.revokeObjectURL = originalRevokeObjectURL;
+            const blob = global.URL.createObjectURL.mock.calls[0][0];
+            expect(blob).toBeInstanceOf(Blob);
+            expect(blob.type).toBe("text/plain");
+            const text = await blob.text();
+            expect(text).toContain("Could not convert project to readable format");
+            expect(text).toContain("User:\nHello\n\n");
         });
 
-        test("handles prepareExport exception during chat export gracefully", () => {
-            const originalCreateObjectURL = global.URL.createObjectURL;
-            const originalRevokeObjectURL = global.URL.revokeObjectURL;
-            global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
-            global.URL.revokeObjectURL = jest.fn();
-
-            const clickMock = jest.fn();
-            const originalCreateElement = document.createElement.bind(document);
-            const createElementSpy = jest
-                .spyOn(document, "createElement")
-                .mockImplementation(tag => {
-                    const el = originalCreateElement(tag);
-                    if (tag === "a") {
-                        el.click = clickMock;
-                    }
-                    return el;
-                });
-
+        test("handles prepareExport exception during chat export gracefully", async () => {
             debuggerWidget.chatHistory = [{ type: "user", content: "Hello" }];
             debuggerWidget.activity.prepareExport = jest.fn(() => {
                 throw new Error("Export failed");
@@ -958,31 +963,20 @@ describe("AIDebuggerWidget", () => {
                 "Chat exported successfully."
             );
 
-            createElementSpy.mockRestore();
-            global.URL.createObjectURL = originalCreateObjectURL;
-            global.URL.revokeObjectURL = originalRevokeObjectURL;
+            const blob = global.URL.createObjectURL.mock.calls[0][0];
+            expect(blob).toBeInstanceOf(Blob);
+            expect(blob.type).toBe("text/plain");
+            const text = await blob.text();
+            expect(text).toContain("Could not convert project to readable format");
+            expect(text).toContain("User:\nHello\n\n");
         });
 
-        test("exports using Turtle Blocks branding when _THIS_IS_MUSIC_BLOCKS_ is false", () => {
-            const originalCreateObjectURL = global.URL.createObjectURL;
-            const originalRevokeObjectURL = global.URL.revokeObjectURL;
-            global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
-            global.URL.revokeObjectURL = jest.fn();
-
-            const clickMock = jest.fn();
-            const originalCreateElement = document.createElement.bind(document);
-            const createElementSpy = jest
-                .spyOn(document, "createElement")
-                .mockImplementation(tag => {
-                    const el = originalCreateElement(tag);
-                    if (tag === "a") {
-                        el.click = clickMock;
-                    }
-                    return el;
-                });
-
+        test("exports using Turtle Blocks branding when _THIS_IS_MUSIC_BLOCKS_ is false", async () => {
             global._THIS_IS_MUSIC_BLOCKS_ = false;
-            debuggerWidget.chatHistory = [{ type: "user", content: "Hi" }];
+            debuggerWidget.chatHistory = [
+                { type: "user", content: "Hi" },
+                { type: "bot", content: "Hello Turtle" }
+            ];
 
             debuggerWidget._exportChat();
 
@@ -990,10 +984,13 @@ describe("AIDebuggerWidget", () => {
                 "Chat exported successfully."
             );
 
-            global._THIS_IS_MUSIC_BLOCKS_ = true;
-            createElementSpy.mockRestore();
-            global.URL.createObjectURL = originalCreateObjectURL;
-            global.URL.revokeObjectURL = originalRevokeObjectURL;
+            const blob = global.URL.createObjectURL.mock.calls[0][0];
+            expect(blob).toBeInstanceOf(Blob);
+            expect(blob.type).toBe("text/plain");
+            const text = await blob.text();
+            expect(text).toContain("Turtle Blocks Debugger Chat Export\n");
+            expect(text).toContain("User:\nHi\n\n");
+            expect(text).toContain("Turtle Blocks Debugger:\nHello Turtle\n\n");
         });
     });
 
@@ -1050,6 +1047,7 @@ describe("AIDebuggerWidget", () => {
 
         afterEach(() => {
             window.widgetWindows = originalWidgetWindows;
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
         });
 
         test("initializes window, sets dimensions, event handlers, and buttons", () => {
@@ -1191,7 +1189,6 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.chatLog.textContent).toContain(
                 "Welcome to Turtle Blocks Debugger!"
             );
-            global._THIS_IS_MUSIC_BLOCKS_ = true;
         });
     });
 
@@ -1951,7 +1948,7 @@ describe("AIDebuggerWidget", () => {
             welcomeSpy.mockRestore();
         });
 
-        test("handles chat export when prepareExport throws error by inserting readable fallback string", () => {
+        test("handles chat export when prepareExport throws error by inserting readable fallback string", async () => {
             const originalCreateObjectURL = global.URL.createObjectURL;
             const originalRevokeObjectURL = global.URL.revokeObjectURL;
             global.URL.createObjectURL = jest.fn(() => "blob:mock-export-url");
@@ -1975,20 +1972,28 @@ describe("AIDebuggerWidget", () => {
             });
             const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-            debuggerWidget._exportChat();
+            try {
+                debuggerWidget._exportChat();
 
-            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
-                "Debugger error: Could not retrieve project data for export."
-            );
-            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
-                "Chat exported successfully."
-            );
-            expect(global.URL.createObjectURL).toHaveBeenCalled();
-
-            errorSpy.mockRestore();
-            createElementSpy.mockRestore();
-            global.URL.createObjectURL = originalCreateObjectURL;
-            global.URL.revokeObjectURL = originalRevokeObjectURL;
+                expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                    "Debugger error: Could not retrieve project data for export."
+                );
+                expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                    "Chat exported successfully."
+                );
+                expect(global.URL.createObjectURL).toHaveBeenCalled();
+                const blob = global.URL.createObjectURL.mock.calls[0][0];
+                expect(blob).toBeInstanceOf(Blob);
+                expect(blob.type).toBe("text/plain");
+                const text = await blob.text();
+                expect(text).toContain("Could not convert project to readable format");
+                expect(text).toContain("User:\nNeed help\n\n");
+            } finally {
+                errorSpy.mockRestore();
+                createElementSpy.mockRestore();
+                global.URL.createObjectURL = originalCreateObjectURL;
+                global.URL.revokeObjectURL = originalRevokeObjectURL;
+            }
         });
 
         test("handles division by zero fallbacks in AST block representations", () => {
