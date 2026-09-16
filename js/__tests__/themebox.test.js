@@ -282,4 +282,29 @@ describe("ThemeBox", () => {
             delete global.platformThemes.dark.paletteColors.pitch;
         }
     });
+
+    test("setPreference() does not crash when localStorage is unavailable", () => {
+        localStorage.getItem.mockImplementation(() => {
+            throw new DOMException("Access denied", "SecurityError");
+        });
+        localStorage.setItem.mockImplementation(() => {
+            throw new DOMException("Access denied", "SecurityError");
+        });
+        themeBox._theme = "dark";
+        expect(() => themeBox.setPreference()).not.toThrow();
+        expect(mockActivity.storage.themePreference).toBe("dark");
+        expect(document.body.classList.contains("dark")).toBe(true);
+    });
+
+    test("setPreference() falls back to applying theme when getItem throws", () => {
+        localStorage.getItem.mockImplementation(() => {
+            throw new DOMException("Access denied", "SecurityError");
+        });
+        themeBox._theme = "light";
+        themeBox.setPreference();
+        expect(mockActivity.storage.themePreference).toBe("light");
+        expect(mockActivity.textMsg).not.toHaveBeenCalledWith(
+            "Music Blocks is already set to this theme."
+        );
+    });
 });

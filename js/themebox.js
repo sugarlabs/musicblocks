@@ -430,10 +430,14 @@ class ThemeBox {
      * @returns {void}
      */
     setPreference() {
-        if (
-            localStorage.getItem("themePreference") === this._theme &&
-            document.body.classList.contains(this._theme)
-        ) {
+        let currentPref;
+        try {
+            currentPref = localStorage.getItem("themePreference");
+        } catch (e) {
+            currentPref = null;
+        }
+
+        if (currentPref === this._theme && document.body.classList.contains(this._theme)) {
             this.activity.textMsg(_("Music Blocks is already set to this theme."));
         } else {
             // Save preference to localStorage
