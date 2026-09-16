@@ -162,7 +162,7 @@ const platformThemes = {
 
         disconnected: "#5C5C5C",
         header: "#1E88E5",
-        ruleColor: "#303030",
+        ruleColor: "#E2E2E2",
         trashBorder: "#424242",
         trashActive: "#E53935",
         background: "#303030", // Very dark gray
@@ -289,7 +289,7 @@ const platformThemes = {
 
         disconnected: "#C4C4C4", // disconnected block color
         header: "#4DA6FF",
-        ruleColor: "#E2E2E2",
+        ruleColor: "#303030",
         trashBorder: "#808080",
         trashActive: "#FF0000",
         background: "#F9F9F9",
