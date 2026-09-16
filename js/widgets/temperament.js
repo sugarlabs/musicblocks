@@ -2778,6 +2778,11 @@ function TemperamentWidget() {
             }
             addTemperamentToDictionary(this.inTemperament, newTemperament);
             updateTemperaments();
+            // The redefined temperament keeps its old name, so any frequency
+            // already cached under that name (see Singer.getCachedPitchToFrequency)
+            // would otherwise keep playing at the pre-edit tuning until the
+            // project is stopped and restarted.
+            Singer.clearPitchToFrequencyCache();
         }
 
         if (isCustomTemperament(this.inTemperament)) {

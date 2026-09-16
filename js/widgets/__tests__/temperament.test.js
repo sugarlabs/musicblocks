@@ -765,6 +765,50 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalled();
     });
 
+    test("_save clears the pitch-to-frequency cache when saving a custom temperament", () => {
+        global.setOctaveRatio = jest.fn();
+        global.rationalToFraction = jest.fn(() => [1, 1]);
+        global.getOctaveRatio = jest.fn(() => 2);
+        global.isCustomTemperament = jest.fn(() => true);
+        global.deleteTemperamentFromList = jest.fn();
+        global.addTemperamentToDictionary = jest.fn();
+        global.updateTemperaments = jest.fn();
+        global.Singer.clearPitchToFrequencyCache = jest.fn();
+
+        widget.inTemperament = "custom1";
+        widget.ratios = [1, 2];
+        widget.notes = [
+            ["C", 4],
+            ["C", 5]
+        ];
+        widget.powerBase = 2;
+
+        widget._logo = {
+            synth: {
+                stop: jest.fn(),
+                startingPitch: "C4"
+            },
+            customTemperamentDefined: false
+        };
+
+        widget.activity = {
+            blocks: {
+                loadNewBlocks: jest.fn(),
+                findUniqueTemperamentName: jest.fn(() => "custom1"),
+                protoBlockDict: { custompitch: { hidden: true } },
+                palettes: { updatePalettes: jest.fn() }
+            }
+        };
+
+        widget._save();
+
+        // saving a redefined custom temperament under the same name must
+        // invalidate any frequency already cached for that name, otherwise
+        // notes keep playing at the pre-edit tuning until the project restarts
+        expect(global.addTemperamentToDictionary).toHaveBeenCalled();
+        expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
+    });
+
     test("init sets up widget correctly", () => {
         const mockWidgetWindow = {
             clear: jest.fn(),
