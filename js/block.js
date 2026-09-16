@@ -4729,11 +4729,11 @@ class Block {
                         case "temperament":
                         case "mode":
                         case "timbre":
-                            lockInit = true;
                             if (
                                 this.blocks.blockList[topBlock].protoblock.staticLabels[0] ===
                                 widgetTitle[i].innerHTML
                             ) {
+                                lockInit = true;
                                 this.blocks.reInitWidget(topBlock, 1500);
                             }
                             break;
