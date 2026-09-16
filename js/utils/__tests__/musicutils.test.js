@@ -454,16 +454,30 @@ describe("Temperament Functions", () => {
     });
 
     describe("addTemperamentToList", () => {
+        // Read TEMPERAMENTS straight off the module rather than importing it
+        // as a top-level binding: addTemperamentToDictionary/updateTemperaments
+        // later reassign the module's internal TEMPERAMENTS to a new array, and
+        // a destructured import here would go stale after that (see the
+        // "updateTemperaments" test below).
+        const musicutils = require("../musicutils");
+
         it("adds a new entry to TEMPERAMENTS if not predefined", () => {
-            const newEntry = ["custom", "custom", "custom"];
+            const newEntry = [
+                "brand-new-temperament",
+                "brand-new-temperament",
+                "brand-new-temperament"
+            ];
             addTemperamentToList(newEntry);
-            expect(TEMPERAMENTS).toContainEqual(newEntry);
+            expect(musicutils.TEMPERAMENTS).toContainEqual(newEntry);
         });
 
         it("does not add a duplicate entry if already present", () => {
+            const before = musicutils.TEMPERAMENTS.filter(entry => entry[1] === "equal").length;
             const duplicateEntry = ["Equal (12EDO)", "equal", "equal"];
             addTemperamentToList(duplicateEntry);
-            expect(TEMPERAMENTS.filter(entry => entry[1] === "equal").length).toBe(1);
+            expect(musicutils.TEMPERAMENTS.filter(entry => entry[1] === "equal").length).toBe(
+                before
+            );
         });
     });
 
