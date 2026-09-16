@@ -14,7 +14,7 @@
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
 
-/* global createjs, platformColor, BORDER, TRASHICON, TRASH_LID_ICON, TRASH_BODY_ICON, last, base64Encode */
+/* global createjs, platformColor, BORDER, TRASHICON, TRASH_LID_ICON, TRASH_BODY_ICON, last, base64Encode, _ */
 
 /* exported Trashcan */
 
@@ -42,9 +42,6 @@ class Trashcan {
                 typeof this.activity.trashContainer.addChild === "function"
             ) {
                 this.activity.trashContainer.addChild(this._hoverBgShape);
-                if (typeof this.activity.trashContainer.setChildIndex === "function") {
-                    this.activity.trashContainer.setChildIndex(this._hoverBgShape, 0);
-                }
             }
         }
         this._borderHighlightBitmap = null;
@@ -74,7 +71,14 @@ class Trashcan {
         };
 
         this.activity.trashContainer.addChild(this._container);
-        this.activity.trashContainer.setChildIndex(this._container, 0);
+        if (
+            this._hoverBgShape &&
+            typeof this.activity.trashContainer.setChildIndex === "function"
+        ) {
+            this.activity.trashContainer.setChildIndex(this._hoverBgShape, 0);
+        } else if (typeof this.activity.trashContainer.setChildIndex === "function") {
+            this.activity.trashContainer.setChildIndex(this._container, 0);
+        }
         window.addEventListener("resize", this._handleResize);
         this.resizeEvent(1);
         this._makeTrash();
@@ -333,6 +337,13 @@ class Trashcan {
         }
 
         this._inAnimation = true;
+        if (
+            this.activity &&
+            typeof this.activity.textMsg === "function" &&
+            typeof _ === "function"
+        ) {
+            this.activity.textMsg(_("Release to delete the block."));
+        }
         this.isVisible = true;
 
         if (this._hoverBgShape) {

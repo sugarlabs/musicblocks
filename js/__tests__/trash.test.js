@@ -27,7 +27,8 @@ const mockActivity = {
         setChildIndex: jest.fn()
     },
     cellSize: 50,
-    refreshCanvas: jest.fn()
+    refreshCanvas: jest.fn(),
+    textMsg: jest.fn()
 };
 const mockTo = jest.fn().mockReturnThis();
 const mockSet = jest.fn().mockReturnThis();
@@ -80,6 +81,7 @@ global.base64Encode = jest.fn(data => data);
 global.BORDER = "mock_border_svg";
 global.TRASHICON = "mock_trash_icon_svg";
 global.last = jest.fn(array => array[array.length - 1]);
+global._ = jest.fn(s => s);
 
 global.Image = jest.fn(() => {
     const img = {};
@@ -516,9 +518,9 @@ describe("interactive lid open and delete glow affordance", () => {
 
             const separatedTrashcan = new Trashcan(mockActivity);
 
-            expect(separatedTrashcan._lidContainer).toBeDefined();
-            expect(separatedTrashcan._lidBitmap).toBeDefined();
-            expect(separatedTrashcan._bodyBitmap).toBeDefined();
+            expect(separatedTrashcan._lidContainer).not.toBeNull();
+            expect(separatedTrashcan._lidBitmap).not.toBeNull();
+            expect(separatedTrashcan._bodyBitmap).not.toBeNull();
 
             delete global.TRASH_LID_ICON;
             delete global.TRASH_BODY_ICON;
@@ -530,12 +532,18 @@ describe("interactive lid open and delete glow affordance", () => {
 
             const fallbackTrashcan = new Trashcan(mockActivity);
 
-            expect(fallbackTrashcan._trashBitmap).toBeDefined();
+            expect(fallbackTrashcan._trashBitmap).not.toBeNull();
             expect(fallbackTrashcan._lidContainer).toBeNull();
         });
     });
 
     describe("animations", () => {
+        it("should announce delete action to screen reader on startHighlightAnimation", () => {
+            mockActivity.textMsg.mockClear();
+            trashcan.startHighlightAnimation();
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("Release to delete the block.");
+        });
+
         it("should trigger tween for hover glow and lid tilt on startHighlightAnimation", () => {
             mockTo.mockClear();
             trashcan._lidContainer = { rotation: 0, y: 0 };
