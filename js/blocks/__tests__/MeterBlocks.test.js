@@ -520,6 +520,24 @@ describe("MeterBlocks setup", () => {
         expect(turtle.singer.bpm).toEqual([]);
     });
 
+    it("clamps setbpm2 against the computed tempo, not the raw bpm arg", () => {
+        const block = getBlock("setbpm2");
+        const turtle = { singer: { bpm: [] } };
+        activity.turtles.ithTurtle.mockReturnValue(turtle);
+
+        // raw bpm (20) is below 30, but with beat value 1 the computed tempo
+        // is 80, which is valid and should not be clamped
+        block.flow([20, 1, "next"], logo, 0, "flow");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe(80);
+
+        // raw bpm (40) is within 30-1000, but with beat value 0.125 the
+        // computed tempo is 20, which is below the minimum and must clamp
+        block.flow([40, 0.125, "next"], logo, 0, "flow");
+        expect(activity.errorMsg).toHaveBeenCalledWith("Beats per minute must be > 30.");
+        expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe(30);
+    });
+
     it("pushes and pops BPM values with the older setbpm block", () => {
         const block = getBlock("setbpm");
         const turtle = { singer: { bpm: [] } };
