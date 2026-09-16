@@ -12,7 +12,7 @@
 //A dropdown for selecting theme
 
 /*
-   global platformColor, platformThemes, getSystemThemePreference,
+   global platformColor, platformThemes, clonePlatformTheme, getSystemThemePreference,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS,
    PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    MULTIPALETTEICONS, PALETTEICONS, makePaletteIcons,
@@ -68,8 +68,16 @@ const THEME_SYNC_KEYS = [
 function syncPlatformColor(theme) {
     const src = platformThemes[theme];
     if (!src || !window.platformColor) return;
+    const colors = clonePlatformTheme(src);
+    for (const name in window.platformColor.paletteColors || {}) {
+        if (!(name in colors.paletteColors)) {
+            colors.paletteColors[name] = clonePlatformTheme(
+                window.platformColor.paletteColors[name]
+            );
+        }
+    }
     for (const key of THEME_SYNC_KEYS) {
-        if (key in src) window.platformColor[key] = src[key];
+        if (key in colors) window.platformColor[key] = colors[key];
     }
 }
 
