@@ -777,10 +777,7 @@ describe("TemperamentWidget basic tests", () => {
 
         widget.inTemperament = "custom1";
         widget.ratios = [1, 2];
-        widget.notes = [
-            ["C", 4],
-            ["C", 5]
-        ];
+        widget.pitchNumber = 2;
         widget.powerBase = 2;
 
         widget._logo = {
@@ -804,8 +801,14 @@ describe("TemperamentWidget basic tests", () => {
 
         // saving a redefined custom temperament under the same name must
         // invalidate any frequency already cached for that name, otherwise
-        // notes keep playing at the pre-edit tuning until the project restarts
-        expect(global.addTemperamentToDictionary).toHaveBeenCalled();
+        // notes keep playing at the pre-edit tuning until the project restarts.
+        // Assert the exact saved payload, not just that the mock was called,
+        // since _save recomputes note/ratio entries from this.ratios.
+        expect(global.addTemperamentToDictionary).toHaveBeenCalledWith("custom1", {
+            pitchNumber: 2,
+            0: [1, "C(+0¢)", 4],
+            1: [2, "C(+0¢)", 4]
+        });
         expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
     });
 
