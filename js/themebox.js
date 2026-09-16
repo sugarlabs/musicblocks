@@ -414,6 +414,11 @@ class ThemeBox {
                 console.debug("Could not update planet iframe theme:", e);
             }
         }
+
+        // Refresh trashcan artwork with new theme colors
+        if (this.activity.trashcan && typeof this.activity.trashcan.refresh === "function") {
+            this.activity.trashcan.refresh();
+        }
     }
 
     /**

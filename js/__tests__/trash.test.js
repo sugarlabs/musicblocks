@@ -37,6 +37,9 @@ const mockCreatejs = {
     Container: jest.fn(() => ({
         addChild: jest.fn(),
         removeChildAt: jest.fn(),
+        removeAllChildren: jest.fn(function () {
+            this.children = [];
+        }),
         getBounds: jest.fn(() => ({
             width: 100,
             height: 100
@@ -538,6 +541,20 @@ describe("interactive lid open and delete glow affordance", () => {
     });
 
     describe("animations", () => {
+        it("should not start highlight animation if artwork is not yet initialized", () => {
+            trashcan._isHighlightInitialized = false;
+            trashcan.startHighlightAnimation();
+            expect(trashcan._inAnimation).toBe(false);
+            expect(trashcan.isVisible).toBe(false);
+        });
+
+        it("should safely handle _switchHighlightVisibility when container children are incomplete", () => {
+            trashcan._container.children = [];
+            expect(() => trashcan._switchHighlightVisibility(true)).not.toThrow();
+            trashcan._container.children = [{}];
+            expect(() => trashcan._switchHighlightVisibility(true)).not.toThrow();
+        });
+
         it("should announce delete action to screen reader on startHighlightAnimation", () => {
             mockActivity.textMsg.mockClear();
             trashcan.startHighlightAnimation();
@@ -580,6 +597,30 @@ describe("interactive lid open and delete glow affordance", () => {
                 expect.objectContaining({ rotation: 0, y: 0 }),
                 150
             );
+        });
+    });
+
+    describe("refresh", () => {
+        it("should clear and rebuild container artwork when refreshed", () => {
+            const removeAllSpy = jest.spyOn(trashcan._container, "removeAllChildren");
+            const updateHoverBgSpy = jest.spyOn(trashcan, "_updateHoverBg");
+            const makeTrashSpy = jest.spyOn(trashcan, "_makeTrash");
+
+            trashcan.refresh();
+
+            expect(removeAllSpy).toHaveBeenCalled();
+            expect(updateHoverBgSpy).toHaveBeenCalled();
+            expect(makeTrashSpy).toHaveBeenCalled();
+            expect(trashcan._isHighlightInitialized).toBe(true);
+        });
+
+        it("should stop active animation before refreshing", () => {
+            trashcan._inAnimation = true;
+            const stopAnimationSpy = jest.spyOn(trashcan, "stopHighlightAnimation");
+
+            trashcan.refresh();
+
+            expect(stopAnimationSpy).toHaveBeenCalled();
         });
     });
 });

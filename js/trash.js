@@ -155,7 +155,7 @@ class Trashcan {
             this._borderHighlightBitmap.scaleX = this.activity.cellSize / this._iconsize;
             this._borderHighlightBitmap.scaleY = this.activity.cellSize / this._iconsize;
             if (!this._isHighlightInitialized) {
-                this._container.visible = false;
+                this._container.visible = this.isVisible;
                 this._isHighlightInitialized = true;
             } else {
                 this._container.removeChildAt(this._container.children.length - 1);
@@ -328,11 +328,35 @@ class Trashcan {
     }
 
     /**
+     * Refresh trashcan artwork and colors when the theme changes.
+     * @public
+     * @returns {void}
+     */
+    refresh() {
+        if (this._inAnimation) {
+            this.stopHighlightAnimation();
+        }
+        if (this._container && typeof this._container.removeAllChildren === "function") {
+            this._container.removeAllChildren();
+        }
+        this._isHighlightInitialized = false;
+        this._borderHighlightBitmap = null;
+        this._trashBitmap = null;
+        this._bodyBitmap = null;
+        this._lidBitmap = null;
+        this._lidContainer = null;
+        if (this._hoverBgShape) {
+            this._updateHoverBg();
+        }
+        this._makeTrash();
+    }
+
+    /**
      * @public
      * @returns {void}
      */
     startHighlightAnimation() {
-        if (this._inAnimation) {
+        if (this._inAnimation || !this._isHighlightInitialized) {
             return;
         }
 
@@ -409,10 +433,20 @@ class Trashcan {
      * @returns {void}
      */
     _switchHighlightVisibility(bool) {
-        last(this._container.children).visible = bool;
-        this._container.children[1].visible = !bool;
+        if (!this._container || !this._container.children || this._container.children.length < 2) {
+            return;
+        }
+        const lastChild = last(this._container.children);
+        if (lastChild) {
+            lastChild.visible = bool;
+        }
+        if (this._container.children[1]) {
+            this._container.children[1].visible = !bool;
+        }
         this._container.visible = true;
-        this.activity.refreshCanvas();
+        if (this.activity && typeof this.activity.refreshCanvas === "function") {
+            this.activity.refreshCanvas();
+        }
     }
 
     /**
