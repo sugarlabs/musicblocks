@@ -1025,6 +1025,26 @@ describe("noteToObj", () => {
         expect(noteToObj("C")).toEqual(["C", 4]);
         expect(noteToObj("Bb")).toEqual(["Bb", 4]);
     });
+    it("should correctly parse multi-digit octaves", () => {
+        expect(noteToObj("C10")).toEqual(["C", 10]);
+        expect(noteToObj("Gb12")).toEqual(["Gb", 12]);
+        expect(noteToObj("A11")).toEqual(["A", 11]);
+    });
+    it("should correctly parse negative octaves and zero octave", () => {
+        expect(noteToObj("A-1")).toEqual(["A", -1]);
+        expect(noteToObj("F#-2")).toEqual(["F#", -2]);
+        expect(noteToObj("C0")).toEqual(["C", 0]);
+    });
+    it("should preserve complex accidentals and microtonal annotations", () => {
+        expect(noteToObj("Sol𝄪4")).toEqual(["Sol𝄪", 4]);
+        expect(noteToObj("C(+14¢)4")).toEqual(["C(+14¢)", 4]);
+    });
+    it("should return default octave 4 when input is not a non-empty string", () => {
+        expect(noteToObj("")).toEqual(["", 4]);
+        expect(noteToObj(null)).toEqual([null, 4]);
+        expect(noteToObj(undefined)).toEqual([undefined, 4]);
+        expect(noteToObj(123)).toEqual([123, 4]);
+    });
 });
 
 describe("frequencyToPitch", () => {
@@ -2839,6 +2859,11 @@ describe("calcOctave", () => {
 
     it("should be able to handle default case", () => {
         expect(calcOctave(4, "default", ["do"], "do")).toBe(4);
+    });
+
+    it("should correctly handle lastNotePlayed with multi-digit or negative octaves", () => {
+        expect(calcOctave(4, "current", ["C10"], "G")).toBe(calcOctave(4, "current", ["C4"], "G"));
+        expect(calcOctave(4, "current", ["A-1"], "G")).toBe(calcOctave(4, "current", ["A4"], "G"));
     });
 });
 

@@ -376,6 +376,31 @@ class BlockDragController {
         if (typeof blocks.hideSnapIndicator === "function") {
             blocks.hideSnapIndicator();
         }
+
+        // Record position changes for undo/redo
+        if (blocks.dragStartX !== undefined && blocks.dragStartY !== undefined) {
+            const myBlock = blocks.blockList[thisBlock];
+            if (myBlock && myBlock.container) {
+                if (
+                    myBlock.container.x !== blocks.dragStartX ||
+                    myBlock.container.y !== blocks.dragStartY
+                ) {
+                    if (!blocks.isUndoingOrRedoing) {
+                        blocks.actionHistory.push({
+                            type: "move",
+                            blockId: thisBlock,
+                            oldX: blocks.dragStartX,
+                            oldY: blocks.dragStartY,
+                            newX: myBlock.container.x,
+                            newY: myBlock.container.y
+                        });
+                        blocks.redoActionHistory = [];
+                    }
+                }
+            }
+            blocks.dragStartX = undefined;
+            blocks.dragStartY = undefined;
+        }
         /**
          * When a block is moved, we have to check the following:
          * (0) Is it inside of a expandable block?

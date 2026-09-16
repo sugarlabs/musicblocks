@@ -85,6 +85,9 @@ class HelpWidget {
      * @returns {void}
      */
     _setup(useActiveBlock, page) {
+        if (!this.isOpen || !this.widgetWindow || !this.widgetWindow.getWidgetBody()) {
+            return;
+        }
         // Which help page are we on?
 
         this._helpDiv.style.width = 100 + "%";

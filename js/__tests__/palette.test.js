@@ -2097,13 +2097,22 @@ describe("Palettes Class", () => {
             mockActivity.palettes = palettes;
             mockActivity.blocks = {
                 blockList: [{ container: { x: 0, y: 0 } }],
-                moveBlock: jest.fn()
+                moveBlock: jest.fn(),
+                actionHistory: [],
+                redoActionHistory: [{ type: "move", blockId: 0 }],
+                isUndoingOrRedoing: false,
+                dragStartX: 10,
+                dragStartY: 20
             };
 
             palette._makeBlockFromProtoblock(protoblk, true, "box", null, 10, 20);
 
             expect(palette._makeBlockFromPalette).toHaveBeenCalled();
             expect(mockActivity.blocks.moveBlock).toHaveBeenCalled();
+            expect(mockActivity.blocks.actionHistory).toEqual([{ type: "restore", blockId: 0 }]);
+            expect(mockActivity.blocks.redoActionHistory).toEqual([]);
+            expect(mockActivity.blocks.dragStartX).toBeUndefined();
+            expect(mockActivity.blocks.dragStartY).toBeUndefined();
         });
 
         test("outside click listener hides menu", () => {

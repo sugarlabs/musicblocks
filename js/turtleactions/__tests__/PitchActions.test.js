@@ -45,7 +45,8 @@ Object.assign(global, {
     SHARP: musicUtils.SHARP,
     FLAT: musicUtils.FLAT,
     getCurrentEDO: musicUtils.getCurrentEDO,
-    getModeLength: musicUtils.getModeLength
+    getModeLength: musicUtils.getModeLength,
+    noteToObj: musicUtils.noteToObj
 });
 
 global.NANERRORMSG = require("../../logo").NANERRORMSG;
@@ -1021,6 +1022,17 @@ describe("Tests for Singer.PitchActions setup", () => {
             turtle.singer.lastNotePlayed = null;
             expect(Singer.PitchActions.consonantStepSize("up", 0)).toEqual(
                 musicUtils.getStepSizeUp("C", "G")
+            );
+        });
+        test("with multi-digit and negative octaves → parses pitch name correctly", () => {
+            turtle.singer.lastNotePlayed = ["C10", 4];
+            expect(Singer.PitchActions.consonantStepSize("up", 0)).toEqual(
+                musicUtils.getStepSizeUp("C", "C")
+            );
+
+            turtle.singer.lastNotePlayed = ["A-1", 4];
+            expect(Singer.PitchActions.consonantStepSize("down", 0)).toEqual(
+                musicUtils.getStepSizeDown("C", "A")
             );
         });
         test("falls back to 1 when the temperament lookup returns a non-number (custom temperament with no ratios table)", () => {
