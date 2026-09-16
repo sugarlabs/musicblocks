@@ -293,12 +293,14 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
 
     it("verifies floating widget windows compute token styles correctly under the async stylesheet cascade", () => {
         // Open status floating window
+        let statusWindow;
         cy.window().then(win => {
             expect(win.widgetWindows, "widgetWindows manager should exist").to.exist;
-            win.widgetWindows.windowFor({}, "status", "status", true);
+            statusWindow = win.widgetWindows.windowFor({}, "status", "status", true);
         });
 
         cy.get(".windowFrame", { timeout: 30000 }).should("be.visible");
+        cy.get(".wftTitle").should("exist");
 
         // Verify Light Mode window frame tokens dynamically resolved from CSS variables
         cy.window().should(win => {
@@ -340,6 +342,7 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
         });
 
         cy.get("body").should("have.class", "dark");
+        cy.get(".wftTitle").should("exist");
 
         // Verify Dark Mode window frame tokens update dynamically according to the cascade
         cy.window().should(win => {
@@ -380,12 +383,17 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
             ).to.eq(expectedDarkTitleText);
         });
 
-        // Close the specific status widget window and verify cleanup
-        cy.get(".windowFrame .wftTitle")
-            .contains("status")
-            .closest(".windowFrame")
-            .find(".wftButton.close")
-            .click({ force: true });
+        // Close the specific status widget window using the window instance and verify cleanup
+        cy.then(() => {
+            if (statusWindow && statusWindow._frame) {
+                cy.wrap(statusWindow._frame).find(".wftButton.close").click({ force: true });
+            } else {
+                cy.get("#statusWidgetID")
+                    .closest(".windowFrame")
+                    .find(".wftButton.close")
+                    .click({ force: true });
+            }
+        });
         cy.get(".windowFrame").should("not.exist");
     });
 
@@ -458,18 +466,20 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
         });
 
         // Close the modal dialog and verify cleanup
-        cy.get(".windowFrame.mb-system-dialog .wftButton.close").first().click({ force: true });
+        cy.get(".windowFrame.mb-system-dialog").find(".wftButton.close").click({ force: true });
         cy.get(".mb-dialog-overlay").should("not.exist");
     });
 
     it("verifies widget window titlebar cascade under mobile viewport breakpoint", () => {
+        let mobileStatusWindow;
         cy.viewport(400, 700);
         cy.window().then(win => {
             expect(win.widgetWindows, "widgetWindows manager should exist").to.exist;
-            win.widgetWindows.windowFor({}, "status", "status", true);
+            mobileStatusWindow = win.widgetWindows.windowFor({}, "status", "status", true);
         });
 
         cy.get(".windowFrame", { timeout: 30000 }).should("be.visible");
+        cy.get(".wftTitle").should("exist");
 
         // Switch to Dark Mode on mobile
         cy.window().then(win => {
@@ -480,6 +490,7 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
         });
 
         cy.get("body").should("have.class", "dark");
+        cy.get(".wftTitle").should("exist");
 
         // Under mobile dark mode, .wftTitle matches --color-widget-titlebar-text
         cy.window().should(win => {
@@ -498,12 +509,17 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
             ).to.eq(expectedMobileDarkTitle);
         });
 
-        // Close the specific status widget window and restore desktop viewport
-        cy.get(".windowFrame .wftTitle")
-            .contains("status")
-            .closest(".windowFrame")
-            .find(".wftButton.close")
-            .click({ force: true });
+        // Close the specific status widget window using the window instance and restore desktop viewport
+        cy.then(() => {
+            if (mobileStatusWindow && mobileStatusWindow._frame) {
+                cy.wrap(mobileStatusWindow._frame).find(".wftButton.close").click({ force: true });
+            } else {
+                cy.get("#statusWidgetID")
+                    .closest(".windowFrame")
+                    .find(".wftButton.close")
+                    .click({ force: true });
+            }
+        });
         cy.get(".windowFrame").should("not.exist");
         cy.viewport(1400, 1000);
     });
