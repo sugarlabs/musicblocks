@@ -1,4 +1,4 @@
-/* global cy, Cypress, describe, it, before, beforeEach, afterEach, expect */
+/* global cy, Cypress, describe, it, before, beforeEach, afterEach, after, expect */
 
 // Suppress non-fatal uncaught exceptions (such as async audio/widget teardowns or RequireJS timing variances)
 Cypress.on("uncaught:exception", () => false);
@@ -51,6 +51,14 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
     });
 
     afterEach(() => {
+        // Dismiss any lingering dialogs or modals
+        cy.get("body").then($body => {
+            const closeButtons = $body.find(".windowFrame .wftButton.close, .mb-dialog-overlay");
+            if (closeButtons.length) {
+                cy.wrap(closeButtons).click({ multiple: true, force: true });
+            }
+        });
+
         // Reset theme to light mode and restore desktop viewport cleanly between tests
         cy.window().then(win => {
             const activity = win.ActivityContext
@@ -66,6 +74,11 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
         });
         cy.get("body").should("not.have.class", "dark").should("not.have.class", "highcontrast");
         cy.viewport(1400, 1000);
+    });
+
+    after(() => {
+        // Clear localStorage so subsequent specs run in a clean environment
+        cy.clearLocalStorage();
     });
 
     it("verifies required async stylesheets finish loading and transition to rel='stylesheet'", () => {
@@ -354,14 +367,36 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
     });
 
     it("verifies overlay and modal backdrop tokens resolve consistently across themes", () => {
-        cy.window().should(win => {
-            const lightBackdrop = resolveTokenColor(win, "--color-overlay-backdrop");
-            const lightPanel = resolveTokenColor(win, "--color-panel-bg");
-            expect(lightBackdrop, "Light overlay backdrop token must resolve").to.not.be.empty;
-            expect(lightPanel, "Light panel background token must resolve").to.not.be.empty;
+        // Open a real modal dialog via MBDialog
+        cy.window().then(win => {
+            expect(win.MBDialog, "MBDialog system should exist").to.exist;
+            win.MBDialog.alert("Modal backdrop cascade verification", "Modal Title");
         });
 
-        // Switch to Dark Mode
+        cy.get(".mb-dialog-overlay").should("exist");
+        cy.get(".windowFrame.mb-system-dialog").should("be.visible");
+
+        // Verify Light Mode modal panel and backdrop computed styles against design tokens
+        cy.window().should(win => {
+            const overlayEl = win.document.querySelector(".mb-dialog-overlay");
+            const panelEl = win.document.querySelector(".windowFrame.mb-system-dialog .wfbWidget");
+            expect(overlayEl, "Overlay backdrop element should exist").to.exist;
+            expect(panelEl, "Modal panel element should exist").to.exist;
+
+            const expectedBackdrop = resolveTokenColor(win, "--color-overlay-backdrop");
+            const expectedPanelBg = resolveTokenColor(win, "--color-panel-bg", panelEl);
+
+            expect(
+                win.getComputedStyle(overlayEl).backgroundColor,
+                "Overlay backdrop must match --color-overlay-backdrop in light mode"
+            ).to.eq(expectedBackdrop);
+            expect(
+                win.getComputedStyle(panelEl).backgroundColor,
+                "Modal panel bg must match --color-panel-bg in light mode"
+            ).to.eq(expectedPanelBg);
+        });
+
+        // Switch to Dark Mode while modal is open
         cy.window().then(win => {
             const activity = win.ActivityContext
                 ? win.ActivityContext.getActivity()
@@ -371,12 +406,27 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
 
         cy.get("body").should("have.class", "dark");
 
+        // Verify Dark Mode modal panel and backdrop computed styles against updated design tokens
         cy.window().should(win => {
-            const darkBackdrop = resolveTokenColor(win, "--color-overlay-backdrop");
-            const darkPanel = resolveTokenColor(win, "--color-panel-bg");
-            expect(darkBackdrop, "Dark overlay backdrop token must resolve").to.not.be.empty;
-            expect(darkPanel, "Dark panel background token must resolve").to.not.be.empty;
+            const overlayEl = win.document.querySelector(".mb-dialog-overlay");
+            const panelEl = win.document.querySelector(".windowFrame.mb-system-dialog .wfbWidget");
+
+            const darkExpectedBackdrop = resolveTokenColor(win, "--color-overlay-backdrop");
+            const darkExpectedPanelBg = resolveTokenColor(win, "--color-panel-bg", panelEl);
+
+            expect(
+                win.getComputedStyle(overlayEl).backgroundColor,
+                "Overlay backdrop must match --color-overlay-backdrop in dark mode"
+            ).to.eq(darkExpectedBackdrop);
+            expect(
+                win.getComputedStyle(panelEl).backgroundColor,
+                "Modal panel bg must match --color-panel-bg in dark mode"
+            ).to.eq(darkExpectedPanelBg);
         });
+
+        // Close the modal dialog and verify cleanup
+        cy.get(".windowFrame.mb-system-dialog .wftButton.close").first().click({ force: true });
+        cy.get(".mb-dialog-overlay").should("not.exist");
     });
 
     it("verifies widget window titlebar cascade under mobile viewport breakpoint", () => {
@@ -423,16 +473,32 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
     });
 
     it("verifies search suggestion cascade rules consume design tokens without specificity leakage", () => {
+        // Open search through palette
+        cy.contains("#palette tbody tr", "Search").click();
+        cy.get("#search").should("be.visible");
+        cy.focused().should("have.id", "search").type("forward");
+        cy.get("ul.ui-autocomplete", { timeout: 10000 }).should("be.visible");
+
+        // Verify Light Mode autocomplete suggestion dropdown computed styles against design tokens
         cy.window().should(win => {
+            const autocompleteEl = win.document.querySelector("ul.ui-autocomplete");
+            expect(autocompleteEl, "Autocomplete dropdown element should exist").to.exist;
+
             const expectedSearchBg = resolveTokenColor(win, "--color-bg-primary");
             const expectedSearchText = resolveTokenColor(win, "--color-text-primary");
 
-            // Verify search tokens are defined
-            expect(expectedSearchBg).to.not.be.empty;
-            expect(expectedSearchText).to.not.be.empty;
+            const computed = win.getComputedStyle(autocompleteEl);
+            expect(
+                computed.backgroundColor,
+                "Autocomplete dropdown bg must match --color-bg-primary in light mode"
+            ).to.eq(expectedSearchBg);
+            expect(
+                computed.color,
+                "Autocomplete dropdown text color must match --color-text-primary in light mode"
+            ).to.eq(expectedSearchText);
         });
 
-        // Switch to Dark Mode
+        // Switch to Dark Mode while autocomplete is open
         cy.window().then(win => {
             const activity = win.ActivityContext
                 ? win.ActivityContext.getActivity()
@@ -442,12 +508,25 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
 
         cy.get("body").should("have.class", "dark");
 
+        // Verify Dark Mode autocomplete suggestion dropdown computed styles against design tokens
         cy.window().should(win => {
+            const autocompleteEl = win.document.querySelector("ul.ui-autocomplete");
             const expectedDarkSearchBg = resolveTokenColor(win, "--color-bg-primary");
             const expectedDarkSearchText = resolveTokenColor(win, "--color-text-primary");
 
-            expect(expectedDarkSearchBg).to.not.be.empty;
-            expect(expectedDarkSearchText).to.not.be.empty;
+            const computed = win.getComputedStyle(autocompleteEl);
+            expect(
+                computed.backgroundColor,
+                "Autocomplete dropdown bg must match --color-bg-primary in dark mode"
+            ).to.eq(expectedDarkSearchBg);
+            expect(
+                computed.color,
+                "Autocomplete dropdown text color must match --color-text-primary in dark mode"
+            ).to.eq(expectedDarkSearchText);
         });
+
+        // Dismiss search widget and autocomplete
+        cy.get("#search").clear().type("{esc}");
+        cy.get("body").type("{esc}");
     });
 });
