@@ -4720,7 +4720,8 @@ class Block {
                         case "pitch staircase":
                         case "status":
                         case "phrase maker":
-                        case "lego bricks":
+                        case "LEGO Bricks":
+                        case "arpeggio":
                         case "custom mode":
                         case "music keyboard":
                         case "pitch drum":

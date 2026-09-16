@@ -832,6 +832,48 @@ describe("BlockDragController", () => {
             }
         });
 
+        it.each(["LEGO Bricks", "arpeggio"])(
+            "reinitializes an open %s widget when a block is dragged out of its stack",
+            async title => {
+                const wftTitle = document.createElement("div");
+                wftTitle.className = "wftTitle";
+                wftTitle.innerHTML = title;
+                document.body.appendChild(wftTitle);
+
+                try {
+                    const parent = makeFlowBlock({
+                        x: -500,
+                        y: -500,
+                        docks: [
+                            [0, 0, "in"],
+                            [0, 20, "out"]
+                        ],
+                        connections: [null, 1],
+                        name: "parent"
+                    });
+                    const moving = makeFlowBlock({
+                        x: 5000,
+                        y: 5000,
+                        docks: [[0, 0, "in"]],
+                        connections: [0],
+                        name: "moving"
+                    });
+                    moving.protoblock = { staticLabels: [title] };
+
+                    const blocks = makeBlocks([parent, moving]);
+
+                    await blocks.blockMoved(1);
+
+                    expect(parent.connections[1]).toBeNull();
+                    expect(moving.connections[0]).toBeNull();
+                    expect(blocks.raiseStackToTop).toHaveBeenCalledWith(1);
+                    expect(blocks.reInitWidget).toHaveBeenCalledWith(1, 1500);
+                } finally {
+                    wftTitle.remove();
+                }
+            }
+        );
+
         it("removes the note block's default/silence placeholder when a new block is inserted", async () => {
             const target = makeFlowBlock({
                 x: 0,
@@ -1443,6 +1485,46 @@ describe("BlockDragController", () => {
                 wftTitle.remove();
             }
         });
+
+        it.each(["LEGO Bricks", "arpeggio"])(
+            "reinitializes an open %s widget on a brand-new connection",
+            async title => {
+                const wftTitle = document.createElement("div");
+                wftTitle.className = "wftTitle";
+                wftTitle.innerHTML = title;
+                document.body.appendChild(wftTitle);
+
+                try {
+                    const target = makeFlowBlock({
+                        x: 0,
+                        y: 0,
+                        docks: [
+                            [0, 0, "in"],
+                            [0, 20, "out"]
+                        ],
+                        connections: [null, null],
+                        name: "target"
+                    });
+                    const moving = makeFlowBlock({
+                        x: 0,
+                        y: 15,
+                        docks: [[0, 0, "in"]],
+                        connections: [null],
+                        name: "moving"
+                    });
+                    moving.protoblock = { staticLabels: [title] };
+
+                    const blocks = makeBlocks([target, moving]);
+
+                    await blocks.blockMoved(1);
+
+                    expect(moving.connections[0]).toBe(0);
+                    expect(blocks.reInitWidget).toHaveBeenCalledWith(1, 1500);
+                } finally {
+                    wftTitle.remove();
+                }
+            }
+        );
 
         it("queues a parent's ARG/FLOW layout re-check based on getLayoutUpdateType after connecting an argument-like block", async () => {
             const target = makeFlowBlock({
