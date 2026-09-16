@@ -509,20 +509,43 @@ describe("transcribeMidi", () => {
             expect(tempoOf(blocks).quarterNotesPerMinute).toBe(120);
         });
 
-        it("sizes notes by the tempo in force, including across a tempo change", async () => {
-            // 60 bpm for two quarter notes, then 120 bpm; the half note starts before the
-            // change and ends after it.
+        // Seconds the imported project plays each note and rest for.
+        const playbackSeconds = blocks => {
+            const { quarterNotesPerMinute } = tempoOf(blocks);
+            return noteValues(blocks).map(value => {
+                const [numerator, denominator] = value.split("/").map(Number);
+                return ((numerator / denominator) * 4 * 60) / quarterNotesPerMinute;
+            });
+        };
+
+        it("plays every note for as long as the file does across a tempo change", async () => {
+            // 60 bpm for two quarter notes, then 120 bpm: under MIDI timing the notes last
+            // 1, 1, 0.5, 0.5 and 1 seconds, and the half note spans the change.
             const blocks = await importBlocks(
                 midiFile({
                     tempos: [
                         [0, 60],
                         [2 * PPQ, 120]
                     ],
-                    lengths: [1, 2, 1, 0.5]
+                    lengths: [1, 1, 1, 1, 2]
                 })
             );
 
-            expect(noteValues(blocks)).toEqual(["1/4", "1/2", "1/4", "1/8"]);
+            expect(tempoOf(blocks).quarterNotesPerMinute).toBe(60);
+            expect(noteValues(blocks)).toEqual(["1/4", "1/4", "1/8", "1/8", "1/4"]);
+            expect(playbackSeconds(blocks)).toEqual([1, 1, 0.5, 0.5, 1]);
+        });
+
+        it("reads notes before a delayed first tempo event at 120 bpm", async () => {
+            // MIDI plays 120 bpm until the first tempo event, here 60 bpm at the third
+            // quarter note, so the notes and rest last 0.25, 0.25, 0.5, 1 and 1 seconds.
+            const blocks = await importBlocks(
+                midiFile({ tempos: [[2 * PPQ, 60]], lengths: [0.5, -0.5, 1, 1, 1] })
+            );
+
+            expect(tempoOf(blocks).quarterNotesPerMinute).toBe(120);
+            expect(noteValues(blocks)).toEqual(["1/8", "1/8", "1/4", "1/2", "1/2"]);
+            expect(playbackSeconds(blocks)).toEqual([0.25, 0.25, 0.5, 1, 1]);
         });
 
         it("sizes rests at the file's tempo", async () => {
