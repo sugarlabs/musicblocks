@@ -46,6 +46,7 @@ class Trashcan {
         }
         this._borderHighlightBitmap = null;
         this._isHighlightInitialized = false;
+        this._artworkGeneration = 0;
         this._inAnimation = false;
         this._animationInterval = null;
         this._highlightPower = 255;
@@ -145,12 +146,16 @@ class Trashcan {
     /**
      * @private
      * @param {boolean} isActive
+     * @param {number} [generation]
      * @returns {void}
      */
-    _makeBorderHighlight(isActive) {
+    _makeBorderHighlight(isActive, generation = this._artworkGeneration) {
         const img = new Image();
 
         img.onload = () => {
+            if (generation !== this._artworkGeneration) {
+                return;
+            }
             this._borderHighlightBitmap = new createjs.Bitmap(img);
             this._borderHighlightBitmap.scaleX = this.activity.cellSize / this._iconsize;
             this._borderHighlightBitmap.scaleY = this.activity.cellSize / this._iconsize;
@@ -186,17 +191,21 @@ class Trashcan {
 
     /**
      * @private
+     * @param {number} [generation]
      * @returns {void}
      */
-    _makeBorder() {
+    _makeBorder(generation = this._artworkGeneration) {
         const img = new Image();
 
         img.onload = () => {
+            if (generation !== this._artworkGeneration) {
+                return;
+            }
             const border = new createjs.Bitmap(img);
             border.scaleX = this.activity.cellSize / this._iconsize;
             border.scaleY = this.activity.cellSize / this._iconsize;
             this._container.addChild(border);
-            this._makeBorderHighlight(false);
+            this._makeBorderHighlight(false, generation);
         };
 
         const colors = this._getTrashColors();
@@ -207,15 +216,19 @@ class Trashcan {
 
     /**
      * @private
+     * @param {number} [generation]
      * @returns {void}
      */
-    _makeTrash() {
+    _makeTrash(generation = this._artworkGeneration) {
         const colors = this._getTrashColors();
         const borderColor = colors.border;
 
         if (typeof TRASH_LID_ICON !== "undefined" && typeof TRASH_BODY_ICON !== "undefined") {
             const bodyImg = new Image();
             bodyImg.onload = () => {
+                if (generation !== this._artworkGeneration) {
+                    return;
+                }
                 const bodyBitmap = new createjs.Bitmap(bodyImg);
                 this._iconsize = bodyBitmap.getBounds ? bodyBitmap.getBounds().width : 55;
                 const scale = this.activity.cellSize / this._iconsize;
@@ -227,6 +240,9 @@ class Trashcan {
 
                 const lidImg = new Image();
                 lidImg.onload = () => {
+                    if (generation !== this._artworkGeneration) {
+                        return;
+                    }
                     const lidBitmap = new createjs.Bitmap(lidImg);
                     lidBitmap.scaleX = scale;
                     lidBitmap.scaleY = scale;
@@ -250,7 +266,7 @@ class Trashcan {
                     this._trashBitmap = trashGroup;
                     this._container.addChild(trashGroup);
 
-                    this._makeBorder();
+                    this._makeBorder(generation);
                 };
                 lidImg.src =
                     "data:image/svg+xml;base64," +
@@ -262,6 +278,9 @@ class Trashcan {
         } else {
             const img = new Image();
             img.onload = () => {
+                if (generation !== this._artworkGeneration) {
+                    return;
+                }
                 const bitmap = new createjs.Bitmap(img);
                 this._container.addChild(bitmap);
                 this._iconsize = bitmap.getBounds ? bitmap.getBounds().width : 55;
@@ -270,7 +289,7 @@ class Trashcan {
                 bitmap.x = ((Trashcan.TRASHWIDTH - this.activity.cellSize) / 2) * bitmap.scaleX;
                 bitmap.y = ((Trashcan.TRASHHEIGHT - this.activity.cellSize) / 2) * bitmap.scaleY;
                 this._trashBitmap = bitmap;
-                this._makeBorder();
+                this._makeBorder(generation);
             };
 
             img.src =
@@ -336,6 +355,7 @@ class Trashcan {
         if (this._inAnimation) {
             this.stopHighlightAnimation();
         }
+        this._artworkGeneration = (this._artworkGeneration || 0) + 1;
         if (this._container && typeof this._container.removeAllChildren === "function") {
             this._container.removeAllChildren();
         }
@@ -348,7 +368,7 @@ class Trashcan {
         if (this._hoverBgShape) {
             this._updateHoverBg();
         }
-        this._makeTrash();
+        this._makeTrash(this._artworkGeneration);
     }
 
     /**

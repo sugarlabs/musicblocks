@@ -622,5 +622,46 @@ describe("interactive lid open and delete glow affordance", () => {
 
             expect(stopAnimationSpy).toHaveBeenCalled();
         });
+
+        it("should ignore image callbacks from older generations when refreshed in succession", () => {
+            const originalImage = global.Image;
+            const pendingCallbacks = [];
+            global.Image = jest.fn(() => {
+                const img = {
+                    set src(val) {
+                        pendingCallbacks.push(this.onload);
+                    }
+                };
+                return img;
+            });
+
+            try {
+                const testTrashcan = new Trashcan(mockActivity);
+                const gen0Callbacks = [...pendingCallbacks];
+                pendingCallbacks.length = 0;
+
+                testTrashcan.refresh();
+                const gen1Callbacks = [...pendingCallbacks];
+
+                for (const cb of gen1Callbacks) {
+                    if (typeof cb === "function") {
+                        cb();
+                    }
+                }
+                const gen1Lid = testTrashcan._lidBitmap;
+                const gen1ChildrenCount = testTrashcan._container.children.length;
+
+                for (const cb of gen0Callbacks) {
+                    if (typeof cb === "function") {
+                        cb();
+                    }
+                }
+
+                expect(testTrashcan._lidBitmap).toBe(gen1Lid);
+                expect(testTrashcan._container.children.length).toBe(gen1ChildrenCount);
+            } finally {
+                global.Image = originalImage;
+            }
+        });
     });
 });
