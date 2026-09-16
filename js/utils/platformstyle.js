@@ -538,11 +538,13 @@ const getSystemThemePreference = () => {
 // Use stored preference, or fallback to system preference
 const activeTheme = themePreference || getSystemThemePreference();
 
-// Set platformColor based on active theme
+const clonePlatformTheme = theme => JSON.parse(JSON.stringify(theme));
+
+// Keep the mutable runtime colors separate from the canonical theme definitions.
 if (platformThemes[activeTheme]) {
-    window.platformColor = platformThemes[activeTheme];
+    window.platformColor = clonePlatformTheme(platformThemes[activeTheme]);
 } else {
-    window.platformColor = platformThemes["light"];
+    window.platformColor = clonePlatformTheme(platformThemes["light"]);
 }
 
 const _themeMeta = document.querySelector("meta[name=theme-color]");
