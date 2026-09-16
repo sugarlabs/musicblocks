@@ -1727,6 +1727,7 @@ describe("BlockDragController", () => {
 
             await blocks.blockMoved(0);
 
+            expect(blocks.actionHistory).toEqual([]);
             expect(blocks.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
         });
 

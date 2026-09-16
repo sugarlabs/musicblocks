@@ -385,17 +385,15 @@ class BlockDragController {
                     myBlock.container.x !== blocks.dragStartX ||
                     myBlock.container.y !== blocks.dragStartY
                 ) {
-                    blocks.actionHistory.push({
-                        type: "move",
-                        blockId: thisBlock,
-                        oldX: blocks.dragStartX,
-                        oldY: blocks.dragStartY,
-                        newX: myBlock.container.x,
-                        newY: myBlock.container.y
-                    });
-
-                    // Clear redo history on new action unless we are actively undoing/redoing
                     if (!blocks.isUndoingOrRedoing) {
+                        blocks.actionHistory.push({
+                            type: "move",
+                            blockId: thisBlock,
+                            oldX: blocks.dragStartX,
+                            oldY: blocks.dragStartY,
+                            newX: myBlock.container.x,
+                            newY: myBlock.container.y
+                        });
                         blocks.redoActionHistory = [];
                     }
                 }
