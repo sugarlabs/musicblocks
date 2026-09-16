@@ -623,6 +623,12 @@ describe("AIDebuggerWidget", () => {
                     "Divide Block --> 0/4 = 0.00"
                 ],
                 [
+                    "newnote duration",
+                    ["divide", ["divide", null], [null, "zero", "four"]],
+                    "newnote",
+                    "Duration --> 0/4 = 0.00"
+                ],
+                [
                     "divide denominator",
                     ["divide", ["divide", null], [null, "four", "zero"]],
                     null,
