@@ -55,6 +55,7 @@ class Tempo {
         this.tapBtn = null;
         this._tapTimes = [];
         this._tapTimeout = null;
+        this._tapButtonTimeout = null;
         this._lastTapIndex = null;
         this._lastCanvasIndex = null;
     }
@@ -70,8 +71,20 @@ class Tempo {
         this._lastTapIndex = null;
         this._lastCanvasIndex = null;
         if (this._tapTimeout) {
-            clearTimeout(this._tapTimeout);
+            if (this.widgetWindow && this.widgetWindow.timerManager) {
+                this.widgetWindow.timerManager.clearTimeout(this._tapTimeout);
+            } else {
+                clearTimeout(this._tapTimeout);
+            }
             this._tapTimeout = null;
+        }
+        if (this._tapButtonTimeout) {
+            if (this.widgetWindow && this.widgetWindow.timerManager) {
+                this.widgetWindow.timerManager.clearTimeout(this._tapButtonTimeout);
+            } else {
+                clearTimeout(this._tapButtonTimeout);
+            }
+            this._tapButtonTimeout = null;
         }
         this.isMoving = true;
         if (this._intervalID !== undefined && this._intervalID !== null) {
@@ -109,6 +122,14 @@ class Tempo {
                     clearTimeout(this._tapTimeout);
                 }
                 this._tapTimeout = null;
+            }
+            if (this._tapButtonTimeout) {
+                if (widgetWindow.timerManager) {
+                    widgetWindow.timerManager.clearTimeout(this._tapButtonTimeout);
+                } else {
+                    clearTimeout(this._tapButtonTimeout);
+                }
+                this._tapButtonTimeout = null;
             }
             this._tapTimes = [];
             this._lastTapIndex = null;
@@ -498,7 +519,17 @@ class Tempo {
             }
         }
 
+        if (this._tapButtonTimeout) {
+            if (this.widgetWindow && this.widgetWindow.timerManager) {
+                this.widgetWindow.timerManager.clearTimeout(this._tapButtonTimeout);
+            } else {
+                clearTimeout(this._tapButtonTimeout);
+            }
+            this._tapButtonTimeout = null;
+        }
+
         const reset = () => {
+            this._tapButtonTimeout = null;
             if (!this.tapBtn) return;
             const normalImg = document.createElement("img");
             normalImg.src = "header-icons/tap-button.svg";
@@ -518,9 +549,9 @@ class Tempo {
         };
 
         if (this.widgetWindow && this.widgetWindow.timerManager) {
-            this.widgetWindow.timerManager.setTimeout(reset, 150);
+            this._tapButtonTimeout = this.widgetWindow.timerManager.setTimeout(reset, 150);
         } else {
-            setTimeout(reset, 150);
+            this._tapButtonTimeout = setTimeout(reset, 150);
         }
     }
 

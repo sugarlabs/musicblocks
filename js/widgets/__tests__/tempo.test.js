@@ -1718,5 +1718,21 @@ describe("Tap Tempo feature", () => {
 
         expect(tempoWidget._tapTimes).toEqual([]);
         expect(tempoWidget._tapTimeout).toBeNull();
+        expect(tempoWidget._tapButtonTimeout).toBeNull();
+    });
+
+    test("_flashTapButton cancels existing timer on rapid taps", () => {
+        tempoWidget.init(mockActivity);
+        tempoWidget._flashTapButton();
+        const firstTimeout = tempoWidget._tapButtonTimeout;
+        expect(firstTimeout).not.toBeNull();
+
+        // Second tap immediately clears the first timer and creates a new one
+        tempoWidget._flashTapButton();
+        expect(tempoWidget._tapButtonTimeout).not.toBeNull();
+
+        // Advancing 150ms completes the reset
+        jest.advanceTimersByTime(150);
+        expect(tempoWidget._tapButtonTimeout).toBeNull();
     });
 });
