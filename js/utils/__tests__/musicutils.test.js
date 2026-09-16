@@ -4115,8 +4115,7 @@ describe("_getStepSize custom temperament with ratios", () => {
         addTemperamentToDictionary("testNoRatios", {
             pitchNumber: 12
         });
-        // Equal-division custom temperament: scalar step follows the mode's
-        // degrees (C -> D = 2 up, C -> B = 1 down), not the raw transposition.
+        // Equal division: C -> D = 2 up, C -> B = -1 down.
         expect(_getStepSize("C major", "C", "up", 5, "testNoRatios")).toBe(2);
         expect(_getStepSize("C major", "C", "down", 3, "testNoRatios")).toBe(-1);
     });

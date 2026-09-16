@@ -642,8 +642,7 @@ class ModeWidget {
         tuningGroup.appendChild(tuningIcon);
         tuningGroup.appendChild(edoSelect);
 
-        // Modes: open the regular mode pie menu (the same one used by the
-        // setKey modeName block) so mode selection is consistent everywhere.
+        // Modes: open piemenu for consistent mode selection.
         const modeBtn = iconButton("pie-chart.svg", _("Switch mode"), () => {
             this._onModePieButtonClick();
         });
@@ -850,11 +849,7 @@ class ModeWidget {
         this._setModeName();
     }
 
-    /**
-     * Applies a step-count pattern to _selectedNotes and updates the note wheel.
-     * @param {number[]} pattern - Array of integer step counts between active notes.
-     * @returns {void}
-     */
+    /** Applies a step-count pattern to _selectedNotes and the note wheel. */
     _applyModePattern(pattern) {
         const n = this._activeEDO;
         this._selectedNotes = this._blankNotes(n);

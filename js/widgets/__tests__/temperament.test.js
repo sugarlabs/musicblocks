@@ -38,8 +38,7 @@ describe("TemperamentWidget basic tests", () => {
             }))
         }))
     });
-    // Shared seed for equal-division edit tests: widget with one pitch plus
-    // the octaveIn/octaveOut/divisions form and preview-wheel mocks.
+    // Equal-division edit seed.
     const seedEqualEdit = divisions => {
         global.docById = jest.fn(id => {
             if (id === "octaveIn") return { value: "0" };

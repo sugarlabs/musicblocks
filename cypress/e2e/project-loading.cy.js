@@ -1,7 +1,6 @@
 describe("Project loading", () => {
     before(() => {
-        // Ignore only the known docById race fired by HelpWidget creation
-        // during first-time-user startup; any other app error still fails.
+        // Known docById race on first-time-user startup.
         cy.on("uncaught:exception", err => {
             if (err.message.includes("docById is not defined")) {
                 return false;

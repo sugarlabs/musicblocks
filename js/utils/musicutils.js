@@ -1779,48 +1779,25 @@ const MODE_PIE_MENUS = {
     "custom": [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
 };
 
-/**
- * Fixed slot count shared by every mode pie menu ring. Both the workspace
- * piemenu (piemenus.js) and the mode widget piemenu (modewidget.js) lay the
- * mode names out on this many slots.
- * @constant {number}
- */
+/** Slot count shared by every mode pie menu ring. */
 const MODEPIEMENU_SLOT_COUNT = 12;
 
-/**
- * Ring geometry shared by the mode-selection pie menus so the group and name
- * rings render with identical proportions in both contexts.
- */
+/** Ring geometry shared by mode-selection pie menus. */
 const MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
 const MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
 
-/**
- * Mid-radius of the mode-name ring (0.3-0.85), used to size each label to its
- * own slice arc.
- * @constant {number}
- */
+/** Mid-radius of the mode-name ring, used to size labels to slice arcs. */
 const MODEPIEMENU_NAME_TITLE_RADIUS = 0.575;
 
-/**
- * Font family and relative group-ring font size shared by both mode pie menus.
- * Font px is computed as GROUP_FONT_RATIO * wheelRadius so the same wheel
- * renders identically regardless of the paper resolution.
- */
+/** Shared font family and group-ring size (px = ratio * wheelRadius). */
 const MODEPIEMENU_FONT_FAMILY = "sans-serif";
 const MODEPIEMENU_GROUP_FONT_RATIO = 0.08;
 
-/**
- * Min/max per-slice font sizes for the mode-name ring, as a fraction of the
- * wheel radius. Kept proportional so both contexts clamp identically.
- */
+/** Min/max name-ring font sizes as a fraction of wheel radius. */
 const MODEPIEMENU_NAME_FONT_MIN_RATIO = 0.06;
 const MODEPIEMENU_NAME_FONT_MAX_RATIO = 0.12;
 
-/**
- * Reads the custom modes saved by the mode widget from local storage.
- * Corrupt or non-array data yields an empty list.
- * @returns {Array} Entries that look like custom modes ({name} is a string)
- */
+/** Custom modes saved by the mode widget; corrupt data yields []. */
 const getSavedCustomModes = () => {
     try {
         const customModes = JSON.parse(localStorage.getItem("customModes") || "[]");
@@ -1833,13 +1810,10 @@ const getSavedCustomModes = () => {
 };
 
 /**
- * Builds the fixed 12-slot list of mode names shown for a pie menu group.
- * Built-in groups come straight from MODE_PIE_MENUS; the "custom" group is
- * padded with blanks. Callers may pass custom names already carrying their own
- * sentinels (the widget prepends "+").
- * @param {string} grp The mode group key
- * @param {Array} [customModeNames] Custom mode names (only used for "custom")
- * @returns {Array} A fixed-length list of mode names
+ * Builds the fixed 12-slot mode-name list for a group ("custom" padded with blanks).
+ * @param {string} grp
+ * @param {Array} [customModeNames]
+ * @returns {Array}
  */
 const getModeNamesForGroup = (grp, customModeNames = []) => {
     if (grp !== "custom") {
@@ -1852,12 +1826,7 @@ const getModeNamesForGroup = (grp, customModeNames = []) => {
     return names;
 };
 
-/**
- * Returns the display label for a mode name, translating the major/ionian and
- * minor/aeolian pairs and leaving blank slots blank.
- * @param {string} modename
- * @returns {string}
- */
+/** Display label for a mode (major/ionian and minor/aeolian pairs translated). */
 const getModeLabel = modename => {
     switch (modename) {
         case "ionian":
@@ -1871,13 +1840,7 @@ const getModeLabel = modename => {
     }
 };
 
-/**
- * Inverse of getModeLabel: resolves a displayed label back to its internal
- * mode name. Falls back to the label itself when nothing matches.
- * @param {string} label
- * @param {Array} modes The mode names for the current group
- * @returns {string}
- */
+/** Inverse of getModeLabel; falls back to the label itself. */
 const getModeNameFromLabel = (label, modes) => {
     if (label === `${_("major")} / ${_("ionian")}`) {
         return "major";
@@ -1893,24 +1856,11 @@ const getModeNameFromLabel = (label, modes) => {
     return label;
 };
 
-/**
- * Builds the per-slice colors for a mode-name ring: blank slots get the
- * "empty" color, real modes the "filled" color.
- * @param {Array} modes
- * @param {Object} colors { emptyColor, filledColor }
- * @returns {Array}
- */
+/** Per-slice colors: blank slots get emptyColor, real modes filledColor. */
 const getModeSliceColors = (modes, colors) =>
     modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
 
-/**
- * Re-renders an existing mode-name wheel in place: updates every per-state
- * title copy and the slice fill attributes, then refreshes the wheel.
- * @param {Object} wheel wheelnav instance
- * @param {Array} labels Display labels
- * @param {Array} colors Per-slice colors
- * @returns {void}
- */
+/** Re-renders a mode-name wheel in place with new labels/colors. */
 const updateModeWheelItems = (wheel, labels, colors) => {
     for (let i = 0; i < wheel.navItems.length; i++) {
         const item = wheel.navItems[i];
@@ -1926,15 +1876,7 @@ const updateModeWheelItems = (wheel, labels, colors) => {
         item.sliceHoverAttr.fill = colors[i];
         item.slicePathAttr.fill = colors[i];
         item.sliceSelectedAttr.fill = colors[i];
-        // The visible title text is baked into the Raphael text element at
-        // createWheel() time (wheelnav.js builds navTitle via raphael.text with
-        // the initial label). refreshWheel() only re-applies slice/title
-        // *attributes* (font, fill) through navTitle.attr(titleAttr) — it never
-        // rewrites the text content. Without this, switching the mode group
-        // updates item.title (so data/logic is correct) but the labels the user
-        // actually sees stay frozen on the first group's names. Push the new
-        // label into the text element directly. Guarded so non-text titles
-        // (path/image) and test mocks without navTitle are unaffected.
+        // refreshWheel() never rewrites text content, so push the label directly.
         if (item.navTitle && typeof item.navTitle.attr === "function") {
             item.navTitle.attr({ text: labels[i] });
         }
@@ -1942,23 +1884,10 @@ const updateModeWheelItems = (wheel, labels, colors) => {
     wheel.refreshWheel();
 };
 
-/**
- * Shared title font for the mode-group ring, scaled to the wheel radius so it
- * renders at the same relative size regardless of paper resolution.
- * @param {number} wheelRadius
- * @returns {string}
- */
+/** Group-ring title font, scaled to wheel radius. */
 const getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
 
-/**
- * Sizes a mode-name label to fit its own slice arc on the shared name ring.
- * The min/max clamps scale with the wheel radius so the same ring renders
- * identically on any paper resolution.
- * @param {number} wheelRadius
- * @param {number} sliceCount
- * @param {number} labelLen
- * @returns {string}
- */
+/** Name-ring label font sized to fit its slice arc. */
 const getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     const arcPx = (2 * Math.PI * 0.575 * wheelRadius) / sliceCount;
     const size = Math.floor((arcPx * 0.85) / (labelLen * 0.6));
@@ -1968,21 +1897,7 @@ const getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     return `100 ${clamped}px sans-serif`;
 };
 
-/**
- * Applies the shared donut-slice configuration to a wheelnav instance:
- * colors, radii, -90° start angle, zero animation, and optional selection
- * paths, title rotation, and title font.
- * @param {Object} wheel - The wheelnav instance to configure.
- * @param {Object} opts - Configuration options.
- * @param {Array} opts.colors - Slice colors.
- * @param {number} opts.minRadius - Min radius percent (0-1).
- * @param {number} opts.maxRadius - Max radius percent (0-1).
- * @param {boolean} [opts.clickModeRotate] - Whether clicks rotate the wheel.
- * @param {boolean} [opts.selectionPaths] - Whether to sync selected/init paths.
- * @param {number} [opts.titleRotateAngle] - Title rotation angle.
- * @param {string} [opts.titleFont] - Title font CSS string.
- * @returns {void}
- */
+/** Applies shared donut-slice config to a wheelnav instance. */
 const configureWheel = (wheel, opts) => {
     wheel.colors = opts.colors;
     wheel.slicePathFunction = slicePath().DonutSlice;

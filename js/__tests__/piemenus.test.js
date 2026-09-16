@@ -742,15 +742,15 @@ describe("piemenus behavioral tests", () => {
         });
 
         test("selecting a group in the inner ring repaints the outer mode-name ring", () => {
-            // Use the REAL updateModeWheelItems so the repaint fix is exercised
-            // (the global is normally mocked out in this file).
+            // global is mocked in this file; use the real implementation here.
             const realUpdate = require("../utils/musicutils.js").updateModeWheelItems;
             const prevUpdate = global.updateModeWheelItems;
             global.updateModeWheelItems = realUpdate;
 
             const savedModes = global.MODE_PIE_MENUS;
+            const blank12 = Array(12).fill(" ");
             global.MODE_PIE_MENUS = {
-                5: ["minor pentatonic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+                5: ["minor pentatonic", ...blank12.slice(1)],
                 7: ["ionian", " ", "dorian", " ", " ", " ", " ", " ", " ", "aeolian", " ", " "],
                 12: [
                     "ionian",
@@ -766,7 +766,7 @@ describe("piemenus behavioral tests", () => {
                     " ",
                     " "
                 ],
-                custom: [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+                custom: blank12.slice()
             };
 
             piemenuModes(mockBlock, "major");
@@ -775,14 +775,12 @@ describe("piemenus behavioral tests", () => {
             const nameWheel = mockBlock._modeNameWheel;
             expect(nameWheel).toBeDefined();
 
-            // Switch from the default "7" group to the "12" group.
             const idx = groupWheel.navItems.findIndex(n => n.title === "12");
             expect(idx).toBeGreaterThanOrEqual(0);
             groupWheel.selectedNavItemIndex = idx;
             groupWheel.navItems[idx].navigateFunction();
 
-            // The visible Raphael text (navTitle.attr) must be repainted with the
-            // "12" group's labels, not frozen on the previous group's labels.
+            // Raphael text must follow the new group, not freeze on the old one.
             const expected = global.MODE_PIE_MENUS["12"].map(getModeLabel);
             for (let i = 0; i < nameWheel.navItems.length; i++) {
                 expect(nameWheel.navItems[i].navTitle.attr).toHaveBeenCalledWith({
@@ -855,22 +853,14 @@ describe("piemenuKey behavioral tests", () => {
         expect(modenameWheel).toBeDefined();
 
         const titles = modenameWheel.navItems.map(item => item.title);
-        // Approach A: the inner ring must expose every scale the mode widget
-        // offers, e.g. pentatonic (from the "5" group), not only the church
-        // modes. The old hardcoded list was ["major","dorian","phrygian",
-        // "lydian","mixolydian","minor","locrian"] — it could never show
-        // "minor pentatonic" and always showed "phrygian" even when absent.
+        // Must expose all MODE_PIE_MENUS scales (e.g. pentatonic), not just church modes.
         expect(titles).toContain("minor pentatonic");
         expect(titles).toContain("dorian");
         expect(titles).not.toContain("phrygian");
-        // The ring is now driven by MODE_PIE_MENUS (4 real modes in this mock),
-        // not the old fixed 7.
         expect(titles.length).toBe(4);
     });
 
     test("updates an existing setkey block in place instead of creating a new one", () => {
-        // Workspace already contains a setkey2 block with key/mode children.
-        // Seed storage so piemenuKey restores the desired KeySignatureEnv.
         mockActivity.storage.KeySignatureEnv = "G,dorian,false";
         mockActivity.blocks.blockList = {
             0: { name: "setkey2", connections: [null, 1, 2], trash: false },

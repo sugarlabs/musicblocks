@@ -3801,24 +3801,11 @@ const piemenuGrid = activity => {
     document.addEventListener("mousedown", clickOutsideHandler);
 };
 
-/**
- * Create a setkey2 block if none exists, otherwise update the key/mode
- * values of the existing one so repeated selections stay in sync.
- * Driven by activity.KeySignatureEnv = [key, mode, movable].
- * @param {Object} activity
- * @returns {void}
- */
+/** Sync setkey2 block with activity.KeySignatureEnv (create or update in place). */
 const syncKeySignatureBlocks = activity => {
-    let setKeyBlock = null;
-    for (const i in activity.blocks.blockList) {
-        if (
-            activity.blocks.blockList[i].name === "setkey2" &&
-            !activity.blocks.blockList[i].trash
-        ) {
-            setKeyBlock = activity.blocks.blockList[i];
-            break;
-        }
-    }
+    const setKeyBlock =
+        Object.values(activity.blocks.blockList).find(b => b && b.name === "setkey2" && !b.trash) ||
+        null;
 
     if (setKeyBlock === null) {
         activity.blocks.findStacks();
@@ -3973,20 +3960,15 @@ const piemenuKey = activity => {
     keyNameWheel2.createWheel(keys2);
 
     const modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
-    // Build the mode list from every MODE_PIE_MENUS group plus any saved custom
-    // modes, matching what the mode-widget pie menu offers. This replaces the
-    // previous hardcoded 7 church-mode list so a key signature can target any
-    // scale (pentatonic, blues, chromatic, etc.), not just major/minor/dorian…
+    // Mode list mirrors the mode-widget pie menu (all MODE_PIE_MENUS groups + custom).
     const savedCustomModes = getSavedCustomModes();
-    const modes = [];
-    for (const grp in MODE_PIE_MENUS) {
-        const grpModes = grp === "custom" ? savedCustomModes.map(m => m.name) : MODE_PIE_MENUS[grp];
-        for (const m of grpModes) {
-            if (m && m !== " " && !modes.includes(m)) {
-                modes.push(m);
-            }
-        }
-    }
+    const modes = [
+        ...new Set(
+            Object.entries(MODE_PIE_MENUS).flatMap(([grp, grpModes]) =>
+                grp === "custom" ? savedCustomModes.map(m => m.name) : grpModes
+            )
+        )
+    ].filter(m => m && m !== " ");
     modenameWheel.slicePathFunction = slicePath().DonutSlice;
     modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
     modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -4001,13 +3983,12 @@ const piemenuKey = activity => {
     modenameWheel.animatetime = 0;
     modenameWheel.createWheel(modes);
 
-    // Size each label to fit its own slice arc, mirroring the mode-widget name
-    // ring; otherwise ~40 thin slices overflow with the wheelnav default font.
+    // Fit each label to its slice arc; default font overflows on ~40 thin slices.
     for (let i = 0; i < modenameWheel.navItems.length; i++) {
         const font = getModeSliceFont(modenameWheel.wheelRadius, modes.length, modes[i].length);
-        modenameWheel.navItems[i].titleAttr.font = font;
-        modenameWheel.navItems[i].titleHoverAttr.font = font;
-        modenameWheel.navItems[i].titleSelectedAttr.font = font;
+        ["titleAttr", "titleHoverAttr", "titleSelectedAttr"].forEach(
+            k => (modenameWheel.navItems[i][k].font = font)
+        );
     }
     modenameWheel.refreshWheel();
 

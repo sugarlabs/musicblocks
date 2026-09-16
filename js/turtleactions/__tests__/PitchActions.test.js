@@ -981,12 +981,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(Singer.PitchActions.deltaPitch("deltascalarpitch", 0)).toBe(0);
         });
         test("scalar step follows the mode for a custom EDO temperament", () => {
-            // A custom temperament with no per-pitch ratio table is still an equal
-            // division of the octave, so scalar step must follow the mode's degrees
-            // (via buildScale) rather than stepping by raw semitones. getStepSizeUp
-            // therefore returns the semitone distance to the next scale degree in
-            // C major (C -> D = 2), and deltaPitch terminates following the mode
-            // instead of looping 100 times.
+            // No ratio table = equal division; step follows mode degrees (C -> D = 2).
             turtle.singer.previousNotePlayed = ["C4", 4];
             turtle.singer.lastNotePlayed = ["E4", 4];
             activity.logo.synth.inTemperament = "totally-not-a-real-temperament";
@@ -994,8 +989,7 @@ describe("Tests for Singer.PitchActions setup", () => {
                 musicUtils.getStepSizeUp("C major", "C", 0, "totally-not-a-real-temperament")
             ).toBe(2);
             const result = Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
-            // C4 -> E4 is covered in 3 upward scalar steps, matching the
-            // equal-temperament ground truth above. It terminates deterministically.
+            // C4 -> E4 in 3 upward scalar steps.
             expect(result).toBe(3);
         }, 10000);
 
@@ -1004,7 +998,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             turtle.singer.lastNotePlayed = ["C4", 4];
             activity.logo.synth.inTemperament = "totally-not-a-real-temperament";
             const result = Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
-            // Follows the mode (E -> D -> C) rather than looping 100 times.
+            // E -> D -> C.
             expect(result).toBe(-3);
         }, 10000);
     });
@@ -1034,9 +1028,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             );
         });
         test("follows the mode for a custom temperament with no ratios table", () => {
-            // A custom temperament without a ratios table is an equal division, so the
-            // step-size lookup follows the mode (F# steps down a semitone to F in C major)
-            // instead of returning undefined. consonantStepSize then returns that numeric step.
+            // No ratios = equal division; F# steps down to F (-1) in C major.
             turtle.singer.lastNotePlayed = ["F#4", 4];
             activity.logo.synth.inTemperament = "totally-not-a-real-temperament";
             expect(

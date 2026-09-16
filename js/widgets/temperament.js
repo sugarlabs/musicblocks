@@ -37,13 +37,7 @@ TemperamentWidget.dependencies = ["widgets/temperament"];
  * @constructor
  */
 
-/**
- * Color for a cents deviation from a reference. Green within ±1 cent,
- * orange for sharp, red for flat. Uses design tokens so high-contrast
- * theme gets accessible colors. Exported for unit testing.
- * @param {number} dev - deviation in cents
- * @returns {string} CSS color
- */
+/** Green within ±1 cent, orange sharp, red flat. Exported for testing. */
 const deviationColor = dev => {
     if (Math.abs(dev) <= 1) return _cssVar("--color-success", "#4caf50");
     return dev > 1 ? _cssVar("--color-warning", "#ff9800") : _cssVar("--color-error", "#f44336");
@@ -58,15 +52,7 @@ const _cssVar = (n, f) =>
 /** Dictionary key safe for note-name lookup; stale "custom" falls back to 12-EDO. */
 const trustedKey = t => (isCustomTemperament(t) ? undefined : t);
 
-/**
- * Deviation of a pitch (in cents) from the nearest 12-EDO step. The
- * visualizer uses 12-EDO as its fixed reference ring, so a 19-EDO step at
- * 63¢ shows as -37¢ (below the nearest 12-EDO step of 100¢), and a JI major
- * third at 386¢ shows as -14¢.
- * Exported for unit testing.
- * @param {number} cents - pitch in cents (0..1200)
- * @returns {number} deviation in cents from the nearest 100¢ step
- */
+/** Deviation in cents from nearest 12-EDO step. Exported for testing. */
 const deviationFrom12EDO = cents => cents - Math.round(cents / 100) * 100;
 
 /** Mid of largest gap (circular 0..1200), clamped 1..1199. Exported for testing. */
@@ -89,8 +75,8 @@ const largestGapMid = centsArr => {
     return bestMid;
 };
 
-/** Converts ratio to cents for arbitrary octave base. For base=2 this is 1200*log2(ratio). Uses log10/log10 which equals log2/log2; kept for powerBase≠2 stretched octaves. NOTE: widget powerBase vs engine getOctaveRatio() diverge — pitchToFrequency/frequencyToPitch in musicutils still hard-code base 2; full unification deferred. */
-const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
+/** Ratio to cents for arbitrary octave base (base=2 is 1200*log2). */
+const ratioToCents = (ratio, base) => (1200 * Math.log(ratio)) / Math.log(base);
 const centsToAngle = cents => 270 + cents * 0.3;
 const angleToCents = angle => (angle - 270) / 0.3;
 
@@ -656,14 +642,12 @@ function TemperamentWidget() {
         legendDiv.appendChild(
             _legendItem("var(--color-text-tertiary, #aaa)", _("12-EDO reference"), false, false)
         );
-        legendDiv.appendChild(
-            _legendItem(_cssVar("--color-success", "#4caf50"), _("no deviation"), true, false)
-        );
-        legendDiv.appendChild(
-            _legendItem(_cssVar("--color-warning", "#ff9800"), _("sharp (+cents)"), false, false)
-        );
-        legendDiv.appendChild(
-            _legendItem(_cssVar("--color-error", "#f44336"), _("flat (-cents)"), false, false)
+        [
+            [_cssVar("--color-success", "#4caf50"), _("no deviation"), true, false],
+            [_cssVar("--color-warning", "#ff9800"), _("sharp (+cents)"), false, false],
+            [_cssVar("--color-error", "#f44336"), _("flat (-cents)"), false, false]
+        ].forEach(([color, label, dashed, dot]) =>
+            legendDiv.appendChild(_legendItem(color, label, dashed, dot))
         );
         temperamentTableDiv.appendChild(legendDiv);
 
@@ -1059,8 +1043,7 @@ function TemperamentWidget() {
         /** Updates a single row (used during drag). */
         const _updateTableRow = function (i) {
             if (!rowRefs[i]) return;
-            // Sparse state (e.g. partial temperament data on load): skip the
-            // row instead of throwing and blanking every row rendered after it.
+            // Skip sparse rows (partial data on load) instead of throwing.
             if (!that.notes[i] || that.cents[i] === undefined || that.ratios[i] === undefined)
                 return;
             const cents = that.cents[i];
@@ -2516,9 +2499,7 @@ function TemperamentWidget() {
         this.notes = [];
 
         if (isCustomTemperament(this.inTemperament)) {
-            // Base frequency must match the table and the saved stack (both
-            // use frequencies[0]). Resolving through the temperament
-            // dictionary can hit a stale "custom" entry and shift every name.
+            // Match table/saved stack via frequencies[0]; dictionary lookup can go stale.
             const startPitch = Number(this.frequencies[0]);
 
             let addOctave = "";
@@ -2526,9 +2507,7 @@ function TemperamentWidget() {
                 const obj = frequencyToPitch(this.ratios[i] * startPitch);
                 const newPitch = obj[0];
                 const newOctave = obj[1];
-                // Use the stored cents (same source as the table) instead of
-                // re-measuring from Hz: the hz round-trip can straddle the
-                // ±30 boundary differently (e.g. 30.03 vs 30.0 → "^^" vs "^").
+                // Use stored cents, not Hz round-trip (avoids ±30 boundary flips).
                 const newCents =
                     typeof this.cents[i] === "number" ? deviationFrom12EDO(this.cents[i]) : obj[2];
                 if (this.powerBase !== 2) {
