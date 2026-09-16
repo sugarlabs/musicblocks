@@ -13,7 +13,9 @@
 
 /* exported  transcribeMidi*/
 
-const defaultTempo = 90;
+// A MIDI file with no tempo event plays at 120 beats per minute, the MIDI default, which is
+// also the tempo @tonejs/midi assumes when it times the file's notes.
+const defaultTempo = 120;
 
 const standardDurations = [
     { value: "1/1", duration: 1 },
@@ -41,6 +43,30 @@ const getClosestStandardNoteValue = duration => {
     return closest.value.split("/").map(Number);
 };
 
+/**
+ * Converts a span of MIDI time from seconds to whole notes. @tonejs/midi times notes in
+ * seconds by following the file's tempo changes, so each part of the span is measured at
+ * the tempo in force over it.
+ * @param {number} start - seconds
+ * @param {number} end - seconds
+ * @param {Array<{bpm: number, time: number}>} tempos - midi.header.tempos, in time order
+ * @returns {number} length in whole notes
+ */
+const secondsToWholeNotes = (start, end, tempos) => {
+    const changes = tempos && tempos.length > 0 ? tempos : [{ bpm: defaultTempo }];
+    let quarterNotes = 0;
+    for (let i = 0; i < changes.length; i++) {
+        // The first tempo also covers anything before it.
+        const from = i === 0 ? -Infinity : changes[i].time;
+        const to = i + 1 < changes.length ? changes[i + 1].time : Infinity;
+        const seconds = Math.min(end, to) - Math.max(start, from);
+        if (seconds > 0) {
+            quarterNotes += (seconds * changes[i].bpm) / 60;
+        }
+    }
+    return quarterNotes / 4;
+};
+
 const transcribeMidi = async (midi, maxNoteBlocks) => {
     const currentMidi = midi;
     const drumMidi = getReverseDrumMidi();
@@ -56,7 +82,8 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
     let trackCount = 0;
     const actionBlockPerTrack = [];
     const instruments = [];
-    let currentMidiTempoBpm = currentMidi.header.tempos;
+    const tempos = currentMidi.header.tempos;
+    let currentMidiTempoBpm = tempos;
     if (currentMidiTempoBpm && currentMidiTempoBpm.length > 0) {
         currentMidiTempoBpm = Math.round(currentMidiTempoBpm[0].bpm);
     } else {
@@ -179,8 +206,9 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
         };
         //Using for loop for finding the shortest note value
         for (const j in sched) {
-            const dur = sched[j].end - sched[j].start;
-            const temp = getClosestStandardNoteValue((dur * 3) / 8);
+            const temp = getClosestStandardNoteValue(
+                secondsToWholeNotes(sched[j].start, sched[j].end, tempos)
+            );
             shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
         }
 
@@ -249,7 +277,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                 }
                 return ar;
             };
-            let obj = getClosestStandardNoteValue((duration * 3) / 8);
+            let obj = getClosestStandardNoteValue(secondsToWholeNotes(start, end, tempos));
             // let scalingFactor=1;
             // if(shortestNoteDenominator>32)
             // scalingFactor=shortestNoteDenominator/32;
@@ -424,7 +452,15 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                 0,
                 [vspaceIndex, setBpmIndex + 1, setBpmIndex + 2, setBpmIndex + 5]
             ],
-            [setBpmIndex + 1, ["number", { value: currentMidiTempoBpm }], 0, 0, [setBpmIndex]],
+            // A MIDI tempo counts quarter notes per minute, while this block counts beats
+            // of the time signature's note value (see MeterActions.setBPM).
+            [
+                setBpmIndex + 1,
+                ["number", { value: (currentMidiTempoBpm * currentMidiTimeSignature[1]) / 4 }],
+                0,
+                0,
+                [setBpmIndex]
+            ],
             [setBpmIndex + 2, "divide", 0, 0, [setBpmIndex, setBpmIndex + 3, setBpmIndex + 4]],
             [setBpmIndex + 3, ["number", { value: 1 }], 0, 0, [setBpmIndex + 2]],
             [

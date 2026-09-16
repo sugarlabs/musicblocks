@@ -130,7 +130,9 @@ describe("transcribeMidi", () => {
         expect(bpmBlock).toBeDefined();
         const tempoValueBlock = loadedBlocks.find(block => block[0] === bpmBlock[4][1]);
         expect(tempoValueBlock).toBeDefined();
-        expect(tempoValueBlock[1][1].value).toBe(90);
+        // MIDI files without a tempo event play at 120 bpm, which is also the tempo
+        // @tonejs/midi uses to time their notes.
+        expect(tempoValueBlock[1][1].value).toBe(120);
     });
 
     it("should skip tracks with no notes", async () => {
@@ -411,5 +413,138 @@ describe("transcribeMidi", () => {
         // chord ends the stack.
         expect(pitchBlocks[0][4][3]).toBe(pitchBlocks[1][0]);
         expect(pitchBlocks[1][4][3]).toBeNull();
+    });
+    describe("tempo and note values", () => {
+        const { Midi } = require("@tonejs/midi");
+        const PPQ = 480;
+
+        // Writes a real MIDI file with @tonejs/midi and reads it back, so every note carries
+        // the time in seconds the library derives from the file's tempo map.
+        // lengths are in quarter notes; a negative length is a rest.
+        const midiFile = ({ tempos = [], timeSignature = null, lengths }) => {
+            const midi = new Midi();
+            midi.header.tempos = tempos.map(([ticks, bpm]) => ({ ticks, bpm }));
+            if (timeSignature) {
+                midi.header.timeSignatures = [{ ticks: 0, timeSignature }];
+            }
+            midi.header.update();
+            const track = midi.addTrack();
+            track.instrument.number = 0;
+            let ticks = 0;
+            lengths.forEach((quarters, index) => {
+                const durationTicks = Math.abs(quarters) * PPQ;
+                if (quarters > 0) {
+                    track.addNote({ midi: 60 + index, ticks, durationTicks });
+                }
+                ticks += durationTicks;
+            });
+            return new Midi(midi.toArray());
+        };
+
+        const importBlocks = async file => {
+            await transcribeMidi(file);
+            return loadNewBlocksSpy.mock.calls[0][0];
+        };
+
+        const numberOf = (blocksByIndex, index) => blocksByIndex.get(index)[1][1].value;
+
+        // Note values of the imported notes and rests, in order, as "numerator/denominator".
+        const noteValues = blocks => {
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            return blocks
+                .filter(block => blockName(block) === "newnote")
+                .map(block => {
+                    const divide = byIndex.get(block[4][1]);
+                    return `${numberOf(byIndex, divide[4][1])}/${numberOf(byIndex, divide[4][2])}`;
+                });
+        };
+
+        // The imported beats-per-minute block, and the quarter notes per minute it plays at
+        // (MeterActions.setBPM plays bpm * beatValue / 0.25 quarter notes per minute).
+        const tempoOf = blocks => {
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const setbpm = blocks.find(block => blockName(block) === "setbpm3");
+            const beat = byIndex.get(setbpm[4][2]);
+            const bpm = numberOf(byIndex, setbpm[4][1]);
+            const beatValue = numberOf(byIndex, beat[4][1]) / numberOf(byIndex, beat[4][2]);
+            return { bpm, beatValue, quarterNotesPerMinute: (bpm * beatValue) / 0.25 };
+        };
+
+        it.each([40, 60, 72, 90, 120, 140, 180, 208])(
+            "keeps quarter, eighth, half and whole notes at %i bpm",
+            async bpm => {
+                const blocks = await importBlocks(
+                    midiFile({ tempos: [[0, bpm]], lengths: [1, 0.5, 0.5, 2, 4] })
+                );
+
+                expect(noteValues(blocks)).toEqual(["1/4", "1/8", "1/8", "1/2", "1/1"]);
+                expect(tempoOf(blocks).quarterNotesPerMinute).toBe(bpm);
+            }
+        );
+
+        it.each([
+            [[4, 4], 120],
+            [[3, 4], 96],
+            [[6, 8], 120],
+            [[2, 2], 120],
+            [[3, 8], 72]
+        ])(
+            "plays a %j file at its own tempo of %i quarter notes per minute",
+            async (meter, bpm) => {
+                const blocks = await importBlocks(
+                    midiFile({ tempos: [[0, bpm]], timeSignature: meter, lengths: [1, 1] })
+                );
+                const tempo = tempoOf(blocks);
+
+                expect(tempo.quarterNotesPerMinute).toBe(bpm);
+                expect(tempo.beatValue).toBe(1 / meter[1]);
+                expect(noteValues(blocks)).toEqual(["1/4", "1/4"]);
+            }
+        );
+
+        it("reads a file with no tempo event at 120 bpm, the MIDI default", async () => {
+            const blocks = await importBlocks(midiFile({ lengths: [1, 0.5, 0.5] }));
+
+            expect(noteValues(blocks)).toEqual(["1/4", "1/8", "1/8"]);
+            expect(tempoOf(blocks).quarterNotesPerMinute).toBe(120);
+        });
+
+        it("sizes notes by the tempo in force, including across a tempo change", async () => {
+            // 60 bpm for two quarter notes, then 120 bpm; the half note starts before the
+            // change and ends after it.
+            const blocks = await importBlocks(
+                midiFile({
+                    tempos: [
+                        [0, 60],
+                        [2 * PPQ, 120]
+                    ],
+                    lengths: [1, 2, 1, 0.5]
+                })
+            );
+
+            expect(noteValues(blocks)).toEqual(["1/4", "1/2", "1/4", "1/8"]);
+        });
+
+        it("sizes rests at the file's tempo", async () => {
+            const blocks = await importBlocks(
+                midiFile({ tempos: [[0, 150]], lengths: [1, -1, 0.5, -0.5, 1] })
+            );
+
+            expect(noteValues(blocks)).toEqual(["1/4", "1/4", "1/8", "1/8", "1/4"]);
+            expect(blocks.filter(block => blockName(block) === "rest2")).toHaveLength(2);
+        });
+
+        it("imports a melody that lasts as long as the file", async () => {
+            const file = midiFile({ tempos: [[0, 150]], lengths: [1, 1, 0.5, 0.5, 2, 4] });
+            const lastNote = file.tracks[0].notes[file.tracks[0].notes.length - 1];
+            const blocks = await importBlocks(file);
+
+            const wholeNotes = noteValues(blocks)
+                .map(value => value.split("/").map(Number))
+                .reduce((sum, [numerator, denominator]) => sum + numerator / denominator, 0);
+            const seconds = (wholeNotes * 4 * 60) / tempoOf(blocks).quarterNotesPerMinute;
+
+            expect(seconds).toBeCloseTo(lastNote.time + lastNote.duration, 2);
+        });
     });
 });
