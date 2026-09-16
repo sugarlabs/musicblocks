@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global saveMxmlOutput:writable */
+/* global frequencyToPitch,saveMxmlOutput:writable */
 /* exported saveMxmlOutput */
 
 // Indices into a notationStaging entry that this file cares about beyond the note-value
@@ -313,7 +313,21 @@ saveMxmlOutput = logo => {
                         divisionsLeft -= preciseDur;
                     }
 
-                    const alter = p[1] === "\u266d" ? -1 : p[1] === "\u266F" ? 1 : 0;
+                    let pitch = p;
+                    let octave;
+                    let cents = 0;
+                    if (typeof p === "number") {
+                        [pitch, octave, cents] = frequencyToPitch(p);
+                    } else {
+                        octave = p[p.length - 1];
+                    }
+                    const accidental = pitch[1];
+                    const alter =
+                        Math.round(
+                            ((accidental === "\u266d" ? -1 : accidental === "\u266F" ? 1 : 0) +
+                                cents / 100) *
+                                1000
+                        ) / 1000;
 
                     add("<note>");
                     indent++;
@@ -324,9 +338,9 @@ saveMxmlOutput = logo => {
                     } else {
                         add("<pitch>");
                         indent++;
-                        add(`<step>${p[0]}</step>`);
+                        add(`<step>${pitch[0]}</step>`);
                         if (alter !== 0) add(`<alter>${alter}</alter>`);
-                        add(`<octave>${p[p.length - 1]}</octave>`);
+                        add(`<octave>${octave}</octave>`);
                         indent--;
                         add("</pitch>");
                     }
