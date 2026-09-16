@@ -536,6 +536,12 @@ describe("MeterBlocks setup", () => {
         block.flow([40, 0.125, "next"], logo, 0, "flow");
         expect(activity.errorMsg).toHaveBeenCalledWith("Beats per minute must be > 30.");
         expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe(30);
+
+        // raw bpm (900) is within 30-1000, but with beat value 2 the
+        // computed tempo is 7200, which is above the maximum and must clamp
+        block.flow([900, 2, "next"], logo, 0, "flow");
+        expect(activity.errorMsg).toHaveBeenCalledWith("Maximum beats per minute is 1000.");
+        expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe(1000);
     });
 
     it("pushes and pops BPM values with the older setbpm block", () => {
