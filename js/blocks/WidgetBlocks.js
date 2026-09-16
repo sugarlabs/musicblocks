@@ -2110,7 +2110,7 @@ function setupWidgetBlocks(activity) {
                 "reflection",
                 _getWidgetDependencies(
                     typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
-                    ["widgets/reflection"]
+                    ["utils/ai-widget-lifecycle", "widgets/reflection"]
                 ),
                 () => new ReflectionMatrix(),
                 turtle,
@@ -2271,7 +2271,7 @@ function setupWidgetBlocks(activity) {
                 "aiDebugger",
                 _getWidgetDependencies(
                     typeof AIDebuggerWidget !== "undefined" ? AIDebuggerWidget : null,
-                    ["widgets/aidebugger"]
+                    ["utils/ai-widget-lifecycle", "widgets/aidebugger"]
                 ),
                 () => new AIDebuggerWidget(),
                 turtle,

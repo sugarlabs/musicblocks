@@ -244,6 +244,18 @@ requirejs.config({
         "activity/toolbar-ui": {
             deps: ["utils/utils", "utils/dom-helpers", "activity/focus-cycle-manager"],
             exports: "ToolbarUI"
+        },
+        // The chat widgets read createWidgetLifecycle off window, so the helper
+        // must be evaluated before they are. These are plain scripts, which
+        // RequireJS would otherwise fetch and evaluate in any order.
+        "utils/ai-widget-lifecycle": {
+            exports: "createWidgetLifecycle"
+        },
+        "widgets/reflection": {
+            deps: ["utils/ai-widget-lifecycle"]
+        },
+        "widgets/aidebugger": {
+            deps: ["utils/ai-widget-lifecycle"]
         }
     },
     paths: {
