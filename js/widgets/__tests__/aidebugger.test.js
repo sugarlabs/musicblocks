@@ -608,6 +608,99 @@ describe("AIDebuggerWidget", () => {
                 );
                 expect(result).toBe("Add --> 3 + 7 = 10.00");
             });
+
+            test.each([
+                [
+                    "setmasterbpm2",
+                    ["bpm", ["setmasterbpm2", null], [null, "zero"]],
+                    null,
+                    "Set Master BPM → 0 BPM"
+                ],
+                [
+                    "divide numerator",
+                    ["divide", ["divide", null], [null, "zero", "four"]],
+                    null,
+                    "Divide Block --> 0/4 = 0.00"
+                ],
+                [
+                    "newnote duration",
+                    ["divide", ["divide", null], [null, "zero", "four"]],
+                    "newnote",
+                    "Duration --> 0/4 = 0.00"
+                ],
+                [
+                    "divide denominator",
+                    ["divide", ["divide", null], [null, "four", "zero"]],
+                    null,
+                    "Divide Block --> 4/0 = ?"
+                ],
+                [
+                    "repeat",
+                    ["repeat", ["repeat", null], [null, "zero", null]],
+                    null,
+                    "Repeat (0) Times"
+                ],
+                [
+                    "forward",
+                    ["forward", ["forward", null], [null, "zero"]],
+                    null,
+                    "Move Forward → 0 Steps"
+                ],
+                ["back", ["back", ["back", null], [null, "zero"]], null, "Move Backward → 0 Steps"],
+                ["right", ["right", ["right", null], [null, "zero"]], null, "Rotate Right → 0°"],
+                ["left", ["left", ["left", null], [null, "zero"]], null, "Rotate Left → 0°"],
+                ["show", ["show", ["show", null], [null, null, "zero"]], null, "Show Number: 0"],
+                [
+                    "increment",
+                    ["increment", ["increment", null], [null, "zero", "zero"]],
+                    null,
+                    "Increment --> Color: 0, Amount: 0"
+                ],
+                [
+                    "arc",
+                    ["arc", ["arc", null], [null, null, "zero", "zero"]],
+                    null,
+                    "Draw Arc --> Angle: 0°, Radius: 0"
+                ],
+                [
+                    "plus",
+                    ["plus", ["plus", null], [null, "zero", "zero"]],
+                    null,
+                    "Add --> 0 + 0 = 0.00"
+                ],
+                [
+                    "pitch",
+                    ["pitch", ["pitch", null], [null, "solfege", "zero"]],
+                    null,
+                    "Pitch --> Solfege: do, Octave: 0"
+                ],
+                [
+                    "settransposition",
+                    ["settransposition", ["settransposition", null], [null, "zero"]],
+                    null,
+                    "Set Transposition --> 0"
+                ]
+            ])("preserves zero in %s block output", (label, block, parentBlockType, expected) => {
+                const blockType = block[1][0];
+                const blockMap = {
+                    [block[0]]: block,
+                    zero: ["zero", ["number", { value: 0 }]],
+                    four: ["four", ["number", { value: 4 }]],
+                    solfege: ["solfege", ["solfege", { value: "do" }]]
+                };
+
+                expect(
+                    debuggerWidget._getBlockRepresentation(
+                        blockType,
+                        null,
+                        block,
+                        blockMap,
+                        1,
+                        false,
+                        parentBlockType
+                    )
+                ).toBe(expected);
+            });
         });
     });
 
