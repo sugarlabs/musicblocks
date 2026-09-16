@@ -321,9 +321,109 @@ describe("Temperament Functions", () => {
             expect(equal5Temperament).toHaveProperty("pitchNumber", 5);
         });
 
+        it("should return the correct temperament for equal17 key", () => {
+            const equal17Temperament = getTemperament("equal17");
+            expect(equal17Temperament).toHaveProperty("perfect 1");
+            expect(equal17Temperament).toHaveProperty("minor 2");
+            expect(equal17Temperament).toHaveProperty("pitchNumber", 17);
+        });
+
         it("should return undefined for an invalid key", () => {
             const invalidTemperament = getTemperament("invalid");
             expect(invalidTemperament).toBeUndefined();
+        });
+    });
+
+    describe("named interval lookups", () => {
+        // The temperament widget fills its ratio, cents, and frequency columns
+        // with getTemperamentRatio(t[t.interval[i]]). When a temperament omits
+        // the named interval keys, every lookup is undefined and the widget
+        // silently falls back to a ratio of 1 for every pitch.
+        const widgetRatios = key => {
+            const t = getTemperament(key);
+            return t.interval.map(name => getTemperamentRatio(t[name]));
+        };
+
+        it.each(["equal", "equal5", "equal7", "equal17", "equal19", "equal31"])(
+            "%s resolves every name in its interval array to a distinct ratio",
+            key => {
+                const ratios = widgetRatios(key);
+                expect(new Set(ratios).size).toBe(ratios.length);
+            }
+        );
+
+        it("equal17 named intervals match its ratios table and close the octave", () => {
+            const t = getTemperament("equal17");
+            const ratios = widgetRatios("equal17");
+            expect(ratios.slice(0, t.ratios.length)).toEqual(t.ratios);
+            expect(ratios[ratios.length - 1]).toBe(2);
+        });
+    });
+
+    describe("interval tables agree with playback", () => {
+        // The temperament widget labels each row with
+        // getNoteFromInterval(startingPitch, t.interval[i]) and prices it with
+        // getTemperamentRatio(t[t.interval[i]]). Those two must describe the same
+        // pitch, otherwise the widget displays a frequency the synth will not play.
+        //
+        // Excluded, and why:
+        //   equal5 / equal7 - their interval arrays name notes outside the scale
+        //   equal31         - uses microtonal names ("mid 2") absent from INTERVALVALUES
+        //   just intonation / Pythagorean - C# vs D-flat spelling only, same ratio
+        const ALIGNED = ["equal", "equal17", "equal19", "1/3 comma meantone", "1/4 comma meantone"];
+
+        const rowsOf = key => {
+            const t = getTemperament(key);
+            const root = pitchToFrequency("C", 4, 0, "C major", key);
+            // the closing octave entry has no pitch of its own
+            return t.interval.slice(0, -1).map(name => {
+                const spelled = getNoteFromInterval("C4", name);
+                const note = Array.isArray(spelled) ? spelled[0] : String(spelled);
+                return {
+                    name,
+                    note,
+                    widget: root * getTemperamentRatio(t[name]),
+                    synth: pitchToFrequency(note, 4, 0, "C major", key)
+                };
+            });
+        };
+
+        it.each(ALIGNED)("%s prices every interval at the pitch it names", key => {
+            rowsOf(key).forEach(row => {
+                const drift = 1200 * Math.log2(row.widget / row.synth);
+                expect({ note: row.note, drift: Math.abs(Math.round(drift)) }).toEqual({
+                    note: row.note,
+                    drift: 0
+                });
+            });
+        });
+
+        it("equal19 spells the step between augmented 4 and perfect 5", () => {
+            // A missing "diminished 5" shifted every later name down one step.
+            const interval = getTemperament("equal19").interval;
+            expect(interval[9]).toBe("augmented 4");
+            expect(interval[10]).toBe("diminished 5");
+            expect(interval[11]).toBe("perfect 5");
+            expect(getTemperament("equal19")["perfect 5"]).toBeCloseTo(Math.pow(2, 11 / 19), 12);
+        });
+
+        it("equal17 orders its first chromatic steps sharp before flat", () => {
+            expect(getTemperament("equal17").interval.slice(0, 6)).toEqual([
+                "perfect 1",
+                "augmented 1",
+                "minor 2",
+                "major 2",
+                "augmented 2",
+                "minor 3"
+            ]);
+        });
+
+        it("1/4 comma meantone labels each ratio with a distinct note", () => {
+            const t = getTemperament("1/4 comma meantone");
+            expect(new Set(t.noteLabels).size).toBe(t.noteLabels.length);
+            // the perfect fifth must be the 3/2 the table already stores
+            const g = t.noteLabels.indexOf("G");
+            expect(1200 * Math.log2(t.ratios[g])).toBeCloseTo(701.955, 2);
         });
     });
 
@@ -924,6 +1024,26 @@ describe("noteToObj", () => {
     it("should default to octave 4 when no octave is specified", () => {
         expect(noteToObj("C")).toEqual(["C", 4]);
         expect(noteToObj("Bb")).toEqual(["Bb", 4]);
+    });
+    it("should correctly parse multi-digit octaves", () => {
+        expect(noteToObj("C10")).toEqual(["C", 10]);
+        expect(noteToObj("Gb12")).toEqual(["Gb", 12]);
+        expect(noteToObj("A11")).toEqual(["A", 11]);
+    });
+    it("should correctly parse negative octaves and zero octave", () => {
+        expect(noteToObj("A-1")).toEqual(["A", -1]);
+        expect(noteToObj("F#-2")).toEqual(["F#", -2]);
+        expect(noteToObj("C0")).toEqual(["C", 0]);
+    });
+    it("should preserve complex accidentals and microtonal annotations", () => {
+        expect(noteToObj("Sol𝄪4")).toEqual(["Sol𝄪", 4]);
+        expect(noteToObj("C(+14¢)4")).toEqual(["C(+14¢)", 4]);
+    });
+    it("should return default octave 4 when input is not a non-empty string", () => {
+        expect(noteToObj("")).toEqual(["", 4]);
+        expect(noteToObj(null)).toEqual([null, 4]);
+        expect(noteToObj(undefined)).toEqual([undefined, 4]);
+        expect(noteToObj(123)).toEqual([123, 4]);
     });
 });
 
@@ -2704,6 +2824,27 @@ describe("calcOctave", () => {
         expect(calcOctave(4, 5, null, "C")).toBe(5);
     });
 
+    it("should treat a number passed as a string like the same number", () => {
+        // NumberBlocks.calculateValueWithOctave forwards a block value to
+        // calcOctave only when it is a string, so "5" is a real input here.
+        expect(calcOctave(4, "5", null, "C")).toBe(calcOctave(4, 5, null, "C"));
+        expect(calcOctave(4, "2", ["C"], "C")).toBe(2);
+        expect(calcOctave(4, "7", ["C"], "C")).toBe(7);
+    });
+
+    it("should clamp a numeric string to the 1..9 octave range", () => {
+        expect(calcOctave(4, "0", ["C"], "C")).toBe(1);
+        expect(calcOctave(4, "12", ["C"], "C")).toBe(9);
+        expect(calcOctave(4, "3.7", ["C"], "C")).toBe(3);
+    });
+
+    it("should fall back to the computed octave for a non-numeric argument", () => {
+        expect(calcOctave(4, "not a number", ["C"], "C")).toBe(
+            calcOctave(4, "current", ["C"], "C")
+        );
+        expect(calcOctave(4, "", ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+    });
+
     it("should return correct octave based on currentNote and lastNotePlayed", () => {
         expect(calcOctave(4, "next", ["C"], "C")).toBe(5);
         expect(calcOctave(4, "next", ["C"], "D")).toBe(5);
@@ -2718,6 +2859,11 @@ describe("calcOctave", () => {
 
     it("should be able to handle default case", () => {
         expect(calcOctave(4, "default", ["do"], "do")).toBe(4);
+    });
+
+    it("should correctly handle lastNotePlayed with multi-digit or negative octaves", () => {
+        expect(calcOctave(4, "current", ["C10"], "G")).toBe(calcOctave(4, "current", ["C4"], "G"));
+        expect(calcOctave(4, "current", ["A-1"], "G")).toBe(calcOctave(4, "current", ["A4"], "G"));
     });
 });
 

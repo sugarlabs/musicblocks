@@ -71,7 +71,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "♮": "!",
             "♯": "is",
             "♭": "es",
-            "10": "''''''''",
+            "10": "'''''''",
             "1": ",, ",
             "2": ", ",
             "3": "",
@@ -79,8 +79,8 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "5": "''",
             "6": "'''",
             "7": "''''",
-            "8": "''''''",
-            "9": "'''''''"
+            "8": "'''''",
+            "9": "''''''"
         };
 
         return note.replace(/[♮♯♭]|10|[1-9]/g, match => replacements[match]).toLowerCase();
@@ -121,16 +121,17 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                     }
                 }
 
-                if (logo.notation.notationStaging[turtle][i + j][NOTATIONSTACCATO]) {
-                    logo.notationNotes[turtle] += " \\staccato ";
-                }
-
                 if (notes.length > 1) {
                     logo.notationNotes[turtle] += ">";
                 }
 
                 logo.notationNotes[turtle] +=
                     logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+
+                if (logo.notation.notationStaging[turtle][i + j][NOTATIONSTACCATO]) {
+                    logo.notationNotes[turtle] += " \\staccato ";
+                }
+
                 j++; // Jump to next note.
                 k++; // Increment notes in tuplet.
             } else if (logo.notation.notationStaging[turtle][i + j] === "tie") {

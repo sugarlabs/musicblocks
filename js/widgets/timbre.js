@@ -500,7 +500,7 @@ class TimbreWidget {
                     timbreEffects["chorusDepth"] !== undefined
                         ? timbreEffects["chorusDepth"]
                         : this.chorusParams && this.chorusParams.length > 2
-                          ? parseFloat(this.chorusParams[2])
+                          ? parseFloat(this.chorusParams[2]) / 100
                           : 0.7;
                 paramsEffects.doChorus = true;
             }

@@ -55,6 +55,7 @@ global.platformThemes = {
         paletteColors: {}
     }
 };
+global.clonePlatformTheme = theme => JSON.parse(JSON.stringify(theme));
 
 // Mock document elements
 document.body.innerHTML = `
@@ -117,6 +118,7 @@ describe("ThemeBox", () => {
     });
 
     test("light_onclick() sets theme to light", () => {
+        document.body.classList.add("light");
         themeBox.light_onclick();
         expect(themeBox._theme).toBe("light");
         expect(localStorage.getItem).toHaveBeenCalledWith("themePreference");
@@ -153,6 +155,7 @@ describe("ThemeBox", () => {
 
     test("setPreference() does not change if theme is unchanged", () => {
         const reloadSpy = jest.spyOn(themeBox, "reload").mockImplementation(() => {});
+        document.body.classList.add("light");
         themeBox.light_onclick();
         expect(reloadSpy).not.toHaveBeenCalled();
         expect(mockActivity.textMsg).toHaveBeenCalledWith(
@@ -216,6 +219,26 @@ describe("ThemeBox", () => {
         expect(themeBox._theme).toBe("dark");
     });
 
+    test("saved light preference can be reapplied after an OS theme change", () => {
+        let capturedHandler;
+        const mockMq = {
+            matches: false,
+            addEventListener: jest.fn((_, handler) => {
+                capturedHandler = handler;
+            }),
+            addListener: jest.fn()
+        };
+        window.matchMedia = jest.fn().mockReturnValue(mockMq);
+        themeBox.initializeTheme();
+
+        capturedHandler({ matches: true });
+        expect(document.body.classList.contains("dark")).toBe(true);
+
+        themeBox.light_onclick();
+        expect(document.body.classList.contains("light")).toBe(true);
+        expect(document.body.classList.contains("dark")).toBe(false);
+    });
+
     // Regression test for #7172: applyThemeInstantly must read from
     // platformThemes, not a duplicate table inside themebox.js.
     test("applyThemeInstantly() picks up mutations to platformThemes", () => {
@@ -227,6 +250,36 @@ describe("ThemeBox", () => {
             expect(window.platformColor.background).toBe("#222222");
         } finally {
             global.platformThemes.dark.background = original;
+        }
+    });
+
+    test("theme changes do not share nested palette colors with theme definitions", () => {
+        global.platformThemes.light.paletteColors.pitch = ["#111111", "#222222"];
+        global.platformThemes.dark.paletteColors.pitch = ["#333333", "#444444"];
+        try {
+            window.platformColor.paletteColors = {};
+            themeBox._theme = "light";
+            themeBox.applyThemeInstantly();
+            window.platformColor.paletteColors.pitch[0] = "#abcdef";
+            window.platformColor.paletteColors.plugin = ["#fedcba"];
+
+            expect(global.platformThemes.light.paletteColors.pitch[0]).toBe("#111111");
+            expect(global.platformThemes.light.paletteColors.plugin).toBeUndefined();
+
+            themeBox._theme = "dark";
+            themeBox.applyThemeInstantly();
+            expect(window.platformColor.paletteColors.plugin).toEqual(["#fedcba"]);
+            window.platformColor.paletteColors.pitch[0] = "#123456";
+            expect(global.platformThemes.dark.paletteColors.pitch[0]).toBe("#333333");
+
+            themeBox._theme = "light";
+            themeBox.applyThemeInstantly();
+            expect(window.platformColor.paletteColors.pitch[0]).toBe("#111111");
+            expect(window.platformColor.paletteColors.plugin).toEqual(["#fedcba"]);
+            expect(global.platformThemes.light.paletteColors.plugin).toBeUndefined();
+        } finally {
+            delete global.platformThemes.light.paletteColors.pitch;
+            delete global.platformThemes.dark.paletteColors.pitch;
         }
     });
 });

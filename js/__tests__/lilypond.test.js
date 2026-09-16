@@ -99,6 +99,17 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("4");
     });
 
+    test("should raise each octave by exactly one", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G7"], 4, 0, null, 0, -1, false],
+            [["G8"], 4, 0, null, 0, -1, false],
+            [["G9"], 4, 0, null, 0, -1, false],
+            [["G10"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("g''''4 g'''''4 g''''''4 g'''''''4 ");
+    });
+
     test("should process a key signature correctly", () => {
         logo.notation.notationStaging[turtle] = ["key", "C", "major"];
         processLilypondNotes(lilypond, logo, turtle);
@@ -159,6 +170,18 @@ describe("processLilypondNotes", () => {
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).not.toContain("\\staccato");
+    });
+
+    test("should place staccato after the duration on a note inside a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 8, [3, 2], 8, -1, true]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("g' 8 \\staccato ");
+    });
+
+    test("should place staccato after the chord on notes inside a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [[["C4", "E4"], 4, 8, [3, 2], 8, -1, true]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("<c' e'>8 \\staccato ");
     });
 
     test("should process a markup command correctly", () => {

@@ -789,10 +789,8 @@ function setupNumberBlocks(activity) {
                     return MathUtility.doPlus(a, b);
                 } catch (e) {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
+                    console.error(e);
 
-                    console.debug(a + " " + b);
-
-                    console.debug(e);
                     if (!isNaN(a)) {
                         return a;
                     } else if (!isNaN(b)) {
@@ -937,7 +935,7 @@ function setupNumberBlocks(activity) {
             try {
                 return Number(activity.blocks.blockList[blk].value);
             } catch (e) {
-                console.debug(e);
+                console.error(e);
                 return 0;
             }
         }

@@ -144,10 +144,14 @@ describe("Trashcan Class", () => {
         expect(mockTo).toHaveBeenCalledWith({ alpha: 1.0 }, 200);
     });
 
-    it("should start and stop highlight animation", () => {
+    it("should activate the trash highlight immediately", () => {
+        const highlightSpy = jest.spyOn(trashcan, "_makeBorderHighlight");
+
         trashcan.startHighlightAnimation();
-        jest.advanceTimersByTime(3000);
+
         expect(trashcan._inAnimation).toBe(true);
+        expect(trashcan.isVisible).toBe(true);
+        expect(highlightSpy).toHaveBeenCalledWith(true);
     });
 
     it("should not restart highlight animation if already running", () => {

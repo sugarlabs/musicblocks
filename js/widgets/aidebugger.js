@@ -1136,7 +1136,7 @@ function AIDebuggerWidget() {
 
             case "setmasterbpm2": {
                 const bpmValue = this._getNumericValue(connections[1], blockMap);
-                let bpmOutput = `Set Master BPM → ${bpmValue || "?"} BPM`;
+                let bpmOutput = `Set Master BPM → ${bpmValue ?? "?"} BPM`;
 
                 if (
                     connections[2] &&
@@ -1172,9 +1172,9 @@ function AIDebuggerWidget() {
                 }
 
                 if (parentBlockType === "newnote") {
-                    return `Duration --> ${numerator || "?"}/${denominator || "?"} = ${result}`;
+                    return `Duration --> ${numerator ?? "?"}/${denominator ?? "?"} = ${result}`;
                 }
-                return `Divide Block --> ${numerator || "?"}/${denominator || "?"} = ${result}`;
+                return `Divide Block --> ${numerator ?? "?"}/${denominator ?? "?"} = ${result}`;
             }
 
             case "storein2": {
@@ -1212,7 +1212,7 @@ function AIDebuggerWidget() {
                         }
                     } else {
                         repeatCount = this._getNumericValue(connections[1], blockMap);
-                        repeatText = repeatCount || "?";
+                        repeatText = repeatCount ?? "?";
                     }
                 }
                 return `Repeat (${repeatText}) Times`;
@@ -1229,22 +1229,22 @@ function AIDebuggerWidget() {
 
             case "forward": {
                 const forwardDist = this._getNumericValue(connections[1], blockMap);
-                return `Move Forward → ${forwardDist || "?"} Steps`;
+                return `Move Forward → ${forwardDist ?? "?"} Steps`;
             }
 
             case "back": {
                 const backDist = this._getNumericValue(connections[1], blockMap);
-                return `Move Backward → ${backDist || "?"} Steps`;
+                return `Move Backward → ${backDist ?? "?"} Steps`;
             }
 
             case "right": {
                 const rightAngle = this._getNumericValue(connections[1], blockMap);
-                return `Rotate Right → ${rightAngle || "?"}°`;
+                return `Rotate Right → ${rightAngle ?? "?"}°`;
             }
 
             case "left": {
                 const leftAngle = this._getNumericValue(connections[1], blockMap);
-                return `Rotate Left → ${leftAngle || "?"}°`;
+                return `Rotate Left → ${leftAngle ?? "?"}°`;
             }
 
             case "setheading": {
@@ -1254,13 +1254,13 @@ function AIDebuggerWidget() {
 
             case "show": {
                 const showValue = this._getNumericValue(connections[2], blockMap);
-                return `Show Number: ${showValue || "?"}`;
+                return `Show Number: ${showValue ?? "?"}`;
             }
 
             case "increment": {
                 const incColor = this._getNumericValue(connections[1], blockMap);
                 const incAmount = this._getNumericValue(connections[2], blockMap);
-                return `Increment --> Color: ${incColor || "?"}, Amount: ${incAmount || "?"}`;
+                return `Increment --> Color: ${incColor ?? "?"}, Amount: ${incAmount ?? "?"}`;
             }
 
             case "incrementOne": {
@@ -1293,11 +1293,11 @@ function AIDebuggerWidget() {
                             angle = (num / den).toFixed(2);
                         }
                     } else {
-                        angle = this._getNumericValue(connections[3], blockMap) || "?";
+                        angle = this._getNumericValue(connections[3], blockMap) ?? "?";
                     }
                 }
                 const radius = this._getNumericValue(connections[2], blockMap);
-                return `Draw Arc --> Angle: ${angle}°, Radius: ${radius || "?"}`;
+                return `Draw Arc --> Angle: ${angle}°, Radius: ${radius ?? "?"}`;
             }
 
             case "print": {
@@ -1308,7 +1308,7 @@ function AIDebuggerWidget() {
             case "plus": {
                 const add1 = this._getNumericValue(connections[1], blockMap);
                 const add2 = this._getNumericValue(connections[2], blockMap);
-                return `Add --> ${add1 || "?"} + ${add2 || "?"} = ${
+                return `Add --> ${add1 ?? "?"} + ${add2 ?? "?"} = ${
                     add1 !== null && add2 !== null ? (add1 + add2).toFixed(2) : "?"
                 }`;
             }
@@ -1333,7 +1333,7 @@ function AIDebuggerWidget() {
                     }
                 }
 
-                return `Pitch --> Solfege: ${solfege}, Octave: ${octave || "?"}`;
+                return `Pitch --> Solfege: ${solfege}, Octave: ${octave ?? "?"}`;
             }
 
             case "solfege":
@@ -1346,7 +1346,7 @@ function AIDebuggerWidget() {
 
             case "settransposition": {
                 const transpositionValue = this._getNumericValue(connections[1], blockMap);
-                return `Set Transposition --> ${transpositionValue || "?"}`;
+                return `Set Transposition --> ${transpositionValue ?? "?"}`;
             }
 
             default:

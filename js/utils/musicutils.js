@@ -2509,11 +2509,11 @@ const TEMPERAMENT = {
         ]
     },
     "equal17": {
-        isEDO: true,
-        edo: 17,
-        name: "Equal (17EDO)",
-        description: "17 Equal Divisions of the Octave",
-        ratios: [
+        "isEDO": true,
+        "edo": 17,
+        "name": "Equal (17EDO)",
+        "description": "17 Equal Divisions of the Octave",
+        "ratios": [
             1,
             Math.pow(2, 1 / 17),
             Math.pow(2, 2 / 17),
@@ -2532,15 +2532,33 @@ const TEMPERAMENT = {
             Math.pow(2, 15 / 17),
             Math.pow(2, 16 / 17)
         ],
-        octaveRatio: 2,
-        pitchNumber: 17,
-        interval: [
+        "octaveRatio": 2,
+        "pitchNumber": 17,
+        "perfect 1": Math.pow(2, 0 / 17),
+        "augmented 1": Math.pow(2, 1 / 17),
+        "minor 2": Math.pow(2, 2 / 17),
+        "major 2": Math.pow(2, 3 / 17),
+        "augmented 2": Math.pow(2, 4 / 17),
+        "minor 3": Math.pow(2, 5 / 17),
+        "major 3": Math.pow(2, 6 / 17),
+        "perfect 4": Math.pow(2, 7 / 17),
+        "augmented 4": Math.pow(2, 8 / 17),
+        "diminished 5": Math.pow(2, 9 / 17),
+        "perfect 5": Math.pow(2, 10 / 17),
+        "augmented 5": Math.pow(2, 11 / 17),
+        "minor 6": Math.pow(2, 12 / 17),
+        "major 6": Math.pow(2, 13 / 17),
+        "augmented 6": Math.pow(2, 14 / 17),
+        "minor 7": Math.pow(2, 15 / 17),
+        "major 7": Math.pow(2, 16 / 17),
+        "perfect 8": Math.pow(2, 17 / 17),
+        "interval": [
             "perfect 1",
-            "minor 2",
             "augmented 1",
-            "minor 3",
+            "minor 2",
             "major 2",
             "augmented 2",
+            "minor 3",
             "major 3",
             "perfect 4",
             "augmented 4",
@@ -2595,15 +2613,15 @@ const TEMPERAMENT = {
         "diminished 4": Math.pow(2, 7 / 19),
         "perfect 4": Math.pow(2, 8 / 19),
         "augmented 4": Math.pow(2, 9 / 19),
-        "diminished 5": Math.pow(2, 9 / 19),
-        "perfect 5": Math.pow(2, 10 / 19),
-        "augmented 5": Math.pow(2, 11 / 19),
-        "minor 6": Math.pow(2, 12 / 19),
-        "major 6": Math.pow(2, 13 / 19),
-        "augmented 6": Math.pow(2, 14 / 19),
-        "minor 7": Math.pow(2, 15 / 19),
-        "major 7": Math.pow(2, 16 / 19),
-        "augmented 7": Math.pow(2, 17 / 19),
+        "diminished 5": Math.pow(2, 10 / 19),
+        "perfect 5": Math.pow(2, 11 / 19),
+        "augmented 5": Math.pow(2, 12 / 19),
+        "minor 6": Math.pow(2, 13 / 19),
+        "major 6": Math.pow(2, 14 / 19),
+        "augmented 6": Math.pow(2, 15 / 19),
+        "minor 7": Math.pow(2, 16 / 19),
+        "major 7": Math.pow(2, 17 / 19),
+        "augmented 7": Math.pow(2, 18 / 19),
         "diminished 8": Math.pow(2, 18 / 19),
         "perfect 8": Math.pow(2, 19 / 19),
         "interval": [
@@ -2617,6 +2635,7 @@ const TEMPERAMENT = {
             "augmented 3",
             "perfect 4",
             "augmented 4",
+            "diminished 5",
             "perfect 5",
             "augmented 5",
             "minor 6",
@@ -2625,7 +2644,6 @@ const TEMPERAMENT = {
             "minor 7",
             "major 7",
             "augmented 7",
-            "diminished 8",
             "perfect 8"
         ]
     },
@@ -2846,8 +2864,8 @@ const TEMPERAMENT = {
         "description": "Meantone temperament with 1/3 syntonic comma (quarter-comma meantone)",
         "noteLabels": [
             "C",
-            "D" + FLAT,
             "C" + SHARP,
+            "D" + FLAT,
             "D",
             "D" + SHARP,
             "E" + FLAT,
@@ -2907,7 +2925,7 @@ const TEMPERAMENT = {
             "augmented 2",
             "minor 3",
             "major 3",
-            "diminished 4",
+            "augmented 3",
             "perfect 4",
             "augmented 4",
             "diminished 5",
@@ -2918,7 +2936,7 @@ const TEMPERAMENT = {
             "augmented 6",
             "minor 7",
             "major 7",
-            "diminished 8",
+            "augmented 7",
             "perfect 8"
         ]
     },
@@ -2929,12 +2947,13 @@ const TEMPERAMENT = {
         "description": "Meantone temperament with 1/4 syntonic comma",
         "noteLabels": [
             "C",
-            "D" + FLAT,
             "C" + SHARP,
+            "D" + FLAT,
             "D",
             "D" + SHARP,
             "E" + FLAT,
             "E",
+            "F" + FLAT,
             "E" + SHARP,
             "F",
             "F" + SHARP,
@@ -2946,14 +2965,13 @@ const TEMPERAMENT = {
             "A" + SHARP,
             "B" + FLAT,
             "B",
-            "B" + SHARP,
             "C" + FLAT,
-            "C"
+            "B" + SHARP
         ],
         "ratios": [
             1,
-            16 / 15,
             25 / 24,
+            16 / 15,
             9 / 8,
             75 / 64,
             6 / 5,
@@ -4008,19 +4026,20 @@ const getTemperamentName = name => {
 };
 
 /**
- * Convert a note string to an object containing the note, octave, and cents.
+ * Convert a note string to an object containing the note and octave.
  * @function
  * @param {string} note - The note string.
- * @returns {Array} An array containing the note, octave, and cents.
+ * @returns {Array} An array containing the note and octave.
  */
 const noteToObj = note => {
-    let octave = parseInt(note.slice(note.length - 1), 10);
-    if (isNaN(octave)) {
-        octave = 4;
-    } else {
-        note = note.slice(0, note.length - 1);
+    if (typeof note !== "string" || note.length === 0) {
+        return [note, 4];
     }
-    return [note, octave];
+    const match = note.match(/^(.*?)(-?\d+)$/);
+    if (match) {
+        return [match[1], parseInt(match[2], 10)];
+    }
+    return [note, 4];
 };
 
 /**
@@ -7886,9 +7905,7 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament
     const stepDownCurrentNote = getNumber(note, currentOctave - 1, temperament);
 
     if (lastNotePlayed !== null) {
-        lastNotePlayed = lastNotePlayed[0];
-        // strip off octave from end of note
-        lastNotePlayed = lastNotePlayed.substring(0, lastNotePlayed.length - 1);
+        lastNotePlayed = noteToObj(lastNotePlayed[0])[0];
     } else {
         lastNotePlayed = "G";
     }
@@ -7921,17 +7938,18 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament
         case _("previous"):
         case "previous":
             return Math.max(changedCurrent - 1, 1);
-        default:
-            try {
-                if (changedCurrent) {
-                    return changedCurrent;
-                } else {
-                    return Math.floor(Number(arg));
-                }
-            } catch (e) {
-                // console.debug("cannot convert " + arg + " to a number");
-                return currentOctave;
+        default: {
+            // A "number" passed as a string (e.g. "2") is a documented argument,
+            // but changedCurrent is always >= 1, so testing it for truthiness
+            // first made the numeric conversion unreachable and silently
+            // ignored the requested octave.
+            const parsed = typeof arg === "string" && arg.trim() !== "" ? Number(arg) : NaN;
+            if (!isNaN(parsed)) {
+                return Math.max(1, Math.min(Math.floor(parsed), 9));
             }
+
+            return changedCurrent;
+        }
     }
 };
 

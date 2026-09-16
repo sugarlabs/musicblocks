@@ -44,6 +44,8 @@ class PitchStaircase {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static DEFAULTFREQUENCY = 220.0;
+    static MIN_FREQUENCY = 27.5; // A0
+    static MAX_FREQUENCY = 16744.04; // C10
 
     /**
      * @constructor
@@ -288,6 +290,21 @@ class PitchStaircase {
         }
 
         const newFrequency = parseFloat(frequency) / inputNum;
+        if (
+            !Number.isFinite(newFrequency) ||
+            newFrequency < PitchStaircase.MIN_FREQUENCY ||
+            newFrequency > PitchStaircase.MAX_FREQUENCY
+        ) {
+            const act = this.activity || (typeof activity !== "undefined" ? activity : null);
+            if (act && typeof act.textMsg === "function") {
+                act.textMsg(
+                    _("Frequency is outside supported range (27.5 Hz - 16744.04 Hz)."),
+                    3000
+                );
+            }
+            return;
+        }
+
         const obj = frequencyToPitch(newFrequency);
         let foundStep = false;
         let repeatStep = false;
@@ -738,8 +755,10 @@ class PitchStaircase {
         this.activity = activity;
 
         for (let i = 0; i < this.Stairs.length; i++) {
-            this.Stairs[i].push(this.Stairs[i][2]); // initial frequency
-            this.Stairs[i].push(this.Stairs[i][2]); // parent frequency
+            if (this.Stairs[i].length === 7) {
+                this.Stairs[i].push(this.Stairs[i][2]); // initial frequency
+                this.Stairs[i].push(this.Stairs[i][2]); // parent frequency
+            }
         }
 
         // this._initialFrequency = this.Stairs[0][2];
@@ -752,8 +771,20 @@ class PitchStaircase {
             window.widgetWindows &&
             window.widgetWindows.openWindows &&
             window.widgetWindows.openWindows["pitch staircase"]
-        )
+        ) {
+            // Previously this branch just returned, meaning any block value
+            // feeding this widget could change (via reInitWidget()) while
+            // the widget was open, without the visible stairs table ever
+            // reflecting it. this._refresh() (which calls
+            // this._makeStairs(true)) rebuilds the table from the current
+            // this.Stairs data without recreating the widgetWindow/buttons,
+            // so it can't reintroduce an #8234-style duplicate-buttons bug.
+            // Reported by @walterbender: "Changing the value in the
+            // pitchstaircase pitch still seems to break the open pitch
+            // staircase."
+            this._refresh();
             return;
+        }
 
         const widgetWindow = window.widgetWindows.windowFor(
             this,
