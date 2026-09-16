@@ -782,7 +782,13 @@ function setupNumberBlocks(activity) {
                 b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
             }
 
-            if (!isNaN(a) && !isNaN(b)) {
+            // isNaN(null) is false (null coerces to 0), so a null/undefined
+            // operand must be excluded here too, or it slips past this guard
+            // into the unguarded call below and doPlus's NanError goes uncaught.
+            const aIsValid = a !== null && a !== undefined && !isNaN(a);
+            const bIsValid = b !== null && b !== undefined && !isNaN(b);
+
+            if (aIsValid && bIsValid) {
                 return MathUtility.doPlus(a, b);
             } else {
                 try {
@@ -791,9 +797,9 @@ function setupNumberBlocks(activity) {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
                     console.error(e);
 
-                    if (!isNaN(a)) {
+                    if (aIsValid) {
                         return a;
-                    } else if (!isNaN(b)) {
+                    } else if (bIsValid) {
                         return b;
                     }
                     return 0;
