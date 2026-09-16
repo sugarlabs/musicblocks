@@ -1684,4 +1684,69 @@ describe("BlockDragController", () => {
             expect(blocks.isBlockMoving).toBe(false);
         });
     });
+
+    describe("undo/redo move tracking in blockMoved", () => {
+        it("records position changes in actionHistory and clears redoActionHistory when position changed", async () => {
+            const blockList = [
+                makeFlowBlock({ x: 50, y: 60, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+            const blocks = makeBlocks(blockList);
+            blocks.dragStartX = 10;
+            blocks.dragStartY = 20;
+            blocks.actionHistory = [];
+            blocks.redoActionHistory = [{ type: "move", blockId: 0 }];
+            blocks.isUndoingOrRedoing = false;
+
+            await blocks.blockMoved(0);
+
+            expect(blocks.actionHistory).toEqual([
+                {
+                    type: "move",
+                    blockId: 0,
+                    oldX: 10,
+                    oldY: 20,
+                    newX: 50,
+                    newY: 60
+                }
+            ]);
+            expect(blocks.redoActionHistory).toEqual([]);
+            expect(blocks.dragStartX).toBeUndefined();
+            expect(blocks.dragStartY).toBeUndefined();
+        });
+
+        it("preserves redoActionHistory when isUndoingOrRedoing is true", async () => {
+            const blockList = [
+                makeFlowBlock({ x: 50, y: 60, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+            const blocks = makeBlocks(blockList);
+            blocks.dragStartX = 10;
+            blocks.dragStartY = 20;
+            blocks.actionHistory = [];
+            blocks.redoActionHistory = [{ type: "move", blockId: 0 }];
+            blocks.isUndoingOrRedoing = true;
+
+            await blocks.blockMoved(0);
+
+            expect(blocks.actionHistory).toEqual([]);
+            expect(blocks.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
+        });
+
+        it("does not push to actionHistory if coordinates are identical", async () => {
+            const blockList = [
+                makeFlowBlock({ x: 10, y: 20, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+            const blocks = makeBlocks(blockList);
+            blocks.dragStartX = 10;
+            blocks.dragStartY = 20;
+            blocks.actionHistory = [];
+            blocks.redoActionHistory = [{ type: "move", blockId: 0 }];
+
+            await blocks.blockMoved(0);
+
+            expect(blocks.actionHistory.length).toBe(0);
+            expect(blocks.redoActionHistory.length).toBe(1);
+            expect(blocks.dragStartX).toBeUndefined();
+            expect(blocks.dragStartY).toBeUndefined();
+        });
+    });
 });

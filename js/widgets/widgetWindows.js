@@ -591,8 +591,12 @@ class WidgetWindow {
      */
     updateTitle(title) {
         const wftTitle = docById(this._key + "WidgetID");
-        wftTitle.textContent = title;
-        this._frame.setAttribute("aria-label", title);
+        if (wftTitle) {
+            wftTitle.textContent = title;
+        }
+        if (this._frame) {
+            this._frame.setAttribute("aria-label", title);
+        }
     }
 
     /**

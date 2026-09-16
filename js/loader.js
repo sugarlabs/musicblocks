@@ -240,6 +240,10 @@ requirejs.config({
         },
         "activity/js-export/ast2blocks.config": {
             exports: "ast2blocklist_config"
+        },
+        "activity/toolbar-ui": {
+            deps: ["utils/utils", "utils/dom-helpers", "activity/focus-cycle-manager"],
+            exports: "ToolbarUI"
         }
     },
     paths: {

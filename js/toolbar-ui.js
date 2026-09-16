@@ -2479,7 +2479,9 @@ class ToolbarUI {
 // ToolbarUI so existing consumers (toolbar.js shim, tests, plugins) keep
 // working unchanged.
 if (typeof define === "function" && define.amd) {
-    define(["activity/focus-cycle-manager"], function (FocusCycleManager) {
+    define(["activity/focus-cycle-manager", "utils/utils", "utils/dom-helpers"], function (
+        FocusCycleManager
+    ) {
         // Expose under the legacy Toolbar name so that
         // instance.constructor.name === "Toolbar" continues to work for
         // any downstream plugin that checks it.
