@@ -753,6 +753,17 @@ describe("Arpeggio Widget", () => {
             }
         });
 
+        test("ignores stale blockMap entries when shifting octave", () => {
+            arpeggio._blockMap = [
+                [999, 1],
+                [1, 999]
+            ];
+
+            arpeggio._shiftOctave(1);
+
+            expect(arpeggio._blockMap).toEqual([]);
+        });
+
         test("widgetWindow.onclose restores Singer.masterVolume if present", () => {
             global.Singer = { masterVolume: [0.8] };
             activityMock.logo.synth.setMasterVolume = jest.fn();

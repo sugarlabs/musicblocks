@@ -2565,6 +2565,114 @@ class Blocks {
             }
         };
 
+        this._snapTargetBlock = null;
+        this._snapIndicatorShape = null;
+
+        /**
+         * Resolves snap indicator colors from CSS tokens in tokens.css,
+         * falling back to default golden values if tokens or computed styles are unavailable.
+         * @private
+         * @returns {{ stroke: string, fill: string }}
+         */
+        this._getSnapIndicatorColors = () => {
+            let stroke = "";
+            let fill = "";
+            if (
+                typeof getComputedStyle !== "undefined" &&
+                typeof document !== "undefined" &&
+                document.body
+            ) {
+                const style = getComputedStyle(document.body);
+                stroke = style.getPropertyValue("--color-snap-indicator-stroke").trim();
+                fill = style.getPropertyValue("--color-snap-indicator-fill").trim();
+            }
+            // Primary values come from tokens.css; fallback for headless test environments
+            return {
+                stroke: stroke || "rgba(255, 215, 0, 0.95)",
+                fill: fill || "rgba(255, 215, 0, 0.35)"
+            };
+        };
+
+        /**
+         * Show visual snap indicator on target block and connection point.
+         * @param {object} candidate - { targetBlock, connectionIndex, dockX, dockY }
+         * @public
+         * @returns {void}
+         */
+        this.showSnapIndicator = candidate => {
+            if (!candidate) {
+                this.hideSnapIndicator();
+                return;
+            }
+
+            // Highlight target block
+            if (this._snapTargetBlock !== candidate.targetBlock) {
+                if (this._snapTargetBlock !== null && this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
+                this._snapTargetBlock = candidate.targetBlock;
+                if (this.blockList[candidate.targetBlock]) {
+                    this.blockList[candidate.targetBlock].highlight();
+                }
+            }
+
+            // Create or position glowing docking indicator circle
+            if (!this._snapIndicatorShape && typeof createjs !== "undefined" && createjs.Shape) {
+                this._snapIndicatorShape = new createjs.Shape();
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.addChild === "function"
+                ) {
+                    this.activity.blocksContainer.addChild(this._snapIndicatorShape);
+                }
+            }
+
+            if (this._snapIndicatorShape) {
+                const colors = this._getSnapIndicatorColors();
+                if (typeof this._snapIndicatorShape.graphics.clear === "function") {
+                    this._snapIndicatorShape.graphics.clear();
+                }
+                this._snapIndicatorShape.graphics
+                    .setStrokeStyle(3)
+                    .beginStroke(colors.stroke)
+                    .beginFill(colors.fill)
+                    .drawCircle(0, 0, 10);
+
+                this._snapIndicatorShape.x = candidate.dockX;
+                this._snapIndicatorShape.y = candidate.dockY;
+                this._snapIndicatorShape.visible = true;
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.setChildIndex === "function" &&
+                    Array.isArray(this.activity.blocksContainer.children)
+                ) {
+                    this.activity.blocksContainer.setChildIndex(
+                        this._snapIndicatorShape,
+                        this.activity.blocksContainer.children.length - 1
+                    );
+                }
+            }
+        };
+
+        /**
+         * Hide visual snap indicator and unhighlight target block.
+         * @public
+         * @returns {void}
+         */
+        this.hideSnapIndicator = () => {
+            if (this._snapTargetBlock !== null) {
+                if (this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
+                this._snapTargetBlock = null;
+            }
+            if (this._snapIndicatorShape) {
+                this._snapIndicatorShape.visible = false;
+            }
+        };
+
         /**
          * Hide all of the blocks.
          * @public
@@ -4395,6 +4503,21 @@ class Blocks {
 
             const myBlock = this.blockList[blk];
             const dblk = myBlock.connections[0];
+
+            /**
+             * Read the number in the divide block's denominator slot. The
+             * slot is empty whenever the user pulls that block out, so fall
+             * back to the same default the rest of this function returns.
+             */
+            const denominatorValue = () => {
+                const nblk = this.blockList[dblk].connections[2];
+                if (nblk === null || nblk === undefined || !this.blockList[nblk]) {
+                    return 1;
+                }
+
+                return this.blockList[nblk].value;
+            };
+
             /** We are connected to a divide block. */
             /** Is the divide block connected to a note value block? */
             let cblk = this.blockList[dblk].connections[0];
@@ -4408,18 +4531,13 @@ class Blocks {
                     case "newslur":
                     case "elapsednotes2":
                         if (this.blockList[cblk].connections[1] === dblk) {
-                            cblk = this.blockList[dblk].connections[2];
-                            return this.blockList[cblk].value;
+                            return denominatorValue();
                         }
                         return 1;
                     case "meter":
                         this.blockList[blk]._check_meter_block = cblk;
                         if (this.blockList[cblk].connections[2] === dblk) {
-                            if (this.blockList[cblk].connections[1] === dblk) {
-                                cblk = this.blockList[dblk].connections[2];
-                                return this.blockList[cblk].value;
-                            }
-                            return 1;
+                            return denominatorValue();
                         }
                         return 1;
                     case "setbpm3":
@@ -4432,11 +4550,7 @@ class Blocks {
                     case "neighbor":
                     case "neighbor2":
                         if (this.blockList[cblk].connections[2] === dblk) {
-                            if (this.blockList[cblk].connections[1] === dblk) {
-                                cblk = this.blockList[dblk].connections[2];
-                                return this.blockList[cblk].value;
-                            }
-                            return 1;
+                            return denominatorValue();
                         }
                         return 1;
                     default:
@@ -4974,18 +5088,39 @@ class Blocks {
                     return false;
                 };
 
-                if (hasCycle()) {
-                    console.warn(
-                        "Circular connection detected in block data. Punting loading of new blocks!"
-                    );
-                    console.debug("Circular block data:", blockObjs);
+                /**
+                 * Abandon a project we cannot load safely, telling the user
+                 * rather than crashing partway through the load.
+                 * @param - warning - console warning describing the problem
+                 * @param - data - the offending block data
+                 * @returns {void}
+                 */
+                const abortLoad = (warning, data) => {
+                    console.warn(warning);
+                    console.debug(data);
                     if (this.activity && typeof this.activity.errorMsg === "function") {
                         this.activity.errorMsg(
                             _("Something went wrong reading JSON-encoded project data.")
                         );
                     }
                     this.activity._suppressRefresh = false;
+                    /**
+                     * The load queue cleared the workspace and started the
+                     * loading animation, so put the UI back the way the
+                     * successful path leaves it.
+                     */
+                    document.body.style.cursor = "default";
+                    if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
+                        this.activity.stopLoadAnimation();
+                    }
                     this._advanceLoadQueue();
+                };
+
+                if (hasCycle()) {
+                    abortLoad(
+                        "Circular connection detected in block data. Punting loading of new blocks!",
+                        blockObjs
+                    );
                     return;
                 }
 
@@ -5274,6 +5409,25 @@ class Blocks {
                         case "tuplet2":
                         case "vibrato":
                             len = blockObjs[b][4].length;
+                            /**
+                             * Dock 0 is the parent and the last dock is the next
+                             * block, so these blocks always have at least two
+                             * connections. With fewer, the repairs below would
+                             * write the hidden block into the parent slot, leaving
+                             * the block and its hidden block pointing at each
+                             * other -- a loop that overflows the stack the next
+                             * time anything walks up the parents (#8679).
+                             */
+                            if (len < 2) {
+                                abortLoad(
+                                    "Too few connections for " +
+                                        name +
+                                        ": punting loading of new blocks!",
+                                    blockObjs[b]
+                                );
+                                return;
+                            }
+
                             if (last(blockObjs[b][4]) === null) {
                                 /** If there is no next block, add a hidden block; */
 
@@ -5293,6 +5447,16 @@ class Blocks {
                                 extraBlocksLength += 1;
                             } else {
                                 const nextBlock = blockObjs[b][4][len - 1];
+                                if (blockObjs[nextBlock] === undefined) {
+                                    abortLoad(
+                                        "Last connection of " +
+                                            name +
+                                            " is not a block in this project: punting loading of new blocks!",
+                                        blockObjs[b]
+                                    );
+                                    return;
+                                }
+
                                 let nextName;
                                 if (typeof blockObjs[nextBlock][1] === "object") {
                                     nextName = blockObjs[nextBlock][1][0];
@@ -5324,6 +5488,20 @@ class Blocks {
                             }
 
                             if (["note", "slur", "staccato", "swing"].includes(name)) {
+                                /**
+                                 * The conversion below reads the argument and
+                                 * clamp docks, so it needs three connections.
+                                 */
+                                if (len < 3) {
+                                    abortLoad(
+                                        "Too few connections to convert " +
+                                            name +
+                                            " to newnote style: punting loading of new blocks!",
+                                        blockObjs[b]
+                                    );
+                                    return;
+                                }
+
                                 /** We need to convert to newnote style: */
                                 /** (1) add a vspace to the start of the clamp of a note block. */
                                 const clampBlock = blockObjs[b][4][2];

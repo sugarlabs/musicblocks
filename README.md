@@ -47,6 +47,7 @@ Additional background on why we combine music and programming can be found
 - [Running Music Blocks](#RUNNING-MUSIC-BLOCKS)
 - [How to set up a local server](#HOW-TO-SET-UP-A-LOCAL-SERVER)
 - [Using Music Blocks](#USING-MUSIC-BLOCKS)
+- [Using the Kokoro voice](./Docs/KOKORO_SPEECH.md)
 
 If you are a developer (beginner, experienced, or pro), you are very
 welcome to participate in the evolution of Music Blocks.

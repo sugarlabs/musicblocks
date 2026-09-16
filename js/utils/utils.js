@@ -684,8 +684,11 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
             script.onerror = e => {
                 URL.revokeObjectURL(url);
                 document.head.removeChild(script);
-                console.error("Failed to load CSP Blob script for plugins", e);
-                reject(e);
+                const err = new Error(
+                    "Failed to load plugin script" + (e && e.message ? ": " + e.message : "")
+                );
+                console.error("Failed to load CSP Blob script for plugins", err);
+                reject(err);
             };
             document.head.appendChild(script);
         });
@@ -713,11 +716,13 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
 
     // Finally, execute safeEvals by creating new Blob scripts for each setup logic block.
     // This is because even setup logic can be blocked by CSP if it contains unsafe-eval.
+    window.__mb_plugin_registry = window.__mb_plugin_registry || {};
     for (const item of pendingSafeEvals) {
         const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random()
             .toString(36)
             .substr(2, 9)}`;
         const setupScript = `
+window.__mb_plugin_registry = window.__mb_plugin_registry || {};
 window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivity) {
     ${item.code}
 };
@@ -726,7 +731,7 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
         const sUrl = URL.createObjectURL(sBlob);
         const sScript = document.createElement("script");
         sScript.src = sUrl;
-        await new Promise(resolve => {
+        await new Promise((resolve, reject) => {
             sScript.onload = () => {
                 if (window.__mb_plugin_registry[registryName]) {
                     try {
@@ -742,12 +747,15 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                 }
                 resolve();
             };
-            sScript.onerror = () => {
+            sScript.onerror = e => {
                 URL.revokeObjectURL(sUrl);
                 if (sScript.parentNode) {
                     sScript.parentNode.removeChild(sScript);
                 }
-                resolve(); // Still resolve to let others run
+                const err = new Error(
+                    "Failed to execute plugin script" + (e && e.message ? ": " + e.message : "")
+                );
+                reject(err);
             };
             document.head.appendChild(sScript);
         });

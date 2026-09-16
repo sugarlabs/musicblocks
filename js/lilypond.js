@@ -71,7 +71,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "♮": "!",
             "♯": "is",
             "♭": "es",
-            "10": "''''''''",
+            "10": "'''''''",
             "1": ",, ",
             "2": ", ",
             "3": "",
@@ -79,8 +79,8 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "5": "''",
             "6": "'''",
             "7": "''''",
-            "8": "''''''",
-            "9": "'''''''"
+            "8": "'''''",
+            "9": "''''''"
         };
 
         return note.replace(/[♮♯♭]|10|[1-9]/g, match => replacements[match]).toLowerCase();

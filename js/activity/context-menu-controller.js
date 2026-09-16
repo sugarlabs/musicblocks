@@ -607,22 +607,23 @@ class ContextMenuController {
     _showHideAuxMenu(resize) {
         const activity = this.activity;
         const cellsize = 55;
+        const auxToolbar = document.getElementById("aux-toolbar");
         let dy;
 
         // function to increase or decrease the "top" property of the top-right corner buttons
 
         const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
-        const gridElement = document.getElementById("Grid");
-        const btnY = gridElement ? gridElement.getBoundingClientRect().top : 70 + LEADING + 6;
 
         this.changeTopButtonsPosition = value => {
             topRightButtons.forEach(child => {
+                const btnY = Number.parseFloat(child.style.top) || 70 + LEADING + 6;
                 child.style.top = `${btnY + value}px`;
             });
         };
 
         if (!resize && activity.toolbarHeight === 0) {
-            dy = cellsize + LEADING + 5;
+            auxToolbar.style.display = "block";
+            dy = auxToolbar.offsetHeight || cellsize + LEADING + 5;
 
             activity.toolbarHeight = dy;
             activity.palettes.deltaY(dy);
