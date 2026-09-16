@@ -160,10 +160,10 @@ describe("Test 1: Simple melody", () => {
 
     test("setkey2 block references G major", async () => {
         const blocks = await parseAndCapture(tune);
-        const keyRootBlocks = blocks.filter(
-            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "G"
-        );
-        expect(keyRootBlocks.length).toBeGreaterThanOrEqual(1);
+        const setKey = blocks.find(b => b[1] === "setkey2");
+        expect(setKey).toBeDefined();
+        const keyRootBlock = blocks.find(b => b[0] === setKey[4][1]);
+        expect(keyRootBlock[1]).toEqual(["notename", { value: "G" }]);
     });
 
     test("parseABC returns null", async () => {
@@ -685,10 +685,10 @@ describe("Test 8: Key signature accidentals (F major)", () => {
 
     test("setkey2 block references F root", async () => {
         const blocks = await parseAndCapture(tune);
-        const fKeyRoot = blocks.find(
-            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "F"
-        );
-        expect(fKeyRoot).toBeDefined();
+        const setKey = blocks.find(b => b[1] === "setkey2");
+        expect(setKey).toBeDefined();
+        const keyRootBlock = blocks.find(b => b[0] === setKey[4][1]);
+        expect(keyRootBlock[1]).toEqual(["notename", { value: "F" }]);
     });
 
     test("B note gets flat symbol applied by _adjustPitch", async () => {
