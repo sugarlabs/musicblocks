@@ -165,8 +165,7 @@ Examples include:
 For example:
 
 ```javascript
-jest.spyOn(document, "getElementsByClassName")
-    .mockReturnValue([{ style: {} }]);
+jest.spyOn(document, "getElementsByClassName").mockReturnValue([{ style: {} }]);
 ```
 
 If a mock or setup is only required by a single test suite, it should remain in that test file. Move it into the shared infrastructure only when it becomes generic enough to be reused across multiple test suites.
@@ -312,3 +311,25 @@ describe("YourBlocks", () => {
 2. Mock only what's needed for the specific test
 3. Use `jest.fn()` for methods you want to verify were called
 4. Run `npx prettier --write` on your test file before committing
+
+---
+
+## End-to-End (Cypress) Testing
+
+Music Blocks uses Cypress for real browser integration and end-to-end testing.
+
+### Running Cypress
+
+```bash
+npm start                                      # Start local server on http://127.0.0.1:3000
+npx cypress run                               # Run all Cypress E2E tests
+npx cypress run --spec "cypress/e2e/async-stylesheet-cascade.cy.js" # Run specific spec
+```
+
+### CSS Cascade & Async Stylesheet Loading
+
+Music Blocks loads several stylesheets asynchronously via `<link rel="preload" as="style">` in `index.html`. Because JSDOM in Jest cannot compute CSS cascades or evaluate asynchronous link preloads, browser-level cascade verification is handled in Cypress:
+
+- **`cy.waitForStylesheetsToLoad(targetStylesheets)`**: A custom command in `cypress/support/commands.js` that asserts the targeted preloaded stylesheets (defaulting to `activities.css`, `windows.css`, `darkmode.css`, `style.css`) have finished loading with `rel="stylesheet"`.
+- **Dynamic Token & Computed Style Verification**: Tests read active CSS custom properties (e.g. `--color-bg-primary`, `--color-widget-frame-bg`, `--color-widget-titlebar-text`) and compare against computed element styles rather than hardcoding static RGB values. This ensures tests stay tied to semantic design tokens and remain robust against palette updates.
+- **Selector Specificity & Cascade Isolation**: Tests verify that component-level stylesheets maintain expected cascade precedence across theme transitions (Light, Dark, High-Contrast) without style leakage.
