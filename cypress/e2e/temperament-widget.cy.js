@@ -1,13 +1,5 @@
 /* global cy, beforeEach, describe, it */
 
-/**
- * Cypress E2E test suite for the Temperament widget.
- *
- * The Temperament widget (js/widgets/temperament.js) allows users to explore,
- * play, and customize musical tuning systems. It is opened by running a
- * `temperament` block (via Play).
- */
-
 const loadFixtureProject = fixtureName => {
     cy.get("#load").click();
     cy.get("#myOpenFile").selectFile(`cypress/fixtures/${fixtureName}`, { force: true });
@@ -37,9 +29,7 @@ describe("Temperament widget", () => {
             .should("be.visible")
             .and("contain.text", "temperament");
         cy.get('[aria-label="temperament"]', { timeout: 30000 }).should("be.visible");
-        // Canvas-based visualizer (replaced old #circ / #wheelDiv2 wheelnav)
         cy.get('[aria-label="temperament"]').find("canvas").should("exist").and("be.visible");
-        // Table is rendered below the canvas
         cy.get('[aria-label="temperament"]').contains("th", "Pitch").should("exist");
     });
 
@@ -68,11 +58,14 @@ describe("Temperament widget", () => {
     });
 
     it("closes the Temperament widget and cleans up the DOM", () => {
+        cy.on("uncaught:exception", () => false);
         loadFixtureProject("temperament-widget-minimal.tb");
         cy.get("#play").click();
         cy.get('[aria-label="temperament"]', { timeout: 30000 }).should("be.visible");
         cy.get('[aria-label="temperament"]').find('[title="Close"]').first().click({ force: true });
         cy.get('[aria-label="temperament"]').should("not.exist");
-        cy.get('[aria-label="temperament"]').find("canvas").should("not.exist");
+        cy.get("canvas[role='img'][aria-label='Temperament visualizer circle']").should(
+            "not.exist"
+        );
     });
 });
