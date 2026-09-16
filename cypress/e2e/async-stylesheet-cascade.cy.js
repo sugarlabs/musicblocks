@@ -1,7 +1,20 @@
 /* global cy, Cypress, describe, it, before, beforeEach, afterEach, after, expect */
 
-// Suppress non-fatal uncaught exceptions (such as async audio/widget teardowns or RequireJS timing variances)
-Cypress.on("uncaught:exception", () => false);
+// Suppress only known non-critical uncaught exceptions that arise from async
+// audio/widget teardowns or RequireJS timing variances.  Unknown errors are
+// allowed to propagate so the spec fails on genuine regressions.
+Cypress.on("uncaught:exception", err => {
+    const ignored = [
+        "ResizeObserver loop limit exceeded",
+        "Cannot read properties of undefined",
+        "Cannot read properties of null",
+        "Cannot set properties of null",
+        "Cannot set properties of undefined",
+        "_ is not defined",
+        "Permissions check failed"
+    ];
+    return !ignored.some(msg => err.message.includes(msg));
+});
 
 /**
  * Helper to resolve a CSS custom property into its computed color format.
@@ -41,21 +54,29 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
     });
 
     beforeEach(() => {
-        // Ensure any floating windows are dismissed before test execution
+        // Ensure any floating windows or search widgets are dismissed before test execution
         cy.get("body").then($body => {
             const openWindows = $body.find(".windowFrame .wftButton.close");
             if (openWindows.length) {
                 cy.wrap(openWindows).click({ multiple: true, force: true });
             }
+            const searchInput = $body.find("#search");
+            if (searchInput.length && searchInput.is(":visible")) {
+                cy.wrap(searchInput).type("{esc}", { force: true });
+            }
         });
     });
 
     afterEach(() => {
-        // Dismiss any lingering dialogs or modals
+        // Dismiss any lingering dialogs, modals, or search widgets
         cy.get("body").then($body => {
             const closeButtons = $body.find(".windowFrame .wftButton.close, .mb-dialog-overlay");
             if (closeButtons.length) {
                 cy.wrap(closeButtons).click({ multiple: true, force: true });
+            }
+            const searchInput = $body.find("#search");
+            if (searchInput.length && searchInput.is(":visible")) {
+                cy.wrap(searchInput).type("{esc}", { force: true });
             }
         });
 
@@ -303,12 +324,11 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
             ).to.eq(expectedFrameBorder);
 
             const titleEl = windowFrame.querySelector(".wftTitle");
-            if (titleEl) {
-                expect(
-                    win.getComputedStyle(titleEl).color,
-                    "Desktop title text must match --color-text-secondary"
-                ).to.eq(expectedTitleText);
-            }
+            expect(titleEl, ".wftTitle must exist in widget frame").to.exist;
+            expect(
+                win.getComputedStyle(titleEl).color,
+                "Desktop title text must match --color-text-secondary"
+            ).to.eq(expectedTitleText);
         });
 
         // Switch to Dark Mode while window is open
@@ -353,16 +373,19 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
             ).to.eq(expectedDarkFrameBorder);
 
             const titleEl = windowFrame.querySelector(".wftTitle");
-            if (titleEl) {
-                expect(
-                    win.getComputedStyle(titleEl).color,
-                    "Dark desktop title text must match dark --color-text-secondary"
-                ).to.eq(expectedDarkTitleText);
-            }
+            expect(titleEl, ".wftTitle must exist in dark mode widget frame").to.exist;
+            expect(
+                win.getComputedStyle(titleEl).color,
+                "Dark desktop title text must match dark --color-text-secondary"
+            ).to.eq(expectedDarkTitleText);
         });
 
-        // Close floating window and verify cleanup
-        cy.get(".windowFrame .wftButton.close").first().click({ force: true });
+        // Close the specific status widget window and verify cleanup
+        cy.get(".windowFrame .wftTitle")
+            .contains("status")
+            .closest(".windowFrame")
+            .find(".wftButton.close")
+            .click({ force: true });
         cy.get(".windowFrame").should("not.exist");
     });
 
@@ -383,11 +406,17 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
             expect(overlayEl, "Overlay backdrop element should exist").to.exist;
             expect(panelEl, "Modal panel element should exist").to.exist;
 
+            // Resolve tokens from document.body (:root), NOT from the element
+            // under test — the overlay/panel inline styles directly reference
+            // these tokens, so reading the token from the same element would
+            // create a circular comparison that can never fail.
             const expectedBackdrop = resolveTokenColor(win, "--color-overlay-backdrop");
-            const expectedPanelBg = resolveTokenColor(win, "--color-panel-bg", panelEl);
+            const expectedPanelBg = resolveTokenColor(win, "--color-panel-bg");
 
+            const overlayBg = win.getComputedStyle(overlayEl).backgroundColor;
+            expect(overlayBg, "Overlay bg must not be transparent").to.not.eq("rgba(0, 0, 0, 0)");
             expect(
-                win.getComputedStyle(overlayEl).backgroundColor,
+                overlayBg,
                 "Overlay backdrop must match --color-overlay-backdrop in light mode"
             ).to.eq(expectedBackdrop);
             expect(
@@ -412,10 +441,14 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
             const panelEl = win.document.querySelector(".windowFrame.mb-system-dialog .wfbWidget");
 
             const darkExpectedBackdrop = resolveTokenColor(win, "--color-overlay-backdrop");
-            const darkExpectedPanelBg = resolveTokenColor(win, "--color-panel-bg", panelEl);
+            const darkExpectedPanelBg = resolveTokenColor(win, "--color-panel-bg");
 
+            const darkOverlayBg = win.getComputedStyle(overlayEl).backgroundColor;
+            expect(darkOverlayBg, "Dark overlay bg must not be transparent").to.not.eq(
+                "rgba(0, 0, 0, 0)"
+            );
             expect(
-                win.getComputedStyle(overlayEl).backgroundColor,
+                darkOverlayBg,
                 "Overlay backdrop must match --color-overlay-backdrop in dark mode"
             ).to.eq(darkExpectedBackdrop);
             expect(
@@ -453,28 +486,31 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
             const windowFrame = win.document.querySelector(".windowFrame");
             expect(windowFrame).to.exist;
             const titleEl = windowFrame.querySelector(".wftTitle");
-            if (titleEl) {
-                const expectedMobileDarkTitle = resolveTokenColor(
-                    win,
-                    "--color-widget-titlebar-text",
-                    windowFrame
-                );
-                expect(
-                    win.getComputedStyle(titleEl).color,
-                    "Mobile dark title text must match --color-widget-titlebar-text"
-                ).to.eq(expectedMobileDarkTitle);
-            }
+            expect(titleEl, ".wftTitle must exist in mobile widget frame").to.exist;
+            const expectedMobileDarkTitle = resolveTokenColor(
+                win,
+                "--color-widget-titlebar-text",
+                windowFrame
+            );
+            expect(
+                win.getComputedStyle(titleEl).color,
+                "Mobile dark title text must match --color-widget-titlebar-text"
+            ).to.eq(expectedMobileDarkTitle);
         });
 
-        // Close floating window and restore desktop viewport
-        cy.get(".windowFrame .wftButton.close").first().click({ force: true });
+        // Close the specific status widget window and restore desktop viewport
+        cy.get(".windowFrame .wftTitle")
+            .contains("status")
+            .closest(".windowFrame")
+            .find(".wftButton.close")
+            .click({ force: true });
         cy.get(".windowFrame").should("not.exist");
         cy.viewport(1400, 1000);
     });
 
     it("verifies search suggestion cascade rules consume design tokens without specificity leakage", () => {
         // Open search through palette
-        cy.contains("#palette tbody tr", "Search").click();
+        cy.contains("#palette tbody tr", "Search").click({ force: true });
         cy.get("#search").should("be.visible");
         cy.focused().should("have.id", "search").type("forward");
         cy.get("ul.ui-autocomplete", { timeout: 10000 }).should("be.visible");
@@ -495,6 +531,18 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
             expect(
                 computed.color,
                 "Autocomplete dropdown text color must match --color-text-primary in light mode"
+            ).to.eq(expectedSearchText);
+
+            // Also verify individual suggestion items — the <ul>-level check
+            // alone can pass even when item-level styles are overridden.
+            const itemEl =
+                autocompleteEl.querySelector("li .ui-menu-item-wrapper") ||
+                autocompleteEl.querySelector("li a") ||
+                autocompleteEl.querySelector("li");
+            expect(itemEl, "At least one suggestion item should exist").to.exist;
+            expect(
+                win.getComputedStyle(itemEl).color,
+                "Suggestion item text must match --color-text-primary in light mode"
             ).to.eq(expectedSearchText);
         });
 
@@ -522,6 +570,16 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
             expect(
                 computed.color,
                 "Autocomplete dropdown text color must match --color-text-primary in dark mode"
+            ).to.eq(expectedDarkSearchText);
+
+            const itemEl =
+                autocompleteEl.querySelector("li .ui-menu-item-wrapper") ||
+                autocompleteEl.querySelector("li a") ||
+                autocompleteEl.querySelector("li");
+            expect(itemEl, "At least one suggestion item should exist in dark mode").to.exist;
+            expect(
+                win.getComputedStyle(itemEl).color,
+                "Suggestion item text must match --color-text-primary in dark mode"
             ).to.eq(expectedDarkSearchText);
         });
 
