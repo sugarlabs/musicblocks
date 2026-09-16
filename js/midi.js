@@ -13,7 +13,9 @@
 
 /* exported  transcribeMidi*/
 
-const defaultTempo = 90;
+// A MIDI file with no tempo event plays at 120 beats per minute, the MIDI default, which is
+// also the tempo @tonejs/midi assumes when it times the file's notes.
+const defaultTempo = 120;
 
 const standardDurations = [
     { value: "1/1", duration: 1 },
@@ -41,6 +43,27 @@ const getClosestStandardNoteValue = duration => {
     return closest.value.split("/").map(Number);
 };
 
+/**
+ * Seconds at a tick under MIDI timing, where 120 beats per minute applies until the first
+ * tempo event.
+ * @param {number} ticks
+ * @param {Array<{ticks: number, bpm: number}>} tempos - midi.header.tempos, in tick order
+ * @param {number} ppq - ticks per quarter note
+ * @returns {number}
+ */
+const midiTicksToSeconds = (ticks, tempos, ppq) => {
+    let seconds = 0;
+    let lastTicks = 0;
+    let bpm = defaultTempo;
+    for (const tempo of tempos) {
+        if (tempo.ticks >= ticks) break;
+        seconds += ((tempo.ticks - lastTicks) / ppq) * (60 / bpm);
+        lastTicks = tempo.ticks;
+        bpm = tempo.bpm;
+    }
+    return seconds + ((ticks - lastTicks) / ppq) * (60 / bpm);
+};
+
 const transcribeMidi = async (midi, maxNoteBlocks) => {
     const currentMidi = midi;
     const drumMidi = getReverseDrumMidi();
@@ -56,12 +79,31 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
     let trackCount = 0;
     const actionBlockPerTrack = [];
     const instruments = [];
-    let currentMidiTempoBpm = currentMidi.header.tempos;
-    if (currentMidiTempoBpm && currentMidiTempoBpm.length > 0) {
-        currentMidiTempoBpm = Math.round(currentMidiTempoBpm[0].bpm);
-    } else {
-        currentMidiTempoBpm = defaultTempo;
-    }
+    const tempos = currentMidi.header.tempos || [];
+    // The project plays at the tempo in force when the file starts, which is 120 bpm until
+    // the first tempo event.
+    const firstTempoIsDelayed = tempos.length > 0 && tempos[0].ticks > 0;
+    const currentMidiTempoBpm =
+        tempos.length > 0 && !firstTempoIsDelayed ? Math.round(tempos[0].bpm) : defaultTempo;
+
+    // Every note and rest is written relative to that one tempo, so it plays for as long as
+    // it does in the file, including after the file changes tempo.
+    const wholeNotesAt = seconds => (seconds * currentMidiTempoBpm) / 240;
+
+    // @tonejs/midi times notes before a delayed first tempo event at 120 bpm, but times the
+    // event itself as if its tempo applied from the start, shifting every note after it. For
+    // such files notes are timed from their ticks instead.
+    const noteSeconds = note =>
+        firstTempoIsDelayed && Number.isFinite(note.ticks)
+            ? [
+                  midiTicksToSeconds(note.ticks, tempos, currentMidi.header.ppq),
+                  midiTicksToSeconds(
+                      note.ticks + note.durationTicks,
+                      tempos,
+                      currentMidi.header.ppq
+                  )
+              ]
+            : [note.time, note.time + note.duration];
 
     const defaultTimeSignature = [4, 4];
     let currentMidiTimeSignature = currentMidi.header.timeSignatures;
@@ -103,8 +145,9 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
         isPercussion.push(isPercussionTrack);
 
         track.notes.forEach((note, index) => {
-            const start = Math.round(note.time * 100) / 100;
-            const end = Math.round((note.time + note.duration) * 100) / 100;
+            const [noteStart, noteEnd] = noteSeconds(note);
+            const start = Math.round(noteStart * 100) / 100;
+            const end = Math.round(noteEnd * 100) / 100;
 
             if (note.duration === 0) return;
 
@@ -179,8 +222,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
         };
         //Using for loop for finding the shortest note value
         for (const j in sched) {
-            const dur = sched[j].end - sched[j].start;
-            const temp = getClosestStandardNoteValue((dur * 3) / 8);
+            const temp = getClosestStandardNoteValue(wholeNotesAt(sched[j].end - sched[j].start));
             shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
         }
 
@@ -249,7 +291,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                 }
                 return ar;
             };
-            let obj = getClosestStandardNoteValue((duration * 3) / 8);
+            let obj = getClosestStandardNoteValue(wholeNotesAt(duration));
             // let scalingFactor=1;
             // if(shortestNoteDenominator>32)
             // scalingFactor=shortestNoteDenominator/32;
@@ -424,7 +466,15 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                 0,
                 [vspaceIndex, setBpmIndex + 1, setBpmIndex + 2, setBpmIndex + 5]
             ],
-            [setBpmIndex + 1, ["number", { value: currentMidiTempoBpm }], 0, 0, [setBpmIndex]],
+            // A MIDI tempo counts quarter notes per minute, while this block counts beats
+            // of the time signature's note value (see MeterActions.setBPM).
+            [
+                setBpmIndex + 1,
+                ["number", { value: (currentMidiTempoBpm * currentMidiTimeSignature[1]) / 4 }],
+                0,
+                0,
+                [setBpmIndex]
+            ],
             [setBpmIndex + 2, "divide", 0, 0, [setBpmIndex, setBpmIndex + 3, setBpmIndex + 4]],
             [setBpmIndex + 3, ["number", { value: 1 }], 0, 0, [setBpmIndex + 2]],
             [
