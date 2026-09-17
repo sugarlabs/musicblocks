@@ -20,7 +20,7 @@
    TONEBPM, Singer, _, delayExecution, deepClone, docById, ManagedTimer,
    calcNoteValueToDisplay, platformColor, beginnerMode, last,
    EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES,
-   VOICENAMES, EFFECTSNAMES, clampNumber
+   VOICENAMES, EFFECTSNAMES, clampNumber, announceToScreenReader
 */
 /*
     Globals location
@@ -627,6 +627,7 @@ class RhythmRuler {
          * @type {WidgetWindow}
          */
         const widgetWindow = window.widgetWindows.windowFor(this, "rhythm maker");
+        announceToScreenReader(_("Rhythm Maker opened"));
         /**
          * The widget window associated with the rhythm maker.
          * @type {WidgetWindow}
@@ -655,6 +656,7 @@ class RhythmRuler {
             this.activity.hideMsgs();
             this._cleanupCircularCanvas();
             this._circularView = false;
+            announceToScreenReader(_("Rhythm Maker closed"));
 
             this.widgetWindow.destroy();
         };

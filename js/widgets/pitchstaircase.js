@@ -16,7 +16,7 @@
    global
 
    platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
-   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, clampNumber
+   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, clampNumber, announceToScreenReader
  */
 
 /*
@@ -792,6 +792,7 @@ class PitchStaircase {
             "pitch staircase",
             true
         );
+        announceToScreenReader(_("Pitch Staircase opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -815,6 +816,7 @@ class PitchStaircase {
             if (Singer && Singer.masterVolume && Singer.masterVolume.length > 0) {
                 this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
             }
+            announceToScreenReader(_("Pitch Staircase closed"));
             widgetWindow.destroy();
         };
 
