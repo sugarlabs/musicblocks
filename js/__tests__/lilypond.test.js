@@ -532,6 +532,38 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain("Turtle1Voice = \\new Staff \\with {");
     });
 
+    test("guitar tablature groups each instrument by its own clef, not turtle 0's", () => {
+        activity.logo.notationNotes = {
+            0: "\\note0",
+            1: "\\note1"
+        };
+        // turtle 0 plays a low note (computed clef: bass_8), turtle 1 plays a
+        // high note (computed clef: treble), so their clefs genuinely differ
+        activity.logo.notation.notationStaging = {
+            0: [[["C2"], 4, 0, null, 0, -1, false]],
+            1: [[["C6"], 4, 0, null, 0, -1, false]]
+        };
+
+        const result = saveLilypondOutput(activity);
+
+        const scoreVoice0 = result.indexOf("\\Turtle0Voice\n");
+        const scoreVoice1 = result.indexOf("\\Turtle1Voice\n");
+        const tab0 = result.indexOf('\\context TabVoice = "Turtle0"');
+        const tab1 = result.indexOf('\\context TabVoice = "Turtle1"');
+
+        expect(scoreVoice0).toBeGreaterThan(-1);
+        expect(scoreVoice1).toBeGreaterThan(-1);
+        expect(tab0).toBeGreaterThan(-1);
+        expect(tab1).toBeGreaterThan(-1);
+
+        // the score section above already groups treble on top, bass_8 on
+        // the bottom, so Turtle1 (treble) lists before Turtle0 (bass_8)
+        expect(scoreVoice1).toBeLessThan(scoreVoice0);
+        // the guitar tablature section must match that same ordering,
+        // grouping each instrument by its own clef instead of turtle 0's
+        expect(tab1).toBeLessThan(tab0);
+    });
+
     test("should ensure last turtle adds a bar", () => {
         activity.logo.notationNotes["0"] = "g'4 ";
         activity.logo.notation.notationStaging["0"] = ["note"];
