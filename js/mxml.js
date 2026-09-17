@@ -313,7 +313,29 @@ saveMxmlOutput = logo => {
                         divisionsLeft -= preciseDur;
                     }
 
-                    const alter = p[1] === "\u266d" ? -1 : p[1] === "\u266F" ? 1 : 0;
+                    let step = p[0];
+                    let alter = p[1] === "\u266d" ? -1 : p[1] === "\u266F" ? 1 : 0;
+                    let octave = p[p.length - 1];
+
+                    const match = p.match(/^([A-Ga-g])([#b♭♯𝄪𝄫x]*)(-?\d+)$/u);
+                    if (match) {
+                        step = match[1].toUpperCase();
+                        const accidentalStr = match[2];
+                        const accidentalMap = {
+                            "♯": 1,
+                            "#": 1,
+                            "♭": -1,
+                            "b": -1,
+                            "𝄪": 2,
+                            "x": 2,
+                            "𝄫": -2
+                        };
+                        alter = [...accidentalStr].reduce(
+                            (sum, char) => sum + (accidentalMap[char] || 0),
+                            0
+                        );
+                        octave = match[3] || p[p.length - 1];
+                    }
 
                     add("<note>");
                     indent++;
@@ -324,9 +346,9 @@ saveMxmlOutput = logo => {
                     } else {
                         add("<pitch>");
                         indent++;
-                        add(`<step>${p[0]}</step>`);
+                        add(`<step>${step}</step>`);
                         if (alter !== 0) add(`<alter>${alter}</alter>`);
-                        add(`<octave>${p[p.length - 1]}</octave>`);
+                        add(`<octave>${octave}</octave>`);
                         indent--;
                         add("</pitch>");
                     }
