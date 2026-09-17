@@ -2972,6 +2972,32 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
             expect(mockRow.scrollIntoView).toHaveBeenCalledWith({ block: "nearest" });
         });
 
+        test("_shiftRuler moves focus, sets tabIndex, and updates ARIA state and live announcement", () => {
+            const mockRow0 = {
+                setAttribute: jest.fn(),
+                focus: jest.fn(),
+                scrollIntoView: jest.fn()
+            };
+            const mockRow1 = {
+                setAttribute: jest.fn(),
+                focus: jest.fn(),
+                scrollIntoView: jest.fn()
+            };
+            rhythmRuler._rulers = [mockRow0, mockRow1];
+            rhythmRuler._rulerSelected = 0;
+            rhythmRuler.activity.textMsg = jest.fn();
+
+            rhythmRuler._shiftRuler(1);
+
+            expect(rhythmRuler._rulerSelected).toBe(1);
+            expect(mockRow1.tabIndex).toBe(-1);
+            expect(mockRow1.focus).toHaveBeenCalled();
+            expect(mockRow0.setAttribute).toHaveBeenCalledWith("aria-selected", "false");
+            expect(mockRow1.setAttribute).toHaveBeenCalledWith("aria-selected", "true");
+            expect(mockRow1.setAttribute).toHaveBeenCalledWith("aria-label", "snare drum ruler 2");
+            expect(rhythmRuler.activity.textMsg).toHaveBeenCalledWith("snare drum ruler 2");
+        });
+
         test("shortcuts are ignored when widget window is not focused", () => {
             window.widgetWindows.focused = {}; // Different widget focused
             rhythmRuler._playAllCell.onclick = jest.fn();

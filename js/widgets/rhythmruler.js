@@ -914,6 +914,36 @@ class RhythmRuler {
             if (typeof rulerRow.scrollIntoView === "function") {
                 rulerRow.scrollIntoView({ block: "nearest" });
             }
+            if (typeof rulerRow.setAttribute === "function") {
+                rulerRow.tabIndex = -1;
+                this._rulers.forEach((row, idx) => {
+                    if (row && typeof row.setAttribute === "function") {
+                        row.setAttribute(
+                            "aria-selected",
+                            idx === this._rulerSelected ? "true" : "false"
+                        );
+                    }
+                });
+                const drumName =
+                    typeof this._getDrumName === "function"
+                        ? this._getDrumName(this._rulerSelected)
+                        : "snare drum";
+                rulerRow.setAttribute(
+                    "aria-label",
+                    `${drumName} ${_("ruler")} ${this._rulerSelected + 1}`
+                );
+            }
+            if (typeof rulerRow.focus === "function") {
+                rulerRow.focus();
+            }
+            const activity = this.activity || this._activity;
+            if (activity && typeof activity.textMsg === "function") {
+                const drumName =
+                    typeof this._getDrumName === "function"
+                        ? this._getDrumName(this._rulerSelected)
+                        : "snare drum";
+                activity.textMsg(`${drumName} ${_("ruler")} ${this._rulerSelected + 1}`);
+            }
         }
     }
 
@@ -1009,6 +1039,9 @@ class RhythmRuler {
             const rulerRow = rulerCellTable.insertRow();
             this._rulers[i] = rulerRow;
             rulerRow.setAttribute("data-row", i);
+            rulerRow.tabIndex = -1;
+            rulerRow.setAttribute("role", "row");
+            rulerRow.setAttribute("aria-selected", i === this._rulerSelected ? "true" : "false");
 
             for (let j = 0; j < this.Rulers[i][0].length; j++) {
                 const noteValue = this.Rulers[i][0][j];
