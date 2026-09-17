@@ -80,6 +80,12 @@ describe("processABCNotes - Basic Note Processing", () => {
         expect(logo.notationNotes["0"]).toBe("g4 c'''4 ");
     });
 
+    it("should write a note with no pitches as a rest", () => {
+        logo.notation.notationStaging["0"] = [[[], 4, 0, null, null, -1, false]];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("R4 ");
+    });
+
     it("should insert a newline after every 8 notes", () => {
         const notes = [];
         // Add 9 notes
