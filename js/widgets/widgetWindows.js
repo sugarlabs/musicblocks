@@ -49,6 +49,45 @@ window.widgetWindows = {
     },
 
     /**
+     * Single source of truth for widgets that should reinitialize when a
+     * connected block changes while their window is open.
+     *
+     * Entries are the English windowFor() title strings. At runtime the
+     * open .wftTitle and the widget block's staticLabels[0] are both
+     * produced with _(), so they must match each other; call sites also
+     * require title === staticLabels[0] before calling reInitWidget().
+     *
+     * Separate from KEY_MAPPING, which is only for closeBlkWidgets().
+     */
+    REINIT_WIDGET_TITLES: new Set([
+        "oscilloscope",
+        "tempo",
+        "rhythm maker",
+        "pitch slider",
+        "pitch staircase",
+        "status",
+        "phrase maker",
+        "LEGO Bricks",
+        "arpeggio",
+        "custom mode",
+        "music keyboard",
+        "pitch drum",
+        "meter",
+        "temperament",
+        "mode",
+        "timbre"
+    ]),
+
+    /**
+     * True when title is listed in REINIT_WIDGET_TITLES.
+     * @param {string} title - Open widget .wftTitle text
+     * @returns {boolean}
+     */
+    isReinitWidgetTitle(title) {
+        return window.widgetWindows.REINIT_WIDGET_TITLES.has(title);
+    },
+
+    /**
      * Closes a specific widget by its name.
      *
      * @param {string} name - The name of the widget to be closed.

@@ -1253,6 +1253,21 @@ describe("widgetWindows", () => {
         });
     });
 
+    describe("isReinitWidgetTitle()", () => {
+        it("recognizes titles used by open-widget stack reinitialization", () => {
+            expect(window.widgetWindows.isReinitWidgetTitle("tempo")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("LEGO Bricks")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("arpeggio")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("not a widget")).toBe(false);
+        });
+
+        it("keeps REINIT_WIDGET_TITLES as the single lookup source", () => {
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("custom mode")).toBe(true);
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("mode")).toBe(true);
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("sampler")).toBe(false);
+        });
+    });
+
     describe("Global Keydown Listeners & Shortcuts", () => {
         beforeEach(() => {
             if (window.widgetWindows._handleGlobalKeyDown) {

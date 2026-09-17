@@ -29,7 +29,7 @@
    instance directly. No global classification lists are consulted here.
 */
 /* global DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _,
-   MINIMUMDOCKDISTANCE, LONGSTACK, announceToScreenReader */
+   MINIMUMDOCKDISTANCE, LONGSTACK, announceToScreenReader, widgetWindows */
 
 /* exported setupBlockDragController, BlockDragController */
 
@@ -508,38 +508,21 @@ class BlockDragController {
             myBlock.connections[0] = null;
             blocks.raiseStackToTop(thisBlock);
 
-            /**
-             * Check if we are disconnecting blocks from widget blocks;
-             * then reinit if widget windows is open.
-             */
+            // Reinit open widgets listed in widgetWindows.REINIT_WIDGET_TITLES.
+            // Only lock after title matches staticLabels[0].
             let lockInit = false;
             for (let x = 0; x < widgetTitle.length; x++) {
-                if (lockInit === false) {
-                    switch (widgetTitle[x].innerHTML) {
-                        case "oscilloscope":
-                        case "tempo":
-                        case "rhythm maker":
-                        case "pitch slider":
-                        case "pitch staircase":
-                        case "status":
-                        case "phrase maker":
-                        case "LEGO Bricks":
-                        case "arpeggio":
-                        case "custom mode":
-                        case "music keyboard":
-                        case "pitch drum":
-                        case "meter":
-                        case "temperament":
-                        case "timbre":
-                            lockInit = true;
-                            if (
-                                blocks.blockList[initialTopBlock].protoblock.staticLabels[0] ===
-                                widgetTitle[x].innerHTML
-                            ) {
-                                blocks.reInitWidget(initialTopBlock, 1500);
-                            }
-                            break;
-                    }
+                if (lockInit) {
+                    break;
+                }
+                const title = widgetTitle[x].innerHTML;
+                if (!widgetWindows.isReinitWidgetTitle(title)) {
+                    continue;
+                }
+                const topProto = blocks.blockList[initialTopBlock].protoblock;
+                if (topProto && topProto.staticLabels && topProto.staticLabels[0] === title) {
+                    lockInit = true;
+                    blocks.reInitWidget(initialTopBlock, 1500);
                 }
             }
         }
@@ -1061,39 +1044,23 @@ class BlockDragController {
                 blocks.activity.refreshCanvas();
             }, 500);
 
-            /** Check if top block is one of the widget blocks. */
+            // Reinit open widgets listed in widgetWindows.REINIT_WIDGET_TITLES
+            // when attaching a previously free block into a widget stack.
             let lockInit = false;
             if (c === null) {
                 for (let i = 0; i < widgetTitle.length; i++) {
-                    const that = blocks;
-                    if (lockInit === false) {
-                        let newTopBlock;
-                        switch (widgetTitle[i].innerHTML) {
-                            case "oscilloscope":
-                            case "tempo":
-                            case "rhythm maker":
-                            case "pitch slider":
-                            case "pitch staircase":
-                            case "status":
-                            case "phrase maker":
-                            case "LEGO Bricks":
-                            case "arpeggio":
-                            case "custom mode":
-                            case "music keyboard":
-                            case "pitch drum":
-                            case "meter":
-                            case "temperament":
-                            case "timbre":
-                                lockInit = true;
-                                newTopBlock = that.findTopBlock(thisBlock);
-                                if (
-                                    blocks.blockList[newTopBlock].protoblock.staticLabels[0] ===
-                                    widgetTitle[i].innerHTML
-                                ) {
-                                    blocks.reInitWidget(newTopBlock, 1500);
-                                }
-                                break;
-                        }
+                    if (lockInit) {
+                        break;
+                    }
+                    const title = widgetTitle[i].innerHTML;
+                    if (!widgetWindows.isReinitWidgetTitle(title)) {
+                        continue;
+                    }
+                    const newTopBlock = blocks.findTopBlock(thisBlock);
+                    const topProto = blocks.blockList[newTopBlock].protoblock;
+                    if (topProto && topProto.staticLabels && topProto.staticLabels[0] === title) {
+                        lockInit = true;
+                        blocks.reInitWidget(newTopBlock, 1500);
                     }
                 }
             }

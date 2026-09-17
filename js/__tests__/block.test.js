@@ -1111,6 +1111,18 @@ describe("Block Foundation", () => {
     describe("_checkWidgets()", () => {
         let getElementsSpy;
 
+        beforeAll(() => {
+            // widgetWindows.js attaches to the environment window; also expose
+            // the bare global that block.js reads via /* global widgetWindows */.
+            require("../widgets/widgetWindows.js");
+            const ww =
+                (typeof window !== "undefined" && window.widgetWindows) || global.widgetWindows;
+            global.widgetWindows = ww;
+            if (typeof window !== "undefined") {
+                window.widgetWindows = ww;
+            }
+        });
+
         afterEach(() => {
             if (getElementsSpy) {
                 getElementsSpy.mockRestore();

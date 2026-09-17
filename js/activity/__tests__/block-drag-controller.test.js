@@ -27,6 +27,9 @@ global.getTextWidth = jest.fn().mockReturnValue(100);
 global._ = jest.fn(str => str);
 global.announceToScreenReader = jest.fn();
 
+require("../../widgets/widgetWindows.js");
+global.widgetWindows = window.widgetWindows;
+
 // NOTE: block collapsibility is determined via the capability-metadata system.
 // BlockDragController calls block.isCollapsible() / block.isInlineCollapsible()
 // directly on Block instances; no global COLLAPSIBLES/INLINECOLLAPSIBLES arrays

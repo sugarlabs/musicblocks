@@ -33,7 +33,8 @@
    retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
     updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
-   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
+   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_,
+   widgetWindows
  */
 
 /*
@@ -4738,45 +4739,28 @@ class Block {
     }
 
     /**
-     * Checks and reinitializes widget windows if their labels are changed.
-     * @param {boolean} closeInput - Flag indicating whether to close input.
+     * Reinitialize an open widget when a block in its stack changes.
+     * Uses widgetWindows.REINIT_WIDGET_TITLES; only locks after a real
+     * title/staticLabels match so unrelated open widgets cannot block.
+     * @param {boolean} closeInput - Skip when true.
      */
     _checkWidgets(closeInput) {
-        // Detect if label is changed, then reinit widget windows
-        // if they are open.
         const thisBlock = this.blockIndex;
         const topBlock = this.blocks.findTopBlock(thisBlock);
         const widgetTitle = document.getElementsByClassName("wftTitle");
         let lockInit = false;
         if (closeInput === false) {
+            const topProto = this.blocks.blockList[topBlock].protoblock;
+            const topLabel =
+                topProto && topProto.staticLabels ? topProto.staticLabels[0] : undefined;
             for (let i = 0; i < widgetTitle.length; i++) {
-                if (lockInit === false) {
-                    switch (widgetTitle[i].innerHTML) {
-                        case "oscilloscope":
-                        case "tempo":
-                        case "rhythm maker":
-                        case "pitch slider":
-                        case "pitch staircase":
-                        case "status":
-                        case "phrase maker":
-                        case "LEGO Bricks":
-                        case "arpeggio":
-                        case "custom mode":
-                        case "music keyboard":
-                        case "pitch drum":
-                        case "meter":
-                        case "temperament":
-                        case "mode":
-                        case "timbre":
-                            if (
-                                this.blocks.blockList[topBlock].protoblock.staticLabels[0] ===
-                                widgetTitle[i].innerHTML
-                            ) {
-                                lockInit = true;
-                                this.blocks.reInitWidget(topBlock, 1500);
-                            }
-                            break;
-                    }
+                if (lockInit) {
+                    break;
+                }
+                const title = widgetTitle[i].innerHTML;
+                if (widgetWindows.isReinitWidgetTitle(title) && topLabel === title) {
+                    lockInit = true;
+                    this.blocks.reInitWidget(topBlock, 1500);
                 }
             }
         }
