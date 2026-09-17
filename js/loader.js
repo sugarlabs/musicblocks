@@ -262,6 +262,9 @@ requirejs.config({
         "utils/ai-widget-lifecycle": {
             exports: "createWidgetLifecycle"
         },
+        "utils/tuningformats": {
+            exports: "TuningFormats"
+        },
         "widgets/reflection": {
             deps: ["utils/ai-widget-lifecycle"]
         },

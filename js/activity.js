@@ -160,6 +160,7 @@ let MYDEFINES = [
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
+    "utils/tuningformats",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",

@@ -24,6 +24,7 @@ const { TextEncoder } = require("util");
 global.TextEncoder = TextEncoder;
 global._ = jest.fn(str => str);
 global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
+global.TuningFormats = require("../tuningformats");
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
@@ -4671,59 +4672,5 @@ describe("generateNoteNames EDO length contract", () => {
             expect(generateNoteNames(edo)[0]).toBe("C");
             expect(generateNoteNames(edo)).toEqual(generateNoteNames(edo));
         }
-    });
-});
-
-describe("parseSclFile", () => {
-    it("parses a .scl file with mixed ratios and cents", () => {
-        const content = [
-            "! meanquar.scl",
-            "!",
-            "1/4-comma meantone scale",
-            "3",
-            "76.04900",
-            "5/4",
-            "2/1"
-        ].join("\n");
-
-        const result = parseSclFile(content);
-        expect(result.description).toBe("1/4-comma meantone scale");
-        expect(result.pitchCount).toBe(3);
-        expect(result.pitches[0].cents).toBeCloseTo(76.049, 1);
-        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 4);
-    });
-
-    it("throws on empty content", () => {
-        expect(() => parseSclFile("")).toThrow();
-    });
-
-    it("parses .scl with integer ratios", () => {
-        const content = ["! test.scl", "!", "Test", "3", "3/2", "5/4", "2/1"].join("\n");
-        const result = parseSclFile(content);
-        expect(result.pitchCount).toBe(3);
-        expect(result.pitches[0].ratio).toBeCloseTo(1.5, 4);
-        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 4);
-    });
-});
-
-describe("mode JSON", () => {
-    it("round-trips exactly", () => {
-        const pattern = [2, 2, 1, 2, 2, 2, 1];
-        const json = JSON.stringify({ name: "major", edo: 12, pattern }, null, 2);
-        const def = parseModeJson(json);
-        expect(def).toEqual({ name: "major", edo: 12, pattern });
-    });
-
-    it("strict-rejects bad structure", () => {
-        expect(() => parseModeJson("not json")).toThrow("Invalid JSON");
-        expect(() =>
-            parseModeJson(JSON.stringify({ name: "bad", edo: 12, pattern: [2, 2, 1] }, null, 2))
-        ).toThrow("does not sum to edo");
-        expect(() =>
-            parseModeJson(JSON.stringify({ name: "bad", edo: 4, pattern: [2, 2] }, null, 2))
-        ).toThrow("invalid edo");
-        expect(() =>
-            parseModeJson(JSON.stringify({ name: "bad", edo: 12, pattern: [2, 0, 10] }, null, 2))
-        ).toThrow("invalid pattern");
     });
 });
