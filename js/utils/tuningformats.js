@@ -20,11 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
-    exported
-
-    parseSclFile, parseModeJson, EDO_MIN, EDO_MAX
- */
+/* exported parseSclFile, parseModeJson, EDO_MIN, EDO_MAX */
 
 const EDO_MIN = 5;
 const EDO_MAX = 55;
@@ -165,5 +161,4 @@ if (typeof module !== "undefined" && module.exports) {
 
 if (typeof window !== "undefined") {
     window.TuningFormats = TuningFormats;
-    Object.assign(window, TuningFormats);
 }

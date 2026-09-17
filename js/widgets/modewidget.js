@@ -16,9 +16,9 @@
     getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
     normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
-    getSavedCustomModes, configureWheel, parseSclFile, parseModeJson,
+    getSavedCustomModes, configureWheel, TuningFormats,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
-    EDO_MIN, EDO_MAX, isUnsafeObjectKey
+    isUnsafeObjectKey
  */
 
 /*
@@ -179,12 +179,7 @@ class ModeWidget {
 
         const shareBtn = this.widgetWindow.addButton("share.svg", ModeWidget.ICONSIZE, _("Share"));
         shareBtn.onclick = () => {
-            this._createSclSharePopup(
-                shareBtn,
-                () => this._exportScl(),
-                () => this._exportJson(),
-                () => this._importFile()
-            );
+            this._createSclSharePopup(shareBtn);
         };
 
         this._piemenuMode();
@@ -1335,6 +1330,7 @@ class ModeWidget {
             12: "equal",
             17: "equal17",
             19: "equal19",
+            21: "1/4 comma meantone",
             31: "equal31"
         };
         if (map[edo]) {
@@ -1366,7 +1362,7 @@ class ModeWidget {
         return [name, octave + 4];
     }
 
-    _createSclSharePopup(anchor, onExport, onExportJson, onImport) {
+    _createSclSharePopup(anchor) {
         const existing = document.getElementById("sclSharePopup");
         if (existing) {
             if (existing._closeHandler) {
@@ -1413,9 +1409,9 @@ class ModeWidget {
             return item;
         };
 
-        popup.appendChild(addItem(_("Export .scl"), onExport));
-        popup.appendChild(addItem(_("Export JSON"), onExportJson));
-        popup.appendChild(addItem(_("Import"), onImport));
+        popup.appendChild(addItem(_("Export .scl"), () => this._exportScl()));
+        popup.appendChild(addItem(_("Export JSON"), () => this._exportJson()));
+        popup.appendChild(addItem(_("Import"), () => this._importFile()));
         document.body.appendChild(popup);
 
         const cleanup = () => {
@@ -1479,7 +1475,7 @@ class ModeWidget {
     }
 
     _findEdoSteps(pitches) {
-        for (let edo = EDO_MIN; edo <= EDO_MAX; edo++) {
+        for (let edo = TuningFormats.EDO_MIN; edo <= TuningFormats.EDO_MAX; edo++) {
             const step = 1200 / edo;
             const steps = [];
             let prevStepCount = 0;
@@ -1565,7 +1561,7 @@ class ModeWidget {
         if (ext.endsWith(".json")) {
             let def;
             try {
-                def = parseModeJson(data.text);
+                def = TuningFormats.parseModeJson(data.text);
             } catch (e) {
                 this.errorMsg(_("Error reading JSON file: ") + e.message);
                 return null;
@@ -1579,7 +1575,7 @@ class ModeWidget {
         if (ext.endsWith(".scl")) {
             let result;
             try {
-                result = parseSclFile(data.text);
+                result = TuningFormats.parseSclFile(data.text);
             } catch (e) {
                 this.errorMsg(_("Error reading .scl file: ") + e.message);
                 return null;

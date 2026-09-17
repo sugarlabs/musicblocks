@@ -116,10 +116,7 @@ global.getNonEDOModeSteps = getNonEDOModeSteps;
 global.getNonEDOFrequency = getNonEDOFrequency;
 global.isEquallyTempered = isEquallyTempered;
 global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
-global.parseSclFile = require("../../utils/tuningformats").parseSclFile;
-global.parseModeJson = require("../../utils/tuningformats").parseModeJson;
-global.EDO_MIN = 5;
-global.EDO_MAX = 55;
+global.TuningFormats = require("../../utils/tuningformats");
 global.pitchToFrequency = pitchToFrequency || jest.fn().mockReturnValue(440);
 global.generateNoteNames =
     global.generateNoteNames ||
@@ -733,7 +730,7 @@ describe("ModeWidget", () => {
 
     test("should rename imported mode that collides with a built-in name", () => {
         MUSICALMODES["major"] = [2, 2, 1, 2, 2, 2, 1];
-        global.parseModeJson = jest.fn(text => JSON.parse(text));
+        global.TuningFormats.parseModeJson = jest.fn(text => JSON.parse(text));
         const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
         jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
             cb(null, {
