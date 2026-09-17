@@ -3111,18 +3111,6 @@ const parseSclFile = content => {
 };
 
 /**
- * Serialize a mode definition to JSON.
- * @function
- * @param {string} name - The mode name.
- * @param {number} edo - The EDO divisions.
- * @param {Array<number>} pattern - The step pattern.
- * @returns {string} The JSON text.
- */
-const modeToJson = (name, edo, pattern) => {
-    return JSON.stringify({ name, edo, pattern }, null, 2);
-};
-
-/**
  * Parse and strictly validate a mode JSON file.
  * @function
  * @param {string} text - The raw JSON text.
@@ -8394,7 +8382,6 @@ if (typeof module !== "undefined" && module.exports) {
         getNonEDOFrequency,
         configureWheel,
         parseSclFile,
-        modeToJson,
         parseModeJson,
         EDO_MIN,
         EDO_MAX

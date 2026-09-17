@@ -142,7 +142,6 @@ const {
     temperamentHasRatios,
     isEquallyTempered,
     parseSclFile,
-    modeToJson,
     parseModeJson
 } = require("../musicutils");
 
@@ -4709,16 +4708,21 @@ describe("parseSclFile", () => {
 describe("mode JSON", () => {
     it("round-trips exactly", () => {
         const pattern = [2, 2, 1, 2, 2, 2, 1];
-        const def = parseModeJson(modeToJson("major", 12, pattern));
+        const json = JSON.stringify({ name: "major", edo: 12, pattern }, null, 2);
+        const def = parseModeJson(json);
         expect(def).toEqual({ name: "major", edo: 12, pattern });
     });
 
     it("strict-rejects bad structure", () => {
         expect(() => parseModeJson("not json")).toThrow("Invalid JSON");
-        expect(() => parseModeJson(modeToJson("bad", 12, [2, 2, 1]))).toThrow(
-            "does not sum to edo"
-        );
-        expect(() => parseModeJson(modeToJson("bad", 4, [2, 2]))).toThrow("invalid edo");
-        expect(() => parseModeJson(modeToJson("bad", 12, [2, 0, 10]))).toThrow("invalid pattern");
+        expect(() =>
+            parseModeJson(JSON.stringify({ name: "bad", edo: 12, pattern: [2, 2, 1] }, null, 2))
+        ).toThrow("does not sum to edo");
+        expect(() =>
+            parseModeJson(JSON.stringify({ name: "bad", edo: 4, pattern: [2, 2] }, null, 2))
+        ).toThrow("invalid edo");
+        expect(() =>
+            parseModeJson(JSON.stringify({ name: "bad", edo: 12, pattern: [2, 0, 10] }, null, 2))
+        ).toThrow("invalid pattern");
     });
 });
