@@ -1533,6 +1533,13 @@ class Logo {
             this.synth.recorder.stop();
 
         this.onStopTurtle();
+        if (
+            this.blocks &&
+            this.blocks.visible &&
+            typeof this.blocks.unhighlightAll === "function"
+        ) {
+            this.blocks.unhighlightAll();
+        }
         this.blocks.bringToTop();
 
         this._alreadyRunning = false;
