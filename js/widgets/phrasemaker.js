@@ -19,7 +19,7 @@
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
    LCD, calcNoteValueToDisplay, NOTESYMBOLS,
-   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, parseNoteString
+   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, parseNoteString, announceToScreenReader
 */
 
 /*
@@ -600,6 +600,9 @@ class PhraseMaker {
         const iconSize = PhraseMaker.ICONSIZE * this._cellScale;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
+        if (this.isInitial) {
+            announceToScreenReader(_("Phrase Maker opened"));
+        }
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -1229,6 +1232,7 @@ class PhraseMaker {
         if (this.widgetWindow && typeof this.widgetWindow.destroy === "function") {
             this.widgetWindow.destroy();
         }
+        announceToScreenReader(_("Phrase Maker closed"));
     }
 
     _setupWheelDiv(size, left, top) {

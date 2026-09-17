@@ -850,8 +850,7 @@ function setupWidgetBlocks(activity) {
                     _getWidgetDependencies(typeof ModeWidget !== "undefined" ? ModeWidget : null, [
                         "widgets/modewidget"
                     ]),
-                    () => new ModeWidget(activity),
-                    resetFlag
+                    () => new ModeWidget(activity)
                 );
             };
 
@@ -964,14 +963,15 @@ function setupWidgetBlocks(activity) {
                 [0, "arpeggiomatrix", x, y, [null, 1, 3, 2]],
                 [1, ["number", { value: 4 }], 0, 0, [0]],
                 [2, "hiddennoflow", 0, 0, [0, null]],
-                [3, "newnote", 0, 0, [0, 4, 7, null]],
+                [3, "newnote", 0, 0, [0, 4, 7, 11]],
                 [4, "divide", 0, 0, [3, 5, 6]],
                 [5, ["number", { value: 1 }], 0, 0, [4]],
                 [6, ["number", { value: 16 }], 0, 0, [4]],
                 [7, "vspace", 0, 0, [3, 8]],
                 [8, "pitch", 0, 0, [7, 9, 10, null]],
                 [9, ["solfege", { value: "do" }], 0, 0, [8]],
-                [10, ["number", { value: 4 }], 0, 0, [8]]
+                [10, ["number", { value: 4 }], 0, 0, [8]],
+                [11, "hidden", 0, 0, [3, null]]
             ]);
         }
 
@@ -2110,7 +2110,7 @@ function setupWidgetBlocks(activity) {
                 "reflection",
                 _getWidgetDependencies(
                     typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
-                    ["widgets/reflection"]
+                    ["utils/ai-widget-lifecycle", "widgets/reflection"]
                 ),
                 () => new ReflectionMatrix(),
                 turtle,
@@ -2271,7 +2271,7 @@ function setupWidgetBlocks(activity) {
                 "aiDebugger",
                 _getWidgetDependencies(
                     typeof AIDebuggerWidget !== "undefined" ? AIDebuggerWidget : null,
-                    ["widgets/aidebugger"]
+                    ["utils/ai-widget-lifecycle", "widgets/aidebugger"]
                 ),
                 () => new AIDebuggerWidget(),
                 turtle,

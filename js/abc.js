@@ -50,6 +50,40 @@ const ACCIDENTAL_SYMBOLS = Object.keys(ACCIDENTAL_MAP)
 const PITCH_ACCIDENTAL_PATTERN = new RegExp(`^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)`, "u");
 
 /**
+ * Converts a LilyPond duration, the form notation.js stages tempo beats in (convertFactor()
+ * in js/utils/musicutils.js), to the note lengths an ABC Q: field adds up.
+ * @param {string} duration - space-separated note values, each optionally dotted,
+ *   e.g. "4", "4.", "4 16".
+ * @returns {string|null} e.g. "1/4", "3/8", "1/4 1/16"; null if not in that form.
+ */
+const lilypondDurationToAbcLengths = duration => {
+    const lengths = [];
+    for (const token of String(duration).trim().split(/\s+/)) {
+        const match = /^(\d+)(\.*)$/.exec(token);
+        if (match === null || Number(match[1]) === 0) return null;
+        // A note value n with d dots lasts (2^(d+1) - 1) / (n * 2^d) of a whole note.
+        const dots = match[2].length;
+        lengths.push(`${2 ** (dots + 1) - 1}/${Number(match[1]) * 2 ** dots}`);
+    }
+    return lengths.join(" ");
+};
+
+/**
+ * Formats text as an ABC annotation. abcjs has no escape for "%" (it always starts a
+ * comment) and reads "\" before the closing quote as escaping it, so both are written as
+ * their fullwidth forms; double quotes are escaped and line breaks become spaces.
+ * @param {string|number} text
+ * @param {string} placement - "^" above the staff, "_" below it.
+ * @returns {string}
+ */
+const abcAnnotation = (text, placement) =>
+    `"${placement}${String(text)
+        .replace(/%/g, "\uFF05")
+        .replace(/\\/g, "\uFF3C")
+        .replace(/"/g, '\\"')
+        .replace(/[\r\n]+/g, " ")}"`;
+
+/**
  * Returns the header string used for the ABC notation output.
  * The ABC header includes metadata for a music composition.
  * @returns {string} The ABC header string.
@@ -140,36 +174,87 @@ const processABCNotes = function (logo, turtle) {
 
     let counter = 0;
     let queueSlur = false;
-    let articulation = false;
+    // Nesting depth of the relative-volume and harmonic blocks around the current note.
+    let articulationDepth = 0;
+    let harmonicsDepth = 0;
+    // Where in parts the most recent note, chord or tuplet starts. Markup is staged right
+    // after its note, but ABC wants an annotation in front of the note, so it goes here.
+    let lastNoteStart = null;
+    // Annotations for the next note: swing, or markup staged before any note.
+    let pendingAnnotations = [];
+    // Where the decorations written since the last note start. A decoration must be
+    // directly followed by its note, so fields staged after one are written before it.
+    let prefixStart = null;
     let notes, note;
+
+    const staging = logo.notation.notationStaging[turtle];
+
+    const __beginNote = () => {
+        lastNoteStart = parts.length;
+        prefixStart = null;
+        parts.push(...pendingAnnotations);
+        pendingAnnotations = [];
+    };
+
+    const __pushPrefix = decoration => {
+        if (prefixStart === null) {
+            prefixStart = parts.length;
+        }
+        parts.push(decoration);
+    };
+
+    // Writes a field ahead of any decorations still waiting for their note. A field on
+    // its own line gets a line break before it unless one is already there; an empty
+    // line would end the tune.
+    const __pushField = (field, ownLine = false) => {
+        const at = prefixStart === null ? parts.length : prefixStart;
+        const written = parts.slice(0, at).join("");
+        const insert =
+            ownLine && written !== "" && !written.endsWith("\n") ? ["\n", field] : [field];
+        parts.splice(at, 0, ...insert);
+        if (prefixStart !== null) {
+            prefixStart += insert.length;
+        }
+    };
+
+    // Decorations for a note, or a whole chord, inside open marker blocks.
+    const __decorations = () =>
+        (articulationDepth > 0 ? "!accent!" : "") + (harmonicsDepth > 0 ? "!open!" : "");
 
     for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
         const obj = logo.notation.notationStaging[turtle][i];
         if (typeof obj === "string") {
             switch (obj) {
                 case "break":
-                    if (i > 0) {
+                    // Only end a line that has something on it; an empty line ends the tune.
+                    if (i > 0 && parts.join("") !== "" && !parts.join("").endsWith("\n")) {
                         parts.push("\n");
                     }
                     counter = 0;
                     break;
                 case "begin articulation":
-                    articulation = true;
+                    articulationDepth++;
                     break;
                 case "end articulation":
-                    articulation = false;
+                    articulationDepth = Math.max(0, articulationDepth - 1);
+                    break;
+                case "begin harmonics":
+                    harmonicsDepth++;
+                    break;
+                case "end harmonics":
+                    harmonicsDepth = Math.max(0, harmonicsDepth - 1);
                     break;
                 case "begin crescendo":
-                    parts.push("!<(!");
+                    __pushPrefix("!<(!");
                     break;
                 case "end crescendo":
-                    parts.push("!<)!");
+                    __pushPrefix("!<)!");
                     break;
                 case "begin decrescendo":
-                    parts.push("!>(!");
+                    __pushPrefix("!>(!");
                     break;
                 case "end decrescendo":
-                    parts.push("!>)!");
+                    __pushPrefix("!>)!");
                     break;
                 case "begin slur":
                     queueSlur = true;
@@ -180,45 +265,80 @@ const processABCNotes = function (logo, turtle) {
                 case "tie":
                     parts.push("");
                     break;
+                // A field changed mid-tune must be inline ("[Q:1/4=90]") or start its own
+                // line; a bare "M:3/4" after a note is not read as a field.
                 case "meter":
-                    parts.push(
-                        "M:" +
-                            logo.notation.notationStaging[turtle][i + 1] +
-                            "/" +
-                            logo.notation.notationStaging[turtle][i + 2] +
-                            "\n"
-                    );
+                    if (Number(staging[i + 1]) > 0 && Number(staging[i + 2]) > 0) {
+                        // On its own line rather than inline: abcjs 6.3.0 throws on an
+                        // inline [M:] right after switching back to a voice on a later line.
+                        __pushField(`M:${staging[i + 1]}/${staging[i + 2]}\n`, true);
+                        // The field already ended the line.
+                        counter = 0;
+                    }
                     i += 2;
                     break;
+                case "tempo": {
+                    const bpm = staging[i + 1];
+                    const lengths = lilypondDurationToAbcLengths(staging[i + 2]);
+                    if (lengths !== null && Number(bpm) > 0) {
+                        __pushField(`[Q:${lengths}=${bpm}]`);
+                    }
+                    i += 2;
+                    break;
+                }
                 case "pickup":
-                    {
-                        // Handle pickup measure
-                        const pickupDuration = logo.notation.notationStaging[turtle][i + 1];
-                        parts.push(`K: pickup=${pickupDuration}\n`);
-                        i += 1;
-                    } // <- made a separate block for this since JS doesn't allow declaration of variables using let or const directly inside a case block
+                    // This exporter writes no bar lines, so there is no first measure for a
+                    // pickup to shorten.
+                    i += 1;
+                    break;
+                case "key":
+                    // Staged pitches are absolute ("F4" is F natural in any key), while an
+                    // ABC key field changes how every later unaccidentalled note sounds, so
+                    // a key change can't be written without changing pitches.
+                    i += 2;
+                    break;
+                case "markup":
+                case "markdown": {
+                    const text = staging[i + 1];
+                    if (text !== undefined) {
+                        const annotation = abcAnnotation(text, obj === "markup" ? "^" : "_");
+                        if (lastNoteStart === null) {
+                            pendingAnnotations.push(annotation);
+                        } else {
+                            parts.splice(lastNoteStart, 0, annotation);
+                            if (prefixStart !== null) {
+                                prefixStart++;
+                            }
+                        }
+                    }
+                    i += 1;
+                    break;
+                }
+                case "swing":
+                    pendingAnnotations.push(abcAnnotation("swing", "^"));
                     break;
                 case "voice one":
-                    parts.push("V:1\n");
+                    __pushField("[V:1]");
                     break;
                 case "voice two":
-                    parts.push("V:2\n");
+                    __pushField("[V:2]");
                     break;
                 case "voice three":
-                    parts.push("V:3\n");
+                    __pushField("[V:3]");
                     break;
                 case "voice four":
-                    parts.push("V:4\n");
+                    __pushField("[V:4]");
                     break;
                 case "one voice":
                     // Return to a single voice
-                    parts.push("V:1\n");
+                    __pushField("[V:1]");
                     break;
                 default:
-                    parts.push(obj);
+                    // A marker with no ABC counterpart. Writing it would put its name into
+                    // the tune as stray characters.
                     break;
             }
-        } else {
+        } else if (Array.isArray(obj)) {
             if (counter % 8 === 0 && counter > 0) {
                 parts.push("\n");
             }
@@ -282,6 +402,7 @@ const processABCNotes = function (logo, turtle) {
                     const tupletNotes = logo.notation.notationStaging[turtle][i + j];
 
                     if (typeof tupletNotes[NOTATIONNOTE] === "object") {
+                        parts.push(__decorations());
                         if (tupletNotes[NOTATIONSTACCATO]) {
                             parts.push(".");
                         }
@@ -311,6 +432,7 @@ const processABCNotes = function (logo, turtle) {
                 const inTuplet = obj[NOTATIONTUPLETVALUE][0];
                 const count = incompleteTuplet === 0 ? inTuplet : incompleteTuplet;
 
+                __beginNote();
                 parts.push(
                     "(" +
                         inTuplet +
@@ -322,6 +444,8 @@ const processABCNotes = function (logo, turtle) {
                 i += Math.max(1, __processTuplet(logo, turtle, i, count)) - 1;
             } else {
                 if (obj[NOTATIONINSIDECHORD] <= 0) {
+                    __beginNote();
+                    parts.push(__decorations());
                     if (obj[NOTATIONSTACCATO]) {
                         parts.push(".");
                     }
@@ -352,6 +476,8 @@ const processABCNotes = function (logo, turtle) {
                             obj[NOTATIONINSIDECHORD]
                     ) {
                         // Open the chord.
+                        __beginNote();
+                        parts.push(__decorations());
                         if (obj[NOTATIONSTACCATO]) {
                             parts.push(".");
                         }
@@ -371,10 +497,6 @@ const processABCNotes = function (logo, turtle) {
                         parts.push("]");
                         parts.push(__convertDuration(obj[NOTATIONDURATION]));
                         for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                            parts.push(" ");
-                        }
-
-                        if (articulation) {
                             parts.push(" ");
                         }
 

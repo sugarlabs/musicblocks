@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global saveMxmlOutput:writable,voiceNum:writable */
+/* global saveMxmlOutput:writable */
 /* exported saveMxmlOutput */
 
 // Indices into a notationStaging entry that this file cares about beyond the note-value
@@ -94,6 +94,14 @@ saveMxmlOutput = logo => {
         );
     };
 
+    const staging =
+        logo && logo.notation && logo.notation.notationStaging ? logo.notation.notationStaging : {};
+    const activeVoices = Object.keys(staging).filter(
+        voice =>
+            Array.isArray(staging[voice]) &&
+            staging[voice].some(entry => Array.isArray(entry) && Array.isArray(entry[0]))
+    );
+
     add("<?xml version='1.0' encoding='UTF-8'?>");
     add(
         '<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">'
@@ -103,278 +111,290 @@ saveMxmlOutput = logo => {
     add("<part-list>");
     indent++;
 
-    Object.keys(logo.notation.notationStaging).forEach(voice => {
-        if (logo.notation.notationStaging[voice].length === 0) return;
-        voiceNum = parseInt(voice, 10) + 1;
-        add(`<score-part id="P${voiceNum}">`);
+    if (activeVoices.length === 0) {
+        add('<score-part id="P1">');
         indent++;
-        add(`<part-name> Voice #${voiceNum} </part-name>`);
+        add("<part-name> Voice #1 </part-name>");
         indent--;
         add("</score-part>");
-    });
+    } else {
+        activeVoices.forEach((voice, index) => {
+            const partNum = index + 1;
+            add(`<score-part id="P${partNum}">`);
+            indent++;
+            add(`<part-name> Voice #${partNum} </part-name>`);
+            indent--;
+            add("</score-part>");
+        });
+    }
     indent--;
     add("</part-list>");
     indent--;
 
-    Object.keys(logo.notation.notationStaging).forEach(voice => {
-        if (logo.notation.notationStaging[voice].length === 0) return;
-        voiceNum = parseInt(voice, 10) + 1;
+    if (activeVoices.length === 0) {
         indent++;
-        add(`<part id="P${voiceNum}">`);
+        add('<part id="P1">');
         indent++;
-
-        const notes = logo.notation.notationStaging[voice];
-        // Scaled once per voice so every tuplet note in it gets an exact <duration>
-        // instead of a rounded one; identical to DIVISIONS_PER_WHOLE_NOTE (32, this
-        // file's long-standing resolution) when the voice has no tuplets at all.
-        const divisionsPerWholeNote = _resolveDivisionsPerWholeNote(notes);
-        const divisionsPerQuarterNote = divisionsPerWholeNote / 4;
-
-        let currMeasure = 1,
-            divisions = divisionsPerWholeNote,
-            beats = 4,
-            beatType = 4;
-        let beatsChanged = false,
-            newDivisions = -1,
-            newBeats = -1,
-            newBeatType = -1;
-        let openedMeasureTag = false,
-            queuedTempo = null,
-            firstMeasure = true;
+        addMeasureAttributes(1, DIVISIONS_PER_WHOLE_NOTE / 4, 4, 4);
         indent++;
-        let divisionsLeft = divisions;
+        add("<barline>");
+        indent++;
+        add("<bar-style>light-heavy</bar-style>");
+        indent--;
+        add("</barline>");
+        indent--;
+        add("</measure>");
+        indent--;
+        add("</part>");
+        indent--;
+    } else {
+        activeVoices.forEach((voice, index) => {
+            const partNum = index + 1;
+            indent++;
+            add(`<part id="P${partNum}">`);
+            indent++;
 
-        for (let i = 0; i < notes.length; i++) {
-            const obj = notes[i];
-            if (["tie", "begin slur", "end slur"].includes(obj) || ignore.includes(obj)) continue;
+            const notes = staging[voice];
+            // Scaled once per voice so every tuplet note in it gets an exact <duration>
+            // instead of a rounded one; identical to DIVISIONS_PER_WHOLE_NOTE (32, this
+            // file's long-standing resolution) when the voice has no tuplets at all.
+            const divisionsPerWholeNote = _resolveDivisionsPerWholeNote(notes);
+            const divisionsPerQuarterNote = divisionsPerWholeNote / 4;
 
-            if (obj === "key") {
-                i += 2;
-                continue;
-            }
+            let currMeasure = 1,
+                divisions = divisionsPerWholeNote,
+                beats = 4,
+                beatType = 4;
+            let beatsChanged = false,
+                newDivisions = -1,
+                newBeats = -1,
+                newBeatType = -1;
+            let openedMeasureTag = false,
+                queuedTempo = null,
+                firstMeasure = true;
+            indent++;
+            let divisionsLeft = divisions;
 
-            if (obj === "begin crescendo") {
-                addDirection("crescendo");
-                continue;
-            }
+            for (let i = 0; i < notes.length; i++) {
+                const obj = notes[i];
+                if (["tie", "begin slur", "end slur"].includes(obj) || ignore.includes(obj))
+                    continue;
 
-            if (obj === "begin decrescendo") {
-                addDirection("diminuendo");
-                continue;
-            }
-
-            if (obj === "end crescendo" || obj === "end decrescendo") {
-                add("<direction>");
-                indent++;
-                add("<direction-type>");
-                indent++;
-                add('<wedge type="stop"/>');
-                indent--;
-                add("</direction-type>");
-                indent--;
-                add("</direction>");
-                continue;
-            }
-
-            if (obj === "tempo") {
-                const bpm = notes[i + 1];
-                const beatMeasure = notes[i + 2];
-                const bpmAdjusted = Math.floor(bpm * (4 / beatMeasure));
-                if (openedMeasureTag) {
-                    add(`<sound tempo="${bpmAdjusted}"/>`);
-                } else {
-                    queuedTempo = `<sound tempo="${bpmAdjusted}"/>`;
-                }
-                i += 2;
-                continue;
-            }
-
-            if (obj === "meter") {
-                newBeats = notes[i + 1];
-                newBeatType = notes[i + 2];
-                newDivisions = newBeats * (1 / newBeatType / (1 / divisionsPerWholeNote));
-                i += 2;
-                beatsChanged = true;
-                continue;
-            }
-
-            let isChordNote = false;
-            for (const p of obj[0]) {
-                // obj[2] is the dot count; 2 - 1/2^dotCount is the same multiplier
-                // durationToNoteValue() (musicutils.js) uses to derive it, so this stays
-                // consistent with how the dot count was assigned in the first place.
-                //
-                // A tuplet note (e.g. from Simple/Advanced Tuplet) doesn't have a
-                // power-of-two note value, so durationToNoteValue() can't express it as
-                // obj[1]/obj[2] and instead returns the sentinel obj[1] = 1, obj[2] = 0,
-                // carrying the note's real shape in obj[MXML_TUPLETVALUE] (an
-                // [oddFactor, powerOfTwoFactor] factoring of its note-value denominator)
-                // and obj[MXML_ROUNDDOWN] (the nearest power-of-two note value). Treating
-                // the sentinel as a real note value previously collapsed every tuplet
-                // note's duration to a full measure (32 divisions) and threw off measure
-                // boundaries for the rest of the voice -- see issue #8559.
-                const tupletRatio = obj[MXML_TUPLETVALUE];
-                let preciseDur, dur, timeModification;
-
-                if (Array.isArray(tupletRatio)) {
-                    const { actualNotes, normalNotes } = _tupletNotesRatio(
-                        tupletRatio,
-                        obj[MXML_ROUNDDOWN]
-                    );
-                    // divisionsPerWholeNote was scaled (see _resolveDivisionsPerWholeNote)
-                    // to be an exact multiple of every tuplet's actualNotes count in this
-                    // voice, so this is already a whole number, not an approximation.
-                    preciseDur =
-                        (divisionsPerWholeNote / obj[MXML_ROUNDDOWN]) * (normalNotes / actualNotes);
-                    // Rounding only guards extreme cases (e.g. a tuplet fine enough that
-                    // divisionsPerWholeNote can't represent it exactly); it's a no-op here.
-                    dur = Math.max(1, Math.round(preciseDur));
-                    timeModification = { actualNotes, normalNotes };
-                } else {
-                    preciseDur = (divisionsPerWholeNote / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
-                    dur = preciseDur;
-                    timeModification = null;
+                if (obj === "key") {
+                    i += 2;
+                    continue;
                 }
 
-                if (divisionsLeft < preciseDur - DIVISIONS_EPSILON && !isChordNote) {
+                if (obj === "begin crescendo") {
+                    addDirection("crescendo");
+                    continue;
+                }
+
+                if (obj === "begin decrescendo") {
+                    addDirection("diminuendo");
+                    continue;
+                }
+
+                if (obj === "end crescendo" || obj === "end decrescendo") {
+                    add("<direction>");
+                    indent++;
+                    add("<direction-type>");
+                    indent++;
+                    add('<wedge type="stop"/>');
+                    indent--;
+                    add("</direction-type>");
+                    indent--;
+                    add("</direction>");
+                    continue;
+                }
+
+                if (obj === "tempo") {
+                    const bpm = notes[i + 1];
+                    const beatMeasure = notes[i + 2];
+                    const bpmAdjusted = Math.floor(bpm * (4 / beatMeasure));
                     if (openedMeasureTag) {
-                        add("</measure>");
-                        currMeasure++;
-                        divisionsLeft = divisions;
-                        openedMeasureTag = false;
+                        add(`<sound tempo="${bpmAdjusted}"/>`);
+                    } else {
+                        queuedTempo = `<sound tempo="${bpmAdjusted}"/>`;
                     }
+                    i += 2;
+                    continue;
                 }
 
-                if (!isChordNote) {
-                    if (divisionsLeft === divisions) {
-                        if (firstMeasure) {
-                            if (beatsChanged) {
+                if (obj === "meter") {
+                    newBeats = notes[i + 1];
+                    newBeatType = notes[i + 2];
+                    newDivisions = newBeats * (1 / newBeatType / (1 / divisionsPerWholeNote));
+                    i += 2;
+                    beatsChanged = true;
+                    continue;
+                }
+
+                let isChordNote = false;
+                for (const p of obj[0]) {
+                    // obj[2] is the dot count; 2 - 1/2^dotCount is the same multiplier
+                    // durationToNoteValue() (musicutils.js) uses to derive it, so this stays
+                    // consistent with how the dot count was assigned in the first place.
+                    //
+                    // A tuplet note (e.g. from Simple/Advanced Tuplet) doesn't have a
+                    // power-of-two note value, so durationToNoteValue() can't express it as
+                    // obj[1]/obj[2] and instead returns the sentinel obj[1] = 1, obj[2] = 0,
+                    // carrying the note's real shape in obj[MXML_TUPLETVALUE] (an
+                    // [oddFactor, powerOfTwoFactor] factoring of its note-value denominator)
+                    // and obj[MXML_ROUNDDOWN] (the nearest power-of-two note value). Treating
+                    // the sentinel as a real note value previously collapsed every tuplet
+                    // note's duration to a full measure (32 divisions) and threw off measure
+                    // boundaries for the rest of the voice -- see issue #8559.
+                    const tupletRatio = obj[MXML_TUPLETVALUE];
+                    let preciseDur, dur, timeModification;
+
+                    if (Array.isArray(tupletRatio)) {
+                        const { actualNotes, normalNotes } = _tupletNotesRatio(
+                            tupletRatio,
+                            obj[MXML_ROUNDDOWN]
+                        );
+                        // divisionsPerWholeNote was scaled (see _resolveDivisionsPerWholeNote)
+                        // to be an exact multiple of every tuplet's actualNotes count in this
+                        // voice, so this is already a whole number, not an approximation.
+                        preciseDur =
+                            (divisionsPerWholeNote / obj[MXML_ROUNDDOWN]) *
+                            (normalNotes / actualNotes);
+                        // Rounding only guards extreme cases (e.g. a tuplet fine enough that
+                        // divisionsPerWholeNote can't represent it exactly); it's a no-op here.
+                        dur = Math.max(1, Math.round(preciseDur));
+                        timeModification = { actualNotes, normalNotes };
+                    } else {
+                        preciseDur =
+                            (divisionsPerWholeNote / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
+                        dur = preciseDur;
+                        timeModification = null;
+                    }
+
+                    if (divisionsLeft < preciseDur - DIVISIONS_EPSILON && !isChordNote) {
+                        if (openedMeasureTag) {
+                            add("</measure>");
+                            currMeasure++;
+                            divisionsLeft = divisions;
+                            openedMeasureTag = false;
+                        }
+                    }
+
+                    if (!isChordNote) {
+                        if (divisionsLeft === divisions) {
+                            if (firstMeasure) {
+                                if (beatsChanged) {
+                                    beats = newBeats;
+                                    beatType = newBeatType;
+                                    divisions = newDivisions;
+                                    divisionsLeft = divisions;
+                                    beatsChanged = false;
+                                }
+                                addMeasureAttributes(
+                                    currMeasure,
+                                    divisionsPerQuarterNote,
+                                    beats,
+                                    beatType
+                                );
+                                firstMeasure = false;
+                            } else if (beatsChanged) {
                                 beats = newBeats;
                                 beatType = newBeatType;
                                 divisions = newDivisions;
                                 divisionsLeft = divisions;
+                                addMeasureAttributes(
+                                    currMeasure,
+                                    divisionsPerQuarterNote,
+                                    beats,
+                                    beatType
+                                );
                                 beatsChanged = false;
+                            } else {
+                                add(`<measure number="${currMeasure}">`);
                             }
-                            addMeasureAttributes(
-                                currMeasure,
-                                divisionsPerQuarterNote,
-                                beats,
-                                beatType
-                            );
-                            firstMeasure = false;
-                        } else if (beatsChanged) {
-                            beats = newBeats;
-                            beatType = newBeatType;
-                            divisions = newDivisions;
-                            divisionsLeft = divisions;
-                            addMeasureAttributes(
-                                currMeasure,
-                                divisionsPerQuarterNote,
-                                beats,
-                                beatType
-                            );
-                            beatsChanged = false;
-                        } else {
-                            add(`<measure number="${currMeasure}">`);
+                            openedMeasureTag = true;
+                            if (queuedTempo !== null) {
+                                add(queuedTempo);
+                                queuedTempo = null;
+                            }
                         }
-                        openedMeasureTag = true;
-                        if (queuedTempo !== null) {
-                            add(queuedTempo);
-                            queuedTempo = null;
-                        }
+                        divisionsLeft -= preciseDur;
                     }
-                    divisionsLeft -= preciseDur;
-                }
 
-                const alter = p[1] === "\u266d" ? -1 : p[1] === "\u266F" ? 1 : 0;
+                    const alter = p[1] === "\u266d" ? -1 : p[1] === "\u266F" ? 1 : 0;
 
-                add("<note>");
-                indent++;
-                if (isChordNote) add("<chord/>");
-
-                if (p[0] === "R") {
-                    add("<rest/>");
-                } else {
-                    add("<pitch>");
+                    add("<note>");
                     indent++;
-                    add(`<step>${p[0]}</step>`);
-                    if (alter !== 0) add(`<alter>${alter}</alter>`);
-                    add(`<octave>${p[p.length - 1]}</octave>`);
-                    indent--;
-                    add("</pitch>");
-                }
+                    if (isChordNote) add("<chord/>");
 
-                add(`<duration>${dur}</duration>`);
-                if (notes[i + 1] === "tie") {
-                    add('<tie type="start"/>');
-                } else if (notes[i - 1] === "tie") {
-                    add('<tie type="stop"/>');
-                }
-                if (timeModification) {
-                    add("<time-modification>");
-                    indent++;
-                    add(`<actual-notes>${timeModification.actualNotes}</actual-notes>`);
-                    add(`<normal-notes>${timeModification.normalNotes}</normal-notes>`);
-                    indent--;
-                    add("</time-modification>");
-                }
-                indent--;
+                    if (p[0] === "R") {
+                        add("<rest/>");
+                    } else {
+                        add("<pitch>");
+                        indent++;
+                        add(`<step>${p[0]}</step>`);
+                        if (alter !== 0) add(`<alter>${alter}</alter>`);
+                        add(`<octave>${p[p.length - 1]}</octave>`);
+                        indent--;
+                        add("</pitch>");
+                    }
 
-                add("<notations>");
-                indent++;
-                add("<articulations>");
-                indent++;
-                if (obj[6]) add('<staccato placement="below"/>');
-                indent--;
-                add("</articulations>");
-                indent--;
-                if (notes[i - 1] === "begin slur") {
-                    indent++;
-                    add('<slur type="start"/>');
+                    add(`<duration>${dur}</duration>`);
+                    if (notes[i + 1] === "tie") {
+                        add('<tie type="start"/>');
+                    } else if (notes[i - 1] === "tie") {
+                        add('<tie type="stop"/>');
+                    }
+                    if (timeModification) {
+                        add("<time-modification>");
+                        indent++;
+                        add(`<actual-notes>${timeModification.actualNotes}</actual-notes>`);
+                        add(`<normal-notes>${timeModification.normalNotes}</normal-notes>`);
+                        indent--;
+                        add("</time-modification>");
+                    }
                     indent--;
-                }
-                if (notes[i + 1] === "end slur") {
+
+                    add("<notations>");
                     indent++;
-                    add('<slur type="stop"/>');
+                    add("<articulations>");
+                    indent++;
+                    if (obj[6]) add('<staccato placement="below"/>');
                     indent--;
+                    add("</articulations>");
+                    indent--;
+                    if (notes[i - 1] === "begin slur") {
+                        indent++;
+                        add('<slur type="start"/>');
+                        indent--;
+                    }
+                    if (notes[i + 1] === "end slur") {
+                        indent++;
+                        add('<slur type="stop"/>');
+                        indent--;
+                    }
+                    add("</notations>");
+                    add("</note>");
+                    isChordNote = true;
                 }
-                add("</notations>");
-                add("</note>");
-                isChordNote = true;
             }
-        }
 
-        indent--;
-        if (openedMeasureTag) {
-            indent++;
-            add("<barline>");
-            indent++;
-            add("<bar-style>light-heavy</bar-style>");
             indent--;
-            add("</barline>");
+            if (openedMeasureTag) {
+                indent++;
+                add("<barline>");
+                indent++;
+                add("<bar-style>light-heavy</bar-style>");
+                indent--;
+                add("</barline>");
+                indent--;
+                add("</measure>");
+            }
             indent--;
-            add("</measure>");
-        }
-        indent--;
-        add("</part>");
-        indent--;
-    });
+            add("</part>");
+            indent--;
+        });
+    }
     add("</score-partwise>");
-
-    let mi = 1e5;
-    for (let i = 0; i < res.length - 1; i++) {
-        if ((res[i] === "P" || res[i] === "#") && "123456789".includes(res[i + 1])) {
-            mi = Math.min(mi, parseInt(res[i + 1], 10));
-        }
-    }
-
-    res = res.split("");
-    for (let i = 0; i < res.length - 1; i++) {
-        if ((res[i] === "P" || res[i] === "#") && "123456789".includes(res[i + 1])) {
-            res[i + 1] = parseInt(res[i + 1], 10) - mi + 1;
-        }
-    }
-    res = res.join("");
 
     return res;
 };

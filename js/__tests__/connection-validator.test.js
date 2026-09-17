@@ -65,6 +65,38 @@ describe("ConnectionValidator.testConnectionType — returns false for unsupport
     });
 });
 
+describe("ConnectionValidator.testConnectionType — boolean docks bridge to anyin/anyout (#8463)", () => {
+    // These are hardcoded rather than derived from ALLOWED_CONNECTIONS itself,
+    // unlike the tests above: a derived assertion would trivially keep
+    // passing even if these specific pairs were removed again, since it only
+    // ever checks whatever happens to be in the set. Every other dock family
+    // (number, text, media, file, solfege, scaledegree, note) already bridges
+    // to anyin/anyout in both directions; boolean is a value type like any of
+    // those and should be no different, so a Boolean block can be docked into
+    // a generic "any" socket (e.g. Switch/Case) and a generic "any" value can
+    // be docked into a booleanin socket (e.g. a namedbox into If/While).
+    it("allows a booleanout block to dock into an anyin socket", () => {
+        expect(ConnectionValidator.testConnectionType("booleanout", "anyin")).toBe(true);
+        expect(ConnectionValidator.testConnectionType("anyin", "booleanout")).toBe(true);
+    });
+
+    it("allows an anyout block to dock into a booleanin socket", () => {
+        expect(ConnectionValidator.testConnectionType("anyout", "booleanin")).toBe(true);
+        expect(ConnectionValidator.testConnectionType("booleanin", "anyout")).toBe(true);
+    });
+
+    it("still allows booleanout to dock directly into booleanin", () => {
+        expect(ConnectionValidator.testConnectionType("booleanout", "booleanin")).toBe(true);
+        expect(ConnectionValidator.testConnectionType("booleanin", "booleanout")).toBe(true);
+    });
+
+    it("does not let boolean docks bridge into unrelated in/out types", () => {
+        expect(ConnectionValidator.testConnectionType("booleanout", "numberin")).toBe(false);
+        expect(ConnectionValidator.testConnectionType("booleanin", "numberout")).toBe(false);
+        expect(ConnectionValidator.testConnectionType("booleanout", "textin")).toBe(false);
+    });
+});
+
 describe("ConnectionValidator.testConnectionType — edge cases", () => {
     it("is case-sensitive", () => {
         const [type1, type2] = ALLOWED_PAIRS[0];
