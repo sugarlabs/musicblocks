@@ -13,12 +13,10 @@
 /* global
 
     docById, _, platformColor, keySignatureToMode, MUSICALMODES,
-    createSclSharePopup, downloadScl, getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
+    getNote, DEFAULTVOICE, last, NOTESTABLE, wheelnav,
     normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
     getSavedCustomModes, configureWheel, parseSclFile, parseModeJson,
-    readSclFile,
-    modeToJson, importFileKind,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
     EDO_MIN, EDO_MAX
  */
@@ -181,7 +179,7 @@ class ModeWidget {
 
         const shareBtn = this.widgetWindow.addButton("share.svg", ModeWidget.ICONSIZE, _("Share"));
         shareBtn.onclick = () => {
-            createSclSharePopup(
+            this._createSclSharePopup(
                 shareBtn,
                 () => this._exportScl(),
                 () => this._exportJson(),
@@ -1368,6 +1366,118 @@ class ModeWidget {
         return [name, octave + 4];
     }
 
+    _createSclSharePopup(anchor, onExport, onExportJson, onImport) {
+        const existing = document.getElementById("sclSharePopup");
+        if (existing) {
+            if (existing._closeHandler) {
+                document.removeEventListener("mousedown", existing._closeHandler);
+            }
+            existing.remove();
+            return;
+        }
+
+        const popup = document.createElement("div");
+        popup.id = "sclSharePopup";
+        popup.style.cssText =
+            "position:fixed;z-index:99999;background:var(--color-bg-primary);" +
+            "color:var(--color-text-primary);border:1px solid var(--color-border-primary);" +
+            "border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:4px 0;" +
+            "min-width:140px;";
+        const rect = anchor.getBoundingClientRect();
+        popup.style.top = rect.bottom + 4 + "px";
+        popup.style.left = rect.left + "px";
+
+        const addItem = (label, handler) => {
+            const item = document.createElement("div");
+            item.textContent = label;
+            item.setAttribute("role", "button");
+            item.setAttribute("tabindex", "0");
+            item.style.cssText = "padding:6px 16px;cursor:pointer;";
+            item.onmouseenter = () => {
+                item.style.background = "var(--color-bg-tertiary)";
+            };
+            item.onmouseleave = () => {
+                item.style.background = "";
+            };
+            item.onclick = () => {
+                cleanup();
+                handler();
+            };
+            item.onkeydown = e => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    cleanup();
+                    handler();
+                }
+            };
+            return item;
+        };
+
+        popup.appendChild(addItem(_("Export .scl"), onExport));
+        popup.appendChild(addItem(_("Export JSON"), onExportJson));
+        popup.appendChild(addItem(_("Import"), onImport));
+        document.body.appendChild(popup);
+
+        const cleanup = () => {
+            popup.remove();
+            document.removeEventListener("mousedown", closeHandler);
+        };
+
+        const closeHandler = e => {
+            if (!popup.contains(e.target)) {
+                cleanup();
+            }
+        };
+        popup._closeHandler = closeHandler;
+        setTimeout(() => {
+            document.addEventListener("mousedown", closeHandler);
+        }, 0);
+    }
+
+    _downloadScl(content, filename) {
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    _readSclFile(inputId, callback) {
+        const fileInput = docById(inputId);
+        if (!fileInput) {
+            callback(new Error(_("File input not found.")));
+            return;
+        }
+
+        fileInput.value = "";
+        fileInput.onchange = function () {
+            const file = fileInput.files[0];
+            if (!file) {
+                return;
+            }
+
+            const MAX_IMPORT_SIZE = 1024 * 1024;
+            if (file.size > MAX_IMPORT_SIZE) {
+                callback(new Error(_("File too large. Maximum is 1 MB.")));
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                callback(null, { text: e.target.result, file });
+            };
+            reader.onerror = function () {
+                callback(new Error(_("Failed to read file.")));
+            };
+            reader.readAsText(file);
+        };
+        fileInput.click();
+    }
+
     _findEdoPattern(pitches) {
         for (let edo = EDO_MIN; edo <= EDO_MAX; edo++) {
             const step = 1200 / edo;
@@ -1422,7 +1532,7 @@ class ModeWidget {
         }
 
         const content = lines.join("\n") + "\n";
-        downloadScl(content, "mode-" + edo + "edo.scl");
+        this._downloadScl(content, "mode-" + edo + "edo.scl");
     }
 
     _exportJson() {
@@ -1430,12 +1540,16 @@ class ModeWidget {
         if (!data) return;
         const { pattern, edo } = data;
 
-        const content = modeToJson(this._selectedModeName || "custom", edo, pattern);
-        downloadScl(content, "mode-" + edo + "edo.json");
+        const content = JSON.stringify(
+            { name: this._selectedModeName || "custom", edo, pattern },
+            null,
+            2
+        );
+        this._downloadScl(content, "mode-" + edo + "edo.json");
     }
 
     _importFile() {
-        readSclFile("myModeSclFile", (err, data) => {
+        this._readSclFile("myModeSclFile", (err, data) => {
             if (err) {
                 this.errorMsg(err.message);
                 return;
@@ -1449,7 +1563,12 @@ class ModeWidget {
             let name = "";
             let saved = false;
 
-            const kind = importFileKind(data.file.name);
+            const kind = (() => {
+                const name = (data.file.name || "").toLowerCase();
+                if (name.endsWith(".json")) return "json";
+                if (name.endsWith(".scl")) return "scl";
+                return "";
+            })();
             if (kind === "json") {
                 let def;
                 try {
