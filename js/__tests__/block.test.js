@@ -1239,4 +1239,32 @@ describe("Block Foundation", () => {
             expect(block.container).toBeNull();
         });
     });
+
+    describe("value setter undo/redo tracking", () => {
+        it("records value_change in actionHistory when value changes after initialization", async () => {
+            const mockBlocksObj = {
+                ...mockBlocks,
+                actionHistory: [],
+                redoActionHistory: [{ type: "move", blockId: 0 }],
+                isUndoingOrRedoing: false
+            };
+            const block = new Block(mockProtoBlock, mockBlocksObj);
+            block.blockIndex = 2;
+            block.text = { text: "initial" };
+            block.valueInitialized = true;
+            block.loadComplete = true;
+
+            block.value = "updated";
+            block.text.text = "updated";
+
+            expect(mockBlocksObj.actionHistory.length).toBe(1);
+            expect(mockBlocksObj.actionHistory[0].type).toBe("value_change");
+            expect(mockBlocksObj.actionHistory[0].blockId).toBe(2);
+            expect(mockBlocksObj.actionHistory[0].newValue).toBe("updated");
+            expect(mockBlocksObj.redoActionHistory).toEqual([]);
+
+            await Promise.resolve();
+            expect(mockBlocksObj.actionHistory[0].newText).toBe("updated");
+        });
+    });
 });
