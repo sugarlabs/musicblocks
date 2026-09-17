@@ -812,6 +812,63 @@ describe("TemperamentWidget basic tests", () => {
         expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
     });
 
+    test("_save invalidates a frequency already cached under the redefined temperament's name", () => {
+        // Exercises the real cache (Singer.getCachedPitchToFrequency /
+        // clearPitchToFrequencyCache) instead of a mocked
+        // clearPitchToFrequencyCache, so this fails the way the original bug
+        // actually manifested: a note kept playing at the pre-edit tuning
+        // after a custom temperament was redefined under the same name.
+        const RealSinger = require("../../turtle-singer");
+        global.Singer.clearPitchToFrequencyCache = RealSinger.clearPitchToFrequencyCache;
+        RealSinger.clearPitchToFrequencyCache();
+
+        global.setOctaveRatio = jest.fn();
+        global.rationalToFraction = jest.fn(() => [1, 1]);
+        global.getOctaveRatio = jest.fn(() => 2);
+        global.isCustomTemperament = jest.fn(() => true);
+        global.deleteTemperamentFromList = jest.fn();
+        global.addTemperamentToDictionary = jest.fn();
+        global.updateTemperaments = jest.fn();
+
+        // Play a note under the temperament's original tuning; this caches
+        // its frequency under a key keyed on the temperament's name.
+        global.pitchToFrequency = jest.fn(() => 440);
+        const beforeEdit = RealSinger.getCachedPitchToFrequency("C", 4, 0, null, "custom1");
+        expect(beforeEdit).toBe(440);
+
+        widget.inTemperament = "custom1";
+        widget.ratios = [1, 2];
+        widget.pitchNumber = 2;
+        widget.powerBase = 2;
+
+        widget._logo = {
+            synth: {
+                stop: jest.fn(),
+                startingPitch: "C4"
+            },
+            customTemperamentDefined: false
+        };
+
+        widget.activity = {
+            blocks: {
+                loadNewBlocks: jest.fn(),
+                findUniqueTemperamentName: jest.fn(() => "custom1"),
+                protoBlockDict: { custompitch: { hidden: true } },
+                palettes: { updatePalettes: jest.fn() }
+            }
+        };
+
+        // Redefine "custom1" with a different tuning, then save under the
+        // same name.
+        global.pitchToFrequency = jest.fn(() => 466.16);
+        widget._save();
+
+        // The same pitch, under the same temperament name, must now recompute
+        // rather than return the frequency cached before the edit.
+        const afterEdit = RealSinger.getCachedPitchToFrequency("C", 4, 0, null, "custom1");
+        expect(afterEdit).toBe(466.16);
+    });
+
     test("init sets up widget correctly", () => {
         const mockWidgetWindow = {
             clear: jest.fn(),

@@ -2784,6 +2784,10 @@ class Singer {
     }
 }
 
+// Exposed for tests that need to exercise the real cache alongside
+// clearPitchToFrequencyCache(), rather than mocking the class methods.
+Singer.getCachedPitchToFrequency = getCachedPitchToFrequency;
+
 // Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Singer;
