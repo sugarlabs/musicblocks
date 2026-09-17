@@ -7735,7 +7735,7 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament
             return changedCurrent;
         case _("next"):
         case "next":
-            return Math.min(changedCurrent + 1, 10);
+            return Math.min(changedCurrent + 1, 9);
         case _("previous"):
         case "previous":
             return Math.max(changedCurrent - 1, 1);
