@@ -15,20 +15,10 @@ describe("Project persistence", () => {
     const waitForPiFullyLoaded = () => {
         let stableObservations = 0;
         cy.window({ timeout: 60000 }).should(win => {
-            let activity = null;
-            try {
-                activity = win.ActivityContext ? win.ActivityContext.getActivity() : null;
-            } catch (e) {
-                activity = null;
-            }
-            const blocks = activity?.blocks;
-            const nonTrash = blocks?.blockList
-                ? blocks.blockList.filter(block => !block.trash)
-                : [];
+            const { blocks } = win.ActivityContext.getActivity();
+            const nonTrash = blocks.blockList.filter(block => !block.trash);
             const fullyLoaded =
-                blocks &&
-                blocks._loadCounter === 0 &&
-                nonTrash.some(block => block.name === "loadFile");
+                blocks._loadCounter === 0 && nonTrash.some(block => block.name === "loadFile");
             stableObservations = fullyLoaded ? stableObservations + 1 : 0;
             expect(
                 stableObservations,
@@ -44,13 +34,7 @@ describe("Project persistence", () => {
     // out avoids a false mismatch between a fresh load (which may land on a turtle
     // index left over from an earlier default project) and a clean session restore.
     const captureBlockState = win => {
-        let activity = null;
-        try {
-            activity = win.ActivityContext ? win.ActivityContext.getActivity() : null;
-        } catch (e) {
-            activity = null;
-        }
-        const blockList = activity?.blocks?.blockList || [];
+        const { blockList } = win.ActivityContext.getActivity().blocks;
         return blockList
             .filter(block => !block.trash)
             .map(block => ({
