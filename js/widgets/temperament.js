@@ -1921,9 +1921,12 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this._save = function () {
-        this.notes = [];
-
         if (isCustomTemperament(this.inTemperament)) {
+            // Only a custom temperament rebuilds this.notes below. Clearing it
+            // for the other temperaments would leave the table of notes with
+            // nothing to read, so it is reset inside this branch alone.
+            this.notes = [];
+
             const startingPitch = this._logo.synth.startingPitch;
             const startPitchParsed = parseNoteString(startingPitch);
             const startPitch = pitchToFrequency(
