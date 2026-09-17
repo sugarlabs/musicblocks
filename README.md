@@ -122,6 +122,8 @@ listening on port 3000.
 **NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
 `socket.error:[Errno 48]`_.
 
+For Turtle Blocks, use `localhost:3000?turtle=true` or `http:127.0.0.1:3000?turtle=true`.
+
 ### Local Setup with Docker
 
 #### Prerequisites
