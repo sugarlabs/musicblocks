@@ -971,7 +971,7 @@ function setupWidgetBlocks(activity) {
                 [8, "pitch", 0, 0, [7, 9, 10, null]],
                 [9, ["solfege", { value: "do" }], 0, 0, [8]],
                 [10, ["number", { value: 4 }], 0, 0, [8]],
-		[11, "hidden", 0, 0, [3, null]]
+                [11, "hidden", 0, 0, [3, null]]
             ]);
         }
 
