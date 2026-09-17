@@ -345,6 +345,9 @@ const processABCNotes = function (logo, turtle) {
             counter += 1;
 
             notes = typeof obj[NOTATIONNOTE] === "string" ? [obj[NOTATIONNOTE]] : obj[NOTATIONNOTE];
+            if (notes.length === 0) {
+                notes = ["R"];
+            }
             note = __toABCnote(notes[0]);
 
             let incompleteTuplet = 0; // An incomplete tuplet

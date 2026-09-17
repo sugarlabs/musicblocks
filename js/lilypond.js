@@ -406,7 +406,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             if (typeof obj[NOTATIONNOTE] === "string") {
                 note = __toLilynote(obj[NOTATIONNOTE]);
             } else {
-                notes = obj[NOTATIONNOTE];
+                notes = obj[NOTATIONNOTE].length > 0 ? obj[NOTATIONNOTE] : ["R"];
                 note = __toLilynote(notes[0]);
             }
 

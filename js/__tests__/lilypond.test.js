@@ -261,6 +261,12 @@ describe("processLilypondNotes", () => {
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\staccato ");
     });
+
+    test("should write a note with no pitches as a rest", () => {
+        logo.notation.notationStaging[turtle] = [[[], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("r4 ");
+    });
     test("should process custom key modes (freygish) correctly", () => {
         getScaleAndHalfSteps.mockReturnValueOnce([
             ["C", "D", "E", "F", "G", "A", "B"],
