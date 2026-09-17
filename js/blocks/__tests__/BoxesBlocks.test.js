@@ -197,6 +197,7 @@ describe("setupBoxesBlocks", () => {
             activity.blocks.blockSetter = jest.fn();
             expect(() => incrementBlock.flow([10, 2], logo, "turtle0", blkId)).not.toThrow();
             expect(activity.blocks.blockSetter).not.toHaveBeenCalled();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
         });
     });
 
