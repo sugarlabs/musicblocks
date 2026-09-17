@@ -523,6 +523,9 @@ saveMxmlOutput = logo => {
 
                     add("<notations>");
                     indent++;
+                    // <tie> only sets playback; notation programs draw the tie from <tied>.
+                    if (tieStop) add('<tied type="stop"/>');
+                    if (tieStart) add('<tied type="start"/>');
                     add("<articulations>");
                     indent++;
                     if (articulationDepth > 0) add("<accent/>");

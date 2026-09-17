@@ -878,6 +878,33 @@ describe("saveMxmlOutput notation markers", () => {
             ]);
         });
 
+        it("draws each tie with <tied> in <notations> as well as sounding it with <tie>", () => {
+            // <tie> only affects playback; notation programs draw the tie from <tied>.
+            const doc = parseScore(exportVoice([note("C4"), "tie", note("C4"), "tie", note("C4")]));
+            const typesOf = (n, tag) =>
+                Array.from(n.getElementsByTagName(tag)).map(el => el.getAttribute("type"));
+
+            expect(notesOf(doc).map(n => typesOf(n, "tie"))).toEqual([
+                ["start"],
+                ["stop", "start"],
+                ["stop"]
+            ]);
+            expect(notesOf(doc).map(n => typesOf(n, "tied"))).toEqual([
+                ["start"],
+                ["stop", "start"],
+                ["stop"]
+            ]);
+            for (const tied of doc.getElementsByTagName("tied")) {
+                expect(tied.parentNode.tagName).toBe("notations");
+            }
+        });
+
+        it("writes no <tied> for notes that aren't tied", () => {
+            const doc = parseScore(exportVoice([note("C4"), note("C4"), "begin slur", note("D4")]));
+
+            expect(doc.getElementsByTagName("tied")).toHaveLength(0);
+        });
+
         it("does not mistake a marker's argument for a tie or slur", () => {
             const doc = parseScore(
                 exportVoice([note("C4"), "markdown", "tie", note("D4"), "markdown", "end slur"])
