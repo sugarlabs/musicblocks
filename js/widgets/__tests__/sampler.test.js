@@ -116,7 +116,10 @@ describe("SampleWidget.dependencies", () => {
 });
 
 describe("Sampler Widget", () => {
+    let originalFetch;
+
     beforeAll(() => {
+        originalFetch = global.fetch;
         if (!HTMLCanvasElement.prototype.getContext) {
             HTMLCanvasElement.prototype.getContext = jest.fn();
         }
@@ -147,6 +150,12 @@ describe("Sampler Widget", () => {
             <div id="wheelDivptm"></div>
             <input id="myOpenAll" type="file" />
         `;
+    });
+
+    afterEach(() => {
+        global.fetch = originalFetch;
+        delete window.AI_SAMPLE_ENDPOINT;
+        jest.useRealTimers();
     });
 
     describe("PitchSmoother", () => {
