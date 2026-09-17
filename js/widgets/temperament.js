@@ -22,8 +22,8 @@
    _, addTemperamentToDictionary, buildScale,
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
-   isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
+   isCustomTemperament, last, ManagedTimer, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
+   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, SHARP, Singer,
    slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber
  */
 
@@ -73,6 +73,87 @@ function TemperamentWidget() {
      */
     this.inTemperament = null;
     this._playTimeout = null;
+
+    /**
+     * Timer manager for managing all widget timeouts safely.
+     * @type {ManagedTimer|null}
+     * @private
+     */
+    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+    /**
+     * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeTimeouts = new Set();
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    this._setWidgetTimeout = function (callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    };
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    this._clearWidgetTimeout = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers cleared.
+     */
+    this._clearWidgetTimers = function () {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+        this._playTimeout = null;
+
+        return count;
+    };
 
     /**
      * Last triggered event.
@@ -2167,7 +2248,7 @@ function TemperamentWidget() {
         }
 
         const that = this;
-        setTimeout(() => {
+        this._setWidgetTimeout(() => {
             that.activity.blocks.loadNewBlocks(newStack);
             that.activity.textMsg(_("New action block generated."), 3000);
         }, 500);
@@ -2284,11 +2365,15 @@ function TemperamentWidget() {
 
         const cell = this.playButton;
         if (this._playing) {
+            if (this._playTimeout) {
+                this._clearWidgetTimeout(this._playTimeout);
+                this._playTimeout = null;
+            }
             this._logo.synth.setMasterVolume(PREVIEWVOLUME);
             setPlayButtonIcon(cell, "stop-button.svg", _("Stop"));
         } else {
             if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
+                this._clearWidgetTimeout(this._playTimeout);
                 this._playTimeout = null;
             }
             this._logo.synth.setMasterVolume(0);
@@ -2455,7 +2540,7 @@ function TemperamentWidget() {
             }
 
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
-                that._playTimeout = setTimeout(
+                that._playTimeout = that._setWidgetTimeout(
                     function () {
                         __playLoop(i);
                     },
@@ -2469,7 +2554,7 @@ function TemperamentWidget() {
                 that._playing = false;
                 that.playbackForward = true;
                 that.inbetween = false;
-                that._playTimeout = setTimeout(
+                that._playTimeout = that._setWidgetTimeout(
                     function () {
                         if (pitchNumber > 1 && that.notesCircle && that.notesCircle.navItems) {
                             setNavItemColor(
@@ -2532,10 +2617,7 @@ function TemperamentWidget() {
         const that = this;
 
         widgetWindow.onclose = function () {
-            if (that._playTimeout) {
-                clearTimeout(that._playTimeout);
-                that._playTimeout = null;
-            }
+            that._clearWidgetTimers();
             that._playing = false;
             that._logo.synth.stop();
             that._logo.synth.setMasterVolume(last(Singer.masterVolume));

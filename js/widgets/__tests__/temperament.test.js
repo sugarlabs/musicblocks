@@ -1,3 +1,5 @@
+const ManagedTimer = require("../../utils/ManagedTimer.js");
+global.ManagedTimer = ManagedTimer;
 const TemperamentWidget = require("../temperament");
 describe("TemperamentWidget basic tests", () => {
     let widget;
@@ -1862,6 +1864,138 @@ describe("TemperamentWidget basic tests", () => {
             expect(mockEditBtn1.removeEventListener).toHaveBeenCalledWith("click", handler3);
             expect(widget._editBtn).toBeNull();
             expect(widget._editClickHandler).toBeNull();
+        });
+    });
+
+    describe("timer fallback without ManagedTimer", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            widget = new TemperamentWidget();
+            widget._timerManager = null;
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("_setWidgetTimeout tracks the timeout and runs the callback, then stops tracking it", () => {
+            const callback = jest.fn();
+
+            const id = widget._setWidgetTimeout(callback, 500);
+            expect(widget._activeTimeouts.has(id)).toBe(true);
+
+            jest.advanceTimersByTime(500);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(widget._activeTimeouts.has(id)).toBe(false);
+        });
+
+        test("_clearWidgetTimeout returns false for null, undefined, or untracked ids", () => {
+            expect(widget._clearWidgetTimeout(null)).toBe(false);
+            expect(widget._clearWidgetTimeout(undefined)).toBe(false);
+            expect(widget._clearWidgetTimeout(999999)).toBe(false);
+        });
+
+        test("_clearWidgetTimeout cancels a tracked timeout before it fires", () => {
+            const callback = jest.fn();
+            const id = widget._setWidgetTimeout(callback, 500);
+
+            expect(widget._clearWidgetTimeout(id)).toBe(true);
+            expect(widget._activeTimeouts.has(id)).toBe(false);
+
+            jest.advanceTimersByTime(500);
+            expect(callback).not.toHaveBeenCalled();
+        });
+
+        test("_clearWidgetTimers cancels tracked timeouts, resets _playTimeout, and returns count", () => {
+            widget._setWidgetTimeout(jest.fn(), 500);
+            widget._setWidgetTimeout(jest.fn(), 700);
+            widget._playTimeout = 123;
+
+            const count = widget._clearWidgetTimers();
+
+            expect(count).toBe(2);
+            expect(widget._activeTimeouts.size).toBe(0);
+            expect(widget._playTimeout).toBeNull();
+        });
+    });
+
+    describe("timer delegation to ManagedTimer", () => {
+        beforeEach(() => {
+            widget = new TemperamentWidget();
+        });
+
+        test("initializes with ManagedTimer when available", () => {
+            expect(widget._timerManager).toBeInstanceOf(ManagedTimer);
+        });
+
+        test("_setWidgetTimeout delegates to the timer manager", () => {
+            const callback = jest.fn();
+            widget._timerManager = {
+                setTimeout: jest.fn().mockReturnValue(42),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(widget._setWidgetTimeout(callback, 500)).toBe(42);
+            expect(widget._timerManager.setTimeout).toHaveBeenCalledWith(callback, 500);
+        });
+
+        test("_clearWidgetTimeout delegates to the timer manager", () => {
+            widget._timerManager = {
+                clearTimeout: jest.fn().mockReturnValue(true),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(widget._clearWidgetTimeout(5)).toBe(true);
+            expect(widget._timerManager.clearTimeout).toHaveBeenCalledWith(5);
+        });
+
+        test("_clearWidgetTimers delegates to the timer manager clearAll and resets _playTimeout", () => {
+            widget._timerManager = {
+                clearAll: jest.fn().mockReturnValue(3)
+            };
+            widget._playTimeout = 55;
+
+            const count = widget._clearWidgetTimers();
+
+            expect(widget._timerManager.clearAll).toHaveBeenCalledTimes(1);
+            expect(count).toBe(3);
+            expect(widget._playTimeout).toBeNull();
+        });
+
+        test("playAll clears previous _playTimeout on restart to prevent overlapping loops", () => {
+            widget._logo = {
+                synth: {
+                    startingPitch: "A4",
+                    inTemperament: "equal",
+                    setMasterVolume: jest.fn(),
+                    stop: jest.fn(),
+                    trigger: jest.fn()
+                },
+                resetSynth: jest.fn(),
+                setUserTemperament: jest.fn()
+            };
+            widget.playButton = createMockElement("play");
+            widget.pitchNumber = 3;
+            widget.frequencies = [440, 493.88, 554.37, 587.33];
+            widget.circleIsVisible = true;
+
+            global.docById = jest.fn(id => {
+                if (id === "wheelDiv4") {
+                    return null;
+                }
+                return { style: {} };
+            });
+
+            widget._clearWidgetTimeout = jest.fn();
+            widget._playTimeout = 999;
+            widget._playing = false;
+
+            // Trigger playAll (start)
+            widget.playAll();
+
+            expect(widget._clearWidgetTimeout).toHaveBeenCalledWith(999);
+            expect(widget._playing).toBe(true);
         });
     });
 });
