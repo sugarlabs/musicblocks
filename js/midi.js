@@ -17,6 +17,10 @@
 // also the tempo @tonejs/midi assumes when it times the file's notes.
 const defaultTempo = 120;
 
+// Note values an imported note can take, in whole notes. Plain values come first, so a length
+// exactly between two values keeps the plain one. Dotted values stop at 3/32 and triplets at
+// 1/12: shorter ones sit so close to the plain values that a note played slightly short, or the
+// 0.01 s rounding of note times, would snap it to the wrong one.
 const standardDurations = [
     { value: "1/1", duration: 1 },
     { value: "1/2", duration: 0.5 },
@@ -25,8 +29,31 @@ const standardDurations = [
     { value: "1/16", duration: 0.0625 },
     { value: "1/32", duration: 0.03125 },
     { value: "1/64", duration: 0.015625 },
-    { value: "1/128", duration: 0.0078125 }
+    { value: "1/128", duration: 0.0078125 },
+    // dotted
+    { value: "3/2", duration: 1.5 },
+    { value: "3/4", duration: 0.75 },
+    { value: "3/8", duration: 0.375 },
+    { value: "3/16", duration: 0.1875 },
+    { value: "3/32", duration: 0.09375 },
+    // triplets
+    { value: "1/3", duration: 1 / 3 },
+    { value: "1/6", duration: 1 / 6 },
+    { value: "1/12", duration: 1 / 12 }
 ];
+
+/**
+ * Splits a MIDI note name into its pitch and octave, e.g. "C#4" into ["C#", 4]. The octave can
+ * be negative: MIDI notes 0 to 11 are in octave -1.
+ * @param {string} name
+ * @returns {[string, number]}
+ */
+const splitNoteName = name => {
+    const match = /^(.*?)(-?\d+)$/.exec(name);
+    return match
+        ? [match[1], parseInt(match[2], 10)]
+        : [name.substring(0, name.length - 1), parseInt(name[name.length - 1], 10)];
+};
 
 const getClosestStandardNoteValue = duration => {
     let closest = standardDurations[0];
@@ -260,7 +287,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                     // Indexed loop for the same reason as the `sched` loop above:
                     // `na` has to be a number for these comparisons to hold.
                     for (let na = 0; na < notes.length; na++) {
-                        const name = notes[na].name;
+                        const [pitchName, octave] = splitNoteName(notes[na].name);
                         const first = na === 0;
                         const last = na === notes.length - 1;
                         ar.push(
@@ -271,20 +298,8 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                                 0,
                                 [first ? prev : x - 3, x + 1, x + 2, last ? null : x + 3]
                             ],
-                            [
-                                x + 1,
-                                ["notename", { value: name.substring(0, name.length - 1) }],
-                                0,
-                                0,
-                                [x]
-                            ],
-                            [
-                                x + 2,
-                                ["number", { value: parseInt(name[name.length - 1], 10) }],
-                                0,
-                                0,
-                                [x]
-                            ]
+                            [x + 1, ["notename", { value: pitchName }], 0, 0, [x]],
+                            [x + 2, ["number", { value: octave }], 0, 0, [x]]
                         );
                         x += 3;
                     }
