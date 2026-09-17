@@ -1,11 +1,5 @@
 describe("Project loading", () => {
     before(() => {
-        // Known docById race on first-time-user startup.
-        cy.on("uncaught:exception", err => {
-            if (err.message.includes("docById is not defined")) {
-                return false;
-            }
-        });
         cy.visit("http://127.0.0.1:3000");
         cy.waitForAppReady();
     });

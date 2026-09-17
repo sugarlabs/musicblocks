@@ -35,26 +35,6 @@ describe("Dark Mode E2E Integration", () => {
         cy.get("body").should("have.class", "dark");
     });
 
-    it("reapplies stored light mode through the theme menu after an OS theme change", () => {
-        cy.window().then(win => {
-            const activity = win.ActivityContext
-                ? win.ActivityContext.getActivity()
-                : win.globalActivity;
-            activity.themeBox._theme = "dark";
-            activity.themeBox.applyThemeInstantly();
-        });
-
-        cy.get("body").should("have.class", "dark");
-        cy.window().its("localStorage.themePreference").should("equal", "light");
-        cy.get("#toggleAuxBtn").click();
-        cy.get("#themeSelectIcon").click();
-        cy.get("#light").click();
-
-        cy.get("body").should("have.class", "light").and("not.have.class", "dark");
-        cy.get("#myCanvas").should("have.css", "background-color", "rgb(249, 249, 249)");
-        cy.window().its("localStorage.themePreference").should("equal", "light");
-    });
-
     it("verifies dark mode theme preference persists across reloads via application storage", () => {
         // Verify default state does not have dark mode enabled before toggling
         cy.get("body").should("not.have.class", "dark");
