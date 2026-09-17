@@ -18,8 +18,35 @@
  */
 
 const saveMxmlOutput = require("../mxml");
+const { frequencyToPitch } = require("../utils/musicutils");
+global.frequencyToPitch = frequencyToPitch;
 
 describe("saveMxmlOutput", () => {
+    it.each([
+        [445, "A", "<alter>0.196</alter>"],
+        [470, "B", "<alter>-0.858</alter>"],
+        [440, "A", null]
+    ])("should export numeric frequency %s as a valid pitch", (frequency, step, alter) => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[[frequency], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain(`<step>${step}</step>`);
+        expect(output).toContain("<octave>4</octave>");
+        if (alter === null) {
+            expect(output).not.toContain("<alter>");
+        } else {
+            expect(output).toContain(alter);
+        }
+        expect(output).not.toContain("undefined");
+    });
+
     it("should return a valid XML string for a basic input", () => {
         const logo = {
             notation: {
