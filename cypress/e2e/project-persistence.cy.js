@@ -61,12 +61,6 @@ describe("Project persistence", () => {
     };
 
     before(() => {
-        // Known docById race on first-time-user startup.
-        cy.on("uncaught:exception", err => {
-            if (err.message.includes("docById is not defined")) {
-                return false;
-            }
-        });
         // Visit first so localStorage is cleared on the Music Blocks origin itself,
         // then reload so the app initializes against a genuinely clean persistence
         // state rather than whatever a previous test session left behind.
@@ -77,9 +71,7 @@ describe("Project persistence", () => {
     });
 
     it("restores a loaded project's blocks after a page reload", () => {
-        // The toolbar renders after showContents(), which can lag behind
-        // waitForAppReady() on slow runners. Wait for visibility explicitly.
-        cy.get("#load", { timeout: 30000 }).should("be.visible").click();
+        cy.get("#load").click();
         cy.get("#myOpenFile").selectFile("cypress/fixtures/pi.tb", { force: true });
 
         cy.get("#load-container").should("be.visible");
