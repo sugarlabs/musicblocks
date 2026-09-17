@@ -1408,6 +1408,51 @@ describe("Turtle.TurtleView", () => {
             expect(view._media[0]).toBe(staticBitmap);
             expect(view._media[1]).toMatchObject({ type: "gif", id: "gif-new" });
         });
+
+        it("stops its own gif and skips registering it when a newer request already won", async () => {
+            const view = withImageMembers(makeView());
+            let resolveFirst;
+            const gifAnimator = {
+                isAnimatedGIF: jest.fn(() => true),
+                createAnimation: jest
+                    .fn()
+                    .mockImplementationOnce(
+                        () =>
+                            new Promise(resolve => {
+                                resolveFirst = resolve;
+                            })
+                    )
+                    .mockImplementationOnce(async () => "gif-second"),
+                stopAnimation: jest.fn()
+            };
+            view.activity.gifAnimator = gifAnimator;
+
+            const firstCall = view.doShowImage(64, "first.gif");
+            await view.doShowImage(64, "second.gif");
+            resolveFirst("gif-first");
+            await firstCall;
+
+            expect(gifAnimator.stopAnimation).toHaveBeenCalledWith("gif-first");
+            expect(view._activeGifId).toBe("gif-second");
+            expect(view._media).toHaveLength(1);
+            expect(view._media[0]).toMatchObject({ type: "gif", id: "gif-second" });
+        });
+
+        it("ignores a stale static image load once a newer request has already loaded", async () => {
+            const view = withImageMembers(makeView());
+            view.activity.gifAnimator = null;
+
+            await view.doShowImage(55, "first.png");
+            const firstImage = images[0];
+            await view.doShowImage(60, "second.png");
+            const secondImage = images[1];
+
+            secondImage.onload();
+            firstImage.onload();
+
+            expect(view._media).toHaveLength(1);
+            expect(view._media[0].source).toBe(secondImage);
+        });
     });
 
     describe("makeTurtleBitmap", () => {
