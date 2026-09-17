@@ -681,6 +681,76 @@ describe("aux toolbar collapse and expand", () => {
         expect(turtles.hideMenu).toHaveBeenCalled();
         expect(turtles.setStageScale).toHaveBeenCalledWith(1.0);
     });
+
+    test("keeps canvas buttons below the auxiliary toolbar after resize", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+        const hardwareConcurrency = Object.getOwnPropertyDescriptor(
+            navigator,
+            "hardwareConcurrency"
+        );
+
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        this.onload?.();
+                    }
+                });
+            }
+        };
+        Object.defineProperty(navigator, "hardwareConcurrency", { configurable: true, value: 1 });
+        jest.useFakeTimers();
+
+        try {
+            activityMock.toolbarHeight = 0;
+            document.getElementById("aux-toolbar").style.display = "none";
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            const buttonIds = ["Grid", "Clear", "Collapse"];
+            const baseTop = 70 + LEADING + 6;
+            buttonIds.forEach(id => {
+                expect(document.getElementById(id).style.top).toBe(`${baseTop}px`);
+            });
+
+            // Opening the menu shifts existing buttons; fullscreen then rebuilds them on resize.
+            activityMock.toolbarHeight = 64;
+            document.getElementById("aux-toolbar").style.display = "block";
+            buttonIds.forEach(id => {
+                document.getElementById(id).style.top = `${baseTop + 64}px`;
+            });
+            const oldGrid = document.getElementById("Grid");
+            turtles._resizeHandler();
+            jest.advanceTimersByTime(150);
+
+            expect(document.getElementById("Grid")).not.toBe(oldGrid);
+            buttonIds.forEach(id => {
+                expect(document.getElementById(id).style.top).toBe(`${baseTop + 64}px`);
+            });
+
+            activityMock.toolbarHeight = 0;
+            document.getElementById("aux-toolbar").style.display = "none";
+            turtles._resizeHandler();
+            jest.advanceTimersByTime(150);
+            buttonIds.forEach(id => {
+                expect(document.getElementById(id).style.top).toBe(`${baseTop}px`);
+            });
+        } finally {
+            jest.useRealTimers();
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+            if (hardwareConcurrency) {
+                Object.defineProperty(navigator, "hardwareConcurrency", hardwareConcurrency);
+            } else {
+                delete navigator.hardwareConcurrency;
+            }
+        }
+    });
 });
 
 describe("TurtlesModel doGrid initialization order", () => {
