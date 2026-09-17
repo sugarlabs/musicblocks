@@ -723,6 +723,11 @@ Turtle.TurtleView = class {
 
         this._canvas = document.getElementById("overlayCanvas");
         this._ctx = this._canvas.getContext("2d");
+
+        // Bumped on every doShowImage call so a slower, overlapping request
+        // can tell -- once its await resolves -- that a newer one already
+        // won and back off instead of clobbering it.
+        this._imageRequestId = 0;
     }
 
     /**
@@ -740,6 +745,7 @@ Turtle.TurtleView = class {
         }
 
         const gifAnimator = this.activity.gifAnimator;
+        const requestId = ++this._imageRequestId;
 
         // HARD CLEANUP: kill previous GIF before loading a new one
         if (this._activeGifId && gifAnimator) {
@@ -783,6 +789,15 @@ Turtle.TurtleView = class {
 
                 // If animation was created successfully
                 if (gifId !== null) {
+                    // A newer doShowImage call already ran while we were
+                    // awaiting createAnimation -- it owns _activeGifId/_media
+                    // now, so stop the animation we just created and bail
+                    // out instead of clobbering the newer request's state.
+                    if (requestId !== this._imageRequestId) {
+                        gifAnimator.stopAnimation(gifId);
+                        return;
+                    }
+
                     // Register as the ONLY active GIF for this turtle
                     this._activeGifId = gifId;
 
@@ -805,6 +820,12 @@ Turtle.TurtleView = class {
         //original static image code (for non-GIFs or static GIFs)
         const image = new Image();
         image.onload = () => {
+            // Same overlap guard as the GIF path above: don't add a stale
+            // static image on top of whatever a newer request set up.
+            if (requestId !== this._imageRequestId) {
+                return;
+            }
+
             const bitmap = new createjs.Bitmap(image);
             this.imageContainer.addChild(bitmap);
             this._media.push(bitmap);
