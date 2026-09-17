@@ -13,7 +13,7 @@
    global
 
    _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH,
-   CUSTOMSAMPLES, globalActivity
+   CUSTOMSAMPLES, globalActivity, isUnsafeObjectKey
  */
 
 const _b64Cache = new Map();
@@ -3005,15 +3005,6 @@ const getOctaveRatio = () => {
  */
 const ratioToWheelAngle = (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base));
 
-/**
- * Parse a Scala (.scl) file content string.
- * Format: comment lines (!), description line, pitch count, then pitch lines
- * (ratios as "num/den" or integers, or cents as decimal numbers).
- * @function
- * @param {string} content - The raw text content of a .scl file.
- * @returns {{ description: string, pitchCount: number, pitches: Array<{ratio: number, cents: number}> }}
- * @throws {Error} If the content is invalid or missing required fields.
- */
 const parseSclFile = content => {
     if (typeof content !== "string" || content.trim().length === 0) {
         throw new Error("Invalid .scl file: empty content");
@@ -3110,13 +3101,6 @@ const parseSclFile = content => {
     return { description, pitchCount, pitches };
 };
 
-/**
- * Parse and strictly validate a mode JSON file.
- * @function
- * @param {string} text - The raw JSON text.
- * @returns {Object} The validated mode definition.
- * @throws {Error} If the structure is invalid.
- */
 const parseModeJson = text => {
     let obj;
     try {
@@ -3225,7 +3209,7 @@ const deleteTemperamentFromList = oldEntry => {
  * @returns {void}
  */
 const addTemperamentToDictionary = (entryName, entryValue) => {
-    if (["__proto__", "constructor", "prototype"].includes(entryName)) return;
+    if (isUnsafeObjectKey(entryName)) return;
     TEMPERAMENT[entryName] = entryValue;
 };
 
