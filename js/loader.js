@@ -256,6 +256,10 @@ requirejs.config({
         },
         "widgets/aidebugger": {
             deps: ["utils/ai-widget-lifecycle"]
+        },
+        "widgets/widgetWindows": {
+            deps: ["utils/dom-helpers"],
+            exports: "widgetWindows"
         }
     },
     paths: {
