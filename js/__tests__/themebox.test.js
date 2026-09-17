@@ -307,4 +307,12 @@ describe("ThemeBox", () => {
             "Music Blocks is already set to this theme."
         );
     });
+
+    test("refreshUIComponents refreshes activity.trashcan if available", () => {
+        mockActivity.trashcan = {
+            refresh: jest.fn()
+        };
+        themeBox.refreshUIComponents();
+        expect(mockActivity.trashcan.refresh).toHaveBeenCalledTimes(1);
+    });
 });
