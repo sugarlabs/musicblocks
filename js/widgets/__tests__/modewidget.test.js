@@ -115,6 +115,7 @@ global.isNonEDO = isNonEDO;
 global.getNonEDOModeSteps = getNonEDOModeSteps;
 global.getNonEDOFrequency = getNonEDOFrequency;
 global.isEquallyTempered = isEquallyTempered;
+global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
 global.pitchToFrequency = pitchToFrequency || jest.fn().mockReturnValue(440);
 global.generateNoteNames =
     global.generateNoteNames ||
@@ -724,6 +725,29 @@ describe("ModeWidget", () => {
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(
             expect.stringContaining("Cannot overwrite built-in mode")
         );
+    });
+
+    test("should rename imported mode that collides with a built-in name", () => {
+        MUSICALMODES["major"] = [2, 2, 1, 2, 2, 2, 1];
+        global.parseModeJson = jest.fn(text => JSON.parse(text));
+        const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
+        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+            cb(null, {
+                text: JSON.stringify({ name: "major", edo: 31, pattern: [3, 4, 2, 3, 4, 3, 3] }),
+                file: { name: "mode.json", size: 100 }
+            });
+        });
+        jest.spyOn(modeWidget, "_temperamentKeyForEDO").mockReturnValue("equal31");
+        jest.spyOn(modeWidget, "_cacheState").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_updateModeDisplay").mockImplementation(() => {});
+
+        modeWidget._importFile();
+
+        expect(saveSpy).toHaveBeenCalledWith("major (31 EDO)", [3, 4, 2, 3, 4, 3, 3], 31);
+        saveSpy.mockRestore();
+        delete MUSICALMODES["major"];
     });
 
     test("should cancel in-flight animations and clear pending timeouts", () => {
