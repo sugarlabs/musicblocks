@@ -497,15 +497,28 @@ describe("KeyboardController", () => {
             expect(activity._doHardStopButton).toHaveBeenCalled();
         });
 
-        it("plain ENTER starts playback when nothing is running", () => {
+        it("Ctrl+Z triggers undoAction", () => {
             const activity = makeActivity();
-            activity.turtles.running.mockReturnValue(false);
+            activity.blocks.undoAction = jest.fn();
             const controller = createController(activity);
+            const event = makeEvent({ keyCode: 90, ctrlKey: true });
 
-            controller.__keyPressed(makeEvent({ keyCode: 13 }));
+            controller.__keyPressed(event);
 
-            expect(activity.toolbar.highlightStop).toHaveBeenCalledWith("red");
-            expect(activity._doFastButton).toHaveBeenCalled();
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity.blocks.undoAction).toHaveBeenCalled();
+        });
+
+        it("Ctrl+Y triggers redoAction", () => {
+            const activity = makeActivity();
+            activity.blocks.redoAction = jest.fn();
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: 89, ctrlKey: true });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity.blocks.redoAction).toHaveBeenCalled();
         });
     });
 

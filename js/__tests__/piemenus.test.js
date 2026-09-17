@@ -269,6 +269,21 @@ describe("piemenus behavioral tests", () => {
         expect(mockBlock.value).toBe("C");
     });
 
+    test("piemenu exit safely hides label and removes hasKeyboard from labelDiv", () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        const labelDiv = { classList: { remove: jest.fn() } };
+        global.docById = jest.fn(id => (id === "labelDiv" ? labelDiv : { style: {} }));
+
+        mockBlock.label = { style: { display: "block" } };
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+        mockBlock._exitWheel.navItems[0].navigateFunction();
+
+        expect(mockBlock.label.style.display).toBe("none");
+        expect(labelDiv.classList.remove).toHaveBeenCalledWith("hasKeyboard");
+    });
+
     test("pitch wrapping logic generic application (7 notes)", async () => {
         const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
         const noteValues = ["C", "D", "E", "F", "G", "A", "B"];

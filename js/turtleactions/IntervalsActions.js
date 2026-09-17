@@ -44,6 +44,20 @@
 /* exported setupIntervalsActions*/
 
 /**
+ * Bounds (in scalar steps) on the value accepted by setScalarInterval().
+ * GetNotesForInterval() derives an octave count as `Math.floor(intervals[0] / 7)`,
+ * which GetIntervalNumber() then walks with a `while (octave > 0)` loop that runs
+ * once per octave. These line up with the existing octave range convention used
+ * elsewhere for pitch (see PitchBlocks.js's "Octave must be an integer in [0, 9]"):
+ * 69 is the largest value for which Math.floor(69 / 7) is still 9, and -63 is the
+ * smallest (Math.floor rounds toward -Infinity, so -64 already overshoots to -10).
+ * Anything outside this range corresponds to an octave shift no Pitch block could
+ * represent, rather than an arbitrary cap.
+ */
+const MAX_SCALAR_INTERVAL = 69;
+const MIN_SCALAR_INTERVAL = -63;
+
+/**
  * Sets up all the methods related to different actions for each block in Intervals palette.
  * @returns {void}
  */
@@ -106,10 +120,13 @@ function setupIntervalsActions(activity) {
             // Handle octave boundary wrap-around for enharmonic equivalents
             // For cases like B (12) to B#/Cb (0), the raw difference is 12 but should be 1
             // Calculate forward distance across octave boundary using modular arithmetic
-            const forwardDiff = (secondStep - firstStep + temperamentLength) % temperamentLength;
-            // When notes are at octave boundary (forwardDiff === 0), use 1 semitone
-            // Otherwise use the shorter of raw difference or forward distance
-            totalIntervals = forwardDiff === 0 ? 1 : Math.min(totalIntervals, forwardDiff);
+            if (totalIntervals !== 0) {
+                const forwardDiff =
+                    (secondStep - firstStep + temperamentLength) % temperamentLength;
+                // When notes are at octave boundary (forwardDiff === 0), use 1 semitone
+                // Otherwise use the shorter of raw difference or forward distance
+                totalIntervals = forwardDiff === 0 ? 1 : Math.min(totalIntervals, forwardDiff);
+            }
 
             if (octave < 0 && totalIntervals !== 0 && totalIntervals !== temperamentLength)
                 totalIntervals = temperamentLength - totalIntervals;
@@ -164,7 +181,7 @@ function setupIntervalsActions(activity) {
             if (totalIntervals % temperamentLength === 0 && letterGap === 0) {
                 if (octave < 0) {
                     if (octave === -1) os = "";
-                    const a = `${os} ${_("perfect")} ${plural} ${_("below")}`;
+                    const a = `${os ? `${os} ` : ""}${_("perfect")} ${plural} ${_("below")}`;
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
                 if (octave > 1) {
@@ -387,6 +404,9 @@ function setupIntervalsActions(activity) {
             let arg = value;
             if (arg === null || typeof arg !== "number") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
+                arg = 1;
+            } else if (arg > MAX_SCALAR_INTERVAL || arg < MIN_SCALAR_INTERVAL) {
+                activity.errorMsg(_("Scalar interval must be within -63 to 69."), blk);
                 arg = 1;
             }
 
