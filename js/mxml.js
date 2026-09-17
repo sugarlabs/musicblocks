@@ -195,6 +195,37 @@ saveMxmlOutput = logo => {
             indent++;
             let divisionsLeft = divisions;
 
+            // Opens the current measure (writing its attributes and any queued tempo)
+            // if it isn't already open. Called both from the note branch below and from
+            // any marker that writes a <direction> outside a note -- a <direction> is
+            // only valid inside <part> when a <measure> is currently open around it.
+            const ensureMeasureOpen = () => {
+                if (openedMeasureTag) return;
+                if (firstMeasure) {
+                    addMeasureAttributes(currMeasure, divisionsPerQuarterNote, beats, beatType);
+                    firstMeasure = false;
+                } else if (beatsChanged) {
+                    beats = newBeats;
+                    beatType = newBeatType;
+                    divisions = newDivisions;
+                    divisionsLeft = divisions;
+                    addMeasureAttributes(
+                        currMeasure,
+                        divisionsPerQuarterNote,
+                        newBeats,
+                        newBeatType
+                    );
+                    beatsChanged = false;
+                } else {
+                    add(`<measure number="${currMeasure}">`);
+                }
+                openedMeasureTag = true;
+                if (queuedTempo !== null) {
+                    add(queuedTempo);
+                    queuedTempo = null;
+                }
+            };
+
             for (let i = 0; i < notes.length; i++) {
                 const obj = notes[i];
                 if (["tie", "begin slur", "end slur"].includes(obj) || ignore.includes(obj))
@@ -281,6 +312,7 @@ saveMxmlOutput = logo => {
                 }
 
                 if (obj === "swing") {
+                    ensureMeasureOpen();
                     addWords("swing", "above");
                     continue;
                 }
@@ -288,6 +320,7 @@ saveMxmlOutput = logo => {
                 if (obj === "markup" || obj === "markdown") {
                     const text = notes[i + 1];
                     if (text !== undefined) {
+                        ensureMeasureOpen();
                         addWords(String(text), obj === "markup" ? "above" : "below");
                     }
                     i += 1;
@@ -345,34 +378,7 @@ saveMxmlOutput = logo => {
 
                     if (!isChordNote) {
                         if (divisionsLeft === divisions) {
-                            if (firstMeasure) {
-                                addMeasureAttributes(
-                                    currMeasure,
-                                    divisionsPerQuarterNote,
-                                    beats,
-                                    beatType
-                                );
-                                firstMeasure = false;
-                            } else if (beatsChanged) {
-                                beats = newBeats;
-                                beatType = newBeatType;
-                                divisions = newDivisions;
-                                divisionsLeft = divisions;
-                                addMeasureAttributes(
-                                    currMeasure,
-                                    divisionsPerQuarterNote,
-                                    newBeats,
-                                    newBeatType
-                                );
-                                beatsChanged = false;
-                            } else {
-                                add(`<measure number="${currMeasure}">`);
-                            }
-                            openedMeasureTag = true;
-                            if (queuedTempo !== null) {
-                                add(queuedTempo);
-                                queuedTempo = null;
-                            }
+                            ensureMeasureOpen();
                         }
                         divisionsLeft -= preciseDur;
                     }

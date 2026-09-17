@@ -569,10 +569,15 @@ describe("saveMxmlOutput", () => {
         const output = saveMxmlOutput(logo);
 
         expect(output).not.toContain("NaN");
-        expect(output).toContain('<direction placement="above">');
-        expect(output).toContain("<words>mf</words>");
-        expect(output).toContain('<direction placement="below">');
-        expect(output).toContain("<words>quietly</words>");
+        // Ties each placement to its own words value, rather than asserting the two
+        // pairs independently, which a swapped above/below implementation would still
+        // pass.
+        expect(output).toMatch(
+            /<direction placement="above">\s*<direction-type>\s*<words>mf<\/words>/
+        );
+        expect(output).toMatch(
+            /<direction placement="below">\s*<direction-type>\s*<words>quietly<\/words>/
+        );
     });
 
     it("should escape special characters staged from a markup block", () => {
@@ -623,6 +628,101 @@ describe("saveMxmlOutput", () => {
 
         expect((output.match(/<technical>\s*<harmonic\/>/g) || []).length).toBe(1);
         expect(output).not.toContain("NaN");
+    });
+
+    it("should keep accenting notes through a nested articulation block and clear it only once the outer block ends", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        "begin articulation",
+                        [["C4"], 4, 0],
+                        "begin articulation",
+                        [["D4"], 4, 0],
+                        "end articulation",
+                        [["E4"], 4, 0],
+                        "end articulation",
+                        [["F4"], 4, 0]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect((output.match(/<accent\/>/g) || []).length).toBe(3);
+        expect(output).toContain("<step>F</step>");
+        expect(output).not.toContain("NaN");
+    });
+
+    it("should keep marking notes with a technical harmonic through a nested harmonics block", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        "begin harmonics",
+                        [["C4"], 4, 0],
+                        "begin harmonics",
+                        [["D4"], 4, 0],
+                        "end harmonics",
+                        [["E4"], 4, 0],
+                        "end harmonics",
+                        [["F4"], 4, 0]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect((output.match(/<technical>\s*<harmonic\/>/g) || []).length).toBe(3);
+        expect(output).toContain("<step>F</step>");
+        expect(output).not.toContain("NaN");
+    });
+
+    it("should clamp an unmatched end articulation/harmonics marker at zero instead of going negative", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        "end articulation",
+                        "end harmonics",
+                        [["C4"], 4, 0],
+                        "begin articulation",
+                        [["D4"], 4, 0]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        // An unmatched "end" before any "begin" must not leave the depth counter
+        // negative -- if it did, the "begin articulation" below would need two
+        // matching "end"s before it stopped accenting notes.
+        expect((output.match(/<accent\/>/g) || []).length).toBe(1);
+        expect((output.match(/<technical>\s*<harmonic\/>/g) || []).length).toBe(0);
+        expect(output).not.toContain("NaN");
+    });
+
+    it("should open the measure before writing a swing/markup direction that comes before the first note", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: ["swing", "markup", "mf", [["C4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+        const measureOpenIndex = output.indexOf("<measure number=");
+        const directionIndex = output.indexOf("<direction ");
+
+        // A <direction> is only valid MusicXML inside an open <measure>; before the
+        // fix, a marker staged ahead of the first note wrote its <direction> straight
+        // into <part>, since openedMeasureTag was still false at that point.
+        expect(measureOpenIndex).toBeGreaterThan(-1);
+        expect(directionIndex).toBeGreaterThan(measureOpenIndex);
     });
 
     it("should ignore voices that contain only control tokens and no note entries", () => {
