@@ -919,9 +919,9 @@ describe("saveMxmlOutput notation markers", () => {
         expect(words[0].textContent).toBe("swing");
     });
 
-    it("keeps markup text intact through XML escaping and voice renumbering", () => {
-        // Voice index 1 makes the renumbering pass rewrite P2/#2 to P1/#1, which would
-        // also rewrite matching text inside <words> if it weren't protected.
+    it("keeps markup text intact through XML escaping", () => {
+        // Text that looks like a part id must be written as-is, and voice index 1 is still
+        // written as part P1.
         const text = "a < b & P1 #2";
         const doc = parseScore(exportVoices({ 1: [note("C4"), "markdown", text, note("D4")] }));
 
