@@ -35,6 +35,11 @@ const DIVISIONS_EPSILON = 1e-6;
 // constant alone could represent.
 const DIVISIONS_PER_WHOLE_NOTE = 32;
 
+// Escapes text staged from a Markup/Markdown block before it is written into a
+// <words> element; unlike pitch letters and voice labels, this is free-form user text.
+const _escapeXmlText = text =>
+    String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
 /**
  * Reduces a tuplet note's staging fields to a MusicXML actual-notes/normal-notes pair.
  * @param {[number, number]} tupletRatio - obj[MXML_TUPLETVALUE]: an
@@ -82,6 +87,18 @@ saveMxmlOutput = logo => {
         add("<direction-type>");
         indent++;
         add(`<wedge type="${type}"/>`);
+        indent--;
+        add("</direction-type>");
+        indent--;
+        add("</direction>");
+    };
+
+    const addWords = (text, placement) => {
+        add(`<direction placement="${placement}">`);
+        indent++;
+        add("<direction-type>");
+        indent++;
+        add(`<words>${_escapeXmlText(text)}</words>`);
         indent--;
         add("</direction-type>");
         indent--;
@@ -172,6 +189,9 @@ saveMxmlOutput = logo => {
             let openedMeasureTag = false,
                 queuedTempo = null,
                 firstMeasure = true;
+            // Nesting depth of the relative-volume and harmonic blocks around the current note.
+            let articulationDepth = 0,
+                harmonicsDepth = 0;
             indent++;
             let divisionsLeft = divisions;
 
@@ -227,6 +247,50 @@ saveMxmlOutput = logo => {
                     newDivisions = newBeats * (1 / newBeatType / (1 / divisionsPerWholeNote));
                     i += 2;
                     beatsChanged = true;
+                    continue;
+                }
+
+                if (obj === "pickup") {
+                    // Shortening the first measure to the pickup's length would need its
+                    // own measure-numbering/divisions-left handling; out of scope here.
+                    // Skipped (rather than falling through to the note branch below,
+                    // which read the marker's characters as a bogus note) so a project
+                    // using a Pickup block still exports valid, if un-shortened, MusicXML.
+                    i += 1;
+                    continue;
+                }
+
+                if (obj === "begin articulation") {
+                    articulationDepth++;
+                    continue;
+                }
+
+                if (obj === "end articulation") {
+                    articulationDepth = Math.max(0, articulationDepth - 1);
+                    continue;
+                }
+
+                if (obj === "begin harmonics") {
+                    harmonicsDepth++;
+                    continue;
+                }
+
+                if (obj === "end harmonics") {
+                    harmonicsDepth = Math.max(0, harmonicsDepth - 1);
+                    continue;
+                }
+
+                if (obj === "swing") {
+                    addWords("swing", "above");
+                    continue;
+                }
+
+                if (obj === "markup" || obj === "markdown") {
+                    const text = notes[i + 1];
+                    if (text !== undefined) {
+                        addWords(String(text), obj === "markup" ? "above" : "below");
+                    }
+                    i += 1;
                     continue;
                 }
 
@@ -352,8 +416,16 @@ saveMxmlOutput = logo => {
                     add("<articulations>");
                     indent++;
                     if (obj[6]) add('<staccato placement="below"/>');
+                    if (articulationDepth > 0) add("<accent/>");
                     indent--;
                     add("</articulations>");
+                    if (harmonicsDepth > 0) {
+                        add("<technical>");
+                        indent++;
+                        add("<harmonic/>");
+                        indent--;
+                        add("</technical>");
+                    }
                     indent--;
                     if (notes[i - 1] === "begin slur") {
                         indent++;

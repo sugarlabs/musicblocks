@@ -523,6 +523,108 @@ describe("saveMxmlOutput", () => {
         expect(output).toContain("<beats>3</beats>");
     });
 
+    it("should skip a pickup marker instead of reading its beat string as a note", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: ["pickup", "4", [["C4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).not.toContain("<step>p</step>");
+        expect(output).not.toContain("NaN");
+        expect(output).toContain("<step>C</step>");
+        expect(output).toContain("<duration>8</duration>");
+    });
+
+    it("should write a swing marker as a direction instead of a bogus note", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: ["swing", [["C4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).not.toContain("<step>s</step>");
+        expect(output).not.toContain("NaN");
+        expect(output).toContain("<words>swing</words>");
+        expect(output).toContain("<step>C</step>");
+    });
+
+    it("should write markup and markdown as directions above/below the staff", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: ["markup", "mf", [["C4"], 4, 0], "markdown", "quietly", [["D4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).not.toContain("NaN");
+        expect(output).toContain('<direction placement="above">');
+        expect(output).toContain("<words>mf</words>");
+        expect(output).toContain('<direction placement="below">');
+        expect(output).toContain("<words>quietly</words>");
+    });
+
+    it("should escape special characters staged from a markup block", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: ["markup", "a < b & c > d", [["C4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain("<words>a &lt; b &amp; c &gt; d</words>");
+    });
+
+    it("should mark notes inside an articulation block with an accent", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        "begin articulation",
+                        [["C4"], 4, 0],
+                        [["D4"], 4, 0],
+                        "end articulation",
+                        [["E4"], 4, 0]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect((output.match(/<accent\/>/g) || []).length).toBe(2);
+        expect(output).not.toContain("NaN");
+    });
+
+    it("should mark notes inside a harmonics block with a technical harmonic", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: ["begin harmonics", [["C4"], 4, 0], "end harmonics", [["D4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect((output.match(/<technical>\s*<harmonic\/>/g) || []).length).toBe(1);
+        expect(output).not.toContain("NaN");
+    });
+
     it("should ignore voices that contain only control tokens and no note entries", () => {
         const logo = {
             notation: {
