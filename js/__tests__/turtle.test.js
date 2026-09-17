@@ -1332,6 +1332,82 @@ describe("Turtle.TurtleView", () => {
 
             expect(view._media[0].scaleX).toBe(2);
         });
+
+        it("drops the replaced gif's own record from _media instead of leaving it behind", async () => {
+            const view = withImageMembers(makeView());
+            view.activity.gifAnimator = {
+                isAnimatedGIF: jest.fn(() => true),
+                createAnimation: jest.fn(async () => "gif-new"),
+                stopAnimation: jest.fn()
+            };
+            // A previous gif is active and already has its bookkeeping record,
+            // the way a real prior doShowImage() call would have left it.
+            view._activeGifId = "gif-old";
+            view._media = [{ type: "gif", id: "gif-old", stop: jest.fn() }];
+
+            await view.doShowImage(64, "dance.gif");
+
+            expect(view._media).toHaveLength(1);
+            expect(view._media[0]).toMatchObject({ type: "gif", id: "gif-new" });
+        });
+
+        it("keeps exactly one gif record in _media across a run of replacements", async () => {
+            // A forever loop re-triggering "show image" on an animated gif with
+            // no "clear" in between -- a natural sprite-animation pattern, and
+            // the scenario from the reported leak (musicblocks#8770).
+            const view = withImageMembers(makeView());
+            let nextId = 0;
+            view.activity.gifAnimator = {
+                isAnimatedGIF: jest.fn(() => true),
+                createAnimation: jest.fn(async () => `gif-${nextId++}`),
+                stopAnimation: jest.fn()
+            };
+
+            for (let i = 0; i < 5; i++) {
+                await view.doShowImage(64, "sprite.gif");
+            }
+
+            expect(view.activity.gifAnimator.stopAnimation).toHaveBeenCalledTimes(4);
+            expect(view._media).toHaveLength(1);
+            expect(view._media[0]).toMatchObject({ type: "gif", id: "gif-4" });
+        });
+
+        it("drops the old gif's record from _media even when the replacement is a static image", async () => {
+            const view = withImageMembers(makeView());
+            view.activity.gifAnimator = {
+                isAnimatedGIF: jest.fn(() => false),
+                createAnimation: jest.fn(),
+                stopAnimation: jest.fn()
+            };
+            view._activeGifId = "gif-old";
+            view._media = [{ type: "gif", id: "gif-old", stop: jest.fn() }];
+
+            await view.doShowImage(55, "photo.png");
+            images[0].onload();
+
+            // Only the new static bitmap should remain; the dead gif record
+            // must not survive a switch away from gifs either.
+            expect(view._media).toHaveLength(1);
+            expect(view._media[0].source).toBe(images[0]);
+        });
+
+        it("leaves other media entries alone when clearing the replaced gif's record", async () => {
+            const view = withImageMembers(makeView());
+            view.activity.gifAnimator = {
+                isAnimatedGIF: jest.fn(() => true),
+                createAnimation: jest.fn(async () => "gif-new"),
+                stopAnimation: jest.fn()
+            };
+            const staticBitmap = { source: "unrelated.png" };
+            view._activeGifId = "gif-old";
+            view._media = [staticBitmap, { type: "gif", id: "gif-old", stop: jest.fn() }];
+
+            await view.doShowImage(64, "dance.gif");
+
+            expect(view._media).toHaveLength(2);
+            expect(view._media[0]).toBe(staticBitmap);
+            expect(view._media[1]).toMatchObject({ type: "gif", id: "gif-new" });
+        });
     });
 
     describe("makeTurtleBitmap", () => {

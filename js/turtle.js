@@ -745,6 +745,15 @@ Turtle.TurtleView = class {
         if (this._activeGifId && gifAnimator) {
             gifAnimator.stopAnimation(this._activeGifId);
 
+            // Drop this turtle's own bookkeeping record for the GIF we just
+            // stopped, too -- stopAnimation() only frees GIFAnimator's side.
+            // Left in place, it lingers in _media until an explicit "clear"
+            // (many looping-animation projects never call one), and every
+            // turtle move iterates the whole array via _updateMediaPositions().
+            this._media = this._media.filter(
+                item => !(item.type === "gif" && item.id === this._activeGifId)
+            );
+
             //Clear the old GIF pixels from overlay canvas
             const ctx = this._ctx;
             ctx.save();
