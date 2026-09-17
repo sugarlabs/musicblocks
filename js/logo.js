@@ -1539,12 +1539,22 @@ class Logo {
             this.synth.recorder.stop();
 
         this.onStopTurtle();
+        if (
+            this.blocks &&
+            this.blocks.visible &&
+            typeof this.blocks.unhighlightAll === "function"
+        ) {
+            this.blocks.unhighlightAll();
+        }
         this.blocks.bringToTop();
 
         this._alreadyRunning = false;
         this.stepQueue = {};
         for (const turtle of this.turtles.turtleList) {
             turtle.unhighlightQueue = [];
+            if (turtle.singer) {
+                turtle.singer._unhighlightTimers = {};
+            }
             if (turtle.delayTimeout !== null) {
                 clearTimeout(turtle.delayTimeout);
                 turtle.delayTimeout = null;
