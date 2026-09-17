@@ -1617,6 +1617,89 @@ describe("PhraseMaker Widget", () => {
         expect(mockActivity.textMsg).toHaveBeenCalledTimes(1);
         expect(phraseMaker.isInitial).toBe(false);
     });
+
+    test("announces widget opened to screen readers only on genuine first open", () => {
+        const mockActivity = {
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: {
+                        beatsPerMeasure: 4,
+                        noteValuePerBeat: 4,
+                        keySignature: 0
+                    }
+                }))
+            },
+            logo: {
+                tupletRhythms: [["notes", 0, 4]],
+                synth: {
+                    inTemperament: "equal",
+                    stopSound: jest.fn(),
+                    stop: jest.fn(),
+                    loadSynth: jest.fn()
+                }
+            },
+            blocks: {
+                protoBlockDict: {
+                    forward: { staticLabels: ["Forward"] }
+                }
+            },
+            canvas: { width: 800, height: 600 },
+            getStageScale: jest.fn(() => 1),
+            hideMsgs: jest.fn(),
+            textMsg: jest.fn()
+        };
+
+        phraseMaker._rows = [];
+        phraseMaker._headcols = [];
+        phraseMaker._labelcols = [];
+        phraseMaker._blockMap = {};
+        phraseMaker.blockNo = 0;
+        phraseMaker.rowLabels = ["C", "kick", "forward"];
+        phraseMaker.rowArgs = [4, 4, 100];
+        phraseMaker._deps.getDrumName = jest.fn(name => (name === "kick" ? "kick" : null));
+        phraseMaker.lyricsON = true;
+
+        global.PhraseMakerUtils = {
+            MATRIXGRAPHICS: ["forward"],
+            MATRIXGRAPHICS2: [],
+            MATRIXSYNTHS: []
+        };
+
+        global.window.widgetWindows = {
+            windowFor: jest.fn().mockReturnValue({
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn().mockReturnValue({
+                    onclick: null,
+                    innerHTML: "",
+                    style: {},
+                    setAttribute: jest.fn()
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    appendChild: jest.fn(),
+                    append: jest.fn()
+                }),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn()
+            })
+        };
+        global.PhraseMakerUI = {
+            calculateNoteWidth: jest.fn(() => 80),
+            resetMatrix: jest.fn()
+        };
+
+        global.announceToScreenReader.mockClear();
+        phraseMaker.init(mockActivity);
+        expect(global.announceToScreenReader).toHaveBeenCalledWith("Phrase Maker opened");
+
+        global.announceToScreenReader.mockClear();
+        phraseMaker._rows = [];
+        phraseMaker._headcols = [];
+        phraseMaker._labelcols = [];
+        phraseMaker._blockMap = {};
+        phraseMaker.init(mockActivity);
+        expect(global.announceToScreenReader).not.toHaveBeenCalled();
+    });
     test("_createColumnPieSubmenu executes", () => {
         phraseMaker.platformColor = {
             pitchWheelcolors: [],
@@ -3035,6 +3118,22 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker.activity.logo.synth.stop).toHaveBeenCalled();
             expect(phraseMaker.activity.logo.synth.stopSound).toHaveBeenCalledWith(0, "piano");
             expect(phraseMaker.widgetWindow.destroy).toHaveBeenCalled();
+        });
+        test("announces widget closed to screen readers", () => {
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                hideMsgs: jest.fn()
+            };
+            phraseMaker.widgetWindow = { destroy: jest.fn() };
+
+            global.announceToScreenReader.mockClear();
+            phraseMaker.handleClose();
+            expect(global.announceToScreenReader).toHaveBeenCalledWith("Phrase Maker closed");
         });
     });
 });

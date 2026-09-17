@@ -600,7 +600,9 @@ class PhraseMaker {
         const iconSize = PhraseMaker.ICONSIZE * this._cellScale;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
-        announceToScreenReader(_("Phrase Maker opened"));
+        if (this.isInitial) {
+            announceToScreenReader(_("Phrase Maker opened"));
+        }
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
