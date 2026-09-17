@@ -113,6 +113,9 @@ global.window = mockWindow;
 
 // Mock Document
 global.document = {
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    activeElement: null,
     createElement: jest.fn().mockImplementation(tag => ({
         style: {},
         setAttribute: jest.fn(),
@@ -238,6 +241,7 @@ describe("RhythmRuler Widget", () => {
             expect(rhythmRuler._playingAll).toBe(false);
             expect(rhythmRuler._tapMode).toBe(false);
             expect(rhythmRuler._rulerSelected).toBe(0);
+            expect(rhythmRuler._keyHandler).toBeNull();
         });
 
         test("should have correct static constants", () => {
@@ -2683,6 +2687,387 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
             expect(cell.addEventListener).toHaveBeenCalledWith("pointerdown", expect.any(Function));
             expect(cell.addEventListener).toHaveBeenCalledWith("pointerup", expect.any(Function));
             expect(cell.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
+        });
+    });
+
+    // =========================================================================
+    // KEYBOARD NAVIGATION AND SHORTCUTS
+    // =========================================================================
+    describe("Keyboard navigation and shortcuts", () => {
+        let widgetWindow;
+        let mockWidgetWindow;
+
+        beforeEach(() => {
+            mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                addButton: jest.fn().mockImplementation((icon, size, title) => ({
+                    title: title,
+                    onclick: null
+                })),
+                addInputButton: jest.fn().mockImplementation(val => ({
+                    value: val,
+                    addEventListener: jest.fn(),
+                    classList: { add: jest.fn(), remove: jest.fn() },
+                    style: {}
+                })),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    append: jest.fn()
+                }),
+                onclose: null,
+                onmaximize: null
+            };
+
+            window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue(mockWidgetWindow),
+                focused: mockWidgetWindow
+            };
+
+            rhythmRuler = new RhythmRuler();
+            rhythmRuler.activity = {
+                blocks: { activeBlock: null },
+                hideMsgs: jest.fn(),
+                logo: { synth: { stop: jest.fn() }, turtleDelay: 0 }
+            };
+            rhythmRuler.Rulers = [
+                [[1, 2, 4], []],
+                [[2, 4, 8], []]
+            ];
+            rhythmRuler._rulerSelected = 0;
+
+            widgetWindow = rhythmRuler._createWidgetWindow();
+            global.document.activeElement = null;
+        });
+
+        afterEach(() => {
+            if (widgetWindow && widgetWindow.onclose) {
+                widgetWindow.onclose();
+            }
+        });
+
+        test("registers _keyHandler on document during _createWidgetWindow", () => {
+            const addSpy = jest.spyOn(document, "addEventListener");
+            const newRuler = new RhythmRuler();
+            newRuler.activity = {
+                blocks: { activeBlock: null },
+                hideMsgs: jest.fn(),
+                logo: { synth: { stop: jest.fn() }, turtleDelay: 0 }
+            };
+            const newWindow = newRuler._createWidgetWindow();
+            expect(typeof newRuler._keyHandler).toBe("function");
+            expect(addSpy).toHaveBeenCalledWith("keydown", newRuler._keyHandler, true);
+            newWindow.onclose();
+            addSpy.mockRestore();
+        });
+
+        test("Space key toggles playback via _playAllCell.onclick", () => {
+            rhythmRuler._playAllCell.onclick = jest.fn();
+
+            const spaceEvent = {
+                key: " ",
+                code: "Space",
+                repeat: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            rhythmRuler._keyHandler(spaceEvent);
+
+            expect(spaceEvent.preventDefault).toHaveBeenCalled();
+            expect(spaceEvent.stopPropagation).toHaveBeenCalled();
+            expect(rhythmRuler._playAllCell.onclick).toHaveBeenCalledTimes(1);
+        });
+
+        test("Space key keyCode fallback (32) triggers playback toggle", () => {
+            rhythmRuler._playAllCell.onclick = jest.fn();
+
+            const spaceEvent = {
+                keyCode: 32,
+                repeat: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            rhythmRuler._keyHandler(spaceEvent);
+
+            expect(spaceEvent.preventDefault).toHaveBeenCalled();
+            expect(spaceEvent.stopPropagation).toHaveBeenCalled();
+            expect(rhythmRuler._playAllCell.onclick).toHaveBeenCalledTimes(1);
+        });
+
+        test("Space key ignores repeat events (event.repeat = true)", () => {
+            rhythmRuler._playAllCell.onclick = jest.fn();
+
+            const repeatEvent = {
+                key: " ",
+                code: "Space",
+                repeat: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            rhythmRuler._keyHandler(repeatEvent);
+
+            expect(repeatEvent.preventDefault).toHaveBeenCalled();
+            expect(repeatEvent.stopPropagation).toHaveBeenCalled();
+            expect(rhythmRuler._playAllCell.onclick).not.toHaveBeenCalled();
+        });
+
+        test("Space key fallback pauses when playing and resumes when not playingAll if _playAllCell is null", () => {
+            rhythmRuler._playAllCell = null;
+            rhythmRuler.__pause = jest.fn();
+            rhythmRuler.__resume = jest.fn();
+
+            rhythmRuler._playing = true;
+            rhythmRuler._keyHandler({
+                key: " ",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            });
+            expect(rhythmRuler.__pause).toHaveBeenCalledTimes(1);
+
+            rhythmRuler._playing = false;
+            rhythmRuler._playingAll = false;
+            rhythmRuler._keyHandler({
+                key: " ",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            });
+            expect(rhythmRuler.__resume).toHaveBeenCalledTimes(1);
+        });
+
+        test("Shift + ArrowDown navigates to the next ruler", () => {
+            expect(rhythmRuler._rulerSelected).toBe(0);
+
+            const shiftDownEvent = {
+                key: "ArrowDown",
+                shiftKey: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            rhythmRuler._keyHandler(shiftDownEvent);
+
+            expect(shiftDownEvent.preventDefault).toHaveBeenCalled();
+            expect(shiftDownEvent.stopPropagation).toHaveBeenCalled();
+            expect(rhythmRuler._rulerSelected).toBe(1);
+        });
+
+        test("Shift + ArrowDown clamps at the last ruler", () => {
+            rhythmRuler._rulerSelected = 1;
+
+            const shiftDownEvent = {
+                key: "ArrowDown",
+                shiftKey: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            rhythmRuler._keyHandler(shiftDownEvent);
+
+            expect(rhythmRuler._rulerSelected).toBe(1);
+        });
+
+        test("Shift + ArrowUp navigates to the previous ruler", () => {
+            rhythmRuler._rulerSelected = 1;
+
+            const shiftUpEvent = {
+                key: "ArrowUp",
+                shiftKey: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            rhythmRuler._keyHandler(shiftUpEvent);
+
+            expect(shiftUpEvent.preventDefault).toHaveBeenCalled();
+            expect(shiftUpEvent.stopPropagation).toHaveBeenCalled();
+            expect(rhythmRuler._rulerSelected).toBe(0);
+        });
+
+        test("Shift + ArrowUp clamps at ruler index 0", () => {
+            rhythmRuler._rulerSelected = 0;
+
+            const shiftUpEvent = {
+                key: "ArrowUp",
+                shiftKey: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            rhythmRuler._keyHandler(shiftUpEvent);
+
+            expect(rhythmRuler._rulerSelected).toBe(0);
+        });
+
+        test("keyCode fallbacks (38 and 40) trigger ruler navigation with shiftKey", () => {
+            expect(rhythmRuler._rulerSelected).toBe(0);
+
+            const downEvent = {
+                keyCode: 40,
+                shiftKey: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            rhythmRuler._keyHandler(downEvent);
+            expect(rhythmRuler._rulerSelected).toBe(1);
+
+            const upEvent = {
+                keyCode: 38,
+                shiftKey: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            rhythmRuler._keyHandler(upEvent);
+            expect(rhythmRuler._rulerSelected).toBe(0);
+        });
+
+        test("plain ArrowUp and ArrowDown without shiftKey do not navigate rulers", () => {
+            rhythmRuler._rulerSelected = 0;
+
+            const plainDownEvent = {
+                key: "ArrowDown",
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            rhythmRuler._keyHandler(plainDownEvent);
+            expect(rhythmRuler._rulerSelected).toBe(0);
+            expect(plainDownEvent.preventDefault).not.toHaveBeenCalled();
+
+            rhythmRuler._rulerSelected = 1;
+            const plainUpEvent = {
+                key: "ArrowUp",
+                shiftKey: false,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            rhythmRuler._keyHandler(plainUpEvent);
+            expect(rhythmRuler._rulerSelected).toBe(1);
+            expect(plainUpEvent.preventDefault).not.toHaveBeenCalled();
+        });
+
+        test("_shiftRuler handles single ruler or missing rulers safely", () => {
+            rhythmRuler.Rulers = [[[1, 2, 4], []]];
+            rhythmRuler._rulerSelected = 0;
+
+            rhythmRuler._shiftRuler(1);
+            expect(rhythmRuler._rulerSelected).toBe(0);
+
+            rhythmRuler.Rulers = null;
+            rhythmRuler._shiftRuler(-1);
+            expect(rhythmRuler._rulerSelected).toBe(0);
+
+            rhythmRuler.Rulers = [[[1, 2, 4], []]];
+        });
+
+        test("_shiftRuler scrolls active ruler row into view if scrollIntoView is available", () => {
+            const mockRow = { scrollIntoView: jest.fn() };
+            rhythmRuler._rulers = [{}, mockRow];
+            rhythmRuler._rulerSelected = 0;
+
+            rhythmRuler._shiftRuler(1);
+            expect(rhythmRuler._rulerSelected).toBe(1);
+            expect(mockRow.scrollIntoView).toHaveBeenCalledWith({ block: "nearest" });
+        });
+
+        test("shortcuts are ignored when widget window is not focused", () => {
+            window.widgetWindows.focused = {}; // Different widget focused
+            rhythmRuler._playAllCell.onclick = jest.fn();
+
+            const spaceEvent = {
+                key: " ",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            rhythmRuler._keyHandler(spaceEvent);
+
+            expect(rhythmRuler._playAllCell.onclick).not.toHaveBeenCalled();
+            expect(spaceEvent.preventDefault).not.toHaveBeenCalled();
+        });
+
+        test("shortcuts are ignored when widgetWindows is undefined", () => {
+            const originalWidgetWindows = window.widgetWindows;
+            delete window.widgetWindows;
+            rhythmRuler._playAllCell.onclick = jest.fn();
+
+            const spaceEvent = {
+                key: " ",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            rhythmRuler._keyHandler(spaceEvent);
+
+            expect(rhythmRuler._playAllCell.onclick).not.toHaveBeenCalled();
+            window.widgetWindows = originalWidgetWindows;
+        });
+
+        test("shortcuts are ignored when an active block exists", () => {
+            rhythmRuler.activity.blocks = { activeBlock: "block123" };
+            rhythmRuler._playAllCell.onclick = jest.fn();
+
+            const spaceEvent = {
+                key: " ",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            rhythmRuler._keyHandler(spaceEvent);
+
+            expect(rhythmRuler._playAllCell.onclick).not.toHaveBeenCalled();
+        });
+
+        test("shortcuts are ignored when focus is in input, textarea, button, select, or contenteditable", () => {
+            rhythmRuler._playAllCell.onclick = jest.fn();
+
+            const elementTypes = [
+                { tagName: "INPUT" },
+                { tagName: "TEXTAREA" },
+                { tagName: "DIV", isContentEditable: true },
+                { tagName: "BUTTON" },
+                { tagName: "SELECT" }
+            ];
+
+            for (const el of elementTypes) {
+                const activeSpy = jest.spyOn(document, "activeElement", "get").mockReturnValue(el);
+
+                const spaceEvent = {
+                    key: " ",
+                    preventDefault: jest.fn(),
+                    stopPropagation: jest.fn()
+                };
+                rhythmRuler._keyHandler(spaceEvent);
+
+                expect(rhythmRuler._playAllCell.onclick).not.toHaveBeenCalled();
+                activeSpy.mockRestore();
+            }
+        });
+
+        test("widgetWindow.onclose cleanly removes the keydown listener and nulls _keyHandler", () => {
+            const registeredHandler = rhythmRuler._keyHandler;
+            expect(typeof registeredHandler).toBe("function");
+
+            const removeSpy = jest.spyOn(document, "removeEventListener");
+            widgetWindow.onclose();
+
+            expect(removeSpy).toHaveBeenCalledWith("keydown", registeredHandler, true);
+            expect(rhythmRuler._keyHandler).toBeNull();
+            removeSpy.mockRestore();
+        });
+
+        test("creating a new widget window tears down existing keyHandler before reattaching", () => {
+            const firstHandler = rhythmRuler._keyHandler;
+            expect(typeof firstHandler).toBe("function");
+
+            const removeSpy = jest.spyOn(document, "removeEventListener");
+            const secondWindow = rhythmRuler._createWidgetWindow();
+
+            expect(removeSpy).toHaveBeenCalledWith("keydown", firstHandler, true);
+            expect(typeof rhythmRuler._keyHandler).toBe("function");
+            expect(rhythmRuler._keyHandler).not.toBe(firstHandler);
+
+            removeSpy.mockRestore();
+            secondWindow.onclose();
         });
     });
 });

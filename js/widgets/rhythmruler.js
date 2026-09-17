@@ -372,6 +372,13 @@ class RhythmRuler {
          * @private
          */
         this._activeIntervals = new Set();
+
+        /**
+         * Keyboard event handler for the widget.
+         * @type {function | null}
+         * @private
+         */
+        this._keyHandler = null;
     }
 
     /**
@@ -643,6 +650,10 @@ class RhythmRuler {
          * @private
          */
         widgetWindow.onclose = () => {
+            if (this._keyHandler) {
+                document.removeEventListener("keydown", this._keyHandler, true);
+                this._keyHandler = null;
+            }
             if (this._playing) {
                 this.__pause();
             }
@@ -802,7 +813,108 @@ class RhythmRuler {
             this._toggleCircularView();
         };
 
+        if (this._keyHandler) {
+            document.removeEventListener("keydown", this._keyHandler, true);
+            this._keyHandler = null;
+        }
+
+        this._keyHandler = event => {
+            if (
+                typeof window === "undefined" ||
+                !window.widgetWindows ||
+                window.widgetWindows.focused !== widgetWindow
+            ) {
+                return;
+            }
+
+            const activity = this.activity || this._activity;
+            if (
+                activity &&
+                activity.blocks &&
+                activity.blocks.activeBlock !== null &&
+                activity.blocks.activeBlock !== undefined
+            ) {
+                return;
+            }
+
+            const activeElement = document.activeElement;
+            if (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.isContentEditable)
+            ) {
+                return;
+            }
+
+            if (
+                activeElement &&
+                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT")
+            ) {
+                return;
+            }
+
+            if (event.key === " " || event.code === "Space" || event.keyCode === 32) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.repeat) {
+                    return;
+                }
+                if (this._playAllCell && typeof this._playAllCell.onclick === "function") {
+                    this._playAllCell.onclick();
+                } else if (this._playing) {
+                    this.__pause();
+                } else if (!this._playingAll) {
+                    this.__resume();
+                }
+                return;
+            }
+
+            if (
+                event.shiftKey &&
+                (event.key === "ArrowUp" || event.code === "ArrowUp" || event.keyCode === 38)
+            ) {
+                event.preventDefault();
+                event.stopPropagation();
+                this._shiftRuler(-1);
+                return;
+            }
+
+            if (
+                event.shiftKey &&
+                (event.key === "ArrowDown" || event.code === "ArrowDown" || event.keyCode === 40)
+            ) {
+                event.preventDefault();
+                event.stopPropagation();
+                this._shiftRuler(1);
+            }
+        };
+
+        document.addEventListener("keydown", this._keyHandler, true);
+
         return widgetWindow;
+    }
+
+    /**
+     * Shifts the active ruler selection up or down.
+     * @private
+     * @param {number} delta - Direction to shift (-1 for up, 1 for down).
+     * @returns {void}
+     */
+    _shiftRuler(delta) {
+        if (!this.Rulers || this.Rulers.length <= 1) {
+            return;
+        }
+        const current = parseInt(this._rulerSelected, 10) || 0;
+        const total = this.Rulers.length;
+        const next = Math.max(0, Math.min(total - 1, current + delta));
+        this._rulerSelected = next;
+        if (this._rulers && this._rulers[this._rulerSelected]) {
+            const rulerRow = this._rulers[this._rulerSelected];
+            if (typeof rulerRow.scrollIntoView === "function") {
+                rulerRow.scrollIntoView({ block: "nearest" });
+            }
+        }
     }
 
     /**
