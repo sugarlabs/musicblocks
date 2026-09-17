@@ -97,6 +97,7 @@ class LogoDependencies {
         instrumentsFilters = null,
         instrumentsEffects = null,
         widgetWindows = null,
+        cameraUtils = null,
         utils = null,
         Singer = null,
         Tone = null,
@@ -212,9 +213,26 @@ class LogoDependencies {
             widgetWindows || (typeof window !== "undefined" ? window.widgetWindows : null);
         this.Singer = Singer || (typeof window !== "undefined" ? window.Singer : null);
         this.Tone = Tone || (typeof window !== "undefined" ? window.Tone : null);
-        this.utils = utils || {
-            doUseCamera: typeof doUseCamera !== "undefined" ? doUseCamera : null,
-            doStopVideoCam: typeof doStopVideoCam !== "undefined" ? doStopVideoCam : null,
+        const resolvedCameraUtils =
+            cameraUtils ||
+            (typeof CameraUtils !== "undefined"
+                ? CameraUtils
+                : typeof window !== "undefined"
+                  ? window.CameraUtils
+                  : null);
+        this.cameraUtils = resolvedCameraUtils;
+        this.utils = utils || {};
+        const fallbackUtils = {
+            doUseCamera: resolvedCameraUtils
+                ? resolvedCameraUtils.doUseCamera
+                : typeof doUseCamera !== "undefined"
+                  ? doUseCamera
+                  : null,
+            doStopVideoCam: resolvedCameraUtils
+                ? resolvedCameraUtils.doStopVideoCam
+                : typeof doStopVideoCam !== "undefined"
+                  ? doStopVideoCam
+                  : null,
             getIntervalDirection:
                 typeof getIntervalDirection !== "undefined" ? getIntervalDirection : null,
             getIntervalNumber: typeof getIntervalNumber !== "undefined" ? getIntervalNumber : null,
@@ -226,6 +244,11 @@ class LogoDependencies {
             delayExecution: typeof delayExecution !== "undefined" ? delayExecution : null,
             last: typeof last !== "undefined" ? last : null
         };
+        Object.keys(fallbackUtils).forEach(key => {
+            if (this.utils[key] === undefined) {
+                this.utils[key] = fallbackUtils[key];
+            }
+        });
         this.classes = classes || {
             Notation: typeof Notation !== "undefined" ? Notation : null,
             Synth: typeof Synth !== "undefined" ? Synth : null,
@@ -245,6 +268,13 @@ class LogoDependencies {
      * const logo = new Logo(deps);
      */
     static fromActivity(activity) {
+        const resolvedCameraUtils =
+            typeof CameraUtils !== "undefined"
+                ? CameraUtils
+                : typeof window !== "undefined" && window.CameraUtils
+                  ? window.CameraUtils
+                  : null;
+
         return new LogoDependencies({
             blocks: activity.blocks,
             turtles: activity.turtles,
@@ -301,9 +331,18 @@ class LogoDependencies {
             widgetWindows: typeof window !== "undefined" ? window.widgetWindows : null,
             Singer: typeof Singer !== "undefined" ? Singer : null,
             Tone: typeof Tone !== "undefined" ? Tone : null,
+            cameraUtils: resolvedCameraUtils,
             utils: {
-                doUseCamera: typeof doUseCamera !== "undefined" ? doUseCamera : null,
-                doStopVideoCam: typeof doStopVideoCam !== "undefined" ? doStopVideoCam : null,
+                doUseCamera: resolvedCameraUtils
+                    ? resolvedCameraUtils.doUseCamera
+                    : typeof doUseCamera !== "undefined"
+                      ? doUseCamera
+                      : null,
+                doStopVideoCam: resolvedCameraUtils
+                    ? resolvedCameraUtils.doStopVideoCam
+                    : typeof doStopVideoCam !== "undefined"
+                      ? doStopVideoCam
+                      : null,
                 getIntervalDirection:
                     typeof getIntervalDirection !== "undefined" ? getIntervalDirection : null,
                 getIntervalNumber:

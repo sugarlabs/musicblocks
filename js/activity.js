@@ -104,6 +104,7 @@ let MYDEFINES = [
     "utils/utils-logic",
     "utils/http-utils",
     "utils/utils",
+    "utils/camera-utils",
     "utils/retryWithBackoff",
     "utils/error-handler",
     "utils/debugLog",
