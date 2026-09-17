@@ -105,13 +105,3 @@ describe("parseModeJson", () => {
         expect(() => parseModeJson(JSON.stringify([1, 2, 3]))).toThrow("expected an object");
     });
 });
-
-describe("EDO constants", () => {
-    it("EDO_MIN is 5", () => {
-        expect(EDO_MIN).toBe(5);
-    });
-
-    it("EDO_MAX is 55", () => {
-        expect(EDO_MAX).toBe(55);
-    });
-});

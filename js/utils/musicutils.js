@@ -13,7 +13,7 @@
    global
 
    _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH,
-   CUSTOMSAMPLES, globalActivity, isUnsafeObjectKey, TuningFormats
+   CUSTOMSAMPLES, globalActivity, isUnsafeObjectKey
  */
 
 const _b64Cache = new Map();
@@ -3004,11 +3004,6 @@ const getOctaveRatio = () => {
  * @returns {number} The wheel angle in degrees.
  */
 const ratioToWheelAngle = (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base));
-
-const parseSclFile = content => TuningFormats.parseSclFile(content);
-const parseModeJson = text => TuningFormats.parseModeJson(text);
-const EDO_MIN = 5;
-const EDO_MAX = 55;
 
 /**
  * Get the list of available temperaments.
@@ -8244,10 +8239,6 @@ if (typeof module !== "undefined" && module.exports) {
         getModeGroupTitleFont,
         getModeSliceFont,
         getNonEDOFrequency,
-        configureWheel,
-        parseSclFile,
-        parseModeJson,
-        EDO_MIN,
-        EDO_MAX
+        configureWheel
     };
 }
