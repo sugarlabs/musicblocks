@@ -1224,7 +1224,7 @@ describe("widgetWindows", () => {
                 "pitch drum": { close: jest.fn() }
             };
 
-            window.widgetWindows.closeBlkWidgets("pitch-drum mapper");
+            window.widgetWindows.closeBlkWidgets("pitch drum");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
         });
@@ -1265,6 +1265,23 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("custom mode")).toBe(true);
             expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("mode")).toBe(true);
             expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("sampler")).toBe(false);
+        });
+
+        it("recognizes a localized title that differs from the English registry entry", () => {
+            // Temporarily replace _ with a translator that maps "pitch drum"
+            // to its German equivalent, simulating a non-English locale.
+            const originalTranslate = global._;
+
+            try {
+                global._ = str => (str === "pitch drum" ? "Tonhöhen-Schlagzeug" : str);
+
+                // The localized form should be recognized…
+                expect(window.widgetWindows.isReinitWidgetTitle("Tonhöhen-Schlagzeug")).toBe(true);
+                // …while the raw English string is no longer a match under this locale.
+                expect(window.widgetWindows.isReinitWidgetTitle("pitch drum")).toBe(false);
+            } finally {
+                global._ = originalTranslate;
+            }
         });
     });
 

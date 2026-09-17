@@ -35,7 +35,7 @@ window.widgetWindows = {
     // verify the target widget's windowFor() call and confirm it does not
     // rely on blockNo for its window key.
     KEY_MAPPING: {
-        "pitch-drum mapper": "pitch drum",
+        "pitch drum": "pitch drum",
         "custom mode": "custom mode",
         "tempo": "tempo",
         "arpeggio": "arpeggio",
@@ -80,11 +80,23 @@ window.widgetWindows = {
 
     /**
      * True when title is listed in REINIT_WIDGET_TITLES.
-     * @param {string} title - Open widget .wftTitle text
+     *
+     * The registry stores English title strings; at runtime the open widget's
+     * title is already localized via _(). We therefore translate each registry
+     * entry with _() before comparing — the same approach used by
+     * closeBlkWidgets() for KEY_MAPPING.
+     *
+     * @param {string} title - Open widget .wftTitle text (may be localized)
      * @returns {boolean}
      */
     isReinitWidgetTitle(title) {
-        return window.widgetWindows.REINIT_WIDGET_TITLES.has(title);
+        const translate = typeof _ === "function" ? _ : str => str;
+        for (const englishTitle of window.widgetWindows.REINIT_WIDGET_TITLES) {
+            if (translate(englishTitle) === title) {
+                return true;
+            }
+        }
+        return false;
     },
 
     /**
