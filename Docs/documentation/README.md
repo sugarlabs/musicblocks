@@ -309,7 +309,7 @@ Many blocks in Music Blocks also feature "pie menus" that allow you to
 change block parameters quickly by selecting options from a circular
 menu that appears when you hover over the block.
 
-For further details on how to use these toolbars effectively, you can refer to the [Turtle Blocks Documentation](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
+For further details on how to use these toolbars effectively, you can refer to the [Turtle Blocks Documentation](https://github.com/sugarlabs/musicblocks/tree/master/TurtleDocs/documentation/README.md).
 
 ---
 
@@ -375,7 +375,7 @@ Looking for a block? Find it in the [Palette
 Tables](https://github.com/sugarlabs/musicblocks/blob/master/Docs/guide/README.md#6-appendix).
 
 See the
-[Turtle Blocks Programming Guide](http://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md)
+[Turtle Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/TurtleDocs/guide/README.md)
 for general details on how to use the blocks.
 
 See the
@@ -384,7 +384,7 @@ for details specific to music: _Rhythm_, _Meter_, _Pitch_, _Intervals_,
 _Tone_, _Ornament_, _Volume_, _Drum_, and _Widget_.
 
 All of the other palettes are described in the
-[Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
+[Turtle Blocks documentation pages](http://github.com/sugarlabs/musicblocks/tree/master/TurtleDocs/documentation/README.md).
 
 ### 1. Defining a note
 
@@ -631,7 +631,7 @@ LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732172483377262&run=True)
 [Back to Table of Contents](#table-of-contents)
 
 The Flow palette is described in more detail in the [Turtle Blocks
-documentation](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation). Here
+documentation](http://github.com/sugarlabs/musicblocks/tree/master/TurtleDocs/documentation/README.md). Here
 we review a few ways to approach taking different actions on different
 beats.
 
