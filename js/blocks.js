@@ -6995,7 +6995,12 @@ class Blocks {
                 }
             });
 
-            return canvas.toDataURL("image/png");
+            try {
+                return canvas.toDataURL("image/png");
+            } catch (error) {
+                if (error.name === "SecurityError") return null;
+                throw error;
+            }
         };
 
         /**
