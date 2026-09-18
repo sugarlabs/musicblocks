@@ -50,46 +50,46 @@ There is more information about the Turtle Confusion projects [here](../guide/Co
 
 | Project file | Description |
 | --- | --- |
-| confusion-01.html | |
-| confusion-02.html | |
-| confusion-03.html | |
-| confusion-04.html | |
-| confusion-05.html | |
-| confusion-06.html | |
-| confusion-07.html | |
-| confusion-08.html | |
-| confusion-09.html | |
-| confusion-10.html | |
-| confusion-11.html | |
-| confusion-12.html | |
-| confusion-13.html | |
-| confusion-14.html | |
-| confusion-15.html | |
-| confusion-16.html | |
-| confusion-17.html | |
-| confusion-18.html | |
-| confusion-19.html | |
-| confusion-20.html | |
-| confusion-21.html | |
-| confusion-22.html | |
-| confusion-23.html | |
-| confusion-24.html | |
-| confusion-25.html | |
-| confusion-26.html | |
-| confusion-27.html | |
-| confusion-28.html | |
-| confusion-29.html | |
-| confusion-30.html | |
-| confusion-31.html | |
-| confusion-32.html | |
-| confusion-33.html | |
-| confusion-34.html | |
-| confusion-35.html | |
-| confusion-36.html | |
-| confusion-37.html | |
-| confusion-38.html | |
-| confusion-39.html | |
-| confusion-40.html | |
+| confusion-01.html | ../guide/confusion01.png |
+| confusion-02.html | ../guide/confusion02.png |
+| confusion-03.html | ../guide/confusion03.png |
+| confusion-04.html | ../guide/confusion04.png |
+| confusion-05.html | ../guide/confusion05.png |
+| confusion-06.html | ../guide/confusion06.png |
+| confusion-07.html | ../guide/confusion07.png |
+| confusion-08.html | ../guide/confusion08.png |
+| confusion-09.html | ../guide/confusion09.png |
+| confusion-10.html | ../guide/confusion10.png |
+| confusion-11.html | ../guide/confusion11.png |
+| confusion-12.html | ../guide/confusion12.png |
+| confusion-13.html | ../guide/confusion13.png |
+| confusion-14.html | ../guide/confusion14.png |
+| confusion-15.html | ../guide/confusion15.png |
+| confusion-16.html | ../guide/confusion16.png |
+| confusion-17.html | ../guide/confusion17.png |
+| confusion-18.html | ../guide/confusion18.png |
+| confusion-19.html | ../guide/confusion19.png |
+| confusion-20.html | ../guide/confusion20.png |
+| confusion-21.html | ../guide/confusion21.png |
+| confusion-22.html | ../guide/confusion22.png |
+| confusion-23.html | ../guide/confusion23.png |
+| confusion-24.html | ../guide/confusion24.png |
+| confusion-25.html | ../guide/confusion25.png |
+| confusion-26.html | ../guide/confusion26.png |
+| confusion-27.html | ../guide/confusion27.png |
+| confusion-28.html | ../guide/confusion28.png |
+| confusion-29.html | ../guide/confusion29.png |
+| confusion-30.html | ../guide/confusion30.png |
+| confusion-31.html | ../guide/confusion31.png |
+| confusion-32.html | ../guide/confusion32.png |
+| confusion-33.html | ../guide/confusion33.png |
+| confusion-34.html | ../guide/confusion34.png |
+| confusion-35.html | ../guide/confusion35.png |
+| confusion-36.html | ../guide/confusion36.png |
+| confusion-37.html | ../guide/confusion37.png |
+| confusion-38.html | ../guide/confusion38.png |
+| confusion-39.html | ../guide/confusion39.png |
+| confusion-40.html | ../guide/confusion40.png |
 
 ## Graphics examples
 
@@ -135,28 +135,23 @@ There is more information about the Turtle Confusion projects [here](../guide/Co
 
 | Project file | Description |
 | --- | --- |
-| arguments-and-boxs.tb | |
-| a.tb | |
-| bezier.tb | |
-| dice.tb | |
-| dragon-curve.tb | |
-| Dragon Curve.tb | |
-| Dragon-Curve.tb | |
-| example.ta | |
-| expected-value.tb | |
-| factors.tb | |
-| flashingSpirals.tb | |
-| impossible-square.tb | |
-| josh-sun.tb | |
-| logothings.tb | |
-| loudness-test.tb | |
-| MunsellChart.tb | |
-| polygons.tb | |
-| poly-stub.tb | |
-| rainbow.tb | |
-| R.tb | |
-| shapes.tb | |
-| squiral.tb | |
-| tree.tb | |
-| triangle-paint.html | |
-| triangles.tb | |
+| actions-and-args.html | random polygon generation using actions and arguments |
+| a.tb | Interactive letter form editor (lowercase a) |
+| bezier.tb | draw bezier curves |
+| dice.tb | simulate rolling dice plot |
+| dragon-curve.tb | colorful dragon curve |
+| Dragon-Curve.tb | fractal dragon curve |
+| expected-value.tb | Calculate the expected value for flipping coins with three heads or tails in a row. |
+| factors.tb | Animate the factors of the integers between 2 and 100.|
+| flashingSpirals.tb | Move the mouse in a spiral over a flashing screen. |
+| impossible-square.tb | optical illusion using multiple start blocks |
+| josh-sun.tb | Sun graphic designed by Josh Burker |
+| logothings.tb | Logo Things logo |
+| loudness-test.tb | microphone volume test |
+| MunsellChart.tb | Munsell Color Chart |
+| rainbow.tb | Colorful circle graphic |
+| R.tb | capital letter R |
+| squiral.tb | Brian Silverman "Squiral" design |
+| tree.tb | Asymmetric fractal tree |
+| triangle-paint.html | Interactive triangle paint program |
+| triangles.tb | example of event broadcasting |
