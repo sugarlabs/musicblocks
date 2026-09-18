@@ -1,48 +1,48 @@
 # Turtle Blocks examples
 
-## Turtle cards are short tutorial
+## Turtle cards are short tutorials
 
 | Project file | Description |
 | --- | --- |
-| card-01.tb | |
-| card-02.tb | |
-| card-03.tb | |
-| card-04.tb | |
-| card-05.tb | |
-| card-06.tb | |
-| card-07.tb | |
-| card-08.tb | |
-| card-09.tb | |
-| card-10.tb | |
-| card-11.tb | |
-| card-12.tb | |
-| card-13.tb | |
-| card-14.tb | |
-| card-15.tb | |
-| card-16.tb | |
-| card-17.tb | |
-| card-18.tb | |
-| card-19.tb | |
-| card-20.tb | |
-| card-21.tb | |
-| card-22.tb | |
-| card-23.tb | |
-| card-24.tb | |
-| card-25.tb | |
-| card-26.tb | |
-| card-27.tb | |
-| card-28.tb | |
-| card-29.tb | |
-| card-30.tb | |
-| card-31.tb | |
-| card-32.tb | |
-| card-33.tb | |
-| card-34.tb | |
-| card-35.tb | |
-| card-36.tb | |
-| card-37.tb | |
-| card-38.tb | |
-| card-39.tb | |
+| card-01.tb | forward block |
+| card-02.tb | forward block/right block |
+| card-03.tb | to square: repeat 4 [forward 100 right 90] |
+| card-04.tb | do action |
+| card-05.tb | right/do action |
+| card-06.tb | repeat [right/do action] |
+| card-07.tb | repeat 5 [forward 100 right 72] |
+| card-08.tb | set color block |
+| card-09.tb | set pen size block |
+| card-10.tb | changing color with setter |
+| card-11.tb | store in box |
+| card-12.tb | changing the value in a box |
+| card-13.tb | changing color and size with a box |
+| card-14.tb | fill clamp block |
+| card-15.tb | radial pattern using forward/back/right |
+| card-16.tb | heading block |
+| card-17.tb | arc block and set xy block|
+| card-18.tb | change color and size before doing action |
+| card-19.tb | exploring arc block parameters |
+| card-20.tb | arcs with color |
+| card-21.tb | simple polygons |
+| card-22.tb | spiraling square |
+| card-23.tb | spinning square pattern |
+| card-24.tb | colorful radial spikes |
+| card-25.tb | grid of dots |
+| card-26.tb | random dot position, size, shade |
+| card-27.tb | shrinking circle |
+| card-28.tb | radial offset |
+| card-29.tb | random dots on a grid |
+| card-30.tb | nested polygons |
+| card-31.tb | another sun pattern (Cynthia Solomon design) |
+| card-32.tb | random squares -- position, color, orientation |
+| card-33.tb | circle of squares |
+| card-34.tb | spiral of squares |
+| card-35.tb | random squares where color is determined by posiiton using an if block |
+| card-36.tb | Brian Silverman's "Squiral" |
+| card-37.tb | random circles where size and chroma are determined by position |
+| card-38.tb | pretzel graphics |
+| card-39.tb | random squares |
 
 ## Turtle Confusion projects
 
@@ -95,41 +95,41 @@ There is more information about the Turtle Confusion projects [here](../guide/Co
 
 | Project file | Description |
 | --- | --- |
-| graphics-8-squares.html | |
-| graphics-action-square.html | |
-| graphics-arcs.html | |
-| graphics-circles-in-a-row.html | |
-| graphics-concentric-circles.html | |
-| graphics-cynthia-arcs.html | |
-| graphics-dots-in-grid.html | |
-| graphics-fading-star.html | |
-| graphics-forward.html | |
-| graphics-forward-right.html | |
-| graphics-grid.html | |
-| graphics-growing-squares.html | |
-| graphics-nested-actions.html | |
-| graphics-pentagons.html | |
-| graphics-pentagons-set-color.html | |
-| graphics-pentagons-with-color.html | |
-| graphics-pentagons-with-fat-lines.html | |
-| graphics-pinwheel.html | |
-| graphics-polygons.html | |
-| graphics-polygons-progression.html | |
-| graphics-radii.html | |
-| graphics-radii-with-color.html | |
-| graphics-random-dots.html | |
-| graphics-random-fill.html | |
-| graphics-random-squares.html | |
-| graphics-repeat-4-forward-right.html | |
-| graphics-repeat-repeat.html | |
-| graphics-rotated-square.html | |
-| graphics-s-curve.html | |
-| graphics-shrinking-filled-squares.html | |
-| graphics-shrinking-squares.html | |
-| graphics-simple-spiral.html | |
-| graphics-square-one.html | |
-| graphics-square-spiral.html | |
-| graphics-sunburst-with-shade.html | |
+| graphics-8-squares.html | 8-squares |
+| graphics-action-square.html | action-square |
+| graphics-arcs.html | arcs |
+| graphics-circles-in-a-row.html | circles-in-a-row |
+| graphics-concentric-circles.html | concentric-circles |
+| graphics-cynthia-arcs.html | Cynthia Solomon arc graphic |
+| graphics-dots-in-grid.html | dots-in-grid |
+| graphics-fading-star.html | fading-star |
+| graphics-forward.html | forward |
+| graphics-forward-right.html | forward-right |
+| graphics-grid.html | grid |
+| graphics-growing-squares.html | growing-squares |
+| graphics-nested-actions.html | nested-actions |
+| graphics-pentagons.html | pentagons |
+| graphics-pentagons-set-color.html | pentagons-set-color |
+| graphics-pentagons-with-color.html | pentagons-with-color |
+| graphics-pentagons-with-fat-lines.html | pentagons-with-fat-lines |
+| graphics-pinwheel.html | pinwheel |
+| graphics-polygons.html | polygons |
+| graphics-polygons-progression.html | polygons-progression |
+| graphics-radii.html | radii |
+| graphics-radii-with-color.html | radii-with-color |
+| graphics-random-dots.html | random-dots |
+| graphics-random-fill.html | random-fill |
+| graphics-random-squares.html | random-squares |
+| graphics-repeat-4-forward-right.html | repeat-4-forward-right |
+| graphics-repeat-repeat.html | repeat-repeat |
+| graphics-rotated-square.html | rotated-square |
+| graphics-s-curve.html | s-curve |
+| graphics-shrinking-filled-squares.html | shrinking-filled-squares |
+| graphics-shrinking-squares.html | shrinking-squares |
+| graphics-simple-spiral.html | simple-spiral |
+| graphics-square-one.html | square-one |
+| graphics-square-spiral.html | square-spiral |
+| graphics-sunburst-with-shade.html | sunburst-with-shade |
 
 ## Other examples
 
