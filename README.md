@@ -49,6 +49,12 @@ Additional background on why we combine music and programming can be found
 - [Using Music Blocks](#USING-MUSIC-BLOCKS)
 - [Using the Kokoro voice](./Docs/KOKORO_SPEECH.md)
 
+**Turtle Blocks**
+
+Turtle Blocks is a view into Music Blocks that focuses on graphics
+rather than music. You can learn more about Turle Blocks
+[here](./TurtleDocs/README.md).
+
 If you are a developer (beginner, experienced, or pro), you are very
 welcome to participate in the evolution of Music Blocks.
 
@@ -78,6 +84,14 @@ your browser — _Google Chrome_ (or _Chromium_), _Microsoft Edge_
 
 To run from the most recent master branch (experimental), visit
 [_sugarlabs.github.io/musicblocks_](https://sugarlabs.github.io/musicblocks).
+
+### <a name="RUNNING_TURTLE_BLOCKS"></a>Running Turtle Blocks
+
+Turtle Blocks shares the same codebase as Music Blocks. To access it,
+simply append ?turtle=true to the URL. We also maintain a link to
+[_turtle.sugarlabs.org_](turtle.sugarlabs.org) that redirects to
+[_musicblocks.sugarlabs.org?turtle=true_](https://musicblocks.sugarlabs.org?turtle=true)
+for your convenience.
 
 ### <a name="HOW_TO_SET_UP_A_LOCAL_SERVER"></a>How to set up a _local server_
 
