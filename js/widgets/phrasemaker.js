@@ -2652,7 +2652,7 @@ class PhraseMaker {
         for (let r = 0; r < this.rowLabels.length; r++) {
             thisRow = [];
             row = this._rows[r];
-            n = row.cells.length;
+            n = row ? row.cells.length : 0;
             for (let i = 0; i < n; i++) {
                 cell = row.cells[i];
                 if (cell.style.backgroundColor === "black") {

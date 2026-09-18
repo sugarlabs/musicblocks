@@ -655,6 +655,23 @@ describe("PhraseMaker Widget", () => {
 
         expect(phraseMaker.sorted).toBe(true);
     });
+    test("_sort handles rowLabels having more entries than _rows", () => {
+        phraseMaker.init = jest.fn();
+        phraseMaker.makeClickable = jest.fn();
+        phraseMaker.rowLabels = ["C", "D", "E"];
+        phraseMaker.rowArgs = [4, 4, 4];
+        phraseMaker._noteStored = ["C4", "D4", "E4"];
+        phraseMaker.columnBlocksMap = [[0], [1], [2]];
+        phraseMaker._rows = [{ cells: [] }, { cells: [] }];
+
+        phraseMaker.activity = {
+            turtles: { ithTurtle: () => ({ singer: { keySignature: 0 } }) },
+            logo: { tupletRhythms: [] }
+        };
+
+        expect(() => phraseMaker._sort()).not.toThrow();
+        expect(phraseMaker.sorted).toBe(true);
+    });
     test("_sort correctly merges marked columns for duplicate pitch rows without adding row indices", () => {
         phraseMaker.init = jest.fn();
         phraseMaker.makeClickable = jest.fn();
