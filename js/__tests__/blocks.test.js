@@ -2591,7 +2591,7 @@ describe("Blocks Foundation", () => {
     });
 
     describe("sendStackToTrash DOM safety", () => {
-        it("should trash image blocks when their preview canvas cannot be exported", () => {
+        it("should ignore only security errors when exporting image block previews", () => {
             const mockActivity = {
                 palettes: { dict: {} },
                 refreshCanvas: jest.fn(),
@@ -2627,14 +2627,21 @@ describe("Blocks Foundation", () => {
                     translate: jest.fn(),
                     restore: jest.fn()
                 });
-            const toDataURL = jest
-                .spyOn(HTMLCanvasElement.prototype, "toDataURL")
-                .mockImplementation(() => {
-                    throw new DOMException("Tainted canvases may not be exported", "SecurityError");
-                });
+            const toDataURL = jest.spyOn(HTMLCanvasElement.prototype, "toDataURL");
+
+            toDataURL.mockImplementationOnce(() => {
+                throw new Error("Preview export failed");
+            });
+            expect(() => blocksInstance.captureStackPreview(1)).toThrow("Preview export failed");
+
+            toDataURL.mockImplementation(() => {
+                throw new DOMException("Tainted canvases may not be exported", "SecurityError");
+            });
+            toDataURL.mockClear();
 
             try {
                 expect(() => blocksInstance.sendStackToTrash(mockBlock)).not.toThrow();
+                expect(toDataURL).toHaveBeenCalledTimes(1);
                 expect(mockBlock.trash).toBe(true);
                 expect(blocksInstance.trashPreviews[1]).toBeUndefined();
             } finally {
