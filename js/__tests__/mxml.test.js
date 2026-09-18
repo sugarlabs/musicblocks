@@ -604,12 +604,23 @@ describe("saveMxmlOutput", () => {
 
         const output = saveMxmlOutput(logo);
 
-        expect(output).toContain("<divisions>8</divisions>");
-        expect(output).toContain("<beats>3</beats>");
-        expect(output).toContain("<beat-type>4</beat-type>");
-        // 4 quarter notes in 3/4 time should span across 2 measures (3 in measure 1, 1 in measure 2)
-        const measureCount = (output.match(/<measure /g) || []).length;
-        expect(measureCount).toBe(2);
+        const measures = output.match(/<measure[\s\S]*?<\/measure>/g) || [];
+        expect(measures).toHaveLength(2);
+
+        const [measure1, measure2] = measures;
+
+        expect(measure1).toContain('<measure number="1">');
+        expect(measure1).toContain("<divisions>8</divisions>");
+        expect(measure1).toContain("<beats>3</beats>");
+        expect(measure1).toContain("<beat-type>4</beat-type>");
+        expect(measure1.match(/<note>/g) || []).toHaveLength(3);
+        expect(measure1).toContain("<step>C</step>");
+        expect(measure1).toContain("<step>D</step>");
+        expect(measure1).toContain("<step>E</step>");
+
+        expect(measure2).toContain('<measure number="2">');
+        expect(measure2.match(/<note>/g) || []).toHaveLength(1);
+        expect(measure2).toContain("<step>F</step>");
     });
 });
 
