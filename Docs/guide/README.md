@@ -2296,6 +2296,13 @@ in the widget: the new beats per minute (BPM) is determined as the
 time between the two clicks. For example, if there is `1/2` second
 between clicks, the new BPM will be set as `120`.
 
+Additionally, you can use the *Tap Tempo* button in the widget toolbar
+to set the tempo by tapping a rhythm. Click the *Tap Tempo* button
+repeatedly and the tempo will be calculated from the average interval
+between your taps. You can also press the `T` key on your keyboard as
+an alternative to clicking the button. After a brief pause in tapping,
+the tempo is automatically applied.
+
 ### <a name="timbre">4.10 Custom Timbres</a>
 
 While Music Blocks comes with many built-in instruments, it is also

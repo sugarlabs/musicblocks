@@ -1108,6 +1108,84 @@ describe("Block Foundation", () => {
         });
     });
 
+    describe("_checkWidgets()", () => {
+        let getElementsSpy;
+
+        beforeAll(() => {
+            // widgetWindows.js attaches to the environment window; also expose
+            // the bare global that block.js reads via /* global widgetWindows */.
+            require("../widgets/widgetWindows.js");
+            const ww =
+                (typeof window !== "undefined" && window.widgetWindows) || global.widgetWindows;
+            global.widgetWindows = ww;
+            if (typeof window !== "undefined") {
+                window.widgetWindows = ww;
+            }
+        });
+
+        afterEach(() => {
+            if (getElementsSpy) {
+                getElementsSpy.mockRestore();
+                getElementsSpy = null;
+            }
+        });
+
+        const makeTitleEl = title => {
+            const el = document.createElement("div");
+            el.className = "wftTitle";
+            el.innerHTML = title;
+            return el;
+        };
+
+        const makeWidgetBlock = label => {
+            const proto = {
+                ...mockProtoBlock,
+                name: label,
+                staticLabels: [label]
+            };
+            const block = new Block(proto, mockBlocks);
+            block.blockIndex = 0;
+            mockBlocks.blockList = [block];
+            mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            mockBlocks.reInitWidget = jest.fn();
+            return block;
+        };
+
+        it("reinitializes when an open widget title matches the top block", () => {
+            const block = makeWidgetBlock("arpeggio");
+            getElementsSpy = jest
+                .spyOn(document, "getElementsByClassName")
+                .mockReturnValue([makeTitleEl("arpeggio")]);
+
+            block._checkWidgets(false);
+
+            expect(mockBlocks.reInitWidget).toHaveBeenCalledWith(0, 1500);
+        });
+
+        it("reinitializes when an unrelated recognized title appears first", () => {
+            const block = makeWidgetBlock("arpeggio");
+            getElementsSpy = jest
+                .spyOn(document, "getElementsByClassName")
+                .mockReturnValue([makeTitleEl("tempo"), makeTitleEl("arpeggio")]);
+
+            block._checkWidgets(false);
+
+            expect(mockBlocks.reInitWidget).toHaveBeenCalledTimes(1);
+            expect(mockBlocks.reInitWidget).toHaveBeenCalledWith(0, 1500);
+        });
+
+        it("does nothing when closeInput is true", () => {
+            const block = makeWidgetBlock("tempo");
+            getElementsSpy = jest
+                .spyOn(document, "getElementsByClassName")
+                .mockReturnValue([makeTitleEl("tempo")]);
+
+            block._checkWidgets(true);
+
+            expect(mockBlocks.reInitWidget).not.toHaveBeenCalled();
+        });
+    });
+
     describe("dispose()", () => {
         it("should clean up connections, DOM nodes, containers, bitmaps, and parent pointers", () => {
             const block = new Block(mockProtoBlock, mockBlocks);

@@ -1039,7 +1039,7 @@ function setupWidgetBlocks(activity) {
                 ""
             ]);
             //.TRANS: makes a mapping between pitches and drum sounds
-            this.formBlock({ name: _("pitch-drum mapper"), canCollapse: true });
+            this.formBlock({ name: _("pitch drum"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "pitchdrummatrix", x, y, [null, 1, 16]],
                 [1, "pitch", 0, 0, [0, 2, 3, 4]],

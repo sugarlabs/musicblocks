@@ -2872,6 +2872,10 @@ describe("calcOctave", () => {
         expect(calcOctave(4, "previous", ["C"], "A")).toBe(2);
     });
 
+    it("should clamp 'next' at the top of the 1..9 octave range", () => {
+        expect(calcOctave(9, "next", ["C"], "C")).toBe(9);
+    });
+
     it("should be able to handle default case", () => {
         expect(calcOctave(4, "default", ["do"], "do")).toBe(4);
     });

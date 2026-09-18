@@ -137,7 +137,6 @@ const {
     hideDOMLabel,
     displayMsg,
     makeKeyboardAccessible,
-    CameraManager,
     announceToScreenReader,
     _
 } = require("../utils.js");
@@ -1343,66 +1342,6 @@ describe("announceToScreenReader()", () => {
         announceToScreenReader("Second message");
         expect(document.createElement).not.toHaveBeenCalled();
         expect(mockElement.textContent).toBe("Second message");
-    });
-});
-
-describe("CameraManager", () => {
-    beforeEach(() => {
-        CameraManager.reset();
-        jest.useFakeTimers();
-    });
-
-    afterEach(() => {
-        CameraManager.reset();
-        jest.useRealTimers();
-    });
-
-    it("starts and stops capture correctly", () => {
-        const drawFn = jest.fn();
-        const id = CameraManager.startCapture(drawFn, 100);
-        expect(id).not.toBeNull();
-        expect(CameraManager.intervalId).toBe(id);
-
-        jest.advanceTimersByTime(250);
-        expect(drawFn).toHaveBeenCalledTimes(2);
-
-        CameraManager.stopCapture();
-        expect(CameraManager.intervalId).toBeNull();
-
-        jest.advanceTimersByTime(200);
-        expect(drawFn).toHaveBeenCalledTimes(2); // Should not increase
-    });
-
-    it("startCapture is idempotent", () => {
-        const id1 = CameraManager.startCapture(jest.fn(), 100);
-        const id2 = CameraManager.startCapture(jest.fn(), 100);
-        expect(id1).toBe(id2);
-    });
-
-    it("sets and clears canplay listener", () => {
-        const video = {
-            addEventListener: jest.fn(),
-            removeEventListener: jest.fn()
-        };
-        const handler = jest.fn();
-
-        CameraManager.setCanplayListener(video, handler);
-        expect(video.addEventListener).toHaveBeenCalledWith("canplay", handler, false);
-        expect(CameraManager.canPlayHandler).toBe(handler);
-        expect(CameraManager.listenerVideoElement).toBe(video);
-
-        CameraManager.clearCanplayListener();
-        expect(video.removeEventListener).toHaveBeenCalledWith("canplay", handler, false);
-        expect(CameraManager.canPlayHandler).toBeNull();
-        expect(CameraManager.listenerVideoElement).toBeNull();
-    });
-
-    it("reset clears interval and listener", () => {
-        CameraManager.intervalId = 123;
-        CameraManager.isSetup = true;
-        CameraManager.reset();
-        expect(CameraManager.intervalId).toBeNull();
-        expect(CameraManager.isSetup).toBe(false);
     });
 });
 

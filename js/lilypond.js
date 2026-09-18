@@ -406,7 +406,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             if (typeof obj[NOTATIONNOTE] === "string") {
                 note = __toLilynote(obj[NOTATIONNOTE]);
             } else {
-                notes = obj[NOTATIONNOTE];
+                notes = obj[NOTATIONNOTE].length > 0 ? obj[NOTATIONNOTE] : ["R"];
                 note = __toLilynote(notes[0]);
             }
 
@@ -930,7 +930,6 @@ const saveLilypondOutput = function (activity) {
     // Add GUITAR TAB in comments.
     activity.logo.notationOutput += activity.logo.guitarOutputHead;
     for (let c = 0; c < CLEFS.length; c++) {
-        const i = 0;
         let instrumentName;
         for (const t in activity.logo.notationNotes) {
             let tNumber = t;
@@ -938,7 +937,7 @@ const saveLilypondOutput = function (activity) {
                 tNumber = Number(t);
             }
 
-            if (clef[i] === CLEFS[c]) {
+            if (clef[tNumber] === CLEFS[c]) {
                 if (activity.logo.notation.notationStaging[t].length > 0) {
                     if (tNumber > startDrums - 1) {
                         instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];

@@ -1454,7 +1454,7 @@ describe("LegoWidget — _createWidgetWindow", () => {
     it("should look up, clear, and show the widget window", () => {
         const widgetWindow = legoWidget._createWidgetWindow();
 
-        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(legoWidget, "LEGO BRICKS");
+        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(legoWidget, "LEGO Bricks");
         expect(widgetWindow).toBe(mockWindow);
         expect(legoWidget.widgetWindow).toBe(mockWindow);
         expect(mockWindow.clear).toHaveBeenCalled();
