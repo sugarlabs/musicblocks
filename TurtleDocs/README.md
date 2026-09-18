@@ -53,50 +53,48 @@ The basic buttons and basic blocks are explained in detail in [Documentation](./
 
 A guide to programming with Turtle Blocks is available in [Turtle Blocks Guide](./guide/README.md).
 
-A quick start:
+<img src='./documentation/play.png' /> Click to run the project at full speed.
 
-[Play](./documentation/play.png) Click to run the project at full speed.
+<img src='./documentation/stop.png' /> Stop the current project running.
 
-[Stop](./documentation/stop.png) Stop the current project running.
+<img src='./documentation/new-project.png' /> To start a new project.
 
-[New project](./documentation/new-project.png) To start a new project.
+<img src='./documentation/save-project.png' /> To save a project.
 
-[Save](./documentation/save-project.png) To save a project.
+<img src='./documentation/open-project.png' /> To open a saved project.
 
-[Open](./documentation/open-project.png) To open a saved project.
+Under the secondary menu <img src='./documentation/hamburger.png' /> there are additional play buttons.
 
-Under the secondary menu [hamburger menu](./documentation/hamburger.png) there are additional play buttons.
+<img src='./documentation/play-slow.png' /> Click to run the project slowly.
 
-[Play slow](./documentation/play-slow.png) Click to run the project slowly.
+<img src='./documentation/step.png' /> Click to run the project step by step.
 
-[Step](./documentation/step.png) Click to run the project step by step.
-
-[Advanced mode](./documentation/advanced-mode.png) Use advanced mode to expose many additional blocks and features.
+<img src='./documentation/advanced-mode.png' /> Use advanced mode to expose many additional blocks and features.
 
 There are some buttons at the top of the canvas:
 
-[Erase](./documentation/erase.png) The Show (or hide) grid button will display a pie menu with a variety of grid options. The Erase button will clear the screen and return the turtles to the center of the screen. The Screen button will shrink (or expand) the graphics area.
+<img src='./documentation/erase.png' /> The Show (or hide) grid button will display a pie menu with a variety of grid options. The Erase button will clear the screen and return the turtles to the center of the screen. The Screen button will shrink (or expand) the graphics area.
 
 There are some buttons on the bottom of the canvas:
 
-[Home/Hide/Collapse](./documentation/home-hide-collapse.png)
+<img src='./documentation/home-hide-collapse.png' />
 The Home buttom returns the blocks the center of the screen. The Hide button hides (or reveals) the blocks. The Collapse button collapses (or expands) stacks of blocks. The Shrink and Grow buttons change the size of the blocks.
 
 Some basic blocks include:
 
-[forward](./documentation/forward.png) Moves turtle forward.
+<img src='./documentation/forward.png' /> Moves turtle forward.
 
-[rotate](./documentation/right.svg) Turns turtle clockwise (angle in degrees).
+<img src='./documentation/right.svg' /> Turns turtle clockwise (angle in degrees).
 
-[set color](./documentation/set_color.svg) Sets color of the line drawn by the turtle.
+<img src='./documentation/set_color.svg' /> Sets color of the line drawn by the turtle.
 
-[set size](./documentation/set_pen_size.svg) Sets size of the line drawn by the turtle.
+<img src='./documentation/set_pen_size.svg' /> Sets size of the line drawn by the turtle.
 
-[repeat](./documentation/repeat.svg) Loops specified number of times.
+<img src='./documentation/repeat.svg' /> Loops specified number of times.
 
-[action](./documentation/action_flow.svg) Top of nameable action stack.
+<img src='./documentation/action_flow.svg' /> Top of nameable action stack.
 
-[do action](./documentation/action.svg) Invokes named action stack.
+<img src='./documentation/action.svg' /> Invokes named action stack.
 
 Google Code-in participant Jasmine Park has created some guides to
 using Turtle Blocks: [Turtle Blocks: An Introductory
