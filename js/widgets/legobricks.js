@@ -711,7 +711,7 @@ function LegoWidget() {
 
         const spacingIn = document.createElement("button");
         spacingIn.textContent = "+";
-        spacingIn.onclick = () => this._adjustVerticalSpacing(1);
+        spacingIn.onclick = () => this._adjustVerticalSpacing(5);
 
         this.spacingValue = document.createElement("span");
         this.spacingValue.textContent = "50px";
