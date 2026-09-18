@@ -1,40 +1,37 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 language: "en-US"
 
+# uncomment if coderabbit is installed org-wide across multiple sugarlabs repos:
+
+# inheritance: true
+# knowledge_base:
+#     automatic_repository_linking: true
+#     issues:
+#         scope: global
+#     pull_requests:
+#         scope: global
+
 reviews:
     profile: "chill"
-    high_level_summary: true
     collapse_walkthrough: false
-    request_changes_workflow: false
-    review_status: true
-    sequence_diagrams: true
+    slop_detection:
+        enabled: true
 
     auto_review:
-        enabled: true
-        drafts: false
         base_branches:
             - "master"
 
     path_filters:
-        - "!**/node_modules/**"
         - "!**/bower_components/**"
         - "!**/lib/**"
         - "!**/dist/**"
-        - "!**/coverage/**"
-        - "!**/po/**"
         - "!**/locales/**"
         - "!**/sounds/**"
         - "!**/images/**"
         - "!**/screenshots/**"
         - "!**/fonts/**"
         - "!**/header-icons/**"
-        - "!**/*.png"
-        - "!**/*.jpg"
-        - "!**/*.jpeg"
-        - "!**/*.mp4"
-        - "!**/*.webm"
         - "!**/*.svg"
-        - "!package-lock.json"
 
     path_instructions:
         - path: "js/**/*.js"
@@ -88,29 +85,17 @@ reviews:
                   Pass: The PR description accurately reflects the code changes in the diff.
                   Fail: The description contradicts the diff or leaves core functional changes unexplained.
                   Inconclusive: The description is brief but not inaccurate.
-
-            - name: "Multiple Issues Linked"
+            
+            - name: "Category-Specific Sections"
               mode: "warning"
               instructions: |
-                  Pass: The PR references multiple closely related issues fixed together.
-                  Fail: The PR references multiple functionally unrelated issues that should be split into separate PRs.
-                  Inconclusive: Only one issue or no issue is linked.
-
-    tools:
-        eslint:
-            enabled: true
-        markdownlint:
-            enabled: true
-        yamllint:
-            enabled: true
-        actionlint:
-            enabled: true
-        gitleaks:
-            enabled: true
-        github-checks:
-            enabled: true
-        semgrep:
-            enabled: true
+                  Read which boxes are checked under "Category" in the PR description and check the diff for visual modifications.
+                  Pass: Every section required by the checked categories or code changes contains real content, not just placeholder HTML comments:
+                  - "Bug Fix" checked -> "Steps to Reproduce" contains concrete, numbered steps describing how to trigger the bug.
+                  - Visual/UI changes detected (in diff or description, e.g., CSS, SCSS, canvas rendering, palette layouts, block artwork, widget styles) -> "Visual Changes" contains at least one Before and one After screenshot or media link.
+                  - Any other category checked -> "Description" and "Changes Made" contains essential details explaining the changes.
+                  Fail: A required section is missing, empty, or contains only placeholder comment text.
+                  Inconclusive: No Category box is checked and no visual changes are detected in the diff or description.
 
 chat:
     auto_reply: true

@@ -78,8 +78,8 @@ window.widgetWindows = {
         for (let i = 0; i < widgetTitle.length; i++) {
             const titleEl = widgetTitle[i];
             if (
-                titleEl.innerHTML === name ||
-                titleEl.innerHTML === searchKey ||
+                titleEl.textContent.trim() === name ||
+                titleEl.textContent.trim() === searchKey ||
                 titleEl.id === `${searchKey}WidgetID`
             ) {
                 const winKey =
@@ -415,6 +415,12 @@ class WidgetWindow {
 
             const newBcr = this._drag.getBoundingClientRect();
             this.setPosition(e.clientX + dxRatio * (newBcr.right - newBcr.left), e.clientY + dy);
+
+            // Recalculate drag offsets from the restored frame so the rAF
+            // callback below does not overwrite the position with stale values.
+            const restoredBcr = this._drag.getBoundingClientRect();
+            this._dx = e.clientX - restoredBcr.left;
+            this._dy = e.clientY - restoredBcr.top;
         }
         // Throttle using requestAnimationFrame to prevent layout thrashing
         if (this._rafTicking) return;
@@ -585,8 +591,12 @@ class WidgetWindow {
      */
     updateTitle(title) {
         const wftTitle = docById(this._key + "WidgetID");
-        wftTitle.textContent = title;
-        this._frame.setAttribute("aria-label", title);
+        if (wftTitle) {
+            wftTitle.textContent = title;
+        }
+        if (this._frame) {
+            this._frame.setAttribute("aria-label", title);
+        }
     }
 
     /**

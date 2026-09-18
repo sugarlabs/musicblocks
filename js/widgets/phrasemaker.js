@@ -19,7 +19,7 @@
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
    LCD, calcNoteValueToDisplay, NOTESYMBOLS,
-   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, parseNoteString
+   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, parseNoteString, announceToScreenReader
 */
 
 /*
@@ -405,6 +405,8 @@ class PhraseMaker {
                 cell.textContent = "";
                 const img = document.createElement("img");
                 img.src = `images/8_bellset_key_${BELLSETIDX[noteName]}.svg`;
+                img.title = this._("bell") + " " + noteName;
+                img.alt = this._("bell") + " " + noteName;
                 img.setAttribute("width", cell.style.width);
                 img.setAttribute("vertical-align", "middle");
                 cell.appendChild(img);
@@ -412,6 +414,8 @@ class PhraseMaker {
                 cell.textContent = "";
                 const img = document.createElement("img");
                 img.src = "images/8_bellset_key_8.svg";
+                img.title = this._("bell") + " C";
+                img.alt = this._("bell") + " C";
                 img.setAttribute("width", cell.style.width);
                 img.setAttribute("vertical-align", "middle");
                 cell.appendChild(img);
@@ -596,6 +600,9 @@ class PhraseMaker {
         const iconSize = PhraseMaker.ICONSIZE * this._cellScale;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
+        if (this.isInitial) {
+            announceToScreenReader(_("Phrase Maker opened"));
+        }
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -774,6 +781,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/synth2.svg";
+                img.title = this._(this.rowLabels[i]);
+                img.alt = this._(this.rowLabels[i]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -783,6 +792,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/mouse.svg";
+                img.title = this._(this.rowLabels[i]);
+                img.alt = this._(this.rowLabels[i]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -792,6 +803,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/mouse.svg";
+                img.title = this._(this.rowLabels[i]);
+                img.alt = this._(this.rowLabels[i]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -819,12 +832,21 @@ class PhraseMaker {
                 if (noteName in BELLSETIDX && this.rowArgs[i] === 4) {
                     const img = document.createElement("img");
                     img.src = `images/8_bellset_key_${BELLSETIDX[noteName]}.svg`;
+                    img.title = this._("bell") + " " + noteName;
+                    img.alt = this._("bell") + " " + noteName;
                     img.setAttribute("width", cell.style.width);
                     img.setAttribute("vertical-align", "middle");
                     cell.appendChild(img);
                 } else if (["C", "do"].includes(noteName) && this.rowArgs[i] === 5) {
                     const img = document.createElement("img");
                     img.src = "images/8_bellset_key_8.svg";
+                    const displayNote =
+                        this._deps.noteIsSolfege(noteName) &&
+                        !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
+                            ? this._deps.i18nSolfege(noteName)
+                            : noteName;
+                    img.title = this._("bell") + " " + displayNote;
+                    img.alt = this._("bell") + " " + displayNote;
                     img.setAttribute("width", cell.style.width);
                     img.setAttribute("vertical-align", "middle");
                     cell.appendChild(img);
@@ -1026,17 +1048,13 @@ class PhraseMaker {
         if (this.lyricsON) {
             const lyricsRow = ptmTable.insertRow();
             lyricsRow.setAttribute("id", "lyricRow");
-            lyricsRow.style.position = "sticky";
+            lyricsRow.classList.add("pm-lyrics-row");
 
             // Label Icon
             cell = lyricsRow.insertCell();
             cell.setAttribute("colspan", "1");
-            cell.className = "headcol";
-            cell.style.position = "sticky";
-            cell.style.left = "1.2px";
-            cell.style.zIndex = "1";
+            cell.className = "headcol pm-lyrics-label";
             cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
-            cell.style.textAlign = "center";
             cell.textContent = "";
             const penImg = document.createElement("img");
             penImg.src = "images/pen.svg";
@@ -1048,12 +1066,8 @@ class PhraseMaker {
             // Label Cell (Fixed like "note value")
             cell = lyricsRow.insertCell();
             cell.setAttribute("colspan", "1");
-            cell.className = "headcol";
-            cell.style.position = "sticky";
-            cell.style.left = "1.2px";
-            cell.style.zIndex = "1";
+            cell.className = "headcol pm-lyrics-label";
             cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
-            cell.style.textAlign = "center";
             cell.textContent = "Lyrics";
 
             // Nested Table for Input Fields
@@ -1072,36 +1086,22 @@ class PhraseMaker {
             for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 const noteValue = this.activity.logo.tupletRhythms[i][2];
                 const inputCell = inputRow.insertCell();
+                inputCell.classList.add("pm-lyrics-cell");
                 inputCell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
                 inputCell.style.width = this._noteWidth(noteValue) + "px";
                 inputCell.style.minWidth = inputCell.style.width;
                 inputCell.style.maxWidth = inputCell.style.width;
                 inputCell.style.backgroundColor = this.platformColor.lyricsInputBackground;
-                inputCell.style.fontFamily = "sans-serif";
-                inputCell.style.cursor = "default";
-                inputCell.style.borderSpacing = "1px 1px";
-                inputCell.style.borderCollapse = "collapse";
-                inputCell.style.boxSizing = "border-box";
-                inputCell.style.padding = "0";
-                inputCell.style.borderRadius = "6px";
-                inputCell.style.border = "none";
                 inputCell.setAttribute("alt", i + "__" + "graphicsblocks2");
 
                 const lyricsInput = document.createElement("input");
                 lyricsInput.type = "text";
                 lyricsInput.value = this._lyrics[i];
+                lyricsInput.classList.add("pm-lyrics-input");
 
                 lyricsInput.style.height = inputCell.style.height;
-                lyricsInput.style.width = "100%";
                 lyricsInput.style.minWidth = inputCell.style.minWidth;
                 lyricsInput.style.maxWidth = inputCell.style.maxWidth;
-                lyricsInput.style.fontSize = "inherit";
-                lyricsInput.style.fontFamily = "sans-serif";
-                lyricsInput.style.cursor = "default";
-                lyricsInput.style.boxSizing = "border-box";
-                lyricsInput.style.padding = "0";
-                lyricsInput.style.border = "none";
-                lyricsInput.style.borderRadius = "6px";
                 lyricsInput.style.backgroundColor = this.platformColor.lyricsInputBackground;
 
                 inputCell.appendChild(lyricsInput);
@@ -1232,6 +1232,7 @@ class PhraseMaker {
         if (this.widgetWindow && typeof this.widgetWindow.destroy === "function") {
             this.widgetWindow.destroy();
         }
+        announceToScreenReader(_("Phrase Maker closed"));
     }
 
     _setupWheelDiv(size, left, top) {
@@ -1740,6 +1741,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/mouse.svg";
+                img.title = this._(this.rowLabels[blockIndex]);
+                img.alt = this._(this.rowLabels[blockIndex]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -2035,6 +2038,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/synth2.svg";
+                img.title = this._(this.rowLabels[blockIndex]);
+                img.alt = this._(this.rowLabels[blockIndex]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -2044,6 +2049,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/mouse.svg";
+                img.title = this._(this.rowLabels[blockIndex]);
+                img.alt = this._(this.rowLabels[blockIndex]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -2852,11 +2859,16 @@ class PhraseMaker {
      */
     _export() {
         const exportWindow = window.open("");
-        const exportDocument = exportWindow.document;
-        if (exportDocument === undefined) {
+        if (!exportWindow) {
             console.debug("Could not create export window");
+            this.activity.errorMsg(
+                this._(
+                    "Could not open export window. This is often caused by a browser pop-up blocker — check your settings and try again."
+                )
+            );
             return;
         }
+        const exportDocument = exportWindow.document;
 
         const title = exportDocument.createElement("title");
         title.textContent = "Music Matrix";

@@ -15,7 +15,7 @@
 
    last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
-   getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
+   getOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
    DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber
@@ -877,6 +877,7 @@ function Synth() {
      * @returns {number|number[]} - The frequency or frequencies.
      */
     this.getCustomFrequency = (notes, customID) => {
+        const _stripCents = n => (typeof n === "string" ? n.replace(/\(.*\)/, "") : n);
         const __getCustomFrequency = (oneNote, startingPitch) => {
             const parsed = parseNoteString(oneNote);
             const octave = parsed[1];
@@ -891,12 +892,14 @@ function Synth() {
             );
             if (typeof oneNote !== "number") {
                 const thisTemperament = getTemperament(customID);
+                const target = _stripCents(oneNote);
                 for (const pitchNumber in thisTemperament) {
                     if (pitchNumber !== "pitchNumber") {
+                        const n3 = thisTemperament[pitchNumber][3];
+                        const n1 = thisTemperament[pitchNumber][1];
                         if (
-                            (isCustomTemperament(customID) &&
-                                oneNote === thisTemperament[pitchNumber][3]) ||
-                            oneNote === thisTemperament[pitchNumber][1]
+                            (isCustomTemperament(customID) && target === _stripCents(n3)) ||
+                            target === _stripCents(n1)
                         ) {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
@@ -1798,7 +1801,6 @@ function Synth() {
      * @returns {Tone.Instrument|null} - The loaded synth or null if not loaded.
      */
     this.loadSynth = async (turtle, sourceName) => {
-        /* eslint-disable */
         sourceName = this.resolveInstrumentName(sourceName);
         if (sourceName.substring(0, 13) === "customsample_") {
             console.debug("loading custom " + sourceName);
@@ -1863,13 +1865,11 @@ function Synth() {
         }
 
         if (needsFreqConversion()) {
-            if (typeof notes === "number") {
-                notes = notes;
-            } else {
+            if (typeof notes !== "number") {
                 const notes1 = notes;
                 notes = this._getFrequency(notes, this.changeInTemperament);
                 if (notes === undefined) {
-                    if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
+                    if (notes1.substring(1, notes1.length - 1) === DOUBLEFLAT) {
                         notes = notes1.substring(0, 1) + "bb" + notes1.substring(notes1.length - 1);
                     } else if (notes1.substring(1, notes1.length - 1) === DOUBLESHARP) {
                         notes = notes1.substring(0, 1) + "x" + notes1.substring(notes1.length - 1);
@@ -1882,12 +1882,7 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            if (
-                typeof notes === "string" &&
-                (notes.search("[+]") !== -1 || notes.search("[-]") !== -1)
-            ) {
-                notes = this.getCustomFrequency(notes, this.inTemperament);
-            }
+            notes = this.getCustomFrequency(notes, this.inTemperament);
             if (notes === undefined || notes === "undefined") {
                 notes = notes1;
             }
@@ -2471,6 +2466,7 @@ function Synth() {
                 instruments[turtle][instrumentName].stop();
                 break;
             default:
+                // eslint-disable-next-line eqeqeq -- loose on purpose, catches null and undefined
                 if (note == undefined) {
                     instruments[turtle][instrumentName].triggerRelease();
                 } else {
@@ -2487,6 +2483,7 @@ function Synth() {
         const flag = instrumentsSource[instrumentName][0];
         const now = Tone.now();
         const loopA = new Tone.Loop(time => {
+            // eslint-disable-next-line eqeqeq -- flag comes from instrumentsSource and may be "1"
             if (flag == 1) {
                 this.setVolume(turtle, instrumentName, velocity * 100);
                 instruments[turtle][instrumentName].start();
@@ -2658,15 +2655,9 @@ function Synth() {
 
         this.mic = new Tone.UserMedia();
         this.recorder = new Tone.Recorder();
-        await this.mic
-            .open()
-            .then(() => {
-                this.mic.connect(this.recorder);
-                this.recorder.start();
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        await this.mic.open();
+        this.mic.connect(this.recorder);
+        this.recorder.start();
     };
 
     const _disposeRecordingPlayer = () => {
@@ -3145,10 +3136,6 @@ function Synth() {
                                 activityProxy.logo = logo;
 
                                 const tempBlock = {
-                                    container: {
-                                        x: targetNoteSelector.offsetLeft,
-                                        y: targetNoteSelector.offsetTop
-                                    },
                                     activity: activityProxy,
                                     blocks: {
                                         blockList: [

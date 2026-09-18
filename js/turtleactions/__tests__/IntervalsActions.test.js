@@ -324,14 +324,15 @@ describe("setupIntervalsActions", () => {
         });
 
         test("19-EDO overflow with multiple octaves uses correct plural", () => {
-            // C→C (forwardDiff=0 → base=1), octave=2 → totalIntervals = 1 + 19 + 19 = 39
-            // 39 > 28 → trigger overflow, reduce: 39-19=20, 20-19=1
-            const notes = { firstNote: "C", secondNote: "C", octave: 2 };
+            // C→B (diff=11), octave=2 → totalIntervals = 11 + 19 + 19 = 49
+            // 49 > 28 → trigger overflow, reduce: 49-19=30, 30-19=11
+            const notes = { firstNote: "C", secondNote: "B", octave: 2 };
             GetNotesForInterval.mockReturnValueOnce(notes);
             GetNotesForInterval.mockReturnValueOnce(notes);
 
             const result = Singer.IntervalsActions.GetCurrentInterval(0);
             // lastWord = ", plus two octaves"
+            expect(result).toContain("plus");
             expect(result).toContain("two");
             expect(result).toContain("octaves");
         });
@@ -386,13 +387,22 @@ describe("setupIntervalsActions", () => {
     describe("GetIntervalNumber precise octave and wrap-around values", () => {
         // Same note letter on both ends keeps letterGap out of play, isolating the
         // octave-sign handling (below-wrap at line ~110, Math.abs at line ~113).
+        test("octave === 0 evaluates identical notes to 0 semitones (unison)", () => {
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: "C",
+                secondNote: "C",
+                octave: 0
+            });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(0);
+        });
+
         test("octave === -1 wraps a single octave below", () => {
             GetNotesForInterval.mockReturnValueOnce({
                 firstNote: "C",
                 secondNote: "C",
                 octave: -1
             });
-            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(11);
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(12);
         });
 
         test("octave === -2 combines the below-wrap with the Math.abs(octave) accumulation", () => {
@@ -401,12 +411,12 @@ describe("setupIntervalsActions", () => {
                 secondNote: "C",
                 octave: -2
             });
-            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(35);
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(24);
         });
 
         test("octave === 1 accumulates one temperament length without the below-wrap", () => {
             GetNotesForInterval.mockReturnValueOnce({ firstNote: "C", secondNote: "C", octave: 1 });
-            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(13);
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(12);
         });
 
         test("overflow-guard boundary: totalIntervals === temperamentLength + 9 is exact, not exceeded", () => {
@@ -435,15 +445,23 @@ describe("setupIntervalsActions", () => {
     });
 
     describe("GetCurrentInterval precise wording assertions", () => {
+        test("octave === 0 evaluates identical notes to Perfect unison", () => {
+            const notes = { firstNote: "C", secondNote: "C", octave: 0 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("perfect");
+        });
+
         test.each([
-            [-2, "perfect,  two octaves below"],
-            [-3, "perfect,  three octaves below"],
-            [-4, "perfect,  four octaves below"],
-            [-5, "perfect,  five octaves below"],
-            [-6, "perfect,  six octaves below"],
-            [-7, "perfect,  seven octaves below"],
-            [-8, "perfect,  eight octaves below"],
-            [-9, "perfect,  nine octaves below"]
+            [-2, "Two perfect octaves below"],
+            [-3, "Three perfect octaves below"],
+            [-4, "Four perfect octaves below"],
+            [-5, "Five perfect octaves below"],
+            [-6, "Six perfect octaves below"],
+            [-7, "Seven perfect octaves below"],
+            [-8, "Eight perfect octaves below"],
+            [-9, "Nine perfect octaves below"]
         ])("octave === %i produces %j", (octave, expected) => {
             const notes = { firstNote: "C", secondNote: "C", octave };
             GetNotesForInterval.mockReturnValueOnce(notes);
@@ -457,7 +475,7 @@ describe("setupIntervalsActions", () => {
             GetNotesForInterval.mockReturnValueOnce(notes);
             GetNotesForInterval.mockReturnValueOnce(notes);
 
-            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("perfect below");
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("Perfect octave below");
         });
 
         test("overflow-guard 'plus one octave' wording uses singular octave and the 'one' word", () => {
@@ -650,6 +668,54 @@ describe("setupIntervalsActions", () => {
     test("setScalarInterval rounds a negative value up with Math.ceil", () => {
         Singer.IntervalsActions.setScalarInterval(-2.5, 0, "blk");
         expect(turtle.singer.intervals).toEqual([-2]);
+    });
+
+    test("setScalarInterval rejects a value far past the bound instead of pushing it unbounded", () => {
+        Singer.IntervalsActions.setScalarInterval(999999999, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval rejects a large negative value past the bound", () => {
+        Singer.IntervalsActions.setScalarInterval(-999999999, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval rejects a value one past the positive bound", () => {
+        Singer.IntervalsActions.setScalarInterval(70, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval accepts a value exactly at the positive bound", () => {
+        Singer.IntervalsActions.setScalarInterval(69, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.intervals).toEqual([69]);
+    });
+
+    test("setScalarInterval rejects a value one past the negative bound", () => {
+        Singer.IntervalsActions.setScalarInterval(-64, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval accepts a value exactly at the negative bound", () => {
+        Singer.IntervalsActions.setScalarInterval(-63, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.intervals).toEqual([-63]);
     });
 
     test("setScalarInterval dispatches to setDispatchBlock when blk is registered", () => {

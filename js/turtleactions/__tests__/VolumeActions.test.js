@@ -98,6 +98,16 @@ describe("setupVolumeActions", () => {
             logo: {
                 setDispatchBlock: jest.fn(),
                 setTurtleListener: jest.fn(),
+                stopTurtle: false,
+                _timerManager: {
+                    setGuardedTimeout: jest.fn((cb, delay, guard) => {
+                        return setTimeout(() => {
+                            if (!guard()) cb();
+                        }, delay);
+                    }),
+                    clearTimeout: jest.fn(id => clearTimeout(id)),
+                    clearAll: jest.fn(() => 0)
+                },
                 synth: {
                     loadSynth: jest.fn(),
                     setMasterVolume: jest.fn(),
@@ -202,8 +212,10 @@ describe("setupVolumeActions", () => {
         ])("listener execution with justCounting %p", (justCounting, noCall) => {
             targetTurtle.singer.justCounting = justCounting;
             Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
+            expect(targetTurtle.singer.inCrescendo.length).toBe(1);
             const listener = activity.logo.setTurtleListener.mock.calls.pop()[2];
             listener();
+            expect(targetTurtle.singer.inCrescendo.length).toBe(0);
             if (!noCall) {
                 expect(crescendoEndSpy).toHaveBeenCalledWith(0, 10);
             } else {

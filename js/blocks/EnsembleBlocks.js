@@ -14,10 +14,10 @@
 
    _, last, FlowBlock, ValueBlock, FlowClampBlock, LeftBlock, BooleanBlock,
    NOINPUTERRORMSG, NANERRORMSG, INVALIDPITCH, getNote, pitchToNumber,
-   TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor, pubsub
+   TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor, pubsub, noteToObj
 */
 
-/* exported setupEnsembleBlocks, getTargetTurtle */
+/* exported setupEnsembleBlocks, getTargetTurtle, _blockFindTurtle */
 
 /**
  * The target-turtle name can be a string or an int. Makes sure there is a turtle by this name and then finds the associated start block.
@@ -56,6 +56,7 @@ function _blockFindTurtle(activity, turtle, blk, receivedArg) {
     }
     const targetTurtleId = getTargetTurtle(activity.turtles, targetTurtle);
     if (targetTurtleId === null) {
+        activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
         return null;
     }
     return activity.turtles.getTurtle(targetTurtleId);
@@ -400,7 +401,13 @@ function setupEnsembleBlocks(activity) {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 //.TRANS: set xy position for this mouse
                 super("setxyturtle", _("set mouse"));
-                this.setHelpString();
+                this.setHelpString([
+                    _(
+                        "The Set mouse block places the specified mouse at a specific x and y coordinate."
+                    ),
+                    "documentation",
+                    ""
+                ]);
 
                 this.formBlock({
                     args: 3,
@@ -411,7 +418,13 @@ function setupEnsembleBlocks(activity) {
             } else {
                 //.TRANS: set xy position for this turtle
                 super("setxyturtle", _("set turtle"));
-                this.setHelpString();
+                this.setHelpString([
+                    _(
+                        "The Set turtle block places the specified turtle at a specific x and y coordinate."
+                    ),
+                    "documentation",
+                    ""
+                ]);
 
                 this.formBlock({
                     args: 3,
@@ -606,7 +619,7 @@ function setupEnsembleBlocks(activity) {
                 });
             } else {
                 //.TRANS: notes played by this turtle
-                super("turtlelapsednotes", _("turtle notes played"));
+                super("turtleelapsednotes", _("turtle notes played"));
                 this.setHelpString([
                     _(
                         "The Turtle elapse notes block returns the number of notes played by the specified turtle."
@@ -694,14 +707,7 @@ function setupEnsembleBlocks(activity) {
                 if (targetTurtle === thisTurtle.name) {
                     let obj;
                     if (thisTurtle.singer.lastNotePlayed !== null) {
-                        const len = thisTurtle.singer.lastNotePlayed[0].length;
-                        const pitch = thisTurtle.singer.lastNotePlayed[0].slice(0, len - 1);
-                        const octave = parseInt(
-                            thisTurtle.singer.lastNotePlayed[0].slice(len - 1),
-                            10
-                        );
-
-                        obj = [pitch, octave];
+                        obj = noteToObj(thisTurtle.singer.lastNotePlayed[0]);
                     } else if (thisTurtle.singer.notePitches.length > 0) {
                         obj = getNote(
                             thisTurtle.singer.notePitches[0],
@@ -736,10 +742,7 @@ function setupEnsembleBlocks(activity) {
 
                 let obj;
                 if (tur.singer.lastNotePlayed !== null) {
-                    const len = tur.singer.lastNotePlayed[0].length;
-                    const pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                    const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
-                    obj = [pitch, octave];
+                    obj = noteToObj(tur.singer.lastNotePlayed[0]);
                 } else if (tur.singer.notePitches.length > 0) {
                     obj = getNote(
                         tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
@@ -1361,5 +1364,5 @@ function setupEnsembleBlocks(activity) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { setupEnsembleBlocks, getTargetTurtle };
+    module.exports = { setupEnsembleBlocks, getTargetTurtle, _blockFindTurtle };
 }

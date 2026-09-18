@@ -106,6 +106,8 @@ describe("ReflectionMatrix", () => {
             expect(reflection.code).toBe("");
             expect(reflection.pendingMessages).toEqual([]);
             expect(reflection.isProcessingPendingMessage).toBe(false);
+            expect(reflection._lifecycle.isMounted).toBe(false);
+            expect(reflection._lifecycle.pendingRequests.size).toBe(0);
         });
     });
 
@@ -148,10 +150,17 @@ describe("ReflectionMatrix", () => {
 
             // Trigger close
             reflection.dotsInterval = setInterval(() => {}, 1000);
+            const abortSpy = jest.fn();
+            reflection._lifecycle.pendingRequests.add({ abort: abortSpy });
             mockWidgetWindow.onclose();
 
             expect(reflection.isOpen).toBe(false);
+            expect(reflection._lifecycle.isMounted).toBe(false);
             expect(mockActivity.isInputON).toBe(false);
+            expect(abortSpy).toHaveBeenCalled();
+            expect(reflection._lifecycle.pendingRequests.size).toBe(0);
+            expect(reflection.pendingMessages).toEqual([]);
+            expect(reflection.isProcessingPendingMessage).toBe(false);
             expect(mockWidgetWindow.destroy).toHaveBeenCalled();
         });
 
@@ -235,6 +244,8 @@ describe("ReflectionMatrix", () => {
         test("showTypingIndicator creates indicator and animates dots", () => {
             const reflection = new ReflectionMatrix();
             reflection.chatLog = document.createElement("div");
+            reflection._lifecycle.isMounted = true;
+            reflection.isOpen = true;
 
             reflection.showTypingIndicator("Thinking");
 
@@ -256,6 +267,8 @@ describe("ReflectionMatrix", () => {
         test("hideTypingIndicator removes indicator and clears interval", () => {
             const reflection = new ReflectionMatrix();
             reflection.chatLog = document.createElement("div");
+            reflection._lifecycle.isMounted = true;
+            reflection.isOpen = true;
 
             reflection.showTypingIndicator("Thinking");
             const typingDiv = reflection.typingDiv;
@@ -296,6 +309,8 @@ describe("ReflectionMatrix", () => {
             reflection.chatLog = document.createElement("div");
             reflection.input = document.createElement("input");
             reflection.summaryButton = document.createElement("button");
+            reflection._lifecycle.isMounted = true;
+            reflection.isOpen = true;
 
             jest.spyOn(reflection, "showTypingIndicator").mockImplementation(() => {});
             jest.spyOn(reflection, "hideTypingIndicator").mockImplementation(() => {});
@@ -376,11 +391,15 @@ describe("ReflectionMatrix", () => {
 
             const data = await reflection.generateAlgorithm("some_code");
 
-            expect(global.fetch).toHaveBeenCalledWith(`${reflection.PORT}/projectcode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ code: "some_code" })
-            });
+            expect(global.fetch).toHaveBeenCalledWith(
+                `${reflection.PORT}/projectcode`,
+                expect.objectContaining({
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    signal: expect.anything(),
+                    body: JSON.stringify({ code: "some_code" })
+                })
+            );
             expect(data).toEqual({ algorithm: "alg" });
         });
 
@@ -400,11 +419,14 @@ describe("ReflectionMatrix", () => {
 
             const data = await reflection.generateNewAlgorithm("new_code");
 
-            expect(global.fetch).toHaveBeenCalledWith(`${reflection.PORT}/updatecode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ oldcode: "old_code", newcode: "new_code" })
-            });
+            expect(global.fetch).toHaveBeenCalledWith(
+                `${reflection.PORT}/updatecode`,
+                expect.objectContaining({
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ oldcode: "old_code", newcode: "new_code" })
+                })
+            );
             expect(data).toEqual({ algorithm: "new_alg" });
         });
 
@@ -416,18 +438,21 @@ describe("ReflectionMatrix", () => {
             const data = await reflection.generateBotReply("msg", [], "meta", "alg");
 
             expect(reflection.showTypingIndicator).toHaveBeenCalled();
-            expect(global.fetch).toHaveBeenCalledWith(`${reflection.PORT}/chat`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    query: "msg",
-                    messages: [],
-                    mentor: "meta",
-                    algorithm: "alg",
-                    conversation_summary: null,
-                    summarized_up_to: 0
+            expect(global.fetch).toHaveBeenCalledWith(
+                `${reflection.PORT}/chat`,
+                expect.objectContaining({
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        query: "msg",
+                        messages: [],
+                        mentor: "meta",
+                        algorithm: "alg",
+                        conversation_summary: null,
+                        summarized_up_to: 0
+                    })
                 })
-            });
+            );
             expect(reflection.hideTypingIndicator).toHaveBeenCalled();
             expect(data).toEqual({ response: "AI reply" });
         });
@@ -608,6 +633,251 @@ describe("ReflectionMatrix", () => {
             expect(global.URL.revokeObjectURL).toHaveBeenCalled();
 
             spy.mockRestore();
+        });
+    });
+
+    describe("Async lifecycle", () => {
+        let reflection;
+
+        beforeEach(() => {
+            reflection = new ReflectionMatrix();
+            reflection.activity = mockActivity;
+            reflection.chatLog = document.createElement("div");
+            reflection.input = document.createElement("input");
+            reflection._lifecycle.isMounted = true;
+            reflection.isOpen = true;
+        });
+
+        test("sendMessage ignores input after the widget is closed", () => {
+            reflection.input.value = "Hello AI";
+            reflection._lifecycle.isMounted = false;
+
+            reflection.sendMessage();
+
+            expect(reflection.chatLog.childNodes.length).toBe(0);
+            expect(reflection.pendingMessages).toEqual([]);
+        });
+
+        test("processPendingMessages stops and drops queued messages after close", async () => {
+            reflection.pendingMessages = [
+                { text: "First", mentor: "meta", algorithm: "alg-1" },
+                { text: "Second", mentor: "code", algorithm: "alg-2" }
+            ];
+            reflection._lifecycle.isMounted = false;
+
+            await reflection.processPendingMessages();
+
+            expect(reflection.chatHistory).toEqual([]);
+            expect(reflection.isProcessingPendingMessage).toBe(false);
+        });
+
+        test("processPendingMessages ignores late replies after close", async () => {
+            reflection.pendingMessages = [{ text: "First", mentor: "meta", algorithm: "alg-1" }];
+            const appendSpy = jest.spyOn(reflection, "appendBotReply");
+
+            let resolveFetch;
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            const processing = reflection.processPendingMessages();
+            reflection._lifecycle.isMounted = false;
+
+            resolveFetch({ json: jest.fn().mockResolvedValue({ response: "Late reply" }) });
+            await processing;
+
+            expect(reflection.chatHistory).toEqual([{ role: "user", content: "First" }]);
+            expect(appendSpy).not.toHaveBeenCalled();
+        });
+
+        test("botReplyDiv preserves the mentor selected when the request started", async () => {
+            reflection.chatHistory = [];
+            reflection.AImentor = "meta";
+            reflection.projectAlgorithm = "alg";
+
+            let resolveFetch;
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            const replyPromise = reflection.botReplyDiv("Hello");
+            reflection.AImentor = "code";
+            resolveFetch({ json: jest.fn().mockResolvedValue({ response: "Still from Rohan" }) });
+            await replyPromise;
+
+            expect(reflection.chatHistory[reflection.chatHistory.length - 1]).toEqual({
+                role: "meta",
+                content: "Still from Rohan"
+            });
+            expect(reflection.chatLog.lastChild.firstChild.innerText).toBe("ROHAN");
+        });
+
+        test("updateProjectCode ignores repeat clicks while a request is in flight", async () => {
+            reflection.code = "old_code";
+            reflection.inputContainer = document.createElement("div");
+
+            let resolveExport;
+            mockActivity.prepareExport.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveExport = resolve;
+                    })
+            );
+            const generateSpy = jest
+                .spyOn(reflection, "generateNewAlgorithm")
+                .mockResolvedValue({ algorithm: "new_alg", response: "Updated" });
+
+            const first = reflection.updateProjectCode();
+            const second = reflection.updateProjectCode();
+
+            resolveExport("new_code");
+            await Promise.all([first, second]);
+
+            expect(generateSpy).toHaveBeenCalledTimes(1);
+            expect(reflection._isUpdatingProjectCode).toBe(false);
+        });
+
+        test("updateProjectCode releases the in-flight flag on error", async () => {
+            reflection.code = "old_code";
+            reflection.inputContainer = document.createElement("div");
+            mockActivity.prepareExport.mockResolvedValue("new_code");
+            jest.spyOn(reflection, "generateNewAlgorithm").mockResolvedValue(null);
+
+            await reflection.updateProjectCode();
+
+            expect(reflection._isUpdatingProjectCode).toBe(false);
+        });
+
+        test("startChatSession can start a new session after an aborted request", async () => {
+            reflection.inputContainer = document.createElement("div");
+
+            let resolveFetch;
+            mockActivity.prepareExport.mockResolvedValue("mocked_code");
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            const first = reflection.startChatSession();
+            await Promise.resolve();
+            reflection._lifecycle.isMounted = false;
+            reflection.isOpen = false;
+            resolveFetch({ json: jest.fn().mockResolvedValue({ response: "Late" }) });
+            await first;
+
+            expect(reflection.triggerFirst).toBe(false);
+
+            reflection._lifecycle.isMounted = true;
+            reflection.isOpen = true;
+            global.fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue({ algorithm: "alg", response: "Hello" })
+            });
+
+            await reflection.startChatSession();
+
+            expect(reflection.triggerFirst).toBe(true);
+            expect(reflection.projectAlgorithm).toBe("alg");
+        });
+
+        test("startChatSession ignores a response that lands after a close and reopen", async () => {
+            reflection.inputContainer = document.createElement("div");
+            reflection.projectAlgorithm = "current_alg";
+            const replySpy = jest.spyOn(reflection, "botReplyDiv").mockResolvedValue(undefined);
+
+            let resolveFetch;
+            mockActivity.prepareExport.mockResolvedValue("mocked_code");
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            const stale = reflection.startChatSession();
+            await Promise.resolve();
+
+            // The widget is closed and opened again while the request is in flight.
+            reflection._lifecycle.unmount();
+            reflection._lifecycle.mount();
+            reflection.triggerFirst = false;
+
+            resolveFetch({
+                json: jest.fn().mockResolvedValue({ algorithm: "stale_alg", response: "Late" })
+            });
+            await stale;
+
+            expect(replySpy).not.toHaveBeenCalled();
+            expect(reflection.projectAlgorithm).toBe("current_alg");
+            expect(reflection.triggerFirst).toBe(false);
+        });
+
+        test("updateProjectCode leaves the refresh flag of a reopened widget alone", async () => {
+            reflection.code = "old_code";
+            reflection.inputContainer = document.createElement("div");
+
+            let resolveExport;
+            mockActivity.prepareExport.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveExport = resolve;
+                    })
+            );
+            const generateSpy = jest.spyOn(reflection, "generateNewAlgorithm");
+
+            const stale = reflection.updateProjectCode();
+
+            reflection._lifecycle.unmount();
+            reflection._lifecycle.mount();
+            // The reopened widget has started a refresh of its own.
+            reflection._isUpdatingProjectCode = true;
+
+            resolveExport("new_code");
+            await stale;
+
+            expect(generateSpy).not.toHaveBeenCalled();
+            expect(reflection._isUpdatingProjectCode).toBe(true);
+        });
+
+        test("_postJSON aborts the request when it times out", async () => {
+            const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            global.fetch.mockImplementation(
+                (url, request) =>
+                    new Promise((resolve, reject) => {
+                        request.signal.addEventListener("abort", () => {
+                            const error = new Error("The operation was aborted");
+                            error.name = "AbortError";
+                            reject(error);
+                        });
+                    })
+            );
+
+            const dataPromise = reflection.generateAlgorithm("some_code");
+            jest.advanceTimersByTime(ReflectionMatrix.REQUEST_TIMEOUT + 1);
+            const data = await dataPromise;
+
+            expect(data).toEqual({ error: "Failed to send message" });
+            expect(reflection._lifecycle.pendingRequests.size).toBe(0);
+
+            consoleSpy.mockRestore();
+        });
+
+        test("getAnalysis ignores repeat clicks while a request is in flight", async () => {
+            reflection.chatHistory = new Array(10).fill({});
+            reflection.typingDiv = document.createElement("div");
+            const generateSpy = jest.spyOn(reflection, "generateAnalysis");
+
+            await reflection.getAnalysis();
+
+            expect(generateSpy).not.toHaveBeenCalled();
         });
     });
 

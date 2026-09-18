@@ -74,7 +74,8 @@ global.wheelnav = jest.fn().mockImplementation(function (div) {
         hoverNavTitleMin: {},
         selectedNavTitleMax: {},
         selectedNavTitleMin: {},
-        initNavTitle: {}
+        initNavTitle: {},
+        navTitle: { attr: jest.fn() }
     });
     this.navItems = Array.from({ length: 40 }, navItemTemplate);
     this.selectedNavItemIndex = 0;
@@ -140,8 +141,6 @@ global.getCurrentEDO = jest.fn().mockReturnValue(12);
 global.DEFAULTVOLUME = 0.5;
 global.SHARP = "♯";
 global.FLAT = "♭";
-global.MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
-global.MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
 global.getSavedCustomModes = () => [];
 global.getModeNamesForGroup = (grp, customModeNames = []) => {
     if (grp !== "custom") {
@@ -202,15 +201,6 @@ global.DEFAULTVOICE = "sine";
 global.PREVIEWVOLUME = 0.5;
 global.getNote = jest.fn().mockReturnValue(["C", 4]);
 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]);
-global.isNonEDO = jest.fn().mockReturnValue(false);
-global.getNonEDOModeSteps = jest.fn().mockReturnValue(null);
-global.pitchToFrequency = jest.fn().mockReturnValue(440);
-global.TEMPERAMENT = {
-    equal: {
-        pitchNumber: 12,
-        noteLabels: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-    }
-};
 
 global.DEFAULTVOLUME = 0.5;
 global.Singer = { setSynthVolume: jest.fn() };
@@ -256,6 +246,43 @@ describe("piemenus behavioral tests", () => {
         expect(mockBlock._pitchWheel).toBeDefined();
         expect(mockBlock._accidentalsWheel).toBeDefined();
         expect(mockBlock._exitWheel).toBeDefined();
+    });
+
+    test("piemenuPitches works for a note name block with no parent", async () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        // A note name block dragged out on its own has a null parent.
+        mockBlock.connections = [null];
+
+        expect(() =>
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "G", "")
+        ).not.toThrow();
+
+        mockBlock._pitchWheel.selectedNavItemIndex = 0;
+        mockBlock._pitchWheel.navItems[0].title = "C";
+        await mockBlock._pitchWheel.navItems[0].navigateFunction();
+
+        mockBlock._accidentalsWheel.selectedNavItemIndex = 0;
+        mockBlock._accidentalsWheel.navItems[0].title = "♮";
+
+        expect(() => mockBlock._exitWheel.navItems[0].navigateFunction()).not.toThrow();
+        expect(mockBlock.value).toBe("C");
+    });
+
+    test("piemenu exit safely hides label and removes hasKeyboard from labelDiv", () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        const labelDiv = { classList: { remove: jest.fn() } };
+        global.docById = jest.fn(id => (id === "labelDiv" ? labelDiv : { style: {} }));
+
+        mockBlock.label = { style: { display: "block" } };
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+        mockBlock._exitWheel.navItems[0].navigateFunction();
+
+        expect(mockBlock.label.style.display).toBe("none");
+        expect(labelDiv.classList.remove).toHaveBeenCalledWith("hasKeyboard");
     });
 
     test("pitch wrapping logic generic application (7 notes)", async () => {
@@ -664,16 +691,105 @@ describe("piemenus behavioral tests", () => {
     });
 
     describe("piemenuModes behavioral tests", () => {
+        beforeEach(() => {
+            global.isNonEDO = jest.fn().mockReturnValue(false);
+            global.getNonEDOModeSteps = jest.fn().mockReturnValue(null);
+        });
+
+        test("onSelect is not called during initial navigation", () => {
+            const onSelect = jest.fn();
+            piemenuModes(mockBlock, "ionian", onSelect);
+
+            // The initial navigateWheel to pre-select "ionian" must NOT
+            // trigger onSelect — otherwise the pie menu opens and closes
+            // in the same frame.
+            expect(onSelect).not.toHaveBeenCalled();
+        });
+
+        test("onSelect fires when user clicks a mode slice", () => {
+            const onSelect = jest.fn();
+            piemenuModes(mockBlock, "ionian", onSelect);
+
+            // Simulate user clicking dorian (index 2).
+            mockBlock._modeNameWheel.selectedNavItemIndex = 2;
+            mockBlock._modeNameWheel.navItems[2].navigateFunction();
+
+            expect(onSelect).toHaveBeenCalledTimes(1);
+            expect(onSelect).toHaveBeenCalledWith("dorian", "dorian");
+        });
+
+        test("onSelect is not called when switching mode groups", () => {
+            const onSelect = jest.fn();
+            piemenuModes(mockBlock, "ionian", onSelect);
+
+            // Simulate user clicking a mode group (inner circle).
+            mockBlock._modeGroupWheel.selectedNavItemIndex = 1;
+            mockBlock._modeGroupWheel.navItems[1].navigateFunction();
+
+            // Group switch must NOT fire onSelect — only mode name clicks should.
+            expect(onSelect).not.toHaveBeenCalled();
+        });
+
         test("selecting a mode slice assigns the internal mode name to the block", () => {
             piemenuModes(mockBlock, "ionian");
 
-            // Initial highlight (index 0 = ionian) already fires the selection
-            // handler; navigate to the dorian slice (index 2) explicitly.
+            // Navigate to the dorian slice (index 2) explicitly.
             mockBlock._modeNameWheel.selectedNavItemIndex = 2;
             mockBlock._modeNameWheel.navItems[2].navigateFunction();
 
             expect(mockBlock.value).toBe("dorian");
             expect(mockBlock.text.text).toBe("dorian");
+        });
+
+        test("selecting a group in the inner ring repaints the outer mode-name ring", () => {
+            // global is mocked in this file; use the real implementation here.
+            const realUpdate = require("../utils/musicutils.js").updateModeWheelItems;
+            const prevUpdate = global.updateModeWheelItems;
+            global.updateModeWheelItems = realUpdate;
+
+            const savedModes = global.MODE_PIE_MENUS;
+            const blank12 = Array(12).fill(" ");
+            global.MODE_PIE_MENUS = {
+                5: ["minor pentatonic", ...blank12.slice(1)],
+                7: ["ionian", " ", "dorian", " ", " ", " ", " ", " ", " ", "aeolian", " ", " "],
+                12: [
+                    "ionian",
+                    "dorian",
+                    "phrygian",
+                    "lydian",
+                    "mixolydian",
+                    "minor",
+                    "locrian",
+                    " ",
+                    " ",
+                    " ",
+                    " ",
+                    " "
+                ],
+                custom: blank12.slice()
+            };
+
+            piemenuModes(mockBlock, "major");
+
+            const groupWheel = mockBlock._modeGroupWheel;
+            const nameWheel = mockBlock._modeNameWheel;
+            expect(nameWheel).toBeDefined();
+
+            const idx = groupWheel.navItems.findIndex(n => n.title === "12");
+            expect(idx).toBeGreaterThanOrEqual(0);
+            groupWheel.selectedNavItemIndex = idx;
+            groupWheel.navItems[idx].navigateFunction();
+
+            // Raphael text must follow the new group, not freeze on the old one.
+            const expected = global.MODE_PIE_MENUS["12"].map(getModeLabel);
+            for (let i = 0; i < nameWheel.navItems.length; i++) {
+                expect(nameWheel.navItems[i].navTitle.attr).toHaveBeenCalledWith({
+                    text: expected[i]
+                });
+            }
+
+            global.updateModeWheelItems = prevUpdate;
+            global.MODE_PIE_MENUS = savedModes;
         });
     });
 });
@@ -688,7 +804,8 @@ describe("piemenuKey behavioral tests", () => {
                 findStacks: jest.fn(),
                 stackList: [],
                 _makeNewBlockWithConnections: jest.fn(),
-                adjustExpandableClampBlock: jest.fn()
+                adjustExpandableClampBlock: jest.fn(),
+                updateBlockText: jest.fn()
             },
             logo: {
                 blocks: {
@@ -699,6 +816,7 @@ describe("piemenuKey behavioral tests", () => {
             KeySignatureEnv: ["C", "major", false],
             storage: {},
             textMsg: jest.fn(),
+            refreshCanvas: jest.fn(),
             turtles: { ithTurtle: jest.fn().mockReturnValue({ singer: { instrumentNames: [] } }) }
         };
         global.event = { clientX: 100, clientY: 100 };
@@ -726,6 +844,44 @@ describe("piemenuKey behavioral tests", () => {
 
         // Verify that blocks were created
         expect(mockActivity.blocks._makeNewBlockWithConnections).toHaveBeenCalled();
+    });
+
+    test("mode ring is built from MODE_PIE_MENUS, not just the 7 church modes", () => {
+        piemenuKey(mockActivity);
+
+        const modenameWheel = global.wheelnav.mock.instances.find(w => w.id === "modenameWheel");
+        expect(modenameWheel).toBeDefined();
+
+        const titles = modenameWheel.navItems.map(item => item.title);
+        // Must expose all MODE_PIE_MENUS scales (e.g. pentatonic), not just church modes.
+        expect(titles).toContain("minor pentatonic");
+        expect(titles).toContain("dorian");
+        expect(titles).not.toContain("phrygian");
+        expect(titles.length).toBe(4);
+    });
+
+    test("updates an existing setkey block in place instead of creating a new one", () => {
+        mockActivity.storage.KeySignatureEnv = "G,dorian,false";
+        mockActivity.blocks.blockList = {
+            0: { name: "setkey2", connections: [null, 1, 2], trash: false },
+            1: { name: "notename", value: "C" },
+            2: { name: "modename", value: "major" },
+            length: 3
+        };
+
+        piemenuKey(mockActivity);
+
+        const exitWheel = global.wheelnav.mock.instances.find(w => w.id === "exitWheel");
+        expect(exitWheel).toBeDefined();
+
+        // __exitMenu → __generateSetKeyBlocks (must take the update branch).
+        exitWheel.navItems[0].navigateFunction();
+
+        // Existing block's key/mode children are updated…
+        expect(mockActivity.blocks.blockList[1].value).toBe("G");
+        expect(mockActivity.blocks.blockList[2].value).toBe("dorian");
+        // …and no new block is created.
+        expect(mockActivity.blocks._makeNewBlockWithConnections).not.toHaveBeenCalled();
     });
 });
 

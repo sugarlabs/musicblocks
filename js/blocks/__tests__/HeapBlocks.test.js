@@ -151,7 +151,7 @@ describe("setupHeapBlocks", () => {
             logo.inStatusMatrix = true;
             const blk = 10;
             const result = heapBlock.arg(logo, turtle, blk);
-            expect(result).toBeUndefined();
+            expect(result).toBe("[]");
             expect(logo.statusFields).toContainEqual([blk, "heap"]);
         });
 
@@ -202,7 +202,7 @@ describe("setupHeapBlocks", () => {
             logo.inStatusMatrix = true;
             const blk = 10;
             const result = heapLengthBlock.arg(logo, turtle, blk);
-            expect(result).toBeUndefined();
+            expect(result).toBe(0);
             expect(logo.statusFields).toContainEqual([blk, "heapLength"]);
         });
     });
@@ -335,9 +335,14 @@ describe("setupHeapBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("No input provided", blk);
         });
 
-        it("should call errorMsg if arguments are not numbers", () => {
+        it("should call errorMsg if index is not a number", () => {
             setHeapEntryBlock.flow(["a", 99], logo, 0, blk);
             expect(activity.errorMsg).toHaveBeenCalledWith("Not a number", blk);
+        });
+
+        it("should allow string values", () => {
+            setHeapEntryBlock.flow([2, "test"], logo, 0, blk);
+            expect(logo.turtleHeaps[0][1]).toEqual("test");
         });
 
         it("should adjust index < 1 and set the value at index 1", () => {
