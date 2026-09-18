@@ -15,9 +15,9 @@
    global
 
    Notation, Synth, instruments, instrumentsFilters,
-   instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
+   instrumentsEffects, Singer, Tone, CAMERAVALUE, 
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
-   mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
+   mixedNumber, rationalToFraction, StatusMatrix,
    getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker,
    requirejs, define, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
    OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
@@ -869,25 +869,29 @@ class Logo {
         if (typeof arg1 === "string") {
             const len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
-                this.deps.utils.doUseCamera(
-                    [arg0],
-                    this.turtles,
-                    turtle,
-                    false,
-                    this.cameraID,
-                    this.setCameraID,
-                    (msg, blk) => this.deps.errorHandler(msg, blk)
-                );
+                if (this.deps.utils.doUseCamera) {
+                    this.deps.utils.doUseCamera(
+                        [arg0],
+                        this.turtles,
+                        turtle,
+                        false,
+                        this.cameraID,
+                        this.setCameraID,
+                        (msg, blk) => this.deps.errorHandler(msg, blk)
+                    );
+                }
             } else if (len === 13 && arg1.substr(0, 13) === VIDEOVALUE) {
-                this.deps.utils.doUseCamera(
-                    [arg0],
-                    this.turtles,
-                    turtle,
-                    true,
-                    this.cameraID,
-                    this.setCameraID,
-                    (msg, blk) => this.deps.errorHandler(msg, blk)
-                );
+                if (this.deps.utils.doUseCamera) {
+                    this.deps.utils.doUseCamera(
+                        [arg0],
+                        this.turtles,
+                        turtle,
+                        true,
+                        this.cameraID,
+                        this.setCameraID,
+                        (msg, blk) => this.deps.errorHandler(msg, blk)
+                    );
+                }
             } else if (len > 10 && arg1.substr(0, 10) === "data:image") {
                 requiredTurtle.doShowImage(arg0, arg1);
             } else if (len > 8 && arg1.substr(0, 8) === "https://") {
@@ -1485,7 +1489,9 @@ class Logo {
 
         // eslint-disable-next-line eqeqeq
         if (this.cameraID != null) {
-            this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
+            if (this.deps.utils.doStopVideoCam) {
+                this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
+            }
         }
     }
 
@@ -1533,12 +1539,22 @@ class Logo {
             this.synth.recorder.stop();
 
         this.onStopTurtle();
+        if (
+            this.blocks &&
+            this.blocks.visible &&
+            typeof this.blocks.unhighlightAll === "function"
+        ) {
+            this.blocks.unhighlightAll();
+        }
         this.blocks.bringToTop();
 
         this._alreadyRunning = false;
         this.stepQueue = {};
         for (const turtle of this.turtles.turtleList) {
             turtle.unhighlightQueue = [];
+            if (turtle.singer) {
+                turtle.singer._unhighlightTimers = {};
+            }
             if (turtle.delayTimeout !== null) {
                 clearTimeout(turtle.delayTimeout);
                 turtle.delayTimeout = null;

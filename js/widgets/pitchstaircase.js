@@ -16,7 +16,7 @@
    global
 
    platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
-   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, clampNumber
+   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, clampNumber, announceToScreenReader
  */
 
 /*
@@ -44,6 +44,8 @@ class PitchStaircase {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static DEFAULTFREQUENCY = 220.0;
+    static MIN_FREQUENCY = 27.5; // A0
+    static MAX_FREQUENCY = 16744.04; // C10
 
     /**
      * @constructor
@@ -288,6 +290,21 @@ class PitchStaircase {
         }
 
         const newFrequency = parseFloat(frequency) / inputNum;
+        if (
+            !Number.isFinite(newFrequency) ||
+            newFrequency < PitchStaircase.MIN_FREQUENCY ||
+            newFrequency > PitchStaircase.MAX_FREQUENCY
+        ) {
+            const act = this.activity || (typeof activity !== "undefined" ? activity : null);
+            if (act && typeof act.textMsg === "function") {
+                act.textMsg(
+                    _("Frequency is outside supported range (27.5 Hz - 16744.04 Hz)."),
+                    3000
+                );
+            }
+            return;
+        }
+
         const obj = frequencyToPitch(newFrequency);
         let foundStep = false;
         let repeatStep = false;
@@ -775,6 +792,7 @@ class PitchStaircase {
             "pitch staircase",
             true
         );
+        announceToScreenReader(_("Pitch Staircase opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -798,6 +816,7 @@ class PitchStaircase {
             if (Singer && Singer.masterVolume && Singer.masterVolume.length > 0) {
                 this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
             }
+            announceToScreenReader(_("Pitch Staircase closed"));
             widgetWindow.destroy();
         };
 

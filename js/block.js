@@ -23,7 +23,7 @@
     EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
    getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
     getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
-   i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
+    i18nSolfege, INVERTMODES, isCustomTemperament, isEquallyTempered, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
    piemenuAccidentals, piemenuBasic, piemenuBlockContext,
@@ -32,7 +32,7 @@
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
    retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
-    topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
+    updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
  */
 
@@ -166,7 +166,41 @@ class Block {
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
         this.text = null; // A dynamically generated text label on block itself.
-        this.value = null; // Value for number, text, and media blocks.
+        this.valueInitialized = false;
+
+        let _value = null;
+        Object.defineProperty(this, "value", {
+            get: () => _value,
+            set: newVal => {
+                if (
+                    this.blocks &&
+                    this.blocks.actionHistory &&
+                    !this.blocks.isUndoingOrRedoing &&
+                    _value !== newVal &&
+                    this.valueInitialized &&
+                    this.loadComplete &&
+                    this.blockIndex !== undefined
+                ) {
+                    const historyItem = {
+                        type: "value_change",
+                        blockId: this.blockIndex,
+                        oldValue: _value,
+                        newValue: newVal,
+                        oldText: this.text ? this.text.text : null,
+                        newText: null
+                    };
+                    this.blocks.actionHistory.push(historyItem);
+                    Promise.resolve().then(() => {
+                        historyItem.newText = this.text ? this.text.text : null;
+                    });
+                    this.blocks.redoActionHistory = [];
+                }
+                this.valueInitialized = true;
+                _value = newVal;
+            },
+            enumerable: true,
+            configurable: true
+        }); // Value for number, text, and media blocks.
         this.privateData = null; // A block may have some private data,
         // e.g., nameboxes use this field to store
         // the box name associated with the block.
@@ -3149,6 +3183,7 @@ class Block {
                     piemenuBlockContext(that);
                     return;
                 } else if ("shiftKey" in event.nativeEvent && event.nativeEvent.shiftKey) {
+                    const topBlock = that.blocks.findTopBlock(thisBlock);
                     if (that.activity.turtles.running()) {
                         that.activity.logo.doStopTurtles();
 
@@ -3256,6 +3291,10 @@ class Block {
 
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
+
+            // Record original coordinates for undoing positional changes
+            that.blocks.dragStartX = that.container.x;
+            that.blocks.dragStartY = that.container.y;
 
             that.blocks.longPressTimeout = setTimeout(() => {
                 that.blocks.activeBlock = that.blockIndex;
@@ -3460,6 +3499,29 @@ class Block {
             } else {
                 that.activity.trashcan.stopHighlightAnimation();
             }
+
+            // Visual dock snap indicator (throttled to ~60fps).
+            // 16ms corresponds to one frame at ~60fps (1000ms / 60 ≈ 16.6ms), preventing
+            // expensive spatial dock candidate scans on every high-frequency pointer move event.
+            const SNAP_CHECK_INTERVAL_MS = 16;
+            if (!overTrash && typeof that.blocks.findDockCandidate === "function") {
+                if (
+                    !that.blocks._lastSnapCheckTime ||
+                    now - that.blocks._lastSnapCheckTime >= SNAP_CHECK_INTERVAL_MS
+                ) {
+                    that.blocks._lastSnapCheckTime = now;
+                    const candidate = that.blocks.findDockCandidate(thisBlock);
+                    if (candidate && typeof that.blocks.showSnapIndicator === "function") {
+                        that.blocks.showSnapIndicator(candidate);
+                    } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                        that.blocks.hideSnapIndicator();
+                    }
+                }
+            } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks._lastSnapCheckTime = 0;
+                that.blocks.hideSnapIndicator();
+            }
+
             if (that.isValueBlock() && that.name !== "media") {
                 // Ensure text is on top
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -3513,6 +3575,10 @@ class Block {
                 return;
             }
 
+            if (!that.blocks.isBlockMoving && typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
+            }
+
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false, false);
             } else {
@@ -3542,6 +3608,11 @@ class Block {
          */
         this.container.on("pressup", event => {
             that._dragPointerDown = false;
+            that.blocks._lastSnapCheckTime = 0;
+
+            if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
+            }
 
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false, true, _dragSpatialGridDirty);
@@ -3989,16 +4060,13 @@ class Block {
                     if (temperament && typeof temperament === "object") {
                         noteLabels[keys[i]] = temperament;
                     }
-                    if (isCustomTemperament(keys[i])) {
+                    if (isCustomTemperament(keys[i]) && temperament && !isEquallyTempered(keys[i]))
                         customLabels.push(keys[i]);
-                    }
                 }
+                if (!customLabels.length) return;
                 let selectedCustom;
-                if (this.customID !== null) {
-                    selectedCustom = this.customID;
-                } else {
-                    selectedCustom = customLabels[0];
-                }
+                if (this.customID !== null) selectedCustom = this.customID;
+                else selectedCustom = customLabels[0];
 
                 if (this.value !== null) {
                     selectedNote = this.value;
@@ -4641,6 +4709,7 @@ class Block {
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener("keypress", this._exitKeyPressed);
+            docById("labelDiv").classList.remove("hasKeyboard");
         }
     }
 
@@ -4650,6 +4719,14 @@ class Block {
      * @returns {boolean} - True if pie menu is okay to launch, false otherwise.
      */
     piemenuOKtoLaunch() {
+        // The drawing libraries are fetched in the background once the app is
+        // up (see loadPieMenuLibs in loader.js). Declining here for the short
+        // window before they land keeps an early click harmless: this method
+        // already exists to say "not right now".
+        if (typeof wheelnav === "undefined" || typeof Raphael === "undefined") {
+            return false;
+        }
+
         if (this._piemenuExitTime === null) {
             return true;
         }

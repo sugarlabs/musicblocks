@@ -85,6 +85,9 @@ class HelpWidget {
      * @returns {void}
      */
     _setup(useActiveBlock, page) {
+        if (!this.isOpen || !this.widgetWindow || !this.widgetWindow.getWidgetBody()) {
+            return;
+        }
         // Which help page are we on?
 
         this._helpDiv.style.width = 100 + "%";
@@ -431,7 +434,10 @@ class HelpWidget {
         const rightArrow = docById("right-arrow");
         const leftArrow = docById("left-arrow");
         const title = HELPCONTENT[page][0];
-        const imageSrc = HELPCONTENT[page][2];
+        // An entry may give a function when its icon depends on state that is
+        // not known while the help content is built, such as the current theme.
+        const image = HELPCONTENT[page][2];
+        const imageSrc = typeof image === "function" ? image() : image;
 
         rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
         leftArrow.classList.toggle("disabled", page === 0);

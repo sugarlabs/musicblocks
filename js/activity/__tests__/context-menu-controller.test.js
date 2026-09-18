@@ -189,6 +189,7 @@ function installDocumentMock() {
         onmousedown: null,
         style_: {},
         innerHTML: "",
+        offsetHeight: 60,
         getBoundingClientRect: () => ({ top: 100 })
     };
     document.getElementById = jest.fn(() => mockElement);
@@ -643,11 +644,19 @@ describe("ContextMenuController", () => {
         });
 
         test("_showHideAuxMenu opens the aux toolbar and repositions containers", () => {
+            const canvasButton = { style: { top: "76px" } };
+            mockElement.offsetHeight = 128;
+            document.querySelectorAll.mockReturnValue([canvasButton]);
             controller._showHideAuxMenu(false);
-            expect(activity.toolbarHeight).toBeGreaterThan(0);
-            expect(activity.palettes.deltaY).toHaveBeenCalled();
-            expect(activity.turtles.deltaY).toHaveBeenCalled();
+            expect(mockElement.style.display).toBe("block");
+            expect(activity.toolbarHeight).toBe(128);
+            expect(activity.palettes.deltaY).toHaveBeenCalledWith(128);
+            expect(activity.turtles.deltaY).toHaveBeenCalledWith(128);
+            expect(canvasButton.style.top).toBe("204px");
             expect(activity.refreshCanvas).toHaveBeenCalled();
+
+            controller._showHideAuxMenu(true);
+            expect(canvasButton.style.top).toBe("76px");
         });
 
         test("_showHideAuxMenu closes the aux toolbar when already open", () => {

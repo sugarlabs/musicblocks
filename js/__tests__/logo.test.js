@@ -1078,6 +1078,23 @@ describe("Logo doStopTurtles", () => {
         expect(clearAllSpy).toHaveBeenCalled();
     });
 
+    test("clears unhighlight timers on turtle.singer on stop", () => {
+        turtle.singer = { _unhighlightTimers: { blk1: 123 } };
+
+        logo.doStopTurtles();
+
+        expect(turtle.singer._unhighlightTimers).toEqual({});
+    });
+
+    test("unhighlights all blocks on stop when blocks are visible", () => {
+        mockActivity.blocks.visible = true;
+        mockActivity.blocks.unhighlightAll = jest.fn();
+
+        logo.doStopTurtles();
+
+        expect(mockActivity.blocks.unhighlightAll).toHaveBeenCalled();
+    });
+
     test("removes active turtle listeners from stage and clears listeners object on stop", () => {
         const mockListener = jest.fn();
         turtle.listeners = { __beat_1_0__: mockListener };

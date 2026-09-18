@@ -36,9 +36,7 @@ const _b64Cache = new Map();
    SOLFEGENAMES, SOLFEGENAMES1, SOLFNOTES,
    WESTERN2EISOLFEGENAMES, PITCHES, PITCHES1, PITCHES3, SCALENOTES,
    EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES,
-   RHYTHMRULERHEIGHT, SLIDERHEIGHT, SLIDERWIDTH, MATRIXLABELCOLOR,
-   MATRIXNOTECELLCOLOR, MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR,
-   MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER, MATRIXSOLFEWIDTH,
+   MATRIXSOLFEWIDTH,
    EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
    MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
    ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
@@ -53,34 +51,38 @@ const _b64Cache = new Map();
    nthDegreeToPitch, getInterval, _parse_pitch_string, calcNoteValueToDisplay,
    durationToNoteValue, noteToFrequency, getSolfege, splitScaleDegree,
    getNumNote, calcOctave, calcOctaveInterval, isInt,
-   convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege,
+   convertFromSolfege, getPitchInfo, i18nSolfege,
    convertFactor, getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
    addTemperamentToList, getTemperament, deleteTemperamentFromList,
    addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
    DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
-    INTERVALVALUES, MUSICALMODES, getIntervalRatio, frequencyToPitch, NOTESTEP,
+   INTERVALVALUES, MUSICALMODES, getIntervalRatio, frequencyToPitch, NOTESTEP,
    GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-   SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
+   SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS,
     INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition,
     scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern,
-    getSavedCustomModes, getModeNamesForGroup,
+    getNonEDOModeSteps,
+    MODEPIEMENU_SLOT_COUNT, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
+    MODEPIEMENU_NAME_TITLE_RADIUS, MODEPIEMENU_FONT_FAMILY,
+    MODEPIEMENU_GROUP_FONT_RATIO, MODEPIEMENU_NAME_FONT_MIN_RATIO,
+    MODEPIEMENU_NAME_FONT_MAX_RATIO, getSavedCustomModes, getModeNamesForGroup,
     getModeLabel, getModeNameFromLabel, getModeSliceColors,
     updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
     isNonEDO, getNonEDOModeSteps, getNonEDOFrequency,
     configureWheel
 */
 
-const stripMicrotonalPrefix = note => note.replace(/^[v^]+/, "");
-
 /**
- * Normalize Unicode accidental symbols in a note string to ASCII equivalents.
+ * Strip at most two leading microtonal ^ / v prefixes (the temperament
+ * widget uses them for cents display, e.g. "^C" or "vvD♭"). Limiting to
+ * two keeps any accidental real articulation prefix from being removed.
  * @param {string} note
  * @returns {string}
  */
+const stripMicrotonalPrefix = s => s.replace(/^[v^]{1,2}/, "");
 function normalizeNoteAccidentals(note) {
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
-    // Strip microtonal ^ / v prefixes (temperament widget cents display)
-    // so the base note can be resolved, e.g. "^C" → "C", "vvD♭" → "D♭".
+    // Strip at most two leading ^ / v so "^C"/"vvD♭" resolve but "^^^C" keeps a "^"
     return stripMicrotonalPrefix(note).replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 }
 
@@ -1163,12 +1165,6 @@ const C10 = 16744.04;
 let octaveRatio = 2;
 
 /**
- * Height of the rhythm ruler.
- * @constant {number}
- */
-const RHYTHMRULERHEIGHT = 100;
-
-/**
  * Height of a staff note.
  * @constant {number}
  */
@@ -1179,60 +1175,6 @@ const YSTAFFNOTEHEIGHT = 12.5;
  * @constant {number}
  */
 const YSTAFFOCTAVEHEIGHT = 87.5;
-
-/**
- * Height of a slider.
- * @constant {number}
- */
-const SLIDERHEIGHT = 200;
-
-/**
- * Width of a slider.
- * @constant {number}
- */
-const SLIDERWIDTH = 50;
-
-/**
- * Color of matrix buttons.
- * @constant {string}
- */
-const MATRIXBUTTONCOLOR = "#c374e9";
-
-/**
- * Color of matrix labels.
- * @constant {string}
- */
-const MATRIXLABELCOLOR = "#90c100";
-
-/**
- * Color of matrix note cells.
- * @constant {string}
- */
-const MATRIXNOTECELLCOLOR = "#b1db00";
-
-/**
- * Color of matrix tuplet cells.
- * @constant {string}
- */
-const MATRIXTUPLETCELLCOLOR = "#57e751";
-
-/**
- * Color of matrix rhythm cells.
- * @constant {string}
- */
-const MATRIXRHYTHMCELLCOLOR = "#c8c8c8";
-
-/**
- * Hover color of matrix buttons.
- * @constant {string}
- */
-const MATRIXBUTTONCOLORHOVER = "#c894e0";
-
-/**
- * Hover color of matrix note cells.
- * @constant {string}
- */
-const MATRIXNOTECELLCOLORHOVER = "#c2e820";
 
 /**
  * Width of matrix solfege.
@@ -1837,11 +1779,25 @@ const MODE_PIE_MENUS = {
     "custom": [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
 };
 
-/**
- * Reads the custom modes saved by the mode widget from local storage.
- * Corrupt or non-array data yields an empty list.
- * @returns {Array} Entries that look like custom modes ({name} is a string)
- */
+/** Slot count shared by every mode pie menu ring. */
+const MODEPIEMENU_SLOT_COUNT = 12;
+
+/** Ring geometry shared by mode-selection pie menus. */
+const MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
+const MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
+
+/** Mid-radius of the mode-name ring, used to size labels to slice arcs. */
+const MODEPIEMENU_NAME_TITLE_RADIUS = 0.575;
+
+/** Shared font family and group-ring size (px = ratio * wheelRadius). */
+const MODEPIEMENU_FONT_FAMILY = "sans-serif";
+const MODEPIEMENU_GROUP_FONT_RATIO = 0.08;
+
+/** Min/max name-ring font sizes as a fraction of wheel radius. */
+const MODEPIEMENU_NAME_FONT_MIN_RATIO = 0.06;
+const MODEPIEMENU_NAME_FONT_MAX_RATIO = 0.12;
+
+/** Custom modes saved by the mode widget; corrupt data yields []. */
 const getSavedCustomModes = () => {
     try {
         const customModes = JSON.parse(localStorage.getItem("customModes") || "[]");
@@ -1854,13 +1810,10 @@ const getSavedCustomModes = () => {
 };
 
 /**
- * Builds the fixed 12-slot list of mode names shown for a pie menu group.
- * Built-in groups come straight from MODE_PIE_MENUS; the "custom" group is
- * padded with blanks. Callers may pass custom names already carrying their own
- * sentinels (the widget prepends "+").
- * @param {string} grp The mode group key
- * @param {Array} [customModeNames] Custom mode names (only used for "custom")
- * @returns {Array} A fixed-length list of mode names
+ * Builds the fixed 12-slot mode-name list for a group ("custom" padded with blanks).
+ * @param {string} grp
+ * @param {Array} [customModeNames]
+ * @returns {Array}
  */
 const getModeNamesForGroup = (grp, customModeNames = []) => {
     if (grp !== "custom") {
@@ -1873,12 +1826,7 @@ const getModeNamesForGroup = (grp, customModeNames = []) => {
     return names;
 };
 
-/**
- * Returns the display label for a mode name, translating the major/ionian and
- * minor/aeolian pairs and leaving blank slots blank.
- * @param {string} modename
- * @returns {string}
- */
+/** Display label for a mode (major/ionian and minor/aeolian pairs translated). */
 const getModeLabel = modename => {
     switch (modename) {
         case "ionian":
@@ -1892,13 +1840,7 @@ const getModeLabel = modename => {
     }
 };
 
-/**
- * Inverse of getModeLabel: resolves a displayed label back to its internal
- * mode name. Falls back to the label itself when nothing matches.
- * @param {string} label
- * @param {Array} modes The mode names for the current group
- * @returns {string}
- */
+/** Inverse of getModeLabel; falls back to the label itself. */
 const getModeNameFromLabel = (label, modes) => {
     if (label === `${_("major")} / ${_("ionian")}`) {
         return "major";
@@ -1914,24 +1856,11 @@ const getModeNameFromLabel = (label, modes) => {
     return label;
 };
 
-/**
- * Builds the per-slice colors for a mode-name ring: blank slots get the
- * "empty" color, real modes the "filled" color.
- * @param {Array} modes
- * @param {Object} colors { emptyColor, filledColor }
- * @returns {Array}
- */
+/** Per-slice colors: blank slots get emptyColor, real modes filledColor. */
 const getModeSliceColors = (modes, colors) =>
     modes.map(modename => (modename === " " ? colors.emptyColor : colors.filledColor));
 
-/**
- * Re-renders an existing mode-name wheel in place: updates every per-state
- * title copy and the slice fill attributes, then refreshes the wheel.
- * @param {Object} wheel wheelnav instance
- * @param {Array} labels Display labels
- * @param {Array} colors Per-slice colors
- * @returns {void}
- */
+/** Re-renders a mode-name wheel in place with new labels/colors. */
 const updateModeWheelItems = (wheel, labels, colors) => {
     for (let i = 0; i < wheel.navItems.length; i++) {
         const item = wheel.navItems[i];
@@ -1947,27 +1876,18 @@ const updateModeWheelItems = (wheel, labels, colors) => {
         item.sliceHoverAttr.fill = colors[i];
         item.slicePathAttr.fill = colors[i];
         item.sliceSelectedAttr.fill = colors[i];
+        // refreshWheel() never rewrites text content, so push the label directly.
+        if (item.navTitle && typeof item.navTitle.attr === "function") {
+            item.navTitle.attr({ text: labels[i] });
+        }
     }
     wheel.refreshWheel();
 };
 
-/**
- * Shared title font for the mode-group ring, scaled to the wheel radius so it
- * renders at the same relative size regardless of paper resolution.
- * @param {number} wheelRadius
- * @returns {string}
- */
+/** Group-ring title font, scaled to wheel radius. */
 const getModeGroupTitleFont = wheelRadius => `100 ${Math.round(0.08 * wheelRadius)}px sans-serif`;
 
-/**
- * Sizes a mode-name label to fit its own slice arc on the shared name ring.
- * The min/max clamps scale with the wheel radius so the same ring renders
- * identically on any paper resolution.
- * @param {number} wheelRadius
- * @param {number} sliceCount
- * @param {number} labelLen
- * @returns {string}
- */
+/** Name-ring label font sized to fit its slice arc. */
 const getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     const arcPx = (2 * Math.PI * 0.575 * wheelRadius) / sliceCount;
     const size = Math.floor((arcPx * 0.85) / (labelLen * 0.6));
@@ -1977,21 +1897,7 @@ const getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     return `100 ${clamped}px sans-serif`;
 };
 
-/**
- * Applies the shared donut-slice configuration to a wheelnav instance:
- * colors, radii, -90° start angle, zero animation, and optional selection
- * paths, title rotation, and title font.
- * @param {Object} wheel - The wheelnav instance to configure.
- * @param {Object} opts - Configuration options.
- * @param {Array} opts.colors - Slice colors.
- * @param {number} opts.minRadius - Min radius percent (0-1).
- * @param {number} opts.maxRadius - Max radius percent (0-1).
- * @param {boolean} [opts.clickModeRotate] - Whether clicks rotate the wheel.
- * @param {boolean} [opts.selectionPaths] - Whether to sync selected/init paths.
- * @param {number} [opts.titleRotateAngle] - Title rotation angle.
- * @param {string} [opts.titleFont] - Title font CSS string.
- * @returns {void}
- */
+/** Applies shared donut-slice config to a wheelnav instance. */
 const configureWheel = (wheel, opts) => {
     wheel.colors = opts.colors;
     wheel.slicePathFunction = slicePath().DonutSlice;
@@ -2233,124 +2139,6 @@ const INTERVAL_CENTS = {
 };
 
 /**
- * Centralized interval definitions with exact ratios and cents.
- * This object provides mathematically accurate interval data for all temperaments.
- * @constant {Object}
- */
-const TEMPERAMENT_INTERVALS = {
-    "perfect 1": {
-        ratio: 1 / 1,
-        cents: INTERVAL_CENTS["1/1"],
-        semitones: 0
-    },
-    "minor 2": {
-        ratio: 16 / 15,
-        cents: INTERVAL_CENTS["16/15"],
-        semitones: 1
-    },
-    "augmented 1": {
-        ratio: 25 / 24,
-        cents: INTERVAL_CENTS["25/24"],
-        semitones: 1
-    },
-    "major 2": {
-        ratio: 9 / 8,
-        cents: INTERVAL_CENTS["9/8"],
-        semitones: 2
-    },
-    "augmented 2": {
-        ratio: 75 / 64,
-        cents: INTERVAL_CENTS["75/64"],
-        semitones: 3
-    },
-    "minor 3": {
-        ratio: 6 / 5,
-        cents: INTERVAL_CENTS["6/5"],
-        semitones: 3
-    },
-    "major 3": {
-        ratio: 5 / 4,
-        cents: INTERVAL_CENTS["5/4"],
-        semitones: 4
-    },
-    "augmented 3": {
-        ratio: 125 / 96,
-        cents: INTERVAL_CENTS["125/96"],
-        semitones: 5
-    },
-    "diminished 4": {
-        ratio: 32 / 25,
-        cents: INTERVAL_CENTS["32/25"],
-        semitones: 4
-    },
-    "perfect 4": {
-        ratio: 4 / 3,
-        cents: INTERVAL_CENTS["4/3"],
-        semitones: 5
-    },
-    "augmented 4": {
-        ratio: 25 / 18,
-        cents: INTERVAL_CENTS["25/18"],
-        semitones: 6
-    },
-    "diminished 5": {
-        ratio: 36 / 25,
-        cents: INTERVAL_CENTS["36/25"],
-        semitones: 6
-    },
-    "perfect 5": {
-        ratio: 3 / 2,
-        cents: INTERVAL_CENTS["3/2"],
-        semitones: 7
-    },
-    "augmented 5": {
-        ratio: 25 / 16,
-        cents: INTERVAL_CENTS["25/16"],
-        semitones: 8
-    },
-    "minor 6": {
-        ratio: 8 / 5,
-        cents: INTERVAL_CENTS["8/5"],
-        semitones: 8
-    },
-    "major 6": {
-        ratio: 5 / 3,
-        cents: INTERVAL_CENTS["5/3"],
-        semitones: 9
-    },
-    "augmented 6": {
-        ratio: 125 / 72,
-        cents: INTERVAL_CENTS["125/72"],
-        semitones: 10
-    },
-    "minor 7": {
-        ratio: 16 / 9,
-        cents: INTERVAL_CENTS["16/9"],
-        semitones: 10
-    },
-    "major 7": {
-        ratio: 15 / 8,
-        cents: INTERVAL_CENTS["15/8"],
-        semitones: 11
-    },
-    "augmented 7": {
-        ratio: 125 / 64,
-        cents: INTERVAL_CENTS["125/64"],
-        semitones: 12
-    },
-    "diminished 8": {
-        ratio: 48 / 25,
-        cents: INTERVAL_CENTS["48/25"],
-        semitones: 11
-    },
-    "perfect 8": {
-        ratio: 2 / 1,
-        cents: INTERVAL_CENTS["2/1"],
-        semitones: 12
-    }
-};
-
-/**
  * Canonical interval ordering for consistent lookup and synthesis.
  * All temperament objects should reference this ordering for stability.
  * @constant {string[]}
@@ -2535,11 +2323,11 @@ const TEMPERAMENT = {
         "octaveRatio": 2,
         "pitchNumber": 17,
         "perfect 1": Math.pow(2, 0 / 17),
-        "minor 2": Math.pow(2, 1 / 17),
-        "augmented 1": Math.pow(2, 2 / 17),
-        "minor 3": Math.pow(2, 3 / 17),
-        "major 2": Math.pow(2, 4 / 17),
-        "augmented 2": Math.pow(2, 5 / 17),
+        "augmented 1": Math.pow(2, 1 / 17),
+        "minor 2": Math.pow(2, 2 / 17),
+        "major 2": Math.pow(2, 3 / 17),
+        "augmented 2": Math.pow(2, 4 / 17),
+        "minor 3": Math.pow(2, 5 / 17),
         "major 3": Math.pow(2, 6 / 17),
         "perfect 4": Math.pow(2, 7 / 17),
         "augmented 4": Math.pow(2, 8 / 17),
@@ -2554,11 +2342,11 @@ const TEMPERAMENT = {
         "perfect 8": Math.pow(2, 17 / 17),
         "interval": [
             "perfect 1",
-            "minor 2",
             "augmented 1",
-            "minor 3",
+            "minor 2",
             "major 2",
             "augmented 2",
+            "minor 3",
             "major 3",
             "perfect 4",
             "augmented 4",
@@ -2613,15 +2401,15 @@ const TEMPERAMENT = {
         "diminished 4": Math.pow(2, 7 / 19),
         "perfect 4": Math.pow(2, 8 / 19),
         "augmented 4": Math.pow(2, 9 / 19),
-        "diminished 5": Math.pow(2, 9 / 19),
-        "perfect 5": Math.pow(2, 10 / 19),
-        "augmented 5": Math.pow(2, 11 / 19),
-        "minor 6": Math.pow(2, 12 / 19),
-        "major 6": Math.pow(2, 13 / 19),
-        "augmented 6": Math.pow(2, 14 / 19),
-        "minor 7": Math.pow(2, 15 / 19),
-        "major 7": Math.pow(2, 16 / 19),
-        "augmented 7": Math.pow(2, 17 / 19),
+        "diminished 5": Math.pow(2, 10 / 19),
+        "perfect 5": Math.pow(2, 11 / 19),
+        "augmented 5": Math.pow(2, 12 / 19),
+        "minor 6": Math.pow(2, 13 / 19),
+        "major 6": Math.pow(2, 14 / 19),
+        "augmented 6": Math.pow(2, 15 / 19),
+        "minor 7": Math.pow(2, 16 / 19),
+        "major 7": Math.pow(2, 17 / 19),
+        "augmented 7": Math.pow(2, 18 / 19),
         "diminished 8": Math.pow(2, 18 / 19),
         "perfect 8": Math.pow(2, 19 / 19),
         "interval": [
@@ -2635,6 +2423,7 @@ const TEMPERAMENT = {
             "augmented 3",
             "perfect 4",
             "augmented 4",
+            "diminished 5",
             "perfect 5",
             "augmented 5",
             "minor 6",
@@ -2643,7 +2432,6 @@ const TEMPERAMENT = {
             "minor 7",
             "major 7",
             "augmented 7",
-            "diminished 8",
             "perfect 8"
         ]
     },
@@ -2864,8 +2652,8 @@ const TEMPERAMENT = {
         "description": "Meantone temperament with 1/3 syntonic comma (quarter-comma meantone)",
         "noteLabels": [
             "C",
-            "D" + FLAT,
             "C" + SHARP,
+            "D" + FLAT,
             "D",
             "D" + SHARP,
             "E" + FLAT,
@@ -2925,7 +2713,7 @@ const TEMPERAMENT = {
             "augmented 2",
             "minor 3",
             "major 3",
-            "diminished 4",
+            "augmented 3",
             "perfect 4",
             "augmented 4",
             "diminished 5",
@@ -2936,7 +2724,7 @@ const TEMPERAMENT = {
             "augmented 6",
             "minor 7",
             "major 7",
-            "diminished 8",
+            "augmented 7",
             "perfect 8"
         ]
     },
@@ -2947,12 +2735,13 @@ const TEMPERAMENT = {
         "description": "Meantone temperament with 1/4 syntonic comma",
         "noteLabels": [
             "C",
-            "D" + FLAT,
             "C" + SHARP,
+            "D" + FLAT,
             "D",
             "D" + SHARP,
             "E" + FLAT,
             "E",
+            "F" + FLAT,
             "E" + SHARP,
             "F",
             "F" + SHARP,
@@ -2964,14 +2753,13 @@ const TEMPERAMENT = {
             "A" + SHARP,
             "B" + FLAT,
             "B",
-            "B" + SHARP,
             "C" + FLAT,
-            "C"
+            "B" + SHARP
         ],
         "ratios": [
             1,
-            16 / 15,
             25 / 24,
+            16 / 15,
             9 / 8,
             75 / 64,
             6 / 5,
@@ -3257,10 +3045,13 @@ const getTemperamentKeys = () => {
  * @returns {void}
  */
 const addTemperamentToList = newEntry => {
-    for (let i = 0; i < TEMPERAMENTS.length; i++) {
-        if (PreDefinedTemperaments[i] === newEntry) {
-            return;
-        }
+    const isDuplicate = TEMPERAMENTS.some(
+        entry =>
+            entry.length === newEntry.length &&
+            entry.every((value, index) => value === newEntry[index])
+    );
+    if (isDuplicate) {
+        return;
     }
     TEMPERAMENTS.push(newEntry);
 };
@@ -3842,40 +3633,52 @@ const isTrueEDO = temperament => {
  */
 const isEquallyTempered = temperament => {
     const t = getTemperament(temperament);
-    if (!t || typeof t !== "object") {
-        return false;
-    }
-    if (t.isEDO) {
+    if (!t || typeof t !== "object") return false;
+    if (t.isEDO === true) return true;
+    if (t.isEDO === false) return false;
+    if (t.ratios) {
+        if (!Array.isArray(t.ratios) || t.ratios.length < 2) return false;
+        const n = Number.isInteger(t.pitchNumber) ? t.pitchNumber : t.ratios.length;
+        // 1e-9 is safe: stored ratios are exact Math.pow values or full-precision
+        // editor output (toFixed(3) is display-only, never persisted).
+        for (let i = 0; i < t.ratios.length; i++) {
+            if (Math.abs(t.ratios[i] - Math.pow(2, i / n)) > 1e-9) return false;
+        }
         return true;
     }
     const n = t.pitchNumber;
-    if (!Number.isInteger(n) || n < 2) {
-        return false;
-    }
+    if (!Number.isInteger(n) || n < 2) return false;
     for (let i = 0; i < n; i++) {
         const entry = t["" + i];
-        if (!Array.isArray(entry) || typeof entry[0] !== "number") {
-            return false;
-        }
-        const expected = Math.pow(2, i / n);
-        if (Math.abs(entry[0] - expected) > 1e-4) {
-            return false;
-        }
+        if (!Array.isArray(entry) || typeof entry[0] !== "number") return false;
+        if (Math.abs(entry[0] - Math.pow(2, i / n)) > 1e-9) return false;
     }
     return true;
 };
 
 /**
- * True when the temperament is tuned by ratios and is NOT an equal division
- * of the octave.
+ * Detect a non-equal (just/meantone/Pythagorean) temperament that still carries
+ * usable per-pitch ratio data. Used to route note/scale math down the
+ * ratio-aware (cents-based) path instead of the EDO step path.
+ *
+ *   isNonEDO = temperamentHasRatios(t) && !isEDO && !isEquallyTempered(t)
+ *
+ * An explicit `isEDO === false` always wins (over the 1e-9 equality probe) so a
+ * declared JI/meantone temperament is never mis-classified as EDO.
  * @function
- * @param {string} temperament - temperament key in TEMPERAMENT
+ * @param {string} temperament - The temperament key.
  * @returns {boolean}
  */
 const isNonEDO = temperament => {
     const t = getTemperament(temperament);
-    if (!t) {
+    if (!t || typeof t !== "object") {
         return false;
+    }
+    if (t.isEDO === true) {
+        return false;
+    }
+    if (t.isEDO === false) {
+        return temperamentHasRatios(temperament);
     }
     return temperamentHasRatios(temperament) && !isEquallyTempered(temperament);
 };
@@ -4026,19 +3829,20 @@ const getTemperamentName = name => {
 };
 
 /**
- * Convert a note string to an object containing the note, octave, and cents.
+ * Convert a note string to an object containing the note and octave.
  * @function
  * @param {string} note - The note string.
- * @returns {Array} An array containing the note, octave, and cents.
+ * @returns {Array} An array containing the note and octave.
  */
 const noteToObj = note => {
-    let octave = parseInt(note.slice(note.length - 1), 10);
-    if (isNaN(octave)) {
-        octave = 4;
-    } else {
-        note = note.slice(0, note.length - 1);
+    if (typeof note !== "string" || note.length === 0) {
+        return [note, 4];
     }
-    return [note, octave];
+    const match = note.match(/^(.*?)(-?\d+)$/);
+    if (match) {
+        return [match[1], parseInt(match[2], 10)];
+    }
+    return [note, 4];
 };
 
 /**
@@ -6427,16 +6231,22 @@ const scalePatternToEDO = (pattern, edo) => {
 const PITCH_COLLECTIONS_EDO_OVERRIDES = {};
 
 /**
- * Get the step pattern for a mode in the given EDO.
+ * Get the step pattern for a mode in the given EDO (or temperament).
  *
  * Lookup order: PITCH_COLLECTIONS_EDO_OVERRIDES[edo][mode] first, then the
  * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom"
  * (chromatic) mode, 12-EDO uses the stored customMode pattern and non-12 EDO
  * returns a full EDO-length step-1 pattern.
+ *
+ * When `temperament` is a non-EDO temperament (JI, meantone, Pythagorean), the
+ * EDO step model does not apply, so the returned array is a list of per-step
+ * CENTS (the actual interval size between consecutive scale degrees derived
+ * from the temperament's ratios). Consumers that render proportional slices or
+ * compute active tabs should use these cents directly.
  * @function
  * @param {string} mode - The mode name (e.g. "major").
  * @param {number} edo - Number of steps per octave.
- * @returns {Array} The step pattern for the mode in the target EDO.
+ * @returns {Array} Integer step pattern.
  */
 const getModePattern = (mode, edo = 12) => {
     const overrides = PITCH_COLLECTIONS_EDO_OVERRIDES[edo];
@@ -6652,15 +6462,6 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     // Returns how many half-steps to the next note in this key.
     if (temperament === undefined) {
         temperament = "equal";
-    }
-    if (isCustomTemperament(temperament)) {
-        const t = getTemperament(temperament);
-        if (!t || !temperamentHasRatios(temperament)) {
-            // Scalar = Semitone for custom Temperament with no ratios.
-            return transposition;
-        }
-        // For custom temperaments with ratios, fall through to ratio-based
-        // step size calculation below.
     }
     let currentEDO = edo;
     if (!currentEDO) {
@@ -7597,6 +7398,7 @@ const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
 
     const pitchNumber = pitchToNumber(pitch, octave, keySignature, temperament);
 
+    // NOTE: stretched-octave powerBase (widget) vs engine getOctaveRatio() diverge here — this function hard-codes base 2; widget ratioToCents generalizes to powerBase. Full unification deferred.
     // Frequency = A0 * 2^(pitchNumber / currentEDO)
     // With cents offset: Frequency = A0 * 2^((pitchNumber * 100 + cents) / (currentEDO * 100))
     // This works because 1 semitone = 100 cents, and 2^(1/1200) is the cents resolution.
@@ -7904,9 +7706,7 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament
     const stepDownCurrentNote = getNumber(note, currentOctave - 1, temperament);
 
     if (lastNotePlayed !== null) {
-        lastNotePlayed = lastNotePlayed[0];
-        // strip off octave from end of note
-        lastNotePlayed = lastNotePlayed.substring(0, lastNotePlayed.length - 1);
+        lastNotePlayed = noteToObj(lastNotePlayed[0])[0];
     } else {
         lastNotePlayed = "G";
     }
@@ -8281,7 +8081,6 @@ if (typeof module !== "undefined" && module.exports) {
         normalizeNoteAccidentals,
         TEMPERAMENT,
         INTERVAL_CENTS,
-        TEMPERAMENT_INTERVALS,
         INTERVAL_ORDER,
         setOctaveRatio,
         getOctaveRatio,
@@ -8322,6 +8121,7 @@ if (typeof module !== "undefined" && module.exports) {
         temperamentHasRatios,
         isTrueEDO,
         isEquallyTempered,
+        isNonEDO,
         getTemperamentRatio,
         getTemperamentCents,
         getTemperamentName,
@@ -8334,6 +8134,7 @@ if (typeof module !== "undefined" && module.exports) {
         scalePatternToEDO,
         PITCH_COLLECTIONS_EDO_OVERRIDES,
         getModePattern,
+        getNonEDOModeSteps,
         modeMapper,
         getSharpFlatPreference,
         getCustomNote,
@@ -8376,6 +8177,8 @@ if (typeof module !== "undefined" && module.exports) {
         INTERVALVALUES,
         FIXEDSOLFEGE,
         FIXEDSOLFEGE1,
+        MODEPIEMENU_GROUP_RING,
+        MODEPIEMENU_NAME_RING,
         getSavedCustomModes,
         getModeNamesForGroup,
         getModeLabel,
@@ -8384,8 +8187,6 @@ if (typeof module !== "undefined" && module.exports) {
         updateModeWheelItems,
         getModeGroupTitleFont,
         getModeSliceFont,
-        isNonEDO,
-        getNonEDOModeSteps,
         getNonEDOFrequency,
         configureWheel
     };

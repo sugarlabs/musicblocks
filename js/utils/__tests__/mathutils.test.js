@@ -247,6 +247,14 @@ describe("MathUtility", () => {
         test("concatenates with empty string", () => {
             expect(MathUtility.doPlus("hello", "")).toBe("hello");
         });
+
+        test("throws NanError when the non-string operand is null", () => {
+            expect(() => MathUtility.doPlus(null, "5")).toThrow("NanError");
+        });
+
+        test("throws NanError when the non-string operand is undefined", () => {
+            expect(() => MathUtility.doPlus("5", undefined)).toThrow("NanError");
+        });
     });
 
     describe("doMinus", () => {

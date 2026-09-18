@@ -80,6 +80,12 @@ describe("processABCNotes - Basic Note Processing", () => {
         expect(logo.notationNotes["0"]).toBe("g4 c'''4 ");
     });
 
+    it("should write a note with no pitches as a rest", () => {
+        logo.notation.notationStaging["0"] = [[[], 4, 0, null, null, -1, false]];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("R4 ");
+    });
+
     it("should insert a newline after every 8 notes", () => {
         const notes = [];
         // Add 9 notes
@@ -206,7 +212,7 @@ describe("processABCNotes - Control Strings", () => {
         expect(out).toContain("V:2");
         expect(out).toContain("V:3");
         expect(out).toContain("V:4");
-        expect(out).toContain("unknown command");
+        expect(out).not.toContain("unknown command");
     });
 
     it("should handle meter command", () => {
@@ -218,7 +224,7 @@ describe("processABCNotes - Control Strings", () => {
     it("should handle pickup command", () => {
         logo.notation.notationStaging["0"] = ["pickup", "8"];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain("K: pickup=8");
+        expect(logo.notationNotes["0"]).not.toContain("K:");
     });
 });
 
@@ -252,7 +258,7 @@ describe("processABCNotes - Chords", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("[C E]4   ");
+        expect(logo.notationNotes["0"]).toBe("!accent![C E]4  ");
     });
 });
 
@@ -305,7 +311,7 @@ describe("processABCNotes - Tuplet Handling", () => {
             ")"
         ];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2:2A8B8 )");
+        expect(logo.notationNotes["0"]).toBe("(3:2:2A8B8 ");
     });
 
     it("should handle incomplete/mixed tuplets logic", () => {
@@ -506,5 +512,353 @@ describe("ACCIDENTAL_MAP", () => {
 
     test("should return undefined for unmapped accidentals", () => {
         expect(ACCIDENTAL_MAP["x"]).toBeUndefined();
+    });
+});
+
+describe("processABCNotes - notation markers", () => {
+    const abcjs = require("abcjs");
+
+    // Staged entries mirror js/notation.js: notes are
+    // [pitches, noteValue, dotCount, tupletValue, roundDown, insideChord, staccato],
+    // markers are bare strings followed by their arguments.
+    const note = (pitch, noteValue = 4) => [[pitch], noteValue, 0, null, null, -1, false];
+    const tupletNote = pitch => [[pitch], 1, 0, [3, 1], 2, -1, false];
+
+    const exportBody = staged => {
+        const logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: staged } } };
+        processABCNotes(logo, "0");
+        return logo.notationNotes["0"];
+    };
+
+    // Parses the exported body with abcjs, which Music Blocks already depends on, and
+    // fails on any parser warning. Returns the parsed notes in order.
+    const parseNotes = body => {
+        const [tune] = abcjs.parseOnly(`${getABCHeader()}K:C\n${body}\n`);
+        const warnings = (tune.warnings || []).map(w => w.replace(/<[^>]*>/g, ""));
+        expect(warnings).toEqual([]);
+        return tune.lines
+            .flatMap(line => (line.staff || []).flatMap(staff => staff.voices.flat()))
+            .filter(element => element.el_type === "note");
+    };
+
+    const annotationsOf = n => (n.chord || []).map(c => `${c.position}:${c.name}`);
+    const decorationsOf = n => n.decoration || [];
+
+    // Every marker notation.js can stage, with the arguments it stages alongside.
+    const EVERY_MARKER = [
+        ["markup", 261.63],
+        ["markdown", "pp"],
+        ["voice one"],
+        ["voice two"],
+        ["voice three"],
+        ["voice four"],
+        ["one voice"],
+        ["key", "C", "major"],
+        ["meter", 3, 4],
+        ["swing"],
+        ["tempo", 90, "4"],
+        ["pickup", "8"],
+        ["begin articulation"],
+        ["end articulation"],
+        ["begin crescendo"],
+        ["begin decrescendo"],
+        ["end crescendo"],
+        ["end decrescendo"],
+        ["begin slur"],
+        ["end slur"],
+        ["tie"],
+        ["begin harmonics"],
+        ["end harmonics"]
+    ].flat();
+
+    it("writes every staged marker as valid ABC without losing or adding notes", () => {
+        const body = exportBody([
+            ...EVERY_MARKER,
+            note("C4"),
+            ...EVERY_MARKER,
+            note("D4"),
+            ...EVERY_MARKER
+        ]);
+
+        expect(parseNotes(body)).toHaveLength(2);
+        // Swing is written as an annotation; outside annotations no marker name may appear.
+        const outsideAnnotations = body.replace(/"[^"]*"/g, "");
+        for (const word of ["markup", "markdown", "key", "major", "swing", "harmonics", "pickup"]) {
+            expect(outsideAnnotations).not.toContain(word);
+        }
+    });
+
+    it("skips marker strings and stray values it has no ABC for", () => {
+        let body;
+        expect(() => {
+            body = exportBody([note("C4"), "unknown command", 42, note("D4")]);
+        }).not.toThrow();
+
+        expect(body).not.toContain("unknown command");
+        expect(body).not.toContain("42");
+        expect(parseNotes(body)).toHaveLength(2);
+    });
+
+    describe("tempo", () => {
+        it.each([
+            ["4", "1/4"],
+            ["8", "1/8"],
+            ["2", "1/2"],
+            ["4.", "3/8"],
+            ["8..", "7/32"],
+            ["4 16", "1/4 1/16"]
+        ])("writes 90 beats per %s note as an inline [Q:%s=90] field", (beat, fraction) => {
+            const body = exportBody([note("C4"), "tempo", 90, beat, note("D4")]);
+
+            expect(body).toContain(`[Q:${fraction}=90]`);
+            expect(parseNotes(body)).toHaveLength(2);
+        });
+
+        it("skips a tempo whose beat isn't a duration", () => {
+            const body = exportBody(["tempo", 90, "not a beat", note("C4")]);
+
+            expect(body).not.toContain("Q:");
+            expect(parseNotes(body)).toHaveLength(1);
+        });
+    });
+
+    it("writes voice changes inline and a meter change on its own line", () => {
+        const body = exportBody([
+            note("C4"),
+            "meter",
+            3,
+            4,
+            note("D4"),
+            "voice two",
+            note("E4"),
+            "one voice",
+            note("F4")
+        ]);
+
+        expect(body).toContain("\nM:3/4\n");
+        expect(body).toContain("[V:2]");
+        expect(body).toContain("[V:1]");
+        expect(parseNotes(body)).toHaveLength(4);
+    });
+
+    it("never writes an empty line, which would end the tune", () => {
+        const body = exportBody([
+            "meter",
+            3,
+            4,
+            ...Array.from({ length: 8 }, () => note("C4")),
+            "meter",
+            6,
+            8,
+            "meter",
+            2,
+            4,
+            ...Array.from({ length: 9 }, () => note("D4")),
+            "meter",
+            4,
+            4
+        ]);
+
+        expect(body).not.toMatch(/\n\s*\n/);
+        expect(parseNotes(body)).toHaveLength(17);
+    });
+
+    it("does not start an empty line for a break at the start or after a meter change", () => {
+        const body = exportBody([
+            "begin slur",
+            "break",
+            note("C4"),
+            "meter",
+            3,
+            4,
+            "break",
+            "break",
+            note("D4")
+        ]);
+
+        expect(body.startsWith("\n")).toBe(false);
+        expect(body).not.toMatch(/\n\s*\n/);
+        expect(parseNotes(body)).toHaveLength(2);
+    });
+
+    it("parses a meter change right after returning to a voice on a later line", () => {
+        // abcjs 6.3.0 throws on this sequence when the meter is written inline as [M:3/4].
+        const staged = [
+            "voice one",
+            note("C4"),
+            "voice two",
+            ...Array.from({ length: 9 }, () => note("D4")),
+            "one voice",
+            "meter",
+            3,
+            4,
+            note("F4")
+        ];
+
+        let notes;
+        expect(() => {
+            notes = parseNotes(exportBody(staged));
+        }).not.toThrow();
+        expect(notes).toHaveLength(11);
+    });
+
+    it("writes fields before a crescendo mark still waiting for its note", () => {
+        const body = exportBody([
+            note("C4"),
+            "begin crescendo",
+            "voice two",
+            "tempo",
+            90,
+            "4",
+            "meter",
+            3,
+            4,
+            note("D4")
+        ]);
+
+        expect(body.indexOf("!<(!")).toBeGreaterThan(body.indexOf("M:3/4"));
+        expect(body).toContain("!<(!D");
+        const notes = parseNotes(body);
+        expect(notes).toHaveLength(2);
+        expect(notes[1].decoration).toContain("crescendo(");
+    });
+
+    it("writes no field for a pickup, since the exporter writes no bar lines", () => {
+        const body = exportBody(["pickup", "8", note("C4"), note("D4")]);
+
+        expect(body).not.toMatch(/K:|pickup/);
+        expect(parseNotes(body)).toHaveLength(2);
+    });
+
+    it("writes no key change, which would re-sharpen or re-flatten the notes after it", () => {
+        const body = exportBody([note("C4"), "key", "G", "major", note("F4")]);
+
+        expect(body).not.toContain("K:");
+        expect(parseNotes(body).map(n => n.pitches[0].accidental)).toEqual([undefined, undefined]);
+    });
+
+    describe("annotations", () => {
+        it("puts markup above the note it follows", () => {
+            const notes = parseNotes(exportBody([note("C4"), "markup", 261.63, note("D4")]));
+
+            expect(notes.map(annotationsOf)).toEqual([["above:261.63"], []]);
+        });
+
+        it("puts markdown below the note it follows", () => {
+            const notes = parseNotes(exportBody([note("C4"), "markdown", "dolce", note("D4")]));
+
+            expect(notes.map(annotationsOf)).toEqual([["below:dolce"], []]);
+        });
+
+        it("attaches markup to the chord it follows", () => {
+            const notes = parseNotes(
+                exportBody([
+                    [["C4"], 4, 0, null, null, 7, false],
+                    [["E4"], 4, 0, null, null, 7, false],
+                    "markup",
+                    440,
+                    note("D4")
+                ])
+            );
+
+            expect(notes.map(annotationsOf)).toEqual([["above:440"], []]);
+        });
+
+        it("attaches markup to the tuplet it follows", () => {
+            const notes = parseNotes(
+                exportBody([
+                    tupletNote("C4"),
+                    tupletNote("D4"),
+                    tupletNote("E4"),
+                    "markup",
+                    330,
+                    note("F4")
+                ])
+            );
+
+            expect(notes.map(annotationsOf)).toEqual([["above:330"], [], [], []]);
+        });
+
+        it("attaches markup staged before any note to the first note", () => {
+            const notes = parseNotes(exportBody(["markup", 440, note("C4")]));
+
+            expect(notes.map(annotationsOf)).toEqual([["above:440"]]);
+        });
+
+        it("writes swing above the note after it", () => {
+            const notes = parseNotes(exportBody([note("C4"), "swing", note("D4")]));
+
+            expect(notes.map(annotationsOf)).toEqual([[], ["above:swing"]]);
+        });
+
+        it("keeps annotation text intact and parseable", () => {
+            // abcjs has no escape for "%" (it always starts a comment) and treats "\"
+            // before the closing quote as escaping it, so those two are written as
+            // their fullwidth forms.
+            const notes = parseNotes(
+                exportBody([note("C4"), "markdown", 'say "hi" 50% a\\b\nc\\', note("D4")])
+            );
+
+            expect(notes.map(annotationsOf)).toEqual([['below:say "hi" 50％ a＼b c＼'], []]);
+        });
+    });
+
+    describe("decorations", () => {
+        it("accents every note inside a relative-volume block, including nested ones", () => {
+            const notes = parseNotes(
+                exportBody([
+                    "begin articulation",
+                    note("C4"),
+                    "begin articulation",
+                    note("D4"),
+                    "end articulation",
+                    note("E4"),
+                    "end articulation",
+                    note("F4")
+                ])
+            );
+
+            expect(notes.map(n => decorationsOf(n).includes("accent"))).toEqual([
+                true,
+                true,
+                true,
+                false
+            ]);
+        });
+
+        it("marks notes, chords and tuplet notes inside a harmonic block as harmonics", () => {
+            const notes = parseNotes(
+                exportBody([
+                    note("C4"),
+                    "begin harmonics",
+                    note("D4"),
+                    [["E4"], 4, 0, null, null, 9, false],
+                    [["G4"], 4, 0, null, null, 9, false],
+                    tupletNote("A4"),
+                    tupletNote("B4"),
+                    tupletNote("C5"),
+                    "end harmonics",
+                    note("D5")
+                ])
+            );
+
+            expect(notes.map(n => decorationsOf(n).includes("open"))).toEqual([
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false
+            ]);
+        });
+
+        it("keeps staccato alongside a decoration", () => {
+            const notes = parseNotes(
+                exportBody(["begin articulation", [["C4"], 4, 0, null, null, -1, true]])
+            );
+
+            expect(decorationsOf(notes[0]).sort()).toEqual(["accent", "staccato"]);
+        });
     });
 });

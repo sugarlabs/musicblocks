@@ -54,8 +54,8 @@ if (typeof module !== "undefined" && module.exports) {
 /* exported
    announceToScreenReader, changeImage,
    delayExecution,
-   doPublish, doStopVideoCam, doSVG,
-   doUseCamera, format, getTextWidth,
+   doPublish, doSVG,
+   format, getTextWidth,
    importMembers, isSVGEmpty, prepareMacroExports, preparePluginExports,
    processMacroData, processPluginData, processRawPluginData, waitForReadiness
 */
@@ -684,8 +684,11 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
             script.onerror = e => {
                 URL.revokeObjectURL(url);
                 document.head.removeChild(script);
-                console.error("Failed to load CSP Blob script for plugins", e);
-                reject(e);
+                const err = new Error(
+                    "Failed to load plugin script" + (e && e.message ? ": " + e.message : "")
+                );
+                console.error("Failed to load CSP Blob script for plugins", err);
+                reject(err);
             };
             document.head.appendChild(script);
         });
@@ -713,11 +716,13 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
 
     // Finally, execute safeEvals by creating new Blob scripts for each setup logic block.
     // This is because even setup logic can be blocked by CSP if it contains unsafe-eval.
+    window.__mb_plugin_registry = window.__mb_plugin_registry || {};
     for (const item of pendingSafeEvals) {
         const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random()
             .toString(36)
             .substr(2, 9)}`;
         const setupScript = `
+window.__mb_plugin_registry = window.__mb_plugin_registry || {};
 window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivity) {
     ${item.code}
 };
@@ -726,7 +731,7 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
         const sUrl = URL.createObjectURL(sBlob);
         const sScript = document.createElement("script");
         sScript.src = sUrl;
-        await new Promise(resolve => {
+        await new Promise((resolve, reject) => {
             sScript.onload = () => {
                 if (window.__mb_plugin_registry[registryName]) {
                     try {
@@ -742,12 +747,15 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                 }
                 resolve();
             };
-            sScript.onerror = () => {
+            sScript.onerror = e => {
                 URL.revokeObjectURL(sUrl);
                 if (sScript.parentNode) {
                     sScript.parentNode.removeChild(sScript);
                 }
-                resolve(); // Still resolve to let others run
+                const err = new Error(
+                    "Failed to execute plugin script" + (e && e.message ? ": " + e.message : "")
+                );
+                reject(err);
             };
             document.head.appendChild(sScript);
         });
@@ -983,193 +991,6 @@ let prepareMacroExports = (name, stack, macroDict) => {
     return JSON.stringify(macroDict);
 };
 
-// Camera functionality module
-// Encapsulates camera-related operations for video/image capture.
-// All interval/listener lifecycle state lives here (not in doUseCamera's
-// closures) so that repeated doUseCamera(...) calls can never accumulate
-// more than one active interval or one active canplay listener.
-const CameraManager = {
-    isSetup: false,
-    canPlayHandler: null,
-    intervalId: null,
-    // Tracks the exact element a listener was attached to, so cleanup always
-    // targets the right node even if #camVideo is ever replaced in the DOM.
-    listenerVideoElement: null,
-
-    /**
-     * Starts the capture interval if one isn't already running. Idempotent:
-     * if a capture interval is already active, this is a no-op that returns
-     * the existing interval id, rather than clearing and restarting it.
-     *
-     * This matters when doUseCamera is invoked rapidly and repeatedly (e.g.
-     * from inside a "forever" loop): clearing and restarting the interval on
-     * every call would cancel it before it ever gets a chance to fire,
-     * meaning draw() would never run and no frame would ever be captured.
-     * @param {function} draw - callback invoked on each tick
-     * @param {number} periodMs - interval period in milliseconds
-     * @returns {number} the active interval id
-     */
-    startCapture(draw, periodMs = 100) {
-        if (this.intervalId !== null) {
-            return this.intervalId;
-        }
-        this.intervalId = window.setInterval(draw, periodMs);
-        return this.intervalId;
-    },
-
-    /**
-     * Stops the capture interval if one is running. Safe to call when no
-     * interval is active (idempotent).
-     */
-    stopCapture() {
-        if (this.intervalId !== null) {
-            window.clearInterval(this.intervalId);
-            this.intervalId = null;
-        }
-    },
-
-    /**
-     * Attaches a canplay handler to a video element, first removing any
-     * previously attached handler (from this element or a prior one).
-     * Idempotent: calling this repeatedly never leaves more than one
-     * listener registered.
-     * @param {HTMLVideoElement} video
-     * @param {function} handler
-     */
-    setCanplayListener(video, handler) {
-        this.clearCanplayListener();
-        video.addEventListener("canplay", handler, false);
-        this.canPlayHandler = handler;
-        this.listenerVideoElement = video;
-    },
-
-    /**
-     * Removes the currently tracked canplay handler from the element it was
-     * actually attached to. Safe to call when no listener is active.
-     */
-    clearCanplayListener() {
-        if (this.canPlayHandler && this.listenerVideoElement) {
-            this.listenerVideoElement.removeEventListener("canplay", this.canPlayHandler, false);
-        }
-        this.canPlayHandler = null;
-        this.listenerVideoElement = null;
-    },
-
-    /**
-     * Resets the camera setup state and tears down any active interval or
-     * listener. Called on doStopVideoCam so a Stop always returns to a
-     * clean slate before the next Camera/Video block run.
-     */
-    reset() {
-        this.isSetup = false;
-        this.stopCapture();
-        this.clearCanplayListener();
-    }
-};
-
-/**
- * Uses the camera to capture images or video frames and displays them on the turtle's canvas.
- * @param {Array} args - Arguments passed to the function.
- * @param {object} turtles - The turtles object.
- * @param {string} turtle - The name of the turtle.
- * @param {boolean} isVideo - Indicates whether to capture video frames.
- * @param {number} cameraID - The ID of the camera interval for video frames.
- * @param {function} setCameraID - Function to set the camera interval ID.
- * @param {function} errorMsg - Function to display error messages.
- */
-let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) => {
-    const w = 320;
-    const h = 240;
-
-    let streaming = false;
-    const video = document.querySelector("#camVideo");
-    const canvas = document.querySelector("#camCanvas");
-    const context = canvas.getContext("2d");
-
-    if (canvas.width !== w) {
-        canvas.width = w;
-    }
-    if (canvas.height !== h) {
-        canvas.height = h;
-    }
-
-    function draw() {
-        context.drawImage(video, 0, 0, w, h);
-        const data = canvas.toDataURL("image/png");
-        turtles.getTurtle(turtle).doShowImage(args[0], data);
-    }
-
-    function startCaptureOrDraw() {
-        if (isVideo) {
-            cameraID = CameraManager.startCapture(draw, 100);
-            setCameraID(cameraID);
-        } else {
-            draw();
-        }
-    }
-
-    if (!CameraManager.isSetup) {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            errorMsg("Your browser does not support the webcam");
-            return;
-        }
-
-        navigator.mediaDevices
-            .getUserMedia({ video: true, audio: false })
-            .then(stream => {
-                video.srcObject = stream;
-                video.play();
-                CameraManager.isSetup = true;
-            })
-            .catch(error => {
-                errorMsg("Could not connect to camera");
-
-                console.debug(error);
-            });
-    } else {
-        streaming = true;
-        video.play();
-        startCaptureOrDraw();
-    }
-
-    function handleCanPlay() {
-        // console.debug("canplay", streaming, CameraManager.isSetup);
-        if (!streaming) {
-            video.setAttribute("width", w);
-            video.setAttribute("height", h);
-            canvas.setAttribute("width", w);
-            canvas.setAttribute("height", h);
-            streaming = true;
-            startCaptureOrDraw();
-        }
-    }
-
-    CameraManager.setCanplayListener(video, handleCanPlay);
-};
-
-/**
- * Stops the camera and clears the camera interval.
- * @param {number} cameraID - The ID of the camera interval.
- * @param {function} setCameraID - Function to set the camera interval ID.
- */
-function doStopVideoCam(cameraID, setCameraID) {
-    if (cameraID !== null) {
-        window.clearInterval(cameraID);
-    }
-
-    setCameraID(null);
-    const video = document.querySelector("#camVideo");
-    if (video) {
-        video.pause();
-        if (video.srcObject) {
-            const tracks = video.srcObject.getTracks();
-            tracks.forEach(track => track.stop());
-            video.srcObject = null;
-        }
-    }
-    CameraManager.reset();
-}
-
 // hideDOMLabel() and displayMsg() moved to js/utils/dom-helpers.js
 
 // safeSVG() and toFixed2() moved to js/utils/utils-logic.js
@@ -1303,10 +1124,7 @@ if (typeof module !== "undefined" && module.exports) {
         preparePluginExports,
         processMacroData,
         updatePluginObj,
-        announceToScreenReader,
-        doUseCamera,
-        doStopVideoCam,
-        CameraManager
+        announceToScreenReader
     };
 }
 

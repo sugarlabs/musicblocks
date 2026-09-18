@@ -25,7 +25,7 @@
    nthDegreeToPitch, SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
-   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO, getModeLength
+   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO, getModeLength, noteToObj
 */
 
 /*
@@ -687,10 +687,7 @@ function setupPitchActions(activity) {
             if (tur.singer.previousNotePlayed == null) {
                 return 0;
             } else {
-                let len = tur.singer.previousNotePlayed[0].length;
-                let pitch = tur.singer.previousNotePlayed[0].slice(0, len - 1);
-                let octave = parseInt(tur.singer.previousNotePlayed[0].slice(len - 1), 10);
-                let obj = [pitch, octave];
+                let obj = noteToObj(tur.singer.previousNotePlayed[0]);
                 const previousValue = pitchToNumber(
                     obj[0],
                     obj[1],
@@ -698,10 +695,8 @@ function setupPitchActions(activity) {
                     activity.logo.synth.inTemperament
                 );
 
-                len = tur.singer.lastNotePlayed[0].length;
-                pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
-                obj = [pitch, octave];
+                obj = noteToObj(tur.singer.lastNotePlayed[0]);
+                let [pitch, octave] = obj;
 
                 let delta =
                     pitchToNumber(
@@ -786,8 +781,7 @@ function setupPitchActions(activity) {
             };
 
             if (tur.singer.lastNotePlayed !== null) {
-                const len = tur.singer.lastNotePlayed[0].length;
-                return _step(stepType, tur.singer.lastNotePlayed[0].slice(0, len - 1));
+                return _step(stepType, noteToObj(tur.singer.lastNotePlayed[0])[0]);
             } else {
                 return _step(stepType, "G");
             }

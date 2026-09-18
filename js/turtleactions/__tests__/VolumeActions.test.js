@@ -98,6 +98,16 @@ describe("setupVolumeActions", () => {
             logo: {
                 setDispatchBlock: jest.fn(),
                 setTurtleListener: jest.fn(),
+                stopTurtle: false,
+                _timerManager: {
+                    setGuardedTimeout: jest.fn((cb, delay, guard) => {
+                        return setTimeout(() => {
+                            if (!guard()) cb();
+                        }, delay);
+                    }),
+                    clearTimeout: jest.fn(id => clearTimeout(id)),
+                    clearAll: jest.fn(() => 0)
+                },
                 synth: {
                     loadSynth: jest.fn(),
                     setMasterVolume: jest.fn(),
