@@ -1,4 +1,7 @@
 const TemperamentWidget = require("../temperament");
+const ManagedTimer = require("../../utils/ManagedTimer");
+
+global.ManagedTimer = ManagedTimer;
 describe("TemperamentWidget basic tests", () => {
     let widget;
     const createMockElement = id => ({
@@ -1035,8 +1038,9 @@ describe("TemperamentWidget basic tests", () => {
 
         test("onclose cleans up timeouts and playing state", () => {
             widget._playAllRunning = true;
-            widget._playAllTimer = setTimeout(() => {}, 1000);
-            widget._playTimeout = setTimeout(() => {}, 1000);
+            widget._playAllTimer = widget._setWidgetTimeout(() => {}, 1000);
+            widget._playTimeout = widget._setWidgetTimeout(() => {}, 1000);
+            expect(widget._timerManager.activeTimeoutCount).toBe(2);
 
             expect(mockWidgetWindow.onclose).toBeDefined();
             mockWidgetWindow.onclose();
@@ -1044,6 +1048,7 @@ describe("TemperamentWidget basic tests", () => {
             expect(widget._playAllRunning).toBe(false);
             expect(widget._playAllTimer).toBeNull();
             expect(widget._playTimeout).toBeNull();
+            expect(widget._timerManager.activeTimeoutCount).toBe(0);
             expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
             expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalled();
         });

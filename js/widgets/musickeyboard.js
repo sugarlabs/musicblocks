@@ -155,7 +155,20 @@ function MusicKeyboard(activity) {
 
     this._savedDocumentOnKeyDown = undefined;
     this._savedDocumentOnKeyUp = undefined;
-    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+    if (typeof ManagedTimer !== "undefined") {
+        this._timerManager = new ManagedTimer();
+    } else if (typeof require !== "undefined") {
+        try {
+            const ManagedTimerCtor = require("../utils/ManagedTimer");
+            this._timerManager = new ManagedTimerCtor();
+        } catch (e) {
+            this._timerManager = null;
+        }
+    } else {
+        this._timerManager = null;
+    }
+    this._playOneTimeout = null;
+    this._chordTimeouts = [];
 
     /**
      * Flag indicating whether playback is currently active.
@@ -193,8 +206,7 @@ function MusicKeyboard(activity) {
         if (this._timerManager !== null) {
             return this._timerManager.setInterval(callback, interval);
         }
-
-        return setInterval(callback, interval);
+        return false;
     };
 
     this._clearWidgetInterval = function (id) {
@@ -202,15 +214,47 @@ function MusicKeyboard(activity) {
             return false;
         }
 
-        if (this._timerManager !== null && this._timerManager.clearInterval(id)) {
-            return true;
+        if (this._timerManager !== null) {
+            return this._timerManager.clearInterval(id);
         }
 
-        clearInterval(id);
-        return true;
+        return false;
+    };
+
+    this._setWidgetTimeout = function (callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return false;
+    };
+
+    this._clearWidgetTimeout = function (id) {
+        if (id === null || id === undefined || id === false) {
+            return false;
+        }
+
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+
+        return false;
+    };
+
+    this._clearPlaybackTimers = function () {
+        if (this._playOneTimeout) {
+            this._clearWidgetTimeout(this._playOneTimeout);
+            this._playOneTimeout = null;
+        }
+        if (Array.isArray(this._chordTimeouts)) {
+            for (let i = 0; i < this._chordTimeouts.length; i++) {
+                this._clearWidgetTimeout(this._chordTimeouts[i]);
+            }
+            this._chordTimeouts = [];
+        }
     };
 
     this._clearWidgetTimers = function () {
+        this._clearPlaybackTimers();
         if (this._timerManager !== null) {
             return this._timerManager.clearAll();
         }
@@ -1103,6 +1147,7 @@ function MusicKeyboard(activity) {
             }
 
             this._stopOrCloseClicked = false;
+            this._clearPlaybackTimers();
 
             // Convert durations to seconds based on BPM
             const durationInSeconds = selectedNotes[0].duration.map(
@@ -1119,6 +1164,7 @@ function MusicKeyboard(activity) {
             }
 
             this._stopOrCloseClicked = true;
+            this._clearPlaybackTimers();
             this._updatePlayButtonIcon(playButtonCell, false);
         }
     };
@@ -1131,7 +1177,12 @@ function MusicKeyboard(activity) {
      * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
      */
     this.playOne = function (counter, time, playButtonCell) {
-        setTimeout(() => {
+        if (this._playOneTimeout) {
+            this._clearWidgetTimeout(this._playOneTimeout);
+            this._playOneTimeout = null;
+        }
+        this._playOneTimeout = this._setWidgetTimeout(() => {
+            this._playOneTimeout = null;
             let cell, eleid, ele, notes, zx, res, maxDuration;
             if (counter < selectedNotes.length) {
                 if (this._stopOrCloseClicked) {
@@ -1218,12 +1269,15 @@ function MusicKeyboard(activity) {
             return;
         }
 
-        setTimeout(() => {
+        const id0 = this._setWidgetTimeout(() => {
             this.activity.logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
         }, 1);
+        if (id0) {
+            this._chordTimeouts.push(id0);
+        }
 
         if (notes.length > 1) {
-            setTimeout(() => {
+            const id1 = this._setWidgetTimeout(() => {
                 this.activity.logo.synth.trigger(
                     0,
                     notes[1],
@@ -1233,10 +1287,13 @@ function MusicKeyboard(activity) {
                     null
                 );
             }, 1);
+            if (id1) {
+                this._chordTimeouts.push(id1);
+            }
         }
 
         if (notes.length > 2) {
-            setTimeout(() => {
+            const id2 = this._setWidgetTimeout(() => {
                 this.activity.logo.synth.trigger(
                     0,
                     notes[2],
@@ -1246,10 +1303,13 @@ function MusicKeyboard(activity) {
                     null
                 );
             }, 1);
+            if (id2) {
+                this._chordTimeouts.push(id2);
+            }
         }
 
         if (notes.length > 3) {
-            setTimeout(() => {
+            const id3 = this._setWidgetTimeout(() => {
                 this.activity.logo.synth.trigger(
                     0,
                     notes[3],
@@ -1259,6 +1319,9 @@ function MusicKeyboard(activity) {
                     null
                 );
             }, 1);
+            if (id3) {
+                this._chordTimeouts.push(id3);
+            }
         }
     };
 
@@ -1488,7 +1551,7 @@ function MusicKeyboard(activity) {
         });
 
         function removeBlock(that, i) {
-            setTimeout(() => {
+            that._setWidgetTimeout(() => {
                 that._removePitchBlock(that.remove[i]);
             }, 200);
         }
@@ -2429,7 +2492,7 @@ function MusicKeyboard(activity) {
             }
             if (aboveBlock !== -1) {
                 creatingNewNote = true;
-                setTimeout(() => {
+                this._setWidgetTimeout(() => {
                     this._addNotesBlockBetween(aboveBlock, newBlock);
                     creatingNewNote = false;
                     this.layout.push({
