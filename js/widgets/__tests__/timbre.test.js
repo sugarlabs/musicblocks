@@ -57,6 +57,7 @@ global.docById = jest.fn(() => ({
 global.docByName = jest.fn(() => []);
 const ManagedTimer = require("../../utils/ManagedTimer.js");
 global.ManagedTimer = ManagedTimer;
+global.announceToScreenReader = jest.fn();
 
 global.window = {
     innerWidth: 1200,

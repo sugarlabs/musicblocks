@@ -162,7 +162,7 @@ const platformThemes = {
 
         disconnected: "#5C5C5C",
         header: "#1E88E5",
-        ruleColor: "#303030",
+        ruleColor: "#E2E2E2",
         trashBorder: "#424242",
         trashActive: "#E53935",
         background: "#303030", // Very dark gray
@@ -289,7 +289,7 @@ const platformThemes = {
 
         disconnected: "#C4C4C4", // disconnected block color
         header: "#4DA6FF",
-        ruleColor: "#E2E2E2",
+        ruleColor: "#303030",
         trashBorder: "#808080",
         trashActive: "#FF0000",
         background: "#F9F9F9",
@@ -538,11 +538,13 @@ const getSystemThemePreference = () => {
 // Use stored preference, or fallback to system preference
 const activeTheme = themePreference || getSystemThemePreference();
 
-// Set platformColor based on active theme
+const clonePlatformTheme = theme => JSON.parse(JSON.stringify(theme));
+
+// Keep the mutable runtime colors separate from the canonical theme definitions.
 if (platformThemes[activeTheme]) {
-    window.platformColor = platformThemes[activeTheme];
+    window.platformColor = clonePlatformTheme(platformThemes[activeTheme]);
 } else {
-    window.platformColor = platformThemes["light"];
+    window.platformColor = clonePlatformTheme(platformThemes["light"]);
 }
 
 const _themeMeta = document.querySelector("meta[name=theme-color]");

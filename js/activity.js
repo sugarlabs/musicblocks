@@ -104,6 +104,7 @@ let MYDEFINES = [
     "utils/utils-logic",
     "utils/http-utils",
     "utils/utils",
+    "utils/camera-utils",
     "utils/retryWithBackoff",
     "utils/error-handler",
     "utils/debugLog",
@@ -2837,8 +2838,7 @@ class Activity {
 
             // Load custom modes saved in local storage so they survive a reload.
             try {
-                const savedModes = getSavedCustomModes();
-                for (const mode of savedModes) {
+                for (const mode of getSavedCustomModes()) {
                     if (mode && mode.name && Array.isArray(mode.pattern)) {
                         MUSICALMODES[mode.name] = mode.pattern;
                     }

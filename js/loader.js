@@ -99,6 +99,9 @@ requirejs.config({
             ],
             exports: "_"
         },
+        "utils/camera-utils": {
+            exports: "CameraUtils"
+        },
         "utils/retryWithBackoff": {
             deps: ["utils/utils"],
             exports: "retryWithBackoff"
@@ -240,6 +243,26 @@ requirejs.config({
         },
         "activity/js-export/ast2blocks.config": {
             exports: "ast2blocklist_config"
+        },
+        "activity/toolbar-ui": {
+            deps: ["utils/utils", "utils/dom-helpers", "activity/focus-cycle-manager"],
+            exports: "ToolbarUI"
+        },
+        // The chat widgets read createWidgetLifecycle off window, so the helper
+        // must be evaluated before they are. These are plain scripts, which
+        // RequireJS would otherwise fetch and evaluate in any order.
+        "utils/ai-widget-lifecycle": {
+            exports: "createWidgetLifecycle"
+        },
+        "widgets/reflection": {
+            deps: ["utils/ai-widget-lifecycle"]
+        },
+        "widgets/aidebugger": {
+            deps: ["utils/ai-widget-lifecycle"]
+        },
+        "widgets/widgetWindows": {
+            deps: ["utils/dom-helpers"],
+            exports: "widgetWindows"
         }
     },
     paths: {
@@ -576,6 +599,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "tweenjs.min",
                 "utils/platformstyle",
                 "utils/utils",
+                "utils/camera-utils",
                 "activity/pubsub",
                 "activity/turtledefs",
                 "activity/block",

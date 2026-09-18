@@ -23,7 +23,7 @@
     EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
    getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
     getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
-   i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
+    i18nSolfege, INVERTMODES, isCustomTemperament, isEquallyTempered, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
    piemenuAccidentals, piemenuBasic, piemenuBlockContext,
@@ -166,7 +166,41 @@ class Block {
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
         this.text = null; // A dynamically generated text label on block itself.
-        this.value = null; // Value for number, text, and media blocks.
+        this.valueInitialized = false;
+
+        let _value = null;
+        Object.defineProperty(this, "value", {
+            get: () => _value,
+            set: newVal => {
+                if (
+                    this.blocks &&
+                    this.blocks.actionHistory &&
+                    !this.blocks.isUndoingOrRedoing &&
+                    _value !== newVal &&
+                    this.valueInitialized &&
+                    this.loadComplete &&
+                    this.blockIndex !== undefined
+                ) {
+                    const historyItem = {
+                        type: "value_change",
+                        blockId: this.blockIndex,
+                        oldValue: _value,
+                        newValue: newVal,
+                        oldText: this.text ? this.text.text : null,
+                        newText: null
+                    };
+                    this.blocks.actionHistory.push(historyItem);
+                    Promise.resolve().then(() => {
+                        historyItem.newText = this.text ? this.text.text : null;
+                    });
+                    this.blocks.redoActionHistory = [];
+                }
+                this.valueInitialized = true;
+                _value = newVal;
+            },
+            enumerable: true,
+            configurable: true
+        }); // Value for number, text, and media blocks.
         this.privateData = null; // A block may have some private data,
         // e.g., nameboxes use this field to store
         // the box name associated with the block.
@@ -3258,6 +3292,10 @@ class Block {
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
 
+            // Record original coordinates for undoing positional changes
+            that.blocks.dragStartX = that.container.x;
+            that.blocks.dragStartY = that.container.y;
+
             that.blocks.longPressTimeout = setTimeout(() => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
@@ -4022,16 +4060,13 @@ class Block {
                     if (temperament && typeof temperament === "object") {
                         noteLabels[keys[i]] = temperament;
                     }
-                    if (isCustomTemperament(keys[i])) {
+                    if (isCustomTemperament(keys[i]) && temperament && !isEquallyTempered(keys[i]))
                         customLabels.push(keys[i]);
-                    }
                 }
+                if (!customLabels.length) return;
                 let selectedCustom;
-                if (this.customID !== null) {
-                    selectedCustom = this.customID;
-                } else {
-                    selectedCustom = customLabels[0];
-                }
+                if (this.customID !== null) selectedCustom = this.customID;
+                else selectedCustom = customLabels[0];
 
                 if (this.value !== null) {
                     selectedNote = this.value;
@@ -4674,6 +4709,7 @@ class Block {
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener("keypress", this._exitKeyPressed);
+            docById("labelDiv").classList.remove("hasKeyboard");
         }
     }
 
