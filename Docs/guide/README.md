@@ -5,7 +5,7 @@ music and graphics. It expands upon Turtle Blocks by adding a
 collection of features relating to pitch and rhythm.
 
 The [Turtle Blocks
-guide](https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md)
+guide](https://github.com/sugarlabs/musicblocks/blob/master/TurtleDocs/guide/README.md)
 is a good place to start learning about the basics. In this guide, we
 illustrate the musical features by walking the reader through numerous
 examples.
