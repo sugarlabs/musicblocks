@@ -2864,6 +2864,7 @@ describe("calcOctave", () => {
         expect(calcOctave(4, "next", ["C"], "C")).toBe(5);
         expect(calcOctave(4, "next", ["C"], "D")).toBe(5);
         expect(calcOctave(4, "previous", ["C"], "D")).toBe(3);
+        expect(calcOctave(9, "next", ["C"], "C")).toBe(9);
     });
 
     it("should correctly calculate octave based on half-steps between notes", () => {
