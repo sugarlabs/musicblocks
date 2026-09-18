@@ -50,46 +50,46 @@ There is more information about the Turtle Confusion projects [here](../guide/Co
 
 | Project file | Description |
 | --- | --- |
-| confusion-01.html | ../guide/confusion01.png |
-| confusion-02.html | ../guide/confusion02.png |
-| confusion-03.html | ../guide/confusion03.png |
-| confusion-04.html | ../guide/confusion04.png |
-| confusion-05.html | ../guide/confusion05.png |
-| confusion-06.html | ../guide/confusion06.png |
-| confusion-07.html | ../guide/confusion07.png |
-| confusion-08.html | ../guide/confusion08.png |
-| confusion-09.html | ../guide/confusion09.png |
-| confusion-10.html | ../guide/confusion10.png |
-| confusion-11.html | ../guide/confusion11.png |
-| confusion-12.html | ../guide/confusion12.png |
-| confusion-13.html | ../guide/confusion13.png |
-| confusion-14.html | ../guide/confusion14.png |
-| confusion-15.html | ../guide/confusion15.png |
-| confusion-16.html | ../guide/confusion16.png |
-| confusion-17.html | ../guide/confusion17.png |
-| confusion-18.html | ../guide/confusion18.png |
-| confusion-19.html | ../guide/confusion19.png |
-| confusion-20.html | ../guide/confusion20.png |
-| confusion-21.html | ../guide/confusion21.png |
-| confusion-22.html | ../guide/confusion22.png |
-| confusion-23.html | ../guide/confusion23.png |
-| confusion-24.html | ../guide/confusion24.png |
-| confusion-25.html | ../guide/confusion25.png |
-| confusion-26.html | ../guide/confusion26.png |
-| confusion-27.html | ../guide/confusion27.png |
-| confusion-28.html | ../guide/confusion28.png |
-| confusion-29.html | ../guide/confusion29.png |
-| confusion-30.html | ../guide/confusion30.png |
-| confusion-31.html | ../guide/confusion31.png |
-| confusion-32.html | ../guide/confusion32.png |
-| confusion-33.html | ../guide/confusion33.png |
-| confusion-34.html | ../guide/confusion34.png |
-| confusion-35.html | ../guide/confusion35.png |
-| confusion-36.html | ../guide/confusion36.png |
-| confusion-37.html | ../guide/confusion37.png |
-| confusion-38.html | ../guide/confusion38.png |
-| confusion-39.html | ../guide/confusion39.png |
-| confusion-40.html | ../guide/confusion40.png |
+| confusion-01.html | <img src='../guide/confusion01.png' /> |
+| confusion-02.html | <img src='../guide/confusion02.png' /> |
+| confusion-03.html | <img src='../guide/confusion03.png' /> |
+| confusion-04.html | <img src='../guide/confusion04.png' /> |
+| confusion-05.html | <img src='../guide/confusion05.png' /> |
+| confusion-06.html | <img src='../guide/confusion06.png' /> |
+| confusion-07.html | <img src='../guide/confusion07.png' /> |
+| confusion-08.html | <img src='../guide/confusion08.png' /> |
+| confusion-09.html | <img src='../guide/confusion09.png' /> |
+| confusion-10.html | <img src='../guide/confusion10.png' /> |
+| confusion-11.html | <img src='../guide/confusion11.png' /> |
+| confusion-12.html | <img src='../guide/confusion12.png' /> |
+| confusion-13.html | <img src='../guide/confusion13.png' /> |
+| confusion-14.html | <img src='../guide/confusion14.png' /> |
+| confusion-15.html | <img src='../guide/confusion15.png' /> |
+| confusion-16.html | <img src='../guide/confusion16.png' /> |
+| confusion-17.html | <img src='../guide/confusion17.png' /> |
+| confusion-18.html | <img src='../guide/confusion18.png' /> |
+| confusion-19.html | <img src='../guide/confusion19.png' /> |
+| confusion-20.html | <img src='../guide/confusion20.png' /> |
+| confusion-21.html | <img src='../guide/confusion21.png' /> |
+| confusion-22.html | <img src='../guide/confusion22.png' /> |
+| confusion-23.html | <img src='../guide/confusion23.png' /> |
+| confusion-24.html | <img src='../guide/confusion24.png' /> |
+| confusion-25.html | <img src='../guide/confusion25.png' /> |
+| confusion-26.html | <img src='../guide/confusion26.png' /> |
+| confusion-27.html | <img src='../guide/confusion27.png' /> |
+| confusion-28.html | <img src='../guide/confusion28.png' /> |
+| confusion-29.html | <img src='../guide/confusion29.png' /> |
+| confusion-30.html | <img src='../guide/confusion30.png' /> |
+| confusion-31.html | <img src='../guide/confusion31.png' /> |
+| confusion-32.html | <img src='../guide/confusion32.png' /> |
+| confusion-33.html | <img src='../guide/confusion33.png' /> |
+| confusion-34.html | <img src='../guide/confusion34.png' /> |
+| confusion-35.html | <img src='../guide/confusion35.png' /> |
+| confusion-36.html | <img src='../guide/confusion36.png' /> |
+| confusion-37.html | <img src='../guide/confusion37.png' /> |
+| confusion-38.html | <img src='../guide/confusion38.png' /> |
+| confusion-39.html | <img src='../guide/confusion39.png' /> |
+| confusion-40.html | <img src='../guide/confusion40.png' /> |
 
 ## Graphics examples
 
