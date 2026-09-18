@@ -311,7 +311,7 @@ function LegoWidget() {
      * @returns {object} The created widget window.
      */
     this._createWidgetWindow = function () {
-        const widgetWindow = window.widgetWindows.windowFor(this, "LEGO BRICKS");
+        const widgetWindow = window.widgetWindows.windowFor(this, "LEGO Bricks");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
