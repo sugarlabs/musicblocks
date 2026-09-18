@@ -51,10 +51,17 @@ global.createjs = {
     })),
     Shape: jest.fn().mockImplementation(() => ({
         graphics: {
+            clear: jest.fn().mockReturnThis(),
             beginFill: jest.fn().mockReturnThis(),
             drawRect: jest.fn().mockReturnThis(),
-            drawEllipse: jest.fn().mockReturnThis()
-        }
+            drawEllipse: jest.fn().mockReturnThis(),
+            setStrokeStyle: jest.fn().mockReturnThis(),
+            beginStroke: jest.fn().mockReturnThis(),
+            drawCircle: jest.fn().mockReturnThis()
+        },
+        x: 0,
+        y: 0,
+        visible: false
     })),
     Bitmap: jest.fn().mockImplementation(() => ({
         getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 50, height: 50 })
@@ -141,7 +148,14 @@ describe("Viewport Culling", () => {
             macroDict: {},
             palettes: { dict: {}, show: jest.fn() },
             logo: { synth: { loadSynth: jest.fn() } },
-            blocksContainer: { x: 0, y: 0 },
+            blocksContainer: {
+                x: 0,
+                y: 0,
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                setChildIndex: jest.fn(),
+                children: []
+            },
             canvas: { width: 800, height: 600 },
             refreshCanvas: jest.fn(),
             errorMsg: jest.fn(),
@@ -673,6 +687,7 @@ describe("Blocks Foundation", () => {
             canvas: { width: 1200, height: 900 },
             refreshCanvas: jest.fn(),
             errorMsg: jest.fn(),
+            textMsg: jest.fn(),
             setSelectionMode: jest.fn(),
             stopLoadAnimation: jest.fn(),
             setHomeContainers: jest.fn(),
@@ -762,6 +777,328 @@ describe("Blocks Foundation", () => {
             expect(Array.isArray(blocks.stackList)).toBe(true);
             expect(blocks.stackList.length).toBe(0);
             expect(Array.isArray(blocks.trashStacks)).toBe(true);
+            expect(Array.isArray(blocks.actionHistory)).toBe(true);
+            expect(Array.isArray(blocks.redoActionHistory)).toBe(true);
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+        });
+    });
+
+    describe("Undo/Redo System", () => {
+        it("should successfully undo and redo a block move", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.moveBlock = jest.fn();
+            blocks.blockMoved = jest.fn();
+            blocks.activity.refreshCanvas = jest.fn();
+
+            // Push a fake move action
+            blocks.actionHistory.push({
+                type: "move",
+                blockId: 1,
+                oldX: 10,
+                oldY: 20,
+                newX: 30,
+                newY: 40
+            });
+
+            // Undo it
+            blocks.undoAction();
+            expect(blocks.moveBlock).toHaveBeenCalledWith(1, 10, 20);
+            expect(blocks.blockMoved).toHaveBeenCalledWith(1);
+            expect(blocks.activity.refreshCanvas).toHaveBeenCalled();
+            expect(blocks.redoActionHistory.length).toBe(1);
+            expect(blocks.actionHistory.length).toBe(0);
+
+            // Redo it
+            blocks.redoAction();
+            expect(blocks.moveBlock).toHaveBeenCalledWith(1, 30, 40);
+            expect(blocks.blockMoved).toHaveBeenCalledWith(1); // 2nd time
+            expect(blocks.actionHistory.length).toBe(1);
+            expect(blocks.redoActionHistory.length).toBe(0);
+        });
+
+        it("should successfully undo and redo a block trash", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+            blocks.sendStackToTrash = jest.fn();
+            blocks.blockList = { 2: { trash: false } }; // mock block
+
+            blocks.actionHistory.push({
+                type: "trash",
+                blockId: 2
+            });
+
+            blocks.undoAction();
+            expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(2);
+            expect(blocks.redoActionHistory[0].type).toBe("trash");
+
+            blocks.redoAction();
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(blocks.blockList[2]);
+            expect(blocks.actionHistory[0].type).toBe("trash");
+        });
+
+        it("should gracefully handle empty history stacks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.undoAction();
+            blocks.redoAction();
+            expect(blocks.activity.textMsg).toHaveBeenCalledWith(expect.any(String), 3000);
+        });
+
+        it("should only push to actionHistory during sendStackToTrash if not undoing/redoing", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { connections: [null], name: "dummy" };
+            blocks.turtles = { turtleList: [] };
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            blocks.isUndoingOrRedoing = false;
+            blocks.sendStackToTrash(mockBlock);
+            expect(blocks.actionHistory.length).toBe(1);
+            expect(blocks.actionHistory[0].type).toBe("trash");
+
+            blocks.isUndoingOrRedoing = true;
+            blocks.sendStackToTrash(mockBlock);
+            expect(blocks.actionHistory.length).toBe(1); // Should not push again
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should undo and redo a value_change action", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity.refreshCanvas = jest.fn();
+            const mockBlock = {
+                label: { value: "old", style: {} },
+                _labelChanged: jest.fn(),
+                text: { text: "old" },
+                updateCache: jest.fn(),
+                value: "old"
+            };
+            blocks.blockList = [null, mockBlock];
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 1,
+                oldValue: "old",
+                newValue: "new",
+                oldText: "old",
+                newText: "new"
+            });
+
+            // Undo value change
+            blocks.undoAction();
+            expect(mockBlock.label.value).toBe("old");
+            expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, true);
+            expect(mockBlock.updateCache).toHaveBeenCalled();
+            expect(blocks.activity.refreshCanvas).toHaveBeenCalled();
+            expect(blocks.redoActionHistory.length).toBe(1);
+
+            // Redo value change
+            blocks.redoAction();
+            expect(mockBlock.label.value).toBe("new");
+            expect(mockBlock.actionHistory || blocks.actionHistory.length).toBeTruthy();
+        });
+
+        it("should undo a restore action (send newly created block to trash)", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { trash: false };
+            blocks.blockList = [null, null, null, mockBlock];
+            blocks.sendStackToTrash = jest.fn();
+
+            blocks.actionHistory.push({
+                type: "restore",
+                blockId: 3
+            });
+
+            blocks.undoAction();
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(mockBlock);
+            expect(blocks.redoActionHistory[0].type).toBe("restore");
+        });
+
+        it("should redo a restore action (restore from trash)", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.redoActionHistory.push({
+                type: "restore",
+                blockId: 5
+            });
+
+            blocks.redoAction();
+            expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(5);
+            expect(blocks.actionHistory[0].type).toBe("restore");
+        });
+
+        it("should hide helpfulWheelDiv when undoing if it is visible", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.moveBlock = jest.fn();
+            blocks.blockMoved = jest.fn();
+            blocks.activity.refreshCanvas = jest.fn();
+            blocks.activity.__tick = jest.fn();
+
+            const mockDiv = { style: { display: "block" } };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue(mockDiv);
+
+            blocks.actionHistory.push({
+                type: "move",
+                blockId: 0,
+                oldX: 0,
+                oldY: 0,
+                newX: 10,
+                newY: 10
+            });
+
+            blocks.undoAction();
+            expect(mockDiv.style.display).toBe("none");
+            expect(blocks.activity.__tick).toHaveBeenCalled();
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should set isUndoingOrRedoing to true during undo and reset after", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.actionHistory.push({ type: "trash", blockId: 1 });
+
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+            blocks.undoAction();
+            // After undoAction completes, isUndoingOrRedoing should be reset
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+        });
+
+        it("should set isUndoingOrRedoing to true during redo and reset after", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.redoActionHistory.push({ type: "restore", blockId: 1 });
+
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+            blocks.redoAction();
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+        });
+
+        it("should handle value_change undo when block has no label", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity.refreshCanvas = jest.fn();
+            const mockBlock = {
+                label: null,
+                _labelChanged: jest.fn(),
+                text: { text: "4" },
+                updateCache: jest.fn(),
+                value: 4
+            };
+            blocks.blockList = [mockBlock];
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 0,
+                oldValue: 1,
+                newValue: 4,
+                oldText: "1",
+                newText: "4"
+            });
+
+            blocks.undoAction();
+            // Should create a label object if it didn't exist
+            expect(mockBlock.label).toEqual({ value: 1, style: {} });
+            expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, true);
+        });
+
+        it("should handle value_change with null oldText gracefully", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity.refreshCanvas = jest.fn();
+            const mockBlock = {
+                label: { value: "x", style: {} },
+                _labelChanged: jest.fn(),
+                text: { text: "x" },
+                updateCache: jest.fn(),
+                value: "x"
+            };
+            blocks.blockList = [mockBlock];
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 0,
+                oldValue: "y",
+                newValue: "x",
+                oldText: null,
+                newText: "x"
+            });
+
+            blocks.undoAction();
+            // text.text should remain unchanged when oldText is null
+            expect(mockBlock.text.text).toBe("x");
+        });
+
+        it("should clear redoActionHistory when sendStackToTrash is called outside undo/redo", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { connections: [null], name: "dummy" };
+            blocks.turtles = { turtleList: [] };
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            // Pre-populate redo history
+            blocks.redoActionHistory.push({ type: "move", blockId: 0 });
+            expect(blocks.redoActionHistory.length).toBe(1);
+
+            blocks.isUndoingOrRedoing = false;
+            blocks.sendStackToTrash(mockBlock);
+
+            // redoActionHistory should be cleared
+            expect(blocks.redoActionHistory.length).toBe(0);
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should cap trashStacks at MAX_TRASH_UNDO", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { connections: [null], name: "dummy" };
+            blocks.turtles = { turtleList: [] };
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            blocks.trashStacks = new Array(100).fill(1);
+            blocks.trashPreviews = { 1: "preview_data" };
+            blocks.trashStacks[0] = 1;
+
+            blocks.sendStackToTrash(mockBlock);
+
+            expect(blocks.trashStacks.length).toBe(100);
+            expect(blocks.trashPreviews[1]).toBeUndefined();
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should gracefully handle missing blocks during undo/redo", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = []; // Empty blocklist
+            blocks.sendStackToTrash = jest.fn();
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.actionHistory.push({ type: "restore", blockId: 1 });
+            blocks.undoAction();
+            expect(blocks.sendStackToTrash).not.toHaveBeenCalled();
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 1,
+                oldValue: 1,
+                newValue: 2
+            });
+            blocks.undoAction();
+            expect(blocks.activity.refreshCanvas).not.toHaveBeenCalled();
+
+            blocks.redoActionHistory.push({ type: "restore", blockId: 1 });
+            // Should not throw or do anything
+            blocks.redoAction();
+            expect(blocks.activity._restoreTrashById).toHaveBeenCalled();
+
+            blocks.redoActionHistory.push({ type: "value_change", blockId: 1, newValue: 2 });
+            blocks.redoAction();
+            expect(blocks.activity.refreshCanvas).not.toHaveBeenCalled();
         });
     });
 
@@ -1156,6 +1493,70 @@ describe("Blocks Foundation", () => {
             );
         });
 
+        it.each(["vibrato", "tuplet2", "staccato", "setbpm"])(
+            "rejects a %s block whose connections array is truncated (#8679)",
+            name => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks._makeNewBlockWithConnections = jest.fn();
+
+                // A corrupt project file: dock 0 is the parent, so a single
+                // connection leaves no next-block dock to repair. Repairing it
+                // anyway used to overwrite the parent and build a loop, which
+                // overflowed the stack in insideExpandableBlock.
+                const truncated = [[0, name, 200, 200, [null]]];
+
+                mockActivity._suppressRefresh = true;
+                mockActivity.errorMsg.mockClear();
+
+                expect(() => blocks.loadNewBlocks(truncated)).not.toThrow();
+                expect(mockActivity._suppressRefresh).toBe(false);
+                expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                    "Something went wrong reading JSON-encoded project data."
+                );
+                // The load is abandoned before any block is built.
+                expect(blocks._makeNewBlockWithConnections).not.toHaveBeenCalled();
+            }
+        );
+
+        it("rejects a block whose next connection is not in the project (#8679)", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn();
+
+            // Dock 1 points at block 99, which this project does not contain.
+            const danglingNext = [[0, "vibrato", 200, 200, [null, 99]]];
+
+            mockActivity._suppressRefresh = true;
+            mockActivity.errorMsg.mockClear();
+
+            expect(() => blocks.loadNewBlocks(danglingNext)).not.toThrow();
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Something went wrong reading JSON-encoded project data."
+            );
+        });
+
+        it("still repairs a vibrato block that has a full connections array", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn();
+
+            // Parent, argument, clamp and next docks, with no next block: the
+            // loader should add the missing hidden block and carry on.
+            const wellFormed = [[0, "vibrato", 200, 200, [null, null, null, null]]];
+
+            mockActivity._suppressRefresh = true;
+            mockActivity.errorMsg.mockClear();
+
+            expect(() => blocks.loadNewBlocks(wellFormed)).not.toThrow();
+            expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+            expect(blocks._makeNewBlockWithConnections).toHaveBeenCalled();
+        });
+
         it("accepts valid parent-child stacks without false cycle detection", () => {
             const blocks = new Blocks(mockActivity);
             blocks.blockList = [];
@@ -1339,6 +1740,17 @@ describe("Blocks Foundation", () => {
         });
 
         it("does not lose the first call's in-flight _adjustTheseStacks entries when a second call arrives mid-load", async () => {
+            // Both the first load and the queued second load fire their own
+            // finishedLoading event; wait for both instead of a fixed delay
+            // so this isn't sensitive to how busy the test runner is.
+            const bothLoadsFinished = new Promise(resolve => {
+                let count = 0;
+                global.pubsub.on("finishedLoading", () => {
+                    count += 1;
+                    if (count === 2) resolve();
+                });
+            });
+
             blocks.loadNewBlocks(makeBatch(25));
             // Let the first chunk's 20 synchronous _processOneBlock calls'
             // queued cleanupAfterLoad callbacks start landing.
@@ -1346,9 +1758,7 @@ describe("Blocks Foundation", () => {
 
             blocks.loadNewBlocks(makeBatch(3));
 
-            // Let everything settle: remaining chunks, all cleanupAfterLoad
-            // callbacks, and the queued second load running to completion.
-            await new Promise(r => setTimeout(r, 50));
+            await bothLoadsFinished;
 
             expect(blocks._processOneBlock).toHaveBeenCalledTimes(28); // 25 + 3
             expect(blocks._loadInProgress).toBe(false);
@@ -1357,13 +1767,18 @@ describe("Blocks Foundation", () => {
 
         it("emits finishedLoading once per queued load, not merged into a single early event", async () => {
             const finishedLoadingCalls = [];
-            global.pubsub.on("finishedLoading", () => finishedLoadingCalls.push(Date.now()));
+            const bothLoadsFinished = new Promise(resolve => {
+                global.pubsub.on("finishedLoading", () => {
+                    finishedLoadingCalls.push(Date.now());
+                    if (finishedLoadingCalls.length === 2) resolve();
+                });
+            });
 
             blocks.loadNewBlocks(makeBatch(25));
             await new Promise(r => setTimeout(r, 0));
             blocks.loadNewBlocks(makeBatch(3));
 
-            await new Promise(r => setTimeout(r, 50));
+            await bothLoadsFinished;
 
             expect(finishedLoadingCalls).toHaveLength(2);
         });
@@ -1488,44 +1903,46 @@ describe("Blocks Foundation", () => {
             const onWindowError = event => event.preventDefault();
             window.addEventListener("error", onWindowError);
 
-            const finishedLoadingCalls = [];
-            const loadBFinished = new Promise(resolve => {
-                global.pubsub.on("finishedLoading", () => {
-                    finishedLoadingCalls.push(Date.now());
-                    resolve();
+            try {
+                const finishedLoadingCalls = [];
+                const loadBFinished = new Promise(resolve => {
+                    global.pubsub.on("finishedLoading", () => {
+                        finishedLoadingCalls.push(Date.now());
+                        resolve();
+                    });
                 });
-            });
 
-            // Load A: 25 blocks, fails on block 20 (first of the deferred
-            // chunk, which only runs once the setTimeout(0) scheduling it
-            // fires). Load B: queued behind A, starts as soon as A's
-            // failure advances the queue.
-            blocks.loadNewBlocks(makeBatch(25));
-            blocks.loadNewBlocks(makeBatch(3));
+                // Load A: 25 blocks, fails on block 20 (first of the deferred
+                // chunk, which only runs once the setTimeout(0) scheduling it
+                // fires). Load B: queued behind A, starts as soon as A's
+                // failure advances the queue.
+                blocks.loadNewBlocks(makeBatch(25));
+                blocks.loadNewBlocks(makeBatch(3));
 
-            // Wait specifically for load B to finish (not a fixed delay),
-            // so this isn't sensitive to how busy the test runner is.
-            await loadBFinished;
+                // Wait specifically for load B to finish (not a fixed delay),
+                // so this isn't sensitive to how busy the test runner is.
+                await loadBFinished;
 
-            expect(staleCleanups).toHaveLength(20);
+                expect(staleCleanups).toHaveLength(20);
 
-            // Now let load A's 20 chunk-1 completions land, well after load
-            // B has already finished and _activeLoadGeneration has moved on.
-            for (const cleanup of staleCleanups) {
-                await cleanup();
+                // Now let load A's 20 chunk-1 completions land, well after load
+                // B has already finished and _activeLoadGeneration has moved on.
+                for (const cleanup of staleCleanups) {
+                    await cleanup();
+                }
+
+                // Load B's own 3 blocks are all that should count toward it. If
+                // a stale straggler from A had been accepted, B's shared
+                // _loadCounter would go negative, and every one of A's 20
+                // stragglers would independently satisfy the "<= 0" finalize
+                // check again, firing finishedLoading many more times than the
+                // one legitimate completion of load B.
+                expect(finishedLoadingCalls).toHaveLength(1);
+                expect(blocks._loadInProgress).toBe(false);
+                expect(blocks._loadQueue).toHaveLength(0);
+            } finally {
+                window.removeEventListener("error", onWindowError);
             }
-
-            // Load B's own 3 blocks are all that should count toward it. If
-            // a stale straggler from A had been accepted, B's shared
-            // _loadCounter would go negative, and every one of A's 20
-            // stragglers would independently satisfy the "<= 0" finalize
-            // check again, firing finishedLoading many more times than the
-            // one legitimate completion of load B.
-            expect(finishedLoadingCalls).toHaveLength(1);
-            expect(blocks._loadInProgress).toBe(false);
-            expect(blocks._loadQueue).toHaveLength(0);
-
-            window.removeEventListener("error", onWindowError);
         });
     });
 
@@ -1628,7 +2045,7 @@ describe("Blocks Foundation", () => {
             blocks._insideNoteBlock = jest.fn(() => null);
         });
 
-        function makeRealFlowBlock({ x, y, docks, connections, name = "flow" }) {
+        function makeRealFlowBlock({ x, y, docks, connections, name = "flow", ...overrides }) {
             return {
                 name,
                 trash: false,
@@ -1645,7 +2062,8 @@ describe("Blocks Foundation", () => {
                 isNoHitBlock: () => false,
                 isTwoArgBooleanBlock: () => false,
                 highlight: jest.fn(),
-                unhighlight: jest.fn()
+                unhighlight: jest.fn(),
+                ...overrides
             };
         }
 
@@ -1724,6 +2142,104 @@ describe("Blocks Foundation", () => {
 
             expect(blocks.blockList[1].connections[0]).toBeNull();
             expect(blocks.blockList[0].connections[1]).toBeNull();
+        });
+
+        it("does not throw when the spatial grid holds a stale index for a disposed block (#8610)", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                })
+            ];
+            blocks._rebuildSpatialGrid();
+
+            // Simulate a grid left out of sync with blockList by some path other
+            // than disposeBlock (which is now fixed to clean up after itself) --
+            // this is the defense-in-depth guard's own regression case.
+            blocks.blockList[2] = null;
+            let cellSet = blocks._spatialGrid.get("0,0");
+            if (!cellSet) {
+                cellSet = new Set();
+                blocks._spatialGrid.set("0,0", cellSet);
+            }
+            cellSet.add(2);
+
+            // Would throw TypeError: Cannot read properties of null (reading
+            // 'inCollapsed') without the guard in block-drag-controller.js.
+            await blocks.blockMoved(1);
+
+            // The real, live target block should still be found and connected to.
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+        });
+
+        it("snaps a booleanout block (e.g. And/Or/Not) onto an anyin dock, like Switch/Case (#8463)", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "anyin"]
+                    ],
+                    connections: [null, null],
+                    name: "switch"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "booleanout"]],
+                    connections: [null],
+                    name: "and",
+                    isArgBlock: () => true,
+                    isTwoArgBooleanBlock: () => true
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[0].connections[1]).toBe(1);
+        });
+
+        it("snaps an anyout block (e.g. namedbox) onto a booleanin dock, like If/While (#8463)", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "booleanin"]
+                    ],
+                    connections: [null, null],
+                    name: "if"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "anyout"]],
+                    connections: [null],
+                    name: "namedbox",
+                    isArgBlock: () => true
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[0].connections[1]).toBe(1);
         });
 
         it("exposes the same BlockDragController instance to every delegated method", () => {
@@ -2289,6 +2805,54 @@ describe("Spatial grid indexing", () => {
         expect(blocks._getNearbyBlocks(5000, 5000)).toContain(1);
     });
 
+    describe("disposeBlock (#8610)", () => {
+        it("removes the disposed block from the spatial grid, not just blockList", () => {
+            blocks.blockList[1].dispose = jest.fn();
+
+            // Sanity check: before disposal, both blocks share the (0,0) cell.
+            expect(blocks._getNearbyBlocks(0, 0)).toEqual(expect.arrayContaining([0, 1]));
+
+            blocks.disposeBlock(1);
+
+            expect(blocks.blockList[1]).toBeNull();
+            expect(cellsHolding(1)).toEqual([]);
+            expect(blocks._blockGridCell.has(1)).toBe(false);
+            expect(blocks._getNearbyBlocks(0, 0)).not.toContain(1);
+        });
+
+        it("leaves the grid alone when the target has already been disposed", () => {
+            blocks.blockList[1].dispose = jest.fn();
+            blocks.disposeBlock(1);
+            const gridSizeAfterFirstDispose = blocks._spatialGrid.size;
+
+            // A second call on the same (now-null) index must be a no-op --
+            // it should not throw and should not touch the other block's entry.
+            expect(() => blocks.disposeBlock(1)).not.toThrow();
+            expect(blocks._spatialGrid.size).toBe(gridSizeAfterFirstDispose);
+            expect(cellsHolding(0)).toEqual(["0,0"]);
+        });
+
+        it("does not disturb the grid entry of a block left in the same cell", () => {
+            blocks.blockList[1].dispose = jest.fn();
+
+            blocks.disposeBlock(1);
+
+            expect(cellsHolding(0)).toEqual(["0,0"]);
+            expect(blocks._getNearbyBlocks(0, 0)).toEqual([0]);
+        });
+
+        it("empty-grid fallback also skips an undefined slot, not just a disposed (null) one", () => {
+            // The fallback used to test `!== null`, which would still return
+            // a hole/undefined slot -- only disposeBlock's exact `null`
+            // assignment happened to be caught. Use a truthiness check
+            // instead so any missing entry is excluded.
+            blocks._spatialGrid.clear();
+            blocks.blockList[1] = undefined;
+
+            expect(blocks._getNearbyBlocks(0, 0)).toEqual([0]);
+        });
+    });
+
     describe("when the index arrives as a string", () => {
         beforeEach(() => {
             blocks.blockList[1].container.x = 5000;
@@ -2400,5 +2964,301 @@ describe("Spatial grid indexing", () => {
             expect(cellsHolding("1")).toEqual([]);
             expectNumericKeysOnly();
         });
+    });
+
+    describe("Snap indicator (showSnapIndicator & hideSnapIndicator)", () => {
+        let block0;
+        let block1;
+
+        let children;
+
+        beforeEach(() => {
+            children = [];
+            blocks.activity = {
+                blocksContainer: {
+                    addChild: jest.fn(child => children.push(child)),
+                    setChildIndex: jest.fn(),
+                    children
+                }
+            };
+            block0 = {
+                trash: false,
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            };
+            block1 = {
+                trash: false,
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            };
+            blocks.blockList = [block0, block1];
+        });
+
+        it("shows indicator shape and highlights target block on candidate", () => {
+            const candidate = {
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 120,
+                dockY: 250
+            };
+
+            blocks.showSnapIndicator(candidate);
+
+            expect(block0.highlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBe(0);
+            expect(blocks._snapIndicatorShape).not.toBeNull();
+            expect(blocks._snapIndicatorShape.x).toBe(120);
+            expect(blocks._snapIndicatorShape.y).toBe(250);
+            expect(blocks._snapIndicatorShape.visible).toBe(true);
+            expect(blocks.activity.blocksContainer.addChild).toHaveBeenCalledWith(
+                blocks._snapIndicatorShape
+            );
+            expect(blocks.activity.blocksContainer.setChildIndex).toHaveBeenCalledWith(
+                blocks._snapIndicatorShape,
+                0
+            );
+        });
+
+        it("preserves snap target block even if a competing hover highlight occurs", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+            expect(block0.highlight).toHaveBeenCalledTimes(1);
+
+            // Simulate hover highlight on block 1
+            blocks.highlight(1, true);
+
+            // Active snap target block remains intact
+            expect(blocks._snapTargetBlock).toBe(0);
+        });
+
+        it("switches highlighted block when candidate changes", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+            expect(block0.highlight).toHaveBeenCalled();
+
+            blocks.showSnapIndicator({
+                targetBlock: 1,
+                connectionIndex: 0,
+                dockX: 200,
+                dockY: 200
+            });
+            expect(block0.unhighlight).toHaveBeenCalled();
+            expect(block1.highlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBe(1);
+            expect(blocks._snapIndicatorShape.x).toBe(200);
+            expect(blocks._snapIndicatorShape.y).toBe(200);
+        });
+
+        it("hides indicator and unhighlights block when hideSnapIndicator is called", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+            expect(blocks._snapIndicatorShape.visible).toBe(true);
+
+            blocks.hideSnapIndicator();
+
+            expect(block0.unhighlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBeNull();
+            expect(blocks._snapIndicatorShape.visible).toBe(false);
+        });
+
+        it("hides indicator if showSnapIndicator is called with null", () => {
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+
+            blocks.showSnapIndicator(null);
+
+            expect(block0.unhighlight).toHaveBeenCalled();
+            expect(blocks._snapTargetBlock).toBeNull();
+            expect(blocks._snapIndicatorShape.visible).toBe(false);
+        });
+
+        it("resolves default snap indicator colors when computed styles are unavailable", () => {
+            const colors = blocks._getSnapIndicatorColors();
+            expect(colors.stroke).toBe("rgba(255, 215, 0, 0.95)");
+            expect(colors.fill).toBe("rgba(255, 215, 0, 0.35)");
+        });
+
+        it("resolves snap indicator colors from CSS tokens when available", () => {
+            const originalGetComputedStyle = global.getComputedStyle;
+            global.getComputedStyle = jest.fn().mockReturnValue({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-snap-indicator-stroke") return "#ffff00";
+                    if (prop === "--color-snap-indicator-fill") return "rgba(255, 255, 0, 0.5)";
+                    return "";
+                })
+            });
+
+            const colors = blocks._getSnapIndicatorColors();
+            expect(colors.stroke).toBe("#ffff00");
+            expect(colors.fill).toBe("rgba(255, 255, 0, 0.5)");
+
+            global.getComputedStyle = originalGetComputedStyle;
+        });
+
+        it("redraws indicator graphics when candidate is shown after a theme change", () => {
+            const originalGetComputedStyle = global.getComputedStyle;
+
+            // Initial theme: light
+            global.getComputedStyle = jest.fn().mockReturnValue({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-snap-indicator-stroke") return "rgba(255, 215, 0, 0.95)";
+                    if (prop === "--color-snap-indicator-fill") return "rgba(255, 215, 0, 0.35)";
+                    return "";
+                })
+            });
+
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 100,
+                dockY: 100
+            });
+
+            expect(blocks._snapIndicatorShape.graphics.beginStroke).toHaveBeenCalledWith(
+                "rgba(255, 215, 0, 0.95)"
+            );
+
+            // User switches theme: e.g. high contrast
+            global.getComputedStyle = jest.fn().mockReturnValue({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-snap-indicator-stroke") return "#ffff00";
+                    if (prop === "--color-snap-indicator-fill") return "rgba(255, 255, 0, 0.35)";
+                    return "";
+                })
+            });
+
+            blocks.showSnapIndicator({
+                targetBlock: 0,
+                connectionIndex: 1,
+                dockX: 110,
+                dockY: 110
+            });
+
+            expect(blocks._snapIndicatorShape.graphics.clear).toHaveBeenCalled();
+            expect(blocks._snapIndicatorShape.graphics.beginStroke).toHaveBeenCalledWith("#ffff00");
+            expect(blocks._snapIndicatorShape.graphics.beginFill).toHaveBeenCalledWith(
+                "rgba(255, 255, 0, 0.35)"
+            );
+
+            global.getComputedStyle = originalGetComputedStyle;
+        });
+    });
+});
+
+// ---------------------------------------------------------------------------
+// noteValueValue — the number in a note's fraction
+// ---------------------------------------------------------------------------
+
+describe("noteValueValue", () => {
+    let blocks;
+
+    beforeEach(() => {
+        const mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    /**
+     * Builds "note 1 / 4", the shape the default project ships with.
+     * Block 2 is the numerator, which is the one the user clicks.
+     * @param {string} parentName - the block the divide hangs from
+     * @param {number|null} denominator - index of the denominator block, or
+     *     null for the empty slot left behind when it is dragged out
+     * @returns {void}
+     */
+    function buildNote(parentName, denominator) {
+        blocks.blockList = [
+            { name: parentName, connections: [null, 1, null] },
+            { name: "divide", connections: [0, 2, denominator] },
+            { name: "number", value: 1, connections: [1] },
+            { name: "number", value: 4, connections: [1] }
+        ];
+    }
+
+    /**
+     * Builds the same fraction under a block that holds its note value in the
+     * second slot, the way meter and the rhythm family do.
+     * @param {string} parentName - the block the divide hangs from
+     * @param {number|null} denominator - index of the denominator block, or
+     *     null for the empty slot left behind when it is dragged out
+     * @returns {void}
+     */
+    function buildMeterStyleNote(parentName, denominator) {
+        blocks.blockList = [
+            { name: parentName, connections: [null, null, 1] },
+            { name: "divide", connections: [0, 2, denominator] },
+            { name: "number", value: 1, connections: [1] },
+            { name: "number", value: 4, connections: [1] }
+        ];
+    }
+
+    it("reads the denominator of a complete fraction", () => {
+        buildNote("newnote", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when the denominator slot is empty", () => {
+        buildNote("newnote", null);
+
+        expect(() => blocks.noteValueValue(2)).not.toThrow();
+        expect(blocks.noteValueValue(2)).toBe(1);
+    });
+
+    it("reads the denominator under meter, which carries the fraction in its second slot", () => {
+        buildMeterStyleNote("meter", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when meter's denominator slot is empty", () => {
+        buildMeterStyleNote("meter", null);
+
+        expect(() => blocks.noteValueValue(2)).not.toThrow();
+        expect(blocks.noteValueValue(2)).toBe(1);
+    });
+
+    it("reads the denominator under rhythm, which carries the fraction the same way", () => {
+        buildMeterStyleNote("rhythm2", 3);
+
+        expect(blocks.noteValueValue(2)).toBe(4);
+    });
+
+    it("falls back to the default when rhythm's denominator slot is empty", () => {
+        buildMeterStyleNote("rhythm2", null);
+
+        expect(() => blocks.noteValueValue(2)).not.toThrow();
+        expect(blocks.noteValueValue(2)).toBe(1);
     });
 });

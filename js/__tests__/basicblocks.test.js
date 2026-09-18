@@ -103,4 +103,8 @@ describe("BACKWARDCOMPATIBILITYDICT", () => {
         expect(BACKWARDCOMPATIBILITYDICT.seth).toBe("setheading");
         expect(BACKWARDCOMPATIBILITYDICT.random2).toBe("random");
     });
+
+    it("maps the old turtlelapsednotes name so old Turtle Blocks projects still load (#8701)", () => {
+        expect(BACKWARDCOMPATIBILITYDICT.turtlelapsednotes).toBe("turtleelapsednotes");
+    });
 });

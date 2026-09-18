@@ -30,9 +30,9 @@ is audio-visual; it produces graphics, artwork and music. Here are a
 couple of screenshots to give you an idea of how the application looks
 like:
 
-![Music Blocks workspace showing block-based music programming](./screenshots/Screenshot-1.png)
+![Music Blocks workspace showing block-based music programming](./screenshots/screenshot-1.png)
 
-![Music Blocks rhythm and melody blocks interface](./screenshots/Screenshot-2.png)
+![Music Blocks rhythm and melody blocks interface](./screenshots/screenshot-2.png)
 
 Visit the Music Blocks website for a hands on experience:
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
@@ -47,6 +47,7 @@ Additional background on why we combine music and programming can be found
 - [Running Music Blocks](#RUNNING-MUSIC-BLOCKS)
 - [How to set up a local server](#HOW-TO-SET-UP-A-LOCAL-SERVER)
 - [Using Music Blocks](#USING-MUSIC-BLOCKS)
+- [Using the Kokoro voice](./Docs/KOKORO_SPEECH.md)
 
 If you are a developer (beginner, experienced, or pro), you are very
 welcome to participate in the evolution of Music Blocks.

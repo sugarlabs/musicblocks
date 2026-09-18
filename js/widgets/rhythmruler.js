@@ -20,7 +20,7 @@
    TONEBPM, Singer, _, delayExecution, deepClone, docById, ManagedTimer,
    calcNoteValueToDisplay, platformColor, beginnerMode, last,
    EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES,
-   VOICENAMES, EFFECTSNAMES, clampNumber
+   VOICENAMES, EFFECTSNAMES, clampNumber, announceToScreenReader
 */
 /*
     Globals location
@@ -134,6 +134,34 @@ class RhythmRuler {
          * @private
          */
         this._circularCanvas = null;
+
+        /**
+         * Handler for circular canvas pointerdown events.
+         * @type {function|null}
+         * @private
+         */
+        this._circularPointerDownHandler = null;
+
+        /**
+         * Handler for circular canvas pointermove events.
+         * @type {function|null}
+         * @private
+         */
+        this._circularPointerMoveHandler = null;
+
+        /**
+         * Handler for circular canvas pointerup events.
+         * @type {function|null}
+         * @private
+         */
+        this._circularPointerUpHandler = null;
+
+        /**
+         * Handler for circular canvas pointercancel and pointerleave events.
+         * @type {function|null}
+         * @private
+         */
+        this._circularDragEndHandler = null;
 
         /**
          * Index of the cell currently highlighted during circular playback.
@@ -545,7 +573,7 @@ class RhythmRuler {
         // earlier run is detached by the time anything draws into it again.
         // Drop it and fall back to the table view, the same pair of resets the
         // close handler performs.
-        this._circularCanvas = null;
+        this._cleanupCircularCanvas();
         this._circularView = false;
 
         // If there are no drums, add one.
@@ -599,6 +627,7 @@ class RhythmRuler {
          * @type {WidgetWindow}
          */
         const widgetWindow = window.widgetWindows.windowFor(this, "rhythm maker");
+        announceToScreenReader(_("Rhythm Maker opened"));
         /**
          * The widget window associated with the rhythm maker.
          * @type {WidgetWindow}
@@ -625,8 +654,9 @@ class RhythmRuler {
             this._playingOne = false;
             this._playingAll = false;
             this.activity.hideMsgs();
-            this._circularCanvas = null;
+            this._cleanupCircularCanvas();
             this._circularView = false;
+            announceToScreenReader(_("Rhythm Maker closed"));
 
             this.widgetWindow.destroy();
         };
@@ -1282,7 +1312,6 @@ class RhythmRuler {
     __endTapping(event) {
         const cell = event.currentTarget || event.target;
         if (cell.parentNode === null) {
-            // console.debug("Null parent node in endTapping");
             return;
         }
 
@@ -2112,7 +2141,6 @@ class RhythmRuler {
             this._elapsedTimes[this._rulerSelected] = 0;
             this._offsets[this._rulerSelected] = 0;
         }
-        // console.debug("this._rulerSelected " + this._rulerSelected);
 
         this.__loop(0, this._rulerSelected, 0);
     }
@@ -3038,26 +3066,38 @@ class RhythmRuler {
                 this._circularCanvas.style.touchAction = "none";
                 // Use Pointer Events so the circular drag-to-edit works on
                 // touchscreens and stylus devices, not just mouse.
-                this._circularCanvas.addEventListener("pointerdown", event => {
+                this._circularPointerDownHandler = event => {
                     this._onCircularMouseDown(event);
-                });
-                this._circularCanvas.addEventListener("pointermove", event => {
+                };
+                this._circularPointerMoveHandler = event => {
                     this._onCircularMouseMove(event);
-                });
-                this._circularCanvas.addEventListener("pointerup", event => {
+                };
+                this._circularPointerUpHandler = event => {
                     this._onCircularMouseUp(event);
-                });
+                };
                 // Both pointercancel and pointerleave perform the same
                 // cleanup — extract to a named handler to avoid duplication
                 // and match the __mouseDownHandler/__mouseUpHandler convention.
-                const __onCircularDragEnd = () => {
+                this._circularDragEndHandler = () => {
                     if (this._circularDragTo !== null) {
                         this._circularDragTo = null;
                         this._drawCircularView();
                     }
                 };
-                this._circularCanvas.addEventListener("pointercancel", __onCircularDragEnd);
-                this._circularCanvas.addEventListener("pointerleave", __onCircularDragEnd);
+                this._circularCanvas.addEventListener(
+                    "pointerdown",
+                    this._circularPointerDownHandler
+                );
+                this._circularCanvas.addEventListener(
+                    "pointermove",
+                    this._circularPointerMoveHandler
+                );
+                this._circularCanvas.addEventListener("pointerup", this._circularPointerUpHandler);
+                this._circularCanvas.addEventListener(
+                    "pointercancel",
+                    this._circularDragEndHandler
+                );
+                this._circularCanvas.addEventListener("pointerleave", this._circularDragEndHandler);
                 this.widgetWindow.getWidgetBody().append(this._circularCanvas);
             }
             this._circularCanvas.style.display = "block";
@@ -3072,6 +3112,50 @@ class RhythmRuler {
                 this._calculateZebraStripes(i);
             }
         }
+    }
+
+    /**
+     * Cleans up circular canvas pointer event listeners and references.
+     * @private
+     */
+    _cleanupCircularCanvas() {
+        if (this._circularCanvas) {
+            if (typeof this._circularCanvas.removeEventListener === "function") {
+                if (this._circularPointerDownHandler) {
+                    this._circularCanvas.removeEventListener(
+                        "pointerdown",
+                        this._circularPointerDownHandler
+                    );
+                }
+                if (this._circularPointerMoveHandler) {
+                    this._circularCanvas.removeEventListener(
+                        "pointermove",
+                        this._circularPointerMoveHandler
+                    );
+                }
+                if (this._circularPointerUpHandler) {
+                    this._circularCanvas.removeEventListener(
+                        "pointerup",
+                        this._circularPointerUpHandler
+                    );
+                }
+                if (this._circularDragEndHandler) {
+                    this._circularCanvas.removeEventListener(
+                        "pointercancel",
+                        this._circularDragEndHandler
+                    );
+                    this._circularCanvas.removeEventListener(
+                        "pointerleave",
+                        this._circularDragEndHandler
+                    );
+                }
+            }
+            this._circularCanvas = null;
+        }
+        this._circularPointerDownHandler = null;
+        this._circularPointerMoveHandler = null;
+        this._circularPointerUpHandler = null;
+        this._circularDragEndHandler = null;
     }
 
     /**

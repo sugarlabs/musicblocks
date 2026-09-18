@@ -69,7 +69,8 @@ const BACKWARDCOMPATIBILITYDICT = {
     startfill: "beginfill",
     stopfill: "endfill",
     string: "text",
-    shell: "turtleshell"
+    shell: "turtleshell",
+    turtlelapsednotes: "turtleelapsednotes"
 };
 
 // Define blocks here. Note: The blocks are placed on the palettes

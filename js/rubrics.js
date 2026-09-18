@@ -31,8 +31,6 @@ Globals location
    getStatsFromNotation
 */
 
-/* eslint-disable no-dupe-keys */
-
 /**
  * TACAT (Turtle Art Category)
  * Maps individual block names to their category bins.
@@ -91,7 +89,6 @@ const TACAT = {
     register: "transpose",
     settransposition: "transpose",
     setratio: "transpose",
-    interval: "pitch",
     accidental: "pitch",
     hertz: "pitch",
     pitchnumber: "pitch",
@@ -172,13 +169,11 @@ const TACAT = {
     phaser: "tone",
     chorus: "tone",
     vibrato: "tone",
-    setvoice: "tone",
     glide: "tone",
     slur: "tone",
     staccato: "tone",
     newslur: "tone",
     newstaccato: "tone",
-    synthname: "tone",
     voicename: "tone",
     settimbre: "tone",
     settemperament: "tone",
@@ -378,9 +373,6 @@ const TACAT = {
     runblock: "programming",
     dockblock: "programming",
     makeblock: "programming",
-    saveabc: "ignore",
-    savelilypond: "ignore",
-    savesvg: "ignore",
     nobackground: "ignore",
     showblocks: "ignore",
     hideblocks: "ignore",

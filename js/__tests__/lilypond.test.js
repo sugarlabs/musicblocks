@@ -99,6 +99,17 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("4");
     });
 
+    test("should raise each octave by exactly one", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G7"], 4, 0, null, 0, -1, false],
+            [["G8"], 4, 0, null, 0, -1, false],
+            [["G9"], 4, 0, null, 0, -1, false],
+            [["G10"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("g''''4 g'''''4 g''''''4 g'''''''4 ");
+    });
+
     test("should process a key signature correctly", () => {
         logo.notation.notationStaging[turtle] = ["key", "C", "major"];
         processLilypondNotes(lilypond, logo, turtle);
@@ -159,6 +170,18 @@ describe("processLilypondNotes", () => {
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).not.toContain("\\staccato");
+    });
+
+    test("should place staccato after the duration on a note inside a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 8, [3, 2], 8, -1, true]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("g' 8 \\staccato ");
+    });
+
+    test("should place staccato after the chord on notes inside a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [[["C4", "E4"], 4, 8, [3, 2], 8, -1, true]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("<c' e'>8 \\staccato ");
     });
 
     test("should process a markup command correctly", () => {
@@ -237,6 +260,12 @@ describe("processLilypondNotes", () => {
         logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 0, -1, true]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\staccato ");
+    });
+
+    test("should write a note with no pitches as a rest", () => {
+        logo.notation.notationStaging[turtle] = [[[], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("r4 ");
     });
     test("should process custom key modes (freygish) correctly", () => {
         getScaleAndHalfSteps.mockReturnValueOnce([
@@ -507,6 +536,38 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain('\\context TabVoice = "Turtle0" \\Turtle0');
         expect(result).toContain('shortInstrumentName = "Tu"');
         expect(result).toContain("Turtle1Voice = \\new Staff \\with {");
+    });
+
+    test("guitar tablature groups each instrument by its own clef, not turtle 0's", () => {
+        activity.logo.notationNotes = {
+            0: "\\note0",
+            1: "\\note1"
+        };
+        // turtle 0 plays a low note (computed clef: bass_8), turtle 1 plays a
+        // high note (computed clef: treble), so their clefs genuinely differ
+        activity.logo.notation.notationStaging = {
+            0: [[["C2"], 4, 0, null, 0, -1, false]],
+            1: [[["C6"], 4, 0, null, 0, -1, false]]
+        };
+
+        const result = saveLilypondOutput(activity);
+
+        const scoreVoice0 = result.indexOf("\\Turtle0Voice\n");
+        const scoreVoice1 = result.indexOf("\\Turtle1Voice\n");
+        const tab0 = result.indexOf('\\context TabVoice = "Turtle0"');
+        const tab1 = result.indexOf('\\context TabVoice = "Turtle1"');
+
+        expect(scoreVoice0).toBeGreaterThan(-1);
+        expect(scoreVoice1).toBeGreaterThan(-1);
+        expect(tab0).toBeGreaterThan(-1);
+        expect(tab1).toBeGreaterThan(-1);
+
+        // the score section above already groups treble on top, bass_8 on
+        // the bottom, so Turtle1 (treble) lists before Turtle0 (bass_8)
+        expect(scoreVoice1).toBeLessThan(scoreVoice0);
+        // the guitar tablature section must match that same ordering,
+        // grouping each instrument by its own clef instead of turtle 0's
+        expect(tab1).toBeLessThan(tab0);
     });
 
     test("should ensure last turtle adds a bar", () => {
