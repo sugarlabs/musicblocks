@@ -62,6 +62,13 @@ class Oscilloscope {
         this._canvasState = {};
         this.drawVisualIDs = {};
 
+        this.isFrozen = false;
+        this._frozenWaveforms = {};
+        this._connectedSynths = {};
+        this.toggleFreeze = this.toggleFreeze.bind(this);
+        this._keyHandler = this._keyHandler.bind(this);
+        document.addEventListener("keydown", this._keyHandler);
+
         // Widget window
         const widgetWindow = window.widgetWindows.windowFor(this, "oscilloscope");
         this.widgetWindow = widgetWindow;
@@ -81,6 +88,7 @@ class Oscilloscope {
         const zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom In"));
         zoomInButton.onclick = () => {
             this.zoomFactor *= 1.333;
+            if (this.isFrozen) this._renderFrame();
         };
         zoomInButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
             base64Encode(BIGGERBUTTON)
@@ -90,10 +98,16 @@ class Oscilloscope {
         zoomOutButton.onclick = () => {
             this.zoomFactor /= 1.333;
             if (this.zoomFactor < 1) this.zoomFactor = 1;
+            if (this.isFrozen) this._renderFrame();
         };
         zoomOutButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
             base64Encode(SMALLERBUTTON)
         )}`;
+
+        // Freeze button
+        this.freezeButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Freeze"));
+        this.freezeButton.onclick = this.toggleFreeze;
+        this._updateFreezeButton();
 
         widgetWindow.sendToCenter();
 
@@ -181,10 +195,39 @@ class Oscilloscope {
         }
     }
 
+    toggleFreeze() {
+        this.isFrozen = !this.isFrozen;
+        this._updateFreezeButton();
+        if (!this.isFrozen && this.divisions.length > 0) {
+            this._startAnimation();
+        }
+    }
+
+    _updateFreezeButton() {
+        if (!this.freezeButton) return;
+        const iconSrc = this.isFrozen ? "play-button.svg" : "pause-button.svg";
+        this.freezeButton.children[0].src = `header-icons/${iconSrc}`;
+        const label = this.isFrozen ? _("Resume") : _("Freeze");
+        this.freezeButton.title = label;
+        this.freezeButton.setAttribute("aria-label", label);
+    }
+
+    _keyHandler(e) {
+        if (!this.widgetWindow) return;
+        if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+        if (document.activeElement.isContentEditable) return;
+
+        if (e.code === "Space" || e.code === "KeyF") {
+            e.preventDefault();
+            this.toggleFreeze();
+        }
+    }
+
     close() {
         this._stopAnimation();
 
         document.removeEventListener("visibilitychange", this._handleVisibilityChange);
+        document.removeEventListener("keydown", this._keyHandler);
 
         for (const key of Object.keys(this.pitchAnalysers)) {
             if (
@@ -199,6 +242,8 @@ class Oscilloscope {
         this.drawVisualIDs = {};
         this._canvasState = {};
         this.pitchAnalysers = {};
+        this._frozenWaveforms = {};
+        this._connectedSynths = {};
 
         if (this.widgetWindow) {
             this.widgetWindow.destroy();
@@ -214,10 +259,15 @@ class Oscilloscope {
                 type: "waveform",
                 size: Oscilloscope.analyserSize
             });
+            this._connectedSynths[turtleIdx] = new Set();
         }
 
         for (const synth in instruments[turtleIdx]) {
-            instruments[turtleIdx][synth].connect(this.pitchAnalysers[turtleIdx]);
+            const synthInst = instruments[turtleIdx][synth];
+            if (!this._connectedSynths[turtleIdx].has(synthInst)) {
+                synthInst.connect(this.pitchAnalysers[turtleIdx]);
+                this._connectedSynths[turtleIdx].add(synthInst);
+            }
         }
     };
 
@@ -253,12 +303,22 @@ class Oscilloscope {
             const state = this._canvasState[key];
             if (!state) continue;
 
-            const analyser = this.pitchAnalysers[state.turtleIdx];
-            if (!analyser) continue;
-            if (!state.turtle.running && !state.resizedOnce) continue;
+            let dataArray;
+            if (this.isFrozen) {
+                dataArray = this._frozenWaveforms[state.turtleIdx];
+                if (!dataArray) continue;
+            } else {
+                this.reconnectSynthsToAnalyser(state.turtleIdx);
+                const analyser = this.pitchAnalysers[state.turtleIdx];
+                if (!analyser) continue;
+
+                const rawData = analyser.getValue();
+                // Copy to preserve the current waveform when frozen
+                dataArray = new Float32Array(rawData);
+                this._frozenWaveforms[state.turtleIdx] = dataArray;
+            }
 
             const ctx = state.canvasCtx;
-            const dataArray = analyser.getValue();
             const bufferLength = dataArray.length;
 
             ctx.fillStyle = platformColor.background || "#FFFFFF";
