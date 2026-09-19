@@ -106,6 +106,7 @@ function setupGraphicsBlocks(activity) {
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "heading"]);
+                return 0;
             } else {
                 return activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle))
                     .orientation;
@@ -191,6 +192,7 @@ function setupGraphicsBlocks(activity) {
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "y"]);
+                return 0;
             } else {
                 return activity.turtles.screenY2turtleY(
                     activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).container.y
@@ -277,6 +279,7 @@ function setupGraphicsBlocks(activity) {
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "x"]);
+                return 0;
             } else {
                 return activity.turtles.screenX2turtleX(
                     activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).container.x
