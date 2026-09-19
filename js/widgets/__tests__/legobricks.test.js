@@ -1982,6 +1982,19 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
             });
         });
 
+        describe("_createSpacingControls", () => {
+            it("wires the − and + buttons to the same step magnitude", () => {
+                const [, spacingOut, , spacingIn] = legoWidget._createSpacingControls();
+                legoWidget.spacingSlider.value = "50";
+
+                spacingOut.onclick();
+                expect(legoWidget.spacingSlider.value).toBe("45");
+
+                spacingIn.onclick();
+                expect(legoWidget.spacingSlider.value).toBe("50");
+            });
+        });
+
         describe("_handleVerticalSpacing", () => {
             it("reads the slider and labels it in pixels", () => {
                 legoWidget.spacingSlider.value = "42";
