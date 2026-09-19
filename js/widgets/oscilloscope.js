@@ -214,6 +214,8 @@ class Oscilloscope {
 
     _keyHandler(e) {
         if (!this.widgetWindow) return;
+        if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+        if (window.widgetWindows.focused !== this.widgetWindow) return;
         if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
         if (document.activeElement.isContentEditable) return;
 
