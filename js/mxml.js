@@ -120,6 +120,22 @@ const _resolveDivisionsPerWholeNote = notes => {
     return DIVISIONS_PER_WHOLE_NOTE * scaleFactor;
 };
 
+const _musicXmlPitch = note => {
+    const match = /^([A-G])([#bx*♯♭♮𝄪𝄫]*)(-?\d+)?$/u.exec(note);
+    if (!match) return null;
+
+    let alter = 0;
+    for (const accidental of match[2]) {
+        if (accidental === "#" || accidental === "♯") alter++;
+        else if (accidental === "b" || accidental === "♭") alter--;
+        else if (accidental === "x" || accidental === "*" || accidental === "𝄪") alter += 2;
+        else if (accidental === "𝄫") alter -= 2;
+        else if (accidental === "♮") alter = 0;
+    }
+
+    return { step: match[1], alter, octave: match[3] ?? "4" };
+};
+
 saveMxmlOutput = logo => {
     const ignore = ["voice one", "voice two", "voice three", "voice four", "one voice"];
     let res = "";
@@ -551,21 +567,18 @@ saveMxmlOutput = logo => {
                         divisionsLeft -= preciseDur;
                     }
 
-                    let pitch = p;
-                    let octave;
-                    let cents = 0;
+                    let pitch;
                     if (typeof p === "number") {
-                        [pitch, octave, cents] = frequencyToPitch(p);
+                        const [note, octave, cents] = frequencyToPitch(p);
+                        pitch = _musicXmlPitch(note + octave);
+                        pitch.alter = Math.round((pitch.alter + cents / 100) * 1000) / 1000;
                     } else {
-                        octave = p[p.length - 1];
+                        pitch = _musicXmlPitch(p) ?? {
+                            step: p[0],
+                            alter: p[1] === "♭" ? -1 : p[1] === "♯" ? 1 : 0,
+                            octave: p[p.length - 1]
+                        };
                     }
-                    const accidental = pitch[1];
-                    const alter =
-                        Math.round(
-                            ((accidental === "\u266d" ? -1 : accidental === "\u266F" ? 1 : 0) +
-                                cents / 100) *
-                                1000
-                        ) / 1000;
 
                     if (!isChordNote) {
                         flushPendingDirections();
@@ -582,9 +595,9 @@ saveMxmlOutput = logo => {
                     } else {
                         add("<pitch>");
                         indent++;
-                        add(`<step>${pitch[0]}</step>`);
-                        if (alter !== 0) add(`<alter>${alter}</alter>`);
-                        add(`<octave>${octave}</octave>`);
+                        add(`<step>${pitch.step}</step>`);
+                        if (pitch.alter !== 0) add(`<alter>${pitch.alter}</alter>`);
+                        add(`<octave>${pitch.octave}</octave>`);
                         indent--;
                         add("</pitch>");
                     }
