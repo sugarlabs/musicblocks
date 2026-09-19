@@ -1114,10 +1114,15 @@ function LegoWidget() {
             // The time gets absorbed into the adjacent larger segment
         }
 
-        // Ensure we have at least start and end boundaries
-        if (filteredBoundaries.length === 1 && boundaries.length > 1) {
-            // If we filtered out everything, add the final boundary to create one long segment
-            filteredBoundaries.push(boundaries[boundaries.length - 1]);
+        // Always end on the final boundary so a short trailing segment is merged
+        // into the previous one instead of being cut off
+        const finalBoundary = boundaries[boundaries.length - 1];
+        if (filteredBoundaries[filteredBoundaries.length - 1] !== finalBoundary) {
+            if (filteredBoundaries.length === 1) {
+                filteredBoundaries.push(finalBoundary);
+            } else {
+                filteredBoundaries[filteredBoundaries.length - 1] = finalBoundary;
+            }
         }
 
         return filteredBoundaries;

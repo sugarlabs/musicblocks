@@ -1233,6 +1233,14 @@ describe("LegoWidget — Extended _filterSmallSegments coverage", () => {
     it("should absorb multiple consecutive small segments", () => {
         expect(legoWidget._filterSmallSegments([0, 200, 400, 600, 2000])).toEqual([0, 2000]);
     });
+
+    it("should merge a short trailing segment into the previous one", () => {
+        expect(legoWidget._filterSmallSegments([0, 1500, 2000])).toEqual([0, 2000]);
+    });
+
+    it("should keep the final boundary when trailing small segments follow a kept one", () => {
+        expect(legoWidget._filterSmallSegments([0, 1500, 3000, 3400])).toEqual([0, 1500, 3400]);
+    });
 });
 
 describe("LegoWidget — Extended _analyzeColumnBoundaries coverage", () => {
