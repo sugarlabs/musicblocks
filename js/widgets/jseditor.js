@@ -1192,10 +1192,12 @@ class JSEditor {
      */
     _addDebuggerToLine(lineNumber) {
         const lines = this._code.split("\n");
-        const insertIndex = lineNumber - 1;
+        if (lineNumber < 0 || lineNumber >= lines.length || !lines[lineNumber]) {
+            return;
+        }
 
         // Check if the line ends with '{' or ';'
-        const currentLine = lines[insertIndex].trim();
+        const currentLine = lines[lineNumber].trim();
         if (!currentLine.endsWith("{") && !currentLine.endsWith(";")) {
             JSEditor.logConsole(
                 `Cannot add breakpoint to line ${
@@ -1208,8 +1210,8 @@ class JSEditor {
 
         // Prevent adding two breakpoints right next to each other
         if (
-            (lines[insertIndex] && lines[insertIndex].trim() === "debugger;") ||
-            (lines[insertIndex + 1] && lines[insertIndex + 1].trim() === "debugger;")
+            (lines[lineNumber] && lines[lineNumber].trim() === "debugger;") ||
+            (lines[lineNumber + 1] && lines[lineNumber + 1].trim() === "debugger;")
         ) {
             JSEditor.logConsole(
                 `Cannot add breakpoint to line ${
@@ -1222,10 +1224,10 @@ class JSEditor {
 
         let indent = "";
         let extraIndent = "";
-        if (insertIndex >= 0 && lines[insertIndex]) {
-            const match = lines[insertIndex].match(/^(\s*)/);
+        if (lines[lineNumber]) {
+            const match = lines[lineNumber].match(/^(\s*)/);
             if (match) indent = match[1];
-            if (lines[insertIndex].trim().endsWith("{")) {
+            if (lines[lineNumber].trim().endsWith("{")) {
                 extraIndent = "\t";
             }
         } else if (lines.length > 0) {
@@ -1233,7 +1235,7 @@ class JSEditor {
             if (match) indent = match[1];
         }
         // Insert debugger statement after the specified line, with matching indentation
-        lines.splice(insertIndex + 1, 0, indent + extraIndent + "debugger;");
+        lines.splice(lineNumber + 1, 0, indent + extraIndent + "debugger;");
         this._code = lines.join("\n");
         this._jar.updateCode(this._code);
         this._setLinesCount(this._code);
@@ -1249,6 +1251,9 @@ class JSEditor {
     _removeDebuggerFromLine(lineNumber) {
         // Allow removing breakpoints at any time
         const lines = this._code.split("\n");
+        if (lineNumber < 0 || lineNumber >= lines.length || !lines[lineNumber]) {
+            return;
+        }
         const currentLine = lines[lineNumber].trim();
         if (currentLine === "debugger;") {
             lines.splice(lineNumber, 1);
