@@ -25,6 +25,8 @@ describe("AIDebuggerWidget Unknown Host Handling", () => {
     test("logs warning, sets null BASE_URL, and disables network actions", () => {
         const w = new AIDebuggerWidget();
         w.chatLog = document.createElement("div");
+        w.widgetWindow = {};
+        w._lifecycle.mount();
         w.activity = { textMsg: jest.fn() };
 
         expect(warnSpy).toHaveBeenCalledWith(

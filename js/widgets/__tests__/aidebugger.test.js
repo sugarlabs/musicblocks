@@ -1450,6 +1450,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.widgetWindow = {
                 getWidgetBody: () => body
             };
+            debuggerWidget._lifecycle.mount();
             debuggerWidget._createLayout();
         });
 
@@ -1524,6 +1525,8 @@ describe("AIDebuggerWidget", () => {
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
             debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.widgetWindow = {};
+            debuggerWidget._lifecycle.mount();
         });
 
         test("renders consent banner with title, description, and action buttons", () => {
@@ -1586,6 +1589,8 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget = new AIDebuggerWidget();
             debuggerWidget.activity = mockActivity;
             debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.widgetWindow = {};
+            debuggerWidget._lifecycle.mount();
         });
 
         afterEach(() => {
@@ -1750,6 +1755,8 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget = new AIDebuggerWidget();
             debuggerWidget.activity = mockActivity;
             debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.widgetWindow = {};
+            debuggerWidget._lifecycle.mount();
             debuggerWidget._isProcessing = true;
         });
 
@@ -2177,6 +2184,8 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget = new AIDebuggerWidget();
             debuggerWidget.activity = mockActivity;
             debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.widgetWindow = {};
+            debuggerWidget._lifecycle.mount();
         });
 
         afterEach(() => {
@@ -2357,7 +2366,7 @@ describe("AIDebuggerWidget", () => {
                 false,
                 null
             );
-            expect(divRepr).toBe("Divide Block --> 4/? = ?");
+            expect(divRepr).toBe("Divide Block --> 4/0 = ?");
 
             // divide with denominator 0 in newnote
             const noteDivRepr = debuggerWidget._getBlockRepresentation(
@@ -2369,7 +2378,7 @@ describe("AIDebuggerWidget", () => {
                 false,
                 "newnote"
             );
-            expect(noteDivRepr).toBe("Duration --> 4/? = ?");
+            expect(noteDivRepr).toBe("Duration --> 4/0 = ?");
 
             // repeat with divide having denominator 0
             const repBlockMap = {

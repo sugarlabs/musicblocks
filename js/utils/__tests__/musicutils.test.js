@@ -140,8 +140,7 @@ const {
     getModeSliceColors,
     updateModeWheelItems,
     getModeGroupTitleFont,
-    temperamentHasRatios,
-    isEquallyTempered
+    temperamentHasRatios
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
