@@ -2188,7 +2188,7 @@ class Activity {
                 recordBtn.classList.remove("grey-text", "inactiveLink");
             }
             // Announce program stop to screen readers
-            this.textMsg && this.textMsg(_("Program stopped."));
+            this.textMsg && this.textMsg(_("Program stopped."), 2000);
             // TODO: plugin support
         };
 
@@ -2208,7 +2208,7 @@ class Activity {
 
             // TODO: plugin support
             // Announce program start to screen readers
-            this.textMsg && this.textMsg(_("Program running."));
+            this.textMsg && this.textMsg(_("Program running."), 2000);
         };
 
         /*
