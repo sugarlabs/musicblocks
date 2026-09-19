@@ -64,6 +64,10 @@ describe("AIDebuggerWidget", () => {
 
         test("_generateConversationId returns unique IDs", () => {
             const debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             const id1 = debuggerWidget._generateConversationId();
             const id2 = debuggerWidget._generateConversationId();
 
@@ -73,6 +77,10 @@ describe("AIDebuggerWidget", () => {
 
         test("_isProcessing starts as false", () => {
             const debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             expect(debuggerWidget._isProcessing).toBe(false);
         });
     });
@@ -82,6 +90,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
         });
 
         describe("_getNumericValue", () => {
@@ -728,6 +738,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
         });
 
         test("returns error for non-array input", () => {
@@ -778,6 +790,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.widgetWindow = {};
             debuggerWidget._lifecycle.isMounted = true;
@@ -825,6 +839,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.messageInput = document.createElement("input");
             debuggerWidget.widgetWindow = {};
@@ -875,6 +891,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.activity = { textMsg: jest.fn(), prepareExport: jest.fn(() => "[]") };
             debuggerWidget._loadProjectAndInitialize = jest.fn();
@@ -900,6 +918,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.widgetWindow = {};
             debuggerWidget._lifecycle.isMounted = true;
@@ -965,6 +985,8 @@ describe("AIDebuggerWidget", () => {
 
             global.fetch = jest.fn();
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
         });
 
         test("init aborts pending requests on close", () => {
@@ -1163,6 +1185,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.activity = { textMsg: jest.fn() };
         });
@@ -1187,6 +1211,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.activity = {
                 textMsg: jest.fn(),
                 prepareExport: jest.fn(() => "[]")
@@ -1369,6 +1395,8 @@ describe("AIDebuggerWidget", () => {
             };
 
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
         });
 
         afterEach(() => {
@@ -1446,6 +1474,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             const body = document.createElement("div");
             debuggerWidget.widgetWindow = {
                 getWidgetBody: () => body
@@ -1524,6 +1554,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.widgetWindow = {};
             debuggerWidget._lifecycle.mount();
@@ -1587,6 +1619,8 @@ describe("AIDebuggerWidget", () => {
             };
 
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.activity = mockActivity;
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.widgetWindow = {};
@@ -1753,6 +1787,8 @@ describe("AIDebuggerWidget", () => {
             };
 
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.activity = mockActivity;
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.widgetWindow = {};
@@ -1896,6 +1932,8 @@ describe("AIDebuggerWidget", () => {
                 getWidgetBody: () => body
             };
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.widgetWindow = mockWidgetWindow;
         });
 
@@ -1929,6 +1967,8 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
         });
 
         test("sanitizes base64 data in block args to 'data'", () => {
@@ -2182,6 +2222,8 @@ describe("AIDebuggerWidget", () => {
             };
 
             debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget._lifecycle.mount();
+            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget.activity = mockActivity;
             debuggerWidget.chatLog = document.createElement("div");
             debuggerWidget.widgetWindow = {};
