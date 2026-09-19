@@ -21,6 +21,9 @@
  */
 
 const PitchStaircase = require("../pitchstaircase.js");
+const ManagedTimer = require("../../utils/ManagedTimer");
+
+global.ManagedTimer = ManagedTimer;
 
 // --- Global Mocks ---
 global._ = msg => msg;
@@ -736,6 +739,7 @@ describe("PitchStaircase Widget", () => {
 
             expect(psc._scaleStepTimeout).not.toBeNull();
             expect(psc._scaleHighlightTimeout).not.toBeNull();
+            expect(psc._timerManager.activeTimeoutCount).toBeGreaterThan(0);
 
             const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
 
@@ -744,6 +748,7 @@ describe("PitchStaircase Widget", () => {
             expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.anything());
             expect(psc._scaleStepTimeout).toBeNull();
             expect(psc._scaleHighlightTimeout).toBeNull();
+            expect(psc._timerManager.activeTimeoutCount).toBe(0);
             expect(psc.closed).toBe(true);
 
             clearTimeoutSpy.mockRestore();

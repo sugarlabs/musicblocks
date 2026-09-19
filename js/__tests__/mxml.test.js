@@ -20,8 +20,110 @@
 const saveMxmlOutput = require("../mxml");
 const { frequencyToPitch } = require("../utils/musicutils");
 global.frequencyToPitch = frequencyToPitch;
+global.getMidiDrum = () => ({ "snare drum": 38, "kick drum": 36 });
 
 describe("saveMxmlOutput", () => {
+    it("exports a drum-only note as unpitched percussion rather than only a rest", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: { 0: [[["R"], 4, 0, null, null, false, false, "snare drum"]] }
+            }
+        });
+
+        expect(output).toContain('<score-part id="D1">');
+        expect(output).toContain('<part id="D1">');
+        expect(output).not.toContain('<part id="P1">');
+        expect(output).toContain("<sign>percussion</sign>");
+        expect(output).toContain("<instrument-name>snare drum</instrument-name>");
+        expect(output).toContain("<midi-unpitched>39</midi-unpitched>");
+        expect(output).toMatch(
+            /<unpitched\/>\s*<duration>8<\/duration>\s*<instrument id="D1-X1"\/>/
+        );
+    });
+
+    it("writes instrument after each tie in a barline-split drum note", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C4"], 4, 0, null, null, false, false, null],
+                        [["C4"], 4, 0, null, null, false, false, null],
+                        [["C4"], 2, 0, null, null, false, false, "snare drum"],
+                        "tie",
+                        [["C4"], 2, 0, null, null, false, false, "snare drum"]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(percussion).toMatch(
+            /<unpitched\/>\s*<duration>16<\/duration>\s*<tie type="start"\/>\s*<instrument id="D1-X1"\/>/
+        );
+        expect(percussion).toMatch(
+            /<unpitched\/>\s*<duration>16<\/duration>\s*<tie type="stop"\/>\s*<instrument id="D1-X1"\/>/
+        );
+        expect(percussion).toContain('<measure number="2">');
+    });
+
+    it("keeps pitched notes and sequential drum identities in separate aligned parts", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C4"], 4, 0, null, null, false, false, "snare drum"],
+                        [["D4"], 4, 0, null, null, false, false, "kick drum"]
+                    ]
+                }
+            }
+        });
+
+        const pitched = output.split('<part id="P1">')[1].split("</part>")[0];
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+        expect(pitched).toContain("<step>C</step>");
+        expect(pitched).toContain("<step>D</step>");
+        expect(pitched).not.toContain("<unpitched/>");
+        expect(percussion.match(/<unpitched\/>/g)).toHaveLength(2);
+        expect(percussion).toContain('<instrument id="D1-X1"/>');
+        expect(percussion).toContain('<instrument id="D1-X2"/>');
+        expect(output).toContain("<midi-unpitched>37</midi-unpitched>");
+        expect(output.indexOf('<score-instrument id="D1-X2">')).toBeLessThan(
+            output.indexOf('<midi-instrument id="D1-X1">')
+        );
+    });
+
+    it("keeps a silent interval before a later drum hit", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["R"], 4, 0, null, null, false, false, null],
+                        [["R"], 4, 0, null, null, false, false, "snare drum"]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(percussion).toMatch(/<rest\/>\s*<duration>8<\/duration>/);
+        expect(percussion).toMatch(/<unpitched\/>\s*<duration>8<\/duration>/);
+    });
+
+    it("exports an unmapped custom drum without an invalid MIDI assignment", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [[["R"], 4, 0, null, null, false, false, "https://example.org/#12&x"]]
+                }
+            }
+        });
+
+        expect(output).toContain("<unpitched/>");
+        expect(output).toContain("<instrument-name>Percussion</instrument-name>");
+        expect(output).not.toContain("<midi-unpitched>");
+        expect(output).not.toContain("example.org");
+    });
+
     it.each([
         [445, "A", "<alter>0.196</alter>"],
         [470, "B", "<alter>-0.858</alter>"],
@@ -279,7 +381,7 @@ describe("saveMxmlOutput", () => {
 
         expect(output).not.toContain("<duration>32</duration>");
         // The internal divisions-per-whole-note resolution scales to 96, which MusicXML
-        // represents as 24 divisions per quarter note. The exact duration remains 8.
+        // represents as 24 divisions per quarter note (96 / 4 = 24). The exact duration remains 8.
         expect(output).toContain("<divisions>24</divisions>");
         expect(output).toContain("<duration>8</duration>");
         expect(output).toContain("<step>C</step>");
@@ -312,6 +414,7 @@ describe("saveMxmlOutput", () => {
         // A note reducing to a 3:2 tuplet and one reducing to a 5:2 tuplet in the same
         // voice both need to divide the voice's divisions-per-whole-note evenly;
         // scaling by their LCM (15) rather than just one of them keeps both exact.
+        // MusicXML divisions element expresses divisions per quarter note (480 / 4 = 120).
         const tripletEighth = [["C4"], 1, 0, [3, 4], 8];
         const quintupletEighth = [["D4"], 1, 0, [5, 4], 8];
         const logo = {
@@ -567,6 +670,90 @@ describe("saveMxmlOutput", () => {
         expect(output).toContain('<part id="P1">');
         expect(output).not.toContain('<score-part id="P2">');
         expect(output).not.toContain('<part id="P2">');
+    });
+
+    it("should emit divisions per quarter note (8) for standard non-tuplet notes", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain("<divisions>8</divisions>");
+        expect(output).toContain("<duration>8</duration>");
+    });
+
+    it("should maintain divisions per quarter note (8) and correct measure boundaries on meter change", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        "meter",
+                        3,
+                        4,
+                        [["C4"], 4, 0],
+                        [["D4"], 4, 0],
+                        [["E4"], 4, 0],
+                        [["F4"], 4, 0]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        const measures = output.match(/<measure[\s\S]*?<\/measure>/g) || [];
+        expect(measures).toHaveLength(2);
+
+        const [measure1, measure2] = measures;
+
+        expect(measure1).toContain('<measure number="1">');
+        expect(measure1).toContain("<divisions>8</divisions>");
+        expect(measure1).toContain("<beats>3</beats>");
+        expect(measure1).toContain("<beat-type>4</beat-type>");
+        expect(measure1.match(/<note>/g) || []).toHaveLength(3);
+        expect(measure1).toContain("<step>C</step>");
+        expect(measure1).toContain("<step>D</step>");
+        expect(measure1).toContain("<step>E</step>");
+
+        expect(measure2).toContain('<measure number="2">');
+        expect(measure2.match(/<note>/g) || []).toHaveLength(1);
+        expect(measure2).toContain("<step>F</step>");
+    });
+
+    it.each([
+        ["C♯4", "C", "1", "4"],
+        ["D♭4", "D", "-1", "4"],
+        ["C𝄪4", "C", "2", "4"],
+        ["D𝄫4", "D", "-2", "4"],
+        ["F♯♯10", "F", "2", "10"],
+        ["G♭♭-1", "G", "-2", "-1"],
+        ["A##5", "A", "2", "5"],
+        ["Cx4", "C", "2", "4"],
+        ["C*4", "C", "2", "4"],
+        ["Bbb3", "B", "-2", "3"],
+        ["C♮4", "C", null, "4"],
+        ["C", "C", null, "4"]
+    ])("should preserve %s accidentals and octave in MusicXML", (note, step, alter, octave) => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [[[note], 4, 0]]
+                }
+            }
+        });
+
+        expect(output).toContain(`<step>${step}</step>`);
+        expect(output).toContain(`<octave>${octave}</octave>`);
+        if (alter === null) {
+            expect(output).not.toContain("<alter>");
+        } else {
+            expect(output).toContain(`<alter>${alter}</alter>`);
+        }
     });
 });
 

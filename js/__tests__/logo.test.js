@@ -1970,6 +1970,27 @@ describe("Logo runFromBlockNow", () => {
             expect(logo.stopTurtle).toBe(true);
         });
 
+        test("a value clamp block with no flow() shows its value instead of throwing", () => {
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 6;
+            });
+            logo.parseArg = jest.fn(() => 3);
+            logo.blockList = [
+                {
+                    name: "notecounter",
+                    value: 3,
+                    protoblock: { args: 1, dockTypes: ["anyout", "in"], arg: jest.fn() },
+                    connections: [null, null],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                }
+            ];
+
+            expect(() => logo.runFromBlockNow(logo, 0, 0, 0, null)).not.toThrow();
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("3");
+        });
+
         test("standalone arg-block echo forwards the real receivedArg, not a stale logo.receivedArg (#8690)", () => {
             timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
                 fn();

@@ -69,7 +69,7 @@ beforeEach(() => {
 // Activity mock
 // ---------------------------------------------------------------------------
 
-const makeActivity = () => ({
+const makeActivity = (overrides = {}) => ({
     keyboardEnableFlag: true,
     currentKeyCode: 0,
     currentKey: "",
@@ -125,7 +125,8 @@ const makeActivity = () => ({
     _doFastButton: jest.fn(),
     _doHardStopButton: jest.fn(),
     _saveHelpBlocks: jest.fn(),
-    workspaceLayoutController: { _findBlocks: jest.fn() }
+    workspaceLayoutController: { _findBlocks: jest.fn() },
+    ...overrides
 });
 
 const makeEvent = (overrides = {}) => ({

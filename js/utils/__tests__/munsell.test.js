@@ -88,16 +88,50 @@ describe("munsell", () => {
             expect(color).toBeLessThanOrEqual(100);
         });
 
+        // getcolor() returns "#rrggbb" only when the interpolation lands
+        // exactly on a table entry, and "rgba(...)" otherwise, so a nearest
+        // match may legitimately be in either form.
+        const COLOR_STRING = /^(#[0-9a-fA-F]{6}|rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+.*\))$/;
+
         it("should find the nearest color for black", () => {
             const color = searchColors(0, 0, 0);
             const nearestColor = getcolor(color);
-            expect(nearestColor[2]).toMatch(/^#[0-9a-fA-F]{6}$/);
+            expect(nearestColor[2]).toMatch(COLOR_STRING);
         });
 
         it("should identify a close match for a RGB value", () => {
             const color = searchColors(100, 150, 200);
             const nearestColor = getcolor(color);
-            expect(nearestColor[2]).toMatch(/^#[0-9a-fA-F]{6}$/);
+            expect(nearestColor[2]).toMatch(COLOR_STRING);
+        });
+
+        it("should consider every candidate, not only the hex-formatted ones", () => {
+            // Only 20 of the 100 candidates serialize as "#rrggbb"; the rest
+            // are "rgba(...)". Feeding a candidate's own RGB back in must
+            // return that candidate.
+            const rgbaCandidates = [];
+            for (let i = 0; i < 100; i++) {
+                const value = getcolor(i)[2];
+                const match = value.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+                if (match) {
+                    rgbaCandidates.push([i, Number(match[1]), Number(match[2]), Number(match[3])]);
+                }
+            }
+
+            expect(rgbaCandidates.length).toBeGreaterThan(0);
+
+            for (const [index, r, g, b] of rgbaCandidates) {
+                expect(searchColors(r, g, b)).toBe(index);
+            }
+        });
+
+        it("should round-trip a hex-formatted candidate too", () => {
+            const value = getcolor(0)[2];
+            expect(value).toMatch(/^#[0-9a-fA-F]{6}$/);
+            const r = parseInt(value.substr(1, 2), 16);
+            const g = parseInt(value.substr(3, 2), 16);
+            const b = parseInt(value.substr(5, 2), 16);
+            expect(searchColors(r, g, b)).toBe(0);
         });
     });
 });
