@@ -42,7 +42,7 @@ try {
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
-   DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
+   DEFAULTDELAY, define, doBrowserCheck, docByClass,
    doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
@@ -102,6 +102,8 @@ let MYDEFINES = [
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
     "utils/utils-logic",
+    "utils/dom-helpers",
+    "utils/browser-utils",
     "utils/http-utils",
     "utils/utils",
     "utils/retryWithBackoff",

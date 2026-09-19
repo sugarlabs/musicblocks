@@ -606,10 +606,12 @@ class WidgetWindow {
     takeFocus() {
         window.widgetWindows.focused = this;
         const windows = docById("floatingWindows");
-        const siblings = windows.children;
-        for (let i = 0; i < siblings.length; i++) {
-            siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = "0.7";
+        if (windows && windows.children) {
+            const siblings = windows.children;
+            for (let i = 0; i < siblings.length; i++) {
+                siblings[i].style.zIndex = "0";
+                siblings[i].style.opacity = "0.7";
+            }
         }
 
         // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block
@@ -645,6 +647,10 @@ class WidgetWindow {
      */
     sendToCenter() {
         const canvas = docById("myCanvas");
+        if (!canvas) {
+            this.setPosition(200, 140);
+            return this;
+        }
         const fRect = this._frame.getBoundingClientRect();
         const cRect = canvas.getBoundingClientRect();
 
