@@ -279,7 +279,7 @@ describe("saveMxmlOutput", () => {
 
         expect(output).not.toContain("<duration>32</duration>");
         // The internal divisions-per-whole-note resolution scales to 96, which MusicXML
-        // represents as 24 divisions per quarter note. The exact duration remains 8.
+        // represents as 24 divisions per quarter note (96 / 4 = 24). The exact duration remains 8.
         expect(output).toContain("<divisions>24</divisions>");
         expect(output).toContain("<duration>8</duration>");
         expect(output).toContain("<step>C</step>");
@@ -312,6 +312,7 @@ describe("saveMxmlOutput", () => {
         // A note reducing to a 3:2 tuplet and one reducing to a 5:2 tuplet in the same
         // voice both need to divide the voice's divisions-per-whole-note evenly;
         // scaling by their LCM (15) rather than just one of them keeps both exact.
+        // MusicXML divisions element expresses divisions per quarter note (480 / 4 = 120).
         const tripletEighth = [["C4"], 1, 0, [3, 4], 8];
         const quintupletEighth = [["D4"], 1, 0, [5, 4], 8];
         const logo = {
@@ -567,6 +568,59 @@ describe("saveMxmlOutput", () => {
         expect(output).toContain('<part id="P1">');
         expect(output).not.toContain('<score-part id="P2">');
         expect(output).not.toContain('<part id="P2">');
+    });
+
+    it("should emit divisions per quarter note (8) for standard non-tuplet notes", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain("<divisions>8</divisions>");
+        expect(output).toContain("<duration>8</duration>");
+    });
+
+    it("should maintain divisions per quarter note (8) and correct measure boundaries on meter change", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        "meter",
+                        3,
+                        4,
+                        [["C4"], 4, 0],
+                        [["D4"], 4, 0],
+                        [["E4"], 4, 0],
+                        [["F4"], 4, 0]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        const measures = output.match(/<measure[\s\S]*?<\/measure>/g) || [];
+        expect(measures).toHaveLength(2);
+
+        const [measure1, measure2] = measures;
+
+        expect(measure1).toContain('<measure number="1">');
+        expect(measure1).toContain("<divisions>8</divisions>");
+        expect(measure1).toContain("<beats>3</beats>");
+        expect(measure1).toContain("<beat-type>4</beat-type>");
+        expect(measure1.match(/<note>/g) || []).toHaveLength(3);
+        expect(measure1).toContain("<step>C</step>");
+        expect(measure1).toContain("<step>D</step>");
+        expect(measure1).toContain("<step>E</step>");
+
+        expect(measure2).toContain('<measure number="2">');
+        expect(measure2.match(/<note>/g) || []).toHaveLength(1);
+        expect(measure2).toContain("<step>F</step>");
     });
 });
 
