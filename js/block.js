@@ -4656,7 +4656,7 @@ class Block {
              * @returns {void}
              */
             let __keypress = event => {
-                if ([13, 10, 9].includes(event.keyCode)) {
+                if (["Enter", "Tab"].includes(event.key)) {
                     __blur(event);
                 }
             };
@@ -4706,7 +4706,7 @@ class Block {
      * @returns {void}
      */
     _exitKeyPressed(event) {
-        if ([13, 10, 9].includes(event.keyCode)) {
+        if (["Enter", "Tab"].includes(event.key)) {
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener("keypress", this._exitKeyPressed);
