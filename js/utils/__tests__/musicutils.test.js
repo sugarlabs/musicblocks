@@ -142,7 +142,6 @@ const {
     updateModeWheelItems,
     getModeGroupTitleFont,
     temperamentHasRatios,
-    isEquallyTempered,
     parseSclFile,
     parseModeJson
 } = require("../musicutils");

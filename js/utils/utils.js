@@ -1124,10 +1124,7 @@ if (typeof module !== "undefined" && module.exports) {
         preparePluginExports,
         processMacroData,
         updatePluginObj,
-        announceToScreenReader,
-        doUseCamera,
-        doStopVideoCam,
-        CameraManager
+        announceToScreenReader
     };
 }
 
