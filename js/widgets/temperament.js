@@ -533,6 +533,9 @@ function TemperamentWidget() {
                 _drawCircle();
                 return;
             }
+            highlightDot = -1;
+            _highlightTableRow(-1);
+            _updateRemoveButton();
             that._playAllRunning = true;
             // Play up the scale, the octave exactly once, then back down.
             // frequencies[] may or may not carry an octave entry at
@@ -774,7 +777,7 @@ function TemperamentWidget() {
                 ctx.fillStyle = color;
                 ctx.fill();
 
-                if (i === highlightDot || i === flashDot) {
+                if (i === flashDot || (!that._playAllRunning && i === highlightDot)) {
                     ctx.beginPath();
                     ctx.arc(dx, dy, dotR + 7, 0, 2 * Math.PI);
                     ctx.strokeStyle = "#ffeb3b";

@@ -1132,6 +1132,26 @@ describe("TemperamentWidget basic tests", () => {
 
                 expect(playedFrequencies()).toEqual([100, 125, 150, 200, 150, 125, 100]);
             });
+
+            test("clears and suppresses previous dot selection highlight when playAll is started", () => {
+                if (widget._vizToolbar && widget._vizToolbar.addPitchAfterBtn) {
+                    widget._vizToolbar.addPitchAfterBtn.onclick();
+                }
+
+                const canvas = document.querySelector("canvas");
+                const ctx = canvas
+                    ? canvas.getContext("2d")
+                    : document.createElement("canvas").getContext("2d");
+                ctx.arc.mockClear();
+
+                // Starting playAll must clear previous selection so only playing dots illuminate
+                widget.playAll();
+                expect(widget._playAllRunning).toBe(true);
+
+                // Clean up timers
+                jest.runAllTimers();
+                expect(widget._playAllRunning).toBe(false);
+            });
         });
 
         test("custom transition resets typeOfEdit so save emits ratio blocks", () => {
