@@ -806,8 +806,8 @@ describe("TemperamentWidget basic tests", () => {
         // since _save recomputes note/ratio entries from this.ratios.
         expect(global.addTemperamentToDictionary).toHaveBeenCalledWith("custom1", {
             pitchNumber: 2,
-            0: [1, "C(+0¢)", 4],
-            1: [2, "C(+0¢)", 4]
+            0: [1, "C", 4],
+            1: [2, "C", 4]
         });
         expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
     });
