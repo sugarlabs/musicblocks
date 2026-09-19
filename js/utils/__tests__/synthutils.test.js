@@ -3568,7 +3568,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
         });
 
         test("preloadProjectSamples scans and preloads instruments from block lists", async () => {
-            synth._loadSample = jest.fn().mockImplementation(name => {
+            synth.sampleLoader.loadSampleAsync = jest.fn().mockImplementation(name => {
                 if (name === "failing_sample")
                     return Promise.reject(new Error("Sample preload error"));
                 return Promise.resolve();
@@ -3585,8 +3585,8 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             ];
 
             await synth.preloadProjectSamples(blockList);
-            expect(synth._loadSample).toHaveBeenCalledWith("piano");
-            expect(synth._loadSample).toHaveBeenCalledWith("kick drum");
+            expect(synth.sampleLoader.loadSampleAsync).toHaveBeenCalledWith("piano");
+            expect(synth.sampleLoader.loadSampleAsync).toHaveBeenCalledWith("kick drum");
 
             // Empty or invalid block list
             await synth.preloadProjectSamples(null);
