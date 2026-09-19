@@ -449,6 +449,21 @@ describe("Logo constructor", () => {
         expect(freshLogo.activity).toBe(mockActivity);
     });
 
+    test("supports Activity initialization before saveLocally is available", () => {
+        mockActivity.saveLocally = null;
+        let deferredLogo;
+        expect(() => {
+            deferredLogo = new Logo(mockActivity);
+        }).not.toThrow();
+
+        // fromActivity wraps saveLocally lazily, so a handler assigned after
+        // construction must be the one that actually runs.
+        const lateSaveLocally = jest.fn();
+        mockActivity.saveLocally = lateSaveLocally;
+        deferredLogo.deps.storage.saveLocally();
+        expect(lateSaveLocally).toHaveBeenCalledTimes(1);
+    });
+
     test("initializes default volume-related properties", () => {
         expect(logo.stopTurtle).toBe(false);
         expect(logo.time).toBe(0);
@@ -527,6 +542,67 @@ describe("Logo constructor", () => {
         expect(depLogo.activity.blocks).toBe(mockActivity.blocks);
         expect(depLogo.activity.turtles).toBe(mockActivity.turtles);
         expect(depLogo.activity.stage).toBe(mockActivity.stage);
+    });
+
+    test("rejects incomplete explicit dependencies before initialization", () => {
+        expect(() => new Logo({ blocks: {}, turtles: {} })).toThrow(
+            "LogoDependencies: 'stage' is required"
+        );
+    });
+
+    test("rejects malformed explicit dependencies before initialization", () => {
+        expect(
+            () =>
+                new Logo({
+                    blocks: { blockList: "not-an-array" },
+                    turtles: {},
+                    stage: { addEventListener: jest.fn() },
+                    errorHandler: jest.fn()
+                })
+        ).toThrow("LogoDependencies: 'blocks.blockList' must be an array");
+    });
+
+    test("adapts an object without errorHandler as a legacy Activity", () => {
+        // The dispatch-integration suites build Logo from a bare activity mock
+        // (blocks/turtles/stage only). That shape must keep taking the
+        // fromActivity path, which validates the adapted dependencies itself.
+        const logo = new Logo({
+            blocks: { blockList: [] },
+            turtles: { turtleList: [] },
+            stage: { addEventListener: jest.fn() }
+        });
+        expect(typeof logo.deps.errorHandler).toBe("function");
+    });
+
+    test("wraps a plain explicit-deps object so optional members get defaults", () => {
+        let plainLogo;
+        expect(() => {
+            plainLogo = new Logo({
+                blocks: { blockList: [] },
+                turtles: { turtleList: [] },
+                stage: { addEventListener: jest.fn() },
+                errorHandler: jest.fn()
+                // no callbacks / config / storage / messageHandler
+            });
+        }).not.toThrow();
+        expect(plainLogo.deps.callbacks).toEqual({ onStopTurtle: null, onRunTurtle: null });
+        expect(typeof plainLogo.deps.storage.saveLocally).toBe("function");
+        expect(typeof plainLogo.deps.messageHandler.hide).toBe("function");
+    });
+
+    test("still rejects a malformed legacy Activity via fromActivity validation", () => {
+        expect(
+            () =>
+                new Logo({
+                    blocks: { blockList: [] },
+                    turtles: { turtleList: "not-an-array" },
+                    stage: { addEventListener: jest.fn() }
+                })
+        ).toThrow("LogoDependencies: 'turtles.turtleList' must be an array");
+    });
+
+    test("rejects null constructor input with a dependency error", () => {
+        expect(() => new Logo(null)).toThrow("LogoDependencies: dependencies must be an object");
     });
 });
 

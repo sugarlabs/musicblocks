@@ -648,7 +648,13 @@ describe("Logo with LogoDependencies", () => {
 
     test("Logo accepts LogoDependencies object", () => {
         const logo = new Logo(mockDeps);
-        expect(logo.deps).toBe(mockDeps);
+        // A plain deps object is wrapped in a LogoDependencies instance so
+        // optional members receive defaults; the injected members must still
+        // be the same references.
+        expect(logo.deps.blocks).toBe(mockDeps.blocks);
+        expect(logo.deps.turtles).toBe(mockDeps.turtles);
+        expect(logo.deps.stage).toBe(mockDeps.stage);
+        expect(logo.deps.errorHandler).toBe(mockDeps.errorHandler);
         expect(logo.activity.blocks).toBe(mockDeps.blocks);
     });
 
