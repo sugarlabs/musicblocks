@@ -23,10 +23,11 @@ const vm = require("vm");
 const { TextEncoder } = require("util");
 global.TextEncoder = TextEncoder;
 global._ = jest.fn(str => str);
+global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
+global.TuningFormats = require("../tuningformats");
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
-
 const {
     scaleDegreeToPitchMapping,
     buildScale,
@@ -140,7 +141,9 @@ const {
     getModeSliceColors,
     updateModeWheelItems,
     getModeGroupTitleFont,
-    temperamentHasRatios
+    temperamentHasRatios,
+    parseSclFile,
+    parseModeJson
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
