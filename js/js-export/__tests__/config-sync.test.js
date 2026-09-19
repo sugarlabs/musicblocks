@@ -55,7 +55,19 @@ const diffPaths = (a, b, prefix = "") => {
         return out;
     }
     for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) {
-        out.push(...diffPaths(a[key], b[key], prefix ? `${prefix}.${key}` : key));
+        const at = prefix ? `${prefix}.${key}` : key;
+        // Compare key presence before values. Object.keys() lists a key whose
+        // value is explicitly undefined, and JSON.stringify(undefined) is
+        // undefined for both sides, so `FOO: undefined` in one copy and no
+        // FOO at all in the other would compare equal -- exactly the drift
+        // these tests exist to catch.
+        if (Object.hasOwn(a, key) !== Object.hasOwn(b, key)) {
+            out.push(
+                `${at}: ${Object.hasOwn(a, key) ? "missing from other" : "missing from json"}`
+            );
+            continue;
+        }
+        out.push(...diffPaths(a[key], b[key], at));
     }
     return out;
 };
@@ -79,6 +91,17 @@ describe("ast2blocks config copies stay in sync", () => {
         const expected = JSON.stringify(source);
         const actual = fs.readFileSync(path.join(DIR, "ast2blocks.min.json"), "utf8").trim();
         expect(actual).toBe(expected);
+    });
+
+    test("a key present in one copy as undefined is reported, not skipped", () => {
+        // Guards the comparison itself: before key presence was checked,
+        // both sides stringified to undefined here and the difference was
+        // silently dropped, so this whole file could pass while the copies
+        // had drifted apart.
+        expect(diffPaths({ EXTRA: undefined }, {})).toEqual(["EXTRA: missing from other"]);
+        expect(diffPaths({}, { EXTRA: undefined })).toEqual(["EXTRA: missing from json"]);
+        expect(diffPaths({ A: { B: undefined } }, { A: {} })).toEqual(["A.B: missing from other"]);
+        expect(diffPaths({ EXTRA: undefined }, { EXTRA: undefined })).toEqual([]);
     });
 
     test("every name in the getter tables maps to a non-empty block name", () => {
