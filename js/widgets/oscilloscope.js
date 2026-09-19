@@ -198,7 +198,10 @@ class Oscilloscope {
     toggleFreeze() {
         this.isFrozen = !this.isFrozen;
         this._updateFreezeButton();
-        if (!this.isFrozen && this.divisions.length > 0) {
+        if (this.isFrozen) {
+            this._stopAnimation();
+            this._renderFrame();
+        } else if (this.divisions.length > 0) {
             this._startAnimation();
         }
     }
@@ -308,6 +311,13 @@ class Oscilloscope {
             let dataArray;
             if (this.isFrozen) {
                 dataArray = this._frozenWaveforms[state.turtleIdx];
+                if (!dataArray) {
+                    const analyser = this.pitchAnalysers[state.turtleIdx];
+                    if (analyser) {
+                        dataArray = new Float32Array(analyser.getValue());
+                        this._frozenWaveforms[state.turtleIdx] = dataArray;
+                    }
+                }
                 if (!dataArray) continue;
             } else {
                 this.reconnectSynthsToAnalyser(state.turtleIdx);
@@ -391,7 +401,9 @@ class Oscilloscope {
         }
 
         if (this.divisions.length > 0) {
-            if (!this._running) {
+            if (this.isFrozen) {
+                this._renderFrame();
+            } else if (!this._running) {
                 this._startAnimation();
             } else {
                 // Already animating; just redraw once without starting a second RAF chain.
