@@ -219,7 +219,7 @@ class Oscilloscope {
         if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
         if (document.activeElement.isContentEditable) return;
 
-        if (e.code === "Space" || e.code === "KeyF") {
+        if (e.code === "Space") {
             e.preventDefault();
             this.toggleFreeze();
         }

@@ -134,6 +134,21 @@
              id="path943-7-2-0" />
         </g>
         <g
+           id="g1139"
+           transform="translate(0,1.6094437)">
+          <rect
+             style="fill:#646464;fill-opacity:1;stroke:none;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             id="rect964-3-1-freeze"
+             width="6.6145835"
+             height="6.6145835"
+             x="87.833727"
+             y="111.97272" />
+          <path
+             style="fill:none;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             d="m 90.04,113.78 v 3.0 m 2.2,0 v -3.0"
+             id="path943-7-2-0-freeze" />
+        </g>
+        <g
            id="g1524"
            transform="translate(10.583334)">
           <rect
@@ -211,11 +226,11 @@
       <text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.9389px;line-height:7.14375px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         x="88.007698"
+         x="96.367907"
          y="118.47512"
          id="text1564"><tspan
            id="tspan1562"
-           x="88.007698"
+           x="96.367907"
            y="118.47512"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';fill:#646464;fill-opacity:1;stroke-width:0.264583px">oscilloscope</tspan></text>
     </g>
