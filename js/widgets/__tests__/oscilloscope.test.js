@@ -1125,6 +1125,22 @@ describe("Oscilloscope", () => {
             renderSpy.mockRestore();
         });
 
+        test("only calls _renderFrame and not _startAnimation when isFrozen is true", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            osc.isFrozen = true;
+            osc._running = false;
+            const startSpy = jest.spyOn(osc, "_startAnimation");
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+
+            osc._scale();
+
+            expect(startSpy).not.toHaveBeenCalled();
+            expect(renderSpy).toHaveBeenCalled();
+            startSpy.mockRestore();
+            renderSpy.mockRestore();
+        });
+
         test("stops animation when no divisions", () => {
             const osc = createOscilloscope([]);
             osc._running = true;
@@ -1177,16 +1193,22 @@ describe("Oscilloscope", () => {
     });
 
     describe("toggleFreeze and _updateFreezeButton", () => {
-        test("toggles isFrozen from false to true and updates button", () => {
+        test("toggles isFrozen from false to true, updates button, and stops animation loop", () => {
             const osc = createOscilloscope();
+            const stopSpy = jest.spyOn(osc, "_stopAnimation");
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
             expect(osc.isFrozen).toBe(false);
 
             osc.toggleFreeze();
 
             expect(osc.isFrozen).toBe(true);
+            expect(stopSpy).toHaveBeenCalled();
+            expect(renderSpy).toHaveBeenCalled();
             expect(osc.freezeButton.children[0].src).toContain("header-icons/play-button.svg");
             expect(osc.freezeButton.title).toBe("Resume");
             expect(osc.freezeButton.getAttribute("aria-label")).toBe("Resume");
+            stopSpy.mockRestore();
+            renderSpy.mockRestore();
         });
 
         test("toggles isFrozen from true to false, updates button, and starts animation if divisions exist", () => {
