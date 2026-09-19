@@ -26,8 +26,8 @@ describe("AIDebuggerWidget Unknown Host Handling", () => {
         const w = new AIDebuggerWidget();
         w.chatLog = document.createElement("div");
         w.widgetWindow = {};
-        w._lifecycle.mount();
         w.activity = { textMsg: jest.fn() };
+        w._lifecycle.mount();
 
         expect(warnSpy).toHaveBeenCalledWith(
             expect.stringContaining("AI Debugger: unrecognized host 'unrecognized-host.org'")
@@ -48,3 +48,4 @@ describe("AIDebuggerWidget Unknown Host Handling", () => {
         );
     });
 });
+
