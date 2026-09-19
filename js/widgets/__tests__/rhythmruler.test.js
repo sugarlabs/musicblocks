@@ -50,6 +50,7 @@ global.last = arr => (arr && arr.length > 0 ? arr[arr.length - 1] : undefined);
 global.nearestBeat = jest.fn(val => val);
 global.rationalToFraction = jest.fn(val => [1, Math.round(1 / val)]);
 global.calcNoteValueToDisplay = jest.fn((denominator, numerator) => `${numerator}/${denominator}`);
+global.announceToScreenReader = jest.fn();
 global.beginnerMode = false;
 global.platformColor = {
     selectorBackground: "#ffb020",

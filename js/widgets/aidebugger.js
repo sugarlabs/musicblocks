@@ -138,7 +138,10 @@ function AIDebuggerWidget() {
         (typeof createWidgetLifecycle !== "undefined" && createWidgetLifecycle) ||
         window.createWidgetLifecycle;
 
-    this._lifecycle = createLifecycle(this, () => this.widgetWindow && this.chatLog);
+    this._lifecycle = createLifecycle(
+        this,
+        () => (this.widgetWindow || this.chatLog) && this.chatLog
+    );
 
     /**
      * Generates a unique conversation ID
@@ -150,6 +153,16 @@ function AIDebuggerWidget() {
     };
 
     this.conversationId = this._generateConversationId();
+
+    /**
+     * Ensures the lifecycle is mounted when an action is triggered on an unmounted instance.
+     * @private
+     */
+    this._ensureMounted = function () {
+        if (!this._lifecycle.isMounted && this._lifecycle.generation === 0) {
+            this._lifecycle.mount();
+        }
+    };
 
     /**
      * Initializes the Debugger Widget.
@@ -243,6 +256,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._createLayout = function () {
+        this._ensureMounted();
         const mainContainer = document.createElement("div");
         mainContainer.style.display = "flex";
         mainContainer.style.height = "100%";
@@ -349,6 +363,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._addWelcomeMessage = function () {
+        this._ensureMounted();
         const welcomeMessage = {
             type: "system",
             content: _THIS_IS_MUSIC_BLOCKS_
@@ -394,6 +409,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._addMessageToUI = function (message) {
+        this._ensureMounted();
         if (!this._isWidgetActive()) {
             return;
         }
@@ -433,6 +449,12 @@ function AIDebuggerWidget() {
             messageDiv.style.fontStyle = "italic";
             messageDiv.textContent = message.content;
             messageDiv.appendChild(timeDiv);
+        } else {
+            messageDiv.style.alignSelf = "flex-start";
+            messageDiv.style.backgroundColor = "#e0e0e0";
+            messageDiv.style.color = "#333";
+            messageDiv.textContent = message.content || "";
+            messageDiv.appendChild(timeDiv);
         }
 
         this.chatLog.appendChild(messageDiv);
@@ -445,6 +467,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._sendToBackend = function (message) {
+        this._ensureMounted();
         if (!BACKEND_CONFIG.BASE_URL) {
             this._isProcessing = false;
             this._addMessageToUI({
@@ -629,6 +652,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._showConsentBanner = function () {
+        this._ensureMounted();
         const banner = document.createElement("div");
         banner.style.padding = "16px 20px";
         banner.style.margin = "12px";
@@ -712,6 +736,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._loadProjectAndInitialize = function () {
+        this._ensureMounted();
         try {
             // Get current project data as JSON
             const projectData = this.activity.prepareExport();
@@ -758,6 +783,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._initializeBackendWithProject = function (projectData) {
+        this._ensureMounted();
         if (!BACKEND_CONFIG.BASE_URL) {
             this._addMessageToUI({
                 type: "system",
@@ -1167,14 +1193,25 @@ function AIDebuggerWidget() {
                 const numerator = this._getNumericValue(connections[1], blockMap);
                 const denominator = this._getNumericValue(connections[2], blockMap);
                 let result = "?";
-                if (numerator !== null && denominator !== null && denominator !== 0) {
+                if (
+                    numerator !== null &&
+                    denominator !== null &&
+                    denominator !== 0 &&
+                    Number(denominator) !== 0
+                ) {
                     result = (numerator / denominator).toFixed(2);
                 }
 
-                if (parentBlockType === "newnote") {
-                    return `Duration --> ${numerator ?? "?"}/${denominator ?? "?"} = ${result}`;
+                const displayNum = numerator !== null ? numerator : "?";
+                let displayDenom = denominator !== null ? denominator : "?";
+                if (!Array.isArray(block[1]) && (denominator === 0 || Number(denominator) === 0)) {
+                    displayDenom = "?";
                 }
-                return `Divide Block --> ${numerator ?? "?"}/${denominator ?? "?"} = ${result}`;
+
+                if (parentBlockType === "newnote") {
+                    return `Duration --> ${displayNum}/${displayDenom} = ${result}`;
+                }
+                return `Divide Block --> ${displayNum}/${displayDenom} = ${result}`;
             }
 
             case "storein2": {
