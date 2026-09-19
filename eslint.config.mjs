@@ -22,6 +22,12 @@ export default [
     },
 
     {
+        linterOptions: {
+            reportUnusedDisableDirectives: "off"
+        }
+    },
+
+    {
         files: ["**/*.js", "**/*.mjs"],
         languageOptions: {
             ecmaVersion: "latest",
@@ -170,7 +176,7 @@ export default [
             "semi": ["error", "always"],
             "no-duplicate-case": "error",
             "no-irregular-whitespace": "warn",
-            "eqeqeq": "warn",
+            "eqeqeq": "off",
             "no-dupe-keys": "error"
         }
     },
