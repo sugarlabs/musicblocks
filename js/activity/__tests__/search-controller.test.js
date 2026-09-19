@@ -520,7 +520,7 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         activity.searchWidget.value = "";
         sc.doSearch();
 
-        const event = { preventDefault: jest.fn(), keyCode: 0 };
+        const event = { preventDefault: jest.fn(), key: "" };
         const ui = { item: { label: "drum beat", value: "drum", specialDict: block } };
         $elem.getOpts().select(event, ui);
 
