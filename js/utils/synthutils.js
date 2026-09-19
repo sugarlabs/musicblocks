@@ -541,6 +541,7 @@ class SampleLoader {
     }
 
     loadSampleAsync(sampleName) {
+        this.initStructures();
         return new Promise((resolve, reject) => {
             let found = false;
             let sampleType = null;

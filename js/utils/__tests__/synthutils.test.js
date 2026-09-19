@@ -3567,6 +3567,19 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(synth.resolveInstrumentName(null)).toBeNull();
         });
 
+        test("loadSampleAsync safely initializes sample structures when loading before synth is fully initialized", async () => {
+            // Replicate the condition where a project loads before the synth calls initStructures
+            synth.sampleLoader.samples = null;
+            expect(synth.sampleLoader.samples).toBeNull();
+
+            // Calling loadSampleAsync should not crash, it should initialize samples automatically
+            await expect(
+                synth.sampleLoader.loadSampleAsync("unknown_sample")
+            ).resolves.toBeUndefined();
+            expect(synth.sampleLoader.samples).not.toBeNull();
+            expect(synth.sampleLoader.samples.voice).toBeDefined();
+        });
+
         test("preloadProjectSamples scans and preloads instruments from block lists", async () => {
             synth.sampleLoader.loadSampleAsync = jest.fn().mockImplementation(name => {
                 if (name === "failing_sample")
