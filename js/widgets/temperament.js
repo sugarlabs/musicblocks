@@ -534,40 +534,32 @@ function TemperamentWidget() {
                 return;
             }
             that._playAllRunning = true;
+            // Play up the scale, the octave exactly once, then back down.
+            // frequencies[] may or may not carry an octave entry at
+            // pitchNumber, so only iterate the pitches within the octave
+            // and synthesize the octave explicitly. The octave sits at the
+            // same position on the circle as the tonic, so highlight dot 0.
+            const n = Math.min(that.pitchNumber, that.frequencies.length);
+            const sequence = [];
+            for (let k = 0; k < n; k++) sequence.push([k]);
+            sequence.push([0, Number(that.frequencies[0]) * that.powerBase]);
+            for (let k = n - 1; k >= 0; k--) sequence.push([k]);
             let i = 0;
-            let forward = true;
-            let octaveWrap = false;
             const step = function () {
                 if (!that._playAllRunning) {
                     flashDot = -1;
                     _drawCircle();
                     return;
                 }
-                // Guard: only play valid indices
-                if (octaveWrap) {
-                    _playNote(0, that.frequencies[0] * that.powerBase);
-                    octaveWrap = false;
-                    forward = false;
-                    i = that.frequencies.length;
-                } else if (i >= 0 && i < that.frequencies.length) {
-                    _playNote(i);
-                }
-                // Advance
-                if (forward) {
-                    i++;
-                    if (i >= that.frequencies.length) {
-                        octaveWrap = true;
-                    }
-                } else {
-                    i--;
-                    if (i < 0) {
-                        that._playAllRunning = false;
-                        that._setWidgetTimeout(function () {
-                            flashDot = -1;
-                            _drawCircle();
-                        }, 200);
-                        return;
-                    }
+                _playNote(sequence[i][0], sequence[i][1]);
+                i++;
+                if (i >= sequence.length) {
+                    that._playAllRunning = false;
+                    that._setWidgetTimeout(function () {
+                        flashDot = -1;
+                        _drawCircle();
+                    }, 200);
+                    return;
                 }
                 // Pace the run by the project tempo factor (matches the
                 // Singer.defaultBPMFactor pattern used for note durations).
