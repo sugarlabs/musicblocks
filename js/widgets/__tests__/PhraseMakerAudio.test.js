@@ -16,6 +16,9 @@
  */
 
 const PhraseMakerAudio = require("../PhraseMakerAudio");
+const ManagedTimer = require("../../utils/ManagedTimer");
+
+global.ManagedTimer = ManagedTimer;
 
 // Mock dependencies that are expected to be globals
 global.PhraseMakerUtils = {
@@ -586,6 +589,41 @@ describe("PhraseMakerAudio", () => {
             delete mockPM._chordTimeouts;
 
             expect(() => PhraseMakerAudio.clearPlaybackTimers(mockPM)).not.toThrow();
+        });
+
+        test("routes clearPlaybackTimers through pm._timerManager when available", () => {
+            const timerManager = new ManagedTimer();
+            mockPM._timerManager = timerManager;
+            const clearTimeoutSpy = jest.spyOn(timerManager, "clearTimeout");
+
+            mockPM._playNoteTimeout = timerManager.setTimeout(() => {}, 1000);
+            mockPM._chordTimeouts = [
+                timerManager.setTimeout(() => {}, 1),
+                timerManager.setTimeout(() => {}, 1)
+            ];
+            expect(timerManager.activeTimeoutCount).toBe(3);
+
+            PhraseMakerAudio.clearPlaybackTimers(mockPM);
+
+            expect(clearTimeoutSpy).toHaveBeenCalledTimes(3);
+            expect(timerManager.activeTimeoutCount).toBe(0);
+            expect(mockPM._playNoteTimeout).toBeNull();
+            expect(mockPM._chordTimeouts).toEqual([]);
+        });
+
+        test("routes _playChord through _timerManager", () => {
+            const timerManager = new ManagedTimer();
+            mockPM._timerManager = timerManager;
+            const setTimeoutSpy = jest.spyOn(timerManager, "setTimeout");
+
+            PhraseMakerAudio._playChord(mockPM, [60, 64, 67, 72], 1);
+
+            expect(setTimeoutSpy).toHaveBeenCalledTimes(4);
+            expect(mockPM._chordTimeouts.length).toBe(4);
+            expect(timerManager.activeTimeoutCount).toBe(4);
+
+            PhraseMakerAudio.clearPlaybackTimers(mockPM);
+            expect(timerManager.activeTimeoutCount).toBe(0);
         });
     });
 });

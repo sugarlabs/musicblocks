@@ -16,7 +16,8 @@
    global
 
    _, docById, getNote, setCustomChord, keySignatureToMode,
-   getModeNumbers, getTemperament, normalizeNoteAccidentals, DEFAULTVOICE
+   getModeNumbers, getTemperament, normalizeNoteAccidentals, DEFAULTVOICE,
+   ManagedTimer
 */
 /*
    Global locations
@@ -24,6 +25,8 @@
        getNote, setCustomChord
    js/utils/utils.js
         _, docById
+   js/utils/ManagedTimer.js
+        ManagedTimer
 */
 /* exported Arpeggio */
 
@@ -47,9 +50,39 @@ class Arpeggio {
         this._blockMap = []; // pairs storage
         this.defaultCols = Arpeggio.DEFAULTCOLS;
         this._playTimeout = null;
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("../utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
         this._arpeggioCellTables = []; // cached arpeggioCellTable elements
         this._arpeggioTable = null; // cached arpeggioTable element
         this._keyHandler = null;
+    }
+
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return setTimeout(callback, delay);
+    }
+
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+        clearTimeout(id);
+        return true;
     }
 
     /**
@@ -145,8 +178,11 @@ class Arpeggio {
                 this._keyHandler = null;
             }
             if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
+                this._clearWidgetTimeout(this._playTimeout);
                 this._playTimeout = null;
+            }
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
             }
             this._playing = false;
             this._activity.logo.synth.stop();
@@ -650,7 +686,7 @@ class Arpeggio {
                 );
             }
             if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
+                this._clearWidgetTimeout(this._playTimeout);
                 this._playTimeout = null;
             }
             this._activity.logo.synth.stop();
@@ -741,7 +777,7 @@ class Arpeggio {
                     null
                 );
             }
-            this._playTimeout = setTimeout(() => {
+            this._playTimeout = this._setWidgetTimeout(() => {
                 this.__playNote(i + 1);
             }, 2600 * this._playList[i][1]);
         } else {
@@ -916,7 +952,7 @@ class Arpeggio {
         if (this._playing) {
             this._playing = false;
             if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
+                this._clearWidgetTimeout(this._playTimeout);
                 this._playTimeout = null;
             }
             this._activity.logo.synth.stop();

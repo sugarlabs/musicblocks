@@ -21,6 +21,9 @@
  */
 
 const Arpeggio = require("../arpeggio.js");
+const ManagedTimer = require("../../utils/ManagedTimer");
+
+global.ManagedTimer = ManagedTimer;
 
 global._ = msg => msg;
 global.platformColor = {
@@ -683,6 +686,7 @@ describe("Arpeggio Widget", () => {
             arpeggio.playButton.onclick();
             expect(arpeggio._playing).toBe(true);
             expect(arpeggio._playTimeout).not.toBeNull();
+            expect(arpeggio._timerManager.activeTimeoutCount).toBe(1);
 
             const timeoutSpy = jest.spyOn(global, "clearTimeout");
 
@@ -691,6 +695,7 @@ describe("Arpeggio Widget", () => {
 
             expect(arpeggio._playing).toBe(false);
             expect(arpeggio._playTimeout).toBeNull();
+            expect(arpeggio._timerManager.activeTimeoutCount).toBe(0);
             expect(timeoutSpy).toHaveBeenCalled();
             expect(activityMock.logo.synth.stop).toHaveBeenCalled();
             expect(mockWidgetWindow.destroy).toHaveBeenCalled();
@@ -704,6 +709,7 @@ describe("Arpeggio Widget", () => {
             arpeggio.playButton.onclick();
             expect(arpeggio._playing).toBe(true);
             expect(arpeggio._playTimeout).not.toBeNull();
+            expect(arpeggio._timerManager.activeTimeoutCount).toBe(1);
 
             const timeoutSpy = jest.spyOn(global, "clearTimeout");
 
@@ -712,6 +718,7 @@ describe("Arpeggio Widget", () => {
 
             expect(arpeggio._playing).toBe(false);
             expect(arpeggio._playTimeout).toBeNull();
+            expect(arpeggio._timerManager.activeTimeoutCount).toBe(0);
             expect(timeoutSpy).toHaveBeenCalled();
             expect(activityMock.logo.synth.stop).toHaveBeenCalled();
 
@@ -723,12 +730,14 @@ describe("Arpeggio Widget", () => {
             cell.onclick({ target: cell });
             arpeggio.playButton.onclick();
             expect(arpeggio._playing).toBe(true);
+            expect(arpeggio._timerManager.activeTimeoutCount).toBe(1);
 
             // Clear widget
             arpeggio._clear();
 
             expect(arpeggio._playing).toBe(false);
             expect(arpeggio._playTimeout).toBeNull();
+            expect(arpeggio._timerManager.activeTimeoutCount).toBe(0);
             expect(activityMock.logo.synth.stop).toHaveBeenCalled();
         });
 
