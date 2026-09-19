@@ -44,6 +44,9 @@ jobs:
         name: Lint PR title
         runs-on: ubuntu-latest
         timeout-minutes: 10
+        # Renovate PR titles follow Conventional Commits format automatically.
+        # Skip linting to avoid false failures on bot-generated titles.
+        if: "!startsWith(github.head_ref, 'renovate/')"
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
