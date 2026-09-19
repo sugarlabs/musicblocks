@@ -39,7 +39,7 @@ try {
    setupHelpController,
    setupBlockScaleController,
    setupContextMenuController,
-   setupActivityAbcParser, setupActivityIdleWatcher,
+   setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -459,6 +459,9 @@ class Activity {
         } catch (e) {
             ErrorHandler.recoverable(e, { operation: "loadKeySignatureEnv" });
         }
+
+        this.sessionStorageManager =
+            typeof SessionStorageManager !== "undefined" ? new SessionStorageManager() : null;
 
         setupActivityIdleWatcher(this);
         setupProjectManager(this);
@@ -2563,6 +2566,70 @@ class Activity {
             );
         };
 
+        this._handleBeforeUnload = () => {
+            // Save synchronously to SESSION* keys so manual reload/F5
+            // still has recoverable data even if async saves are cut short.
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            if (typeof this.saveLocally === "function" && this.saveLocally !== this.__saveLocally) {
+                this.saveLocally();
+            }
+            this._stopRenderLoop();
+            if (typeof this._stopAutoSave === "function") {
+                this._stopAutoSave();
+            }
+        };
+
+        this.saveSessionAsync = async () => {
+            // First, trigger __saveLocally for the image thumb and fallback.
+            // If the payload is huge, it will quota exceed but fail silently, which is fine!
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            // Second, save the massive payload safely to IndexedDB.
+            if (this.sessionStorageManager) {
+                const data = this.prepareExport();
+                let p = "My Project";
+                try {
+                    p = (this.storage && this.storage.currentProject) || "My Project";
+                } catch (e) {
+                    p = "My Project";
+                }
+
+                // We use the same timestamp that __saveLocally just wrote,
+                // or generate a new one if it failed or was invalid.
+                let timestampStr = null;
+                try {
+                    timestampStr = this.storage ? this.storage["SESSION_TIMESTAMP" + p] : null;
+                } catch (e) {
+                    timestampStr = null;
+                }
+                let parsedTimestamp = timestampStr ? parseInt(timestampStr, 10) : NaN;
+                let isValidTimestamp = Number.isFinite(parsedTimestamp) && parsedTimestamp > 0;
+                let timestamp = isValidTimestamp ? parsedTimestamp : Date.now();
+
+                try {
+                    await this.sessionStorageManager.saveSession("SESSION" + p, data, timestamp);
+                    if (!isValidTimestamp) {
+                        try {
+                            if (this.storage) {
+                                this.storage["SESSION_TIMESTAMP" + p] = timestamp.toString();
+                            }
+                        } catch (storageErr) {
+                            console.warn(
+                                "Failed to write session timestamp to localStorage:",
+                                storageErr
+                            );
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to save session to IndexedDB:", e);
+                    throw e;
+                }
+            }
+        };
+
         this.__saveLocally = (...args) => this.projectManager.saveLocally(...args);
 
         // 2D drag-selection and multi-selection are owned by
@@ -2654,23 +2721,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
-            this.addEventListener(window, "beforeunload", () => {
-                // Save synchronously to SESSION* keys so manual reload/F5
-                // still has recoverable data even if async saves are cut short.
-                if (typeof this.__saveLocally === "function") {
-                    this.__saveLocally();
-                }
-                if (
-                    typeof this.saveLocally === "function" &&
-                    this.saveLocally !== this.__saveLocally
-                ) {
-                    this.saveLocally();
-                }
-                this._stopRenderLoop();
-                if (typeof this._stopAutoSave === "function") {
-                    this._stopAutoSave();
-                }
-            });
+            this.addEventListener(window, "beforeunload", this._handleBeforeUnload);
 
             this._createMsgContainer(
                 "#ffffff",
