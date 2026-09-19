@@ -815,6 +815,7 @@ if (typeof module !== "undefined" && module.exports) {
         createDefaultStack,
         createHelpContent,
         getLanguagePreference,
+        GUIDEURL,
         LOGOJA,
         LOGODEFAULT,
         // A getter: createHelpContent() rebinds HELPCONTENT, so exporting the
