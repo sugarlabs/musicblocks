@@ -1246,32 +1246,12 @@ describe("Oscilloscope", () => {
             toggleSpy.mockRestore();
         });
 
-        test("toggles freeze and prevents default when KeyF is pressed on focused widget", () => {
-            const osc = createOscilloscope();
-            window.widgetWindows.focused = osc.widgetWindow;
-            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
-            const event = {
-                code: "KeyF",
-                repeat: false,
-                ctrlKey: false,
-                metaKey: false,
-                altKey: false,
-                preventDefault: jest.fn()
-            };
-
-            osc._keyHandler(event);
-
-            expect(event.preventDefault).toHaveBeenCalled();
-            expect(toggleSpy).toHaveBeenCalled();
-            toggleSpy.mockRestore();
-        });
-
         test("ignores repeated keydown events (e.repeat is true)", () => {
             const osc = createOscilloscope();
             window.widgetWindows.focused = osc.widgetWindow;
             const toggleSpy = jest.spyOn(osc, "toggleFreeze");
             const event = {
-                code: "KeyF",
+                code: "Space",
                 repeat: true,
                 ctrlKey: false,
                 metaKey: false,
@@ -1286,12 +1266,12 @@ describe("Oscilloscope", () => {
             toggleSpy.mockRestore();
         });
 
-        test("ignores Ctrl-modified keys like Ctrl+F", () => {
+        test("ignores Ctrl-modified keys like Ctrl+Space", () => {
             const osc = createOscilloscope();
             window.widgetWindows.focused = osc.widgetWindow;
             const toggleSpy = jest.spyOn(osc, "toggleFreeze");
             const event = {
-                code: "KeyF",
+                code: "Space",
                 repeat: false,
                 ctrlKey: true,
                 metaKey: false,
@@ -1306,12 +1286,12 @@ describe("Oscilloscope", () => {
             toggleSpy.mockRestore();
         });
 
-        test("ignores Meta-modified keys like Meta+F", () => {
+        test("ignores Meta-modified keys like Meta+Space", () => {
             const osc = createOscilloscope();
             window.widgetWindows.focused = osc.widgetWindow;
             const toggleSpy = jest.spyOn(osc, "toggleFreeze");
             const event = {
-                code: "KeyF",
+                code: "Space",
                 repeat: false,
                 ctrlKey: false,
                 metaKey: true,
@@ -1326,12 +1306,12 @@ describe("Oscilloscope", () => {
             toggleSpy.mockRestore();
         });
 
-        test("ignores Alt-modified keys like Alt+F", () => {
+        test("ignores Alt-modified keys like Alt+Space", () => {
             const osc = createOscilloscope();
             window.widgetWindows.focused = osc.widgetWindow;
             const toggleSpy = jest.spyOn(osc, "toggleFreeze");
             const event = {
-                code: "KeyF",
+                code: "Space",
                 repeat: false,
                 ctrlKey: false,
                 metaKey: false,
@@ -1351,7 +1331,7 @@ describe("Oscilloscope", () => {
             window.widgetWindows.focused = null;
             const toggleSpy = jest.spyOn(osc, "toggleFreeze");
             const event = {
-                code: "KeyF",
+                code: "Space",
                 repeat: false,
                 ctrlKey: false,
                 metaKey: false,
@@ -1400,7 +1380,7 @@ describe("Oscilloscope", () => {
             textarea.focus();
 
             const event = {
-                code: "KeyF",
+                code: "Space",
                 repeat: false,
                 ctrlKey: false,
                 metaKey: false,
@@ -1429,7 +1409,7 @@ describe("Oscilloscope", () => {
             });
 
             const event = {
-                code: "KeyF",
+                code: "Space",
                 repeat: false,
                 ctrlKey: false,
                 metaKey: false,
@@ -1454,7 +1434,7 @@ describe("Oscilloscope", () => {
             osc.widgetWindow = null;
             const toggleSpy = jest.spyOn(osc, "toggleFreeze");
             const event = {
-                code: "KeyF",
+                code: "Space",
                 repeat: false,
                 ctrlKey: false,
                 metaKey: false,
