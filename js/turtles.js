@@ -161,6 +161,9 @@ class Turtles {
                 y: turtle.container.y - event.stageY / scale
             };
 
+            this._isDraggingTurtle = true;
+            this._showTurtleHUD(turtle);
+
             turtlesStage.dispatchEvent("CursorDown" + turtle.id);
             // console.debug("--> [CursorDown " + turtle.name + "]");
 
@@ -174,13 +177,18 @@ class Turtles {
                 turtle.container.y = event.stageY / scale + offset.y;
                 turtle.x = this.screenX2turtleX(turtle.container.x);
                 turtle.y = this.screenY2turtleY(turtle.container.y);
+                this._updateTurtleHUD(turtle);
                 this.activity.refreshCanvas();
             });
         });
 
         turtle.container.on("pressup", () => {
             // console.debug("--> [CursorUp " + turtle.name + "]");
+            this._isDraggingTurtle = false;
             turtlesStage.dispatchEvent("CursorUp" + turtle.id);
+            if (this._mouseOverTurtle !== turtle) {
+                this._hideTurtleHUD();
+            }
         });
 
         turtle.container.on("click", () => {
@@ -191,11 +199,14 @@ class Turtles {
 
         turtle.container.on("mouseover", () => {
             // console.debug("--> [mouseover " + turtle.name + "]");
+            this._mouseOverTurtle = turtle;
             turtlesStage.dispatchEvent("CursorOver" + turtle.id);
 
             if (turtle.running) {
                 return;
             }
+
+            this._showTurtleHUD(turtle);
 
             turtle.container.scaleX *= 1.2;
             turtle.container.scaleY = turtle.container.scaleX;
@@ -205,6 +216,9 @@ class Turtles {
 
         turtle.container.on("mouseout", () => {
             // console.debug("--> [mouseout " + turtle.name + "]");
+            if (this._mouseOverTurtle === turtle) {
+                this._mouseOverTurtle = null;
+            }
             turtlesStage.dispatchEvent("CursorOut" + turtle.id);
 
             if (turtle.running) {
@@ -214,10 +228,18 @@ class Turtles {
             turtle.container.scaleX /= 1.2;
             turtle.container.scaleY = turtle.container.scaleX;
             turtle.container.scale = turtle.container.scaleX;
+
+            if (!this._isDraggingTurtle) {
+                this._hideTurtleHUD();
+            }
+
             this.activity.refreshCanvas();
         });
 
-        document.getElementById("loader").className = "";
+        const loader = document.getElementById("loader");
+        if (loader) {
+            loader.className = "";
+        }
 
         this.addTurtleGraphicProps(turtle, blkInfoAvailable, infoDict);
         this.activity.refreshCanvas();
@@ -234,7 +256,240 @@ class Turtles {
             turtle.running = false;
         }
 
+        this._hideTurtleHUD();
         this.activity.refreshCanvas();
+    }
+
+    // ================================= HUD ==================================
+    // ========================================================================
+
+    /**
+     * Retrieves HUD colors from CSS custom properties with fallbacks.
+     *
+     * @returns {Object} { ring, pointer, bg, text }
+     * @private
+     */
+    _getTurtleHudColors() {
+        let ring = "";
+        let pointer = "";
+        let bg = "";
+        let text = "";
+        if (
+            typeof getComputedStyle !== "undefined" &&
+            typeof document !== "undefined" &&
+            document.body
+        ) {
+            const style = getComputedStyle(document.body);
+            ring = style.getPropertyValue("--color-turtle-hud-ring").trim();
+            pointer = style.getPropertyValue("--color-turtle-hud-pointer").trim();
+            bg = style.getPropertyValue("--color-turtle-hud-bg").trim();
+            text = style.getPropertyValue("--color-turtle-hud-text").trim();
+        }
+        return {
+            ring: ring || "rgba(37, 99, 235, 0.45)",
+            pointer: pointer || "#2563eb",
+            bg: bg || "rgba(17, 24, 39, 0.85)",
+            text: text || "#ffffff"
+        };
+    }
+
+    /**
+     * Renders the compass ring, directional heading needle, and coordinate pill.
+     *
+     * @param {Object} turtle - Turtle object
+     * @private
+     */
+    _renderTurtleHUD(turtle) {
+        if (!this._hudContainer || !this._hudShape || !this._hudPill || !this._hudText) {
+            return;
+        }
+
+        const colors = this._getTurtleHudColors();
+        const orientation = typeof turtle.orientation === "number" ? turtle.orientation : 0;
+        const headingDeg = Math.round(((orientation % 360) + 360) % 360);
+        const tx = Math.round(typeof turtle.x === "number" ? turtle.x : 0);
+        const ty = Math.round(typeof turtle.y === "number" ? turtle.y : 0);
+
+        this._hudContainer.x = turtle.container.x;
+        this._hudContainer.y = turtle.container.y;
+
+        const g = this._hudShape.graphics;
+        g.clear();
+
+        // Subtle background circle behind the compass ring
+        g.beginFill("rgba(255, 255, 255, 0.05)").drawCircle(0, 0, 36);
+
+        // Compass ring
+        g.setStrokeStyle(1.5).beginStroke(colors.ring).drawCircle(0, 0, 36);
+
+        // Cardinal tick marks (North, East, South, West)
+        g.setStrokeStyle(1.5).beginStroke(colors.ring);
+        g.moveTo(0, -36).lineTo(0, -42);
+        g.moveTo(36, 0).lineTo(42, 0);
+        g.moveTo(0, 36).lineTo(0, 42);
+        g.moveTo(-36, 0).lineTo(-42, 0);
+
+        // Directional heading arrow (needle pointing along turtle.orientation)
+        const headingRad = (orientation * Math.PI) / 180;
+        const sinA = Math.sin(headingRad);
+        const cosA = -Math.cos(headingRad);
+
+        const tipX = sinA * 42;
+        const tipY = cosA * 42;
+        const baseX = sinA * 28;
+        const baseY = cosA * 28;
+        const perpX = -cosA * 5;
+        const perpY = sinA * 5;
+
+        g.beginFill(colors.pointer);
+        g.moveTo(tipX, tipY);
+        g.lineTo(baseX + perpX, baseY + perpY);
+        g.lineTo(baseX - perpX, baseY - perpY);
+        g.closePath();
+
+        // Coordinate pill position (below turtle, or above if close to bottom)
+        const pillY = turtle.container.y + 70 > (this._h || 800) ? -54 : 54;
+        this._hudText.text = `${headingDeg}°  (${tx}, ${ty})`;
+        this._hudText.color = colors.text;
+        this._hudText.x = 0;
+        this._hudText.y = pillY;
+
+        const bounds = this._hudText.getBounds ? this._hudText.getBounds() : null;
+        const pillWidth = bounds ? Math.max(bounds.width + 16, 76) : 80;
+        const pillHeight = 20;
+
+        const pg = this._hudPill.graphics;
+        pg.clear();
+        pg.beginFill(colors.bg).drawRoundRect(
+            -pillWidth / 2,
+            pillY - pillHeight / 2,
+            pillWidth,
+            pillHeight,
+            6
+        );
+        pg.setStrokeStyle(1)
+            .beginStroke(colors.ring)
+            .drawRoundRect(-pillWidth / 2, pillY - pillHeight / 2, pillWidth, pillHeight, 6);
+    }
+
+    /**
+     * Displays the Turtle compass and coordinate HUD with smooth fade-in.
+     *
+     * @param {Object} turtle - Turtle object
+     * @private
+     */
+    _showTurtleHUD(turtle) {
+        if (!turtle || !turtle.container || turtle.running) {
+            return;
+        }
+
+        const targetStage = this._stage || (this.activity && this.activity.stage);
+        if (!targetStage || typeof createjs === "undefined") {
+            return;
+        }
+
+        if (!this._hudContainer) {
+            this._hudContainer = new createjs.Container();
+            this._hudContainer.mouseEnabled = false;
+            this._hudContainer.mouseChildren = false;
+            this._hudShape = new createjs.Shape();
+            this._hudPill = new createjs.Shape();
+            this._hudText = new createjs.Text("", "bold 11px sans-serif", "#2c3e50");
+            this._hudText.textAlign = "center";
+            this._hudText.textBaseline = "middle";
+            this._hudContainer.addChild(this._hudShape);
+            this._hudContainer.addChild(this._hudPill);
+            this._hudContainer.addChild(this._hudText);
+        }
+
+        if (targetStage.addChild) {
+            if (typeof targetStage.contains === "function") {
+                if (!targetStage.contains(this._hudContainer)) {
+                    targetStage.addChild(this._hudContainer);
+                }
+            } else {
+                targetStage.addChild(this._hudContainer);
+            }
+        }
+
+        if (typeof targetStage.setChildIndex === "function" && targetStage.numChildren) {
+            targetStage.setChildIndex(this._hudContainer, targetStage.numChildren - 1);
+        }
+
+        this._renderTurtleHUD(turtle);
+
+        this._hudContainer.visible = true;
+        if (
+            typeof createjs !== "undefined" &&
+            createjs.Tween &&
+            typeof createjs.Tween.get === "function"
+        ) {
+            createjs.Tween.get(this._hudContainer, { override: true }).to({ alpha: 1.0 }, 150);
+        } else {
+            this._hudContainer.alpha = 1.0;
+        }
+
+        if (this.activity && typeof this.activity.textMsg === "function") {
+            const orientation = typeof turtle.orientation === "number" ? turtle.orientation : 0;
+            const headingDeg = Math.round(((orientation % 360) + 360) % 360);
+            const tx = Math.round(typeof turtle.x === "number" ? turtle.x : 0);
+            const ty = Math.round(typeof turtle.y === "number" ? turtle.y : 0);
+            const name = turtle.name || (typeof _ === "function" ? _("turtle") : "turtle");
+            this.activity.textMsg(`${name}: ${headingDeg}°, (${tx}, ${ty})`, 1500);
+        }
+
+        if (this.activity && typeof this.activity.refreshCanvas === "function") {
+            this.activity.refreshCanvas();
+        }
+    }
+
+    /**
+     * Updates HUD position, heading, and coordinates during interaction.
+     *
+     * @param {Object} turtle - Turtle object
+     * @private
+     */
+    _updateTurtleHUD(turtle) {
+        if (!this._hudContainer || !this._hudContainer.visible || !turtle || !turtle.container) {
+            return;
+        }
+        this._renderTurtleHUD(turtle);
+        if (this.activity && typeof this.activity.refreshCanvas === "function") {
+            this.activity.refreshCanvas();
+        }
+    }
+
+    /**
+     * Hides the Turtle HUD with a smooth fade-out animation.
+     *
+     * @private
+     */
+    _hideTurtleHUD() {
+        if (!this._hudContainer) {
+            return;
+        }
+        if (
+            typeof createjs !== "undefined" &&
+            createjs.Tween &&
+            typeof createjs.Tween.get === "function"
+        ) {
+            createjs.Tween.get(this._hudContainer, { override: true })
+                .to({ alpha: 0 }, 150)
+                .call(() => {
+                    if (this._hudContainer) {
+                        this._hudContainer.visible = false;
+                    }
+                    if (this.activity && typeof this.activity.refreshCanvas === "function") {
+                        this.activity.refreshCanvas();
+                    }
+                });
+        } else {
+            this._hudContainer.alpha = 0;
+            this._hudContainer.visible = false;
+            if (this.activity && typeof this.activity.refreshCanvas === "function") {
+                this.activity.refreshCanvas();
+            }
+        }
     }
 
     // ================================ MODEL =================================

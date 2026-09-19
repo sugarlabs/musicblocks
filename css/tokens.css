@@ -64,6 +64,12 @@
     --color-trash-hover-border: #ef4444;
     --color-trash-hover-bg: rgba(239, 68, 68, 0.25);
 
+    /* Turtle Heading & Coordinate HUD */
+    --color-turtle-hud-ring: rgba(37, 99, 235, 0.45);
+    --color-turtle-hud-pointer: #2563eb;
+    --color-turtle-hud-bg: rgba(17, 24, 39, 0.85);
+    --color-turtle-hud-text: #ffffff;
+
     /* =========================================================================
      Spacing (Base 4px scale)
      ========================================================================= */
@@ -163,6 +169,12 @@ body.dark {
     --color-trash-hover-border: #f87171;
     --color-trash-hover-bg: rgba(239, 68, 68, 0.35);
 
+    /* Turtle Heading & Coordinate HUD */
+    --color-turtle-hud-ring: rgba(96, 165, 250, 0.55);
+    --color-turtle-hud-pointer: #60a5fa;
+    --color-turtle-hud-bg: rgba(31, 41, 55, 0.9);
+    --color-turtle-hud-text: #f9fafb;
+
     /* Adjusted state backgrounds for dark mode */
     --color-success-bg: rgba(16, 185, 129, 0.2);
     --color-warning-bg: rgba(245, 158, 11, 0.2);
@@ -219,6 +231,12 @@ body.highcontrast {
     --color-trash-border: #ffffff;
     --color-trash-hover-border: #ff0000;
     --color-trash-hover-bg: rgba(255, 0, 0, 0.4);
+
+    /* Turtle Heading & Coordinate HUD */
+    --color-turtle-hud-ring: #00ffff;
+    --color-turtle-hud-pointer: #ffff00;
+    --color-turtle-hud-bg: #000000;
+    --color-turtle-hud-text: #ffffff;
 
     --color-success: #00ff00;
     --color-success-bg: #000000;
