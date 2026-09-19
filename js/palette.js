@@ -161,7 +161,7 @@ class Palettes {
 
             // Exit palette keyboard navigation without allowing Escape to reach
             // the global play shortcut.
-            const isEscape = key === "Escape" || key === "Esc" || event.keyCode === 27;
+            const isEscape = key === "Escape" || key === "Esc";
             if (isEscape) {
                 const searchWidget = document.getElementById("search");
                 if (searchWidget && document.activeElement === searchWidget) return;
