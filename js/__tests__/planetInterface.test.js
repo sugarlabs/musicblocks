@@ -23,6 +23,7 @@ global.platformColor = {
     header: "#8bc34a"
 };
 global._THIS_IS_MUSIC_BLOCKS_ = {};
+global._ = jest.fn(str => str);
 global.doSVG = jest.fn();
 global.pubsub = new PubSub();
 
@@ -348,6 +349,7 @@ describe("PlanetInterface", () => {
         planetInterface.showPlanet();
 
         expect(console.error).toHaveBeenCalled();
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith("Planet view is not ready yet.");
     });
     test("saveLocally: non-empty SVG triggers image‑onload path", done => {
         doSVG.mockReturnValue("<svg/>");
