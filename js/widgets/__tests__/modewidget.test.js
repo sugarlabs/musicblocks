@@ -812,6 +812,7 @@ describe("ModeWidget", () => {
             pattern: [2, 2, 1, 2, 2, 2, 1],
             edo: 12
         });
+        jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("major");
         modeWidget._selectedModeName = "major";
         let downloadedContent;
         jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
@@ -822,6 +823,25 @@ describe("ModeWidget", () => {
 
         const parsed = JSON.parse(downloadedContent);
         expect(parsed).toEqual({ name: "major", edo: 12, pattern: [2, 2, 1, 2, 2, 2, 1] });
+    });
+
+    test("_exportJson ignores stale _selectedModeName and resolves name from pattern", () => {
+        jest.spyOn(modeWidget, "_modeExportData").mockReturnValue({
+            pattern: [2, 2, 1, 2, 2, 2, 1],
+            edo: 12
+        });
+        jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("ionian");
+        modeWidget._selectedModeName = "41EDO";
+        let downloadedContent;
+        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+            downloadedContent = content;
+        });
+
+        modeWidget._exportJson();
+
+        const parsed = JSON.parse(downloadedContent);
+        expect(parsed).toEqual({ name: "ionian", edo: 12, pattern: [2, 2, 1, 2, 2, 2, 1] });
+        expect(modeWidget._findModeNameForPattern).toHaveBeenCalledWith([2, 2, 1, 2, 2, 2, 1]);
     });
 
     test("_importFile shows error for unsupported file type", () => {

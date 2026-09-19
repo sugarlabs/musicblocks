@@ -1202,12 +1202,8 @@ class ModeWidget {
         return currentMode;
     }
 
-    _setModeName() {
-        const currentMode = this._calculateMode();
-        const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
-        const patternKey = currentMode.join(",");
-
-        let matchedMode = null;
+    _findModeNameForPattern(pattern) {
+        const patternKey = pattern.join(",");
 
         // Check custom modes first — they take priority over built-in modes
         // when patterns match, since they are EDO-specific.
@@ -1215,26 +1211,30 @@ class ModeWidget {
             if (!(mode in MUSICALMODES)) {
                 continue;
             }
-            const pattern = this._modeStepPattern(mode, null);
-            if (pattern && pattern.join(",") === patternKey) {
-                matchedMode = mode;
-                break;
+            const modePattern = this._modeStepPattern(mode, null);
+            if (modePattern && modePattern.join(",") === patternKey) {
+                return mode;
             }
         }
 
         // If no custom mode matched, check built-in modes.
-        if (!matchedMode) {
-            for (const mode in MUSICALMODES) {
-                if (this._customModeNames.has(mode)) {
-                    continue;
-                }
-                const pattern = this._modeStepPattern(mode, null);
-                if (pattern && pattern.join(",") === patternKey) {
-                    matchedMode = mode;
-                    break;
-                }
+        for (const mode in MUSICALMODES) {
+            if (this._customModeNames.has(mode)) {
+                continue;
+            }
+            const modePattern = this._modeStepPattern(mode, null);
+            if (modePattern && modePattern.join(",") === patternKey) {
+                return mode;
             }
         }
+
+        return null;
+    }
+
+    _setModeName() {
+        const currentMode = this._calculateMode();
+        const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
+        const matchedMode = this._findModeNameForPattern(currentMode);
 
         if (matchedMode) {
             this._selectedModeName = matchedMode;
@@ -1536,11 +1536,8 @@ class ModeWidget {
         if (!data) return;
         const { pattern, edo } = data;
 
-        const content = JSON.stringify(
-            { name: this._selectedModeName || "custom", edo, pattern },
-            null,
-            2
-        );
+        const name = this._findModeNameForPattern(pattern) || "custom";
+        const content = JSON.stringify({ name, edo, pattern }, null, 2);
         this._downloadScl(content, "mode-" + edo + "edo.json");
     }
 
