@@ -536,38 +536,30 @@ function TemperamentWidget() {
             that._playAllRunning = true;
             let i = 0;
             let forward = true;
-            let octaveWrap = false;
             const step = function () {
                 if (!that._playAllRunning) {
                     flashDot = -1;
                     _drawCircle();
                     return;
                 }
-                // Guard: only play valid indices
-                if (octaveWrap) {
-                    _playNote(0, that.frequencies[0] * that.powerBase);
-                    octaveWrap = false;
-                    forward = false;
-                    i = that.frequencies.length;
-                } else if (i >= 0 && i < that.frequencies.length) {
-                    _playNote(i);
-                }
-                // Advance
+                _playNote(i);
                 if (forward) {
-                    i++;
-                    if (i >= that.frequencies.length) {
-                        octaveWrap = true;
+                    if (i >= that.pitchNumber) {
+                        forward = false;
+                        i--;
+                    } else {
+                        i++;
                     }
                 } else {
                     i--;
-                    if (i < 0) {
-                        that._playAllRunning = false;
-                        that._setWidgetTimeout(function () {
-                            flashDot = -1;
-                            _drawCircle();
-                        }, 200);
-                        return;
-                    }
+                }
+                if (i < 0) {
+                    that._playAllRunning = false;
+                    that._setWidgetTimeout(function () {
+                        flashDot = -1;
+                        _drawCircle();
+                    }, 200);
+                    return;
                 }
                 // Pace the run by the project tempo factor (matches the
                 // Singer.defaultBPMFactor pattern used for note durations).
@@ -1172,15 +1164,14 @@ function TemperamentWidget() {
 
         const _playNote = function (index, freqOverride) {
             that._logo.resetSynth(0);
-            that._logo.synth.trigger(
-                0,
-                freqOverride !== undefined ? freqOverride : Number(that.frequencies[index]),
-                1 / 4,
-                "electronic synth",
-                null,
-                null
-            );
-            flashDot = index;
+            const freq =
+                freqOverride !== undefined
+                    ? freqOverride
+                    : that.frequencies[index] !== undefined
+                      ? Number(that.frequencies[index])
+                      : Number(that.frequencies[0]) * that.powerBase;
+            that._logo.synth.trigger(0, freq, 1 / 4, "electronic synth", null, null);
+            flashDot = that.pitchNumber > 0 && index === that.pitchNumber ? 0 : index;
             _drawCircle();
             that._setWidgetTimeout(function () {
                 flashDot = -1;

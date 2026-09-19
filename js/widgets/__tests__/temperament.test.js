@@ -1384,4 +1384,221 @@ describe("TemperamentWidget basic tests", () => {
             );
         });
     });
+
+    describe("play-all octave playback (Issue #8795)", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("plays scale ascending, octave once, and descending back to tonic", () => {
+            const mockActivity = {
+                errorMsg: jest.fn(),
+                logo: {
+                    synth: {
+                        startingPitch: "C4",
+                        _getFrequency: jest.fn(() => 261.63),
+                        setMasterVolume: jest.fn(),
+                        stop: jest.fn(),
+                        trigger: jest.fn()
+                    },
+                    resetSynth: jest.fn(),
+                    setUserTemperament: jest.fn()
+                }
+            };
+
+            global.getTemperament = jest.fn(name => {
+                if (name === "equal") {
+                    return {
+                        "pitchNumber": 12,
+                        "interval": [
+                            "perfect 1",
+                            "minor 2",
+                            "major 2",
+                            "minor 3",
+                            "major 3",
+                            "perfect 4",
+                            "diminished 5",
+                            "perfect 5",
+                            "minor 6",
+                            "major 6",
+                            "minor 7",
+                            "major 7",
+                            "perfect 8"
+                        ],
+                        "perfect 1": 1,
+                        "minor 2": Math.pow(2, 1 / 12),
+                        "major 2": Math.pow(2, 2 / 12),
+                        "minor 3": Math.pow(2, 3 / 12),
+                        "major 3": Math.pow(2, 4 / 12),
+                        "perfect 4": Math.pow(2, 5 / 12),
+                        "diminished 5": Math.pow(2, 6 / 12),
+                        "perfect 5": Math.pow(2, 7 / 12),
+                        "minor 6": Math.pow(2, 8 / 12),
+                        "major 6": Math.pow(2, 9 / 12),
+                        "minor 7": Math.pow(2, 10 / 12),
+                        "major 7": Math.pow(2, 11 / 12),
+                        "perfect 8": 2,
+                        "noteLabels": [
+                            "C",
+                            "C#",
+                            "D",
+                            "D#",
+                            "E",
+                            "F",
+                            "F#",
+                            "G",
+                            "G#",
+                            "A",
+                            "A#",
+                            "B"
+                        ]
+                    };
+                }
+                return null;
+            });
+
+            const playWidget = new TemperamentWidget();
+            playWidget.inTemperament = "equal";
+            playWidget.scale = ["C", "Major"];
+            playWidget.init(mockActivity);
+
+            expect(typeof playWidget._playAll).toBe("function");
+
+            const triggeredNotes = [];
+            mockActivity.logo.synth.trigger.mockImplementation((voice, freq) => {
+                triggeredNotes.push(freq);
+            });
+
+            playWidget.playAll();
+
+            // Run all scheduled timers in the playback sequence
+            jest.runAllTimers();
+
+            // 12EDO has 13 notes ascending (indices 0..12) and 12 descending (indices 11..0) = 25 notes total
+            expect(triggeredNotes.length).toBe(25);
+
+            // Octave note (523.26 Hz) must be played exactly once at index 12 (turnaround)
+            const octaveFreq = Number(playWidget.frequencies[12]);
+            const octavePlays = triggeredNotes.filter(f => Math.abs(f - octaveFreq) < 0.05);
+            expect(octavePlays.length).toBe(1);
+            expect(triggeredNotes[12]).toBeCloseTo(octaveFreq, 2);
+
+            // Ascending notes (0 to 12)
+            for (let i = 0; i <= 12; i++) {
+                expect(triggeredNotes[i]).toBeCloseTo(Number(playWidget.frequencies[i]), 2);
+            }
+
+            // Descending notes (11 down to 0)
+            for (let i = 11; i >= 0; i--) {
+                const triggerIndex = 12 + (12 - i);
+                expect(triggeredNotes[triggerIndex]).toBeCloseTo(
+                    Number(playWidget.frequencies[i]),
+                    2
+                );
+            }
+
+            expect(playWidget._playAllRunning).toBe(false);
+        });
+
+        test("highlights dot 0 when playing octave note at pitchNumber", () => {
+            const mockActivity = {
+                errorMsg: jest.fn(),
+                logo: {
+                    synth: {
+                        startingPitch: "C4",
+                        _getFrequency: jest.fn(() => 261.63),
+                        setMasterVolume: jest.fn(),
+                        stop: jest.fn(),
+                        trigger: jest.fn()
+                    },
+                    resetSynth: jest.fn(),
+                    setUserTemperament: jest.fn()
+                }
+            };
+
+            global.getTemperament = jest.fn(name => {
+                if (name === "equal") {
+                    return {
+                        "pitchNumber": 12,
+                        "interval": [
+                            "perfect 1",
+                            "minor 2",
+                            "major 2",
+                            "minor 3",
+                            "major 3",
+                            "perfect 4",
+                            "diminished 5",
+                            "perfect 5",
+                            "minor 6",
+                            "major 6",
+                            "minor 7",
+                            "major 7",
+                            "perfect 8"
+                        ],
+                        "perfect 1": 1,
+                        "minor 2": Math.pow(2, 1 / 12),
+                        "major 2": Math.pow(2, 2 / 12),
+                        "minor 3": Math.pow(2, 3 / 12),
+                        "major 3": Math.pow(2, 4 / 12),
+                        "perfect 4": Math.pow(2, 5 / 12),
+                        "diminished 5": Math.pow(2, 6 / 12),
+                        "perfect 5": Math.pow(2, 7 / 12),
+                        "minor 6": Math.pow(2, 8 / 12),
+                        "major 6": Math.pow(2, 9 / 12),
+                        "minor 7": Math.pow(2, 10 / 12),
+                        "major 7": Math.pow(2, 11 / 12),
+                        "perfect 8": 2,
+                        "noteLabels": [
+                            "C",
+                            "C#",
+                            "D",
+                            "D#",
+                            "E",
+                            "F",
+                            "F#",
+                            "G",
+                            "G#",
+                            "A",
+                            "A#",
+                            "B"
+                        ]
+                    };
+                }
+                return null;
+            });
+
+            const playWidget = new TemperamentWidget();
+            playWidget.inTemperament = "equal";
+            playWidget.scale = ["C", "Major"];
+            playWidget.init(mockActivity);
+
+            const octaveFreq = Number(playWidget.frequencies[playWidget.pitchNumber]);
+            mockActivity.logo.synth.trigger.mockClear();
+
+            playWidget.playAll();
+            // Step 0: i = 0
+            // Advance by 12 steps (to i = 12, which is pitchNumber)
+            for (let step = 0; step < 12; step++) {
+                jest.advanceTimersByTime(300);
+            }
+
+            // At step 12, C5 is played and dot 0 is flashed
+            expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                0,
+                expect.closeTo(octaveFreq, 2),
+                1 / 4,
+                "electronic synth",
+                null,
+                null
+            );
+
+            // Clean up remaining timers
+            jest.runAllTimers();
+            expect(playWidget._playAllRunning).toBe(false);
+        });
+    });
 });
