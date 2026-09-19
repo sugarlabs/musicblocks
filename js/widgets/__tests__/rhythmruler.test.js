@@ -209,6 +209,7 @@ describe("RhythmRuler Widget", () => {
 
         // Set the global activity variable
         global.activity = mockActivity;
+        global.announceToScreenReader = jest.fn();
         rhythmRuler.activity = mockActivity;
 
         // Manually setup widgetWindow as if init() was called
