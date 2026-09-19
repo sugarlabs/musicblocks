@@ -1238,6 +1238,10 @@ describe("LegoWidget — Extended _filterSmallSegments coverage", () => {
         expect(legoWidget._filterSmallSegments([0, 1500, 2000])).toEqual([0, 2000]);
     });
 
+    it("should append the final boundary when only the start boundary was kept", () => {
+        expect(legoWidget._filterSmallSegments([0, 500, 3000])).toEqual([0, 3000]);
+    });
+
     it("should keep the final boundary when trailing small segments follow a kept one", () => {
         expect(legoWidget._filterSmallSegments([0, 1500, 3000, 3400])).toEqual([0, 1500, 3400]);
     });
