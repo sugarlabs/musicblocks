@@ -1,0 +1,159 @@
+name: Docker
+
+# Builds the container image and proves the built image actually serves
+# traffic.
+#
+# Why this exists: the Dockerfile has been in the tree since #3753 and
+# README.md documents `docker build` / `docker run` against it, but no
+# workflow has ever built it. A change that breaks the image — a dependency
+# that needs a compiler in the final stage, a file that stops being copied,
+# a port that moves — is currently found by whoever next builds it by hand.
+#
+# The smoke test hits /healthz, added in #7962 for exactly this purpose and
+# not currently exercised by anything. Asserting on its payload rather than
+# on "the container is running" means a container that boots but serves a
+# broken app still fails.
+#
+# Nothing is published. Pushing an image to a registry needs a decision about
+# where it should live and a token to match; this job only proves the image
+# builds and works, which is the prerequisite for that conversation.
+
+on:
+    push:
+        branches: [master]
+        paths:
+            - "dockerfile"
+            - ".dockerignore"
+            - "package.json"
+            - "package-lock.json"
+            - "index.js"
+            - ".github/workflows/docker.yml"
+    pull_request:
+        branches: [master]
+        paths:
+            - "dockerfile"
+            - ".dockerignore"
+            - "package.json"
+            - "package-lock.json"
+            - "index.js"
+            - ".github/workflows/docker.yml"
+    workflow_dispatch:
+
+# One in-flight run per PR / ref; newer pushes cancel older runs.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+# Least privilege: this job only reads the repository. It deliberately does
+# not push an image, so it needs no packages: write.
+permissions:
+    contents: read
+
+jobs:
+    build:
+        name: Build image and smoke-test the container
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            # Load into the local daemon rather than pushing, so the next step
+            # can actually run it. GitHub Actions cache keeps rebuilds cheap;
+            # a cold build of this image is a full `npm install`.
+            - name: Build image
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: ./dockerfile
+                  load: true
+                  push: false
+                  tags: musicblocks:ci
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
+
+            - name: Start the container
+              run: |
+                  docker run -d --name musicblocks-ci -p 3000:3000 musicblocks:ci
+                  echo "started"
+
+            # The image declares a HEALTHCHECK, so let Docker's own health
+            # state be the wait condition rather than sleeping a fixed amount.
+            # Falls back to polling the endpoint directly if the container
+            # reports no health state at all.
+            - name: Wait for the container to become healthy
+              run: |
+                  for i in $(seq 1 60); do
+                      status=$(docker inspect -f '{{.State.Health.Status}}' musicblocks-ci 2>/dev/null || echo "none")
+                      state=$(docker inspect -f '{{.State.Status}}' musicblocks-ci)
+
+                      if [ "$state" != "running" ]; then
+                          echo "container stopped early (state: $state)"
+                          exit 1
+                      fi
+
+                      case "$status" in
+                          healthy)
+                              echo "healthy after ${i}s"
+                              exit 0
+                              ;;
+                          unhealthy)
+                              echo "container reported unhealthy"
+                              exit 1
+                              ;;
+                          none)
+                              # No HEALTHCHECK in this image; poll instead.
+                              if curl -fsS http://localhost:3000/healthz >/dev/null 2>&1; then
+                                  echo "responding after ${i}s (no healthcheck declared)"
+                                  exit 0
+                              fi
+                              ;;
+                      esac
+                      sleep 1
+                  done
+                  echo "timed out after 60s"
+                  exit 1
+
+            # Assert on the payload, not just on a 200. A container that boots
+            # but serves the wrong build is still a failure worth catching, so
+            # the reported version has to match package.json.
+            - name: Check /healthz reports the version we built
+              run: |
+                  body=$(curl -fsS http://localhost:3000/healthz)
+                  echo "$body"
+
+                  status=$(echo "$body" | jq -r '.status')
+                  served=$(echo "$body" | jq -r '.version')
+                  expected=$(jq -r '.version' package.json)
+
+                  if [ "$status" != "ok" ]; then
+                      echo "status was '$status', expected 'ok'"
+                      exit 1
+                  fi
+                  if [ "$served" != "$expected" ]; then
+                      echo "served version '$served' != package.json version '$expected'"
+                      exit 1
+                  fi
+                  echo "ok — serving $served"
+
+            - name: Check the app itself is served, not just the health route
+              run: |
+                  code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/)
+                  if [ "$code" != "200" ]; then
+                      echo "GET / returned $code"
+                      exit 1
+                  fi
+                  echo "ok — / returned 200"
+
+            # Container logs are the only useful artefact when the steps above
+            # fail, and they are gone once the job ends.
+            - name: Container logs
+              if: failure()
+              run: docker logs musicblocks-ci || true
+
+            - name: Stop the container
+              if: always()
+              run: docker rm -f musicblocks-ci || true
