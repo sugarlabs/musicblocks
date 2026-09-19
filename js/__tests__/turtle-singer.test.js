@@ -69,6 +69,8 @@ global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
 const musicUtils = require("../utils/musicutils");
 global.keySignatureToMode = musicUtils.keySignatureToMode;
 global.getSavedCustomModes = musicUtils.getSavedCustomModes;
+global.SOLFEGENAMES1 = musicUtils.SOLFEGENAMES1;
+global.NOTENAMES1 = musicUtils.NOTENAMES1;
 global.last = array => (array && array.length > 0 ? array[array.length - 1] : null);
 global.deepClone = value => {
     if (typeof structuredClone === "function") {
@@ -1298,6 +1300,38 @@ describe("processNote playback path avoids discarded ratio computation", () => {
         // The ratio/fraction results were never consumed anywhere, so the
         // hot per-note path must not pay for computing them.
         expect(global.rationalToFraction).not.toHaveBeenCalled();
+    });
+
+    test.each([
+        ["sol𝄪", "G𝄪4"],
+        ["mi𝄫", "E𝄫4"]
+    ])("preserves %s through MusicXML staging", (pitch, expected) => {
+        const originalGetNote = global.getNote;
+        global.getNote = musicUtils.getNote;
+
+        turtleMock.singer.notePitches.mockBlk = [];
+        turtleMock.singer.noteOctaves.mockBlk = [];
+        turtleMock.singer.noteCents.mockBlk = [];
+        turtleMock.singer.noteHertz.mockBlk = [];
+        turtleMock.singer.noteBeatValues.mockBlk = [];
+        activityMock.logo.runningMxml = true;
+        activityMock.logo.notationMIDI = jest.fn();
+        activityMock.logo.updateNotation = jest.fn();
+
+        try {
+            Singer.processPitch(activityMock, pitch, 4, 0, 0, "pitchBlk");
+            Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        } finally {
+            global.getNote = originalGetNote;
+        }
+
+        expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(
+            [expected],
+            expect.any(Number),
+            0,
+            -1,
+            []
+        );
     });
 });
 

@@ -46,6 +46,7 @@ global.docById = jest.fn().mockReturnValue({
 });
 global.deepClone = value => JSON.parse(JSON.stringify(value));
 global.delayExecution = jest.fn().mockResolvedValue(undefined);
+global.announceToScreenReader = jest.fn();
 global.last = arr => (arr && arr.length > 0 ? arr[arr.length - 1] : undefined);
 global.nearestBeat = jest.fn(val => val);
 global.rationalToFraction = jest.fn(val => [1, Math.round(1 / val)]);

@@ -2263,7 +2263,14 @@ class Logo {
             }
         }
 
-        if (!currentBlock.isArgBlock()) {
+        // Value blocks that are not styled as arg blocks (note counter,
+        // calculate, make block) define arg() but no flow(). Clicking one on
+        // its own should show its value like any other value block.
+        const returnsValue =
+            currentBlock.isArgBlock() ||
+            (!(currentBlock.name in logo.evalFlowDict) && typeof proto.flow !== "function");
+
+        if (!returnsValue) {
             let res = null;
             // Is it a plugin?
             if (currentBlock.name in logo.evalFlowDict) {
