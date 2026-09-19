@@ -219,10 +219,10 @@ describe("Oscilloscope", () => {
             expect(osc.widgetWindow).toBe(mockWidgetWindow);
         });
 
-        test("adds two zoom buttons", () => {
+        test("adds three buttons (zoom in, zoom out, freeze)", () => {
             createOscilloscope();
 
-            expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(2);
+            expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(3);
         });
 
         test("calls sendToCenter", () => {
@@ -323,6 +323,18 @@ describe("Oscilloscope", () => {
             osc._stopAnimation();
 
             expect(cancelAnimationFrame).not.toHaveBeenCalled();
+        });
+
+        test("cancels _timeoutId when set", () => {
+            const osc = createOscilloscope();
+            osc._timeoutId = 555;
+            const clearSpy = jest.spyOn(global, "clearTimeout");
+
+            osc._stopAnimation();
+
+            expect(clearSpy).toHaveBeenCalledWith(555);
+            expect(osc._timeoutId).toBeNull();
+            clearSpy.mockRestore();
         });
 
         test("cancels per-turtle drawVisualIDs", () => {
@@ -515,6 +527,16 @@ describe("Oscilloscope", () => {
             osc.close();
 
             expect(removeSpy).toHaveBeenCalledWith("visibilitychange", osc._handleVisibilityChange);
+            removeSpy.mockRestore();
+        });
+
+        test("removes keydown event listener", () => {
+            const removeSpy = jest.spyOn(document, "removeEventListener");
+            const osc = createOscilloscope();
+
+            osc.close();
+
+            expect(removeSpy).toHaveBeenCalledWith("keydown", osc._keyHandler);
             removeSpy.mockRestore();
         });
     });
@@ -937,32 +959,35 @@ describe("Oscilloscope", () => {
     });
 
     describe("_renderFrame", () => {
-        test("skips entry when no analyser exists", () => {
+        test("draws entry by automatically creating analyser if none exists", () => {
             const osc = createOscilloscope();
             const ctx = makeCtx();
             osc._canvasState[0] = {
                 canvasCtx: ctx,
                 width: 400,
                 height: 200,
-                turtle: { running: true, painter: { _canvasColor: "#f00" } },
+                turtle: { painter: { _canvasColor: "#f00" } },
                 turtleIdx: 0,
                 resizedOnce: false
             };
-            osc.pitchAnalysers = {};
+            osc.pitchAnalysers = {}; // Start empty
 
             osc._renderFrame();
 
-            expect(ctx.fillRect).not.toHaveBeenCalled();
+            // It should have created the analyser and drawn
+            expect(osc.pitchAnalysers[0]).toBeDefined();
+            expect(ctx.fillRect).toHaveBeenCalled();
         });
 
-        test("skips when turtle not running and resizedOnce is false", () => {
+        test("draws using reconnected analyser data when not frozen", () => {
             const osc = createOscilloscope();
+            osc.reconnectSynthsToAnalyser = jest.fn();
             const ctx = makeCtx();
             osc._canvasState[0] = {
                 canvasCtx: ctx,
                 width: 400,
                 height: 200,
-                turtle: { running: false, painter: { _canvasColor: "#f00" } },
+                turtle: { painter: { _canvasColor: "#0f0" } },
                 turtleIdx: 0,
                 resizedOnce: false
             };
@@ -970,44 +995,46 @@ describe("Oscilloscope", () => {
 
             osc._renderFrame();
 
-            expect(ctx.fillRect).not.toHaveBeenCalled();
+            expect(osc.reconnectSynthsToAnalyser).toHaveBeenCalledWith(0);
+            expect(ctx.fillRect).toHaveBeenCalled();
+            expect(ctx.stroke).toHaveBeenCalled();
+            expect(osc._frozenWaveforms[0]).toBeInstanceOf(Float32Array);
         });
 
-        test("draws when turtle is running", () => {
+        test("skips when frozen and no cached waveform exists", () => {
             const osc = createOscilloscope();
+            osc.isFrozen = true;
             const ctx = makeCtx();
             osc._canvasState[0] = {
                 canvasCtx: ctx,
                 width: 400,
                 height: 200,
-                turtle: { running: true, painter: { _canvasColor: "#0f0" } },
-                turtleIdx: 0,
-                resizedOnce: false
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0
             };
-            osc.pitchAnalysers[0] = { getValue: jest.fn(() => new Float32Array(128)) };
+
+            osc._renderFrame();
+
+            expect(ctx.fillRect).not.toHaveBeenCalled();
+        });
+
+        test("draws using cached waveform when frozen", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = true;
+            const ctx = makeCtx();
+            osc._canvasState[0] = {
+                canvasCtx: ctx,
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0
+            };
+            osc._frozenWaveforms[0] = new Float32Array(128);
 
             osc._renderFrame();
 
             expect(ctx.fillRect).toHaveBeenCalled();
             expect(ctx.stroke).toHaveBeenCalled();
-        });
-
-        test("draws when resizedOnce is true even if turtle not running", () => {
-            const osc = createOscilloscope();
-            const ctx = makeCtx();
-            osc._canvasState[0] = {
-                canvasCtx: ctx,
-                width: 400,
-                height: 200,
-                turtle: { running: false, painter: { _canvasColor: "#00f" } },
-                turtleIdx: 0,
-                resizedOnce: true
-            };
-            osc.pitchAnalysers[0] = { getValue: jest.fn(() => new Float32Array(128)) };
-
-            osc._renderFrame();
-
-            expect(ctx.fillRect).toHaveBeenCalled();
         });
 
         test("resets resizedOnce to false after drawing", () => {
@@ -1017,7 +1044,7 @@ describe("Oscilloscope", () => {
                 canvasCtx: ctx,
                 width: 400,
                 height: 200,
-                turtle: { running: true, painter: { _canvasColor: "#000" } },
+                turtle: { painter: { _canvasColor: "#000" } },
                 turtleIdx: 0,
                 resizedOnce: true
             };
@@ -1098,6 +1125,22 @@ describe("Oscilloscope", () => {
             renderSpy.mockRestore();
         });
 
+        test("only calls _renderFrame and not _startAnimation when isFrozen is true", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            osc.isFrozen = true;
+            osc._running = false;
+            const startSpy = jest.spyOn(osc, "_startAnimation");
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+
+            osc._scale();
+
+            expect(startSpy).not.toHaveBeenCalled();
+            expect(renderSpy).toHaveBeenCalled();
+            startSpy.mockRestore();
+            renderSpy.mockRestore();
+        });
+
         test("stops animation when no divisions", () => {
             const osc = createOscilloscope([]);
             osc._running = true;
@@ -1146,6 +1189,368 @@ describe("Oscilloscope", () => {
                 true
             );
             makeCanvasSpy.mockRestore();
+        });
+    });
+
+    describe("toggleFreeze and _updateFreezeButton", () => {
+        test("toggles isFrozen from false to true, updates button, and stops animation loop", () => {
+            const osc = createOscilloscope();
+            const stopSpy = jest.spyOn(osc, "_stopAnimation");
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+            expect(osc.isFrozen).toBe(false);
+
+            osc.toggleFreeze();
+
+            expect(osc.isFrozen).toBe(true);
+            expect(stopSpy).toHaveBeenCalled();
+            expect(renderSpy).toHaveBeenCalled();
+            expect(osc.freezeButton.children[0].src).toContain("header-icons/play-button.svg");
+            expect(osc.freezeButton.title).toBe("Resume");
+            expect(osc.freezeButton.getAttribute("aria-label")).toBe("Resume");
+            stopSpy.mockRestore();
+            renderSpy.mockRestore();
+        });
+
+        test("toggles isFrozen from true to false, updates button, and starts animation if divisions exist", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            osc.isFrozen = true;
+            const startSpy = jest.spyOn(osc, "_startAnimation");
+
+            osc.toggleFreeze();
+
+            expect(osc.isFrozen).toBe(false);
+            expect(osc.freezeButton.children[0].src).toContain("header-icons/pause-button.svg");
+            expect(osc.freezeButton.title).toBe("Freeze");
+            expect(osc.freezeButton.getAttribute("aria-label")).toBe("Freeze");
+            expect(startSpy).toHaveBeenCalled();
+            startSpy.mockRestore();
+        });
+
+        test("does not start animation when unfreezing if divisions is empty", () => {
+            const osc = createOscilloscope([]);
+            osc.isFrozen = true;
+            const startSpy = jest.spyOn(osc, "_startAnimation");
+
+            osc.toggleFreeze();
+
+            expect(osc.isFrozen).toBe(false);
+            expect(startSpy).not.toHaveBeenCalled();
+            startSpy.mockRestore();
+        });
+
+        test("handles null freezeButton in _updateFreezeButton gracefully", () => {
+            const osc = createOscilloscope();
+            osc.freezeButton = null;
+
+            expect(() => osc._updateFreezeButton()).not.toThrow();
+        });
+    });
+
+    describe("_keyHandler", () => {
+        test("toggles freeze and prevents default when Space is pressed on focused widget", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(toggleSpy).toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores repeated keydown events (e.repeat is true)", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: true,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores Ctrl-modified keys like Ctrl+Space", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: true,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores Meta-modified keys like Meta+Space", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: true,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores Alt-modified keys like Alt+Space", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: true,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores events when widget is not focused", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = null;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores events when active element is INPUT", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            input.focus();
+
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            document.body.removeChild(input);
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores events when active element is TEXTAREA", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const textarea = document.createElement("textarea");
+            document.body.appendChild(textarea);
+            textarea.focus();
+
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            document.body.removeChild(textarea);
+            toggleSpy.mockRestore();
+        });
+
+        test("ignores events when active element is contentEditable", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const div = document.createElement("div");
+            Object.defineProperty(div, "isContentEditable", { value: true, configurable: true });
+            const origActiveElement = document.activeElement;
+            Object.defineProperty(document, "activeElement", {
+                value: div,
+                configurable: true
+            });
+
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+
+            Object.defineProperty(document, "activeElement", {
+                value: origActiveElement,
+                configurable: true
+            });
+            toggleSpy.mockRestore();
+        });
+
+        test("returns early if widgetWindow is null", () => {
+            const osc = createOscilloscope();
+            osc.widgetWindow = null;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "Space",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+
+        test("does nothing for unrelated keys", () => {
+            const osc = createOscilloscope();
+            window.widgetWindows.focused = osc.widgetWindow;
+            const toggleSpy = jest.spyOn(osc, "toggleFreeze");
+            const event = {
+                code: "KeyA",
+                repeat: false,
+                ctrlKey: false,
+                metaKey: false,
+                altKey: false,
+                preventDefault: jest.fn()
+            };
+
+            osc._keyHandler(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(toggleSpy).not.toHaveBeenCalled();
+            toggleSpy.mockRestore();
+        });
+    });
+
+    describe("toolbar buttons click handlers", () => {
+        test("zoomInButton multiplies zoomFactor and triggers _renderFrame when frozen", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = true;
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+            const initialZoom = osc.zoomFactor;
+
+            const zoomInBtn = mockWidgetWindow.addButton.mock.results[0].value;
+            zoomInBtn.onclick();
+
+            expect(osc.zoomFactor).toBeCloseTo(initialZoom * 1.333);
+            expect(renderSpy).toHaveBeenCalled();
+            renderSpy.mockRestore();
+        });
+
+        test("zoomInButton does not call _renderFrame when not frozen", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = false;
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+
+            const zoomInBtn = mockWidgetWindow.addButton.mock.results[0].value;
+            zoomInBtn.onclick();
+
+            expect(renderSpy).not.toHaveBeenCalled();
+            renderSpy.mockRestore();
+        });
+
+        test("zoomOutButton divides zoomFactor and triggers _renderFrame when frozen", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = true;
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+            const initialZoom = osc.zoomFactor;
+
+            const zoomOutBtn = mockWidgetWindow.addButton.mock.results[1].value;
+            zoomOutBtn.onclick();
+
+            expect(osc.zoomFactor).toBeCloseTo(initialZoom / 1.333);
+            expect(renderSpy).toHaveBeenCalled();
+            renderSpy.mockRestore();
+        });
+
+        test("zoomOutButton clamps zoomFactor to minimum 1", () => {
+            const osc = createOscilloscope();
+            osc.zoomFactor = 0.5;
+
+            const zoomOutBtn = mockWidgetWindow.addButton.mock.results[1].value;
+            zoomOutBtn.onclick();
+
+            expect(osc.zoomFactor).toBe(1);
+        });
+
+        test("freezeButton onclick calls toggleFreeze", () => {
+            const osc = createOscilloscope();
+            expect(osc.isFrozen).toBe(false);
+
+            const freezeBtn = mockWidgetWindow.addButton.mock.results[2].value;
+            freezeBtn.onclick();
+
+            expect(osc.isFrozen).toBe(true);
         });
     });
 });

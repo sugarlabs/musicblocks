@@ -2511,6 +2511,8 @@ plays.
 A separate wave will be displayed for each mouse.
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725883406989554&run=True)
 
+You can freeze the live waveform for detailed visual analysis by clicking the **Pause/Freeze** button in the widget toolbar (or by pressing `Space` when the widget is active). While frozen, you can use the **Zoom In** and **Zoom Out** buttons to inspect the waveform. Click the **Play/Resume** button (or press `Space` again) to resume live monitoring.
+
 ###  <a name="sampler">4.14 The Sampler</a>
 
 ![widget](../documentation/sampler_block.svg "Sampler")
