@@ -381,11 +381,19 @@ class ToolbarUI {
         const advancedMode = docById("advancedMode");
         if (this.activity.beginnerMode) {
             // || mode === "null") {
-            advancedMode.style.display = "block";
-            beginnerMode.style.display = "none";
+            if (advancedMode) {
+                advancedMode.style.display = "block";
+            }
+            if (beginnerMode) {
+                beginnerMode.style.display = "none";
+            }
         } else {
-            advancedMode.style.display = "none";
-            beginnerMode.style.display = "block";
+            if (advancedMode) {
+                advancedMode.style.display = "none";
+            }
+            if (beginnerMode) {
+                beginnerMode.style.display = "block";
+            }
         }
 
         for (let i = 0; i < strings.length; i++) {
