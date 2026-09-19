@@ -1107,17 +1107,25 @@ describe("TemperamentWidget basic tests", () => {
                 jest.useRealTimers();
             });
 
-            test("plays the octave once when frequencies include the octave entry", () => {
-                widget.frequencies = ["100", "125", "150", "200"];
+            test("12EDO: plays 25 notes with the octave exactly once", () => {
+                widget.pitchNumber = 12;
+                widget.frequencies = Array.from({ length: 13 }, (_, i) =>
+                    (261.63 * Math.pow(2, i / 12)).toFixed(2)
+                );
 
                 widget.playAll();
                 jest.runAllTimers();
 
-                expect(playedFrequencies()).toEqual([100, 125, 150, 200, 150, 125, 100]);
+                const freqs = playedFrequencies();
+                expect(freqs).toHaveLength(25);
+                expect(freqs.filter(f => f === 261.63 * 2)).toHaveLength(1);
             });
 
-            test("plays the octave once when frequencies omit the octave entry", () => {
-                widget.frequencies = ["100", "125", "150"];
+            test.each([
+                ["include", ["100", "125", "150", "200"]],
+                ["omit", ["100", "125", "150"]]
+            ])("plays the octave once when frequencies %s the octave entry", (_, frequencies) => {
+                widget.frequencies = frequencies;
 
                 widget.playAll();
                 jest.runAllTimers();
