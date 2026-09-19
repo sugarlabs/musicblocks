@@ -191,10 +191,10 @@ describe("Activity Toolbar Integration", () => {
             expect(activity.toolbar.resetStop).toHaveBeenCalled();
         });
 
-        test("announces program stopped to screen readers", () => {
+        test("shows the stopped notification for two seconds", () => {
             activity.onStopTurtle();
 
-            expect(activity.textMsg).toHaveBeenCalledWith("Program stopped.");
+            expect(activity.textMsg).toHaveBeenCalledWith("Program stopped.", 2000);
         });
     });
 
@@ -202,7 +202,7 @@ describe("Activity Toolbar Integration", () => {
         test("announces program running to screen readers", () => {
             activity.onRunTurtle();
 
-            expect(activity.textMsg).toHaveBeenCalledWith("Program running.");
+            expect(activity.textMsg).toHaveBeenCalledWith("Program running.", 2000);
         });
     });
 
