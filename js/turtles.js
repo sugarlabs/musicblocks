@@ -894,11 +894,6 @@ Turtles.TurtlesView = class {
             canvas.style.backgroundColor = this._backgroundColor;
         }
 
-        // Also update body background if available
-        if (typeof document !== "undefined") {
-            document.body.style.backgroundColor = this._backgroundColor;
-        }
-
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
 
