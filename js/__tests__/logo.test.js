@@ -1308,17 +1308,23 @@ describe("Logo runLogoCommands", () => {
         // With the start block trashed, clicking a lone stack adds a fresh
         // turtle. It must exist before prepSynths() runs, or its first note
         // has no instrument to play on.
-        const order = [];
+        const newTurtle = createMockTurtle();
+        const seenByPrepSynths = [];
         mockActivity.turtles.turtleCount = jest.fn(() => 0);
-        mockActivity.turtles.addTurtle = jest.fn(() => order.push("addTurtle"));
-        logo.prepSynths = jest.fn(() => order.push("prepSynths"));
+        mockActivity.turtles.addTurtle = jest.fn(() => {
+            mockActivity.turtles.turtleList.push(newTurtle);
+        });
+        logo.prepSynths = jest.fn(() => {
+            seenByPrepSynths.push(...mockActivity.turtles.turtleList);
+        });
         logo._restoreConnections = jest.fn();
         logo.runFromBlock = jest.fn();
         logo.blockList = [{ name: "newnote", trash: false, connections: [null] }];
 
         logo.runLogoCommands(0, null);
 
-        expect(order).toEqual(["addTurtle", "prepSynths"]);
+        expect(mockActivity.turtles.addTurtle).toHaveBeenCalledTimes(1);
+        expect(seenByPrepSynths).toContain(newTurtle);
     });
 
     describe("the Stop button is shown however a project is started", () => {
