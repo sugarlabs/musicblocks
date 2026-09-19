@@ -66,8 +66,6 @@ describe("AIDebuggerWidget", () => {
             const debuggerWidget = new AIDebuggerWidget();
             debuggerWidget._lifecycle.mount();
             debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
-            debuggerWidget._lifecycle.mount();
-            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             const id1 = debuggerWidget._generateConversationId();
             const id2 = debuggerWidget._generateConversationId();
 
@@ -77,8 +75,6 @@ describe("AIDebuggerWidget", () => {
 
         test("_isProcessing starts as false", () => {
             const debuggerWidget = new AIDebuggerWidget();
-            debuggerWidget._lifecycle.mount();
-            debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             debuggerWidget._lifecycle.mount();
             debuggerWidget.widgetWindow = debuggerWidget.widgetWindow || {};
             expect(debuggerWidget._isProcessing).toBe(false);
