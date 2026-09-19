@@ -1092,6 +1092,40 @@ describe("TemperamentWidget basic tests", () => {
             expect(widget.ratios[14]).toBeCloseTo(Math.pow(2, 14 / 15), 10);
         });
 
+        describe("playAll", () => {
+            const playedFrequencies = () =>
+                mockActivity.logo.synth.trigger.mock.calls.map(call => call[1]);
+
+            beforeEach(() => {
+                jest.useFakeTimers();
+                mockActivity.logo.synth.trigger.mockClear();
+                widget.pitchNumber = 3;
+                widget.powerBase = 2;
+            });
+
+            afterEach(() => {
+                jest.useRealTimers();
+            });
+
+            test("plays the octave once when frequencies include the octave entry", () => {
+                widget.frequencies = ["100", "125", "150", "200"];
+
+                widget.playAll();
+                jest.runAllTimers();
+
+                expect(playedFrequencies()).toEqual([100, 125, 150, 200, 150, 125, 100]);
+            });
+
+            test("plays the octave once when frequencies omit the octave entry", () => {
+                widget.frequencies = ["100", "125", "150"];
+
+                widget.playAll();
+                jest.runAllTimers();
+
+                expect(playedFrequencies()).toEqual([100, 125, 150, 200, 150, 125, 100]);
+            });
+        });
+
         test("custom transition resets typeOfEdit so save emits ratio blocks", () => {
             global.getTemperamentKeys = jest.fn(() => ["equal"]);
             widget.activity = { errorMsg: jest.fn() };
