@@ -352,14 +352,14 @@ describe("SearchUI.setupMainAutocomplete", () => {
         ui.setupMainAutocomplete(() => [], selectCb, jest.fn());
 
         const item = { label: "drum", value: "drum-id", specialDict: { name: "drum" } };
-        const event = { preventDefault: jest.fn(), keyCode: 0 };
+        const event = { preventDefault: jest.fn(), key: "" };
         $elem._capturedOpts.select(event, { item });
 
         expect(event.preventDefault).toHaveBeenCalled();
         expect(activity.searchWidget.value).toBe("drum");
         expect(activity.searchWidget.idInput_custom).toBe("drum-id");
         expect(activity.searchWidget.protoblk).toBe(item.specialDict);
-        expect(selectCb).toHaveBeenCalledWith(item, 0);
+        expect(selectCb).toHaveBeenCalledWith(item, "");
     });
 
     test("focus callback calls event.preventDefault", () => {
