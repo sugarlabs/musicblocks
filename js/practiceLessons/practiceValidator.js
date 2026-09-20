@@ -42,8 +42,52 @@ const LOOP_BODY_CONNECTION = new Map([
     ["repeat", 2],
     ["forever", 1]
 ]);
-// A signal ring counts as built once the conductor and at least three drum mice exist.
-const RING_MOUSE_MINIMUM = 4;
+// A ring passes the beat once the conductor has two mice to call.
+const RING_MOUSE_MINIMUM = 3;
+// A polygon closes whichever way the child turns, so both turn blocks count.
+const POLYGON_TURN_BLOCKS = ["right", "left"];
+// A child types a whole number, so the turn only has to land near 360 over the sides.
+const POLYGON_TURN_TOLERANCE = 1;
+// The palette offers "on every note do" and "on every beat do"; either drives the animation.
+const EVERY_NOTE_BLOCKS = ["everybeatdo", "everybeatdonew"];
+// Any block that reports how long a note lasted can steer motion from the rhythm.
+const NOTE_VALUE_BLOCKS = [
+    "mynotevalue",
+    "turtlenote2",
+    "turtleelapsednotes",
+    "turtlelapsednotes",
+    "elapsednotes",
+    "elapsednotes2",
+    "notecounter",
+    "notecounter2",
+    "beatvalue",
+    "measurevalue"
+];
+// Any block that names a note gives a rhythm a singing voice instead of a drum.
+const PITCH_VOICE_BLOCKS = [
+    "pitch",
+    "settimbre",
+    "notename",
+    "scaledegree2",
+    "nthmodalpitch",
+    "hertz",
+    "steppitch"
+];
+// Any block that changes the heading counts as moving with the beat.
+const TURN_BLOCKS = ["right", "left", "setheading", "arc"];
+// Any block that shifts a part somewhere else counts as moving the song.
+const TRANSPOSE_BLOCKS = [
+    "settransposition",
+    "setscalartransposition",
+    "setratio",
+    "octave",
+    "invert",
+    "invert1"
+];
+// Any percussion block counts as giving a mouse a sound to answer with.
+const DRUM_BLOCKS = ["playdrum", "setdrum", "playnoise"];
+// Subtracting from one or counting modulo two both flip a box between 0 and 1.
+const TOGGLE_ARITHMETIC_BLOCKS = ["minus", "mod"];
 // The three phrases Phrase Maker exports for Twinkle Twinkle, in solfege at octave 4.
 const TWINKLE_SECTIONS = new Map([
     ["A1", ["do4", "do4", "sol4", "sol4", "la4", "la4", "sol4"]],
@@ -169,12 +213,7 @@ const PracticeValidator = {
             case "changedOctave":
                 return this.hasChangedPitchOctave(problem.expected?.octaves);
             case "usedTranspose":
-                return this.hasConnectedBlockNamed([
-                    "settransposition",
-                    "setscalartransposition",
-                    "setratio",
-                    "octave"
-                ]);
+                return this.hasConnectedBlockNamed(TRANSPOSE_BLOCKS);
             case "createdVariation":
                 return this.hasCreatedVariation(problem.expected?.pattern);
             case "changedRhythmLength":
@@ -205,24 +244,19 @@ const PracticeValidator = {
             case "usedAvatarAnimation":
                 return this.hasConnectedBlockNamed(["turtleshell"]);
             case "usedEveryNoteAction":
-                return this.hasConnectedBlockNamed(["everybeatdo"]);
+                return this.hasConnectedBlockNamed(EVERY_NOTE_BLOCKS);
             case "usedNoteValueMotion":
-                return this.hasConnectedBlockNamed([
-                    "turtlenote",
-                    "turtlenote2",
-                    "turtleelapsednotes",
-                    "elapsednotes"
-                ]);
+                return this.hasConnectedBlockNamed(NOTE_VALUE_BLOCKS);
             case "createdPitchPolyrhythm":
-                return this.hasConnectedBlockNamed(["pitch", "settimbre"]);
+                return this.hasConnectedBlockNamed(PITCH_VOICE_BLOCKS);
             case "changedAnimationTurn":
-                return this.hasConnectedBlockNamed(["right", "left", "setheading"]);
+                return this.hasConnectedBlockNamed(TURN_BLOCKS);
             case "completeCircularRhythmRing":
                 return this.validateCircularRhythmRing();
             case "usedOneMinusToggle":
                 return this.hasToggleStore();
             case "playedRingDrum":
-                return this.hasConnectedBlockNamed(["playdrum", "setdrum"]);
+                return this.hasConnectedBlockNamed(DRUM_BLOCKS);
             case "builtMouseRing":
                 return this.countStartBlocks() >= RING_MOUSE_MINIMUM;
             case "readBoxValue":
@@ -524,7 +558,7 @@ const PracticeValidator = {
     validateAnimatedPolyrhythm() {
         return (
             this.hasRhythmDivisors(new Set([2, 3])) &&
-            this.hasConnectedBlockNamed(["everybeatdo"]) &&
+            this.hasConnectedBlockNamed(EVERY_NOTE_BLOCKS) &&
             this.hasConnectedBlockNamed(["turtleshell"])
         );
     },
@@ -564,7 +598,7 @@ const PracticeValidator = {
 
     hasToggleStore() {
         const blockList = this.getBlockList();
-        const minusBlock = new Set(["minus"]);
+        const toggleBlocks = new Set(TOGGLE_ARITHMETIC_BLOCKS);
 
         return Object.values(blockList).some(block => {
             if (!block || block.trash) return false;
@@ -572,7 +606,7 @@ const PracticeValidator = {
             const valueId = this.getStoreValueId(block);
             if (valueId === null || valueId === undefined) return false;
 
-            return this.argTreeContainsNamed(valueId, blockList, minusBlock);
+            return this.argTreeContainsNamed(valueId, blockList, toggleBlocks);
         });
     },
 
@@ -797,7 +831,11 @@ const PracticeValidator = {
             if (block.name === "repeat") {
                 const repeatCount = this.getNumericValue(block.connections?.[1], blockList);
                 const bodyId = block.connections?.[2];
-                const turnAngle = this.getFirstBlockArgumentValue(bodyId, blockList, "right");
+                const turnAngle = this.getFirstBlockArgumentValue(
+                    bodyId,
+                    blockList,
+                    POLYGON_TURN_BLOCKS
+                );
                 const hasForward = this.flowContainsBlockNamed(bodyId, blockList, ["forward"]);
 
                 if (hasForward && repeatCount && this.isPolygonTurn(repeatCount, turnAngle)) {
@@ -815,10 +853,11 @@ const PracticeValidator = {
     isPolygonTurn(sides, angle) {
         if (!sides || !angle) return false;
 
-        return Math.abs(360 / sides - angle) < 0.001;
+        return Math.abs(360 / sides - angle) <= POLYGON_TURN_TOLERANCE;
     },
 
-    getFirstBlockArgumentValue(blockId, blockList, name) {
+    getFirstBlockArgumentValue(blockId, blockList, names) {
+        const blockNames = new Set(names);
         let currentId = this.unwrapHiddenFlow(blockId, blockList);
         let guard = 0;
 
@@ -826,7 +865,7 @@ const PracticeValidator = {
             const block = blockList[currentId];
             if (!block || block.trash) return null;
 
-            if (block.name === name) {
+            if (blockNames.has(block.name)) {
                 return this.getNumericValue(block.connections?.[1], blockList);
             }
 
@@ -837,23 +876,47 @@ const PracticeValidator = {
         return null;
     },
 
-    getNumericValue(blockId, blockList) {
+    getNumericValue(blockId, blockList, seen = new Set()) {
         const block = blockList[blockId];
-        if (!block || block.trash) return null;
+        if (!block || block.trash || seen.has(blockId)) return null;
+
+        seen.add(blockId);
 
         if (block.name === "number") {
             return Number(block.value);
         }
 
         if (block.name === "divide") {
-            const numerator = this.getNumericValue(block.connections?.[1], blockList);
-            const denominator = this.getNumericValue(block.connections?.[2], blockList);
+            const numerator = this.getNumericValue(block.connections?.[1], blockList, seen);
+            const denominator = this.getNumericValue(block.connections?.[2], blockList, seen);
             if (!denominator) return null;
 
             return numerator / denominator;
         }
 
+        if (block.name === "namedbox") {
+            return this.getNumericValue(this.getBoxValueId(block, blockList), blockList, seen);
+        }
+
         return Number.isFinite(Number(block.value)) ? Number(block.value) : null;
+    },
+
+    getBoxValueId(readBlock, blockList) {
+        const boxName = readBlock.value ?? readBlock.privateData;
+        if (!boxName) return null;
+
+        const store = Object.values(blockList).find(
+            block => block && !block.trash && this.getStoreBoxName(block, blockList) === boxName
+        );
+
+        return store ? this.getStoreValueId(store) : null;
+    },
+
+    getStoreBoxName(block, blockList) {
+        if (block.name === "storein") return blockList[block.connections?.[1]]?.value ?? null;
+        if (block.name === "storein2") return block.privateData ?? block.value ?? null;
+
+        return null;
     },
 
     validatePhraseMakerLesson(problem) {

@@ -243,6 +243,12 @@ A prose card opens a written explanation instead:
 These buttons only explain an idea.
 They award nothing on their own; the matching badge is earned by the criterion, not by opening the card.
 
+Write one card per hidden badge, and label it with the action a learner should go and try rather than the name of a block.
+A card for something the mission already requires turns the list into a glossary, which is what these buttons are not for.
+
+Word a card as an example and not as a recipe, and keep the criterion wide enough to match.
+A learner who reads "change it to 5" and tries 7 instead has explored exactly as intended, so the badge has to fire for 7 as well; a criterion that only recognises the one value named in the hint turns a discovery into a dictation exercise.
+
 ## Explorer Journal
 
 Completing a lesson calls `ensureJournalPage()`, which creates a page seeded from the lesson's `journal` block.

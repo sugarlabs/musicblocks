@@ -22,28 +22,69 @@
 
 const { PracticeValidator } = require("../practiceValidator");
 
-function makePolygonStack(startId, repeatId, sideCount, turnBlock) {
+function makePolygonStack(startId, repeatId, sideCount, turnBlock, turnName = "right") {
     const numberId = `${repeatId}-count`;
     const forwardId = `${repeatId}-forward`;
     const forwardNumberId = `${repeatId}-forward-number`;
     const rightId = `${repeatId}-right`;
+    const count =
+        typeof sideCount === "object"
+            ? sideCount
+            : {
+                  id: numberId,
+                  blocks: {
+                      [numberId]: {
+                          name: "number",
+                          value: sideCount,
+                          trash: false,
+                          connections: [repeatId]
+                      }
+                  }
+              };
 
     return {
         [startId]: { name: "start", trash: false, connections: [null, repeatId, null] },
         [repeatId]: {
             name: "repeat",
             trash: false,
-            connections: [startId, numberId, forwardId, null]
+            connections: [startId, count.id, forwardId, null]
         },
-        [numberId]: { name: "number", value: sideCount, trash: false, connections: [repeatId] },
+        ...count.blocks,
         [forwardId]: {
             name: "forward",
             trash: false,
             connections: [repeatId, forwardNumberId, rightId]
         },
         [forwardNumberId]: { name: "number", value: 100, trash: false, connections: [forwardId] },
-        [rightId]: { name: "right", trash: false, connections: [forwardId, turnBlock.id, null] },
+        [rightId]: { name: turnName, trash: false, connections: [forwardId, turnBlock.id, null] },
         ...turnBlock.blocks
+    };
+}
+
+// A number the child parked in a box with Store in, then read back with a box block.
+function boxedNumber(id, boxName, value) {
+    return {
+        id,
+        blocks: {
+            [id]: { name: "namedbox", value: boxName, trash: false, connections: [] },
+            [`${id}-store`]: {
+                name: "storein",
+                trash: false,
+                connections: [null, `${id}-store-name`, `${id}-store-value`, null]
+            },
+            [`${id}-store-name`]: {
+                name: "text",
+                value: boxName,
+                trash: false,
+                connections: [`${id}-store`]
+            },
+            [`${id}-store-value`]: {
+                name: "number",
+                value,
+                trash: false,
+                connections: [`${id}-store`]
+            }
+        }
     };
 }
 
@@ -140,6 +181,45 @@ describe("PracticeValidator geometry levels", () => {
                 "repeat-pentagon",
                 5,
                 dividedTurn("turn-pentagon", 5)
+            )
+        };
+
+        window.ActivityContext.getActivity.mockReturnValue({ blocks: { blockList } });
+
+        expect(PracticeValidator.validate({ expected: { basicShapeSet: true } })).toBe(true);
+    });
+
+    test("accepts shapes drawn with left turns", () => {
+        const blockList = {
+            ...makePolygonStack("s3", "r3", 3, numberTurn("t3", 120), "left"),
+            ...makePolygonStack("s4", "r4", 4, numberTurn("t4", 90), "left"),
+            ...makePolygonStack("s5", "r5", 5, numberTurn("t5", 72), "left")
+        };
+
+        window.ActivityContext.getActivity.mockReturnValue({ blocks: { blockList } });
+
+        expect(PracticeValidator.validate({ expected: { basicShapeSet: true } })).toBe(true);
+    });
+
+    test("reads the side count and the turn back out of a box", () => {
+        const blockList = {
+            ...makePolygonStack(
+                "s3",
+                "r3",
+                boxedNumber("b3", "sides3", 3),
+                boxedNumber("a3", "angle3", 120)
+            ),
+            ...makePolygonStack(
+                "s4",
+                "r4",
+                boxedNumber("b4", "sides4", 4),
+                boxedNumber("a4", "angle4", 90)
+            ),
+            ...makePolygonStack(
+                "s5",
+                "r5",
+                boxedNumber("b5", "sides5", 5),
+                boxedNumber("a5", "angle5", 72)
             )
         };
 
@@ -659,6 +739,18 @@ describe("PracticeValidator animated polyrhythm", () => {
         expect(PracticeValidator.validate({ expected: { animatedPolyrhythm: true } })).toBe(false);
     });
 
+    test("accepts on every beat do in place of on every note do", () => {
+        useBlocks({
+            ...makeRhythmBlock("duplet", 2),
+            ...makeRhythmBlock("triplet", 3),
+            start: { name: "start", trash: false, connections: [null, "every", null] },
+            every: { name: "everybeatdonew", trash: false, connections: ["start", null, "shell"] },
+            shell: { name: "turtleshell", trash: false, connections: ["every", null, null, null] }
+        });
+
+        expect(PracticeValidator.validate({ expected: { animatedPolyrhythm: true } })).toBe(true);
+    });
+
     test("needs both rhythms, not just one", () => {
         useBlocks({
             ...makeRhythmBlock("duplet", 2),
@@ -707,7 +799,7 @@ describe("PracticeValidator badge criteria that look for one block", () => {
         ["changedShapeColor", "setcolor"],
         ["usedAvatarAnimation", "turtleshell"],
         ["usedEveryNoteAction", "everybeatdo"],
-        ["usedNoteValueMotion", "turtlenote"],
+        ["usedNoteValueMotion", "mynotevalue"],
         ["createdPitchPolyrhythm", "pitch"],
         ["changedAnimationTurn", "right"],
         ["playedRingDrum", "playdrum"]
@@ -728,7 +820,7 @@ describe("PracticeValidator badge criteria that look for one block", () => {
         expect(PracticeValidator.hasBadgeEvidence({}, criterion)).toBe(false);
     });
 
-    test("builtMouseRing needs four mice", () => {
+    test("builtMouseRing needs the conductor and two mice", () => {
         const mice = count =>
             Object.fromEntries(
                 Array.from({ length: count }, (unused, index) => [
@@ -737,10 +829,10 @@ describe("PracticeValidator badge criteria that look for one block", () => {
                 ])
             );
 
-        useBlocks(mice(3));
+        useBlocks(mice(2));
         expect(PracticeValidator.hasBadgeEvidence({}, "builtMouseRing")).toBe(false);
 
-        useBlocks(mice(4));
+        useBlocks(mice(3));
         expect(PracticeValidator.hasBadgeEvidence({}, "builtMouseRing")).toBe(true);
     });
 
@@ -1011,5 +1103,75 @@ describe("PracticeValidator piano discoveries", () => {
 
         expect(PracticeValidator.hasBadgeEvidence({}, "spacedTheKeys")).toBe(false);
         expect(PracticeValidator.hasBadgeEvidence({}, "namedTheKeys")).toBe(false);
+    });
+});
+
+describe("PracticeValidator extra actions accept more than the one idea the hint names", () => {
+    const connected = name => ({
+        start: { name: "start", trash: false, connections: [null, "target", null] },
+        target: { name, trash: false, connections: ["start", null, null] }
+    });
+
+    test.each([
+        ["usedNoteValueMotion", "mynotevalue"],
+        ["usedNoteValueMotion", "elapsednotes2"],
+        ["usedNoteValueMotion", "notecounter"],
+        ["usedNoteValueMotion", "beatvalue"],
+        ["createdPitchPolyrhythm", "notename"],
+        ["createdPitchPolyrhythm", "scaledegree2"],
+        ["changedAnimationTurn", "arc"],
+        ["usedTranspose", "invert"],
+        ["playedRingDrum", "playnoise"]
+    ])("%s is proved by a connected %s block", (criterion, blockName) => {
+        useBlocks(connected(blockName));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, criterion)).toBe(true);
+    });
+
+    test("a turn badge is still not proved by moving forward", () => {
+        useBlocks(connected("forward"));
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "changedAnimationTurn")).toBe(false);
+    });
+
+    test("the drum toggle accepts counting modulo two as well as subtracting from one", () => {
+        useBlocks({
+            store: { name: "storein", trash: false, connections: [null, "name", "mod", null] },
+            name: { name: "text", value: "flip", trash: false, connections: ["store"] },
+            mod: { name: "mod", trash: false, connections: ["store", null, null] }
+        });
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "usedOneMinusToggle")).toBe(true);
+    });
+
+    test("a polygon still counts when its turn is rounded to a whole number", () => {
+        const heptagon = {
+            start: { name: "start", trash: false, connections: [null, "repeat", null] },
+            repeat: { name: "repeat", trash: false, connections: ["start", "sides", "fd", null] },
+            sides: { name: "number", value: 7, trash: false, connections: ["repeat"] },
+            fd: { name: "forward", trash: false, connections: ["repeat", "step", "turn"] },
+            step: { name: "number", value: 100, trash: false, connections: ["fd"] },
+            turn: { name: "right", trash: false, connections: ["fd", "angle", null] },
+            // 360 over 7 is 51.43, and a child types 51.
+            angle: { name: "number", value: 51, trash: false, connections: ["turn"] }
+        };
+
+        useBlocks(heptagon);
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "createdExtraPolygon")).toBe(true);
+    });
+
+    test("a turn nowhere near the shape it repeats is still not a polygon", () => {
+        useBlocks({
+            start: { name: "start", trash: false, connections: [null, "repeat", null] },
+            repeat: { name: "repeat", trash: false, connections: ["start", "sides", "fd", null] },
+            sides: { name: "number", value: 7, trash: false, connections: ["repeat"] },
+            fd: { name: "forward", trash: false, connections: ["repeat", "step", "turn"] },
+            step: { name: "number", value: 100, trash: false, connections: ["fd"] },
+            turn: { name: "right", trash: false, connections: ["fd", "angle", null] },
+            angle: { name: "number", value: 20, trash: false, connections: ["turn"] }
+        });
+
+        expect(PracticeValidator.hasBadgeEvidence({}, "createdExtraPolygon")).toBe(false);
     });
 });
