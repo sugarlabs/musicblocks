@@ -725,7 +725,7 @@ class Tempo {
                 // missed beats instead of replaying them one per frame. Keep the
                 // beat phase so the next beat still lands on the original grid.
                 let beatsPassed = 1;
-                if (this._intervals[i] > 0 && d.getTime() > this._widgetNextTimes[i]) {
+                if (this._intervals[i] > 0 && d.getTime() >= this._widgetNextTimes[i]) {
                     const missed =
                         Math.floor((d.getTime() - this._widgetNextTimes[i]) / this._intervals[i]) +
                         1;

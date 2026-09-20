@@ -610,6 +610,24 @@ describe("Tempo Widget", () => {
             expect(tempoWidget._widgetNextTimes[0] - Date.now()).toBeLessThanOrEqual(500);
         });
 
+        test("should not replay a beat when exactly one interval late", () => {
+            jest.useFakeTimers();
+            try {
+                jest.setSystemTime(new Date(1000000));
+                tempoWidget._intervals = [500];
+                tempoWidget._widgetNextTimes = [1000000 - 500];
+
+                tempoWidget._draw();
+                jest.setSystemTime(new Date(1000005));
+                tempoWidget._draw();
+
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+                expect(tempoWidget._widgetNextTimes[0]).toBe(1000500);
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+
         test("should flip direction once per beat that went by", () => {
             tempoWidget._directions = [1];
             tempoWidget._widgetNextTimes = [Date.now() - 500 - 100];
