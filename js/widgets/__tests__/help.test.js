@@ -710,15 +710,16 @@ describe("HelpWidget", () => {
             expect(helpBody.style.color).toBe("");
         });
 
-        test("_showPage does not duplicate the window title as an in-card heading", () => {
+        test("_showPage titles the card with the page heading", () => {
             const activity = createMockActivity();
             const hw = new HelpWidget(activity, false);
             jest.runAllTimers();
 
-            hw._showPage(1);
+            hw._showPage(0);
 
-            const helpBody = document.getElementById("helpBodyDiv");
-            expect(helpBody.querySelector("h1")).toBeNull();
+            const heading = document.getElementById("helpBodyDiv").querySelector("h1.heading");
+            expect(heading).not.toBeNull();
+            expect(heading.textContent).toBe(HELPCONTENT[0][0]);
         });
 
         test("_showPage calls takeFocus", () => {
