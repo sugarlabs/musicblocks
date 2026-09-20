@@ -509,6 +509,44 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         expect(response.mock.calls[0][0].some(r => r.value === "drum")).toBe(true);
     });
 
+    test("source callback keeps an empty-state row when no blocks match", () => {
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        activity.searchWidget.idInput_custom = "";
+        activity.searchWidget.value = "";
+        sc.doSearch();
+
+        const response = jest.fn();
+        $elem.getOpts().source({ term: "zzzznonexistent" }, response);
+        const items = response.mock.calls[0][0];
+        expect(items).toHaveLength(1);
+        expect(items[0].isEmptyState).toBe(true);
+        expect(items[0].label).toBe("No results found for zzzznonexistent");
+    });
+
+    test("select callback does not place a block for the empty-state row", () => {
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        activity.searchWidget.idInput_custom = "";
+        activity.searchWidget.value = "";
+        sc.doSearch();
+
+        const event = { preventDefault: jest.fn(), keyCode: 13 };
+        const result = $elem.getOpts().select(event, {
+            item: { isEmptyState: true, label: "No results found for zzz", specialDict: null }
+        });
+
+        expect(result).toBe(false);
+        expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).not.toHaveBeenCalled();
+        expect(activity.searchWidget.value).toBe("");
+    });
+
     test("select callback sets widget fields and re-runs doSearch", () => {
         const block = makeProtoBlock("drum", "drum beat");
         const activity = makeActivity({ drum: block });

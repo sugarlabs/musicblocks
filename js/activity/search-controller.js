@@ -27,6 +27,52 @@ class SearchController {
     }
 
     /**
+     * Keep the autocomplete menu open with a disabled empty-state row when
+     * a non-empty query matches no blocks. Delegates to SearchUI when present.
+     *
+     * @param {string} term
+     * @param {Array} results
+     * @param {string} displayTerm
+     * @returns {Array}
+     */
+    _wrapSearchResults(term, results, displayTerm) {
+        const ui = this.activity.searchUI;
+        if (ui && typeof ui.wrapEmptySearchResults === "function") {
+            return ui.wrapEmptySearchResults(term, results, displayTerm);
+        }
+        if (results && results.length > 0) {
+            return results;
+        }
+        if (!term) {
+            return results || [];
+        }
+        const query = String(
+            displayTerm === undefined || displayTerm === null ? term : displayTerm
+        ).trim();
+        return [
+            {
+                label: _("No results found for %s").replace(/%s/g, query),
+                value: "",
+                artwork: "",
+                specialDict: null,
+                isEmptyState: true
+            }
+        ];
+    }
+
+    /**
+     * @param {object} item
+     * @returns {boolean}
+     */
+    _isEmptySearchResult(item) {
+        const ui = this.activity.searchUI;
+        if (ui && typeof ui.isEmptySearchResult === "function") {
+            return ui.isEmptySearchResult(item);
+        }
+        return !!(item && item.isEmptyState);
+    }
+
+    /**
      * Builds the block list used for search bar autocompletion.
      * Reads from activity.blocks.protoBlockDict and populates
      * searchSuggestions and deprecatedBlockNames.
@@ -280,12 +326,17 @@ class SearchController {
             $search.autocomplete({
                 source: (request, response) => {
                     const term = (request.term || "").toLowerCase().trim();
-                    response(that.filterSuggestions(term));
+                    response(
+                        that._wrapSearchResults(term, that.filterSuggestions(term), request.term)
+                    );
                 },
                 delay: 400,
                 appendTo: "body",
                 select: (event, ui) => {
                     event.preventDefault();
+                    if (that._isEmptySearchResult(ui.item)) {
+                        return false;
+                    }
                     activity.searchWidget.value = ui.item.label;
                     activity.searchWidget.idInput_custom = ui.item.value;
                     activity.searchWidget.protoblk = ui.item.specialDict;
@@ -307,6 +358,17 @@ class SearchController {
             const instance = $search.autocomplete("instance");
             if (instance) {
                 instance._renderItem = (ul, item) => {
+                    if (that._isEmptySearchResult(item) && activity.searchUI) {
+                        return activity.searchUI.renderEmptySearchItem($j, ul, item);
+                    }
+                    if (that._isEmptySearchResult(item)) {
+                        const emptyLi = $j("<li></li>");
+                        if (typeof emptyLi.addClass === "function") {
+                            emptyLi.addClass("ui-state-disabled search-no-results");
+                        }
+                        emptyLi.append($j("<a>").text(item.label));
+                        return emptyLi.appendTo(ul.css("z-index", 35000));
+                    }
                     const li = $j("<li></li>");
 
                     const img = document.createElement("img");
@@ -669,12 +731,17 @@ class SearchController {
             $helpfulSearch.autocomplete({
                 source: (request, response) => {
                     const term = (request.term || "").toLowerCase().trim();
-                    response(that.filterSuggestions(term));
+                    response(
+                        that._wrapSearchResults(term, that.filterSuggestions(term), request.term)
+                    );
                 },
                 delay: 400,
                 appendTo: "body",
                 select: (event, ui) => {
                     event.preventDefault();
+                    if (that._isEmptySearchResult(ui.item)) {
+                        return false;
+                    }
                     activity.helpfulSearchWidget.value = ui.item.label;
                     activity.helpfulSearchWidget.idInput_custom = ui.item.value;
                     activity.helpfulSearchWidget.protoblk = ui.item.specialDict;
@@ -688,6 +755,17 @@ class SearchController {
             const instance = $helpfulSearch.autocomplete("instance");
             if (instance) {
                 instance._renderItem = (ul, item) => {
+                    if (that._isEmptySearchResult(item) && activity.searchUI) {
+                        return activity.searchUI.renderEmptySearchItem($j, ul, item);
+                    }
+                    if (that._isEmptySearchResult(item)) {
+                        const emptyLi = $j("<li></li>");
+                        if (typeof emptyLi.addClass === "function") {
+                            emptyLi.addClass("ui-state-disabled search-no-results");
+                        }
+                        emptyLi.append($j("<a>").text(item.label));
+                        return emptyLi.appendTo(ul.css("z-index", 35000));
+                    }
                     const li = $j("<li></li>");
                     const img = document.createElement("img");
                     img.src = item.artwork || "";

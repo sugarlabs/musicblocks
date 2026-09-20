@@ -33,6 +33,20 @@ body:not(.dark):not(.highcontrast) .ui-autocomplete li:hover {
     background-color: var(--color-bg-tertiary) !important;
 }
 
+.ui-autocomplete .search-no-results,
+.ui-autocomplete .search-no-results:hover,
+.ui-autocomplete .search-no-results.ui-state-focus,
+.ui-autocomplete .search-no-results.ui-state-active {
+    cursor: default;
+    font-style: italic;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+body:not(.dark):not(.highcontrast) .ui-autocomplete .search-no-results:hover {
+    background-color: var(--color-bg-primary) !important;
+}
+
 body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     background-color: var(--color-bg-secondary) !important;
 }
