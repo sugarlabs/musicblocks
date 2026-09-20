@@ -572,7 +572,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             )
         ) + "px";
 
-    // Navigate to a the current note value.
+    // Navigate to the current note value.
     let i = noteValues.indexOf(note);
     if (i === -1) {
         if (custom) {
@@ -670,7 +670,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     }
 
     if (hasOctaveWheel) {
-        // Use the octave associated with block block, if available.
+        // Use the octave associated with the block, if available.
         const pitchOctave = block.blocks.findPitchOctave(block.connections[0]);
 
         // Navigate to current octave.
@@ -1307,7 +1307,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         ) + "px";
 
     if (hasOctaveWheel) {
-        // Use the octave associated with block block, if available.
+        // Use the octave associated with the block, if available.
         const pitchOctave = block.blocks.findPitchOctave(block.connections[0]);
 
         // Navigate to current octave
@@ -1569,7 +1569,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
             )
         ) + "px";
 
-    // Navigate to a the current accidental value.
+    // Navigate to the current accidental value.
     let i = accidentalValues.indexOf(accidental);
     if (i === -1) {
         i = 2;
@@ -1799,7 +1799,7 @@ const piemenuNoteValue = (block, noteValue) => {
         block._noteValueWheel.navItems[i].navigateFunction = __showHide;
     }
 
-    // Navigate to a the current noteValue value.
+    // Navigate to the current noteValue value.
     // Special case 1 to use power of 2.
     if (noteValue === 1) {
         block._noteValueWheel.navigateWheel(1);
@@ -2025,7 +2025,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     block.label.style.width =
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
-    // Navigate to a the current number value.
+    // Navigate to the current number value.
     let i = wheelValues.indexOf(selectedValue);
     if (i === -1) {
         // Find the closest valid value from the wheelValues array
@@ -2375,7 +2375,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block.label.style.width =
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
 
-    // Navigate to a the current number value.
+    // Navigate to the current number value.
     let i = wheelValues.indexOf(selectedValue);
     if (i === -1) {
         i = 0;
@@ -2535,7 +2535,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
             )
         ) + "px";
 
-    // Navigate to a the current selectedValue value.
+    // Navigate to the current selectedValue value.
     let i = menuValues.indexOf(selectedValue);
     if (i === -1) {
         i = 1;
@@ -2649,7 +2649,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
             )
         ) + "px";
 
-    // Navigate to a the current boolean value.
+    // Navigate to the current boolean value.
     let i = booleanValues.indexOf(boolean);
     if (i === -1) {
         i = 0;
@@ -2784,7 +2784,7 @@ const piemenuChords = (block, selectedChord) => {
             )
         ) + "px";
 
-    // Navigate to a the current chord value.
+    // Navigate to the current chord value.
     let i = chordLabels.indexOf(selectedChord);
     if (i === -1) {
         i = 0;
