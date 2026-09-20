@@ -547,6 +547,10 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     color: var(--color-text-primary) !important;
 }
 
+.highcontrast #floatingWindows > .windowFrame > .wfTopBar .wftButton.wftMaxmin img {
+    filter: invert(1);
+}
+
 .highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
     color: var(--color-text-primary) !important;
     background-color: var(--color-bg-secondary) !important;
