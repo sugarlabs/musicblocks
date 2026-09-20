@@ -700,3 +700,44 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         expect(activity.textMsg).toHaveBeenCalledWith("a comment");
     });
 });
+
+describe("proto block registration names", () => {
+    // setup() is `activity.blocks.protoBlockDict[this.name] = this`, a plain
+    // assignment, so two classes registering the same name means the later
+    // setup() silently replaces the earlier proto. The loader then cannot
+    // find the name it substitutes for an unknown block, and drops it.
+    // NOPTwoArgMathBlock shipped with NOPOneArgMathBlock's name and hit both
+    // halves of that at once.
+    it("every class in ExtrasBlocks registers a distinct name", () => {
+        const fs = require("fs");
+        const path = require("path");
+        const src = fs.readFileSync(path.join(__dirname, "..", "ExtrasBlocks.js"), "utf8");
+
+        const pairs = [
+            ...src.matchAll(/class\s+(\w+)\s+extends\s+\w+\s*\{[\s\S]*?super\(\s*"([^"]+)"/g)
+        ].map(m => ({ className: m[1], protoName: m[2] }));
+        expect(pairs.length).toBeGreaterThan(20);
+
+        const byProtoName = {};
+        for (const { className, protoName } of pairs) {
+            (byProtoName[protoName] ||= []).push(className);
+        }
+        const collisions = Object.entries(byProtoName)
+            .filter(([, classes]) => classes.length > 1)
+            .map(([protoName, classes]) => `${protoName} <- ${classes.join(", ")}`);
+
+        expect(collisions).toEqual([]);
+    });
+
+    it("NOPTwoArgMathBlock registers under its own name", () => {
+        const fs = require("fs");
+        const path = require("path");
+        const src = fs.readFileSync(path.join(__dirname, "..", "ExtrasBlocks.js"), "utf8");
+        const body = /class\s+NOPTwoArgMathBlock\s+extends\s+\w+\s*\{[\s\S]*?\n {4}\}/.exec(src)[0];
+
+        expect(body).toContain('super("nopTwoArgMathBlock"');
+        // The name blocks.js substitutes for an unknown two-argument math
+        // block, so the two have to agree.
+        expect(body).toMatch(/args:\s*2/);
+    });
+});
