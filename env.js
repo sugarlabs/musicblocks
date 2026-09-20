@@ -7,5 +7,6 @@ window.MB_IS_DEV = false;
 // secrets are never shipped to the client.
 window.MB_PLANET_API_KEY = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";
 window.MB_PROJECT_API_KEY = "3tgTzMXbbw6xEKX7";
-window.MB_GIT_BACKEND_URL = "http://localhost:5000";
-
+window.MB_GIT_BACKEND_URL = "http://git-planet.sugarlabs.org";
+// For local dev: run `ssh -L 5001:127.0.0.1:5001 zealot@containers.sugarlabs.org -N`
+// then override this to "http://localhost:5001" in your local copy of env.js.

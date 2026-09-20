@@ -20,7 +20,7 @@ app.get("/env.js", (req, res) => {
             `window.MB_IS_DEV=${JSON.stringify(isDev)};` +
             `window.MB_PLANET_API_KEY = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";` +
             `window.MB_PROJECT_API_KEY = "3tgTzMXbbw6xEKX7";` +
-            `window.MB_GIT_BACKEND_URL = "http://localhost:5000";`
+            `window.MB_GIT_BACKEND_URL = ${JSON.stringify(process.env.MB_GIT_BACKEND_URL || "http://git-planet.sugarlabs.org")};`
     );
 });
 

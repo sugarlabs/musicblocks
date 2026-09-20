@@ -65,8 +65,11 @@ class ServerInterface {
     constructor(Planet) {
         this.Planet = Planet;
 
-        // Base URL for the Express backend. Reads from env.js if set.
-        this.BaseURL = (window.MB_GIT_BACKEND_URL || "http://localhost:5001") + "/api/github";
+        // Base URL for the Express backend.
+        // Override via window.MB_GIT_BACKEND_URL (set in env.js) for local dev or staging.
+        // Falls back to the production deployment on containers.sugarlabs.org.
+        this.BaseURL =
+            (window.MB_GIT_BACKEND_URL || "http://git-planet.sugarlabs.org") + "/api/github";
 
         this.ConnectionFailureData = { success: false, error: "ERROR_CONNECTION_FAILURE" };
 
