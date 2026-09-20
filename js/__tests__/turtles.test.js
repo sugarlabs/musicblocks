@@ -1171,15 +1171,17 @@ describe("Turtle Heading & Coordinate HUD", () => {
             expect(turtles._hudContainer.x).toBeLessThanOrEqual(500 - 42);
         });
 
-        it("respects prefers-reduced-motion on show", () => {
+        it("respects prefers-reduced-motion on show without scheduling a tween", () => {
             const originalMatchMedia = window.matchMedia;
             window.matchMedia = jest.fn().mockImplementation(query => ({
                 matches: query.includes("prefers-reduced-motion")
             }));
+            createjs.Tween.get.mockClear();
 
             turtles._showTurtleHUD(mockTurtle);
             expect(turtles._hudContainer.visible).toBe(true);
             expect(turtles._hudContainer.alpha).toBe(1.0);
+            expect(createjs.Tween.get).not.toHaveBeenCalled();
 
             window.matchMedia = originalMatchMedia;
         });
@@ -1219,16 +1221,39 @@ describe("Turtle Heading & Coordinate HUD", () => {
             expect(mockActivity.refreshCanvas).toHaveBeenCalled();
         });
 
-        it("respects prefers-reduced-motion on hide", () => {
+        it("respects prefers-reduced-motion on hide without scheduling a tween", () => {
             turtles._showTurtleHUD(mockTurtle);
             const originalMatchMedia = window.matchMedia;
             window.matchMedia = jest.fn().mockImplementation(query => ({
                 matches: query.includes("prefers-reduced-motion")
             }));
+            createjs.Tween.get.mockClear();
 
             turtles._hideTurtleHUD();
             expect(turtles._hudContainer.visible).toBe(false);
             expect(turtles._hudContainer.alpha).toBe(0);
+            expect(createjs.Tween.get).not.toHaveBeenCalled();
+
+            window.matchMedia = originalMatchMedia;
+        });
+
+        it("uses createjs.Tween when prefers-reduced-motion is false", () => {
+            const originalMatchMedia = window.matchMedia;
+            window.matchMedia = jest.fn().mockImplementation(() => ({
+                matches: false
+            }));
+            createjs.Tween.get.mockClear();
+
+            turtles._showTurtleHUD(mockTurtle);
+            expect(createjs.Tween.get).toHaveBeenCalledWith(turtles._hudContainer, {
+                override: true
+            });
+
+            createjs.Tween.get.mockClear();
+            turtles._hideTurtleHUD();
+            expect(createjs.Tween.get).toHaveBeenCalledWith(turtles._hudContainer, {
+                override: true
+            });
 
             window.matchMedia = originalMatchMedia;
         });
