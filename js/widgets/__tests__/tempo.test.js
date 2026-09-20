@@ -585,6 +585,40 @@ describe("Tempo Widget", () => {
             expect(tempoWidget._directions[0]).toBe(-1);
             expect(tempoWidget._widgetNextTimes[0]).toBeGreaterThan(Date.now());
         });
+
+        test("should play a single tone when the loop is many beats behind", () => {
+            tempoWidget._intervals = [500];
+            tempoWidget._widgetNextTimes = [Date.now() - 60 * 500];
+
+            for (let frame = 0; frame < 5; frame++) {
+                tempoWidget._draw();
+            }
+
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+            expect(tempoWidget._widgetNextTimes[0]).toBeGreaterThan(Date.now());
+        });
+
+        test("should keep the beat phase when skipping missed beats", () => {
+            const now = Date.now();
+            tempoWidget._intervals = [500];
+            tempoWidget._widgetNextTimes = [now - 10 * 500 - 100];
+
+            tempoWidget._draw();
+
+            const drift = (tempoWidget._widgetNextTimes[0] - (now - 10 * 500 - 100)) % 500;
+            expect(drift).toBe(0);
+            expect(tempoWidget._widgetNextTimes[0] - Date.now()).toBeLessThanOrEqual(500);
+        });
+
+        test("should flip direction once per beat that went by", () => {
+            tempoWidget._directions = [1];
+            tempoWidget._widgetNextTimes = [Date.now() - 500 - 100];
+
+            tempoWidget._draw();
+
+            // two beats passed (the fired one plus one skipped): even, so no net flip
+            expect(tempoWidget._directions[0]).toBe(1);
+        });
     });
     describe("Canvas Tap Tempo (onclick)", () => {
         beforeEach(() => {
