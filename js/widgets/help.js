@@ -31,6 +31,7 @@ const HELP_SVG_DATA_PREFIX = "data:image/svg+xml;base64,";
 
 /*exported HelpWidget*/
 class HelpWidget {
+    static dependencies = ["utils/dom-helpers", "widgets/widgetWindows", "widgets/help"];
     static ICONSIZE = 32;
 
     /**

@@ -29,7 +29,7 @@ class HelpController {
             window.widgetWindows.clear("keyboard-shortcuts");
         }
         // Will show welcome page by default.
-        await lazyLoad("widgets/help");
+        await lazyLoad(["utils/dom-helpers", "widgets/widgetWindows", "widgets/help"]);
         new HelpWidget(this.activity, false);
     }
 
@@ -38,7 +38,7 @@ class HelpController {
      */
     async showAboutPage() {
         // Will show welcome page by default.
-        await lazyLoad("widgets/help");
+        await lazyLoad(["utils/dom-helpers", "widgets/widgetWindows", "widgets/help"]);
         new HelpWidget(this.activity, false);
     }
 

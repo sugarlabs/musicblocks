@@ -1417,4 +1417,108 @@ describe("widgetWindows", () => {
             expect(win.onmaximize).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe("Defensive DOM and global resolution", () => {
+        test("gracefully falls back when floatingWindows container is not in DOM", () => {
+            const el = document.getElementById("floatingWindows");
+            el.remove();
+            try {
+                let win;
+                expect(() => {
+                    win = createTestWindow("No Floating Windows");
+                }).not.toThrow();
+                expect(win._frame.parentElement).toBe(document.body);
+            } finally {
+                document.body.appendChild(el);
+            }
+        });
+
+        test("takeFocus safely handles missing floatingWindows container", () => {
+            const win = createTestWindow("Focus Test");
+            const el = document.getElementById("floatingWindows");
+            el.remove();
+            try {
+                expect(() => win.takeFocus()).not.toThrow();
+                expect(window.widgetWindows.focused).toBe(win);
+            } finally {
+                document.body.appendChild(el);
+            }
+        });
+
+        test("sendToCenter safely handles missing canvas element", () => {
+            const win = createTestWindow("Center Test");
+            const canvasEl = document.getElementById("myCanvas");
+            canvasEl.remove();
+            try {
+                expect(() => win.sendToCenter()).not.toThrow();
+                expect(win._frame.style.left).toBe("200px");
+                expect(win._frame.style.top).toBe("140px");
+            } finally {
+                document.body.appendChild(canvasEl);
+            }
+        });
+
+        test("_docById resolves via targetWindow.docById when provided", () => {
+            const mockEl = { id: "testEl" };
+            const mockWin = {
+                docById: jest.fn(() => mockEl)
+            };
+            const result = window.widgetWindows._docById("testEl", mockWin);
+            expect(mockWin.docById).toHaveBeenCalledWith("testEl");
+            expect(result).toBe(mockEl);
+        });
+
+        test("_docById falls back to targetWindow.document.getElementById when targetWindow.docById is absent", () => {
+            const mockEl = { id: "testCanvas" };
+            const mockWin = {
+                document: {
+                    getElementById: jest.fn(() => mockEl)
+                }
+            };
+            const result = window.widgetWindows._docById("testCanvas", mockWin);
+            expect(mockWin.document.getElementById).toHaveBeenCalledWith("testCanvas");
+            expect(result).toBe(mockEl);
+        });
+
+        test("_docById returns null when element is not found and no helpers exist", () => {
+            const mockWin = {
+                document: {
+                    getElementById: jest.fn(() => null)
+                }
+            };
+            const result = window.widgetWindows._docById("nonExistent", mockWin);
+            expect(result).toBeNull();
+        });
+
+        test("_docById returns null when targetWindow has no document", () => {
+            const mockWin = {};
+            const result = window.widgetWindows._docById("nonExistent", mockWin);
+            expect(result).toBeNull();
+        });
+
+        test("_t resolves via targetWindow._ when provided", () => {
+            const mockWin = {
+                _: jest.fn(text => `translated_${text}`)
+            };
+            const result = window.widgetWindows._t("hello", mockWin);
+            expect(mockWin._).toHaveBeenCalledWith("hello");
+            expect(result).toBe("translated_hello");
+        });
+
+        test("_t falls back to identity text when targetWindow._ is absent", () => {
+            const mockWin = {};
+            const result = window.widgetWindows._t("fallback text", mockWin);
+            expect(result).toBe("fallback text");
+        });
+
+        test("updateTitle safely handles missing title element", () => {
+            const win = createTestWindow("Missing Title Test");
+            const titleEl = document.getElementById(win._key + "WidgetID");
+            if (titleEl) {
+                titleEl.remove();
+            }
+            expect(() => win.updateTitle("New Title")).not.toThrow();
+            expect(win._frame.getAttribute("aria-label")).toBe("New Title");
+        });
+    });
 });

@@ -957,4 +957,15 @@ describe("HelpWidget", () => {
             expect(rightArrow.classList.contains("disabled")).toBe(true);
         });
     });
+
+    describe("Dependencies", () => {
+        test("declares static dependencies array including dom-helpers, widgetWindows, and help", () => {
+            expect(Array.isArray(HelpWidget.dependencies)).toBe(true);
+            expect(HelpWidget.dependencies).toEqual([
+                "utils/dom-helpers",
+                "widgets/widgetWindows",
+                "widgets/help"
+            ]);
+        });
+    });
 });

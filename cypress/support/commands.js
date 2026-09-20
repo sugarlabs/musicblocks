@@ -27,6 +27,7 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 Cypress.Commands.add("waitForAppReady", () => {
     cy.get("#loading-image-container", { timeout: 60000 }).should("not.be.visible");
+    cy.get("#canvas", { timeout: 60000 }).should("be.visible");
     cy.get("#hideContents", { timeout: 60000 }).should("be.visible");
 });
 

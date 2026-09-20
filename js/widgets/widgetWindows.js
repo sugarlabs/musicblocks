@@ -17,7 +17,32 @@ Globals location
 _, docById
 */
 
+function _docById(id, targetWindow) {
+    if (!targetWindow && typeof docById === "function") {
+        return docById(id);
+    }
+    const win = targetWindow || (typeof window !== "undefined" ? window : undefined);
+    if (win && typeof win.docById === "function") {
+        return win.docById(id);
+    }
+    const doc = (win && win.document) || (typeof document !== "undefined" ? document : undefined);
+    return doc && typeof doc.getElementById === "function" ? doc.getElementById(id) : null;
+}
+
+function _t(text, targetWindow) {
+    if (!targetWindow && typeof _ === "function") {
+        return _(text);
+    }
+    const win = targetWindow || (typeof window !== "undefined" ? window : undefined);
+    if (win && typeof win._ === "function") {
+        return win._(text);
+    }
+    return text;
+}
+
 window.widgetWindows = {
+    _docById,
+    _t,
     openWindows: {},
     _posCache: {},
     focused: null,
@@ -320,10 +345,10 @@ class WidgetWindow {
      * @returns {void}
      */
     _createUIelements() {
-        const windows = docById("floatingWindows");
+        const windows = _docById("floatingWindows") || document.body;
         this._frame = this._create("div", "windowFrame", windows);
         this._frame.setAttribute("role", "dialog");
-        this._frame.setAttribute("aria-label", _(this._title));
+        this._frame.setAttribute("aria-label", _t(this._title));
         this._overlayframe = this._create("div", "windowFrame windowOverlay", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._drag.style.display = "flex";
@@ -344,9 +369,9 @@ class WidgetWindow {
             };
         }
         const closeButton = this._create("div", "wftButton close", this._drag);
-        closeButton.title = _("Close");
+        closeButton.title = _t("Close");
         closeButton.setAttribute("role", "button");
-        closeButton.setAttribute("aria-label", _("Close window"));
+        closeButton.setAttribute("aria-label", _t("Close window"));
         closeButton.setAttribute("tabindex", "0");
         closeButton.onclick = e => {
             this.onclose();
@@ -361,7 +386,7 @@ class WidgetWindow {
 
         const titleEl = this._create("div", "wftTitle", this._nonclose);
         titleEl.replaceChildren();
-        titleEl.textContent = _(this._title);
+        titleEl.textContent = _t(this._title);
         titleEl.id = `${this._key}WidgetID`;
 
         this._nonclose.onmousedown = e => {
@@ -378,9 +403,9 @@ class WidgetWindow {
         this._nonclosebuttons.style.display = "flex";
         this._rollButton = this._create("div", "wftButton rollup", this._nonclosebuttons);
         const rollButton = this._rollButton;
-        rollButton.title = _("Minimize");
+        rollButton.title = _t("Minimize");
         rollButton.setAttribute("role", "button");
-        rollButton.setAttribute("aria-label", _("Roll up window"));
+        rollButton.setAttribute("aria-label", _t("Roll up window"));
         rollButton.setAttribute("tabindex", "0");
         rollButton.onclick = e => {
             if (this._rolled) {
@@ -400,9 +425,9 @@ class WidgetWindow {
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
             this._maxminButton = maxminButton;
-            maxminButton.title = _("Maximize window");
+            maxminButton.title = _t("Maximize window");
             maxminButton.setAttribute("role", "button");
-            maxminButton.setAttribute("aria-label", _("Maximize window"));
+            maxminButton.setAttribute("aria-label", _t("Maximize window"));
             maxminButton.setAttribute("tabindex", "0");
             maxminButton.onclick = e => {
                 if (this._maximized) {
@@ -641,7 +666,7 @@ class WidgetWindow {
      * @returns {void}
      */
     updateTitle(title) {
-        const wftTitle = docById(this._key + "WidgetID");
+        const wftTitle = _docById(this._key + "WidgetID");
         if (wftTitle) {
             wftTitle.textContent = title;
         }
@@ -656,7 +681,7 @@ class WidgetWindow {
      */
     takeFocus() {
         window.widgetWindows.focused = this;
-        const windows = docById("floatingWindows");
+        const windows = _docById("floatingWindows");
         if (windows && windows.children) {
             const siblings = windows.children;
             for (let i = 0; i < siblings.length; i++) {
@@ -697,13 +722,13 @@ class WidgetWindow {
      * @returns {WidgetWindow} this
      */
     sendToCenter() {
-        const canvas = docById("myCanvas");
+        const canvas = _docById("myCanvas");
         if (!canvas) {
             this.setPosition(200, 140);
             return this;
         }
         const fRect = this._frame.getBoundingClientRect();
-        const cRect = canvas.getBoundingClientRect();
+        const cRect = canvas ? canvas.getBoundingClientRect() : { width: 0, height: 0 };
 
         if (cRect.width === 0 || cRect.height === 0) {
             // The canvas isn't shown so we set some approximate numbers
@@ -727,7 +752,7 @@ class WidgetWindow {
     _restore() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         if (this._maxminButton) {
-            this._maxminButton.title = _("Maximize window");
+            this._maxminButton.title = _t("Maximize window");
         }
         this._maximized = false;
 
@@ -750,7 +775,7 @@ class WidgetWindow {
     _maximize() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         if (this._maxminButton) {
-            this._maxminButton.title = _("Restore");
+            this._maxminButton.title = _t("Restore");
         }
         this._maximized = true;
         this.unroll();

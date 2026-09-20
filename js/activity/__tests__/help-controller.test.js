@@ -159,7 +159,11 @@ describe("HelpController.showHelp", () => {
         await controller.showHelp();
 
         expect(window.widgetWindows.clear).toHaveBeenCalledWith("keyboard-shortcuts");
-        expect(global.lazyLoad).toHaveBeenCalledWith("widgets/help");
+        expect(global.lazyLoad).toHaveBeenCalledWith([
+            "utils/dom-helpers",
+            "widgets/widgetWindows",
+            "widgets/help"
+        ]);
         expect(HelpWidgetMock.instances).toHaveLength(1);
         expect(HelpWidgetMock.instances[0]).toEqual({ activity, showWelcome: false });
     });
@@ -183,7 +187,11 @@ describe("HelpController.showAboutPage", () => {
         await controller.showAboutPage();
 
         expect(window.widgetWindows.clear).not.toHaveBeenCalled();
-        expect(global.lazyLoad).toHaveBeenCalledWith("widgets/help");
+        expect(global.lazyLoad).toHaveBeenCalledWith([
+            "utils/dom-helpers",
+            "widgets/widgetWindows",
+            "widgets/help"
+        ]);
         expect(HelpWidgetMock.instances).toHaveLength(1);
         expect(HelpWidgetMock.instances[0]).toEqual({ activity, showWelcome: false });
     });
