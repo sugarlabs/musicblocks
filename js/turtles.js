@@ -178,7 +178,6 @@ class Turtles {
                 turtle.x = this.screenX2turtleX(turtle.container.x);
                 turtle.y = this.screenY2turtleY(turtle.container.y);
                 this._updateTurtleHUD(turtle);
-                this.activity.refreshCanvas();
             });
         });
 
@@ -310,9 +309,6 @@ class Turtles {
         const tx = Math.round(typeof turtle.x === "number" ? turtle.x : 0);
         const ty = Math.round(typeof turtle.y === "number" ? turtle.y : 0);
 
-        this._hudContainer.x = turtle.container.x;
-        this._hudContainer.y = turtle.container.y;
-
         const g = this._hudShape.graphics;
         g.clear();
 
@@ -357,6 +353,18 @@ class Turtles {
         const bounds = this._hudText.getBounds ? this._hudText.getBounds() : null;
         const pillWidth = bounds ? Math.max(bounds.width + 16, 76) : 80;
         const pillHeight = 20;
+
+        // Keep HUD center inside horizontal stage boundary [minMargin, this._w - minMargin]
+        const minMargin = Math.max(42, pillWidth / 2);
+        if (this._w && this._w > minMargin * 2) {
+            this._hudContainer.x = Math.max(
+                minMargin,
+                Math.min(this._w - minMargin, turtle.container.x)
+            );
+        } else {
+            this._hudContainer.x = turtle.container.x;
+        }
+        this._hudContainer.y = turtle.container.y;
 
         const pg = this._hudPill.graphics;
         pg.clear();
@@ -418,8 +426,14 @@ class Turtles {
 
         this._renderTurtleHUD(turtle);
 
+        const prefersReducedMotion =
+            typeof window !== "undefined" &&
+            typeof window.matchMedia === "function" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
         this._hudContainer.visible = true;
         if (
+            !prefersReducedMotion &&
             typeof createjs !== "undefined" &&
             createjs.Tween &&
             typeof createjs.Tween.get === "function"
@@ -468,7 +482,13 @@ class Turtles {
         if (!this._hudContainer) {
             return;
         }
+        const prefersReducedMotion =
+            typeof window !== "undefined" &&
+            typeof window.matchMedia === "function" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
         if (
+            !prefersReducedMotion &&
             typeof createjs !== "undefined" &&
             createjs.Tween &&
             typeof createjs.Tween.get === "function"

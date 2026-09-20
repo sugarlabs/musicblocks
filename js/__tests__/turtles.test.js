@@ -1159,6 +1159,30 @@ describe("Turtle Heading & Coordinate HUD", () => {
 
             expect(turtles._hudText.y).toBe(-54);
         });
+
+        it("clamps HUD center horizontally within stage width when near edges", () => {
+            turtles._w = 500;
+            mockTurtle.container.x = 10;
+            turtles._showTurtleHUD(mockTurtle);
+            expect(turtles._hudContainer.x).toBeGreaterThanOrEqual(42);
+
+            mockTurtle.container.x = 490;
+            turtles._updateTurtleHUD(mockTurtle);
+            expect(turtles._hudContainer.x).toBeLessThanOrEqual(500 - 42);
+        });
+
+        it("respects prefers-reduced-motion on show", () => {
+            const originalMatchMedia = window.matchMedia;
+            window.matchMedia = jest.fn().mockImplementation(query => ({
+                matches: query.includes("prefers-reduced-motion")
+            }));
+
+            turtles._showTurtleHUD(mockTurtle);
+            expect(turtles._hudContainer.visible).toBe(true);
+            expect(turtles._hudContainer.alpha).toBe(1.0);
+
+            window.matchMedia = originalMatchMedia;
+        });
     });
 
     describe("_updateTurtleHUD", () => {
@@ -1193,6 +1217,20 @@ describe("Turtle Heading & Coordinate HUD", () => {
             turtles._hideTurtleHUD();
             expect(turtles._hudContainer.visible).toBe(false);
             expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("respects prefers-reduced-motion on hide", () => {
+            turtles._showTurtleHUD(mockTurtle);
+            const originalMatchMedia = window.matchMedia;
+            window.matchMedia = jest.fn().mockImplementation(query => ({
+                matches: query.includes("prefers-reduced-motion")
+            }));
+
+            turtles._hideTurtleHUD();
+            expect(turtles._hudContainer.visible).toBe(false);
+            expect(turtles._hudContainer.alpha).toBe(0);
+
+            window.matchMedia = originalMatchMedia;
         });
 
         it("safely handles being called when _hudContainer is not created", () => {
