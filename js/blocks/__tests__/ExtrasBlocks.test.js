@@ -700,3 +700,66 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         expect(activity.textMsg).toHaveBeenCalledWith("a comment");
     });
 });
+
+describe("NOP math blocks register under their own internal names", () => {
+    // Records, per class, the name passed to super() and the args count from
+    // formBlock(). The loader looks up NOP placeholders by these internal names
+    // (see blocks.js), so each NOP class must register under its own name with
+    // the matching arity. Regression guard for the NOPTwoArgMathBlock name bug.
+    let registered;
+
+    beforeEach(() => {
+        registered = {};
+
+        const makeRecorder = () =>
+            class {
+                constructor(name) {
+                    this._recorderName = name;
+                    registered[this.constructor.name] = { name };
+                }
+                setPalette() {}
+                setHelpString() {}
+                formBlock(def) {
+                    if (registered[this.constructor.name]) {
+                        registered[this.constructor.name].args = def && def.args;
+                    }
+                }
+                setup() {}
+                beginnerBlock() {}
+                makeMacro() {}
+                updateDockValue() {}
+                setCapability() {
+                    return this;
+                }
+                getCapability() {}
+            };
+
+        const origLeftBlock = global.LeftBlock;
+        const origFlowBlock = global.FlowBlock;
+        const origValueBlock = global.ValueBlock;
+        global.LeftBlock = makeRecorder();
+        global.FlowBlock = makeRecorder();
+        global.ValueBlock = makeRecorder();
+
+        const activity = { blocks: { blockList: {} } };
+        setupExtrasBlocks(activity);
+
+        global.LeftBlock = origLeftBlock;
+        global.FlowBlock = origFlowBlock;
+        global.ValueBlock = origValueBlock;
+    });
+
+    test("NOPOneArgMathBlock registers as nopOneArgMathBlock with 1 arg", () => {
+        expect(registered["NOPOneArgMathBlock"]).toEqual({
+            name: "nopOneArgMathBlock",
+            args: 1
+        });
+    });
+
+    test("NOPTwoArgMathBlock registers as nopTwoArgMathBlock with 2 args", () => {
+        expect(registered["NOPTwoArgMathBlock"]).toEqual({
+            name: "nopTwoArgMathBlock",
+            args: 2
+        });
+    });
+});
