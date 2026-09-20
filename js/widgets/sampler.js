@@ -582,11 +582,25 @@ function SampleWidget() {
             }
             // Dispose Tone.Analyser nodes to free Web Audio resources
             for (const key in this.pitchAnalysers) {
-                if (
-                    this.pitchAnalysers[key] &&
-                    typeof this.pitchAnalysers[key].dispose === "function"
-                ) {
-                    this.pitchAnalysers[key].dispose();
+                const analyser = this.pitchAnalysers[key];
+                if (analyser) {
+                    if (typeof instruments !== "undefined" && instruments[0]) {
+                        for (const synth in instruments[0]) {
+                            try {
+                                if (
+                                    instruments[0][synth] &&
+                                    typeof instruments[0][synth].disconnect === "function"
+                                ) {
+                                    instruments[0][synth].disconnect(analyser);
+                                }
+                            } catch (_) {
+                                // Synth may not have been connected to this analyser.
+                            }
+                        }
+                    }
+                    if (typeof analyser.dispose === "function") {
+                        analyser.dispose();
+                    }
                 }
             }
             this.pitchAnalysers = {};
