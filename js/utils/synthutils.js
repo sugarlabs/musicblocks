@@ -1498,20 +1498,19 @@ function Synth() {
         const solfegeDict = { do: 0, re: 2, mi: 4, fa: 5, sol: 7, la: 9, ti: 11 };
         const letterDict = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
-        let attr = getArticulation(solfege);
-        if (attr === SHARP) {
+        const articulation = getArticulation(solfege);
+        let attr = 0;
+        if (articulation === SHARP) {
             attr = 1;
-        } else if (attr === FLAT) {
+        } else if (articulation === FLAT) {
             attr = -1;
-        } else if (attr === DOUBLESHARP) {
+        } else if (articulation === DOUBLESHARP) {
             attr = 2;
-        } else if (attr === DOUBLEFLAT) {
+        } else if (articulation === DOUBLEFLAT) {
             attr = -2;
-        } else {
-            attr = 0;
         }
 
-        const fragment = solfege.replace(attr, "");
+        const fragment = articulation ? solfege.replace(articulation, "") : solfege;
         let chromaticNumber = 0;
         if (fragment in solfegeDict) {
             chromaticNumber = solfegeDict[fragment];
