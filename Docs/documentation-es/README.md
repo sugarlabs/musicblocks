@@ -2,7 +2,7 @@
 ==================
 
 Music Blocks is a fork of [Turtle
-Blocks](href="https://turtle.sugarlabs.org). It has extensions for
+Blocks](https://turtle.sugarlabs.org). It has extensions for
 exploring music: pitch and rhythm.
 
 Music Blocks is designed to run in a browser. Most of the development
@@ -20,7 +20,7 @@ Edge	      | Coming soon
 You can run it from
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/getting-started.png "Music Blocks in a browser")
+![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/Docs/documentation/getting-started.png "Music Blocks in a browser")
 
 Getting Started
 ---------------
@@ -34,7 +34,7 @@ of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
 
 https://github.com/sugarlabs
 
-![alt tag](../header-icons/play-button.svg "play button")
+![alt tag](../../header-icons/play-button.svg "play button")
 
 Try clicking on the *Start* block or click on the *Play* button. You should hear the notes play in succession: `Do` `Mi` `Sol` `Do`.
 
@@ -123,7 +123,7 @@ See the
 for general details on how to use the blocks.
 
 See the
-[Music Blocks Programming Guide](https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md)
+[Music Blocks Programming Guide](https://github.com/sugarlabs/musicblocks/blob/master/Docs/guide/README.md)
 for details specific to music: *Rhythm*, *Meter*, *Pitch*, *Intervals*,
 *Tone*, *Ornament*, *Volume*, *Drum*, and *Widget*.
 
@@ -174,7 +174,7 @@ in that it lets you scroll through `C`, `D`, `E`, `F`, `G`, `A`,
 `B`. It also uses a second selector for sharps and flats.
 
 As noted, and described in more detail in the
-[Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md),
+[Music Blocks Programming Guide](https://github.com/sugarlabs/musicblocks/blob/master/Docs/guide/README.md),
 you can put as many *Pitch* blocks inside a note as you'd like. They
 will play together as a chord. You can also insert graphics blocks
 inside a note in order to create sound-sync animations.
@@ -354,7 +354,7 @@ blocks, individual note blocks, or the *Tuplet* block.
 
 The *Rhythm* block is used to specify a series of notes of the same
 duration (e.g., three quarter notes or seven eighth notes). The number
-of notes is the top argument; the bottom argument is the the note
+of notes is the top argument; the bottom argument is the note
 duration, e.g., `1/1` for a whole note, `1/2` for a half note, `1/4`
 for a quarter note, etc. (Recall that in traditional Western notation
 all note values are (1) in powers of two, and are (2) in relation to

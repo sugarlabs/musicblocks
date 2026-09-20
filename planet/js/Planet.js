@@ -247,6 +247,7 @@ class Planet {
         this.SaveInterface.init();
         this.LocalPlanet = new LocalPlanet(this);
         this.LocalPlanet.init();
+        if (this.GlobalPlanet) this.GlobalPlanet.destroy();
         this.GlobalPlanet = new GlobalPlanet(this);
         this.GlobalPlanet.init();
     }

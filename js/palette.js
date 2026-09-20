@@ -19,7 +19,7 @@ const _paletteIconCache = new Map();
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES, base64Encode,
    safeSVG, blockIsMacro, getMacroExpansion, StatusMatrix,
-   activity, cameraPALETTE, mediaPALETTE, videoPALETTE
+   activity, cameraPALETTE, mediaPALETTE, videoPALETTE, makeKeyboardAccessible
 */
 
 /* exported Palettes, initPalettes */
@@ -61,6 +61,12 @@ const makePaletteIcons = (data, width, height) => {
 
     const img = new Image();
     img.src = src;
+    // Decorative icon: the parent element (palette tab, button, etc.)
+    // already carries an aria-label/role, so mark this image as
+    // presentational to avoid duplicate/empty announcements for
+    // screen reader users (WCAG 1.1.1 Non-text Content).
+    img.alt = "";
+    img.setAttribute("role", "presentation");
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
@@ -152,7 +158,39 @@ class Palettes {
 
         palette.addEventListener("keydown", event => {
             const key = event.key;
-            if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"].includes(key)) {
+
+            // Exit palette keyboard navigation without allowing Escape to reach
+            // the global play shortcut.
+            const isEscape = key === "Escape" || key === "Esc" || event.keyCode === 27;
+            if (isEscape) {
+                const searchWidget = document.getElementById("search");
+                if (searchWidget && document.activeElement === searchWidget) return;
+
+                event.preventDefault();
+                event.stopPropagation();
+                this.resetKeyboardNavigation({ closeMenus: true, blur: true });
+
+                if (
+                    typeof window !== "undefined" &&
+                    window._focusCycleManager &&
+                    typeof window._focusCycleManager.exitKeyboardNavigation === "function"
+                ) {
+                    window._focusCycleManager.exitKeyboardNavigation();
+                }
+                return;
+            }
+
+            if (
+                ![
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "ArrowUp",
+                    "ArrowDown",
+                    "Enter",
+                    " ",
+                    "Spacebar"
+                ].includes(key)
+            ) {
                 return;
             }
 
@@ -268,7 +306,7 @@ class Palettes {
                     }
                 }
                 this._updateKeyboardFocus(tr, blockRows);
-            } else if (key === "Enter") {
+            } else if (key === "Enter" || key === " " || key === "Spacebar") {
                 this._activateCurrentNavItem(blockRows);
             }
         });
@@ -582,7 +620,7 @@ class Palettes {
     deltaY(dy) {
         // Cache DOM element reference to avoid multiple lookups and forced reflow
         const palette = document.getElementById("palette");
-        const curr = parseInt(palette.style.top);
+        const curr = parseInt(palette.style.top, 10);
         palette.style.top = curr + dy + "px";
     }
 
@@ -595,13 +633,13 @@ class Palettes {
 
         if (this.collapsed) {
             palette.style.transform = "translateX(-100%)";
-            document.getElementById("paletteToggle").innerHTML = "▶";
+            document.getElementById("paletteToggle").textContent = "▶";
             document.getElementById("paletteToggle").setAttribute("aria-expanded", "false");
             palette.style.transition = "transform 0.3s ease";
             this.paletteWidth = 0;
         } else {
             palette.style.transform = "translateX(0)";
-            document.getElementById("paletteToggle").innerHTML = "◀";
+            document.getElementById("paletteToggle").textContent = "◀";
             document.getElementById("paletteToggle").setAttribute("aria-expanded", "true");
             this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
         }
@@ -644,7 +682,7 @@ class Palettes {
             document.body.appendChild(element);
 
             const toggleBtn = document.createElement("div");
-            toggleBtn.innerHTML = "◀";
+            toggleBtn.textContent = "◀";
             toggleBtn.id = "paletteToggle";
             toggleBtn.setAttribute("role", "button");
             toggleBtn.setAttribute("aria-label", _("Toggle Palette"));
@@ -697,6 +735,8 @@ class Palettes {
 
             toggleBtn.style.fontWeight = "bold";
             toggleBtn.style.fontSize = "14px";
+
+            makeKeyboardAccessible(toggleBtn, _("Toggle Palette"));
         }
 
         const tr = docById("palette").children[0].children[0].children[0].children[0];
@@ -887,11 +927,17 @@ class Palettes {
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
+        img.style.flexShrink = "0";
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
         row.style.borderBottom = "1px solid #0CAFFF";
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
+        label.style.overflow = "hidden";
+        label.style.textOverflow = "ellipsis";
+        label.style.whiteSpace = "nowrap";
+        label.style.maxWidth = "75px";
+        label.style.display = "inline-block";
         row.style.display = "flex";
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
@@ -928,10 +974,16 @@ class Palettes {
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
+        img.style.flexShrink = "0";
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
+        label.style.overflow = "hidden";
+        label.style.textOverflow = "ellipsis";
+        label.style.whiteSpace = "nowrap";
+        label.style.maxWidth = "75px";
+        label.style.display = "inline-block";
         row.style.display = "flex";
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
@@ -979,6 +1031,9 @@ class Palettes {
         // Hide the menu buttons and the palettes themselves.
 
         this.activity.hideSearchWidget(true);
+        if (this.activePalette !== null) {
+            this.lastActivePalette = this.activePalette;
+        }
         this.activePalette = null;
 
         if (docById("PaletteBody"))
@@ -1313,7 +1368,7 @@ class PaletteModel {
                             label = `${_("store in")} ${block.staticLabels[0]}`;
                         }
                     } else {
-                        label = block.defaults[0];
+                        label = _(block.defaults[0]);
                     }
                 } else if (protoBlock.staticLabels.length > 0) {
                     label = protoBlock.staticLabels[0];
@@ -1480,10 +1535,37 @@ class Palette {
         this._hideMenuItems();
     }
 
+    /**
+     * Vertical scroll offset of the open block list, negative when scrolled
+     * down. Kept in the sign convention of the pre-HTML palette so the
+     * keyboard controller's Home handler (which passes -scrollDiff) still
+     * scrolls back to the top.
+     * @returns {number}
+     */
+    get scrollDiff() {
+        const items = docById("PaletteBody_items");
+        return items ? -items.scrollTop : 0;
+    }
+
+    /**
+     * Scroll the open block list. A positive direction moves the list down
+     * (revealing blocks above), a negative one moves it up.
+     * @param {number} direction - signed pixel amount
+     * @param {number} scrollSpeed - multiplier
+     * @returns {void}
+     */
+    scrollEvent(direction, scrollSpeed) {
+        const items = docById("PaletteBody_items");
+        if (!items) {
+            return;
+        }
+        items.scrollTop -= direction * scrollSpeed;
+    }
+
     showMenu(createHeader) {
         const palDiv = docById("palette");
         palDiv.childNodes[0].style.borderRight = "0";
-        if (docById("PaletteBody")) palDiv.removeChild(docById("PaletteBody"));
+        if (docById("PaletteBody")) docById("PaletteBody").remove();
         const palBody = document.createElement("table");
         palBody.id = "PaletteBody";
         const palBodyHeight = window.innerHeight - this.palettes.top - this.palettes.cellSize - 26;
@@ -1498,13 +1580,17 @@ class Palette {
         palBody.style.minWidth = "180px";
         palBody.style.background = platformColor.paletteBackground;
         palBody.style.float = "left";
+        palBody.style.position = "fixed";
+        palBody.style.left = `${palDiv.offsetLeft + palDiv.children[0].offsetWidth}px`;
+        palBody.style.top = `${palDiv.offsetTop}px`;
+        palBody.style.zIndex = palDiv.style.zIndex;
 
         palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
         [palBody.childNodes[0], palBody.childNodes[1]].forEach(item => {
             item.style.boxSizing = "border-box";
             item.style.padding = "8px";
         });
-        palDiv.appendChild(palBody);
+        palDiv.parentNode.appendChild(palBody);
 
         this.menuContainer = palBody;
 
@@ -1512,8 +1598,10 @@ class Palette {
             let header = this.menuContainer.children[0];
             header = header.insertRow();
             header.style.backgroundColor = platformColor.paletteLabelBackground;
-            header.innerHTML =
-                '<td style ="width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;"></td>';
+            const headerCell = document.createElement("td");
+            headerCell.style.cssText =
+                "width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;";
+            header.appendChild(headerCell);
             header = header.children[0];
             header.style.padding = "8px";
 
@@ -1540,7 +1628,15 @@ class Palette {
                 this.palettes.cellSize,
                 this.palettes.cellSize
             );
+            // This icon is functional (closes the menu), not decorative,
+            // so override the default presentational/empty-alt markup
+            // applied in makePaletteIcons with a real accessible name.
+            closeImg.removeAttribute("role");
+            closeImg.alt = _("Close");
+            closeImg.setAttribute("role", "button");
+            closeImg.tabIndex = 0;
             closeImg.onclick = () => this.hideMenu();
+            makeKeyboardAccessible(closeImg, _("Close"));
             closeImg.onmouseover = () => (document.body.style.cursor = "pointer");
             closeImg.onmouseleave = () => (document.body.style.cursor = "default");
             closeDownImg.appendChild(closeImg);
@@ -1548,6 +1644,11 @@ class Palette {
         }
 
         this._showMenuItems();
+        if (this.palettes.mobile) {
+            return;
+        }
+        const paletteItems = docById("PaletteBody_items");
+        paletteItems.style.height = `${window.innerHeight - paletteItems.getBoundingClientRect().top}px`;
 
         // Close palette menu on outside click
         // Remove any existing outside-click listener
@@ -1575,7 +1676,7 @@ class Palette {
         if (this.name === "search" && this.activity.hideSearchWidget !== null) {
             this.activity.hideSearchWidget(true);
         }
-        if (docById("PaletteBody")) docById("palette").removeChild(docById("PaletteBody"));
+        if (docById("PaletteBody")) docById("PaletteBody").remove();
     }
 
     _showMenuItems() {
@@ -1664,8 +1765,8 @@ class Palette {
                     img.onmouseup = null;
                     img.ontouchend = null;
 
-                    const x = parseInt(img.style.left);
-                    const y = parseInt(img.style.top);
+                    const x = parseInt(img.style.left, 10);
+                    const y = parseInt(img.style.top, 10);
 
                     img.style.position = posit;
                     img.style.zIndex = zInd;
@@ -1927,16 +2028,17 @@ class Palette {
     }
 
     _makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY) {
+        // Prevent block creation from triggering a 'move' undo action
+        // by clearing the palette block's drag start coordinates
+        this.activity.blocks.dragStartX = undefined;
+        this.activity.blocks.dragStartY = undefined;
+
         let newBlock;
         const __myCallback = newBlock => {
             // Move the drag group under the cursor.
             this.activity.blocks.findDragGroup(newBlock);
-            for (const i in this.activity.blocks.dragGroup) {
-                this.activity.blocks.moveBlockRelative(
-                    this.activity.blocks.dragGroup[i],
-                    saveX,
-                    saveY
-                );
+            for (const blockId of this.activity.blocks.dragGroup) {
+                this.activity.blocks.moveBlockRelative(blockId, saveX, saveY);
             }
             // Dock with other blocks if needed
             this.activity.blocks.blockMoved(newBlock);
@@ -1966,7 +2068,11 @@ class Palette {
                 if (block.name === "print") {
                     const arg = block.connections[1];
                     if (arg !== null && arg in this.activity.blocks.blockList) {
-                        this.activity.logo.parseArg(this.activity.logo, 0, arg);
+                        try {
+                            this.activity.logo.parseArg(this.activity.logo, 0, arg);
+                        } catch (e) {
+                            // turtle not yet initialized; skip field registration
+                        }
                     }
                 }
 
@@ -2068,6 +2174,18 @@ class Palette {
                 }
 
                 initializeStatusMatrix(topBlk);
+
+                // Add block creation to the undo history
+                if (
+                    this.activity.blocks.actionHistory &&
+                    !this.activity.blocks.isUndoingOrRedoing
+                ) {
+                    this.activity.blocks.actionHistory.push({
+                        type: "restore",
+                        blockId: topBlk
+                    });
+                    this.activity.blocks.redoActionHistory = [];
+                }
             } else if (this.name === "myblocks") {
                 // If we are on the myblocks palette, it is a macro.
                 const macroName = blkname.replace("macro_", "");
@@ -2133,6 +2251,18 @@ class Palette {
                 setTimeout(() => {
                     this.activity.blocks.blockList[topBlk].collapseToggle();
                 }, 500);
+
+                // Add block creation to the undo history
+                if (
+                    this.activity.blocks.actionHistory &&
+                    !this.activity.blocks.isUndoingOrRedoing
+                ) {
+                    this.activity.blocks.actionHistory.push({
+                        type: "restore",
+                        blockId: topBlk
+                    });
+                    this.activity.blocks.redoActionHistory = [];
+                }
             } else {
                 newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback);
                 // Ensure that the newly created block is not under
@@ -2146,6 +2276,18 @@ class Palette {
                         this.activity.palettes.paletteWidth * 2,
                         this.activity.blocks.blockList[newBlock].container.y
                     );
+                }
+
+                // Add block creation to the undo history
+                if (
+                    this.activity.blocks.actionHistory &&
+                    !this.activity.blocks.isUndoingOrRedoing
+                ) {
+                    this.activity.blocks.actionHistory.push({
+                        type: "restore",
+                        blockId: newBlock
+                    });
+                    this.activity.blocks.redoActionHistory = [];
                 }
             }
         }

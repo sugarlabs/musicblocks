@@ -16,7 +16,8 @@ export default [
             "**/*.min.js",
             "**/bower_components/**",
             "**/planet/libs/**",
-            "**/sounds/**"
+            "**/sounds/**",
+            "**/.kilo/**"
         ]
     },
 
@@ -178,20 +179,6 @@ export default [
         files: ["**/__tests__/**/*.js", "**/*.test.js"],
         rules: {
             "no-undef": "off"
-        }
-    },
-
-
-    {
-        files: ["js/practice/**/*.js"],
-        languageOptions: {
-            sourceType: "module"
-        }
-    },
-    {
-        files: ["js/badges/**/*.js"],
-        languageOptions: {
-            sourceType: "module"
         }
     },
 

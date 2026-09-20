@@ -31,6 +31,7 @@ global.POSNUMBER = "POS_NUMBER";
 class BaseBlock {
     constructor(name) {
         this.name = name;
+        this.capabilities = Object.create(null);
         this.dockTypes = [null];
         this.size = 1;
         this.lang = "en";
@@ -43,6 +44,16 @@ class BaseBlock {
 
     setHelpString(help) {
         this.help = help;
+    }
+
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+    }
+
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
 
     formBlock(defn) {
@@ -97,12 +108,14 @@ global.BaseBlock = BaseBlock;
 global.FlowBlock = FlowBlock;
 global.FlowClampBlock = FlowClampBlock;
 global.ValueBlock = ValueBlock;
+// Field names match the runtime Queue class (js/logo.js): blk, count,
+// parentBlk, args - not child/factor/receivedArg.
 global.Queue = class Queue {
-    constructor(child, factor, parentBlk, receivedArg) {
-        this.child = child;
-        this.factor = factor;
+    constructor(blk, count, parentBlk, args) {
+        this.blk = blk;
+        this.count = count;
         this.parentBlk = parentBlk;
-        this.receivedArg = receivedArg;
+        this.args = args;
     }
 };
 
@@ -253,7 +266,7 @@ describe("FlowBlocks integration", () => {
         // Factor is multiplied before listener runs
         expect(turtle.singer.duplicateFactor).toBe(2);
         const listener = logo.setTurtleListener.mock.calls.pop()[2];
-        listener();
+        expect(listener()).toBeUndefined();
         expect(turtle.singer.duplicateFactor).toBe(1);
 
         // Path where another turtle already stored connections
@@ -301,6 +314,25 @@ describe("FlowBlocks integration", () => {
         }).toThrow();
 
         // The critical guarantee: lock is released even after an error
+        expect(logo.connectionStoreLock).toBe(false);
+    });
+
+    test("DuplicateBlock listener releases lock when restoration throws", () => {
+        const block = getBlock("duplicatenotes");
+        const blk = 0;
+        activity.blocks.blockList = {
+            0: { name: "duplicatenotes", connections: [null, 1, null, 2] },
+            1: { name: "visibleA", connections: [0, 2] },
+            2: { name: "hidden", connections: [1, null] }
+        };
+        activity.blocks.findBottomBlock = jest.fn(() => 1);
+        logo.connectionStore = { 0: {} };
+
+        block.flow([2, 1], logo, 0, blk, []);
+        logo.connectionStore[0][blk] = [["missing", 0, null]];
+        const listener = logo.setTurtleListener.mock.calls.pop()[2];
+
+        expect(() => listener()).toThrow();
         expect(logo.connectionStoreLock).toBe(false);
     });
 
@@ -353,7 +385,7 @@ describe("FlowBlocks integration", () => {
         ];
         logo.parseArg.mockReturnValue("match");
         listener();
-        expect(activity.turtles.ithTurtle(0).queue[0].child).toBe(12);
+        expect(activity.turtles.ithTurtle(0).queue[0].blk).toBe(12);
 
         // Default path when no case matches
         logo.switchBlocks[0] = [blk];
@@ -365,7 +397,42 @@ describe("FlowBlocks integration", () => {
         ];
         logo.parseArg.mockReturnValue("unknown");
         listener();
-        expect(activity.turtles.ithTurtle(0).queue.pop().child).toBe(77);
+        expect(activity.turtles.ithTurtle(0).queue.pop().blk).toBe(77);
+    });
+
+    test("SwitchBlock resolves an arg-block selector using the receivedArg it was called with (#8690)", () => {
+        const block = getBlock("switch");
+        const blk = 5;
+        const argBlk = 21;
+        activity.blocks.blockList[blk] = { connections: [null, argBlk] };
+        logo.switchBlocks[0] = [];
+        logo.switchCases[0] = {};
+
+        // Simulate this switch running inside an action call: receivedArg is
+        // the actionArgs array threaded down from the enclosing "do with arg".
+        const receivedArg = ["fromAction"];
+        block.flow([null, 9], logo, 0, blk, receivedArg);
+        const listener = logo.setTurtleListener.mock.calls.pop()[2];
+
+        logo.switchBlocks[0] = [blk];
+        logo.switchCases[0][blk] = [
+            [
+                ["fromAction", 30],
+                ["__default__", 31]
+            ]
+        ];
+        // The mock parseArg only resolves to the 5th (receivedArg) argument,
+        // so this only matches if flow()'s receivedArg reached the listener
+        // and was passed to parseArg in the correct position.
+        logo.parseArg.mockImplementation((...args) => args[4]?.[0] ?? "match");
+        listener();
+
+        expect(logo.parseArg).toHaveBeenCalledWith(logo, 0, argBlk, blk, receivedArg);
+        const queued = activity.turtles.ithTurtle(0).queue.pop();
+        expect(queued.blk).toBe(30);
+        // The matched case's own body must also receive receivedArg, so any
+        // arg block nested inside it can resolve the action's argument too.
+        expect(queued.args).toBe(receivedArg);
     });
 
     test("ClampBlock simply forwards flow", () => {
@@ -399,6 +466,9 @@ describe("FlowBlocks integration", () => {
         logo.firstNoteTime = null;
         block.flow([true], logo, 0, blk);
         expect(logo.firstNoteTime).not.toBeNull();
+        expect(Number.isFinite(turtle.singer.turtleTime)).toBe(true);
+        expect(turtle.singer.turtleTime).toBeGreaterThanOrEqual(0);
+        expect(turtle.singer.previousTurtleTime).toBe(turtle.singer.turtleTime);
         // One requeued entry should remain for this block
         const remaining = turtle.queue.filter(q => q.parentBlk === blk);
         expect(remaining).toHaveLength(1);
@@ -432,6 +502,53 @@ describe("FlowBlocks integration", () => {
         turtle.queue.push(new Queue(98, 1, blk));
         block.flow([false, 82], logo, 0, blk);
         expect(turtle.queue).toHaveLength(1);
+    });
+
+    test("WaitForBlock's requeue carries receivedArg forward so a later re-check can still resolve an arg block (#8696)", () => {
+        const block = getBlock("waitFor");
+        const blk = 6;
+        activity.blocks.blockList[blk] = { connections: [60] };
+
+        const receivedArg = ["fromAction"];
+        block.flow([false], logo, 0, blk, receivedArg);
+
+        const turtle = activity.turtles.ithTurtle(0);
+        expect(turtle.queue[0].args).toBe(receivedArg);
+
+        // Simulate the queue runner: the args it just queued are the
+        // receivedArg passed into the next flow() call for the re-check.
+        block.flow([false], logo, 0, blk, turtle.queue[0].args);
+        expect(turtle.queue[1].args).toBe(receivedArg);
+    });
+
+    test("UntilBlock's requeue carries receivedArg forward so a later re-check can still resolve an arg block (#8696)", () => {
+        const block = getBlock("until");
+        const blk = 7;
+        activity.blocks.blockList[blk] = { connections: [70] };
+
+        const receivedArg = ["fromAction"];
+        block.flow([false, 71], logo, 0, blk, receivedArg);
+
+        const turtle = activity.turtles.ithTurtle(0);
+        expect(turtle.queue[0].args).toBe(receivedArg);
+
+        block.flow([false, 71], logo, 0, blk, turtle.queue[0].args);
+        expect(turtle.queue[1].args).toBe(receivedArg);
+    });
+
+    test("WhileBlock's requeue carries receivedArg forward so a later re-check can still resolve an arg block (#8696)", () => {
+        const block = getBlock("while");
+        const blk = 8;
+        activity.blocks.blockList[blk] = { connections: [80] };
+
+        const receivedArg = ["fromAction"];
+        block.flow([true, 81], logo, 0, blk, receivedArg);
+
+        const turtle = activity.turtles.ithTurtle(0);
+        expect(turtle.queue[0].args).toBe(receivedArg);
+
+        block.flow([true, 81], logo, 0, blk, turtle.queue[0].args);
+        expect(turtle.queue[1].args).toBe(receivedArg);
     });
 
     test("IfThenElseBlock chooses correct branch", () => {
@@ -484,6 +601,11 @@ describe("FlowBlocks integration", () => {
     test("Hidden block variants simply no-op", () => {
         expect(() => getBlock("hiddennoflow").flow()).not.toThrow();
         expect(() => getBlock("hidden").flow()).not.toThrow();
+    });
+
+    test("Hidden block variants declare the noHit capability", () => {
+        expect(getBlock("hiddennoflow").getCapability("noHit")).toBe(true);
+        expect(getBlock("hidden").getCapability("noHit")).toBe(true);
     });
 
     test("WaitForBlock ignores malformed args and While/Until guard arg length", () => {

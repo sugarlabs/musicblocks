@@ -11,14 +11,17 @@
 
 /**
  * @file LogoDependencies.js
- * @description Explicit dependency container for the Logo execution engine.
+ * @description LogoDependencies instance — explicit dependency container for
+ * the Logo execution engine.
  *
- * This class manages Logo's explicit dependencies.
+ * This class bundles the dependencies that Logo requires so they can be
+ * injected explicitly rather than read from globals.
  */
 
 /**
  * @class
- * @classdesc Container for Logo's explicit dependencies.
+ * @classdesc LogoDependencies instance: bundles all dependencies required by
+ * the Logo execution engine into a single typed container.
  */
 class LogoDependencies {
     /**
@@ -61,7 +64,18 @@ class LogoDependencies {
      * @param {Function} deps.callbacks.onStopTurtle - Called when turtle stops
      * @param {Function} deps.callbacks.onRunTurtle - Called when turtle runs
      *
-
+     * @param {Function} [deps.refreshCanvas] - Trigger a canvas repaint after parameter block updates
+     * @param {Function} [deps.textMsg] - Display a transient text message to the user
+     * @param {Function} [deps.markStageDirty] - Notify the stage that a visual update is pending
+     *
+     * @param {Object} [deps.save] - Save-completion callbacks for notation export
+     * @param {Function} [deps.save.afterSaveLilypond]
+     * @param {Function} [deps.save.afterSaveAbc]
+     * @param {Function} [deps.save.afterSaveMxml]
+     * @param {Function} [deps.save.afterSaveMIDI]
+     *
+     * @param {Object} [deps.statsWindow] - Stats display handler
+     * @param {Function} [deps.statsWindow.displayInfo]
      */
     constructor({
         blocks,
@@ -73,10 +87,17 @@ class LogoDependencies {
         config,
         callbacks,
 
+        refreshCanvas = null,
+        textMsg = null,
+        markStageDirty = null,
+        save = null,
+        statsWindow = null,
+
         instruments = null,
         instrumentsFilters = null,
         instrumentsEffects = null,
         widgetWindows = null,
+        cameraUtils = null,
         utils = null,
         Singer = null,
         Tone = null,
@@ -144,6 +165,41 @@ class LogoDependencies {
          */
         this.callbacks = callbacks || { onStopTurtle: null, onRunTurtle: null };
 
+        /**
+         * Trigger a canvas repaint after parameter block updates during stepped execution.
+         * @type {Function}
+         */
+        this.refreshCanvas = refreshCanvas || (() => {});
+
+        /**
+         * Display a transient text message to the user (used by print blocks and debug output).
+         * @type {Function}
+         */
+        this.textMsg = textMsg || (() => {});
+
+        /**
+         * Notify the rendering loop that the stage needs a visual update.
+         * @type {Function}
+         */
+        this.markStageDirty = markStageDirty || (() => {});
+
+        /**
+         * Save-completion callbacks for notation export (Lilypond, ABC, MusicXML, MIDI).
+         * @type {Object}
+         */
+        this.save = save || {
+            afterSaveLilypond: () => {},
+            afterSaveAbc: () => {},
+            afterSaveMxml: () => {},
+            afterSaveMIDI: () => {}
+        };
+
+        /**
+         * Stats window — displays project statistics after a collection run.
+         * @type {Object}
+         */
+        this.statsWindow = statsWindow || { displayInfo: () => {} };
+
         // Audio and utility dependencies
         this.instruments =
             instruments || (typeof window !== "undefined" ? window.instruments : null);
@@ -157,9 +213,26 @@ class LogoDependencies {
             widgetWindows || (typeof window !== "undefined" ? window.widgetWindows : null);
         this.Singer = Singer || (typeof window !== "undefined" ? window.Singer : null);
         this.Tone = Tone || (typeof window !== "undefined" ? window.Tone : null);
-        this.utils = utils || {
-            doUseCamera: typeof doUseCamera !== "undefined" ? doUseCamera : null,
-            doStopVideoCam: typeof doStopVideoCam !== "undefined" ? doStopVideoCam : null,
+        const resolvedCameraUtils =
+            cameraUtils ||
+            (typeof CameraUtils !== "undefined"
+                ? CameraUtils
+                : typeof window !== "undefined"
+                  ? window.CameraUtils
+                  : null);
+        this.cameraUtils = resolvedCameraUtils;
+        this.utils = utils || {};
+        const fallbackUtils = {
+            doUseCamera: resolvedCameraUtils
+                ? resolvedCameraUtils.doUseCamera
+                : typeof doUseCamera !== "undefined"
+                  ? doUseCamera
+                  : null,
+            doStopVideoCam: resolvedCameraUtils
+                ? resolvedCameraUtils.doStopVideoCam
+                : typeof doStopVideoCam !== "undefined"
+                  ? doStopVideoCam
+                  : null,
             getIntervalDirection:
                 typeof getIntervalDirection !== "undefined" ? getIntervalDirection : null,
             getIntervalNumber: typeof getIntervalNumber !== "undefined" ? getIntervalNumber : null,
@@ -171,6 +244,11 @@ class LogoDependencies {
             delayExecution: typeof delayExecution !== "undefined" ? delayExecution : null,
             last: typeof last !== "undefined" ? last : null
         };
+        Object.keys(fallbackUtils).forEach(key => {
+            if (this.utils[key] === undefined) {
+                this.utils[key] = fallbackUtils[key];
+            }
+        });
         this.classes = classes || {
             Notation: typeof Notation !== "undefined" ? Notation : null,
             Synth: typeof Synth !== "undefined" ? Synth : null,
@@ -190,11 +268,18 @@ class LogoDependencies {
      * const logo = new Logo(deps);
      */
     static fromActivity(activity) {
+        const resolvedCameraUtils =
+            typeof CameraUtils !== "undefined"
+                ? CameraUtils
+                : typeof window !== "undefined" && window.CameraUtils
+                  ? window.CameraUtils
+                  : null;
+
         return new LogoDependencies({
             blocks: activity.blocks,
             turtles: activity.turtles,
             stage: activity.stage,
-            errorHandler: msg => activity.errorMsg(msg),
+            errorHandler: (msg, blk) => activity.errorMsg(msg, blk),
             messageHandler: {
                 hide: () => activity.hideMsgs()
             },
@@ -213,6 +298,29 @@ class LogoDependencies {
                 onStopTurtle: activity.onStopTurtle,
                 onRunTurtle: activity.onRunTurtle
             },
+            refreshCanvas: () => activity.refreshCanvas && activity.refreshCanvas(),
+            textMsg: msg => activity.textMsg && activity.textMsg(msg),
+            markStageDirty: () => {
+                activity.stageDirty = true;
+            },
+            save: {
+                afterSaveLilypond: () =>
+                    activity.save &&
+                    activity.save.afterSaveLilypond &&
+                    activity.save.afterSaveLilypond(),
+                afterSaveAbc: () =>
+                    activity.save && activity.save.afterSaveAbc && activity.save.afterSaveAbc(),
+                afterSaveMxml: () =>
+                    activity.save && activity.save.afterSaveMxml && activity.save.afterSaveMxml(),
+                afterSaveMIDI: () =>
+                    activity.save && activity.save.afterSaveMIDI && activity.save.afterSaveMIDI()
+            },
+            statsWindow: {
+                displayInfo: (...args) =>
+                    activity.statsWindow &&
+                    activity.statsWindow.displayInfo &&
+                    activity.statsWindow.displayInfo(...args)
+            },
 
             // Pass globals for backward compatibility during migration
             instruments: typeof instruments !== "undefined" ? instruments : null,
@@ -223,9 +331,18 @@ class LogoDependencies {
             widgetWindows: typeof window !== "undefined" ? window.widgetWindows : null,
             Singer: typeof Singer !== "undefined" ? Singer : null,
             Tone: typeof Tone !== "undefined" ? Tone : null,
+            cameraUtils: resolvedCameraUtils,
             utils: {
-                doUseCamera: typeof doUseCamera !== "undefined" ? doUseCamera : null,
-                doStopVideoCam: typeof doStopVideoCam !== "undefined" ? doStopVideoCam : null,
+                doUseCamera: resolvedCameraUtils
+                    ? resolvedCameraUtils.doUseCamera
+                    : typeof doUseCamera !== "undefined"
+                      ? doUseCamera
+                      : null,
+                doStopVideoCam: resolvedCameraUtils
+                    ? resolvedCameraUtils.doStopVideoCam
+                    : typeof doStopVideoCam !== "undefined"
+                      ? doStopVideoCam
+                      : null,
                 getIntervalDirection:
                     typeof getIntervalDirection !== "undefined" ? getIntervalDirection : null,
                 getIntervalNumber:

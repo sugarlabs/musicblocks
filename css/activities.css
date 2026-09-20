@@ -19,45 +19,45 @@
 }
 
 *:focus-visible {
-    outline: 2px solid #0066ff !important;
+    outline: 2px solid var(--color-brand-primary) !important;
     outline-offset: 2px;
 }
 
 body:not(.dark):not(.highcontrast) #helpfulSearch,
 body:not(.dark):not(.highcontrast) .ui-autocomplete {
-    background-color: #fff !important;
-    color: #000 !important;
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
 }
 
 body:not(.dark):not(.highcontrast) .ui-autocomplete li:hover {
-    background-color: #ddd !important;
+    background-color: var(--color-bg-tertiary) !important;
 }
 
 body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
-    background-color: #f9f9f9 !important;
+    background-color: var(--color-bg-secondary) !important;
 }
 
 /* High Contrast Mode Search Suggestions */
 .highcontrast .ui-menu {
-    background-color: #000000 !important;
+    background-color: var(--color-text-inverse) !important;
     border: 1px solid #ffffff !important;
 }
 
 .highcontrast .ui-menu .ui-menu-item {
-    color: #ffffff !important;
+    color: var(--color-text-inverse) !important;
 }
 
 .highcontrast .ui-menu .ui-menu-item:hover,
 .highcontrast .ui-menu .ui-state-focus {
-    background-color: #333333 !important;
-    color: #00ffff !important;
+    background-color: var(--color-bg-tertiary) !important;
+    color: var(--color-brand-secondary) !important;
 }
 
 #newdropdown {
     font-size: 16px;
-    background-color: #fff;
-    border: 1px solid #cccccc;
-    color: #000000;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    color: var(--color-text-primary);
     padding: 24px;
     width: 400px;
     border-radius: 8px;
@@ -88,7 +88,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     line-height: normal;
     font-size: 24px;
     text-align: left;
-    color: #0066ff;
+    color: var(--color-brand-primary);
 }
 
 #confirmation-message {
@@ -104,7 +104,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     transform: translate(-50%, -50%);
     width: 400px;
     padding: 24px;
-    background-color: #fff;
+    background-color: var(--color-panel-bg);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     z-index: 10000;
@@ -112,13 +112,13 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .modal-title {
-    color: #0066ff;
+    color: var(--color-brand-primary);
     font-size: 24px;
     margin: 0 0 16px 0;
 }
 
 .modal-message {
-    color: black;
+    color: var(--color-text-primary);
     font-size: 16px;
     margin-bottom: 24px;
 }
@@ -134,29 +134,84 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     padding: 8px 16px;
     font-weight: bold;
     cursor: pointer;
-    background-color: #0066ff;
-    color: white;
+    background-color: var(--color-brand-primary);
+    color: var(--color-text-inverse);
     margin-right: 16px;
     transition: background-color 0.2s ease;
 }
 
 .confirm-button:hover {
-    background-color: #023a76;
+    background-color: var(--color-brand-primary-hover);
 }
 
 .cancel-button {
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: #e0e0e0;
-  color: black;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
 }
 
 .cancel-button:hover {
-    background-color: #afafaf;
+    background-color: var(--color-border-primary);
+}
+
+/* Plugin dialog modal styles */
+.plugin-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+}
+
+.plugin-modal-select {
+    width: 100% !important;
+    padding: 10px 12px !important;
+    margin-bottom: 24px;
+    font-size: 16px;
+    font-weight: normal !important;
+    text-align: left !important;
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary);
+    border: 2px solid var(--color-border-primary) !important;
+    border-radius: 8px;
+    cursor: pointer;
+    appearance: auto;
+    transition: border-color 0.2s ease;
+}
+
+.plugin-modal-select:focus {
+    border-color: var(--color-brand-primary) !important;
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+.plugin-modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.plugin-upload-button {
+    border: 2px solid var(--color-brand-primary);
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: transparent;
+    color: var(--color-brand-primary);
+    transition: all 0.2s ease;
+}
+
+.plugin-upload-button:hover {
+    background-color: var(--color-brand-primary);
+    color: var(--color-text-inverse);
 }
 
 .modal {
@@ -178,7 +233,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     transform: translate(-50%, -50%);
     width: 400px;
     padding: 24px;
-    background-color: #fefefe;
+    background-color: var(--color-bg-primary);
     box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
     border-radius: 8px;
     z-index: 10000;
@@ -188,9 +243,9 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 .block-count-dropdown {
     padding: 4px !important;
     font-size: 16px;
-    border: 2px solid #ccc;
+    border: 2px solid var(--color-border-primary);
     border-radius: 8px;
-    background: #dedededd;
+    background: var(--color-bg-tertiary);
     cursor: pointer;
     width: fit-content;
     text-align: center;
@@ -208,7 +263,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .close {
-    color: #aaa;
+    color: var(--color-text-tertiary);
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -227,17 +282,20 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     width: 300px;
     height: 48px;
     padding: 0 16px;
-    background-color: #ffffff;
-    border: 2px solid #03a9f4;
+    background-color: var(--color-bg-primary);
+    border: 2px solid var(--color-brand-primary);
     border-radius: 24px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     font-size: 18px;
     transition: all 0.2s ease;
     margin-left: 8px;
 }
+#searchDragHandle {
+    pointer-events: auto;
+}
 
 #search:focus {
-    border-color: #4da6ff;
+    border-color: var(--color-brand-primary-hover);
     box-shadow: 0 4px 12px rgba(77, 166, 255, 0.2);
     outline: none;
 }
@@ -247,43 +305,57 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 #helpfulSearchDiv {
-    display: block !important;
-    position: absolute;
-    background-color: #f0f0f0;
-    padding: 2px;
-    border: 1px solid #ccc;
-    width: 230px;
-    z-index: 1;
+    position: fixed !important;
+    background-color: var(--color-bg-secondary);
+    padding: 0;
+    border: 1px solid var(--color-border-primary);
+    border-radius: 24px;
+    width: 320px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    height: 46px;
+    overflow: hidden;
 }
 
 #helpfulSearch {
-    padding: 2px;
-    border: 2px solid grey;
-    width: 220px;
-    height: 20px;
+    padding: 0 40px 0 28px;
+    border: none;
+    width: 100%;
+    height: 46px;
     font-size: large;
+    background-color: transparent;
+    color: inherit;
+    outline: none;
+    display: block;
+    box-sizing: border-box;
 }
 
 #crossButton {
     position: absolute;
     top: 50%;
-    right: -30px;
+    right: 10px;
     transform: translateY(-50%);
-    background: transparent;
+    background: rgba(80, 80, 80, 0.5);
     border: none;
-    font-size: large;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    color: white;
+    font-size: 14px;
     cursor: pointer;
+    line-height: 22px;
+    text-align: center;
 }
 
 .trash-view {
     position: relative;
-    background-color: white;
+    background-color: var(--color-bg-primary);
     max-width: 396px;
     max-height: 200px;
     overflow-y: auto;
     font-size: 16px;
-    color: black;
-    border: 2px solid #87cefa;
+    color: var(--color-text-primary);
+    border: 2px solid var(--color-brand-secondary);
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -298,10 +370,10 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     z-index: 10;
     display: flex;
     gap: 10px;
-    background: #2196f3;
+    background: var(--color-brand-primary);
     margin: 0;
     padding: 5px;
-    border-bottom: 1px solid #d9d9d9;
+    border-bottom: 1px solid var(--color-bg-tertiary);
 }
 
 .trash-item {
@@ -312,14 +384,18 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .trash-item.hover {
-    background-color: #d9d9d9;
+    background-color: var(--color-bg-tertiary);
 }
 
 .trash-item-icon {
-    width: 30px;
-    height: 30px;
-    margin-right: 10px;
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
     vertical-align: middle;
+    object-fit: contain;
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-sm);
+    padding: 2px;
 }
 
 #restoreLastIcon,
@@ -340,6 +416,25 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     display: none;
 }
 
+.trash-preview-popup {
+    position: fixed;
+    z-index: 10001;
+    background-color: var(--color-bg-primary);
+    border: 2px solid var(--color-brand-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 10px;
+    display: none;
+    pointer-events: none;
+}
+
+.trash-preview-popup img {
+    max-width: 400px;
+    max-height: 400px;
+    display: block;
+    object-fit: contain;
+}
+
 .ui-menu {
     position: relative;
     background-color: rgba(255, 255, 255, 1);
@@ -347,7 +442,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     max-height: 200px;
     overflow-y: auto;
     font-size: 18px;
-    border: 2px solid #87cefa;
+    border: 2px solid var(--color-brand-secondary);
     list-style-type: none;
 }
 
@@ -378,11 +473,11 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 #ui-id-1 li:hover:before {
-    background-color: #d0d3d4;
+    background-color: var(--color-bg-tertiary);
 }
 
 .ui-state-focus {
-    background-color: #d0d3d4;
+    background-color: var(--color-bg-tertiary);
 }
 
 .scrollSearch {
@@ -404,12 +499,33 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 #myBar {
     width: 0%;
     height: 40px;
-    background-color: #ffffff;
+    background-color: var(--color-bg-primary);
     line-height: 30px;
 }
 
-.blink {
+#record {
+    position: relative;
+}
+
+#record .dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+}
+
+#record.recording .dot {
+    color: red;
     animation: blink-animation 1.5s infinite;
+}
+
+@media (max-width: 690px) {
+    #record .ring,
+    #record .dot {
+        font-size: 26px;
+        margin: 0;
+        width: auto;
+    }
 }
 
 @keyframes blink-animation {
@@ -426,7 +542,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     left: 0;
     position: fixed;
     display: block;
-    background-color: #fff;
+    background-color: var(--color-bg-primary);
     opacity: 0.7;
     z-index: 99;
     text-align: center;
@@ -480,7 +596,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 #popdown-palette h3 {
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid var(--color-border-primary);
     width: 50%;
     padding: 0 10%;
 }
@@ -547,11 +663,29 @@ nav {
     background-color: #8bc34a;
     height: 64px;
     width: 100%;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
+    box-shadow:
+        0px 2px 5px 0px rgba(0, 0, 0, 0.16),
+        0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     font: 32px sans;
     vertical-align: middle;
     line-height: 64px;
     color: white;
+}
+
+/* Auxiliary (secondary) toolbar opened by the 3-dot menu.
+   Its icon groups (ul.aux.left / ul.aux.right) are floated, and the toolbar
+   otherwise inherits the fixed 64px nav height, so when the icons wrap to a
+   second row (e.g. in advanced mode at some browser-zoom widths) that row
+   spilled below the blue background into the workspace. Contain the floated
+   rows and let the blue band grow to cover them, while keeping a single 64px
+   row when the icons fit. */
+#aux-toolbar,
+#aux-toolbar .nav-wrapper {
+    height: auto;
+    min-height: 64px;
+}
+#aux-toolbar .nav-wrapper {
+    display: flow-root;
 }
 
 nav .nav-container {
@@ -648,7 +782,7 @@ nav ul li {
 #planet-iframe {
     width: 100vw;
     height: calc(var(--vh, 1vh) * 100);
-    background-color: #fff;
+    background-color: var(--color-bg-primary);
     position: absolute;
     top: 0;
     left: 0;
@@ -679,7 +813,7 @@ img.icon:hover {
 }
 
 body {
-    background-color: #92b5c8 !important;
+    background-color: var(--color-bg-primary);
     /*  2.5B 7/4 */
     padding: 0;
     margin: 0;
@@ -693,7 +827,7 @@ body.noScroll {
 
 body.samples-shown {
     overflow-y: scroll;
-    background: white !important;
+    background: var(--color-bg-primary);
 }
 
 select {
@@ -707,7 +841,7 @@ select {
 }
 
 input.input {
-    background-color: #fff !important;
+    background-color: var(--color-bg-primary) !important;
     text-align: center;
     font-weight: bold !important;
     font-size: 24px !important;
@@ -951,7 +1085,7 @@ table {
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: transparent;
     width: 680px;
 }
 
@@ -1161,12 +1295,12 @@ table {
     width: 100%;
     position: absolute;
     top: 0;
-    background: #2196f3;
+    background: var(--color-brand-primary);
     font-family: sans-serif;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    color: #fff;
+    color: var(--color-text-inverse);
     font-size: 1.1em;
     text-align: center;
     height: 55px;
@@ -1222,8 +1356,9 @@ table {
 }
 
 .help-widget-frame {
-    background: var(--help-window-bg, #ffffff) !important;
-    border: 1px solid color-mix(in srgb, var(--accent, #2196f3) 45%, var(--border, #cccccc)) !important;
+    background: var(--color-bg-primary) !important;
+    border: 1px solid
+        color-mix(in srgb, var(--color-brand-primary) 45%, var(--color-border-primary)) !important;
     border-radius: 8px !important;
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
     overflow: hidden;
@@ -1231,13 +1366,13 @@ table {
 
 .help-widget-frame > .wfTopBar {
     min-height: 44px;
-    background: var(--accent, #2196f3) !important;
+    background: var(--color-brand-primary) !important;
     border-bottom: 0 !important;
-    color: var(--help-action-fg, #ffffff);
+    color: var(--color-text-inverse);
 }
 
 .help-widget-frame > .wfTopBar .wftTitle {
-    color: var(--help-action-fg, #ffffff) !important;
+    color: var(--color-text-inverse) !important;
     font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: 0;
@@ -1247,8 +1382,12 @@ table {
 .help-widget-frame > .wfWinBody,
 .help-widget-frame > .wfWinBody .wfbWidget.help-widget-body {
     background:
-        linear-gradient(180deg, color-mix(in srgb, var(--accent, #2196f3) 7%, transparent) 0%, transparent 42%),
-        var(--help-window-bg, #ffffff) !important;
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-brand-primary) 7%, transparent) 0%,
+            transparent 42%
+        ),
+        var(--color-bg-primary) !important;
 }
 
 .help-widget-panel {
@@ -1260,7 +1399,8 @@ table {
     box-sizing: border-box;
     margin: 0 auto !important;
     left: 0 !important;
-    border: 1px solid color-mix(in srgb, var(--accent, #2196f3) 38%, var(--border, #cccccc));
+    border: 1px solid
+        color-mix(in srgb, var(--color-brand-primary) 38%, var(--color-border-primary));
     border-radius: 10px;
     overflow-x: visible;
     width: calc(100% - 130px) !important;
@@ -1270,12 +1410,12 @@ table {
     background:
         linear-gradient(
             180deg,
-            color-mix(in srgb, var(--accent, #2196f3) 10%, transparent) 0%,
+            color-mix(in srgb, var(--color-brand-primary, #2196f3) 10%, transparent) 0%,
             transparent 38%
         ),
-        var(--help-card-bg, #ffffff);
+        var(--color-panel-bg);
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
-    color: var(--fg, #666666);
+    color: var(--color-text-primary, #666666);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1296,13 +1436,13 @@ table {
     text-align: center;
     line-height: 1.35;
     margin: 0;
-    color: var(--fg, #666666);
+    color: var(--color-text-primary);
 }
 
 #helpBodyDiv .heading {
     font-size: 1.45rem;
     font-weight: 700;
-    color: color-mix(in srgb, var(--accent, #2196f3) 55%, var(--fg, #666666));
+    color: color-mix(in srgb, var(--color-brand-primary) 55%, var(--color-text-primary));
 }
 
 #helpBodyDiv.help-block-card {
@@ -1310,19 +1450,34 @@ table {
     min-height: 0;
 }
 
+#helpBodyDiv .help-tour-image,
+#helpBodyDiv .help-tour-detailed-icon,
+#helpBodyDiv .help-tour-icon {
+    display: block;
+    margin: 0 auto 0.5rem;
+}
+
+#helpBodyDiv .help-tour-large-image {
+    max-width: 100%;
+    max-height: min(38vh, 220px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
 #helpBodyDiv p {
     margin: 0.35rem 0;
 }
 
 #helpBodyDiv a {
-    color: var(--accent, #2196f3);
+    color: var(--color-brand-primary, #2196f3);
     text-decoration: underline;
     font-weight: 600;
     transition: color 0.2s ease;
 }
 
 #helpBodyDiv a:hover {
-    color: color-mix(in srgb, var(--accent, #2196f3) 72%, var(--fg, #666666));
+    color: color-mix(in srgb, var(--color-brand-primary) 72%, var(--color-text-primary));
 }
 
 #helpBodyDiv .help-card-action {
@@ -1331,10 +1486,11 @@ table {
     min-height: 38px;
     margin-top: 0.35rem;
     padding: 0.55rem 1rem;
-    border: 1px solid color-mix(in srgb, var(--accent, #2196f3) 70%, var(--border, #cccccc));
+    border: 1px solid
+        color-mix(in srgb, var(--color-brand-primary) 70%, var(--color-border-primary));
     border-radius: 8px;
-    background: var(--accent, #2196f3);
-    color: var(--help-action-fg, #ffffff);
+    background: var(--color-brand-primary);
+    color: var(--color-text-inverse);
     font:
         700 0.92rem/1.2 "Fira Sans",
         sans-serif;
@@ -1342,13 +1498,13 @@ table {
     white-space: normal;
     overflow-wrap: anywhere;
     cursor: pointer;
-    box-shadow: 0 3px 10px color-mix(in srgb, var(--accent, #2196f3) 28%, transparent);
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
 }
 
 #helpBodyDiv .help-card-action:hover,
 #helpBodyDiv .help-card-action:focus {
-    background: color-mix(in srgb, var(--accent, #2196f3) 82%, var(--fg, #666666));
-    outline: 2px solid color-mix(in srgb, var(--accent, #2196f3) 50%, transparent);
+    background: color-mix(in srgb, var(--color-brand-primary) 82%, var(--color-text-primary));
+    outline: 2px solid color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
     outline-offset: 2px;
 }
 
@@ -1389,9 +1545,18 @@ table {
 }
 
 @media (max-width: 600px) {
+    #helpBodyDiv {
+        justify-content: flex-start;
+        padding-top: 1rem;
+    }
+
     #helpBodyDiv .icon-container {
         margin-top: 0;
         padding-top: 0;
+    }
+
+    #helpBodyDiv .help-tour-large-image {
+        max-height: min(32vh, 180px);
     }
 
     .icon-container #findIcon,
@@ -1554,6 +1719,62 @@ input.timbreName {
     background: #8cc6ff;
     border: 1px solid black;
     text-align: center;
+}
+
+/* ==========================================================================
+   PhraseMaker Widget Token-Backed Component Styles
+   ========================================================================== */
+
+.pm-widget-container {
+    position: absolute;
+    left: 55px;
+    right: 0;
+    width: -webkit-fill-available;
+    height: 100%;
+    height: -webkit-fill-available;
+}
+
+.pm-win-body {
+    position: absolute;
+    width: 100%;
+    width: -webkit-fill-available;
+    height: 100%;
+    height: -webkit-fill-available;
+    background: var(--color-widget-frame-bg);
+}
+
+.pm-lyrics-row {
+    position: sticky;
+    top: 0;
+}
+
+.pm-lyrics-label {
+    position: sticky;
+    left: 1.2px;
+    z-index: 1;
+    text-align: center;
+}
+
+.pm-lyrics-cell {
+    font-family: var(--font-family-system, sans-serif);
+    cursor: default;
+    border-spacing: 1px 1px;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    padding: 0;
+    border-radius: var(--radius-md, 6px);
+    border: none;
+}
+
+.pm-lyrics-input {
+    width: 100%;
+    font-size: inherit;
+    font-family: var(--font-family-system, sans-serif);
+    cursor: default;
+    box-sizing: border-box;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-md, 6px);
 }
 
 .popup {
@@ -1797,7 +2018,7 @@ input.timbreName {
     height: 40px;
     border-radius: 50%;
     font-size: 25px;
-    color: #fff;
+    color: var(--color-text-inverse);
     line-height: 40px;
     text-align: center;
     background: #000;
@@ -2099,7 +2320,7 @@ table {
 #errorText {
     border: 2px solid red;
     background-color: pink;
-    color: #000000;
+    color: var(--color-text-primary);
 }
 
 .contentWrapper {
@@ -2123,12 +2344,33 @@ table {
 .msgCloseIcon {
     width: 28px;
     height: 28px;
-    filter: invert(100%);
-    transition: background-color 0.3s, filter 0.3s;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        background-color 0.3s,
+        filter 0.3s;
 }
 
-.msgCloseIcon:hover {
+.msgCloseIcon img {
+    width: 28px;
+    height: 28px;
+    filter: invert(100%);
+    transition: filter 0.3s;
+}
+
+.msgCloseIcon:hover img {
     filter: invert(0%);
+}
+
+.msgCloseIcon:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
 }
 
 .disable_highlighting {
@@ -2170,7 +2412,7 @@ table {
 #link-to-sugarLabs:visited,
 #link-to-sugarLabs:hover,
 #link-to-sugarLabs:active {
-    color: #000;
+    color: var(--color-text-primary);
 }
 
 .color-change {
@@ -2184,8 +2426,8 @@ table {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #1e88e5;
-    color: white;
+    background-color: var(--color-notification-bg);
+    color: var(--color-notification-text);
     padding: 15px 20px;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
@@ -2208,7 +2450,7 @@ table {
 .chatLog {
     flex: 1;
     overflow-y: auto;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border-primary);
     padding: 10px;
     margin-bottom: 10px;
     display: flex;
@@ -2232,7 +2474,7 @@ table {
 .message-container {
     align-self: flex-start;
     background: #dfdfdf;
-    color: #000;
+    color: var(--color-text-primary);
     padding: 10px;
     border-radius: 12px;
     max-width: 60%;
@@ -2309,25 +2551,41 @@ table {
    FIX: Center the Welcome Modal on Mobile
    ====================================================== */
 @media screen and (max-width: 600px) {
-  #helpDiv {
-    /* 1. Fit the screen width */
-    width: 90% !important;
+    #helpDiv {
+        /* 1. Fit the screen width */
+        width: 90% !important;
 
-    /* 2. Center Horizontally */
-    left: 50% !important;
-    transform: translateX(-50%);
-    /* Moves it back by half its width to center it */
+        /* 2. Center Horizontally */
+        left: 50% !important;
+        transform: translateX(-50%);
+        /* Moves it back by half its width to center it */
 
-    /* 3. Reset Top position if needed */
-    top: 15% !important;
-  }
+        /* 3. Reset Top position if needed */
+        top: 15% !important;
+    }
 
-  /* Fix the inner text box width so it doesn't overflow */
-  #helpBodyDiv {
-    width: calc(100% - 110px) !important;
-    margin: 0 auto !important;
-    left: 0 !important;
-    padding: 0 10px;
-    box-sizing: border-box;
-  }
+    /* Fix the inner text box width so it doesn't overflow */
+    #helpBodyDiv {
+        width: calc(100% - 110px) !important;
+        margin: 0 auto !important;
+        left: 0 !important;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+}
+
+/* Pitch Staircase Widget CSS */
+.pitch-staircase-btn,
+.pitch-staircase-step {
+    background-color: var(--color-selector-bg);
+    color: var(--color-selector-text);
+    transition: background-color 0.2s ease;
+}
+
+.pitch-staircase-btn:hover {
+    background-color: var(--color-selector-selected);
+}
+
+.pitch-staircase-step.active {
+    background-color: var(--color-selector-selected);
 }

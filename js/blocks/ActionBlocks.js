@@ -13,7 +13,7 @@
 global
 
 FlowBlock, LeftBlock, FlowClampBlock, StackClampBlock, ValueBlock,
-Queue, NOACTIONERRORMSG, NOINPUTERRORMSG
+Queue, NOACTIONERRORMSG, NOINPUTERRORMSG, isSafeUrl
 */
 
 /* exported setupActionBlocks */
@@ -100,14 +100,6 @@ function setupActionBlocks(activity) {
      * @class
      * @extends FlowBlock
      */
-    function isSafeUrl(urlString) {
-        try {
-            const parsed = new URL(urlString);
-            return parsed.protocol === "http:" || parsed.protocol === "https:";
-        } catch (e) {
-            return false;
-        }
-    }
     class ReturnToURLBlock extends FlowBlock {
         /**
          * Constructor for the ReturnToURLBlock class.
@@ -259,6 +251,30 @@ function setupActionBlocks(activity) {
                 defaults: [_("action")],
                 argTypes: ["anyin"]
             });
+        }
+        arg(logo, turtle, blk, receivedArg) {
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            } else {
+                const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                if (name in logo.actions) {
+                    activity.turtles.getTurtle(turtle).running = true;
+                    logo.runFromBlockNow(
+                        logo,
+                        turtle,
+                        logo.actions[name],
+                        true,
+                        [],
+                        activity.turtles.getTurtle(turtle).queue.length
+                    );
+                    return logo.returns[turtle].pop();
+                } else {
+                    activity.errorMsg(NOACTIONERRORMSG, blk, name);
+                    return 0;
+                }
+            }
         }
     }
     /**
@@ -489,6 +505,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("namedcalcArg");
+            this.setCapability("argumentLike");
 
             /**
              * Sets the palette for the block.
@@ -581,6 +598,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("doArg");
+            this.setCapability("argumentLike");
 
             /**
              * Sets the palette for the block.
@@ -676,6 +694,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("calcArg");
+            this.setCapability("argumentLike");
 
             /**
              * Sets the palette for the block.
@@ -986,7 +1005,6 @@ function setupActionBlocks(activity) {
                 return [logo.actions[args[0]], 1];
             }
 
-            console.debug("action " + args[0] + " not found");
             activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
     }
@@ -1100,8 +1118,10 @@ function setupActionBlocks(activity) {
                     }
                 };
 
-                // If there is already a listener, remove it before adding the new one
-                logo.setTurtleListener(turtle, args[0], __listener);
+                // If there is already a listener, remove it before adding the new one.
+                // Mark it persistent so it keeps listening for events (e.g. a click)
+                // after this run stops or finishes, which is the whole point of Listen.
+                logo.setTurtleListener(turtle, args[0], __listener, true);
             }
         }
     }
@@ -1195,6 +1215,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("start");
+            this.setCapability("collapsible");
 
             /**
              * Sets the palette for the block.
@@ -1287,6 +1308,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("action");
+            this.setCapability("collapsible");
 
             /**
              * Sets the palette for the block.
@@ -1368,7 +1390,6 @@ function setupActionBlocks(activity) {
                 return [logo.actions[args[0]], 1];
             }
 
-            console.debug("action " + args[0] + " not found");
             activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
     }
@@ -1481,6 +1502,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("temperament1");
+            this.setCapability("collapsible");
 
             /**
              * Sets the palette for the block.

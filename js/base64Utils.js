@@ -22,6 +22,8 @@
  * @module base64Utils
  */
 
+/* exported base64Encode, base64Decode */
+
 /**
  * Encodes a string to Base64 format.
  * @param {string} str - The string to encode.

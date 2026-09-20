@@ -19,15 +19,41 @@
 
 /* exported setupRhythmBlockPaletteBlocks */
 
-const language = localStorage.languagePreference || navigator.language;
+let language;
+try {
+    language = localStorage.languagePreference;
+} catch (e) {
+    language = undefined;
+}
+language = language || navigator.language;
 let rhythmBlockPalette = language === "ja" ? "rhythm" : "widgets";
 if (_THIS_IS_TURTLE_BLOCKS_) {
     rhythmBlockPalette = "rhythm";
 }
 
 function setupRhythmBlockPaletteBlocks(activity) {
+    const MAX_RHYTHM_NOTES = 128;
+
+    const getNoteCount = (value, defaultValue, blk) => {
+        if (value === null || typeof value !== "number" || !Number.isFinite(value) || value < 1) {
+            activity.errorMsg(NOINPUTERRORMSG, blk);
+            return defaultValue;
+        }
+
+        if (value > MAX_RHYTHM_NOTES) {
+            activity.errorMsg(
+                _("Maximum number of notes is %s.").replace(/%s/g, MAX_RHYTHM_NOTES),
+                blk
+            );
+            return MAX_RHYTHM_NOTES;
+        }
+
+        return Math.floor(value);
+    };
+
     /**
      * Schedules a note to be played after a timeout.
+     * @param {object} logo - The Logo execution engine.
      * @param {object} activity - The activity object.
      * @param {number} beat - The beat value.
      * @param {string} blk - The block ID.
@@ -35,8 +61,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
      * @param {function} callback - The callback function.
      * @param {number} timeout - The timeout in milliseconds.
      */
-    const scheduleNote = (activity, beat, blk, turtle, callback, timeout) => {
-        setTimeout(() => Singer.processNote(activity, beat, false, blk, turtle, callback), timeout);
+    const scheduleNote = (logo, activity, beat, blk, turtle, callback, timeout) => {
+        const processNote = () => Singer.processNote(activity, beat, false, blk, turtle, callback);
+
+        logo._timerManager.setGuardedTimeout(processNote, timeout, () => logo.stopTurtle);
     };
 
     /**
@@ -102,12 +130,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             let noteBeatValue, arg0, arg1;
-            if (args[0] === null || typeof args[0] !== "number" || args[0] < 1) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 3;
-            } else {
-                arg0 = args[0];
-            }
+            arg0 = getNoteCount(args[0], 3, blk);
 
             if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -122,17 +145,64 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 noteBeatValue = arg1;
             }
 
-            if (logo.inMatrix || logo.tuplet) {
+            const isTuplet =
+                typeof logo.tuplet === "object" &&
+                logo.tuplet !== null &&
+                !Array.isArray(logo.tuplet)
+                    ? Boolean(logo.tuplet[turtle])
+                    : Boolean(logo.tuplet);
+
+            if (logo.inMatrix || isTuplet) {
                 if (logo.inMatrix) {
                     logo.phraseMaker.addColBlock(blk, arg0);
+                }
 
-                    // Add individual entries for each beat to avoid extra × blocks
+                if (isTuplet) {
+                    const tRhythms =
+                        typeof logo.tupletRhythms === "object" &&
+                        logo.tupletRhythms !== null &&
+                        !Array.isArray(logo.tupletRhythms)
+                            ? (logo.tupletRhythms[turtle] = logo.tupletRhythms[turtle] || [])
+                            : logo.tupletRhythms;
+                    const tParams =
+                        typeof logo.tupletParams === "object" &&
+                        logo.tupletParams !== null &&
+                        !Array.isArray(logo.tupletParams)
+                            ? (logo.tupletParams[turtle] = logo.tupletParams[turtle] || [])
+                            : logo.tupletParams;
+
                     for (let i = 0; i < arg0; i++) {
-                        logo.tupletRhythms.push(["individual", 1, noteBeatValue]);
+                        const addingNotes =
+                            typeof logo.addingNotesToTuplet === "object" &&
+                            logo.addingNotesToTuplet !== null
+                                ? logo.addingNotesToTuplet[turtle]
+                                : logo.addingNotesToTuplet;
+                        if (!addingNotes) {
+                            tRhythms.push(["notes", tParams.length - 1]);
+                            if (
+                                typeof logo.addingNotesToTuplet === "object" &&
+                                logo.addingNotesToTuplet !== null
+                            ) {
+                                logo.addingNotesToTuplet[turtle] = true;
+                            } else {
+                                logo.addingNotesToTuplet = true;
+                            }
+                        }
+                        last(tRhythms).push(noteBeatValue);
+                    }
+                } else {
+                    const tRhythms =
+                        typeof logo.tupletRhythms === "object" &&
+                        logo.tupletRhythms !== null &&
+                        !Array.isArray(logo.tupletRhythms)
+                            ? (logo.tupletRhythms[turtle] = logo.tupletRhythms[turtle] || [])
+                            : logo.tupletRhythms;
+                    for (let i = 0; i < arg0; i++) {
+                        tRhythms.push(["individual", 1, noteBeatValue]);
                     }
                 }
 
-                for (let i = 0; i < args[0]; i++) {
+                for (let i = 0; i < arg0; i++) {
                     Singer.processNote(activity, noteBeatValue, false, blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
@@ -197,6 +267,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     }
 
                     scheduleNote(
+                        logo,
                         activity,
                         noteBeatValue,
                         blk,
@@ -538,20 +609,41 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.inMatrix) {
-                if (activity.blocks.blockList[blk].name === "tuplet3") {
-                    logo.tupletParams.push([
-                        args[0],
-                        (1 / args[1]) * activity.turtles.ithTurtle(turtle).singer.beatFactor
-                    ]);
-                } else {
-                    logo.tupletParams.push([
-                        args[0],
-                        args[1] * activity.turtles.ithTurtle(turtle).singer.beatFactor
-                    ]);
+                const param =
+                    activity.blocks.blockList[blk].name === "tuplet3"
+                        ? [
+                              args[0],
+                              (1 / args[1]) * activity.turtles.ithTurtle(turtle).singer.beatFactor
+                          ]
+                        : [args[0], args[1] * activity.turtles.ithTurtle(turtle).singer.beatFactor];
+
+                if (Array.isArray(logo.tupletParams)) {
+                    logo.tupletParams.push(param);
+                } else if (typeof logo.tupletParams === "object" && logo.tupletParams !== null) {
+                    if (!logo.tupletParams[turtle]) {
+                        logo.tupletParams[turtle] = [];
+                    }
+                    logo.tupletParams[turtle].push(param);
                 }
 
-                logo.tuplet = true;
-                logo.addingNotesToTuplet = false;
+                if (
+                    typeof logo.tuplet === "object" &&
+                    logo.tuplet !== null &&
+                    !Array.isArray(logo.tuplet)
+                ) {
+                    logo.tuplet[turtle] = true;
+                } else {
+                    logo.tuplet = true;
+                }
+
+                if (
+                    typeof logo.addingNotesToTuplet === "object" &&
+                    logo.addingNotesToTuplet !== null
+                ) {
+                    logo.addingNotesToTuplet[turtle] = false;
+                } else {
+                    logo.addingNotesToTuplet = false;
+                }
             }
 
             const listenerName = "_tuplet_" + turtle;
@@ -559,8 +651,24 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
             const __listener = event => {
                 if (logo.inMatrix) {
-                    logo.tuplet = false;
-                    logo.addingNotesToTuplet = false;
+                    if (
+                        typeof logo.tuplet === "object" &&
+                        logo.tuplet !== null &&
+                        !Array.isArray(logo.tuplet)
+                    ) {
+                        logo.tuplet[turtle] = false;
+                    } else {
+                        logo.tuplet = false;
+                    }
+
+                    if (
+                        typeof logo.addingNotesToTuplet === "object" &&
+                        logo.addingNotesToTuplet !== null
+                    ) {
+                        logo.addingNotesToTuplet[turtle] = false;
+                    } else {
+                        logo.addingNotesToTuplet = false;
+                    }
                 }
             };
 
@@ -691,16 +799,58 @@ function setupRhythmBlockPaletteBlocks(activity) {
             }
 
             if (!logo.inMatrix) {
-                logo.tupletRhythms = [];
-                logo.tupletParams = [];
+                if (
+                    typeof logo.tupletRhythms === "object" &&
+                    logo.tupletRhythms !== null &&
+                    !Array.isArray(logo.tupletRhythms)
+                ) {
+                    logo.tupletRhythms[turtle] = [];
+                } else {
+                    logo.tupletRhythms = [];
+                }
+
+                if (
+                    typeof logo.tupletParams === "object" &&
+                    logo.tupletParams !== null &&
+                    !Array.isArray(logo.tupletParams)
+                ) {
+                    logo.tupletParams[turtle] = [];
+                } else {
+                    logo.tupletParams = [];
+                }
             }
 
-            logo.tuplet = true;
-            logo.addingNotesToTuplet = false;
-            logo.tupletParams.push([
+            if (
+                typeof logo.tuplet === "object" &&
+                logo.tuplet !== null &&
+                !Array.isArray(logo.tuplet)
+            ) {
+                logo.tuplet[turtle] = true;
+            } else {
+                logo.tuplet = true;
+            }
+
+            if (typeof logo.addingNotesToTuplet === "object" && logo.addingNotesToTuplet !== null) {
+                logo.addingNotesToTuplet[turtle] = false;
+            } else {
+                logo.addingNotesToTuplet = false;
+            }
+
+            const tupletParamItem = [
                 1,
                 (1 / arg) * activity.turtles.ithTurtle(turtle).singer.beatFactor
-            ]);
+            ];
+
+            if (
+                typeof logo.tupletParams === "object" &&
+                logo.tupletParams !== null &&
+                !Array.isArray(logo.tupletParams)
+            ) {
+                logo.tupletParams[turtle] = logo.tupletParams[turtle] || [];
+                logo.tupletParams[turtle].push(tupletParamItem);
+            } else if (Array.isArray(logo.tupletParams)) {
+                logo.tupletParams.push(tupletParamItem);
+            }
 
             const listenerName = "_tuplet_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
@@ -708,65 +858,114 @@ function setupRhythmBlockPaletteBlocks(activity) {
             const __listener = event => {
                 const tur = activity.turtles.ithTurtle(turtle);
 
-                logo.tuplet = false;
-                logo.addingNotesToTuplet = false;
+                if (
+                    typeof logo.tuplet === "object" &&
+                    logo.tuplet !== null &&
+                    !Array.isArray(logo.tuplet)
+                ) {
+                    logo.tuplet[turtle] = false;
+                } else {
+                    logo.tuplet = false;
+                }
+
+                if (
+                    typeof logo.addingNotesToTuplet === "object" &&
+                    logo.addingNotesToTuplet !== null
+                ) {
+                    logo.addingNotesToTuplet[turtle] = false;
+                } else {
+                    logo.addingNotesToTuplet = false;
+                }
+
                 if (!logo.inMatrix) {
                     const beatValues = [];
+                    const tRhythms =
+                        typeof logo.tupletRhythms === "object" &&
+                        logo.tupletRhythms !== null &&
+                        !Array.isArray(logo.tupletRhythms)
+                            ? logo.tupletRhythms[turtle] || []
+                            : Array.isArray(logo.tupletRhythms)
+                              ? logo.tupletRhythms
+                              : [];
+                    const tParams =
+                        typeof logo.tupletParams === "object" &&
+                        logo.tupletParams !== null &&
+                        !Array.isArray(logo.tupletParams)
+                            ? logo.tupletParams[turtle] || []
+                            : Array.isArray(logo.tupletParams)
+                              ? logo.tupletParams
+                              : [];
 
-                    for (let i = 0; i < logo.tupletRhythms.length; i++) {
-                        const tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
+                    for (let i = 0; i < tRhythms.length; i++) {
+                        const tupletParam = [tParams[tRhythms[i][1]]];
                         tupletParam.push([]);
                         let tupletBeats = 0;
-                        for (let j = 2; j < logo.tupletRhythms[i].length; j++) {
-                            tupletBeats += 1 / logo.tupletRhythms[i][j];
-                            tupletParam[1].push(logo.tupletRhythms[i][j]);
+                        for (let j = 2; j < tRhythms[i].length; j++) {
+                            tupletBeats += 1 / tRhythms[i][j];
+                            tupletParam[1].push(tRhythms[i][j]);
                         }
 
                         const factor = tupletParam[0][0] / (tupletParam[0][1] * tupletBeats);
-                        for (let j = 2; j < logo.tupletRhythms[i].length; j++) {
-                            beatValues.push(logo.tupletRhythms[i][j] / factor);
+                        for (let j = 2; j < tRhythms[i].length; j++) {
+                            beatValues.push(tRhythms[i][j] / factor);
                         }
                     }
 
-                    // Play rhythm block as if it were a drum.
-                    if (tur.singer.drumStyle.length > 0) {
-                        logo.clearNoteParams(tur, blk, tur.singer.drumStyle);
-                    } else {
-                        logo.clearNoteParams(tur, blk, [DEFAULTDRUM]);
-                    }
-
-                    tur.singer.inNoteBlock.push(blk);
-
-                    const bpmFactor =
-                        TONEBPM /
-                        (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
-
-                    let timeout = 0;
-                    let beatValue;
-                    let __callback = null;
-                    for (let i = 0; i < beatValues.length; i++) {
-                        const thisBeat = beatValues[i];
-                        beatValue = bpmFactor / thisBeat;
-
-                        if (i === beatValues.length - 1) {
-                            __callback = () => {
-                                delete tur.singer.noteDrums[blk];
-                                tur.singer.inNoteBlock.splice(
-                                    tur.singer.inNoteBlock.indexOf(blk),
-                                    1
-                                );
-                            };
+                    if (beatValues.length > 0) {
+                        // Play rhythm block as if it were a drum.
+                        if (tur.singer.drumStyle.length > 0) {
+                            logo.clearNoteParams(tur, blk, tur.singer.drumStyle);
+                            tur.singer.inNoteBlock.push(blk);
                         } else {
-                            __callback = null;
+                            logo.clearNoteParams(tur, blk, [DEFAULTDRUM]);
+                            tur.singer.inNoteBlock.push(blk);
+                            tur.singer.notePitches[last(tur.singer.inNoteBlock)] = ["G"];
+                            tur.singer.noteOctaves[last(tur.singer.inNoteBlock)] = [4];
+                            tur.singer.noteCents[last(tur.singer.inNoteBlock)] = [0];
                         }
 
-                        scheduleNote(activity, thisBeat, blk, turtle, __callback, timeout);
+                        const bpmFactor =
+                            TONEBPM /
+                            (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-                        timeout += beatValue * 1000;
-                        totalBeats += beatValue;
+                        let timeout = 0;
+                        let totalBeats = 0;
+                        let beatValue;
+                        let __callback = null;
+                        for (let i = 0; i < beatValues.length; i++) {
+                            const thisBeat = beatValues[i];
+                            beatValue = bpmFactor / thisBeat;
+
+                            if (i === beatValues.length - 1) {
+                                __callback = () => {
+                                    delete tur.singer.noteDrums[blk];
+                                    tur.singer.inNoteBlock.splice(
+                                        tur.singer.inNoteBlock.indexOf(blk),
+                                        1
+                                    );
+                                };
+                            } else {
+                                __callback = null;
+                            }
+
+                            scheduleNote(
+                                logo,
+                                activity,
+                                thisBeat,
+                                blk,
+                                turtle,
+                                __callback,
+                                timeout
+                            );
+
+                            timeout += beatValue * 1000;
+                            totalBeats += beatValue;
+                        }
+
+                        tur.doWait(totalBeats - beatValue);
+                    } else {
+                        tur.doWait(0);
                     }
-
-                    tur.doWait(totalBeats - beatValue);
                 }
             };
 
@@ -916,12 +1115,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             let arg0, arg1;
-            if (args[0] === null || typeof args[0] !== "number" || args[0] <= 0) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = 3;
-            } else {
-                arg0 = args[0];
-            }
+            arg0 = getNoteCount(args[0], 3, blk);
 
             if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -931,25 +1125,57 @@ function setupRhythmBlockPaletteBlocks(activity) {
             }
 
             const noteBeatValue = (1 / arg1) * activity.turtles.ithTurtle(turtle).singer.beatFactor;
-            if (logo.inMatrix || logo.tuplet) {
+            const isTuplet =
+                typeof logo.tuplet === "object" &&
+                logo.tuplet !== null &&
+                !Array.isArray(logo.tuplet)
+                    ? Boolean(logo.tuplet[turtle])
+                    : Boolean(logo.tuplet);
+
+            if (logo.inMatrix || isTuplet) {
                 logo.phraseMaker.addColBlock(blk, arg0);
-                if (logo.tuplet) {
+                const tRhythms =
+                    typeof logo.tupletRhythms === "object" &&
+                    logo.tupletRhythms !== null &&
+                    !Array.isArray(logo.tupletRhythms)
+                        ? (logo.tupletRhythms[turtle] = logo.tupletRhythms[turtle] || [])
+                        : logo.tupletRhythms;
+                const tParams =
+                    typeof logo.tupletParams === "object" &&
+                    logo.tupletParams !== null &&
+                    !Array.isArray(logo.tupletParams)
+                        ? (logo.tupletParams[turtle] = logo.tupletParams[turtle] || [])
+                        : logo.tupletParams;
+
+                if (isTuplet) {
                     // The simple-tuplet block is inside.
                     for (let i = 0; i < arg0; i++) {
-                        if (!logo.addingNotesToTuplet) {
-                            logo.tupletRhythms.push(["notes", 0]);
-                            logo.addingNotesToTuplet = true;
+                        const addingNotes =
+                            typeof logo.addingNotesToTuplet === "object" &&
+                            logo.addingNotesToTuplet !== null
+                                ? logo.addingNotesToTuplet[turtle]
+                                : logo.addingNotesToTuplet;
+                        if (!addingNotes) {
+                            tRhythms.push(["notes", 0]);
+                            if (
+                                typeof logo.addingNotesToTuplet === "object" &&
+                                logo.addingNotesToTuplet !== null
+                            ) {
+                                logo.addingNotesToTuplet[turtle] = true;
+                            } else {
+                                logo.addingNotesToTuplet = true;
+                            }
                         }
 
                         Singer.processNote(activity, noteBeatValue, false, blk, turtle);
                     }
                 } else {
-                    logo.tupletParams.push([1, noteBeatValue]);
+                    tParams.push([1, noteBeatValue]);
                     const obj = ["simple", 0];
                     for (let i = 0; i < arg0; i++) {
                         obj.push((1 / arg1) * activity.turtles.ithTurtle(turtle).singer.beatFactor);
                     }
-                    logo.tupletRhythms.push(obj);
+                    tRhythms.push(obj);
                 }
             } else {
                 const tur = activity.turtles.ithTurtle(turtle);
@@ -968,13 +1194,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                 const beatValue = bpmFactor / noteBeatValue / arg0;
 
-                const __rhythmPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
-                    setTimeout(
-                        () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
-                        timeout
-                    );
-                };
-
                 let __callback = null;
                 for (let i = 0; i < arg0; i++) {
                     if (i === arg0 - 1) {
@@ -986,7 +1205,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
                         __callback = null;
                     }
 
-                    __rhythmPlayNote(
+                    scheduleNote(
+                        logo,
+                        activity,
                         noteBeatValue * arg0,
                         blk,
                         turtle,

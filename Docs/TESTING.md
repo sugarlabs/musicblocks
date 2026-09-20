@@ -10,6 +10,178 @@ npm test -- path/to/file.test.js           # Run specific test file
 npm test -- --coverage                      # Run with coverage report
 ```
 
+## Shared Test Infrastructure
+
+Music Blocks provides a shared test infrastructure to reduce duplication, improve consistency, and make test suites easier to maintain.
+
+Before adding new mocks or setup code, check whether similar functionality already exists in the shared test infrastructure.
+
+### Project Structure
+
+```text
+test/
+├── setup/
+│   └── globalSetup.js
+├── utils/
+│   ├── activityFactory.js
+│   ├── domFactory.js
+│   ├── domMocks.js
+│   ├── imageMock.js
+│   └── svgMock.js
+└── setupTests.js
+```
+
+### `test/setupTests.js`
+
+`test/setupTests.js` is loaded automatically before every test suite through Jest using `setupFilesAfterEnv`.
+
+Use this file only for test infrastructure that should be available to every test suite.
+
+Examples include:
+
+- Common Jest lifecycle hooks.
+- Browser API polyfills.
+- Shared browser mocks.
+- Common Music Blocks globals and constants.
+- Project-wide test environment initialization.
+
+Example:
+
+```javascript
+afterEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+});
+```
+
+Avoid placing widget-specific or feature-specific mocks in this file.
+
+---
+
+### `test/setup/`
+
+The `test/setup/` directory contains reusable setup helpers for initializing shared test state.
+
+If multiple test suites require the same setup logic, extract it into a helper in this directory instead of duplicating it.
+
+Example:
+
+```javascript
+const { setupGlobalEnvironment } = require("../../test/setup/globalSetup");
+
+beforeEach(() => {
+    setupGlobalEnvironment();
+});
+```
+
+---
+
+### `test/utils/`
+
+The `test/utils/` directory contains reusable mock factories and helper utilities.
+
+If the same mock or helper is needed by multiple test suites, prefer creating or reusing a helper here instead of duplicating the implementation.
+
+#### Activity helper
+
+Use `activityFactory.js` to create mock activity objects.
+
+```javascript
+const { createMockActivity } = require("../../test/utils/activityFactory");
+
+const activity = createMockActivity({
+    beginnerMode: true
+});
+```
+
+Instead of manually creating the same activity object in every test.
+
+---
+
+#### DOM helpers
+
+Use `domFactory.js` and `domMocks.js` when tests require reusable DOM structures or `docById` mocks.
+
+```javascript
+const { createMockDOM } = require("../../test/utils/domFactory");
+const { mockDocById } = require("../../test/utils/domMocks");
+
+const { container, body } = createMockDOM();
+
+mockDocById({
+    palette: container,
+    PaletteBody: body
+});
+```
+
+Instead of manually recreating the same DOM structure across multiple test files.
+
+---
+
+#### SVG and Image helpers
+
+Use the shared helpers instead of redefining `SVG` or `Image` mocks in every test file.
+
+```javascript
+const { setupSVGMock } = require("../../test/utils/svgMock");
+const { setupImageMock } = require("../../test/utils/imageMock");
+
+beforeEach(() => {
+    setupSVGMock();
+    setupImageMock();
+});
+```
+
+---
+
+### When should I add to the shared infrastructure?
+
+Move code into the shared infrastructure when:
+
+- The same setup is duplicated across multiple test files.
+- The helper is generic and reusable.
+- The helper represents common testing infrastructure instead of application behavior.
+
+Examples include:
+
+- Activity factories.
+- Generic DOM helpers.
+- Shared browser mocks.
+- Common setup functions.
+
+---
+
+### When should setup remain inside a test?
+
+Keep setup local to the test file when it represents behavior specific to a single widget, block, or feature.
+
+Examples include:
+
+- Widget-specific DOM structure.
+- Feature-specific event listeners.
+- Mocks whose behavior differs between test suites.
+- Test data that is only meaningful for a particular component.
+
+For example:
+
+```javascript
+jest.spyOn(document, "getElementsByClassName").mockReturnValue([{ style: {} }]);
+```
+
+If a mock or setup is only required by a single test suite, it should remain in that test file. Move it into the shared infrastructure only when it becomes generic enough to be reused across multiple test suites.
+
+---
+
+### General Guidelines
+
+Before introducing new setup code:
+
+1. Check whether a shared helper already exists.
+2. Reuse existing helpers whenever possible.
+3. Create a new shared helper only when the logic is generic and reusable across multiple test suites.
+4. Keep feature-specific setup local to the corresponding test file.
+5. Prefer small, focused helper modules over large, test-specific utilities.
+
 ## Testing Blocks
 
 Block files (in `js/blocks/`) need specific mocks. Copy this template and modify for your block:
@@ -139,3 +311,29 @@ describe("YourBlocks", () => {
 2. Mock only what's needed for the specific test
 3. Use `jest.fn()` for methods you want to verify were called
 4. Run `npx prettier --write` on your test file before committing
+
+---
+
+## End-to-End (Cypress) Testing
+
+Music Blocks uses Cypress for real browser integration and end-to-end testing.
+
+### Running Cypress
+
+```bash
+npm start                                      # Start local server on http://127.0.0.1:3000
+npx cypress run                               # Run all Cypress E2E tests
+npx cypress run --spec "cypress/e2e/async-stylesheet-cascade.cy.js" # Run specific spec
+```
+
+### CSS Cascade & Async Stylesheet Loading
+
+Music Blocks loads several stylesheets asynchronously via `<link rel="preload" as="style">` in `index.html`. Because JSDOM in Jest cannot compute CSS cascades or evaluate asynchronous link preloads, browser-level cascade verification is handled in Cypress:
+
+- **`cy.waitForStylesheetsToLoad(targetStylesheets)`**: A custom command in `cypress/support/commands.js` that asserts the targeted preloaded stylesheets (defaulting to `activities.css`, `windows.css`, `darkmode.css`, `style.css`) have finished loading with `rel="stylesheet"` (or registered `style[data-href]` under PrefixFree transformations).
+- **Dynamic Token & Computed Style Verification**: Tests read active CSS custom properties (e.g. `--color-bg-primary`, `--color-widget-frame-bg`, `--color-widget-titlebar-text`) from the root scope (`document.body` / `:root`) and compare against computed element styles rather than hardcoding static RGB values. This avoids tautological circular comparisons when elements apply tokens as inline styles.
+- **Modal & Overlay Backdrop Cascade**: Tests open real modals via `MBDialog` and verify that the `.mb-dialog-overlay` computed background is strictly non-transparent (`!= rgba(0, 0, 0, 0)`) and matches `--color-overlay-backdrop`, and the modal panel `.wfbWidget` background matches `--color-panel-bg` resolved from `:root` across Light and Dark themes.
+- **Search Autocomplete Item-Level Verification**: Tests both the outer `ul.ui-autocomplete` container and concrete rendered suggestion items (`li .ui-menu-item-wrapper` / `li`) to ensure item-level font colors and backgrounds consume `--color-text-primary` and `--color-bg-primary` without specificity leakage or theme override gaps.
+- **Widget Titlebar Structural & Responsive Cascade**: Unconditionally asserts that `.wftTitle` elements exist within floating widget frames on desktop, dark mode, and mobile viewport breakpoints (preventing silent passes if DOM structure changes), and verifies that titlebar text color resolves to `--color-text-secondary` on desktop and `--color-widget-titlebar-text` under mobile breakpoints.
+- **Scoped Teardown & Clean Error Propagation**: Uses precise title-based and class-based selector scoping (window instance frames and `.mb-system-dialog`) for window/dialog cleanup to avoid cross-spec leakage. The test suite operates cleanly without suppressing uncaught exceptions, allowing all genuine runtime regressions (such as theme switching errors or missing properties) to propagate directly and fail the spec.
+- **Selector Specificity & Cascade Isolation**: Tests verify that component-level stylesheets maintain expected cascade precedence across theme transitions (Light, Dark, High-Contrast, Light) without residual inline style leakage or theme class conflicts.

@@ -112,6 +112,8 @@ global.toFixed2 = function (value) {
     return Number(value).toFixed(2);
 };
 
+global.isValidHex = require("../../utils/utils-logic.js").isValidHex;
+global.hexToRGB = require("../../utils/utils-logic.js").hexToRGB;
 global.hex2rgb = function (hex) {
     // Dummy conversion: simply return a fixed rgb string.
     return "rgb(100,150,200)";
@@ -239,6 +241,7 @@ describe("setupSensorsBlocks", () => {
 
         beforeEach(() => {
             block = DummyFlowBlock.createdBlocks["getcolorpixel"];
+            global.platformColor.background = "rgb(200,200,200)";
             logo = {
                 inStatusMatrix: false,
                 statusFields: [],
@@ -337,6 +340,13 @@ describe("setupSensorsBlocks", () => {
                 expect(color).toBe("rgb(200,200,200)");
             });
 
+            it("should return hex background color for transparent pixel", () => {
+                global.platformColor.background = "#303030";
+                const pixelData = [100, 150, 200, 0];
+                const color = block.detectColor(pixelData);
+                expect(color).toBe("rgb(48,48,48)");
+            });
+
             it("should throw an error for invalid pixel data", () => {
                 const pixelData = [100, 150]; // Invalid length
                 expect(() => block.detectColor(pixelData)).toThrow("Invalid pixel data");
@@ -347,6 +357,18 @@ describe("setupSensorsBlocks", () => {
             it("should parse and return background color", () => {
                 const color = block.getBackgroundColor();
                 expect(color).toBe("rgb(200,200,200)");
+            });
+
+            it("should parse and return full hex background color", () => {
+                global.platformColor.background = "#F9F9F9";
+                const color = block.getBackgroundColor();
+                expect(color).toBe("rgb(249,249,249)");
+            });
+
+            it("should parse and return shorthand hex background color", () => {
+                global.platformColor.background = "#abc";
+                const color = block.getBackgroundColor();
+                expect(color).toBe("rgb(170,187,204)");
             });
         });
 
@@ -373,7 +395,100 @@ describe("setupSensorsBlocks", () => {
             expect(labelDiv.replaceChildren).toHaveBeenCalled();
             expect(labelDiv.innerHTML).toContain('input id="textLabel"');
             expect(activity.turtles.ithTurtle(turtleIndex).doWait).toHaveBeenCalledWith(120);
-            // Note: we are not simulating the keypress event.
+            expect(labelDiv.classList.add).toHaveBeenCalledWith("hasKeyboard");
+        });
+
+        it("should ignore non-Enter keys and keep listener active for subsequent Enter", () => {
+            const inputBlock = DummyFlowBlock.createdBlocks["input"];
+            activity.turtles.ithTurtle(turtleIndex).doWait = jest.fn();
+            activity.blocks.blockList["blkInput"] = { connections: [null, null] };
+            inputBlock.flow([], logo, turtleIndex, "blkInput");
+            const labelDiv = docById("labelDiv");
+            const inputElem = labelDiv.children[0];
+
+            inputElem.value = "test";
+            inputElem.dispatchEvent(new KeyboardEvent("keypress", { key: "a", bubbles: true }));
+
+            expect(logo.clearTurtleRun).not.toHaveBeenCalled();
+            expect(labelDiv.classList.remove).not.toHaveBeenCalledWith("hasKeyboard");
+            expect(logo.inputValues[turtleIndex]).toBeUndefined();
+
+            // Dispatch Enter after non-Enter key to verify listener remained active
+            inputElem.dispatchEvent(new KeyboardEvent("keypress", { key: "Enter", bubbles: true }));
+
+            expect(logo.inputValues[turtleIndex]).toBe("test");
+            expect(logo.clearTurtleRun).toHaveBeenCalledWith(turtleIndex);
+            expect(labelDiv.classList.remove).toHaveBeenCalledWith("hasKeyboard");
+        });
+
+        it("should handle Enter key (event.key === 'Enter') with string value", () => {
+            const inputBlock = DummyFlowBlock.createdBlocks["input"];
+            activity.turtles.ithTurtle(turtleIndex).doWait = jest.fn();
+            activity.blocks.blockList["blkInput"] = { connections: [null, null] };
+            inputBlock.flow([], logo, turtleIndex, "blkInput");
+            const labelDiv = docById("labelDiv");
+            const inputElem = labelDiv.children[0];
+
+            inputElem.value = "Hello MusicBlocks";
+            inputElem.dispatchEvent(new KeyboardEvent("keypress", { key: "Enter", bubbles: true }));
+
+            expect(logo.inputValues[turtleIndex]).toBe("Hello MusicBlocks");
+            expect(inputElem.style.display).toBe("none");
+            expect(logo.clearTurtleRun).toHaveBeenCalledWith(turtleIndex);
+            expect(labelDiv.classList.remove).toHaveBeenCalledWith("hasKeyboard");
+        });
+
+        it("should handle Enter key with numeric value and convert with parseFloat", () => {
+            const inputBlock = DummyFlowBlock.createdBlocks["input"];
+            activity.turtles.ithTurtle(turtleIndex).doWait = jest.fn();
+            activity.blocks.blockList["blkInput"] = { connections: [null, null] };
+            inputBlock.flow([], logo, turtleIndex, "blkInput");
+            const labelDiv = docById("labelDiv");
+            const inputElem = labelDiv.children[0];
+
+            inputElem.value = "123.45";
+            inputElem.dispatchEvent(new KeyboardEvent("keypress", { key: "Enter", bubbles: true }));
+
+            expect(logo.inputValues[turtleIndex]).toBe(123.45);
+            expect(typeof logo.inputValues[turtleIndex]).toBe("number");
+        });
+
+        it("should support legacy event.keyCode === 13 fallback on keypress", () => {
+            const inputBlock = DummyFlowBlock.createdBlocks["input"];
+            activity.turtles.ithTurtle(turtleIndex).doWait = jest.fn();
+            activity.blocks.blockList["blkInput"] = { connections: [null, null] };
+            inputBlock.flow([], logo, turtleIndex, "blkInput");
+            const labelDiv = docById("labelDiv");
+            const inputElem = labelDiv.children[0];
+
+            inputElem.value = "99";
+            inputElem.dispatchEvent(new KeyboardEvent("keypress", { keyCode: 13, bubbles: true }));
+
+            expect(logo.inputValues[turtleIndex]).toBe(99);
+            expect(logo.clearTurtleRun).toHaveBeenCalledWith(turtleIndex);
+        });
+
+        it("should handle missing labelDiv or turtle container defensively without throwing", () => {
+            const inputBlock = DummyFlowBlock.createdBlocks["input"];
+            activity.turtles.ithTurtle(turtleIndex).doWait = jest.fn();
+            activity.blocks.blockList["blkInput"] = { connections: [null, "missingCblk"] };
+
+            // Temporarily remove labelDiv
+            const savedLabelDiv = documentElements.labelDiv;
+            delete documentElements.labelDiv;
+
+            // Temporarily mock turtle without container
+            const turtle = activity.turtles.getTurtle(turtleIndex);
+            const originalContainer = turtle.container;
+            turtle.container = null;
+
+            expect(() => {
+                inputBlock.flow([], logo, turtleIndex, "blkInput");
+            }).not.toThrow();
+
+            // Restore
+            turtle.container = originalContainer;
+            documentElements.labelDiv = savedLabelDiv;
         });
     });
 

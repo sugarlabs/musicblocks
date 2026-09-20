@@ -12,7 +12,7 @@
 /* global
 
    Singer, _, last, platformColor, docById, wheelnav, slicePath,
-   PREVIEWVOLUME, TONEBPM
+   PREVIEWVOLUME, TONEBPM, clampNumber, ManagedTimer
 */
 
 /*
@@ -22,6 +22,9 @@
      
      - js/utils/utils.js
          _, last, docById
+
+     - js/utils/ManagedTimer.js
+         ManagedTimer
      
      - js/turtle-singer.js
          Singer
@@ -51,6 +54,9 @@
  * @exports MeterWidget
  */
 class MeterWidget {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/meterwidget"];
+
     // A pie menu is used to show the meter and strong beats
     /**
      * Width of the button div.
@@ -114,6 +120,20 @@ class MeterWidget {
          */
         this._playing = false;
 
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("../utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
+        this._playBeatTimeout = null;
+
         /**
          * Flag indicating if the widget is locked for clicks.
          *
@@ -165,6 +185,16 @@ class MeterWidget {
          */
         widgetWindow.onclose = () => {
             this._playing = false;
+            if (this._playBeatTimeout) {
+                this._clearWidgetTimeout(this._playBeatTimeout);
+                this._playBeatTimeout = null;
+            }
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
+            }
+            if (Singer && Singer.masterVolume && Singer.masterVolume.length > 0) {
+                this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
+            }
             this.activity.hideMsgs();
             widgetWindow.destroy();
         };
@@ -192,14 +222,21 @@ class MeterWidget {
                     playBtn.textContent = "\u00A0\u00A0";
                     const img = document.createElement("img");
                     img.src = "header-icons/play-button.svg";
-                    img.title = _("Play all");
-                    img.alt = _("Play all");
+                    img.title = _("Play");
+                    img.alt = _("Play");
                     img.setAttribute("height", MeterWidget.ICONSIZE);
                     img.setAttribute("width", MeterWidget.ICONSIZE);
                     img.setAttribute("vertical-align", "middle");
                     playBtn.appendChild(img);
                     playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
                     this._playing = false;
+                    if (this._playBeatTimeout) {
+                        this._clearWidgetTimeout(this._playBeatTimeout);
+                        this._playBeatTimeout = null;
+                    }
+                    if (this._timerManager !== null) {
+                        this._timerManager.clearAll();
+                    }
                 } else {
                     playBtn.textContent = "\u00A0\u00A0";
                     const img = document.createElement("img");
@@ -239,13 +276,23 @@ class MeterWidget {
         meterTableDiv.appendChild(meterWheelDiv);
 
         // Grab the number of beats and beat value from the meter block.
+        // this._meterBlock is a raw blockList index captured when the widget
+        // was requested; if that block has since been disposed (e.g. evicted
+        // by the trash undo history), blockList[this._meterBlock] is null, so
+        // guard the lookup itself rather than just the index being non-null.
         let v1, c1, c2, c3;
-        if (this._meterBlock !== null) {
+        if (this._meterBlock !== null && this.activity.blocks.blockList[this._meterBlock]) {
             c1 = this.activity.blocks.blockList[this._meterBlock].connections[1];
             v1 = c1 !== null ? this.activity.blocks.blockList[c1].value : 4;
+            v1 = isNaN(v1) ? 4 : clampNumber(v1, 1, 16);
             c2 = this.activity.blocks.blockList[this._meterBlock].connections[2];
-            c3 = this.activity.blocks.blockList[c2].connections[2];
-            if (c2 !== null) {
+            c3 =
+                c2 !== null &&
+                this.activity.blocks.blockList[c2] &&
+                this.activity.blocks.blockList[c2].connections
+                    ? this.activity.blocks.blockList[c2].connections[2]
+                    : null;
+            if (c2 !== null && this.activity.blocks.blockList[c2]) {
                 this._beatValue = this.activity.blocks.blockList[c2].value;
             }
 
@@ -283,25 +330,40 @@ class MeterWidget {
         widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset")).onclick = () => {
             //change Values of blocks in stack.
             this._playing = false;
+            if (this._playBeatTimeout) {
+                this._clearWidgetTimeout(this._playBeatTimeout);
+                this._playBeatTimeout = null;
+            }
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
+            }
             const el = divInput.children[0];
             const el2 = divInput2.children[0];
 
-            divInput.children[0].value = Math.min(el.max, Math.max(el.min, el.value));
-            divInput2.children[0].value = Math.min(el2.max, Math.max(el2.min, el2.value));
+            divInput.children[0].value = clampNumber(el.value, el.min, el.max);
+            divInput2.children[0].value = clampNumber(el2.value, el2.min, el2.max);
 
-            const bnBlk = this.activity.blocks.blockList[c1]; // number of beats
-            const bvBlk = this.activity.blocks.blockList[c3]; // beat value
+            const bnBlk = c1 !== null ? this.activity.blocks.blockList[c1] : null;
+            const bvBlk = c3 !== null ? this.activity.blocks.blockList[c3] : null;
 
             const bnValue = divInput.children[0].value;
             const bvValue = divInput2.children[0].value;
 
-            bnBlk.value = bnValue;
-            bnBlk.text.text = bnValue;
-            bnBlk.container.setChildIndex(bnBlk.text, bnBlk.container.children.length - 1);
+            if (bnBlk) {
+                bnBlk.value = bnValue;
+                if (bnBlk.text) bnBlk.text.text = bnValue;
+                if (bnBlk.container && bnBlk.container.children) {
+                    bnBlk.container.setChildIndex(bnBlk.text, bnBlk.container.children.length - 1);
+                }
+            }
 
-            bvBlk.value = bvValue;
-            bvBlk.text.text = bvValue;
-            bvBlk.container.setChildIndex(bvBlk.text, bvBlk.container.children.length - 1);
+            if (bvBlk) {
+                bvBlk.value = bvValue;
+                if (bvBlk.text) bvBlk.text.text = bvValue;
+                if (bvBlk.container && bvBlk.container.children) {
+                    bvBlk.container.setChildIndex(bvBlk.text, bvBlk.container.children.length - 1);
+                }
+            }
 
             this.activity.logo.runLogoCommands(widgetBlock);
         };
@@ -309,6 +371,24 @@ class MeterWidget {
         activity.textMsg(_("Click in the circle to select strong beats for the meter."), 3000);
         widgetWindow.sendToCenter();
         this._scale.call(this.widgetWindow);
+    }
+
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return setTimeout(callback, delay);
+    }
+
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+        clearTimeout(id);
+        return true;
     }
 
     /**
@@ -381,9 +461,17 @@ class MeterWidget {
      * @returns {void}
      */
     __playOneBeat(i, ms) {
+        if (!this._playing) {
+            return;
+        }
+
         if (this.__getPauseStatus()) {
-            for (let i = 0; i < this._strongBeats.length; i++) {
-                this._playWheel.navItems[i].navItem.hide();
+            if (this._playWheel && this._playWheel.navItems) {
+                for (let i = 0; i < this._strongBeats.length; i++) {
+                    if (this._playWheel.navItems[i] && this._playWheel.navItems[i].navItem) {
+                        this._playWheel.navItems[i].navItem.hide();
+                    }
+                }
             }
             return;
         }
@@ -393,8 +481,17 @@ class MeterWidget {
             j += this._strongBeats.length;
         }
 
-        this._playWheel.navItems[i].navItem.show();
-        this._playWheel.navItems[j].navItem.hide();
+        if (
+            this._playWheel &&
+            this._playWheel.navItems &&
+            this._playWheel.navItems[i] &&
+            this._playWheel.navItems[i].navItem &&
+            this._playWheel.navItems[j] &&
+            this._playWheel.navItems[j].navItem
+        ) {
+            this._playWheel.navItems[i].navItem.show();
+            this._playWheel.navItems[j].navItem.hide();
+        }
 
         if (this._strongBeats[i]) {
             this.__playDrum("snare drum");
@@ -402,8 +499,10 @@ class MeterWidget {
             this.__playDrum("kick drum");
         }
 
-        setTimeout(() => {
-            this.__playOneBeat((i + 1) % this._strongBeats.length, ms);
+        this._playBeatTimeout = this._setWidgetTimeout(() => {
+            if (this._playing) {
+                this.__playOneBeat((i + 1) % this._strongBeats.length, ms);
+            }
         }, ms);
     }
 

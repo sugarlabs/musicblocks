@@ -47,14 +47,9 @@ global.NOTATIONSTACCATO = NOTATIONSTACCATO;
 global.NOTATIONTUPLETVALUE = NOTATIONTUPLETVALUE;
 global.NOTATIONDOTCOUNT = NOTATIONDOTCOUNT;
 
-global.SHARP = "♯";
-global.FLAT = "♭";
-global.NATURAL = "♮";
-global.DOUBLESHARP = "𝄪";
-global.DOUBLEFLAT = "𝄫";
-
 global._ = jest.fn(str => str);
 global.last = jest.fn(array => array[array.length - 1]);
+global.getCurrentEDO = jest.fn(() => 12);
 
 const { getLilypondHeader, processLilypondNotes, saveLilypondOutput } = require("../lilypond");
 
@@ -83,6 +78,9 @@ describe("processLilypondNotes", () => {
                 notationStaging: {
                     [turtle]: [[["G4"], 4, 0, null, 0, -1, false], "meter", 4, 4]
                 }
+            },
+            synth: {
+                inTemperament: "equal"
             }
         };
         lilypond = "";
@@ -99,6 +97,17 @@ describe("processLilypondNotes", () => {
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 ");
         expect(logo.notationNotes[turtle]).toContain("4");
+    });
+
+    test("should raise each octave by exactly one", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G7"], 4, 0, null, 0, -1, false],
+            [["G8"], 4, 0, null, 0, -1, false],
+            [["G9"], 4, 0, null, 0, -1, false],
+            [["G10"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("g''''4 g'''''4 g''''''4 g'''''''4 ");
     });
 
     test("should process a key signature correctly", () => {
@@ -147,6 +156,32 @@ describe("processLilypondNotes", () => {
         logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, [3, 2], 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "\\tuplet Infinity/1 { g' 0} ");
+    });
+
+    test("should process staccato on a note inside a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, [3, 2], 0, -1, true]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\staccato ");
+    });
+
+    test("should not add staccato to a tuplet chord when staccato flag is false", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C4", "D4", "E4", "F4", "G4", "A4", "B4"], 4, 0, [3, 2], 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("\\staccato");
+    });
+
+    test("should place staccato after the duration on a note inside a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 8, [3, 2], 8, -1, true]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("g' 8 \\staccato ");
+    });
+
+    test("should place staccato after the chord on notes inside a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [[["C4", "E4"], 4, 8, [3, 2], 8, -1, true]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("<c' e'>8 \\staccato ");
     });
 
     test("should process a markup command correctly", () => {
@@ -225,6 +260,12 @@ describe("processLilypondNotes", () => {
         logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 0, -1, true]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\staccato ");
+    });
+
+    test("should write a note with no pitches as a rest", () => {
+        logo.notation.notationStaging[turtle] = [[[], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("r4 ");
     });
     test("should process custom key modes (freygish) correctly", () => {
         getScaleAndHalfSteps.mockReturnValueOnce([
@@ -384,7 +425,10 @@ describe("saveLilypondOutput", () => {
                 notationOutput: "",
                 guitarOutputHead: "",
                 guitarOutputEnd: "",
-                MIDIOutput: ""
+                MIDIOutput: "",
+                synth: {
+                    inTemperament: "equal"
+                }
             },
             turtles: {
                 turtleList: {
@@ -492,6 +536,38 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain('\\context TabVoice = "Turtle0" \\Turtle0');
         expect(result).toContain('shortInstrumentName = "Tu"');
         expect(result).toContain("Turtle1Voice = \\new Staff \\with {");
+    });
+
+    test("guitar tablature groups each instrument by its own clef, not turtle 0's", () => {
+        activity.logo.notationNotes = {
+            0: "\\note0",
+            1: "\\note1"
+        };
+        // turtle 0 plays a low note (computed clef: bass_8), turtle 1 plays a
+        // high note (computed clef: treble), so their clefs genuinely differ
+        activity.logo.notation.notationStaging = {
+            0: [[["C2"], 4, 0, null, 0, -1, false]],
+            1: [[["C6"], 4, 0, null, 0, -1, false]]
+        };
+
+        const result = saveLilypondOutput(activity);
+
+        const scoreVoice0 = result.indexOf("\\Turtle0Voice\n");
+        const scoreVoice1 = result.indexOf("\\Turtle1Voice\n");
+        const tab0 = result.indexOf('\\context TabVoice = "Turtle0"');
+        const tab1 = result.indexOf('\\context TabVoice = "Turtle1"');
+
+        expect(scoreVoice0).toBeGreaterThan(-1);
+        expect(scoreVoice1).toBeGreaterThan(-1);
+        expect(tab0).toBeGreaterThan(-1);
+        expect(tab1).toBeGreaterThan(-1);
+
+        // the score section above already groups treble on top, bass_8 on
+        // the bottom, so Turtle1 (treble) lists before Turtle0 (bass_8)
+        expect(scoreVoice1).toBeLessThan(scoreVoice0);
+        // the guitar tablature section must match that same ordering,
+        // grouping each instrument by its own clef instead of turtle 0's
+        expect(tab1).toBeLessThan(tab0);
     });
 
     test("should ensure last turtle adds a bar", () => {
@@ -623,7 +699,7 @@ describe("saveLilypondOutput", () => {
         };
         const result = saveLilypondOutput(activity);
         expect(result).toBeDefined();
-        expect(frequencyToPitch).toHaveBeenCalledWith(440);
+        expect(frequencyToPitch).toHaveBeenCalledWith(440, "equal");
     });
     test("should handle short name collision for names without spaces (longer loop)", () => {
         activity.turtles.turtleList = {
@@ -641,5 +717,45 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain('shortInstrumentName = "Tr"');
         expect(result).toContain('shortInstrumentName = "Tro"');
         expect(result).toContain('shortInstrumentName = "Tri"');
+    });
+
+    test("should handle single character instrument names", () => {
+        activity.turtles.turtleList = {
+            0: { name: "A" },
+            1: { name: "B" }
+        };
+        activity.logo.notation.notationStaging = {
+            0: ["note"],
+            1: ["note"]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('shortInstrumentName = "A"');
+        expect(result).toContain('shortInstrumentName = "B"');
+    });
+
+    test("should handle instrument names with underscore and resolve collisions", () => {
+        activity.turtles.turtleList = {
+            0: { name: "violin_one" },
+            1: { name: "viola_one" },
+            2: { name: "v_one" },
+            3: { name: "flute_two" },
+            4: { name: "aa_bb" },
+            5: { name: "aa_b" }
+        };
+        activity.logo.notation.notationStaging = {
+            0: ["note"],
+            1: ["note"],
+            2: ["note"],
+            3: ["note"],
+            4: ["note"],
+            5: ["note"]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('shortInstrumentName = "vo"');
+        expect(result).toContain('shortInstrumentName = "von"');
+        expect(result).toContain('shortInstrumentName = "vone"');
+        expect(result).toContain('shortInstrumentName = "ft"');
+        expect(result).toContain('shortInstrumentName = "ab"');
+        expect(result).toContain('shortInstrumentName = "aab"');
     });
 });

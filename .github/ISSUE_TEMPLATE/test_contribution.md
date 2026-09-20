@@ -23,10 +23,10 @@ assignees: ""
 -   [ ] I have read and followed the project's code of conduct.
 -   [ ] I have checked that no existing tests cover this area.
 -   [ ] I have checked that there is no open PR for the tests I am submitting.
--   [ ] I have reviewed [docs/TESTING.md](docs/TESTING.md) for testing patterns.
+-   [ ] I have reviewed [Docs/TESTING.md](blob/master/Docs/TESTING.md) for testing patterns.
 
 ---
 
-📚 See [Testing Guide](docs/TESTING.md) for how to write block tests.
+📚 See [Testing Guide](blob/master/Docs/TESTING.md) for how to write block tests.
 
 🙋🏾🙋🏼 Questions: [Community Matrix Server](https://matrix.to/#/#sugar:matrix.org).

@@ -27,24 +27,37 @@
     - js/utils/platformstyle.js
         platformColor
     - js/utils/utils-logic.js
-        resolveObject
+        resolveObject, isUnsafeObjectKey
+    - js/utils/browser-utils.js
+        canvasPixelRatio, doBrowserCheck, fnBrowserDetect, windowHeight, windowWidth
 */
 
 if (typeof module !== "undefined" && module.exports) {
     var UtilsLogic =
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
-    var { resolveObject } = UtilsLogic;
+    var { resolveObject, isUnsafeObjectKey } = UtilsLogic;
+
+    var DomHelpers =
+        (typeof window !== "undefined" && window.DomHelpers) ||
+        (typeof require !== "undefined" ? require("./dom-helpers") : {});
+
+    var BrowserUtils =
+        (typeof window !== "undefined" && window.BrowserUtils) ||
+        (typeof require !== "undefined" ? require("./browser-utils") : {});
+
+    var HttpUtils =
+        (typeof window !== "undefined" && window.HttpUtils) ||
+        (typeof require !== "undefined" ? require("./http-utils") : {});
 }
 
 /* exported
-   canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
-   delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
-   docBySelector, docByTagName, doPublish, doStopVideoCam, doSVG,
-   doUseCamera, format, getTextWidth, hideDOMLabel, httpGet, httpPost, HttpRequest,
+   announceToScreenReader, changeImage,
+   delayExecution,
+   doPublish, doSVG,
+   format, getTextWidth,
    importMembers, isSVGEmpty, prepareMacroExports, preparePluginExports,
-   processMacroData, processRawPluginData, windowHeight, windowWidth,
-   fnBrowserDetect, waitForReadiness
+   processMacroData, processPluginData, processRawPluginData, waitForReadiness
 */
 
 /**
@@ -55,9 +68,11 @@ if (typeof module !== "undefined" && module.exports) {
  * @param {string} to - The new base64-encoded SVG data URI.
  */
 const changeImage = (imgElement, from, to) => {
-    const oldSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(from));
+    if (!to) return;
+
     const newSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(to));
-    if (imgElement.src === oldSrc) {
+
+    if (imgElement.src !== newSrc) {
         imgElement.src = newSrc;
     }
 };
@@ -164,202 +179,6 @@ let format = (str, data) => {
 };
 
 /**
- * Detects the current browser name.
- * @function
- * @returns {string} The name of the detected browser.
- */
-function fnBrowserDetect() {
-    const userAgent = navigator.userAgent;
-    let browserName;
-
-    if (userAgent.match(/chrome|chromium|crios/i)) {
-        browserName = "chrome";
-    } else if (userAgent.match(/firefox|fxios/i)) {
-        browserName = "firefox";
-    } else if (userAgent.match(/safari/i)) {
-        browserName = "safari";
-    } else if (userAgent.match(/opr\//i)) {
-        browserName = "opera";
-    } else if (userAgent.match(/edg/i)) {
-        browserName = "edge";
-    } else {
-        browserName = "No browser detection";
-    }
-    return browserName;
-}
-
-/**
- * Returns the pixel ratio of the canvas for high-resolution displays.
- * @function
- * @returns {number} The canvas pixel ratio.
- */
-function canvasPixelRatio() {
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    const context = document.querySelector("#myCanvas").getContext("2d");
-    const backingStoreRatio =
-        context.webkitBackingStorePixelRatio ||
-        context.mozBackingStorePixelRatio ||
-        context.msBackingStorePixelRatio ||
-        context.oBackingStorePixelRatio ||
-        context.backingStorePixelRatio ||
-        1;
-    return devicePixelRatio / backingStoreRatio;
-}
-
-/**
- * Returns the height of the window, accounting for Android-specific behavior.
- * @function
- * @returns {number} The window height.
- */
-function windowHeight() {
-    const onAndroid = /Android/i.test(navigator.userAgent);
-    if (onAndroid) {
-        return window.outerHeight;
-    } else {
-        return window.innerHeight;
-    }
-}
-
-/**
- * Returns the width of the window, accounting for Android-specific behavior.
- * @function
- * @returns {number} The window width.
- */
-function windowWidth() {
-    const onAndroid = /Android/i.test(navigator.userAgent);
-    if (onAndroid) {
-        return window.outerWidth;
-    } else {
-        return window.innerWidth;
-    }
-}
-
-/**
- * Performs an HTTP GET request to retrieve data from the server.
- * Uses async fetch to avoid blocking the UI during network requests.
- * @param {string|null} projectName - The name of the project (or null for the base URL).
- * @throws {Error} Throws an error if the HTTP status code is greater than 299.
- * @returns {Promise<string>} A promise that resolves to the response text from the server.
- */
-let httpGet = async projectName => {
-    const url = projectName === null ? window.server : window.server + projectName;
-    const response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "x-api-key": window.MB_PROJECT_API_KEY || ""
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error("Error from server");
-    }
-
-    return response.text();
-};
-
-/**
- * Performs an HTTP POST request to send data to the server.
- * Uses async fetch to avoid blocking the UI during network requests.
- * @param {string} projectName - The name of the project.
- * @param {string} data - The data to be sent in the POST request.
- * @returns {Promise<string>} A promise that resolves to the response text from the server.
- */
-let httpPost = async (projectName, data) => {
-    const response = await fetch(window.server + projectName, {
-        method: "POST",
-        headers: {
-            "x-api-key": window.MB_PROJECT_API_KEY || ""
-        },
-        body: data
-    });
-
-    if (!response.ok) {
-        throw new Error("Error from server");
-    }
-
-    return response.text();
-};
-
-/**
- * Constructor function for making an HTTP request.
- * @constructor
- * @param {string} url - The URL to make the HTTP request to.
- * @param {function} loadCallback - The callback function to handle the loaded response.
- * @param {function} [userCallback] - An optional user-defined callback function.
- */
-function HttpRequest(url, loadCallback, userCallback) {
-    // userCallback is an optional callback-handler.
-    const req = (this.request = new XMLHttpRequest());
-    this.handler = loadCallback;
-    this.url = url;
-    this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
-    this.userCallback = userCallback;
-
-    const objref = this;
-    try {
-        req.open("GET", url);
-
-        req.onreadystatechange = () => {
-            objref.handler();
-        };
-
-        req.send("");
-    } catch (e) {
-        if (self.console) {
-            console.debug("Failed to load resource from " + url + ": Network error.");
-
-            console.debug(e);
-        }
-
-        if (typeof userCallback === "function") {
-            userCallback(false, "network error");
-        }
-
-        this.request = this.handler = this.userCallback = null;
-    }
-}
-
-/**
- * Checks the browser type and version.
- * Sets properties in the jQuery.browser object based on the user agent.
- * @function
- */
-function doBrowserCheck() {
-    jQuery.uaMatch = ua => {
-        ua = ua.toLowerCase();
-
-        const match =
-            /(chrome)[ /]([\w.]+)/.exec(ua) ||
-            /(webkit)[ /]([\w.]+)/.exec(ua) ||
-            /(opera)(?:.*version|)[ /]([\w.]+)/.exec(ua) ||
-            /(msie) ([\w.]+)/.exec(ua) ||
-            (ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua)) ||
-            [];
-
-        return {
-            browser: match[1] || "",
-            version: match[2] || "0"
-        };
-    };
-
-    const matched = jQuery.uaMatch(navigator.userAgent);
-    const browser = {};
-
-    if (matched.browser) {
-        browser[matched.browser] = true;
-        browser.version = matched.version;
-    }
-
-    if (browser.chrome) {
-        browser.webkit = true;
-    } else if (browser.webkit) {
-        browser.safari = true;
-    }
-
-    jQuery.browser = browser;
-}
-
-/**
  * Wait for critical dependencies to be ready before calling callback.
  * Uses polling with exponential backoff and maximum timeout.
  * This replaces the arbitrary 5-second delay for Firefox with actual readiness checks.
@@ -421,96 +240,8 @@ function waitForReadiness(callback, options = {}) {
     requestAnimationFrame(check);
 }
 
-// Check for Internet Explorer
-
-window.addEventListener("load", () => {
-    const userAgent = window.navigator.userAgent;
-    // For IE 10 or older
-    const MSIE = userAgent.indexOf("MSIE ");
-    let DetectVersionOfIE;
-    if (MSIE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(MSIE + 5, userAgent.indexOf(".", MSIE)),
-            10
-        );
-    }
-
-    // For IE 11
-    const IETrident = userAgent.indexOf("Trident/");
-    if (IETrident > 0) {
-        const IERv = userAgent.indexOf("rv:");
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IERv + 3, userAgent.indexOf(".", IERv)),
-            10
-        );
-    }
-
-    // For IE 12
-    const IEEDGE = userAgent.indexOf("Edge/");
-    if (IEEDGE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IEEDGE + 5, userAgent.indexOf(".", IEEDGE)),
-            10
-        );
-    }
-
-    if (typeof DetectVersionOfIE !== "undefined") {
-        document.body.innerHTML =
-            "<div style='margin: 200px;'>" +
-            "<h1 style='font-size: 100px; font-family: Arial; text-align: center; color: #F00;'>Music Blocks</h1>" +
-            "<h3 style='font-size: 40px; font-family: Arial; text-align: center;'>Music Blocks will not work in Internet Explorer, you can use:</h3>" +
-            "<div style='width: 550px; margin: 0 auto;'><a href='https://www.chromium.org/getting-involved/download-chromium' style='float: left; display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chromium</a>" +
-            "<a href='https://www.google.com/chrome/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chrome</a>" +
-            "<a href='https://support.apple.com/downloads/safari' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Safari</a>" +
-            "<a href='https://www.mozilla.org/en-US/firefox/new/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Firefox</a>" +
-            "</div></div>";
-    }
-});
-
-/**
- * Retrieves a collection of elements by class name.
- * @param {string} classname - The class name to search for.
- * @returns {HTMLCollectionOf<Element>} A collection of elements with the specified class name.
- */
-function docByClass(classname) {
-    return document.getElementsByClassName(classname);
-}
-
-/**
- * Retrieves a collection of elements by tag name.
- * @param {string} tag - The tag name to search for.
- * @returns {NodeList} A collection of elements with the specified tag name.
- */
-function docByTagName(tag) {
-    return document.getElementsByTagName(tag);
-}
-
-/**
- * Retrieves an element by its ID.
- * @param {string} id - The ID of the element to retrieve.
- * @returns {HTMLElement|null} The element with the specified ID, or null if not found.
- */
-function docById(id) {
-    return document.getElementById(id);
-}
-
-/**
- * Retrieves a collection of elements by name.
- * @param {string} name - The name attribute value to search for.
- * @returns {NodeListOf<Element>} A collection of elements with the specified name attribute.
- */
-function docByName(name) {
-    return document.getElementsByName(name);
-}
-
-/**
- * Retrieves the first element that matches a specified CSS selector.
- * @param {string} selector - A CSS selector string.
- * @returns {Element|null} The first element that matches the selector, or null if not found.
- */
-function docBySelector(selector) {
-    return document.querySelector(selector);
-}
+// docByClass(), docByTagName(), docById(), docByName(), docBySelector()
+// moved to js/utils/dom-helpers.js
 
 // last() and deepClone() moved to js/utils/utils-logic.js
 
@@ -673,6 +404,12 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
             return;
         }
 
+        // Fix for Chrome CSP which blocks Function("return this")() typically found in webpack bundles
+        code = code.replace(
+            /(?:new\s+)?Function\s*\(\s*['"]return this['"]\s*\)\s*\(\)/g,
+            "window"
+        );
+
         // We wrap the code in a closure that provides activity and globalActivity.
         // We'll execute these after the Blob script is loaded and populates the registry.
         pendingSafeEvals.push({ code, label });
@@ -693,7 +430,8 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     let newPalette = false,
         paletteName = null;
     if ("PALETTEPLUGINS" in obj) {
-        for (const name in obj["PALETTEPLUGINS"]) {
+        for (const name of Object.keys(obj["PALETTEPLUGINS"])) {
+            if (isUnsafeObjectKey(name)) continue;
             paletteName = name;
             PALETTEICONS[name] = obj["PALETTEPLUGINS"][name];
             let fillColor = "#ff0066";
@@ -761,7 +499,8 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
 
     // Define the image blocks
     if ("IMAGES" in obj) {
-        for (const blkName in obj["IMAGES"]) {
+        for (const blkName of Object.keys(obj["IMAGES"])) {
+            if (isUnsafeObjectKey(blkName)) continue;
             activity.pluginsImages[blkName] = obj["IMAGES"][blkName];
         }
     }
@@ -769,7 +508,8 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     // Populate the flow-block dictionary, i.e., the code that is
     // compiled into a function for hot-path execution.
     if ("FLOWPLUGINS" in obj) {
-        for (const flow in obj["FLOWPLUGINS"]) {
+        for (const flow of Object.keys(obj["FLOWPLUGINS"])) {
+            if (isUnsafeObjectKey(flow)) continue;
             // Pre-compile trusted plugins for performance.
             // UNTRUSTED plugins (if any made it past confirmation) are stored as strings
             // and handled via whitelist in safePluginExecute.
@@ -790,7 +530,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, rec
 
     // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
-        for (const arg in obj["ARGPLUGINS"]) {
+        for (const arg of Object.keys(obj["ARGPLUGINS"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const argCode = obj["ARGPLUGINS"][arg];
                 const registryName = `arg_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -809,7 +550,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
     // Populate the macro dictionary, i.e., the code that is
     // eval'd by this block.
     if ("MACROPLUGINS" in obj) {
-        for (const macro in obj["MACROPLUGINS"]) {
+        for (const macro of Object.keys(obj["MACROPLUGINS"])) {
+            if (isUnsafeObjectKey(macro)) continue;
             try {
                 activity.palettes.pluginMacros[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
@@ -822,7 +564,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
 
     // Populate the setter dictionary
     if ("SETTERPLUGINS" in obj) {
-        for (const setter in obj["SETTERPLUGINS"]) {
+        for (const setter of Object.keys(obj["SETTERPLUGINS"])) {
+            if (isUnsafeObjectKey(setter)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const setterCode = obj["SETTERPLUGINS"][setter];
                 const registryName = `setter_${setter}_${Math.random().toString(36).substr(2, 9)}`;
@@ -839,13 +582,9 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     }
 
     // Create the plugin protoblocks.
-    // FIXME: On Chrome, plugins are broken (They still work on Firefox):
-    // EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self' blob: filesystem: chrome-extension-resource:".
-    // Maybe:
-    // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
-
     if ("BLOCKPLUGINS" in obj) {
-        for (const block in obj["BLOCKPLUGINS"]) {
+        for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
+            if (isUnsafeObjectKey(block)) continue;
             console.debug("adding plugin block " + block);
             safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
@@ -857,7 +596,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     }
 
     if ("PARAMETERPLUGINS" in obj) {
-        for (const parameter in obj["PARAMETERPLUGINS"]) {
+        for (const parameter of Object.keys(obj["PARAMETERPLUGINS"])) {
+            if (isUnsafeObjectKey(parameter)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const paramCode = obj["PARAMETERPLUGINS"][parameter];
                 const registryName = `param_${parameter}_${Math.random()
@@ -877,14 +617,16 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
 
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
-        for (const arg in obj["ONLOAD"]) {
+        for (const arg of Object.keys(obj["ONLOAD"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
         }
     }
 
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
-        for (const arg in obj["ONSTART"]) {
+        for (const arg of Object.keys(obj["ONSTART"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const onStartCode = obj["ONSTART"][arg];
                 const registryName = `onstart_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -902,7 +644,8 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
 
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
-        for (const arg in obj["ONSTOP"]) {
+        for (const arg of Object.keys(obj["ONSTOP"])) {
+            if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const onStopCode = obj["ONSTOP"][arg];
                 const registryName = `onstop_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -935,12 +678,17 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
         await new Promise((resolve, reject) => {
             script.onload = () => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 resolve();
             };
             script.onerror = e => {
                 URL.revokeObjectURL(url);
-                console.error("Failed to load CSP Blob script for plugins", e);
-                reject(e);
+                document.head.removeChild(script);
+                const err = new Error(
+                    "Failed to load plugin script" + (e && e.message ? ": " + e.message : "")
+                );
+                console.error("Failed to load CSP Blob script for plugins", err);
+                reject(err);
             };
             document.head.appendChild(script);
         });
@@ -968,11 +716,13 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
 
     // Finally, execute safeEvals by creating new Blob scripts for each setup logic block.
     // This is because even setup logic can be blocked by CSP if it contains unsafe-eval.
+    window.__mb_plugin_registry = window.__mb_plugin_registry || {};
     for (const item of pendingSafeEvals) {
         const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random()
             .toString(36)
             .substr(2, 9)}`;
         const setupScript = `
+window.__mb_plugin_registry = window.__mb_plugin_registry || {};
 window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivity) {
     ${item.code}
 };
@@ -981,7 +731,7 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
         const sUrl = URL.createObjectURL(sBlob);
         const sScript = document.createElement("script");
         sScript.src = sUrl;
-        await new Promise(resolve => {
+        await new Promise((resolve, reject) => {
             sScript.onload = () => {
                 if (window.__mb_plugin_registry[registryName]) {
                     try {
@@ -992,11 +742,20 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                     delete window.__mb_plugin_registry[registryName];
                 }
                 URL.revokeObjectURL(sUrl);
+                if (sScript.parentNode) {
+                    sScript.parentNode.removeChild(sScript);
+                }
                 resolve();
             };
-            sScript.onerror = () => {
+            sScript.onerror = e => {
                 URL.revokeObjectURL(sUrl);
-                resolve(); // Still resolve to let others run
+                if (sScript.parentNode) {
+                    sScript.parentNode.removeChild(sScript);
+                }
+                const err = new Error(
+                    "Failed to execute plugin script" + (e && e.message ? ": " + e.message : "")
+                );
+                reject(err);
             };
             document.head.appendChild(sScript);
         });
@@ -1084,36 +843,59 @@ const updatePluginObj = (activity, obj) => {
         return;
     }
 
-    for (const name in obj["PALETTEPLUGINS"]) {
-        activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
+    if ("PALETTEPLUGINS" in obj) {
+        for (const name of Object.keys(obj["PALETTEPLUGINS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
+        }
     }
 
-    for (const name in obj["PALETTEFILLCOLORS"]) {
-        activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
+    if ("PALETTEFILLCOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTEFILLCOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
+        }
     }
 
-    for (const name in obj["PALETTESTROKECOLORS"]) {
-        activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
+    if ("PALETTESTROKECOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTESTROKECOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
+        }
     }
 
-    for (const name in obj["PALETTEHIGHLIGHTCOLORS"]) {
-        activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] = obj["PALETTEHIGHLIGHTCOLORS"][name];
+    if ("PALETTEHIGHLIGHTCOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTEHIGHLIGHTCOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] =
+                obj["PALETTEHIGHLIGHTCOLORS"][name];
+        }
     }
 
-    for (const flow in obj["FLOWPLUGINS"]) {
-        activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
+    if ("FLOWPLUGINS" in obj) {
+        for (const flow of Object.keys(obj["FLOWPLUGINS"])) {
+            if (isUnsafeObjectKey(flow)) continue;
+            activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
+        }
     }
 
-    for (const arg in obj["ARGPLUGINS"]) {
-        activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
+    if ("ARGPLUGINS" in obj) {
+        for (const arg of Object.keys(obj["ARGPLUGINS"])) {
+            if (isUnsafeObjectKey(arg)) continue;
+            activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
+        }
     }
 
-    for (const block in obj["BLOCKPLUGINS"]) {
-        activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
+    if ("BLOCKPLUGINS" in obj) {
+        for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
+            if (isUnsafeObjectKey(block)) continue;
+            activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
+        }
     }
 
     if ("MACROPLUGINS" in obj) {
-        for (const macro in obj["MACROPLUGINS"]) {
+        for (const macro of Object.keys(obj["MACROPLUGINS"])) {
+            if (isUnsafeObjectKey(macro)) continue;
             activity.pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
         }
     }
@@ -1129,16 +911,25 @@ const updatePluginObj = (activity, obj) => {
         activity.pluginObjs["IMAGES"] = obj["IMAGES"];
     }
 
-    for (const name in obj["ONLOAD"]) {
-        activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
+    if ("ONLOAD" in obj) {
+        for (const name of Object.keys(obj["ONLOAD"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
+        }
     }
 
-    for (const name in obj["ONSTART"]) {
-        activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
+    if ("ONSTART" in obj) {
+        for (const name of Object.keys(obj["ONSTART"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
+        }
     }
 
-    for (const name in obj["ONSTOP"]) {
-        activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
+    if ("ONSTOP" in obj) {
+        for (const name of Object.keys(obj["ONSTOP"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
+        }
     }
 };
 
@@ -1169,7 +960,8 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
             const obj = JSON.parse(macroData);
             palettes.add("myblocks", "black", "#a0a0a0");
 
-            for (const name in obj) {
+            for (const name of Object.keys(obj)) {
+                if (isUnsafeObjectKey(name)) continue;
                 // console.debug("adding " + name + " to macroDict");
                 macroDict[name] = obj[name];
                 blocks.addToMyPalette(name, macroDict[name]);
@@ -1199,176 +991,7 @@ let prepareMacroExports = (name, stack, macroDict) => {
     return JSON.stringify(macroDict);
 };
 
-// Camera functionality module
-// Encapsulates camera-related operations for video/image capture
-const CameraManager = {
-    isSetup: false,
-    canPlayHandler: null,
-    intervalId: null,
-
-    /**
-     * Resets the camera setup state
-     */
-    reset() {
-        this.isSetup = false;
-    }
-};
-
-/**
- * Uses the camera to capture images or video frames and displays them on the turtle's canvas.
- * @param {Array} args - Arguments passed to the function.
- * @param {object} turtles - The turtles object.
- * @param {string} turtle - The name of the turtle.
- * @param {boolean} isVideo - Indicates whether to capture video frames.
- * @param {number} cameraID - The ID of the camera interval for video frames.
- * @param {function} setCameraID - Function to set the camera interval ID.
- * @param {function} errorMsg - Function to display error messages.
- */
-let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) => {
-    const w = 320;
-    const h = 240;
-
-    let streaming = false;
-    const video = document.querySelector("#camVideo");
-    const canvas = document.querySelector("#camCanvas");
-    const context = canvas.getContext("2d");
-
-    if (canvas.width !== w) {
-        canvas.width = w;
-    }
-    if (canvas.height !== h) {
-        canvas.height = h;
-    }
-
-    function draw() {
-        context.drawImage(video, 0, 0, w, h);
-        const data = canvas.toDataURL("image/png");
-        turtles.getTurtle(turtle).doShowImage(args[0], data);
-    }
-
-    if (!CameraManager.isSetup) {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            errorMsg("Your browser does not support the webcam");
-            return;
-        }
-
-        navigator.mediaDevices
-            .getUserMedia({ video: true, audio: false })
-            .then(stream => {
-                video.srcObject = stream;
-                video.play();
-                CameraManager.isSetup = true;
-            })
-            .catch(error => {
-                errorMsg("Could not connect to camera");
-
-                console.debug(error);
-            });
-    } else {
-        streaming = true;
-        video.play();
-        if (isVideo) {
-            if (CameraManager.intervalId !== null) {
-                window.clearInterval(CameraManager.intervalId);
-                CameraManager.intervalId = null;
-            }
-            cameraID = window.setInterval(draw, 100);
-            CameraManager.intervalId = cameraID;
-            setCameraID(cameraID);
-        } else {
-            draw();
-        }
-    }
-
-    if (CameraManager.canPlayHandler) {
-        video.removeEventListener("canplay", CameraManager.canPlayHandler, false);
-    }
-
-    function handleCanPlay() {
-        // console.debug("canplay", streaming, CameraManager.isSetup);
-        if (!streaming) {
-            video.setAttribute("width", w);
-            video.setAttribute("height", h);
-            canvas.setAttribute("width", w);
-            canvas.setAttribute("height", h);
-            streaming = true;
-
-            if (isVideo) {
-                if (CameraManager.intervalId !== null) {
-                    window.clearInterval(CameraManager.intervalId);
-                    CameraManager.intervalId = null;
-                }
-                cameraID = window.setInterval(draw, 100);
-                CameraManager.intervalId = cameraID;
-                setCameraID(cameraID);
-            } else {
-                draw();
-            }
-        }
-    }
-
-    CameraManager.canPlayHandler = handleCanPlay;
-
-    video.addEventListener("canplay", CameraManager.canPlayHandler, false);
-};
-
-/**
- * Stops the camera and clears the camera interval.
- * @param {number} cameraID - The ID of the camera interval.
- * @param {function} setCameraID - Function to set the camera interval ID.
- */
-function doStopVideoCam(cameraID, setCameraID) {
-    if (cameraID !== null) {
-        window.clearInterval(cameraID);
-    }
-
-    setCameraID(null);
-    const video = document.querySelector("#camVideo");
-    if (video) {
-        video.pause();
-        if (video.srcObject) {
-            const tracks = video.srcObject.getTracks();
-            tracks.forEach(track => track.stop());
-            video.srcObject = null;
-        }
-    }
-    CameraManager.reset();
-}
-
-/**
- * Hides certain DOM elements related to labels.
- */
-function hideDOMLabel() {
-    const textLabel = docById("textLabel");
-    if (textLabel !== null) {
-        textLabel.style.display = "none";
-    }
-
-    const numberLabel = docById("numberLabel");
-    if (numberLabel !== null) {
-        numberLabel.style.display = "none";
-    }
-
-    const piemenu = docById("wheelDiv");
-    if (piemenu !== null) {
-        piemenu.style.display = "none";
-    }
-}
-
-/**
- * Displays a message (currently unused).
- * @returns {undefined}
- */
-function displayMsg(/*blocks, text*/) {
-    /*
-    let msgContainer = blocks.msgText.parent;
-    msgContainer.visible = true;
-    blocks.msgText.text = text;
-    msgContainer.updateCache();
-    blocks.stage.setChildIndex(msgContainer, blocks.stage.getNumChildren() - 1);
-    */
-    return;
-}
+// hideDOMLabel() and displayMsg() moved to js/utils/dom-helpers.js
 
 // safeSVG() and toFixed2() moved to js/utils/utils-logic.js
 
@@ -1390,30 +1013,7 @@ let delayExecution = duration => {
     });
 };
 
-/**
- * Closes all widgets in the window.
- *
- * @returns {void}
- */
-function closeWidgets() {
-    window.widgetWindows.hideAllWindows();
-}
-
-/**
- * Closes a specific widget by its name.
- *
- * @param {string} name - The name of the widget to be closed.
- * @returns {void}
- */
-let closeBlkWidgets = name => {
-    const widgetTitle = document.getElementsByClassName("wftTitle");
-    for (let i = 0; i < widgetTitle.length; i++) {
-        if (widgetTitle[i].innerHTML === name) {
-            window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
-            break;
-        }
-    }
-};
+// closeWidgets() moved to js/utils/dom-helpers.js
 
 // resolveObject() moved to js/utils/utils-logic.js
 
@@ -1426,6 +1026,25 @@ let closeBlkWidgets = name => {
  * @param {*[]} viewArgs - Constructor arguments for the view.
  * @returns {void}
  */
+/**
+ * Announces a message to screen readers via a shared aria-live region.
+ * Creates the region lazily on first use and reuses it for all subsequent calls.
+ * @param {string} msg - The message to announce.
+ */
+const announceToScreenReader = msg => {
+    let region = document.getElementById("mbA11yLiveRegion");
+    if (!region) {
+        region = document.createElement("div");
+        region.id = "mbA11yLiveRegion";
+        region.setAttribute("role", "status");
+        region.setAttribute("aria-live", "polite");
+        region.setAttribute("aria-atomic", "true");
+        region.style.cssText =
+            "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+        document.body.appendChild(region);
+    }
+    region.textContent = msg;
+};
 let importMembers = (obj, className, modelArgs, viewArgs) => {
     /**
      * Adds methods and variables of one class to another class's instance.
@@ -1487,12 +1106,35 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         ...UtilsLogic,
+        ...DomHelpers,
+        ...BrowserUtils,
+        ...HttpUtils,
         extractProjectDataFromHTML,
         _,
         format,
         delayExecution,
-        closeWidgets,
-        closeBlkWidgets,
-        importMembers
+        importMembers,
+        changeImage,
+        getTextWidth,
+        doSVG,
+        isSVGEmpty,
+        prepareMacroExports,
+        processPluginData,
+        processRawPluginData,
+        preparePluginExports,
+        processMacroData,
+        updatePluginObj,
+        announceToScreenReader
     };
+}
+
+// In the browser (and not under test, where dom-helpers.js's equivalent
+// guard already explains why this is conditional), explicitly attach this
+// to `window` rather than relying on it being reachable as a bare
+// identifier from other classic <script>-loaded files. That reachability
+// is real but load-order-dependent and not guaranteed -- callers in newer
+// or differently-ordered files have hit `ReferenceError: announceToScreenReader
+// is not defined` despite the function existing here.
+if (typeof window !== "undefined" && (typeof module === "undefined" || !module.exports)) {
+    window.announceToScreenReader = announceToScreenReader;
 }

@@ -9,6 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/* global clampNumber */
+
 /**
  * mb-dialog.js
  *
@@ -93,7 +95,7 @@
         overlay.style.top = "0";
         overlay.style.width = "100vw";
         overlay.style.height = "100vh";
-        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.35)";
+        overlay.style.backgroundColor = "var(--color-overlay-backdrop)";
         overlay.style.zIndex = "10000";
 
         const frame = document.createElement("div");
@@ -105,8 +107,8 @@
         frame.style.maxWidth = "640px";
         frame.style.minWidth = "320px";
         frame.style.zIndex = "10001";
-        frame.style.backgroundColor = "var(--bg)";
-        frame.style.borderColor = "var(--border)";
+        frame.style.backgroundColor = "var(--color-widget-frame-bg)";
+        frame.style.borderColor = "var(--color-widget-frame-border)";
 
         const topBar = document.createElement("div");
         topBar.className = "wfTopBar";
@@ -137,8 +139,8 @@
         widget.style.flexDirection = "column";
         widget.style.gap = "16px";
         widget.style.minWidth = "0";
-        widget.style.backgroundColor = "var(--panel-bg)";
-        widget.style.color = "var(--fg)";
+        widget.style.backgroundColor = "var(--color-panel-bg)";
+        widget.style.color = "var(--color-text-primary)";
 
         const message = document.createElement("div");
         message.textContent = options.message || "";
@@ -227,8 +229,8 @@
                 const y = clientY - dragDy;
                 const maxLeft = Math.max(window.innerWidth - frame.offsetWidth, 8);
                 const maxTop = Math.max(window.innerHeight - frame.offsetHeight, 64);
-                frame.style.left = `${Math.min(Math.max(x, 8), maxLeft)}px`;
-                frame.style.top = `${Math.min(Math.max(y, 64), maxTop)}px`;
+                frame.style.left = `${clampNumber(x, 8, maxLeft)}px`;
+                frame.style.top = `${clampNumber(y, 64, maxTop)}px`;
                 dragRafId = null;
             });
         };
@@ -313,9 +315,9 @@
                 input.style.width = "100%";
                 input.style.padding = "8px";
                 input.style.borderRadius = "4px";
-                input.style.border = "1px solid var(--border)";
-                input.style.backgroundColor = "var(--bg)";
-                input.style.color = "var(--fg)";
+                input.style.border = "1px solid var(--color-border-primary)";
+                input.style.backgroundColor = "var(--color-bg-primary)";
+                input.style.color = "var(--color-text-primary)";
                 input.style.boxSizing = "border-box";
 
                 const finish = value => {

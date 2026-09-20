@@ -14,6 +14,11 @@
 
 global._ = msg => msg;
 
+// updateAll schedules its DOM render on the next animation frame; run it
+// synchronously so the rendering tests below stay direct. The throttling
+// describe overrides this with a manual queue.
+global.requestAnimationFrame = cb => cb();
+
 global._THIS_IS_MUSIC_BLOCKS_ = true;
 global.MATRIXBUTTONHEIGHT = 40;
 global.MATRIXSOLFEHEIGHT = 30;
@@ -269,6 +274,32 @@ describe("StatusMatrix Widget", () => {
             statusMatrix.init(mockActivity);
             expect(statusMatrix._statusTable).toBeDefined();
         });
+
+        test("handles missing or undefined blocks in statusFields without throwing", () => {
+            mockActivity.blocks.blockList = {};
+            mockActivity.logo.statusFields = [
+                [99, "namedbox"],
+                [100, "bpm"],
+                [101, "bpmfactor"],
+                [102, "outputtools"],
+                [103, "customblock"]
+            ];
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+            expect(statusMatrix._statusTable).toBeDefined();
+        });
+
+        test("handles missing protoblock in bpm and outputtools blocks", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "bpm" },
+                1: { name: "outputtools", privateData: null }
+            };
+            mockActivity.logo.statusFields = [
+                [0, "bpm"],
+                [1, "outputtools"]
+            ];
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+            expect(statusMatrix._statusTable).toBeDefined();
+        });
     });
 
     describe("Turtle Display", () => {
@@ -326,6 +357,125 @@ describe("StatusMatrix Widget", () => {
 
         test("resets updatingStatusMatrix to false after update", () => {
             statusMatrix.updateAll();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        describe("frame throttling", () => {
+            let frameQueue;
+            const flushFrame = () => frameQueue.shift()();
+
+            beforeEach(() => {
+                frameQueue = [];
+                global.requestAnimationFrame = cb => {
+                    frameQueue.push(cb);
+                    return frameQueue.length;
+                };
+            });
+
+            afterEach(() => {
+                global.requestAnimationFrame = cb => cb();
+            });
+
+            test("coalesces repeated synchronous calls into one render per frame", () => {
+                statusMatrix.updateAll();
+                statusMatrix.updateAll();
+                statusMatrix.updateAll();
+
+                expect(frameQueue).toHaveLength(1);
+                expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+
+                flushFrame();
+
+                expect(mockActivity.logo.parseArg).toHaveBeenCalledTimes(1);
+            });
+
+            test("schedules a fresh render after the previous frame flushed", () => {
+                statusMatrix.updateAll();
+                flushFrame();
+                statusMatrix.updateAll();
+
+                expect(frameQueue).toHaveLength(1);
+
+                flushFrame();
+
+                expect(mockActivity.logo.parseArg).toHaveBeenCalledTimes(2);
+            });
+
+            test("skips the render when the widget closed before the frame fired", () => {
+                statusMatrix.updateAll();
+                statusMatrix.isOpen = false;
+
+                flushFrame();
+
+                expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+            });
+
+            test("falls back to a 100 ms timeout when requestAnimationFrame is unavailable", () => {
+                jest.useFakeTimers();
+                const savedRaf = global.requestAnimationFrame;
+                global.requestAnimationFrame = undefined;
+
+                try {
+                    statusMatrix.updateAll();
+                    statusMatrix.updateAll();
+
+                    expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+
+                    jest.advanceTimersByTime(99);
+                    expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+
+                    jest.advanceTimersByTime(1);
+                    expect(mockActivity.logo.parseArg).toHaveBeenCalledTimes(1);
+                } finally {
+                    global.requestAnimationFrame = savedRaf;
+                    jest.useRealTimers();
+                }
+            });
+        });
+
+        test("does not throw when a turtle is added after initialization and its column is missing", () => {
+            mockActivity.turtles.turtleList = [
+                { name: "Mouse1", inTrash: false },
+                { name: "Mouse2", inTrash: false }
+            ];
+
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        test("does not throw when a status-field row is missing or out of range", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["x"] }, value: 150 },
+                1: { name: "y", protoblock: { staticLabels: ["y"] }, value: 200 }
+            };
+            mockActivity.logo.statusFields = [
+                [0, "x"],
+                [1, "y"]
+            ];
+            statusMatrix._statusTable.rows = [
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] }
+            ];
+
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        test("does not update after the widget closes", () => {
+            statusMatrix.widgetWindow.onclose();
+
+            statusMatrix.updateAll();
+
+            expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        test("does not update without a status table", () => {
+            statusMatrix._statusTable = null;
+
+            statusMatrix.updateAll();
+
+            expect(mockActivity.logo.parseArg).not.toHaveBeenCalled();
             expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
         });
 
@@ -790,6 +940,64 @@ describe("StatusMatrix Widget", () => {
         test("increments activeTurtles count correctly", () => {
             statusMatrix.updateAll();
             expect(statusMatrix._statusTable).toBeDefined();
+        });
+    });
+
+    describe("Robustness and Null-Safety in _renderAll", () => {
+        beforeEach(() => {
+            statusMatrix.init(mockActivity);
+            statusMatrix._statusTable.rows = [
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] }
+            ];
+        });
+
+        test("handles missing block from blockList during _renderAll without throwing", () => {
+            mockActivity.blocks.blockList = {};
+            mockActivity.logo.statusFields = [
+                [999, "x"],
+                [1000, "namedbox"]
+            ];
+            expect(() => statusMatrix._renderAll()).not.toThrow();
+            expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe("");
+        });
+
+        test("handles elapsednotes2 with missing connections array", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "elapsednotes2", value: 2 }
+            };
+            mockActivity.logo.statusFields = [[0, "elapsednotes2"]];
+            expect(() => statusMatrix._renderAll()).not.toThrow();
+        });
+
+        test("handles turtle with missing or undefined singer", () => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                name: "turtleWithoutSinger",
+                singer: null,
+                inTrash: false
+            });
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", value: null },
+                1: { name: "measurevalue", value: null },
+                2: { name: "pitchinhertz", value: null }
+            };
+            mockActivity.logo.statusFields = [
+                [0, "beatvalue"],
+                [1, "measurevalue"],
+                [2, "pitchinhertz"]
+            ];
+            expect(() => statusMatrix._renderAll()).not.toThrow();
+        });
+
+        test("handles namedbox when box key does not exist in boxes", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "namedbox", privateData: "nonexistentBox" }
+            };
+            mockActivity.logo.boxes = {};
+            mockActivity.logo.statusFields = [[0, "namedbox"]];
+            expect(() => statusMatrix._renderAll()).not.toThrow();
+            expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe("");
         });
     });
 });

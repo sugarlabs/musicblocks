@@ -16,7 +16,8 @@
    global
 
    platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
-   normalizeNoteAccidentals
+   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, clampNumber, announceToScreenReader,
+   ManagedTimer
  */
 
 /*
@@ -24,19 +25,30 @@
     - js/utils/musicutils.js
         SYNTHSVG, frequencyToPitch, DEFAULTVOICE
     - js/utils/utils.js
-        _
+        _, last
     - js/utils/platformstyle.js
         platformColor
+    - js/logoconstants.js
+        PREVIEWVOLUME
+    - js/turtle-singer.js
+        Singer
+    - js/utils/ManagedTimer.js
+        ManagedTimer
 */
 /* exported PitchStaircase */
 
 class PitchStaircase {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/pitchstaircase"];
+
     static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     static OUTERWINDOWWIDTH = 685;
     static INNERWINDOWWIDTH = 600;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static DEFAULTFREQUENCY = 220.0;
+    static MIN_FREQUENCY = 27.5; // A0
+    static MAX_FREQUENCY = 16744.04; // C10
 
     /**
      * @constructor
@@ -47,6 +59,44 @@ class PitchStaircase {
         this._stepTables = [];
         this._musicRatio1 = null;
         this._musicRatio2 = null;
+        this._playingRowIndex = null;
+        this._rowStopTimeout = null;
+        this._isPlayingAll = false;
+        this._playAllTimeout = null;
+        this._isPlayingScale = false;
+        this._scaleStopped = false;
+        this._scaleStepTimeout = null;
+        this._scaleHighlightTimeout = null;
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("../utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
+    }
+
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return setTimeout(callback, delay);
+    }
+
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+        clearTimeout(id);
+        return true;
     }
 
     /**
@@ -80,17 +130,40 @@ class PitchStaircase {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = () => {
-            cell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = () => {
-            cell.style.backgroundColor = platformColor.selectorBackground;
-        };
+        cell.classList.add("pitch-staircase-btn");
 
         return cell;
+    }
+
+    /**
+     * @private
+     * @param {Cell} cell
+     * @param {string} icon
+     * @param {string} label
+     * @returns {void}
+     */
+    _setButtonIcon(cell, icon, label) {
+        if (!cell || typeof cell.replaceChildren !== "function") {
+            return;
+        }
+        const img = document.createElement("img");
+        img.src = "header-icons/" + icon;
+        img.title = label;
+        img.alt = label;
+        img.height = PitchStaircase.ICONSIZE;
+        img.width = PitchStaircase.ICONSIZE;
+        img.style.verticalAlign = "middle";
+        img.style.alignContent = "center";
+
+        if (cell.classList.contains("pitch-staircase-btn")) {
+            cell.replaceChildren(
+                document.createTextNode("\u00a0\u00a0"),
+                img,
+                document.createTextNode("\u00a0\u00a0")
+            );
+        } else {
+            cell.replaceChildren(img);
+        }
     }
 
     /**
@@ -129,12 +202,17 @@ class PitchStaircase {
             playCell.style.cursor = "pointer";
             const stepCell = stepTableRow.insertCell();
             stepCell.setAttribute("id", frequency);
-            stepCell.style.width =
+            const safeFreq =
+                typeof frequency === "number" && Number.isFinite(frequency) && frequency > 0
+                    ? frequency
+                    : PitchStaircase.DEFAULTFREQUENCY;
+            const rawWidth =
                 (PitchStaircase.INNERWINDOWWIDTH *
-                    parseFloat(PitchStaircase.DEFAULTFREQUENCY / frequency) *
+                    (PitchStaircase.DEFAULTFREQUENCY / safeFreq) *
                     this._cellScale) /
-                    3 +
-                "px";
+                3;
+            const calculatedWidth = clampNumber(rawWidth, 20, PitchStaircase.INNERWINDOWWIDTH);
+            stepCell.style.width = calculatedWidth + "px";
             stepCell.replaceChildren(
                 document.createTextNode(frequency.toFixed(2)),
                 document.createElement("br"),
@@ -143,7 +221,7 @@ class PitchStaircase {
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = PitchStaircase.BUTTONSIZE + "px";
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            stepCell.classList.add("pitch-staircase-step");
 
             const cellWidth = Number(stepCell.style.width.replace(/px/, ""));
             const svgWidth = cellWidth.toString();
@@ -167,9 +245,20 @@ class PitchStaircase {
             });
 
             playCell.onclick = () => {
-                const i = playCell.getAttribute("id");
+                const i = Number(playCell.getAttribute("id"));
                 const stepCell = this._stepTables[i].rows[0].cells[1];
-                this._playOne(stepCell);
+                if (this._playingRowIndex === i) {
+                    this._clearWidgetTimeout(this._rowStopTimeout);
+                    this._rowStopTimeout = null;
+                    stepCell.classList.remove("active");
+                    stepCell.style.backgroundColor = "";
+                    this._setButtonIcon(playCell, "play-button.svg", _("Play"));
+                    const frequency = Number(stepCell.getAttribute("id"));
+                    this.activity.logo.synth.stopSound(0, DEFAULTVOICE, frequency);
+                    this._playingRowIndex = null;
+                } else {
+                    this._playOne(stepCell, playCell);
+                }
             };
         }
     }
@@ -201,19 +290,19 @@ class PitchStaircase {
     _dissectStair(event) {
         let inputNum1 = this._musicRatio1.value;
 
-        if (isNaN(inputNum1)) {
+        if (isNaN(inputNum1) || Number(inputNum1) <= 0) {
             inputNum1 = 3;
         } else {
-            inputNum1 = Math.abs(Math.floor(inputNum1));
+            inputNum1 = Math.floor(inputNum1);
         }
 
         this._musicRatio1.value = inputNum1;
         let inputNum2 = this._musicRatio2.value;
 
-        if (isNaN(inputNum2)) {
+        if (isNaN(inputNum2) || Number(inputNum2) <= 0) {
             inputNum2 = 2;
         } else {
-            inputNum2 = Math.abs(Math.floor(inputNum2));
+            inputNum2 = Math.floor(inputNum2);
         }
 
         this._musicRatio2.value = inputNum2;
@@ -235,11 +324,33 @@ class PitchStaircase {
         }
 
         const newFrequency = parseFloat(frequency) / inputNum;
+        if (
+            !Number.isFinite(newFrequency) ||
+            newFrequency < PitchStaircase.MIN_FREQUENCY ||
+            newFrequency > PitchStaircase.MAX_FREQUENCY
+        ) {
+            const act = this.activity || (typeof activity !== "undefined" ? activity : null);
+            if (act && typeof act.textMsg === "function") {
+                act.textMsg(
+                    _("Frequency is outside supported range (27.5 Hz - 16744.04 Hz)."),
+                    3000
+                );
+            }
+            return;
+        }
+
         const obj = frequencyToPitch(newFrequency);
         let foundStep = false;
         let repeatStep = false;
         let isStepDeleted = true;
         let i;
+
+        // Snapshot the source stair's metadata before any splice so that
+        // inserting at index i < n does not shift n and corrupt the values.
+        const srcNumerator = this.Stairs[n][3];
+        const srcDenominator = this.Stairs[n][4];
+        const srcFrequency = this.Stairs[n][2];
+        const srcOctave = this.Stairs[n][6];
 
         for (i = 0; i < this.Stairs.length; i++) {
             // Check if the frequency is effectively the same (within epsilon)
@@ -248,10 +359,10 @@ class PitchStaircase {
                     obj[0],
                     obj[1],
                     newFrequency,
-                    this.Stairs[n][3] * parseFloat(inputNum2),
-                    this.Stairs[n][4] * parseFloat(inputNum1),
-                    this.Stairs[n][2],
-                    this.Stairs[n][6]
+                    srcNumerator * parseFloat(inputNum2),
+                    srcDenominator * parseFloat(inputNum1),
+                    srcFrequency,
+                    srcOctave
                 ]);
                 foundStep = true;
                 repeatStep = true;
@@ -264,10 +375,10 @@ class PitchStaircase {
                     obj[0],
                     obj[1],
                     newFrequency,
-                    this.Stairs[n][3] * parseFloat(inputNum2),
-                    this.Stairs[n][4] * parseFloat(inputNum1),
-                    this.Stairs[n][2],
-                    this.Stairs[n][6]
+                    srcNumerator * parseFloat(inputNum2),
+                    srcDenominator * parseFloat(inputNum1),
+                    srcFrequency,
+                    srcOctave
                 ]);
                 foundStep = true;
                 break;
@@ -279,10 +390,10 @@ class PitchStaircase {
                 obj[0],
                 obj[1],
                 newFrequency,
-                this.Stairs[n][3] * parseFloat(inputNum2),
-                this.Stairs[n][4] * parseFloat(inputNum1),
-                this.Stairs[n][2],
-                this.Stairs[n][6]
+                srcNumerator * parseFloat(inputNum2),
+                srcDenominator * parseFloat(inputNum1),
+                srcFrequency,
+                srcOctave
             ]);
             this._history.push(this.Stairs.length - 1);
         } else {
@@ -299,14 +410,21 @@ class PitchStaircase {
      * @param {Cell} stepcell
      * @returns {void}
      */
-    _playOne(stepCell) {
+    _playOne(stepCell, playCell) {
         // The frequency is stored in the stepCell.
-        stepCell.style.backgroundColor = platformColor.selectorBackground;
+        stepCell.classList.add("active");
+        stepCell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+        const i = Number(playCell.getAttribute("id"));
+        this._playingRowIndex = i;
         const frequency = Number(stepCell.getAttribute("id"));
         this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
+        this._setButtonIcon(playCell, "stop-button.svg", _("Stop"));
 
-        setTimeout(() => {
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+        this._rowStopTimeout = this._setWidgetTimeout(() => {
+            stepCell.classList.remove("active");
+            stepCell.style.backgroundColor = "";
+            this._setButtonIcon(playCell, "play-button.svg", _("Play"));
+            this._playingRowIndex = null;
         }, 1000);
     }
 
@@ -316,20 +434,32 @@ class PitchStaircase {
      */
     _playAll() {
         const pitchnotes = [];
+        this._isPlayingAll = true;
+        if (this._playAllButton) {
+            this._setButtonIcon(
+                this._isPlayingAll ? this._playAllButton : null,
+                "stop-button.svg",
+                _("Stop")
+            );
+        }
 
         for (let i = 0; i < this.Stairs.length; i++) {
             const note = this.Stairs[i][0] + this.Stairs[i][1];
             pitchnotes.push(normalizeNoteAccidentals(note));
             const stepCell = this._stepTables[i].rows[0].cells[1];
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            stepCell.classList.add("active");
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         }
 
-        setTimeout(() => {
+        this._playAllTimeout = this._setWidgetTimeout(() => {
             for (let i = 0; i < this.Stairs.length; i++) {
                 const stepCell = this._stepTables[i].rows[0].cells[1];
-                stepCell.style.backgroundColor = platformColor.selectorBackground;
+                stepCell.classList.remove("active");
             }
+            if (this._playAllButton) {
+                this._setButtonIcon(this._playAllButton, "play-chord.svg", _("Play chord"));
+            }
+            this._isPlayingAll = false;
         }, 1000);
     }
 
@@ -338,13 +468,18 @@ class PitchStaircase {
      * @returns {void}
      */
     playUpAndDown() {
+        this._scaleStopped = false;
+        this._isPlayingScale = true;
+        if (this._playScaleButton) {
+            this._setButtonIcon(this._playScaleButton, "stop-button.svg", _("Stop"));
+        }
         const pitchnotes = [];
         const note =
             this.Stairs[this.Stairs.length - 1][0] + this.Stairs[this.Stairs.length - 1][1];
         pitchnotes.push(normalizeNoteAccidentals(note));
         const last = this.Stairs.length - 1;
         const stepCell = this._stepTables[last].rows[0].cells[1];
-        stepCell.style.backgroundColor = platformColor.selectorBackground;
+        stepCell.classList.add("active");
         this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         this._playNext(this.Stairs.length - 2, -1);
     }
@@ -356,29 +491,59 @@ class PitchStaircase {
      * @returns {void}
      */
     _playNext(index, next) {
-        if (this.closed) return;
+        if (this.closed || this._scaleStopped) return;
 
         if (index === this.Stairs.length) {
-            setTimeout(() => {
+            const completionTimeout = this._setWidgetTimeout(() => {
+                if (this.closed || this._scaleStopped) return;
                 for (let i = 0; i < this.Stairs.length; i++) {
-                    const stepCell = this._stepTables[i].rows[0].cells[1];
-                    stepCell.style.backgroundColor = platformColor.selectorBackground;
+                    if (
+                        this._stepTables[i] &&
+                        this._stepTables[i].rows &&
+                        this._stepTables[i].rows[0] &&
+                        this._stepTables[i].rows[0].cells[1]
+                    ) {
+                        const stepCell = this._stepTables[i].rows[0].cells[1];
+                        stepCell.classList.remove("active");
+                    }
                 }
+                if (this._playScaleButton) {
+                    this._setButtonIcon(this._playScaleButton, "play-scale.svg", _("Play scale"));
+                }
+                this._isPlayingScale = false;
             }, 1000);
+            if (this._playScaleButton) {
+                this._scaleStepTimeout = completionTimeout;
+            }
             return;
         }
 
         if (index === -1) {
-            setTimeout(() => {
+            const highlightCleanupTimeout = this._setWidgetTimeout(() => {
+                if (this.closed || this._scaleStopped) return;
                 for (let i = 0; i < this.Stairs.length; i++) {
-                    const stepCell = this._stepTables[i].rows[0].cells[1];
-                    stepCell.style.backgroundColor = platformColor.selectorBackground;
+                    if (
+                        this._stepTables[i] &&
+                        this._stepTables[i].rows &&
+                        this._stepTables[i].rows[0] &&
+                        this._stepTables[i].rows[0].cells[1]
+                    ) {
+                        const stepCell = this._stepTables[i].rows[0].cells[1];
+                        stepCell.classList.remove("active");
+                    }
                 }
             }, 1000);
+            if (this._playScaleButton) {
+                this._scaleHighlightTimeout = highlightCleanupTimeout;
+            }
 
-            setTimeout(() => {
+            const initialStepTimeout = this._setWidgetTimeout(() => {
+                if (this.closed || this._scaleStopped) return;
                 this._playNext(0, 1);
             }, 200);
+            if (this._playScaleButton) {
+                this._scaleStepTimeout = initialStepTimeout;
+            }
 
             return;
         }
@@ -387,21 +552,43 @@ class PitchStaircase {
         const note = this.Stairs[index][0] + this.Stairs[index][1];
         pitchnotes.push(normalizeNoteAccidentals(note));
         const previousRowNumber = index - next;
-        const pscTableCell = this._stepTables[previousRowNumber];
+        // _stepTables is a dense array; a negative index yields undefined,
+        // not null, so use != null (loose) to catch both.
+        const pscTableCell = previousRowNumber >= 0 ? this._stepTables[previousRowNumber] : null;
 
-        setTimeout(() => {
-            if (pscTableCell !== null) {
+        const stepTimeout = this._setWidgetTimeout(() => {
+            if (this.closed || this._scaleStopped) return;
+            if (
+                pscTableCell !== null &&
+                pscTableCell !== undefined &&
+                pscTableCell.rows &&
+                pscTableCell.rows[0] &&
+                pscTableCell.rows[0].cells[1]
+            ) {
                 const stepCell = pscTableCell.rows[0].cells[1];
-                stepCell.style.backgroundColor = platformColor.selectorBackground;
+                stepCell.classList.remove("active");
             }
 
-            const stepCell = this._stepTables[index].rows[0].cells[1];
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            if (
+                this._stepTables[index] &&
+                this._stepTables[index].rows &&
+                this._stepTables[index].rows[0] &&
+                this._stepTables[index].rows[0].cells[1]
+            ) {
+                const stepCell = this._stepTables[index].rows[0].cells[1];
+                stepCell.classList.add("active");
+            }
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
-            if (index < this.Stairs.length || index > -1) {
+            // Use && so playback terminates when index reaches either boundary;
+            // the boundary cases (=== -1 and === Stairs.length) are already
+            // handled by the early-return guards at the top of this function.
+            if (index > -1 && index < this.Stairs.length) {
                 this._playNext(index + next, next);
             }
         }, 1000);
+        if (this._playScaleButton) {
+            this._scaleStepTimeout = stepTimeout;
+        }
     }
 
     /**
@@ -583,7 +770,7 @@ class PitchStaircase {
         }
 
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(_("New action block generated."), 3000);
+        this.activity.textMsg(_("New action block generated."), 3000);
     }
 
     /**
@@ -602,8 +789,10 @@ class PitchStaircase {
         this.activity = activity;
 
         for (let i = 0; i < this.Stairs.length; i++) {
-            this.Stairs[i].push(this.Stairs[i][2]); // initial frequency
-            this.Stairs[i].push(this.Stairs[i][2]); // parent frequency
+            if (this.Stairs[i].length === 7) {
+                this.Stairs[i].push(this.Stairs[i][2]); // initial frequency
+                this.Stairs[i].push(this.Stairs[i][2]); // parent frequency
+            }
         }
 
         // this._initialFrequency = this.Stairs[0][2];
@@ -612,32 +801,116 @@ class PitchStaircase {
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
+        if (
+            window.widgetWindows &&
+            window.widgetWindows.openWindows &&
+            window.widgetWindows.openWindows["pitch staircase"]
+        ) {
+            // Previously this branch just returned, meaning any block value
+            // feeding this widget could change (via reInitWidget()) while
+            // the widget was open, without the visible stairs table ever
+            // reflecting it. this._refresh() (which calls
+            // this._makeStairs(true)) rebuilds the table from the current
+            // this.Stairs data without recreating the widgetWindow/buttons,
+            // so it can't reintroduce an #8234-style duplicate-buttons bug.
+            // Reported by @walterbender: "Changing the value in the
+            // pitchstaircase pitch still seems to break the open pitch
+            // staircase."
+            this._refresh();
+            return;
+        }
+
         const widgetWindow = window.widgetWindows.windowFor(
             this,
             "pitch staircase",
             "pitch staircase",
             true
         );
+        announceToScreenReader(_("Pitch Staircase opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
         widgetWindow.onclose = () => {
-            this.activity.logo.synth.setMasterVolume(0);
             this.closed = true;
+            this._clearWidgetTimeout(this._rowStopTimeout);
+            this._clearWidgetTimeout(this._playAllTimeout);
+            this._clearWidgetTimeout(this._scaleStepTimeout);
+            this._clearWidgetTimeout(this._scaleHighlightTimeout);
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
+            }
+            this._rowStopTimeout = null;
+            this._playAllTimeout = null;
+            this._scaleStepTimeout = null;
+            this._scaleHighlightTimeout = null;
+            this._scaleStopped = true;
+            this._isPlayingAll = false;
+            this._isPlayingScale = false;
+            this._playingRowIndex = null;
+            this.activity.logo.synth.stop();
+            // Restore the project's master volume so audio still works
+            // after exiting mid-playback (was incorrectly left at PREVIEWVOLUME).
+            if (Singer && Singer.masterVolume && Singer.masterVolume.length > 0) {
+                this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
+            }
+            announceToScreenReader(_("Pitch Staircase closed"));
             widgetWindow.destroy();
         };
 
         this.closed = false;
+        this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
 
-        widgetWindow.addButton("play-chord.svg", PitchStaircase.ICONSIZE, _("Play chord")).onclick =
-            () => {
+        this._playAllButton = widgetWindow.addButton(
+            "play-chord.svg",
+            PitchStaircase.ICONSIZE,
+            _("Play chord")
+        );
+        this._playAllButton.onclick = () => {
+            if (this._isPlayingAll) {
+                this._clearWidgetTimeout(this._playAllTimeout);
+                this._playAllTimeout = null;
+                for (let i = 0; i < this.Stairs.length; i++) {
+                    const stepCell = this._stepTables[i].rows[0].cells[1];
+                    stepCell.classList.remove("active");
+                }
+                this._setButtonIcon(this._playAllButton, "play-chord.svg", _("Play chord"));
+                this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
+                this._isPlayingAll = false;
+            } else {
                 this._playAll();
-            };
+            }
+        };
 
-        widgetWindow.addButton("play-scale.svg", PitchStaircase.ICONSIZE, _("Play scale")).onclick =
-            () => {
+        this._playScaleButton = widgetWindow.addButton(
+            "play-scale.svg",
+            PitchStaircase.ICONSIZE,
+            _("Play scale")
+        );
+        this._playScaleButton.onclick = () => {
+            if (this._isPlayingScale) {
+                this._scaleStopped = true;
+                this._clearWidgetTimeout(this._scaleStepTimeout);
+                this._clearWidgetTimeout(this._scaleHighlightTimeout);
+                this._scaleStepTimeout = null;
+                this._scaleHighlightTimeout = null;
+                for (let i = 0; i < this.Stairs.length; i++) {
+                    if (
+                        this._stepTables[i] &&
+                        this._stepTables[i].rows &&
+                        this._stepTables[i].rows[0] &&
+                        this._stepTables[i].rows[0].cells[1]
+                    ) {
+                        const stepCell = this._stepTables[i].rows[0].cells[1];
+                        stepCell.classList.remove("active");
+                    }
+                }
+                this._setButtonIcon(this._playScaleButton, "play-scale.svg", _("Play scale"));
+                this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
+                this._isPlayingScale = false;
+            } else {
                 this.playUpAndDown();
-            };
+            }
+        };
 
         this._save_lock = false;
         widgetWindow.addButton("export-chunk.svg", PitchStaircase.ICONSIZE, _("Save")).onclick =
@@ -651,9 +924,11 @@ class PitchStaircase {
                     }, 1000);
                 }
             };
-        const wfbWidget = document.getElementsByClassName("wfbWidget")[0];
-        wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
-        wfbWidget.style.overflowY = "scroll";
+        const wfbWidget = widgetWindow.getWidgetBody();
+        if (wfbWidget && wfbWidget.style) {
+            wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
+            wfbWidget.style.overflowY = "scroll";
+        }
         this._musicRatio1 = widgetWindow.addInputButton("3");
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");
@@ -676,10 +951,17 @@ class PitchStaircase {
         activity.textMsg(_("Click on a note to create a new step."), 3000);
 
         widgetWindow.onmaximize = () => {
-            if (widgetWindow._maximized) {
-                wfbWidget.style.maxHeight = 16 * PitchStaircase.BUTTONSIZE + "px";
-            } else {
-                wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
+            const body = widgetWindow.getWidgetBody();
+            if (body && body.style) {
+                const isMax =
+                    typeof widgetWindow.isMaximized === "function"
+                        ? widgetWindow.isMaximized()
+                        : widgetWindow._maximized;
+                if (isMax) {
+                    body.style.maxHeight = 16 * PitchStaircase.BUTTONSIZE + "px";
+                } else {
+                    body.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
+                }
             }
         };
     }

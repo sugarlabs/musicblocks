@@ -13,7 +13,7 @@
    global
    _, last, FlowBlock, ValueBlock, LeftBlock, NOINPUTERRORMSG,
    NANERRORMSG, mixedNumber, TONEBPM, DEFAULTDELAY, Singer,
-   StackClampBlock, platformColor, StatusMatrix
+   StackClampBlock, StatusMatrix
 */
 
 /* exported setupExtrasBlocks */
@@ -60,12 +60,8 @@ function setupExtrasBlocks(activity) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return "0/1";
             } else {
-                let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (typeof a === "number") {
-                    if (a < 0) {
-                        a = a * -1;
-                        return "-" + mixedNumber(a);
-                    }
                     return mixedNumber(a);
                 }
                 activity.errorMsg(NANERRORMSG, blk);
@@ -192,7 +188,9 @@ function setupExtrasBlocks(activity) {
                         '" width="' +
                         logo.canvas.width +
                         '" fill="' +
-                        platformColor.background +
+                        (getComputedStyle(document.body)
+                            .getPropertyValue("--color-bg-primary")
+                            .trim() || "#ffffff") +
                         '"/> ' +
                         logo.svgOutput;
                 }
@@ -553,6 +551,7 @@ function setupExtrasBlocks(activity) {
          */
         constructor() {
             super("drum");
+            this.setCapability("collapsible");
             this.setPalette("extras", activity);
             this.setHelpString();
 
@@ -671,6 +670,8 @@ function setupExtrasBlocks(activity) {
          */
         constructor() {
             super("grid");
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ outType: "gridout" });

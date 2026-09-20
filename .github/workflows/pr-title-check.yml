@@ -1,0 +1,73 @@
+name: PR Title Check
+
+# Lints the pull request TITLE as a Conventional Commit.
+#
+# Why this is separate from ci.yml's commitlint job:
+# On a squash merge, the single commit that lands on master is the PR title —
+# not any of the commits inside the PR. release-please builds CHANGELOG.md from
+# master's commit messages, so an unconventional PR title would silently drop
+# the change from the changelog. ci.yml lints the PR's individual commits,
+# which covers merge commits but not squashes.
+#
+# Why it is its own workflow rather than a step in ci.yml:
+# Catching a title that is renamed after checks go green requires the `edited`
+# activity type. Adding `edited` to ci.yml would re-run the entire pipeline —
+# build matrix, Jest, Cypress, security audit — every time anyone edits a PR
+# title *or body*. Body edits are routine here: pr-category-check.yml tells
+# contributors to edit their description to tick category checkboxes. So the
+# cheap title check gets the noisy trigger and the expensive pipeline does not.
+#
+# Uses `pull_request` (NOT pull_request_target): the title comes from the event
+# payload, but this workflow checks out and runs npm from the PR head, so it
+# must stay in the unprivileged context.
+
+on:
+    pull_request:
+        branches: [master]
+        # `edited` catches a rename after checks go green — the case this
+        # workflow exists for. `synchronize` looks redundant (a push does not
+        # change the title) but is required if this is ever added to branch
+        # protection: a required check must have a run against the *current*
+        # head SHA, and every push creates a new one. Without it the check
+        # would sit "expected" forever after any push. Keep it.
+        types: [opened, edited, reopened, synchronize]
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    pr-title:
+        name: Lint PR title
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha }}
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            # --ignore-scripts: this job only needs commitlint, which is pure
+            # JS. Skipping lifecycle scripts avoids running install hooks from
+            # a fork PR's dependency tree, and skips the Electron and Cypress
+            # binary downloads, which are pure waste here.
+            - name: Install dependencies
+              run: npm ci --ignore-scripts
+
+            # Same commitlint.config.js the commit-message hook and ci.yml use,
+            # so the title and the commits are held to one set of rules.
+            - name: Lint PR title
+              env:
+                  PR_TITLE: ${{ github.event.pull_request.title }}
+              run: |
+                  echo "PR title: $PR_TITLE"
+                  printf '%s' "$PR_TITLE" | npx commitlint --verbose

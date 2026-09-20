@@ -17,6 +17,9 @@
  */
 
 global.LeftBlock = class {
+    constructor() {
+        this.capabilities = Object.create(null);
+    }
     setPalette = jest.fn();
     setHelpString = jest.fn();
     formBlock = jest.fn();
@@ -24,6 +27,15 @@ global.LeftBlock = class {
     makeMacro = jest.fn();
     beginnerBlock = jest.fn();
     updateDockValue = jest.fn();
+    setCapability = jest.fn(function (name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    });
+    getCapability = jest.fn(function (name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
+    });
 
     flow = jest.fn().mockImplementation(function (args = [], logo = {}, turtle) {
         if (args.includes("test.abc")) {
@@ -540,6 +552,7 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         global.LeftBlock = class {
             constructor() {
                 instances[this.constructor.name] = this;
+                this.capabilities = Object.create(null);
             }
             setPalette() {}
             setHelpString() {}
@@ -548,10 +561,20 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
             beginnerBlock() {}
             makeMacro() {}
             updateDockValue() {}
+            setCapability(name, value = true) {
+                this.capabilities[name] = !!value;
+                return this;
+            }
+            getCapability(name) {
+                return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                    ? this.capabilities[name]
+                    : undefined;
+            }
         };
         global.FlowBlock = class {
             constructor() {
                 instances[this.constructor.name] = this;
+                this.capabilities = Object.create(null);
             }
             setPalette() {}
             setHelpString() {}
@@ -560,6 +583,15 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
             beginnerBlock() {}
             makeMacro() {}
             updateDockValue() {}
+            setCapability(name, value = true) {
+                this.capabilities[name] = !!value;
+                return this;
+            }
+            getCapability(name) {
+                return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                    ? this.capabilities[name]
+                    : undefined;
+            }
         };
         setupExtrasBlocks(activity);
         global.LeftBlock = origLeftBlock;

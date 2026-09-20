@@ -49,6 +49,7 @@ describe("StatsWindow", () => {
             show: jest.fn(),
             destroy: jest.fn(),
             sendToCenter: jest.fn(),
+            addButton: jest.fn().mockReturnValue({ onclick: null }),
             onclose: null,
             onmaximize: null,
             getWidgetBody: jest.fn().mockReturnValue(body),
@@ -251,5 +252,169 @@ describe("StatsWindow", () => {
         expect(html).toContain("524Hz"); // 523.25 + 0.5 rounded
         expect(html).toContain("rests used: 4");
         expect(html).toContain("ornaments used: 1");
+    });
+
+    test("displayInfo does not throw and shows N/A when no notes were played", () => {
+        const sw = new StatsWindow(activity);
+
+        expect(() =>
+            sw.displayInfo({
+                duples: 0,
+                triplets: 0,
+                quintuplets: 0,
+                pitchNames: new Set(),
+                numberOfNotes: 0,
+                rests: 0,
+                ornaments: 0
+            })
+        ).not.toThrow();
+
+        const html = sw.jsonObject.innerHTML;
+        expect(html).toContain("lowest note: N/A");
+        expect(html).toContain("highest note: N/A");
+        expect(html).toContain("number of notes: 0");
+    });
+
+    test("displayInfo formats totalSeconds using formatSeconds when provided", () => {
+        const sw = new StatsWindow(activity);
+        global.formatSeconds = jest.fn().mockReturnValue("02:05");
+
+        sw.displayInfo({
+            duples: 1,
+            triplets: 0,
+            quintuplets: 0,
+            pitchNames: new Set(["A4"]),
+            numberOfNotes: 1,
+            rests: 0,
+            ornaments: 0,
+            totalSeconds: 125
+        });
+
+        const html = sw.jsonObject.innerHTML;
+        expect(html).toContain("total duration: 02:05");
+        expect(global.formatSeconds).toHaveBeenCalledWith(125);
+    });
+
+    test("adds reload.svg Refresh button to toolbar and re-runs analytics on click", () => {
+        const sw = new StatsWindow(activity);
+        expect(widgetWin.addButton).toHaveBeenCalledWith("reload.svg", 32, "Refresh");
+
+        const btnObj = widgetWin.addButton.mock.results[0].value;
+        expect(typeof btnObj.onclick).toBe("function");
+
+        global.analyzeProject.mockClear();
+        btnObj.onclick();
+
+        expect(global.analyzeProject).toHaveBeenCalledTimes(1);
+    });
+
+    test("refresh method clears body and re-executes doAnalytics", () => {
+        const sw = new StatsWindow(activity);
+        const stale = document.createElement("div");
+        stale.textContent = "stale-data";
+        body.appendChild(stale);
+
+        global.analyzeProject.mockClear();
+        sw.refresh();
+
+        expect(body.textContent).not.toContain("stale-data");
+        expect(global.analyzeProject).toHaveBeenCalledTimes(1);
+    });
+
+    test("guards against in-flight rapid double-clicks while refresh is running", () => {
+        const sw = new StatsWindow(activity);
+        global.analyzeProject.mockClear();
+
+        sw._inFlight = true;
+        sw.refresh();
+
+        expect(global.analyzeProject).not.toHaveBeenCalled();
+    });
+
+    describe("busy-state release", () => {
+        let errorSpy;
+
+        beforeEach(() => {
+            errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            document.body.style.cursor = "";
+        });
+
+        afterEach(() => {
+            errorSpy.mockRestore();
+        });
+
+        test("chart callback clears activity.loading on the success path", () => {
+            const sw = new StatsWindow(activity);
+            expect(activity.loading).toBe(true);
+
+            capturedCb();
+
+            expect(activity.loading).toBe(false);
+            expect(document.body.style.cursor).toBe("default");
+        });
+
+        test("a completed run releases _inFlight so Refresh works again", () => {
+            // Asserting _inFlight === false straight after construction would
+            // pass even if the success callback never released it, since it
+            // starts false. Drive a full run, then prove the next refresh is
+            // allowed to start analysis.
+            const sw = new StatsWindow(activity);
+            capturedCb();
+
+            global.analyzeProject.mockClear();
+            sw.refresh();
+
+            expect(global.analyzeProject).toHaveBeenCalledTimes(1);
+        });
+
+        test("a throwing analyzeProject does not leave the UI wedged", () => {
+            global.analyzeProject.mockImplementation(() => {
+                throw new Error("malformed project data");
+            });
+
+            const sw = new StatsWindow(activity);
+
+            expect(activity.loading).toBe(false);
+            expect(document.body.style.cursor).toBe("default");
+            expect(sw._inFlight).toBe(false);
+            expect(errorSpy).toHaveBeenCalled();
+        });
+
+        test("a throwing chart constructor does not leave the UI wedged", () => {
+            global.Chart.mockImplementation(() => ({
+                Radar: () => {
+                    throw new Error("chart render failed");
+                }
+            }));
+
+            const sw = new StatsWindow(activity);
+
+            expect(activity.loading).toBe(false);
+            expect(document.body.style.cursor).toBe("default");
+            expect(sw._inFlight).toBe(false);
+        });
+
+        test("constructing the widget does not rethrow when analysis fails", () => {
+            global.runAnalytics.mockImplementation(() => {
+                throw new Error("worker crashed");
+            });
+
+            expect(() => new StatsWindow(activity)).not.toThrow();
+        });
+
+        test("Refresh still works after a failed analysis", () => {
+            global.analyzeProject.mockImplementation(() => {
+                throw new Error("malformed project data");
+            });
+            const sw = new StatsWindow(activity);
+
+            // Recover: the next run succeeds, and must not be blocked by the
+            // _inFlight flag left over from the failed one.
+            global.analyzeProject.mockReturnValue([1]);
+            global.analyzeProject.mockClear();
+            sw.refresh();
+
+            expect(global.analyzeProject).toHaveBeenCalledTimes(1);
+        });
     });
 });

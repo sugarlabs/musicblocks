@@ -151,8 +151,18 @@ describe("setupHeapBlocks", () => {
             logo.inStatusMatrix = true;
             const blk = 10;
             const result = heapBlock.arg(logo, turtle, blk);
-            expect(result).toBeUndefined();
+            expect(result).toBe("[]");
             expect(logo.statusFields).toContainEqual([blk, "heap"]);
+        });
+
+        it("should create an empty heap and return '[]' if the turtle heap is undefined", () => {
+            const turtle = 1;
+            delete logo.turtleHeaps[turtle];
+            const heapBlock = createdBlocks["heap"];
+            logo.inStatusMatrix = false;
+            const result = heapBlock.arg(logo, turtle, 99);
+            expect(result).toBe("[]");
+            expect(logo.turtleHeaps[turtle]).toEqual([]);
         });
     });
 
@@ -192,7 +202,7 @@ describe("setupHeapBlocks", () => {
             logo.inStatusMatrix = true;
             const blk = 10;
             const result = heapLengthBlock.arg(logo, turtle, blk);
-            expect(result).toBeUndefined();
+            expect(result).toBe(0);
             expect(logo.statusFields).toContainEqual([blk, "heapLength"]);
         });
     });
@@ -240,6 +250,23 @@ describe("setupHeapBlocks", () => {
             const reverseHeapBlock = createdBlocks["reverseHeap"];
             reverseHeapBlock.flow([], logo, turtle);
             expect(logo.turtleHeaps[turtle]).toEqual([4, 3, 2, 1]);
+        });
+
+        it("should create an empty heap if the turtle heap is undefined", () => {
+            const turtle = 1;
+            delete logo.turtleHeaps[turtle];
+            const reverseHeapBlock = createdBlocks["reverseHeap"];
+            reverseHeapBlock.flow([], logo, turtle);
+            expect(logo.turtleHeaps[turtle]).toEqual([]);
+            expect(Array.isArray(logo.turtleHeaps[turtle])).toBe(true);
+        });
+
+        it("should leave a single-entry heap unchanged", () => {
+            const turtle = 0;
+            setTurtleHeap(turtle, [9]);
+            const reverseHeapBlock = createdBlocks["reverseHeap"];
+            reverseHeapBlock.flow([], logo, turtle);
+            expect(logo.turtleHeaps[turtle]).toEqual([9]);
         });
     });
 
@@ -308,9 +335,14 @@ describe("setupHeapBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("No input provided", blk);
         });
 
-        it("should call errorMsg if arguments are not numbers", () => {
+        it("should call errorMsg if index is not a number", () => {
             setHeapEntryBlock.flow(["a", 99], logo, 0, blk);
             expect(activity.errorMsg).toHaveBeenCalledWith("Not a number", blk);
+        });
+
+        it("should allow string values", () => {
+            setHeapEntryBlock.flow([2, "test"], logo, 0, blk);
+            expect(logo.turtleHeaps[0][1]).toEqual("test");
         });
 
         it("should adjust index < 1 and set the value at index 1", () => {

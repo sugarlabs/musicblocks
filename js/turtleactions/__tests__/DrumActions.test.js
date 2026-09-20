@@ -221,7 +221,14 @@ describe("setupDrumActions", () => {
             Singer.DrumActions[actionName]("d1", 0, 1);
             expect(activity.logo._currentDrumBlock).toBe(1);
             expect(activity.logo.rhythmRuler.Drums).toContain(1);
-            expect(activity.logo.rhythmRuler.Rulers).toHaveLength(1);
+            expect(activity.logo.rhythmRuler.Rulers).toEqual([[[], []]]);
+        });
+
+        it("does not touch rhythm ruler state when inRhythmRuler is false", () => {
+            Singer.DrumActions[actionName]("d1", 0, 1);
+            expect(activity.logo._currentDrumBlock).toBeNull();
+            expect(activity.logo.rhythmRuler.Drums).toHaveLength(0);
+            expect(activity.logo.rhythmRuler.Rulers).toHaveLength(0);
         });
 
         it("removes drumStyle on listener", () => {
@@ -256,6 +263,102 @@ describe("setupDrumActions", () => {
                 expect.any(String),
                 expect.any(Function)
             );
+        });
+
+        it("does not dispatch when blk is defined but not in blockList", () => {
+            Singer.DrumActions[actionName]("d1", 0, 999);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                prefix,
+                expect.any(Function)
+            );
+        });
+
+        it("does not throw and skips the mouse listener when MusicBlocks is undefined", () => {
+            const originalMusicBlocks = global.MusicBlocks;
+            delete global.MusicBlocks;
+            try {
+                expect(() => Singer.DrumActions[actionName]("d1", 0)).not.toThrow();
+                expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+                expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
+                expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                    0,
+                    prefix,
+                    expect.any(Function)
+                );
+            } finally {
+                global.MusicBlocks = originalMusicBlocks;
+            }
+        });
+    });
+
+    describe("setDrum: pitchDrumTable scoping (issue #8199)", () => {
+        beforeEach(() => {
+            targetTurtle.singer.drumStyle = [];
+            activity.logo.setTurtleListener.mockClear();
+        });
+
+        it("preserves a pre-existing mapping (e.g. from Map Pitch to Drum) across an unrelated Set Drum block", () => {
+            targetTurtle.singer.pitchDrumTable = { C4: "drum2" };
+
+            Singer.DrumActions.setDrum("d1", 0, 1);
+            const closeListener = activity.logo.setTurtleListener.mock.calls[0][2];
+            closeListener();
+
+            expect(targetTurtle.singer.pitchDrumTable).toEqual({ C4: "drum2" });
+        });
+
+        it("still discards entries the clamp itself added, once it closes", () => {
+            targetTurtle.singer.pitchDrumTable = { C4: "drum2" };
+
+            Singer.DrumActions.setDrum("d1", 0, 1);
+            // A note played inside the clamp records itself into pitchDrumTable,
+            // exactly as js/turtle-singer.js:1150-1153 does for a real pitch.
+            targetTurtle.singer.pitchDrumTable.D4 = "drum1";
+
+            const closeListener = activity.logo.setTurtleListener.mock.calls[0][2];
+            closeListener();
+
+            // D4 (added inside the clamp) is gone; C4 (pre-existing) survives.
+            expect(targetTurtle.singer.pitchDrumTable).toEqual({ C4: "drum2" });
+        });
+
+        it("restores a pre-existing mapping's original drum if the clamp overwrote it", () => {
+            targetTurtle.singer.pitchDrumTable = { C4: "drum2" };
+
+            Singer.DrumActions.setDrum("d1", 0, 1);
+            // The same pitch (C4) is played again inside this clamp, overwriting
+            // the earlier mapping for the duration of the clamp.
+            targetTurtle.singer.pitchDrumTable.C4 = "drum1";
+
+            const closeListener = activity.logo.setTurtleListener.mock.calls[0][2];
+            closeListener();
+
+            expect(targetTurtle.singer.pitchDrumTable).toEqual({ C4: "drum2" });
+        });
+
+        it("nested Set Drum blocks each discard only what they themselves added", () => {
+            targetTurtle.singer.pitchDrumTable = { preexisting: "drum2" };
+
+            Singer.DrumActions.setDrum("d1", 0, 1); // outer clamp opens
+            const outerClose = activity.logo.setTurtleListener.mock.calls[0][2];
+            targetTurtle.singer.pitchDrumTable.fromOuter = "drum1";
+
+            activity.logo.setTurtleListener.mockClear();
+            Singer.DrumActions.setDrum("d2", 0, 1); // inner clamp opens
+            const innerClose = activity.logo.setTurtleListener.mock.calls[0][2];
+            targetTurtle.singer.pitchDrumTable.fromInner = "drum2";
+
+            innerClose();
+            expect(targetTurtle.singer.pitchDrumTable).toEqual({
+                preexisting: "drum2",
+                fromOuter: "drum1"
+            });
+
+            outerClose();
+            expect(targetTurtle.singer.pitchDrumTable).toEqual({ preexisting: "drum2" });
         });
     });
 
@@ -317,6 +420,15 @@ describe("setupDrumActions", () => {
             Singer.DrumActions.playNoise("n1", 0, 4);
             expect(targetTurtle.singer.synthVolume["noise1"]).toEqual([50]);
             expect(targetTurtle.singer.crescendoInitialVolume["noise1"]).toEqual([60]);
+        });
+
+        it("resolves a nickname that does not match the first NOISENAMES entry", () => {
+            targetTurtle.singer.inNoteBlock.push(2);
+            targetTurtle.singer.noteDrums[2] = [];
+            targetTurtle.singer.noteBeatValues[2] = [];
+            Singer.DrumActions.playNoise("n2", 0, 1);
+            expect(targetTurtle.singer.noteDrums[2]).toContain("noise2");
+            expect(targetTurtle.singer.noteDrums[2]).not.toContain("n2");
         });
     });
 });

@@ -44,8 +44,8 @@
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    background: var(--panel-bg, #fdfefe);
-    border: 2px solid var(--border, #e0e0e0);
+    background: var(--color-panel-bg);
+    border: 2px solid var(--color-border-primary);
     border-radius: 8px;
     box-shadow: -4px 0 12px rgba(0, 0, 0, 0.08);
     overflow: hidden;
@@ -69,7 +69,7 @@
     font-size: 14px;
     font-weight: bold;
     line-height: 1;
-    background: var(--accent, #2196f3);
+    background: var(--color-brand-primary);
     border-radius: 30px 0 0 30px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     z-index: 1;
@@ -107,7 +107,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 14px 16px;
-    background: var(--accent, #2196f3);
+    background: var(--color-brand-primary);
     color: white;
     font-size: 18px;
     font-weight: 600;
@@ -154,12 +154,12 @@
     flex: 1;
     padding: 14px;
     overflow-y: auto;
-    background: var(--bg, #f5f7fa);
-    color: var(--fg, #263238);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
 }
 
 .journal-header {
-    background: var(--accent, #2196f3);
+    background: var(--color-brand-primary);
 }
 
 .quest-title {
@@ -1106,8 +1106,8 @@
 .journal-empty-card {
     margin: 10px 0;
     padding: 14px;
-    background: var(--panel-bg, #fffdf7);
-    border: 1px solid var(--border, #e4d8b4);
+    background: var(--color-panel-bg);
+    border: 1px solid var(--color-border-primary);
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(88, 61, 18, 0.08);
 }
@@ -1119,7 +1119,7 @@
     overflow: hidden;
     background:
         radial-gradient(circle at 88% 18%, rgba(255, 209, 102, 0.32) 0 10%, transparent 11%),
-        var(--panel-bg, #fff8dc);
+        var(--color-panel-bg);
 }
 
 .journal-cover::after {
@@ -1134,20 +1134,20 @@
         linear-gradient(
             90deg,
             transparent 48%,
-            color-mix(in srgb, var(--fg, #263238) 24%, transparent) 49% 51%,
+            color-mix(in srgb, var(--color-text-primary) 24%, transparent) 49% 51%,
             transparent 52%
         ),
         linear-gradient(
-            var(--panel-bg, #ffe8a3),
-            color-mix(in srgb, var(--accent, #2196f3) 34%, var(--panel-bg, #ffffff))
+            var(--color-panel-bg),
+            color-mix(in srgb, var(--color-brand-primary) 34%, var(--color-panel-bg))
         );
-    border: 2px solid var(--accent, #2196f3);
+    border: 2px solid var(--color-brand-primary);
     transform: rotate(-4deg);
 }
 
 .journal-cover h3 {
     margin: 0;
-    color: var(--accent, #2196f3);
+    color: var(--color-brand-primary);
     font-size: 21px;
 }
 
@@ -1155,7 +1155,7 @@
 .journal-empty-card p {
     max-width: 210px;
     margin: 6px 0 0;
-    color: var(--fg, #5c677d);
+    color: var(--color-text-primary);
     font-size: 13px;
     line-height: 1.35;
 }
@@ -1167,8 +1167,8 @@
     border-radius: 6px 6px 5px 5px;
     background:
         linear-gradient(90deg, transparent 47%, rgba(255, 255, 255, 0.5) 48% 52%, transparent 53%),
-        linear-gradient(var(--accent, #8ecae6), var(--accent, #2a9d8f));
-    border: 2px solid var(--border, #1b4965);
+        linear-gradient(var(--color-brand-primary), var(--color-brand-primary));
+    border: 2px solid var(--color-border-primary);
 }
 
 .journal-page-list {
@@ -1182,64 +1182,64 @@
     gap: 4px;
     min-height: 84px;
     padding: 12px 14px;
-    border: 1px solid var(--border, #d8e2dc);
+    border: 1px solid var(--color-border-primary);
     border-radius: 8px;
-    background: var(--panel-bg, #ffffff);
-    color: var(--fg, #263238);
+    background: var(--color-panel-bg);
+    color: var(--color-text-primary);
     text-align: left;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    border-left: 6px solid var(--accent, #2196f3);
+    border-left: 6px solid var(--color-brand-primary);
 }
 
 .journal-open-page:hover,
 .journal-open-page:focus {
-    outline: 3px solid color-mix(in srgb, var(--accent, #2196f3) 28%, transparent);
-    border-color: var(--accent, #2196f3);
+    outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+    border-color: var(--color-brand-primary);
 }
 
 .journal-open-title {
-    color: var(--fg, #263238);
+    color: var(--color-text-primary);
     font-size: 17px;
     font-weight: 800;
 }
 
 .journal-open-meta {
-    color: var(--fg, #5c677d);
+    color: var(--color-text-primary);
     font-size: 12px;
     opacity: 0.82;
 }
 
 .journal-level-1 {
-    border-left-color: var(--accent, #2196f3);
+    border-left-color: var(--color-brand-primary);
 }
 
 .journal-level-2 {
-    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 68%, #e91e63);
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 68%, #e91e63);
 }
 
 .journal-level-3 {
-    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 64%, #00a676);
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 64%, #00a676);
 }
 
 .journal-level-4 {
-    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 58%, #ffca3a);
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 58%, #ffca3a);
 }
 
 .journal-level-5 {
-    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 54%, #2a9d8f);
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 54%, #2a9d8f);
 }
 
 .journal-level-6 {
-    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 50%, #4dabf7);
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 50%, #4dabf7);
 }
 
 .journal-level-7 {
-    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 46%, #7b5ea7);
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 46%, #7b5ea7);
 }
 
 .journal-level-8 {
-    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 42%, #ffd93d);
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 42%, #ffd93d);
 }
 
 .journal-page-top {
@@ -1247,19 +1247,19 @@
     justify-content: space-between;
     gap: 8px;
     margin-bottom: 6px;
-    color: var(--fg, #6c757d);
+    color: var(--color-text-primary);
     font-size: 12px;
     font-weight: 700;
 }
 
 .journal-page-number {
-    color: var(--accent, #2196f3);
+    color: var(--color-brand-primary);
 }
 
 .journal-page-card h4,
 .journal-empty-card h4 {
     margin: 0 0 10px;
-    color: var(--fg, #264653);
+    color: var(--color-text-primary);
     font-size: 18px;
 }
 
@@ -1272,7 +1272,7 @@
 .journal-prompt-book label {
     display: block;
     margin-bottom: 6px;
-    color: var(--fg, #34495e);
+    color: var(--color-text-primary);
     font-size: 13px;
 }
 
@@ -1288,9 +1288,9 @@
     min-height: 28px;
     padding: 4px 8px;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--accent, #2196f3) 12%, var(--panel-bg, #ffffff));
-    border: 1px solid var(--accent, #2a9d8f);
-    color: var(--fg, #1b6658);
+    background: color-mix(in srgb, var(--color-brand-primary) 12%, var(--color-panel-bg));
+    border: 1px solid var(--color-brand-primary);
+    color: var(--color-text-primary);
     font-size: 12px;
     font-weight: 700;
 }
@@ -1298,7 +1298,7 @@
 .journal-learned span::before {
     content: "\2713";
     margin-right: 5px;
-    color: var(--accent, #2a9d8f);
+    color: var(--color-brand-primary);
     font-weight: 900;
 }
 
@@ -1310,9 +1310,9 @@
     box-sizing: border-box;
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid var(--border, #cfd8dc);
-    background: var(--bg, #ffffff);
-    color: var(--fg, #263238);
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
     font:
         14px "Segoe UI",
         sans-serif;
@@ -1321,8 +1321,8 @@
 
 .journal-page-card textarea:focus,
 .journal-prompt-book textarea:focus {
-    outline: 3px solid color-mix(in srgb, var(--accent, #2196f3) 28%, transparent);
-    border-color: var(--accent, #2196f3);
+    outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+    border-color: var(--color-brand-primary);
 }
 
 .journal-add-note,
@@ -1336,7 +1336,7 @@
     padding: 8px 14px;
     border: none;
     border-radius: 8px;
-    background: var(--accent, #2196f3);
+    background: var(--color-brand-primary);
     color: white;
     font-size: 14px;
     font-weight: 800;
@@ -1358,9 +1358,9 @@
 
 .journal-delete-note,
 .journal-delete-page {
-    background: var(--bg, #eceff1);
-    color: var(--fg, #455a64);
-    border: 1px solid var(--border, #cfd8dc);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
 }
 
 .journal-delete-note:hover,
@@ -1383,13 +1383,13 @@
 
 .journal-note-card {
     padding: 10px;
-    border: 1px solid var(--border, #d8e2dc);
+    border: 1px solid var(--color-border-primary);
     border-radius: 8px;
-    background: var(--bg, #ffffff);
+    background: var(--color-bg-primary);
 }
 
 .journal-note-card.empty {
-    color: var(--fg, #455a64);
+    color: var(--color-text-primary);
 }
 
 .journal-note-card.empty span {
@@ -1401,7 +1401,7 @@
 
 .journal-note-date {
     margin-bottom: 6px;
-    color: var(--accent, #2196f3);
+    color: var(--color-brand-primary);
     font-size: 12px;
     font-weight: 800;
 }
@@ -1409,7 +1409,7 @@
 .journal-new-note {
     margin-top: 14px;
     padding-top: 12px;
-    border-top: 1px solid var(--border, #d8e2dc);
+    border-top: 1px solid var(--color-border-primary);
 }
 
 .journal-section {
@@ -1418,7 +1418,7 @@
 
 .journal-section-title {
     margin: 0 0 8px;
-    color: var(--accent, #2196f3);
+    color: var(--color-brand-primary);
     font-size: 14px;
     font-weight: 900;
     text-transform: uppercase;
@@ -1431,13 +1431,13 @@
 
 .journal-general-empty {
     margin: 0 0 8px;
-    color: var(--fg, #5c677d);
+    color: var(--color-text-primary);
     font-size: 13px;
     line-height: 1.35;
 }
 
 .journal-open-general {
-    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 42%, #ffb703);
+    border-left-color: color-mix(in srgb, var(--color-brand-primary) 42%, #ffb703);
 }
 
 .journal-fab-add {
@@ -1445,10 +1445,10 @@
     min-height: 44px;
     margin-top: 14px;
     padding: 10px 14px;
-    border: 2px dashed var(--accent, #2196f3);
+    border: 2px dashed var(--color-brand-primary);
     border-radius: 10px;
-    background: color-mix(in srgb, var(--accent, #2196f3) 8%, var(--panel-bg, #ffffff));
-    color: var(--accent, #2196f3);
+    background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-panel-bg));
+    color: var(--color-brand-primary);
     font-size: 15px;
     font-weight: 900;
     cursor: pointer;
@@ -1459,7 +1459,7 @@
 
 .journal-fab-add:hover,
 .journal-fab-add:focus {
-    outline: 3px solid color-mix(in srgb, var(--accent, #2196f3) 28%, transparent);
+    outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
     filter: brightness(0.97);
 }
 
@@ -1470,9 +1470,9 @@
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid var(--border, #cfd8dc);
-    background: var(--bg, #ffffff);
-    color: var(--fg, #263238);
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
     font:
         14px "Segoe UI",
         sans-serif;
@@ -1481,8 +1481,8 @@
 
 .journal-page-card input[type="text"]:focus,
 .journal-general-page input[type="text"]:focus {
-    outline: 3px solid color-mix(in srgb, var(--accent, #2196f3) 28%, transparent);
-    border-color: var(--accent, #2196f3);
+    outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+    border-color: var(--color-brand-primary);
 }
 
 #explorer-journal-prompt {
@@ -1501,13 +1501,13 @@
     background:
         linear-gradient(
             90deg,
-            color-mix(in srgb, var(--accent, #2196f3) 18%, transparent) 0 14px,
+            color-mix(in srgb, var(--color-brand-primary) 18%, transparent) 0 14px,
             transparent 15px
         ),
-        var(--panel-bg, #fffdf7);
-    border: 2px solid var(--accent, #2196f3);
+        var(--color-panel-bg);
+    border: 2px solid var(--color-brand-primary);
     box-shadow: 0 12px 32px rgba(33, 37, 41, 0.22);
-    color: var(--fg, #263238);
+    color: var(--color-text-primary);
 }
 
 #close-journal-prompt {
@@ -1518,8 +1518,8 @@
     height: 28px;
     border: none;
     border-radius: 50%;
-    background: var(--bg, #f1e5c8);
-    color: var(--fg, #5f4b00);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
     font-weight: 900;
     cursor: pointer;
 }
@@ -1527,7 +1527,7 @@
 .journal-prompt-kicker {
     display: inline-block;
     margin-bottom: 4px;
-    color: var(--accent, #2196f3);
+    color: var(--color-brand-primary);
     font-size: 12px;
     font-weight: 900;
     text-transform: uppercase;
@@ -1535,13 +1535,13 @@
 
 .journal-prompt-book h3 {
     margin: 0 28px 8px 0;
-    color: var(--accent, #2196f3);
+    color: var(--color-brand-primary);
     font-size: 20px;
 }
 
 .journal-prompt-book p {
     margin: 0 0 12px;
-    color: var(--fg, #4f5d75);
+    color: var(--color-text-primary);
     font-size: 13px;
     line-height: 1.35;
 }
@@ -1555,9 +1555,9 @@
     min-height: 38px;
     padding: 8px 14px;
     border-radius: 8px;
-    background: var(--bg, #eceff1);
-    color: var(--fg, #455a64);
-    border: 1px solid var(--border, #cfd8dc);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
     font-size: 14px;
     font-weight: 800;
     cursor: pointer;
@@ -1874,9 +1874,9 @@
     min-height: 34px;
     padding: 7px 12px;
     border-radius: 8px;
-    border: 1px solid var(--border, #90caf9);
-    background: var(--panel-bg, #e3f2fd);
-    color: var(--accent, #1565c0);
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-panel-bg);
+    color: var(--color-brand-primary);
     font-size: 13px;
     font-weight: 800;
     cursor: pointer;
@@ -1887,8 +1887,8 @@
 #back-to-journal-index:hover,
 #back-to-levels:focus,
 #back-to-journal-index:focus {
-    outline: 3px solid color-mix(in srgb, var(--accent, #2196f3) 26%, transparent);
-    border-color: var(--accent, #2196f3);
+    outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 26%, transparent);
+    border-color: var(--color-brand-primary);
 }
 
 /* === LEVEL CONTENT === */

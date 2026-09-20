@@ -59,6 +59,7 @@ class DummyValueBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
         this.extraWidth = 0;
+        this.capabilities = Object.create(null);
     }
     setPalette(palette, activity) {
         return this;
@@ -79,6 +80,15 @@ class DummyValueBlock {
     }
     setup(activity) {
         return this;
+    }
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    }
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
     arg(logo, turtle, blk) {
         return global.activity.blocks.blockList[blk].value;
@@ -126,7 +136,7 @@ global.NANERRORMSG = "Not a number";
 
 global.toFixed2 = val => Number(val).toFixed(2);
 
-global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val);
+global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val, 10);
 global.pitchToFrequency = (note, octave, cents, keySig) => 440;
 global.doStopVideoCam = jest.fn();
 
@@ -174,7 +184,6 @@ const dummyLogo = {
     parseArg: jest.fn((logo, turtle, cblk, blk, receivedArg) => receivedArg),
     processShow: jest.fn(),
     processSpeak: jest.fn(),
-    meSpeak: {},
     setDispatchBlock: jest.fn(),
     setTurtleListener: jest.fn(),
     cameraID: null
@@ -341,10 +350,12 @@ describe("setupMediaBlocks", () => {
     });
 
     describe("SpeakBlock", () => {
-        it("should call processSpeak if meSpeak is not null and no note block is active", () => {
+        it("should not be hidden, so it shows up in the palette", () => {
+            expect(createdBlocks["speak"].hidden).toBeFalsy();
+        });
+        it("should call processSpeak when no note block is active", () => {
             const turtle = activity.turtles.ithTurtle(turtleIndex);
             turtle.singer.inNoteBlock = [];
-            logo.meSpeak = {};
             logo.processSpeak = jest.fn();
             const speakBlock = createdBlocks["speak"];
             speakBlock.flow(["Hello world"], logo, turtleIndex, 400);
@@ -357,6 +368,22 @@ describe("setupMediaBlocks", () => {
             const speakBlock = createdBlocks["speak"];
             speakBlock.flow(["Hello world"], logo, turtleIndex, 400);
             expect(turtle.singer.embeddedGraphics[999]).toContain(400);
+        });
+        it("should stay silent while output is suppressed", () => {
+            const turtle = activity.turtles.ithTurtle(turtleIndex);
+            turtle.singer.inNoteBlock = [];
+            turtle.singer.suppressOutput = true;
+            logo.processSpeak = jest.fn();
+            const speakBlock = createdBlocks["speak"];
+            speakBlock.flow(["Hello world"], logo, turtleIndex, 400);
+            expect(logo.processSpeak).not.toHaveBeenCalled();
+            turtle.singer.suppressOutput = false;
+        });
+        it("should do nothing when no text is connected", () => {
+            logo.processSpeak = jest.fn();
+            const speakBlock = createdBlocks["speak"];
+            speakBlock.flow([], logo, turtleIndex, 400);
+            expect(logo.processSpeak).not.toHaveBeenCalled();
         });
     });
 
@@ -480,6 +507,10 @@ describe("setupMediaBlocks", () => {
     });
 
     describe("TextBlock", () => {
+        it("declares the valueDrivenLabel capability", () => {
+            expect(createdBlocks["text"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
         it("should return its value from blockList", () => {
             activity.blocks.blockList[620] = { value: "hello world" };
             const textBlock = createdBlocks["text"];

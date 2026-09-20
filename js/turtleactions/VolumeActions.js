@@ -18,7 +18,7 @@
 
 /*
    global Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
-   Tone, instruments, DEFAULTVOLUME, DEFAULTVOICE
+   Tone, instruments, DEFAULTVOLUME, DEFAULTVOICE, clampNumber
 */
 
 /*
@@ -57,6 +57,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static doCrescendo(type, value, turtle, blk) {
+            value = clampNumber(value, 0, 100);
             const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.crescendoDelta.push(type === "crescendo" ? value : -value);
@@ -76,7 +77,7 @@ function setupVolumeActions(activity) {
             const listenerName = "_crescendo_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -97,6 +98,7 @@ function setupVolumeActions(activity) {
                     );
                     tur.singer.crescendoInitialVolume[synth].pop();
                 }
+                tur.singer.inCrescendo.pop();
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
@@ -116,7 +118,11 @@ function setupVolumeActions(activity) {
 
             for (const synth of synthList) {
                 let newVolume = (last(tur.singer.synthVolume[synth]) * (100 + volume)) / 100;
-                newVolume = Math.max(Math.min(newVolume, 100), -100);
+                // Clamp to 0 rather than -100, matching doCrescendo, setMasterVolume and
+                // setSynthVolume. A stored negative volume is not just unplayable: the
+                // next relative change multiplies by it, so a further decrease turns
+                // into an increase.
+                newVolume = clampNumber(newVolume, 0, 100);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     tur.singer.synthVolume[synth] = [newVolume];
@@ -136,7 +142,7 @@ function setupVolumeActions(activity) {
             const listenerName = "_articulation_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -169,7 +175,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setMasterVolume(volume, turtle, blk) {
-            volume = Math.max(Math.min(volume, 100), 0);
+            volume = clampNumber(volume, 0, 100);
 
             if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
 
@@ -193,7 +199,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setPanning(value, turtle) {
-            value = Math.max(Math.min(value, 100), -100) / 100;
+            value = clampNumber(value, -100, 100) / 100;
 
             const tur = activity.turtles.ithTurtle(turtle);
             if (!tur.singer.panner) {
@@ -273,13 +279,26 @@ function setupVolumeActions(activity) {
                 }
             }
 
+            volume = clampNumber(volume, 0, 100);
             tur.singer.synthVolume[synth].push(volume);
             if (!tur.singer.suppressOutput) {
                 Singer.setSynthVolume(activity.logo, turtle, synth, volume);
                 if (firstConnection === null && lastConnection === null) {
-                    setTimeout(() => {
-                        activity.logo.synth.trigger(0, "G4", 1 / 4, synthname, null, null, false);
-                    }, 250);
+                    activity.logo._timerManager.setGuardedTimeout(
+                        () => {
+                            activity.logo.synth.trigger(
+                                0,
+                                "G4",
+                                1 / 4,
+                                synthname,
+                                null,
+                                null,
+                                false
+                            );
+                        },
+                        250,
+                        () => activity.logo.stopTurtle
+                    );
                 }
             }
         }
