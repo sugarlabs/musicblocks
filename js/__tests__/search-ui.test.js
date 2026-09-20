@@ -305,6 +305,7 @@ describe("SearchUI empty search results", () => {
             })
         };
         const anchor = {
+            0: { setAttribute: jest.fn() },
             text: jest.fn(function () {
                 return this;
             })
@@ -325,6 +326,8 @@ describe("SearchUI empty search results", () => {
         expect(li.addClass).toHaveBeenCalledWith("ui-state-disabled search-no-results");
         expect(li[0].setAttribute).toHaveBeenCalledWith("aria-disabled", "true");
         expect(anchor.text).toHaveBeenCalledWith("No results found for xyz");
+        expect(anchor[0].setAttribute).toHaveBeenCalledWith("role", "status");
+        expect(anchor[0].setAttribute).toHaveBeenCalledWith("aria-live", "polite");
         expect(rendered).toBe(li);
     });
 });

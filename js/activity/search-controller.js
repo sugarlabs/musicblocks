@@ -73,6 +73,33 @@ class SearchController {
     }
 
     /**
+     * @param {object} $j
+     * @param {object} ul
+     * @param {object} item
+     * @returns {object}
+     */
+    _renderEmptySearchRow($j, ul, item) {
+        const ui = this.activity.searchUI;
+        if (ui && typeof ui.renderEmptySearchItem === "function") {
+            return ui.renderEmptySearchItem($j, ul, item);
+        }
+        const emptyLi = $j("<li></li>");
+        if (typeof emptyLi.addClass === "function") {
+            emptyLi.addClass("ui-state-disabled search-no-results");
+        }
+        if (emptyLi[0]) {
+            emptyLi[0].setAttribute("aria-disabled", "true");
+        }
+        const message = $j("<a>").text(item.label);
+        if (message[0]) {
+            message[0].setAttribute("role", "status");
+            message[0].setAttribute("aria-live", "polite");
+        }
+        emptyLi.append(message);
+        return emptyLi.appendTo(ul.css("z-index", 35000));
+    }
+
+    /**
      * Builds the block list used for search bar autocompletion.
      * Reads from activity.blocks.protoBlockDict and populates
      * searchSuggestions and deprecatedBlockNames.
@@ -358,16 +385,8 @@ class SearchController {
             const instance = $search.autocomplete("instance");
             if (instance) {
                 instance._renderItem = (ul, item) => {
-                    if (that._isEmptySearchResult(item) && activity.searchUI) {
-                        return activity.searchUI.renderEmptySearchItem($j, ul, item);
-                    }
                     if (that._isEmptySearchResult(item)) {
-                        const emptyLi = $j("<li></li>");
-                        if (typeof emptyLi.addClass === "function") {
-                            emptyLi.addClass("ui-state-disabled search-no-results");
-                        }
-                        emptyLi.append($j("<a>").text(item.label));
-                        return emptyLi.appendTo(ul.css("z-index", 35000));
+                        return that._renderEmptySearchRow($j, ul, item);
                     }
                     const li = $j("<li></li>");
 
@@ -755,16 +774,8 @@ class SearchController {
             const instance = $helpfulSearch.autocomplete("instance");
             if (instance) {
                 instance._renderItem = (ul, item) => {
-                    if (that._isEmptySearchResult(item) && activity.searchUI) {
-                        return activity.searchUI.renderEmptySearchItem($j, ul, item);
-                    }
                     if (that._isEmptySearchResult(item)) {
-                        const emptyLi = $j("<li></li>");
-                        if (typeof emptyLi.addClass === "function") {
-                            emptyLi.addClass("ui-state-disabled search-no-results");
-                        }
-                        emptyLi.append($j("<a>").text(item.label));
-                        return emptyLi.appendTo(ul.css("z-index", 35000));
+                        return that._renderEmptySearchRow($j, ul, item);
                     }
                     const li = $j("<li></li>");
                     const img = document.createElement("img");

@@ -236,6 +236,21 @@ class SearchUI {
      */
     renderEmptySearchItem($j, ul, item) {
         const li = $j("<li></li>");
+        this.decorateEmptySearchItem(li, item, $j);
+        const styled = typeof ul.css === "function" ? ul.css("z-index", 35000) : ul;
+        return li.appendTo(styled);
+    }
+
+    /**
+     * Marks an autocomplete row as the non-interactive empty-state message
+     * and exposes that message to assistive tech.
+     *
+     * @param {object} li - jQuery <li>
+     * @param {object} item - Empty-state item
+     * @param {object} $j - jQuery reference
+     * @returns {object} li
+     */
+    decorateEmptySearchItem(li, item, $j) {
         if (typeof li.addClass === "function") {
             li.addClass("ui-state-disabled search-no-results");
         }
@@ -244,9 +259,13 @@ class SearchUI {
             li[0].className = li[0].className ? li[0].className + " " + extra : extra;
             li[0].setAttribute("aria-disabled", "true");
         }
-        li.append($j("<a>").text(item.label));
-        const styled = typeof ul.css === "function" ? ul.css("z-index", 35000) : ul;
-        return li.appendTo(styled);
+        const message = $j("<a>").text(item.label);
+        if (message[0]) {
+            message[0].setAttribute("role", "status");
+            message[0].setAttribute("aria-live", "polite");
+        }
+        li.append(message);
+        return li;
     }
 
     /**
