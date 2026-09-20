@@ -660,4 +660,29 @@ describe("transcribeMidi", () => {
             });
         });
     });
+
+    it("should preserve master's chunking behavior and emit exactly 121 blocks for a 100 limit", async () => {
+        const { Midi } = require("@tonejs/midi");
+        const PPQ = 480;
+        const midi = new Midi();
+        midi.header.tempos = [{ ticks: 0, bpm: 120 }];
+        midi.header.update();
+        const track = midi.addTrack();
+        track.instrument.number = 0;
+        // Add 150 notes to exceed the 100 limit
+        for (let i = 0; i < 150; i++) {
+            track.addNote({ midi: 60, ticks: i * PPQ, durationTicks: PPQ });
+        }
+
+        await transcribeMidi(new Midi(midi.toArray()), 100);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        const noteBlocks = loadedBlocks.filter(
+            block => Array.isArray(block[1]) && block[1][0] === "newnote"
+        );
+
+        // This asserts that totalnoteblockCount only counts closed chunks
+        // ensuring maxNoteBlocks behaves exactly as it did before the refactor
+        expect(noteBlocks.length).toBe(121);
+    });
 });
