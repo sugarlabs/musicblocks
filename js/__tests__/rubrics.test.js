@@ -348,6 +348,31 @@ describe("rubrics.js test suite", () => {
             expect(stats.ornaments).toBe(1);
         });
 
+        it("pushes 'end articulation' into .end, not .begin (regression)", () => {
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [[["C4"], 4], "begin articulation", [["D4"], 4], "end articulation"]
+                        }
+                    },
+                    synth: {
+                        inTemperament: false,
+                        _getFrequency: jest.fn(() => 440)
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            const stats = getStatsFromNotation(activity);
+
+            expect(stats.articulation.begin).toHaveLength(1);
+            expect(stats.articulation.end).toHaveLength(1);
+            // The "end articulation" marker must NOT appear in .begin.
+            expect(stats.articulation.begin).not.toContain("3");
+            expect(stats.articulation.end).toContain("3");
+        });
+
         it("resolves note names through the custom temperament table when one is active", () => {
             isCustomTemperament.mockReturnValueOnce(true);
             getTemperament.mockReturnValueOnce([["idx", "Cff", "ratio", "C"]]);

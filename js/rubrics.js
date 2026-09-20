@@ -873,7 +873,7 @@ const getStatsFromNotation = activity => {
                 if (item === "begin articulation") {
                     projectStats["articulation"].begin.push(it);
                 } else if (item === "end articulation") {
-                    projectStats["articulation"].begin.push(it);
+                    projectStats["articulation"].end.push(it);
                 }
             }
         }
