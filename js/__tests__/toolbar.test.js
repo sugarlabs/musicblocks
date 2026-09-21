@@ -655,7 +655,7 @@ describe("Toolbar Class", () => {
         expect(recordButton.style.display).toBe("");
     });
 
-    test("updateRecordButton does not throw when fnBrowserDetect is undefined", () => {
+    test("updateRecordButton configures record button state when fnBrowserDetect is undefined", () => {
         const recordButton = {
             classList: { add: jest.fn(), remove: jest.fn() },
             style: { display: "" }
@@ -677,6 +677,8 @@ describe("Toolbar Class", () => {
         delete global.fnBrowserDetect;
 
         expect(() => toolbar.updateRecordButton(jest.fn())).not.toThrow();
+        expect(recordButton.style.display).toBe("block");
+        expect(typeof recordButton.onclick).toBe("function");
 
         if (originalFnBrowserDetect) {
             global.fnBrowserDetect = originalFnBrowserDetect;
