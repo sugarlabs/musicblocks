@@ -304,11 +304,17 @@ class MidiTranscriber {
             noteSum += duration;
             const isLastNoteInBlock =
                 noteSum >= 16 || (this.noteblockCount > 0 && this.noteblockCount % 24 === 0);
-            if (isLastNoteInBlock) {
-                this.totalnoteblockCount += this.noteblockCount;
-                this.noteblockCount = 0;
-                noteSum = 0;
+
+            if (this.totalnoteblockCount >= this.maxNoteBlocks) {
+                if (typeof activity !== "undefined" && activity.textMsg) {
+                    activity.textMsg(
+                        `MIDI file is too large. Generating only ${this.maxNoteBlocks} noteblocks`
+                    );
+                }
+                this.stopProcessing = true;
+                break;
             }
+
             const isLastNoteInSched = i === sched.length - 1;
             const last = isLastNoteInBlock || isLastNoteInSched;
             const first = i === 0;
@@ -344,14 +350,10 @@ class MidiTranscriber {
                 addNewActionBlock(isLastNoteInSched);
             }
 
-            if (this.totalnoteblockCount >= this.maxNoteBlocks) {
-                if (typeof activity !== "undefined" && activity.textMsg) {
-                    activity.textMsg(
-                        `MIDI file is too large. Generating only ${this.maxNoteBlocks} noteblocks`
-                    );
-                }
-                this.stopProcessing = true;
-                break;
+            if (isLastNoteInBlock) {
+                this.totalnoteblockCount += this.noteblockCount;
+                this.noteblockCount = 0;
+                noteSum = 0;
             }
         }
 

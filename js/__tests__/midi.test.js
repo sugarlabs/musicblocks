@@ -681,8 +681,10 @@ describe("transcribeMidi", () => {
             block => Array.isArray(block[1]) && block[1][0] === "newnote"
         );
 
-        // This asserts that totalnoteblockCount only counts closed chunks
-        // ensuring maxNoteBlocks behaves exactly as it did before the refactor
-        expect(noteBlocks.length).toBe(121);
+        // This asserts that totalnoteblockCount only counts closed chunks.
+        // For this specific synthetic file, chunks are exactly 25 notes long.
+        // 4 chunks * 25 = 100. It breaks exactly on note 101, yielding 100 blocks.
+        // This exactly matches the legacy `master` behavior.
+        expect(noteBlocks.length).toBe(100);
     });
 });
