@@ -207,6 +207,20 @@ describe("Singer Class", () => {
         expect(singer.currentOctave).toBe(4);
     });
 
+    test("keeps representative music state isolated between turtles", () => {
+        const secondSinger = new Singer(createTurtleMock());
+
+        singer.currentOctave = 7;
+        singer.swing = [0.5];
+        singer.vibratoRate = [12];
+        singer.suppressOutput = true;
+
+        expect(secondSinger.currentOctave).toBe(4);
+        expect(secondSinger.swing).toEqual([]);
+        expect(secondSinger.vibratoRate).toEqual([]);
+        expect(secondSinger.suppressOutput).toBe(false);
+    });
+
     test("should correctly add scalar transposition", () => {
         const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 2);
         expect(result).toEqual(["C", 4]);

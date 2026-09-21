@@ -788,6 +788,16 @@ describe("Logo initTurtle", () => {
         expect(logo.returns[0]).toEqual([]);
         expect(logo.returns[1]).toEqual([]);
     });
+
+    test("delegates turtle-owned initialization to Turtle.initTurtle", () => {
+        const turtleInit = jest.fn();
+        mockActivity.turtles.ithTurtle.mockReturnValue({ initTurtle: turtleInit });
+
+        logo.initTurtle(3);
+
+        expect(mockActivity.turtles.ithTurtle).toHaveBeenCalledWith(3);
+        expect(turtleInit).toHaveBeenCalledWith(false);
+    });
 });
 
 // ─── Logo step ───────────────────────────────────────────────────────────────
