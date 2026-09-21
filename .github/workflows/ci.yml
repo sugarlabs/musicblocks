@@ -34,7 +34,7 @@ jobs:
         timeout-minutes: 30
         # Renovate commit messages follow Conventional Commits automatically.
         # Skip linting to avoid false failures on bot-generated commits.
-        if: "!startsWith(github.head_ref, 'renovate/')"
+        if: "github.actor != 'renovate[bot]'"
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -86,7 +86,7 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  if [[ "$GITHUB_HEAD_REF" == renovate/* ]]; then
+                  if [[ "$GITHUB_ACTOR" == "renovate[bot]" ]]; then
                     npm install --legacy-peer-deps
                   else
                     npm ci
@@ -164,7 +164,7 @@ jobs:
               # and the tests can verify it doesn't break anything.
               # Human branches use strict 'npm ci' for lockfile integrity.
               run: |
-                  if [[ "$GITHUB_HEAD_REF" == renovate/* ]]; then
+                  if [[ "$GITHUB_ACTOR" == "renovate[bot]" ]]; then
                     npm install --legacy-peer-deps
                   else
                     npm ci
@@ -195,7 +195,7 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  if [[ "$GITHUB_HEAD_REF" == renovate/* ]]; then
+                  if [[ "$GITHUB_ACTOR" == "renovate[bot]" ]]; then
                     npm install --legacy-peer-deps
                   else
                     npm ci
@@ -290,5 +290,15 @@ jobs:
               with:
                   node-version: '22'
 
+            - name: Resolve dependencies before audit
+              # CodeRabbit: Audit the dependency tree installed by Renovate.
+              # Run npm install --legacy-peer-deps --ignore-scripts before npm audit
+              # so the audit uses the same resolved dependency tree.
+              run: |
+                  if [[ "$GITHUB_ACTOR" == "renovate[bot]" ]]; then
+                    npm install --legacy-peer-deps --ignore-scripts
+                  fi
+              shell: bash
+
             - name: Run npm audit
-              run: npm audit --omit=dev --audit-level=critical
+              run: npm audit --omit=dev --audit-level=high

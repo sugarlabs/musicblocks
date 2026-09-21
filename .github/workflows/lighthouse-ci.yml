@@ -22,10 +22,10 @@ jobs:
     # Lighthouse is a UX/performance audit — not meaningful for a
     # lockfile-only dependency bump. Skip it for all Renovate bot PRs.
     # Uses branch name (head_ref) instead of github.actor because our
-    # self-hosted Renovate runs under a PAT so the actor is the account
-    # owner, not 'renovate[bot]'. Branch name is reliable for both the
-    # GitHub Actions setup and the official Mend App.
-    if: "!startsWith(github.head_ref, 'renovate/')"
+    # owner, not 'renovate[bot]'. For the main repository, the Mend App
+    # uses 'renovate[bot]' as the actor, preventing malicious PRs from
+    # bypassing checks by forging branch names.
+    if: "github.actor != 'renovate[bot]'"
     strategy:
       fail-fast: false
       matrix:

@@ -27,10 +27,9 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 5
         # Renovate adds Signed-off-by via :gitSignOff preset — skip the
-        # check to avoid failure if the branch is rebased before the
-        # new commit propagates. Branch name is reliable regardless of
-        # PAT vs Mend App auth method.
-        if: "!startsWith(github.head_ref, 'renovate/')"
+        # check for bot PRs. We use github.actor instead of branch name
+        # to ensure malicious PRs cannot bypass checks by forging branch names.
+        if: "github.actor != 'renovate[bot]'"
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
