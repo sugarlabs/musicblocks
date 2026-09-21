@@ -133,6 +133,7 @@ const makeEvent = (overrides = {}) => ({
     key: "",
     altKey: false,
     ctrlKey: false,
+    metaKey: false,
     shiftKey: false,
     preventDefault: jest.fn(),
     stopPropagation: jest.fn(),
@@ -502,6 +503,18 @@ describe("KeyboardController", () => {
             activity.blocks.undoAction = jest.fn();
             const controller = createController(activity);
             const event = makeEvent({ keyCode: 90, ctrlKey: true });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity.blocks.undoAction).toHaveBeenCalled();
+        });
+
+        it("Cmd+Z triggers undoAction on macOS", () => {
+            const activity = makeActivity();
+            activity.blocks.undoAction = jest.fn();
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: 90, metaKey: true });
 
             controller.__keyPressed(event);
 
