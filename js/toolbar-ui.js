@@ -1095,7 +1095,7 @@ class ToolbarUI {
     updateRecordButton(rec_onclick) {
         const Record = docById("record");
         const RecordDropdownArrow = docById("recordDropdownArrow");
-        const browser = fnBrowserDetect();
+        const browser = window.fnBrowserDetect ? window.fnBrowserDetect() : "unknown";
         const hideIn = ["firefox", "safari"];
 
         this._cleanupRecordDropdownListeners();
