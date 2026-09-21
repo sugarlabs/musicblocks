@@ -687,6 +687,7 @@ describe("Blocks Foundation", () => {
             canvas: { width: 1200, height: 900 },
             refreshCanvas: jest.fn(),
             errorMsg: jest.fn(),
+            textMsg: jest.fn(),
             setSelectionMode: jest.fn(),
             stopLoadAnimation: jest.fn(),
             setHomeContainers: jest.fn(),
@@ -776,6 +777,328 @@ describe("Blocks Foundation", () => {
             expect(Array.isArray(blocks.stackList)).toBe(true);
             expect(blocks.stackList.length).toBe(0);
             expect(Array.isArray(blocks.trashStacks)).toBe(true);
+            expect(Array.isArray(blocks.actionHistory)).toBe(true);
+            expect(Array.isArray(blocks.redoActionHistory)).toBe(true);
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+        });
+    });
+
+    describe("Undo/Redo System", () => {
+        it("should successfully undo and redo a block move", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.moveBlock = jest.fn();
+            blocks.blockMoved = jest.fn();
+            blocks.activity.refreshCanvas = jest.fn();
+
+            // Push a fake move action
+            blocks.actionHistory.push({
+                type: "move",
+                blockId: 1,
+                oldX: 10,
+                oldY: 20,
+                newX: 30,
+                newY: 40
+            });
+
+            // Undo it
+            blocks.undoAction();
+            expect(blocks.moveBlock).toHaveBeenCalledWith(1, 10, 20);
+            expect(blocks.blockMoved).toHaveBeenCalledWith(1);
+            expect(blocks.activity.refreshCanvas).toHaveBeenCalled();
+            expect(blocks.redoActionHistory.length).toBe(1);
+            expect(blocks.actionHistory.length).toBe(0);
+
+            // Redo it
+            blocks.redoAction();
+            expect(blocks.moveBlock).toHaveBeenCalledWith(1, 30, 40);
+            expect(blocks.blockMoved).toHaveBeenCalledWith(1); // 2nd time
+            expect(blocks.actionHistory.length).toBe(1);
+            expect(blocks.redoActionHistory.length).toBe(0);
+        });
+
+        it("should successfully undo and redo a block trash", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+            blocks.sendStackToTrash = jest.fn();
+            blocks.blockList = { 2: { trash: false } }; // mock block
+
+            blocks.actionHistory.push({
+                type: "trash",
+                blockId: 2
+            });
+
+            blocks.undoAction();
+            expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(2);
+            expect(blocks.redoActionHistory[0].type).toBe("trash");
+
+            blocks.redoAction();
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(blocks.blockList[2]);
+            expect(blocks.actionHistory[0].type).toBe("trash");
+        });
+
+        it("should gracefully handle empty history stacks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.undoAction();
+            blocks.redoAction();
+            expect(blocks.activity.textMsg).toHaveBeenCalledWith(expect.any(String), 3000);
+        });
+
+        it("should only push to actionHistory during sendStackToTrash if not undoing/redoing", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { connections: [null], name: "dummy" };
+            blocks.turtles = { turtleList: [] };
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            blocks.isUndoingOrRedoing = false;
+            blocks.sendStackToTrash(mockBlock);
+            expect(blocks.actionHistory.length).toBe(1);
+            expect(blocks.actionHistory[0].type).toBe("trash");
+
+            blocks.isUndoingOrRedoing = true;
+            blocks.sendStackToTrash(mockBlock);
+            expect(blocks.actionHistory.length).toBe(1); // Should not push again
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should undo and redo a value_change action", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity.refreshCanvas = jest.fn();
+            const mockBlock = {
+                label: { value: "old", style: {} },
+                _labelChanged: jest.fn(),
+                text: { text: "old" },
+                updateCache: jest.fn(),
+                value: "old"
+            };
+            blocks.blockList = [null, mockBlock];
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 1,
+                oldValue: "old",
+                newValue: "new",
+                oldText: "old",
+                newText: "new"
+            });
+
+            // Undo value change
+            blocks.undoAction();
+            expect(mockBlock.label.value).toBe("old");
+            expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, true);
+            expect(mockBlock.updateCache).toHaveBeenCalled();
+            expect(blocks.activity.refreshCanvas).toHaveBeenCalled();
+            expect(blocks.redoActionHistory.length).toBe(1);
+
+            // Redo value change
+            blocks.redoAction();
+            expect(mockBlock.label.value).toBe("new");
+            expect(mockBlock.actionHistory || blocks.actionHistory.length).toBeTruthy();
+        });
+
+        it("should undo a restore action (send newly created block to trash)", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { trash: false };
+            blocks.blockList = [null, null, null, mockBlock];
+            blocks.sendStackToTrash = jest.fn();
+
+            blocks.actionHistory.push({
+                type: "restore",
+                blockId: 3
+            });
+
+            blocks.undoAction();
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(mockBlock);
+            expect(blocks.redoActionHistory[0].type).toBe("restore");
+        });
+
+        it("should redo a restore action (restore from trash)", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.redoActionHistory.push({
+                type: "restore",
+                blockId: 5
+            });
+
+            blocks.redoAction();
+            expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(5);
+            expect(blocks.actionHistory[0].type).toBe("restore");
+        });
+
+        it("should hide helpfulWheelDiv when undoing if it is visible", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.moveBlock = jest.fn();
+            blocks.blockMoved = jest.fn();
+            blocks.activity.refreshCanvas = jest.fn();
+            blocks.activity.__tick = jest.fn();
+
+            const mockDiv = { style: { display: "block" } };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue(mockDiv);
+
+            blocks.actionHistory.push({
+                type: "move",
+                blockId: 0,
+                oldX: 0,
+                oldY: 0,
+                newX: 10,
+                newY: 10
+            });
+
+            blocks.undoAction();
+            expect(mockDiv.style.display).toBe("none");
+            expect(blocks.activity.__tick).toHaveBeenCalled();
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should set isUndoingOrRedoing to true during undo and reset after", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.actionHistory.push({ type: "trash", blockId: 1 });
+
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+            blocks.undoAction();
+            // After undoAction completes, isUndoingOrRedoing should be reset
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+        });
+
+        it("should set isUndoingOrRedoing to true during redo and reset after", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.redoActionHistory.push({ type: "restore", blockId: 1 });
+
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+            blocks.redoAction();
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+        });
+
+        it("should handle value_change undo when block has no label", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity.refreshCanvas = jest.fn();
+            const mockBlock = {
+                label: null,
+                _labelChanged: jest.fn(),
+                text: { text: "4" },
+                updateCache: jest.fn(),
+                value: 4
+            };
+            blocks.blockList = [mockBlock];
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 0,
+                oldValue: 1,
+                newValue: 4,
+                oldText: "1",
+                newText: "4"
+            });
+
+            blocks.undoAction();
+            // Should create a label object if it didn't exist
+            expect(mockBlock.label).toEqual({ value: 1, style: {} });
+            expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, true);
+        });
+
+        it("should handle value_change with null oldText gracefully", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity.refreshCanvas = jest.fn();
+            const mockBlock = {
+                label: { value: "x", style: {} },
+                _labelChanged: jest.fn(),
+                text: { text: "x" },
+                updateCache: jest.fn(),
+                value: "x"
+            };
+            blocks.blockList = [mockBlock];
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 0,
+                oldValue: "y",
+                newValue: "x",
+                oldText: null,
+                newText: "x"
+            });
+
+            blocks.undoAction();
+            // text.text should remain unchanged when oldText is null
+            expect(mockBlock.text.text).toBe("x");
+        });
+
+        it("should clear redoActionHistory when sendStackToTrash is called outside undo/redo", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { connections: [null], name: "dummy" };
+            blocks.turtles = { turtleList: [] };
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            // Pre-populate redo history
+            blocks.redoActionHistory.push({ type: "move", blockId: 0 });
+            expect(blocks.redoActionHistory.length).toBe(1);
+
+            blocks.isUndoingOrRedoing = false;
+            blocks.sendStackToTrash(mockBlock);
+
+            // redoActionHistory should be cleared
+            expect(blocks.redoActionHistory.length).toBe(0);
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should cap trashStacks at MAX_TRASH_UNDO", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { connections: [null], name: "dummy" };
+            blocks.turtles = { turtleList: [] };
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            blocks.trashStacks = new Array(100).fill(1);
+            blocks.trashPreviews = { 1: "preview_data" };
+            blocks.trashStacks[0] = 1;
+
+            blocks.sendStackToTrash(mockBlock);
+
+            expect(blocks.trashStacks.length).toBe(100);
+            expect(blocks.trashPreviews[1]).toBeUndefined();
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should gracefully handle missing blocks during undo/redo", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = []; // Empty blocklist
+            blocks.sendStackToTrash = jest.fn();
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.actionHistory.push({ type: "restore", blockId: 1 });
+            blocks.undoAction();
+            expect(blocks.sendStackToTrash).not.toHaveBeenCalled();
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 1,
+                oldValue: 1,
+                newValue: 2
+            });
+            blocks.undoAction();
+            expect(blocks.activity.refreshCanvas).not.toHaveBeenCalled();
+
+            blocks.redoActionHistory.push({ type: "restore", blockId: 1 });
+            // Should not throw or do anything
+            blocks.redoAction();
+            expect(blocks.activity._restoreTrashById).toHaveBeenCalled();
+
+            blocks.redoActionHistory.push({ type: "value_change", blockId: 1, newValue: 2 });
+            blocks.redoAction();
+            expect(blocks.activity.refreshCanvas).not.toHaveBeenCalled();
         });
     });
 
@@ -1417,6 +1740,17 @@ describe("Blocks Foundation", () => {
         });
 
         it("does not lose the first call's in-flight _adjustTheseStacks entries when a second call arrives mid-load", async () => {
+            // Both the first load and the queued second load fire their own
+            // finishedLoading event; wait for both instead of a fixed delay
+            // so this isn't sensitive to how busy the test runner is.
+            const bothLoadsFinished = new Promise(resolve => {
+                let count = 0;
+                global.pubsub.on("finishedLoading", () => {
+                    count += 1;
+                    if (count === 2) resolve();
+                });
+            });
+
             blocks.loadNewBlocks(makeBatch(25));
             // Let the first chunk's 20 synchronous _processOneBlock calls'
             // queued cleanupAfterLoad callbacks start landing.
@@ -1424,9 +1758,7 @@ describe("Blocks Foundation", () => {
 
             blocks.loadNewBlocks(makeBatch(3));
 
-            // Let everything settle: remaining chunks, all cleanupAfterLoad
-            // callbacks, and the queued second load running to completion.
-            await new Promise(r => setTimeout(r, 50));
+            await bothLoadsFinished;
 
             expect(blocks._processOneBlock).toHaveBeenCalledTimes(28); // 25 + 3
             expect(blocks._loadInProgress).toBe(false);
@@ -1435,13 +1767,18 @@ describe("Blocks Foundation", () => {
 
         it("emits finishedLoading once per queued load, not merged into a single early event", async () => {
             const finishedLoadingCalls = [];
-            global.pubsub.on("finishedLoading", () => finishedLoadingCalls.push(Date.now()));
+            const bothLoadsFinished = new Promise(resolve => {
+                global.pubsub.on("finishedLoading", () => {
+                    finishedLoadingCalls.push(Date.now());
+                    if (finishedLoadingCalls.length === 2) resolve();
+                });
+            });
 
             blocks.loadNewBlocks(makeBatch(25));
             await new Promise(r => setTimeout(r, 0));
             blocks.loadNewBlocks(makeBatch(3));
 
-            await new Promise(r => setTimeout(r, 50));
+            await bothLoadsFinished;
 
             expect(finishedLoadingCalls).toHaveLength(2);
         });
@@ -1566,44 +1903,46 @@ describe("Blocks Foundation", () => {
             const onWindowError = event => event.preventDefault();
             window.addEventListener("error", onWindowError);
 
-            const finishedLoadingCalls = [];
-            const loadBFinished = new Promise(resolve => {
-                global.pubsub.on("finishedLoading", () => {
-                    finishedLoadingCalls.push(Date.now());
-                    resolve();
+            try {
+                const finishedLoadingCalls = [];
+                const loadBFinished = new Promise(resolve => {
+                    global.pubsub.on("finishedLoading", () => {
+                        finishedLoadingCalls.push(Date.now());
+                        resolve();
+                    });
                 });
-            });
 
-            // Load A: 25 blocks, fails on block 20 (first of the deferred
-            // chunk, which only runs once the setTimeout(0) scheduling it
-            // fires). Load B: queued behind A, starts as soon as A's
-            // failure advances the queue.
-            blocks.loadNewBlocks(makeBatch(25));
-            blocks.loadNewBlocks(makeBatch(3));
+                // Load A: 25 blocks, fails on block 20 (first of the deferred
+                // chunk, which only runs once the setTimeout(0) scheduling it
+                // fires). Load B: queued behind A, starts as soon as A's
+                // failure advances the queue.
+                blocks.loadNewBlocks(makeBatch(25));
+                blocks.loadNewBlocks(makeBatch(3));
 
-            // Wait specifically for load B to finish (not a fixed delay),
-            // so this isn't sensitive to how busy the test runner is.
-            await loadBFinished;
+                // Wait specifically for load B to finish (not a fixed delay),
+                // so this isn't sensitive to how busy the test runner is.
+                await loadBFinished;
 
-            expect(staleCleanups).toHaveLength(20);
+                expect(staleCleanups).toHaveLength(20);
 
-            // Now let load A's 20 chunk-1 completions land, well after load
-            // B has already finished and _activeLoadGeneration has moved on.
-            for (const cleanup of staleCleanups) {
-                await cleanup();
+                // Now let load A's 20 chunk-1 completions land, well after load
+                // B has already finished and _activeLoadGeneration has moved on.
+                for (const cleanup of staleCleanups) {
+                    await cleanup();
+                }
+
+                // Load B's own 3 blocks are all that should count toward it. If
+                // a stale straggler from A had been accepted, B's shared
+                // _loadCounter would go negative, and every one of A's 20
+                // stragglers would independently satisfy the "<= 0" finalize
+                // check again, firing finishedLoading many more times than the
+                // one legitimate completion of load B.
+                expect(finishedLoadingCalls).toHaveLength(1);
+                expect(blocks._loadInProgress).toBe(false);
+                expect(blocks._loadQueue).toHaveLength(0);
+            } finally {
+                window.removeEventListener("error", onWindowError);
             }
-
-            // Load B's own 3 blocks are all that should count toward it. If
-            // a stale straggler from A had been accepted, B's shared
-            // _loadCounter would go negative, and every one of A's 20
-            // stragglers would independently satisfy the "<= 0" finalize
-            // check again, firing finishedLoading many more times than the
-            // one legitimate completion of load B.
-            expect(finishedLoadingCalls).toHaveLength(1);
-            expect(blocks._loadInProgress).toBe(false);
-            expect(blocks._loadQueue).toHaveLength(0);
-
-            window.removeEventListener("error", onWindowError);
         });
     });
 
@@ -1706,7 +2045,7 @@ describe("Blocks Foundation", () => {
             blocks._insideNoteBlock = jest.fn(() => null);
         });
 
-        function makeRealFlowBlock({ x, y, docks, connections, name = "flow" }) {
+        function makeRealFlowBlock({ x, y, docks, connections, name = "flow", ...overrides }) {
             return {
                 name,
                 trash: false,
@@ -1723,7 +2062,8 @@ describe("Blocks Foundation", () => {
                 isNoHitBlock: () => false,
                 isTwoArgBooleanBlock: () => false,
                 highlight: jest.fn(),
-                unhighlight: jest.fn()
+                unhighlight: jest.fn(),
+                ...overrides
             };
         }
 
@@ -1843,6 +2183,63 @@ describe("Blocks Foundation", () => {
 
             // The real, live target block should still be found and connected to.
             expect(blocks.blockList[1].connections[0]).toBe(0);
+        });
+
+        it("snaps a booleanout block (e.g. And/Or/Not) onto an anyin dock, like Switch/Case (#8463)", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "anyin"]
+                    ],
+                    connections: [null, null],
+                    name: "switch"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "booleanout"]],
+                    connections: [null],
+                    name: "and",
+                    isArgBlock: () => true,
+                    isTwoArgBooleanBlock: () => true
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[0].connections[1]).toBe(1);
+        });
+
+        it("snaps an anyout block (e.g. namedbox) onto a booleanin dock, like If/While (#8463)", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "booleanin"]
+                    ],
+                    connections: [null, null],
+                    name: "if"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "anyout"]],
+                    connections: [null],
+                    name: "namedbox",
+                    isArgBlock: () => true
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[0].connections[1]).toBe(1);
         });
 
         it("exposes the same BlockDragController instance to every delegated method", () => {
@@ -2194,6 +2591,65 @@ describe("Blocks Foundation", () => {
     });
 
     describe("sendStackToTrash DOM safety", () => {
+        it("should ignore only security errors when exporting image block previews", () => {
+            const mockActivity = {
+                palettes: { dict: {} },
+                refreshCanvas: jest.fn(),
+                trashcan: { stopHighlightAnimation: jest.fn() }
+            };
+            const blocksInstance = new Blocks(mockActivity);
+            const mockBlock = {
+                blockIndex: 1,
+                name: "camera",
+                connections: [null],
+                width: 100,
+                height: 40,
+                container: {
+                    x: 0,
+                    y: 0,
+                    scaleX: 1,
+                    scaleY: 1,
+                    bitmapCache: null,
+                    draw: jest.fn(),
+                    uncache: jest.fn()
+                },
+                protoblock: { style: "value", parameter: false, staticLabels: ["camera"] },
+                hide: jest.fn(),
+                trash: false
+            };
+            blocksInstance.blockList[1] = mockBlock;
+            const getContext = jest
+                .spyOn(HTMLCanvasElement.prototype, "getContext")
+                .mockReturnValue({
+                    fillRect: jest.fn(),
+                    scale: jest.fn(),
+                    save: jest.fn(),
+                    translate: jest.fn(),
+                    restore: jest.fn()
+                });
+            const toDataURL = jest.spyOn(HTMLCanvasElement.prototype, "toDataURL");
+
+            toDataURL.mockImplementationOnce(() => {
+                throw new Error("Preview export failed");
+            });
+            expect(() => blocksInstance.captureStackPreview(1)).toThrow("Preview export failed");
+
+            toDataURL.mockImplementation(() => {
+                throw new DOMException("Tainted canvases may not be exported", "SecurityError");
+            });
+            toDataURL.mockClear();
+
+            try {
+                expect(() => blocksInstance.sendStackToTrash(mockBlock)).not.toThrow();
+                expect(toDataURL).toHaveBeenCalledTimes(1);
+                expect(mockBlock.trash).toBe(true);
+                expect(blocksInstance.trashPreviews[1]).toBeUndefined();
+            } finally {
+                toDataURL.mockRestore();
+                getContext.mockRestore();
+            }
+        });
+
         it("should safely complete sendStackToTrash when #hideContents element is missing from DOM", () => {
             const mockActivity = {
                 palettes: { dict: {} },

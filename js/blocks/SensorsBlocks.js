@@ -89,37 +89,46 @@ function setupSensorsBlocks(activity) {
             inputElem.style.mozUserSelect = "text";
             inputElem.style.msUserSelect = "text";
 
-            docById("labelDiv").replaceChildren(inputElem);
+            const labelDiv = docById("labelDiv");
+            if (labelDiv) {
+                labelDiv.replaceChildren(inputElem);
+            }
             const cblk = activity.blocks.blockList[blk].connections[1];
-            if (cblk !== null) {
+            if (cblk !== null && activity.blocks.blockList[cblk]) {
                 inputElem.placeholder = activity.blocks.blockList[cblk].value;
             }
-            inputElem.style.left = activity.turtles.getTurtle(turtle).container.x + "px";
-            inputElem.style.top = activity.turtles.getTurtle(turtle).container.y + "px";
+            const turtleObj = activity.turtles.getTurtle(turtle);
+            if (turtleObj && turtleObj.container) {
+                inputElem.style.left = turtleObj.container.x + "px";
+                inputElem.style.top = turtleObj.container.y + "px";
+            }
             inputElem.focus();
 
-            docById("labelDiv").classList.add("hasKeyboard");
+            if (labelDiv) {
+                labelDiv.classList.add("hasKeyboard");
+            }
 
             // Add a handler to continue the flow after the input.
             function __keyPressed(event) {
-                if (event.keyCode === 13) {
+                if (event.key === "Enter" || event.keyCode === 13) {
                     // RETURN
-                    const inputElem = docById("textLabel");
                     const value = inputElem.value;
                     if (isNaN(value)) {
                         logo.inputValues[turtle] = value;
                     } else {
-                        logo.inputValues[turtle] = Number(value);
+                        logo.inputValues[turtle] = parseFloat(value);
                     }
-
                     inputElem.blur();
                     inputElem.style.display = "none";
                     logo.clearTurtleRun(turtle);
-                    docById("labelDiv").classList.remove("hasKeyboard");
+                    const currentLabelDiv = docById("labelDiv");
+                    if (currentLabelDiv) {
+                        currentLabelDiv.classList.remove("hasKeyboard");
+                    }
                 }
             }
 
-            docById("textLabel").addEventListener("keypress", __keyPressed);
+            inputElem.addEventListener("keypress", __keyPressed);
         }
     }
     /**

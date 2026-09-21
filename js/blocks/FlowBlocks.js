@@ -679,8 +679,11 @@ function setupFlowBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {number} blk - The block number.
+         * @param {*} receivedArg - Argument forwarded from an enclosing action call,
+         *     needed so the condition can still resolve an `arg` block correctly on
+         *     every requeued re-check, not just the first one.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (args.length !== 1) return;
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -691,7 +694,7 @@ function setupFlowBlocks(activity) {
                 // Requeue.
                 const connections = activity.blocks.blockList[blk].connections;
                 const parentBlk = connections[0];
-                const queueBlock = new Queue(blk, 1, parentBlk);
+                const queueBlock = new Queue(blk, 1, parentBlk, receivedArg);
                 parentFlowQueue.push(parentBlk);
                 queue.push(queueBlock);
                 tur.doWait(0.05);
@@ -765,9 +768,12 @@ function setupFlowBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {number} blk - The block number.
+         * @param {*} receivedArg - Argument forwarded from an enclosing action call,
+         *     needed so the condition can still resolve an `arg` block correctly on
+         *     every requeued re-check, not just the first one.
          * @returns {Array} - An array containing the next block and its count.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (args.length !== 2) return;
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -787,7 +793,7 @@ function setupFlowBlocks(activity) {
                 // Requeue
                 const connections = activity.blocks.blockList[blk].connections;
                 const parentBlk = connections[0];
-                const queueBlock = new Queue(blk, 1, parentBlk);
+                const queueBlock = new Queue(blk, 1, parentBlk, receivedArg);
                 parentFlowQueue.push(parentBlk);
                 queue.push(queueBlock);
             } else {
@@ -848,9 +854,12 @@ function setupFlowBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {number} blk - The block number.
+         * @param {*} receivedArg - Argument forwarded from an enclosing action call,
+         *     needed so the condition can still resolve an `arg` block correctly on
+         *     every requeued re-check, not just the first one.
          * @returns {Array} - An array containing the next block and its count.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             // While is tricky because we need to recalculate
             // args[0] each time, so we requeue the While block
             // itself.
@@ -873,7 +882,7 @@ function setupFlowBlocks(activity) {
 
                 const connections = activity.blocks.blockList[blk].connections;
                 const parentBlk = connections[0];
-                const queueBlock = new Queue(blk, 1, parentBlk);
+                const queueBlock = new Queue(blk, 1, parentBlk, receivedArg);
                 parentFlowQueue.push(parentBlk);
                 queue.push(queueBlock);
 

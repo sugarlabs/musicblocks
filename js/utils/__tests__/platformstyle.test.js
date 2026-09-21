@@ -125,6 +125,29 @@ describe("platformstyle", () => {
         expect(document.querySelector("meta[name=theme-color]").content).toBe("#4DA6FF");
     });
 
+    it.each(["light", "dark", "highcontrast"])(
+        "keeps the graphics boundary visible in %s mode",
+        theme => {
+            localStorage.themePreference = theme;
+            loadModuleWithUA("Chrome/123");
+
+            const luminance = hex => {
+                const channels = hex.match(/[\da-f]{2}/gi).map(channel => {
+                    const value = parseInt(channel, 16) / 255;
+                    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+                });
+                return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+            };
+
+            const { ruleColor, background } = global.window.platformColor;
+            const foreground = luminance(ruleColor);
+            const backdrop = luminance(background);
+            const contrast =
+                (Math.max(foreground, backdrop) + 0.05) / (Math.min(foreground, backdrop) + 0.05);
+            expect(contrast).toBeGreaterThanOrEqual(3);
+        }
+    );
+
     it("honors dark theme preference", () => {
         Object.defineProperty(global.window.navigator, "userAgent", {
             value: "Chrome/123",

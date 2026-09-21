@@ -1078,6 +1078,23 @@ describe("Logo doStopTurtles", () => {
         expect(clearAllSpy).toHaveBeenCalled();
     });
 
+    test("clears unhighlight timers on turtle.singer on stop", () => {
+        turtle.singer = { _unhighlightTimers: { blk1: 123 } };
+
+        logo.doStopTurtles();
+
+        expect(turtle.singer._unhighlightTimers).toEqual({});
+    });
+
+    test("unhighlights all blocks on stop when blocks are visible", () => {
+        mockActivity.blocks.visible = true;
+        mockActivity.blocks.unhighlightAll = jest.fn();
+
+        logo.doStopTurtles();
+
+        expect(mockActivity.blocks.unhighlightAll).toHaveBeenCalled();
+    });
+
     test("removes active turtle listeners from stage and clears listeners object on stop", () => {
         const mockListener = jest.fn();
         turtle.listeners = { __beat_1_0__: mockListener };
@@ -1951,6 +1968,27 @@ describe("Logo runFromBlockNow", () => {
 
             expect(mockActivity.textMsg).toHaveBeenCalledWith("width: 77");
             expect(logo.stopTurtle).toBe(true);
+        });
+
+        test("a value clamp block with no flow() shows its value instead of throwing", () => {
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 6;
+            });
+            logo.parseArg = jest.fn(() => 3);
+            logo.blockList = [
+                {
+                    name: "notecounter",
+                    value: 3,
+                    protoblock: { args: 1, dockTypes: ["anyout", "in"], arg: jest.fn() },
+                    connections: [null, null],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                }
+            ];
+
+            expect(() => logo.runFromBlockNow(logo, 0, 0, 0, null)).not.toThrow();
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("3");
         });
 
         test("standalone arg-block echo forwards the real receivedArg, not a stale logo.receivedArg (#8690)", () => {

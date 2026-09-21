@@ -110,6 +110,8 @@ describe("Activity Toolbar Integration", () => {
             style: { visibility: "hidden" }
         };
 
+        activity.textMsg = jest.fn();
+
         global.window.widgetWindows = {
             isOpen: jest.fn(() => false),
             openWindows: {}
@@ -188,6 +190,20 @@ describe("Activity Toolbar Integration", () => {
 
             expect(activity.toolbar.resetStop).toHaveBeenCalled();
         });
+
+        test("announces program stopped to screen readers", () => {
+            activity.onStopTurtle();
+
+            expect(activity.textMsg).toHaveBeenCalledWith("Program stopped.");
+        });
+    });
+
+    describe("onRunTurtle", () => {
+        test("announces program running to screen readers", () => {
+            activity.onRunTurtle();
+
+            expect(activity.textMsg).toHaveBeenCalledWith("Program running.");
+        });
     });
 
     describe("onRunTurtle", () => {
@@ -208,6 +224,36 @@ describe("Activity Toolbar Integration", () => {
             activity.onStopTurtle();
             expect(activity.toolbar.resetStop).toHaveBeenCalledTimes(1);
             expect(activity.toolbar.highlightStop).toHaveBeenCalledTimes(1);
+        });
+    });
+    describe("beforeunload event", () => {
+        test("calls __saveLocally", () => {
+            activity.__saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+
+            activity._handleBeforeUnload();
+
+            expect(activity.__saveLocally).toHaveBeenCalled();
+        });
+
+        test("calls saveLocally when it differs from __saveLocally", () => {
+            activity.__saveLocally = jest.fn();
+            activity.saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+
+            activity._handleBeforeUnload();
+
+            expect(activity.saveLocally).toHaveBeenCalled();
+        });
+
+        test("calls _stopAutoSave if it exists", () => {
+            activity.__saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+            activity._stopAutoSave = jest.fn();
+
+            activity._handleBeforeUnload();
+
+            expect(activity._stopAutoSave).toHaveBeenCalled();
         });
     });
 });

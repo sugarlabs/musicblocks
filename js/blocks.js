@@ -161,6 +161,9 @@ class Blocks {
 
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
+        this.actionHistory = [];
+        this.redoActionHistory = [];
+        this.isUndoingOrRedoing = false;
         /** We keep a list of previews of stacks in the trash. */
         this.trashPreviews = {};
 
@@ -6992,7 +6995,12 @@ class Blocks {
                 }
             });
 
-            return canvas.toDataURL("image/png");
+            try {
+                return canvas.toDataURL("image/png");
+            } catch (error) {
+                if (error.name === "SecurityError") return null;
+                throw error;
+            }
         };
 
         /**
@@ -7030,6 +7038,89 @@ class Blocks {
          * @public
          * @returns {void}
          */
+        this.undoAction = () => {
+            if (!this.actionHistory || this.actionHistory.length === 0) {
+                this.activity.textMsg(_("Nothing to undo."), 3000);
+                return;
+            }
+
+            const action = this.actionHistory.pop();
+            this.isUndoingOrRedoing = true;
+
+            if (action.type === "move") {
+                this.moveBlock(action.blockId, action.oldX, action.oldY);
+                this.blockMoved(action.blockId);
+                this.activity.refreshCanvas();
+            } else if (action.type === "trash") {
+                this.activity._restoreTrashById(action.blockId);
+            } else if (action.type === "restore") {
+                const block = this.blockList[action.blockId];
+                if (block) this.sendStackToTrash(block);
+            } else if (action.type === "value_change") {
+                const block = this.blockList[action.blockId];
+                if (block) {
+                    if (!block.label) block.label = { value: action.oldValue, style: {} };
+                    block.label.value = action.oldValue;
+                    block._labelChanged(true, true);
+
+                    block.value = action.oldValue;
+                    if (action.oldText !== null && block.text) {
+                        block.text.text = action.oldText;
+                    }
+                    block.updateCache();
+                    this.activity.refreshCanvas();
+                }
+            }
+
+            this.redoActionHistory.push(action);
+            this.isUndoingOrRedoing = false;
+
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
+                this.activity.__tick();
+            }
+        };
+
+        this.redoAction = () => {
+            if (!this.redoActionHistory || this.redoActionHistory.length === 0) {
+                this.activity.textMsg(_("Nothing to redo."), 3000);
+                return;
+            }
+
+            const action = this.redoActionHistory.pop();
+            this.isUndoingOrRedoing = true;
+
+            if (action.type === "move") {
+                this.moveBlock(action.blockId, action.newX, action.newY);
+                this.blockMoved(action.blockId);
+                this.activity.refreshCanvas();
+            } else if (action.type === "trash") {
+                const block = this.blockList[action.blockId];
+                if (block) this.sendStackToTrash(block);
+            } else if (action.type === "restore") {
+                this.activity._restoreTrashById(action.blockId);
+            } else if (action.type === "value_change") {
+                const block = this.blockList[action.blockId];
+                if (block) {
+                    if (!block.label) block.label = { value: action.newValue, style: {} };
+                    block.label.value = action.newValue;
+                    block._labelChanged(true, true);
+
+                    block.value = action.newValue;
+                    if (action.newText !== null && block.text) {
+                        block.text.text = action.newText;
+                    }
+                    block.updateCache();
+                    this.activity.refreshCanvas();
+                }
+            }
+
+            this.actionHistory.push(action);
+            this.isUndoingOrRedoing = false;
+        };
+
         this.sendStackToTrash = myBlock => {
             /** First, hide the palettes as they may need updating. */
             for (const name in this.activity.palettes.dict) {
@@ -7048,6 +7139,10 @@ class Blocks {
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
+            if (!this.isUndoingOrRedoing) {
+                this.actionHistory.push({ type: "trash", blockId: thisBlock });
+                this.redoActionHistory = [];
+            }
 
             // Cap the undo history to prevent unbounded memory growth.
             // Keep the 100 most recent trashed stacks.
@@ -7125,9 +7220,11 @@ class Blocks {
                     delete this.blockCollapseArt[blk];
                 }
 
-                const title = this.blockList[blk].protoblock.staticLabels
-                    ? this.blockList[blk].protoblock.staticLabels[0]
-                    : this.blockList[blk].name;
+                const pb = this.blockList[blk] && this.blockList[blk].protoblock;
+                const title =
+                    pb && pb.staticLabels && pb.staticLabels[0]
+                        ? pb.staticLabels[0]
+                        : this.blockList[blk] && this.blockList[blk].name;
                 if (title && window.widgetWindows && window.widgetWindows.closeBlkWidgets) {
                     window.widgetWindows.closeBlkWidgets(_(title));
                 }
@@ -7136,7 +7233,9 @@ class Blocks {
 
             // Announce block sent to trash to screen readers (aria-live only, no visual message)
             const blockLabel =
-                (myBlock.protoblock.staticLabels && myBlock.protoblock.staticLabels[0]) ||
+                (myBlock.protoblock &&
+                    myBlock.protoblock.staticLabels &&
+                    myBlock.protoblock.staticLabels[0]) ||
                 myBlock.name;
             announceToScreenReader(blockLabel + " " + _("block sent to trash"));
 

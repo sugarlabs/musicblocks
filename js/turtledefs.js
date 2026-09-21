@@ -36,7 +36,7 @@
    getAuxToolbarButtonNames, TITLESTRING
  */
 
-const VERSION = "3.7.1";
+const VERSION = "3.8.0";
 let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
@@ -53,8 +53,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     LOGOJA = LOGODEFAULT;
 
     if (GUIDEURL === "guide url" || GUIDEURL === "") {
-        // Fix me: Move turtle guide to MB repo.
-        GUIDEURL = "Docs/guide/README.md";
+        GUIDEURL = "TurtleDocs/guide/index.html";
     }
 
     NUMBERBLOCKDEFAULT = 100;
@@ -816,6 +815,7 @@ if (typeof module !== "undefined" && module.exports) {
         createDefaultStack,
         createHelpContent,
         getLanguagePreference,
+        GUIDEURL,
         LOGOJA,
         LOGODEFAULT,
         // A getter: createHelpContent() rebinds HELPCONTENT, so exporting the

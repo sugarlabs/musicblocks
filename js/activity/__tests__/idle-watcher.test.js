@@ -53,6 +53,10 @@ describe("setupActivityIdleWatcher", () => {
                 _alreadyRunning: false
             },
             saveLocally: jest.fn(),
+            saveSessionAsync: jest.fn().mockResolvedValue(),
+            gitDropdownUI: {
+                onSaveLocally: jest.fn()
+            },
             stageDirty: false
         };
 
@@ -303,15 +307,29 @@ describe("setupActivityIdleWatcher", () => {
     });
 
     describe("_initAutoSave", () => {
-        it("saves locally after 5 minutes", () => {
+        it("calls saveSessionAsync after 15 seconds if available", () => {
             setupActivityIdleWatcher(mockActivity);
+            mockActivity._initAutoSave();
+
+            expect(mockActivity.saveSessionAsync).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(15 * 1000);
+
+            expect(mockActivity.saveSessionAsync).toHaveBeenCalledTimes(1);
+            expect(mockActivity.gitDropdownUI.onSaveLocally).toHaveBeenCalled();
+        });
+
+        it("calls saveLocally after 15 seconds if saveSessionAsync is missing", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.saveSessionAsync = undefined;
             mockActivity._initAutoSave();
 
             expect(mockActivity.saveLocally).not.toHaveBeenCalled();
 
-            jest.advanceTimersByTime(5 * 60 * 1000);
+            jest.advanceTimersByTime(15 * 1000);
 
             expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
+            expect(mockActivity.gitDropdownUI.onSaveLocally).toHaveBeenCalled();
         });
 
         it("does not save if logo is already running", () => {
@@ -319,34 +337,36 @@ describe("setupActivityIdleWatcher", () => {
             mockActivity.logo._alreadyRunning = true;
             mockActivity._initAutoSave();
 
-            jest.advanceTimersByTime(5 * 60 * 1000);
+            jest.advanceTimersByTime(15 * 1000);
 
+            expect(mockActivity.saveSessionAsync).not.toHaveBeenCalled();
             expect(mockActivity.saveLocally).not.toHaveBeenCalled();
         });
 
         it("catches errors and calls ErrorHandler.recoverable", () => {
             setupActivityIdleWatcher(mockActivity);
+            mockActivity.saveSessionAsync = undefined;
             const testError = new Error("Save failed");
             mockActivity.saveLocally.mockImplementation(() => {
                 throw testError;
             });
             mockActivity._initAutoSave();
 
-            jest.advanceTimersByTime(5 * 60 * 1000);
+            jest.advanceTimersByTime(15 * 1000);
 
             expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(testError, {
                 operation: "autoSave"
             });
         });
 
-        it("does not throw when saveLocally is null", () => {
+        it("does not throw when saveLocally is null and saveSessionAsync is undefined", () => {
             setupActivityIdleWatcher(mockActivity);
+            mockActivity.saveSessionAsync = undefined;
             mockActivity.saveLocally = null;
             mockActivity._initAutoSave();
 
-            jest.advanceTimersByTime(5 * 60 * 1000);
+            jest.advanceTimersByTime(15 * 1000);
 
-            // Should not crash and ErrorHandler should not be called
             expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
         });
     });
