@@ -227,6 +227,22 @@ class AST2BlockList {
                             argArray.push(_getPropertyValue(bodyAST, argPath));
                         }
                     }
+                    // The `until` block repeats while its condition is FALSE, so a
+                    // JavaScript `do { ... } while (test)` maps to `until (!test)`.
+                    // Negate the condition, collapsing an existing `!x` back to `x`
+                    // so a blocks -> JS -> blocks round-trip is stable.
+                    if (pair.name === "until" && argArray.length > 0) {
+                        const test = argArray[0];
+                        argArray[0] =
+                            test && test.type === "UnaryExpression" && test.operator === "!"
+                                ? test.argument
+                                : {
+                                      type: "UnaryExpression",
+                                      operator: "!",
+                                      prefix: true,
+                                      argument: test
+                                  };
+                    }
                     let args = _createArgNode(argArray);
                     if (args.length > 0) {
                         node["arguments"] = args;

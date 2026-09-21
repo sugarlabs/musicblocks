@@ -308,13 +308,26 @@ class ASTUtils {
      * @returns {Object} Abstract Syntax Tree of do-while-loop
      */
     static _getDoWhileLoopAST(args, flow, iteratorNum) {
+        // The `until` block repeats while its condition is FALSE, so it maps to
+        // `do { ... } while (!condition)`. Emit the negated condition, collapsing
+        // an existing `!x` back to `x` to avoid a double negation.
+        const condition = ASTUtils._getArgsAST(args)[0];
+        const test =
+            condition && condition.type === "UnaryExpression" && condition.operator === "!"
+                ? condition.argument
+                : {
+                      type: "UnaryExpression",
+                      operator: "!",
+                      prefix: true,
+                      argument: condition
+                  };
         return {
             type: "DoWhileStatement",
             body: {
                 type: "BlockStatement",
                 body: ASTUtils._getBlockAST(flow, iteratorNum)
             },
-            test: ASTUtils._getArgsAST(args)[0]
+            test
         };
     }
 

@@ -231,14 +231,40 @@ describe("ASTUtils", () => {
             const flow = ["flow"];
             const iteratorNum = 0;
             const result = ASTUtils._getDoWhileLoopAST(args, flow, iteratorNum);
+            // `until` repeats while the condition is false, so the exported
+            // do-while must test the negated condition.
             expect(result).toEqual({
                 type: "DoWhileStatement",
                 body: {
                     type: "BlockStatement",
                     body: ASTUtils._getBlockAST(flow, iteratorNum)
                 },
-                test: ASTUtils._getArgsAST(args)[0]
+                test: {
+                    type: "UnaryExpression",
+                    operator: "!",
+                    prefix: true,
+                    argument: ASTUtils._getArgsAST(args)[0]
+                }
             });
+        });
+
+        it("should collapse an already-negated condition instead of double-negating", () => {
+            // An `until (not done)` block yields a negated condition; the export
+            // must drop the outer negation rather than emit `!!done`.
+            const negated = {
+                type: "UnaryExpression",
+                operator: "!",
+                prefix: true,
+                argument: { type: "Identifier", name: "done" }
+            };
+            const original = ASTUtils._getArgsAST;
+            ASTUtils._getArgsAST = () => [negated];
+            try {
+                const result = ASTUtils._getDoWhileLoopAST(["ignored"], ["flow"], 0);
+                expect(result.test).toEqual({ type: "Identifier", name: "done" });
+            } finally {
+                ASTUtils._getArgsAST = original;
+            }
         });
     });
 
