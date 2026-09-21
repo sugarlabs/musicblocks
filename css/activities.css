@@ -423,6 +423,13 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     outline-offset: -2px;
 }
 
+.highcontrast #restoreLastIcon:hover .material-icons,
+.highcontrast #restoreAllIcon:hover .material-icons,
+.highcontrast #restoreLastIcon:focus-visible .material-icons,
+.highcontrast #restoreAllIcon:focus-visible .material-icons {
+    color: var(--color-text-inverse) !important;
+}
+
 .material-icons.md-48 {
     font-size: 32px;
 }
