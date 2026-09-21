@@ -1954,6 +1954,30 @@ describe("Utility Functions (logic-only)", () => {
             expect(mockSynth.setNote).not.toHaveBeenCalled();
         });
 
+        it("should play a filtered note on a basic oscillator (paramsEffects null) without throwing", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                chain: jest.fn().mockReturnThis(),
+                disconnect: jest.fn(),
+                connect: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            // Basic oscillators (sine/sawtooth/...) reach _performNotes with
+            // paramsEffects === null but a live filter. A non-empty filter forces
+            // the slow graph-rewire path, which must not dereference paramsEffects.
+            const paramsFilters = [
+                { filterType: "lowpass", filterRolloff: -12, filterFrequency: 400 }
+            ];
+
+            await expect(
+                _performNotes.call(Synth, mockSynth, "C4", 0.25, null, paramsFilters, false, 0)
+            ).resolves.not.toThrow();
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+        });
+
         it("should route plain (non-portamento) notes through the fast path unaffected", async () => {
             const mockSynth = {
                 toDestination: jest.fn().mockReturnThis(),
