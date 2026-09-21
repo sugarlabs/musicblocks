@@ -21,6 +21,7 @@ permissions:
 
 jobs:
   dashboard:
+    if: github.repository == 'sugarlabs/musicblocks'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -99,6 +99,9 @@ requirejs.config({
             ],
             exports: "_"
         },
+        "utils/camera-utils": {
+            exports: "CameraUtils"
+        },
         "utils/retryWithBackoff": {
             deps: ["utils/utils"],
             exports: "retryWithBackoff"
@@ -256,6 +259,10 @@ requirejs.config({
         },
         "widgets/aidebugger": {
             deps: ["utils/ai-widget-lifecycle"]
+        },
+        "widgets/widgetWindows": {
+            deps: ["utils/dom-helpers"],
+            exports: "widgetWindows"
         }
     },
     paths: {
@@ -592,6 +599,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "tweenjs.min",
                 "utils/platformstyle",
                 "utils/utils",
+                "utils/camera-utils",
                 "activity/pubsub",
                 "activity/turtledefs",
                 "activity/block",

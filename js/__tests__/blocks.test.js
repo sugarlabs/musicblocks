@@ -2591,6 +2591,65 @@ describe("Blocks Foundation", () => {
     });
 
     describe("sendStackToTrash DOM safety", () => {
+        it("should ignore only security errors when exporting image block previews", () => {
+            const mockActivity = {
+                palettes: { dict: {} },
+                refreshCanvas: jest.fn(),
+                trashcan: { stopHighlightAnimation: jest.fn() }
+            };
+            const blocksInstance = new Blocks(mockActivity);
+            const mockBlock = {
+                blockIndex: 1,
+                name: "camera",
+                connections: [null],
+                width: 100,
+                height: 40,
+                container: {
+                    x: 0,
+                    y: 0,
+                    scaleX: 1,
+                    scaleY: 1,
+                    bitmapCache: null,
+                    draw: jest.fn(),
+                    uncache: jest.fn()
+                },
+                protoblock: { style: "value", parameter: false, staticLabels: ["camera"] },
+                hide: jest.fn(),
+                trash: false
+            };
+            blocksInstance.blockList[1] = mockBlock;
+            const getContext = jest
+                .spyOn(HTMLCanvasElement.prototype, "getContext")
+                .mockReturnValue({
+                    fillRect: jest.fn(),
+                    scale: jest.fn(),
+                    save: jest.fn(),
+                    translate: jest.fn(),
+                    restore: jest.fn()
+                });
+            const toDataURL = jest.spyOn(HTMLCanvasElement.prototype, "toDataURL");
+
+            toDataURL.mockImplementationOnce(() => {
+                throw new Error("Preview export failed");
+            });
+            expect(() => blocksInstance.captureStackPreview(1)).toThrow("Preview export failed");
+
+            toDataURL.mockImplementation(() => {
+                throw new DOMException("Tainted canvases may not be exported", "SecurityError");
+            });
+            toDataURL.mockClear();
+
+            try {
+                expect(() => blocksInstance.sendStackToTrash(mockBlock)).not.toThrow();
+                expect(toDataURL).toHaveBeenCalledTimes(1);
+                expect(mockBlock.trash).toBe(true);
+                expect(blocksInstance.trashPreviews[1]).toBeUndefined();
+            } finally {
+                toDataURL.mockRestore();
+                getContext.mockRestore();
+            }
+        });
+
         it("should safely complete sendStackToTrash when #hideContents element is missing from DOM", () => {
             const mockActivity = {
                 palettes: { dict: {} },

@@ -1496,3 +1496,243 @@ describe("Tempo widget cleanup on block deletion", () => {
         expect(audioTriggered).toBe(false);
     });
 });
+
+describe("Tap Tempo feature", () => {
+    let tempoWidget;
+    let mockActivity;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        jest.useFakeTimers();
+        tempoWidget = new Tempo();
+
+        mockActivity = {
+            logo: {
+                synth: {
+                    loadSynth: jest.fn(),
+                    trigger: jest.fn()
+                },
+                firstNoteTime: 1000
+            },
+            blocks: {
+                blockList: {},
+                loadNewBlocks: jest.fn()
+            },
+            refreshCanvas: jest.fn(),
+            saveLocally: jest.fn(),
+            textMsg: jest.fn(),
+            errorMsg: jest.fn()
+        };
+
+        tempoWidget.activity = mockActivity;
+        tempoWidget.BPMs = [100];
+        tempoWidget.BPMInputs = [{ value: 100 }];
+        tempoWidget._intervals = [600];
+        tempoWidget.BPMBlocks = [null];
+        tempoWidget._directions = [1];
+        tempoWidget._widgetFirstTimes = [Date.now()];
+        tempoWidget._widgetNextTimes = [Date.now() + 600];
+        tempoWidget.isMoving = true;
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+        if (tempoWidget._intervalID) {
+            clearInterval(tempoWidget._intervalID);
+        }
+        if (tempoWidget._tapTimeout) {
+            clearTimeout(tempoWidget._tapTimeout);
+        }
+    });
+
+    test("first tap records timestamp and prompts to tap again without changing BPM", () => {
+        jest.setSystemTime(1000);
+        const result = tempoWidget.tapTempo(0);
+
+        expect(result).toBeNull();
+        expect(tempoWidget.BPMs[0]).toBe(100);
+        expect(mockActivity.textMsg).toHaveBeenCalledWith("Tap again to set tempo", 1500);
+        expect(tempoWidget._tapTimes).toEqual([1000]);
+    });
+
+    test("two successive taps compute BPM from interval", () => {
+        jest.setSystemTime(1000);
+        tempoWidget.tapTempo(0);
+
+        // 500ms interval -> 60000 / 500 = 120 BPM
+        jest.setSystemTime(1500);
+        const result = tempoWidget.tapTempo(0);
+
+        expect(result).toBe(120);
+        expect(tempoWidget.BPMs[0]).toBe(120);
+        expect(tempoWidget.BPMInputs[0].value).toBe(120);
+    });
+
+    test("subsequent taps compute rolling average across intervals", () => {
+        jest.setSystemTime(1000);
+        tempoWidget.tapTempo(0);
+
+        // Interval 1: 500ms (1500 - 1000)
+        jest.setSystemTime(1500);
+        tempoWidget.tapTempo(0);
+
+        // Interval 2: 700ms (2200 - 1500)
+        // Average interval = (500 + 700) / 2 = 600ms -> 60000 / 600 = 100 BPM
+        jest.setSystemTime(2200);
+        const result = tempoWidget.tapTempo(0);
+
+        expect(result).toBe(100);
+        expect(tempoWidget.BPMs[0]).toBe(100);
+    });
+
+    test("taps spaced > 2000ms apart reset sequence as a new first tap", () => {
+        jest.setSystemTime(1000);
+        tempoWidget.tapTempo(0);
+
+        // More than 2000ms later
+        jest.setSystemTime(3500);
+        const result1 = tempoWidget.tapTempo(0);
+
+        expect(result1).toBeNull();
+        expect(tempoWidget._tapTimes).toEqual([3500]);
+
+        // Next tap at 4000 (500ms interval -> 120 BPM)
+        jest.setSystemTime(4000);
+        const result2 = tempoWidget.tapTempo(0);
+
+        expect(result2).toBe(120);
+        expect(tempoWidget.BPMs[0]).toBe(120);
+    });
+
+    test("clamps BPM to lower limit of 30", () => {
+        jest.setSystemTime(1000);
+        tempoWidget.tapTempo(0);
+
+        // 2000ms interval -> 60000 / 2000 = 30 BPM
+        jest.advanceTimersByTime(2000);
+        const result = tempoWidget.tapTempo(0);
+
+        expect(result).toBe(30);
+        expect(tempoWidget.BPMs[0]).toBe(30);
+    });
+
+    test("resets tap history when active BPM index changes across multiple indices", () => {
+        tempoWidget.BPMs = [100, 120];
+        tempoWidget.BPMInputs = [{ value: 100 }, { value: 120 }];
+
+        jest.setSystemTime(1000);
+        const result0 = tempoWidget.tapTempo(0);
+        expect(result0).toBeNull();
+        expect(tempoWidget._tapTimes).toEqual([1000]);
+
+        // Second tap on a different index within 500ms starts fresh for index 1
+        jest.advanceTimersByTime(500);
+        const result1 = tempoWidget.tapTempo(1);
+        expect(result1).toBeNull();
+        expect(tempoWidget.BPMs[1]).toBe(120);
+        expect(tempoWidget._tapTimes).toEqual([1500]);
+
+        // Subsequent tap on index 1 calculates its BPM normally
+        jest.advanceTimersByTime(400);
+        const result1Second = tempoWidget.tapTempo(1);
+        expect(result1Second).toBe(150);
+        expect(tempoWidget.BPMs[1]).toBe(150);
+    });
+
+    test("clicking different pendulum canvases resets _firstClickTime per track", () => {
+        tempoWidget.BPMs = [90, 90];
+        tempoWidget.init(mockActivity);
+
+        jest.setSystemTime(1000);
+        tempoWidget.tempoCanvases[0].onclick();
+        expect(tempoWidget._firstClickTime).toBe(1000);
+        expect(tempoWidget._lastCanvasIndex).toBe(0);
+
+        // Clicking canvas 1 resets _firstClickTime and captures its own time
+        jest.setSystemTime(1500);
+        tempoWidget.tempoCanvases[1].onclick();
+        expect(tempoWidget._firstClickTime).toBe(1500);
+        expect(tempoWidget._lastCanvasIndex).toBe(1);
+        expect(tempoWidget.BPMs[1]).toBe(90);
+
+        // Second click on canvas 1 calculates BPM normally
+        jest.setSystemTime(2000);
+        tempoWidget.tempoCanvases[1].onclick();
+        expect(tempoWidget.BPMs[1]).toBe(120);
+        expect(tempoWidget._firstClickTime).toBeNull();
+    });
+
+    test("clamps BPM to upper limit of 1000 for extremely fast taps", () => {
+        jest.setSystemTime(1000);
+        tempoWidget.tapTempo(0);
+
+        // 40ms interval -> 60000 / 40 = 1500 -> clamped to 1000
+        jest.setSystemTime(1040);
+        const result = tempoWidget.tapTempo(0);
+
+        expect(result).toBe(1000);
+        expect(tempoWidget.BPMs[0]).toBe(1000);
+    });
+
+    test("handles empty BPMs array safely", () => {
+        tempoWidget.BPMs = [];
+        const result = tempoWidget.tapTempo(0);
+        expect(result).toBeNull();
+    });
+
+    test("tapBtn in init calls tapTempo", () => {
+        tempoWidget.init(mockActivity);
+        expect(tempoWidget.tapBtn).toBeDefined();
+
+        const tapSpy = jest.spyOn(tempoWidget, "tapTempo");
+        tempoWidget.tapBtn.onclick();
+        expect(tapSpy).toHaveBeenCalledWith(0);
+    });
+
+    test("pressing 't' triggers tapTempo when window is focused", () => {
+        tempoWidget.init(mockActivity);
+        const tapSpy = jest.spyOn(tempoWidget, "tapTempo");
+
+        const event = {
+            key: "t",
+            preventDefault: jest.fn(),
+            stopPropagation: jest.fn()
+        };
+
+        window.widgetWindows.focused = tempoWidget.widgetWindow;
+        tempoWidget._keyHandler(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(tapSpy).toHaveBeenCalled();
+    });
+
+    test("widgetWindow.onclose cleans up tap timeout and times", () => {
+        tempoWidget.init(mockActivity);
+        jest.setSystemTime(1000);
+        tempoWidget.tapTempo(0);
+
+        expect(tempoWidget._tapTimes.length).toBe(1);
+        expect(tempoWidget._tapTimeout).not.toBeNull();
+
+        tempoWidget.widgetWindow.onclose();
+
+        expect(tempoWidget._tapTimes).toEqual([]);
+        expect(tempoWidget._tapTimeout).toBeNull();
+        expect(tempoWidget._tapButtonTimeout).toBeNull();
+    });
+
+    test("_flashTapButton cancels existing timer on rapid taps", () => {
+        tempoWidget.init(mockActivity);
+        tempoWidget._flashTapButton();
+        const firstTimeout = tempoWidget._tapButtonTimeout;
+        expect(firstTimeout).not.toBeNull();
+
+        // Second tap immediately clears the first timer and creates a new one
+        tempoWidget._flashTapButton();
+        expect(tempoWidget._tapButtonTimeout).not.toBeNull();
+
+        // Advancing 150ms completes the reset
+        jest.advanceTimersByTime(150);
+        expect(tempoWidget._tapButtonTimeout).toBeNull();
+    });
+});

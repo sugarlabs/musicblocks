@@ -2,6 +2,7 @@ global.localStorage = {
     beginnerMode: "false"
 };
 global._ = x => x;
+global.announceToScreenReader = jest.fn();
 global.TextEncoder = require("util").TextEncoder;
 global.TextDecoder = require("util").TextDecoder;
 global.last = arr => arr[arr.length - 1];
@@ -1528,19 +1529,80 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
         expect(keyboard._savedDocumentOnKeyUp).toBeUndefined();
     });
 
-    test("handles fallback timer calls when ManagedTimer is null", () => {
-        jest.useFakeTimers();
+    test("handles timer calls safely when ManagedTimer is null without raw fallbacks", () => {
         const keyboard = new MusicKeyboard({});
         keyboard._timerManager = null;
 
         const callback = jest.fn();
-        const id = keyboard._setWidgetInterval(callback, 500);
+        expect(keyboard._setWidgetInterval(callback, 500)).toBe(false);
+        expect(keyboard._clearWidgetInterval(123)).toBe(false);
+        expect(keyboard._setWidgetTimeout(callback, 500)).toBe(false);
+        expect(keyboard._clearWidgetTimeout(123)).toBe(false);
+    });
 
-        jest.advanceTimersByTime(500);
-        expect(callback).toHaveBeenCalledTimes(1);
+    test("tracks widget timeouts and chords through ManagedTimer", () => {
+        jest.useFakeTimers();
+        try {
+            const keyboard = new MusicKeyboard({});
+            const callback = jest.fn();
 
-        expect(keyboard._clearWidgetInterval(id)).toBe(true);
-        jest.useRealTimers();
+            keyboard._setWidgetTimeout(callback, 500);
+            expect(keyboard._timerManager).toBeInstanceOf(ManagedTimer);
+            expect(keyboard._timerManager.activeTimeoutCount).toBe(1);
+
+            jest.advanceTimersByTime(500);
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(keyboard._timerManager.activeTimeoutCount).toBe(0);
+
+            const cancelId = keyboard._setWidgetTimeout(() => {}, 1000);
+            expect(keyboard._clearWidgetTimeout(cancelId)).toBe(true);
+            expect(keyboard._timerManager.activeTimeoutCount).toBe(0);
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
+    test("_playChord schedules voices through ManagedTimer", () => {
+        const keyboard = new MusicKeyboard({});
+        keyboard.activity = {
+            logo: {
+                synth: {
+                    trigger: jest.fn()
+                }
+            }
+        };
+
+        keyboard._playChord(["C", "E", "G", "B"], [1], ["piano", "piano", "piano", "piano"]);
+        expect(keyboard._timerManager.activeTimeoutCount).toBe(4);
+
+        keyboard._clearWidgetTimers();
+        expect(keyboard._timerManager.activeTimeoutCount).toBe(0);
+    });
+
+    test("_clearPlaybackTimers clears playback timeouts while preserving other widget timers", () => {
+        const keyboard = new MusicKeyboard({});
+        keyboard.activity = {
+            logo: {
+                synth: {
+                    trigger: jest.fn()
+                }
+            }
+        };
+
+        keyboard._setWidgetTimeout(() => {}, 1000);
+        keyboard._playChord(["C", "E"], [1], ["piano", "piano"]);
+        keyboard._playOneTimeout = keyboard._setWidgetTimeout(() => {}, 2000);
+
+        expect(keyboard._timerManager.activeTimeoutCount).toBe(4);
+
+        keyboard._clearPlaybackTimers();
+
+        expect(keyboard._timerManager.activeTimeoutCount).toBe(1);
+        expect(keyboard._playOneTimeout).toBeNull();
+        expect(keyboard._chordTimeouts).toEqual([]);
+
+        keyboard._clearWidgetTimers();
+        expect(keyboard._timerManager.activeTimeoutCount).toBe(0);
     });
 
     test("shiftOctave shifts octaves up and down within bounds", () => {

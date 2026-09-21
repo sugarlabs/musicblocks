@@ -151,6 +151,8 @@ Object.assign(global, {
     isTrueEDO: musicUtils.isTrueEDO,
     TEMPERAMENT: musicUtils.TEMPERAMENT
 });
+global.SOLFEGENAMES1 = musicUtils.SOLFEGENAMES1;
+global.NOTENAMES1 = musicUtils.NOTENAMES1;
 
 const { Queue, Logo } = require("../logo");
 

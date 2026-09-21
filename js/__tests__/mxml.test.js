@@ -18,8 +18,137 @@
  */
 
 const saveMxmlOutput = require("../mxml");
+const { frequencyToPitch } = require("../utils/musicutils");
+global.frequencyToPitch = frequencyToPitch;
+global.getMidiDrum = () => ({ "snare drum": 38, "kick drum": 36 });
 
 describe("saveMxmlOutput", () => {
+    it("exports a drum-only note as unpitched percussion rather than only a rest", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: { 0: [[["R"], 4, 0, null, null, false, false, "snare drum"]] }
+            }
+        });
+
+        expect(output).toContain('<score-part id="D1">');
+        expect(output).toContain('<part id="D1">');
+        expect(output).not.toContain('<part id="P1">');
+        expect(output).toContain("<sign>percussion</sign>");
+        expect(output).toContain("<instrument-name>snare drum</instrument-name>");
+        expect(output).toContain("<midi-unpitched>39</midi-unpitched>");
+        expect(output).toMatch(
+            /<unpitched\/>\s*<duration>8<\/duration>\s*<instrument id="D1-X1"\/>/
+        );
+    });
+
+    it("writes instrument after each tie in a barline-split drum note", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C4"], 4, 0, null, null, false, false, null],
+                        [["C4"], 4, 0, null, null, false, false, null],
+                        [["C4"], 2, 0, null, null, false, false, "snare drum"],
+                        "tie",
+                        [["C4"], 2, 0, null, null, false, false, "snare drum"]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(percussion).toMatch(
+            /<unpitched\/>\s*<duration>16<\/duration>\s*<tie type="start"\/>\s*<instrument id="D1-X1"\/>/
+        );
+        expect(percussion).toMatch(
+            /<unpitched\/>\s*<duration>16<\/duration>\s*<tie type="stop"\/>\s*<instrument id="D1-X1"\/>/
+        );
+        expect(percussion).toContain('<measure number="2">');
+    });
+
+    it("keeps pitched notes and sequential drum identities in separate aligned parts", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["C4"], 4, 0, null, null, false, false, "snare drum"],
+                        [["D4"], 4, 0, null, null, false, false, "kick drum"]
+                    ]
+                }
+            }
+        });
+
+        const pitched = output.split('<part id="P1">')[1].split("</part>")[0];
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+        expect(pitched).toContain("<step>C</step>");
+        expect(pitched).toContain("<step>D</step>");
+        expect(pitched).not.toContain("<unpitched/>");
+        expect(percussion.match(/<unpitched\/>/g)).toHaveLength(2);
+        expect(percussion).toContain('<instrument id="D1-X1"/>');
+        expect(percussion).toContain('<instrument id="D1-X2"/>');
+        expect(output).toContain("<midi-unpitched>37</midi-unpitched>");
+        expect(output.indexOf('<score-instrument id="D1-X2">')).toBeLessThan(
+            output.indexOf('<midi-instrument id="D1-X1">')
+        );
+    });
+
+    it("keeps a silent interval before a later drum hit", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["R"], 4, 0, null, null, false, false, null],
+                        [["R"], 4, 0, null, null, false, false, "snare drum"]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(percussion).toMatch(/<rest\/>\s*<duration>8<\/duration>/);
+        expect(percussion).toMatch(/<unpitched\/>\s*<duration>8<\/duration>/);
+    });
+
+    it("exports an unmapped custom drum without an invalid MIDI assignment", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [[["R"], 4, 0, null, null, false, false, "https://example.org/#12&x"]]
+                }
+            }
+        });
+
+        expect(output).toContain("<unpitched/>");
+        expect(output).toContain("<instrument-name>Percussion</instrument-name>");
+        expect(output).not.toContain("<midi-unpitched>");
+        expect(output).not.toContain("example.org");
+    });
+
+    it.each([
+        [445, "A", "<alter>0.196</alter>"],
+        [470, "B", "<alter>-0.858</alter>"],
+        [440, "A", null]
+    ])("should export numeric frequency %s as a valid pitch", (frequency, step, alter) => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[[frequency], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain(`<step>${step}</step>`);
+        expect(output).toContain("<octave>4</octave>");
+        if (alter === null) {
+            expect(output).not.toContain("<alter>");
+        } else {
+            expect(output).toContain(alter);
+        }
+        expect(output).not.toContain("undefined");
+    });
+
     it("should return a valid XML string for a basic input", () => {
         const logo = {
             notation: {
@@ -252,7 +381,7 @@ describe("saveMxmlOutput", () => {
 
         expect(output).not.toContain("<duration>32</duration>");
         // The internal divisions-per-whole-note resolution scales to 96, which MusicXML
-        // represents as 24 divisions per quarter note. The exact duration remains 8.
+        // represents as 24 divisions per quarter note (96 / 4 = 24). The exact duration remains 8.
         expect(output).toContain("<divisions>24</divisions>");
         expect(output).toContain("<duration>8</duration>");
         expect(output).toContain("<step>C</step>");
@@ -285,6 +414,7 @@ describe("saveMxmlOutput", () => {
         // A note reducing to a 3:2 tuplet and one reducing to a 5:2 tuplet in the same
         // voice both need to divide the voice's divisions-per-whole-note evenly;
         // scaling by their LCM (15) rather than just one of them keeps both exact.
+        // MusicXML divisions element expresses divisions per quarter note (480 / 4 = 120).
         const tripletEighth = [["C4"], 1, 0, [3, 4], 8];
         const quintupletEighth = [["D4"], 1, 0, [5, 4], 8];
         const logo = {
@@ -540,5 +670,556 @@ describe("saveMxmlOutput", () => {
         expect(output).toContain('<part id="P1">');
         expect(output).not.toContain('<score-part id="P2">');
         expect(output).not.toContain('<part id="P2">');
+    });
+
+    it("should emit divisions per quarter note (8) for standard non-tuplet notes", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 4, 0]]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain("<divisions>8</divisions>");
+        expect(output).toContain("<duration>8</duration>");
+    });
+
+    it("should maintain divisions per quarter note (8) and correct measure boundaries on meter change", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: [
+                        "meter",
+                        3,
+                        4,
+                        [["C4"], 4, 0],
+                        [["D4"], 4, 0],
+                        [["E4"], 4, 0],
+                        [["F4"], 4, 0]
+                    ]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        const measures = output.match(/<measure[\s\S]*?<\/measure>/g) || [];
+        expect(measures).toHaveLength(2);
+
+        const [measure1, measure2] = measures;
+
+        expect(measure1).toContain('<measure number="1">');
+        expect(measure1).toContain("<divisions>8</divisions>");
+        expect(measure1).toContain("<beats>3</beats>");
+        expect(measure1).toContain("<beat-type>4</beat-type>");
+        expect(measure1.match(/<note>/g) || []).toHaveLength(3);
+        expect(measure1).toContain("<step>C</step>");
+        expect(measure1).toContain("<step>D</step>");
+        expect(measure1).toContain("<step>E</step>");
+
+        expect(measure2).toContain('<measure number="2">');
+        expect(measure2.match(/<note>/g) || []).toHaveLength(1);
+        expect(measure2).toContain("<step>F</step>");
+    });
+
+    it.each([
+        ["C♯4", "C", "1", "4"],
+        ["D♭4", "D", "-1", "4"],
+        ["C𝄪4", "C", "2", "4"],
+        ["D𝄫4", "D", "-2", "4"],
+        ["F♯♯10", "F", "2", "10"],
+        ["G♭♭-1", "G", "-2", "-1"],
+        ["A##5", "A", "2", "5"],
+        ["Cx4", "C", "2", "4"],
+        ["C*4", "C", "2", "4"],
+        ["Bbb3", "B", "-2", "3"],
+        ["C♮4", "C", null, "4"],
+        ["C", "C", null, "4"]
+    ])("should preserve %s accidentals and octave in MusicXML", (note, step, alter, octave) => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [[[note], 4, 0]]
+                }
+            }
+        });
+
+        expect(output).toContain(`<step>${step}</step>`);
+        expect(output).toContain(`<octave>${octave}</octave>`);
+        if (alter === null) {
+            expect(output).not.toContain("<alter>");
+        } else {
+            expect(output).toContain(`<alter>${alter}</alter>`);
+        }
+    });
+});
+
+describe("saveMxmlOutput notation markers", () => {
+    // Staged entries mirror what js/notation.js pushes: notes are
+    // [pitches, noteValue, dotCount, tupletValue, roundDown, insideChord, staccato],
+    // and markers are bare strings followed by their arguments.
+    const note = (pitch, noteValue = 4) => [[pitch], noteValue, 0, null, null, false, false];
+
+    const exportVoices = staging => saveMxmlOutput({ notation: { notationStaging: staging } });
+    const exportVoice = staged => exportVoices({ 0: staged });
+
+    const parseScore = xml => {
+        const doc = new DOMParser().parseFromString(xml, "application/xml");
+        expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
+        return doc;
+    };
+
+    const measuresOf = doc => Array.from(doc.getElementsByTagName("measure"));
+    const notesOf = el => Array.from(el.getElementsByTagName("note"));
+    const stepsOf = el => Array.from(el.getElementsByTagName("step")).map(s => s.textContent);
+
+    // Every marker notation.js can stage, with the arguments it stages alongside.
+    const EVERY_MARKER = [
+        ["markup", 261.63],
+        ["markdown", "pp"],
+        ["voice one"],
+        ["voice two"],
+        ["voice three"],
+        ["voice four"],
+        ["one voice"],
+        ["key", "C", "major"],
+        ["meter", 4, 4],
+        ["swing"],
+        ["tempo", 90, "4"],
+        ["pickup", "8"],
+        ["begin articulation"],
+        ["end articulation"],
+        ["begin crescendo"],
+        ["begin decrescendo"],
+        ["end crescendo"],
+        ["end decrescendo"],
+        ["begin slur"],
+        ["end slur"],
+        ["tie"],
+        ["begin harmonics"],
+        ["end harmonics"]
+    ].flat();
+
+    it("never renders a staged marker as a note", () => {
+        const xml = exportVoice([
+            ...EVERY_MARKER,
+            note("C4"),
+            ...EVERY_MARKER,
+            note("D4"),
+            ...EVERY_MARKER
+        ]);
+        const doc = parseScore(xml);
+
+        expect(stepsOf(doc)).toEqual(["C", "D"]);
+        expect(xml).not.toContain("NaN");
+    });
+
+    describe("pickup", () => {
+        it("writes a pickup as a short, implicit first measure", () => {
+            const doc = parseScore(
+                exportVoice([
+                    "meter",
+                    3,
+                    4,
+                    "pickup",
+                    "4",
+                    note("G4"),
+                    note("C4"),
+                    note("D4"),
+                    note("E4"),
+                    note("F4")
+                ])
+            );
+            const [pickup, first, second] = measuresOf(doc);
+
+            expect(pickup.getAttribute("number")).toBe("0");
+            expect(pickup.getAttribute("implicit")).toBe("yes");
+            expect(stepsOf(pickup)).toEqual(["G"]);
+            expect(pickup.getElementsByTagName("beats")[0].textContent).toBe("3");
+
+            expect(first.getAttribute("number")).toBe("1");
+            expect(first.hasAttribute("implicit")).toBe(false);
+            expect(stepsOf(first)).toEqual(["C", "D", "E"]);
+
+            expect(second.getAttribute("number")).toBe("2");
+            expect(stepsOf(second)).toEqual(["F"]);
+        });
+
+        // Every duration convertFactor() (js/utils/musicutils.js) can return that is
+        // shorter than a 4/4 measure, paired with its length in whole notes.
+        const PICKUPS = [
+            ["16", 1 / 16],
+            ["8", 1 / 8],
+            ["16.", 3 / 32],
+            ["8.", 3 / 16],
+            ["8..", 7 / 32],
+            ["4", 1 / 4],
+            ["4 16", 5 / 16],
+            ["4.", 3 / 8],
+            ["4..", 7 / 16],
+            ["2", 1 / 2],
+            ["2 16", 9 / 16],
+            ["2 8", 5 / 8],
+            ["2 8 16", 11 / 16],
+            ["2.", 3 / 4],
+            ["2 4 16", 13 / 16],
+            ["2..", 7 / 8],
+            ["2 4 8 16", 15 / 16]
+        ];
+
+        it.each(PICKUPS)("sizes a %s pickup to exactly its length", (duration, wholeNotes) => {
+            // Thirty-second notes are one division each, so the pickup measure should
+            // hold exactly one note per division of the pickup.
+            const thirtySeconds = Array.from({ length: 64 }, () => note("C4", 32));
+            const doc = parseScore(exportVoice(["pickup", duration, ...thirtySeconds]));
+            const [pickup, first] = measuresOf(doc);
+
+            expect(pickup.getAttribute("implicit")).toBe("yes");
+            expect(notesOf(pickup)).toHaveLength(wholeNotes * 32);
+            expect(notesOf(first)).toHaveLength(32);
+        });
+
+        it("treats a pickup of a full measure as an ordinary first measure", () => {
+            const doc = parseScore(
+                exportVoice(["pickup", "1", note("C4"), note("D4"), note("E4"), note("F4")])
+            );
+            const [first] = measuresOf(doc);
+
+            expect(first.getAttribute("number")).toBe("1");
+            expect(first.hasAttribute("implicit")).toBe(false);
+            expect(stepsOf(first)).toEqual(["C", "D", "E", "F"]);
+        });
+
+        it("ignores a pickup staged after the first note", () => {
+            const doc = parseScore(exportVoice([note("C4"), "pickup", "4", note("D4")]));
+            const [first] = measuresOf(doc);
+
+            expect(measuresOf(doc)).toHaveLength(1);
+            expect(first.hasAttribute("implicit")).toBe(false);
+            expect(stepsOf(first)).toEqual(["C", "D"]);
+        });
+    });
+
+    it("applies a meter staged before the first note to the first measure", () => {
+        const doc = parseScore(
+            exportVoice(["meter", 3, 4, note("C4"), note("D4"), note("E4"), note("F4")])
+        );
+        const [first, second] = measuresOf(doc);
+
+        expect(first.getElementsByTagName("beats")[0].textContent).toBe("3");
+        expect(stepsOf(first)).toEqual(["C", "D", "E"]);
+        expect(stepsOf(second)).toEqual(["F"]);
+    });
+
+    it.each([
+        ["4", 120],
+        ["8", 60],
+        ["2", 240],
+        ["4.", 180],
+        ["8.", 90],
+        ["4 16", 150]
+    ])("converts 120 beats per %s note to %i quarter notes per minute", (beat, quarterBpm) => {
+        const doc = parseScore(exportVoice(["tempo", 120, beat, note("C4")]));
+        const sounds = Array.from(doc.getElementsByTagName("sound"));
+
+        expect(sounds.map(s => s.getAttribute("tempo"))).toEqual([String(quarterBpm)]);
+        expect(sounds[0].parentNode.tagName).toBe("measure");
+    });
+
+    it.each([
+        [90, "8.", "67.5"],
+        [90, "16", "22.5"],
+        [75, "8", "37.5"]
+    ])("keeps a fractional tempo: %i beats per %s note is %s per minute", (bpm, beat, tempo) => {
+        const doc = parseScore(exportVoice(["tempo", bpm, beat, note("C4")]));
+
+        expect(doc.getElementsByTagName("sound")[0].getAttribute("tempo")).toBe(tempo);
+    });
+
+    describe("direction placement", () => {
+        const childTags = measure => Array.from(measure.children).map(c => c.tagName);
+
+        it("keeps a direction staged before the first note inside the first measure", () => {
+            const doc = parseScore(
+                exportVoice(["begin crescendo", note("C4"), note("D4"), "end crescendo"])
+            );
+            const [measure] = measuresOf(doc);
+            const tags = childTags(measure);
+
+            expect(doc.getElementsByTagName("part")[0].children[0].tagName).toBe("measure");
+            expect(tags.indexOf("direction")).toBeLessThan(tags.indexOf("note"));
+        });
+
+        it("writes a direction staged after the last note into the final measure", () => {
+            const doc = parseScore(exportVoice([note("C4"), note("D4"), "end crescendo"]));
+            const [measure] = measuresOf(doc);
+            const tags = childTags(measure);
+
+            expect(tags.lastIndexOf("direction")).toBeGreaterThan(tags.lastIndexOf("note"));
+            expect(tags.lastIndexOf("direction")).toBeLessThan(tags.indexOf("barline"));
+        });
+
+        it("attaches a direction to the note it precedes when that note opens a measure", () => {
+            const doc = parseScore(
+                exportVoice([
+                    note("C4"),
+                    note("D4"),
+                    note("E4"),
+                    note("F4"),
+                    "begin crescendo",
+                    note("G4")
+                ])
+            );
+            const [first, second] = measuresOf(doc);
+
+            expect(childTags(first)).not.toContain("direction");
+            expect(childTags(second).slice(-3, -1)).toEqual(["direction", "note"]);
+        });
+    });
+
+    it("accents every note inside a relative-volume block, including nested ones", () => {
+        const doc = parseScore(
+            exportVoice([
+                "begin articulation",
+                note("C4"),
+                "begin articulation",
+                note("D4"),
+                "end articulation",
+                note("E4"),
+                "end articulation",
+                note("F4")
+            ])
+        );
+        const accented = notesOf(doc).map(n => n.getElementsByTagName("accent").length === 1);
+
+        expect(accented).toEqual([true, true, true, false]);
+    });
+
+    it("marks only the notes inside a harmonic block as harmonics", () => {
+        const doc = parseScore(
+            exportVoice([note("C4"), "begin harmonics", note("D4"), "end harmonics", note("E4")])
+        );
+        const harmonics = notesOf(doc).map(n => {
+            const technical = n.getElementsByTagName("technical");
+            return technical.length === 1 && technical[0].children[0].tagName === "harmonic";
+        });
+
+        expect(harmonics).toEqual([false, true, false]);
+    });
+
+    it("writes markup above and print text below the note they follow", () => {
+        // Notation.doUpdateNotation stages a note's markup right after that note.
+        const doc = parseScore(
+            exportVoice([note("C4"), "markup", 261.63, note("D4"), "markdown", "pp", note("E4")])
+        );
+        const words = Array.from(doc.getElementsByTagName("words")).map(w => {
+            const direction = w.parentNode.parentNode;
+            return [
+                w.textContent,
+                direction.getAttribute("placement"),
+                stepsOf(direction.nextElementSibling)[0]
+            ];
+        });
+
+        expect(words).toEqual([
+            ["261.63", "above", "C"],
+            ["pp", "below", "D"]
+        ]);
+        expect(stepsOf(doc)).toEqual(["C", "D", "E"]);
+    });
+
+    it("keeps markup with its note when that note ends a measure", () => {
+        const doc = parseScore(
+            exportVoice([note("C4"), note("D4"), note("E4"), note("F4"), "markup", 440, note("G4")])
+        );
+        const [first, second] = measuresOf(doc);
+        const direction = first.getElementsByTagName("direction")[0];
+
+        expect(stepsOf(direction.nextElementSibling)).toEqual(["F"]);
+        expect(second.getElementsByTagName("direction")).toHaveLength(0);
+    });
+
+    it("keeps markup that follows a drum-only note, which has no pitches to write", () => {
+        const drumOnly = [[], 4, 0, null, null, false, false];
+        const doc = parseScore(exportVoice([drumOnly, "markup", 440, note("C4")]));
+        const words = doc.getElementsByTagName("words");
+
+        expect(words).toHaveLength(1);
+        expect(words[0].textContent).toBe("440");
+        expect(stepsOf(words[0].parentNode.parentNode.nextElementSibling)).toEqual(["C"]);
+    });
+
+    describe("ties and slurs between notes", () => {
+        const marksOf = n =>
+            ["tie", "slur"].flatMap(tag =>
+                Array.from(n.getElementsByTagName(tag)).map(
+                    el => `${tag} ${el.getAttribute("type")}`
+                )
+            );
+
+        it.each([
+            ["tie", "end slur"],
+            ["end slur", "tie"]
+        ])("starts a tie and ends a slur on one note when staged as %s, %s", (first, second) => {
+            const doc = parseScore(
+                exportVoice(["begin slur", note("C4"), first, second, note("C4")])
+            );
+            const [tied, continuation] = notesOf(doc);
+
+            expect(marksOf(tied).sort()).toEqual(["slur start", "slur stop", "tie start"]);
+            expect(marksOf(continuation)).toEqual(["tie stop"]);
+        });
+
+        it("keeps a tie when a direction is staged between the tied notes", () => {
+            const doc = parseScore(
+                exportVoice([note("C4"), "tie", "begin crescendo", note("C4"), "end crescendo"])
+            );
+
+            expect(notesOf(doc).map(marksOf)).toEqual([["tie start"], ["tie stop"]]);
+        });
+
+        it("both stops and starts a tie on the middle of three tied notes", () => {
+            // A note split across two barlines is staged as three tied notes.
+            const doc = parseScore(exportVoice([note("C4"), "tie", note("C4"), "tie", note("C4")]));
+
+            expect(notesOf(doc).map(marksOf)).toEqual([
+                ["tie start"],
+                ["tie stop", "tie start"],
+                ["tie stop"]
+            ]);
+        });
+
+        it("draws each tie with <tied> in <notations> as well as sounding it with <tie>", () => {
+            // <tie> only affects playback; notation programs draw the tie from <tied>.
+            const doc = parseScore(exportVoice([note("C4"), "tie", note("C4"), "tie", note("C4")]));
+            const typesOf = (n, tag) =>
+                Array.from(n.getElementsByTagName(tag)).map(el => el.getAttribute("type"));
+
+            expect(notesOf(doc).map(n => typesOf(n, "tie"))).toEqual([
+                ["start"],
+                ["stop", "start"],
+                ["stop"]
+            ]);
+            expect(notesOf(doc).map(n => typesOf(n, "tied"))).toEqual([
+                ["start"],
+                ["stop", "start"],
+                ["stop"]
+            ]);
+            for (const tied of doc.getElementsByTagName("tied")) {
+                expect(tied.parentNode.tagName).toBe("notations");
+            }
+        });
+
+        it("writes no <tied> for notes that aren't tied", () => {
+            const doc = parseScore(exportVoice([note("C4"), note("C4"), "begin slur", note("D4")]));
+
+            expect(doc.getElementsByTagName("tied")).toHaveLength(0);
+        });
+
+        it("does not mistake a marker's argument for a tie or slur", () => {
+            const doc = parseScore(
+                exportVoice([note("C4"), "markdown", "tie", note("D4"), "markdown", "end slur"])
+            );
+
+            expect(notesOf(doc).map(marksOf)).toEqual([[], []]);
+        });
+    });
+
+    it("still ties and slurs notes that carry markup", () => {
+        // A note split across a barline is staged as the note, its markup, then "tie".
+        const doc = parseScore(
+            exportVoice([
+                "begin slur",
+                note("C4"),
+                "markup",
+                261.63,
+                "tie",
+                note("C4"),
+                "markup",
+                261.63,
+                "end slur"
+            ])
+        );
+        const [tied, continuation] = notesOf(doc);
+        const typeOf = (el, tag) => el.getElementsByTagName(tag)[0].getAttribute("type");
+
+        expect(typeOf(tied, "tie")).toBe("start");
+        expect(typeOf(tied, "slur")).toBe("start");
+        expect(typeOf(continuation, "tie")).toBe("stop");
+        expect(typeOf(continuation, "slur")).toBe("stop");
+    });
+
+    it("writes swing as a words direction", () => {
+        const doc = parseScore(exportVoice(["swing", note("C4")]));
+        const words = doc.getElementsByTagName("words");
+
+        expect(words).toHaveLength(1);
+        expect(words[0].textContent).toBe("swing");
+    });
+
+    it("keeps markup text intact through XML escaping", () => {
+        // Text that looks like a part id must be written as-is, and voice index 1 is still
+        // written as part P1.
+        const text = "a < b & P1 #2";
+        const doc = parseScore(exportVoices({ 1: [note("C4"), "markdown", text, note("D4")] }));
+
+        expect(doc.getElementsByTagName("words")[0].textContent).toBe(text);
+        expect(doc.getElementsByTagName("score-part")[0].getAttribute("id")).toBe("P1");
+        expect(doc.getElementsByTagName("part")[0].getAttribute("id")).toBe("P1");
+    });
+
+    it("omits a voice whose notes are all drum-only, since none of them has a pitch to write", () => {
+        const drumOnly = [[], 4, 0, null, null, false, false];
+        const doc = parseScore(
+            exportVoices({
+                0: [drumOnly, drumOnly, "begin crescendo", drumOnly, "end crescendo"],
+                1: [note("C4"), note("D4")]
+            })
+        );
+
+        expect(doc.getElementsByTagName("score-part")).toHaveLength(1);
+        expect(doc.getElementsByTagName("part")).toHaveLength(1);
+        expect(stepsOf(doc)).toEqual(["C", "D"]);
+    });
+
+    it.each([
+        ["rests", [note("R"), note("R")]],
+        [
+            "drum hits and rests",
+            [
+                [[], 4, 0, null, null, false, false],
+                note("R"),
+                [[], 4, 0, null, null, false, false],
+                note("R")
+            ]
+        ]
+    ])("omits a voice with no pitched note: only %s", (_label, staged) => {
+        const doc = parseScore(exportVoices({ 0: [note("C4"), note("D4")], 1: staged }));
+
+        expect(doc.getElementsByTagName("part")).toHaveLength(1);
+        expect(doc.getElementsByTagName("rest")).toHaveLength(0);
+    });
+
+    it("keeps rests in a voice that also has pitched notes", () => {
+        const doc = parseScore(exportVoice([note("C4"), note("R"), note("D4")]));
+
+        expect(doc.getElementsByTagName("rest")).toHaveLength(1);
+        expect(stepsOf(doc)).toEqual(["C", "D"]);
+    });
+
+    it("omits a voice that stages markers but no notes", () => {
+        const doc = parseScore(
+            exportVoices({
+                0: ["tempo", 90, "4", "meter", 3, 4],
+                1: [note("C4"), note("D4")]
+            })
+        );
+
+        expect(doc.getElementsByTagName("score-part")).toHaveLength(1);
+        expect(doc.getElementsByTagName("part")).toHaveLength(1);
+        expect(measuresOf(doc).length).toBeGreaterThan(0);
     });
 });

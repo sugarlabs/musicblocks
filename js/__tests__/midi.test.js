@@ -569,5 +569,95 @@ describe("transcribeMidi", () => {
 
             expect(seconds).toBeCloseTo(lastNote.time + lastNote.duration, 2);
         });
+
+        describe("dotted notes and triplets", () => {
+            // Pitches of the imported notes, in order, as [note name, octave].
+            const pitchesOf = blocks => {
+                const byIndex = new Map(blocks.map(block => [block[0], block]));
+                return blocks
+                    .filter(block => blockName(block) === "pitch")
+                    .map(block => [numberOf(byIndex, block[4][1]), numberOf(byIndex, block[4][2])]);
+            };
+
+            it.each([60, 120, 180])(
+                "imports dotted notes at their dotted length at %i bpm",
+                async bpm => {
+                    // dotted quarter, eighth, dotted half, quarter, dotted eighth, sixteenth,
+                    // dotted whole
+                    const blocks = await importBlocks(
+                        midiFile({ tempos: [[0, bpm]], lengths: [1.5, 0.5, 3, 1, 0.75, 0.25, 6] })
+                    );
+
+                    expect(noteValues(blocks)).toEqual([
+                        "3/8",
+                        "1/8",
+                        "3/4",
+                        "1/4",
+                        "3/16",
+                        "1/16",
+                        "3/2"
+                    ]);
+                }
+            );
+
+            it("imports eighth-, quarter- and half-note triplets", async () => {
+                const blocks = await importBlocks(
+                    midiFile({
+                        tempos: [[0, 120]],
+                        lengths: [1 / 3, 1 / 3, 1 / 3, 2 / 3, 2 / 3, 2 / 3, 4 / 3, 4 / 3, 4 / 3]
+                    })
+                );
+
+                expect(noteValues(blocks)).toEqual([
+                    "1/12",
+                    "1/12",
+                    "1/12",
+                    "1/6",
+                    "1/6",
+                    "1/6",
+                    "1/3",
+                    "1/3",
+                    "1/3"
+                ]);
+            });
+
+            it("imports a melody with dotted notes and triplets that lasts as long as the file", async () => {
+                const file = midiFile({
+                    tempos: [[0, 150]],
+                    lengths: [1.5, 0.5, 1 / 3, 1 / 3, 1 / 3, 3, 0.75, 0.25, 2 / 3, 2 / 3, 2 / 3]
+                });
+                const lastNote = file.tracks[0].notes[file.tracks[0].notes.length - 1];
+                const blocks = await importBlocks(file);
+
+                const seconds = playbackSeconds(blocks).reduce((sum, value) => sum + value, 0);
+
+                expect(seconds).toBeCloseTo(lastNote.time + lastNote.duration, 2);
+            });
+
+            it("keeps a sixteenth note played short a sixteenth", async () => {
+                // At 96 of its 120 ticks, the sixteenth is nearer a dotted thirty-second (3/64)
+                // than a sixteenth, which is why dotted values shorter than 3/32 aren't used.
+                const blocks = await importBlocks(
+                    midiFile({ tempos: [[0, 120]], lengths: [96 / PPQ, 1] })
+                );
+
+                expect(noteValues(blocks)).toEqual(["1/16", "1/4"]);
+            });
+
+            it("reads notes in MIDI's lowest octave with their octave number", async () => {
+                const midi = new Midi();
+                const track = midi.addTrack();
+                track.addNote({ midi: 0, ticks: 0, durationTicks: PPQ });
+                track.addNote({ midi: 11, ticks: PPQ, durationTicks: PPQ });
+                track.addNote({ midi: 61, ticks: 2 * PPQ, durationTicks: PPQ });
+                const blocks = await importBlocks(new Midi(midi.toArray()));
+
+                expect(pitchesOf(blocks)).toEqual([
+                    ["C", -1],
+                    ["B", -1],
+                    ["C#", 4]
+                ]);
+            });
+        });
     });
 });

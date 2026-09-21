@@ -246,33 +246,68 @@ class JSEditor {
     }
 
     /**
-     * Marks an error span in the editor with a simple approach
+     * Marks an error span in the editor by wrapping the error range inside
+     * the existing DOM tree. Unlike the previous approach that replaced the
+     * entire editor content with plain text (destroying hljs highlighting),
+     * this walks the text nodes with a TreeWalker and only wraps the
+     * overlapping portions, preserving all syntax-highlighting spans.
+     *
      * @param {HTMLElement} editor - the editor element
-     * @param {Number} start - the start position of the error
-     * @param {Number} end - the end position of the error
-     * @param {String} message - the error message
+     * @param {Number} start - the start character position of the error
+     * @param {Number} end - the end character position of the error
+     * @param {String} message - the error message (shown as tooltip)
      * @returns {void}
      */
     _markErrorSpan(editor, start, end, message) {
-        const text = editor.textContent;
-        const errorText = text.substring(start, end);
+        const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
+        let charOffset = 0;
+        let node;
+        const nodesToWrap = [];
 
-        const beforeError = text.substring(0, start);
-        const afterError = text.substring(end);
+        // Collect all text nodes that overlap with the error range [start, end)
+        while ((node = walker.nextNode())) {
+            const nodeStart = charOffset;
+            const nodeEnd = charOffset + node.textContent.length;
 
-        const highlightedContent = document.createDocumentFragment();
-        highlightedContent.appendChild(document.createTextNode(beforeError));
+            if (nodeEnd > start && nodeStart < end) {
+                nodesToWrap.push({
+                    node,
+                    overlapStart: Math.max(0, start - nodeStart),
+                    overlapEnd: Math.min(node.textContent.length, end - nodeStart)
+                });
+            }
 
-        const errorSpan = document.createElement("span");
-        errorSpan.className = "error";
-        errorSpan.title = String(message);
-        errorSpan.textContent = errorText;
-        highlightedContent.appendChild(errorSpan);
+            charOffset = nodeEnd;
+            if (charOffset >= end) break;
+        }
 
-        highlightedContent.appendChild(document.createTextNode(afterError));
+        // Process in reverse order so earlier node positions remain valid
+        for (let i = nodesToWrap.length - 1; i >= 0; i--) {
+            const { node: textNode, overlapStart, overlapEnd } = nodesToWrap[i];
+            const content = textNode.textContent;
 
-        editor.textContent = "";
-        editor.appendChild(highlightedContent);
+            const beforeText = content.substring(0, overlapStart);
+            const errorText = content.substring(overlapStart, overlapEnd);
+            const afterText = content.substring(overlapEnd);
+
+            const fragment = document.createDocumentFragment();
+
+            if (beforeText) {
+                fragment.appendChild(document.createTextNode(beforeText));
+            }
+
+            const errorSpan = document.createElement("span");
+            errorSpan.className = "error";
+            errorSpan.title = String(message);
+            errorSpan.textContent = errorText;
+            fragment.appendChild(errorSpan);
+
+            if (afterText) {
+                fragment.appendChild(document.createTextNode(afterText));
+            }
+
+            textNode.parentNode.replaceChild(fragment, textNode);
+        }
     }
 
     /**

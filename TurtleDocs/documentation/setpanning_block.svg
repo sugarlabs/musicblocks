@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="223.5"
+   height="34.5"
+   version="1.1"
+   id="svg26">
+  <metadata
+     id="metadata32">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs30" />
+  <g
+     id="g14"
+     transform="translate(-48)">
+    <g
+       transform="scale(1.5)"
+       id="g12">
+      <path
+         d="m 32.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 61 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -61 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -3.301409,-1.904227 -4,-4 v -4 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path2" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text6"><tspan
+           x="109"
+           y="14"
+           id="tspan4">set panning</tspan></text>
+      <text
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text10"><tspan
+           x="109"
+           y="12"
+           id="tspan8" /></text>
+    </g>
+  </g>
+  <g
+     transform="translate(120)"
+     id="g24">
+    <g
+       transform="scale(1.5)"
+       id="g22">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path16" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text20"><tspan
+           x="13"
+           y="14"
+           id="tspan18">50</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g919"
+     transform="translate(-48)">
+    <g
+       transform="scale(1.5)"
+       id="g917">
+      <path
+         d="m 32.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 61 4 c 2.20914,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.79086,4 -4,4 h -4 -61 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -3.301409,-1.904227 -4,-4 v -4 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path907" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text911"><tspan
+           x="109"
+           y="14"
+           id="tspan909">set panning</tspan></text>
+      <text
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text915"><tspan
+           x="109"
+           y="12"
+           id="tspan913" /></text>
+    </g>
+  </g>
+  <g
+     transform="translate(120)"
+     id="g929">
+    <g
+       transform="scale(1.5)"
+       id="g927">
+      <path
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path921" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text925"><tspan
+           x="13"
+           y="14"
+           id="tspan923">50</tspan></text>
+    </g>
+  </g>
+</svg>

@@ -130,6 +130,7 @@ describe("Notation Class", () => {
             const insideChord = false;
             const drum = ["kick"];
             notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
+            expect(notation._notationStaging[turtle][0][7]).toBe("kick");
             expect(notation._notationDrumStaging[turtle]).toContainEqual(
                 expect.arrayContaining([["drums"], expect.any(Number), expect.any(Number)])
             );
@@ -142,6 +143,7 @@ describe("Notation Class", () => {
             const insideChord = false;
             const drum = ["noise1"];
             notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
+            expect(notation._notationStaging[turtle][0][7]).toBeNull();
             expect(notation._notationDrumStaging[turtle].length).toBe(0);
         });
 

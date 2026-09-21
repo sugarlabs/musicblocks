@@ -8,7 +8,7 @@
  * (at your option) any later version.
  */
 
-const { doUseCamera, doStopVideoCam, CameraManager } = require("../utils.js");
+const { doUseCamera, doStopVideoCam, CameraManager } = require("../camera-utils.js");
 
 /**
  * Builds a minimal fake <video>/<canvas> pair and wires document.querySelector
@@ -345,5 +345,57 @@ describe("doStopVideoCam", () => {
         await Promise.resolve();
         dom.video.fireCanplay();
         expect(turtlesCtx.doShowImage).toHaveBeenCalledTimes(2);
+    });
+    test("stale getUserMedia requests do not clear _pendingRequest of newer requests", async () => {
+        CameraManager.isSetup = false;
+        CameraManager._pendingRequest = false;
+        const dom = makeDom();
+        const turtlesCtx = makeTurtles();
+        let resolveFirst;
+        let resolveSecond;
+        const firstPromise = new Promise(r => {
+            resolveFirst = r;
+        });
+        const secondPromise = new Promise(r => {
+            resolveSecond = r;
+        });
+
+        const track1 = { stop: jest.fn() };
+        const track2 = { stop: jest.fn() };
+
+        let requestCount = 0;
+        navigator.mediaDevices.getUserMedia = jest.fn(() => {
+            requestCount++;
+            return requestCount === 1 ? firstPromise : secondPromise;
+        });
+
+        doUseCamera(["t"], turtlesCtx.turtles, "t", false, null, jest.fn(), jest.fn());
+        expect(CameraManager._pendingRequest).toBe(true);
+        expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1);
+
+        document.querySelector = jest.fn(() => ({ pause: jest.fn(), srcObject: null }));
+        doStopVideoCam(null, jest.fn());
+
+        document.querySelector = jest.fn(selector => {
+            if (selector === "#camVideo") return dom.video;
+            if (selector === "#camCanvas") return dom.canvas;
+            return null;
+        });
+        doUseCamera(["t"], turtlesCtx.turtles, "t", false, null, jest.fn(), jest.fn());
+        expect(CameraManager._pendingRequest).toBe(true);
+        expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(2);
+
+        resolveFirst({ getTracks: () => [track1] });
+        await firstPromise;
+
+        expect(CameraManager._pendingRequest).toBe(true);
+        expect(track1.stop).toHaveBeenCalled();
+        expect(dom.video.srcObject).toBeNull();
+
+        const secondStream = { getTracks: () => [track2] };
+        resolveSecond(secondStream);
+        await secondPromise;
+        expect(CameraManager._pendingRequest).toBe(false);
+        expect(dom.video.srcObject).toBe(secondStream);
     });
 });
