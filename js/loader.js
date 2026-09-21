@@ -77,6 +77,12 @@ requirejs.config({
         "p5-sound-adapter": {
             deps: ["p5.sound.min"]
         },
+        "utils/plugin-utils": {
+            exports: "PluginUtils"
+        },
+        "utils/macro-utils": {
+            exports: "MacroUtils"
+        },
         "utils/utils-logic": {
             exports: "UtilsLogic"
         },
@@ -95,7 +101,9 @@ requirejs.config({
                 "utils/utils-logic",
                 "utils/dom-helpers",
                 "utils/browser-utils",
-                "utils/http-utils"
+                "utils/http-utils",
+                "utils/plugin-utils",
+                "utils/macro-utils"
             ],
             exports: "_"
         },
@@ -600,6 +608,8 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "utils/platformstyle",
                 "utils/utils",
                 "utils/camera-utils",
+                "utils/plugin-utils",
+                "utils/macro-utils",
                 "activity/pubsub",
                 "activity/turtledefs",
                 "activity/block",
