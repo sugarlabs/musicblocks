@@ -348,12 +348,19 @@ describe("rubrics.js test suite", () => {
             expect(stats.ornaments).toBe(1);
         });
 
-        it("pushes 'end articulation' into .end, not .begin (regression)", () => {
+        it("pushes multiple 'end articulation' markers into .end, not .begin (regression)", () => {
             const activity = {
                 logo: {
                     notation: {
                         notationStaging: {
-                            0: [[["C4"], 4], "begin articulation", [["D4"], 4], "end articulation"]
+                            0: [
+                                [["C4"], 4],
+                                "begin articulation",
+                                [["D4"], 4],
+                                "end articulation",
+                                [["E4"], 4],
+                                "end articulation"
+                            ]
                         }
                     },
                     synth: {
@@ -367,10 +374,12 @@ describe("rubrics.js test suite", () => {
             const stats = getStatsFromNotation(activity);
 
             expect(stats.articulation.begin).toHaveLength(1);
-            expect(stats.articulation.end).toHaveLength(1);
-            // The "end articulation" marker must NOT appear in .begin.
+            expect(stats.articulation.end).toHaveLength(2);
+            // The "end articulation" markers must NOT appear in .begin.
             expect(stats.articulation.begin).not.toContain("3");
+            expect(stats.articulation.begin).not.toContain("5");
             expect(stats.articulation.end).toContain("3");
+            expect(stats.articulation.end).toContain("5");
         });
 
         it("resolves note names through the custom temperament table when one is active", () => {
