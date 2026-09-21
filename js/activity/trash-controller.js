@@ -253,13 +253,16 @@ class TrashController {
         trashView.id = "trashView";
         trashView.classList.add("trash-view");
 
-        // Sticky icons
+        // Sticky restore controls
         const buttonContainer = document.createElement("div");
         buttonContainer.classList.add("button-container");
 
-        const restoreLastIcon = document.createElement("a");
+        const restoreLastIcon = document.createElement("button");
         restoreLastIcon.id = "restoreLastIcon";
-        restoreLastIcon.classList.add("restore-last-icon");
+        restoreLastIcon.type = "button";
+        restoreLastIcon.classList.add("restore-control", "restore-last-icon", "tooltipped");
+        restoreLastIcon.setAttribute("data-tooltip", _("Restore last item"));
+        restoreLastIcon.setAttribute("data-position", "bottom");
         const restoreLastIconInner = document.createElement("i");
         restoreLastIconInner.className = "material-icons md-48";
         restoreLastIconInner.textContent = "restore_from_trash";
@@ -271,9 +274,12 @@ class TrashController {
             trashView.classList.add("hidden");
         });
 
-        const restoreAllIcon = document.createElement("a");
+        const restoreAllIcon = document.createElement("button");
         restoreAllIcon.id = "restoreAllIcon";
-        restoreAllIcon.classList.add("restore-all-icon");
+        restoreAllIcon.type = "button";
+        restoreAllIcon.classList.add("restore-control", "restore-all-icon", "tooltipped");
+        restoreAllIcon.setAttribute("data-tooltip", _("Restore all items"));
+        restoreAllIcon.setAttribute("data-position", "bottom");
         const restoreAllIconInner = document.createElement("i");
         restoreAllIconInner.className = "material-icons md-48";
         restoreAllIconInner.textContent = "delete_sweep";
@@ -284,8 +290,8 @@ class TrashController {
             }
             trashView.classList.add("hidden");
         });
-        restoreLastIcon.setAttribute("title", _("Restore last item"));
-        restoreAllIcon.setAttribute("title", _("Restore all items"));
+        restoreLastIcon.setAttribute("aria-label", _("Restore last item"));
+        restoreAllIcon.setAttribute("aria-label", _("Restore all items"));
 
         buttonContainer.appendChild(restoreLastIcon);
         buttonContainer.appendChild(restoreAllIcon);
@@ -351,6 +357,13 @@ class TrashController {
             trashList.replaceChild(trashView, existingView);
         } else {
             trashList.appendChild(trashView);
+        }
+
+        if (!(activity.toolbar && activity.toolbar.tooltipsDisabled) && window.jQuery) {
+            window.jQuery("#trashView .tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
         }
     }
 

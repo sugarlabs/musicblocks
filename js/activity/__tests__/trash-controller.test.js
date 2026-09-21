@@ -324,6 +324,30 @@ describe("TrashController.renderTrashView", () => {
         expect(trashView.querySelectorAll(".trash-item").length).toBe(2);
         expect(document.getElementById("restoreLastIcon")).not.toBeNull();
         expect(document.getElementById("restoreAllIcon")).not.toBeNull();
+        expect(document.getElementById("restoreLastIcon").dataset.tooltip).toBe(
+            "Restore last item"
+        );
+        expect(document.getElementById("restoreAllIcon").dataset.tooltip).toBe("Restore all items");
+    });
+
+    test("initializes restore controls with the standard toolbar tooltip", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList.blk1 = makeBlock();
+        activity.blocks.trashStacks = ["blk1"];
+        const tooltip = jest.fn();
+        const originalJQuery = window.jQuery;
+        window.jQuery = jest.fn(() => ({ tooltip }));
+        const controller = new TrashController(activity);
+
+        controller.renderTrashView();
+
+        expect(window.jQuery).toHaveBeenCalledWith("#trashView .tooltipped");
+        expect(tooltip).toHaveBeenCalledWith({ html: true, delay: 100 });
+        if (originalJQuery) {
+            window.jQuery = originalJQuery;
+        } else {
+            delete window.jQuery;
+        }
     });
 
     test("replaces an existing trashView rather than appending a duplicate", () => {
