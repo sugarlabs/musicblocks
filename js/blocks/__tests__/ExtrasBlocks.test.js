@@ -741,3 +741,86 @@ describe("proto block registration names", () => {
         expect(body).toMatch(/args:\s*2/);
     });
 });
+
+describe("runtime proto registration", () => {
+    // The tests above read ExtrasBlocks.js as text, which proves the source
+    // says the right thing but not that setup() ends up registering it.
+    // This drives the real setupExtrasBlocks() against a base class that
+    // records what super() and formBlock() were given and registers the way
+    // ProtoBlock.setup does (protoBlockDict[this.name] = this), so a
+    // regression in registration fails here even if the source still reads
+    // correctly.
+    const register = dict =>
+        class {
+            constructor(name) {
+                this.name = name;
+                this.capabilities = Object.create(null);
+            }
+            setPalette() {}
+            setHelpString() {}
+            beginnerBlock() {}
+            makeMacro() {}
+            updateDockValue() {}
+            setCapability(n, v = true) {
+                this.capabilities[n] = !!v;
+                return this;
+            }
+            getCapability(n) {
+                return this.capabilities[n];
+            }
+            formBlock(def) {
+                this.formBlockDef = def;
+            }
+            setup() {
+                dict[this.name] = this;
+            }
+        };
+
+    let saved;
+    let protoBlockDict;
+
+    beforeAll(() => {
+        saved = {
+            LeftBlock: global.LeftBlock,
+            FlowBlock: global.FlowBlock,
+            ValueBlock: global.ValueBlock,
+            StackClampBlock: global.StackClampBlock
+        };
+        protoBlockDict = {};
+        const Base = register(protoBlockDict);
+        global.LeftBlock = Base;
+        global.FlowBlock = class extends Base {};
+        global.ValueBlock = class extends Base {};
+        global.StackClampBlock = class extends Base {};
+
+        setupExtrasBlocks({
+            blocks: { blockList: {}, protoBlockDict },
+            turtles: { ithTurtle: () => ({ singer: {}, doWait() {} }), getTurtleCount: () => 1 },
+            save: {},
+            errorMsg: () => {},
+            textMsg: () => {}
+        });
+    });
+
+    afterAll(() => {
+        Object.assign(global, saved);
+    });
+
+    it("registers nopOneArgMathBlock and nopTwoArgMathBlock separately", () => {
+        expect(protoBlockDict.nopOneArgMathBlock).toBeDefined();
+        expect(protoBlockDict.nopTwoArgMathBlock).toBeDefined();
+        // The bug was one overwriting the other, so identity matters.
+        expect(protoBlockDict.nopOneArgMathBlock).not.toBe(protoBlockDict.nopTwoArgMathBlock);
+    });
+
+    it("gives each NOP math placeholder its own argument count", () => {
+        expect(protoBlockDict.nopOneArgMathBlock.formBlockDef.args).toBe(1);
+        expect(protoBlockDict.nopTwoArgMathBlock.formBlockDef.args).toBe(2);
+    });
+
+    it("registers every class under a distinct name", () => {
+        const names = Object.keys(protoBlockDict);
+        expect(new Set(names).size).toBe(names.length);
+        expect(names.length).toBeGreaterThan(20);
+    });
+});
