@@ -1971,9 +1971,10 @@ describe("Utility Functions (logic-only)", () => {
                 { filterType: "lowpass", filterRolloff: -12, filterFrequency: 400 }
             ];
 
-            await expect(
-                _performNotes.call(Synth, mockSynth, "C4", 0.25, null, paramsFilters, false, 0)
-            ).resolves.not.toThrow();
+            // Awaiting directly: if the slow path threw (as it did before the
+            // fix), the rejection fails the test. The triggerAttackRelease
+            // assertion then verifies the note actually played.
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, null, paramsFilters, false, 0);
 
             expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
         });
