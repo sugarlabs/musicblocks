@@ -444,6 +444,14 @@ describe("MathUtility", () => {
         test("throws NanError for string divisor", () => {
             expect(() => MathUtility.doDivide(6, "2")).toThrow("NanError");
         });
+
+        test("throws NanError for valid number divided by missing argument", () => {
+            expect(() => MathUtility.doDivide(10)).toThrow("NanError");
+        });
+
+        test("throws NanError when divisor is null (not a typeof number)", () => {
+            expect(() => MathUtility.doDivide(5, null)).toThrow("NanError");
+        });
     });
 
     describe("doCalculateDistance", () => {
