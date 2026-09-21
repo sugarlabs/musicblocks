@@ -311,7 +311,7 @@ function LegoWidget() {
      * @returns {object} The created widget window.
      */
     this._createWidgetWindow = function () {
-        const widgetWindow = window.widgetWindows.windowFor(this, "LEGO BRICKS");
+        const widgetWindow = window.widgetWindows.windowFor(this, "LEGO Bricks");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -711,7 +711,7 @@ function LegoWidget() {
 
         const spacingIn = document.createElement("button");
         spacingIn.textContent = "+";
-        spacingIn.onclick = () => this._adjustVerticalSpacing(1);
+        spacingIn.onclick = () => this._adjustVerticalSpacing(5);
 
         this.spacingValue = document.createElement("span");
         this.spacingValue.textContent = "50px";

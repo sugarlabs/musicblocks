@@ -23,8 +23,9 @@
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
    isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber
+   PREVIEWVOLUME,   ratioToWheelAngle, rationalToFraction, setOctaveRatio, SHARP, Singer,
+   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber,
+   ManagedTimer
  */
 
 /* exported TemperamentWidget, deviationColor, deviationFrom12EDO, largestGapMid */
@@ -126,6 +127,36 @@ function TemperamentWidget() {
      */
     this.inTemperament = null;
     this._playTimeout = null;
+    if (typeof ManagedTimer !== "undefined") {
+        this._timerManager = new ManagedTimer();
+    } else if (typeof require !== "undefined") {
+        try {
+            const ManagedTimerCtor = require("../utils/ManagedTimer");
+            this._timerManager = new ManagedTimerCtor();
+        } catch (e) {
+            this._timerManager = null;
+        }
+    } else {
+        this._timerManager = null;
+    }
+
+    this._setWidgetTimeout = function (callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return setTimeout(callback, delay);
+    };
+
+    this._clearWidgetTimeout = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+        clearTimeout(id);
+        return true;
+    };
 
     /**
      * Last triggered event.
@@ -495,7 +526,8 @@ function TemperamentWidget() {
         that._playAllRunning = false;
         const _playAll = function () {
             if (that._playAllRunning) {
-                clearTimeout(that._playAllTimer);
+                that._clearWidgetTimeout(that._playAllTimer);
+                that._playAllTimer = null;
                 that._playAllRunning = false;
                 flashDot = -1;
                 _drawCircle();
@@ -530,7 +562,7 @@ function TemperamentWidget() {
                     i--;
                     if (i < 0) {
                         that._playAllRunning = false;
-                        setTimeout(function () {
+                        that._setWidgetTimeout(function () {
                             flashDot = -1;
                             _drawCircle();
                         }, 200);
@@ -543,7 +575,7 @@ function TemperamentWidget() {
                     typeof Singer !== "undefined" && Singer.defaultBPMFactor
                         ? 300 * Singer.defaultBPMFactor
                         : 300;
-                that._playAllTimer = setTimeout(step, gap);
+                that._playAllTimer = that._setWidgetTimeout(step, gap);
             };
             step();
         };
@@ -1150,7 +1182,7 @@ function TemperamentWidget() {
             );
             flashDot = index;
             _drawCircle();
-            setTimeout(function () {
+            that._setWidgetTimeout(function () {
                 flashDot = -1;
                 _drawCircle();
             }, 200);
@@ -1540,7 +1572,8 @@ function TemperamentWidget() {
      */
     this.edit = function () {
         if (this._playAllRunning) {
-            clearTimeout(this._playAllTimer);
+            this._clearWidgetTimeout(this._playAllTimer);
+            this._playAllTimer = null;
             this._playAllRunning = false;
         }
         this._lastPlaybackIndex = 0;
@@ -2867,7 +2900,7 @@ function TemperamentWidget() {
 
         widgetWindow.onclose = function () {
             if (that._playAllTimer) {
-                clearTimeout(that._playAllTimer);
+                that._clearWidgetTimeout(that._playAllTimer);
                 that._playAllTimer = null;
             }
             that._playAllRunning = false;
@@ -2880,8 +2913,11 @@ function TemperamentWidget() {
                 that._vizMenuClose = null;
             }
             if (that._playTimeout) {
-                clearTimeout(that._playTimeout);
+                that._clearWidgetTimeout(that._playTimeout);
                 that._playTimeout = null;
+            }
+            if (that._timerManager !== null) {
+                that._timerManager.clearAll();
             }
             that._logo.synth.stop();
             that._logo.synth.setMasterVolume(last(Singer.masterVolume));

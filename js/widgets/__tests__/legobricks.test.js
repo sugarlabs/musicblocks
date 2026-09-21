@@ -1454,7 +1454,7 @@ describe("LegoWidget — _createWidgetWindow", () => {
     it("should look up, clear, and show the widget window", () => {
         const widgetWindow = legoWidget._createWidgetWindow();
 
-        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(legoWidget, "LEGO BRICKS");
+        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(legoWidget, "LEGO Bricks");
         expect(widgetWindow).toBe(mockWindow);
         expect(legoWidget.widgetWindow).toBe(mockWindow);
         expect(mockWindow.clear).toHaveBeenCalled();
@@ -1979,6 +1979,19 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
                 legoWidget._adjustVerticalSpacing(-50);
 
                 expect(legoWidget.spacingSlider.value).toBe("2");
+            });
+        });
+
+        describe("_createSpacingControls", () => {
+            it("wires the − and + buttons to the same step magnitude", () => {
+                const [, spacingOut, , spacingIn] = legoWidget._createSpacingControls();
+                legoWidget.spacingSlider.value = "50";
+
+                spacingOut.onclick();
+                expect(legoWidget.spacingSlider.value).toBe("45");
+
+                spacingIn.onclick();
+                expect(legoWidget.spacingSlider.value).toBe("50");
             });
         });
 

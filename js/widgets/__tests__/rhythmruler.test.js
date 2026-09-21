@@ -46,6 +46,7 @@ global.docById = jest.fn().mockReturnValue({
 });
 global.deepClone = value => JSON.parse(JSON.stringify(value));
 global.delayExecution = jest.fn().mockResolvedValue(undefined);
+global.announceToScreenReader = jest.fn();
 global.last = arr => (arr && arr.length > 0 ? arr[arr.length - 1] : undefined);
 global.nearestBeat = jest.fn(val => val);
 global.rationalToFraction = jest.fn(val => [1, Math.round(1 / val)]);
@@ -78,6 +79,7 @@ const mockWindow = {
             }),
             addInputButton: jest.fn().mockImplementation(val => ({
                 value: val,
+                style: {},
                 addEventListener: jest.fn(),
                 classList: { add: jest.fn(), remove: jest.fn() },
                 onfocus: null,
@@ -1913,6 +1915,90 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
             expect(rhythmRuler._rhythmRulerTable.style.display).toBe("none");
             expect(rhythmRuler._circularCanvas).toBeDefined();
             expect(rhythmRuler._circularCanvas.style.display).toBe("block");
+        });
+
+        test("_toggleCircularView registers named pointer event listeners", () => {
+            rhythmRuler._circularView = true;
+            global.document.createElement = jest.fn(() => mockCanvas);
+
+            rhythmRuler._toggleCircularView();
+
+            expect(mockCanvas.addEventListener).toHaveBeenCalledWith(
+                "pointerdown",
+                rhythmRuler._circularPointerDownHandler
+            );
+            expect(mockCanvas.addEventListener).toHaveBeenCalledWith(
+                "pointermove",
+                rhythmRuler._circularPointerMoveHandler
+            );
+            expect(mockCanvas.addEventListener).toHaveBeenCalledWith(
+                "pointerup",
+                rhythmRuler._circularPointerUpHandler
+            );
+            expect(mockCanvas.addEventListener).toHaveBeenCalledWith(
+                "pointercancel",
+                rhythmRuler._circularDragEndHandler
+            );
+            expect(mockCanvas.addEventListener).toHaveBeenCalledWith(
+                "pointerleave",
+                rhythmRuler._circularDragEndHandler
+            );
+        });
+
+        test("_cleanupCircularCanvas removes registered pointer event listeners and nulls references", () => {
+            rhythmRuler._circularView = true;
+            global.document.createElement = jest.fn(() => mockCanvas);
+
+            rhythmRuler._toggleCircularView();
+
+            const downHandler = rhythmRuler._circularPointerDownHandler;
+            const moveHandler = rhythmRuler._circularPointerMoveHandler;
+            const upHandler = rhythmRuler._circularPointerUpHandler;
+            const dragEndHandler = rhythmRuler._circularDragEndHandler;
+
+            expect(downHandler).toEqual(expect.any(Function));
+
+            rhythmRuler._cleanupCircularCanvas();
+
+            expect(mockCanvas.removeEventListener).toHaveBeenCalledWith("pointerdown", downHandler);
+            expect(mockCanvas.removeEventListener).toHaveBeenCalledWith("pointermove", moveHandler);
+            expect(mockCanvas.removeEventListener).toHaveBeenCalledWith("pointerup", upHandler);
+            expect(mockCanvas.removeEventListener).toHaveBeenCalledWith(
+                "pointercancel",
+                dragEndHandler
+            );
+            expect(mockCanvas.removeEventListener).toHaveBeenCalledWith(
+                "pointerleave",
+                dragEndHandler
+            );
+
+            expect(rhythmRuler._circularCanvas).toBeNull();
+            expect(rhythmRuler._circularPointerDownHandler).toBeNull();
+            expect(rhythmRuler._circularPointerMoveHandler).toBeNull();
+            expect(rhythmRuler._circularPointerUpHandler).toBeNull();
+            expect(rhythmRuler._circularDragEndHandler).toBeNull();
+        });
+
+        test("widgetWindow.onclose invokes _cleanupCircularCanvas and cleans up pointer listeners", () => {
+            window.widgetWindows = mockWindow.widgetWindows;
+            rhythmRuler.activity = { hideMsgs: jest.fn() };
+            rhythmRuler._createWidgetWindow();
+            rhythmRuler._circularView = true;
+            global.document.createElement = jest.fn(() => mockCanvas);
+            rhythmRuler._toggleCircularView();
+
+            expect(rhythmRuler._circularCanvas).toBe(mockCanvas);
+            expect(rhythmRuler._circularPointerDownHandler).toEqual(expect.any(Function));
+
+            rhythmRuler.widgetWindow.onclose();
+
+            expect(mockCanvas.removeEventListener).toHaveBeenCalledWith(
+                "pointerdown",
+                expect.any(Function)
+            );
+            expect(rhythmRuler._circularCanvas).toBeNull();
+            expect(rhythmRuler._circularView).toBe(false);
+            expect(rhythmRuler._circularPointerDownHandler).toBeNull();
         });
 
         test("_toggleCircularView restores linear table view when deactivated", () => {

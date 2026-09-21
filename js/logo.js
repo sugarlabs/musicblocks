@@ -258,8 +258,8 @@ class Logo {
         // pitch-rhythm matrix
         this.inMatrix = false;
         this.inLegoWidget = false;
-        this.tupletRhythms = [];
-        this.addingNotesToTuplet = false;
+        this.tupletRhythms = {};
+        this.addingNotesToTuplet = {};
         this.drumBlocks = [];
         this.pitchBlocks = [];
 
@@ -268,8 +268,8 @@ class Logo {
         this.connectionStoreLock = false;
 
         // tuplet
-        this.tuplet = false;
-        this.tupletParams = [];
+        this.tuplet = {};
+        this.tupletParams = {};
 
         // object that deals with notations
         this._notation = new this.deps.classes.Notation(this.activity);
@@ -1773,7 +1773,10 @@ class Logo {
         this.inStatusMatrix = false;
         this.pitchBlocks = [];
         this.drumBlocks = [];
-        this.tuplet = false;
+        this.tuplet = {};
+        this.tupletParams = {};
+        this.tupletRhythms = {};
+        this.addingNotesToTuplet = {};
         this.modeBlock = null;
         this._meterBlock = null;
 
@@ -2260,7 +2263,14 @@ class Logo {
             }
         }
 
-        if (!currentBlock.isArgBlock()) {
+        // Value blocks that are not styled as arg blocks (note counter,
+        // calculate, make block) define arg() but no flow(). Clicking one on
+        // its own should show its value like any other value block.
+        const returnsValue =
+            currentBlock.isArgBlock() ||
+            (!(currentBlock.name in logo.evalFlowDict) && typeof proto.flow !== "function");
+
+        if (!returnsValue) {
             let res = null;
             // Is it a plugin?
             if (currentBlock.name in logo.evalFlowDict) {

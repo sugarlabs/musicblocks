@@ -48,6 +48,92 @@ const ACCIDENTAL_SYMBOLS = Object.keys(ACCIDENTAL_MAP)
     .map(symbol => symbol.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
     .join("");
 const PITCH_ACCIDENTAL_PATTERN = new RegExp(`^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)`, "u");
+// A staged pitch name: a letter, then accidentals, an octave, and the accidental a courtesy
+// natural adds after the octave ("C♯4", "F4♮").
+const STAGED_PITCH_PATTERN = new RegExp(
+    `^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)(\\d+)([${ACCIDENTAL_SYMBOLS}]*)$`,
+    "u"
+);
+
+// How many semitones each accidental moves a note.
+const ACCIDENTAL_ALTERATIONS = {
+    "𝄪": 2,
+    "♯": 1,
+    "#": 1,
+    "♮": 0,
+    "♭": -1,
+    "b": -1,
+    "𝄫": -2
+};
+const ALTERATION_ACCIDENTALS = { "-2": "__", "-1": "_", "0": "=", "1": "^", "2": "^^" };
+
+// The letters in the order a key signature sharpens them; it flattens them in reverse.
+const SHARP_ORDER = "FCGDAEB";
+// Where the tonic of a major key sits on the circle of fifths, and how far from that major
+// key each mode ABC can name sits on it.
+const TONIC_FIFTHS = { F: -1, C: 0, G: 1, D: 2, A: 3, E: 4, B: 5 };
+const ABC_MODES = {
+    "lydian": ["Lyd", 1],
+    "major": ["", 0],
+    "ionian": ["", 0],
+    "mixolydian": ["Mix", -1],
+    "dorian": ["Dor", -2],
+    "m": ["m", -3],
+    "minor": ["m", -3],
+    "natural minor": ["m", -3],
+    "aeolian": ["m", -3],
+    "ethiopian": ["m", -3],
+    "geez": ["m", -3],
+    "phrygian": ["Phr", -4],
+    "locrian": ["Loc", -5]
+};
+// "B ♭ major" as well as "B♭ major" and "Bbm"; "b" is only a flat where a mode name such as
+// "bebop" cannot start instead.
+const KEY_SIGNATURE_PATTERN = /^([A-Ga-g])\s*(b(?![A-Za-z])|[♯♭𝄪𝄫#])?\s*(.*)$/u;
+
+/**
+ * Reads a Music Blocks key signature as an ABC one.
+ *
+ * Music Blocks has far more modes than ABC can name. A mode ABC does not know is written
+ * with the signature of the major or minor key on the same tonic -- the one its own name
+ * points at -- and every note the mode alters carries an accidental, so the pitches sound
+ * right whichever signature is printed.
+ * @param {string} keySignature - e.g. "C major", "B♭ dorian", "G harmonic minor".
+ * @returns {{field: string, alterations: object}} the text of an ABC K: field, and the
+ *   alteration in semitones that signature applies to each of the seven letters.
+ */
+const abcKeySignature = keySignature => {
+    const text = String(keySignature ?? "").trim();
+    // "Cm" and "B♭m" are that tonic's minor, as they are to keySignatureToMode().
+    const minor = /^([A-Ga-g](?:b|#|♭|♯|𝄪|𝄫)?)m$/u.exec(text);
+    const match = KEY_SIGNATURE_PATTERN.exec(minor === null ? text : `${minor[1]} minor`);
+    const alterations = {};
+    for (const letter of SHARP_ORDER) alterations[letter] = 0;
+    if (match === null) {
+        // Music Blocks reads a key it cannot parse as C major, which alters nothing.
+        return { field: "C", alterations };
+    }
+
+    const tonic = match[1].toUpperCase() + (match[2] === "b" ? "♭" : (match[2] ?? ""));
+    const mode = match[3].trim().toLowerCase();
+    const named = ABC_MODES[mode] ?? ABC_MODES[mode.includes("minor") ? "minor" : "major"];
+    // Sharps (or, negative, flats) in the signature.
+    const fifths =
+        TONIC_FIFTHS[match[1].toUpperCase()] +
+        7 * (ACCIDENTAL_ALTERATIONS[match[2]] ?? 0) +
+        named[1];
+    if (fifths < -7 || fifths > 7) {
+        // A signature this far around the circle of fifths (A♯ major, say) needs more than
+        // the seven accidentals ABC can print. "none" prints no signature at all.
+        return { field: "none", alterations };
+    }
+
+    for (let i = 0; i < SHARP_ORDER.length; i++) {
+        // The signature sharpens SHARP_ORDER[i] once it holds more than i sharps.
+        alterations[SHARP_ORDER[i]] = Math.floor((fifths - i + 6) / 7);
+    }
+    return { field: tonic.replace("♭", "b").replace("♯", "#") + named[0], alterations };
+};
 
 /**
  * Converts a LilyPond duration, the form notation.js stages tempo beats in (convertFactor()
@@ -96,8 +182,10 @@ const getABCHeader = function () {
  * Processes musical notes and converts them into ABC notation format.
  * @param {object} logo - The logo object containing notationNotes to update.
  * @param {string} turtle - The identifier for the turtle.
+ * @param {string} [keySignature] - the key the tune is written in, e.g. "G major". Staged
+ *   pitches are absolute, so this is what the accidentals are written against.
  */
-const processABCNotes = function (logo, turtle) {
+const processABCNotes = function (logo, turtle, keySignature = "C major") {
     // obj = [instructions] or
     // obj = [[notes], duration, dotCount, tupletValue, roundDown,
     //        insideChord, staccato]
@@ -121,6 +209,68 @@ const processABCNotes = function (logo, turtle) {
         return durationMap[duration] || duration.toString();
     };
 
+    // The key the notes are written against, and the alteration last written for each
+    // pitch, which stays in force: this exporter writes no bar lines to end its reach.
+    let { field: keyField, alterations: keyAlterations } = abcKeySignature(keySignature);
+    const accidentalsInForce = {};
+    // Pitches whose accidental is in doubt, and so must be written out again. ABC readers
+    // differ over whether the voices of a tune carry their own accidentals, so after a
+    // voice change every accidental still in force is written again for the new voice.
+    let pitchesInDoubt = new Set();
+
+    const __voiceChanged = () => {
+        pitchesInDoubt = new Set(Object.keys(accidentalsInForce));
+    };
+
+    /**
+     * Converts a staged pitch name to ABC, writing an accidental wherever the key signature
+     * or an accidental still in force would otherwise sound a different pitch.
+     * @param {Array} staged - STAGED_PITCH_PATTERN match: letter, accidentals, octave, and
+     *   the accidentals of a courtesy natural written after the octave.
+     * @returns {string|null} The note in ABC notation, or null for an alteration ABC has no
+     *   accidental for, which is left to the caller to write symbol by symbol.
+     */
+    const __toKeyedABCnote = staged => {
+        const letter = staged[1].toUpperCase();
+        const symbols = Array.from(staged[2] + staged[4]);
+        // A natural cancels the accidentals beside it; anything else adds up. It is written
+        // out even where the key calls for nothing, since it was asked for: Music Blocks
+        // stages one for the accidental block and for a courtesy natural alike.
+        const courtesy = symbols.includes("♮");
+        const alteration = courtesy
+            ? 0
+            : symbols.reduce((sum, symbol) => sum + ACCIDENTAL_ALTERATIONS[symbol], 0);
+
+        if (!(alteration in ALTERATION_ACCIDENTALS)) {
+            return null;
+        }
+
+        const octave = parseInt(staged[3], 10);
+        const pitch = letter + octave;
+        let accidental = "";
+        if (
+            courtesy ||
+            alteration !== keyAlterations[letter] ||
+            pitchesInDoubt.has(pitch) ||
+            (accidentalsInForce[pitch] !== undefined && accidentalsInForce[pitch] !== alteration)
+        ) {
+            // Written even where one already in force would do, so that the pitch survives
+            // bar lines added to the tune later.
+            accidental = ALTERATION_ACCIDENTALS[alteration] ?? "";
+            accidentalsInForce[pitch] = alteration;
+            pitchesInDoubt.delete(pitch);
+        }
+
+        // The same octave marks as OCTAVE_NOTATION_MAP, counted out so that an octave
+        // outside its range still lands in the right one.
+        return (
+            accidental +
+            (octave >= 5
+                ? letter.toLowerCase() + "'".repeat(octave - 5)
+                : letter + ",".repeat(4 - octave))
+        );
+    };
+
     /**
      * Converts a musical note into ABC notation format.
      * @param {string|number} note - The musical note to convert. It can be a string note (e.g., 'C#') or a frequency (number).
@@ -141,6 +291,12 @@ const processABCNotes = function (logo, turtle) {
         if (typeof note === "number") {
             const pitchObj = frequencyToPitch(note);
             note = pitchObj[0] + pitchObj[1];
+        }
+
+        const staged = String(note).match(STAGED_PITCH_PATTERN);
+        const keyed = staged === null ? null : __toKeyedABCnote(staged);
+        if (keyed !== null) {
+            return keyed;
         }
 
         const pitchMatch = note.match(PITCH_ACCIDENTAL_PATTERN);
@@ -185,7 +341,7 @@ const processABCNotes = function (logo, turtle) {
     // Where the decorations written since the last note start. A decoration must be
     // directly followed by its note, so fields staged after one are written before it.
     let prefixStart = null;
-    let notes, note;
+    let notes;
 
     const staging = logo.notation.notationStaging[turtle];
 
@@ -291,12 +447,20 @@ const processABCNotes = function (logo, turtle) {
                     // pickup to shorten.
                     i += 1;
                     break;
-                case "key":
-                    // Staged pitches are absolute ("F4" is F natural in any key), while an
-                    // ABC key field changes how every later unaccidentalled note sounds, so
-                    // a key change can't be written without changing pitches.
+                case "key": {
+                    // Staged pitches are absolute ("F4" is F natural in any key), and so are
+                    // written against whichever signature is in force from here on.
+                    const changed = abcKeySignature(`${staging[i + 1]} ${staging[i + 2]}`);
+                    if (changed.field !== keyField) {
+                        __pushField(`[K:${changed.field}]`);
+                        keyField = changed.field;
+                        keyAlterations = changed.alterations;
+                        // Accidentals already written stay in force over the new signature,
+                        // so what is in force is still known.
+                    }
                     i += 2;
                     break;
+                }
                 case "markup":
                 case "markdown": {
                     const text = staging[i + 1];
@@ -319,19 +483,24 @@ const processABCNotes = function (logo, turtle) {
                     break;
                 case "voice one":
                     __pushField("[V:1]");
+                    __voiceChanged();
                     break;
                 case "voice two":
                     __pushField("[V:2]");
+                    __voiceChanged();
                     break;
                 case "voice three":
                     __pushField("[V:3]");
+                    __voiceChanged();
                     break;
                 case "voice four":
                     __pushField("[V:4]");
+                    __voiceChanged();
                     break;
                 case "one voice":
                     // Return to a single voice
                     __pushField("[V:1]");
+                    __voiceChanged();
                     break;
                 default:
                     // A marker with no ABC counterpart. Writing it would put its name into
@@ -348,7 +517,6 @@ const processABCNotes = function (logo, turtle) {
             if (notes.length === 0) {
                 notes = ["R"];
             }
-            note = __toABCnote(notes[0]);
 
             let incompleteTuplet = 0; // An incomplete tuplet
 
@@ -488,7 +656,7 @@ const processABCNotes = function (logo, turtle) {
                         parts.push("[");
                     }
 
-                    parts.push(note);
+                    parts.push(__toABCnote(notes[0]));
 
                     // Is logo the last note in the chord?
                     if (
@@ -529,17 +697,9 @@ const saveAbcOutput = function (activity) {
     const outputParts = [getABCHeader()];
 
     for (const t in activity.logo.notation.notationStaging) {
-        outputParts.push(
-            "K:" +
-                activity.turtles
-                    .ithTurtle(t)
-                    .singer.keySignature.toUpperCase()
-                    .replace(" ", "")
-                    .replace("♭", "b")
-                    .replace("♯", "#") +
-                "\n"
-        );
-        processABCNotes(activity.logo, t);
+        const keySignature = activity.turtles.ithTurtle(t).singer.keySignature;
+        outputParts.push("K:" + abcKeySignature(keySignature).field + "\n");
+        processABCNotes(activity.logo, t, keySignature);
         outputParts.push(activity.logo.notationNotes[t]);
     }
 
@@ -553,6 +713,7 @@ if (typeof module !== "undefined" && module.exports) {
         getABCHeader,
         processABCNotes,
         saveAbcOutput,
+        abcKeySignature,
         ACCIDENTAL_MAP,
         OCTAVE_NOTATION_MAP
     };

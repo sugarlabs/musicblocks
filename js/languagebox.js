@@ -253,20 +253,42 @@ class LanguageBox {
     }
 
     /**
+     * @protected
+     * @returns {void}
+     */
+    _reloadWindow() {
+        window.location.reload();
+    }
+
+    /**
      * @public
      * @returns {void}
      */
     reload() {
         const reloadWindow = () => {
-            window.location.reload();
+            this._reloadWindow();
         };
 
-        if (!this.activity || typeof this.activity.saveLocally !== "function") {
+        if (
+            !this.activity ||
+            (typeof this.activity.saveLocally !== "function" &&
+                typeof this.activity.saveSessionAsync !== "function")
+        ) {
             reloadWindow();
             return;
         }
 
         try {
+            if (typeof this.activity.saveSessionAsync === "function") {
+                this.activity
+                    .saveSessionAsync()
+                    .then(() => reloadWindow())
+                    .catch(error => {
+                        console.error(error);
+                    });
+                return;
+            }
+
             const saveResult = this.activity.saveLocally();
             if (saveResult && typeof saveResult.then === "function") {
                 saveResult
