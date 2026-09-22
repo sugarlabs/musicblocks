@@ -59,6 +59,11 @@
     --color-snap-indicator-stroke: rgba(255, 215, 0, 0.95);
     --color-snap-indicator-fill: rgba(255, 215, 0, 0.35);
 
+    /* Trash Can (Interactive delete / hover glow during drag) */
+    --color-trash-border: #666666;
+    --color-trash-hover-border: #ef4444;
+    --color-trash-hover-bg: rgba(239, 68, 68, 0.25);
+
     /* =========================================================================
      Spacing (Base 4px scale)
      ========================================================================= */
@@ -153,6 +158,11 @@ body.dark {
     --color-snap-indicator-stroke: rgba(255, 215, 0, 0.95);
     --color-snap-indicator-fill: rgba(255, 215, 0, 0.35);
 
+    /* Trash Can (Interactive delete / hover glow during drag) */
+    --color-trash-border: #9ca3af;
+    --color-trash-hover-border: #f87171;
+    --color-trash-hover-bg: rgba(239, 68, 68, 0.35);
+
     /* Adjusted state backgrounds for dark mode */
     --color-success-bg: rgba(16, 185, 129, 0.2);
     --color-warning-bg: rgba(245, 158, 11, 0.2);
@@ -204,6 +214,11 @@ body.highcontrast {
     /* Snap Indicator (Visual dock snap indicator during block drag) */
     --color-snap-indicator-stroke: #ffff00;
     --color-snap-indicator-fill: rgba(255, 255, 0, 0.35);
+
+    /* Trash Can (Interactive delete / hover glow during drag) */
+    --color-trash-border: #ffffff;
+    --color-trash-hover-border: #ff0000;
+    --color-trash-hover-bg: rgba(255, 0, 0, 0.4);
 
     --color-success: #00ff00;
     --color-success-bg: #000000;

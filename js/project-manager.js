@@ -185,35 +185,121 @@ class ProjectManager {
         that.keyboardEnableFlag = 0;
 
         that.sessionData = null;
-        const currentProject = that.storage.currentProject;
-        const sessionKey = currentProject !== undefined ? "SESSION" + currentProject : null;
+        let sessionSource = null;
+        let currentProject = "My Project";
+        try {
+            currentProject = (that.storage && that.storage.currentProject) || "My Project";
+        } catch (e) {
+            currentProject = "My Project";
+        }
+        const sessionKey = "SESSION" + currentProject;
+        const sessionTimestampKey = "SESSION_TIMESTAMP" + currentProject;
+
+        let idbPayload = null;
+        if (that.sessionStorageManager) {
+            try {
+                idbPayload = await that.sessionStorageManager.loadSession(sessionKey);
+            } catch (e) {
+                console.error("Failed to load session from IndexedDB:", e);
+            }
+        }
+
+        let localData = null;
+        let localTimestamp = 0;
+        try {
+            if (that.storage) {
+                localData = that.storage[sessionKey] || null;
+                let localTimestampStr = that.storage[sessionTimestampKey];
+                let parsedLocalTimestamp = localTimestampStr ? parseInt(localTimestampStr, 10) : 0;
+                localTimestamp = Number.isFinite(parsedLocalTimestamp) ? parsedLocalTimestamp : 0;
+            }
+        } catch (storageReadErr) {
+            console.warn(
+                "[ProjectManager] Failed to read session from local storage:",
+                storageReadErr
+            );
+            localData = null;
+            localTimestamp = 0;
+        }
 
         if (that.planet) {
             that.sessionData = await that.planet.openCurrentProject();
-            if (!that.sessionData) {
-                if (currentProject !== undefined) {
-                    that.sessionData = that.storage[sessionKey];
+            if (that.sessionData) {
+                sessionSource = "planet";
+            } else {
+                if (idbPayload && idbPayload.data) {
+                    if (!localData || idbPayload.timestamp >= localTimestamp) {
+                        that.sessionData = idbPayload.data;
+                        sessionSource = "idb";
+                    } else {
+                        that.sessionData = localData;
+                        sessionSource = "local";
+                    }
+                } else if (localData) {
+                    that.sessionData = localData;
+                    sessionSource = "local";
                 }
             }
+            // Fix #1+#4: Restore Git state keys if repo data exists in Planet storage
+            try {
+                const repoData =
+                    that.planet.getCurrentGitRepoData && that.planet.getCurrentGitRepoData();
+                if (repoData && repoData.repoName) {
+                    that.storage.mbGitRepoName = repoData.repoName;
+                    that.storage.mbGitHashedKey = repoData.hashedKey || "";
+                    that.storage.mbGitCurrentProjectId = repoData.projectId || "";
+                    if (repoData.displayName) {
+                        that.storage.mbGitDisplayName = repoData.displayName;
+                    }
+                }
+            } catch (gitRestoreErr) {
+                console.warn(
+                    "[ProjectManager] Could not restore git session state:",
+                    gitRestoreErr
+                );
+            }
         } else {
-            if (sessionKey !== null) {
-                that.sessionData = that.storage[sessionKey];
+            if (idbPayload && idbPayload.data) {
+                if (!localData || idbPayload.timestamp >= localTimestamp) {
+                    that.sessionData = idbPayload.data;
+                    sessionSource = "idb";
+                } else {
+                    that.sessionData = localData;
+                    sessionSource = "local";
+                }
+            } else if (localData) {
+                that.sessionData = localData;
+                sessionSource = "local";
             }
         }
 
         pubsub.on("finishedLoading", __afterLoad);
 
-        if (that.sessionData) {
-            that.doLoadAnimation();
-            try {
-                if (that.sessionData === "undefined" || that.sessionData === "[]") {
-                    that.justLoadStart();
-                } else {
-                    window.loadedSession = that.sessionData;
-                    that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
+        const tryParseAndLoad = data => {
+            if (data === "undefined" || data === "[]") {
+                that.justLoadStart();
+                return true;
+            }
+            const parsed = JSON.parse(data);
+            window.loadedSession = data;
+            that.blocks.loadNewBlocks(parsed);
+            return true;
+        };
+
+        const deleteFromSource = async source => {
+            if (source === "idb") {
+                if (
+                    that.sessionStorageManager &&
+                    typeof that.sessionStorageManager.deleteSession === "function" &&
+                    sessionKey
+                ) {
+                    try {
+                        await that.sessionStorageManager.deleteSession(sessionKey);
+                    } catch (idbErr) {
+                        ErrorHandler.recoverable(idbErr, { operation: "removeBadIdbSessionKey" });
+                    }
                 }
-            } catch (e) {
-                ErrorHandler.recoverable(e, { operation: "loadSessionData" });
+            } else if (source === "local") {
                 if (sessionKey !== null) {
                     try {
                         if (typeof that.storage.removeItem === "function") {
@@ -227,7 +313,44 @@ class ProjectManager {
                         });
                     }
                 }
-                that.justLoadStart();
+            }
+        };
+
+        if (that.sessionData) {
+            that.doLoadAnimation();
+            let loaded = false;
+            try {
+                loaded = tryParseAndLoad(that.sessionData);
+            } catch (e) {
+                ErrorHandler.recoverable(e, { operation: "loadSessionData" });
+                await deleteFromSource(sessionSource);
+
+                // Attempt fallback to the alternative source if available
+                let fallbackData = null;
+                let fallbackSource = null;
+                if (sessionSource === "idb" && localData) {
+                    fallbackData = localData;
+                    fallbackSource = "local";
+                } else if (sessionSource === "local" && idbPayload && idbPayload.data) {
+                    fallbackData = idbPayload.data;
+                    fallbackSource = "idb";
+                }
+
+                if (fallbackData) {
+                    try {
+                        that.sessionData = fallbackData;
+                        loaded = tryParseAndLoad(fallbackData);
+                    } catch (fallbackErr) {
+                        ErrorHandler.recoverable(fallbackErr, {
+                            operation: "loadFallbackSessionData"
+                        });
+                        await deleteFromSource(fallbackSource);
+                    }
+                }
+
+                if (!loaded) {
+                    that.justLoadStart();
+                }
             }
         } else {
             that.justLoadStart();
@@ -616,7 +739,11 @@ class ProjectManager {
         try {
             p = activity.storage.currentProject;
             activity.storage["SESSION" + p] = data;
+            activity.storage["SESSION_TIMESTAMP" + p] = Date.now().toString();
         } catch (e) {
+            // If it hits QuotaExceededError, it fails gracefully because saveSessionAsync
+            // (IndexedDB) handles large payloads.
+            console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
         }
 

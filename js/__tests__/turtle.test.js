@@ -125,6 +125,21 @@ describe("Turtle", () => {
         turtle = new Turtle(mockActivity, 0, "turtle1", {}, null);
     });
 
+    describe("component ownership", () => {
+        test("gives each turtle independent Singer and Painter instances", () => {
+            const secondTurtle = new Turtle(mockActivity, 1, "turtle2", {}, null);
+
+            expect(turtle.singer).not.toBe(secondTurtle.singer);
+            expect(turtle.painter).not.toBe(secondTurtle.painter);
+
+            turtle.singer.currentOctave = 7;
+            turtle.painter.cp1x = 42;
+
+            expect(secondTurtle.singer.currentOctave).toBe(4);
+            expect(secondTurtle.painter.cp1x).toBe(0);
+        });
+    });
+
     describe("blinking()", () => {
         it("should return false when _blinkFinished is true", () => {
             turtle._blinkFinished = true;
@@ -178,6 +193,46 @@ describe("Turtle", () => {
             turtle.inSetTimbre = true;
             turtle.initTurtle(false);
             expect(turtle.inSetTimbre).toBe(false);
+        });
+
+        it("should reset representative Singer state groups", () => {
+            turtle.singer.currentOctave = 7;
+            turtle.singer.beatFactor = 3;
+            turtle.singer.instrumentNames = ["piano"];
+            turtle.singer.vibratoRate = [12];
+            turtle.singer.transposition = 4;
+            turtle.singer.intervals = [2];
+            turtle.singer.swing = [0.5];
+            turtle.singer.staccato = [0.25];
+            turtle.singer.tie = true;
+            turtle.singer.justCounting = [1];
+
+            turtle.initTurtle(false);
+
+            expect(turtle.singer.currentOctave).toBe(4);
+            expect(turtle.singer.beatFactor).toBe(1);
+            expect(turtle.singer.instrumentNames).toEqual([DEFAULTVOICE]);
+            expect(turtle.singer.vibratoRate).toEqual([]);
+            expect(turtle.singer.transposition).toBe(0);
+            expect(turtle.singer.intervals).toEqual([]);
+            expect(turtle.singer.swing).toEqual([]);
+            expect(turtle.singer.staccato).toEqual([]);
+            expect(turtle.singer.tie).toBe(false);
+            expect(turtle.singer.justCounting).toEqual([]);
+        });
+
+        it("should reset Painter control-point state", () => {
+            turtle.painter.cp1x = 42;
+            turtle.painter.cp1y = 43;
+            turtle.painter.cp2x = 44;
+            turtle.painter.cp2y = 45;
+
+            turtle.initTurtle(false);
+
+            expect(turtle.painter.cp1x).toBe(0);
+            expect(turtle.painter.cp1y).toBe(100);
+            expect(turtle.painter.cp2x).toBe(100);
+            expect(turtle.painter.cp2y).toBe(100);
         });
 
         it("should reset singer.scalarTransposition to 0", () => {
@@ -1331,6 +1386,127 @@ describe("Turtle.TurtleView", () => {
             images[0].onload();
 
             expect(view._media[0].scaleX).toBe(2);
+        });
+
+        it("drops the replaced gif's own record from _media instead of leaving it behind", async () => {
+            const view = withImageMembers(makeView());
+            view.activity.gifAnimator = {
+                isAnimatedGIF: jest.fn(() => true),
+                createAnimation: jest.fn(async () => "gif-new"),
+                stopAnimation: jest.fn()
+            };
+            // A previous gif is active and already has its bookkeeping record,
+            // the way a real prior doShowImage() call would have left it.
+            view._activeGifId = "gif-old";
+            view._media = [{ type: "gif", id: "gif-old", stop: jest.fn() }];
+
+            await view.doShowImage(64, "dance.gif");
+
+            expect(view._media).toHaveLength(1);
+            expect(view._media[0]).toMatchObject({ type: "gif", id: "gif-new" });
+        });
+
+        it("keeps exactly one gif record in _media across a run of replacements", async () => {
+            // A forever loop re-triggering "show image" on an animated gif with
+            // no "clear" in between -- a natural sprite-animation pattern, and
+            // the scenario from the reported leak (musicblocks#8770).
+            const view = withImageMembers(makeView());
+            let nextId = 0;
+            view.activity.gifAnimator = {
+                isAnimatedGIF: jest.fn(() => true),
+                createAnimation: jest.fn(async () => `gif-${nextId++}`),
+                stopAnimation: jest.fn()
+            };
+
+            for (let i = 0; i < 5; i++) {
+                await view.doShowImage(64, "sprite.gif");
+            }
+
+            expect(view.activity.gifAnimator.stopAnimation).toHaveBeenCalledTimes(4);
+            expect(view._media).toHaveLength(1);
+            expect(view._media[0]).toMatchObject({ type: "gif", id: "gif-4" });
+        });
+
+        it("drops the old gif's record from _media even when the replacement is a static image", async () => {
+            const view = withImageMembers(makeView());
+            view.activity.gifAnimator = {
+                isAnimatedGIF: jest.fn(() => false),
+                createAnimation: jest.fn(),
+                stopAnimation: jest.fn()
+            };
+            view._activeGifId = "gif-old";
+            view._media = [{ type: "gif", id: "gif-old", stop: jest.fn() }];
+
+            await view.doShowImage(55, "photo.png");
+            images[0].onload();
+
+            // Only the new static bitmap should remain; the dead gif record
+            // must not survive a switch away from gifs either.
+            expect(view._media).toHaveLength(1);
+            expect(view._media[0].source).toBe(images[0]);
+        });
+
+        it("leaves other media entries alone when clearing the replaced gif's record", async () => {
+            const view = withImageMembers(makeView());
+            view.activity.gifAnimator = {
+                isAnimatedGIF: jest.fn(() => true),
+                createAnimation: jest.fn(async () => "gif-new"),
+                stopAnimation: jest.fn()
+            };
+            const staticBitmap = { source: "unrelated.png" };
+            view._activeGifId = "gif-old";
+            view._media = [staticBitmap, { type: "gif", id: "gif-old", stop: jest.fn() }];
+
+            await view.doShowImage(64, "dance.gif");
+
+            expect(view._media).toHaveLength(2);
+            expect(view._media[0]).toBe(staticBitmap);
+            expect(view._media[1]).toMatchObject({ type: "gif", id: "gif-new" });
+        });
+
+        it("stops its own gif and skips registering it when a newer request already won", async () => {
+            const view = withImageMembers(makeView());
+            let resolveFirst;
+            const gifAnimator = {
+                isAnimatedGIF: jest.fn(() => true),
+                createAnimation: jest
+                    .fn()
+                    .mockImplementationOnce(
+                        () =>
+                            new Promise(resolve => {
+                                resolveFirst = resolve;
+                            })
+                    )
+                    .mockImplementationOnce(async () => "gif-second"),
+                stopAnimation: jest.fn()
+            };
+            view.activity.gifAnimator = gifAnimator;
+
+            const firstCall = view.doShowImage(64, "first.gif");
+            await view.doShowImage(64, "second.gif");
+            resolveFirst("gif-first");
+            await firstCall;
+
+            expect(gifAnimator.stopAnimation).toHaveBeenCalledWith("gif-first");
+            expect(view._activeGifId).toBe("gif-second");
+            expect(view._media).toHaveLength(1);
+            expect(view._media[0]).toMatchObject({ type: "gif", id: "gif-second" });
+        });
+
+        it("ignores a stale static image load once a newer request has already loaded", async () => {
+            const view = withImageMembers(makeView());
+            view.activity.gifAnimator = null;
+
+            await view.doShowImage(55, "first.png");
+            const firstImage = images[0];
+            await view.doShowImage(60, "second.png");
+            const secondImage = images[1];
+
+            secondImage.onload();
+            firstImage.onload();
+
+            expect(view._media).toHaveLength(1);
+            expect(view._media[0].source).toBe(secondImage);
         });
     });
 

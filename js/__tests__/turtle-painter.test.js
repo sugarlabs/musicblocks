@@ -128,6 +128,16 @@ describe("Painter Class", () => {
             expect(painter._penDown).toBe(true);
         });
 
+        test("keeps Painter state isolated between turtles", () => {
+            const secondPainter = new Painter(createMockTurtle());
+
+            painter.color = 75;
+            painter.penState = false;
+
+            expect(secondPainter.color).toBe(0);
+            expect(secondPainter.penState).toBe(true);
+        });
+
         test("should initialize value to DEFAULTVALUE (50)", () => {
             expect(painter._value).toBe(50);
         });
@@ -587,6 +597,45 @@ describe("Drawing - doArc", () => {
         mockTurtle.turtles.activity.errorMsg.mockClear();
         painter.doArc(10, Infinity);
         expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+    });
+
+    test("doArc should reject a very large positive angle instead of looping unbounded", () => {
+        const arcSpy = jest.spyOn(painter, "_doArcPart");
+        painter.doArc(9000000, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(arcSpy).not.toHaveBeenCalled();
+    });
+
+    test("doArc should reject a very large negative angle instead of looping unbounded", () => {
+        const arcSpy = jest.spyOn(painter, "_doArcPart");
+        painter.doArc(-9000000, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(arcSpy).not.toHaveBeenCalled();
+    });
+
+    test("doArc should reject an angle just past the cap and accept one just at it", () => {
+        const arcSpy = jest.spyOn(painter, "_doArcPart");
+        painter.doArc(45001, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(arcSpy).not.toHaveBeenCalled();
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doArc(45000, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).not.toHaveBeenCalled();
+        expect(arcSpy).toHaveBeenCalled();
+    });
+
+    test("doArc rejects an out-of-range angle regardless of caller, closing the embedded-playback gap", () => {
+        // embedded-graphics-scheduler.js re-reads an Arc block's angle from its
+        // block connections at note-playback time via logo.parseArg(), so a
+        // dynamic input (e.g. a random or box block) can hand doArc() a value
+        // that never went through ArcBlock.flow()'s own dispatch-time check.
+        // doArc() must reject a runaway angle on its own, independent of caller.
+        const arcSpy = jest.spyOn(painter, "_doArcPart");
+        const dynamicAngleFromPlayback = 9000000;
+        painter.doArc(dynamicAngleFromPlayback, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(arcSpy).not.toHaveBeenCalled();
     });
 });
 

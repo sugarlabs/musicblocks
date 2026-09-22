@@ -115,6 +115,8 @@ global.isNonEDO = isNonEDO;
 global.getNonEDOModeSteps = getNonEDOModeSteps;
 global.getNonEDOFrequency = getNonEDOFrequency;
 global.isEquallyTempered = isEquallyTempered;
+global.isUnsafeObjectKey = key => ["__proto__", "constructor", "prototype"].includes(key);
+global.TuningFormats = require("../../utils/tuningformats");
 global.pitchToFrequency = pitchToFrequency || jest.fn().mockReturnValue(440);
 global.generateNoteNames =
     global.generateNoteNames ||
@@ -443,6 +445,7 @@ describe("ModeWidget", () => {
 
         expect(modeWidget._selectedNotes[0]).toBe(true);
         expect(modeWidget._selectedNotes.slice(1).every(v => v === false)).toBe(true);
+        expect(modeWidget._selectedModeName).toBe("");
     });
 
     test("should translate notes to a new EDO slice count", () => {
@@ -723,6 +726,225 @@ describe("ModeWidget", () => {
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(
             expect.stringContaining("Cannot overwrite built-in mode")
         );
+    });
+
+    test("should rename imported mode that collides with a built-in name", () => {
+        MUSICALMODES["major"] = [2, 2, 1, 2, 2, 2, 1];
+        global.TuningFormats.parseModeJson = jest.fn(text => JSON.parse(text));
+        const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
+        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+            cb(null, {
+                text: JSON.stringify({ name: "major", edo: 31, pattern: [3, 4, 2, 3, 4, 3, 3] }),
+                file: { name: "mode.json", size: 100 }
+            });
+        });
+        jest.spyOn(modeWidget, "_temperamentKeyForEDO").mockReturnValue("equal31");
+        jest.spyOn(modeWidget, "_cacheState").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_updateModeDisplay").mockImplementation(() => {});
+
+        modeWidget._importFile();
+
+        expect(saveSpy).toHaveBeenCalledWith("major (31 EDO)", [3, 4, 2, 3, 4, 3, 3], 31);
+        saveSpy.mockRestore();
+        delete MUSICALMODES["major"];
+    });
+
+    test("should import a JSON mode and apply it", () => {
+        const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
+        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+            cb(null, {
+                text: JSON.stringify({ name: "dorian", edo: 12, pattern: [2, 1, 2, 2, 2, 1, 2] }),
+                file: { name: "dorian.json", size: 100 }
+            });
+        });
+        jest.spyOn(modeWidget, "_temperamentKeyForEDO").mockReturnValue("equal");
+        jest.spyOn(modeWidget, "_cacheState").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_updateModeDisplay").mockImplementation(() => {});
+
+        modeWidget._importFile();
+
+        expect(saveSpy).toHaveBeenCalledWith("dorian", [2, 1, 2, 2, 2, 1, 2], 12);
+        saveSpy.mockRestore();
+    });
+
+    test("should import a .scl file and detect EDO", () => {
+        const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
+        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+            const content = [
+                "! major.scl",
+                "!",
+                "Major scale",
+                "7",
+                "200.00",
+                "400.00",
+                "500.00",
+                "700.00",
+                "900.00",
+                "1100.00",
+                "1200.00"
+            ].join("\n");
+            cb(null, {
+                text: content,
+                file: { name: "major.scl", size: 200 }
+            });
+        });
+        jest.spyOn(modeWidget, "_temperamentKeyForEDO").mockReturnValue("equal");
+        jest.spyOn(modeWidget, "_cacheState").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+        jest.spyOn(modeWidget, "_updateModeDisplay").mockImplementation(() => {});
+
+        modeWidget._importFile();
+
+        expect(saveSpy).toHaveBeenCalled();
+        const [name, pattern, edo] = saveSpy.mock.calls[0];
+        expect(edo).toBe(48);
+        expect(pattern).toEqual([8, 8, 4, 8, 8, 8, 4]);
+        saveSpy.mockRestore();
+    });
+
+    test("_exportJson produces valid JSON with name, edo, pattern", () => {
+        jest.spyOn(modeWidget, "_modeExportData").mockReturnValue({
+            pattern: [2, 2, 1, 2, 2, 2, 1],
+            edo: 12
+        });
+        jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("major");
+        modeWidget._selectedModeName = "major";
+        let downloadedContent;
+        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+            downloadedContent = content;
+        });
+
+        modeWidget._exportJson();
+
+        const parsed = JSON.parse(downloadedContent);
+        expect(parsed).toEqual({ name: "major", edo: 12, pattern: [2, 2, 1, 2, 2, 2, 1] });
+    });
+
+    test("_exportJson ignores stale _selectedModeName and resolves name from pattern", () => {
+        jest.spyOn(modeWidget, "_modeExportData").mockReturnValue({
+            pattern: [2, 2, 1, 2, 2, 2, 1],
+            edo: 12
+        });
+        jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("ionian");
+        modeWidget._selectedModeName = "41EDO";
+        let downloadedContent;
+        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+            downloadedContent = content;
+        });
+
+        modeWidget._exportJson();
+
+        const parsed = JSON.parse(downloadedContent);
+        expect(parsed).toEqual({ name: "ionian", edo: 12, pattern: [2, 2, 1, 2, 2, 2, 1] });
+        expect(modeWidget._findModeNameForPattern).toHaveBeenCalledWith([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    test("_exportScl writes the resolved mode name as the description line", () => {
+        jest.spyOn(modeWidget, "_modeExportData").mockReturnValue({
+            pattern: [2, 2, 1, 2, 2, 2, 1],
+            edo: 12
+        });
+        jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("major");
+        let downloadedContent;
+        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+            downloadedContent = content;
+        });
+
+        modeWidget._exportScl();
+
+        expect(downloadedContent.split("\n")[2]).toBe("major");
+    });
+
+    test("_exportScl falls back to custom when the pattern has no known name", () => {
+        jest.spyOn(modeWidget, "_modeExportData").mockReturnValue({
+            pattern: [3, 3, 3, 3],
+            edo: 12
+        });
+        jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue(null);
+        let downloadedContent;
+        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+            downloadedContent = content;
+        });
+
+        modeWidget._exportScl();
+
+        expect(downloadedContent.split("\n")[2]).toBe("custom");
+    });
+
+    test("_importFile shows error for unsupported file type", () => {
+        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+            cb(null, {
+                text: "some data",
+                file: { name: "mode.txt", size: 100 }
+            });
+        });
+        modeWidget._importFile();
+
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Unsupported file type")
+        );
+    });
+
+    test("_importFile shows error for bad JSON", () => {
+        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+            cb(null, {
+                text: "not json",
+                file: { name: "bad.json", size: 100 }
+            });
+        });
+        modeWidget._importFile();
+
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Error reading JSON file")
+        );
+    });
+
+    test("_importFile shows error for bad .scl content", () => {
+        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+            cb(null, {
+                text: "not a scl file",
+                file: { name: "bad.scl", size: 100 }
+            });
+        });
+        modeWidget._importFile();
+
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Error reading .scl file")
+        );
+    });
+
+    test("_saveCustomMode rejects an unset EDO instead of saving garbage", () => {
+        modeWidget._activeEDO = undefined;
+
+        const result = modeWidget._saveCustomMode("mydorian", [2, 1, 2, 2, 2, 1, 2]);
+
+        expect(result).toBe(false);
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Invalid EDO"));
+    });
+
+    test("_findEdoSteps returns largest valid EDO for whole-tone scale", () => {
+        const pitches = [200, 400, 600, 800, 1000, 1200].map(c => ({
+            cents: c,
+            ratio: Math.pow(2, c / 1200)
+        }));
+        const result = modeWidget._findEdoSteps(pitches);
+        expect(result).not.toBeNull();
+        expect(result.edo).toBe(54);
+        expect(result.pattern).toEqual([9, 9, 9, 9, 9, 9]);
+    });
+
+    test("_findEdoSteps rejects multi-octave .scl files", () => {
+        const pitches = [200, 400, 1200, 1400].map(c => ({
+            cents: c,
+            ratio: Math.pow(2, c / 1200)
+        }));
+        const result = modeWidget._findEdoSteps(pitches);
+        expect(result).toBeNull();
     });
 
     test("should cancel in-flight animations and clear pending timeouts", () => {

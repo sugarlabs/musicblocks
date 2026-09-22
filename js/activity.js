@@ -39,10 +39,10 @@ try {
    setupHelpController,
    setupBlockScaleController,
    setupContextMenuController,
-   setupActivityAbcParser, setupActivityIdleWatcher,
+   setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
-   DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
+   DEFAULTDELAY, define, doBrowserCheck, docByClass,
    doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
@@ -62,7 +62,7 @@ try {
    MUSICALMODES, getSavedCustomModes, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode
+   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode, announceToScreenReader
  */
 
 /*
@@ -102,8 +102,13 @@ let MYDEFINES = [
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
     "utils/utils-logic",
+    "utils/dom-helpers",
+    "utils/browser-utils",
     "utils/http-utils",
     "utils/utils",
+    "utils/camera-utils",
+    "utils/plugin-utils",
+    "utils/macro-utils",
     "utils/retryWithBackoff",
     "utils/error-handler",
     "utils/debugLog",
@@ -157,6 +162,7 @@ let MYDEFINES = [
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
+    "utils/tuningformats",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
@@ -459,6 +465,9 @@ class Activity {
             ErrorHandler.recoverable(e, { operation: "loadKeySignatureEnv" });
         }
 
+        this.sessionStorageManager =
+            typeof SessionStorageManager !== "undefined" ? new SessionStorageManager() : null;
+
         setupActivityIdleWatcher(this);
         setupProjectManager(this);
         setupKeyboardController(this);
@@ -475,10 +484,27 @@ class Activity {
         setupContextMenuController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
-            onDelete: () => this._deletePlugin(),
+            onDelete: name => this._deletePlugin(name),
             onFileSelected: file => this.handlePluginFileSelected(file),
             closeAuxToolbar: callback => this.toolbar.closeAuxToolbar(callback),
-            showHideAuxMenu: (activity, resize) => activity._showHideAuxMenu(resize)
+            showHideAuxMenu: (activity, resize) => activity._showHideAuxMenu(resize),
+            getLoadedPlugins: () => {
+                return this.pluginObjs && this.pluginObjs["PALETTEPLUGINS"]
+                    ? Object.keys(this.pluginObjs["PALETTEPLUGINS"])
+                    : [];
+            },
+            getActivePlugin: () => {
+                const name = this.palettes.activePalette || this.palettes.lastActivePalette;
+                if (
+                    name &&
+                    this.pluginObjs &&
+                    this.pluginObjs["PALETTEPLUGINS"] &&
+                    name in this.pluginObjs["PALETTEPLUGINS"]
+                ) {
+                    return name;
+                }
+                return null;
+            }
         });
 
         /**
@@ -1085,19 +1111,88 @@ class Activity {
         };
 
         /**
-         * Deletes a plugin palette from local storage.
+         * Deletes a plugin palette from local storage and UI.
          */
-        this._deletePlugin = () => {
-            if (this.palettes.activePalette !== null) {
-                const paletteName = this.palettes.activePalette;
-                const protoList = this.palettes.dict[paletteName].protoList;
-                const deleted = this.pluginController.deletePluginFromStorage(
-                    paletteName,
-                    protoList
-                );
-                if (deleted) {
-                    this.textMsg(paletteName + " " + _("plugins will be removed upon restart."));
+        this._deletePlugin = providedName => {
+            const paletteName =
+                providedName || this.palettes.activePalette || this.palettes.lastActivePalette;
+
+            // Ensure the active palette is actually a loaded plugin
+            const isPlugin =
+                this.pluginObjs &&
+                this.pluginObjs["PALETTEPLUGINS"] &&
+                paletteName in this.pluginObjs["PALETTEPLUGINS"];
+
+            if (!paletteName || paletteName === "start" || !isPlugin) {
+                this.textMsg(_("Please open a plugin palette before clicking delete."), 3000);
+                return;
+            }
+
+            // Pass protoList if available
+            const protoList = this.palettes.dict[paletteName]
+                ? this.palettes.dict[paletteName].protoList
+                : undefined;
+            const deleted = this.pluginController.deletePluginFromStorage(paletteName, protoList);
+
+            if (deleted) {
+                // 1. Remove from session memory
+                if (this.pluginObjs && this.pluginObjs["PALETTEPLUGINS"]) {
+                    delete this.pluginObjs["PALETTEPLUGINS"][paletteName];
                 }
+
+                // 2. Remove from palettes dictionary and hide it if it's currently showing
+                if (this.palettes && this.palettes.dict) {
+                    if (this.palettes.dict[paletteName]) {
+                        this.palettes.dict[paletteName].hide();
+                        delete this.palettes.dict[paletteName];
+                    }
+                    // 3. Remove from MULTIPALETTES to ensure it is not re-rendered
+                    if (typeof MULTIPALETTES !== "undefined" && Array.isArray(MULTIPALETTES)) {
+                        for (let i = 0; i < MULTIPALETTES.length; i++) {
+                            if (Array.isArray(MULTIPALETTES[i])) {
+                                const index = MULTIPALETTES[i].indexOf(paletteName);
+                                if (index > -1) {
+                                    MULTIPALETTES[i].splice(index, 1);
+                                }
+                            }
+                        }
+                    }
+
+                    // 4. Reset active palette to start, or first available, or null
+                    const availablePalettes = Object.keys(this.palettes.dict);
+                    this.palettes.activePalette = availablePalettes.includes("start")
+                        ? "start"
+                        : availablePalettes[0];
+                    this.palettes.lastActivePalette = null;
+                }
+
+                // 5. Force UI refresh
+                if (this.palettes) {
+                    // Update the sidebar buttons
+                    if (typeof this.palettes.makePalettes === "function") {
+                        const navIndex =
+                            this.palettes._navTypeIndex !== undefined
+                                ? this.palettes._navTypeIndex
+                                : 0;
+                        this.palettes.makePalettes(navIndex);
+                    }
+                    // Update the blocks container inside
+                    if (typeof this.palettes.updatePalettes === "function") {
+                        this.palettes.updatePalettes();
+                    }
+                    if (
+                        this.palettes.dict["start"] &&
+                        typeof this.palettes.showPalette === "function"
+                    ) {
+                        this.palettes.showPalette("start");
+                    } else if (typeof this.palettes.show === "function") {
+                        this.palettes.show();
+                    }
+                }
+
+                this.textMsg(_("Plugin deleted successfully."), 3000);
+            } else {
+                this.textMsg(_("Plugin could not be deleted or was not found."), 3000);
             }
         };
 
@@ -2115,7 +2210,8 @@ class Activity {
             if (recordBtn) {
                 recordBtn.classList.remove("grey-text", "inactiveLink");
             }
-
+            // Announce program stop to screen readers
+            announceToScreenReader(_("Program stopped."));
             // TODO: plugin support
         };
 
@@ -2134,6 +2230,8 @@ class Activity {
             this.toolbar.highlightStop(window.platformColor.stopIconcolor);
 
             // TODO: plugin support
+            // Announce program start to screen readers
+            announceToScreenReader(_("Program running."));
         };
 
         /*
@@ -2371,6 +2469,7 @@ class Activity {
             const that = this;
             this.pluginController.loadBuiltInPluginFromXHR(name).then(success => {
                 if (success) {
+                    that.textMsg(_("Plugin added"));
                     // Refresh the palettes.
                     setTimeout(() => {
                         if (that.palettes.visible) {
@@ -2381,6 +2480,7 @@ class Activity {
                     ErrorHandler.warn("Could not load built-in plugin: " + name, {
                         operation: "loadPlugin"
                     });
+                    that.textMsg(_("Could not load plugin: ") + name, 5000);
                 }
             });
         };
@@ -2396,6 +2496,8 @@ class Activity {
                 setTimeout(async () => {
                     const source = file.name ? "file:" + file.name : "file:local-file";
                     await that.pluginController.loadPluginFromFileContent(reader.result, source);
+
+                    that.textMsg(_("Plugin added"));
 
                     // Refresh the palettes.
                     setTimeout(() => {
@@ -2485,6 +2587,70 @@ class Activity {
                 "activity.domReady.start",
                 "activity.domReady.end"
             );
+        };
+
+        this._handleBeforeUnload = () => {
+            // Save synchronously to SESSION* keys so manual reload/F5
+            // still has recoverable data even if async saves are cut short.
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            if (typeof this.saveLocally === "function" && this.saveLocally !== this.__saveLocally) {
+                this.saveLocally();
+            }
+            this._stopRenderLoop();
+            if (typeof this._stopAutoSave === "function") {
+                this._stopAutoSave();
+            }
+        };
+
+        this.saveSessionAsync = async () => {
+            // First, trigger __saveLocally for the image thumb and fallback.
+            // If the payload is huge, it will quota exceed but fail silently, which is fine!
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            // Second, save the massive payload safely to IndexedDB.
+            if (this.sessionStorageManager) {
+                const data = this.prepareExport();
+                let p = "My Project";
+                try {
+                    p = (this.storage && this.storage.currentProject) || "My Project";
+                } catch (e) {
+                    p = "My Project";
+                }
+
+                // We use the same timestamp that __saveLocally just wrote,
+                // or generate a new one if it failed or was invalid.
+                let timestampStr = null;
+                try {
+                    timestampStr = this.storage ? this.storage["SESSION_TIMESTAMP" + p] : null;
+                } catch (e) {
+                    timestampStr = null;
+                }
+                let parsedTimestamp = timestampStr ? parseInt(timestampStr, 10) : NaN;
+                let isValidTimestamp = Number.isFinite(parsedTimestamp) && parsedTimestamp > 0;
+                let timestamp = isValidTimestamp ? parsedTimestamp : Date.now();
+
+                try {
+                    await this.sessionStorageManager.saveSession("SESSION" + p, data, timestamp);
+                    if (!isValidTimestamp) {
+                        try {
+                            if (this.storage) {
+                                this.storage["SESSION_TIMESTAMP" + p] = timestamp.toString();
+                            }
+                        } catch (storageErr) {
+                            console.warn(
+                                "Failed to write session timestamp to localStorage:",
+                                storageErr
+                            );
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to save session to IndexedDB:", e);
+                    throw e;
+                }
+            }
         };
 
         this.__saveLocally = (...args) => this.projectManager.saveLocally(...args);
@@ -2578,23 +2744,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
-            this.addEventListener(window, "beforeunload", () => {
-                // Save synchronously to SESSION* keys so manual reload/F5
-                // still has recoverable data even if async saves are cut short.
-                if (typeof this.__saveLocally === "function") {
-                    this.__saveLocally();
-                }
-                if (
-                    typeof this.saveLocally === "function" &&
-                    this.saveLocally !== this.__saveLocally
-                ) {
-                    this.saveLocally();
-                }
-                this._stopRenderLoop();
-                if (typeof this._stopAutoSave === "function") {
-                    this._stopAutoSave();
-                }
-            });
+            this.addEventListener(window, "beforeunload", this._handleBeforeUnload);
 
             this._createMsgContainer(
                 "#ffffff",
@@ -2762,8 +2912,7 @@ class Activity {
 
             // Load custom modes saved in local storage so they survive a reload.
             try {
-                const savedModes = getSavedCustomModes();
-                for (const mode of savedModes) {
+                for (const mode of getSavedCustomModes()) {
                     if (mode && mode.name && Array.isArray(mode.pattern)) {
                         MUSICALMODES[mode.name] = mode.pattern;
                     }

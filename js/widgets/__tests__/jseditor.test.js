@@ -375,6 +375,30 @@ describe("JSEditor", () => {
                 expect(countLinks()).toBe(baseline);
             }
         });
+
+        test("onclose removes tooltip elements from document.body", () => {
+            const beforeCount = document.body.children.length;
+            const editor = createEditor();
+
+            // 6 tooltips were added to document.body
+            expect(document.body.children.length).toBe(beforeCount + 6);
+
+            editor.widgetWindow.onclose();
+
+            // After close, all 6 tooltips should be removed from document.body
+            expect(document.body.children.length).toBe(beforeCount);
+        });
+
+        test("repeated open/close cycles do not leak tooltip containers into document.body", () => {
+            const baseline = document.body.children.length;
+
+            for (let i = 0; i < 5; i++) {
+                const editor = createEditor();
+                expect(document.body.children.length).toBe(baseline + 6);
+                editor.widgetWindow.onclose();
+                expect(document.body.children.length).toBe(baseline);
+            }
+        });
     });
 
     describe("code editing functions", () => {
@@ -561,15 +585,69 @@ describe("JSEditor", () => {
             expect(editorEl.innerHTML).toContain("defg");
         });
 
-        test("_addDebuggerToLine inserts debugger statement", () => {
+        test("_addDebuggerToLine inserts debugger statement after specified 0-based line", () => {
             const editor = createEditor();
-
             editor._code = "const x = 1;\nconst y = 2;\nconst z = 3;";
 
-            // lineNumber is 1-based (insertIndex = lineNumber - 1)
-            editor._addDebuggerToLine(1);
+            editor._addDebuggerToLine(0);
 
-            expect(editor._code).toContain("debugger;");
+            const lines = editor._code.split("\n");
+            expect(lines[0]).toBe("const x = 1;");
+            expect(lines[1].trim()).toBe("debugger;");
+            expect(lines[2]).toBe("const y = 2;");
+        });
+
+        test("_addDebuggerToLine inserts debugger after line ending with brace and indents", () => {
+            const editor = createEditor();
+            editor._code = "function test() {\n    return 1;\n}";
+
+            editor._addDebuggerToLine(0);
+
+            const lines = editor._code.split("\n");
+            expect(lines[0]).toBe("function test() {");
+            expect(lines[1]).toBe("\tdebugger;");
+        });
+
+        test("_addDebuggerToLine does not crash when lineNumber is out of bounds", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;";
+
+            expect(() => editor._addDebuggerToLine(-1)).not.toThrow();
+            expect(() => editor._addDebuggerToLine(999)).not.toThrow();
+            expect(editor._code).toBe("const x = 1;");
+        });
+
+        test("_addDebuggerToLine rejects line not ending with semicolon or brace", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1\nconst y = 2;";
+
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
+            editor._addDebuggerToLine(0);
+
+            expect(editor._code).toBe("const x = 1\nconst y = 2;");
+            expect(logSpy).toHaveBeenCalledWith(
+                expect.stringContaining(
+                    "Breakpoints can only be added after lines ending with '{' or ';'"
+                ),
+                "red"
+            );
+            logSpy.mockRestore();
+        });
+
+        test("_addDebuggerToLine prevents adjacent breakpoints", () => {
+            const editor = createEditor();
+            const initialCode = "const x = 1;\ndebugger;\nconst y = 2;";
+            editor._code = initialCode;
+
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
+            editor._addDebuggerToLine(0);
+
+            expect(editor._code).toBe(initialCode);
+            expect(logSpy).toHaveBeenCalledWith(
+                expect.stringContaining("already a breakpoint on an adjacent line"),
+                "red"
+            );
+            logSpy.mockRestore();
         });
 
         test("_removeDebuggerFromLine removes debugger statement", () => {
@@ -580,6 +658,24 @@ describe("JSEditor", () => {
             editor._removeDebuggerFromLine(1);
 
             expect(editor._code).not.toContain("debugger;");
+        });
+
+        test("_removeDebuggerFromLine does not crash on out of bounds line", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;";
+
+            expect(() => editor._removeDebuggerFromLine(-1)).not.toThrow();
+            expect(() => editor._removeDebuggerFromLine(999)).not.toThrow();
+            expect(editor._code).toBe("const x = 1;");
+        });
+
+        test("_removeDebuggerFromLine ignores line that is not a debugger statement", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;\nconst y = 2;";
+
+            editor._removeDebuggerFromLine(0);
+
+            expect(editor._code).toBe("const x = 1;\nconst y = 2;");
         });
     });
 
@@ -1015,6 +1111,115 @@ describe("JSEditor", () => {
 
                 expect(spy).not.toHaveBeenCalled();
                 spy.mockRestore();
+            });
+        });
+
+        // -----------------------------------------------------------------------
+        // BUG-2 fix: _markErrorSpan must preserve hljs syntax highlighting
+        //
+        // The old implementation did `editor.textContent = ""` which nuked all
+        // hljs <span> elements. The TreeWalker-based fix wraps only the error
+        // range inside the existing DOM tree.
+        // -----------------------------------------------------------------------
+
+        describe("_markErrorSpan preserves hljs highlighting (BUG-2 fix)", () => {
+            test("preserves existing hljs spans when marking an error", () => {
+                const editor = createEditor();
+                const el = document.createElement("div");
+
+                // Simulate hljs-highlighted DOM:
+                // <span class="hljs-keyword">const</span> x = <span class="hljs-number">42</span>
+                // textContent = "const x = 42"
+                const kwSpan = document.createElement("span");
+                kwSpan.className = "hljs-keyword";
+                kwSpan.textContent = "const";
+                el.appendChild(kwSpan);
+                el.appendChild(document.createTextNode(" x = "));
+                const numSpan = document.createElement("span");
+                numSpan.className = "hljs-number";
+                numSpan.textContent = "42";
+                el.appendChild(numSpan);
+
+                // Mark error at "x" (position 6, length 1)
+                editor._markErrorSpan(el, 6, 7, "Unexpected token");
+
+                // hljs-keyword span should still exist
+                expect(el.querySelector(".hljs-keyword")).not.toBeNull();
+                expect(el.querySelector(".hljs-keyword").textContent).toBe("const");
+
+                // hljs-number span should still exist
+                expect(el.querySelector(".hljs-number")).not.toBeNull();
+                expect(el.querySelector(".hljs-number").textContent).toBe("42");
+
+                // Error span should be inserted
+                const errorSpan = el.querySelector(".error");
+                expect(errorSpan).not.toBeNull();
+                expect(errorSpan.textContent).toBe("x");
+                expect(errorSpan.title).toBe("Unexpected token");
+            });
+
+            test("handles error that spans across multiple text nodes", () => {
+                const editor = createEditor();
+                const el = document.createElement("div");
+
+                // DOM: "ab" + <span class="hljs-keyword">"cd"</span> + "ef"
+                // textContent = "abcdef"
+                el.appendChild(document.createTextNode("ab"));
+                const kwSpan = document.createElement("span");
+                kwSpan.className = "hljs-keyword";
+                kwSpan.textContent = "cd";
+                el.appendChild(kwSpan);
+                el.appendChild(document.createTextNode("ef"));
+
+                // Mark error spanning positions 1-5 ("bcde")
+                editor._markErrorSpan(el, 1, 5, "Error");
+
+                // Error spans should exist
+                const errors = el.querySelectorAll(".error");
+                expect(errors.length).toBeGreaterThanOrEqual(1);
+
+                // Collect all error text
+                let errorText = "";
+                errors.forEach(e => {
+                    errorText += e.textContent;
+                });
+                expect(errorText).toBe("bcde");
+                expect(el.querySelector(".hljs-keyword .error").textContent).toBe("cd");
+            });
+
+            test("still works correctly on plain text (no hljs spans)", () => {
+                const editor = createEditor();
+                const el = document.createElement("div");
+                el.textContent = "const x = ;";
+
+                editor._markErrorSpan(el, 10, 11, "Unexpected token");
+
+                expect(el.querySelector(".error")).not.toBeNull();
+                expect(el.querySelector(".error").textContent).toBe(";");
+                expect(el.textContent).toBe("const x = ;");
+            });
+
+            test("handles error at the very start of the content", () => {
+                const editor = createEditor();
+                const el = document.createElement("div");
+
+                const kwSpan = document.createElement("span");
+                kwSpan.className = "hljs-keyword";
+                kwSpan.textContent = "var";
+                el.appendChild(kwSpan);
+                el.appendChild(document.createTextNode(" = 1;"));
+
+                // Mark error at "var" (position 0-3)
+                editor._markErrorSpan(el, 0, 3, "Use const instead");
+
+                const errorSpan = el.querySelector(".error");
+                expect(errorSpan).not.toBeNull();
+                expect(errorSpan.textContent).toBe("var");
+                expect(errorSpan.title).toBe("Use const instead");
+
+                // Full text content should be preserved
+                expect(el.textContent).toBe("var = 1;");
+                expect(el.querySelector(".hljs-keyword .error")).toBe(errorSpan);
             });
         });
     });

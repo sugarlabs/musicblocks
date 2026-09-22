@@ -5,9 +5,9 @@
 
 ミュージック・ブロックスは音楽とコードの基本を楽しく発見するための「ソフトウエア・ツール」の組み合わせです。
 
-![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-1.png)
+![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/screenshot-1.png)
 
-![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-2.png)
+![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/screenshot-2.png)
 
 ミュージック・ブロックスの使い方　(短）
 --------------------------------------

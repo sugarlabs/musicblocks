@@ -16,7 +16,8 @@
    global
 
    platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
-   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, clampNumber
+   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, clampNumber, announceToScreenReader,
+   ManagedTimer
  */
 
 /*
@@ -31,6 +32,8 @@
         PREVIEWVOLUME
     - js/turtle-singer.js
         Singer
+    - js/utils/ManagedTimer.js
+        ManagedTimer
 */
 /* exported PitchStaircase */
 
@@ -44,6 +47,8 @@ class PitchStaircase {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static DEFAULTFREQUENCY = 220.0;
+    static MIN_FREQUENCY = 27.5; // A0
+    static MAX_FREQUENCY = 16744.04; // C10
 
     /**
      * @constructor
@@ -62,6 +67,36 @@ class PitchStaircase {
         this._scaleStopped = false;
         this._scaleStepTimeout = null;
         this._scaleHighlightTimeout = null;
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("../utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
+    }
+
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return setTimeout(callback, delay);
+    }
+
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+        clearTimeout(id);
+        return true;
     }
 
     /**
@@ -213,7 +248,8 @@ class PitchStaircase {
                 const i = Number(playCell.getAttribute("id"));
                 const stepCell = this._stepTables[i].rows[0].cells[1];
                 if (this._playingRowIndex === i) {
-                    clearTimeout(this._rowStopTimeout);
+                    this._clearWidgetTimeout(this._rowStopTimeout);
+                    this._rowStopTimeout = null;
                     stepCell.classList.remove("active");
                     stepCell.style.backgroundColor = "";
                     this._setButtonIcon(playCell, "play-button.svg", _("Play"));
@@ -288,6 +324,21 @@ class PitchStaircase {
         }
 
         const newFrequency = parseFloat(frequency) / inputNum;
+        if (
+            !Number.isFinite(newFrequency) ||
+            newFrequency < PitchStaircase.MIN_FREQUENCY ||
+            newFrequency > PitchStaircase.MAX_FREQUENCY
+        ) {
+            const act = this.activity || (typeof activity !== "undefined" ? activity : null);
+            if (act && typeof act.textMsg === "function") {
+                act.textMsg(
+                    _("Frequency is outside supported range (27.5 Hz - 16744.04 Hz)."),
+                    3000
+                );
+            }
+            return;
+        }
+
         const obj = frequencyToPitch(newFrequency);
         let foundStep = false;
         let repeatStep = false;
@@ -369,7 +420,7 @@ class PitchStaircase {
         this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
         this._setButtonIcon(playCell, "stop-button.svg", _("Stop"));
 
-        this._rowStopTimeout = setTimeout(() => {
+        this._rowStopTimeout = this._setWidgetTimeout(() => {
             stepCell.classList.remove("active");
             stepCell.style.backgroundColor = "";
             this._setButtonIcon(playCell, "play-button.svg", _("Play"));
@@ -400,7 +451,7 @@ class PitchStaircase {
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         }
 
-        this._playAllTimeout = setTimeout(() => {
+        this._playAllTimeout = this._setWidgetTimeout(() => {
             for (let i = 0; i < this.Stairs.length; i++) {
                 const stepCell = this._stepTables[i].rows[0].cells[1];
                 stepCell.classList.remove("active");
@@ -443,7 +494,7 @@ class PitchStaircase {
         if (this.closed || this._scaleStopped) return;
 
         if (index === this.Stairs.length) {
-            const completionTimeout = setTimeout(() => {
+            const completionTimeout = this._setWidgetTimeout(() => {
                 if (this.closed || this._scaleStopped) return;
                 for (let i = 0; i < this.Stairs.length; i++) {
                     if (
@@ -468,7 +519,7 @@ class PitchStaircase {
         }
 
         if (index === -1) {
-            const highlightCleanupTimeout = setTimeout(() => {
+            const highlightCleanupTimeout = this._setWidgetTimeout(() => {
                 if (this.closed || this._scaleStopped) return;
                 for (let i = 0; i < this.Stairs.length; i++) {
                     if (
@@ -486,7 +537,7 @@ class PitchStaircase {
                 this._scaleHighlightTimeout = highlightCleanupTimeout;
             }
 
-            const initialStepTimeout = setTimeout(() => {
+            const initialStepTimeout = this._setWidgetTimeout(() => {
                 if (this.closed || this._scaleStopped) return;
                 this._playNext(0, 1);
             }, 200);
@@ -505,7 +556,7 @@ class PitchStaircase {
         // not null, so use != null (loose) to catch both.
         const pscTableCell = previousRowNumber >= 0 ? this._stepTables[previousRowNumber] : null;
 
-        const stepTimeout = setTimeout(() => {
+        const stepTimeout = this._setWidgetTimeout(() => {
             if (this.closed || this._scaleStopped) return;
             if (
                 pscTableCell !== null &&
@@ -775,15 +826,19 @@ class PitchStaircase {
             "pitch staircase",
             true
         );
+        announceToScreenReader(_("Pitch Staircase opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
         widgetWindow.onclose = () => {
             this.closed = true;
-            clearTimeout(this._rowStopTimeout);
-            clearTimeout(this._playAllTimeout);
-            clearTimeout(this._scaleStepTimeout);
-            clearTimeout(this._scaleHighlightTimeout);
+            this._clearWidgetTimeout(this._rowStopTimeout);
+            this._clearWidgetTimeout(this._playAllTimeout);
+            this._clearWidgetTimeout(this._scaleStepTimeout);
+            this._clearWidgetTimeout(this._scaleHighlightTimeout);
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
+            }
             this._rowStopTimeout = null;
             this._playAllTimeout = null;
             this._scaleStepTimeout = null;
@@ -798,6 +853,7 @@ class PitchStaircase {
             if (Singer && Singer.masterVolume && Singer.masterVolume.length > 0) {
                 this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
             }
+            announceToScreenReader(_("Pitch Staircase closed"));
             widgetWindow.destroy();
         };
 
@@ -811,7 +867,8 @@ class PitchStaircase {
         );
         this._playAllButton.onclick = () => {
             if (this._isPlayingAll) {
-                clearTimeout(this._playAllTimeout);
+                this._clearWidgetTimeout(this._playAllTimeout);
+                this._playAllTimeout = null;
                 for (let i = 0; i < this.Stairs.length; i++) {
                     const stepCell = this._stepTables[i].rows[0].cells[1];
                     stepCell.classList.remove("active");
@@ -832,8 +889,8 @@ class PitchStaircase {
         this._playScaleButton.onclick = () => {
             if (this._isPlayingScale) {
                 this._scaleStopped = true;
-                clearTimeout(this._scaleStepTimeout);
-                clearTimeout(this._scaleHighlightTimeout);
+                this._clearWidgetTimeout(this._scaleStepTimeout);
+                this._clearWidgetTimeout(this._scaleHighlightTimeout);
                 this._scaleStepTimeout = null;
                 this._scaleHighlightTimeout = null;
                 for (let i = 0; i < this.Stairs.length; i++) {

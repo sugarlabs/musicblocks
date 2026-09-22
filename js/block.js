@@ -23,7 +23,7 @@
     EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
    getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
     getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
-   i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
+    i18nSolfege, INVERTMODES, isCustomTemperament, isEquallyTempered, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
    piemenuAccidentals, piemenuBasic, piemenuBlockContext,
@@ -33,7 +33,8 @@
    retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
     updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
-   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
+   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_,
+   widgetWindows
  */
 
 /*
@@ -166,7 +167,41 @@ class Block {
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
         this.text = null; // A dynamically generated text label on block itself.
-        this.value = null; // Value for number, text, and media blocks.
+        this.valueInitialized = false;
+
+        let _value = null;
+        Object.defineProperty(this, "value", {
+            get: () => _value,
+            set: newVal => {
+                if (
+                    this.blocks &&
+                    this.blocks.actionHistory &&
+                    !this.blocks.isUndoingOrRedoing &&
+                    _value !== newVal &&
+                    this.valueInitialized &&
+                    this.loadComplete &&
+                    this.blockIndex !== undefined
+                ) {
+                    const historyItem = {
+                        type: "value_change",
+                        blockId: this.blockIndex,
+                        oldValue: _value,
+                        newValue: newVal,
+                        oldText: this.text ? this.text.text : null,
+                        newText: null
+                    };
+                    this.blocks.actionHistory.push(historyItem);
+                    Promise.resolve().then(() => {
+                        historyItem.newText = this.text ? this.text.text : null;
+                    });
+                    this.blocks.redoActionHistory = [];
+                }
+                this.valueInitialized = true;
+                _value = newVal;
+            },
+            enumerable: true,
+            configurable: true
+        }); // Value for number, text, and media blocks.
         this.privateData = null; // A block may have some private data,
         // e.g., nameboxes use this field to store
         // the box name associated with the block.
@@ -3258,6 +3293,10 @@ class Block {
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
 
+            // Record original coordinates for undoing positional changes
+            that.blocks.dragStartX = that.container.x;
+            that.blocks.dragStartY = that.container.y;
+
             that.blocks.longPressTimeout = setTimeout(() => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
@@ -4022,16 +4061,13 @@ class Block {
                     if (temperament && typeof temperament === "object") {
                         noteLabels[keys[i]] = temperament;
                     }
-                    if (isCustomTemperament(keys[i])) {
+                    if (isCustomTemperament(keys[i]) && temperament && !isEquallyTempered(keys[i]))
                         customLabels.push(keys[i]);
-                    }
                 }
+                if (!customLabels.length) return;
                 let selectedCustom;
-                if (this.customID !== null) {
-                    selectedCustom = this.customID;
-                } else {
-                    selectedCustom = customLabels[0];
-                }
+                if (this.customID !== null) selectedCustom = this.customID;
+                else selectedCustom = customLabels[0];
 
                 if (this.value !== null) {
                     selectedNote = this.value;
@@ -4674,6 +4710,7 @@ class Block {
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener("keypress", this._exitKeyPressed);
+            docById("labelDiv").classList.remove("hasKeyboard");
         }
     }
 
@@ -4699,44 +4736,28 @@ class Block {
     }
 
     /**
-     * Checks and reinitializes widget windows if their labels are changed.
-     * @param {boolean} closeInput - Flag indicating whether to close input.
+     * Reinitialize an open widget when a block in its stack changes.
+     * Uses widgetWindows.REINIT_WIDGET_TITLES; only locks after a real
+     * title/staticLabels match so unrelated open widgets cannot block.
+     * @param {boolean} closeInput - Skip when true.
      */
     _checkWidgets(closeInput) {
-        // Detect if label is changed, then reinit widget windows
-        // if they are open.
         const thisBlock = this.blockIndex;
         const topBlock = this.blocks.findTopBlock(thisBlock);
         const widgetTitle = document.getElementsByClassName("wftTitle");
         let lockInit = false;
         if (closeInput === false) {
+            const topProto = this.blocks.blockList[topBlock].protoblock;
+            const topLabel =
+                topProto && topProto.staticLabels ? topProto.staticLabels[0] : undefined;
             for (let i = 0; i < widgetTitle.length; i++) {
-                if (lockInit === false) {
-                    switch (widgetTitle[i].innerHTML) {
-                        case "oscilloscope":
-                        case "tempo":
-                        case "rhythm maker":
-                        case "pitch slider":
-                        case "pitch staircase":
-                        case "status":
-                        case "phrase maker":
-                        case "lego bricks":
-                        case "custom mode":
-                        case "music keyboard":
-                        case "pitch drum":
-                        case "meter":
-                        case "temperament":
-                        case "mode":
-                        case "timbre":
-                            lockInit = true;
-                            if (
-                                this.blocks.blockList[topBlock].protoblock.staticLabels[0] ===
-                                widgetTitle[i].innerHTML
-                            ) {
-                                this.blocks.reInitWidget(topBlock, 1500);
-                            }
-                            break;
-                    }
+                if (lockInit) {
+                    break;
+                }
+                const title = widgetTitle[i].innerHTML;
+                if (widgetWindows.isReinitWidgetTitle(title) && topLabel === title) {
+                    lockInit = true;
+                    this.blocks.reInitWidget(topBlock, 1500);
                 }
             }
         }

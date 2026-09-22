@@ -3226,6 +3226,35 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
                 tempBlock._exitWheel.navItems[0].navigateFunction();
             }
 
+            // Exercise fallback and catch branches when frequency computation fails or throws
+            const origCompute = global.computeTargetPitchFrequency;
+            const navFn = tempBlock._pitchWheel.navItems[0].navigateFunction;
+            expect(typeof navFn).toBe("function");
+
+            // 1. computeTargetPitchFrequency returns NaN -> falls back to 440 Hz
+            global.computeTargetPitchFrequency = jest.fn().mockReturnValue(NaN);
+            navFn();
+            expect(targetNoteSelector.textContent).toBe("C5");
+            synthInstance.tunerAnalyser.getValue = jest
+                .fn()
+                .mockReturnValue(bufferForFrequency(440));
+            await new Promise(resolve => setTimeout(resolve, 5));
+            expect(segments[5].getAttribute("fill")).toBe("#00FF00");
+
+            // 2. computeTargetPitchFrequency throws error -> falls back to 440 Hz
+            global.computeTargetPitchFrequency = jest.fn().mockImplementation(() => {
+                throw new Error("tuner calculation error");
+            });
+            navFn();
+            expect(targetNoteSelector.textContent).toBe("C5");
+            synthInstance.tunerAnalyser.getValue = jest
+                .fn()
+                .mockReturnValue(bufferForFrequency(440));
+            await new Promise(resolve => setTimeout(resolve, 5));
+            expect(segments[5].getAttribute("fill")).toBe("#00FF00");
+
+            global.computeTargetPitchFrequency = origCompute;
+
             // Test stopTuner
             synthInstance.stopTuner();
             expect(synthInstance._tunerActive).toBe(false);
@@ -3528,6 +3557,15 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(synth._parseSampleCenterNo("re", 4)).toBe("50");
             expect(synth._parseSampleCenterNo("D", 4)).toBe("50");
             expect(synth._parseSampleCenterNo("unknown", 4)).toBe("48");
+            // Non-zero chromatic degrees must strip the accidental glyph before
+            // the dictionary lookup, otherwise the lookup misses and the degree
+            // wrongly falls back to 0 (e.g. sol#4 -> C#4).
+            expect(synth._parseSampleCenterNo("sol" + SHARP, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("G" + SHARP, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("la" + FLAT, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("A" + FLAT, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("mi" + DOUBLEFLAT, 4)).toBe("50");
+            expect(synth._parseSampleCenterNo("ti" + DOUBLESHARP, 4)).toBe("61");
         });
 
         test("resolveInstrumentName resolves translated names and internal keys", () => {
@@ -3538,8 +3576,21 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(synth.resolveInstrumentName(null)).toBeNull();
         });
 
+        test("loadSampleAsync safely initializes sample structures when loading before synth is fully initialized", async () => {
+            // Replicate the condition where a project loads before the synth calls initStructures
+            synth.sampleLoader.samples = null;
+            expect(synth.sampleLoader.samples).toBeNull();
+
+            // Calling loadSampleAsync should not crash, it should initialize samples automatically
+            await expect(
+                synth.sampleLoader.loadSampleAsync("unknown_sample")
+            ).resolves.toBeUndefined();
+            expect(synth.sampleLoader.samples).not.toBeNull();
+            expect(synth.sampleLoader.samples.voice).toBeDefined();
+        });
+
         test("preloadProjectSamples scans and preloads instruments from block lists", async () => {
-            synth._loadSample = jest.fn().mockImplementation(name => {
+            synth.sampleLoader.loadSampleAsync = jest.fn().mockImplementation(name => {
                 if (name === "failing_sample")
                     return Promise.reject(new Error("Sample preload error"));
                 return Promise.resolve();
@@ -3556,8 +3607,8 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             ];
 
             await synth.preloadProjectSamples(blockList);
-            expect(synth._loadSample).toHaveBeenCalledWith("piano");
-            expect(synth._loadSample).toHaveBeenCalledWith("kick drum");
+            expect(synth.sampleLoader.loadSampleAsync).toHaveBeenCalledWith("piano");
+            expect(synth.sampleLoader.loadSampleAsync).toHaveBeenCalledWith("kick drum");
 
             // Empty or invalid block list
             await synth.preloadProjectSamples(null);

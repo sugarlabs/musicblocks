@@ -12,7 +12,7 @@
 //A dropdown for selecting theme
 
 /*
-   global platformColor, platformThemes, getSystemThemePreference,
+   global platformColor, platformThemes, clonePlatformTheme, getSystemThemePreference,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS,
    PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    MULTIPALETTEICONS, PALETTEICONS, makePaletteIcons,
@@ -63,8 +63,16 @@ const THEME_SYNC_KEYS = [
 function syncPlatformColor(theme) {
     const src = platformThemes[theme];
     if (!src || !window.platformColor) return;
+    const colors = clonePlatformTheme(src);
+    for (const name in window.platformColor.paletteColors || {}) {
+        if (!(name in colors.paletteColors)) {
+            colors.paletteColors[name] = clonePlatformTheme(
+                window.platformColor.paletteColors[name]
+            );
+        }
+    }
     for (const key of THEME_SYNC_KEYS) {
-        if (key in src) window.platformColor[key] = src[key];
+        if (key in colors) window.platformColor[key] = colors[key];
     }
 }
 
@@ -246,7 +254,10 @@ class ThemeBox {
         if (themeSelectIcon) {
             const currentThemeElement = document.getElementById(this._theme);
             if (currentThemeElement) {
-                themeSelectIcon.innerHTML = currentThemeElement.innerHTML;
+                themeSelectIcon.textContent = "";
+                currentThemeElement.childNodes.forEach(child => {
+                    themeSelectIcon.appendChild(child.cloneNode(true));
+                });
             }
         }
     }
@@ -406,6 +417,11 @@ class ThemeBox {
                 console.debug("Could not update planet iframe theme:", e);
             }
         }
+
+        // Refresh trashcan artwork with new theme colors
+        if (this.activity.trashcan && typeof this.activity.trashcan.refresh === "function") {
+            this.activity.trashcan.refresh();
+        }
     }
 
     /**
@@ -422,7 +438,14 @@ class ThemeBox {
      * @returns {void}
      */
     setPreference() {
-        if (localStorage.getItem("themePreference") === this._theme) {
+        let currentPref;
+        try {
+            currentPref = localStorage.getItem("themePreference");
+        } catch (e) {
+            currentPref = null;
+        }
+
+        if (currentPref === this._theme && document.body.classList.contains(this._theme)) {
             this.activity.textMsg(_("Music Blocks is already set to this theme."));
         } else {
             // Save preference to localStorage

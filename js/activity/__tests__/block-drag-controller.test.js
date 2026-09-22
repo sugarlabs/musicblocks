@@ -27,6 +27,9 @@ global.getTextWidth = jest.fn().mockReturnValue(100);
 global._ = jest.fn(str => str);
 global.announceToScreenReader = jest.fn();
 
+require("../../widgets/widgetWindows.js");
+global.widgetWindows = window.widgetWindows;
+
 // NOTE: block collapsibility is determined via the capability-metadata system.
 // BlockDragController calls block.isCollapsible() / block.isInlineCollapsible()
 // directly on Block instances; no global COLLAPSIBLES/INLINECOLLAPSIBLES arrays
@@ -832,6 +835,48 @@ describe("BlockDragController", () => {
             }
         });
 
+        it.each(["LEGO Bricks", "arpeggio"])(
+            "reinitializes an open %s widget when a block is dragged out of its stack",
+            async title => {
+                const wftTitle = document.createElement("div");
+                wftTitle.className = "wftTitle";
+                wftTitle.innerHTML = title;
+                document.body.appendChild(wftTitle);
+
+                try {
+                    const parent = makeFlowBlock({
+                        x: -500,
+                        y: -500,
+                        docks: [
+                            [0, 0, "in"],
+                            [0, 20, "out"]
+                        ],
+                        connections: [null, 1],
+                        name: "parent"
+                    });
+                    const moving = makeFlowBlock({
+                        x: 5000,
+                        y: 5000,
+                        docks: [[0, 0, "in"]],
+                        connections: [0],
+                        name: "moving"
+                    });
+                    moving.protoblock = { staticLabels: [title] };
+
+                    const blocks = makeBlocks([parent, moving]);
+
+                    await blocks.blockMoved(1);
+
+                    expect(parent.connections[1]).toBeNull();
+                    expect(moving.connections[0]).toBeNull();
+                    expect(blocks.raiseStackToTop).toHaveBeenCalledWith(1);
+                    expect(blocks.reInitWidget).toHaveBeenCalledWith(1, 1500);
+                } finally {
+                    wftTitle.remove();
+                }
+            }
+        );
+
         it("removes the note block's default/silence placeholder when a new block is inserted", async () => {
             const target = makeFlowBlock({
                 x: 0,
@@ -1444,6 +1489,46 @@ describe("BlockDragController", () => {
             }
         });
 
+        it.each(["LEGO Bricks", "arpeggio"])(
+            "reinitializes an open %s widget on a brand-new connection",
+            async title => {
+                const wftTitle = document.createElement("div");
+                wftTitle.className = "wftTitle";
+                wftTitle.innerHTML = title;
+                document.body.appendChild(wftTitle);
+
+                try {
+                    const target = makeFlowBlock({
+                        x: 0,
+                        y: 0,
+                        docks: [
+                            [0, 0, "in"],
+                            [0, 20, "out"]
+                        ],
+                        connections: [null, null],
+                        name: "target"
+                    });
+                    const moving = makeFlowBlock({
+                        x: 0,
+                        y: 15,
+                        docks: [[0, 0, "in"]],
+                        connections: [null],
+                        name: "moving"
+                    });
+                    moving.protoblock = { staticLabels: [title] };
+
+                    const blocks = makeBlocks([target, moving]);
+
+                    await blocks.blockMoved(1);
+
+                    expect(moving.connections[0]).toBe(0);
+                    expect(blocks.reInitWidget).toHaveBeenCalledWith(1, 1500);
+                } finally {
+                    wftTitle.remove();
+                }
+            }
+        );
+
         it("queues a parent's ARG/FLOW layout re-check based on getLayoutUpdateType after connecting an argument-like block", async () => {
             const target = makeFlowBlock({
                 x: 0,
@@ -1682,6 +1767,71 @@ describe("BlockDragController", () => {
             expect(blocks._cachedDragGroup).toBeNull();
             expect(blocks._dragActiveGroup).toBeNull();
             expect(blocks.isBlockMoving).toBe(false);
+        });
+    });
+
+    describe("undo/redo move tracking in blockMoved", () => {
+        it("records position changes in actionHistory and clears redoActionHistory when position changed", async () => {
+            const blockList = [
+                makeFlowBlock({ x: 50, y: 60, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+            const blocks = makeBlocks(blockList);
+            blocks.dragStartX = 10;
+            blocks.dragStartY = 20;
+            blocks.actionHistory = [];
+            blocks.redoActionHistory = [{ type: "move", blockId: 0 }];
+            blocks.isUndoingOrRedoing = false;
+
+            await blocks.blockMoved(0);
+
+            expect(blocks.actionHistory).toEqual([
+                {
+                    type: "move",
+                    blockId: 0,
+                    oldX: 10,
+                    oldY: 20,
+                    newX: 50,
+                    newY: 60
+                }
+            ]);
+            expect(blocks.redoActionHistory).toEqual([]);
+            expect(blocks.dragStartX).toBeUndefined();
+            expect(blocks.dragStartY).toBeUndefined();
+        });
+
+        it("preserves redoActionHistory when isUndoingOrRedoing is true", async () => {
+            const blockList = [
+                makeFlowBlock({ x: 50, y: 60, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+            const blocks = makeBlocks(blockList);
+            blocks.dragStartX = 10;
+            blocks.dragStartY = 20;
+            blocks.actionHistory = [];
+            blocks.redoActionHistory = [{ type: "move", blockId: 0 }];
+            blocks.isUndoingOrRedoing = true;
+
+            await blocks.blockMoved(0);
+
+            expect(blocks.actionHistory).toEqual([]);
+            expect(blocks.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
+        });
+
+        it("does not push to actionHistory if coordinates are identical", async () => {
+            const blockList = [
+                makeFlowBlock({ x: 10, y: 20, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+            const blocks = makeBlocks(blockList);
+            blocks.dragStartX = 10;
+            blocks.dragStartY = 20;
+            blocks.actionHistory = [];
+            blocks.redoActionHistory = [{ type: "move", blockId: 0 }];
+
+            await blocks.blockMoved(0);
+
+            expect(blocks.actionHistory.length).toBe(0);
+            expect(blocks.redoActionHistory.length).toBe(1);
+            expect(blocks.dragStartX).toBeUndefined();
+            expect(blocks.dragStartY).toBeUndefined();
         });
     });
 });

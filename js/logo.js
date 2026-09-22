@@ -15,9 +15,9 @@
    global
 
    Notation, Synth, instruments, instrumentsFilters,
-   instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
+   instrumentsEffects, Singer, Tone, CAMERAVALUE, 
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
-   mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
+   mixedNumber, rationalToFraction, StatusMatrix,
    getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker,
    requirejs, define, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
    OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
@@ -258,8 +258,8 @@ class Logo {
         // pitch-rhythm matrix
         this.inMatrix = false;
         this.inLegoWidget = false;
-        this.tupletRhythms = [];
-        this.addingNotesToTuplet = false;
+        this.tupletRhythms = {};
+        this.addingNotesToTuplet = {};
         this.drumBlocks = [];
         this.pitchBlocks = [];
 
@@ -268,8 +268,8 @@ class Logo {
         this.connectionStoreLock = false;
 
         // tuplet
-        this.tuplet = false;
-        this.tupletParams = [];
+        this.tuplet = {};
+        this.tupletParams = {};
 
         // object that deals with notations
         this._notation = new this.deps.classes.Notation(this.activity);
@@ -869,25 +869,29 @@ class Logo {
         if (typeof arg1 === "string") {
             const len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
-                this.deps.utils.doUseCamera(
-                    [arg0],
-                    this.turtles,
-                    turtle,
-                    false,
-                    this.cameraID,
-                    this.setCameraID,
-                    (msg, blk) => this.deps.errorHandler(msg, blk)
-                );
+                if (this.deps.utils.doUseCamera) {
+                    this.deps.utils.doUseCamera(
+                        [arg0],
+                        this.turtles,
+                        turtle,
+                        false,
+                        this.cameraID,
+                        this.setCameraID,
+                        (msg, blk) => this.deps.errorHandler(msg, blk)
+                    );
+                }
             } else if (len === 13 && arg1.substr(0, 13) === VIDEOVALUE) {
-                this.deps.utils.doUseCamera(
-                    [arg0],
-                    this.turtles,
-                    turtle,
-                    true,
-                    this.cameraID,
-                    this.setCameraID,
-                    (msg, blk) => this.deps.errorHandler(msg, blk)
-                );
+                if (this.deps.utils.doUseCamera) {
+                    this.deps.utils.doUseCamera(
+                        [arg0],
+                        this.turtles,
+                        turtle,
+                        true,
+                        this.cameraID,
+                        this.setCameraID,
+                        (msg, blk) => this.deps.errorHandler(msg, blk)
+                    );
+                }
             } else if (len > 10 && arg1.substr(0, 10) === "data:image") {
                 requiredTurtle.doShowImage(arg0, arg1);
             } else if (len > 8 && arg1.substr(0, 8) === "https://") {
@@ -1485,7 +1489,9 @@ class Logo {
 
         // eslint-disable-next-line eqeqeq
         if (this.cameraID != null) {
-            this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
+            if (this.deps.utils.doStopVideoCam) {
+                this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
+            }
         }
     }
 
@@ -1533,12 +1539,22 @@ class Logo {
             this.synth.recorder.stop();
 
         this.onStopTurtle();
+        if (
+            this.blocks &&
+            this.blocks.visible &&
+            typeof this.blocks.unhighlightAll === "function"
+        ) {
+            this.blocks.unhighlightAll();
+        }
         this.blocks.bringToTop();
 
         this._alreadyRunning = false;
         this.stepQueue = {};
         for (const turtle of this.turtles.turtleList) {
             turtle.unhighlightQueue = [];
+            if (turtle.singer) {
+                turtle.singer._unhighlightTimers = {};
+            }
             if (turtle.delayTimeout !== null) {
                 clearTimeout(turtle.delayTimeout);
                 turtle.delayTimeout = null;
@@ -1683,9 +1699,11 @@ class Logo {
         this.firstNoteTime = null;
         this.firstNoteAudioTime = null;
 
-        // Ensure we have at least one turtle.
-        if (this.turtles.getTurtleCount() === 0) {
-            this.turtles.add(null);
+        // Ensure we have at least one turtle that is not in the trash. This
+        // has to happen before prepSynths() and initTurtle() below, or a
+        // turtle added here gets no synth and no notation state.
+        if (this.turtles.turtleCount() === 0) {
+            this.turtles.addTurtle(null);
         }
 
         this.deps.Singer.masterBPM = TARGETBPM;
@@ -1757,7 +1775,10 @@ class Logo {
         this.inStatusMatrix = false;
         this.pitchBlocks = [];
         this.drumBlocks = [];
-        this.tuplet = false;
+        this.tuplet = {};
+        this.tupletParams = {};
+        this.tupletRhythms = {};
+        this.addingNotesToTuplet = {};
         this.modeBlock = null;
         this._meterBlock = null;
 
@@ -1836,11 +1857,6 @@ class Logo {
         }
 
         this.onRunTurtle();
-
-        // Make sure that there is atleast one turtle.
-        if (this.turtles.turtleCount() === 0) {
-            this.turtles.addTurtle(null);
-        }
 
         // Mark all turtles as not running.
         for (const turtle in this.turtles.turtleList) {
@@ -2244,7 +2260,14 @@ class Logo {
             }
         }
 
-        if (!currentBlock.isArgBlock()) {
+        // Value blocks that are not styled as arg blocks (note counter,
+        // calculate, make block) define arg() but no flow(). Clicking one on
+        // its own should show its value like any other value block.
+        const returnsValue =
+            currentBlock.isArgBlock() ||
+            (!(currentBlock.name in logo.evalFlowDict) && typeof proto.flow !== "function");
+
+        if (!returnsValue) {
             let res = null;
             // Is it a plugin?
             if (currentBlock.name in logo.evalFlowDict) {

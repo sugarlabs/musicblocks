@@ -30,7 +30,8 @@ global.cancelAnimationFrame = jest.fn();
 global.setTimeout = setTimeout;
 global.Tone = {
     Analyser: jest.fn(() => ({
-        connect: jest.fn()
+        connect: jest.fn(),
+        dispose: jest.fn()
     }))
 };
 global.requestAnimationFrame = jest.fn(() => 1);
@@ -240,7 +241,8 @@ describe("Sampler Widget", () => {
                 },
                 canvas: { width: 1000, height: 800 },
                 getStageScale: () => 1,
-                textMsg: jest.fn()
+                textMsg: jest.fn(),
+                errorMsg: jest.fn()
             };
             global.activity = mockActivity;
             widget.activity = mockActivity;
@@ -725,6 +727,20 @@ describe("Sampler Widget", () => {
 
             await widget._recordBtn.onclick();
             expect(widget.is_recording).toBe(true);
+
+            // Reset for mic denial test
+            widget.is_recording = false;
+            mockActivity.logo.synth.startRecording.mockRejectedValueOnce(
+                new Error("Permission denied")
+            );
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(_("Microphone access denied."));
+
+            // Resume normal recording for subsequent tests
+            mockActivity.logo.synth.startRecording.mockResolvedValue();
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording).toBe(true);
             await widget._recordBtn.onclick();
             expect(widget.is_recording).toBe(false);
 
@@ -815,6 +831,65 @@ describe("Sampler Widget", () => {
 
             expect(mockActivity.logo.synth.stopRecording).not.toHaveBeenCalled();
             expect(mockActivity.logo.synth.stopTuner).not.toHaveBeenCalled();
+        });
+
+        test("onclose disposes the pitch analysers and disconnects the synths", () => {
+            widget.init(mockActivity, 1);
+            widget.originalSampleName = "test";
+            global.instruments[0] = {
+                "electronic synth": { connect: jest.fn(), disconnect: jest.fn() },
+                "customsample_test": { connect: jest.fn(), disconnect: jest.fn() }
+            };
+
+            widget.reconnectSynthsToAnalyser();
+            const analysers = Object.values(widget.pitchAnalysers);
+            expect(analysers).toHaveLength(2);
+
+            widgetWindow.onclose();
+
+            for (const analyser of analysers) {
+                expect(analyser.dispose).toHaveBeenCalled();
+                const synth1 = global.instruments[0]["electronic synth"];
+                const synth2 = global.instruments[0].customsample_test;
+
+                expect(synth1.disconnect).toHaveBeenCalledWith(analyser);
+                expect(synth2.disconnect).toHaveBeenCalledWith(analyser);
+
+                const synth1CallIdx = synth1.disconnect.mock.calls.findIndex(
+                    c => c[0] === analyser
+                );
+                const synth2CallIdx = synth2.disconnect.mock.calls.findIndex(
+                    c => c[0] === analyser
+                );
+                const synth1Order = synth1.disconnect.mock.invocationCallOrder[synth1CallIdx];
+                const synth2Order = synth2.disconnect.mock.invocationCallOrder[synth2CallIdx];
+                const disposeOrder = analyser.dispose.mock.invocationCallOrder[0];
+
+                expect(synth1Order).toBeLessThan(disposeOrder);
+                expect(synth2Order).toBeLessThan(disposeOrder);
+            }
+            expect(widget.pitchAnalysers).toEqual({});
+        });
+
+        test("onclose safely ignores errors when synth disconnect throws", () => {
+            widget.init(mockActivity, 1);
+            const analyserDispose = jest.fn();
+            widget.pitchAnalysers = {
+                0: {
+                    dispose: analyserDispose
+                }
+            };
+            global.instruments[0] = {
+                "failing synth": {
+                    disconnect: jest.fn(() => {
+                        throw new Error("InvalidAccessError");
+                    })
+                }
+            };
+
+            expect(() => widgetWindow.onclose()).not.toThrow();
+            expect(analyserDispose).toHaveBeenCalled();
+            expect(widget.pitchAnalysers).toEqual({});
         });
 
         test("prompt UI handles submit, preview, and save", async () => {
@@ -1072,6 +1147,7 @@ describe("Sampler Widget", () => {
         test("startPitchDetection handles getUserMedia failure", async () => {
             widget.widgetWindow = widgetWindow;
             mockActivity.errorMsg = jest.fn();
+            widget.activity = mockActivity;
             const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
             global.AudioContext = jest.fn(() => ({
                 sampleRate: 44100,

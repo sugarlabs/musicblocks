@@ -35,7 +35,7 @@ window.widgetWindows = {
     // verify the target widget's windowFor() call and confirm it does not
     // rely on blockNo for its window key.
     KEY_MAPPING: {
-        "pitch-drum mapper": "pitch drum",
+        "pitch drum": "pitch drum",
         "custom mode": "custom mode",
         "tempo": "tempo",
         "arpeggio": "arpeggio",
@@ -46,6 +46,57 @@ window.widgetWindows = {
         "temperament": "temperament",
         "meter": "meter",
         "LEGO Bricks": "LEGO BRICKS"
+    },
+
+    /**
+     * Single source of truth for widgets that should reinitialize when a
+     * connected block changes while their window is open.
+     *
+     * Entries are the English windowFor() title strings. At runtime the
+     * open .wftTitle and the widget block's staticLabels[0] are both
+     * produced with _(), so they must match each other; call sites also
+     * require title === staticLabels[0] before calling reInitWidget().
+     *
+     * Separate from KEY_MAPPING, which is only for closeBlkWidgets().
+     */
+    REINIT_WIDGET_TITLES: new Set([
+        "oscilloscope",
+        "tempo",
+        "rhythm maker",
+        "pitch slider",
+        "pitch staircase",
+        "status",
+        "phrase maker",
+        "LEGO Bricks",
+        "arpeggio",
+        "custom mode",
+        "music keyboard",
+        "pitch drum",
+        "meter",
+        "temperament",
+        "mode",
+        "timbre"
+    ]),
+
+    /**
+     * True when title is listed in REINIT_WIDGET_TITLES.
+     *
+     * The registry stores English title strings; at runtime the open widget's
+     * title is already localized via _(). We therefore translate each registry
+     * entry with _() before comparing — the same approach used by
+     * closeBlkWidgets() for KEY_MAPPING.
+     *
+     * @param {string} title - Open widget .wftTitle text (may be localized)
+     * @returns {boolean}
+     */
+    isReinitWidgetTitle(title) {
+        const translate = typeof _ === "function" ? _ : str => str;
+        for (const englishTitle of window.widgetWindows.REINIT_WIDGET_TITLES) {
+            if (translate(englishTitle) === title) {
+                return true;
+            }
+        }
+        return false;
     },
 
     /**
@@ -591,8 +642,12 @@ class WidgetWindow {
      */
     updateTitle(title) {
         const wftTitle = docById(this._key + "WidgetID");
-        wftTitle.textContent = title;
-        this._frame.setAttribute("aria-label", title);
+        if (wftTitle) {
+            wftTitle.textContent = title;
+        }
+        if (this._frame) {
+            this._frame.setAttribute("aria-label", title);
+        }
     }
 
     /**
@@ -602,10 +657,12 @@ class WidgetWindow {
     takeFocus() {
         window.widgetWindows.focused = this;
         const windows = docById("floatingWindows");
-        const siblings = windows.children;
-        for (let i = 0; i < siblings.length; i++) {
-            siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = "0.7";
+        if (windows && windows.children) {
+            const siblings = windows.children;
+            for (let i = 0; i < siblings.length; i++) {
+                siblings[i].style.zIndex = "0";
+                siblings[i].style.opacity = "0.7";
+            }
         }
 
         // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block
@@ -641,6 +698,10 @@ class WidgetWindow {
      */
     sendToCenter() {
         const canvas = docById("myCanvas");
+        if (!canvas) {
+            this.setPosition(200, 140);
+            return this;
+        }
         const fRect = this._frame.getBoundingClientRect();
         const cRect = canvas.getBoundingClientRect();
 

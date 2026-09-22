@@ -15,18 +15,23 @@ const { loadActivitySandbox } = require("./helpers/activity-vm-sandbox");
 // setupProjectManager stays mocked (the shared helper's default) rather than
 // wiring in the real ProjectManager - that real wiring is covered by
 // activity-projectmanager-integration.test.js.
-const loadActivityClass = () => loadActivitySandbox().Activity;
+const loadActivityClass = () => loadActivitySandbox();
 
 describe("Activity Toolbar Integration", () => {
     let Activity;
     let activity;
     let mockElement;
+    let announceToScreenReader;
 
     beforeAll(() => {
-        Activity = loadActivityClass();
+        const sandbox = loadActivityClass();
+        Activity = sandbox.Activity;
+        announceToScreenReader = sandbox.announceToScreenReader;
     });
 
     beforeEach(() => {
+        announceToScreenReader.mockClear();
+
         // Setup clean mocks for each test
         mockElement = {
             id: "",
@@ -110,6 +115,8 @@ describe("Activity Toolbar Integration", () => {
             style: { visibility: "hidden" }
         };
 
+        activity.textMsg = jest.fn();
+
         global.window.widgetWindows = {
             isOpen: jest.fn(() => false),
             openWindows: {}
@@ -188,6 +195,22 @@ describe("Activity Toolbar Integration", () => {
 
             expect(activity.toolbar.resetStop).toHaveBeenCalled();
         });
+
+        test("announces that execution stopped without showing a visible notification", () => {
+            activity.onStopTurtle();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Program stopped.");
+            expect(activity.textMsg).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("onRunTurtle", () => {
+        test("announces that execution started without showing a visible notification", () => {
+            activity.onRunTurtle();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Program running.");
+            expect(activity.textMsg).not.toHaveBeenCalled();
+        });
     });
 
     describe("onRunTurtle", () => {
@@ -208,6 +231,36 @@ describe("Activity Toolbar Integration", () => {
             activity.onStopTurtle();
             expect(activity.toolbar.resetStop).toHaveBeenCalledTimes(1);
             expect(activity.toolbar.highlightStop).toHaveBeenCalledTimes(1);
+        });
+    });
+    describe("beforeunload event", () => {
+        test("calls __saveLocally", () => {
+            activity.__saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+
+            activity._handleBeforeUnload();
+
+            expect(activity.__saveLocally).toHaveBeenCalled();
+        });
+
+        test("calls saveLocally when it differs from __saveLocally", () => {
+            activity.__saveLocally = jest.fn();
+            activity.saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+
+            activity._handleBeforeUnload();
+
+            expect(activity.saveLocally).toHaveBeenCalled();
+        });
+
+        test("calls _stopAutoSave if it exists", () => {
+            activity.__saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+            activity._stopAutoSave = jest.fn();
+
+            activity._handleBeforeUnload();
+
+            expect(activity._stopAutoSave).toHaveBeenCalled();
         });
     });
 });

@@ -311,7 +311,7 @@ function LegoWidget() {
      * @returns {object} The created widget window.
      */
     this._createWidgetWindow = function () {
-        const widgetWindow = window.widgetWindows.windowFor(this, "LEGO BRICKS");
+        const widgetWindow = window.widgetWindows.windowFor(this, "LEGO Bricks");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -711,7 +711,7 @@ function LegoWidget() {
 
         const spacingIn = document.createElement("button");
         spacingIn.textContent = "+";
-        spacingIn.onclick = () => this._adjustVerticalSpacing(1);
+        spacingIn.onclick = () => this._adjustVerticalSpacing(5);
 
         this.spacingValue = document.createElement("span");
         this.spacingValue.textContent = "50px";
@@ -1114,10 +1114,15 @@ function LegoWidget() {
             // The time gets absorbed into the adjacent larger segment
         }
 
-        // Ensure we have at least start and end boundaries
-        if (filteredBoundaries.length === 1 && boundaries.length > 1) {
-            // If we filtered out everything, add the final boundary to create one long segment
-            filteredBoundaries.push(boundaries[boundaries.length - 1]);
+        // Always end on the final boundary so a short trailing segment is merged
+        // into the previous one instead of being cut off
+        const finalBoundary = boundaries[boundaries.length - 1];
+        if (filteredBoundaries[filteredBoundaries.length - 1] !== finalBoundary) {
+            if (filteredBoundaries.length === 1) {
+                filteredBoundaries.push(finalBoundary);
+            } else {
+                filteredBoundaries[filteredBoundaries.length - 1] = finalBoundary;
+            }
         }
 
         return filteredBoundaries;
@@ -2194,7 +2199,9 @@ function LegoWidget() {
     this._drawGridLines = function () {
         if (!this.rowHeaderTable.rows.length || !this.gridOverlay) return;
 
-        this.gridOverlay.replaceChildren();
+        // Keep the scanning lines of an in-progress playback attached to the overlay
+        const scanningElements = (this.scanningLines || []).map(line => line.element);
+        this.gridOverlay.replaceChildren(...scanningElements);
 
         const numRows = this.matrixData.rows.length;
 
