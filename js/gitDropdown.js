@@ -22,9 +22,8 @@ class GitDropdownUI {
     init(activity) {
         this.activity = activity;
         const backendUrl =
-            typeof MB_GIT_BACKEND_URL !== "undefined"
-                ? MB_GIT_BACKEND_URL
-                : "http://localhost:5001";
+            (typeof window !== "undefined" && window.MB_GIT_BACKEND_URL) ||
+            "https://git-planet.sugarlabs.org";
         this._BASE_URL = backendUrl.replace(/\/$/, "") + "/api/github";
 
         // Tracks whether the Time Travel panel is currently open.

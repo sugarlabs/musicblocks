@@ -50,7 +50,7 @@ class NetworkMonitor {
         const backendBase =
             typeof window !== "undefined" && window.MB_GIT_BACKEND_URL
                 ? window.MB_GIT_BACKEND_URL.replace(/\/$/, "")
-                : "http://localhost:5001";
+                : "https://git-planet.sugarlabs.org";
         this._probeUrl = probeUrl || `${backendBase}/health`;
 
         // Cached state — start optimistic so the first real probe decides

@@ -69,7 +69,7 @@ class ServerInterface {
         // Override via window.MB_GIT_BACKEND_URL (set in env.js) for local dev or staging.
         // Falls back to the production deployment on containers.sugarlabs.org.
         this.BaseURL =
-            (window.MB_GIT_BACKEND_URL || "http://git-planet.sugarlabs.org") + "/api/github";
+            (window.MB_GIT_BACKEND_URL || "https://git-planet.sugarlabs.org") + "/api/github";
 
         this.ConnectionFailureData = { success: false, error: "ERROR_CONNECTION_FAILURE" };
 
