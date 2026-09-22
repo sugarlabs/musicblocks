@@ -550,6 +550,33 @@ describe("Sampler Widget", () => {
             expect(widget.isMoving).toBe(true);
         });
 
+        test("pause cancels pending playback timers so they cannot fire after the widget stops", () => {
+            jest.useFakeTimers();
+            widget._timerManager = null;
+            const playSpy = jest.fn();
+            const endSpy = jest.fn();
+
+            // Schedule both timers as the play chain would
+            widget._playbackWaitTimeout = widget._setWidgetTimeout(playSpy, 500);
+            widget._endPlayingTimeout = widget._setWidgetTimeout(endSpy, 1000);
+
+            expect(widget._activeTimeouts.size).toBe(2);
+
+            widget.pause();
+
+            // Both timers must be cancelled and their IDs cleared
+            expect(widget._playbackWaitTimeout).toBeNull();
+            expect(widget._endPlayingTimeout).toBeNull();
+            expect(widget._activeTimeouts.size).toBe(0);
+
+            // Advance past both delays; neither callback should have fired
+            jest.advanceTimersByTime(1500);
+            expect(playSpy).not.toHaveBeenCalled();
+            expect(endSpy).not.toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+
         test("_usePitch/_useAccidental/_useOctave update centers", () => {
             widget._usePitch("mi");
             widget._useAccidental(global.SHARP);
@@ -1241,6 +1268,8 @@ describe("Sampler Widget", () => {
                 expect(widget._saveTimeout).toBeNull();
                 expect(widget._tunerModeTimeout).toBeNull();
                 expect(widget._restartPitchTimeout).toBeNull();
+                expect(widget._playbackWaitTimeout).toBeNull();
+                expect(widget._endPlayingTimeout).toBeNull();
             });
         });
     });

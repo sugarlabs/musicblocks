@@ -226,6 +226,22 @@ function SampleWidget() {
     this._restartPitchTimeout = null;
 
     /**
+     * Timeout ID for the _waitAndPlaySample delay.
+     * Cleared in pause() so a stale timer cannot fire during a subsequent play.
+     * @type {number|null}
+     * @private
+     */
+    this._playbackWaitTimeout = null;
+
+    /**
+     * Timeout ID for the _waitAndEndPlaying delay.
+     * Cleared in pause() so a stale end-of-play timer cannot call pause() again.
+     * @type {number|null}
+     * @private
+     */
+    this._endPlayingTimeout = null;
+
+    /**
      * Schedules a timeout owned by the widget lifecycle.
      * @private
      * @param {Function} callback - Callback to run after the delay.
@@ -339,6 +355,8 @@ function SampleWidget() {
         this._saveTimeout = null;
         this._tunerModeTimeout = null;
         this._restartPitchTimeout = null;
+        this._playbackWaitTimeout = null;
+        this._endPlayingTimeout = null;
 
         return count;
     };
@@ -418,9 +436,16 @@ function SampleWidget() {
 
     /**
      * Pauses the sample playback.
+     * Cancels any pending playback timers so a stale timer from a previous play
+     * cannot fire after this pause and corrupt the next play sequence.
      * @returns {void}
      */
     this.pause = function () {
+        this._clearWidgetTimeout(this._playbackWaitTimeout);
+        this._playbackWaitTimeout = null;
+        this._clearWidgetTimeout(this._endPlayingTimeout);
+        this._endPlayingTimeout = null;
+
         const img = this.playBtn ? this.playBtn.getElementsByTagName("img")[0] : null;
         if (img) {
             img.src = "header-icons/play-button.svg";
@@ -1748,11 +1773,13 @@ function SampleWidget() {
 
     /**
      * Waits for a specified time and then plays the sample.
+     * Stores its timer ID in _playbackWaitTimeout so pause() can cancel it.
      * @returns {Promise<string>} A promise that resolves once the sample is played.
      */
     this._waitAndPlaySample = function () {
         return new Promise(resolve => {
-            this._setWidgetTimeout(() => {
+            this._playbackWaitTimeout = this._setWidgetTimeout(() => {
+                this._playbackWaitTimeout = null;
                 this._playSample();
                 resolve("played");
                 this._endPlaying();
@@ -1770,11 +1797,13 @@ function SampleWidget() {
 
     /**
      * Waits for the sample to finish playing.
+     * Stores its timer ID in _endPlayingTimeout so pause() can cancel it.
      * @returns {Promise<string>} A promise that resolves once the sample playback ends.
      */
     this._waitAndEndPlaying = function () {
         return new Promise(resolve => {
-            this._setWidgetTimeout(() => {
+            this._endPlayingTimeout = this._setWidgetTimeout(() => {
+                this._endPlayingTimeout = null;
                 this.pause();
                 resolve("ended");
             }, this.sampleLength);
