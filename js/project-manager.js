@@ -277,7 +277,7 @@ class ProjectManager {
 
         // Returns the loadToken loadNewBlocks() assigns this request (see
         // js/blocks.js), or null when no load was actually started (the
-        // empty/undefined-session shortcut below already routes through
+        // empty/undefined-session shortcuts below already route through
         // justLoadStart() instead).
         const tryParseAndLoad = data => {
             if (data === "undefined" || data === "[]") {
@@ -285,6 +285,20 @@ class ProjectManager {
                 return null;
             }
             const parsed = JSON.parse(data);
+            if (Array.isArray(parsed) && parsed.length === 0) {
+                // Any whitespace/formatting variant of "[]" (e.g. " [ ]")
+                // still parses to an empty array here, past the literal
+                // string check above. loadNewBlocks([]) completes
+                // synchronously inside blocks.js's own zero-block fast
+                // path, emitting "finishedLoading" before this call even
+                // returns — before a caller could register a watcher for
+                // it. Treating a parsed-empty array the same as the
+                // literal "[]" case keeps that synchronous emit from
+                // leaving watchForDeferredLoadFailure()'s listeners
+                // stranded (review comment on issue #8855's fix).
+                that.justLoadStart();
+                return null;
+            }
             window.loadedSession = data;
             return that.blocks.loadNewBlocks(parsed);
         };

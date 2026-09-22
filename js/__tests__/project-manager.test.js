@@ -437,6 +437,35 @@ describe("_loadStart", () => {
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
 
+    it("calls justLoadStart for whitespace-formatted empty JSON, not loadNewBlocks([])", async () => {
+        // " [ ]" parses to an empty array but doesn't match the literal
+        // "[]" string check above it. loadNewBlocks([]) completes
+        // synchronously inside blocks.js's own zero-block fast path,
+        // emitting "finishedLoading" before this call even returns — so if
+        // it were reached here, watchForDeferredLoadFailure() would
+        // register its listeners too late to ever see that completion,
+        // leaving them stranded (review comment on issue #8855's fix).
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: " [ ]",
+                removeItem: jest.fn()
+            }
+        });
+        activity.sessionData = " [ ]";
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.justLoadStart).toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+
+        // No watcher should have been left registered: a later, unrelated
+        // "loadFailed" must not trigger this session's recovery.
+        global.pubsub.emit("loadFailed", { error: new Error("unrelated") });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
+    });
+
     it("recovers from malformed JSON and removes the bad session key", async () => {
         const removeItem = jest.fn();
         const activity = makeActivity({
