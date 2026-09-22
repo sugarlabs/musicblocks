@@ -517,6 +517,10 @@ class ModeWidget {
     }
 
     _saveCustomMode(name, pattern, edo = this._activeEDO) {
+        if (!Number.isInteger(edo)) {
+            this.errorMsg(_("Invalid EDO for mode."));
+            return false;
+        }
         if (isUnsafeObjectKey(name)) {
             this.errorMsg(_("Invalid mode name."));
             return false;
@@ -1475,7 +1479,7 @@ class ModeWidget {
     }
 
     _findEdoSteps(pitches) {
-        for (let edo = TuningFormats.EDO_MIN; edo <= TuningFormats.EDO_MAX; edo++) {
+        for (let edo = TuningFormats.EDO_MAX; edo >= TuningFormats.EDO_MIN; edo--) {
             const step = 1200 / edo;
             const steps = [];
             let prevStepCount = 0;
@@ -1515,10 +1519,11 @@ class ModeWidget {
         if (!data) return;
         const { pattern, edo } = data;
 
+        const name = this._findModeNameForPattern(pattern) || "custom";
         const lines = [];
         lines.push("! mode.scl");
         lines.push("!");
-        lines.push("Mode (" + edo + "EDO) - exported from Music Blocks");
+        lines.push(name);
         lines.push(String(pattern.length));
 
         let cumulativeCents = 0;
@@ -1553,16 +1558,24 @@ class ModeWidget {
         return name;
     }
 
+    _parseImportText(parseFn, text, errorPrefix) {
+        try {
+            return parseFn(text);
+        } catch (e) {
+            this.errorMsg(errorPrefix + e.message);
+            return null;
+        }
+    }
+
     _parseImportFile(data) {
         const ext = (data.file.name || "").toLowerCase();
         if (ext.endsWith(".json")) {
-            let def;
-            try {
-                def = TuningFormats.parseModeJson(data.text);
-            } catch (e) {
-                this.errorMsg(_("Error reading JSON file: ") + e.message);
-                return null;
-            }
+            const def = this._parseImportText(
+                TuningFormats.parseModeJson,
+                data.text,
+                _("Error reading JSON file: ")
+            );
+            if (!def) return null;
             return {
                 edo: def.edo,
                 pattern: def.pattern,
@@ -1570,13 +1583,12 @@ class ModeWidget {
             };
         }
         if (ext.endsWith(".scl")) {
-            let result;
-            try {
-                result = TuningFormats.parseSclFile(data.text);
-            } catch (e) {
-                this.errorMsg(_("Error reading .scl file: ") + e.message);
-                return null;
-            }
+            const result = this._parseImportText(
+                TuningFormats.parseSclFile,
+                data.text,
+                _("Error reading .scl file: ")
+            );
+            if (!result) return null;
             const edoResult = this._findEdoSteps(result.pitches);
             if (!edoResult) {
                 this.errorMsg(

@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* exported parseSclFile, parseModeJson, EDO_MIN, EDO_MAX */
+/* exported parseSclFile, parseModeJson, EDO_MIN, EDO_MAX, TuningFormats */
 
 const EDO_MIN = 5;
 const EDO_MAX = 55;

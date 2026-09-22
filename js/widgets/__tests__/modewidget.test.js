@@ -802,8 +802,8 @@ describe("ModeWidget", () => {
 
         expect(saveSpy).toHaveBeenCalled();
         const [name, pattern, edo] = saveSpy.mock.calls[0];
-        expect(edo).toBe(12);
-        expect(pattern).toEqual([2, 2, 1, 2, 2, 2, 1]);
+        expect(edo).toBe(48);
+        expect(pattern).toEqual([8, 8, 4, 8, 8, 8, 4]);
         saveSpy.mockRestore();
     });
 
@@ -844,6 +844,38 @@ describe("ModeWidget", () => {
         expect(modeWidget._findModeNameForPattern).toHaveBeenCalledWith([2, 2, 1, 2, 2, 2, 1]);
     });
 
+    test("_exportScl writes the resolved mode name as the description line", () => {
+        jest.spyOn(modeWidget, "_modeExportData").mockReturnValue({
+            pattern: [2, 2, 1, 2, 2, 2, 1],
+            edo: 12
+        });
+        jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue("major");
+        let downloadedContent;
+        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+            downloadedContent = content;
+        });
+
+        modeWidget._exportScl();
+
+        expect(downloadedContent.split("\n")[2]).toBe("major");
+    });
+
+    test("_exportScl falls back to custom when the pattern has no known name", () => {
+        jest.spyOn(modeWidget, "_modeExportData").mockReturnValue({
+            pattern: [3, 3, 3, 3],
+            edo: 12
+        });
+        jest.spyOn(modeWidget, "_findModeNameForPattern").mockReturnValue(null);
+        let downloadedContent;
+        jest.spyOn(modeWidget, "_downloadScl").mockImplementation(content => {
+            downloadedContent = content;
+        });
+
+        modeWidget._exportScl();
+
+        expect(downloadedContent.split("\n")[2]).toBe("custom");
+    });
+
     test("_importFile shows error for unsupported file type", () => {
         jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
             cb(null, {
@@ -870,6 +902,49 @@ describe("ModeWidget", () => {
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(
             expect.stringContaining("Error reading JSON file")
         );
+    });
+
+    test("_importFile shows error for bad .scl content", () => {
+        jest.spyOn(modeWidget, "_readSclFile").mockImplementation((_inputId, cb) => {
+            cb(null, {
+                text: "not a scl file",
+                file: { name: "bad.scl", size: 100 }
+            });
+        });
+        modeWidget._importFile();
+
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Error reading .scl file")
+        );
+    });
+
+    test("_saveCustomMode rejects an unset EDO instead of saving garbage", () => {
+        modeWidget._activeEDO = undefined;
+
+        const result = modeWidget._saveCustomMode("mydorian", [2, 1, 2, 2, 2, 1, 2]);
+
+        expect(result).toBe(false);
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Invalid EDO"));
+    });
+
+    test("_findEdoSteps returns largest valid EDO for whole-tone scale", () => {
+        const pitches = [200, 400, 600, 800, 1000, 1200].map(c => ({
+            cents: c,
+            ratio: Math.pow(2, c / 1200)
+        }));
+        const result = modeWidget._findEdoSteps(pitches);
+        expect(result).not.toBeNull();
+        expect(result.edo).toBe(54);
+        expect(result.pattern).toEqual([9, 9, 9, 9, 9, 9]);
+    });
+
+    test("_findEdoSteps rejects multi-octave .scl files", () => {
+        const pitches = [200, 400, 1200, 1400].map(c => ({
+            cents: c,
+            ratio: Math.pow(2, c / 1200)
+        }));
+        const result = modeWidget._findEdoSteps(pitches);
+        expect(result).toBeNull();
     });
 
     test("should cancel in-flight animations and clear pending timeouts", () => {

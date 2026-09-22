@@ -67,6 +67,14 @@ describe("parseSclFile", () => {
         const content = ["! bad.scl", "!", "Bad", "abc"].join("\n");
         expect(() => parseSclFile(content)).toThrow("invalid pitch count");
     });
+
+    it("treats a bare integer pitch as a ratio per the Scala spec", () => {
+        const content = ["! oct.scl", "!", "Octave", "1", "2"].join("\n");
+        const result = parseSclFile(content);
+        expect(result.pitchCount).toBe(1);
+        expect(result.pitches[0].ratio).toBeCloseTo(2, 10);
+        expect(result.pitches[0].cents).toBeCloseTo(1200, 6);
+    });
 });
 
 describe("parseModeJson", () => {
