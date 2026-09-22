@@ -520,6 +520,157 @@ const transport = {
 };
 
 /**
+ * Class responsible for loading and managing audio samples (Tone.js samplers).
+ */
+class SampleLoader {
+    constructor() {
+        this.samples = null;
+    }
+
+    initStructures() {
+        if (this.samples === null) {
+            this.samples = { voice: {}, drum: {} };
+            // Pre-populate with null to indicate they exist as valid instruments but are not loaded
+            for (const type in SAMPLE_INFO) {
+                for (const name in SAMPLE_INFO[type]) {
+                    this.samples[type][name] = null;
+                }
+            }
+            this.samples.voice["empty"] = () => null;
+        }
+    }
+
+    loadSampleAsync(sampleName) {
+        this.initStructures();
+        return new Promise((resolve, reject) => {
+            let found = false;
+            let sampleType = null;
+            let sampleInfo = null;
+
+            // Find the sample info
+            for (const type in SAMPLE_INFO) {
+                if (SAMPLE_INFO[type][sampleName]) {
+                    sampleType = type;
+                    sampleInfo = SAMPLE_INFO[type][sampleName];
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                // If not found in SAMPLE_INFO, it might be a built-in or custom synth, so we resolve immediately
+                resolve();
+                return;
+            }
+
+            if (this.samples[sampleType][sampleName] !== null) {
+                // Already loaded
+                resolve();
+                return;
+            }
+
+            // Load the sample module using require
+            requirejs(
+                [sampleInfo.path],
+                () => {
+                    try {
+                        const sampleData = window[sampleInfo.global];
+                        if (sampleData) {
+                            this.samples[sampleType][sampleName] = sampleData();
+                            resolve();
+                        } else {
+                            console.error(
+                                `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
+                            );
+                            reject(`Sample global not found: ${sampleName}`);
+                        }
+                    } catch (e) {
+                        console.error(`Error processing sample ${sampleName}:`, e);
+                        reject(e);
+                    }
+                },
+                err => {
+                    console.error(`Failed to load sample module for ${sampleName}:`, err);
+                    reject(err);
+                }
+            );
+        });
+    }
+
+    async preloadProject(blockList) {
+        if (!blockList || !Array.isArray(blockList)) {
+            return;
+        }
+
+        const instrumentsToLoad = new Set();
+
+        // Known instrument block names
+        const instrumentBlockNames = ["settimbre", "setinstrument", "timbre", "instrument"];
+
+        // Scan blocks for instrument references
+        for (const block of blockList) {
+            if (!Array.isArray(block) || block.length < 2) continue;
+
+            const blockName = block[1];
+
+            // Check if this is an instrument-setting block
+            if (instrumentBlockNames.includes(blockName)) {
+                // The instrument name is usually in a connected block
+                // Check the connections for potential instrument names
+                const connections = block[4];
+                if (Array.isArray(connections)) {
+                    for (const connIdx of connections) {
+                        if (connIdx !== null && blockList[connIdx]) {
+                            const connBlock = blockList[connIdx];
+                            // Check if it's a text/value block with an instrument name
+                            if (Array.isArray(connBlock) && connBlock.length > 1) {
+                                const value = connBlock[1];
+                                // Check if this value is a known instrument
+                                if (typeof value === "string") {
+                                    // Check voice samples
+                                    if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[value]) {
+                                        instrumentsToLoad.add(value);
+                                    }
+                                    // Check drum samples
+                                    if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[value]) {
+                                        instrumentsToLoad.add(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Also check if the block name itself is an instrument
+            if (typeof blockName === "string") {
+                if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[blockName]) {
+                    instrumentsToLoad.add(blockName);
+                }
+                if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[blockName]) {
+                    instrumentsToLoad.add(blockName);
+                }
+            }
+        }
+
+        // Preload all found instruments in parallel
+        if (instrumentsToLoad.size > 0) {
+            console.debug(
+                `Preloading ${instrumentsToLoad.size} instruments:`,
+                Array.from(instrumentsToLoad)
+            );
+            const loadPromises = Array.from(instrumentsToLoad).map(name =>
+                this.loadSampleAsync(name).catch(err => {
+                    console.warn(`Failed to preload sample ${name}:`, err);
+                })
+            );
+            await Promise.all(loadPromises);
+            console.debug("Project samples preloaded successfully");
+        }
+    }
+}
+
+/**
  * Synth constructor function.
  * @constructor
  */
@@ -563,11 +714,21 @@ function Synth() {
     Tone.Buffer.onload = () => {
         console.debug("sample loaded");
     };
+
     /**
-     * Object to store samples.
-     * @type {Object}
+     * The loader responsible for initializing and fetching sample synths.
+     * @type {SampleLoader}
      */
-    this.samples = null;
+    this.sampleLoader = new SampleLoader();
+
+    // Define a getter/setter for backward compatibility with Synth instance state
+    Object.defineProperty(this, "samples", {
+        get: () => this.sampleLoader.samples,
+        set: val => {
+            this.sampleLoader.samples = val;
+        }
+    });
+
     /**
      * Suffix for sample names.
      * @type {string}
@@ -952,23 +1113,9 @@ function Synth() {
      * @function
      */
     this.loadSamples = () => {
-        if (this.samples === null) {
-            this.samples = { voice: {}, drum: {} };
-            // Pre-populate with null to indicate they exist as valid instruments but are not loaded
-            for (const type in SAMPLE_INFO) {
-                for (const name in SAMPLE_INFO[type]) {
-                    this.samples[type][name] = null;
-                }
-            }
-            this.samples.voice["empty"] = () => null;
-        }
+        this.sampleLoader.initStructures();
     };
 
-    /**
-     * Loads samples into the Synth instance.
-     * @function
-     * @memberof Synth
-     */
     /**
      * Loads a specific sample into the Synth instance asynchronously.
      * @function
@@ -977,59 +1124,7 @@ function Synth() {
      * @returns {Promise<void>} - A promise that resolves when the sample is loaded.
      */
     this._loadSample = sampleName => {
-        return new Promise((resolve, reject) => {
-            let found = false;
-            let sampleType = null;
-            let sampleInfo = null;
-
-            // Find the sample info
-            for (const type in SAMPLE_INFO) {
-                if (SAMPLE_INFO[type][sampleName]) {
-                    sampleType = type;
-                    sampleInfo = SAMPLE_INFO[type][sampleName];
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                // If not found in SAMPLE_INFO, it might be a built-in or custom synth, so we resolve immediately
-                resolve();
-                return;
-            }
-
-            if (this.samples[sampleType][sampleName] !== null) {
-                // Already loaded
-                resolve();
-                return;
-            }
-
-            // Load the sample module using require
-            requirejs(
-                [sampleInfo.path],
-                () => {
-                    try {
-                        const sampleData = window[sampleInfo.global];
-                        if (sampleData) {
-                            this.samples[sampleType][sampleName] = sampleData();
-                            resolve();
-                        } else {
-                            console.error(
-                                `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
-                            );
-                            reject(`Sample global not found: ${sampleName}`);
-                        }
-                    } catch (e) {
-                        console.error(`Error processing sample ${sampleName}:`, e);
-                        reject(e);
-                    }
-                },
-                err => {
-                    console.error(`Failed to load sample module for ${sampleName}:`, err);
-                    reject(err);
-                }
-            );
-        });
+        return this.sampleLoader.loadSampleAsync(sampleName);
     };
 
     /**
@@ -1041,75 +1136,7 @@ function Synth() {
      * @returns {Promise<void>} - A promise that resolves when all samples are preloaded.
      */
     this.preloadProjectSamples = async blockList => {
-        if (!blockList || !Array.isArray(blockList)) {
-            return;
-        }
-
-        const instrumentsToLoad = new Set();
-
-        // Known instrument block names
-        const instrumentBlockNames = ["settimbre", "setinstrument", "timbre", "instrument"];
-
-        // Scan blocks for instrument references
-        for (const block of blockList) {
-            if (!Array.isArray(block) || block.length < 2) continue;
-
-            const blockName = block[1];
-
-            // Check if this is an instrument-setting block
-            if (instrumentBlockNames.includes(blockName)) {
-                // The instrument name is usually in a connected block
-                // Check the connections for potential instrument names
-                const connections = block[4];
-                if (Array.isArray(connections)) {
-                    for (const connIdx of connections) {
-                        if (connIdx !== null && blockList[connIdx]) {
-                            const connBlock = blockList[connIdx];
-                            // Check if it's a text/value block with an instrument name
-                            if (Array.isArray(connBlock) && connBlock.length > 1) {
-                                const value = connBlock[1];
-                                // Check if this value is a known instrument
-                                if (typeof value === "string") {
-                                    // Check voice samples
-                                    if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[value]) {
-                                        instrumentsToLoad.add(value);
-                                    }
-                                    // Check drum samples
-                                    if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[value]) {
-                                        instrumentsToLoad.add(value);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Also check if the block name itself is an instrument
-            if (typeof blockName === "string") {
-                if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[blockName]) {
-                    instrumentsToLoad.add(blockName);
-                }
-                if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[blockName]) {
-                    instrumentsToLoad.add(blockName);
-                }
-            }
-        }
-
-        // Preload all found instruments in parallel
-        if (instrumentsToLoad.size > 0) {
-            console.debug(
-                `Preloading ${instrumentsToLoad.size} instruments:`,
-                Array.from(instrumentsToLoad)
-            );
-            const loadPromises = Array.from(instrumentsToLoad).map(name =>
-                this._loadSample(name).catch(err => {
-                    console.warn(`Failed to preload sample ${name}:`, err);
-                })
-            );
-            await Promise.all(loadPromises);
-            console.debug("Project samples preloaded successfully");
-        }
+        return await this.sampleLoader.preloadProject(blockList);
     };
 
     /**

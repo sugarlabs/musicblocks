@@ -3567,8 +3567,21 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(synth.resolveInstrumentName(null)).toBeNull();
         });
 
+        test("loadSampleAsync safely initializes sample structures when loading before synth is fully initialized", async () => {
+            // Replicate the condition where a project loads before the synth calls initStructures
+            synth.sampleLoader.samples = null;
+            expect(synth.sampleLoader.samples).toBeNull();
+
+            // Calling loadSampleAsync should not crash, it should initialize samples automatically
+            await expect(
+                synth.sampleLoader.loadSampleAsync("unknown_sample")
+            ).resolves.toBeUndefined();
+            expect(synth.sampleLoader.samples).not.toBeNull();
+            expect(synth.sampleLoader.samples.voice).toBeDefined();
+        });
+
         test("preloadProjectSamples scans and preloads instruments from block lists", async () => {
-            synth._loadSample = jest.fn().mockImplementation(name => {
+            synth.sampleLoader.loadSampleAsync = jest.fn().mockImplementation(name => {
                 if (name === "failing_sample")
                     return Promise.reject(new Error("Sample preload error"));
                 return Promise.resolve();
@@ -3585,8 +3598,8 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             ];
 
             await synth.preloadProjectSamples(blockList);
-            expect(synth._loadSample).toHaveBeenCalledWith("piano");
-            expect(synth._loadSample).toHaveBeenCalledWith("kick drum");
+            expect(synth.sampleLoader.loadSampleAsync).toHaveBeenCalledWith("piano");
+            expect(synth.sampleLoader.loadSampleAsync).toHaveBeenCalledWith("kick drum");
 
             // Empty or invalid block list
             await synth.preloadProjectSamples(null);
