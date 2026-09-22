@@ -23,24 +23,42 @@ describe("recovery from a malformed session past the first load chunk", () => {
     };
 
     it("clears the partially loaded stack, logs the recovery, and comes up with a clean project", () => {
-        // First pass just to get onto the app's own origin so localStorage
-        // can be seeded under it, then a real second visit does the actual
-        // load-failure/recovery run being tested.
-        cy.visit("http://127.0.0.1:3000");
-        cy.clearLocalStorage();
-        cy.window().then(win => {
-            win.localStorage.setItem("SESSIONMy Project", buildMalformedSession());
-            win.localStorage.setItem("SESSION_TIMESTAMPMy Project", Date.now().toString());
-        });
-
+        // Everything here runs inside onBeforeLoad, i.e. before any of the
+        // app's own scripts execute on this navigation. That matters because
+        // a *live* app instance's idle-watcher autosave can rewrite
+        // "SESSIONMy Project" into IndexedDB in the background at any time;
+        // doing this setup against a page that has never booted the app
+        // means there is no autosave in flight that could race a
+        // localStorage.clear() / IndexedDB delete done afterwards and leave
+        // a leftover session behind for _loadStart's idb-vs-local selection,
+        // or for recoverFromLoadFailure()'s own fallback, to pick up instead
+        // of the malformed one this test seeds.
         const recoverableWarnings = [];
         cy.visit("http://127.0.0.1:3000", {
             onBeforeLoad(win) {
+                win.localStorage.clear();
+                win.localStorage.setItem("SESSIONMy Project", buildMalformedSession());
+                win.localStorage.setItem("SESSION_TIMESTAMPMy Project", Date.now().toString());
+
                 const originalWarn = win.console.warn.bind(win.console);
                 win.console.warn = (...args) => {
                     if (args[0] === "[Recoverable]") recoverableWarnings.push(args.join(" "));
                     originalWarn(...args);
                 };
+
+                // IndexedDB serializes a deleteDatabase() request against any
+                // open() request that comes after it on the same connection
+                // queue, so returning this promise (Cypress awaits it before
+                // letting the page's own scripts run) guarantees the app's
+                // own SessionStorageManager.init() call, made once its
+                // scripts do start, opens a database with no leftover
+                // "SESSIONMy Project" record in it.
+                return new Promise(resolve => {
+                    const req = win.indexedDB.deleteDatabase("MusicBlocksSessionDB");
+                    req.onsuccess = resolve;
+                    req.onerror = resolve;
+                    req.onblocked = resolve;
+                });
             }
         });
 
@@ -93,10 +111,13 @@ describe("recovery from a malformed session past the first load chunk", () => {
         // direct evidence the deferred-chunk failure was actually caught and
         // routed through recovery, not that the malformed block was somehow
         // silently skipped by some other path that happens to also leave a
-        // clean 31-block project behind.
-        cy.then(() => {
+        // clean 31-block project behind. cy.wrap(...).should() re-reads the
+        // array on retry rather than asserting on a single snapshot of it, in
+        // case this console.warn capture itself lands a beat after the
+        // block-list state does.
+        cy.wrap(recoverableWarnings, { timeout: 10000 }).should(warnings => {
             expect(
-                recoverableWarnings.some(w => w.includes("loadSessionData")),
+                warnings.some(w => w.includes("loadSessionData")),
                 "a recoverable loadSessionData warning should have been logged"
             ).to.be.true;
         });
