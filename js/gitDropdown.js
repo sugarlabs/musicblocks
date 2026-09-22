@@ -293,12 +293,39 @@ class GitDropdownUI {
         this._syncMenuState();
     }
 
+    /**
+     * Hides all visible Materialize tooltip nodes in the document.
+     *
+     * Why not data-tooltip-id: toolbar-ui.js's click handler calls
+     * _syncMenuState() in the same tick, which updates the tooltip element
+     * and causes Materialize to re-show it, undoing a synchronous hide.
+     *
+     * Why setTimeout(0): we need to run AFTER all synchronous click handlers
+     * (including the toolbar-ui sync hook) have finished. A macrotask via
+     * setTimeout is the simplest cross-browser way to achieve that.
+     *
+     * Materialize renders each tooltip as a .material-tooltip element appended
+     * to <body>. Setting visibility:hidden is exactly what Materialize's own
+     * mouseleave handler does and leaves internal plugin state intact.
+     */
+    _dismissAllTooltips() {
+        setTimeout(() => {
+            document.querySelectorAll(".material-tooltip").forEach(tip => {
+                tip.style.visibility = "hidden";
+                tip.style.opacity = "0";
+            });
+        }, 0);
+    }
+
     _bindButtons() {
         const btn = document.getElementById("gitProjectBtn");
         if (btn) {
             const sync = () => this._syncMenuState();
             btn.addEventListener("mouseenter", sync);
             btn.addEventListener("focus", sync);
+            // Dismiss the hover tooltip after the dropdown opens.
+            // Deferred so it runs after toolbar-ui's own click → _syncMenuState.
+            btn.addEventListener("click", () => this._dismissAllTooltips());
         }
 
         const bind = (id, fn) => {
@@ -306,6 +333,7 @@ class GitDropdownUI {
             if (el) {
                 el.onclick = e => {
                     e.preventDefault();
+                    this._dismissAllTooltips();
                     fn();
                 };
             }
