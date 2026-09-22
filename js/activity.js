@@ -62,7 +62,7 @@ try {
    MUSICALMODES, getSavedCustomModes, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode
+   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode, announceToScreenReader
  */
 
 /*
@@ -2184,7 +2184,7 @@ class Activity {
                 recordBtn.classList.remove("grey-text", "inactiveLink");
             }
             // Announce program stop to screen readers
-            this.textMsg && this.textMsg(_("Program stopped."), 2000);
+            announceToScreenReader(_("Program stopped."));
             // TODO: plugin support
         };
 
@@ -2204,7 +2204,7 @@ class Activity {
 
             // TODO: plugin support
             // Announce program start to screen readers
-            this.textMsg && this.textMsg(_("Program running."), 2000);
+            announceToScreenReader(_("Program running."));
         };
 
         /*

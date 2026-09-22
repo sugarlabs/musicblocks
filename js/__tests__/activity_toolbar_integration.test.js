@@ -15,18 +15,23 @@ const { loadActivitySandbox } = require("./helpers/activity-vm-sandbox");
 // setupProjectManager stays mocked (the shared helper's default) rather than
 // wiring in the real ProjectManager - that real wiring is covered by
 // activity-projectmanager-integration.test.js.
-const loadActivityClass = () => loadActivitySandbox().Activity;
+const loadActivityClass = () => loadActivitySandbox();
 
 describe("Activity Toolbar Integration", () => {
     let Activity;
     let activity;
     let mockElement;
+    let announceToScreenReader;
 
     beforeAll(() => {
-        Activity = loadActivityClass();
+        const sandbox = loadActivityClass();
+        Activity = sandbox.Activity;
+        announceToScreenReader = sandbox.announceToScreenReader;
     });
 
     beforeEach(() => {
+        announceToScreenReader.mockClear();
+
         // Setup clean mocks for each test
         mockElement = {
             id: "",
@@ -191,18 +196,20 @@ describe("Activity Toolbar Integration", () => {
             expect(activity.toolbar.resetStop).toHaveBeenCalled();
         });
 
-        test("shows the stopped notification for two seconds", () => {
+        test("announces that execution stopped without showing a visible notification", () => {
             activity.onStopTurtle();
 
-            expect(activity.textMsg).toHaveBeenCalledWith("Program stopped.", 2000);
+            expect(announceToScreenReader).toHaveBeenCalledWith("Program stopped.");
+            expect(activity.textMsg).not.toHaveBeenCalled();
         });
     });
 
     describe("onRunTurtle", () => {
-        test("announces program running to screen readers", () => {
+        test("announces that execution started without showing a visible notification", () => {
             activity.onRunTurtle();
 
-            expect(activity.textMsg).toHaveBeenCalledWith("Program running.", 2000);
+            expect(announceToScreenReader).toHaveBeenCalledWith("Program running.");
+            expect(activity.textMsg).not.toHaveBeenCalled();
         });
     });
 
