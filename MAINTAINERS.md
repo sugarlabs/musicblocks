@@ -35,7 +35,14 @@ project's test practice.
 
 | Area | GitHub handles |
 | --- | --- |
+| Music & Pedagogy | [@021nirav-blip](https://github.com/021nirav-blip) |
+| UI/UX & Accessibility | [@abhnish](https://github.com/abhnish) |
+| Blocks & Runtime | [@kunalKumar-13](https://github.com/kunalKumar-13), [@rakshityadav1868](https://github.com/rakshityadav1868) |
+| Tests & CI | [@Jetshree](https://github.com/Jetshree) |
 | Docs, Lessons & i18n | [@stutijain2006](https://github.com/stutijain2006) |
+
+Areas show where each Reviewer has the most experience. Any Reviewer may
+review any pull request.
 
 ## Emeritus
 
