@@ -1092,6 +1092,48 @@ describe("TemperamentWidget basic tests", () => {
             expect(widget.ratios[14]).toBeCloseTo(Math.pow(2, 14 / 15), 10);
         });
 
+        describe("playAll", () => {
+            const playedFrequencies = () =>
+                mockActivity.logo.synth.trigger.mock.calls.map(call => call[1]);
+
+            beforeEach(() => {
+                jest.useFakeTimers();
+                mockActivity.logo.synth.trigger.mockClear();
+                widget.pitchNumber = 3;
+                widget.powerBase = 2;
+            });
+
+            afterEach(() => {
+                jest.useRealTimers();
+            });
+
+            test("12EDO: plays 25 notes with the octave exactly once", () => {
+                widget.pitchNumber = 12;
+                widget.frequencies = Array.from({ length: 13 }, (_, i) =>
+                    (261.63 * Math.pow(2, i / 12)).toFixed(2)
+                );
+
+                widget.playAll();
+                jest.runAllTimers();
+
+                const freqs = playedFrequencies();
+                expect(freqs).toHaveLength(25);
+                expect(freqs.filter(f => f === 261.63 * 2)).toHaveLength(1);
+            });
+
+            test.each([
+                ["include", ["100", "125", "150", "200"]],
+                ["omit", ["100", "125", "150"]]
+            ])("plays the octave once when frequencies %s the octave entry", (_, frequencies) => {
+                widget.frequencies = frequencies;
+
+                widget.playAll();
+                jest.runAllTimers();
+
+                expect(playedFrequencies()).toEqual([100, 125, 150, 200, 150, 125, 100]);
+            });
+        });
+
         test("custom transition resets typeOfEdit so save emits ratio blocks", () => {
             global.getTemperamentKeys = jest.fn(() => ["equal"]);
             widget.activity = { errorMsg: jest.fn() };

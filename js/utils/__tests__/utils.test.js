@@ -129,17 +129,19 @@ const {
     getTextWidth,
     doSVG,
     isSVGEmpty,
-    prepareMacroExports,
-    processMacroData,
-    updatePluginObj,
-    processRawPluginData,
-    preparePluginExports,
     hideDOMLabel,
     displayMsg,
     makeKeyboardAccessible,
     announceToScreenReader,
     _
 } = require("../utils.js");
+
+const { processMacroData, prepareMacroExports } = require("../macro-utils.js");
+const {
+    updatePluginObj,
+    processRawPluginData,
+    preparePluginExports
+} = require("../plugin-utils.js");
 
 describe("makeKeyboardAccessible()", () => {
     test("adds button semantics and activates on Enter and Space", () => {

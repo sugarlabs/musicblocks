@@ -110,7 +110,7 @@ function setupSensorsBlocks(activity) {
 
             // Add a handler to continue the flow after the input.
             function __keyPressed(event) {
-                if (event.key === "Enter" || event.keyCode === 13) {
+                if (event.key === "Enter") {
                     // RETURN
                     const value = inputElem.value;
                     if (isNaN(value)) {
