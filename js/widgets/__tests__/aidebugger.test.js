@@ -1541,7 +1541,6 @@ describe("AIDebuggerWidget", () => {
             };
             debuggerWidget._lifecycle.mount();
             debuggerWidget._createLayout();
-            debuggerWidget._lifecycle.mount();
         });
 
         test("sets up messageInput focus and blur styling", () => {
