@@ -753,7 +753,7 @@ class RhythmRuler {
 
         // Handle Enter key to validate and blur (prevent any play action)
         this._dissectNumber.addEventListener("keydown", event => {
-            if (event.keyCode === 13 || event.key === "Enter") {
+            if (event.key === "Enter") {
                 event.preventDefault();
                 event.stopPropagation();
                 const inputValue = parseInt(this._dissectNumber.value, 10);
