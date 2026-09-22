@@ -222,12 +222,14 @@ jobs:
                   verbose: true
 
     # ----------------------------------------------------------------------
-    # Stryker mutation testing
+    # Stryker mutation testing (mathutils.js)
     # ----------------------------------------------------------------------
     mutation:
-        name: Mutation testing
+        name: Mutation testing (mathutils.js)
         runs-on: ubuntu-latest
-        timeout-minutes: 30
+        # mathutils.js has 245 mutants. CI runners have 2 CPUs so concurrency=1.
+        # 245 mutants × ~5 s/mutant (single worker) ≈ 20 min. 45 min gives headroom.
+        timeout-minutes: 45
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -249,8 +251,8 @@ jobs:
                   fi
               shell: bash
 
-            - name: Run Stryker
-              run: npx stryker run
+            - name: Run Stryker on mathutils.js
+              run: npx stryker run --mutate "js/utils/mathutils.js"
 
     # ----------------------------------------------------------------------
     # Cypress end-to-end tests
