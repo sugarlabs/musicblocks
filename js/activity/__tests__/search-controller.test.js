@@ -520,7 +520,7 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         activity.searchWidget.value = "";
         sc.doSearch();
 
-        const event = { preventDefault: jest.fn(), keyCode: 0 };
+        const event = { preventDefault: jest.fn(), key: "" };
         const ui = { item: { label: "drum beat", value: "drum", specialDict: block } };
         $elem.getOpts().select(event, ui);
 
@@ -530,6 +530,27 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         expect(activity.searchWidget.idInput_custom).toBe("drum");
         expect(activity.searchWidget.protoblk).toBe(block);
         expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
+    });
+
+    test("select callback keeps search widget visible on Enter", () => {
+        const block = makeProtoBlock("drum", "drum beat");
+        const activity = makeActivity({ drum: block });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        // Ensure we start with some initial state to distinguish the change
+        activity.searchWidget.style.visibility = "hidden";
+
+        activity.searchWidget.idInput_custom = "";
+        activity.searchWidget.value = "";
+        sc.doSearch();
+
+        const event = { preventDefault: jest.fn(), key: "Enter" };
+        const ui = { item: { label: "drum beat", value: "drum", specialDict: block } };
+        $elem.getOpts().select(event, ui);
+
+        expect(activity.searchWidget.style.visibility).toBe("visible");
     });
 
     test("focus callback calls preventDefault", () => {

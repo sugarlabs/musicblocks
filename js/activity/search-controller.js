@@ -290,7 +290,7 @@ class SearchController {
                     activity.searchWidget.idInput_custom = ui.item.value;
                     activity.searchWidget.protoblk = ui.item.specialDict;
                     that.doSearch();
-                    if (event.keyCode === 13) activity.searchWidget.style.visibility = "visible";
+                    if (event.key === "Enter") activity.searchWidget.style.visibility = "visible";
                 },
                 focus: event => {
                     event.preventDefault();
