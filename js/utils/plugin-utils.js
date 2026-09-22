@@ -502,9 +502,9 @@ const processRawPluginData = async (activity, rawData, pluginSource) => {
     } catch (e) {
         obj = null;
 
-        console.log(rawData);
+        console.debug(rawData);
 
-        console.log(cleanData);
+        console.debug(cleanData);
         activity.errorMsg("Error loading plugin: " + e);
     }
 
