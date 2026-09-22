@@ -13,7 +13,7 @@
    global
 
    _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH,
-   CUSTOMSAMPLES, globalActivity
+   CUSTOMSAMPLES, globalActivity, isUnsafeObjectKey
  */
 
 const _b64Cache = new Map();
@@ -3086,6 +3086,7 @@ const deleteTemperamentFromList = oldEntry => {
  * @returns {void}
  */
 const addTemperamentToDictionary = (entryName, entryValue) => {
+    if (isUnsafeObjectKey(entryName)) return;
     TEMPERAMENT[entryName] = entryValue;
 };
 
