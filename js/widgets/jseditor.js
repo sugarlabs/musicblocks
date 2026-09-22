@@ -34,6 +34,7 @@ class JSEditor {
         this.activity = activity;
         this.isOpen = true;
         this._showingHelp = false;
+        this._tooltips = [];
 
         this.widgetWindow = window.widgetWindows.windowFor(
             this,
@@ -327,6 +328,12 @@ class JSEditor {
             // Each open() adds a fresh set of theme <link> elements to
             // document.head (see constructor); remove this instance's set
             // on close so repeated open/close cycles don't leak them.
+            if (this._tooltips) {
+                for (const tooltipBox of this._tooltips) {
+                    tooltipBox.remove();
+                }
+                this._tooltips = null;
+            }
             if (this._styles) {
                 for (const link of this._styles) {
                     link.remove();
@@ -366,13 +373,16 @@ class JSEditor {
         menuLeft.style.justifyContent = "end";
         menuLeft.style.alignItems = "center";
 
-        function generateTooltip(targetButton, tooltipText, positionOfTooltip = "bottom") {
+        const generateTooltip = (targetButton, tooltipText, positionOfTooltip = "bottom") => {
             const tooltipBox = document.createElement("div");
             const tooltip = document.createElement("div");
 
             tooltipBox.appendChild(tooltip);
 
             document.body.appendChild(tooltipBox);
+            if (this._tooltips) {
+                this._tooltips.push(tooltipBox);
+            }
 
             targetButton.addEventListener("mouseover", () => {
                 const rect = targetButton.getBoundingClientRect();
@@ -407,7 +417,7 @@ class JSEditor {
             });
 
             return tooltip;
-        }
+        };
 
         const helpBtn = document.createElement("span");
         helpBtn.id = "js_editor_help_btn";

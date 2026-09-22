@@ -375,6 +375,30 @@ describe("JSEditor", () => {
                 expect(countLinks()).toBe(baseline);
             }
         });
+
+        test("onclose removes tooltip elements from document.body", () => {
+            const beforeCount = document.body.children.length;
+            const editor = createEditor();
+
+            // 6 tooltips were added to document.body
+            expect(document.body.children.length).toBe(beforeCount + 6);
+
+            editor.widgetWindow.onclose();
+
+            // After close, all 6 tooltips should be removed from document.body
+            expect(document.body.children.length).toBe(beforeCount);
+        });
+
+        test("repeated open/close cycles do not leak tooltip containers into document.body", () => {
+            const baseline = document.body.children.length;
+
+            for (let i = 0; i < 5; i++) {
+                const editor = createEditor();
+                expect(document.body.children.length).toBe(baseline + 6);
+                editor.widgetWindow.onclose();
+                expect(document.body.children.length).toBe(baseline);
+            }
+        });
     });
 
     describe("code editing functions", () => {
