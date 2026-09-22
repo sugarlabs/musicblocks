@@ -354,6 +354,9 @@ class TrashController {
 
         const existingView = document.getElementById("trashView");
         if (existingView) {
+            if (window.jQuery) {
+                window.jQuery("#trashView .tooltipped").tooltip("remove");
+            }
             trashList.replaceChild(trashView, existingView);
         } else {
             trashList.appendChild(trashView);

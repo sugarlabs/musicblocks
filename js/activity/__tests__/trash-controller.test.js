@@ -362,6 +362,26 @@ describe("TrashController.renderTrashView", () => {
         expect(document.querySelectorAll("#trashView").length).toBe(1);
     });
 
+    test("removes restore-control tooltips before replacing the trash view", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList.blk1 = makeBlock();
+        activity.blocks.trashStacks = ["blk1"];
+        const tooltip = jest.fn();
+        const originalJQuery = window.jQuery;
+        window.jQuery = jest.fn(() => ({ tooltip }));
+        const controller = new TrashController(activity);
+
+        controller.renderTrashView();
+        controller.renderTrashView();
+
+        expect(tooltip).toHaveBeenCalledWith("remove");
+        if (originalJQuery) {
+            window.jQuery = originalJQuery;
+        } else {
+            delete window.jQuery;
+        }
+    });
+
     test("clicking a trash item restores that block", () => {
         const activity = makeActivity();
         activity.blocks.blockList.blk1 = makeBlock();
