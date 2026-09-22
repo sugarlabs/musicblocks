@@ -1279,4 +1279,109 @@ describe("Block Foundation", () => {
             expect(mockBlocksObj.actionHistory[0].newText).toBe("updated");
         });
     });
+
+    describe("_exitKeyPressed()", () => {
+        it("handles Enter and Tab keys correctly", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.label = { removeEventListener: jest.fn() };
+            block._labelChanged = jest.fn();
+
+            document.body.innerHTML = '<div id="labelDiv" class="hasKeyboard"></div>';
+            const originalDocById = global.docById;
+            global.docById = jest.fn(id => document.getElementById(id));
+
+            const eventEnter = { key: "Enter", preventDefault: jest.fn() };
+            block._exitKeyPressed(eventEnter);
+            expect(block._labelChanged).toHaveBeenCalledWith(true, false);
+            expect(eventEnter.preventDefault).toHaveBeenCalled();
+            expect(block.label.removeEventListener).toHaveBeenCalledWith(
+                "keypress",
+                block._exitKeyPressed
+            );
+            expect(document.getElementById("labelDiv").classList.contains("hasKeyboard")).toBe(
+                false
+            );
+
+            document.getElementById("labelDiv").classList.add("hasKeyboard");
+
+            const eventTab = { key: "Tab", preventDefault: jest.fn() };
+            block._exitKeyPressed(eventTab);
+            expect(block._labelChanged).toHaveBeenCalledTimes(2);
+            expect(eventTab.preventDefault).toHaveBeenCalled();
+            expect(document.getElementById("labelDiv").classList.contains("hasKeyboard")).toBe(
+                false
+            );
+
+            global.docById = originalDocById;
+        });
+
+        it("ignores other keys", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.label = { removeEventListener: jest.fn() };
+            block._labelChanged = jest.fn();
+            const event = { key: "Escape", preventDefault: jest.fn() };
+
+            block._exitKeyPressed(event);
+            expect(block._labelChanged).not.toHaveBeenCalled();
+            expect(event.preventDefault).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("_changeLabel() keypress handler", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+            jest.restoreAllMocks();
+        });
+
+        it("handles Enter and Tab keys correctly", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block._usePiemenu = jest.fn().mockReturnValue(false);
+            block.activity = {
+                blocksContainer: { x: 0, y: 0, update: jest.fn() },
+                getStageScale: jest.fn().mockReturnValue(1),
+                canvas: { offsetLeft: 0, offsetTop: 0 }
+            };
+            block._labelChanged = jest.fn();
+            block.blocks = { blockScale: 1 };
+            block.protoblock = { scale: 1 };
+            block.name = "text";
+            block.value = "test";
+            block.container = { x: 0, y: 0 };
+
+            document.body.innerHTML = '<div id="labelDiv"></div>';
+            const originalDocById = global.docById;
+            global.docById = jest.fn(id => document.getElementById(id));
+
+            let keypressHandler;
+            jest.spyOn(HTMLInputElement.prototype, "addEventListener").mockImplementation(
+                function (event, handler) {
+                    if (event === "keypress") {
+                        keypressHandler = handler;
+                    }
+                }
+            );
+
+            block._changeLabel();
+
+            jest.advanceTimersByTime(100);
+
+            expect(keypressHandler).toBeDefined();
+
+            const eventEnter = { key: "Enter", preventDefault: jest.fn() };
+            keypressHandler(eventEnter);
+            expect(block._labelChanged).toHaveBeenCalledWith(true, true);
+            expect(eventEnter.preventDefault).toHaveBeenCalled();
+
+            const eventTab = { key: "Tab", preventDefault: jest.fn() };
+            keypressHandler(eventTab);
+            expect(block._labelChanged).toHaveBeenCalledTimes(2);
+            expect(eventTab.preventDefault).toHaveBeenCalled();
+
+            global.docById = originalDocById;
+        });
+    });
 });
