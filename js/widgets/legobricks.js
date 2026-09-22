@@ -2194,7 +2194,9 @@ function LegoWidget() {
     this._drawGridLines = function () {
         if (!this.rowHeaderTable.rows.length || !this.gridOverlay) return;
 
-        this.gridOverlay.replaceChildren();
+        // Keep the scanning lines of an in-progress playback attached to the overlay
+        const scanningElements = (this.scanningLines || []).map(line => line.element);
+        this.gridOverlay.replaceChildren(...scanningElements);
 
         const numRows = this.matrixData.rows.length;
 

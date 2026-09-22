@@ -2307,4 +2307,25 @@ describe("LegoWidget — _clearPhrase and _initializeMatrix safety (Issue #8609)
         expect(legoWidget.synth.stopSound).toHaveBeenCalledWith(0, "electronic synth", "G4");
         await playbackPromise;
     });
+
+    describe("_drawGridLines during playback", () => {
+        it("keeps the scanning lines attached to the overlay when the grid is redrawn", () => {
+            legoWidget.matrixData = { rows: [{ note: "C" }, { note: "D" }] };
+            legoWidget.rowHeaderTable = { rows: [{}, {}] };
+            legoWidget.gridOverlay = document.createElement("div");
+            legoWidget.verticalSpacing = 50;
+
+            const scanLine = document.createElement("div");
+            legoWidget.gridOverlay.appendChild(scanLine);
+            legoWidget.scanningLines = [{ element: scanLine }];
+
+            legoWidget._drawGridLines();
+
+            expect(scanLine.parentNode).toBe(legoWidget.gridOverlay);
+            const redLines = Array.from(legoWidget.gridOverlay.children).filter(
+                el => el.style.backgroundColor === "red"
+            );
+            expect(redLines).toHaveLength(2);
+        });
+    });
 });
