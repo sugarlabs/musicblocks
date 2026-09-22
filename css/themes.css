@@ -677,7 +677,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast #confirmation-message {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .material-tooltip {
