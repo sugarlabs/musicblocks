@@ -766,24 +766,39 @@ describe("aux toolbar collapse and expand", () => {
         };
 
         const originalJQuery = window.jQuery;
-        window.jQuery = jest.fn(() => ({ tooltip: jest.fn() }));
+        const mockJQuery = jest.fn(() => ({
+            tooltip: jest.fn(),
+            each: jest.fn(function (cb) {
+                cb.call(document.createElement("div"));
+                return this;
+            })
+        }));
+        mockJQuery.noConflict = jest.fn(() => mockJQuery);
+        window.jQuery = mockJQuery;
+        global.jQuery = mockJQuery;
         const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
         global.makeKeyboardAccessible = jest.fn();
 
         const originalImage = global.Image;
-        const mockImage = function () {};
-        Object.defineProperty(mockImage.prototype, "src", {
-            set: function (val) {
-                this._src = val;
-                if (typeof this.onload === "function") {
-                    this.onload();
+        global.Image = function () {
+            const img = document.createElement("img");
+            const originalSetAttribute = img.setAttribute;
+            img.setAttribute = jest.fn(function (name, value) {
+                return originalSetAttribute.call(img, name, value);
+            });
+            Object.defineProperty(img, "src", {
+                set: function (val) {
+                    this.setAttribute("src", val);
+                    if (typeof this.onload === "function") {
+                        this.onload();
+                    }
+                },
+                get: function () {
+                    return this.getAttribute("src");
                 }
-            },
-            get: function () {
-                return this._src;
-            }
-        });
-        global.Image = mockImage;
+            });
+            return img;
+        };
 
         const activityMock = {
             toolbarHeight: 0,
@@ -792,11 +807,18 @@ describe("aux toolbar collapse and expand", () => {
             refreshCanvas: jest.fn()
         };
         const turtles = new Turtles(activityMock);
+        mixinPrototypes(turtles);
         turtles.activity = activityMock; // Manually assign activity just in case importMembers is mocked
-        turtles.borderContainer = { removeAllChildren: jest.fn(), addChild: jest.fn() };
-        turtles.canvas = { style: {}, getContext: jest.fn() };
+        turtles._borderContainer = { removeAllChildren: jest.fn(), addChild: jest.fn() };
+        turtles._canvas = { style: {}, getContext: jest.fn(), width: 1200, height: 900 };
         turtles.stage = { addChild: jest.fn() };
         turtles._backgroundColor = "white"; // Add to prevent crash
+        turtles._expandedBoundary = null;
+        turtles._collapsedBoundary = null;
+        turtles._expandButton = null;
+        turtles._collapseButton = null;
+        turtles.gridButton = null;
+        turtles._clearButton = null;
 
         window._focusCycleManager = { exitKeyboardNavigation: jest.fn() };
 
