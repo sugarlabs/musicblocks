@@ -661,21 +661,35 @@ class Palettes {
             element.style.top = this.top + "px";
             element.style.transition = "transform 0.3s ease";
 
-            element.innerHTML = `<div style="height:fit-content">
-                    <table width="${1.5 * this.cellSize}" bgcolor="white">
-                        <thead>
-                            <tr role="tablist" aria-label="${_("Palette Categories")}"></tr>
-                        </thead>
-                    </table>
-                    <table width ="${4.5 * this.cellSize}" bgcolor="white">
-                        <thead>
-                            <tr>
-                                <td style="width:28px"></td>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>`;
+            const containerDiv = document.createElement("div");
+            containerDiv.style.height = "fit-content";
+
+            const table1 = document.createElement("table");
+            table1.setAttribute("width", 1.5 * this.cellSize);
+            table1.setAttribute("bgcolor", "white");
+            const thead1 = document.createElement("thead");
+            const tr1 = document.createElement("tr");
+            tr1.setAttribute("role", "tablist");
+            tr1.setAttribute("aria-label", _("Palette Categories"));
+            thead1.appendChild(tr1);
+            table1.appendChild(thead1);
+            containerDiv.appendChild(table1);
+
+            const table2 = document.createElement("table");
+            table2.setAttribute("width", 4.5 * this.cellSize);
+            table2.setAttribute("bgcolor", "white");
+            const thead2 = document.createElement("thead");
+            const tr2 = document.createElement("tr");
+            const td2 = document.createElement("td");
+            td2.style.width = "28px";
+            tr2.appendChild(td2);
+            thead2.appendChild(tr2);
+            const tbody2 = document.createElement("tbody");
+            table2.appendChild(thead2);
+            table2.appendChild(tbody2);
+            containerDiv.appendChild(table2);
+
+            element.appendChild(containerDiv);
 
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
 
