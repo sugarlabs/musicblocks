@@ -1455,6 +1455,18 @@ describe("Plugin and Macro Utilities", () => {
             expect(spy).toHaveBeenCalled();
             spy.mockRestore();
         });
+
+        it("handles unexpected errors gracefully", async () => {
+            const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            // Passing "true" makes JSON.parse succeed (returns boolean true), but triggers a
+            // TypeError in processPluginData ("PALETTEPLUGINS" in obj) which then hits the catch block.
+            const rawData = "true";
+            const res = await processRawPluginData(mockActivity, rawData, "localStorage:plugins");
+            expect(res).toBeNull();
+            expect(spy).toHaveBeenCalledWith(rawData);
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            spy.mockRestore();
+        });
     });
 
     describe("preparePluginExports()", () => {
