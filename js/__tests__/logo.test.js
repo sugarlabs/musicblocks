@@ -1304,6 +1304,29 @@ describe("Logo runLogoCommands", () => {
         });
     });
 
+    test("a turtle added because every turtle is in the trash gets its synth set up", () => {
+        // With the start block trashed, clicking a lone stack adds a fresh
+        // turtle. It must exist before prepSynths() runs, or its first note
+        // has no instrument to play on.
+        const newTurtle = createMockTurtle();
+        const seenByPrepSynths = [];
+        mockActivity.turtles.turtleCount = jest.fn(() => 0);
+        mockActivity.turtles.addTurtle = jest.fn(() => {
+            mockActivity.turtles.turtleList.push(newTurtle);
+        });
+        logo.prepSynths = jest.fn(() => {
+            seenByPrepSynths.push(...mockActivity.turtles.turtleList);
+        });
+        logo._restoreConnections = jest.fn();
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [{ name: "newnote", trash: false, connections: [null] }];
+
+        logo.runLogoCommands(0, null);
+
+        expect(mockActivity.turtles.addTurtle).toHaveBeenCalledTimes(1);
+        expect(seenByPrepSynths).toContain(newTurtle);
+    });
+
     describe("the Stop button is shown however a project is started", () => {
         // walterbender asked how #8494 was tested, given the many ways a run
         // can begin. These drive runLogoCommands the way each of those ways
