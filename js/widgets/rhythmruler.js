@@ -867,84 +867,12 @@ class RhythmRuler {
                 } else if (!this._playingAll) {
                     this.__resume();
                 }
-                return;
-            }
-
-            if (
-                event.shiftKey &&
-                (event.key === "ArrowUp" || event.code === "ArrowUp" || event.keyCode === 38)
-            ) {
-                event.preventDefault();
-                event.stopPropagation();
-                this._shiftRuler(-1);
-                return;
-            }
-
-            if (
-                event.shiftKey &&
-                (event.key === "ArrowDown" || event.code === "ArrowDown" || event.keyCode === 40)
-            ) {
-                event.preventDefault();
-                event.stopPropagation();
-                this._shiftRuler(1);
             }
         };
 
         document.addEventListener("keydown", this._keyHandler, true);
 
         return widgetWindow;
-    }
-
-    /**
-     * Shifts the active ruler selection up or down.
-     * @private
-     * @param {number} delta - Direction to shift (-1 for up, 1 for down).
-     * @returns {void}
-     */
-    _shiftRuler(delta) {
-        if (!this.Rulers || this.Rulers.length <= 1) {
-            return;
-        }
-        const current = parseInt(this._rulerSelected, 10) || 0;
-        const total = this.Rulers.length;
-        const next = Math.max(0, Math.min(total - 1, current + delta));
-        this._rulerSelected = next;
-        if (this._rulers && this._rulers[this._rulerSelected]) {
-            const rulerRow = this._rulers[this._rulerSelected];
-            if (typeof rulerRow.scrollIntoView === "function") {
-                rulerRow.scrollIntoView({ block: "nearest" });
-            }
-            if (typeof rulerRow.setAttribute === "function") {
-                rulerRow.tabIndex = -1;
-                this._rulers.forEach((row, idx) => {
-                    if (row && typeof row.setAttribute === "function") {
-                        row.setAttribute(
-                            "aria-selected",
-                            idx === this._rulerSelected ? "true" : "false"
-                        );
-                    }
-                });
-                const drumName =
-                    typeof this._getDrumName === "function"
-                        ? this._getDrumName(this._rulerSelected)
-                        : "snare drum";
-                rulerRow.setAttribute(
-                    "aria-label",
-                    `${drumName} ${_("ruler")} ${this._rulerSelected + 1}`
-                );
-            }
-            if (typeof rulerRow.focus === "function") {
-                rulerRow.focus();
-            }
-            const activity = this.activity || this._activity;
-            if (activity && typeof activity.textMsg === "function") {
-                const drumName =
-                    typeof this._getDrumName === "function"
-                        ? this._getDrumName(this._rulerSelected)
-                        : "snare drum";
-                activity.textMsg(`${drumName} ${_("ruler")} ${this._rulerSelected + 1}`);
-            }
-        }
     }
 
     /**
@@ -1039,9 +967,6 @@ class RhythmRuler {
             const rulerRow = rulerCellTable.insertRow();
             this._rulers[i] = rulerRow;
             rulerRow.setAttribute("data-row", i);
-            rulerRow.tabIndex = -1;
-            rulerRow.setAttribute("role", "row");
-            rulerRow.setAttribute("aria-selected", i === this._rulerSelected ? "true" : "false");
 
             for (let j = 0; j < this.Rulers[i][0].length; j++) {
                 const noteValue = this.Rulers[i][0][j];
