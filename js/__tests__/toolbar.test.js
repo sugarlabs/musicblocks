@@ -655,6 +655,36 @@ describe("Toolbar Class", () => {
         expect(recordButton.style.display).toBe("");
     });
 
+    test("updateRecordButton configures record button state when fnBrowserDetect is undefined", () => {
+        const recordButton = {
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" }
+        };
+        const recordDropdownArrow = {
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" },
+            appendChild: jest.fn(),
+            addEventListener: jest.fn(),
+            querySelector: jest.fn(() => ({ textContent: "arrow_drop_down" }))
+        };
+        global.docById.mockImplementation(id => {
+            if (id === "record") return recordButton;
+            if (id === "recordDropdownArrow") return recordDropdownArrow;
+            return null;
+        });
+        toolbar.activity = { beginnerMode: false };
+        const originalFnBrowserDetect = global.fnBrowserDetect;
+        delete global.fnBrowserDetect;
+
+        expect(() => toolbar.updateRecordButton(jest.fn())).not.toThrow();
+        expect(recordButton.style.display).toBe("block");
+        expect(typeof recordButton.onclick).toBe("function");
+
+        if (originalFnBrowserDetect) {
+            global.fnBrowserDetect = originalFnBrowserDetect;
+        }
+    });
+
     test("updateRecordButton keeps only one outside-click listener and dispose removes it", () => {
         const recordButton = {
             classList: { add: jest.fn(), remove: jest.fn() },
