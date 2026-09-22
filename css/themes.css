@@ -672,8 +672,8 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast #newdropdown {
-    border: #ffffff;
-    background-color: var(--color-text-inverse);
+    border: 1px solid #ffffff;
+    background-color: var(--color-bg-primary);
 }
 
 .highcontrast #confirmation-message {
