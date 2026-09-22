@@ -1856,13 +1856,73 @@ describe("Blocks Foundation", () => {
             expect(windowErrors.length).toBeGreaterThan(0);
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(blocks._loadInProgress).toBe(false);
+            // Autosave (js/activity/idle-watcher.js) checks this flag before
+            // persisting blockList, so it doesn't overwrite a good saved
+            // session with the truncated result of this failed load
+            // (issue #8855).
+            expect(blocks._lastLoadFailed).toBe(true);
 
-            // A load issued after the failure must not be stranded behind it.
+            // A load issued after the failure must not be stranded behind it,
+            // and must clear the failure flag now that a fresh attempt is
+            // underway.
             blocks._processOneBlock = stubProcessOneBlock();
             blocks.loadNewBlocks(makeBatch(2));
 
             expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._lastLoadFailed).toBe(false);
             expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("emits a 'loadFailed' pubsub event when a deferred chunk (block 21+) throws", async () => {
+            // Unlike the first, synchronous chunk (whose throw still reaches
+            // whatever try/catch called loadNewBlocks() directly), a
+            // deferred chunk's throw has no such caller to reach. This event
+            // is how a caller like ProjectManager._loadStart() can still
+            // find out and run its recovery logic (issue #8855).
+            let callCount = 0;
+            const thrownError = new Error("deferred chunk failure");
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+                if (callCount === 21) {
+                    throw thrownError;
+                }
+                const thisBlock = blockOffset + b;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+            const loadFailedEvents = [];
+            global.pubsub.on("loadFailed", payload => loadFailedEvents.push(payload));
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
+
+            blocks.loadNewBlocks(makeBatch(25));
+            await new Promise(r => setTimeout(r, 50));
+
+            window.removeEventListener("error", onWindowError);
+
+            expect(loadFailedEvents).toHaveLength(1);
+            expect(loadFailedEvents[0].error).toBe(thrownError);
+            expect(loadFailedEvents[0].generation).toBe(blocks._activeLoadGeneration);
+        });
+
+        it("does not emit 'loadFailed' when the first, synchronous chunk throws", () => {
+            // The synchronous throw already reaches whatever try/catch
+            // called loadNewBlocks() directly, so a listener that also
+            // reacted to "loadFailed" here would run the same recovery
+            // twice for one failure.
+            blocks._processOneBlock = jest.fn(() => {
+                throw new Error("first chunk failure");
+            });
+
+            const loadFailedEvents = [];
+            global.pubsub.on("loadFailed", payload => loadFailedEvents.push(payload));
+
+            expect(() => blocks.loadNewBlocks(makeBatch(2))).toThrow("first chunk failure");
+
+            expect(loadFailedEvents).toHaveLength(0);
+            expect(blocks._lastLoadFailed).toBe(true);
         });
 
         it("does not let a stale completion from a failed load corrupt the next queued load's counter", async () => {

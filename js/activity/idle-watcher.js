@@ -152,6 +152,19 @@ const setupActivityIdleWatcher = activityInstance => {
                         return;
                     }
 
+                    // Don't autosave while a project load is still chunking
+                    // through blocks, or right after one failed partway: in
+                    // both cases activity.blocks.blockList can hold only a
+                    // truncated prefix of the intended project, and saving
+                    // that now would overwrite the last good session with it
+                    // on every storage tier (issue #8855).
+                    if (
+                        activity.blocks &&
+                        (activity.blocks._loadInProgress || activity.blocks._lastLoadFailed)
+                    ) {
+                        return;
+                    }
+
                     // Fix #7: Use saveSessionAsync (IndexedDB) when available;
                     // fall back to saveLocally. In both cases, call
                     // gitDropdownUI.onSaveLocally() so mbGitLastSavedHash is

@@ -316,41 +316,86 @@ class ProjectManager {
             }
         };
 
-        if (that.sessionData) {
-            that.doLoadAnimation();
-            let loaded = false;
-            try {
-                loaded = tryParseAndLoad(that.sessionData);
-            } catch (e) {
-                ErrorHandler.recoverable(e, { operation: "loadSessionData" });
-                await deleteFromSource(sessionSource);
+        // A block-processing failure past the first ~20 blocks throws from
+        // inside loadNewBlocks()'s deferred setTimeout chunking
+        // (js/blocks.js), which no synchronous try/catch around
+        // tryParseAndLoad() below can ever observe: that throw has no
+        // caller left to reach (see issue #8855). loadNewBlocks() reports
+        // that case through this "loadFailed" pubsub event instead (the
+        // same channel "finishedLoading" already uses for success), so it
+        // can still reach the same delete-and-fallback recovery a
+        // synchronous failure gets below. Returns a cleanup function so a
+        // synchronous failure, handled locally, can remove these listeners
+        // itself instead of leaving them stranded.
+        const watchForDeferredLoadFailure = source => {
+            const stopWatching = () => {
+                pubsub.off("finishedLoading", onSucceeded);
+                pubsub.off("loadFailed", onFailed);
+            };
+            const onFailed = payload => {
+                stopWatching();
+                recoverFromLoadFailure(
+                    source,
+                    (payload && payload.error) || new Error("loadNewBlocks failed")
+                );
+            };
+            const onSucceeded = () => stopWatching();
+            pubsub.on("finishedLoading", onSucceeded);
+            pubsub.on("loadFailed", onFailed);
+            return stopWatching;
+        };
 
-                // Attempt fallback to the alternative source if available
-                let fallbackData = null;
-                let fallbackSource = null;
-                if (sessionSource === "idb" && localData) {
+        // Runs the delete-and-fallback recovery for a failed session load,
+        // whether that failure was caught synchronously below or reported
+        // asynchronously via "loadFailed" above. Attempts at most one
+        // fallback (the same bound the original synchronous-only version of
+        // this logic had) so two independently bad storage tiers can't
+        // bounce off each other indefinitely.
+        let fallbackAttempted = false;
+        const recoverFromLoadFailure = async (failedSource, error) => {
+            ErrorHandler.recoverable(error, { operation: "loadSessionData" });
+            await deleteFromSource(failedSource);
+
+            let fallbackData = null;
+            let fallbackSource = null;
+            if (!fallbackAttempted) {
+                if (failedSource === "idb" && localData) {
                     fallbackData = localData;
                     fallbackSource = "local";
-                } else if (sessionSource === "local" && idbPayload && idbPayload.data) {
+                } else if (failedSource === "local" && idbPayload && idbPayload.data) {
                     fallbackData = idbPayload.data;
                     fallbackSource = "idb";
                 }
+            }
 
-                if (fallbackData) {
-                    try {
-                        that.sessionData = fallbackData;
-                        loaded = tryParseAndLoad(fallbackData);
-                    } catch (fallbackErr) {
-                        ErrorHandler.recoverable(fallbackErr, {
-                            operation: "loadFallbackSessionData"
-                        });
-                        await deleteFromSource(fallbackSource);
-                    }
+            if (fallbackData) {
+                fallbackAttempted = true;
+                const stopWatchingFallback = watchForDeferredLoadFailure(fallbackSource);
+                try {
+                    that.sessionData = fallbackData;
+                    tryParseAndLoad(fallbackData);
+                    return;
+                } catch (fallbackErr) {
+                    stopWatchingFallback();
+                    ErrorHandler.recoverable(fallbackErr, {
+                        operation: "loadFallbackSessionData"
+                    });
+                    await deleteFromSource(fallbackSource);
                 }
+            }
 
-                if (!loaded) {
-                    that.justLoadStart();
-                }
+            that.errorMsg(_("Your saved project could not be loaded. Starting a new project."));
+            that.justLoadStart();
+        };
+
+        if (that.sessionData) {
+            that.doLoadAnimation();
+            const stopWatching = watchForDeferredLoadFailure(sessionSource);
+            try {
+                tryParseAndLoad(that.sessionData);
+            } catch (e) {
+                stopWatching();
+                await recoverFromLoadFailure(sessionSource, e);
             }
         } else {
             that.justLoadStart();
