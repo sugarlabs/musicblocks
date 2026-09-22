@@ -62,6 +62,9 @@ global.VOICENAMES = [];
 global.EFFECTSNAMES = [];
 global.getComputedStyle = jest.fn().mockReturnValue({ backgroundColor: "#303030" });
 global.ManagedTimer = ManagedTimer;
+global.clampNumber = jest
+    .fn()
+    .mockImplementation((val, min, max) => Math.min(Math.max(val, min), max));
 
 // Mock Window Manager
 
@@ -81,6 +84,7 @@ const mockWindow = {
                 value: val,
                 style: {},
                 addEventListener: jest.fn(),
+                blur: jest.fn(),
                 classList: { add: jest.fn(), remove: jest.fn() },
                 onfocus: null,
                 onblur: null
@@ -120,6 +124,9 @@ global.document = {
         setAttribute: jest.fn(),
         getAttribute: jest.fn(),
         addEventListener: jest.fn(),
+        blur: jest.fn(),
+        onfocus: null,
+        onblur: null,
         appendChild: jest.fn(),
         replaceChildren: jest.fn(),
         insertRow: jest.fn().mockReturnValue({
@@ -240,6 +247,26 @@ describe("RhythmRuler Widget", () => {
             expect(rhythmRuler._playingAll).toBe(false);
             expect(rhythmRuler._tapMode).toBe(false);
             expect(rhythmRuler._rulerSelected).toBe(0);
+        });
+
+        test("should validate and blur the dissect input on Enter", () => {
+            window.widgetWindows = mockWindow.widgetWindows;
+            rhythmRuler._createWidgetWindow();
+            const input = rhythmRuler._dissectNumber;
+            const keydownHandler = input.addEventListener.mock.calls.find(
+                ([eventName]) => eventName === "keydown"
+            )[1];
+            const event = {
+                key: "Enter",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            input.value = "1";
+            keydownHandler(event);
+
+            expect(input.value).toBe(2);
+            expect(input.blur).toHaveBeenCalled();
         });
 
         test("should have correct static constants", () => {
