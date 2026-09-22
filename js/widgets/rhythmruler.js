@@ -372,6 +372,13 @@ class RhythmRuler {
          * @private
          */
         this._activeIntervals = new Set();
+
+        /**
+         * Keyboard event handler for the widget.
+         * @type {function | null}
+         * @private
+         */
+        this._keyHandler = null;
     }
 
     /**
@@ -644,6 +651,10 @@ class RhythmRuler {
          * @private
          */
         widgetWindow.onclose = () => {
+            if (this._keyHandler) {
+                document.removeEventListener("keydown", this._keyHandler, true);
+                this._keyHandler = null;
+            }
             if (this._playing) {
                 this.__pause();
             }
@@ -803,6 +814,65 @@ class RhythmRuler {
             this._circularView = !this._circularView;
             this._toggleCircularView();
         };
+
+        if (this._keyHandler) {
+            document.removeEventListener("keydown", this._keyHandler, true);
+            this._keyHandler = null;
+        }
+
+        this._keyHandler = event => {
+            if (
+                typeof window === "undefined" ||
+                !window.widgetWindows ||
+                window.widgetWindows.focused !== widgetWindow
+            ) {
+                return;
+            }
+
+            const activity = this.activity || this._activity;
+            if (
+                activity &&
+                activity.blocks &&
+                activity.blocks.activeBlock !== null &&
+                activity.blocks.activeBlock !== undefined
+            ) {
+                return;
+            }
+
+            const activeElement = document.activeElement;
+            if (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.isContentEditable)
+            ) {
+                return;
+            }
+
+            if (
+                activeElement &&
+                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT")
+            ) {
+                return;
+            }
+
+            if (event.key === " " || event.code === "Space" || event.keyCode === 32) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.repeat) {
+                    return;
+                }
+                if (this._playAllCell && typeof this._playAllCell.onclick === "function") {
+                    this._playAllCell.onclick();
+                } else if (this._playing) {
+                    this.__pause();
+                } else if (!this._playingAll) {
+                    this.__resume();
+                }
+            }
+        };
+
+        document.addEventListener("keydown", this._keyHandler, true);
 
         return widgetWindow;
     }
