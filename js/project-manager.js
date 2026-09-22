@@ -486,13 +486,22 @@ class ProjectManager {
         // Clear the Git tracking for the new project — mirrors the
         // same cleanup done in activity.js _afterDelete (which is only
         // reached via a different code path).
-        localStorage.removeItem("mbGitRepoName");
-        localStorage.removeItem("mbGitHashedKey");
-        localStorage.removeItem("mbGitDisplayName");
-        localStorage.removeItem("mbGitLastSavedHash");
-        localStorage.removeItem("mbGitCurrentSha");
-        localStorage.removeItem("mbGitCurrentDraftId");
-        localStorage.removeItem("mbGitCurrentProjectId");
+        const gitKeys = [
+            "mbGitRepoName",
+            "mbGitHashedKey",
+            "mbGitDisplayName",
+            "mbGitLastSavedHash",
+            "mbGitCurrentSha",
+            "mbGitCurrentDraftId",
+            "mbGitCurrentProjectId"
+        ];
+        for (const key of gitKeys) {
+            if (typeof that.storage.removeItem === "function") {
+                that.storage.removeItem(key);
+            } else {
+                delete that.storage[key];
+            }
+        }
         if (that.gitDropdownUI && typeof that.gitDropdownUI.clearForNewProject === "function") {
             that.gitDropdownUI.clearForNewProject();
         } else if (that.gitDropdownUI && typeof that.gitDropdownUI._syncMenuState === "function") {
