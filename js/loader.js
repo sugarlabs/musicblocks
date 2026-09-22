@@ -248,6 +248,14 @@ requirejs.config({
             deps: ["utils/utils", "utils/dom-helpers", "activity/focus-cycle-manager"],
             exports: "ToolbarUI"
         },
+        "widgets/widgetWindows": {
+            deps: ["utils/utils", "utils/dom-helpers"],
+            exports: "widgetWindows"
+        },
+        "widgets/help": {
+            deps: ["utils/utils", "utils/dom-helpers", "widgets/widgetWindows"],
+            exports: "HelpWidget"
+        },
         // The chat widgets read createWidgetLifecycle off window, so the helper
         // must be evaluated before they are. These are plain scripts, which
         // RequireJS would otherwise fetch and evaluate in any order.
@@ -598,6 +606,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "easeljs.min",
                 "tweenjs.min",
                 "utils/platformstyle",
+                "utils/dom-helpers",
                 "utils/utils",
                 "utils/camera-utils",
                 "activity/pubsub",
