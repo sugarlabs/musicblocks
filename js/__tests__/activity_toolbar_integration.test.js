@@ -421,11 +421,15 @@ describe("Activity Toolbar Integration", () => {
             expect(activity._lastCullContainerY).toBe(340);
         });
 
-        test("catches error during stage.update, logs error, and keeps loop alive", () => {
+        test("catches error during stage.update, sets stageDirty to retry, logs error, and retries in next frame", () => {
             const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
             const renderError = new Error("Stage update failed");
+            let updateAttempts = 0;
             activity.stage.update = jest.fn(() => {
-                throw renderError;
+                updateAttempts++;
+                if (updateAttempts === 1) {
+                    throw renderError;
+                }
             });
             activity.stageDirty = true;
 
@@ -438,9 +442,19 @@ describe("Activity Toolbar Integration", () => {
                 "Music Blocks: render frame failed",
                 renderError
             );
+            expect(activity.stageDirty).toBe(true);
             expect(activity._renderLoopRunning).toBe(true);
-            expect(activity._renderLoopRafId).not.toBeNull();
-            expect(activity._renderLoopRafId).not.toBe(firstId);
+            const secondId = activity._renderLoopRafId;
+            expect(secondId).not.toBeNull();
+            expect(secondId).not.toBe(firstId);
+
+            // Second frame retries stage.update and completes cleanly
+            flushRaf(secondId);
+
+            expect(activity.stage.update).toHaveBeenCalledTimes(2);
+            expect(activity.stageDirty).toBe(false);
+            expect(activity._renderLoopRunning).toBe(false);
+            expect(activity._renderLoopRafId).toBeNull();
 
             consoleErrorSpy.mockRestore();
         });

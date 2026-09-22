@@ -642,6 +642,7 @@ class Activity {
                             // restart on that flag, so the canvas stopped repainting for
                             // the rest of the session. Report the frame and keep going.
                             frameErrored = true;
+                            this.stageDirty = true;
                             console.error("Music Blocks: render frame failed", err);
                         }
 
