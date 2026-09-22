@@ -16,11 +16,20 @@
 const defaultTempo = 90;
 
 const standardDurations = [
+    { value: "3/2", duration: 1.5 },
     { value: "1/1", duration: 1 },
+    { value: "3/4", duration: 0.75 },
     { value: "1/2", duration: 0.5 },
+    { value: "3/8", duration: 0.375 },
+    { value: "1/3", duration: 1 / 3 },
     { value: "1/4", duration: 0.25 },
+    { value: "3/16", duration: 0.1875 },
+    { value: "1/6", duration: 1 / 6 },
     { value: "1/8", duration: 0.125 },
+    { value: "3/32", duration: 0.09375 },
+    { value: "1/12", duration: 1 / 12 },
     { value: "1/16", duration: 0.0625 },
+    { value: "1/24", duration: 1 / 24 },
     { value: "1/32", duration: 0.03125 },
     { value: "1/64", duration: 0.015625 },
     { value: "1/128", duration: 0.0078125 }

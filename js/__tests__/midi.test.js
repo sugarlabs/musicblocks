@@ -69,6 +69,18 @@ describe("getClosestStandardNoteValue", () => {
         expect(getClosestStandardNoteValue(1)).toEqual([1, 1]);
         expect(getClosestStandardNoteValue(0.0078125)).toEqual([1, 128]);
     });
+
+    it("should correctly quantize dotted notes", () => {
+        expect(getClosestStandardNoteValue(1.5)).toEqual([3, 2]);
+        expect(getClosestStandardNoteValue(0.75)).toEqual([3, 4]);
+        expect(getClosestStandardNoteValue(0.375)).toEqual([3, 8]);
+    });
+
+    it("should correctly quantize tuplets (triplets)", () => {
+        expect(getClosestStandardNoteValue(1 / 3)).toEqual([1, 3]);
+        expect(getClosestStandardNoteValue(1 / 6)).toEqual([1, 6]);
+        expect(getClosestStandardNoteValue(1 / 12)).toEqual([1, 12]);
+    });
 });
 
 describe("transcribeMidi", () => {
