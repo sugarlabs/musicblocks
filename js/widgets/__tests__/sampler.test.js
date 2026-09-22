@@ -670,6 +670,82 @@ describe("Sampler Widget", () => {
             jest.useRealTimers();
         });
 
+        test("_waitAndPlaySample cancels previous pending playback timeout before scheduling a new one", () => {
+            jest.useFakeTimers();
+            const clearTimeoutSpy = jest.spyOn(widget, "_clearWidgetTimeout");
+            widget._playSample = jest.fn();
+            widget._endPlaying = jest.fn();
+
+            widget._waitAndPlaySample();
+            const firstTimeoutId = widget._playbackWaitTimeout;
+            expect(firstTimeoutId).not.toBeNull();
+
+            widget._waitAndPlaySample();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(firstTimeoutId);
+            expect(widget._playbackWaitTimeout).not.toBe(firstTimeoutId);
+
+            jest.advanceTimersByTime(500);
+            expect(widget._playSample).toHaveBeenCalledTimes(1);
+
+            jest.useRealTimers();
+        });
+
+        test("_waitAndEndPlaying cancels previous pending end timeout before scheduling a new one", () => {
+            jest.useFakeTimers();
+            const clearTimeoutSpy = jest.spyOn(widget, "_clearWidgetTimeout");
+            widget.pause = jest.fn();
+            widget.sampleLength = 250;
+
+            widget._waitAndEndPlaying();
+            const firstTimeoutId = widget._endPlayingTimeout;
+            expect(firstTimeoutId).not.toBeNull();
+
+            widget._waitAndEndPlaying();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(firstTimeoutId);
+            expect(widget._endPlayingTimeout).not.toBe(firstTimeoutId);
+
+            jest.advanceTimersByTime(250);
+            expect(widget.pause).toHaveBeenCalledTimes(1);
+
+            jest.useRealTimers();
+        });
+
+        test("cent-adjustment restart followed by play cancels previous playback timeout and pause prevents firing", () => {
+            jest.useFakeTimers();
+            widget._playDelayedSample = realPlayDelayedSample;
+            widget._playSample = jest.fn();
+            widget._endPlaying = jest.fn();
+            widget.setTimbre = jest.fn();
+            widget._updateBlocks = jest.fn();
+
+            // Simulate cent adjustment triggering a restart while playing
+            widget.isMoving = true;
+            widget.applyCentAdjustment(5);
+
+            // Cent adjustment scheduled restartPitchTimeout for 100ms
+            expect(widget._restartPitchTimeout).not.toBeNull();
+
+            // Advance 100ms so restart runs _playReferencePitch -> _playDelayedSample -> _waitAndPlaySample
+            jest.advanceTimersByTime(100);
+            const firstPlaybackTimeout = widget._playbackWaitTimeout;
+            expect(firstPlaybackTimeout).not.toBeNull();
+
+            // User triggers play again before the first 500ms delay fires
+            widget._playDelayedSample();
+            expect(widget._playbackWaitTimeout).not.toBe(firstPlaybackTimeout);
+
+            // Pause before the replacement timer fires
+            widget.pause();
+            expect(widget._playbackWaitTimeout).toBeNull();
+            expect(widget._endPlayingTimeout).toBeNull();
+
+            // Advance clock; neither callback should fire
+            jest.advanceTimersByTime(1000);
+            expect(widget._playSample).not.toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+
         test("_scale resizes and redraws canvas", () => {
             const canvas = document.createElement("canvas");
             canvas.className = "samplerCanvas";

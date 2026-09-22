@@ -1778,6 +1778,7 @@ function SampleWidget() {
      */
     this._waitAndPlaySample = function () {
         return new Promise(resolve => {
+            this._clearWidgetTimeout(this._playbackWaitTimeout);
             this._playbackWaitTimeout = this._setWidgetTimeout(() => {
                 this._playbackWaitTimeout = null;
                 this._playSample();
@@ -1802,6 +1803,7 @@ function SampleWidget() {
      */
     this._waitAndEndPlaying = function () {
         return new Promise(resolve => {
+            this._clearWidgetTimeout(this._endPlayingTimeout);
             this._endPlayingTimeout = this._setWidgetTimeout(() => {
                 this._endPlayingTimeout = null;
                 this.pause();
