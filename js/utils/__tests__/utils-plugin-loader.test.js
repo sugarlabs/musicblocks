@@ -78,7 +78,7 @@ describe("processPluginData script cleanup", () => {
         });
         URL.revokeObjectURL = jest.fn();
 
-        ({ processPluginData } = require("../utils.js"));
+        ({ processPluginData } = require("../plugin-utils.js"));
     });
 
     afterEach(() => {
@@ -212,7 +212,7 @@ describe("processPluginData - prototype pollution guard", () => {
         global.HIGHLIGHTSTROKECOLORS = {};
         global.MULTIPALETTES = [[], [], []];
         global.platformColor = { paletteColors: {} };
-        ({ processPluginData } = require("../utils.js"));
+        ({ processPluginData } = require("../plugin-utils.js"));
     });
 
     it("skips __proto__ and constructor keys in every plugin-data section", async () => {
@@ -255,7 +255,7 @@ describe("updatePluginObj - prototype pollution guard", () => {
     beforeEach(() => {
         jest.resetModules();
         global._ = msg => msg;
-        ({ updatePluginObj } = require("../utils.js"));
+        ({ updatePluginObj } = require("../plugin-utils.js"));
     });
 
     it("skips __proto__ and constructor keys when merging into activity.pluginObjs", () => {
