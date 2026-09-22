@@ -34,7 +34,6 @@ app.get("/healthz", (req, res) => {
     });
 });
 
-
 // Enable compression for all responses
 app.use(
     compression({

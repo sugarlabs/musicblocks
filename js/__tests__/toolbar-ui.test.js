@@ -294,7 +294,6 @@ describe("ToolbarUI - renderGitDropdownIcon", () => {
     });
 });
 
-
 describe("ToolbarUI keyboard activation", () => {
     test("activates the button that received focus instead of the first button", () => {
         const toolbarElement = document.createElement("div");

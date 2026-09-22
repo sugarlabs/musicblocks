@@ -83,9 +83,8 @@ class ProjectViewer {
         } else if (proj.ProjectImage && proj.ProjectImage !== "") {
             img = proj.ProjectImage;
         } else {
-            img = proj.ProjectIsMusicBlocks === 1
-                ? this.PlaceholderMBImage
-                : this.PlaceholderTBImage;
+            img =
+                proj.ProjectIsMusicBlocks === 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
         }
 
         document.getElementById("projectviewer-image").src = img;
@@ -121,7 +120,7 @@ class ProjectViewer {
 
     download() {
         const Planet = this.Planet;
-        const proj   = this.ProjectCache[this.id];
+        const proj = this.ProjectCache[this.id];
 
         // If the backend exposes a ZIP download endpoint, use it directly.
         // This avoids fetching the full JSON into memory just to re-save it.

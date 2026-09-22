@@ -461,7 +461,7 @@ class GlobalPlanet {
         }
 
         this._scrollObserver = new IntersectionObserver(
-            (entries) => {
+            entries => {
                 const entry = entries[0];
                 if (entry.isIntersecting && this.loadButtonShown) {
                     this.loadMoreProjects();
@@ -522,9 +522,11 @@ class GlobalPlanet {
                     } else {
                         remixedName = `${this.remixPrefix}  ${_("My Project")}`;
                     }
-                    Planet.ProjectStorage.initialiseNewProject(remixedName, data, null).then(newId => {
-                        Planet._postGitState(newId);
-                    });
+                    Planet.ProjectStorage.initialiseNewProject(remixedName, data, null).then(
+                        newId => {
+                            Planet._postGitState(newId);
+                        }
+                    );
                 }
 
                 Planet.loadProjectFromData(data);
@@ -559,7 +561,7 @@ class GlobalPlanet {
             }
 
             const forkedRepoName = result.repository;
-            const forkedData     = result.projectData;
+            const forkedData = result.projectData;
 
             let remixedName;
             const language = localStorage.languagePreference;
@@ -581,9 +583,9 @@ class GlobalPlanet {
             const originalCache = this.cache[id] || {};
             const forkDescription = originalCache.ProjectDescription || result.description || "";
             const forkTags = originalCache.ProjectTags
-                ? (Array.isArray(originalCache.ProjectTags)
+                ? Array.isArray(originalCache.ProjectTags)
                     ? originalCache.ProjectTags
-                    : [originalCache.ProjectTags])
+                    : [originalCache.ProjectTags]
                 : [];
 
             // If the fork returned project data directly, decode then open it.
@@ -601,7 +603,12 @@ class GlobalPlanet {
                 ).then(async newId => {
                     // Record the GitHub repo link + original metadata separately
                     // so Publisher can flip visible=1 without creating a duplicate repo.
-                    await Planet.ProjectStorage.addGitRepoData(newId, forkedRepoName, forkDescription, forkTags);
+                    await Planet.ProjectStorage.addGitRepoData(
+                        newId,
+                        forkedRepoName,
+                        forkDescription,
+                        forkTags
+                    );
                     // Notify parent toolbar of the forked project's git state so
                     // Time Travel is available immediately after fork.
                     Planet._postGitState(newId);
@@ -617,7 +624,12 @@ class GlobalPlanet {
                             (this.cache[id] && this.cache[id].ProjectImage) || null,
                             null
                         ).then(async newId => {
-                            await Planet.ProjectStorage.addGitRepoData(newId, forkedRepoName, forkDescription, forkTags);
+                            await Planet.ProjectStorage.addGitRepoData(
+                                newId,
+                                forkedRepoName,
+                                forkDescription,
+                                forkTags
+                            );
                             Planet._postGitState(newId);
                         });
                         Planet.loadProjectFromData(data);
