@@ -3557,6 +3557,15 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(synth._parseSampleCenterNo("re", 4)).toBe("50");
             expect(synth._parseSampleCenterNo("D", 4)).toBe("50");
             expect(synth._parseSampleCenterNo("unknown", 4)).toBe("48");
+            // Non-zero chromatic degrees must strip the accidental glyph before
+            // the dictionary lookup, otherwise the lookup misses and the degree
+            // wrongly falls back to 0 (e.g. sol#4 -> C#4).
+            expect(synth._parseSampleCenterNo("sol" + SHARP, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("G" + SHARP, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("la" + FLAT, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("A" + FLAT, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("mi" + DOUBLEFLAT, 4)).toBe("50");
+            expect(synth._parseSampleCenterNo("ti" + DOUBLESHARP, 4)).toBe("61");
         });
 
         test("resolveInstrumentName resolves translated names and internal keys", () => {
