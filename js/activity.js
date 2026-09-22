@@ -621,6 +621,7 @@ class Activity {
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         let frameErrored = false;
+                        this.stageDirty = false;
                         try {
                             // Recompute culling when container moved.
                             if (
@@ -642,13 +643,11 @@ class Activity {
                             // the rest of the session. Report the frame and keep going.
                             frameErrored = true;
                             console.error("Music Blocks: render frame failed", err);
-                        } finally {
-                            this.stageDirty = false;
                         }
 
                         // On error: always keep the loop alive (prevents canvas freeze).
                         // On success: continue only if there is still outstanding work.
-                        // Re-reading stageDirty after clearing it catches the edge case
+                        // Clearing stageDirty before stage.update() catches the edge case
                         // where stage.update() itself synchronously re-dirtied the stage.
                         if (
                             frameErrored ||
