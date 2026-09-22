@@ -455,6 +455,11 @@ describe("_loadStart", () => {
             { operation: "loadSessionData" }
         );
         expect(removeItem).toHaveBeenCalledWith("SESSIONBad");
+        // Any blocks a partially-successful load left behind must be
+        // cleared before justLoadStart()/the fallback attempt runs, or the
+        // new stack renders on top of the leftovers instead of replacing
+        // them (reported against this fix).
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
 
@@ -549,7 +554,41 @@ describe("_loadStart", () => {
             operation: "loadSessionData"
         });
         expect(removeItem).toHaveBeenCalledWith("SESSIONTest");
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
         expect(activity.errorMsg).toHaveBeenCalled();
+        expect(activity.justLoadStart).toHaveBeenCalled();
+    });
+
+    it("ignores a 'loadFailed' event tagged with a different load's generation", async () => {
+        // loadNewBlocks() tags "loadFailed"/"finishedLoading" with the
+        // generation of the call they belong to; a listener registered for
+        // one load must not react to some other, unrelated load's event
+        // just because the names match (review comment on issue #8855's fix).
+        const sessionData = JSON.stringify([{ name: "start" }]);
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: sessionData,
+                removeItem: jest.fn()
+            }
+        });
+        activity.sessionData = sessionData;
+        activity.blocks._activeLoadGeneration = 5;
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        global.pubsub.emit("loadFailed", { generation: 999, error: new Error("unrelated") });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
+
+        const deferredError = new Error("deferred chunk failure");
+        global.pubsub.emit("loadFailed", { generation: 5, error: deferredError });
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(deferredError, {
+            operation: "loadSessionData"
+        });
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
 

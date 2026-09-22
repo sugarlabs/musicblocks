@@ -324,25 +324,39 @@ class ProjectManager {
         // that case through this "loadFailed" pubsub event instead (the
         // same channel "finishedLoading" already uses for success), so it
         // can still reach the same delete-and-fallback recovery a
-        // synchronous failure gets below. Returns a cleanup function so a
-        // synchronous failure, handled locally, can remove these listeners
-        // itself instead of leaving them stranded.
+        // synchronous failure gets below.
+        //
+        // Both events carry the generation of the loadNewBlocks() call they
+        // belong to (js/blocks.js's _activeLoadGeneration), and this only
+        // ever registers once that call has returned without throwing — so
+        // reading that counter right after is exactly the generation to
+        // watch. Filtering on it keeps this from reacting to some other,
+        // unrelated load's completion or failure (e.g. one a widget starts
+        // later), which a plain event-name match couldn't tell apart.
         const watchForDeferredLoadFailure = source => {
+            const expectedGeneration = that.blocks._activeLoadGeneration;
+            const belongsToThisLoad = payload =>
+                !payload || payload.generation === undefined
+                    ? true
+                    : payload.generation === expectedGeneration;
             const stopWatching = () => {
                 pubsub.off("finishedLoading", onSucceeded);
                 pubsub.off("loadFailed", onFailed);
             };
             const onFailed = payload => {
+                if (!belongsToThisLoad(payload)) return;
                 stopWatching();
                 recoverFromLoadFailure(
                     source,
                     (payload && payload.error) || new Error("loadNewBlocks failed")
                 );
             };
-            const onSucceeded = () => stopWatching();
+            const onSucceeded = payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+            };
             pubsub.on("finishedLoading", onSucceeded);
             pubsub.on("loadFailed", onFailed);
-            return stopWatching;
         };
 
         // Runs the delete-and-fallback recovery for a failed session load,
@@ -355,6 +369,14 @@ class ProjectManager {
         const recoverFromLoadFailure = async (failedSource, error) => {
             ErrorHandler.recoverable(error, { operation: "loadSessionData" });
             await deleteFromSource(failedSource);
+
+            // The failed load may have only partially populated blockList
+            // before it threw. Clear those leftover blocks before loading
+            // anything else, or the next attempt's blocks render on top of
+            // them instead of replacing them (reported against this fix).
+            if (typeof that.sendAllToTrash === "function") {
+                that.sendAllToTrash(false, false);
+            }
 
             let fallbackData = null;
             let fallbackSource = null;
@@ -370,13 +392,16 @@ class ProjectManager {
 
             if (fallbackData) {
                 fallbackAttempted = true;
-                const stopWatchingFallback = watchForDeferredLoadFailure(fallbackSource);
                 try {
                     that.sessionData = fallbackData;
                     tryParseAndLoad(fallbackData);
+                    // Still synchronous here: loadNewBlocks() can't have
+                    // reached a deferred chunk's setTimeout(0) yet, so this
+                    // is exactly the generation the fallback attempt needs
+                    // watched.
+                    watchForDeferredLoadFailure(fallbackSource);
                     return;
                 } catch (fallbackErr) {
-                    stopWatchingFallback();
                     ErrorHandler.recoverable(fallbackErr, {
                         operation: "loadFallbackSessionData"
                     });
@@ -390,11 +415,10 @@ class ProjectManager {
 
         if (that.sessionData) {
             that.doLoadAnimation();
-            const stopWatching = watchForDeferredLoadFailure(sessionSource);
             try {
                 tryParseAndLoad(that.sessionData);
+                watchForDeferredLoadFailure(sessionSource);
             } catch (e) {
-                stopWatching();
                 await recoverFromLoadFailure(sessionSource, e);
             }
         } else {

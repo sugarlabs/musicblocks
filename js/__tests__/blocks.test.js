@@ -1925,6 +1925,21 @@ describe("Blocks Foundation", () => {
             expect(blocks._lastLoadFailed).toBe(true);
         });
 
+        it("tags 'finishedLoading' with the load's generation, like 'loadFailed'", async () => {
+            // A listener scoped to one particular loadNewBlocks() call (e.g.
+            // ProjectManager._loadStart()'s recovery watcher) needs this to
+            // tell its own load's completion apart from some other,
+            // unrelated load's.
+            const finishedLoadingEvents = [];
+            global.pubsub.on("finishedLoading", payload => finishedLoadingEvents.push(payload));
+
+            blocks.loadNewBlocks(makeBatch(2));
+            await new Promise(r => setTimeout(r, 10));
+
+            expect(finishedLoadingEvents).toHaveLength(1);
+            expect(finishedLoadingEvents[0].generation).toBe(blocks._activeLoadGeneration);
+        });
+
         it("does not let a stale completion from a failed load corrupt the next queued load's counter", async () => {
             // One stub shared by both loads (load B is queued while load A
             // is still running, so swapping _processOneBlock out from under

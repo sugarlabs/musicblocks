@@ -6722,7 +6722,13 @@ class Blocks {
                 if (this.activity.stopLoadAnimation) {
                     this.activity.stopLoadAnimation();
                 }
-                pubsub.emit("finishedLoading");
+                // Tagged with the load generation that just finished, the
+                // same way "loadFailed" is tagged, so a listener scoped to
+                // one particular loadNewBlocks() call (e.g.
+                // ProjectManager._loadStart()'s recovery watcher) can tell
+                // it apart from some other, unrelated load's completion
+                // (review comment on issue #8855's fix).
+                pubsub.emit("finishedLoading", { generation: this._activeLoadGeneration });
             } finally {
                 /** All blocks loaded — allow canvas redraws again. */
                 this.activity._suppressRefresh = false;
