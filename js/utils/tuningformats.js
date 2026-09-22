@@ -1,7 +1,7 @@
 /**
  * MusicBlocks v3.8.0
  *
- * @author Walter Bender
+ * @author Nirav Sharma
  *
  * @copyright 2026 Walter Bender
  *
