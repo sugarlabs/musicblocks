@@ -37,6 +37,20 @@ class GitDropdownUI {
         window.addEventListener("message", e => {
             if (!e.data) return;
 
+            // Only accept same-origin messages (prevents cross-origin spoofing).
+            if (e.origin !== window.location.origin) return;
+
+            // Only accept messages from the planet iframe's content window.
+            const planetIframeWin = (() => {
+                try {
+                    const f = document.getElementById("planet-iframe");
+                    return f ? f.contentWindow : null;
+                } catch (_) {
+                    return null;
+                }
+            })();
+            if (!planetIframeWin || e.source !== planetIframeWin) return;
+
             if (e.data.type === "MB_GIT_STATE") {
                 this._applyGitState(
                     e.data.repoName || "",
@@ -194,6 +208,8 @@ class GitDropdownUI {
             }, timeout);
 
             function handler(e) {
+                // Reject messages from other origins.
+                if (e.origin !== window.location.origin) return;
                 if (e.data && e.data.type === type) {
                     clearTimeout(timer);
                     window.removeEventListener("message", handler);

@@ -284,6 +284,8 @@ class Planet {
         //   3. Refresh the local planet cards.
         window.addEventListener("message", async e => {
             if (!e.data) return;
+            // Only process messages from the same origin (the parent Music Blocks page).
+            if (e.origin !== window.location.origin) return;
 
             // ── Git state sync from gitDropdown ──────────────────────────
             if (e.data.type === "MB_GIT_CREATED") {

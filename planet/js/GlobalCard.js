@@ -58,9 +58,9 @@ class GlobalCard {
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                 "Open in Music Blocks"
                             )}" id="global-project-open-{ID}"><i class="material-icons">launch</i></a>
-                            <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
+                            <button type="button" class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                 "Remix project"
-                            )}" id="global-project-fork-{ID}"><i class="material-icons">call_split</i></a>
+                            )}" id="global-project-fork-{ID}"><i class="material-icons">call_split</i></button>
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                 "Merge with current project"
                             )}" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
@@ -299,17 +299,21 @@ class GlobalCard {
                 const entry = entries[0];
                 if (!entry.isIntersecting) return;
 
-                // Swap in the real URL.
+                // Assign handlers before changing src so cached images
+                // (which fire load synchronously) are never missed.
                 const image = entry.target;
-                image.src = realSrc;
+                const placeholderSrc = image.src;
                 image.onload = () => {
                     image.classList.remove("mb-thumb-loading");
                     image.classList.add("mb-thumb-loaded");
                 };
                 image.onerror = () => {
-                    // Network failure — silently keep the placeholder.
+                    // Network failure — clear handler and restore placeholder.
+                    image.onerror = null;
+                    image.src = placeholderSrc;
                     image.classList.remove("mb-thumb-loading");
                 };
+                image.src = realSrc;
 
                 // One-shot: stop observing after the first intersection.
                 observer.disconnect();

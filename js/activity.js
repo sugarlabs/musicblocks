@@ -2321,57 +2321,6 @@ class Activity {
 
         this.showContents = (...args) => this.projectManager.showContents(...args);
 
-        /*
-         * Sets up a new "clean" MB i.e. new project instance
-         */
-        const _afterDelete = that => {
-            if (that.turtles.running()) {
-                that._doHardStopButton();
-            }
-
-            // Clear the Git tracking for the new project
-            localStorage.removeItem("mbGitRepoName");
-            localStorage.removeItem("mbGitHashedKey");
-            localStorage.removeItem("mbGitDisplayName");
-            localStorage.removeItem("mbGitLastSavedHash");
-            localStorage.removeItem("mbGitCurrentSha");
-            localStorage.removeItem("mbGitCurrentDraftId");
-            localStorage.removeItem("mbGitCurrentProjectId");
-            if (that.gitDropdownUI) {
-                // clearForNewProject() resets the prefetch cache in addition
-                // to updating the menu — prevents old project's commits from
-                // appearing in Time Travel when starting a fresh project.
-                if (typeof that.gitDropdownUI.clearForNewProject === "function") {
-                    that.gitDropdownUI.clearForNewProject();
-                } else {
-                    that.gitDropdownUI._syncMenuState();
-                }
-            }
-
-            // Use the planet New Project mechanism if it is available
-            // and Planet storage is actually initialized (planet.planet
-            // is null when running from file:///index.html), but only
-            // if the current project has a name.
-            if (that.planet !== undefined && that.planet.planet !== null) {
-                // Always save current project first (regardless of name)
-                // so it's never lost from local planet when creating a new one.
-                that.planet.saveLocally();
-                that.planet.initialiseNewProject();
-                loadStart(that);
-                that.planet.saveLocally();
-            } else {
-                that.toolbar.closeAuxToolbar(showHideAuxMenu);
-
-                setTimeout(() => {
-                    // Don't create the new blocks in sendAllToTrash so as to
-                    // avoid clearing the screen of any graphics. Do it here
-                    // instead.
-                    that.sendAllToTrash(false, false);
-                    that.blocks.loadNewBlocks(DATAOBJS);
-                }, 1000);
-            }
-        };
-
         this.justLoadStart = (...args) => this.projectManager.justLoadStart(...args);
 
         /*

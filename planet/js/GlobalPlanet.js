@@ -249,7 +249,14 @@ class GlobalPlanet {
         const hasMore = l >= this.page;
 
         if (l === 0) {
-            this.throwNoProjectsError();
+            if (this.index === 0) {
+                // Initial load returned nothing — show the empty-state message.
+                this.throwNoProjectsError();
+            } else {
+                // Load-more returned nothing — pagination is exhausted.
+                // Keep the cards already rendered; just hide the Load More button.
+                this.hideLoadMore();
+            }
             this.afterAddProjects();
         } else if (this.loadCount === 0) {
             this.render(data);

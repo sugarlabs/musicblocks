@@ -42,9 +42,11 @@ class LocalCard {
                             <span class="git-repo-badge tooltipped" data-position="top" data-delay="50" data-tooltip="${_(
                                 "Being tracked"
                             )}" style="display:none;" id="local-project-git-{ID}">
-                                <img src="https://cdn.jsdelivr.net/npm/@phosphor-icons/core/assets/bold/git-branch-bold.svg"
-                                     alt="GitHub repository"
-                                     class="git-repo-badge-icon" />
+                                <!-- git-branch icon (Phosphor, bold weight, MIT licence) — inlined to avoid external CDN dependency -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"
+                                     class="git-repo-badge-icon" role="img" aria-label="GitHub repository">
+                                    <path d="M232,64a32,32,0,1,0-40,30.9V128a8,8,0,0,1-8,8H104a8,8,0,0,1-8-8V94.9a32,32,0,1,0-16,0V128a24,24,0,0,0,24,24h80v33.1a32,32,0,1,0,16,0V152h0V94.9A32.1,32.1,0,0,0,232,64ZM80,64a16,16,0,1,1-16-16A16,16,0,0,1,80,64ZM192,208a16,16,0,1,1-16-16A16,16,0,0,1,192,208ZM200,80a16,16,0,1,1,16-16A16,16,0,0,1,200,80Z"/>
+                                </svg>
                             </span>
                         </div>
                         
