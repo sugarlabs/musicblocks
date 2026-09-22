@@ -1739,6 +1739,24 @@ describe("Blocks Foundation", () => {
             expect(blocks._loadQueue).toHaveLength(1);
         });
 
+        it("assigns a queued call its own token immediately, distinct from the running load's", () => {
+            // A caller needs its own request's token the moment it calls
+            // loadNewBlocks(), not whatever load happens to be active once
+            // this one finally runs — otherwise a caller that queues up
+            // behind an unrelated load would watch that other load's events
+            // instead of its own (issue #8855 review comment).
+            const firstToken = blocks.loadNewBlocks(makeBatch(25));
+            expect(blocks._loadInProgress).toBe(true);
+
+            const secondToken = blocks.loadNewBlocks(makeBatch(3));
+
+            expect(blocks._loadQueue).toHaveLength(1);
+            expect(secondToken).not.toBe(firstToken);
+            // The queued token travels with the request, not recomputed
+            // later from whatever's active when it's dequeued.
+            expect(blocks._loadQueue[0].loadToken).toBe(secondToken);
+        });
+
         it("does not lose the first call's in-flight _adjustTheseStacks entries when a second call arrives mid-load", async () => {
             // Both the first load and the queued second load fire their own
             // finishedLoading event; wait for both instead of a fixed delay
@@ -1897,14 +1915,14 @@ describe("Blocks Foundation", () => {
             const onWindowError = event => event.preventDefault();
             window.addEventListener("error", onWindowError);
 
-            blocks.loadNewBlocks(makeBatch(25));
+            const loadToken = blocks.loadNewBlocks(makeBatch(25));
             await new Promise(r => setTimeout(r, 50));
 
             window.removeEventListener("error", onWindowError);
 
             expect(loadFailedEvents).toHaveLength(1);
             expect(loadFailedEvents[0].error).toBe(thrownError);
-            expect(loadFailedEvents[0].generation).toBe(blocks._activeLoadGeneration);
+            expect(loadFailedEvents[0].token).toBe(loadToken);
         });
 
         it("does not emit 'loadFailed' when the first, synchronous chunk throws", () => {
@@ -1925,19 +1943,20 @@ describe("Blocks Foundation", () => {
             expect(blocks._lastLoadFailed).toBe(true);
         });
 
-        it("tags 'finishedLoading' with the load's generation, like 'loadFailed'", async () => {
+        it("tags 'finishedLoading' with the load's token, like 'loadFailed'", async () => {
             // A listener scoped to one particular loadNewBlocks() call (e.g.
             // ProjectManager._loadStart()'s recovery watcher) needs this to
             // tell its own load's completion apart from some other,
-            // unrelated load's.
+            // unrelated load's — including one that was still queued behind
+            // it when the listener was set up.
             const finishedLoadingEvents = [];
             global.pubsub.on("finishedLoading", payload => finishedLoadingEvents.push(payload));
 
-            blocks.loadNewBlocks(makeBatch(2));
+            const loadToken = blocks.loadNewBlocks(makeBatch(2));
             await new Promise(r => setTimeout(r, 10));
 
             expect(finishedLoadingEvents).toHaveLength(1);
-            expect(finishedLoadingEvents[0].generation).toBe(blocks._activeLoadGeneration);
+            expect(finishedLoadingEvents[0].token).toBe(loadToken);
         });
 
         it("does not let a stale completion from a failed load corrupt the next queued load's counter", async () => {

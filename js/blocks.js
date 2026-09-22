@@ -239,8 +239,27 @@ class Blocks {
          * so a completion callback that lands after its own load has already
          * been abandoned (queue advanced past it on failure) can recognize
          * itself as stale and skip touching the next load's _loadCounter.
+         *
+         * This is distinct from the per-request token below: it only
+         * changes once a request actually starts running, while a caller
+         * outside this class needs to know which request is *its own* the
+         * moment it calls loadNewBlocks(), even if that request is still
+         * sitting in _loadQueue behind an unrelated one.
          */
         this._activeLoadGeneration = 0;
+        /**
+         * Bumped once per loadNewBlocks() call, whether it runs immediately
+         * or is queued (see loadNewBlocks() below), and returned to the
+         * caller. A caller that needs to know when *its own* request
+         * finishes or fails — not some other, unrelated request that
+         * happens to run before or after it — passes this token back in and
+         * filters "finishedLoading"/"loadFailed" events by it, since
+         * _activeLoadGeneration alone can't tell a still-queued request
+         * apart from whatever else is currently running (issue #8855).
+         */
+        this._nextLoadToken = 0;
+        /** The loadToken of whichever load is currently running, if any — see _loadNewBlocksNow. */
+        this._activeLoadToken = null;
         /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
@@ -4945,18 +4964,28 @@ class Blocks {
          * Load new blocks. Queues the call instead of running it immediately
          * if another load is still in progress, so the two loads' bookkeeping
          * never overlaps (issue #8392).
+         *
+         * Returns a token identifying this specific request, assigned here
+         * regardless of whether it runs immediately or is queued. A caller
+         * that needs to watch for this request's own completion/failure
+         * (see "finishedLoading"/"loadFailed" in _loadNewBlocksNow) should
+         * keep this token rather than assuming whatever is currently active
+         * when the request eventually runs is still this one (issue #8855).
          * @param - blockObj - Block Objects
          * @public
-         * return {void}
+         * @returns {number} this request's load token
          */
         this.loadNewBlocks = blockObjs => {
+            const loadToken = ++this._nextLoadToken;
+
             if (this._loadInProgress) {
-                this._loadQueue.push(blockObjs);
-                return;
+                this._loadQueue.push({ blockObjs, loadToken });
+                return loadToken;
             }
 
             this._loadInProgress = true;
-            this._loadNewBlocksNow(blockObjs);
+            this._loadNewBlocksNow(blockObjs, loadToken);
+            return loadToken;
         };
 
         /**
@@ -4969,9 +4998,9 @@ class Blocks {
             this._loadInProgress = false;
 
             if (this._loadQueue.length > 0) {
-                const nextBlockObjs = this._loadQueue.shift();
+                const next = this._loadQueue.shift();
                 this._loadInProgress = true;
-                this._loadNewBlocksNow(nextBlockObjs);
+                this._loadNewBlocksNow(next.blockObjs, next.loadToken);
             }
         };
 
@@ -4980,9 +5009,12 @@ class Blocks {
          * call to loadNewBlocks at a time, see _advanceLoadQueue above.
          * @private
          * @param - blockObj - Block Objects
+         * @param - loadToken - this request's token, as returned by
+         *   loadNewBlocks() (see there for why it's distinct from
+         *   _activeLoadGeneration)
          * @returns {void}
          */
-        this._loadNewBlocksNow = blockObjs => {
+        this._loadNewBlocksNow = (blockObjs, loadToken) => {
             /** Suppress intermediate canvas redraws during block loading. */
             this.activity._suppressRefresh = true;
             // Optimistically clear the previous attempt's failure flag; the
@@ -4993,11 +5025,11 @@ class Blocks {
             // told apart from a completion belonging to whatever load is
             // active by the time it fires.
             this._activeLoadGeneration += 1;
-            // Captured so the deferred-chunk catch inside processChunk() can
-            // tag its "loadFailed" event with the load it belongs to, the
-            // same way cleanupAfterLoad() tags its own completion (see
-            // _activeLoadGeneration's other use, above).
-            const thisLoadGeneration = this._activeLoadGeneration;
+            // Recorded so cleanupAfterLoad() — a shared method with no
+            // closure over any one call's loadToken — can still tag
+            // "finishedLoading" with the token of whichever load is
+            // current when it fires.
+            this._activeLoadToken = loadToken;
 
             try {
                 /**
@@ -5743,7 +5775,7 @@ class Blocks {
                                 this._lastLoadFailed = true;
                                 this._advanceLoadQueue();
                                 pubsub.emit("loadFailed", {
-                                    generation: thisLoadGeneration,
+                                    token: loadToken,
                                     error: e
                                 });
                                 throw e;
@@ -6722,13 +6754,15 @@ class Blocks {
                 if (this.activity.stopLoadAnimation) {
                     this.activity.stopLoadAnimation();
                 }
-                // Tagged with the load generation that just finished, the
-                // same way "loadFailed" is tagged, so a listener scoped to
-                // one particular loadNewBlocks() call (e.g.
-                // ProjectManager._loadStart()'s recovery watcher) can tell
-                // it apart from some other, unrelated load's completion
-                // (review comment on issue #8855's fix).
-                pubsub.emit("finishedLoading", { generation: this._activeLoadGeneration });
+                // Tagged with the request token loadNewBlocks() returned for
+                // the load that just finished, the same way "loadFailed" is
+                // tagged, so a listener scoped to one particular
+                // loadNewBlocks() call (e.g. ProjectManager._loadStart()'s
+                // recovery watcher) can tell it apart from some other,
+                // unrelated call's completion — including one that was
+                // still queued behind this one when that listener was set
+                // up (review comment on issue #8855's fix).
+                pubsub.emit("finishedLoading", { token: this._activeLoadToken });
             } finally {
                 /** All blocks loaded — allow canvas redraws again. */
                 this.activity._suppressRefresh = false;

@@ -275,15 +275,18 @@ class ProjectManager {
 
         pubsub.on("finishedLoading", __afterLoad);
 
+        // Returns the loadToken loadNewBlocks() assigns this request (see
+        // js/blocks.js), or null when no load was actually started (the
+        // empty/undefined-session shortcut below already routes through
+        // justLoadStart() instead).
         const tryParseAndLoad = data => {
             if (data === "undefined" || data === "[]") {
                 that.justLoadStart();
-                return true;
+                return null;
             }
             const parsed = JSON.parse(data);
             window.loadedSession = data;
-            that.blocks.loadNewBlocks(parsed);
-            return true;
+            return that.blocks.loadNewBlocks(parsed);
         };
 
         const deleteFromSource = async source => {
@@ -326,19 +329,18 @@ class ProjectManager {
         // can still reach the same delete-and-fallback recovery a
         // synchronous failure gets below.
         //
-        // Both events carry the generation of the loadNewBlocks() call they
-        // belong to (js/blocks.js's _activeLoadGeneration), and this only
-        // ever registers once that call has returned without throwing — so
-        // reading that counter right after is exactly the generation to
-        // watch. Filtering on it keeps this from reacting to some other,
-        // unrelated load's completion or failure (e.g. one a widget starts
-        // later), which a plain event-name match couldn't tell apart.
-        const watchForDeferredLoadFailure = source => {
-            const expectedGeneration = that.blocks._activeLoadGeneration;
+        // Both events carry the loadToken loadNewBlocks() returned for the
+        // request they belong to (js/blocks.js), which is assigned the
+        // moment that request is made — whether it then runs immediately or
+        // sits queued behind another, unrelated load already in progress.
+        // Filtering on it (rather than just the event name) keeps this from
+        // reacting to that other load's own completion or failure, which a
+        // reviewer flagged: reading a "currently active load" counter after
+        // the fact isn't safe here, since this request may still be queued
+        // at that point.
+        const watchForDeferredLoadFailure = (source, expectedToken) => {
             const belongsToThisLoad = payload =>
-                !payload || payload.generation === undefined
-                    ? true
-                    : payload.generation === expectedGeneration;
+                !payload || payload.token === undefined ? true : payload.token === expectedToken;
             const stopWatching = () => {
                 pubsub.off("finishedLoading", onSucceeded);
                 pubsub.off("loadFailed", onFailed);
@@ -394,12 +396,10 @@ class ProjectManager {
                 fallbackAttempted = true;
                 try {
                     that.sessionData = fallbackData;
-                    tryParseAndLoad(fallbackData);
-                    // Still synchronous here: loadNewBlocks() can't have
-                    // reached a deferred chunk's setTimeout(0) yet, so this
-                    // is exactly the generation the fallback attempt needs
-                    // watched.
-                    watchForDeferredLoadFailure(fallbackSource);
+                    const loadToken = tryParseAndLoad(fallbackData);
+                    if (loadToken !== null) {
+                        watchForDeferredLoadFailure(fallbackSource, loadToken);
+                    }
                     return;
                 } catch (fallbackErr) {
                     ErrorHandler.recoverable(fallbackErr, {
@@ -416,8 +416,10 @@ class ProjectManager {
         if (that.sessionData) {
             that.doLoadAnimation();
             try {
-                tryParseAndLoad(that.sessionData);
-                watchForDeferredLoadFailure(sessionSource);
+                const loadToken = tryParseAndLoad(that.sessionData);
+                if (loadToken !== null) {
+                    watchForDeferredLoadFailure(sessionSource, loadToken);
+                }
             } catch (e) {
                 await recoverFromLoadFailure(sessionSource, e);
             }
