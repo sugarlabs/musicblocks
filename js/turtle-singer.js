@@ -2271,13 +2271,6 @@ class Singer {
                             }
 
                             notes.push(note);
-                            console.log(
-                                i +
-                                    "]=" +
-                                    note +
-                                    " temperament=" +
-                                    activity.logo.synth.inTemperament
-                            );
                         }
 
                         if (duration > 0) {
