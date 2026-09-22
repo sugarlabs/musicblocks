@@ -1498,7 +1498,7 @@ describe("Plugin and Macro Utilities", () => {
             const blocks = { addToMyPalette: jest.fn() };
             const macroDict = {};
 
-            const spy = jest.spyOn(console, "log").mockImplementation(() => {});
+            const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
             processMacroData("invalid json", palettes, blocks, macroDict);
             expect(spy).toHaveBeenCalledWith("invalid json");
             spy.mockRestore();
