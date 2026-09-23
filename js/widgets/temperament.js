@@ -531,9 +531,16 @@ function TemperamentWidget() {
                 that._playAllRunning = false;
                 flashDot = -1;
                 _drawCircle();
+                _updateRemoveButton();
                 return;
             }
+            if (that._vizMenu) _removeMenu();
+            dragIndex = -1;
+            lockedDrag = false;
+            highlightDot = -1;
+            _highlightTableRow(-1);
             that._playAllRunning = true;
+            _updateRemoveButton();
             // Play up the scale, the octave exactly once, then back down.
             // frequencies[] may or may not carry an octave entry at
             // pitchNumber, so only iterate the pitches within the octave
@@ -555,6 +562,7 @@ function TemperamentWidget() {
                 i++;
                 if (i >= sequence.length) {
                     that._playAllRunning = false;
+                    _updateRemoveButton();
                     that._setWidgetTimeout(function () {
                         flashDot = -1;
                         _drawCircle();
@@ -575,6 +583,7 @@ function TemperamentWidget() {
         that._playAll = _playAll;
 
         const _addPitch = function (dir) {
+            if (that._playAllRunning) return;
             const base = that.cents.slice(0, that.pitchNumber);
             const nGaps = base.length;
             const s = highlightDot >= 0 && highlightDot < that.cents.length ? highlightDot : -1;
@@ -610,11 +619,22 @@ function TemperamentWidget() {
         const _updateRemoveButton = () => {
             if (!that._vizToolbar) return;
             const btn = that._vizToolbar.removePitchBtn;
-            if (!btn || !btn.style) return;
-            const locked = highlightDot >= 0 && _isLocked(highlightDot);
-            btn.style.opacity = locked ? "0.4" : "1";
-            btn.style.pointerEvents = locked ? "none" : "auto";
-            btn.style.cursor = locked ? "not-allowed" : "pointer";
+            if (btn && btn.style) {
+                const locked =
+                    that._playAllRunning || (highlightDot >= 0 && _isLocked(highlightDot));
+                btn.style.opacity = locked ? "0.4" : "1";
+                btn.style.pointerEvents = locked ? "none" : "auto";
+                btn.style.cursor = locked ? "not-allowed" : "pointer";
+            }
+            const addAfter = that._vizToolbar.addPitchAfterBtn;
+            const addBefore = that._vizToolbar.addPitchBeforeBtn;
+            for (const addBtn of [addAfter, addBefore]) {
+                if (addBtn && addBtn.style) {
+                    addBtn.style.opacity = that._playAllRunning ? "0.4" : "1";
+                    addBtn.style.pointerEvents = that._playAllRunning ? "none" : "auto";
+                    addBtn.style.cursor = that._playAllRunning ? "not-allowed" : "pointer";
+                }
+            }
         };
 
         // ── Canvas ──
@@ -694,6 +714,7 @@ function TemperamentWidget() {
         };
 
         canvas.onkeydown = function (e) {
+            if (that._playAllRunning) return;
             if (e.key === "ArrowRight" || e.key === "ArrowDown") {
                 e.preventDefault();
                 focusedDot = (focusedDot + 1) % that.pitchNumber;
@@ -774,7 +795,7 @@ function TemperamentWidget() {
                 ctx.fillStyle = color;
                 ctx.fill();
 
-                if (i === highlightDot || i === flashDot) {
+                if (i === flashDot || (!that._playAllRunning && i === highlightDot)) {
                     ctx.beginPath();
                     ctx.arc(dx, dy, dotR + 7, 0, 2 * Math.PI);
                     ctx.strokeStyle = "#ffeb3b";
@@ -873,7 +894,7 @@ function TemperamentWidget() {
             td.style.cursor = _isLocked(i) ? "default" : "text";
             td.ondblclick = ev => {
                 ev.stopPropagation();
-                if (_isLocked(i)) return;
+                if (_isLocked(i) || that._playAllRunning) return;
                 const prev = getPrev(i);
                 const next = getNext(i);
                 const cur = getCur(i);
@@ -896,6 +917,10 @@ function TemperamentWidget() {
                 input.focus();
                 input.select();
                 const commit = () => {
+                    if (that._playAllRunning) {
+                        _updateTableRow(i);
+                        return;
+                    }
                     let v = parseFloat(input.value);
                     if (isNaN(v)) {
                         _updateTableRow(i);
@@ -979,6 +1004,7 @@ function TemperamentWidget() {
                             : bgColor;
                 };
                 tr.onclick = function () {
+                    if (that._playAllRunning) return;
                     highlightDot = i;
                     _drawCircle();
                     _highlightTableRow(i);
@@ -1146,7 +1172,7 @@ function TemperamentWidget() {
         };
 
         const _removePitch = function (index) {
-            if (that.pitchNumber <= 1) return;
+            if (that._playAllRunning || that.pitchNumber <= 1) return;
             if (index < 0 || index >= that.pitchNumber) return;
             if (_isLocked(index)) return;
             that.cents.splice(index, 1);
@@ -1331,6 +1357,7 @@ function TemperamentWidget() {
         };
 
         const _showMenu = function (e, index) {
+            if (that._playAllRunning) return;
             e.preventDefault();
             _removeMenu();
             const menu = document.createElement("div");
@@ -1437,7 +1464,7 @@ function TemperamentWidget() {
         };
 
         canvas.onmousedown = function (e) {
-            if (e.button !== 0) return;
+            if (that._playAllRunning || e.button !== 0) return;
             const [x, y] = _canvasCoords(e, canvas);
             const hit = _findNearest(x, y, dotR + 8);
             if (hit !== null) {
@@ -1460,6 +1487,10 @@ function TemperamentWidget() {
         };
 
         canvas.onmousemove = function (e) {
+            if (that._playAllRunning) {
+                canvas.style.cursor = "default";
+                return;
+            }
             const [x, y] = _canvasCoords(e, canvas);
             if (dragIndex >= 0 && !lockedDrag) {
                 dragMoved = true;
@@ -1477,6 +1508,7 @@ function TemperamentWidget() {
         canvas.onmouseup = _endDrag;
 
         canvas.ontouchstart = function (e) {
+            if (that._playAllRunning) return;
             const [x, y] = _canvasCoords(e.touches[0], canvas);
             const hit = _findNearest(x, y, dotR + 16);
             if (hit !== null) {
