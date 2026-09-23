@@ -15,7 +15,19 @@ const { loadActivitySandbox } = require("./helpers/activity-vm-sandbox");
 // setupProjectManager stays mocked (the shared helper's default) rather than
 // wiring in the real ProjectManager - that real wiring is covered by
 // activity-projectmanager-integration.test.js.
-const loadActivityClass = () => loadActivitySandbox();
+const loadActivityClass = (overrides = {}) =>
+    loadActivitySandbox({
+        overrides: {
+            createjs: {
+                Tween: {
+                    hasActiveTweens: jest.fn(() => false)
+                }
+            },
+            requestAnimationFrame: (...args) => global.requestAnimationFrame(...args),
+            cancelAnimationFrame: (...args) => global.cancelAnimationFrame(...args),
+            ...overrides
+        }
+    });
 
 describe("Activity Toolbar Integration", () => {
     let Activity;
@@ -261,6 +273,242 @@ describe("Activity Toolbar Integration", () => {
             activity._handleBeforeUnload();
 
             expect(activity._stopAutoSave).toHaveBeenCalled();
+        });
+    });
+
+    describe("Render Loop (_startRenderLoop and _stopRenderLoop)", () => {
+        let rafCallbacks;
+        let nextRafId;
+        let originalRaf;
+        let originalCaf;
+
+        beforeEach(() => {
+            rafCallbacks = new Map();
+            nextRafId = 1;
+            originalRaf = global.requestAnimationFrame;
+            originalCaf = global.cancelAnimationFrame;
+
+            global.requestAnimationFrame = jest.fn(cb => {
+                const id = nextRafId++;
+                rafCallbacks.set(id, cb);
+                return id;
+            });
+            global.cancelAnimationFrame = jest.fn(id => {
+                rafCallbacks.delete(id);
+            });
+            window.requestAnimationFrame = global.requestAnimationFrame;
+            window.cancelAnimationFrame = global.cancelAnimationFrame;
+
+            activity.stage = {
+                update: jest.fn()
+            };
+            activity.selectionController = {
+                isDragging: false,
+                isSelecting: false
+            };
+            activity.gifAnimator = null;
+            activity.blocks = null;
+            activity.blocksContainer = null;
+            activity.stageDirty = false;
+            activity._renderLoopRunning = false;
+            activity._renderLoopRafId = null;
+        });
+
+        afterEach(() => {
+            global.requestAnimationFrame = originalRaf;
+            global.cancelAnimationFrame = originalCaf;
+            window.requestAnimationFrame = originalRaf;
+            window.cancelAnimationFrame = originalCaf;
+        });
+
+        const flushRaf = id => {
+            const cb = rafCallbacks.get(id);
+            if (cb) {
+                rafCallbacks.delete(id);
+                cb();
+            }
+        };
+
+        test("does not schedule a new RAF when already running", () => {
+            activity._renderLoopRunning = true;
+            activity._startRenderLoop();
+            expect(global.requestAnimationFrame).not.toHaveBeenCalled();
+        });
+
+        test("renderLoop returns early if loop was stopped before callback executes", () => {
+            activity._startRenderLoop();
+            const rafId = activity._renderLoopRafId;
+            activity._renderLoopRunning = false;
+
+            flushRaf(rafId);
+            expect(activity.stage.update).not.toHaveBeenCalled();
+        });
+
+        test("re-queues RAF when stage is not yet initialized", () => {
+            activity.stage = null;
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+            expect(activity._renderLoopRafId).not.toBeNull();
+            expect(activity._renderLoopRafId).not.toBe(firstId);
+        });
+
+        test("performs clean render, clears stageDirty before update, and transitions to idle when clean", () => {
+            let stageDirtyDuringUpdate = null;
+            activity.stage.update = jest.fn(() => {
+                stageDirtyDuringUpdate = activity.stageDirty;
+            });
+            activity.stageDirty = true;
+
+            activity._startRenderLoop();
+            const rafId = activity._renderLoopRafId;
+
+            flushRaf(rafId);
+
+            expect(activity.stage.update).toHaveBeenCalledTimes(1);
+            expect(stageDirtyDuringUpdate).toBe(false);
+            expect(activity.stageDirty).toBe(false);
+            expect(activity._renderLoopRunning).toBe(false);
+            expect(activity._renderLoopRafId).toBeNull();
+        });
+
+        test("transitions to idle immediately when called with clean stage and no active animations", () => {
+            activity.stageDirty = false;
+
+            activity._startRenderLoop();
+            const rafId = activity._renderLoopRafId;
+
+            flushRaf(rafId);
+
+            expect(activity.stage.update).not.toHaveBeenCalled();
+            expect(activity._renderLoopRunning).toBe(false);
+            expect(activity._renderLoopRafId).toBeNull();
+        });
+
+        test("re-queues next frame if stageDirty is set during stage.update()", () => {
+            activity.stage.update = jest.fn(() => {
+                activity.stageDirty = true;
+            });
+            activity.stageDirty = true;
+
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+
+            expect(activity.stage.update).toHaveBeenCalledTimes(1);
+            expect(activity._renderLoopRunning).toBe(true);
+            expect(activity._renderLoopRafId).not.toBeNull();
+            expect(activity._renderLoopRafId).not.toBe(firstId);
+        });
+
+        test("recomputes viewport culling when container position changes", () => {
+            const updateCullingSpy = jest.fn();
+            activity.blocks = { _updateViewportCulling: updateCullingSpy };
+            activity.blocksContainer = { x: 120, y: 340 };
+            activity._lastCullContainerX = 0;
+            activity._lastCullContainerY = 0;
+            activity.stageDirty = true;
+
+            activity._startRenderLoop();
+            const rafId = activity._renderLoopRafId;
+
+            flushRaf(rafId);
+
+            expect(updateCullingSpy).toHaveBeenCalledTimes(1);
+            expect(activity._lastCullContainerX).toBe(120);
+            expect(activity._lastCullContainerY).toBe(340);
+        });
+
+        test("catches error during stage.update, sets stageDirty to retry, logs error, and retries in next frame", () => {
+            const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            const renderError = new Error("Stage update failed");
+            let updateAttempts = 0;
+            activity.stage.update = jest.fn(() => {
+                updateAttempts++;
+                if (updateAttempts === 1) {
+                    throw renderError;
+                }
+            });
+            activity.stageDirty = true;
+
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                "Music Blocks: render frame failed",
+                renderError
+            );
+            expect(activity.stageDirty).toBe(true);
+            expect(activity._renderLoopRunning).toBe(true);
+            const secondId = activity._renderLoopRafId;
+            expect(secondId).not.toBeNull();
+            expect(secondId).not.toBe(firstId);
+
+            // Second frame retries stage.update and completes cleanly
+            flushRaf(secondId);
+
+            expect(activity.stage.update).toHaveBeenCalledTimes(2);
+            expect(activity.stageDirty).toBe(false);
+            expect(activity._renderLoopRunning).toBe(false);
+            expect(activity._renderLoopRafId).toBeNull();
+
+            consoleErrorSpy.mockRestore();
+        });
+
+        test("keeps loop running when active tweens, active gifs, or interactions are ongoing", () => {
+            activity.stageDirty = true;
+            activity.selectionController.isDragging = true;
+
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+
+            expect(activity.stage.update).toHaveBeenCalledTimes(1);
+            expect(activity._renderLoopRunning).toBe(true);
+            expect(activity._renderLoopRafId).not.toBeNull();
+            expect(activity._renderLoopRafId).not.toBe(firstId);
+        });
+
+        test("keeps loop running when selection is active", () => {
+            activity.stageDirty = true;
+            activity.selectionController.isSelecting = true;
+
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+
+            expect(activity._renderLoopRunning).toBe(true);
+            expect(activity._renderLoopRafId).not.toBeNull();
+        });
+
+        test("keeps loop running when active GIFs are playing", () => {
+            activity.stageDirty = true;
+            activity.gifAnimator = { getActiveCount: () => 2 };
+
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+
+            expect(activity._renderLoopRunning).toBe(true);
+            expect(activity._renderLoopRafId).not.toBeNull();
+        });
+
+        test("_stopRenderLoop stops running state and cancels active RAF", () => {
+            activity._renderLoopRunning = true;
+            activity._renderLoopRafId = 99;
+
+            activity._stopRenderLoop();
+
+            expect(activity._renderLoopRunning).toBe(false);
+            expect(activity._renderLoopRafId).toBeNull();
+            expect(global.cancelAnimationFrame).toHaveBeenCalledWith(99);
         });
     });
 });

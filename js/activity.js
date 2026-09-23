@@ -620,6 +620,8 @@ class Activity {
                         this.selectionController.isDragging || this.selectionController.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
+                        let frameErrored = false;
+                        this.stageDirty = false;
                         try {
                             // Recompute culling when container moved.
                             if (
@@ -639,11 +641,27 @@ class Activity {
                             // with no frame queued, and _startRenderLoop() refuses to
                             // restart on that flag, so the canvas stopped repainting for
                             // the rest of the session. Report the frame and keep going.
+                            frameErrored = true;
+                            this.stageDirty = true;
                             console.error("Music Blocks: render frame failed", err);
-                        } finally {
-                            this.stageDirty = false;
-                            // Continue the loop if there's work or ongoing interaction
+                        }
+
+                        // On error: always keep the loop alive (prevents canvas freeze).
+                        // On success: continue only if there is still outstanding work.
+                        // Clearing stageDirty before stage.update() catches the edge case
+                        // where stage.update() itself synchronously re-dirtied the stage.
+                        if (
+                            frameErrored ||
+                            this.stageDirty ||
+                            hasActiveTweens ||
+                            hasActiveGifs ||
+                            isInteracting
+                        ) {
                             this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                        } else {
+                            // Nothing to render — let the loop go idle
+                            this._renderLoopRunning = false;
+                            this._renderLoopRafId = null;
                         }
                     } else {
                         // Nothing to render — let the loop go idle
