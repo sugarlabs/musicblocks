@@ -983,14 +983,18 @@ describe("TemperamentWidget basic tests", () => {
     describe("TemperamentWidget interactive events", () => {
         let mockWidgetWindow;
         let mockActivity;
+        let widgetBody;
 
         beforeEach(() => {
+            widgetBody = document.createElement("div");
+            document.body.appendChild(widgetBody);
             mockWidgetWindow = {
                 clear: jest.fn(),
                 show: jest.fn(),
-                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                getWidgetBody: jest.fn(() => widgetBody),
                 addButton: jest.fn(() => ({
                     onclick: null,
+                    style: {},
                     getElementsByTagName: jest.fn(() => [createMockElement("img")])
                 })),
                 sendToCenter: jest.fn(),
@@ -1034,6 +1038,12 @@ describe("TemperamentWidget basic tests", () => {
             widget.wheel = { removeWheel: jest.fn() };
             widget.notesCircle = { removeWheel: jest.fn() };
             widget.wheel1 = { removeWheel: jest.fn() };
+        });
+
+        afterEach(() => {
+            if (widgetBody && widgetBody.parentNode) {
+                widgetBody.parentNode.removeChild(widgetBody);
+            }
         });
 
         test("onclose cleans up timeouts and playing state", () => {
@@ -1151,6 +1161,95 @@ describe("TemperamentWidget basic tests", () => {
                 // Clean up timers
                 jest.runAllTimers();
                 expect(widget._playAllRunning).toBe(false);
+            });
+
+            test("disables mutation buttons and ignores add/remove/edit actions during playback", () => {
+                widget.pitchNumber = 3;
+                widget.cents = [0, 100, 200];
+                widget.frequencies = ["261.63", "277.18", "293.66"];
+                widget.ratios = [1, Math.pow(2, 1 / 12), Math.pow(2, 2 / 12)];
+                widget.notes = [
+                    ["C", 4],
+                    ["C#", 4],
+                    ["D", 4]
+                ];
+                widget.intervals = ["unison", "minor second", "major second"];
+                widget.ratiosNotesPair = [
+                    [widget.ratios[0], widget.notes[0]],
+                    [widget.ratios[1], widget.notes[1]],
+                    [widget.ratios[2], widget.notes[2]]
+                ];
+                widget._visualizerView();
+
+                const pitchCountBefore = widget.pitchNumber;
+                const freqsBefore = [...widget.frequencies];
+
+                // Query the visualizer elements inside widgetBody
+                const rows = widgetBody ? widgetBody.querySelectorAll("tbody tr") : [];
+                const row1 = rows[1];
+                const tdCents =
+                    row1 && row1.cells
+                        ? row1.cells[3]
+                        : row1 && row1.children
+                          ? row1.children[3]
+                          : null;
+                if (tdCents && tdCents.ondblclick) {
+                    tdCents.ondblclick({ stopPropagation: () => {} });
+                    const input = tdCents.querySelector("input");
+                    if (input) input.value = "101";
+                }
+
+                widget.playAll();
+                expect(widget._playAllRunning).toBe(true);
+
+                if (widget._vizToolbar) {
+                    expect(widget._vizToolbar.removePitchBtn.style.pointerEvents).toBe("none");
+                    expect(widget._vizToolbar.addPitchAfterBtn.style.pointerEvents).toBe("none");
+                    expect(widget._vizToolbar.addPitchBeforeBtn.style.pointerEvents).toBe("none");
+
+                    // Mutations during playback must be ignored
+                    widget._vizToolbar.removePitchBtn.onclick();
+                    widget._vizToolbar.addPitchAfterBtn.onclick();
+                    widget._vizToolbar.addPitchBeforeBtn.onclick();
+                }
+
+                const canvas = widgetBody
+                    ? widgetBody.querySelector("canvas")
+                    : document.querySelector("canvas");
+                if (canvas) {
+                    canvas.onmousedown({ button: 0 });
+                    canvas.onmousemove({});
+                    canvas.ontouchstart({ touches: [{ clientX: 0, clientY: 0 }] });
+                    canvas.oncontextmenu({ preventDefault: () => {} });
+                    canvas.onkeydown({ key: "ArrowRight", preventDefault: () => {} });
+                }
+
+                if (row1) {
+                    row1.onclick();
+                    row1.oncontextmenu({ preventDefault: () => {} });
+                }
+
+                if (tdCents) {
+                    // Double-clicking an unlocked cell during playback must be ignored
+                    tdCents.ondblclick({ stopPropagation: () => {} });
+                    // Blurring an active input during playback must revert rather than commit mutation
+                    const input = tdCents.querySelector("input");
+                    if (input && input.onblur) input.onblur();
+                }
+
+                expect(widget.pitchNumber).toBe(pitchCountBefore);
+                expect(widget.frequencies).toEqual(freqsBefore);
+                expect(widget.cents[1]).toBe(100);
+
+                // Toggling playAll while running stops playback early and restores buttons
+                widget.playAll();
+                expect(widget._playAllRunning).toBe(false);
+
+                if (widget._vizToolbar) {
+                    expect(widget._vizToolbar.removePitchBtn.style.pointerEvents).toBe("auto");
+                    expect(widget._vizToolbar.addPitchAfterBtn.style.pointerEvents).toBe("auto");
+                    expect(widget._vizToolbar.addPitchBeforeBtn.style.pointerEvents).toBe("auto");
+                }
             });
         });
 
