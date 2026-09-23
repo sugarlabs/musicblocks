@@ -655,7 +655,9 @@ function SampleWidget() {
     };
 
     this.drag_and_drop = () => {
-        this._dropZone = document.getElementsByClassName("samplerCanvas")[0];
+        this._dropZone = this.widgetWindow
+            .getWidgetBody()
+            .getElementsByClassName("samplerCanvas")[0];
         if (this._dropZone) {
             this._dropZone.addEventListener("dragover", this._dragOverHandler);
             this._dropZone.addEventListener("drop", this._dropHandler);
@@ -1196,7 +1198,9 @@ function SampleWidget() {
             if (!tunerOn) {
                 tunerOn = true;
 
-                const samplerCanvas = docByClass("samplerCanvas")[0];
+                const samplerCanvas = this.widgetWindow
+                    .getWidgetBody()
+                    .getElementsByClassName("samplerCanvas")[0];
                 if (samplerCanvas) {
                     samplerCanvas.style.display = "none";
                 }
@@ -1389,7 +1393,9 @@ function SampleWidget() {
                 this.centAdjustmentOn = false;
 
                 // Show the sampler canvas
-                const samplerCanvas = docByClass("samplerCanvas")[0];
+                const samplerCanvas = this.widgetWindow
+                    .getWidgetBody()
+                    .getElementsByClassName("samplerCanvas")[0];
                 if (samplerCanvas) {
                     samplerCanvas.style.display = "block";
                 }
@@ -1408,7 +1414,9 @@ function SampleWidget() {
                 this.centAdjustmentOn = true;
 
                 // Hide the sampler canvas
-                const samplerCanvas = docByClass("samplerCanvas")[0];
+                const samplerCanvas = this.widgetWindow
+                    .getWidgetBody()
+                    .getElementsByClassName("samplerCanvas")[0];
                 if (samplerCanvas) {
                     samplerCanvas.style.display = "none";
                 }
@@ -1586,7 +1594,9 @@ function SampleWidget() {
                 }
 
                 // Show the sampler canvas
-                const samplerCanvas = docByClass("samplerCanvas")[0];
+                const samplerCanvas = this.widgetWindow
+                    .getWidgetBody()
+                    .getElementsByClassName("samplerCanvas")[0];
                 if (samplerCanvas) {
                     samplerCanvas.style.display = "block";
                 }
@@ -2077,7 +2087,7 @@ function SampleWidget() {
      */
     this._scale = function () {
         let width, height;
-        const canvas = document.getElementsByClassName("samplerCanvas");
+        const canvas = this.widgetWindow.getWidgetBody().getElementsByClassName("samplerCanvas");
         Array.prototype.forEach.call(canvas, ele => {
             this.widgetWindow.getWidgetBody().removeChild(ele);
         });
@@ -2161,7 +2171,9 @@ function SampleWidget() {
             canvas.style.marginTop = tunerCanvas.height + 20 + "px";
         } else if (this.tunerDisplay) {
             // Remove the tuner canvas if it exists
-            const tunerCanvas = document.getElementsByClassName("tunerCanvas")[0];
+            const tunerCanvas = this.widgetWindow
+                .getWidgetBody()
+                .getElementsByClassName("tunerCanvas")[0];
             if (tunerCanvas) {
                 tunerCanvas.parentNode.removeChild(tunerCanvas);
             }
