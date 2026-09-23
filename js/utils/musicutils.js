@@ -5612,9 +5612,6 @@ function getNote(
         if (movable) {
             kOffset = PITCHES.indexOf(keySignature.split(" ")[0]);
             if (kOffset === -1) {
-                kOffset = PITCHES.indexOf(keySignature.split(" ")[0]);
-            }
-            if (kOffset === -1) {
                 kOffset = PITCHES2.indexOf(keySignature.split(" ")[0]);
             }
             if (kOffset === -1) {
