@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { setupEnsembleBlocks, getTargetTurtle } = require("../EnsembleBlocks");
+const { setupEnsembleBlocks, getTargetTurtle, _blockFindTurtle } = require("../EnsembleBlocks");
 
 describe("setupEnsembleBlocks", () => {
     let activity, logo, createdBlocks, turtles;
@@ -158,6 +158,7 @@ describe("setupEnsembleBlocks", () => {
         global.getMunsellColor = jest.fn((hue, chroma, value) => `#${hue}${chroma}${value}`);
         global.TURTLESVG = "<svg>fill_color stroke_color</svg>";
         global.base64Encode = jest.fn(str => str);
+        global.noteToObj = require("../../utils/musicutils").noteToObj;
 
         const mockTurtles = [0, 1, 2].map(index => ({
             name: index === 0 ? "Yertle" : index === 1 ? "Turtle1" : "Turtle2",
@@ -290,6 +291,54 @@ describe("setupEnsembleBlocks", () => {
             }));
             const result = getTargetTurtle(turtles, "Yertle");
             expect(result).toBeNull();
+        });
+    });
+
+    describe("_blockFindTurtle", () => {
+        const blk = 50;
+
+        beforeEach(() => {
+            activity.blocks.blockList[blk] = { connections: [null, 100] };
+            activity.blocks.blockList[100] = { name: "text", value: "Yertle" };
+        });
+
+        it("should return null if block not found in blockList", () => {
+            delete activity.blocks.blockList[blk];
+            const result = _blockFindTurtle(activity, 0, blk, undefined);
+            expect(result).toBeNull();
+        });
+
+        it("should return null if turtle name connection is null", () => {
+            activity.blocks.blockList[blk].connections[1] = null;
+            const result = _blockFindTurtle(activity, 0, blk, undefined);
+            expect(result).toBeNull();
+        });
+
+        it("should return null if parsed turtle name is null", () => {
+            logo.parseArg.mockReturnValue(null);
+            const result = _blockFindTurtle(activity, 0, blk, undefined);
+            expect(result).toBeNull();
+        });
+
+        it("should call errorMsg and return null when target turtle not found", () => {
+            logo.parseArg.mockReturnValue("NonExistent");
+            const result = _blockFindTurtle(activity, 0, blk, undefined);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find turtle NonExistent", blk);
+            expect(result).toBeNull();
+        });
+
+        it("should return turtle object when turtle found", () => {
+            logo.parseArg.mockReturnValue("Yertle");
+            const result = _blockFindTurtle(activity, 0, blk, undefined);
+            expect(result).toBeDefined();
+            expect(result.name).toBe("Yertle");
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should pass receivedArg to parseArg", () => {
+            logo.parseArg.mockReturnValue("Turtle1");
+            _blockFindTurtle(activity, 0, blk, "Turtle1");
+            expect(logo.parseArg).toHaveBeenCalledWith(activity.logo, 0, 100, blk, "Turtle1");
         });
     });
 
@@ -592,7 +641,7 @@ describe("setupEnsembleBlocks", () => {
         const blk = 50;
 
         beforeEach(() => {
-            turtleElapsedNotesBlock = createdBlocks["turtlelapsednotes"];
+            turtleElapsedNotesBlock = createdBlocks["turtleelapsednotes"];
             activity.blocks.blockList[blk] = { connections: [null, 100] };
             activity.blocks.blockList[100] = { name: "text", value: "Yertle" };
         });
@@ -1075,6 +1124,40 @@ describe("setupEnsembleBlocks", () => {
             logo.parseArg.mockReturnValue("Yertle");
             turtlePitchBlock.arg(logo, 0, blk, null);
             expect(pitchToNumber).toHaveBeenCalled();
+        });
+
+        it("should parse multi-digit and negative octaves correctly for matched turtle", () => {
+            const turtlePitchBlock = createdBlocks["turtlepitch"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100], value: null };
+            activity.blocks.blockList[100] = { name: "text", value: "Yertle" };
+            const tur = turtles.ithTurtle(0);
+            logo.parseArg.mockReturnValue("Yertle");
+
+            tur.singer.lastNotePlayed = ["C10", 0.25];
+            turtlePitchBlock.arg(logo, 0, blk, null);
+            expect(pitchToNumber).toHaveBeenCalledWith("C", 10, "C");
+
+            tur.singer.lastNotePlayed = ["A-1", 0.25];
+            turtlePitchBlock.arg(logo, 0, blk, null);
+            expect(pitchToNumber).toHaveBeenCalledWith("A", -1, "C");
+        });
+
+        it("should parse multi-digit and negative octaves correctly in fallback path", () => {
+            const turtlePitchBlock = createdBlocks["turtlepitch"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100], value: null };
+            activity.blocks.blockList[100] = { name: "text", value: "UnknownTurtle" };
+            const tur = turtles.ithTurtle(0);
+            logo.parseArg.mockReturnValue("UnknownTurtle");
+
+            tur.singer.lastNotePlayed = ["Gb12", 0.25];
+            turtlePitchBlock.arg(logo, 0, blk, null);
+            expect(pitchToNumber).toHaveBeenCalledWith("Gb", 12, "C");
+
+            tur.singer.lastNotePlayed = ["F#-2", 0.25];
+            turtlePitchBlock.arg(logo, 0, blk, null);
+            expect(pitchToNumber).toHaveBeenCalledWith("F#", -2, "C");
         });
     });
 });

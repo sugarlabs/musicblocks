@@ -174,6 +174,22 @@ describe("themes.css colour tokens", () => {
         expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
     });
 
+    it("keeps the new project confirmation readable in the highcontrast theme", () => {
+        const dialogRule = rules.find(r => r.selector.trim() === ".highcontrast #newdropdown");
+        const messageRule = rules.find(
+            r => r.selector.trim() === ".highcontrast #confirmation-message"
+        );
+        expect(dialogRule).toBeDefined();
+        expect(messageRule).toBeDefined();
+
+        const tokens = THEMES.highcontrast;
+        const foreground = resolveColor(declaration(messageRule.body, "color"), tokens);
+        const background = resolveColor(declaration(dialogRule.body, "background-color"), tokens);
+        expect(foreground).not.toBeNull();
+        expect(background).not.toBeNull();
+        expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
+    });
+
     it.each(["dark", "highcontrast"])("keeps modal content readable in the %s theme", theme => {
         const rule = rules.find(r => r.selector.trim() === ".modal-content");
         expect(rule).toBeDefined();

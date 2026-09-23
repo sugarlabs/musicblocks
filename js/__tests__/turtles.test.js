@@ -681,6 +681,170 @@ describe("aux toolbar collapse and expand", () => {
         expect(turtles.hideMenu).toHaveBeenCalled();
         expect(turtles.setStageScale).toHaveBeenCalledWith(1.0);
     });
+
+    test("keeps canvas buttons below the auxiliary toolbar after resize", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+        const hardwareConcurrency = Object.getOwnPropertyDescriptor(
+            navigator,
+            "hardwareConcurrency"
+        );
+
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        this.onload?.();
+                    }
+                });
+            }
+        };
+        Object.defineProperty(navigator, "hardwareConcurrency", { configurable: true, value: 1 });
+        jest.useFakeTimers();
+
+        try {
+            activityMock.toolbarHeight = 0;
+            document.getElementById("aux-toolbar").style.display = "none";
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            const buttonIds = ["Grid", "Clear", "Collapse"];
+            const baseTop = 70 + LEADING + 6;
+            buttonIds.forEach(id => {
+                expect(document.getElementById(id).style.top).toBe(`${baseTop}px`);
+            });
+
+            // Opening the menu shifts existing buttons; fullscreen then rebuilds them on resize.
+            activityMock.toolbarHeight = 64;
+            document.getElementById("aux-toolbar").style.display = "block";
+            buttonIds.forEach(id => {
+                document.getElementById(id).style.top = `${baseTop + 64}px`;
+            });
+            const oldGrid = document.getElementById("Grid");
+            turtles._resizeHandler();
+            jest.advanceTimersByTime(150);
+
+            expect(document.getElementById("Grid")).not.toBe(oldGrid);
+            buttonIds.forEach(id => {
+                expect(document.getElementById(id).style.top).toBe(`${baseTop + 64}px`);
+            });
+
+            activityMock.toolbarHeight = 0;
+            document.getElementById("aux-toolbar").style.display = "none";
+            turtles._resizeHandler();
+            jest.advanceTimersByTime(150);
+            buttonIds.forEach(id => {
+                expect(document.getElementById(id).style.top).toBe(`${baseTop}px`);
+            });
+        } finally {
+            jest.useRealTimers();
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+            if (hardwareConcurrency) {
+                Object.defineProperty(navigator, "hardwareConcurrency", hardwareConcurrency);
+            } else {
+                delete navigator.hardwareConcurrency;
+            }
+        }
+    });
+
+    test("Escape key on canvas buttons exits keyboard navigation", () => {
+        const listeners = [];
+        const originalCreateElement = document.createElement;
+        document.createElement = function (tag) {
+            const el = originalCreateElement.call(document, tag);
+            const originalAddEventListener = el.addEventListener;
+            el.addEventListener = function (event, handler) {
+                if (event === "keydown") listeners.push(handler);
+                originalAddEventListener.call(this, event, handler);
+            };
+            return el;
+        };
+
+        const originalJQuery = window.jQuery;
+        const mockJQuery = jest.fn(() => ({
+            tooltip: jest.fn(),
+            each: jest.fn(function (cb) {
+                cb.call(document.createElement("div"));
+                return this;
+            })
+        }));
+        mockJQuery.noConflict = jest.fn(() => mockJQuery);
+        window.jQuery = mockJQuery;
+        global.jQuery = mockJQuery;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+        global.makeKeyboardAccessible = jest.fn();
+
+        const originalImage = global.Image;
+        global.Image = function () {
+            const img = document.createElement("img");
+            const originalSetAttribute = img.setAttribute;
+            img.setAttribute = jest.fn(function (name, value) {
+                return originalSetAttribute.call(img, name, value);
+            });
+            Object.defineProperty(img, "src", {
+                set: function (val) {
+                    this.setAttribute("src", val);
+                    if (typeof this.onload === "function") {
+                        this.onload();
+                    }
+                },
+                get: function () {
+                    return this.getAttribute("src");
+                }
+            });
+            return img;
+        };
+
+        const activityMock = {
+            toolbarHeight: 0,
+            loading: false,
+            getCanvasPadding: jest.fn(() => ({ paddingTop: 0, paddingLeft: 0 })),
+            refreshCanvas: jest.fn()
+        };
+        const turtles = new Turtles(activityMock);
+        mixinPrototypes(turtles);
+        turtles.activity = activityMock; // Manually assign activity just in case importMembers is mocked
+        turtles._borderContainer = { removeAllChildren: jest.fn(), addChild: jest.fn() };
+        turtles._canvas = { style: {}, getContext: jest.fn(), width: 1200, height: 900 };
+        turtles.stage = { addChild: jest.fn() };
+        turtles._backgroundColor = "white"; // Add to prevent crash
+        turtles._expandedBoundary = null;
+        turtles._collapsedBoundary = null;
+        turtles._expandButton = null;
+        turtles._collapseButton = null;
+        turtles.gridButton = null;
+        turtles._clearButton = null;
+
+        window._focusCycleManager = { exitKeyboardNavigation: jest.fn() };
+
+        turtles.makeBackground();
+
+        expect(listeners.length).toBeGreaterThan(0);
+
+        const handler = listeners[0];
+
+        handler({ key: "A", preventDefault: jest.fn(), stopPropagation: jest.fn() });
+        expect(window._focusCycleManager.exitKeyboardNavigation).not.toHaveBeenCalled();
+
+        const preventDefault = jest.fn();
+        const stopPropagation = jest.fn();
+        handler({ key: "Escape", preventDefault, stopPropagation });
+
+        expect(preventDefault).toHaveBeenCalled();
+        expect(stopPropagation).toHaveBeenCalled();
+        expect(window._focusCycleManager.exitKeyboardNavigation).toHaveBeenCalled();
+
+        document.createElement = originalCreateElement;
+        window.jQuery = originalJQuery;
+        global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        global.Image = originalImage;
+        delete window._focusCycleManager;
+    });
 });
 
 describe("TurtlesModel doGrid initialization order", () => {

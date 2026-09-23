@@ -879,6 +879,7 @@ Turtles.TurtlesView = class {
      */
     makeBackground(setCollapsed) {
         const activity = this.activity;
+        const getTopButtonY = () => 70 + LEADING + 6 + activity.toolbarHeight;
 
         const _doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
@@ -893,11 +894,6 @@ Turtles.TurtlesView = class {
             canvas.style.backgroundColor = this._backgroundColor;
         }
 
-        // Also update body background if available
-        if (typeof document !== "undefined") {
-            document.body.style.backgroundColor = this._backgroundColor;
-        }
-
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
 
@@ -910,8 +906,7 @@ Turtles.TurtlesView = class {
             makeKeyboardAccessible(container, object.label || object.name || "Canvas button");
             if (typeof container.addEventListener === "function") {
                 container.addEventListener("keydown", event => {
-                    const isEscape =
-                        event.key === "Escape" || event.key === "Esc" || event.keyCode === 27;
+                    const isEscape = event.key === "Escape" || event.key === "Esc";
                     if (!isEscape) return;
 
                     event.preventDefault();
@@ -1025,7 +1020,7 @@ Turtles.TurtlesView = class {
                     label: _("Grid")
                 },
                 this._w - 10 - 3 * 55,
-                70 + LEADING + 6
+                getTopButtonY()
             );
             const that = this;
             this.gridButton.onclick = () => {
@@ -1042,7 +1037,7 @@ Turtles.TurtlesView = class {
                     label: _("Clear")
                 },
                 this._w - 5 - 2 * 55,
-                70 + LEADING + 6
+                getTopButtonY()
             );
 
             // Assign click listener to the Clear button
@@ -1063,7 +1058,7 @@ Turtles.TurtlesView = class {
                     label: _("Collapse")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                getTopButtonY()
             );
 
             this._collapseButton.onclick = () => {
@@ -1130,7 +1125,7 @@ Turtles.TurtlesView = class {
                     label: _("Expand")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                getTopButtonY()
             );
             if (this._expandButton !== null) {
                 this._expandButton.style.visibility = "hidden";

@@ -1233,6 +1233,18 @@ describe("LegoWidget — Extended _filterSmallSegments coverage", () => {
     it("should absorb multiple consecutive small segments", () => {
         expect(legoWidget._filterSmallSegments([0, 200, 400, 600, 2000])).toEqual([0, 2000]);
     });
+
+    it("should merge a short trailing segment into the previous one", () => {
+        expect(legoWidget._filterSmallSegments([0, 1500, 2000])).toEqual([0, 2000]);
+    });
+
+    it("should append the final boundary when only the start boundary was kept", () => {
+        expect(legoWidget._filterSmallSegments([0, 500, 3000])).toEqual([0, 3000]);
+    });
+
+    it("should keep the final boundary when trailing small segments follow a kept one", () => {
+        expect(legoWidget._filterSmallSegments([0, 1500, 3000, 3400])).toEqual([0, 1500, 3400]);
+    });
 });
 
 describe("LegoWidget — Extended _analyzeColumnBoundaries coverage", () => {
@@ -1454,7 +1466,7 @@ describe("LegoWidget — _createWidgetWindow", () => {
     it("should look up, clear, and show the widget window", () => {
         const widgetWindow = legoWidget._createWidgetWindow();
 
-        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(legoWidget, "LEGO BRICKS");
+        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(legoWidget, "LEGO Bricks");
         expect(widgetWindow).toBe(mockWindow);
         expect(legoWidget.widgetWindow).toBe(mockWindow);
         expect(mockWindow.clear).toHaveBeenCalled();
@@ -1982,6 +1994,19 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
             });
         });
 
+        describe("_createSpacingControls", () => {
+            it("wires the − and + buttons to the same step magnitude", () => {
+                const [, spacingOut, , spacingIn] = legoWidget._createSpacingControls();
+                legoWidget.spacingSlider.value = "50";
+
+                spacingOut.onclick();
+                expect(legoWidget.spacingSlider.value).toBe("45");
+
+                spacingIn.onclick();
+                expect(legoWidget.spacingSlider.value).toBe("50");
+            });
+        });
+
         describe("_handleVerticalSpacing", () => {
             it("reads the slider and labels it in pixels", () => {
                 legoWidget.spacingSlider.value = "42";
@@ -2293,5 +2318,26 @@ describe("LegoWidget — _clearPhrase and _initializeMatrix safety (Issue #8609)
 
         expect(legoWidget.synth.stopSound).toHaveBeenCalledWith(0, "electronic synth", "G4");
         await playbackPromise;
+    });
+
+    describe("_drawGridLines during playback", () => {
+        it("keeps the scanning lines attached to the overlay when the grid is redrawn", () => {
+            legoWidget.matrixData = { rows: [{ note: "C" }, { note: "D" }] };
+            legoWidget.rowHeaderTable = { rows: [{}, {}] };
+            legoWidget.gridOverlay = document.createElement("div");
+            legoWidget.verticalSpacing = 50;
+
+            const scanLine = document.createElement("div");
+            legoWidget.gridOverlay.appendChild(scanLine);
+            legoWidget.scanningLines = [{ element: scanLine }];
+
+            legoWidget._drawGridLines();
+
+            expect(scanLine.parentNode).toBe(legoWidget.gridOverlay);
+            const redLines = Array.from(legoWidget.gridOverlay.children).filter(
+                el => el.style.backgroundColor === "red"
+            );
+            expect(redLines).toHaveLength(2);
+        });
     });
 });

@@ -41,9 +41,13 @@ async function parseAndCapture(tune) {
 
 /** Build a bare-minimum note element matching ABCJS output shape. */
 function makeNote(name, pitch, duration = 0.25, opts = {}) {
+    const pitchObj = { name, pitch };
+    if (opts.accidental) {
+        pitchObj.accidental = opts.accidental;
+    }
     return {
         el_type: "note",
-        pitches: [{ name, pitch }],
+        pitches: [pitchObj],
         duration,
         startTriplet: opts.startTriplet ?? null,
         endTriplet: opts.endTriplet ?? null
@@ -156,10 +160,10 @@ describe("Test 1: Simple melody", () => {
 
     test("setkey2 block references G major", async () => {
         const blocks = await parseAndCapture(tune);
-        const keyRootBlocks = blocks.filter(
-            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "G"
-        );
-        expect(keyRootBlocks.length).toBeGreaterThanOrEqual(1);
+        const setKey = blocks.find(b => b[1] === "setkey2");
+        expect(setKey).toBeDefined();
+        const keyRootBlock = blocks.find(b => b[0] === setKey[4][1]);
+        expect(keyRootBlock[1]).toEqual(["notename", { value: "G" }]);
     });
 
     test("parseABC returns null", async () => {
@@ -389,9 +393,271 @@ describe("Test 4: Triplets", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Test 5 — Key signature with accidentals (F major = B♭)
+// Test 5 — Inline accidentals on individual notes
 // ---------------------------------------------------------------------------
-describe("Test 5: Key signature accidentals (F major)", () => {
+describe("Test 5: Inline accidentals", () => {
+    test("sharp accidental (^C) produces C♯ notename", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "", accidentals: [] },
+                    voices: [[makeNote("^C", 0, 0.25, { accidental: "sharp" })]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const cSharp = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "C♯"
+        );
+        expect(cSharp).toBeDefined();
+    });
+
+    test("flat accidental (_E) produces E♭ notename", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "", accidentals: [] },
+                    voices: [[makeNote("_E", 2, 0.25, { accidental: "flat" })]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const eFlat = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "E♭"
+        );
+        expect(eFlat).toBeDefined();
+    });
+
+    test("natural accidental (=F) overrides key-sig flat, produces bare F", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "Bb", mode: "", accidentals: [{ note: "F", acc: "flat" }] },
+                    voices: [[makeNote("=F", 3, 0.25, { accidental: "natural" })]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const bareF = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "F"
+        );
+        expect(bareF).toBeDefined();
+    });
+
+    test("double sharp (^^G) produces G with double-sharp symbol", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "", accidentals: [] },
+                    voices: [[makeNote("^^G", 4, 0.25, { accidental: "dblsharp" })]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const gDblSharp = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "G𝄪"
+        );
+        expect(gDblSharp).toBeDefined();
+    });
+
+    test("double flat (__A) produces A with double-flat symbol", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "", accidentals: [] },
+                    voices: [[makeNote("__A", 5, 0.25, { accidental: "dblflat" })]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const aDblFlat = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "A𝄫"
+        );
+        expect(aDblFlat).toBeDefined();
+    });
+
+    test("inline accidental overrides key-sig accidental on the same note", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "F", mode: "", accidentals: [{ note: "B", acc: "flat" }] },
+                    voices: [[makeNote("=B", 6, 0.25, { accidental: "natural" })]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const bareB = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "B"
+        );
+        expect(bareB).toBeDefined();
+        const bFlat = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "B♭"
+        );
+        expect(bFlat).toBeUndefined();
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Test 6 — Key root with accidental in setkey2 block
+// ---------------------------------------------------------------------------
+describe("Test 6: Key root accidental in setkey2", () => {
+    test("K:Bb produces setkey2 notename B♭", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: {
+                        root: "B",
+                        acc: "b",
+                        mode: "",
+                        accidentals: [{ note: "B", acc: "flat" }]
+                    },
+                    voices: [[makeNote("C", 0)]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const bFlatRoot = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "B♭"
+        );
+        expect(bFlatRoot).toBeDefined();
+    });
+
+    test("K:F# produces setkey2 notename F♯", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "F", acc: "#", mode: "", accidentals: [] },
+                    voices: [[makeNote("C", 0)]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const fSharpRoot = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "F♯"
+        );
+        expect(fSharpRoot).toBeDefined();
+    });
+
+    test("K:C (no accidental) produces plain C notename", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", acc: "", mode: "", accidentals: [] },
+                    voices: [[makeNote("C", 0)]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const cRoot = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "C"
+        );
+        expect(cRoot).toBeDefined();
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Test 7 — Mode mapping in setkey2 block
+// ---------------------------------------------------------------------------
+describe("Test 7: Mode mapping in setkey2", () => {
+    test("K:Ddor produces modename dorian", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "D", acc: "", mode: "Dor", accidentals: [] },
+                    voices: [[makeNote("D", 1)]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const dorianMode = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "modename" && b[1][1]?.value === "dorian"
+        );
+        expect(dorianMode).toBeDefined();
+    });
+
+    test("K:Amix produces modename mixolydian", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "A", acc: "", mode: "Mix", accidentals: [] },
+                    voices: [[makeNote("A", 5)]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const mixMode = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "modename" && b[1][1]?.value === "mixolydian"
+        );
+        expect(mixMode).toBeDefined();
+    });
+
+    test("K:Dm produces modename minor", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "D", acc: "", mode: "m", accidentals: [] },
+                    voices: [[makeNote("D", 1)]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const minorMode = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "modename" && b[1][1]?.value === "minor"
+        );
+        expect(minorMode).toBeDefined();
+    });
+
+    test("K:Elyd produces modename lydian", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "E", acc: "", mode: "Lyd", accidentals: [] },
+                    voices: [[makeNote("E", 2)]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const lydianMode = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "modename" && b[1][1]?.value === "lydian"
+        );
+        expect(lydianMode).toBeDefined();
+    });
+
+    test("unrecognized mode falls back to major", async () => {
+        const tune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", acc: "", mode: "Unknown", accidentals: [] },
+                    voices: [[makeNote("C", 0)]]
+                }
+            ]
+        });
+        const blocks = await parseAndCapture(tune);
+        const majorMode = blocks.find(
+            b => Array.isArray(b[1]) && b[1][0] === "modename" && b[1][1]?.value === "major"
+        );
+        expect(majorMode).toBeDefined();
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Test 8 — Key signature with accidentals (F major = B♭)
+// ---------------------------------------------------------------------------
+describe("Test 8: Key signature accidentals (F major)", () => {
     // F major has one flat: B♭
     const fMajorKey = {
         root: "F",
@@ -419,10 +685,10 @@ describe("Test 5: Key signature accidentals (F major)", () => {
 
     test("setkey2 block references F root", async () => {
         const blocks = await parseAndCapture(tune);
-        const fKeyRoot = blocks.find(
-            b => Array.isArray(b[1]) && b[1][0] === "notename" && b[1][1]?.value === "F"
-        );
-        expect(fKeyRoot).toBeDefined();
+        const setKey = blocks.find(b => b[1] === "setkey2");
+        expect(setKey).toBeDefined();
+        const keyRootBlock = blocks.find(b => b[0] === setKey[4][1]);
+        expect(keyRootBlock[1]).toEqual(["notename", { value: "F" }]);
     });
 
     test("B note gets flat symbol applied by _adjustPitch", async () => {
@@ -444,9 +710,9 @@ describe("Test 5: Key signature accidentals (F major)", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Test 6 — Empty-voice / degenerate input guard (issue: actionBlock[0] crash)
+// Test 9 — Empty-voice / degenerate input guard (issue: actionBlock[0] crash)
 // ---------------------------------------------------------------------------
-describe("Test 6: Empty-voice and degenerate input guard", () => {
+describe("Test 9: Empty-voice and degenerate input guard", () => {
     test("ABC rest creates a rest block inside a note", async () => {
         const tune = makeTune({
             staves: [

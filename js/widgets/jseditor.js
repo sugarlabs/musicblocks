@@ -34,6 +34,7 @@ class JSEditor {
         this.activity = activity;
         this.isOpen = true;
         this._showingHelp = false;
+        this._tooltips = [];
 
         this.widgetWindow = window.widgetWindows.windowFor(
             this,
@@ -246,33 +247,68 @@ class JSEditor {
     }
 
     /**
-     * Marks an error span in the editor with a simple approach
+     * Marks an error span in the editor by wrapping the error range inside
+     * the existing DOM tree. Unlike the previous approach that replaced the
+     * entire editor content with plain text (destroying hljs highlighting),
+     * this walks the text nodes with a TreeWalker and only wraps the
+     * overlapping portions, preserving all syntax-highlighting spans.
+     *
      * @param {HTMLElement} editor - the editor element
-     * @param {Number} start - the start position of the error
-     * @param {Number} end - the end position of the error
-     * @param {String} message - the error message
+     * @param {Number} start - the start character position of the error
+     * @param {Number} end - the end character position of the error
+     * @param {String} message - the error message (shown as tooltip)
      * @returns {void}
      */
     _markErrorSpan(editor, start, end, message) {
-        const text = editor.textContent;
-        const errorText = text.substring(start, end);
+        const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
+        let charOffset = 0;
+        let node;
+        const nodesToWrap = [];
 
-        const beforeError = text.substring(0, start);
-        const afterError = text.substring(end);
+        // Collect all text nodes that overlap with the error range [start, end)
+        while ((node = walker.nextNode())) {
+            const nodeStart = charOffset;
+            const nodeEnd = charOffset + node.textContent.length;
 
-        const highlightedContent = document.createDocumentFragment();
-        highlightedContent.appendChild(document.createTextNode(beforeError));
+            if (nodeEnd > start && nodeStart < end) {
+                nodesToWrap.push({
+                    node,
+                    overlapStart: Math.max(0, start - nodeStart),
+                    overlapEnd: Math.min(node.textContent.length, end - nodeStart)
+                });
+            }
 
-        const errorSpan = document.createElement("span");
-        errorSpan.className = "error";
-        errorSpan.title = String(message);
-        errorSpan.textContent = errorText;
-        highlightedContent.appendChild(errorSpan);
+            charOffset = nodeEnd;
+            if (charOffset >= end) break;
+        }
 
-        highlightedContent.appendChild(document.createTextNode(afterError));
+        // Process in reverse order so earlier node positions remain valid
+        for (let i = nodesToWrap.length - 1; i >= 0; i--) {
+            const { node: textNode, overlapStart, overlapEnd } = nodesToWrap[i];
+            const content = textNode.textContent;
 
-        editor.textContent = "";
-        editor.appendChild(highlightedContent);
+            const beforeText = content.substring(0, overlapStart);
+            const errorText = content.substring(overlapStart, overlapEnd);
+            const afterText = content.substring(overlapEnd);
+
+            const fragment = document.createDocumentFragment();
+
+            if (beforeText) {
+                fragment.appendChild(document.createTextNode(beforeText));
+            }
+
+            const errorSpan = document.createElement("span");
+            errorSpan.className = "error";
+            errorSpan.title = String(message);
+            errorSpan.textContent = errorText;
+            fragment.appendChild(errorSpan);
+
+            if (afterText) {
+                fragment.appendChild(document.createTextNode(afterText));
+            }
+
+            textNode.parentNode.replaceChild(fragment, textNode);
+        }
     }
 
     /**
@@ -292,6 +328,12 @@ class JSEditor {
             // Each open() adds a fresh set of theme <link> elements to
             // document.head (see constructor); remove this instance's set
             // on close so repeated open/close cycles don't leak them.
+            if (this._tooltips) {
+                for (const tooltipBox of this._tooltips) {
+                    tooltipBox.remove();
+                }
+                this._tooltips = null;
+            }
             if (this._styles) {
                 for (const link of this._styles) {
                     link.remove();
@@ -331,13 +373,16 @@ class JSEditor {
         menuLeft.style.justifyContent = "end";
         menuLeft.style.alignItems = "center";
 
-        function generateTooltip(targetButton, tooltipText, positionOfTooltip = "bottom") {
+        const generateTooltip = (targetButton, tooltipText, positionOfTooltip = "bottom") => {
             const tooltipBox = document.createElement("div");
             const tooltip = document.createElement("div");
 
             tooltipBox.appendChild(tooltip);
 
             document.body.appendChild(tooltipBox);
+            if (this._tooltips) {
+                this._tooltips.push(tooltipBox);
+            }
 
             targetButton.addEventListener("mouseover", () => {
                 const rect = targetButton.getBoundingClientRect();
@@ -372,7 +417,7 @@ class JSEditor {
             });
 
             return tooltip;
-        }
+        };
 
         const helpBtn = document.createElement("span");
         helpBtn.id = "js_editor_help_btn";
@@ -1157,10 +1202,12 @@ class JSEditor {
      */
     _addDebuggerToLine(lineNumber) {
         const lines = this._code.split("\n");
-        const insertIndex = lineNumber - 1;
+        if (lineNumber < 0 || lineNumber >= lines.length || !lines[lineNumber]) {
+            return;
+        }
 
         // Check if the line ends with '{' or ';'
-        const currentLine = lines[insertIndex].trim();
+        const currentLine = lines[lineNumber].trim();
         if (!currentLine.endsWith("{") && !currentLine.endsWith(";")) {
             JSEditor.logConsole(
                 `Cannot add breakpoint to line ${
@@ -1173,8 +1220,8 @@ class JSEditor {
 
         // Prevent adding two breakpoints right next to each other
         if (
-            (lines[insertIndex] && lines[insertIndex].trim() === "debugger;") ||
-            (lines[insertIndex + 1] && lines[insertIndex + 1].trim() === "debugger;")
+            (lines[lineNumber] && lines[lineNumber].trim() === "debugger;") ||
+            (lines[lineNumber + 1] && lines[lineNumber + 1].trim() === "debugger;")
         ) {
             JSEditor.logConsole(
                 `Cannot add breakpoint to line ${
@@ -1187,10 +1234,10 @@ class JSEditor {
 
         let indent = "";
         let extraIndent = "";
-        if (insertIndex >= 0 && lines[insertIndex]) {
-            const match = lines[insertIndex].match(/^(\s*)/);
+        if (lines[lineNumber]) {
+            const match = lines[lineNumber].match(/^(\s*)/);
             if (match) indent = match[1];
-            if (lines[insertIndex].trim().endsWith("{")) {
+            if (lines[lineNumber].trim().endsWith("{")) {
                 extraIndent = "\t";
             }
         } else if (lines.length > 0) {
@@ -1198,7 +1245,7 @@ class JSEditor {
             if (match) indent = match[1];
         }
         // Insert debugger statement after the specified line, with matching indentation
-        lines.splice(insertIndex + 1, 0, indent + extraIndent + "debugger;");
+        lines.splice(lineNumber + 1, 0, indent + extraIndent + "debugger;");
         this._code = lines.join("\n");
         this._jar.updateCode(this._code);
         this._setLinesCount(this._code);
@@ -1214,6 +1261,9 @@ class JSEditor {
     _removeDebuggerFromLine(lineNumber) {
         // Allow removing breakpoints at any time
         const lines = this._code.split("\n");
+        if (lineNumber < 0 || lineNumber >= lines.length || !lines[lineNumber]) {
+            return;
+        }
         const currentLine = lines[lineNumber].trim();
         if (currentLine === "debugger;") {
             lines.splice(lineNumber, 1);

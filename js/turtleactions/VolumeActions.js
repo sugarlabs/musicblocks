@@ -284,9 +284,21 @@ function setupVolumeActions(activity) {
             if (!tur.singer.suppressOutput) {
                 Singer.setSynthVolume(activity.logo, turtle, synth, volume);
                 if (firstConnection === null && lastConnection === null) {
-                    setTimeout(() => {
-                        activity.logo.synth.trigger(0, "G4", 1 / 4, synthname, null, null, false);
-                    }, 250);
+                    activity.logo._timerManager.setGuardedTimeout(
+                        () => {
+                            activity.logo.synth.trigger(
+                                0,
+                                "G4",
+                                1 / 4,
+                                synthname,
+                                null,
+                                null,
+                                false
+                            );
+                        },
+                        250,
+                        () => activity.logo.stopTurtle
+                    );
                 }
             }
         }

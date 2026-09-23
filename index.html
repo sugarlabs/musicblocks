@@ -124,13 +124,15 @@
         <script src="js/utils/jquery-setup.js" defer></script>
         <script src="js/utils/abcLoader.js" defer></script>
         <script src="lib/midi.js" defer></script>
-        <script src="lib/raphael.min.js" defer></script>
-        <script src="lib/wheelnav.js" defer></script>
+        <!-- raphael and wheelnav are loaded from loader.js once the app is up,
+             not here. They are only used to draw the pie menus, which need a
+             block interaction to exist, and as defer scripts they had to run
+             before DOMContentLoaded and so before anything could be painted. -->
         <script src="lib/codejar/codejar.min.js" defer></script>
         <script src="lib/codejar/highlight.pack.js" defer></script>
         <link
             rel="preload"
-            href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
             as="style"
             integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
             crossorigin="anonymous"
@@ -142,7 +144,7 @@
         <noscript
             ><link
                 rel="stylesheet"
-                href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+                href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
                 integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
                 crossorigin="anonymous"
         /></noscript>
@@ -163,6 +165,7 @@
         </script>
         <script src="lib/astring.min.js" defer></script>
         <script src="lib/purify.min.js" defer></script>
+        <script src="js/utils/sessionManager.js" defer></script>
         <script src="js/utils/mb-dialog.js" defer></script>
         <script src="js/svgAssetSelector.js" defer></script>
         <script src="lib/acorn.min.js" defer></script>
@@ -172,7 +175,7 @@
         <script data-main="js/loader" src="lib/require.js" defer></script>
         <link
             rel="preload"
-            href="/fonts/material-icons.woff2"
+            href="fonts/material-icons.woff2"
             as="font"
             type="font/woff2"
             crossorigin="anonymous"
@@ -380,6 +383,13 @@
                             tabindex="-1"
                         />
                         <input class="file" type="file" id="myOpenAll" tabindex="-1" />
+                        <input
+                            class="file"
+                            type="file"
+                            id="myModeSclFile"
+                            accept=".scl,.json"
+                            tabindex="-1"
+                        />
                     </div>
                 </div>
                 <!-- canvasHolder -->
@@ -395,6 +405,7 @@
                     <iframe
                         src="planet/index.html"
                         id="planet-iframe"
+                        title="Music Blocks Planet — save, load, and share projects"
                         style="display: none"
                     ></iframe>
 
@@ -820,14 +831,6 @@
                                             ><i class="material-icons md-48">code</i></a
                                         >
                                     </li>
-                                    <li
-                                        class="filler"
-                                        id="aligns_merge_under_load"
-                                        style="user-select: none; visibility: hidden"
-                                    >
-                                        <a style="color: transparent">space&nbsp;&nbsp;&nbsp;</a>
-                                    </li>
-
                                     <li>
                                         <a
                                             id="restoreIcon"
@@ -933,6 +936,7 @@
                         <li><a id="zhCN" role="button" tabindex="0"></a></li>
                         <li><a id="th" role="button" tabindex="0"></a></li>
                         <li><a id="tr" role="button" tabindex="0"></a></li>
+                        <li><a id="az" role="button" tabindex="0"></a></li>
                         <li><a id="ayc" role="button" tabindex="0"></a></li>
                         <li><a id="quz" role="button" tabindex="0"></a></li>
                         <li><a id="gug" role="button" tabindex="0"></a></li>

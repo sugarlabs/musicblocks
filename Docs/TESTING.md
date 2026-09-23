@@ -165,8 +165,7 @@ Examples include:
 For example:
 
 ```javascript
-jest.spyOn(document, "getElementsByClassName")
-    .mockReturnValue([{ style: {} }]);
+jest.spyOn(document, "getElementsByClassName").mockReturnValue([{ style: {} }]);
 ```
 
 If a mock or setup is only required by a single test suite, it should remain in that test file. Move it into the shared infrastructure only when it becomes generic enough to be reused across multiple test suites.
@@ -312,3 +311,29 @@ describe("YourBlocks", () => {
 2. Mock only what's needed for the specific test
 3. Use `jest.fn()` for methods you want to verify were called
 4. Run `npx prettier --write` on your test file before committing
+
+---
+
+## End-to-End (Cypress) Testing
+
+Music Blocks uses Cypress for real browser integration and end-to-end testing.
+
+### Running Cypress
+
+```bash
+npm start                                      # Start local server on http://127.0.0.1:3000
+npx cypress run                               # Run all Cypress E2E tests
+npx cypress run --spec "cypress/e2e/async-stylesheet-cascade.cy.js" # Run specific spec
+```
+
+### CSS Cascade & Async Stylesheet Loading
+
+Music Blocks loads several stylesheets asynchronously via `<link rel="preload" as="style">` in `index.html`. Because JSDOM in Jest cannot compute CSS cascades or evaluate asynchronous link preloads, browser-level cascade verification is handled in Cypress:
+
+- **`cy.waitForStylesheetsToLoad(targetStylesheets)`**: A custom command in `cypress/support/commands.js` that asserts the targeted preloaded stylesheets (defaulting to `activities.css`, `windows.css`, `darkmode.css`, `style.css`) have finished loading with `rel="stylesheet"` (or registered `style[data-href]` under PrefixFree transformations).
+- **Dynamic Token & Computed Style Verification**: Tests read active CSS custom properties (e.g. `--color-bg-primary`, `--color-widget-frame-bg`, `--color-widget-titlebar-text`) from the root scope (`document.body` / `:root`) and compare against computed element styles rather than hardcoding static RGB values. This avoids tautological circular comparisons when elements apply tokens as inline styles.
+- **Modal & Overlay Backdrop Cascade**: Tests open real modals via `MBDialog` and verify that the `.mb-dialog-overlay` computed background is strictly non-transparent (`!= rgba(0, 0, 0, 0)`) and matches `--color-overlay-backdrop`, and the modal panel `.wfbWidget` background matches `--color-panel-bg` resolved from `:root` across Light and Dark themes.
+- **Search Autocomplete Item-Level Verification**: Tests both the outer `ul.ui-autocomplete` container and concrete rendered suggestion items (`li .ui-menu-item-wrapper` / `li`) to ensure item-level font colors and backgrounds consume `--color-text-primary` and `--color-bg-primary` without specificity leakage or theme override gaps.
+- **Widget Titlebar Structural & Responsive Cascade**: Unconditionally asserts that `.wftTitle` elements exist within floating widget frames on desktop, dark mode, and mobile viewport breakpoints (preventing silent passes if DOM structure changes), and verifies that titlebar text color resolves to `--color-text-secondary` on desktop and `--color-widget-titlebar-text` under mobile breakpoints.
+- **Scoped Teardown & Clean Error Propagation**: Uses precise title-based and class-based selector scoping (window instance frames and `.mb-system-dialog`) for window/dialog cleanup to avoid cross-spec leakage. The test suite operates cleanly without suppressing uncaught exceptions, allowing all genuine runtime regressions (such as theme switching errors or missing properties) to propagate directly and fail the spec.
+- **Selector Specificity & Cascade Isolation**: Tests verify that component-level stylesheets maintain expected cascade precedence across theme transitions (Light, Dark, High-Contrast, Light) without residual inline style leakage or theme class conflicts.

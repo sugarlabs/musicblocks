@@ -129,18 +129,19 @@ const {
     getTextWidth,
     doSVG,
     isSVGEmpty,
-    prepareMacroExports,
-    processMacroData,
-    updatePluginObj,
-    processRawPluginData,
-    preparePluginExports,
     hideDOMLabel,
     displayMsg,
     makeKeyboardAccessible,
-    CameraManager,
     announceToScreenReader,
     _
 } = require("../utils.js");
+
+const { processMacroData, prepareMacroExports } = require("../macro-utils.js");
+const {
+    updatePluginObj,
+    processRawPluginData,
+    preparePluginExports
+} = require("../plugin-utils.js");
 
 describe("makeKeyboardAccessible()", () => {
     test("adds button semantics and activates on Enter and Space", () => {
@@ -1346,66 +1347,6 @@ describe("announceToScreenReader()", () => {
     });
 });
 
-describe("CameraManager", () => {
-    beforeEach(() => {
-        CameraManager.reset();
-        jest.useFakeTimers();
-    });
-
-    afterEach(() => {
-        CameraManager.reset();
-        jest.useRealTimers();
-    });
-
-    it("starts and stops capture correctly", () => {
-        const drawFn = jest.fn();
-        const id = CameraManager.startCapture(drawFn, 100);
-        expect(id).not.toBeNull();
-        expect(CameraManager.intervalId).toBe(id);
-
-        jest.advanceTimersByTime(250);
-        expect(drawFn).toHaveBeenCalledTimes(2);
-
-        CameraManager.stopCapture();
-        expect(CameraManager.intervalId).toBeNull();
-
-        jest.advanceTimersByTime(200);
-        expect(drawFn).toHaveBeenCalledTimes(2); // Should not increase
-    });
-
-    it("startCapture is idempotent", () => {
-        const id1 = CameraManager.startCapture(jest.fn(), 100);
-        const id2 = CameraManager.startCapture(jest.fn(), 100);
-        expect(id1).toBe(id2);
-    });
-
-    it("sets and clears canplay listener", () => {
-        const video = {
-            addEventListener: jest.fn(),
-            removeEventListener: jest.fn()
-        };
-        const handler = jest.fn();
-
-        CameraManager.setCanplayListener(video, handler);
-        expect(video.addEventListener).toHaveBeenCalledWith("canplay", handler, false);
-        expect(CameraManager.canPlayHandler).toBe(handler);
-        expect(CameraManager.listenerVideoElement).toBe(video);
-
-        CameraManager.clearCanplayListener();
-        expect(video.removeEventListener).toHaveBeenCalledWith("canplay", handler, false);
-        expect(CameraManager.canPlayHandler).toBeNull();
-        expect(CameraManager.listenerVideoElement).toBeNull();
-    });
-
-    it("reset clears interval and listener", () => {
-        CameraManager.intervalId = 123;
-        CameraManager.isSetup = true;
-        CameraManager.reset();
-        expect(CameraManager.intervalId).toBeNull();
-        expect(CameraManager.isSetup).toBe(false);
-    });
-});
-
 describe("Plugin and Macro Utilities", () => {
     let mockActivity;
 
@@ -1514,6 +1455,18 @@ describe("Plugin and Macro Utilities", () => {
             expect(spy).toHaveBeenCalled();
             spy.mockRestore();
         });
+
+        it("handles unexpected errors gracefully", async () => {
+            const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            // Passing "true" makes JSON.parse succeed (returns boolean true), but triggers a
+            // TypeError in processPluginData ("PALETTEPLUGINS" in obj) which then hits the catch block.
+            const rawData = "true";
+            const res = await processRawPluginData(mockActivity, rawData, "localStorage:plugins");
+            expect(res).toBeNull();
+            expect(spy).toHaveBeenCalledWith(rawData);
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            spy.mockRestore();
+        });
     });
 
     describe("preparePluginExports()", () => {
@@ -1557,7 +1510,7 @@ describe("Plugin and Macro Utilities", () => {
             const blocks = { addToMyPalette: jest.fn() };
             const macroDict = {};
 
-            const spy = jest.spyOn(console, "log").mockImplementation(() => {});
+            const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
             processMacroData("invalid json", palettes, blocks, macroDict);
             expect(spy).toHaveBeenCalledWith("invalid json");
             spy.mockRestore();

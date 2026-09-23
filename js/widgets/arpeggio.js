@@ -16,7 +16,8 @@
    global
 
    _, docById, getNote, setCustomChord, keySignatureToMode,
-   getModeNumbers, getTemperament, normalizeNoteAccidentals, DEFAULTVOICE
+   getModeNumbers, getTemperament, normalizeNoteAccidentals, DEFAULTVOICE,
+   ManagedTimer
 */
 /*
    Global locations
@@ -24,6 +25,8 @@
        getNote, setCustomChord
    js/utils/utils.js
         _, docById
+   js/utils/ManagedTimer.js
+        ManagedTimer
 */
 /* exported Arpeggio */
 
@@ -47,8 +50,39 @@ class Arpeggio {
         this._blockMap = []; // pairs storage
         this.defaultCols = Arpeggio.DEFAULTCOLS;
         this._playTimeout = null;
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("../utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
         this._arpeggioCellTables = []; // cached arpeggioCellTable elements
         this._arpeggioTable = null; // cached arpeggioTable element
+        this._keyHandler = null;
+    }
+
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return setTimeout(callback, delay);
+    }
+
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+        clearTimeout(id);
+        return true;
     }
 
     /**
@@ -81,10 +115,18 @@ class Arpeggio {
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
+        if (this._keyHandler) {
+            document.removeEventListener("keydown", this._keyHandler, true);
+            this._keyHandler = null;
+        }
+
         const widgetWindow = window.widgetWindows.windowFor(this, "arpeggio");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        if (typeof widgetWindow.takeFocus === "function") {
+            widgetWindow.takeFocus();
+        }
 
         this.playButton = widgetWindow.addButton("play-button.svg", Arpeggio.ICONSIZE, _("Play"));
 
@@ -131,16 +173,27 @@ class Arpeggio {
 
         // For the button callbacks
         widgetWindow.onclose = () => {
+            if (this._keyHandler) {
+                document.removeEventListener("keydown", this._keyHandler, true);
+                this._keyHandler = null;
+            }
             if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
+                this._clearWidgetTimeout(this._playTimeout);
                 this._playTimeout = null;
+            }
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
             }
             this._playing = false;
             this._activity.logo.synth.stop();
             if (
                 typeof Singer !== "undefined" &&
                 Singer.masterVolume &&
-                Singer.masterVolume.length > 0
+                Singer.masterVolume.length > 0 &&
+                this._activity &&
+                this._activity.logo &&
+                this._activity.logo.synth &&
+                typeof this._activity.logo.synth.setMasterVolume === "function"
             ) {
                 const vol =
                     typeof last === "function"
@@ -153,6 +206,79 @@ class Arpeggio {
             this._activity.hideMsgs();
             widgetWindow.destroy();
         };
+
+        this._keyHandler = event => {
+            if (
+                typeof window === "undefined" ||
+                !window.widgetWindows ||
+                window.widgetWindows.focused !== widgetWindow
+            ) {
+                return;
+            }
+
+            if (
+                this._activity &&
+                this._activity.blocks &&
+                this._activity.blocks.activeBlock !== null &&
+                this._activity.blocks.activeBlock !== undefined
+            ) {
+                return;
+            }
+
+            const activeElement = document.activeElement;
+            if (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.isContentEditable)
+            ) {
+                return;
+            }
+
+            if (
+                activeElement &&
+                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT")
+            ) {
+                return;
+            }
+
+            if (event.key === " " || event.code === "Space" || event.keyCode === 32) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.repeat) {
+                    return;
+                }
+                if (this.playButton && typeof this.playButton.onclick === "function") {
+                    this.playButton.onclick();
+                } else {
+                    this._playing = !this._playing;
+                    this._activity.logo.turtleDelay = 0;
+                    this._playAll();
+                }
+                return;
+            }
+
+            if (
+                event.shiftKey &&
+                (event.key === "ArrowUp" || event.code === "ArrowUp" || event.keyCode === 38)
+            ) {
+                event.preventDefault();
+                event.stopPropagation();
+                this._shiftOctave(-1);
+                return;
+            }
+
+            if (
+                event.shiftKey &&
+                (event.key === "ArrowDown" || event.code === "ArrowDown" || event.keyCode === 40)
+            ) {
+                event.preventDefault();
+                event.stopPropagation();
+                this._shiftOctave(1);
+            }
+        };
+
+        document.addEventListener("keydown", this._keyHandler, true);
 
         this.widgetWindow.onmaximize = this._scale;
 
@@ -524,39 +650,43 @@ class Arpeggio {
         // Play all of the arpeggio cells in the matrix.
         const icon = this.playButton;
         if (this._playing) {
-            icon.replaceChildren(
-                document.createTextNode("\u00a0\u00a0"),
-                (() => {
-                    const img = document.createElement("img");
-                    img.src = "header-icons/stop-button.svg";
-                    img.title = _("Stop");
-                    img.alt = _("Stop");
-                    img.height = Arpeggio.ICONSIZE;
-                    img.width = Arpeggio.ICONSIZE;
-                    img.style.verticalAlign = "middle";
-                    img.style.alignContent = "center";
-                    return img;
-                })(),
-                document.createTextNode("\u00a0\u00a0")
-            );
+            if (icon && typeof icon.replaceChildren === "function") {
+                icon.replaceChildren(
+                    document.createTextNode("\u00a0\u00a0"),
+                    (() => {
+                        const img = document.createElement("img");
+                        img.src = "header-icons/stop-button.svg";
+                        img.title = _("Stop");
+                        img.alt = _("Stop");
+                        img.height = Arpeggio.ICONSIZE;
+                        img.width = Arpeggio.ICONSIZE;
+                        img.style.verticalAlign = "middle";
+                        img.style.alignContent = "center";
+                        return img;
+                    })(),
+                    document.createTextNode("\u00a0\u00a0")
+                );
+            }
         } else {
-            icon.replaceChildren(
-                document.createTextNode("\u00a0\u00a0"),
-                (() => {
-                    const img = document.createElement("img");
-                    img.src = "header-icons/play-button.svg";
-                    img.title = _("Play");
-                    img.alt = _("Play");
-                    img.height = Arpeggio.ICONSIZE;
-                    img.width = Arpeggio.ICONSIZE;
-                    img.style.verticalAlign = "middle";
-                    img.style.alignContent = "center";
-                    return img;
-                })(),
-                document.createTextNode("\u00a0\u00a0")
-            );
+            if (icon && typeof icon.replaceChildren === "function") {
+                icon.replaceChildren(
+                    document.createTextNode("\u00a0\u00a0"),
+                    (() => {
+                        const img = document.createElement("img");
+                        img.src = "header-icons/play-button.svg";
+                        img.title = _("Play");
+                        img.alt = _("Play");
+                        img.height = Arpeggio.ICONSIZE;
+                        img.width = Arpeggio.ICONSIZE;
+                        img.style.verticalAlign = "middle";
+                        img.style.alignContent = "center";
+                        return img;
+                    })(),
+                    document.createTextNode("\u00a0\u00a0")
+                );
+            }
             if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
+                this._clearWidgetTimeout(this._playTimeout);
                 this._playTimeout = null;
             }
             this._activity.logo.synth.stop();
@@ -647,26 +777,28 @@ class Arpeggio {
                     null
                 );
             }
-            this._playTimeout = setTimeout(() => {
+            this._playTimeout = this._setWidgetTimeout(() => {
                 this.__playNote(i + 1);
             }, 2600 * this._playList[i][1]);
         } else {
             const icon = this.playButton;
-            icon.replaceChildren(
-                document.createTextNode("\u00a0\u00a0"),
-                (() => {
-                    const img = document.createElement("img");
-                    img.src = "header-icons/play-button.svg";
-                    img.title = _("Play");
-                    img.alt = _("Play");
-                    img.height = Arpeggio.ICONSIZE;
-                    img.width = Arpeggio.ICONSIZE;
-                    img.style.verticalAlign = "middle";
-                    img.style.alignContent = "center";
-                    return img;
-                })(),
-                document.createTextNode("\u00a0\u00a0")
-            );
+            if (icon && typeof icon.replaceChildren === "function") {
+                icon.replaceChildren(
+                    document.createTextNode("\u00a0\u00a0"),
+                    (() => {
+                        const img = document.createElement("img");
+                        img.src = "header-icons/play-button.svg";
+                        img.title = _("Play");
+                        img.alt = _("Play");
+                        img.height = Arpeggio.ICONSIZE;
+                        img.width = Arpeggio.ICONSIZE;
+                        img.style.verticalAlign = "middle";
+                        img.style.alignContent = "center";
+                        return img;
+                    })(),
+                    document.createTextNode("\u00a0\u00a0")
+                );
+            }
             this._playing = false;
         }
     }
@@ -820,26 +952,28 @@ class Arpeggio {
         if (this._playing) {
             this._playing = false;
             if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
+                this._clearWidgetTimeout(this._playTimeout);
                 this._playTimeout = null;
             }
             this._activity.logo.synth.stop();
             const icon = this.playButton;
-            icon.replaceChildren(
-                document.createTextNode("\u00a0\u00a0"),
-                (() => {
-                    const img = document.createElement("img");
-                    img.src = "header-icons/play-button.svg";
-                    img.title = _("Play");
-                    img.alt = _("Play");
-                    img.height = Arpeggio.ICONSIZE;
-                    img.width = Arpeggio.ICONSIZE;
-                    img.style.verticalAlign = "middle";
-                    img.style.alignContent = "center";
-                    return img;
-                })(),
-                document.createTextNode("\u00a0\u00a0")
-            );
+            if (icon && typeof icon.replaceChildren === "function") {
+                icon.replaceChildren(
+                    document.createTextNode("\u00a0\u00a0"),
+                    (() => {
+                        const img = document.createElement("img");
+                        img.src = "header-icons/play-button.svg";
+                        img.title = _("Play");
+                        img.alt = _("Play");
+                        img.height = Arpeggio.ICONSIZE;
+                        img.width = Arpeggio.ICONSIZE;
+                        img.style.verticalAlign = "middle";
+                        img.style.alignContent = "center";
+                        return img;
+                    })(),
+                    document.createTextNode("\u00a0\u00a0")
+                );
+            }
         }
         // "Unclick" every entry in the matrix.
         const arpeggioTable = this._arpeggioTable;

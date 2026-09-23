@@ -161,6 +161,9 @@ class Blocks {
 
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
+        this.actionHistory = [];
+        this.redoActionHistory = [];
+        this.isUndoingOrRedoing = false;
         /** We keep a list of previews of stacks in the trash. */
         this.trashPreviews = {};
 
@@ -2565,6 +2568,114 @@ class Blocks {
             }
         };
 
+        this._snapTargetBlock = null;
+        this._snapIndicatorShape = null;
+
+        /**
+         * Resolves snap indicator colors from CSS tokens in tokens.css,
+         * falling back to default golden values if tokens or computed styles are unavailable.
+         * @private
+         * @returns {{ stroke: string, fill: string }}
+         */
+        this._getSnapIndicatorColors = () => {
+            let stroke = "";
+            let fill = "";
+            if (
+                typeof getComputedStyle !== "undefined" &&
+                typeof document !== "undefined" &&
+                document.body
+            ) {
+                const style = getComputedStyle(document.body);
+                stroke = style.getPropertyValue("--color-snap-indicator-stroke").trim();
+                fill = style.getPropertyValue("--color-snap-indicator-fill").trim();
+            }
+            // Primary values come from tokens.css; fallback for headless test environments
+            return {
+                stroke: stroke || "rgba(255, 215, 0, 0.95)",
+                fill: fill || "rgba(255, 215, 0, 0.35)"
+            };
+        };
+
+        /**
+         * Show visual snap indicator on target block and connection point.
+         * @param {object} candidate - { targetBlock, connectionIndex, dockX, dockY }
+         * @public
+         * @returns {void}
+         */
+        this.showSnapIndicator = candidate => {
+            if (!candidate) {
+                this.hideSnapIndicator();
+                return;
+            }
+
+            // Highlight target block
+            if (this._snapTargetBlock !== candidate.targetBlock) {
+                if (this._snapTargetBlock !== null && this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
+                this._snapTargetBlock = candidate.targetBlock;
+                if (this.blockList[candidate.targetBlock]) {
+                    this.blockList[candidate.targetBlock].highlight();
+                }
+            }
+
+            // Create or position glowing docking indicator circle
+            if (!this._snapIndicatorShape && typeof createjs !== "undefined" && createjs.Shape) {
+                this._snapIndicatorShape = new createjs.Shape();
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.addChild === "function"
+                ) {
+                    this.activity.blocksContainer.addChild(this._snapIndicatorShape);
+                }
+            }
+
+            if (this._snapIndicatorShape) {
+                const colors = this._getSnapIndicatorColors();
+                if (typeof this._snapIndicatorShape.graphics.clear === "function") {
+                    this._snapIndicatorShape.graphics.clear();
+                }
+                this._snapIndicatorShape.graphics
+                    .setStrokeStyle(3)
+                    .beginStroke(colors.stroke)
+                    .beginFill(colors.fill)
+                    .drawCircle(0, 0, 10);
+
+                this._snapIndicatorShape.x = candidate.dockX;
+                this._snapIndicatorShape.y = candidate.dockY;
+                this._snapIndicatorShape.visible = true;
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.setChildIndex === "function" &&
+                    Array.isArray(this.activity.blocksContainer.children)
+                ) {
+                    this.activity.blocksContainer.setChildIndex(
+                        this._snapIndicatorShape,
+                        this.activity.blocksContainer.children.length - 1
+                    );
+                }
+            }
+        };
+
+        /**
+         * Hide visual snap indicator and unhighlight target block.
+         * @public
+         * @returns {void}
+         */
+        this.hideSnapIndicator = () => {
+            if (this._snapTargetBlock !== null) {
+                if (this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
+                this._snapTargetBlock = null;
+            }
+            if (this._snapIndicatorShape) {
+                this._snapIndicatorShape.visible = false;
+            }
+        };
+
         /**
          * Hide all of the blocks.
          * @public
@@ -3601,17 +3712,15 @@ class Blocks {
                 return;
             }
 
+            const namedBlocks = new Set(["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"]);
+
             /** Update the blocks, do->oldName should be do->newName */
             for (const blk in this.blockList) {
                 if (this.blockList[blk].trash) {
                     continue;
                 }
 
-                if (
-                    ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
-                        this.blockList[blk].name
-                    )
-                ) {
+                if (namedBlocks.has(this.blockList[blk].name)) {
                     const targetBlock = this.blockList[blk];
 
                     let activeName = targetBlock.privateData || targetBlock.overrideName;
@@ -3633,8 +3742,7 @@ class Blocks {
             for (let blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
                 const block = actionsPalette.protoList[blockId];
                 if (
-                    ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(block.name) !==
-                        -1 /** && block.defaults[0] !== _('action') */ &&
+                    namedBlocks.has(block.name) /** && block.defaults[0] !== _('action') */ &&
                     block.defaults[0] === oldName
                 ) {
                     block.defaults[0] = newName;
@@ -6884,7 +6992,12 @@ class Blocks {
                 }
             });
 
-            return canvas.toDataURL("image/png");
+            try {
+                return canvas.toDataURL("image/png");
+            } catch (error) {
+                if (error.name === "SecurityError") return null;
+                throw error;
+            }
         };
 
         /**
@@ -6922,6 +7035,89 @@ class Blocks {
          * @public
          * @returns {void}
          */
+        this.undoAction = () => {
+            if (!this.actionHistory || this.actionHistory.length === 0) {
+                this.activity.textMsg(_("Nothing to undo."), 3000);
+                return;
+            }
+
+            const action = this.actionHistory.pop();
+            this.isUndoingOrRedoing = true;
+
+            if (action.type === "move") {
+                this.moveBlock(action.blockId, action.oldX, action.oldY);
+                this.blockMoved(action.blockId);
+                this.activity.refreshCanvas();
+            } else if (action.type === "trash") {
+                this.activity._restoreTrashById(action.blockId);
+            } else if (action.type === "restore") {
+                const block = this.blockList[action.blockId];
+                if (block) this.sendStackToTrash(block);
+            } else if (action.type === "value_change") {
+                const block = this.blockList[action.blockId];
+                if (block) {
+                    if (!block.label) block.label = { value: action.oldValue, style: {} };
+                    block.label.value = action.oldValue;
+                    block._labelChanged(true, true);
+
+                    block.value = action.oldValue;
+                    if (action.oldText !== null && block.text) {
+                        block.text.text = action.oldText;
+                    }
+                    block.updateCache();
+                    this.activity.refreshCanvas();
+                }
+            }
+
+            this.redoActionHistory.push(action);
+            this.isUndoingOrRedoing = false;
+
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
+                this.activity.__tick();
+            }
+        };
+
+        this.redoAction = () => {
+            if (!this.redoActionHistory || this.redoActionHistory.length === 0) {
+                this.activity.textMsg(_("Nothing to redo."), 3000);
+                return;
+            }
+
+            const action = this.redoActionHistory.pop();
+            this.isUndoingOrRedoing = true;
+
+            if (action.type === "move") {
+                this.moveBlock(action.blockId, action.newX, action.newY);
+                this.blockMoved(action.blockId);
+                this.activity.refreshCanvas();
+            } else if (action.type === "trash") {
+                const block = this.blockList[action.blockId];
+                if (block) this.sendStackToTrash(block);
+            } else if (action.type === "restore") {
+                this.activity._restoreTrashById(action.blockId);
+            } else if (action.type === "value_change") {
+                const block = this.blockList[action.blockId];
+                if (block) {
+                    if (!block.label) block.label = { value: action.newValue, style: {} };
+                    block.label.value = action.newValue;
+                    block._labelChanged(true, true);
+
+                    block.value = action.newValue;
+                    if (action.newText !== null && block.text) {
+                        block.text.text = action.newText;
+                    }
+                    block.updateCache();
+                    this.activity.refreshCanvas();
+                }
+            }
+
+            this.actionHistory.push(action);
+            this.isUndoingOrRedoing = false;
+        };
+
         this.sendStackToTrash = myBlock => {
             /** First, hide the palettes as they may need updating. */
             for (const name in this.activity.palettes.dict) {
@@ -6940,6 +7136,10 @@ class Blocks {
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
+            if (!this.isUndoingOrRedoing) {
+                this.actionHistory.push({ type: "trash", blockId: thisBlock });
+                this.redoActionHistory = [];
+            }
 
             // Cap the undo history to prevent unbounded memory growth.
             // Keep the 100 most recent trashed stacks.
@@ -7017,9 +7217,11 @@ class Blocks {
                     delete this.blockCollapseArt[blk];
                 }
 
-                const title = this.blockList[blk].protoblock.staticLabels
-                    ? this.blockList[blk].protoblock.staticLabels[0]
-                    : this.blockList[blk].name;
+                const pb = this.blockList[blk] && this.blockList[blk].protoblock;
+                const title =
+                    pb && pb.staticLabels && pb.staticLabels[0]
+                        ? pb.staticLabels[0]
+                        : this.blockList[blk] && this.blockList[blk].name;
                 if (title && window.widgetWindows && window.widgetWindows.closeBlkWidgets) {
                     window.widgetWindows.closeBlkWidgets(_(title));
                 }
@@ -7028,7 +7230,9 @@ class Blocks {
 
             // Announce block sent to trash to screen readers (aria-live only, no visual message)
             const blockLabel =
-                (myBlock.protoblock.staticLabels && myBlock.protoblock.staticLabels[0]) ||
+                (myBlock.protoblock &&
+                    myBlock.protoblock.staticLabels &&
+                    myBlock.protoblock.staticLabels[0]) ||
                 myBlock.name;
             announceToScreenReader(blockLabel + " " + _("block sent to trash"));
 

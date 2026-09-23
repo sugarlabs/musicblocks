@@ -295,8 +295,16 @@ class KeyboardController {
                         activity.stageDirty = true;
                     }
             }
-        } else if (event.ctrlKey) {
+        } else if (event.ctrlKey || (event.metaKey && event.keyCode === 90)) {
             switch (event.keyCode) {
+                case 90: // 'Z'
+                    event.preventDefault();
+                    activity.blocks.undoAction();
+                    break;
+                case 89: // 'Y'
+                    event.preventDefault();
+                    activity.blocks.redoAction();
+                    break;
                 case V:
                     // activity.textMsg("Ctl-V " + _("Paste"));
                     activity.pasteBox.createBox(activity.turtleBlocksScale, 200, 200);

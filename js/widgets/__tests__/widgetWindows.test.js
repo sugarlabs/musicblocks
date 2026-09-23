@@ -649,7 +649,7 @@ describe("widgetWindows", () => {
     });
 
     describe("updateTitle", () => {
-        test("updates the title element innerHTML", () => {
+        test("updates the title element textContent", () => {
             const win = createTestWindow("Old Title");
             const key = win._key;
             const titleEl = document.getElementById(key + "WidgetID");
@@ -657,7 +657,7 @@ describe("widgetWindows", () => {
 
             win.updateTitle("New Title");
 
-            expect(titleEl.innerHTML).toBe("New Title");
+            expect(titleEl.textContent).toBe("New Title");
         });
 
         test("keeps the frame's aria-label in sync with the new title", () => {
@@ -1072,6 +1072,24 @@ describe("widgetWindows", () => {
             expect(win._dragTopHandler).toHaveBeenCalledWith(upEvent);
             expect(window.widgetWindows.draggingWindow).toBeNull();
         });
+
+        test("recalculates _dx and _dy after restoring a maximized window during drag", () => {
+            const win = createTestWindow("MaxDrag Window");
+            win._maximize();
+
+            // Stale offsets from the maximized state
+            win._dx = 999;
+            win._dy = 999;
+
+            const moveEvent = { clientX: 200, clientY: 300, preventDefault: jest.fn() };
+            win._docMouseMoveHandler(moveEvent);
+
+            // After restore, _maximized should be false
+            expect(win._maximized).toBe(false);
+            // _dx and _dy should have been recalculated (no longer 999)
+            expect(win._dx).not.toBe(999);
+            expect(win._dy).not.toBe(999);
+        });
     });
 
     describe("window visibility and management helpers", () => {
@@ -1182,7 +1200,7 @@ describe("widgetWindows", () => {
         });
 
         it("closes matching widget by name", () => {
-            const mockElement = { innerHTML: "TestWidget" };
+            const mockElement = { textContent: "TestWidget", id: "" };
 
             document.getElementsByClassName = jest.fn(() => [mockElement]);
 
@@ -1206,14 +1224,14 @@ describe("widgetWindows", () => {
                 "pitch drum": { close: jest.fn() }
             };
 
-            window.widgetWindows.closeBlkWidgets("pitch-drum mapper");
+            window.widgetWindows.closeBlkWidgets("pitch drum");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
         });
 
         it("closes widget by matching element ID when display title changes", () => {
             const mockElement = {
-                innerHTML: "C MAJOR",
+                textContent: "C MAJOR",
                 id: "custom modeWidgetID"
             };
 
@@ -1225,11 +1243,45 @@ describe("widgetWindows", () => {
         });
 
         it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [{ innerHTML: "OtherWidget" }]);
+            document.getElementsByClassName = jest.fn(() => [
+                { textContent: "OtherWidget", id: "" }
+            ]);
 
             window.widgetWindows.closeBlkWidgets("TestWidget");
 
             expect(window.widgetWindows.closeWindow).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("isReinitWidgetTitle()", () => {
+        it("recognizes titles used by open-widget stack reinitialization", () => {
+            expect(window.widgetWindows.isReinitWidgetTitle("tempo")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("LEGO Bricks")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("arpeggio")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("not a widget")).toBe(false);
+        });
+
+        it("keeps REINIT_WIDGET_TITLES as the single lookup source", () => {
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("custom mode")).toBe(true);
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("mode")).toBe(true);
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("sampler")).toBe(false);
+        });
+
+        it("recognizes a localized title that differs from the English registry entry", () => {
+            // Temporarily replace _ with a translator that maps "pitch drum"
+            // to its German equivalent, simulating a non-English locale.
+            const originalTranslate = global._;
+
+            try {
+                global._ = str => (str === "pitch drum" ? "Tonhöhen-Schlagzeug" : str);
+
+                // The localized form should be recognized…
+                expect(window.widgetWindows.isReinitWidgetTitle("Tonhöhen-Schlagzeug")).toBe(true);
+                // …while the raw English string is no longer a match under this locale.
+                expect(window.widgetWindows.isReinitWidgetTitle("pitch drum")).toBe(false);
+            } finally {
+                global._ = originalTranslate;
+            }
         });
     });
 
