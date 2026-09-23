@@ -1945,7 +1945,6 @@ function TemperamentWidget() {
             const ratio = [];
             const frequency = [];
             const ratioDifference = [];
-            const index = [];
             const compareRatios = [];
             that.tempRatios = that.ratios.slice();
 
@@ -1954,13 +1953,11 @@ function TemperamentWidget() {
                     for (let j = 0; j < that.tempRatios.length; j++) {
                         ratioDifference[j] = ratio[i] - that.tempRatios[j];
                         if (ratioDifference[j] < 0) {
-                            index.push(j);
-                            that.tempRatios.splice(index[i], 0, ratio[i]);
+                            that.tempRatios.splice(j, 0, ratio[i]);
                             break;
                         }
                         if (ratioDifference[j] === 0) {
-                            index.push(j);
-                            that.tempRatios.splice(index[i], 1, ratio[i]);
+                            that.tempRatios.splice(j, 1, ratio[i]);
                             break;
                         }
                     }
