@@ -307,7 +307,6 @@
   "Set the max blocks to generate:": "Set the max blocks to generate:",
   "Confirm": "Confirm",
   "Cannot load project from the file. Please check the file type.": "Cannot load project from the file. Please check the file type.",
-  "Your saved project could not be loaded. Starting a new project.": "Your saved project could not be loaded. Starting a new project.",
   "Cannot find project data in this HTML file.": "Cannot find project data in this HTML file.",
   "Something went wrong reading JSON-encoded project data.": "Something went wrong reading JSON-encoded project data.",
   "Invalid parameters": "Invalid parameters",

@@ -1,3 +1,25 @@
+/**
+ * MusicBlocks v3.8.0
+ *
+ * @author Bhuvan Somisetty
+ *
+ * @copyright 2026 Bhuvan Somisetty
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 // Regression coverage for issue #8855 / PR #8856: a saved session where a
 // block past the first chunk (block 21+, index 20) is malformed used to
 // throw from inside loadNewBlocks()'s deferred setTimeout chunking with no
