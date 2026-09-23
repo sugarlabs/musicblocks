@@ -863,30 +863,32 @@ describe("Blocks Foundation", () => {
             document.getElementById = originalGetElementById;
         });
 
-        it("should undo and redo a value_change action", () => {
+        it("should undo and redo changing a number from 10 to 20", () => {
             const blocks = new Blocks(mockActivity);
             blocks.activity.refreshCanvas = jest.fn();
             const mockBlock = {
-                label: { value: "old", style: {} },
+                label: { value: "20", style: {} },
                 _labelChanged: jest.fn(),
-                text: { text: "old" },
+                text: { text: "20" },
                 updateCache: jest.fn(),
-                value: "old"
+                value: 20
             };
             blocks.blockList = [null, mockBlock];
 
             blocks.actionHistory.push({
                 type: "value_change",
                 blockId: 1,
-                oldValue: "old",
-                newValue: "new",
-                oldText: "old",
-                newText: "new"
+                oldValue: 10,
+                newValue: 20,
+                oldText: "10",
+                newText: "20"
             });
 
             // Undo value change
             blocks.undoAction();
-            expect(mockBlock.label.value).toBe("old");
+            expect(mockBlock.label.value).toBe(10);
+            expect(mockBlock.value).toBe(10);
+            expect(mockBlock.text.text).toBe("10");
             expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, true);
             expect(mockBlock.updateCache).toHaveBeenCalled();
             expect(blocks.activity.refreshCanvas).toHaveBeenCalled();
@@ -894,7 +896,9 @@ describe("Blocks Foundation", () => {
 
             // Redo value change
             blocks.redoAction();
-            expect(mockBlock.label.value).toBe("new");
+            expect(mockBlock.label.value).toBe(20);
+            expect(mockBlock.value).toBe(20);
+            expect(mockBlock.text.text).toBe("20");
             expect(mockBlock.actionHistory || blocks.actionHistory.length).toBeTruthy();
         });
 

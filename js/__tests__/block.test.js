@@ -1252,31 +1252,58 @@ describe("Block Foundation", () => {
         });
     });
 
-    describe("value setter undo/redo tracking", () => {
-        it("records value_change in actionHistory when value changes after initialization", async () => {
+    describe("value change undo/redo tracking", () => {
+        it("does not record runtime value assignments", () => {
             const mockBlocksObj = {
                 ...mockBlocks,
-                actionHistory: [],
+                actionHistory: [{ type: "move", blockId: 1 }],
                 redoActionHistory: [{ type: "move", blockId: 0 }],
                 isUndoingOrRedoing: false
             };
             const block = new Block(mockProtoBlock, mockBlocksObj);
             block.blockIndex = 2;
             block.text = { text: "initial" };
-            block.valueInitialized = true;
             block.loadComplete = true;
 
             block.value = "updated";
-            block.text.text = "updated";
 
-            expect(mockBlocksObj.actionHistory.length).toBe(1);
-            expect(mockBlocksObj.actionHistory[0].type).toBe("value_change");
-            expect(mockBlocksObj.actionHistory[0].blockId).toBe(2);
-            expect(mockBlocksObj.actionHistory[0].newValue).toBe("updated");
+            expect(mockBlocksObj.actionHistory).toEqual([{ type: "move", blockId: 1 }]);
+            expect(mockBlocksObj.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
+        });
+
+        it("records changing a number label from 10 to 20", () => {
+            const mockBlocksObj = {
+                ...mockBlocks,
+                actionHistory: [],
+                redoActionHistory: [{ type: "move", blockId: 0 }],
+                isUndoingOrRedoing: false
+            };
+            const block = new Block(
+                { ...mockProtoBlock, name: "number", capabilities: Object.create(null) },
+                mockBlocksObj
+            );
+            block.blockIndex = 2;
+            block.value = 10;
+            block.label = { value: "20", style: { display: "" } };
+            block.text = { text: "10" };
+            block.connections = [null];
+            block.container = { setChildIndex: jest.fn(), children: [] };
+            block.updateCache = jest.fn();
+            global.docById = jest.fn().mockReturnValue({ style: {} });
+
+            block._labelChanged(true, true);
+
+            expect(mockBlocksObj.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 2,
+                    oldValue: 10,
+                    newValue: 20,
+                    oldText: "10",
+                    newText: "20"
+                }
+            ]);
             expect(mockBlocksObj.redoActionHistory).toEqual([]);
-
-            await Promise.resolve();
-            expect(mockBlocksObj.actionHistory[0].newText).toBe("updated");
         });
     });
 

@@ -167,41 +167,7 @@ class Block {
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
         this.text = null; // A dynamically generated text label on block itself.
-        this.valueInitialized = false;
-
-        let _value = null;
-        Object.defineProperty(this, "value", {
-            get: () => _value,
-            set: newVal => {
-                if (
-                    this.blocks &&
-                    this.blocks.actionHistory &&
-                    !this.blocks.isUndoingOrRedoing &&
-                    _value !== newVal &&
-                    this.valueInitialized &&
-                    this.loadComplete &&
-                    this.blockIndex !== undefined
-                ) {
-                    const historyItem = {
-                        type: "value_change",
-                        blockId: this.blockIndex,
-                        oldValue: _value,
-                        newValue: newVal,
-                        oldText: this.text ? this.text.text : null,
-                        newText: null
-                    };
-                    this.blocks.actionHistory.push(historyItem);
-                    Promise.resolve().then(() => {
-                        historyItem.newText = this.text ? this.text.text : null;
-                    });
-                    this.blocks.redoActionHistory = [];
-                }
-                this.valueInitialized = true;
-                _value = newVal;
-            },
-            enumerable: true,
-            configurable: true
-        }); // Value for number, text, and media blocks.
+        this.value = null; // Value for number, text, and media blocks.
         this.privateData = null; // A block may have some private data,
         // e.g., nameboxes use this field to store
         // the box name associated with the block.
@@ -4783,6 +4749,7 @@ class Block {
 
         const hasInitialValue = typeof this._capturedInitialValue !== "undefined";
         const oldValue = hasInitialValue ? this._capturedInitialValue : this.value;
+        const oldText = this.text ? this.text.text : null;
 
         if (closeInput) {
             this.label.style.display = "none";
@@ -5103,6 +5070,23 @@ class Block {
         // Load the synth for the selected drum.
         if (["drumname", "effectsname", "voicename", "noisename"].includes(this.name)) {
             this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+        }
+
+        if (
+            oldValue !== this.value &&
+            this.blocks.actionHistory &&
+            !this.blocks.isUndoingOrRedoing &&
+            this.blockIndex >= 0
+        ) {
+            this.blocks.actionHistory.push({
+                type: "value_change",
+                blockId: this.blockIndex,
+                oldValue,
+                newValue: this.value,
+                oldText,
+                newText: this.text ? this.text.text : null
+            });
+            this.blocks.redoActionHistory = [];
         }
     }
 }
