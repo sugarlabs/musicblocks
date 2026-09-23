@@ -548,6 +548,12 @@ describe("setupEnsembleBlocks", () => {
             setXYTurtleBlock = createdBlocks["setxyturtle"];
         });
 
+        it("should return error if args[0] is null", () => {
+            setXYTurtleBlock.flow([null, 10, 20], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(turtles.getTurtle(0).painter.doSetXY).not.toHaveBeenCalled();
+        });
+
         it("should return error if turtle not found", () => {
             setXYTurtleBlock.flow(["NonExistent", 10, 20], logo, 0, 10);
             expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find turtle NonExistent", 10);
@@ -571,6 +577,12 @@ describe("setupEnsembleBlocks", () => {
 
         beforeEach(() => {
             setTurtleBlock = createdBlocks["setturtle"];
+        });
+
+        it("should return error if args[0] is null", () => {
+            setTurtleBlock.flow([null, 100], logo, 0, 10, null, [], false);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(logo.runFromBlock).not.toHaveBeenCalled();
         });
 
         it("should run from block for valid turtle", () => {
@@ -814,6 +826,12 @@ describe("setupEnsembleBlocks", () => {
             const result = foundTurtleBlock.arg(logo, 0, blk, null);
             expect(result).toBe(false);
         });
+
+        it("should return false if the name slot is empty", () => {
+            logo.parseArg.mockReturnValue(null);
+            const result = foundTurtleBlock.arg(logo, 0, blk, null);
+            expect(result).toBe(false);
+        });
     });
 
     describe("NewTurtleBlock", () => {
@@ -839,6 +857,12 @@ describe("setupEnsembleBlocks", () => {
             logo.parseArg.mockReturnValue("Yertle");
             newTurtleBlock.flow(["Yertle"], logo, 0, blk, null);
             expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("Yertle");
+        });
+
+        it("should not create a turtle if the name slot is empty", () => {
+            logo.parseArg.mockReturnValue(null);
+            newTurtleBlock.flow([null], logo, 0, blk, null);
+            expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
         });
     });
 
