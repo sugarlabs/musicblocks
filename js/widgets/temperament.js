@@ -1358,7 +1358,7 @@ function TemperamentWidget() {
         let longPressTimer = null;
         const _clearLongPress = () => {
             if (longPressTimer) {
-                clearTimeout(longPressTimer);
+                that._clearWidgetTimeout(longPressTimer);
                 longPressTimer = null;
             }
         };
@@ -1454,7 +1454,7 @@ function TemperamentWidget() {
             document.body.appendChild(menu);
             that._vizMenu = menu;
             that._vizMenuClose = _closeMenu;
-            setTimeout(function () {
+            that._setWidgetTimeout(function () {
                 if (that._vizMenu) document.addEventListener("mousedown", _closeMenu);
             }, 0);
         };
@@ -1545,7 +1545,7 @@ function TemperamentWidget() {
                 _clearLongPress();
                 const tx = e.touches[0].clientX;
                 const ty = e.touches[0].clientY;
-                longPressTimer = setTimeout(() => {
+                longPressTimer = that._setWidgetTimeout(() => {
                     if (!dragMoved && dragIndex === hit) {
                         _showMenu({ clientX: tx, clientY: ty, preventDefault: () => {} }, hit);
                         dragIndex = -1;
