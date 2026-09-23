@@ -72,7 +72,8 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                                         type: "MB_OFFLINE_CREATE_RESULT",
                                         success: true,
                                         repository: msg.repoName
-                                    }
+                                    },
+                                    origin: window.location.origin
                                 })
                             );
                         }, 5);
@@ -83,7 +84,8 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                                     data: {
                                         type: "MB_OFFLINE_COMMIT_RESULT",
                                         success: true
-                                    }
+                                    },
+                                    origin: window.location.origin
                                 })
                             );
                         }, 5);
@@ -375,7 +377,9 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                         hashedKey: "planet-key-xyz",
                         projectName: "Planet Project",
                         projectId: "p99"
-                    }
+                    },
+                    origin: window.location.origin,
+                    source: mockIframe.contentWindow
                 })
             );
 
@@ -398,7 +402,9 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                 new MessageEvent("message", {
                     data: {
                         type: "MB_NEW_PROJECT"
-                    }
+                    },
+                    origin: window.location.origin,
+                    source: mockIframe.contentWindow
                 })
             );
 
@@ -420,7 +426,9 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                     data: {
                         type: "MB_SYNC_COMPLETE",
                         synced: 2
-                    }
+                    },
+                    origin: window.location.origin,
+                    source: mockIframe.contentWindow
                 })
             );
 
