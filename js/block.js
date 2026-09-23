@@ -4754,7 +4754,7 @@ class Block {
                 if (lockInit) {
                     break;
                 }
-                const title = widgetTitle[i].innerHTML;
+                const title = widgetTitle[i].textContent;
                 if (widgetWindows.isReinitWidgetTitle(title) && topLabel === title) {
                     lockInit = true;
                     this.blocks.reInitWidget(topBlock, 1500);
