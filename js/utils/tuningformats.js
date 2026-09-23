@@ -67,7 +67,8 @@ const parseSclFile = content => {
         const line = lines[idx];
         idx++;
 
-        // Per the Scala spec, anything after a valid pitch value is ignored.
+        // Per the Scala spec, anything after a valid pitch value is ignored
+        // (e.g. "100.0 C#" or "5/4   E\").
         const cleaned = line.split(/\s+/, 1)[0];
 
         let ratio, cents;
