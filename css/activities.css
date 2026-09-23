@@ -405,7 +405,29 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     justify-content: center;
     width: 48px;
     height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: inherit;
+    font: inherit;
     cursor: pointer;
+}
+
+#restoreLastIcon:hover,
+#restoreAllIcon:hover,
+#restoreLastIcon:focus-visible,
+#restoreAllIcon:focus-visible {
+    background-color: var(--color-brand-primary-hover);
+    outline: 2px solid var(--color-text-inverse);
+    outline-offset: -2px;
+}
+
+.highcontrast #restoreLastIcon:hover .material-icons,
+.highcontrast #restoreAllIcon:hover .material-icons,
+.highcontrast #restoreLastIcon:focus-visible .material-icons,
+.highcontrast #restoreAllIcon:focus-visible .material-icons {
+    color: var(--color-text-inverse) !important;
 }
 
 .material-icons.md-48 {
