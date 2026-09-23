@@ -1433,6 +1433,8 @@ describe("Utility Functions (logic-only)", () => {
             expect(_parseSampleCenterNo("do", 5)).toBe("60");
             expect(_parseSampleCenterNo("A", 5)).toBe("69");
             expect(_parseSampleCenterNo("A", 2)).toBe("33");
+            expect(_parseSampleCenterNo("^G" + SHARP, 4)).toBe("56");
+            expect(_parseSampleCenterNo("vla" + FLAT, 4)).toBe("56");
         });
     });
 
