@@ -2586,6 +2586,8 @@ describe("Blocks Foundation", () => {
                 ]
             ],
             ["empty array", []],
+            ["empty string element", [""]],
+            ["whitespace-only string element", ["   "]],
             ["null value", null],
             ["undefined value", undefined],
             ["array with null element", [null]],
