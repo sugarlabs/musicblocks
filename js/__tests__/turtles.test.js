@@ -751,6 +751,100 @@ describe("aux toolbar collapse and expand", () => {
             }
         }
     });
+
+    test("Escape key on canvas buttons exits keyboard navigation", () => {
+        const listeners = [];
+        const originalCreateElement = document.createElement;
+        document.createElement = function (tag) {
+            const el = originalCreateElement.call(document, tag);
+            const originalAddEventListener = el.addEventListener;
+            el.addEventListener = function (event, handler) {
+                if (event === "keydown") listeners.push(handler);
+                originalAddEventListener.call(this, event, handler);
+            };
+            return el;
+        };
+
+        const originalJQuery = window.jQuery;
+        const mockJQuery = jest.fn(() => ({
+            tooltip: jest.fn(),
+            each: jest.fn(function (cb) {
+                cb.call(document.createElement("div"));
+                return this;
+            })
+        }));
+        mockJQuery.noConflict = jest.fn(() => mockJQuery);
+        window.jQuery = mockJQuery;
+        global.jQuery = mockJQuery;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+        global.makeKeyboardAccessible = jest.fn();
+
+        const originalImage = global.Image;
+        global.Image = function () {
+            const img = document.createElement("img");
+            const originalSetAttribute = img.setAttribute;
+            img.setAttribute = jest.fn(function (name, value) {
+                return originalSetAttribute.call(img, name, value);
+            });
+            Object.defineProperty(img, "src", {
+                set: function (val) {
+                    this.setAttribute("src", val);
+                    if (typeof this.onload === "function") {
+                        this.onload();
+                    }
+                },
+                get: function () {
+                    return this.getAttribute("src");
+                }
+            });
+            return img;
+        };
+
+        const activityMock = {
+            toolbarHeight: 0,
+            loading: false,
+            getCanvasPadding: jest.fn(() => ({ paddingTop: 0, paddingLeft: 0 })),
+            refreshCanvas: jest.fn()
+        };
+        const turtles = new Turtles(activityMock);
+        mixinPrototypes(turtles);
+        turtles.activity = activityMock; // Manually assign activity just in case importMembers is mocked
+        turtles._borderContainer = { removeAllChildren: jest.fn(), addChild: jest.fn() };
+        turtles._canvas = { style: {}, getContext: jest.fn(), width: 1200, height: 900 };
+        turtles.stage = { addChild: jest.fn() };
+        turtles._backgroundColor = "white"; // Add to prevent crash
+        turtles._expandedBoundary = null;
+        turtles._collapsedBoundary = null;
+        turtles._expandButton = null;
+        turtles._collapseButton = null;
+        turtles.gridButton = null;
+        turtles._clearButton = null;
+
+        window._focusCycleManager = { exitKeyboardNavigation: jest.fn() };
+
+        turtles.makeBackground();
+
+        expect(listeners.length).toBeGreaterThan(0);
+
+        const handler = listeners[0];
+
+        handler({ key: "A", preventDefault: jest.fn(), stopPropagation: jest.fn() });
+        expect(window._focusCycleManager.exitKeyboardNavigation).not.toHaveBeenCalled();
+
+        const preventDefault = jest.fn();
+        const stopPropagation = jest.fn();
+        handler({ key: "Escape", preventDefault, stopPropagation });
+
+        expect(preventDefault).toHaveBeenCalled();
+        expect(stopPropagation).toHaveBeenCalled();
+        expect(window._focusCycleManager.exitKeyboardNavigation).toHaveBeenCalled();
+
+        document.createElement = originalCreateElement;
+        window.jQuery = originalJQuery;
+        global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        global.Image = originalImage;
+        delete window._focusCycleManager;
+    });
 });
 
 describe("TurtlesModel doGrid initialization order", () => {

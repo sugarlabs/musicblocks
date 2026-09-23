@@ -906,8 +906,7 @@ Turtles.TurtlesView = class {
             makeKeyboardAccessible(container, object.label || object.name || "Canvas button");
             if (typeof container.addEventListener === "function") {
                 container.addEventListener("keydown", event => {
-                    const isEscape =
-                        event.key === "Escape" || event.key === "Esc" || event.keyCode === 27;
+                    const isEscape = event.key === "Escape" || event.key === "Esc";
                     if (!isEscape) return;
 
                     event.preventDefault();

@@ -607,6 +607,42 @@ describe("ContextMenuController", () => {
 
     // -----------------------------------------------------------------------
     describe("makeButton", () => {
+        test("Escape key exits keyboard navigation", () => {
+            const listeners = {};
+            const originalCreateElement = document.createElement;
+            document.createElement = jest.fn(() => ({
+                setAttribute: jest.fn(),
+                appendChild: jest.fn(),
+                addEventListener: (event, handler) => {
+                    listeners[event] = handler;
+                },
+                style: {},
+                blur: jest.fn(),
+                classList: { contains: jest.fn(() => false), add: jest.fn(), remove: jest.fn() }
+            }));
+
+            window._focusCycleManager = { exitKeyboardNavigation: jest.fn() };
+            const container = controller.makeButton("<svg/>", "Home", 10, 20);
+
+            listeners["keydown"]({
+                key: "A",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            });
+            expect(window._focusCycleManager.exitKeyboardNavigation).not.toHaveBeenCalled();
+
+            const preventDefault = jest.fn();
+            const stopPropagation = jest.fn();
+            listeners["keydown"]({ key: "Escape", preventDefault, stopPropagation });
+
+            expect(preventDefault).toHaveBeenCalled();
+            expect(stopPropagation).toHaveBeenCalled();
+            expect(window._focusCycleManager.exitKeyboardNavigation).toHaveBeenCalled();
+
+            document.createElement = originalCreateElement;
+            delete window._focusCycleManager;
+        });
+
         test("creates a tooltipped button element positioned via right/top offsets", () => {
             const container = controller.makeButton("<svg/>", "Home", 10, 20);
             expect(container.setAttribute).toHaveBeenCalledWith("id", "Home");
