@@ -94,10 +94,16 @@ describe("munsell", () => {
             expect(nearestColor[2]).toMatch(/^#[0-9a-fA-F]{6}$/);
         });
 
-        it("should identify a close match for a RGB value", () => {
+        it("should identify a close match for an RGB value", () => {
             const color = searchColors(100, 150, 200);
             const nearestColor = getcolor(color);
-            expect(nearestColor[2]).toMatch(/^#[0-9a-fA-F]{6}$/);
+            expect(nearestColor[2]).toMatch(/^(?:#[0-9a-fA-F]{6}|rgba\(\d+, \d+, \d+, 1\))$/);
+        });
+
+        it("considers interpolated RGB candidates", () => {
+            const [, red, green, blue] = getcolor(37)[2].match(/rgba\((\d+), (\d+), (\d+), 1\)/);
+
+            expect(searchColors(Number(red), Number(green), Number(blue))).toBe(37);
         });
     });
 });
