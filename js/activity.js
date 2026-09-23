@@ -913,16 +913,13 @@ class Activity {
             this.toolbarController.runFast(env, currentDelay);
 
             // Keep DOM queries, colors, and block visibilities in activity.js
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-
-                    this.logo.tempo.resume();
-                    break;
+            const tempoTitle = document.getElementById("tempoWidgetID");
+            if (tempoTitle) {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
+
+                this.logo.tempo.resume();
             }
 
             if (!this.turtles.running()) {
@@ -1015,13 +1012,10 @@ class Activity {
 
             this.toolbar.resetStop();
 
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-                    break;
+            const tempoTitle = document.getElementById("tempoWidgetID");
+            if (tempoTitle) {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
             }
         };
