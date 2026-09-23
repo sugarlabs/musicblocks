@@ -1983,6 +1983,9 @@ class Blocks {
                 case "loadFile":
                     try {
                         label = myBlock.value[0].toString();
+                        if (label.trim() === "") {
+                            label = _("open file");
+                        }
                     } catch (e) {
                         label = _("open file");
                     }

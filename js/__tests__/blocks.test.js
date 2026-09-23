@@ -2546,6 +2546,75 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("updateBlockText error handling", () => {
+        let blocks;
+        let originalTranslate;
+
+        beforeEach(() => {
+            originalTranslate = global._;
+            global._ = jest.fn(msg => msg);
+            blocks = new Blocks({});
+        });
+
+        afterEach(() => {
+            global._ = originalTranslate;
+        });
+
+        const createMockBlock = (overrides = {}) => ({
+            name: "loadFile",
+            value: [],
+            text: { text: "" },
+            container: {
+                children: { length: 1 },
+                setChildIndex: jest.fn(),
+                updateCache: jest.fn()
+            },
+            loadComplete: true,
+            hasWideLabel: () => false,
+            ...overrides
+        });
+
+        it.each([
+            [
+                "throwing toString method",
+                [
+                    {
+                        toString: () => {
+                            throw new Error("Invalid");
+                        }
+                    }
+                ]
+            ],
+            ["empty array", []],
+            ["empty string element", [""]],
+            ["whitespace-only string element", ["   "]],
+            ["null value", null],
+            ["undefined value", undefined],
+            ["array with null element", [null]],
+            ["array with undefined element", [undefined]]
+        ])("falls back to 'open file' when loadFile value is %s", (_, invalidValue) => {
+            const mockBlock = createMockBlock({ value: invalidValue });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("open file");
+            expect(global._).toHaveBeenCalledWith("open file");
+            expect(mockBlock.container.setChildIndex).toHaveBeenCalledWith(mockBlock.text, 0);
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("displays formatted file name on valid loadFile value", () => {
+            const mockBlock = createMockBlock({ value: ["project.mb"] });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("project.mb");
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+    });
+
     describe("wideLabel Capability Migration", () => {
         let blocks;
 
