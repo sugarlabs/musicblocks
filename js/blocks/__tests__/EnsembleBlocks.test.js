@@ -828,9 +828,19 @@ describe("setupEnsembleBlocks", () => {
         });
 
         it("should return false if the name slot is empty", () => {
-            logo.parseArg.mockReturnValue(null);
+            // Empty the slot and mirror logo.parseArg, which reports the
+            // missing argument and returns null for an empty connection.
+            activity.blocks.blockList[blk].connections = [null, null];
+            logo.parseArg.mockImplementation((l, t, cblk, parentBlk) => {
+                if (cblk === null) {
+                    activity.errorMsg(NOINPUTERRORMSG, parentBlk);
+                    return null;
+                }
+                return "Yertle";
+            });
             const result = foundTurtleBlock.arg(logo, 0, blk, null);
             expect(result).toBe(false);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
         });
     });
 
@@ -860,9 +870,19 @@ describe("setupEnsembleBlocks", () => {
         });
 
         it("should not create a turtle if the name slot is empty", () => {
-            logo.parseArg.mockReturnValue(null);
+            // Empty the slot and mirror logo.parseArg, which reports the
+            // missing argument and returns null for an empty connection.
+            activity.blocks.blockList[blk].connections = [null, null];
+            logo.parseArg.mockImplementation((l, t, cblk, parentBlk) => {
+                if (cblk === null) {
+                    activity.errorMsg(NOINPUTERRORMSG, parentBlk);
+                    return null;
+                }
+                return "NewTurtle";
+            });
             newTurtleBlock.flow([null], logo, 0, blk, null);
             expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
         });
     });
 
