@@ -2118,7 +2118,7 @@ function Synth() {
 
                 synth.chain(...chainNodes, Tone.Destination);
 
-                if (!paramsEffects.doNeighbor) {
+                if (!paramsEffects || !paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
                         if (this._instrumentEpoch !== epoch) return;
                         if (synth.oscillator !== undefined) {
