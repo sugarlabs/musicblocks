@@ -17,7 +17,7 @@
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
-   getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
+   getArticulation, stripMicrotonalPrefix, piemenuPitches, docById, slicePath, wheelnav, platformColor,
    DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber,
    computeTargetPitchFrequency
 */
@@ -29,7 +29,7 @@
     - js/utils/musicutils.js
         pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
         isCustomTemperament, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
-        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE, parseNoteString,
+        getArticulation, stripMicrotonalPrefix, getOctaveRatio, getTemperament, DEFAULTVOICE, parseNoteString,
         computeTargetPitchFrequency
     - js/turtle-singer.js
         Singer
@@ -1525,7 +1525,8 @@ function Synth() {
         const solfegeDict = { do: 0, re: 2, mi: 4, fa: 5, sol: 7, la: 9, ti: 11 };
         const letterDict = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
-        const articulation = getArticulation(solfege);
+        const note = stripMicrotonalPrefix(solfege);
+        const articulation = getArticulation(note);
         let attr = 0;
         if (articulation === SHARP) {
             attr = 1;
@@ -1537,7 +1538,7 @@ function Synth() {
             attr = -2;
         }
 
-        const fragment = articulation ? solfege.replace(articulation, "") : solfege;
+        const fragment = articulation ? note.replace(articulation, "") : note;
         let chromaticNumber = 0;
         if (fragment in solfegeDict) {
             chromaticNumber = solfegeDict[fragment];

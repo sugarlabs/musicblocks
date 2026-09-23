@@ -8181,6 +8181,7 @@ if (typeof module !== "undefined" && module.exports) {
         getCurrentEDO,
         noteToObj,
         frequencyToPitch,
+        stripMicrotonalPrefix,
         getArticulation,
         keySignatureToMode,
         getScaleAndHalfSteps,
