@@ -3135,6 +3135,40 @@ describe("PhraseMaker Widget", () => {
             phraseMaker.handleClose();
             expect(global.announceToScreenReader).toHaveBeenCalledWith("Phrase Maker closed");
         });
+        test("closing does not throw when wheelDivptm is missing (#8231)", () => {
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                hideMsgs: jest.fn()
+            };
+            phraseMaker.widgetWindow = { destroy: jest.fn() };
+            phraseMaker.docById = jest.fn(() => null);
+
+            expect(() => phraseMaker.handleClose()).not.toThrow();
+            expect(phraseMaker.widgetWindow.destroy).toHaveBeenCalled();
+        });
+        test("closing hides wheelDivptm when the element exists", () => {
+            const wheelDiv = { style: { display: "" } };
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                hideMsgs: jest.fn()
+            };
+            phraseMaker.widgetWindow = { destroy: jest.fn() };
+            phraseMaker.docById = jest.fn(() => wheelDiv);
+
+            phraseMaker.handleClose();
+
+            expect(wheelDiv.style.display).toBe("none");
+        });
     });
 });
 
