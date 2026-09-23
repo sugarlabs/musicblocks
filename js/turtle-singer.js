@@ -90,15 +90,9 @@ const getOctaveInterval = activity => {
  * Class pertaining to music related actions for each turtle.
  *
  * @class
- * @classdesc This is the prototype of the Singer for each Turtle component. It is responsible
- * for the music related actions of the Turtle, including playing them while using utility functions
- * in utils/musicutils.js.
- *
- * @todo move music related states from logo.js to here eventually.
- * As of now, the state variables are completely present in logo.js. To ensure modularity and
- * independence of components, Logo should contain members only related to execution of blocks while
- * the logic of execution of blocks should be present in respective files in blocks/ directory,
- * which should eventually use members of this file and turtle-painter.js to proceed.
+ * @classdesc This is the prototype of the Singer for each Turtle component. It owns the
+ * per-turtle music state and actions, including playing music with utility functions in
+ * utils/musicutils.js.
  *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
