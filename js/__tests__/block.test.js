@@ -768,6 +768,103 @@ describe("Block Foundation", () => {
         });
     });
 
+    describe("media selection undo history", () => {
+        it("records a built-in image selection before thumbnail conversion", () => {
+            const selectCallbacks = [];
+            global.openSvgAssetSelector = jest.fn(onSelect => selectCallbacks.push(onSelect));
+            const block = new Block(
+                { ...mockProtoBlock, name: "media", capabilities: Object.create(null) },
+                {
+                    ...mockBlocks,
+                    actionHistory: [],
+                    redoActionHistory: [{ type: "move", blockId: 0 }],
+                    isUndoingOrRedoing: false
+                }
+            );
+            block.blockIndex = 2;
+            block.value = "old-image";
+            block.loadThumbnail = jest.fn();
+
+            block._doOpenMedia(2);
+            selectCallbacks[0]("selected-image");
+
+            expect(block.blocks.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 2,
+                    oldValue: "old-image",
+                    newValue: "selected-image",
+                    oldText: null,
+                    newText: null
+                }
+            ]);
+            expect(block.blocks.redoActionHistory).toEqual([]);
+            expect(block.loadThumbnail).toHaveBeenCalledWith(null);
+
+            block.value = "converted-thumbnail";
+            expect(block.blocks.actionHistory).toHaveLength(1);
+
+            delete global.openSvgAssetSelector;
+        });
+
+        it("records an uploaded image selection", () => {
+            const originalFileReader = global.FileReader;
+            const originalScroll = window.scroll;
+            let changeHandler;
+            const fileChooser = {
+                value: "",
+                files: [{ name: "photo.png" }],
+                addEventListener: jest.fn((event, handler) => {
+                    if (event === "change") changeHandler = handler;
+                }),
+                removeEventListener: jest.fn(),
+                focus: jest.fn(),
+                click: jest.fn()
+            };
+            global.docById = jest.fn().mockReturnValue(fileChooser);
+            window.scroll = jest.fn();
+            global.FileReader = class {
+                constructor() {
+                    this.result = "uploaded-image";
+                }
+
+                readAsDataURL() {
+                    this.onloadend();
+                }
+            };
+            const block = new Block(
+                { ...mockProtoBlock, name: "media", capabilities: Object.create(null) },
+                {
+                    ...mockBlocks,
+                    actionHistory: [],
+                    redoActionHistory: [],
+                    isUndoingOrRedoing: false
+                }
+            );
+            block.blockIndex = 3;
+            block.value = "old-image";
+            block.loadThumbnail = jest.fn();
+
+            block._doOpenMediaFromDevice(3);
+            changeHandler();
+
+            expect(block.blocks.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 3,
+                    oldValue: "old-image",
+                    newValue: "uploaded-image",
+                    oldText: null,
+                    newText: null
+                }
+            ]);
+            expect(block.loadThumbnail).toHaveBeenCalledWith(null);
+
+            global.FileReader = originalFileReader;
+            window.scroll = originalScroll;
+        });
+    });
+
     describe("hide", () => {
         it("should not throw when container is null", () => {
             const b = new Block(mockProtoBlock, mockBlocks);
@@ -1271,7 +1368,7 @@ describe("Block Foundation", () => {
             expect(mockBlocksObj.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
         });
 
-        it("records changing a number label from 10 to 20", () => {
+        it("records one change for input followed by blur", () => {
             const mockBlocksObj = {
                 ...mockBlocks,
                 actionHistory: [],
@@ -1284,12 +1381,17 @@ describe("Block Foundation", () => {
             );
             block.blockIndex = 2;
             block.value = 10;
+            block._capturedInitialValue = 10;
+            block._capturedInitialText = "10";
             block.label = { value: "20", style: { display: "" } };
             block.text = { text: "10" };
             block.connections = [null];
             block.container = { setChildIndex: jest.fn(), children: [] };
             block.updateCache = jest.fn();
             global.docById = jest.fn().mockReturnValue({ style: {} });
+
+            block._labelChanged(false, true);
+            expect(mockBlocksObj.actionHistory).toEqual([]);
 
             block._labelChanged(true, true);
 

@@ -2362,6 +2362,34 @@ class Block {
     }
 
     /**
+     * Records one completed user value change.
+     * @param {*} oldValue - Value before the edit.
+     * @param {*} newValue - Value after the edit.
+     * @param {string|null} oldText - Displayed text before the edit.
+     * @param {string|null} newText - Displayed text after the edit.
+     */
+    _recordValueChange(oldValue, newValue, oldText = null, newText = null) {
+        if (
+            oldValue === newValue ||
+            !this.blocks.actionHistory ||
+            this.blocks.isUndoingOrRedoing ||
+            this.blockIndex < 0
+        ) {
+            return;
+        }
+
+        this.blocks.actionHistory.push({
+            type: "value_change",
+            blockId: this.blockIndex,
+            oldValue,
+            newValue,
+            oldText,
+            newText
+        });
+        this.blocks.redoActionHistory = [];
+    }
+
+    /**
      * Opens media for the block.
      * Shows a chooser modal for media blocks that lets the user
      * either select a built-in SVG image or upload from their device.
@@ -2382,7 +2410,9 @@ class Block {
             openSvgAssetSelector(
                 // Callback when a built-in image is selected
                 function (dataURL) {
+                    const oldValue = that.value;
                     that.value = dataURL;
+                    that._recordValueChange(oldValue, dataURL);
                     that.loadThumbnail(null);
                 },
                 // Callback when the user chooses to upload from device
@@ -2413,7 +2443,9 @@ class Block {
             reader.onloadend = () => {
                 if (reader.result) {
                     if (that.name === "media") {
+                        const oldValue = that.value;
                         that.value = reader.result;
+                        that._recordValueChange(oldValue, reader.result);
                         that.loadThumbnail(null);
                         fileChooser.value = "";
                         return;
@@ -3909,6 +3941,7 @@ class Block {
     _changeLabel() {
         const that = this;
         this._capturedInitialValue = this.value;
+        this._capturedInitialText = this.text ? this.text.text : null;
         const x = this.container.x;
         const y = this.container.y;
 
@@ -4749,7 +4782,12 @@ class Block {
 
         const hasInitialValue = typeof this._capturedInitialValue !== "undefined";
         const oldValue = hasInitialValue ? this._capturedInitialValue : this.value;
-        const oldText = this.text ? this.text.text : null;
+        const oldText = hasInitialValue
+            ? this._capturedInitialText
+            : this.text
+              ? this.text.text
+              : null;
+        const commitLabelEdit = closeInput || notPieMenu === false;
 
         if (closeInput) {
             this.label.style.display = "none";
@@ -4793,6 +4831,10 @@ class Block {
             const requiresUpdate = isText && (parentName === "storein" || parentName === "action");
 
             if (!requiresUpdate) {
+                if (commitLabelEdit) {
+                    delete this._capturedInitialValue;
+                    delete this._capturedInitialText;
+                }
                 return;
             }
         }
@@ -5072,21 +5114,15 @@ class Block {
             this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
         }
 
-        if (
-            oldValue !== this.value &&
-            this.blocks.actionHistory &&
-            !this.blocks.isUndoingOrRedoing &&
-            this.blockIndex >= 0
-        ) {
-            this.blocks.actionHistory.push({
-                type: "value_change",
-                blockId: this.blockIndex,
+        if (commitLabelEdit) {
+            this._recordValueChange(
                 oldValue,
-                newValue: this.value,
+                this.value,
                 oldText,
-                newText: this.text ? this.text.text : null
-            });
-            this.blocks.redoActionHistory = [];
+                this.text ? this.text.text : null
+            );
+            delete this._capturedInitialValue;
+            delete this._capturedInitialText;
         }
     }
 }
