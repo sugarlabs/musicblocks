@@ -79,6 +79,8 @@ global.TunerDisplay = class {
     }
 };
 
+global.ManagedTimer = require("../../utils/ManagedTimer.js");
+
 const { SampleWidget, PitchSmoother, resolveBackendURL } = require("../sampler.js");
 
 describe("resolveBackendURL", () => {
@@ -115,7 +117,10 @@ describe("SampleWidget.dependencies", () => {
 });
 
 describe("Sampler Widget", () => {
+    let originalFetch;
+
     beforeAll(() => {
+        originalFetch = global.fetch;
         if (!HTMLCanvasElement.prototype.getContext) {
             HTMLCanvasElement.prototype.getContext = jest.fn();
         }
@@ -146,6 +151,12 @@ describe("Sampler Widget", () => {
             <div id="wheelDivptm"></div>
             <input id="myOpenAll" type="file" />
         `;
+    });
+
+    afterEach(() => {
+        global.fetch = originalFetch;
+        delete window.AI_SAMPLE_ENDPOINT;
+        jest.useRealTimers();
     });
 
     describe("PitchSmoother", () => {
@@ -540,6 +551,33 @@ describe("Sampler Widget", () => {
             expect(widget.isMoving).toBe(true);
         });
 
+        test("pause cancels pending playback timers so they cannot fire after the widget stops", () => {
+            jest.useFakeTimers();
+            widget._timerManager = null;
+            const playSpy = jest.fn();
+            const endSpy = jest.fn();
+
+            // Schedule both timers as the play chain would
+            widget._playbackWaitTimeout = widget._setWidgetTimeout(playSpy, 500);
+            widget._endPlayingTimeout = widget._setWidgetTimeout(endSpy, 1000);
+
+            expect(widget._activeTimeouts.size).toBe(2);
+
+            widget.pause();
+
+            // Both timers must be cancelled and their IDs cleared
+            expect(widget._playbackWaitTimeout).toBeNull();
+            expect(widget._endPlayingTimeout).toBeNull();
+            expect(widget._activeTimeouts.size).toBe(0);
+
+            // Advance past both delays; neither callback should have fired
+            jest.advanceTimersByTime(1500);
+            expect(playSpy).not.toHaveBeenCalled();
+            expect(endSpy).not.toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+
         test("_usePitch/_useAccidental/_useOctave update centers", () => {
             widget._usePitch("mi");
             widget._useAccidental(global.SHARP);
@@ -630,6 +668,82 @@ describe("Sampler Widget", () => {
             await promise;
 
             expect(widget.pause).toHaveBeenCalled();
+            jest.useRealTimers();
+        });
+
+        test("_waitAndPlaySample cancels previous pending playback timeout before scheduling a new one", () => {
+            jest.useFakeTimers();
+            const clearTimeoutSpy = jest.spyOn(widget, "_clearWidgetTimeout");
+            widget._playSample = jest.fn();
+            widget._endPlaying = jest.fn();
+
+            widget._waitAndPlaySample();
+            const firstTimeoutId = widget._playbackWaitTimeout;
+            expect(firstTimeoutId).not.toBeNull();
+
+            widget._waitAndPlaySample();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(firstTimeoutId);
+            expect(widget._playbackWaitTimeout).not.toBe(firstTimeoutId);
+
+            jest.advanceTimersByTime(500);
+            expect(widget._playSample).toHaveBeenCalledTimes(1);
+
+            jest.useRealTimers();
+        });
+
+        test("_waitAndEndPlaying cancels previous pending end timeout before scheduling a new one", () => {
+            jest.useFakeTimers();
+            const clearTimeoutSpy = jest.spyOn(widget, "_clearWidgetTimeout");
+            widget.pause = jest.fn();
+            widget.sampleLength = 250;
+
+            widget._waitAndEndPlaying();
+            const firstTimeoutId = widget._endPlayingTimeout;
+            expect(firstTimeoutId).not.toBeNull();
+
+            widget._waitAndEndPlaying();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith(firstTimeoutId);
+            expect(widget._endPlayingTimeout).not.toBe(firstTimeoutId);
+
+            jest.advanceTimersByTime(250);
+            expect(widget.pause).toHaveBeenCalledTimes(1);
+
+            jest.useRealTimers();
+        });
+
+        test("cent-adjustment restart followed by play cancels previous playback timeout and pause prevents firing", () => {
+            jest.useFakeTimers();
+            widget._playDelayedSample = realPlayDelayedSample;
+            widget._playSample = jest.fn();
+            widget._endPlaying = jest.fn();
+            widget.setTimbre = jest.fn();
+            widget._updateBlocks = jest.fn();
+
+            // Simulate cent adjustment triggering a restart while playing
+            widget.isMoving = true;
+            widget.applyCentAdjustment(5);
+
+            // Cent adjustment scheduled restartPitchTimeout for 100ms
+            expect(widget._restartPitchTimeout).not.toBeNull();
+
+            // Advance 100ms so restart runs _playReferencePitch -> _playDelayedSample -> _waitAndPlaySample
+            jest.advanceTimersByTime(100);
+            const firstPlaybackTimeout = widget._playbackWaitTimeout;
+            expect(firstPlaybackTimeout).not.toBeNull();
+
+            // User triggers play again before the first 500ms delay fires
+            widget._playDelayedSample();
+            expect(widget._playbackWaitTimeout).not.toBe(firstPlaybackTimeout);
+
+            // Pause before the replacement timer fires
+            widget.pause();
+            expect(widget._playbackWaitTimeout).toBeNull();
+            expect(widget._endPlayingTimeout).toBeNull();
+
+            // Advance clock; neither callback should fire
+            jest.advanceTimersByTime(1000);
+            expect(widget._playSample).not.toHaveBeenCalled();
+
             jest.useRealTimers();
         });
 
@@ -1023,6 +1137,7 @@ describe("Sampler Widget", () => {
         });
 
         test("tuner toggle handles maximized mode and mode toggle clicks", async () => {
+            jest.useFakeTimers();
             widget.init(mockActivity, 1);
             widget.widgetWindow.isMaximized.mockReturnValue(true);
             const tunerContainer = document.createElement("div");
@@ -1033,7 +1148,10 @@ describe("Sampler Widget", () => {
             const toggle = docById("modeToggle");
             const buttons = Array.from(toggle.querySelectorAll("div"));
             buttons[0].onclick();
+            jest.advanceTimersByTime(200);
             buttons[1].onclick();
+            jest.advanceTimersByTime(200);
+            jest.useRealTimers();
         });
 
         test("makeCanvas draws waveform and updates tuner when enabled", () => {
@@ -1182,6 +1300,266 @@ describe("Sampler Widget", () => {
             const path = require("path");
             const source = fs.readFileSync(path.resolve(__dirname, "../sampler.js"), "utf8");
             expect(source).not.toMatch(/http:\/\/\d+\.\d+\.\d+\.\d+/);
+        });
+    });
+
+    describe("SampleWidget timer management (fallback without ManagedTimer)", () => {
+        let widget;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            widget = new SampleWidget();
+            widget._timerManager = null;
+        });
+
+        afterEach(() => {
+            jest.clearAllTimers();
+            jest.useRealTimers();
+        });
+
+        describe("_setWidgetTimeout", () => {
+            it("tracks the timeout and runs the callback, then stops tracking it", () => {
+                const callback = jest.fn();
+                const id = widget._setWidgetTimeout(callback, 100);
+
+                expect(widget._activeTimeouts.has(id)).toBe(true);
+
+                jest.advanceTimersByTime(100);
+
+                expect(callback).toHaveBeenCalledTimes(1);
+                expect(widget._activeTimeouts.has(id)).toBe(false);
+            });
+        });
+
+        describe("_clearWidgetTimeout", () => {
+            it("returns false for null or undefined ids", () => {
+                expect(widget._clearWidgetTimeout(null)).toBe(false);
+                expect(widget._clearWidgetTimeout(undefined)).toBe(false);
+            });
+
+            it("cancels a tracked timeout before it fires", () => {
+                const callback = jest.fn();
+                const id = widget._setWidgetTimeout(callback, 100);
+
+                expect(widget._clearWidgetTimeout(id)).toBe(true);
+                expect(widget._activeTimeouts.has(id)).toBe(false);
+
+                jest.advanceTimersByTime(100);
+                expect(callback).not.toHaveBeenCalled();
+            });
+
+            it("returns false for an untracked id", () => {
+                expect(widget._clearWidgetTimeout(999999)).toBe(false);
+            });
+        });
+
+        describe("_setWidgetInterval", () => {
+            it("tracks the interval and runs the callback repeatedly", () => {
+                const callback = jest.fn();
+                const id = widget._setWidgetInterval(callback, 100);
+
+                expect(widget._activeIntervals.has(id)).toBe(true);
+
+                jest.advanceTimersByTime(250);
+                expect(callback).toHaveBeenCalledTimes(2);
+
+                widget._clearWidgetInterval(id);
+            });
+        });
+
+        describe("_clearWidgetInterval", () => {
+            it("returns false for null or undefined ids", () => {
+                expect(widget._clearWidgetInterval(null)).toBe(false);
+                expect(widget._clearWidgetInterval(undefined)).toBe(false);
+            });
+
+            it("cancels a tracked interval", () => {
+                const callback = jest.fn();
+                const id = widget._setWidgetInterval(callback, 100);
+
+                expect(widget._clearWidgetInterval(id)).toBe(true);
+                expect(widget._activeIntervals.has(id)).toBe(false);
+
+                jest.advanceTimersByTime(300);
+                expect(callback).not.toHaveBeenCalled();
+            });
+
+            it("returns false for an untracked id", () => {
+                expect(widget._clearWidgetInterval(999999)).toBe(false);
+            });
+        });
+
+        describe("_clearWidgetTimers", () => {
+            it("cancels every tracked timer and returns the count", () => {
+                widget._setWidgetTimeout(jest.fn(), 100);
+                widget._setWidgetTimeout(jest.fn(), 200);
+                widget._setWidgetInterval(jest.fn(), 100);
+
+                const count = widget._clearWidgetTimers();
+
+                expect(count).toBe(3);
+                expect(widget._activeTimeouts.size).toBe(0);
+                expect(widget._activeIntervals.size).toBe(0);
+                expect(widget._promptBlinkInterval).toBeNull();
+                expect(widget._saveTimeout).toBeNull();
+                expect(widget._tunerModeTimeout).toBeNull();
+                expect(widget._restartPitchTimeout).toBeNull();
+                expect(widget._playbackWaitTimeout).toBeNull();
+                expect(widget._endPlayingTimeout).toBeNull();
+            });
+        });
+    });
+
+    describe("SampleWidget timer delegation (with ManagedTimer)", () => {
+        let widget;
+
+        beforeEach(() => {
+            widget = new SampleWidget();
+        });
+
+        it("_setWidgetTimeout delegates to the timer manager", () => {
+            const callback = jest.fn();
+            widget._timerManager = { setTimeout: jest.fn().mockReturnValue(42) };
+
+            expect(widget._setWidgetTimeout(callback, 100)).toBe(42);
+            expect(widget._timerManager.setTimeout).toHaveBeenCalledWith(callback, 100);
+        });
+
+        it("_clearWidgetTimeout delegates to the timer manager", () => {
+            widget._timerManager = { clearTimeout: jest.fn().mockReturnValue(true) };
+
+            expect(widget._clearWidgetTimeout(123)).toBe(true);
+            expect(widget._timerManager.clearTimeout).toHaveBeenCalledWith(123);
+        });
+
+        it("_setWidgetInterval delegates to the timer manager", () => {
+            const callback = jest.fn();
+            widget._timerManager = { setInterval: jest.fn().mockReturnValue(7) };
+
+            expect(widget._setWidgetInterval(callback, 100)).toBe(7);
+            expect(widget._timerManager.setInterval).toHaveBeenCalledWith(callback, 100);
+        });
+
+        it("_clearWidgetInterval delegates to the timer manager", () => {
+            widget._timerManager = { clearInterval: jest.fn().mockReturnValue(true) };
+
+            expect(widget._clearWidgetInterval(456)).toBe(true);
+            expect(widget._timerManager.clearInterval).toHaveBeenCalledWith(456);
+        });
+
+        it("_clearWidgetTimers adds the manager count to the tracked timer count", () => {
+            widget._timerManager = { clearAll: jest.fn().mockReturnValue(5) };
+            widget._activeTimeouts.add(1);
+            widget._activeIntervals.add(2);
+
+            expect(widget._clearWidgetTimers()).toBe(7);
+        });
+    });
+
+    describe("SampleWidget lifecycle and timer cleanup", () => {
+        let widget;
+        let mockActivity;
+        let widgetWindow;
+
+        beforeEach(() => {
+            widget = new SampleWidget();
+            const widgetBody = document.createElement("div");
+            const widgetFrame = document.createElement("div");
+            widgetBody.getBoundingClientRect = () => ({ width: 800, height: 500 });
+            widgetFrame.getBoundingClientRect = () => ({ height: 500 });
+            document.body.appendChild(widgetBody);
+            const toolbar = document.createElement("div");
+            const buttons = [];
+            widgetWindow = {
+                _toolbar: toolbar,
+                addButton: jest.fn((icon, size, tip) => {
+                    const btn = document.createElement("button");
+                    btn.getElementsByTagName = jest.fn(() => [{ src: "" }]);
+                    btn.classList = { add: jest.fn(), remove: jest.fn() };
+                    btn.tip = tip;
+                    buttons.push(btn);
+                    return btn;
+                }),
+                clearScreen: jest.fn(),
+                getWidgetBody: jest.fn(() => widgetBody),
+                getWidgetFrame: jest.fn(() => widgetFrame),
+                isMaximized: jest.fn(() => false),
+                clear: jest.fn(),
+                show: jest.fn(),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn(),
+                _buttons: buttons
+            };
+            window.widgetWindows = {
+                windowFor: jest.fn(() => widgetWindow)
+            };
+            mockActivity = {
+                logo: {
+                    synth: {
+                        trigger: jest.fn(),
+                        stopRecording: jest.fn(),
+                        stopTuner: jest.fn()
+                    }
+                },
+                errorMsg: jest.fn(),
+                refreshCanvas: jest.fn(),
+                saveLocally: jest.fn(),
+                textMsg: jest.fn()
+            };
+        });
+
+        it("clears all timers when widgetWindow closes", () => {
+            const clearSpy = jest.spyOn(widget, "_clearWidgetTimers");
+            widget.init(mockActivity, 1);
+
+            expect(typeof widgetWindow.onclose).toBe("function");
+            widgetWindow.onclose();
+
+            expect(clearSpy).toHaveBeenCalled();
+        });
+
+        it("clears active prompt interval if widget is closed during AI generation", async () => {
+            jest.useFakeTimers();
+            window.AI_SAMPLE_ENDPOINT = "https://samples.example";
+
+            widget.init(mockActivity, 1);
+            widget._promptBtn.onclick();
+
+            const container = docById("samplerPrompt");
+            const textArea = container.querySelector("textarea");
+            const buttons = Array.from(container.querySelectorAll("button"));
+            const submit = buttons.find(btn => btn.innerHTML === "Submit");
+
+            textArea.value = "synth sound";
+
+            let resolveFetch;
+            global.fetch = jest.fn(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            const submitPromise = submit.onclick();
+
+            expect(widget._promptBlinkInterval).not.toBeNull();
+            expect(widget._timerManager.activeCount).toBe(1);
+
+            jest.advanceTimersByTime(5000);
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("Generating audio...", 1000);
+
+            widgetWindow.onclose();
+
+            expect(widget._promptBlinkInterval).toBeNull();
+            expect(widget._timerManager.activeCount).toBe(0);
+
+            resolveFetch({
+                json: () => Promise.resolve({ status: "success" })
+            });
+            await submitPromise;
+
+            delete window.AI_SAMPLE_ENDPOINT;
+            jest.useRealTimers();
         });
     });
 });
