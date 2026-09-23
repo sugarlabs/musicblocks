@@ -436,6 +436,102 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget.ratios).toEqual([1, 2]);
     });
 
+    test("ratioEdit handles valid ratio and updates temperament via calculateRatios", () => {
+        widget.activity = { errorMsg: jest.fn() };
+        widget.ratios = [1, 2];
+        widget.frequencies = [440, 880];
+        widget.powerBase = 2;
+        widget.checkTemperament = jest.fn();
+        widget._visualizerView = jest.fn();
+
+        const divAppends = [];
+        const realCreateElement = document.createElement.bind(document);
+        jest.spyOn(document, "createElement").mockImplementation(tag => {
+            const el = realCreateElement(tag);
+            if (tag === "div") divAppends.push(el);
+            return el;
+        });
+
+        global.docById = jest.fn(id => {
+            if (id === "ratioIn") return { value: "3" };
+            if (id === "ratioOut") return { value: "2" };
+            if (id === "recursion") return { value: "2" }; // Multiple recursions to trigger different branches
+            return {
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn(),
+                style: {},
+                append: jest.fn(),
+                onmouseover: null,
+                onclick: null
+            };
+        });
+
+        widget.ratioEdit();
+        document.createElement.mockRestore();
+
+        const divWithOnclick = divAppends.find(el => typeof el.onclick === "function");
+        expect(divWithOnclick).toBeDefined();
+        // Emulate clicking "done"
+        divWithOnclick.onclick({ target: { textContent: _("done") } });
+
+        // CalculateRatios branches:
+        // Initial ratios: 1, 2
+        // recursion 1: ratio = 1.5. freq < 880 (true). 1.5 is inserted between 1 and 2.
+        // recursion 2: ratio = 2.25. freq < 880 (false). ratio is halved to 1.125. 1.125 is inserted between 1 and 1.5.
+        // After both, the new ratios should contain 1.125 and 1.5.
+
+        expect(widget.activity.errorMsg).not.toHaveBeenCalled();
+        expect(widget.ratios).toEqual([1, 1.125, 1.5, 2]);
+        expect(widget.typeOfEdit).toBe("nonequal");
+        expect(widget.checkTemperament).toHaveBeenCalled();
+        expect(widget._visualizerView).toHaveBeenCalled();
+    });
+
+    test("ratioEdit calculates correctly with ratioDifference === 0", () => {
+        widget.activity = { errorMsg: jest.fn() };
+        widget.ratios = [1, 1.5, 2];
+        widget.frequencies = [440, 660, 880];
+        widget.powerBase = 2;
+        widget.checkTemperament = jest.fn();
+        widget._visualizerView = jest.fn();
+
+        const divAppends = [];
+        const realCreateElement = document.createElement.bind(document);
+        jest.spyOn(document, "createElement").mockImplementation(tag => {
+            const el = realCreateElement(tag);
+            if (tag === "div") divAppends.push(el);
+            return el;
+        });
+
+        global.docById = jest.fn(id => {
+            if (id === "ratioIn") return { value: "3" };
+            if (id === "ratioOut") return { value: "2" };
+            if (id === "recursion") return { value: "1" };
+            return {
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn(),
+                style: {},
+                append: jest.fn(),
+                onmouseover: null,
+                onclick: null
+            };
+        });
+
+        widget.ratioEdit();
+        document.createElement.mockRestore();
+
+        const divWithOnclick = divAppends.find(el => typeof el.onclick === "function");
+        expect(divWithOnclick).toBeDefined();
+
+        // This will try to add 1.5, which already exists (ratioDifference === 0).
+        divWithOnclick.onclick({ target: { textContent: _("done") } });
+
+        expect(widget.activity.errorMsg).not.toHaveBeenCalled();
+        expect(widget.ratios).toEqual([1, 1.5, 2]);
+    });
+
     test("arbitraryEdit sets editMode to arbitrary", () => {
         global.docById = jest.fn(id => {
             if (id === "circ1") {
