@@ -5233,7 +5233,9 @@ const GetNotesForInterval = tur => {
         const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""), 10);
         const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""), 10);
         octave = octaveb - octavea;
-    } else if (notePitches) {
+    } else if (notePitches && notePitches[last(tur.singer.inNoteBlock)]?.length) {
+        // Outside a note block there is no pitch list to read from, so keep
+        // the C to C default instead of indexing into undefined.
         const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
         firstNote = pitchBlk[0];
         secondNote = pitchBlk[pitchBlk.length - 1];
