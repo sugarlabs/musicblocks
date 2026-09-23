@@ -44,7 +44,7 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
 
             palettes.makePalettes(1);
         } catch (e) {
-            console.log(macroData);
+            console.debug(macroData);
 
             console.debug(e);
         }
