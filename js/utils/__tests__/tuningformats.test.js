@@ -96,10 +96,19 @@ describe("parseSclFile", () => {
     });
 
     it("still accepts a trailing cents unit", () => {
-        const content = ["! unit.scl", "!", "Unit", "2", "100.0 cents", "200.0cents"].join("\n");
+        const content = [
+            "! unit.scl",
+            "!",
+            "Unit",
+            "3",
+            "100.0 cents",
+            "200.0cents",
+            "300.0cents D#"
+        ].join("\n");
         const result = parseSclFile(content);
         expect(result.pitches[0].cents).toBeCloseTo(100, 6);
         expect(result.pitches[1].cents).toBeCloseTo(200, 6);
+        expect(result.pitches[2].cents).toBeCloseTo(300, 6);
     });
 
     it("still rejects an invalid pitch value followed by text", () => {
