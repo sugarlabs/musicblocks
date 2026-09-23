@@ -776,6 +776,13 @@ describe("Sampler Widget", () => {
         });
 
         test("drag_and_drop wires drop handler to call handleFiles", () => {
+            const otherBody = document.createElement("div");
+            const otherCanvas = document.createElement("canvas");
+            otherCanvas.className = "samplerCanvas";
+            otherCanvas.addEventListener = jest.fn();
+            otherBody.appendChild(otherCanvas);
+            document.body.insertBefore(otherBody, widgetWindow.getWidgetBody());
+
             const samplerCanvas = document.createElement("canvas");
             samplerCanvas.className = "samplerCanvas";
             const dropHandlers = {};
@@ -783,9 +790,17 @@ describe("Sampler Widget", () => {
                 dropHandlers[evt] = handler;
             });
             widgetWindow.getWidgetBody().appendChild(samplerCanvas);
+            widget.widgetWindow = widgetWindow;
+
             widget.handleFiles = jest.fn();
 
             widget.drag_and_drop();
+
+            expect(samplerCanvas.addEventListener).toHaveBeenCalledWith(
+                "drop",
+                expect.any(Function)
+            );
+            expect(otherCanvas.addEventListener).not.toHaveBeenCalled();
 
             const dropEvent = {
                 preventDefault: jest.fn(),
