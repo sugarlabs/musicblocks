@@ -4605,7 +4605,7 @@ class PhraseMaker {
             graphicsBlock = false;
             graphicNote = note.split(": ");
             if (
-                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(graphicNote[0]) !== -1 &&
+                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(graphicNote[0]) !== -1 ||
                 PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(graphicNote[0]) !== -1
             ) {
                 graphicsBlock = true;
