@@ -92,6 +92,10 @@ class Queue {
     }
 }
 
+/**
+ * @classdesc Logo owns global execution, scheduling, widget and session context, notation and
+ * export, synth and transport, camera and shared resources, and orchestration state.
+ */
 class Logo {
     /**
      * @constructor
