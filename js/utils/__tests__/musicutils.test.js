@@ -1748,6 +1748,22 @@ describe("GetNotesForInterval", () => {
             octave: 0
         });
     });
+    it("should fall back to C when not inside a note block", () => {
+        // Clicking current interval on its own: the singer has a notePitches
+        // map but inNoteBlock is empty, so there is no pitch list to read.
+        const tur = {
+            singer: {
+                noteStatus: null,
+                notePitches: {},
+                inNoteBlock: []
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 0
+        });
+    });
     it("should handle empty tur object", () => {
         const tur = {
             singer: {}
