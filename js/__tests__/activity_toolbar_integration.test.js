@@ -161,6 +161,21 @@ describe("Activity Toolbar Integration", () => {
             expect(activity.toolbar.dimThenRestoreStop).toHaveBeenCalledWith("red");
             expect(activity.toolbarController.runFast).toHaveBeenCalledWith("normal-env", 0);
         });
+
+        test("pauses and resumes tempo when tempoWidgetID is present in DOM", () => {
+            activity.turtles.running.mockReturnValue(false);
+            activity.logo.tempo.isMoving = true;
+            const tempoTitle = document.createElement("div");
+            tempoTitle.id = "tempoWidgetID";
+            document.body.appendChild(tempoTitle);
+
+            activity._doFastButton("normal-env");
+
+            expect(activity.logo.tempo.pause).toHaveBeenCalled();
+            expect(activity.logo.tempo.resume).toHaveBeenCalled();
+
+            document.body.removeChild(tempoTitle);
+        });
     });
 
     describe("_doStepButton", () => {
@@ -198,6 +213,20 @@ describe("Activity Toolbar Integration", () => {
             activity._doHardStopButton(false);
 
             expect(activity.toolbar.resetStop).not.toHaveBeenCalled();
+        });
+
+        test("pauses tempo when tempoWidgetID is present in DOM", () => {
+            activity.toolbarController.hardStop.mockReturnValue(true);
+            activity.logo.tempo.isMoving = true;
+            const tempoTitle = document.createElement("div");
+            tempoTitle.id = "tempoWidgetID";
+            document.body.appendChild(tempoTitle);
+
+            activity._doHardStopButton(false);
+
+            expect(activity.logo.tempo.pause).toHaveBeenCalled();
+
+            document.body.removeChild(tempoTitle);
         });
     });
 
