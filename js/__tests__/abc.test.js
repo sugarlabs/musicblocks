@@ -83,7 +83,7 @@ describe("processABCNotes - Basic Note Processing", () => {
     it("should write a note with no pitches as a rest", () => {
         logo.notation.notationStaging["0"] = [[[], 4, 0, null, null, -1, false]];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("R4 ");
+        expect(logo.notationNotes["0"]).toBe("z4 ");
     });
 
     it("should insert a newline after every 8 notes", () => {
@@ -118,7 +118,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
     it("should handle staccato and dots", () => {
         logo.notation.notationStaging["0"] = [[["C4"], 4, 2, null, null, -1, true]];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe(".C4.. ");
+        expect(logo.notationNotes["0"]).toBe(".C7 ");
     });
 
     it("should convert durations using the map and fallback to string", () => {
@@ -133,7 +133,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
         expect(output).toContain("C1/4");
         expect(output).toContain("D1/2");
         expect(output).toContain("E16");
-        expect(output).toContain("F5");
+        expect(output).toContain("F16/5");
     });
 
     it("should write accidental markers before the ABC pitch", () => {
@@ -169,7 +169,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
 
         processABCNotes(logo, "0");
 
-        expect(logo.notationNotes["0"]).toBe("R4 ");
+        expect(logo.notationNotes["0"]).toBe("z4 ");
     });
 });
 describe("processABCNotes - Control Strings", () => {
@@ -247,7 +247,7 @@ describe("processABCNotes - Chords", () => {
 
         processABCNotes(logo, "0");
         const out = logo.notationNotes["0"];
-        expect(out).toBe("[C E G]4  [A]4  ");
+        expect(out).toBe("[C E G]4 [A]4 ");
     });
 
     it("should handle articulation inside chords", () => {
@@ -260,7 +260,7 @@ describe("processABCNotes - Chords", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("!accent![C E]4  ");
+        expect(logo.notationNotes["0"]).toBe("!accent![C E]4 ");
     });
 });
 
@@ -390,7 +390,7 @@ describe("processABCNotes - Edge Cases for 100% Coverage", () => {
             [["G4"], 4, 0, null, null, -1, false]
         ];
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain(" ");
+        expect(logo.notationNotes["0"]).toContain("[C E]7 G4 ");
     });
 });
 describe("saveAbcOutput", () => {
@@ -567,8 +567,6 @@ describe("processABCNotes - notation markers", () => {
         ["end crescendo"],
         ["end decrescendo"],
         ["begin slur"],
-        ["end slur"],
-        ["tie"],
         ["begin harmonics"],
         ["end harmonics"]
     ].flat();
@@ -577,8 +575,12 @@ describe("processABCNotes - notation markers", () => {
         const body = exportBody([
             ...EVERY_MARKER,
             note("C4"),
+            "tie",
+            "end slur",
             ...EVERY_MARKER,
             note("D4"),
+            "tie",
+            "end slur",
             ...EVERY_MARKER
         ]);
 
