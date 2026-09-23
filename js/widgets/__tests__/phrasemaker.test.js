@@ -1146,6 +1146,58 @@ describe("PhraseMaker Widget", () => {
 
         phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
     });
+    test("_setNoteCell detects graphics block from MATRIXGRAPHICS", () => {
+        phraseMaker._noteStored = ["forward"];
+        phraseMaker.rowLabels = ["forward"];
+
+        phraseMaker._rows = [{ cells: [{ getAttribute: jest.fn(() => 1), style: {} }] }];
+
+        phraseMaker._deps.Singer = { defaultBPMFactor: 1 };
+        phraseMaker._deps.getDrumName = jest.fn(() => null);
+
+        global.PhraseMakerUtils = {
+            MATRIXSYNTHS: [],
+            MATRIXGRAPHICS: ["forward", "back", "right", "left"],
+            MATRIXGRAPHICS2: ["arc", "setxy"]
+        };
+
+        phraseMaker.activity = {
+            logo: {
+                synth: { trigger: jest.fn() }
+            }
+        };
+
+        phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
+
+        // synth.trigger must NOT be called for a graphics block
+        expect(phraseMaker.activity.logo.synth.trigger).not.toHaveBeenCalled();
+    });
+    test("_setNoteCell detects graphics block from MATRIXGRAPHICS2", () => {
+        phraseMaker._noteStored = ["arc"];
+        phraseMaker.rowLabels = ["arc"];
+
+        phraseMaker._rows = [{ cells: [{ getAttribute: jest.fn(() => 1), style: {} }] }];
+
+        phraseMaker._deps.Singer = { defaultBPMFactor: 1 };
+        phraseMaker._deps.getDrumName = jest.fn(() => null);
+
+        global.PhraseMakerUtils = {
+            MATRIXSYNTHS: [],
+            MATRIXGRAPHICS: ["forward", "back", "right", "left"],
+            MATRIXGRAPHICS2: ["arc", "setxy"]
+        };
+
+        phraseMaker.activity = {
+            logo: {
+                synth: { trigger: jest.fn() }
+            }
+        };
+
+        phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
+
+        // synth.trigger must NOT be called for a graphics block
+        expect(phraseMaker.activity.logo.synth.trigger).not.toHaveBeenCalled();
+    });
     test("_clear resets matrix safely", () => {
         phraseMaker.rowLabels = ["C"];
         phraseMaker._rows = [
