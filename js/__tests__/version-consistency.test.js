@@ -46,7 +46,7 @@ describe("version consistency", () => {
 
         // Without the marker release-please leaves the line alone, and the
         // test above only fails later, after a release has already shipped.
-        expect(source).toMatch(/const VERSION = "[^"]+";\s*\/\/ x-release-please-version/);
+        expect(source).toMatch(/^const VERSION = "[^"]+";[ \t]*\/\/ x-release-please-version$/m);
     });
 
     it("lists js/turtledefs.js among release-please extra-files", () => {
