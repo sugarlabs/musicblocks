@@ -732,7 +732,8 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget.editMode).toBe("octave");
     });
 
-    test("_save executes without crash", () => {
+    test("_save executes without crash and loads both stacks even if widget timers are cleared", () => {
+        jest.useFakeTimers();
         global.setOctaveRatio = jest.fn();
         global.rationalToFraction = jest.fn(() => [1, 1]);
         global.getOctaveRatio = jest.fn(() => 2);
@@ -753,6 +754,7 @@ describe("TemperamentWidget basic tests", () => {
         };
 
         widget.activity = {
+            textMsg: jest.fn(),
             blocks: {
                 loadNewBlocks: jest.fn(),
                 findUniqueTemperamentName: jest.fn(() => "custom1")
@@ -761,7 +763,15 @@ describe("TemperamentWidget basic tests", () => {
 
         widget._save();
 
-        expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+
+        // Closing the widget clears widget timers, but save's delayed loadNewBlocks must stay alive
+        widget._clearWidgetTimers();
+        jest.advanceTimersByTime(500);
+
+        expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalledTimes(2);
+        expect(widget.activity.textMsg).toHaveBeenCalled();
+        jest.useRealTimers();
     });
 
     test("init sets up widget correctly", () => {

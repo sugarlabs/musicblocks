@@ -2813,7 +2813,7 @@ function TemperamentWidget() {
         }
 
         const that = this;
-        this._setWidgetTimeout(() => {
+        setTimeout(() => {
             that.activity.blocks.loadNewBlocks(newStack);
             that.activity.textMsg(_("New action block generated."), 3000);
         }, 500);
