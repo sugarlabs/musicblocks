@@ -295,6 +295,14 @@ describe("SearchUI empty search results", () => {
         expect(ui.wrapEmptySearchResults("", null, "")).toEqual([]);
     });
 
+    test("wrapEmptySearchResults uses the match term when displayTerm is omitted", () => {
+        const ui = new SearchUI(makeActivity());
+        expect(ui.wrapEmptySearchResults("xyz", [])[0].label).toBe("No results found for xyz");
+        expect(ui.wrapEmptySearchResults("xyz", [], null)[0].label).toBe(
+            "No results found for xyz"
+        );
+    });
+
     test("renderEmptySearchItem draws a disabled row without artwork", () => {
         const li = {
             0: { className: "", setAttribute: jest.fn() },
@@ -329,6 +337,50 @@ describe("SearchUI empty search results", () => {
         expect(anchor[0].setAttribute).toHaveBeenCalledWith("role", "status");
         expect(anchor[0].setAttribute).toHaveBeenCalledWith("aria-live", "polite");
         expect(rendered).toBe(li);
+    });
+
+    test("decorateEmptySearchItem keeps existing classes and skips missing nodes", () => {
+        const li = {
+            0: { className: "ui-menu-item", setAttribute: jest.fn() },
+            append: jest.fn()
+        };
+        const $j = jest.fn(() => ({
+            text: jest.fn(function () {
+                return this;
+            })
+        }));
+        const ui = new SearchUI(makeActivity());
+
+        ui.decorateEmptySearchItem(li, { label: "No results found for xyz" }, $j);
+
+        expect(li[0].className).toBe("ui-menu-item ui-state-disabled search-no-results");
+        expect(li[0].setAttribute).toHaveBeenCalledWith("aria-disabled", "true");
+    });
+
+    test("renderEmptySearchItem still appends when ul.css is missing", () => {
+        const li = {
+            0: { className: "", setAttribute: jest.fn() },
+            addClass: jest.fn(),
+            append: jest.fn(),
+            appendTo: jest.fn(function () {
+                return this;
+            })
+        };
+        const anchor = {
+            0: { setAttribute: jest.fn() },
+            text: jest.fn(function () {
+                return this;
+            })
+        };
+        const $j = jest.fn(selector => {
+            if (selector === "<li></li>") return li;
+            if (selector === "<a>") return anchor;
+            return {};
+        });
+        const ui = new SearchUI(makeActivity());
+
+        expect(ui.renderEmptySearchItem($j, {}, { label: "No results found for xyz" })).toBe(li);
+        expect(li.appendTo).toHaveBeenCalledWith({});
     });
 });
 
@@ -1047,6 +1099,22 @@ describe("SearchUI.setupHelpfulAutocomplete", () => {
         expect(selectCb).toHaveBeenCalledWith(item);
     });
 
+    test("select callback ignores the empty-state row", () => {
+        const selectCb = jest.fn();
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.setupHelpfulAutocomplete(() => [], selectCb);
+
+        const event = { preventDefault: jest.fn() };
+        const result = $elem._capturedOpts.select(event, {
+            item: { isEmptyState: true, label: "No results found for zzz" }
+        });
+
+        expect(result).toBe(false);
+        expect(selectCb).not.toHaveBeenCalled();
+        expect(activity.helpfulSearchWidget.value).toBe(null);
+    });
+
     test("focus callback calls event.preventDefault", () => {
         const ui = new SearchUI(makeActivity());
         ui.setupHelpfulAutocomplete(() => [], jest.fn());
@@ -1087,6 +1155,42 @@ describe("SearchUI.setupHelpfulAutocomplete", () => {
         const item = { label: "drum", artwork: "" };
         instance._renderItem(ul, item);
         expect(li.append).toHaveBeenCalled();
+    });
+
+    test("renders the empty-state row from the helpful-search instance", () => {
+        const instance = { _renderItem: null };
+        const li = {
+            0: { className: "", setAttribute: jest.fn() },
+            addClass: jest.fn(),
+            append: jest.fn(),
+            appendTo: jest.fn(function () {
+                return this;
+            })
+        };
+        const anchor = {
+            0: { setAttribute: jest.fn() },
+            text: jest.fn(function () {
+                return this;
+            })
+        };
+        $elem.autocomplete = jest.fn(function (arg) {
+            if (typeof arg === "object") this._capturedOpts = arg;
+            if (arg === "instance") return instance;
+        });
+        global.window.jQuery = jest.fn(selector => {
+            if (selector === "<li></li>") return li;
+            if (selector === "<a>") return anchor;
+            return $elem;
+        });
+
+        const ui = new SearchUI(makeActivity());
+        ui.setupHelpfulAutocomplete(() => [], jest.fn());
+
+        const ul = { css: jest.fn(() => ul) };
+        instance._renderItem(ul, { isEmptyState: true, label: "No results found for xyz" });
+
+        expect(li.addClass).toHaveBeenCalledWith("ui-state-disabled search-no-results");
+        expect(anchor.text).toHaveBeenCalledWith("No results found for xyz");
     });
 });
 

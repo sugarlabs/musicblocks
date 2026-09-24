@@ -14,8 +14,9 @@
 /* exported setupSearchController, SearchController */
 
 class SearchController {
-    constructor(activity) {
+    constructor(activity, searchUI) {
         this.activity = activity;
+        this.searchUI = searchUI || activity.searchUI || null;
 
         this.searchSuggestions = [];
         this._searchCache = {};
@@ -24,79 +25,6 @@ class SearchController {
         this.searchBlockPosition = [100, 100];
         this.deprecatedBlockNames = [];
         this.helpfulSearchDiv = null;
-    }
-
-    /**
-     * Keep the autocomplete menu open with a disabled empty-state row when
-     * a non-empty query matches no blocks. Delegates to SearchUI when present.
-     *
-     * @param {string} term
-     * @param {Array} results
-     * @param {string} displayTerm
-     * @returns {Array}
-     */
-    _wrapSearchResults(term, results, displayTerm) {
-        const ui = this.activity.searchUI;
-        if (ui && typeof ui.wrapEmptySearchResults === "function") {
-            return ui.wrapEmptySearchResults(term, results, displayTerm);
-        }
-        if (results && results.length > 0) {
-            return results;
-        }
-        if (!term) {
-            return results || [];
-        }
-        const query = String(
-            displayTerm === undefined || displayTerm === null ? term : displayTerm
-        ).trim();
-        return [
-            {
-                label: _("No results found for %s").replace(/%s/g, query),
-                value: "",
-                artwork: "",
-                specialDict: null,
-                isEmptyState: true
-            }
-        ];
-    }
-
-    /**
-     * @param {object} item
-     * @returns {boolean}
-     */
-    _isEmptySearchResult(item) {
-        const ui = this.activity.searchUI;
-        if (ui && typeof ui.isEmptySearchResult === "function") {
-            return ui.isEmptySearchResult(item);
-        }
-        return !!(item && item.isEmptyState);
-    }
-
-    /**
-     * @param {object} $j
-     * @param {object} ul
-     * @param {object} item
-     * @returns {object}
-     */
-    _renderEmptySearchRow($j, ul, item) {
-        const ui = this.activity.searchUI;
-        if (ui && typeof ui.renderEmptySearchItem === "function") {
-            return ui.renderEmptySearchItem($j, ul, item);
-        }
-        const emptyLi = $j("<li></li>");
-        if (typeof emptyLi.addClass === "function") {
-            emptyLi.addClass("ui-state-disabled search-no-results");
-        }
-        if (emptyLi[0]) {
-            emptyLi[0].setAttribute("aria-disabled", "true");
-        }
-        const message = $j("<a>").text(item.label);
-        if (message[0]) {
-            message[0].setAttribute("role", "status");
-            message[0].setAttribute("aria-live", "polite");
-        }
-        emptyLi.append(message);
-        return emptyLi.appendTo(ul.css("z-index", 35000));
     }
 
     /**
@@ -354,14 +282,18 @@ class SearchController {
                 source: (request, response) => {
                     const term = (request.term || "").toLowerCase().trim();
                     response(
-                        that._wrapSearchResults(term, that.filterSuggestions(term), request.term)
+                        that.searchUI.wrapEmptySearchResults(
+                            term,
+                            that.filterSuggestions(term),
+                            request.term
+                        )
                     );
                 },
                 delay: 400,
                 appendTo: "body",
                 select: (event, ui) => {
                     event.preventDefault();
-                    if (that._isEmptySearchResult(ui.item)) {
+                    if (that.searchUI.isEmptySearchResult(ui.item)) {
                         return false;
                     }
                     activity.searchWidget.value = ui.item.label;
@@ -385,8 +317,8 @@ class SearchController {
             const instance = $search.autocomplete("instance");
             if (instance) {
                 instance._renderItem = (ul, item) => {
-                    if (that._isEmptySearchResult(item)) {
-                        return that._renderEmptySearchRow($j, ul, item);
+                    if (that.searchUI.isEmptySearchResult(item)) {
+                        return that.searchUI.renderEmptySearchItem($j, ul, item);
                     }
                     const li = $j("<li></li>");
 
@@ -751,14 +683,18 @@ class SearchController {
                 source: (request, response) => {
                     const term = (request.term || "").toLowerCase().trim();
                     response(
-                        that._wrapSearchResults(term, that.filterSuggestions(term), request.term)
+                        that.searchUI.wrapEmptySearchResults(
+                            term,
+                            that.filterSuggestions(term),
+                            request.term
+                        )
                     );
                 },
                 delay: 400,
                 appendTo: "body",
                 select: (event, ui) => {
                     event.preventDefault();
-                    if (that._isEmptySearchResult(ui.item)) {
+                    if (that.searchUI.isEmptySearchResult(ui.item)) {
                         return false;
                     }
                     activity.helpfulSearchWidget.value = ui.item.label;
@@ -774,8 +710,8 @@ class SearchController {
             const instance = $helpfulSearch.autocomplete("instance");
             if (instance) {
                 instance._renderItem = (ul, item) => {
-                    if (that._isEmptySearchResult(item)) {
-                        return that._renderEmptySearchRow($j, ul, item);
+                    if (that.searchUI.isEmptySearchResult(item)) {
+                        return that.searchUI.renderEmptySearchItem($j, ul, item);
                     }
                     const li = $j("<li></li>");
                     const img = document.createElement("img");
@@ -836,9 +772,10 @@ class SearchController {
  * Installs delegation methods on activity so external callers
  * (palette.js, planetInterface.js) continue to work unchanged.
  * @param {object} activity - The Activity instance.
+ * @param {object} [searchUI] - SearchUI that owns empty-state rendering.
  */
-const setupSearchController = activity => {
-    activity.searchController = new SearchController(activity);
+const setupSearchController = (activity, searchUI) => {
+    activity.searchController = new SearchController(activity, searchUI || activity.searchUI);
 };
 
 if (typeof define === "function" && define.amd) {
