@@ -356,7 +356,7 @@ class WidgetWindow {
 
         this._nonclose = this._create("div", "nonclose", this._drag);
         this._nonclose.style.display = "flex";
-        this._nonclose.justifyContent = "space-between";
+        this._nonclose.style.justifyContent = "space-between";
         this._nonclose.style.width = "100%";
 
         const titleEl = this._create("div", "wftTitle", this._nonclose);
