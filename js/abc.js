@@ -513,7 +513,9 @@ class AbcExporter {
         if (this.counter % 8 === 0 && this.counter > 0 && !inChordContinuation) {
             this.parts.push("\n");
         }
-        this.counter += 1;
+        if (!inChordContinuation) {
+            this.counter += 1;
+        }
 
         let notes = typeof obj[NOTATIONNOTE] === "string" ? [obj[NOTATIONNOTE]] : obj[NOTATIONNOTE];
         if (notes.length === 0) {
