@@ -325,6 +325,24 @@ describe("setupVolumeBlocks", () => {
             expect(logo.setTurtleListener).toHaveBeenCalled();
             expect(ret).toEqual([100, 1]);
         });
+
+        it("does not throw when the voice is already in instrumentNames without a synthVolume entry", () => {
+            const blk = "blkSSV2";
+            const args = ["piano", 90, 100];
+            const setSynthVol2Block = createdBlocks["setsynthvolume2"];
+            const turtleObj = activity.turtles.ithTurtle(turtleIndex);
+            // A voice selected via "set default instrument" lands in
+            // instrumentNames with no synthVolume entry. The push must still
+            // find an array to push onto.
+            turtleObj.singer.instrumentNames = ["piano"];
+            turtleObj.singer.synthVolume = {};
+            turtleObj.singer.crescendoInitialVolume = {};
+            logo.synth.loadSynth = jest.fn();
+
+            expect(() => setSynthVol2Block.flow(args, logo, turtleIndex, blk)).not.toThrow();
+            expect(last(turtleObj.singer.synthVolume.piano)).toBe(90);
+            expect(logo.synth.loadSynth).not.toHaveBeenCalled();
+        });
     });
 
     describe("SetSynthVolumeBlock", () => {

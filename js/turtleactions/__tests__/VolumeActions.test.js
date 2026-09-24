@@ -710,6 +710,22 @@ describe("setupVolumeActions", () => {
             expect(targetTurtle.singer.crescendoInitialVolume.violin).toEqual([DEFAULTVOLUME]);
         });
 
+        it("initializes synthVolume for a voice already in instrumentNames without an entry", () => {
+            // "set default instrument" adds the voice to instrumentNames but
+            // never creates a synthVolume entry, so the includes() check is
+            // true while synthVolume[synth] is still undefined.
+            targetTurtle.singer.instrumentNames = ["default", "violin"];
+            delete targetTurtle.singer.synthVolume.violin;
+            delete targetTurtle.singer.crescendoInitialVolume.violin;
+
+            expect(() =>
+                Singer.VolumeActions.setSynthVolume("violin", 70, 0, "testBlock")
+            ).not.toThrow();
+
+            expect(targetTurtle.singer.synthVolume.violin).toEqual([DEFAULTVOLUME, 70]);
+            expect(loadSynthSpy).not.toHaveBeenCalled();
+        });
+
         it("does not reset an already-tracked synth volume when the instrument is newly added", () => {
             targetTurtle.singer.instrumentNames = ["default"];
             targetTurtle.singer.synthVolume.violin = [99];
