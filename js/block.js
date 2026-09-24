@@ -2289,11 +2289,13 @@ class Block {
     /**
      * Loads a thumbnail image onto the block.
      * @param {string} imagePath - The path to the image to load as a thumbnail.
+     * @param {*} [oldValue] - Value before a user-selected image was applied.
      */
-    loadThumbnail(imagePath) {
+    loadThumbnail(imagePath, oldValue) {
         // Load an image thumbnail onto block.
         const thisBlock = this.blockIndex;
         const that = this;
+        const recordSelection = arguments.length > 1;
 
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
             return;
@@ -2352,6 +2354,9 @@ class Block {
             );
             that.container.addChild(bitmap);
             that.updateCache();
+            if (recordSelection) {
+                that._recordValueChange(oldValue, that.value);
+            }
         };
 
         if (imagePath === null) {
@@ -2412,8 +2417,7 @@ class Block {
                 function (dataURL) {
                     const oldValue = that.value;
                     that.value = dataURL;
-                    that._recordValueChange(oldValue, dataURL);
-                    that.loadThumbnail(null);
+                    that.loadThumbnail(null, oldValue);
                 },
                 // Callback when the user chooses to upload from device
                 function () {
@@ -2445,12 +2449,14 @@ class Block {
                     if (that.name === "media") {
                         const oldValue = that.value;
                         that.value = reader.result;
-                        that._recordValueChange(oldValue, reader.result);
-                        that.loadThumbnail(null);
+                        that.loadThumbnail(null, oldValue);
                         fileChooser.value = "";
                         return;
                     }
-                    that.value = [fileChooser.files[0].name, reader.result];
+                    const oldValue = that.value;
+                    const newValue = [fileChooser.files[0].name, reader.result];
+                    that.value = newValue;
+                    that._recordValueChange(oldValue, newValue);
                     that.blocks.updateBlockText(thisBlock);
                     fileChooser.value = "";
                 }

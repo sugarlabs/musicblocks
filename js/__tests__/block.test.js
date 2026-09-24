@@ -766,10 +766,47 @@ describe("Block Foundation", () => {
             expect(mockCache).toHaveBeenCalledWith(0, 0, 100, 100);
             expect(block.value).toBe("fallback-cached");
         });
+
+        it("records the effective converted value for a user selection", () => {
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 1 }];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+
+            block.loadThumbnail(null, "old-cached-value");
+            mockImageInstance.onload();
+
+            expect(block.blocks.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 0,
+                    oldValue: "old-cached-value",
+                    newValue: "cached-data-url",
+                    oldText: null,
+                    newText: null
+                }
+            ]);
+            expect(block.blocks.redoActionHistory).toEqual([]);
+        });
+
+        it("preserves redo history when conversion produces the existing value", () => {
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 1 }];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+
+            block.loadThumbnail(null, "cached-data-url");
+            mockImageInstance.onload();
+
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([{ type: "move", blockId: 1 }]);
+        });
     });
 
     describe("media selection undo history", () => {
-        it("records a built-in image selection before thumbnail conversion", () => {
+        it("defers a built-in image history entry until thumbnail conversion", () => {
             const selectCallbacks = [];
             global.openSvgAssetSelector = jest.fn(onSelect => selectCallbacks.push(onSelect));
             const block = new Block(
@@ -788,21 +825,9 @@ describe("Block Foundation", () => {
             block._doOpenMedia(2);
             selectCallbacks[0]("selected-image");
 
-            expect(block.blocks.actionHistory).toEqual([
-                {
-                    type: "value_change",
-                    blockId: 2,
-                    oldValue: "old-image",
-                    newValue: "selected-image",
-                    oldText: null,
-                    newText: null
-                }
-            ]);
-            expect(block.blocks.redoActionHistory).toEqual([]);
-            expect(block.loadThumbnail).toHaveBeenCalledWith(null);
-
-            block.value = "converted-thumbnail";
-            expect(block.blocks.actionHistory).toHaveLength(1);
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
+            expect(block.loadThumbnail).toHaveBeenCalledWith(null, "old-image");
 
             delete global.openSvgAssetSelector;
         });
@@ -848,17 +873,70 @@ describe("Block Foundation", () => {
             block._doOpenMediaFromDevice(3);
             changeHandler();
 
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.loadThumbnail).toHaveBeenCalledWith(null, "old-image");
+
+            global.FileReader = originalFileReader;
+            window.scroll = originalScroll;
+        });
+
+        it.each(["audiofile", "loadFile"])("records a %s upload and clears redo history", name => {
+            const originalFileReader = global.FileReader;
+            const originalScroll = window.scroll;
+            let changeHandler;
+            const fileChooser = {
+                value: "",
+                files: [{ name: "lesson.dat" }],
+                addEventListener: jest.fn((event, handler) => {
+                    if (event === "change") changeHandler = handler;
+                }),
+                removeEventListener: jest.fn(),
+                focus: jest.fn(),
+                click: jest.fn()
+            };
+            global.docById = jest.fn().mockReturnValue(fileChooser);
+            window.scroll = jest.fn();
+            global.FileReader = class {
+                constructor() {
+                    this.result = "file-contents";
+                }
+
+                readAsDataURL() {
+                    this.onloadend();
+                }
+
+                readAsText() {
+                    this.onloadend();
+                }
+            };
+            const block = new Block(
+                { ...mockProtoBlock, name, capabilities: Object.create(null) },
+                {
+                    ...mockBlocks,
+                    actionHistory: [],
+                    redoActionHistory: [{ type: "move", blockId: 0 }],
+                    isUndoingOrRedoing: false,
+                    updateBlockText: jest.fn()
+                }
+            );
+            block.blockIndex = 4;
+            block.value = ["old.dat", "old-contents"];
+
+            block._doOpenMediaFromDevice(4);
+            changeHandler();
+
             expect(block.blocks.actionHistory).toEqual([
                 {
                     type: "value_change",
-                    blockId: 3,
-                    oldValue: "old-image",
-                    newValue: "uploaded-image",
+                    blockId: 4,
+                    oldValue: ["old.dat", "old-contents"],
+                    newValue: ["lesson.dat", "file-contents"],
                     oldText: null,
                     newText: null
                 }
             ]);
-            expect(block.loadThumbnail).toHaveBeenCalledWith(null);
+            expect(block.blocks.redoActionHistory).toEqual([]);
+            expect(block.blocks.updateBlockText).toHaveBeenCalledWith(4);
 
             global.FileReader = originalFileReader;
             window.scroll = originalScroll;
