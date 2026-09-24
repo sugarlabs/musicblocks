@@ -18,7 +18,7 @@
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
     getSavedCustomModes, configureWheel, TuningFormats,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
-    isUnsafeObjectKey
+    isUnsafeObjectKey, ManagedTimer
  */
 
 /*
@@ -90,7 +90,19 @@ class ModeWidget {
         this.widgetWindow.clear();
         this.widgetWindow.show();
 
-        this._timeouts = [];
+        /**
+         * Timer manager for managing all widget timeouts safely.
+         * @type {ManagedTimer|null}
+         * @private
+         */
+        this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+        /**
+         * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeTimeouts = new Set();
 
         // Layout: pie wheel + mode table (label row) + bottom control bar
         this.modeTableDiv = document.createElement("div");
@@ -111,10 +123,7 @@ class ModeWidget {
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
         this.widgetWindow.onclose = () => {
-            if (this._timeouts) {
-                this._timeouts.forEach(id => clearTimeout(id));
-                this._timeouts = [];
-            }
+            this._clearWidgetTimers();
             this._playing = false;
             if (this.logo && this.logo.synth) {
                 this.logo.synth.stop();
@@ -221,24 +230,90 @@ class ModeWidget {
         window.requestAnimationFrame(() => this.widgetWindow.sendToCenter());
     }
 
-    // ── Timeout helper ────────────────────────────────────────────
+    // ── Timeout helpers ───────────────────────────────────────────
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    }
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers cleared.
+     */
+    _clearWidgetTimers() {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        if (Array.isArray(this._timeouts)) {
+            for (const id of this._timeouts) {
+                clearTimeout(id);
+                count++;
+            }
+            this._timeouts = [];
+        }
+
+        return count;
+    }
 
     _setTimeout(fn, delay) {
-        const id = setTimeout(() => {
-            this._timeouts = this._timeouts.filter(t => t !== id);
-            fn();
-        }, delay);
-        this._timeouts.push(id);
-        return id;
+        return this._setWidgetTimeout(fn, delay);
     }
 
     _cancelAnimations() {
         // Clear stale rotate/invert/play callbacks before rebuilding for a
         // new EDO; they reference old navItem indexes.
-        if (this._timeouts) {
-            this._timeouts.forEach(id => clearTimeout(id));
-            this._timeouts = [];
-        }
+        this._clearWidgetTimers();
         this._locked = false;
         this._playing = false;
         this._newPattern = null;
@@ -1429,7 +1504,7 @@ class ModeWidget {
             }
         };
         popup._closeHandler = closeHandler;
-        setTimeout(() => {
+        this._setWidgetTimeout(() => {
             document.addEventListener("mousedown", closeHandler);
         }, 0);
     }
