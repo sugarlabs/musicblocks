@@ -168,6 +168,21 @@ describe("saveMxmlOutput", () => {
         expect(output).toContain('<part id="P1">');
     });
 
+    it("should export crescendo marks and stop them correctly", () => {
+        const logo = {
+            notation: {
+                notationStaging: {
+                    0: ["begin crescendo", [["C4"], 4, 0], "end crescendo"]
+                }
+            }
+        };
+
+        const output = saveMxmlOutput(logo);
+
+        expect(output).toContain('<wedge type="crescendo"/>');
+        expect(output).toContain('<wedge type="stop"/>');
+    });
+
     it("should express a quarter note using divisions per quarter note", () => {
         const logo = {
             notation: {
