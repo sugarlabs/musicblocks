@@ -1335,6 +1335,11 @@ function LegoWidget() {
     this._startWebcam = function () {
         this.imageDisplayArea.replaceChildren();
 
+        this._offscreenCanvas = null;
+        this._offscreenCtx = null;
+        this._offscreenIsVideo = false;
+        this._offscreenMediaElement = null;
+
         this.imageWrapper = createImageWrapper();
 
         this.webcamVideo = document.createElement("video");
@@ -1785,6 +1790,10 @@ function LegoWidget() {
                 ctx.drawImage(mediaElement, 0, 0, w, h);
             } catch (e) {
                 console.warn("Could not draw media element to off-screen canvas:", e);
+                this._offscreenCanvas = null;
+                this._offscreenCtx = null;
+                this._offscreenIsVideo = false;
+                this._offscreenMediaElement = null;
                 return;
             }
         }
@@ -2767,9 +2776,16 @@ function LegoWidget() {
         }
 
         // Resolve the shared off-screen canvas (pre-built in _activateMediaDisplay /
-        // img.onload). Rebuild lazily if it was cleared (e.g. a new image was swapped
-        // in or the widget was reopened before a scan started).
-        if (!this._offscreenCanvas) {
+        // img.onload). Rebuild lazily if it was cleared, if the media element changed,
+        // or if video dimensions updated once metadata loaded.
+        const needsRebuild =
+            !this._offscreenCanvas ||
+            this._offscreenMediaElement !== mediaElement ||
+            (this._offscreenIsVideo &&
+                mediaElement.videoWidth > 0 &&
+                (this._offscreenCanvas.width !== mediaElement.videoWidth ||
+                    this._offscreenCanvas.height !== mediaElement.videoHeight));
+        if (needsRebuild) {
             this._buildOffscreenCanvas();
         }
         if (!this._offscreenCanvas) {

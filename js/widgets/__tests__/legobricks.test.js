@@ -2521,9 +2521,15 @@ describe("LegoWidget — BUG-1: shared off-screen canvas (_buildOffscreenCanvas)
     // _buildOffscreenCanvas: cross-origin image taints canvas → graceful bail
     // -------------------------------------------------------------------------
 
-    it("_buildOffscreenCanvas bails gracefully when drawImage throws for a cross-origin image", () => {
+    it("_buildOffscreenCanvas bails gracefully and clears prior cache when drawImage throws", () => {
         const img = makeImg({ w: 100, h: 100 });
         mountMedia(img);
+
+        // Seed with existing cached canvas to ensure error resets it
+        legoWidget._offscreenCanvas = document.createElement("canvas");
+        legoWidget._offscreenCtx = {};
+        legoWidget._offscreenIsVideo = true;
+        legoWidget._offscreenMediaElement = document.createElement("img");
 
         const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
         const realCreate = document.createElement.bind(document);
@@ -2540,8 +2546,11 @@ describe("LegoWidget — BUG-1: shared off-screen canvas (_buildOffscreenCanvas)
         });
 
         expect(() => legoWidget._buildOffscreenCanvas()).not.toThrow();
-        // When drawImage fails the canvas must NOT be stored.
+        // When drawImage fails all canvas properties must be reset to null/false
         expect(legoWidget._offscreenCanvas).toBeNull();
+        expect(legoWidget._offscreenCtx).toBeNull();
+        expect(legoWidget._offscreenIsVideo).toBe(false);
+        expect(legoWidget._offscreenMediaElement).toBeNull();
         expect(warnSpy).toHaveBeenCalled();
     });
 
@@ -2779,5 +2788,115 @@ describe("LegoWidget — BUG-1: shared off-screen canvas (_buildOffscreenCanvas)
         expect(legoWidget._offscreenMediaElement).toBeNull();
 
         window.widgetWindows = originalWidgetWindows;
+    });
+
+    // -------------------------------------------------------------------------
+    // _sampleAndDetectColor: rebuilds when media element changes
+    // -------------------------------------------------------------------------
+
+    it("_sampleAndDetectColor rebuilds the off-screen canvas when the media element changes", () => {
+        const oldImg = makeImg({ w: 200, h: 100 });
+        const newImg = makeImg({ w: 300, h: 150 });
+        mountMedia(newImg);
+
+        // Canvas is currently cached for the OLD image
+        legoWidget._offscreenCanvas = { width: 200, height: 100 };
+        legoWidget._offscreenCtx = {
+            drawImage: jest.fn(),
+            getImageData: jest.fn(() => ({ data: [0, 0, 0, 255] }))
+        };
+        legoWidget._offscreenIsVideo = false;
+        legoWidget._offscreenMediaElement = oldImg;
+
+        legoWidget._buildOffscreenCanvas = jest.fn(() => {
+            legoWidget._offscreenCanvas = { width: 300, height: 150 };
+            legoWidget._offscreenCtx = {
+                drawImage: jest.fn(),
+                getImageData: jest.fn(() => ({ data: [0, 0, 0, 255] }))
+            };
+            legoWidget._offscreenIsVideo = false;
+            legoWidget._offscreenMediaElement = newImg;
+        });
+
+        legoWidget._getColorForCanvasRow = jest.fn(() => null);
+        legoWidget.gridOverlay = {
+            getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 400 })
+        };
+
+        const line = { topPos: 0, bottomPos: 40, currentX: 50 };
+        legoWidget._sampleAndDetectColor(line, Date.now());
+
+        expect(legoWidget._buildOffscreenCanvas).toHaveBeenCalledTimes(1);
+        expect(legoWidget._offscreenMediaElement).toBe(newImg);
+    });
+
+    // -------------------------------------------------------------------------
+    // _sampleAndDetectColor: rebuilds when video dimensions update
+    // -------------------------------------------------------------------------
+
+    it("_sampleAndDetectColor rebuilds when video dimensions change after metadata loads", () => {
+        const video = makeVideo({ w: 640, h: 480 });
+        mountMedia(video);
+
+        // Cached canvas has initial fallback size (e.g. 300x150)
+        legoWidget._offscreenCanvas = { width: 300, height: 150 };
+        legoWidget._offscreenCtx = {
+            drawImage: jest.fn(),
+            getImageData: jest.fn(() => ({ data: [0, 0, 0, 255] }))
+        };
+        legoWidget._offscreenIsVideo = true;
+        legoWidget._offscreenMediaElement = video;
+
+        legoWidget._buildOffscreenCanvas = jest.fn(() => {
+            legoWidget._offscreenCanvas = { width: 640, height: 480 };
+            legoWidget._offscreenCtx = {
+                drawImage: jest.fn(),
+                getImageData: jest.fn(() => ({ data: [0, 0, 0, 255] }))
+            };
+            legoWidget._offscreenIsVideo = true;
+            legoWidget._offscreenMediaElement = video;
+        });
+
+        legoWidget._getColorForCanvasRow = jest.fn(() => null);
+        legoWidget.gridOverlay = {
+            getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 400 })
+        };
+
+        const line = { topPos: 0, bottomPos: 40, currentX: 50 };
+        legoWidget._sampleAndDetectColor(line, Date.now());
+
+        expect(legoWidget._buildOffscreenCanvas).toHaveBeenCalledTimes(1);
+        expect(legoWidget._offscreenCanvas.width).toBe(640);
+        expect(legoWidget._offscreenCanvas.height).toBe(480);
+    });
+
+    // -------------------------------------------------------------------------
+    // _startWebcam: clears cached off-screen state
+    // -------------------------------------------------------------------------
+
+    it("_startWebcam resets cached off-screen state so old image canvas is not retained", () => {
+        legoWidget.imageDisplayArea = document.createElement("div");
+
+        // Seed with existing image canvas
+        legoWidget._offscreenCanvas = document.createElement("canvas");
+        legoWidget._offscreenCtx = {};
+        legoWidget._offscreenIsVideo = false;
+        legoWidget._offscreenMediaElement = document.createElement("img");
+
+        // Mock navigator.mediaDevices.getUserMedia to reject (camera denied/blocked)
+        const originalMediaDevices = navigator.mediaDevices;
+        navigator.mediaDevices = {
+            getUserMedia: jest.fn().mockRejectedValue(new Error("Permission denied"))
+        };
+        legoWidget.activity = { textMsg: jest.fn() };
+
+        legoWidget._startWebcam();
+
+        expect(legoWidget._offscreenCanvas).toBeNull();
+        expect(legoWidget._offscreenCtx).toBeNull();
+        expect(legoWidget._offscreenIsVideo).toBe(false);
+        expect(legoWidget._offscreenMediaElement).toBeNull();
+
+        navigator.mediaDevices = originalMediaDevices;
     });
 });
