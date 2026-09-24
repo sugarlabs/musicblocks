@@ -143,7 +143,7 @@ global.TemperamentWidget = jest.fn(() => ({
     scale: null,
     init: jest.fn()
 }));
-global.TemperamentWidget.dependencies = ["widgets/temperament"];
+global.TemperamentWidget.dependencies = ["widgets/TemperamentUI", "widgets/temperament"];
 
 global.MusicKeyboard = jest.fn();
 global.MusicKeyboard.dependencies = ["widgets/musickeyboard"];
