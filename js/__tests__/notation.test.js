@@ -144,7 +144,10 @@ describe("Notation Class", () => {
             const drum = ["noise1"];
             notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
             expect(notation._notationStaging[turtle][0][7]).toBeNull();
-            expect(notation._notationDrumStaging[turtle].length).toBe(0);
+            expect(notation._notationDrumStaging[turtle][0][0]).toEqual(["R"]);
+            expect(notation._notationDrumStaging[turtle].length).toBe(
+                notation._notationStaging[turtle].length
+            );
         });
 
         it("should handle object notes with markup", () => {
