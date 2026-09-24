@@ -58,7 +58,11 @@ global.wheelnav = function WheelNav() {
     this.createWheel = labels => {
         this.navItems = labels.map(label => ({
             title: label,
-            navItem: { hide: jest.fn() }
+            navItem: { hide: jest.fn() },
+            sliceSelectedAttr: {},
+            sliceHoverAttr: {},
+            titleSelectedAttr: {},
+            titleHoverAttr: {}
         }));
     };
     this.setTooltips = jest.fn();
@@ -242,7 +246,9 @@ describe("Sampler Widget", () => {
                         startRecording: jest.fn().mockResolvedValue(),
                         stopRecording: jest.fn().mockResolvedValue("recording-url"),
                         LiveWaveForm: jest.fn(),
-                        playRecording: jest.fn(),
+                        playRecording: jest.fn(cb => {
+                            if (cb) cb();
+                        }),
                         stopPlayBackRecording: jest.fn(),
                         startTuner: jest.fn().mockResolvedValue(),
                         stopTuner: jest.fn(),
@@ -346,12 +352,41 @@ describe("Sampler Widget", () => {
             expect(widget.accidentalCenter).toBe(3);
             expect(widget.octaveCenter).toBe("3");
 
-            widget.samplePitch = "sobb";
+            widget.samplePitch = "sox"; // DOUBLESHARP
+            widget.sampleOctave = "4";
+            widget._parseSamplePitch();
+            expect(widget.pitchCenter).toBe(4);
+            expect(widget.accidentalCenter).toBe(4);
+            expect(widget.octaveCenter).toBe("4");
+
+            // Avoid substring match by temporarily modifying globals
+            const origFlat = global.FLAT;
+            global.FLAT = "flat_only";
+            global.DOUBLEFLAT = "double_flat_symbol";
+
+            widget.samplePitch = "soflat_only"; // FLAT
             widget.sampleOctave = "5";
             widget._parseSamplePitch();
             expect(widget.pitchCenter).toBe(4);
             expect(widget.accidentalCenter).toBe(1);
             expect(widget.octaveCenter).toBe("5");
+
+            widget.samplePitch = "sodouble_flat_symbol"; // DOUBLEFLAT
+            widget.sampleOctave = "5";
+            widget._parseSamplePitch();
+            expect(widget.pitchCenter).toBe(4);
+            expect(widget.accidentalCenter).toBe(0);
+            expect(widget.octaveCenter).toBe("5");
+
+            global.FLAT = origFlat;
+            global.DOUBLEFLAT = "bb"; // restore
+
+            widget.samplePitch = "do"; // Natural
+            widget.sampleOctave = "6";
+            widget._parseSamplePitch();
+            expect(widget.pitchCenter).toBe(0);
+            expect(widget.accidentalCenter).toBe(2);
+            expect(widget.octaveCenter).toBe("6");
         });
 
         test("_calculateFrequency uses pitch centers to compute frequency", () => {
@@ -754,11 +789,15 @@ describe("Sampler Widget", () => {
             widget.widgetWindow = widgetWindow;
             widget.makeCanvas = jest.fn();
             widget.reconnectSynthsToAnalyser = jest.fn();
+            widget.drawVisualIDs = { 0: 999 };
+            global.cancelAnimationFrame = jest.fn();
 
             widget._scale();
 
             expect(widget.makeCanvas).toHaveBeenCalledWith(800, 400, 0, true);
             expect(widget.reconnectSynthsToAnalyser).toHaveBeenCalled();
+            expect(global.cancelAnimationFrame).toHaveBeenCalledWith(999);
+            expect(widget.drawVisualIDs[0]).toBeNull();
         });
 
         test("_scale uses maximized dimensions", () => {
@@ -893,7 +932,9 @@ describe("Sampler Widget", () => {
             await widget._tunerBtn.onclick();
 
             widget.centsSliderBtn.onclick();
-            const container = docById("centAdjustmentContainer");
+            const container = widget.widgetWindow
+                .getWidgetBody()
+                .querySelector("#centAdjustmentContainer");
             console.log("In test: container after first click is", !!container);
             const slider = container.querySelector("input[type=range]");
             slider.value = "10";
@@ -916,6 +957,27 @@ describe("Sampler Widget", () => {
 
             expect(addSpy).toHaveBeenCalled();
             addSpy.mockRestore();
+        });
+
+        test("tunerBtn.onclick removes centAdjustmentContainer if it is open", async () => {
+            widget.init(mockActivity, 1);
+
+            // Open the cent adjustment container
+            widget.centsSliderBtn.onclick();
+            let container = widget.widgetWindow
+                .getWidgetBody()
+                .querySelector("#centAdjustmentContainer");
+            expect(container).not.toBeNull();
+            expect(widget.centAdjustmentOn).toBe(true);
+
+            // Click tuner button, which should close the cent adjustment container
+            await widget._tunerBtn.onclick();
+
+            container = widget.widgetWindow
+                .getWidgetBody()
+                .querySelector("#centAdjustmentContainer");
+            expect(container).toBeNull();
+            expect(widget.centAdjustmentOn).toBe(false);
         });
 
         test("init save button debounces and onclose cleans up", () => {
@@ -1075,13 +1137,39 @@ describe("Sampler Widget", () => {
             preview.disabled = false;
             save.disabled = false;
             const playSpy = jest.fn();
+            const pauseSpy = jest.fn();
+            let lastAudioInstance;
+            let firstAudioInstance;
             global.Audio = class {
                 constructor() {
                     this.play = playSpy;
+                    this.pause = pauseSpy;
+                    if (!firstAudioInstance) {
+                        firstAudioInstance = this;
+                    }
+                    lastAudioInstance = this;
                 }
             };
+
+            // 1st click: creates firstAudioInstance and plays
             preview.onclick();
-            expect(playSpy).toHaveBeenCalled();
+            expect(playSpy).toHaveBeenCalledTimes(1);
+
+            // 2nd click: should pause firstAudioInstance, and create lastAudioInstance
+            preview.onclick();
+            expect(pauseSpy).toHaveBeenCalledTimes(1);
+            expect(playSpy).toHaveBeenCalledTimes(2);
+
+            // Trigger onended on the CURRENT active instance (lastAudioInstance)
+            if (lastAudioInstance && lastAudioInstance.onended) {
+                lastAudioInstance.onended();
+            }
+
+            // Trigger onended on the OLD instance (firstAudioInstance)
+            // It should NOT set that.audioPreview to null (no crash, no state change)
+            if (firstAudioInstance && firstAudioInstance.onended) {
+                firstAudioInstance.onended();
+            }
 
             const clickSpy = jest
                 .spyOn(HTMLAnchorElement.prototype, "click")
@@ -1148,12 +1236,16 @@ describe("Sampler Widget", () => {
         test("_createPieMenu builds wheels and positions menu", () => {
             widget.init(mockActivity, 1);
             widget.pitchBtn.getBoundingClientRect = () => ({ x: 10, y: 20 });
+            window.configureExitWheel = jest.fn();
 
             widget._createPieMenu();
 
             expect(docById("wheelDivptm").style.display).toBe("");
             expect(widget._pitchWheel.createWheel).toBeDefined();
             expect(widget._accidentalsWheel.setTooltips).toHaveBeenCalled();
+            expect(window.configureExitWheel).toHaveBeenCalledWith(widget._exitWheel);
+
+            delete window.configureExitWheel;
         });
 
         test("_createPieMenu selection and exit handlers update pitch and close", () => {
@@ -1260,15 +1352,21 @@ describe("Sampler Widget", () => {
                 100,
                 100
             );
-            global.TunerUtils.frequencyToNote.mockReturnValue({ note: "A", cents: 0 });
+            global.TunerUtils.frequencyToNote.mockReturnValue({ note: "A", cents: -40 });
             global.detectPitch = jest.fn(() => 440);
-            widget.tunerSegments = [{ setAttribute: jest.fn() }];
+            widget.tunerSegments = [
+                { setAttribute: jest.fn() },
+                { setAttribute: jest.fn() },
+                { setAttribute: jest.fn() }
+            ];
             const querySelectorAll = jest.spyOn(document, "querySelectorAll");
 
             widget.makeCanvas(400, 300, 0, true);
             expect(widget.tunerDisplay.canvas).toBeTruthy();
-            expect(widget.tunerDisplay.update).toHaveBeenCalledWith("A", 0, 0);
+            expect(widget.tunerDisplay.update).toHaveBeenCalledWith("A", -40, 0);
             expect(widget.tunerSegments[0].setAttribute).toHaveBeenCalledWith("fill", "#0000ff");
+            expect(widget.tunerSegments[1].setAttribute).toHaveBeenCalledWith("fill", "#00ff00");
+            expect(widget.tunerSegments[2].setAttribute).toHaveBeenCalledWith("fill", "#ff0000");
             expect(querySelectorAll).not.toHaveBeenCalled();
             querySelectorAll.mockRestore();
         });
@@ -1315,18 +1413,38 @@ describe("Sampler Widget", () => {
             expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalled();
         });
 
+        test("cents slider button handles maximized widget window styling", () => {
+            widget.widgetWindow = widgetWindow;
+            widget.widgetWindow.isMaximized.mockReturnValue(true);
+
+            widget.init(mockActivity, 1);
+            widget.centsSliderBtn.onclick();
+
+            const body = widget.widgetWindow.getWidgetBody();
+            const divs = body.querySelectorAll("div");
+            let width60Count = 0;
+            for (let i = 0; i < divs.length; i++) {
+                if (divs[i].style.width === "60%") {
+                    width60Count++;
+                }
+            }
+            // One for sliderContainer, one for labelsDiv
+            expect(width60Count).toBe(2);
+        });
+
         test("makeTuner handles zero pitch properly", async () => {
             widget.widgetWindow = widgetWindow;
+            const getFloatTimeDomainData = jest.fn(buffer => {
+                for (let i = 0; i < buffer.length; i++) {
+                    buffer[i] = 0;
+                }
+            });
             const audioContext = {
                 sampleRate: 44100,
                 createMediaStreamSource: jest.fn(() => ({ connect: jest.fn() })),
                 createAnalyser: jest.fn(() => ({
                     fftSize: 0,
-                    getFloatTimeDomainData: jest.fn(buffer => {
-                        for (let i = 0; i < buffer.length; i++) {
-                            buffer[i] = 0;
-                        }
-                    })
+                    getFloatTimeDomainData
                 })),
                 close: jest.fn().mockResolvedValue()
             };
@@ -1350,11 +1468,15 @@ describe("Sampler Widget", () => {
 
             widget.makeTuner(400, 300);
 
-            const startButton = document.getElementById("start");
+            const widgetBody = widgetWindow.getWidgetBody();
+            const startButton = widgetBody.querySelector("#start");
+            const pitchElement = widgetBody.querySelector("#pitch");
+            pitchElement.textContent = "A";
+
             startButton.click();
 
             await Promise.resolve();
-            const pitchElement = document.getElementById("pitch");
+            expect(getFloatTimeDomainData).toHaveBeenCalled();
             expect(pitchElement.textContent).toBe("---");
         });
 
@@ -1387,6 +1509,69 @@ describe("Sampler Widget", () => {
             await Promise.resolve();
             expect(mockActivity.errorMsg).toHaveBeenCalledWith("Microphone access failed: no mic");
             errorSpy.mockRestore();
+        });
+
+        test("updatePitch returns early if pitch detection is stopped", async () => {
+            widget.widgetWindow = widgetWindow;
+            const getFloatTimeDomainData = jest.fn();
+            global.AudioContext = jest.fn(() => ({
+                sampleRate: 44100,
+                createMediaStreamSource: jest.fn(() => ({ connect: jest.fn() })),
+                createAnalyser: jest.fn(() => ({
+                    fftSize: 0,
+                    getFloatTimeDomainData
+                })),
+                close: jest.fn().mockResolvedValue()
+            }));
+            Object.defineProperty(window, "navigator", {
+                value: {
+                    mediaDevices: {
+                        getUserMedia: jest
+                            .fn()
+                            .mockResolvedValue({ getTracks: jest.fn(() => [{ stop: jest.fn() }]) })
+                    }
+                },
+                configurable: true
+            });
+
+            let capturedRafCb = null;
+            global.requestAnimationFrame = jest.fn(cb => {
+                capturedRafCb = cb;
+                return 1;
+            });
+
+            widget.makeTuner(400, 300);
+            const widgetBody = widgetWindow.getWidgetBody();
+            widgetBody.querySelector("#start").click();
+            await Promise.resolve();
+
+            expect(capturedRafCb).not.toBeNull();
+
+            widget.isPitchDetectionRunning = false;
+            capturedRafCb();
+
+            expect(getFloatTimeDomainData).not.toHaveBeenCalled();
+        });
+
+        test("stopPitchDetection catches audio context close error", () => {
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            widget.pitchDetectionStream = {
+                getTracks: jest.fn(() => [{ stop: jest.fn() }])
+            };
+            widget.pitchDetectionAudioContext = {
+                close: jest.fn(() => Promise.reject(new Error("already closed")))
+            };
+
+            widget.stopPitchDetection();
+
+            expect(widget.pitchDetectionAudioContext).toBeNull();
+            return Promise.resolve().then(() => {
+                expect(debugSpy).toHaveBeenCalledWith(
+                    "AudioContext close error (may already be closed):",
+                    expect.any(Error)
+                );
+                debugSpy.mockRestore();
+            });
         });
     });
 
