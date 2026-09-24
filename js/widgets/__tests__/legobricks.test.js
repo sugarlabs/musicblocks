@@ -1233,6 +1233,18 @@ describe("LegoWidget — Extended _filterSmallSegments coverage", () => {
     it("should absorb multiple consecutive small segments", () => {
         expect(legoWidget._filterSmallSegments([0, 200, 400, 600, 2000])).toEqual([0, 2000]);
     });
+
+    it("should merge a short trailing segment into the previous one", () => {
+        expect(legoWidget._filterSmallSegments([0, 1500, 2000])).toEqual([0, 2000]);
+    });
+
+    it("should append the final boundary when only the start boundary was kept", () => {
+        expect(legoWidget._filterSmallSegments([0, 500, 3000])).toEqual([0, 3000]);
+    });
+
+    it("should keep the final boundary when trailing small segments follow a kept one", () => {
+        expect(legoWidget._filterSmallSegments([0, 1500, 3000, 3400])).toEqual([0, 1500, 3400]);
+    });
 });
 
 describe("LegoWidget — Extended _analyzeColumnBoundaries coverage", () => {
@@ -1454,7 +1466,7 @@ describe("LegoWidget — _createWidgetWindow", () => {
     it("should look up, clear, and show the widget window", () => {
         const widgetWindow = legoWidget._createWidgetWindow();
 
-        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(legoWidget, "LEGO BRICKS");
+        expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(legoWidget, "LEGO Bricks");
         expect(widgetWindow).toBe(mockWindow);
         expect(legoWidget.widgetWindow).toBe(mockWindow);
         expect(mockWindow.clear).toHaveBeenCalled();
@@ -1599,5 +1611,733 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
 
         expect(mockImageDisplayArea.removeEventListener).toHaveBeenCalledTimes(6);
         expect(mockImageDisplayArea.addEventListener).toHaveBeenCalledTimes(6);
+    });
+
+    // -----------------------------------------------------------------------
+    // Eye dropper: colour sampling, hover preview and background display
+    // -----------------------------------------------------------------------
+
+    describe("eye dropper colour sampling", () => {
+        // jsdom canvases have no 2d context, so stand in a minimal one whose
+        // getImageData returns a known pixel. Only "canvas" is intercepted;
+        // every other createElement call falls through to the real DOM.
+        const stubCanvas = ({ rgb = [255, 0, 0], taint = false } = {}) => {
+            const ctx = {
+                // A cross-origin image does not make drawImage throw. It taints
+                // the canvas silently, and the SecurityError surfaces on the
+                // first pixel read, so that is where the failure is simulated.
+                drawImage: jest.fn(),
+                getImageData: jest.fn(() => {
+                    if (taint) {
+                        const err = new Error("Tainted canvases may not be read.");
+                        err.name = "SecurityError";
+                        throw err;
+                    }
+                    return { data: [...rgb, 255] };
+                })
+            };
+            const realCreate = document.createElement.bind(document);
+            jest.spyOn(document, "createElement").mockImplementation(tag => {
+                const el = realCreate(tag);
+                if (tag === "canvas") el.getContext = jest.fn(() => ctx);
+                return el;
+            });
+            return ctx;
+        };
+
+        const mountMedia = ({ w = 100, h = 100 } = {}) => {
+            const img = document.createElement("img");
+            img.getBoundingClientRect = () => ({ left: 0, top: 0, width: w, height: h });
+            Object.defineProperty(img, "naturalWidth", { value: w });
+            Object.defineProperty(img, "naturalHeight", { value: h });
+            const wrapper = document.createElement("div");
+            wrapper.appendChild(img);
+            legoWidget.imageWrapper = wrapper;
+            return img;
+        };
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it("returns null when no media has been loaded", () => {
+            legoWidget.imageWrapper = null;
+
+            expect(legoWidget._sampleColorAtPosition(10, 10)).toBeNull();
+        });
+
+        it("returns null when the wrapper holds neither an img nor a video", () => {
+            legoWidget.imageWrapper = document.createElement("div");
+
+            expect(legoWidget._sampleColorAtPosition(10, 10)).toBeNull();
+        });
+
+        it("returns null when the canvas has been tainted by a cross-origin image", () => {
+            const ctx = stubCanvas({ taint: true });
+            mountMedia();
+
+            expect(legoWidget._sampleColorAtPosition(50, 50)).toBeNull();
+            // The read is what fails, so it has to be attempted before the
+            // function can report the failure.
+            expect(ctx.getImageData).toHaveBeenCalled();
+        });
+
+        it.each([
+            ["left of the media", -5, 10],
+            ["above the media", 10, -5],
+            ["right of the media", 150, 10],
+            ["below the media", 10, 150]
+        ])("returns null for a point %s", (label, x, y) => {
+            stubCanvas();
+            mountMedia();
+
+            expect(legoWidget._sampleColorAtPosition(x, y)).toBeNull();
+        });
+
+        it("samples the pixel under the cursor and maps it to a colour family", () => {
+            const ctx = stubCanvas({ rgb: [255, 0, 0] });
+            mountMedia();
+
+            const result = legoWidget._sampleColorAtPosition(50, 50);
+
+            expect(ctx.drawImage).toHaveBeenCalled();
+            expect(ctx.getImageData).toHaveBeenCalledWith(50, 50, 1, 1);
+            // A pure red pixel must map to the red family, which is what
+            // proves the rgb -> hsl -> family chain actually ran.
+            expect(result).toEqual(expect.objectContaining({ name: "red" }));
+        });
+    });
+
+    describe("eye dropper mode toggle", () => {
+        it("activates on the first toggle", () => {
+            legoWidget.eyeDropperMode = false;
+            legoWidget._activateEyeDropper = jest.fn();
+            legoWidget._deactivateEyeDropper = jest.fn();
+
+            legoWidget._toggleEyeDropper();
+
+            expect(legoWidget.eyeDropperMode).toBe(true);
+            expect(legoWidget._activateEyeDropper).toHaveBeenCalledTimes(1);
+            expect(legoWidget._deactivateEyeDropper).not.toHaveBeenCalled();
+        });
+
+        it("deactivates on the second toggle", () => {
+            legoWidget.eyeDropperMode = true;
+            legoWidget._activateEyeDropper = jest.fn();
+            legoWidget._deactivateEyeDropper = jest.fn();
+
+            legoWidget._toggleEyeDropper();
+
+            expect(legoWidget.eyeDropperMode).toBe(false);
+            expect(legoWidget._deactivateEyeDropper).toHaveBeenCalledTimes(1);
+            expect(legoWidget._activateEyeDropper).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("eye dropper hover preview", () => {
+        const mountTooltip = () => {
+            legoWidget.colorPreviewTooltip = document.createElement("div");
+            legoWidget.colorSwatch = document.createElement("div");
+            legoWidget.colorPreviewText = document.createElement("span");
+        };
+
+        it("does nothing while eye dropper mode is off", () => {
+            mountTooltip();
+            legoWidget.eyeDropperMode = false;
+            legoWidget._sampleColorAtPosition = jest.fn();
+
+            legoWidget._handleEyeDropperHover({ clientX: 10, clientY: 10 });
+
+            expect(legoWidget._sampleColorAtPosition).not.toHaveBeenCalled();
+        });
+
+        it("does nothing when the tooltip has not been created", () => {
+            legoWidget.eyeDropperMode = true;
+            legoWidget.colorPreviewTooltip = null;
+            legoWidget._sampleColorAtPosition = jest.fn();
+
+            legoWidget._handleEyeDropperHover({ clientX: 10, clientY: 10 });
+
+            expect(legoWidget._sampleColorAtPosition).not.toHaveBeenCalled();
+        });
+
+        it("hides the tooltip when the cursor is off the media", () => {
+            mountTooltip();
+            legoWidget.eyeDropperMode = true;
+            legoWidget.colorPreviewTooltip.style.display = "block";
+            legoWidget._sampleColorAtPosition = jest.fn(() => null);
+
+            legoWidget._handleEyeDropperHover({ clientX: 10, clientY: 10 });
+
+            expect(legoWidget.colorPreviewTooltip.style.display).toBe("none");
+        });
+
+        it("shows the colour name and follows the cursor", () => {
+            mountTooltip();
+            legoWidget.eyeDropperMode = true;
+            legoWidget._sampleColorAtPosition = jest.fn(() => ({ name: "red" }));
+
+            legoWidget._handleEyeDropperHover({ clientX: 100, clientY: 200 });
+
+            expect(legoWidget.colorPreviewText.textContent).toBe("Red");
+            expect(legoWidget.colorPreviewTooltip.style.display).toBe("block");
+            expect(legoWidget.colorPreviewTooltip.style.left).toBe("115px");
+            expect(legoWidget.colorPreviewTooltip.style.top).toBe("160px");
+        });
+
+        it("hides the tooltip when the cursor leaves the area", () => {
+            mountTooltip();
+            legoWidget.colorPreviewTooltip.style.display = "block";
+
+            legoWidget._handleEyeDropperLeave({});
+
+            expect(legoWidget.colorPreviewTooltip.style.display).toBe("none");
+        });
+
+        it("leaving is a no-op when no tooltip exists", () => {
+            legoWidget.colorPreviewTooltip = null;
+
+            expect(() => legoWidget._handleEyeDropperLeave({})).not.toThrow();
+        });
+    });
+
+    describe("background colour display", () => {
+        // jsdom normalises any colour it is given to the rgb() form.
+        const hexToRgb = hex => {
+            const n = parseInt(hex.replace("#", ""), 16);
+            return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`;
+        };
+
+        it("is a no-op when the display element is absent", () => {
+            legoWidget.backgroundColorDisplay = null;
+
+            expect(() => legoWidget._updateBackgroundColorDisplay()).not.toThrow();
+        });
+
+        it("writes the colour name and a contrasting text colour", () => {
+            legoWidget.backgroundColorDisplay = document.createElement("div");
+            legoWidget.selectedBackgroundColor = { name: "yellow" };
+
+            legoWidget._updateBackgroundColorDisplay();
+
+            const style = legoWidget.backgroundColorDisplay.style;
+            expect(legoWidget.backgroundColorDisplay.textContent).toBe("yellow");
+            // Yellow is a light colour, so the update must paint the swatch
+            // yellow and drop the label to black to stay legible.
+            expect(style.backgroundColor).toBe(hexToRgb(legoWidget._getColorHex("yellow")));
+            expect(style.color).toBe("rgb(0, 0, 0)");
+        });
+
+        it("uses a light label on a dark background", () => {
+            legoWidget.backgroundColorDisplay = document.createElement("div");
+            legoWidget.selectedBackgroundColor = { name: "blue" };
+
+            legoWidget._updateBackgroundColorDisplay();
+
+            expect(legoWidget.backgroundColorDisplay.style.color).toBe("rgb(255, 255, 255)");
+        });
+
+        it("falls back to grey for an unknown colour name", () => {
+            expect(legoWidget._getColorHex("definitely-not-a-colour")).toBe("#808080");
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    // Zoom and vertical-spacing controls
+    // -----------------------------------------------------------------------
+
+    describe("zoom and vertical spacing controls", () => {
+        // Both handlers defer a grid redraw through setTimeout. Capture the
+        // scheduled callback rather than installing fake timers, which other
+        // suites in this file have already disturbed.
+        let scheduled;
+
+        const mountControls = () => {
+            legoWidget.zoomSlider = document.createElement("input");
+            legoWidget.zoomValue = document.createElement("span");
+            legoWidget.spacingSlider = document.createElement("input");
+            legoWidget.spacingValue = document.createElement("span");
+            legoWidget._drawGridLines = jest.fn();
+        };
+
+        beforeEach(() => {
+            scheduled = [];
+            jest.spyOn(global, "setTimeout").mockImplementation((fn, delay) => {
+                scheduled.push({ fn, delay });
+                return 0;
+            });
+            mountControls();
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        describe("_showZoomControls", () => {
+            it("initialises the zoom controls to 100 percent", () => {
+                legoWidget.verticalSpacing = 20;
+
+                legoWidget._showZoomControls();
+
+                expect(legoWidget.currentZoom).toBe(1);
+                expect(legoWidget.zoomSlider.value).toBe("1");
+                expect(legoWidget.zoomValue.textContent).toBe("100%");
+            });
+
+            it("mirrors the current vertical spacing onto its slider", () => {
+                legoWidget.verticalSpacing = 35;
+
+                legoWidget._showZoomControls();
+
+                expect(legoWidget.spacingSlider.value).toBe("35");
+                expect(legoWidget.spacingValue.textContent).toBe("35px");
+            });
+        });
+
+        describe("_adjustZoom", () => {
+            it("applies the delta and formats to two decimals", () => {
+                legoWidget.zoomSlider.value = "1";
+
+                legoWidget._adjustZoom(0.25);
+
+                expect(legoWidget.zoomSlider.value).toBe("1.25");
+            });
+
+            it("clamps at the 3x maximum", () => {
+                legoWidget.zoomSlider.value = "2.9";
+
+                legoWidget._adjustZoom(5);
+
+                expect(legoWidget.zoomSlider.value).toBe("3.00");
+            });
+
+            it("clamps at the 0.1x minimum", () => {
+                legoWidget.zoomSlider.value = "0.2";
+
+                legoWidget._adjustZoom(-5);
+
+                expect(legoWidget.zoomSlider.value).toBe("0.10");
+            });
+
+            it("applies the new zoom straight away", () => {
+                legoWidget.imageWrapper = document.createElement("div");
+                legoWidget.zoomSlider.value = "1";
+
+                legoWidget._adjustZoom(0.5);
+
+                expect(legoWidget.currentZoom).toBe(1.5);
+                expect(legoWidget.zoomValue.textContent).toBe("150%");
+            });
+        });
+
+        describe("_handleZoom", () => {
+            it("does nothing until media has been loaded", () => {
+                legoWidget.imageWrapper = null;
+                legoWidget.zoomSlider.value = "2";
+
+                expect(() => legoWidget._handleZoom()).not.toThrow();
+                expect(legoWidget.zoomValue.textContent).toBe("");
+                expect(scheduled).toHaveLength(0);
+            });
+
+            it("scales the wrapper and reports the percentage", () => {
+                legoWidget.imageWrapper = document.createElement("div");
+                legoWidget.zoomSlider.value = "1.5";
+
+                legoWidget._handleZoom();
+
+                expect(legoWidget.imageWrapper.style.transform).toBe("scale(1.5)");
+                expect(legoWidget.zoomValue.textContent).toBe("150%");
+                expect(legoWidget.imageWrapper.style.width).toBe("100%");
+                expect(legoWidget.imageWrapper.style.height).toBe("100%");
+            });
+
+            it("defers the grid redraw until the scale has settled", () => {
+                legoWidget.imageWrapper = document.createElement("div");
+                legoWidget.zoomSlider.value = "2";
+
+                legoWidget._handleZoom();
+
+                expect(legoWidget._drawGridLines).not.toHaveBeenCalled();
+                expect(scheduled).toHaveLength(1);
+                expect(scheduled[0].delay).toBe(50);
+
+                scheduled[0].fn();
+                expect(legoWidget._drawGridLines).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("_adjustVerticalSpacing", () => {
+            it("applies the delta", () => {
+                legoWidget.spacingSlider.value = "20";
+
+                legoWidget._adjustVerticalSpacing(5);
+
+                expect(legoWidget.spacingSlider.value).toBe("25");
+                expect(legoWidget.verticalSpacing).toBe(25);
+            });
+
+            it("clamps at the 200px maximum", () => {
+                legoWidget.spacingSlider.value = "195";
+
+                legoWidget._adjustVerticalSpacing(50);
+
+                expect(legoWidget.spacingSlider.value).toBe("200");
+            });
+
+            it("clamps at the 2px minimum", () => {
+                legoWidget.spacingSlider.value = "5";
+
+                legoWidget._adjustVerticalSpacing(-50);
+
+                expect(legoWidget.spacingSlider.value).toBe("2");
+            });
+        });
+
+        describe("_createSpacingControls", () => {
+            it("wires the − and + buttons to the same step magnitude", () => {
+                const [, spacingOut, , spacingIn] = legoWidget._createSpacingControls();
+                legoWidget.spacingSlider.value = "50";
+
+                spacingOut.onclick();
+                expect(legoWidget.spacingSlider.value).toBe("45");
+
+                spacingIn.onclick();
+                expect(legoWidget.spacingSlider.value).toBe("50");
+            });
+        });
+
+        describe("_handleVerticalSpacing", () => {
+            it("reads the slider and labels it in pixels", () => {
+                legoWidget.spacingSlider.value = "42";
+
+                legoWidget._handleVerticalSpacing();
+
+                expect(legoWidget.verticalSpacing).toBe(42);
+                expect(legoWidget.spacingValue.textContent).toBe("42px");
+            });
+
+            it("defers the grid redraw after the spacing changes", () => {
+                legoWidget.spacingSlider.value = "30";
+
+                legoWidget._handleVerticalSpacing();
+
+                expect(legoWidget._drawGridLines).not.toHaveBeenCalled();
+                expect(scheduled).toHaveLength(1);
+                expect(scheduled[0].delay).toBe(50);
+
+                scheduled[0].fn();
+                expect(legoWidget._drawGridLines).toHaveBeenCalledTimes(1);
+            });
+        });
+    });
+});
+
+describe("_savePhrase chord block connection hierarchy", () => {
+    const originalUnderscore = global._;
+    afterEach(() => {
+        global._ = originalUnderscore;
+    });
+
+    it("correctly chains sequential pitch blocks for a chord", () => {
+        const legoWidget = new LegoWidget();
+
+        global._ = val => val;
+
+        legoWidget.colorData = [{ color: "red" }];
+        legoWidget._collectNotesToPlay = jest.fn();
+        legoWidget._notesToPlay = [
+            {
+                noteValue: 1,
+                pitches: [
+                    { solfege: "do", octave: 4 },
+                    { solfege: "mi", octave: 4 },
+                    { solfege: "sol", octave: 4 }
+                ],
+                isRest: false
+            }
+        ];
+
+        let generatedStack = null;
+
+        legoWidget.activity = {
+            textMsg: jest.fn(),
+            refreshCanvas: jest.fn(),
+            blocks: {
+                palettes: { dict: {} },
+                loadNewBlocks: jest.fn(stack => {
+                    generatedStack = stack;
+                })
+            }
+        };
+
+        legoWidget._savePhrase();
+
+        expect(legoWidget.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        expect(generatedStack).toBeDefined();
+
+        const pitchBlocks = generatedStack.filter(block => block[1] === "pitch");
+
+        expect(pitchBlocks).toHaveLength(3);
+
+        const vspaceBlock = generatedStack.find(block => block[1] === "vspace");
+
+        const firstPitchId = pitchBlocks[0][0];
+        const secondPitchId = pitchBlocks[1][0];
+        const thirdPitchId = pitchBlocks[2][0];
+
+        // vspace → first pitch → second pitch → third pitch
+        expect(pitchBlocks[0][4][0]).toBe(vspaceBlock[0]);
+        expect(pitchBlocks[0][4][3]).toBe(secondPitchId);
+
+        expect(pitchBlocks[1][4][0]).toBe(firstPitchId);
+        expect(pitchBlocks[1][4][3]).toBe(thirdPitchId);
+
+        expect(pitchBlocks[2][4][0]).toBe(secondPitchId);
+        expect(pitchBlocks[2][4][3]).toBeNull();
+    });
+});
+
+describe("LegoWidget — _clearPhrase and _initializeMatrix safety (Issue #8609)", () => {
+    let legoWidget;
+
+    beforeEach(() => {
+        global._ = jest.fn(val => val);
+        global.platformColor = {
+            background: "#ffffff",
+            strokeColor: "#333333",
+            selectorSelected: "#0066FF",
+            textColor: "#000000",
+            selectorBackgroundHOFF: "#f8f8f8"
+        };
+        legoWidget = new LegoWidget();
+        legoWidget.activity = {
+            textMsg: jest.fn(),
+            hideMsgs: jest.fn()
+        };
+    });
+
+    afterEach(() => {
+        delete global._;
+        delete global.platformColor;
+    });
+
+    it("should execute _clearPhrase safely without throwing when matrixTable is undefined", () => {
+        expect(legoWidget.matrixTable).toBeUndefined();
+        expect(() => legoWidget._clearPhrase()).not.toThrow();
+        expect(legoWidget.activity.textMsg).toHaveBeenCalledWith("Phrase cleared");
+    });
+
+    it("should reset colorData, _notesToPlay, and hasGeneratedVisualization", () => {
+        legoWidget.colorData = [{ note: "C4", colorSegments: [{ color: "red", duration: 500 }] }];
+        legoWidget._notesToPlay = [{ noteValue: 1, pitches: [] }];
+        legoWidget.hasGeneratedVisualization = true;
+
+        legoWidget._clearPhrase();
+
+        expect(legoWidget.colorData).toEqual([]);
+        expect(legoWidget._notesToPlay).toEqual([]);
+        expect(legoWidget.hasGeneratedVisualization).toBe(false);
+    });
+
+    it("should stop active playback when isPlaying is true", () => {
+        legoWidget.isPlaying = true;
+        legoWidget._stopPlayback = jest.fn();
+
+        legoWidget._clearPhrase();
+
+        expect(legoWidget._stopPlayback).toHaveBeenCalled();
+        expect(legoWidget.hasGeneratedVisualization).toBe(false);
+    });
+
+    it("should remove column lines from gridOverlay", () => {
+        const overlay = document.createElement("div");
+        const colLine1 = document.createElement("div");
+        colLine1.className = "column-line";
+        const colLine2 = document.createElement("div");
+        colLine2.className = "column-line";
+        const otherEl = document.createElement("div");
+        otherEl.className = "grid-line";
+
+        overlay.appendChild(colLine1);
+        overlay.appendChild(colLine2);
+        overlay.appendChild(otherEl);
+
+        legoWidget.gridOverlay = overlay;
+
+        legoWidget._clearPhrase();
+
+        expect(overlay.querySelectorAll(".column-line")).toHaveLength(0);
+        expect(overlay.querySelectorAll(".grid-line")).toHaveLength(1);
+    });
+
+    it("should remove scanning lines from DOM and reset scanningLines to null", () => {
+        const parent = document.createElement("div");
+        const lineEl = document.createElement("div");
+        parent.appendChild(lineEl);
+
+        legoWidget.scanningLines = [{ element: lineEl, currentX: 10 }];
+
+        legoWidget._clearPhrase();
+
+        expect(lineEl.parentNode).toBeNull();
+        expect(legoWidget.scanningLines).toBeNull();
+    });
+
+    it("should clear matrixData.selectedCells when present", () => {
+        legoWidget.matrixData.selectedCells.add("cell-0-0");
+        expect(legoWidget.matrixData.selectedCells.size).toBe(1);
+
+        legoWidget._clearPhrase();
+
+        expect(legoWidget.matrixData.selectedCells.size).toBe(0);
+    });
+
+    it("should clear cells in matrixTable if matrixTable exists", () => {
+        const table = document.createElement("table");
+        const row = table.insertRow();
+        const cell = row.insertCell();
+        cell.setAttribute("data-cell-id", "0-0");
+        cell.style.backgroundColor = "red";
+        const dot = document.createElement("div");
+        dot.className = "cell-dot";
+        cell.appendChild(dot);
+
+        legoWidget.matrixTable = table;
+
+        legoWidget._clearPhrase();
+
+        expect(cell.style.backgroundColor).toBe("");
+        expect(cell.querySelector(".cell-dot")).toBeNull();
+    });
+
+    it("should handle missing activity and gridOverlay gracefully", () => {
+        legoWidget.activity = null;
+        legoWidget.gridOverlay = null;
+
+        expect(() => legoWidget._clearPhrase()).not.toThrow();
+        expect(legoWidget.colorData).toEqual([]);
+    });
+
+    it("should return early in _initializeMatrix without crashing when matrixTable is undefined", () => {
+        expect(legoWidget.matrixTable).toBeUndefined();
+        expect(() => legoWidget._initializeMatrix()).not.toThrow();
+    });
+
+    it("should cancel ongoing polyphonic playback and silence active notes when _clearPhrase is called", async () => {
+        legoWidget.synth = {
+            trigger: jest.fn(),
+            stopSound: jest.fn()
+        };
+        legoWidget.selectedInstrument = "electronic synth";
+        legoWidget.selectedBackgroundColor = { name: "green" };
+        legoWidget.colorData = [
+            {
+                note: "C4",
+                label: "C (4)",
+                colorSegments: [
+                    { color: "red", duration: 1500 },
+                    { color: "red", duration: 1500 }
+                ]
+            },
+            {
+                note: "E4",
+                label: "E (4)",
+                colorSegments: [
+                    { color: "red", duration: 1500 },
+                    { color: "red", duration: 1500 }
+                ]
+            }
+        ];
+
+        legoWidget._analyzeColumnBoundaries = () => [0, 1500, 3000];
+        legoWidget._filterSmallSegments = boundaries => boundaries;
+
+        const playbackPromise = legoWidget.playColorMusicPolyphonic(legoWidget.colorData);
+
+        // At time 0, notes start playing
+        expect(legoWidget.synth.trigger).toHaveBeenCalledWith(
+            0,
+            "C4",
+            999,
+            "electronic synth",
+            null,
+            null,
+            false,
+            0
+        );
+        expect(legoWidget._playingNotes.has("C4")).toBe(true);
+
+        const initialTriggerCount = legoWidget.synth.trigger.mock.calls.length;
+
+        // Clear while awaiting between notes
+        legoWidget._clearPhrase();
+
+        // Sound should be stopped immediately
+        expect(legoWidget.synth.stopSound).toHaveBeenCalledWith(0, "electronic synth", "C4");
+        expect(legoWidget._playingNotes.size).toBe(0);
+
+        // Playback promise should resolve cleanly without hanging
+        await playbackPromise;
+
+        // No new notes should have been triggered
+        expect(legoWidget.synth.trigger).toHaveBeenCalledTimes(initialTriggerCount);
+    });
+
+    it("should cancel ongoing polyphonic playback when _stopPlayback is called directly", async () => {
+        legoWidget.synth = {
+            trigger: jest.fn(),
+            stopSound: jest.fn()
+        };
+        legoWidget.selectedInstrument = "electronic synth";
+        legoWidget.selectedBackgroundColor = { name: "green" };
+        legoWidget.colorData = [
+            {
+                note: "G4",
+                label: "G (4)",
+                colorSegments: [{ color: "red", duration: 1500 }]
+            }
+        ];
+
+        legoWidget._analyzeColumnBoundaries = () => [0, 1500];
+        legoWidget._filterSmallSegments = boundaries => boundaries;
+
+        const playbackPromise = legoWidget.playColorMusicPolyphonic(legoWidget.colorData);
+        expect(legoWidget.synth.trigger).toHaveBeenCalledWith(
+            0,
+            "G4",
+            999,
+            "electronic synth",
+            null,
+            null,
+            false,
+            0
+        );
+
+        legoWidget._stopPlayback();
+
+        expect(legoWidget.synth.stopSound).toHaveBeenCalledWith(0, "electronic synth", "G4");
+        await playbackPromise;
+    });
+
+    describe("_drawGridLines during playback", () => {
+        it("keeps the scanning lines attached to the overlay when the grid is redrawn", () => {
+            legoWidget.matrixData = { rows: [{ note: "C" }, { note: "D" }] };
+            legoWidget.rowHeaderTable = { rows: [{}, {}] };
+            legoWidget.gridOverlay = document.createElement("div");
+            legoWidget.verticalSpacing = 50;
+
+            const scanLine = document.createElement("div");
+            legoWidget.gridOverlay.appendChild(scanLine);
+            legoWidget.scanningLines = [{ element: scanLine }];
+
+            legoWidget._drawGridLines();
+
+            expect(scanLine.parentNode).toBe(legoWidget.gridOverlay);
+            const redLines = Array.from(legoWidget.gridOverlay.children).filter(
+                el => el.style.backgroundColor === "red"
+            );
+            expect(redLines).toHaveLength(2);
+        });
     });
 });

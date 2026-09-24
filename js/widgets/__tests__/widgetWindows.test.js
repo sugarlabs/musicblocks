@@ -72,6 +72,28 @@ function createTestWindow(title = "Test Title", fullscreen = true) {
 }
 
 beforeEach(() => {
+    if (window.widgetWindows._boundHandleGlobalKeyDown) {
+        document.removeEventListener(
+            "keydown",
+            window.widgetWindows._boundHandleGlobalKeyDown,
+            true
+        );
+        document.removeEventListener(
+            "mouseup",
+            window.widgetWindows._boundHandleGlobalMouseUp,
+            true
+        );
+        document.removeEventListener(
+            "mousemove",
+            window.widgetWindows._boundHandleGlobalMouseMove,
+            true
+        );
+        document.removeEventListener(
+            "mousedown",
+            window.widgetWindows._boundHandleGlobalMouseDown,
+            true
+        );
+    }
     // Clear the floatingWindows container but keep it in DOM
     floatingWindows.innerHTML = "";
     // Reset open windows tracking but preserve functions
@@ -165,11 +187,11 @@ describe("widgetWindows", () => {
             createTestWindow("Window 2");
             createTestWindow("Window 3");
 
-            // mouseup, mousemove, mousedown (each once)
-            const globalMouseListeners = addSpy.mock.calls.filter(call =>
-                ["mouseup", "mousemove", "mousedown"].includes(call[0])
+            // mouseup, mousemove, mousedown, keydown (each once)
+            const globalListeners = addSpy.mock.calls.filter(call =>
+                ["mouseup", "mousemove", "mousedown", "keydown"].includes(call[0])
             );
-            expect(globalMouseListeners).toHaveLength(3);
+            expect(globalListeners).toHaveLength(4);
 
             addSpy.mockRestore();
         });
@@ -335,6 +357,28 @@ describe("widgetWindows", () => {
             win.addButton("c.svg", 24, "C");
 
             expect(win._buttons).toHaveLength(3);
+        });
+
+        test("modifyButton still addresses the live buttons after a re-init", () => {
+            // A widget that re-initialises on an already open window (see
+            // Blocks.reInitWidget) calls clear() and then re-adds its buttons.
+            const win = createTestWindow();
+            win.clear();
+            win.addButton("play-button.svg", 24, "Play");
+            win.addButton("erase-button.svg", 24, "Clear");
+
+            win.clear();
+            win.addButton("play-button.svg", 24, "Play");
+            win.addButton("erase-button.svg", 24, "Clear");
+
+            expect(win._buttons).toHaveLength(2);
+
+            const target = win.modifyButton(0, "stop-button.svg", 24, "Stop");
+
+            expect(win._toolbar.contains(target)).toBe(true);
+            expect(win._toolbar.querySelector("img").getAttribute("src")).toBe(
+                "header-icons/stop-button.svg"
+            );
         });
     });
 
@@ -605,7 +649,7 @@ describe("widgetWindows", () => {
     });
 
     describe("updateTitle", () => {
-        test("updates the title element innerHTML", () => {
+        test("updates the title element textContent", () => {
             const win = createTestWindow("Old Title");
             const key = win._key;
             const titleEl = document.getElementById(key + "WidgetID");
@@ -613,7 +657,7 @@ describe("widgetWindows", () => {
 
             win.updateTitle("New Title");
 
-            expect(titleEl.innerHTML).toBe("New Title");
+            expect(titleEl.textContent).toBe("New Title");
         });
 
         test("keeps the frame's aria-label in sync with the new title", () => {
@@ -948,7 +992,7 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.focused).toBe(win1);
 
             const escEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
-            window.dispatchEvent(escEvent);
+            document.dispatchEvent(escEvent);
 
             expect(closeSpy1).toHaveBeenCalledTimes(1);
             expect(closeSpy2).not.toHaveBeenCalled();
@@ -965,7 +1009,7 @@ describe("widgetWindows", () => {
                 shiftKey: true,
                 bubbles: true
             });
-            window.dispatchEvent(maxEvent);
+            document.dispatchEvent(maxEvent);
 
             expect(win1.isMaximized()).toBe(true);
             expect(win2.isMaximized()).toBe(false);
@@ -986,7 +1030,7 @@ describe("widgetWindows", () => {
             [input, textarea, contentEditable].forEach(element => {
                 element.focus();
                 const event = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
-                window.dispatchEvent(event);
+                document.dispatchEvent(event);
             });
 
             expect(win.onclose).not.toHaveBeenCalled();
@@ -1006,7 +1050,7 @@ describe("widgetWindows", () => {
                 repeat: true,
                 bubbles: true
             });
-            window.dispatchEvent(event);
+            document.dispatchEvent(event);
 
             expect(win.onclose).not.toHaveBeenCalled();
         });
@@ -1027,6 +1071,24 @@ describe("widgetWindows", () => {
             document.dispatchEvent(upEvent);
             expect(win._dragTopHandler).toHaveBeenCalledWith(upEvent);
             expect(window.widgetWindows.draggingWindow).toBeNull();
+        });
+
+        test("recalculates _dx and _dy after restoring a maximized window during drag", () => {
+            const win = createTestWindow("MaxDrag Window");
+            win._maximize();
+
+            // Stale offsets from the maximized state
+            win._dx = 999;
+            win._dy = 999;
+
+            const moveEvent = { clientX: 200, clientY: 300, preventDefault: jest.fn() };
+            win._docMouseMoveHandler(moveEvent);
+
+            // After restore, _maximized should be false
+            expect(win._maximized).toBe(false);
+            // _dx and _dy should have been recalculated (no longer 999)
+            expect(win._dx).not.toBe(999);
+            expect(win._dy).not.toBe(999);
         });
     });
 
@@ -1138,7 +1200,7 @@ describe("widgetWindows", () => {
         });
 
         it("closes matching widget by name", () => {
-            const mockElement = { innerHTML: "TestWidget" };
+            const mockElement = { textContent: "TestWidget", id: "" };
 
             document.getElementsByClassName = jest.fn(() => [mockElement]);
 
@@ -1162,14 +1224,14 @@ describe("widgetWindows", () => {
                 "pitch drum": { close: jest.fn() }
             };
 
-            window.widgetWindows.closeBlkWidgets("pitch-drum mapper");
+            window.widgetWindows.closeBlkWidgets("pitch drum");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
         });
 
         it("closes widget by matching element ID when display title changes", () => {
             const mockElement = {
-                innerHTML: "C MAJOR",
+                textContent: "C MAJOR",
                 id: "custom modeWidgetID"
             };
 
@@ -1181,11 +1243,178 @@ describe("widgetWindows", () => {
         });
 
         it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [{ innerHTML: "OtherWidget" }]);
+            document.getElementsByClassName = jest.fn(() => [
+                { textContent: "OtherWidget", id: "" }
+            ]);
 
             window.widgetWindows.closeBlkWidgets("TestWidget");
 
             expect(window.widgetWindows.closeWindow).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("isReinitWidgetTitle()", () => {
+        it("recognizes titles used by open-widget stack reinitialization", () => {
+            expect(window.widgetWindows.isReinitWidgetTitle("tempo")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("LEGO Bricks")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("arpeggio")).toBe(true);
+            expect(window.widgetWindows.isReinitWidgetTitle("not a widget")).toBe(false);
+        });
+
+        it("keeps REINIT_WIDGET_TITLES as the single lookup source", () => {
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("custom mode")).toBe(true);
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("mode")).toBe(true);
+            expect(window.widgetWindows.REINIT_WIDGET_TITLES.has("sampler")).toBe(false);
+        });
+
+        it("recognizes a localized title that differs from the English registry entry", () => {
+            // Temporarily replace _ with a translator that maps "pitch drum"
+            // to its German equivalent, simulating a non-English locale.
+            const originalTranslate = global._;
+
+            try {
+                global._ = str => (str === "pitch drum" ? "Tonhöhen-Schlagzeug" : str);
+
+                // The localized form should be recognized…
+                expect(window.widgetWindows.isReinitWidgetTitle("Tonhöhen-Schlagzeug")).toBe(true);
+                // …while the raw English string is no longer a match under this locale.
+                expect(window.widgetWindows.isReinitWidgetTitle("pitch drum")).toBe(false);
+            } finally {
+                global._ = originalTranslate;
+            }
+        });
+    });
+
+    describe("Global Keydown Listeners & Shortcuts", () => {
+        beforeEach(() => {
+            if (window.widgetWindows._handleGlobalKeyDown) {
+                document.removeEventListener(
+                    "keydown",
+                    window.widgetWindows._handleGlobalKeyDown,
+                    true
+                );
+            }
+            window.widgetWindows._globalListenersInitialized = false;
+        });
+
+        test("registers keydown event listener in _initGlobalListeners", () => {
+            const addSpy = jest.spyOn(document, "addEventListener");
+            window.widgetWindows._globalListenersInitialized = false;
+            window.widgetWindows._initGlobalListeners();
+
+            expect(addSpy).toHaveBeenCalledWith("keydown", expect.any(Function), true);
+            addSpy.mockRestore();
+        });
+
+        test("pressing Escape closes the focused window", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            document.dispatchEvent(escapeEvent);
+
+            expect(win.onclose).toHaveBeenCalledTimes(1);
+        });
+
+        test("pressing Cmd/Ctrl+Shift+M toggles maximize on focused window", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win._fullscreenEnabled = true;
+            win._maximize = jest.fn();
+            win.onmaximize = jest.fn();
+            win.takeFocus = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            document.dispatchEvent(maxEvent);
+
+            expect(win._maximize).toHaveBeenCalledTimes(1);
+            expect(win.onmaximize).toHaveBeenCalledTimes(1);
+        });
+
+        test("ignores shortcut when e.repeat is true", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const repeatEvent = new KeyboardEvent("keydown", {
+                key: "Escape",
+                repeat: true,
+                bubbles: true
+            });
+            document.dispatchEvent(repeatEvent);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+        });
+
+        test("ignores shortcut when focus is inside an input, textarea, or contenteditable element", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const inputEl = document.createElement("input");
+            document.body.appendChild(inputEl);
+            inputEl.focus();
+
+            const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            document.dispatchEvent(escapeEvent);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+
+            document.body.removeChild(inputEl);
+        });
+
+        test("does not maximize when _fullscreenEnabled is false", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win._fullscreenEnabled = false;
+            win._maximize = jest.fn();
+            win.onmaximize = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            document.dispatchEvent(maxEvent);
+
+            expect(win._maximize).not.toHaveBeenCalled();
+            expect(win.onmaximize).not.toHaveBeenCalled();
+        });
+
+        test("restores window when Cmd/Ctrl+Shift+M is pressed on maximized window", () => {
+            window.widgetWindows._initGlobalListeners();
+            const win = createTestWindow();
+            win._fullscreenEnabled = true;
+            win._maximized = true;
+            win._restore = jest.fn();
+            win.sendToCenter = jest.fn();
+            win.takeFocus = jest.fn();
+            win.onmaximize = jest.fn();
+            window.widgetWindows.focused = win;
+
+            const maxEvent = new KeyboardEvent("keydown", {
+                code: "KeyM",
+                metaKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            document.dispatchEvent(maxEvent);
+
+            expect(win._restore).toHaveBeenCalledTimes(1);
+            expect(win.sendToCenter).toHaveBeenCalledTimes(1);
+            expect(win.onmaximize).toHaveBeenCalledTimes(1);
         });
     });
 });

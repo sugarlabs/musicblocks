@@ -129,15 +129,19 @@ const {
     getTextWidth,
     doSVG,
     isSVGEmpty,
-    prepareMacroExports,
-    processMacroData,
     hideDOMLabel,
     displayMsg,
     makeKeyboardAccessible,
-    CameraManager,
     announceToScreenReader,
     _
 } = require("../utils.js");
+
+const { processMacroData, prepareMacroExports } = require("../macro-utils.js");
+const {
+    updatePluginObj,
+    processRawPluginData,
+    preparePluginExports
+} = require("../plugin-utils.js");
 
 describe("makeKeyboardAccessible()", () => {
     test("adds button semantics and activates on Enter and Space", () => {
@@ -273,7 +277,31 @@ describe("Utility Functions (logic-only)", () => {
             expect(mixedNumber(2)).toBe("2/1");
         });
         it("handles negative fraction", () => {
-            expect(mixedNumber(-1.5)).toBe("-2 1/2");
+            // The sign is carried on the front and the whole/fractional parts
+            // come from the magnitude, so this reads as -1.5 and not -2.5.
+            expect(mixedNumber(-1.5)).toBe("-1 1/2");
+            expect(mixedNumber(-2.75)).toBe("-2 3/4");
+        });
+
+        it("keeps a negative proper fraction below one", () => {
+            expect(mixedNumber(-0.25)).toBe("-1/4");
+            expect(mixedNumber(-0.5)).toBe("-1/2");
+            expect(mixedNumber(-0.875)).toBe("-7/8");
+        });
+
+        it("handles negative integers", () => {
+            expect(mixedNumber(-2)).toBe("-2/1");
+            expect(mixedNumber(-1)).toBe("-1/1");
+        });
+
+        it("formats negatives as the mirror of their positive counterpart", () => {
+            for (const n of [0.25, 0.5, 0.875, 1.5, 2.25, 2.75, 3, 1.9999999999, 2.123456]) {
+                expect(mixedNumber(-n)).toBe("-" + mixedNumber(n));
+            }
+        });
+
+        it("treats negative zero as zero", () => {
+            expect(mixedNumber(-0)).toBe("0/1");
         });
 
         it("handles zero", () => {
@@ -380,6 +408,19 @@ describe("Utility Functions (logic-only)", () => {
 
         it("handles numbers greater than 1", () => {
             expect(rationalToFraction(2)).toEqual([2, 1]);
+            expect(rationalToFraction(4 / 3)).toEqual([4, 3]);
+        });
+
+        it("handles negative numbers", () => {
+            expect(rationalToFraction(-0.5)).toEqual([-1, 2]);
+            expect(rationalToFraction(-2.5)).toEqual([-5, 2]);
+        });
+
+        it("handles numbers exceeding iteration cap without returning reciprocal", () => {
+            const [n, d] = rationalToFraction(Math.PI);
+            expect(n / d).toBeGreaterThan(1);
+            expect(Math.abs(n / d - Math.PI)).toBeLessThan(0.001);
+            expect(d).toBeGreaterThan(0);
         });
     });
 
@@ -1306,62 +1347,215 @@ describe("announceToScreenReader()", () => {
     });
 });
 
-describe("CameraManager", () => {
+describe("Plugin and Macro Utilities", () => {
+    let mockActivity;
+
     beforeEach(() => {
-        CameraManager.reset();
-        jest.useFakeTimers();
-    });
-
-    afterEach(() => {
-        CameraManager.reset();
-        jest.useRealTimers();
-    });
-
-    it("starts and stops capture correctly", () => {
-        const drawFn = jest.fn();
-        const id = CameraManager.startCapture(drawFn, 100);
-        expect(id).not.toBeNull();
-        expect(CameraManager.intervalId).toBe(id);
-
-        jest.advanceTimersByTime(250);
-        expect(drawFn).toHaveBeenCalledTimes(2);
-
-        CameraManager.stopCapture();
-        expect(CameraManager.intervalId).toBeNull();
-
-        jest.advanceTimersByTime(200);
-        expect(drawFn).toHaveBeenCalledTimes(2); // Should not increase
-    });
-
-    it("startCapture is idempotent", () => {
-        const id1 = CameraManager.startCapture(jest.fn(), 100);
-        const id2 = CameraManager.startCapture(jest.fn(), 100);
-        expect(id1).toBe(id2);
-    });
-
-    it("sets and clears canplay listener", () => {
-        const video = {
-            addEventListener: jest.fn(),
-            removeEventListener: jest.fn()
+        mockActivity = {
+            pluginObjs: {
+                PALETTEPLUGINS: {},
+                PALETTEFILLCOLORS: {},
+                PALETTESTROKECOLORS: {},
+                PALETTEHIGHLIGHTCOLORS: {},
+                FLOWPLUGINS: {},
+                ARGPLUGINS: {},
+                BLOCKPLUGINS: {},
+                MACROPLUGINS: {},
+                ONLOAD: {},
+                ONSTART: {},
+                ONSTOP: {}
+            },
+            errorMsg: jest.fn()
         };
-        const handler = jest.fn();
-
-        CameraManager.setCanplayListener(video, handler);
-        expect(video.addEventListener).toHaveBeenCalledWith("canplay", handler, false);
-        expect(CameraManager.canPlayHandler).toBe(handler);
-        expect(CameraManager.listenerVideoElement).toBe(video);
-
-        CameraManager.clearCanplayListener();
-        expect(video.removeEventListener).toHaveBeenCalledWith("canplay", handler, false);
-        expect(CameraManager.canPlayHandler).toBeNull();
-        expect(CameraManager.listenerVideoElement).toBeNull();
     });
 
-    it("reset clears interval and listener", () => {
-        CameraManager.intervalId = 123;
-        CameraManager.isSetup = true;
-        CameraManager.reset();
-        expect(CameraManager.intervalId).toBeNull();
-        expect(CameraManager.isSetup).toBe(false);
+    describe("updatePluginObj()", () => {
+        it("returns early when obj is null", () => {
+            updatePluginObj(mockActivity, null);
+            expect(mockActivity.pluginObjs.PALETTEPLUGINS).toEqual({});
+        });
+
+        it("updates plugin object maps for valid plugin properties", () => {
+            const pluginData = {
+                PALETTEPLUGINS: { testPal: "icon.svg" },
+                PALETTEFILLCOLORS: { testPal: "#ff0000" },
+                PALETTESTROKECOLORS: { testPal: "#00ff00" },
+                PALETTEHIGHLIGHTCOLORS: { testPal: "#0000ff" },
+                FLOWPLUGINS: { customFlow: "flowFunc" },
+                ARGPLUGINS: { customArg: "argFunc" },
+                BLOCKPLUGINS: { customBlock: "blockFunc" },
+                MACROPLUGINS: { customMacro: "macroFunc" },
+                GLOBALS: "var x = 10;",
+                IMAGES: { img1: "data:image/png" },
+                ONLOAD: { loadHook: "onLoadFunc" },
+                ONSTART: { startHook: "onStartFunc" },
+                ONSTOP: { stopHook: "onStopFunc" }
+            };
+
+            updatePluginObj(mockActivity, pluginData);
+
+            expect(mockActivity.pluginObjs.PALETTEPLUGINS.testPal).toBe("icon.svg");
+            expect(mockActivity.pluginObjs.PALETTEFILLCOLORS.testPal).toBe("#ff0000");
+            expect(mockActivity.pluginObjs.PALETTESTROKECOLORS.testPal).toBe("#00ff00");
+            expect(mockActivity.pluginObjs.PALETTEHIGHLIGHTCOLORS.testPal).toBe("#0000ff");
+            expect(mockActivity.pluginObjs.FLOWPLUGINS.customFlow).toBe("flowFunc");
+            expect(mockActivity.pluginObjs.ARGPLUGINS.customArg).toBe("argFunc");
+            expect(mockActivity.pluginObjs.BLOCKPLUGINS.customBlock).toBe("blockFunc");
+            expect(mockActivity.pluginObjs.MACROPLUGINS.customMacro).toBe("macroFunc");
+            expect(mockActivity.pluginObjs.GLOBALS).toBe("var x = 10;");
+            expect(mockActivity.pluginObjs.IMAGES).toEqual({ img1: "data:image/png" });
+            expect(mockActivity.pluginObjs.ONLOAD.loadHook).toBe("onLoadFunc");
+            expect(mockActivity.pluginObjs.ONSTART.startHook).toBe("onStartFunc");
+            expect(mockActivity.pluginObjs.ONSTOP.stopHook).toBe("onStopFunc");
+        });
+
+        it("appends GLOBALS string if GLOBALS already exists", () => {
+            mockActivity.pluginObjs.GLOBALS = "var a = 1;";
+            updatePluginObj(mockActivity, { GLOBALS: "var b = 2;" });
+            expect(mockActivity.pluginObjs.GLOBALS).toBe("var a = 1;var b = 2;");
+        });
+
+        it("filters out unsafe keys to prevent prototype pollution", () => {
+            const unsafeData = {
+                PALETTEPLUGINS: JSON.parse(`{
+                    "__proto__": "malicious",
+                    "constructor": "malicious",
+                    "safeKey": "valid"
+                }`)
+            };
+            updatePluginObj(mockActivity, unsafeData);
+            expect(mockActivity.pluginObjs.PALETTEPLUGINS.safeKey).toBe("valid");
+            expect(
+                Object.prototype.hasOwnProperty.call(
+                    mockActivity.pluginObjs.PALETTEPLUGINS,
+                    "__proto__"
+                )
+            ).toBe(false);
+            expect(
+                Object.prototype.hasOwnProperty.call(
+                    mockActivity.pluginObjs.PALETTEPLUGINS,
+                    "constructor"
+                )
+            ).toBe(false);
+        });
+    });
+
+    describe("processRawPluginData()", () => {
+        it("strips blank lines and comment lines starting with /", async () => {
+            const rawData = '// Comment line\n\n{"PALETTEPLUGINS": {"test": "val"}}';
+            const res = await processRawPluginData(mockActivity, rawData, "plugin.json");
+            expect(res).toBeDefined();
+        });
+
+        it("handles invalid JSON data gracefully", async () => {
+            const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+            const invalidData = "// Comment\n{ invalid json content";
+            const res = await processRawPluginData(mockActivity, invalidData, "plugin.json");
+            expect(res).toBeNull();
+            expect(spy).toHaveBeenCalled();
+            spy.mockRestore();
+        });
+
+        it("handles unexpected errors gracefully", async () => {
+            const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            // Passing "true" makes JSON.parse succeed (returns boolean true), but triggers a
+            // TypeError in processPluginData ("PALETTEPLUGINS" in obj) which then hits the catch block.
+            const rawData = "true";
+            const res = await processRawPluginData(mockActivity, rawData, "localStorage:plugins");
+            expect(res).toBeNull();
+            expect(spy).toHaveBeenCalledWith(rawData);
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            spy.mockRestore();
+        });
+    });
+
+    describe("preparePluginExports()", () => {
+        it("updates plugin object and returns stringified JSON", () => {
+            const pluginData = { PALETTEPLUGINS: { demo: "icon" } };
+            const jsonString = preparePluginExports(mockActivity, pluginData);
+            expect(typeof jsonString).toBe("string");
+            expect(JSON.parse(jsonString).PALETTEPLUGINS.demo).toBe("icon");
+        });
+    });
+
+    describe("processMacroData() and prepareMacroExports()", () => {
+        it("does nothing if macroData is undefined or empty json", () => {
+            const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+            const blocks = { addToMyPalette: jest.fn() };
+            const macroDict = {};
+
+            processMacroData(undefined, palettes, blocks, macroDict);
+            processMacroData("{}", palettes, blocks, macroDict);
+
+            expect(palettes.add).not.toHaveBeenCalled();
+        });
+
+        it("parses valid macro JSON and updates macroDict and palettes/blocks", () => {
+            const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+            const blocks = { addToMyPalette: jest.fn() };
+            const macroDict = {};
+            const validData = JSON.stringify({
+                macro1: { palette: "custom", block: "customBlock" }
+            });
+
+            processMacroData(validData, palettes, blocks, macroDict);
+            expect(macroDict.macro1).toBeDefined();
+            expect(palettes.add).toHaveBeenCalledWith("myblocks", "black", "#a0a0a0");
+            expect(blocks.addToMyPalette).toHaveBeenCalledWith("macro1", macroDict.macro1);
+            expect(palettes.makePalettes).toHaveBeenCalledWith(1);
+        });
+
+        it("handles invalid macro JSON gracefully", () => {
+            const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+            const blocks = { addToMyPalette: jest.fn() };
+            const macroDict = {};
+
+            const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            processMacroData("invalid json", palettes, blocks, macroDict);
+            expect(spy).toHaveBeenCalledWith("invalid json");
+            spy.mockRestore();
+        });
+
+        it("prepareMacroExports encodes macro dictionary as JSON", () => {
+            const macroDict = {};
+            const stack = { id: 1 };
+            const json = prepareMacroExports("testMacro", stack, macroDict);
+            expect(JSON.parse(json)).toEqual({ testMacro: stack });
+        });
+    });
+});
+
+describe("SVG Utilities", () => {
+    describe("isSVGEmpty()", () => {
+        it("returns true when all turtles have empty SVG output", () => {
+            const mockTurtles = {
+                turtleList: { 0: {} },
+                getTurtle: jest.fn(() => ({
+                    painter: { closeSVG: jest.fn(), svgOutput: "" }
+                }))
+            };
+            expect(isSVGEmpty(mockTurtles)).toBe(true);
+        });
+
+        it("returns false when any turtle has SVG output", () => {
+            const mockTurtles = {
+                turtleList: { 0: {} },
+                getTurtle: jest.fn(() => ({
+                    painter: { closeSVG: jest.fn(), svgOutput: "<path d='M0,0 L10,10'/>" }
+                }))
+            };
+            expect(isSVGEmpty(mockTurtles)).toBe(false);
+        });
+    });
+});
+
+describe("UtilsLogic re-exports in utils.js", () => {
+    it("exports formatSeconds function from utils-logic", () => {
+        const utils = require("../utils");
+        expect(typeof utils.formatSeconds).toBe("function");
+        expect(utils.formatSeconds(0)).toBe("00:00");
+        expect(utils.formatSeconds(125)).toBe("02:05");
+        expect(utils.formatSeconds(3665)).toBe("01:01:05");
+        expect(utils.formatSeconds(null)).toBe("00:00");
     });
 });

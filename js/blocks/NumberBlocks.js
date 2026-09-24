@@ -24,10 +24,12 @@ function setupNumberBlocks(activity) {
      * Check if block is in status matrix print context
      */
     const isInStatusMatrix = (logo, blk, fieldName) => {
+        const parentId = activity.blocks.blockList[blk].connections[0];
         if (
             logo.inStatusMatrix &&
-            activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                "print"
+            parentId !== null &&
+            activity.blocks.blockList[parentId] &&
+            activity.blocks.blockList[parentId].name === "print"
         ) {
             logo.statusFields.push([blk, fieldName]);
             return true;
@@ -40,13 +42,13 @@ function setupNumberBlocks(activity) {
      */
     const toInteger = (logo, value, blk) => {
         if (typeof value === "string") {
-            try {
-                return parseInt(value, 10);
-            } catch (e) {
+            const result = parseInt(value, 10);
+            if (isNaN(result)) {
                 logo.stopTurtle = true;
                 activity.errorMsg(NANERRORMSG, blk);
                 return null;
             }
+            return result;
         }
         return value;
     };
@@ -77,11 +79,17 @@ function setupNumberBlocks(activity) {
         if (cblk0 === null) return undefined;
         let par = activity.blocks.blockList[cblk0];
         while (par.name === "hspace") {
+            if (par.connections[0] === null) return undefined;
             par = activity.blocks.blockList[par.connections[0]];
         }
-        return par.name === "pitch"
-            ? activity.blocks.blockList[par.connections[2]].value
-            : undefined;
+        if (
+            par.name === "pitch" &&
+            par.connections[2] !== null &&
+            par.connections[2] !== undefined
+        ) {
+            return activity.blocks.blockList[par.connections[2]].value;
+        }
+        return undefined;
     };
 
     /**
@@ -782,20 +790,24 @@ function setupNumberBlocks(activity) {
                 b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
             }
 
-            if (!isNaN(a) && !isNaN(b)) {
+            // isNaN(null) is false (null coerces to 0), so a null/undefined
+            // operand must be excluded here too, or it slips past this guard
+            // into the unguarded call below and doPlus's NanError goes uncaught.
+            const aIsValid = a !== null && a !== undefined && !isNaN(a);
+            const bIsValid = b !== null && b !== undefined && !isNaN(b);
+
+            if (aIsValid && bIsValid) {
                 return MathUtility.doPlus(a, b);
             } else {
                 try {
                     return MathUtility.doPlus(a, b);
                 } catch (e) {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
+                    console.error(e);
 
-                    console.debug(a + " " + b);
-
-                    console.debug(e);
-                    if (!isNaN(a)) {
+                    if (aIsValid) {
                         return a;
-                    } else if (!isNaN(b)) {
+                    } else if (bIsValid) {
                         return b;
                     }
                     return 0;
@@ -937,7 +949,7 @@ function setupNumberBlocks(activity) {
             try {
                 return Number(activity.blocks.blockList[blk].value);
             } catch (e) {
-                console.debug(e);
+                console.error(e);
                 return 0;
             }
         }

@@ -22,7 +22,6 @@ window.widgetWindows = {
     _posCache: {},
     focused: null,
     draggingWindow: null,
-    _shortcutsInitialized: false,
     _globalListenersInitialized: false,
 
     // NOTE: This mapping only works for widgets that never set their own
@@ -36,7 +35,7 @@ window.widgetWindows = {
     // verify the target widget's windowFor() call and confirm it does not
     // rely on blockNo for its window key.
     KEY_MAPPING: {
-        "pitch-drum mapper": "pitch drum",
+        "pitch drum": "pitch drum",
         "custom mode": "custom mode",
         "tempo": "tempo",
         "arpeggio": "arpeggio",
@@ -47,6 +46,57 @@ window.widgetWindows = {
         "temperament": "temperament",
         "meter": "meter",
         "LEGO Bricks": "LEGO BRICKS"
+    },
+
+    /**
+     * Single source of truth for widgets that should reinitialize when a
+     * connected block changes while their window is open.
+     *
+     * Entries are the English windowFor() title strings. At runtime the
+     * open .wftTitle and the widget block's staticLabels[0] are both
+     * produced with _(), so they must match each other; call sites also
+     * require title === staticLabels[0] before calling reInitWidget().
+     *
+     * Separate from KEY_MAPPING, which is only for closeBlkWidgets().
+     */
+    REINIT_WIDGET_TITLES: new Set([
+        "oscilloscope",
+        "tempo",
+        "rhythm maker",
+        "pitch slider",
+        "pitch staircase",
+        "status",
+        "phrase maker",
+        "LEGO Bricks",
+        "arpeggio",
+        "custom mode",
+        "music keyboard",
+        "pitch drum",
+        "meter",
+        "temperament",
+        "mode",
+        "timbre"
+    ]),
+
+    /**
+     * True when title is listed in REINIT_WIDGET_TITLES.
+     *
+     * The registry stores English title strings; at runtime the open widget's
+     * title is already localized via _(). We therefore translate each registry
+     * entry with _() before comparing — the same approach used by
+     * closeBlkWidgets() for KEY_MAPPING.
+     *
+     * @param {string} title - Open widget .wftTitle text (may be localized)
+     * @returns {boolean}
+     */
+    isReinitWidgetTitle(title) {
+        const translate = typeof _ === "function" ? _ : str => str;
+        for (const englishTitle of window.widgetWindows.REINIT_WIDGET_TITLES) {
+            if (translate(englishTitle) === title) {
+                return true;
+            }
+        }
+        return false;
     },
 
     /**
@@ -79,8 +129,8 @@ window.widgetWindows = {
         for (let i = 0; i < widgetTitle.length; i++) {
             const titleEl = widgetTitle[i];
             if (
-                titleEl.innerHTML === name ||
-                titleEl.innerHTML === searchKey ||
+                titleEl.textContent.trim() === name ||
+                titleEl.textContent.trim() === searchKey ||
                 titleEl.id === `${searchKey}WidgetID`
             ) {
                 const winKey =
@@ -140,13 +190,17 @@ window.widgetWindows = {
     _initGlobalListeners() {
         if (this._globalListenersInitialized) return;
 
-        this._handleGlobalMouseMove = this._handleGlobalMouseMove.bind(this);
-        this._handleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
-        this._handleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
+        this._boundHandleGlobalMouseMove = this._handleGlobalMouseMove.bind(this);
+        this._boundHandleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
+        this._boundHandleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
+        this._boundHandleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
 
-        document.addEventListener("mouseup", this._handleGlobalMouseUp, true);
-        document.addEventListener("mousemove", this._handleGlobalMouseMove, true);
-        document.addEventListener("mousedown", this._handleGlobalMouseDown, true);
+        document.addEventListener("mouseup", this._boundHandleGlobalMouseUp, true);
+        document.addEventListener("mousemove", this._boundHandleGlobalMouseMove, true);
+        document.addEventListener("mousedown", this._boundHandleGlobalMouseDown, true);
+        // Use capture phase (true) to handle keyboard shortcuts before individual
+        // widgets can intercept them via stopPropagation().
+        document.addEventListener("keydown", this._boundHandleGlobalKeyDown, true);
 
         this._globalListenersInitialized = true;
     },
@@ -228,14 +282,6 @@ class WidgetWindow {
 
         window.widgetWindows._initGlobalListeners();
 
-        if (!window.widgetWindows._shortcutsInitialized) {
-            // Use capture phase (true) to ensure global window control shortcuts are handled
-            // before individual widgets/blocks can intercept them via stopPropagation().
-            window.removeEventListener("keydown", window.widgetWindows._handleGlobalKeyDown, true);
-            window.addEventListener("keydown", window.widgetWindows._handleGlobalKeyDown, true);
-            window.widgetWindows._shortcutsInitialized = true;
-        }
-
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
             this.setPosition(_pos[0], _pos[1]);
@@ -278,14 +324,19 @@ class WidgetWindow {
         this._frame = this._create("div", "windowFrame", windows);
         this._frame.setAttribute("role", "dialog");
         this._frame.setAttribute("aria-label", _(this._title));
-        this._overlayframe = this._create("div", "windowFrame", windows);
+        this._overlayframe = this._create("div", "windowFrame windowOverlay", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._drag.style.display = "flex";
         this._drag.style.justifyContent = "space-between";
 
         if (this._fullscreenEnabled) {
             this._drag.ondblclick = e => {
-                this._maximize();
+                if (this._maximized) {
+                    this._restore();
+                    this.sendToCenter();
+                } else {
+                    this._maximize();
+                }
                 this.takeFocus();
                 this.onmaximize();
                 e.preventDefault();
@@ -315,20 +366,6 @@ class WidgetWindow {
 
         this._nonclose.onmousedown = e => {
             window.widgetWindows.draggingWindow = this;
-            if (this._maximized) {
-                // Perform special repositioning to make the drag feel right when
-                // restoring a window from maximized.
-                let bcr = this._drag.getBoundingClientRect();
-                let dx = (bcr.left - e.clientX) / (bcr.right - bcr.left);
-                const dy = bcr.top - e.clientY;
-
-                this._restore();
-                this.onmaximize();
-
-                bcr = this._drag.getBoundingClientRect();
-                dx *= bcr.right - bcr.left;
-                this.setPosition(e.clientX + dx, e.clientY + dy);
-            }
 
             this.takeFocus();
 
@@ -419,6 +456,23 @@ class WidgetWindow {
      * @returns {void}
      */
     _docMouseMoveHandler(e) {
+        if (this._maximized) {
+            const bcr = this._drag.getBoundingClientRect();
+            const dxRatio = (bcr.left - e.clientX) / (bcr.right - bcr.left);
+            const dy = bcr.top - e.clientY;
+
+            this._restore();
+            this.onmaximize();
+
+            const newBcr = this._drag.getBoundingClientRect();
+            this.setPosition(e.clientX + dxRatio * (newBcr.right - newBcr.left), e.clientY + dy);
+
+            // Recalculate drag offsets from the restored frame so the rAF
+            // callback below does not overwrite the position with stale values.
+            const restoredBcr = this._drag.getBoundingClientRect();
+            this._dx = e.clientX - restoredBcr.left;
+            this._dy = e.clientY - restoredBcr.top;
+        }
         // Throttle using requestAnimationFrame to prevent layout thrashing
         if (this._rafTicking) return;
         this._rafTicking = true;
@@ -446,7 +500,7 @@ class WidgetWindow {
             this._overlayframe.style.width = "100vw";
             this._overlayframe.style.height = "calc(100vh - 64px)";
             this._overlayframe.style.border = "0.25vw solid black";
-            this._overlayframe.style.backgroundColor = "var(--overlay-bg)";
+            this._overlayframe.style.backgroundColor = "var(--color-overlay-backdrop)";
         } else {
             this._frame.style.zIndex = "10000";
             this._overlayframe.style.border = "0px";
@@ -588,8 +642,12 @@ class WidgetWindow {
      */
     updateTitle(title) {
         const wftTitle = docById(this._key + "WidgetID");
-        wftTitle.textContent = title;
-        this._frame.setAttribute("aria-label", title);
+        if (wftTitle) {
+            wftTitle.textContent = title;
+        }
+        if (this._frame) {
+            this._frame.setAttribute("aria-label", title);
+        }
     }
 
     /**
@@ -599,10 +657,12 @@ class WidgetWindow {
     takeFocus() {
         window.widgetWindows.focused = this;
         const windows = docById("floatingWindows");
-        const siblings = windows.children;
-        for (let i = 0; i < siblings.length; i++) {
-            siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = "0.7";
+        if (windows && windows.children) {
+            const siblings = windows.children;
+            for (let i = 0; i < siblings.length; i++) {
+                siblings[i].style.zIndex = "0";
+                siblings[i].style.opacity = "0.7";
+            }
         }
 
         // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block
@@ -638,6 +698,10 @@ class WidgetWindow {
      */
     sendToCenter() {
         const canvas = docById("myCanvas");
+        if (!canvas) {
+            this.setPosition(200, 140);
+            return this;
+        }
         const fRect = this._frame.getBoundingClientRect();
         const cRect = canvas.getBoundingClientRect();
 
@@ -805,6 +869,11 @@ class WidgetWindow {
     clear() {
         this._widget.replaceChildren();
         this._toolbar.replaceChildren();
+        // The toolbar buttons have just been removed from the DOM, so drop the
+        // references too. Widgets re-add their buttons after clear(), and
+        // modifyButton() addresses them by index — leaving the old entries in
+        // place would push every index past the detached ones.
+        this._buttons = [];
         return this;
     }
 

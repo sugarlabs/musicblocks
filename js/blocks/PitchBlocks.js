@@ -18,9 +18,9 @@
      DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
     NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
     YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
-    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
+    nthDegreeToPitch, getCurrentEDO, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
      NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
-     INTERVALVALUES, CENTSSYMBOL
+     INTERVALVALUES, CENTSSYMBOL, noteToObj
   */
 
 /* exported setupPitchBlocks */
@@ -285,7 +285,7 @@ function setupPitchBlocks(activity) {
                 undefined,
                 activity
             );
-            tur.singer.lastNotePlayed = [obj[0] + obj[1], tur.singer.lastNotePlayed[1]];
+            tur.singer.lastNotePlayed = [obj[0] + obj[1], tur.singer.lastNotePlayed?.[1] ?? 4];
         }
 
         arg(logo, turtle, blk) {
@@ -302,10 +302,7 @@ function setupPitchBlocks(activity) {
                 let obj;
                 if (tur.singer.lastNotePlayed !== null) {
                     if (typeof tur.singer.lastNotePlayed[0] === "string") {
-                        const len = tur.singer.lastNotePlayed[0].length;
-                        const pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                        const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
-                        obj = [pitch, octave];
+                        obj = noteToObj(tur.singer.lastNotePlayed[0]);
                     } else {
                         // Hertz?
                         obj = frequencyToPitch(tur.singer.lastNotePlayed[0]);
@@ -495,7 +492,9 @@ function setupPitchBlocks(activity) {
                 if (cblk1 !== null) {
                     arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 }
-                if (activity.blocks.blockList[cblk1].name === "notename") {
+                if (cblk1 === null) {
+                    notePlayed = "G4";
+                } else if (activity.blocks.blockList[cblk1].name === "notename") {
                     notePlayed = arg1 + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else if (
                     activity.blocks.blockList[cblk1].name === "solfege" ||
@@ -2004,9 +2003,6 @@ function setupPitchBlocks(activity) {
                     }
 
                     scaledegree = Number(scaledegree.replace(attr, ""));
-                    if (attr !== NATURAL) {
-                        note += attr;
-                    }
 
                     const obj = keySignatureToMode(tur.singer.keySignature);
 
@@ -2033,6 +2029,10 @@ function setupPitchBlocks(activity) {
                         tur.singer.movable,
                         null
                     );
+                    if (attr !== NATURAL) {
+                        note += attr;
+                    }
+
                     let semitones = ref;
 
                     semitones += NOTESFLAT.includes(note)
@@ -2072,11 +2072,14 @@ function setupPitchBlocks(activity) {
                 arg0 = Number(arg0);
 
                 // We interpret numbers two different ways:
-                //  (1) a positive integer between 1 and 12 is taken to be a movable solfege, e.g. 1 : do, 2 : re ...
+                //  (1) a positive integer between 1 and currentEDO is taken to be
+                //      a movable solfege, e.g. 1 : do, 2 : re ...
                 //  (2) if frequency is input, ignore octave (arg1)
                 // Negative numbers will throw an error.
 
-                if (arg0 <= 12) {
+                const currentEDO = getCurrentEDO(logo.synth.inTemperament);
+
+                if (arg0 <= currentEDO) {
                     // movable solfege
                     if (arg0 < 1) {
                         activity.errorMsg(INVALIDPITCH, blk);
@@ -2085,7 +2088,8 @@ function setupPitchBlocks(activity) {
 
                     const [noteName, offset] = nthDegreeToPitch(
                         tur.singer.keySignature,
-                        Math.round(arg0)
+                        Math.round(arg0),
+                        currentEDO
                     );
                     note = noteName;
                     octave =

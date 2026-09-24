@@ -74,7 +74,8 @@ describe("jquery-setup", () => {
         };
 
         mockJQuery.fn = {
-            autocomplete: jest.fn()
+            autocomplete: jest.fn(),
+            tooltip: jest.fn()
         };
 
         mockJQuery.widget = {
@@ -274,5 +275,85 @@ describe("jquery-setup", () => {
         wrappedRenderMenu.call(mockInstance, ul, items);
 
         expect(originalRenderMenu).toHaveBeenCalledTimes(1);
+    });
+    describe("Materialize tooltip re-initialisation guard", () => {
+        /**
+         * Builds a stand-in for a jQuery set of tooltipped elements.
+         * @param {HTMLElement[]} elements - The elements in the set.
+         * @returns {object} An object exposing the subset of the jQuery API the shim uses.
+         */
+        const asSet = elements => ({
+            each(callback) {
+                elements.forEach(element => callback.call(element));
+                return this;
+            }
+        });
+
+        /**
+         * Creates a tooltipped element together with its tooltip node.
+         * @param {string} id - The tooltip node's id.
+         * @returns {{origin: HTMLElement, tooltip: HTMLElement}} The pair.
+         */
+        const makeTooltipped = id => {
+            const origin = document.createElement("a");
+            origin.setAttribute("data-tooltip-id", id);
+
+            const tooltip = document.createElement("div");
+            tooltip.className = "material-tooltip";
+            tooltip.id = id;
+
+            document.body.appendChild(origin);
+            document.body.appendChild(tooltip);
+
+            return { origin, tooltip };
+        };
+
+        test("detaches the live tooltip node before Materialize re-initialises", () => {
+            require("../jquery-setup");
+
+            const { origin, tooltip } = makeTooltipped("tip-1");
+
+            jQuery.fn.tooltip.call(asSet([origin]), { html: true, delay: 100 });
+
+            expect(document.body.contains(tooltip)).toBe(false);
+        });
+
+        test("delegates to the original plugin with the same arguments and context", () => {
+            const original = global.jQuery.fn.tooltip;
+
+            require("../jquery-setup");
+
+            const { origin } = makeTooltipped("tip-2");
+            const set = asSet([origin]);
+            const options = { html: true, delay: 100 };
+
+            jQuery.fn.tooltip.call(set, options);
+
+            expect(original).toHaveBeenCalledTimes(1);
+            expect(original).toHaveBeenCalledWith(options);
+            expect(original.mock.instances[0]).toBe(set);
+        });
+
+        test('passes the "remove" command through untouched', () => {
+            const original = global.jQuery.fn.tooltip;
+
+            require("../jquery-setup");
+
+            const { origin, tooltip } = makeTooltipped("tip-3");
+
+            jQuery.fn.tooltip.call(asSet([origin]), "remove");
+
+            expect(document.body.contains(tooltip)).toBe(true);
+            expect(original).toHaveBeenCalledWith("remove");
+        });
+
+        test("tolerates elements that have no tooltip node yet", () => {
+            require("../jquery-setup");
+
+            const origin = document.createElement("a");
+            document.body.appendChild(origin);
+
+            expect(() => jQuery.fn.tooltip.call(asSet([origin]), {})).not.toThrow();
+        });
     });
 });

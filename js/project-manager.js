@@ -185,35 +185,121 @@ class ProjectManager {
         that.keyboardEnableFlag = 0;
 
         that.sessionData = null;
-        const currentProject = that.storage.currentProject;
-        const sessionKey = currentProject !== undefined ? "SESSION" + currentProject : null;
+        let sessionSource = null;
+        let currentProject = "My Project";
+        try {
+            currentProject = (that.storage && that.storage.currentProject) || "My Project";
+        } catch (e) {
+            currentProject = "My Project";
+        }
+        const sessionKey = "SESSION" + currentProject;
+        const sessionTimestampKey = "SESSION_TIMESTAMP" + currentProject;
+
+        let idbPayload = null;
+        if (that.sessionStorageManager) {
+            try {
+                idbPayload = await that.sessionStorageManager.loadSession(sessionKey);
+            } catch (e) {
+                console.error("Failed to load session from IndexedDB:", e);
+            }
+        }
+
+        let localData = null;
+        let localTimestamp = 0;
+        try {
+            if (that.storage) {
+                localData = that.storage[sessionKey] || null;
+                let localTimestampStr = that.storage[sessionTimestampKey];
+                let parsedLocalTimestamp = localTimestampStr ? parseInt(localTimestampStr, 10) : 0;
+                localTimestamp = Number.isFinite(parsedLocalTimestamp) ? parsedLocalTimestamp : 0;
+            }
+        } catch (storageReadErr) {
+            console.warn(
+                "[ProjectManager] Failed to read session from local storage:",
+                storageReadErr
+            );
+            localData = null;
+            localTimestamp = 0;
+        }
 
         if (that.planet) {
             that.sessionData = await that.planet.openCurrentProject();
-            if (!that.sessionData) {
-                if (currentProject !== undefined) {
-                    that.sessionData = that.storage[sessionKey];
+            if (that.sessionData) {
+                sessionSource = "planet";
+            } else {
+                if (idbPayload && idbPayload.data) {
+                    if (!localData || idbPayload.timestamp >= localTimestamp) {
+                        that.sessionData = idbPayload.data;
+                        sessionSource = "idb";
+                    } else {
+                        that.sessionData = localData;
+                        sessionSource = "local";
+                    }
+                } else if (localData) {
+                    that.sessionData = localData;
+                    sessionSource = "local";
                 }
             }
+            // Fix #1+#4: Restore Git state keys if repo data exists in Planet storage
+            try {
+                const repoData =
+                    that.planet.getCurrentGitRepoData && that.planet.getCurrentGitRepoData();
+                if (repoData && repoData.repoName) {
+                    that.storage.mbGitRepoName = repoData.repoName;
+                    that.storage.mbGitHashedKey = repoData.hashedKey || "";
+                    that.storage.mbGitCurrentProjectId = repoData.projectId || "";
+                    if (repoData.displayName) {
+                        that.storage.mbGitDisplayName = repoData.displayName;
+                    }
+                }
+            } catch (gitRestoreErr) {
+                console.warn(
+                    "[ProjectManager] Could not restore git session state:",
+                    gitRestoreErr
+                );
+            }
         } else {
-            if (sessionKey !== null) {
-                that.sessionData = that.storage[sessionKey];
+            if (idbPayload && idbPayload.data) {
+                if (!localData || idbPayload.timestamp >= localTimestamp) {
+                    that.sessionData = idbPayload.data;
+                    sessionSource = "idb";
+                } else {
+                    that.sessionData = localData;
+                    sessionSource = "local";
+                }
+            } else if (localData) {
+                that.sessionData = localData;
+                sessionSource = "local";
             }
         }
 
         pubsub.on("finishedLoading", __afterLoad);
 
-        if (that.sessionData) {
-            that.doLoadAnimation();
-            try {
-                if (that.sessionData === "undefined" || that.sessionData === "[]") {
-                    that.justLoadStart();
-                } else {
-                    window.loadedSession = that.sessionData;
-                    that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
+        const tryParseAndLoad = data => {
+            if (data === "undefined" || data === "[]") {
+                that.justLoadStart();
+                return true;
+            }
+            const parsed = JSON.parse(data);
+            window.loadedSession = data;
+            that.blocks.loadNewBlocks(parsed);
+            return true;
+        };
+
+        const deleteFromSource = async source => {
+            if (source === "idb") {
+                if (
+                    that.sessionStorageManager &&
+                    typeof that.sessionStorageManager.deleteSession === "function" &&
+                    sessionKey
+                ) {
+                    try {
+                        await that.sessionStorageManager.deleteSession(sessionKey);
+                    } catch (idbErr) {
+                        ErrorHandler.recoverable(idbErr, { operation: "removeBadIdbSessionKey" });
+                    }
                 }
-            } catch (e) {
-                ErrorHandler.recoverable(e, { operation: "loadSessionData" });
+            } else if (source === "local") {
                 if (sessionKey !== null) {
                     try {
                         if (typeof that.storage.removeItem === "function") {
@@ -227,13 +313,62 @@ class ProjectManager {
                         });
                     }
                 }
-                that.justLoadStart();
+            }
+        };
+
+        if (that.sessionData) {
+            that.doLoadAnimation();
+            let loaded = false;
+            try {
+                loaded = tryParseAndLoad(that.sessionData);
+            } catch (e) {
+                ErrorHandler.recoverable(e, { operation: "loadSessionData" });
+                await deleteFromSource(sessionSource);
+
+                // Attempt fallback to the alternative source if available
+                let fallbackData = null;
+                let fallbackSource = null;
+                if (sessionSource === "idb" && localData) {
+                    fallbackData = localData;
+                    fallbackSource = "local";
+                } else if (sessionSource === "local" && idbPayload && idbPayload.data) {
+                    fallbackData = idbPayload.data;
+                    fallbackSource = "idb";
+                }
+
+                if (fallbackData) {
+                    try {
+                        that.sessionData = fallbackData;
+                        loaded = tryParseAndLoad(fallbackData);
+                    } catch (fallbackErr) {
+                        ErrorHandler.recoverable(fallbackErr, {
+                            operation: "loadFallbackSessionData"
+                        });
+                        await deleteFromSource(fallbackSource);
+                    }
+                }
+
+                if (!loaded) {
+                    that.justLoadStart();
+                }
             }
         } else {
             that.justLoadStart();
         }
 
         that.update = true;
+    }
+
+    /**
+     * Clears the loading state after a project load attempt completes,
+     * successfully or not.
+     * @private
+     * @returns {void}
+     */
+    _finishLoading() {
+        this.activity.loading = false;
+        document.body.style.cursor = "default";
+        this.activity.update = true;
     }
 
     _loadProject(projectID, flags) {
@@ -268,12 +403,6 @@ class ProjectManager {
 
         const pm = this;
         setTimeout(() => {
-            const finishLoading = () => {
-                that.loading = false;
-                document.body.style.cursor = "default";
-                that.update = true;
-            };
-
             try {
                 if (that.planet && typeof that.planet.openProjectFromPlanet === "function") {
                     that.planet.openProjectFromPlanet(projectID, () => {
@@ -299,7 +428,7 @@ class ProjectManager {
                 });
             }
 
-            finishLoading();
+            pm._finishLoading();
         }, 2500);
 
         const run = flags.run;
@@ -515,7 +644,7 @@ class ProjectManager {
                     case "action":
                     case "matrix":
                     case "pitchdrummatrix":
-                    case "rhythmruler":
+                    case "rhythmruler2":
                     case "timbre":
                     case "pitchstaircase":
                     case "tempo":
@@ -610,7 +739,11 @@ class ProjectManager {
         try {
             p = activity.storage.currentProject;
             activity.storage["SESSION" + p] = data;
+            activity.storage["SESSION_TIMESTAMP" + p] = Date.now().toString();
         } catch (e) {
+            // If it hits QuotaExceededError, it fails gracefully because saveSessionAsync
+            // (IndexedDB) handles large payloads.
+            console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
         }
 
@@ -658,7 +791,6 @@ class ProjectManager {
         const title = document.createElement("h2");
         title.textContent = _("Import MIDI");
         title.classList.add("modal-title");
-        title.style.color = platformColor.headingColor;
         modal.appendChild(title);
 
         const container = document.createElement("div");
@@ -684,8 +816,6 @@ class ProjectManager {
         const importConfirm = document.createElement("button");
         importConfirm.classList.add("confirm-button");
         importConfirm.textContent = _("Confirm");
-        importConfirm.style.backgroundColor = platformColor.blueButton;
-        importConfirm.style.color = platformColor.blueButtonText;
         importConfirm.style.border = "none";
         importConfirm.style.borderRadius = "4px";
         importConfirm.style.padding = "8px 16px";
@@ -753,6 +883,12 @@ class ProjectManager {
         const that = this.activity;
         const pm = this;
 
+        const finishLoading = () => {
+            that.loading = false;
+            document.body.style.cursor = "default";
+            that.stopLoadAnimation();
+        };
+
         that.fileChooser.addEventListener("click", event => {
             event.currentTarget.value = "";
         });
@@ -774,6 +910,7 @@ class ProjectManager {
                             that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
+                            finishLoading();
                         } else {
                             /* istanbul ignore next -- file-chooser change handler is browser-only; inaccessible from Jest */
                             const cleanData = rawData.replace(/\n/g, " ");
@@ -801,8 +938,25 @@ class ProjectManager {
 
                                 if (!that.merging) {
                                     const __listener = () => {
-                                        that.blocks.loadNewBlocks(obj);
-                                        that.stage.removeAllEventListeners("trashsignal");
+                                        try {
+                                            that.blocks.loadNewBlocks(obj);
+                                            if (that.planet) {
+                                                that.planet.saveLocally();
+                                            }
+                                        } catch (e) {
+                                            that.errorMsg(
+                                                _(
+                                                    "Cannot load project from the file. Please check the file type."
+                                                )
+                                            );
+                                            ErrorHandler.capture(e, {
+                                                operation: "loadProjectFromFile"
+                                            });
+                                            finishLoading();
+                                            return;
+                                        } finally {
+                                            that.stage.removeAllEventListeners("trashsignal");
+                                        }
                                         if (that.planet) {
                                             that.planet.saveLocally();
                                         }
@@ -835,8 +989,7 @@ class ProjectManager {
                                 );
 
                                 ErrorHandler.capture(e, { operation: "loadProjectFromFile" });
-                                document.body.style.cursor = "default";
-                                that.loading = false;
+                                finishLoading();
                             }
                         }
                     }, 200);
@@ -890,6 +1043,7 @@ class ProjectManager {
                         that.errorMsg(
                             _("Cannot load project from the file. Please check the file type.")
                         );
+                        finishLoading();
                     } else {
                         /* istanbul ignore next -- drag-and-drop file handler is browser-only; inaccessible from Jest */
                         const cleanData = rawData.replace(/\n/g, " ");
@@ -918,10 +1072,20 @@ class ProjectManager {
                             };
 
                             const __listener = () => {
-                                that.blocks.loadNewBlocks(obj);
-                                that.stage.removeAllEventListeners("trashsignal");
-
-                                pubsub.on("finishedLoading", __afterLoad);
+                                try {
+                                    that.blocks.loadNewBlocks(obj);
+                                    pubsub.on("finishedLoading", __afterLoad);
+                                } catch (e) {
+                                    ErrorHandler.capture(e, { operation: "loadFromFile" });
+                                    that.errorMsg(
+                                        _(
+                                            "Cannot load project from the file. Please check the file type."
+                                        )
+                                    );
+                                    finishLoading();
+                                } finally {
+                                    that.stage.removeAllEventListeners("trashsignal");
+                                }
                             };
 
                             that.stage.addEventListener("trashsignal", __listener, false);
@@ -939,8 +1103,7 @@ class ProjectManager {
                             that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
-                            document.body.style.cursor = "default";
-                            that.loading = false;
+                            finishLoading();
                         }
                     }
                 }, 200);
@@ -961,16 +1124,25 @@ class ProjectManager {
             };
 
             abcReader.onload = async event => {
-                let abcData = event.target.result;
-                abcData = abcData.replace(/\\/g, "");
+                that.loading = true;
+                document.body.style.cursor = "wait";
+                try {
+                    let abcData = event.target.result;
+                    abcData = abcData.replace(/\\/g, "");
 
-                await ensureABCJS();
-                const tunebook = new ABCJS.parseOnly(abcData);
+                    await ensureABCJS();
+                    const tunebook = new ABCJS.parseOnly(abcData);
 
-                debugLog(tunebook);
-                tunebook.forEach(tune => {
-                    that.parseABC(tune);
-                });
+                    debugLog(tunebook);
+                    await Promise.all(tunebook.map(tune => that.parseABC(tune)));
+                    finishLoading();
+                } catch (e) {
+                    ErrorHandler.capture(e, { operation: "abcImport" });
+                    that.errorMsg(
+                        _("Cannot load project from the file. Please check the file type.")
+                    );
+                    finishLoading();
+                }
             };
 
             if (files[0] !== undefined) {

@@ -184,7 +184,6 @@ const dummyLogo = {
     parseArg: jest.fn((logo, turtle, cblk, blk, receivedArg) => receivedArg),
     processShow: jest.fn(),
     processSpeak: jest.fn(),
-    meSpeak: {},
     setDispatchBlock: jest.fn(),
     setTurtleListener: jest.fn(),
     cameraID: null
@@ -351,10 +350,12 @@ describe("setupMediaBlocks", () => {
     });
 
     describe("SpeakBlock", () => {
-        it("should call processSpeak if meSpeak is not null and no note block is active", () => {
+        it("should not be hidden, so it shows up in the palette", () => {
+            expect(createdBlocks["speak"].hidden).toBeFalsy();
+        });
+        it("should call processSpeak when no note block is active", () => {
             const turtle = activity.turtles.ithTurtle(turtleIndex);
             turtle.singer.inNoteBlock = [];
-            logo.meSpeak = {};
             logo.processSpeak = jest.fn();
             const speakBlock = createdBlocks["speak"];
             speakBlock.flow(["Hello world"], logo, turtleIndex, 400);
@@ -367,6 +368,22 @@ describe("setupMediaBlocks", () => {
             const speakBlock = createdBlocks["speak"];
             speakBlock.flow(["Hello world"], logo, turtleIndex, 400);
             expect(turtle.singer.embeddedGraphics[999]).toContain(400);
+        });
+        it("should stay silent while output is suppressed", () => {
+            const turtle = activity.turtles.ithTurtle(turtleIndex);
+            turtle.singer.inNoteBlock = [];
+            turtle.singer.suppressOutput = true;
+            logo.processSpeak = jest.fn();
+            const speakBlock = createdBlocks["speak"];
+            speakBlock.flow(["Hello world"], logo, turtleIndex, 400);
+            expect(logo.processSpeak).not.toHaveBeenCalled();
+            turtle.singer.suppressOutput = false;
+        });
+        it("should do nothing when no text is connected", () => {
+            logo.processSpeak = jest.fn();
+            const speakBlock = createdBlocks["speak"];
+            speakBlock.flow([], logo, turtleIndex, 400);
+            expect(logo.processSpeak).not.toHaveBeenCalled();
         });
     });
 

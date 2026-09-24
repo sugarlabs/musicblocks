@@ -19,7 +19,7 @@
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
    LCD, calcNoteValueToDisplay, NOTESYMBOLS,
-   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, parseNoteString
+   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, parseNoteString, announceToScreenReader
 */
 
 /*
@@ -405,6 +405,8 @@ class PhraseMaker {
                 cell.textContent = "";
                 const img = document.createElement("img");
                 img.src = `images/8_bellset_key_${BELLSETIDX[noteName]}.svg`;
+                img.title = this._("bell") + " " + noteName;
+                img.alt = this._("bell") + " " + noteName;
                 img.setAttribute("width", cell.style.width);
                 img.setAttribute("vertical-align", "middle");
                 cell.appendChild(img);
@@ -412,6 +414,8 @@ class PhraseMaker {
                 cell.textContent = "";
                 const img = document.createElement("img");
                 img.src = "images/8_bellset_key_8.svg";
+                img.title = this._("bell") + " C";
+                img.alt = this._("bell") + " C";
                 img.setAttribute("width", cell.style.width);
                 img.setAttribute("vertical-align", "middle");
                 cell.appendChild(img);
@@ -596,11 +600,12 @@ class PhraseMaker {
         const iconSize = PhraseMaker.ICONSIZE * this._cellScale;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
+        if (this.isInitial) {
+            announceToScreenReader(_("Phrase Maker opened"));
+        }
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-
-        console.debug("notes " + this.rowLabels + " octave " + this.rowArgs);
 
         this._notesToPlay = [];
         this._matrixHasTuplets = false;
@@ -609,17 +614,7 @@ class PhraseMaker {
         // Add the buttons to the top row.
 
         widgetWindow.onclose = () => {
-            this._rowOffset = [];
-            for (let i = 0; i < this._rowMap.length; i++) {
-                this._rowMap[i] = i;
-            }
-
-            this.activity.logo.synth.stopSound(0, this._instrumentName);
-            this.activity.logo.synth.stop();
-            this._stopOrCloseClicked = true;
-            this.activity.hideMsgs();
-            this.docById("wheelDivptm").style.display = "none";
-            widgetWindow.destroy();
+            this.handleClose();
         };
 
         this._playButton = widgetWindow.addButton(
@@ -786,6 +781,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/synth2.svg";
+                img.title = this._(this.rowLabels[i]);
+                img.alt = this._(this.rowLabels[i]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -795,6 +792,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/mouse.svg";
+                img.title = this._(this.rowLabels[i]);
+                img.alt = this._(this.rowLabels[i]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -804,6 +803,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/mouse.svg";
+                img.title = this._(this.rowLabels[i]);
+                img.alt = this._(this.rowLabels[i]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -831,12 +832,21 @@ class PhraseMaker {
                 if (noteName in BELLSETIDX && this.rowArgs[i] === 4) {
                     const img = document.createElement("img");
                     img.src = `images/8_bellset_key_${BELLSETIDX[noteName]}.svg`;
+                    img.title = this._("bell") + " " + noteName;
+                    img.alt = this._("bell") + " " + noteName;
                     img.setAttribute("width", cell.style.width);
                     img.setAttribute("vertical-align", "middle");
                     cell.appendChild(img);
                 } else if (["C", "do"].includes(noteName) && this.rowArgs[i] === 5) {
                     const img = document.createElement("img");
                     img.src = "images/8_bellset_key_8.svg";
+                    const displayNote =
+                        this._deps.noteIsSolfege(noteName) &&
+                        !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
+                            ? this._deps.i18nSolfege(noteName)
+                            : noteName;
+                    img.title = this._("bell") + " " + displayNote;
+                    img.alt = this._("bell") + " " + displayNote;
                     img.setAttribute("width", cell.style.width);
                     img.setAttribute("vertical-align", "middle");
                     cell.appendChild(img);
@@ -1038,17 +1048,13 @@ class PhraseMaker {
         if (this.lyricsON) {
             const lyricsRow = ptmTable.insertRow();
             lyricsRow.setAttribute("id", "lyricRow");
-            lyricsRow.style.position = "sticky";
+            lyricsRow.classList.add("pm-lyrics-row");
 
             // Label Icon
             cell = lyricsRow.insertCell();
             cell.setAttribute("colspan", "1");
-            cell.className = "headcol";
-            cell.style.position = "sticky";
-            cell.style.left = "1.2px";
-            cell.style.zIndex = "1";
+            cell.className = "headcol pm-lyrics-label";
             cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
-            cell.style.textAlign = "center";
             cell.textContent = "";
             const penImg = document.createElement("img");
             penImg.src = "images/pen.svg";
@@ -1060,12 +1066,8 @@ class PhraseMaker {
             // Label Cell (Fixed like "note value")
             cell = lyricsRow.insertCell();
             cell.setAttribute("colspan", "1");
-            cell.className = "headcol";
-            cell.style.position = "sticky";
-            cell.style.left = "1.2px";
-            cell.style.zIndex = "1";
+            cell.className = "headcol pm-lyrics-label";
             cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
-            cell.style.textAlign = "center";
             cell.textContent = "Lyrics";
 
             // Nested Table for Input Fields
@@ -1084,36 +1086,22 @@ class PhraseMaker {
             for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 const noteValue = this.activity.logo.tupletRhythms[i][2];
                 const inputCell = inputRow.insertCell();
+                inputCell.classList.add("pm-lyrics-cell");
                 inputCell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
                 inputCell.style.width = this._noteWidth(noteValue) + "px";
                 inputCell.style.minWidth = inputCell.style.width;
                 inputCell.style.maxWidth = inputCell.style.width;
                 inputCell.style.backgroundColor = this.platformColor.lyricsInputBackground;
-                inputCell.style.fontFamily = "sans-serif";
-                inputCell.style.cursor = "default";
-                inputCell.style.borderSpacing = "1px 1px";
-                inputCell.style.borderCollapse = "collapse";
-                inputCell.style.boxSizing = "border-box";
-                inputCell.style.padding = "0";
-                inputCell.style.borderRadius = "6px";
-                inputCell.style.border = "none";
                 inputCell.setAttribute("alt", i + "__" + "graphicsblocks2");
 
                 const lyricsInput = document.createElement("input");
                 lyricsInput.type = "text";
                 lyricsInput.value = this._lyrics[i];
+                lyricsInput.classList.add("pm-lyrics-input");
 
                 lyricsInput.style.height = inputCell.style.height;
-                lyricsInput.style.width = "100%";
                 lyricsInput.style.minWidth = inputCell.style.minWidth;
                 lyricsInput.style.maxWidth = inputCell.style.maxWidth;
-                lyricsInput.style.fontSize = "inherit";
-                lyricsInput.style.fontFamily = "sans-serif";
-                lyricsInput.style.cursor = "default";
-                lyricsInput.style.boxSizing = "border-box";
-                lyricsInput.style.padding = "0";
-                lyricsInput.style.border = "none";
-                lyricsInput.style.borderRadius = "6px";
                 lyricsInput.style.backgroundColor = this.platformColor.lyricsInputBackground;
 
                 inputCell.appendChild(lyricsInput);
@@ -1216,6 +1204,35 @@ class PhraseMaker {
                 item.titleHoverAttr.cursor = "pointer";
             }
         }
+    }
+
+    /**
+     * Handles cleanup and state reset when PhraseMaker widget window is closed.
+     */
+    handleClose() {
+        this._rowOffset = [];
+        for (let i = 0; i < this._rowMap.length; i++) {
+            this._rowMap[i] = i;
+        }
+
+        if (this.activity && this.activity.logo && this.activity.logo.synth) {
+            this.activity.logo.synth.stopSound(0, this._instrumentName);
+            this.activity.logo.synth.stop();
+        }
+        this._stopOrCloseClicked = true;
+        this.playingNow = false;
+        PhraseMakerAudio.clearPlaybackTimers(this);
+        if (this.activity && typeof this.activity.hideMsgs === "function") {
+            this.activity.hideMsgs();
+        }
+        const wheelDiv = this.docById("wheelDivptm");
+        if (wheelDiv && wheelDiv.style) {
+            wheelDiv.style.display = "none";
+        }
+        if (this.widgetWindow && typeof this.widgetWindow.destroy === "function") {
+            this.widgetWindow.destroy();
+        }
+        announceToScreenReader(_("Phrase Maker closed"));
     }
 
     _setupWheelDiv(size, left, top) {
@@ -1375,7 +1392,6 @@ class PhraseMaker {
                     rArg = 0;
                     break;
                 default:
-                    console.debug(label + " not found");
                     break;
             }
 
@@ -1435,14 +1451,15 @@ class PhraseMaker {
                 setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
                 let i;
                 for (i = 0; i < this.columnBlocksMap.length; i++) {
-                    if (this.columnBlocksMap[i][0] === aboveBlock) {
+                    if (this.columnBlocksMap[i] && this.columnBlocksMap[i][0] === aboveBlock) {
                         break;
                     }
                 }
 
-                this.rowLabels.splice(i + 1, 0, rLabel);
-                this.rowArgs.splice(i + 1, 0, rArg);
-                this._rowBlocks.splice(i + 1, 0, newBlock);
+                const insertIndex = i < this.columnBlocksMap.length ? i + 1 : this.rowLabels.length;
+                this.rowLabels.splice(insertIndex, 0, rLabel);
+                this.rowArgs.splice(insertIndex, 0, rArg);
+                this._rowBlocks.splice(insertIndex, 0, newBlock);
             }
 
             this.sorted = false;
@@ -1724,6 +1741,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/mouse.svg";
+                img.title = this._(this.rowLabels[blockIndex]);
+                img.alt = this._(this.rowLabels[blockIndex]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -2019,6 +2038,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/synth2.svg";
+                img.title = this._(this.rowLabels[blockIndex]);
+                img.alt = this._(this.rowLabels[blockIndex]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -2028,6 +2049,8 @@ class PhraseMaker {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = "images/mouse.svg";
+                img.title = this._(this.rowLabels[blockIndex]);
+                img.alt = this._(this.rowLabels[blockIndex]);
                 img.setAttribute("height", iconSize);
                 img.setAttribute("width", iconSize);
                 img.setAttribute("vertical-align", "middle");
@@ -2683,7 +2706,21 @@ class PhraseMaker {
 
         // Add the rows we skipped when capturing marked columns.
         for (let i = 0; i < rowsWeSkipped.length; i++) {
-            this._markedColsInRow[rowsWeSkipped[i][0]].push(rowsWeSkipped[i][1]);
+            const targetSortableIdx = rowsWeSkipped[i][0];
+            const skippedRowIdx = rowsWeSkipped[i][1];
+            const targetRowIdx = sortableList[targetSortableIdx]?.[3];
+
+            if (
+                targetRowIdx !== undefined &&
+                this._markedColsInRow[skippedRowIdx] &&
+                this._markedColsInRow[targetRowIdx]
+            ) {
+                for (const colIdx of this._markedColsInRow[skippedRowIdx]) {
+                    if (!this._markedColsInRow[targetRowIdx].includes(colIdx)) {
+                        this._markedColsInRow[targetRowIdx].push(colIdx);
+                    }
+                }
+            }
         }
 
         // Add the stuff we didn't sort.
@@ -2756,7 +2793,6 @@ class PhraseMaker {
             if (i === 0) {
                 this._sortedRowMap.push(0);
             } else if (i > 0 && obj[1] !== "hertz" && obj[1] === this._deps.last(this.rowLabels)) {
-                console.debug("skipping " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap));
                 if (oldColumnBlockMap[sortedList[lastObj][3]] !== undefined) {
                     setTimeout(
@@ -2776,7 +2812,6 @@ class PhraseMaker {
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
             } else {
-                console.debug("pushing " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap) + 1);
                 lastObj = i;
                 this.stylePhraseMaker();
@@ -2824,11 +2859,16 @@ class PhraseMaker {
      */
     _export() {
         const exportWindow = window.open("");
-        const exportDocument = exportWindow.document;
-        if (exportDocument === undefined) {
+        if (!exportWindow) {
             console.debug("Could not create export window");
+            this.activity.errorMsg(
+                this._(
+                    "Could not open export window. This is often caused by a browser pop-up blocker — check your settings and try again."
+                )
+            );
             return;
         }
+        const exportDocument = exportWindow.document;
 
         const title = exportDocument.createElement("title");
         title.textContent = "Music Matrix";
@@ -4377,11 +4417,16 @@ class PhraseMaker {
                 ii = this._rowMapper[i];
                 r = this._sortedRowMap[i];
                 row = this._rows[r];
+                if (!row || !this._markedColsInRow[ii]) {
+                    continue;
+                }
                 for (let j = 0; j < this._markedColsInRow[ii].length; j++) {
                     c = this._markedColsInRow[ii][j];
-                    cell = row.cells[c];
-                    cell.style.backgroundColor = "black";
-                    this._setNoteCell(r, c, cell, false, null);
+                    cell = row.cells?.[c];
+                    if (cell) {
+                        cell.style.backgroundColor = "black";
+                        this._setNoteCell(r, c, cell, false, null);
+                    }
                 }
             }
         } else {

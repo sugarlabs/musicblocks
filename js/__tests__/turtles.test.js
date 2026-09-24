@@ -681,6 +681,170 @@ describe("aux toolbar collapse and expand", () => {
         expect(turtles.hideMenu).toHaveBeenCalled();
         expect(turtles.setStageScale).toHaveBeenCalledWith(1.0);
     });
+
+    test("keeps canvas buttons below the auxiliary toolbar after resize", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+        const hardwareConcurrency = Object.getOwnPropertyDescriptor(
+            navigator,
+            "hardwareConcurrency"
+        );
+
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        this.onload?.();
+                    }
+                });
+            }
+        };
+        Object.defineProperty(navigator, "hardwareConcurrency", { configurable: true, value: 1 });
+        jest.useFakeTimers();
+
+        try {
+            activityMock.toolbarHeight = 0;
+            document.getElementById("aux-toolbar").style.display = "none";
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            const buttonIds = ["Grid", "Clear", "Collapse"];
+            const baseTop = 70 + LEADING + 6;
+            buttonIds.forEach(id => {
+                expect(document.getElementById(id).style.top).toBe(`${baseTop}px`);
+            });
+
+            // Opening the menu shifts existing buttons; fullscreen then rebuilds them on resize.
+            activityMock.toolbarHeight = 64;
+            document.getElementById("aux-toolbar").style.display = "block";
+            buttonIds.forEach(id => {
+                document.getElementById(id).style.top = `${baseTop + 64}px`;
+            });
+            const oldGrid = document.getElementById("Grid");
+            turtles._resizeHandler();
+            jest.advanceTimersByTime(150);
+
+            expect(document.getElementById("Grid")).not.toBe(oldGrid);
+            buttonIds.forEach(id => {
+                expect(document.getElementById(id).style.top).toBe(`${baseTop + 64}px`);
+            });
+
+            activityMock.toolbarHeight = 0;
+            document.getElementById("aux-toolbar").style.display = "none";
+            turtles._resizeHandler();
+            jest.advanceTimersByTime(150);
+            buttonIds.forEach(id => {
+                expect(document.getElementById(id).style.top).toBe(`${baseTop}px`);
+            });
+        } finally {
+            jest.useRealTimers();
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+            if (hardwareConcurrency) {
+                Object.defineProperty(navigator, "hardwareConcurrency", hardwareConcurrency);
+            } else {
+                delete navigator.hardwareConcurrency;
+            }
+        }
+    });
+
+    test("Escape key on canvas buttons exits keyboard navigation", () => {
+        const listeners = [];
+        const originalCreateElement = document.createElement;
+        document.createElement = function (tag) {
+            const el = originalCreateElement.call(document, tag);
+            const originalAddEventListener = el.addEventListener;
+            el.addEventListener = function (event, handler) {
+                if (event === "keydown") listeners.push(handler);
+                originalAddEventListener.call(this, event, handler);
+            };
+            return el;
+        };
+
+        const originalJQuery = window.jQuery;
+        const mockJQuery = jest.fn(() => ({
+            tooltip: jest.fn(),
+            each: jest.fn(function (cb) {
+                cb.call(document.createElement("div"));
+                return this;
+            })
+        }));
+        mockJQuery.noConflict = jest.fn(() => mockJQuery);
+        window.jQuery = mockJQuery;
+        global.jQuery = mockJQuery;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+        global.makeKeyboardAccessible = jest.fn();
+
+        const originalImage = global.Image;
+        global.Image = function () {
+            const img = document.createElement("img");
+            const originalSetAttribute = img.setAttribute;
+            img.setAttribute = jest.fn(function (name, value) {
+                return originalSetAttribute.call(img, name, value);
+            });
+            Object.defineProperty(img, "src", {
+                set: function (val) {
+                    this.setAttribute("src", val);
+                    if (typeof this.onload === "function") {
+                        this.onload();
+                    }
+                },
+                get: function () {
+                    return this.getAttribute("src");
+                }
+            });
+            return img;
+        };
+
+        const activityMock = {
+            toolbarHeight: 0,
+            loading: false,
+            getCanvasPadding: jest.fn(() => ({ paddingTop: 0, paddingLeft: 0 })),
+            refreshCanvas: jest.fn()
+        };
+        const turtles = new Turtles(activityMock);
+        mixinPrototypes(turtles);
+        turtles.activity = activityMock; // Manually assign activity just in case importMembers is mocked
+        turtles._borderContainer = { removeAllChildren: jest.fn(), addChild: jest.fn() };
+        turtles._canvas = { style: {}, getContext: jest.fn(), width: 1200, height: 900 };
+        turtles.stage = { addChild: jest.fn() };
+        turtles._backgroundColor = "white"; // Add to prevent crash
+        turtles._expandedBoundary = null;
+        turtles._collapsedBoundary = null;
+        turtles._expandButton = null;
+        turtles._collapseButton = null;
+        turtles.gridButton = null;
+        turtles._clearButton = null;
+
+        window._focusCycleManager = { exitKeyboardNavigation: jest.fn() };
+
+        turtles.makeBackground();
+
+        expect(listeners.length).toBeGreaterThan(0);
+
+        const handler = listeners[0];
+
+        handler({ key: "A", preventDefault: jest.fn(), stopPropagation: jest.fn() });
+        expect(window._focusCycleManager.exitKeyboardNavigation).not.toHaveBeenCalled();
+
+        const preventDefault = jest.fn();
+        const stopPropagation = jest.fn();
+        handler({ key: "Escape", preventDefault, stopPropagation });
+
+        expect(preventDefault).toHaveBeenCalled();
+        expect(stopPropagation).toHaveBeenCalled();
+        expect(window._focusCycleManager.exitKeyboardNavigation).toHaveBeenCalled();
+
+        document.createElement = originalCreateElement;
+        window.jQuery = originalJQuery;
+        global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        global.Image = originalImage;
+        delete window._focusCycleManager;
+    });
 });
 
 describe("TurtlesModel doGrid initialization order", () => {
@@ -803,5 +967,113 @@ describe("turtleCount", () => {
         });
 
         expect(turtles.turtleCount()).toBe(1);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// removeTurtle — stage cleanup
+// ---------------------------------------------------------------------------
+
+describe("TurtlesModel.removeTurtle", () => {
+    let stage;
+    let model;
+
+    // importMembers is mocked in this file, so new Turtles() never runs the
+    // TurtlesModel constructor. Construct the model directly, the same way the
+    // doGrid tests above do, so removeTurtle is actually present.
+    const makeModel = () => {
+        stage = { addChild: jest.fn(), removeChild: jest.fn() };
+        const activity = {
+            stage: { addChild: jest.fn(), removeChild: jest.fn() },
+            turtleContainer: stage,
+            canvas: {},
+            hideAuxMenu: jest.fn(),
+            doClear: jest.fn(),
+            hideGrids: jest.fn(),
+            refreshCanvas: jest.fn()
+        };
+        return new Turtles.TurtlesModel(activity);
+    };
+
+    const makeTurtle = (overrides = {}) => ({
+        imageContainer: { id: "image" },
+        penstrokes: { id: "pen" },
+        container: { id: "body" },
+        ...overrides
+    });
+
+    beforeEach(() => {
+        model = makeModel();
+        stage.addChild.mockClear();
+        stage.removeChild.mockClear();
+    });
+
+    // add() attaches imageContainer, penstrokes and container to the stage for
+    // every turtle. Leaving them behind keeps the turtle in the display list,
+    // so it still costs a walk on every frame and whatever it displayed stays
+    // on screen.
+    it("detaches the three children that were attached to the stage", () => {
+        const turtle = makeTurtle();
+        model._turtleList = [turtle];
+
+        model.removeTurtle(0);
+
+        expect(stage.removeChild).toHaveBeenCalledWith(turtle.imageContainer);
+        expect(stage.removeChild).toHaveBeenCalledWith(turtle.penstrokes);
+        expect(stage.removeChild).toHaveBeenCalledWith(turtle.container);
+        expect(stage.removeChild).toHaveBeenCalledTimes(3);
+    });
+
+    it("drops the turtle from the list", () => {
+        const a = makeTurtle();
+        const b = makeTurtle();
+        model._turtleList = [a, b];
+
+        model.removeTurtle(0);
+
+        expect(model._turtleList).toEqual([b]);
+    });
+
+    it("still clears a pending interval", () => {
+        const clearSpy = jest.spyOn(global, "clearInterval");
+        const turtle = makeTurtle({ interval: 4242 });
+        model._turtleList = [turtle];
+
+        model.removeTurtle(0);
+
+        expect(clearSpy).toHaveBeenCalledWith(4242);
+        expect(turtle.interval).toBeUndefined();
+        clearSpy.mockRestore();
+    });
+
+    it("skips children the turtle never had", () => {
+        const turtle = makeTurtle({ imageContainer: null, penstrokes: null });
+        model._turtleList = [turtle];
+
+        expect(() => model.removeTurtle(0)).not.toThrow();
+        expect(stage.removeChild).toHaveBeenCalledTimes(1);
+        expect(stage.removeChild).toHaveBeenCalledWith(turtle.container);
+    });
+
+    it("removes the turtle even when the stage is unavailable", () => {
+        const turtle = makeTurtle();
+        model._turtleList = [turtle];
+        model._stage = null;
+
+        expect(() => model.removeTurtle(0)).not.toThrow();
+        expect(model._turtleList).toEqual([]);
+    });
+
+    it.each([
+        ["a negative index", -1],
+        ["an index past the end", 5]
+    ])("leaves the list untouched for %s", (label, index) => {
+        const turtle = makeTurtle();
+        model._turtleList = [turtle];
+
+        model.removeTurtle(index);
+
+        expect(model._turtleList).toEqual([turtle]);
+        expect(stage.removeChild).not.toHaveBeenCalled();
     });
 });

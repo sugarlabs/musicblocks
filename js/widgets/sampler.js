@@ -18,9 +18,45 @@
    instruments, slicePath, platformColor, TunerDisplay, TunerUtils
 */
 
-/* exported SampleWidget */
+/* exported SampleWidget, resolveBackendURL */
 /** AMD module dependencies for lazy loading. */
 SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
+
+/**
+ * Resolves the AI backend service URL based on global configuration or query parameter overrides.
+ * @param {Location} [loc] Optional location object for testability.
+ * @returns {string}
+ */
+function resolveBackendURL(loc) {
+    if (
+        typeof window !== "undefined" &&
+        typeof window.AI_SAMPLE_ENDPOINT === "string" &&
+        window.AI_SAMPLE_ENDPOINT.trim()
+    ) {
+        return window.AI_SAMPLE_ENDPOINT.trim().replace(/\/+$/, "");
+    }
+
+    try {
+        const location =
+            loc !== undefined ? loc : typeof window !== "undefined" ? window.location : null;
+        if (!location) {
+            return "";
+        }
+
+        const search = location.search || "";
+        const params = new URLSearchParams(search);
+        if (params.has("backend")) {
+            return params.get("backend").replace(/\/+$/, "");
+        }
+        if (params.has("backend_url")) {
+            return params.get("backend_url").replace(/\/+$/, "");
+        }
+
+        return "";
+    } catch (e) {
+        return "";
+    }
+}
 
 /**
  * Represents a Sample Widget.
@@ -546,11 +582,25 @@ function SampleWidget() {
             }
             // Dispose Tone.Analyser nodes to free Web Audio resources
             for (const key in this.pitchAnalysers) {
-                if (
-                    this.pitchAnalysers[key] &&
-                    typeof this.pitchAnalysers[key].dispose === "function"
-                ) {
-                    this.pitchAnalysers[key].dispose();
+                const analyser = this.pitchAnalysers[key];
+                if (analyser) {
+                    if (typeof instruments !== "undefined" && instruments[0]) {
+                        for (const synth in instruments[0]) {
+                            try {
+                                if (
+                                    instruments[0][synth] &&
+                                    typeof instruments[0][synth].disconnect === "function"
+                                ) {
+                                    instruments[0][synth].disconnect(analyser);
+                                }
+                            } catch (_) {
+                                // Synth may not have been connected to this analyser.
+                            }
+                        }
+                    }
+                    if (typeof analyser.dispose === "function") {
+                        analyser.dispose();
+                    }
                 }
             }
             this.pitchAnalysers = {};
@@ -678,6 +728,14 @@ function SampleWidget() {
 
         this._promptBtn.onclick = () => {
             stopTuner();
+            const aiSampleEndpoint = resolveBackendURL();
+            if (!aiSampleEndpoint) {
+                activity.errorMsg(_("AI sample generation is not available."));
+                return;
+            }
+            if (aiSampleEndpoint.startsWith("http://")) {
+                console.warn("AI sample endpoint is using HTTP instead of HTTPS.");
+            }
             if (this.is_recording) {
                 this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
@@ -789,7 +847,7 @@ function SampleWidget() {
                 setPromptBtnState(submit, true);
                 const prompt = textArea.value;
                 const encodedPrompt = encodeURIComponent(prompt);
-                const url = `http://13.61.94.100:8000/generate?prompt=${encodedPrompt}`;
+                const url = `${aiSampleEndpoint}/generate?prompt=${encodedPrompt}`;
 
                 let blinkInterval;
 
@@ -834,7 +892,7 @@ function SampleWidget() {
                     that.audioPreview = null;
                 }
 
-                const audioURL = `http://13.61.94.100:8000/preview`;
+                const audioURL = `${aiSampleEndpoint}/preview`;
                 const newAudio = new Audio(audioURL);
                 that.audioPreview = newAudio;
                 newAudio.play();
@@ -850,7 +908,7 @@ function SampleWidget() {
             stylePromptBtn(save, "Save");
             setPromptBtnState(save, true);
             save.onclick = function () {
-                const audioURL = `http://13.61.94.100:8000/save`;
+                const audioURL = `${aiSampleEndpoint}/save`;
                 const link = document.createElement("a");
                 link.href = audioURL;
                 link.download = "output.wav";
@@ -877,11 +935,16 @@ function SampleWidget() {
         this._recordBtn.onclick = async () => {
             stopTuner();
             if (!this.is_recording) {
-                await this.activity.logo.synth.startRecording();
-                this.is_recording = true;
-                this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
-                this.displayRecordingStartMessage();
-                this.activity.logo.synth.LiveWaveForm();
+                try {
+                    await this.activity.logo.synth.startRecording();
+                    this.is_recording = true;
+                    this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
+                    this.displayRecordingStartMessage();
+                    this.activity.logo.synth.LiveWaveForm();
+                } catch (err) {
+                    console.error(err);
+                    this.activity.errorMsg(_("Microphone access denied."));
+                }
             } else {
                 this.recordingURL = await this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
@@ -1967,7 +2030,7 @@ function SampleWidget() {
                         if (dataArray && dataArray.length > 0) {
                             const pitch = detectPitch(dataArray);
                             if (pitch > 0) {
-                                const { note, cents } = frequencyToNote(pitch);
+                                const { note, cents } = TunerUtils.frequencyToNote(pitch);
                                 this.tunerDisplay.update(note, cents, this.centsValue);
 
                                 // Update segments
@@ -2104,19 +2167,6 @@ function SampleWidget() {
     };
 
     /**
-     * Convert frequency to note and cents
-     */
-    const frequencyToNote = (frequency, edo) => {
-        if (frequency <= 0) return { note: "---", cents: 0 };
-
-        const result = TunerUtils.frequencyToPitch(frequency, edo);
-        const noteName = result[0] + result[1];
-        const centsOffset = result[2];
-
-        return { note: noteName, cents: centsOffset };
-    };
-
-    /**
      * Stops pitch detection and releases all associated resources.
      * This prevents memory leaks from AudioContext, MediaStream, and animation frames.
      * @returns {void}
@@ -2188,7 +2238,7 @@ function SampleWidget() {
                 // Update widget-local DOM elements (passed in from makeTuner — no global query)
                 if (pitchElement && noteElement) {
                     if (pitch > 0) {
-                        const { note, cents } = frequencyToNote(pitch);
+                        const { note, cents } = TunerUtils.frequencyToNote(pitch);
                         pitchElement.textContent = pitch.toFixed(2);
                         noteElement.textContent =
                             cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;
@@ -2208,7 +2258,7 @@ function SampleWidget() {
             this.pitchDetectionAnimationId = requestAnimationFrame(updatePitch);
         } catch (err) {
             console.error(`${err.name}: ${err.message}`);
-            alert(_("Microphone access failed: %s").replace(/%s/g, err.message));
+            this.activity.errorMsg(_("Microphone access failed: %s").replace(/%s/g, err.message));
             // Clean up any partially initialized resources
             this.stopPitchDetection();
         }
@@ -2356,5 +2406,5 @@ class PitchSmoother {
 }
 
 if (typeof module !== "undefined") {
-    module.exports = { SampleWidget, PitchSmoother };
+    module.exports = { SampleWidget, PitchSmoother, resolveBackendURL };
 }

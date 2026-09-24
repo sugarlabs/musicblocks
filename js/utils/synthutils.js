@@ -15,10 +15,11 @@
 
    last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
-   getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
+   getOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
-   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber
+   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber,
+   computeTargetPitchFrequency
 */
 
 /*
@@ -28,7 +29,8 @@
     - js/utils/musicutils.js
         pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
         isCustomTemperament, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
-        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE, parseNoteString
+        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE, parseNoteString,
+        computeTargetPitchFrequency
     - js/turtle-singer.js
         Singer
     - js/utils/platformstyle.js
@@ -518,6 +520,157 @@ const transport = {
 };
 
 /**
+ * Class responsible for loading and managing audio samples (Tone.js samplers).
+ */
+class SampleLoader {
+    constructor() {
+        this.samples = null;
+    }
+
+    initStructures() {
+        if (this.samples === null) {
+            this.samples = { voice: {}, drum: {} };
+            // Pre-populate with null to indicate they exist as valid instruments but are not loaded
+            for (const type in SAMPLE_INFO) {
+                for (const name in SAMPLE_INFO[type]) {
+                    this.samples[type][name] = null;
+                }
+            }
+            this.samples.voice["empty"] = () => null;
+        }
+    }
+
+    loadSampleAsync(sampleName) {
+        this.initStructures();
+        return new Promise((resolve, reject) => {
+            let found = false;
+            let sampleType = null;
+            let sampleInfo = null;
+
+            // Find the sample info
+            for (const type in SAMPLE_INFO) {
+                if (SAMPLE_INFO[type][sampleName]) {
+                    sampleType = type;
+                    sampleInfo = SAMPLE_INFO[type][sampleName];
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                // If not found in SAMPLE_INFO, it might be a built-in or custom synth, so we resolve immediately
+                resolve();
+                return;
+            }
+
+            if (this.samples[sampleType][sampleName] !== null) {
+                // Already loaded
+                resolve();
+                return;
+            }
+
+            // Load the sample module using require
+            requirejs(
+                [sampleInfo.path],
+                () => {
+                    try {
+                        const sampleData = window[sampleInfo.global];
+                        if (sampleData) {
+                            this.samples[sampleType][sampleName] = sampleData();
+                            resolve();
+                        } else {
+                            console.error(
+                                `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
+                            );
+                            reject(`Sample global not found: ${sampleName}`);
+                        }
+                    } catch (e) {
+                        console.error(`Error processing sample ${sampleName}:`, e);
+                        reject(e);
+                    }
+                },
+                err => {
+                    console.error(`Failed to load sample module for ${sampleName}:`, err);
+                    reject(err);
+                }
+            );
+        });
+    }
+
+    async preloadProject(blockList) {
+        if (!blockList || !Array.isArray(blockList)) {
+            return;
+        }
+
+        const instrumentsToLoad = new Set();
+
+        // Known instrument block names
+        const instrumentBlockNames = ["settimbre", "setinstrument", "timbre", "instrument"];
+
+        // Scan blocks for instrument references
+        for (const block of blockList) {
+            if (!Array.isArray(block) || block.length < 2) continue;
+
+            const blockName = block[1];
+
+            // Check if this is an instrument-setting block
+            if (instrumentBlockNames.includes(blockName)) {
+                // The instrument name is usually in a connected block
+                // Check the connections for potential instrument names
+                const connections = block[4];
+                if (Array.isArray(connections)) {
+                    for (const connIdx of connections) {
+                        if (connIdx !== null && blockList[connIdx]) {
+                            const connBlock = blockList[connIdx];
+                            // Check if it's a text/value block with an instrument name
+                            if (Array.isArray(connBlock) && connBlock.length > 1) {
+                                const value = connBlock[1];
+                                // Check if this value is a known instrument
+                                if (typeof value === "string") {
+                                    // Check voice samples
+                                    if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[value]) {
+                                        instrumentsToLoad.add(value);
+                                    }
+                                    // Check drum samples
+                                    if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[value]) {
+                                        instrumentsToLoad.add(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Also check if the block name itself is an instrument
+            if (typeof blockName === "string") {
+                if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[blockName]) {
+                    instrumentsToLoad.add(blockName);
+                }
+                if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[blockName]) {
+                    instrumentsToLoad.add(blockName);
+                }
+            }
+        }
+
+        // Preload all found instruments in parallel
+        if (instrumentsToLoad.size > 0) {
+            console.debug(
+                `Preloading ${instrumentsToLoad.size} instruments:`,
+                Array.from(instrumentsToLoad)
+            );
+            const loadPromises = Array.from(instrumentsToLoad).map(name =>
+                this.loadSampleAsync(name).catch(err => {
+                    console.warn(`Failed to preload sample ${name}:`, err);
+                })
+            );
+            await Promise.all(loadPromises);
+            console.debug("Project samples preloaded successfully");
+        }
+    }
+}
+
+/**
  * Synth constructor function.
  * @constructor
  */
@@ -561,11 +714,21 @@ function Synth() {
     Tone.Buffer.onload = () => {
         console.debug("sample loaded");
     };
+
     /**
-     * Object to store samples.
-     * @type {Object}
+     * The loader responsible for initializing and fetching sample synths.
+     * @type {SampleLoader}
      */
-    this.samples = null;
+    this.sampleLoader = new SampleLoader();
+
+    // Define a getter/setter for backward compatibility with Synth instance state
+    Object.defineProperty(this, "samples", {
+        get: () => this.sampleLoader.samples,
+        set: val => {
+            this.sampleLoader.samples = val;
+        }
+    });
+
     /**
      * Suffix for sample names.
      * @type {string}
@@ -877,6 +1040,7 @@ function Synth() {
      * @returns {number|number[]} - The frequency or frequencies.
      */
     this.getCustomFrequency = (notes, customID) => {
+        const _stripCents = n => (typeof n === "string" ? n.replace(/\(.*\)/, "") : n);
         const __getCustomFrequency = (oneNote, startingPitch) => {
             const parsed = parseNoteString(oneNote);
             const octave = parsed[1];
@@ -891,12 +1055,14 @@ function Synth() {
             );
             if (typeof oneNote !== "number") {
                 const thisTemperament = getTemperament(customID);
+                const target = _stripCents(oneNote);
                 for (const pitchNumber in thisTemperament) {
                     if (pitchNumber !== "pitchNumber") {
+                        const n3 = thisTemperament[pitchNumber][3];
+                        const n1 = thisTemperament[pitchNumber][1];
                         if (
-                            (isCustomTemperament(customID) &&
-                                oneNote === thisTemperament[pitchNumber][3]) ||
-                            oneNote === thisTemperament[pitchNumber][1]
+                            (isCustomTemperament(customID) && target === _stripCents(n3)) ||
+                            target === _stripCents(n1)
                         ) {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
@@ -947,23 +1113,9 @@ function Synth() {
      * @function
      */
     this.loadSamples = () => {
-        if (this.samples === null) {
-            this.samples = { voice: {}, drum: {} };
-            // Pre-populate with null to indicate they exist as valid instruments but are not loaded
-            for (const type in SAMPLE_INFO) {
-                for (const name in SAMPLE_INFO[type]) {
-                    this.samples[type][name] = null;
-                }
-            }
-            this.samples.voice["empty"] = () => null;
-        }
+        this.sampleLoader.initStructures();
     };
 
-    /**
-     * Loads samples into the Synth instance.
-     * @function
-     * @memberof Synth
-     */
     /**
      * Loads a specific sample into the Synth instance asynchronously.
      * @function
@@ -972,59 +1124,7 @@ function Synth() {
      * @returns {Promise<void>} - A promise that resolves when the sample is loaded.
      */
     this._loadSample = sampleName => {
-        return new Promise((resolve, reject) => {
-            let found = false;
-            let sampleType = null;
-            let sampleInfo = null;
-
-            // Find the sample info
-            for (const type in SAMPLE_INFO) {
-                if (SAMPLE_INFO[type][sampleName]) {
-                    sampleType = type;
-                    sampleInfo = SAMPLE_INFO[type][sampleName];
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                // If not found in SAMPLE_INFO, it might be a built-in or custom synth, so we resolve immediately
-                resolve();
-                return;
-            }
-
-            if (this.samples[sampleType][sampleName] !== null) {
-                // Already loaded
-                resolve();
-                return;
-            }
-
-            // Load the sample module using require
-            requirejs(
-                [sampleInfo.path],
-                () => {
-                    try {
-                        const sampleData = window[sampleInfo.global];
-                        if (sampleData) {
-                            this.samples[sampleType][sampleName] = sampleData();
-                            resolve();
-                        } else {
-                            console.error(
-                                `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
-                            );
-                            reject(`Sample global not found: ${sampleName}`);
-                        }
-                    } catch (e) {
-                        console.error(`Error processing sample ${sampleName}:`, e);
-                        reject(e);
-                    }
-                },
-                err => {
-                    console.error(`Failed to load sample module for ${sampleName}:`, err);
-                    reject(err);
-                }
-            );
-        });
+        return this.sampleLoader.loadSampleAsync(sampleName);
     };
 
     /**
@@ -1036,75 +1136,7 @@ function Synth() {
      * @returns {Promise<void>} - A promise that resolves when all samples are preloaded.
      */
     this.preloadProjectSamples = async blockList => {
-        if (!blockList || !Array.isArray(blockList)) {
-            return;
-        }
-
-        const instrumentsToLoad = new Set();
-
-        // Known instrument block names
-        const instrumentBlockNames = ["settimbre", "setinstrument", "timbre", "instrument"];
-
-        // Scan blocks for instrument references
-        for (const block of blockList) {
-            if (!Array.isArray(block) || block.length < 2) continue;
-
-            const blockName = block[1];
-
-            // Check if this is an instrument-setting block
-            if (instrumentBlockNames.includes(blockName)) {
-                // The instrument name is usually in a connected block
-                // Check the connections for potential instrument names
-                const connections = block[4];
-                if (Array.isArray(connections)) {
-                    for (const connIdx of connections) {
-                        if (connIdx !== null && blockList[connIdx]) {
-                            const connBlock = blockList[connIdx];
-                            // Check if it's a text/value block with an instrument name
-                            if (Array.isArray(connBlock) && connBlock.length > 1) {
-                                const value = connBlock[1];
-                                // Check if this value is a known instrument
-                                if (typeof value === "string") {
-                                    // Check voice samples
-                                    if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[value]) {
-                                        instrumentsToLoad.add(value);
-                                    }
-                                    // Check drum samples
-                                    if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[value]) {
-                                        instrumentsToLoad.add(value);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Also check if the block name itself is an instrument
-            if (typeof blockName === "string") {
-                if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[blockName]) {
-                    instrumentsToLoad.add(blockName);
-                }
-                if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[blockName]) {
-                    instrumentsToLoad.add(blockName);
-                }
-            }
-        }
-
-        // Preload all found instruments in parallel
-        if (instrumentsToLoad.size > 0) {
-            console.debug(
-                `Preloading ${instrumentsToLoad.size} instruments:`,
-                Array.from(instrumentsToLoad)
-            );
-            const loadPromises = Array.from(instrumentsToLoad).map(name =>
-                this._loadSample(name).catch(err => {
-                    console.warn(`Failed to preload sample ${name}:`, err);
-                })
-            );
-            await Promise.all(loadPromises);
-            console.debug("Project samples preloaded successfully");
-        }
+        return await this.sampleLoader.preloadProject(blockList);
     };
 
     /**
@@ -1493,20 +1525,19 @@ function Synth() {
         const solfegeDict = { do: 0, re: 2, mi: 4, fa: 5, sol: 7, la: 9, ti: 11 };
         const letterDict = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
-        let attr = getArticulation(solfege);
-        if (attr === SHARP) {
+        const articulation = getArticulation(solfege);
+        let attr = 0;
+        if (articulation === SHARP) {
             attr = 1;
-        } else if (attr === FLAT) {
+        } else if (articulation === FLAT) {
             attr = -1;
-        } else if (attr === DOUBLESHARP) {
+        } else if (articulation === DOUBLESHARP) {
             attr = 2;
-        } else if (attr === DOUBLEFLAT) {
+        } else if (articulation === DOUBLEFLAT) {
             attr = -2;
-        } else {
-            attr = 0;
         }
 
-        const fragment = solfege.replace(attr, "");
+        const fragment = articulation ? solfege.replace(articulation, "") : solfege;
         let chromaticNumber = 0;
         if (fragment in solfegeDict) {
             chromaticNumber = solfegeDict[fragment];
@@ -1798,7 +1829,6 @@ function Synth() {
      * @returns {Tone.Instrument|null} - The loaded synth or null if not loaded.
      */
     this.loadSynth = async (turtle, sourceName) => {
-        /* eslint-disable */
         sourceName = this.resolveInstrumentName(sourceName);
         if (sourceName.substring(0, 13) === "customsample_") {
             console.debug("loading custom " + sourceName);
@@ -1863,13 +1893,11 @@ function Synth() {
         }
 
         if (needsFreqConversion()) {
-            if (typeof notes === "number") {
-                notes = notes;
-            } else {
+            if (typeof notes !== "number") {
                 const notes1 = notes;
                 notes = this._getFrequency(notes, this.changeInTemperament);
                 if (notes === undefined) {
-                    if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
+                    if (notes1.substring(1, notes1.length - 1) === DOUBLEFLAT) {
                         notes = notes1.substring(0, 1) + "bb" + notes1.substring(notes1.length - 1);
                     } else if (notes1.substring(1, notes1.length - 1) === DOUBLESHARP) {
                         notes = notes1.substring(0, 1) + "x" + notes1.substring(notes1.length - 1);
@@ -1882,12 +1910,7 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            if (
-                typeof notes === "string" &&
-                (notes.search("[+]") !== -1 || notes.search("[-]") !== -1)
-            ) {
-                notes = this.getCustomFrequency(notes, this.inTemperament);
-            }
+            notes = this.getCustomFrequency(notes, this.inTemperament);
             if (notes === undefined || notes === "undefined") {
                 notes = notes1;
             }
@@ -2471,6 +2494,7 @@ function Synth() {
                 instruments[turtle][instrumentName].stop();
                 break;
             default:
+                // eslint-disable-next-line eqeqeq -- loose on purpose, catches null and undefined
                 if (note == undefined) {
                     instruments[turtle][instrumentName].triggerRelease();
                 } else {
@@ -2487,6 +2511,7 @@ function Synth() {
         const flag = instrumentsSource[instrumentName][0];
         const now = Tone.now();
         const loopA = new Tone.Loop(time => {
+            // eslint-disable-next-line eqeqeq -- flag comes from instrumentsSource and may be "1"
             if (flag == 1) {
                 this.setVolume(turtle, instrumentName, velocity * 100);
                 instruments[turtle][instrumentName].start();
@@ -2658,15 +2683,9 @@ function Synth() {
 
         this.mic = new Tone.UserMedia();
         this.recorder = new Tone.Recorder();
-        await this.mic
-            .open()
-            .then(() => {
-                this.mic.connect(this.recorder);
-                this.recorder.start();
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        await this.mic.open();
+        this.mic.connect(this.recorder);
+        this.recorder.start();
     };
 
     const _disposeRecordingPlayer = () => {
@@ -3145,10 +3164,6 @@ function Synth() {
                                 activityProxy.logo = logo;
 
                                 const tempBlock = {
-                                    container: {
-                                        x: targetNoteSelector.offsetLeft,
-                                        y: targetNoteSelector.offsetTop
-                                    },
                                     activity: activityProxy,
                                     blocks: {
                                         blockList: [
@@ -3313,55 +3328,11 @@ function Synth() {
 
                                     // Calculate the frequency for the target pitch
                                     try {
-                                        // Define base frequencies for each note (C4 = 261.63 Hz)
-                                        const baseFrequencies = {
-                                            "C": 261.63,
-                                            "C#": 277.18,
-                                            "D": 293.66,
-                                            "D#": 311.13,
-                                            "E": 329.63,
-                                            "F": 349.23,
-                                            "F#": 369.99,
-                                            "G": 392.0,
-                                            "G#": 415.3,
-                                            "A": 440.0,
-                                            "A#": 466.16,
-                                            "B": 493.88
-                                        };
-
-                                        // Extract note and octave
-                                        const noteMatch = noteWithOctave.match(/([A-G][#b]?)(\d+)/);
-                                        if (!noteMatch) {
-                                            throw new Error("Invalid note format");
-                                        }
-
-                                        const [, note, octave] = noteMatch;
-                                        // Convert flats to sharps for lookup
-                                        const lookupNote = note
-                                            .replace("b", "#")
-                                            .replace("bb", "##");
-
-                                        // Get base frequency for the note
-                                        let freq = baseFrequencies[lookupNote];
-                                        if (!freq) {
-                                            throw new Error("Invalid note");
-                                        }
-
-                                        // Adjust for octave (C4 is the reference octave)
-                                        const octaveDiff = parseInt(octave, 10) - 4;
-                                        freq *= Math.pow(2, octaveDiff);
-
-                                        targetPitch.frequency = freq;
-
-                                        // Validate frequency
-                                        if (
-                                            isNaN(targetPitch.frequency) ||
-                                            targetPitch.frequency <= 0
-                                        ) {
-                                            console.error(
-                                                "Invalid frequency calculated:",
-                                                targetPitch.frequency
-                                            );
+                                        const freq = computeTargetPitchFrequency(noteWithOctave);
+                                        if (!isNaN(freq) && freq > 0) {
+                                            targetPitch.frequency = freq;
+                                        } else {
+                                            console.error("Invalid frequency calculated:", freq);
                                             targetPitch.frequency = 440; // Default to A4 if calculation fails
                                         }
                                     } catch (error) {

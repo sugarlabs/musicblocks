@@ -29,7 +29,7 @@
    instance directly. No global classification lists are consulted here.
 */
 /* global DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _,
-   MINIMUMDOCKDISTANCE, LONGSTACK, announceToScreenReader */
+   MINIMUMDOCKDISTANCE, LONGSTACK, announceToScreenReader, widgetWindows */
 
 /* exported setupBlockDragController, BlockDragController */
 
@@ -100,6 +100,27 @@ class BlockDragController {
         const blocks = this.blocks;
         blocks._cachedDragGroup = null;
         blocks._dragActiveGroup = null;
+        // moveBlockRelative/moveBlockRelativeBatched raise isBlockMoving on
+        // every pressmove, but blockMoved() is the only place that lowers it
+        // and it runs only for a drag that passed the movement threshold and
+        // ended away from the trashcan. Clearing here instead covers every
+        // way a drag can finish, since both the mouseout and pressup handlers
+        // call this unconditionally once the drag is over.
+        blocks.isBlockMoving = false;
+    }
+
+    /**
+     * Reconcile spatial-grid positions after a drag that deferred updates.
+     * @public
+     * @returns {void}
+     */
+    syncDragGroupSpatialGrid() {
+        const blocks = this.blocks;
+        const dragGroup = blocks._cachedDragGroup ?? blocks.dragGroup;
+
+        for (const blk of dragGroup) {
+            blocks._updateSpatialGrid(blk);
+        }
     }
 
     /**
@@ -189,10 +210,11 @@ class BlockDragController {
      * @param - blk - block index
      * @param - dx - delta x
      * @param - dy - delta y
+     * @param {boolean} deferSpatialGrid - defer spatial-grid updates until drag release
      * @public
      * @returns {void}
      */
-    moveBlockRelativeBatched(blk, dx, dy) {
+    moveBlockRelativeBatched(blk, dx, dy, deferSpatialGrid = false) {
         const blocks = this.blocks;
         blocks.inLongPress = false;
         blocks.isBlockMoving = true;
@@ -200,7 +222,9 @@ class BlockDragController {
         if (myBlock.container) {
             myBlock.container.x += dx;
             myBlock.container.y += dy;
-            blocks._updateSpatialGrid(blk);
+            if (!deferSpatialGrid) {
+                blocks._updateSpatialGrid(blk);
+            }
         }
     }
 
@@ -225,6 +249,123 @@ class BlockDragController {
     }
 
     /**
+     * Find candidate block and connection to snap to while dragging thisBlock.
+     * Returns candidate details or null if no compatible dock is in range.
+     * @param {number} thisBlock - index of dragged block
+     * @returns {{ targetBlock: number, connectionIndex: number, dockX: number, dockY: number } | null}
+     */
+    findDockCandidate(thisBlock) {
+        const blocks = this.blocks;
+        if (thisBlock === null || !blocks.blockList || !blocks.blockList[thisBlock]) {
+            return null;
+        }
+
+        const myBlock = blocks.blockList[thisBlock];
+        if (
+            !myBlock.docks ||
+            myBlock.docks.length === 0 ||
+            !myBlock.docks[0] ||
+            !myBlock.container
+        ) {
+            return null;
+        }
+
+        const x1 = myBlock.container.x + myBlock.docks[0][0];
+        const y1 = myBlock.container.y + myBlock.docks[0][1];
+
+        let min = (MINIMUMDOCKDISTANCE / DEFAULTBLOCKSCALE) * blocks.blockScale;
+        const blkType = myBlock.docks[0][2];
+
+        let candidate = null;
+
+        const nearby =
+            typeof blocks._getNearbyBlocks === "function"
+                ? blocks._getNearbyBlocks(x1, y1)
+                : Object.keys(blocks.blockList).map(Number);
+
+        for (let bi = 0; bi < nearby.length; bi++) {
+            const b = nearby[bi];
+            if (b === thisBlock) continue;
+
+            const targetBlock = blocks.blockList[b];
+            if (
+                !targetBlock ||
+                targetBlock.trash ||
+                targetBlock.inCollapsed ||
+                !targetBlock.container
+            ) {
+                continue;
+            }
+
+            if (typeof targetBlock.isCollapsible === "function" && targetBlock.isCollapsible()) {
+                if (
+                    typeof targetBlock.isInlineCollapsible === "function" &&
+                    !targetBlock.isInlineCollapsible()
+                ) {
+                    if (targetBlock.collapsed) continue;
+                }
+            }
+
+            if (!targetBlock.connections || !targetBlock.docks) continue;
+
+            let start = 1;
+            if (
+                typeof targetBlock.isInlineCollapsible === "function" &&
+                targetBlock.isInlineCollapsible() &&
+                targetBlock.collapsed
+            ) {
+                start = targetBlock.connections.length - 1;
+            }
+
+            for (let i = start; i < targetBlock.connections.length; i++) {
+                if (i >= targetBlock.docks.length) break;
+
+                if (
+                    i === targetBlock.connections.length - 1 &&
+                    targetBlock.connections[i] !== null &&
+                    blocks.blockList[targetBlock.connections[i]] &&
+                    blocks.blockList[targetBlock.connections[i]].isNoHitBlock()
+                ) {
+                    continue;
+                } else if (
+                    ["backward", "status"].includes(targetBlock.name) &&
+                    i === 1 &&
+                    targetBlock.connections[1] !== null &&
+                    blocks.blockList[targetBlock.connections[1]] &&
+                    blocks.blockList[targetBlock.connections[1]].isNoHitBlock()
+                ) {
+                    continue;
+                } else if (
+                    targetBlock.name === "action" &&
+                    i === 2 &&
+                    targetBlock.connections[2] !== null &&
+                    blocks.blockList[targetBlock.connections[2]] &&
+                    blocks.blockList[targetBlock.connections[2]].isNoHitBlock()
+                ) {
+                    continue;
+                }
+
+                if (blocks._testConnectionType(blkType, targetBlock.docks[i][2])) {
+                    const x2 = targetBlock.container.x + targetBlock.docks[i][0];
+                    const y2 = targetBlock.container.y + targetBlock.docks[i][1];
+                    const dist = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+                    if (dist < min) {
+                        min = dist;
+                        candidate = {
+                            targetBlock: b,
+                            connectionIndex: i,
+                            dockX: x2,
+                            dockY: y2
+                        };
+                    }
+                }
+            }
+        }
+
+        return candidate;
+    }
+
+    /**
      * Handle connections when blocks are moved.
      * @param - thisBlock -new variable
      * @public
@@ -232,6 +373,34 @@ class BlockDragController {
      */
     async blockMoved(thisBlock) {
         const blocks = this.blocks;
+        if (typeof blocks.hideSnapIndicator === "function") {
+            blocks.hideSnapIndicator();
+        }
+
+        // Record position changes for undo/redo
+        if (blocks.dragStartX !== undefined && blocks.dragStartY !== undefined) {
+            const myBlock = blocks.blockList[thisBlock];
+            if (myBlock && myBlock.container) {
+                if (
+                    myBlock.container.x !== blocks.dragStartX ||
+                    myBlock.container.y !== blocks.dragStartY
+                ) {
+                    if (!blocks.isUndoingOrRedoing) {
+                        blocks.actionHistory.push({
+                            type: "move",
+                            blockId: thisBlock,
+                            oldX: blocks.dragStartX,
+                            oldY: blocks.dragStartY,
+                            newX: myBlock.container.x,
+                            newY: myBlock.container.y
+                        });
+                        blocks.redoActionHistory = [];
+                    }
+                }
+            }
+            blocks.dragStartX = undefined;
+            blocks.dragStartY = undefined;
+        }
         /**
          * When a block is moved, we have to check the following:
          * (0) Is it inside of a expandable block?
@@ -258,6 +427,7 @@ class BlockDragController {
         blocks.clampBlocksToCheck = [];
         if (thisBlock === null) {
             console.debug("blockMoved called with null block.");
+            blocks.isBlockMoving = false;
             return;
         }
 
@@ -292,6 +462,7 @@ class BlockDragController {
         const myBlock = blocks.blockList[thisBlock];
         if (myBlock === null || myBlock === undefined) {
             console.debug("null block found in blockMoved method: " + thisBlock);
+            blocks.isBlockMoving = false;
             return;
         }
 
@@ -337,37 +508,21 @@ class BlockDragController {
             myBlock.connections[0] = null;
             blocks.raiseStackToTop(thisBlock);
 
-            /**
-             * Check if we are disconnecting blocks from widget blocks;
-             * then reinit if widget windows is open.
-             */
+            // Reinit open widgets listed in widgetWindows.REINIT_WIDGET_TITLES.
+            // Only lock after title matches staticLabels[0].
             let lockInit = false;
             for (let x = 0; x < widgetTitle.length; x++) {
-                if (lockInit === false) {
-                    switch (widgetTitle[x].innerHTML) {
-                        case "oscilloscope":
-                        case "tempo":
-                        case "rhythm maker":
-                        case "pitch slider":
-                        case "pitch staircase":
-                        case "status":
-                        case "phrase maker":
-                        case "lego bricks":
-                        case "custom mode":
-                        case "music keyboard":
-                        case "pitch drum":
-                        case "meter":
-                        case "temperament":
-                        case "timbre":
-                            lockInit = true;
-                            if (
-                                blocks.blockList[initialTopBlock].protoblock.staticLabels[0] ===
-                                widgetTitle[x].innerHTML
-                            ) {
-                                blocks.reInitWidget(initialTopBlock, 1500);
-                            }
-                            break;
-                    }
+                if (lockInit) {
+                    break;
+                }
+                const title = widgetTitle[x].innerHTML;
+                if (!widgetWindows.isReinitWidgetTitle(title)) {
+                    continue;
+                }
+                const topProto = blocks.blockList[initialTopBlock].protoblock;
+                if (topProto && topProto.staticLabels && topProto.staticLabels[0] === title) {
+                    lockInit = true;
+                    blocks.reInitWidget(initialTopBlock, 1500);
                 }
             }
         }
@@ -393,6 +548,14 @@ class BlockDragController {
 
             /** Don't connect to yourself. */
             if (b === thisBlock) {
+                continue;
+            }
+
+            /** Skip an index the spatial grid returned for a block that no
+             *  longer exists (defense in depth alongside the fix for #8610:
+             *  disposeBlock keeps the grid in sync, but this guard protects
+             *  against any future path that forgets to). */
+            if (!blocks.blockList[b]) {
                 continue;
             }
 
@@ -881,38 +1044,23 @@ class BlockDragController {
                 blocks.activity.refreshCanvas();
             }, 500);
 
-            /** Check if top block is one of the widget blocks. */
+            // Reinit open widgets listed in widgetWindows.REINIT_WIDGET_TITLES
+            // when attaching a previously free block into a widget stack.
             let lockInit = false;
             if (c === null) {
                 for (let i = 0; i < widgetTitle.length; i++) {
-                    const that = blocks;
-                    if (lockInit === false) {
-                        let newTopBlock;
-                        switch (widgetTitle[i].innerHTML) {
-                            case "oscilloscope":
-                            case "tempo":
-                            case "rhythm maker":
-                            case "pitch slider":
-                            case "pitch staircase":
-                            case "status":
-                            case "phrase maker":
-                            case "lego bricks":
-                            case "custom mode":
-                            case "music keyboard":
-                            case "pitch drum":
-                            case "meter":
-                            case "temperament":
-                            case "timbre":
-                                lockInit = true;
-                                newTopBlock = that.findTopBlock(thisBlock);
-                                if (
-                                    blocks.blockList[newTopBlock].protoblock.staticLabels[0] ===
-                                    widgetTitle[i].innerHTML
-                                ) {
-                                    blocks.reInitWidget(newTopBlock, 1500);
-                                }
-                                break;
-                        }
+                    if (lockInit) {
+                        break;
+                    }
+                    const title = widgetTitle[i].innerHTML;
+                    if (!widgetWindows.isReinitWidgetTitle(title)) {
+                        continue;
+                    }
+                    const newTopBlock = blocks.findTopBlock(thisBlock);
+                    const topProto = blocks.blockList[newTopBlock].protoblock;
+                    if (topProto && topProto.staticLabels && topProto.staticLabels[0] === title) {
+                        lockInit = true;
+                        blocks.reInitWidget(newTopBlock, 1500);
                     }
                 }
             }
@@ -1014,9 +1162,11 @@ const setupBlockDragController = blocks => {
     blocks.findDragGroup = (...args) => controller.findDragGroup(...args);
     blocks.cacheDragGroup = (...args) => controller.cacheDragGroup(...args);
     blocks.clearCachedDragGroup = (...args) => controller.clearCachedDragGroup(...args);
+    blocks.syncDragGroupSpatialGrid = (...args) => controller.syncDragGroupSpatialGrid(...args);
     blocks.moveBlockRelative = (...args) => controller.moveBlockRelative(...args);
     blocks.moveBlockRelativeBatched = (...args) => controller.moveBlockRelativeBatched(...args);
     blocks.moveStackRelative = (...args) => controller.moveStackRelative(...args);
+    blocks.findDockCandidate = (...args) => controller.findDockCandidate(...args);
 
     return controller;
 };

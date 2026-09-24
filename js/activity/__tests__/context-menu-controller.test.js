@@ -189,6 +189,7 @@ function installDocumentMock() {
         onmousedown: null,
         style_: {},
         innerHTML: "",
+        offsetHeight: 60,
         getBoundingClientRect: () => ({ top: 100 })
     };
     document.getElementById = jest.fn(() => mockElement);
@@ -606,6 +607,42 @@ describe("ContextMenuController", () => {
 
     // -----------------------------------------------------------------------
     describe("makeButton", () => {
+        test("Escape key exits keyboard navigation", () => {
+            const listeners = {};
+            const originalCreateElement = document.createElement;
+            document.createElement = jest.fn(() => ({
+                setAttribute: jest.fn(),
+                appendChild: jest.fn(),
+                addEventListener: (event, handler) => {
+                    listeners[event] = handler;
+                },
+                style: {},
+                blur: jest.fn(),
+                classList: { contains: jest.fn(() => false), add: jest.fn(), remove: jest.fn() }
+            }));
+
+            window._focusCycleManager = { exitKeyboardNavigation: jest.fn() };
+            const container = controller.makeButton("<svg/>", "Home", 10, 20);
+
+            listeners["keydown"]({
+                key: "A",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            });
+            expect(window._focusCycleManager.exitKeyboardNavigation).not.toHaveBeenCalled();
+
+            const preventDefault = jest.fn();
+            const stopPropagation = jest.fn();
+            listeners["keydown"]({ key: "Escape", preventDefault, stopPropagation });
+
+            expect(preventDefault).toHaveBeenCalled();
+            expect(stopPropagation).toHaveBeenCalled();
+            expect(window._focusCycleManager.exitKeyboardNavigation).toHaveBeenCalled();
+
+            document.createElement = originalCreateElement;
+            delete window._focusCycleManager;
+        });
+
         test("creates a tooltipped button element positioned via right/top offsets", () => {
             const container = controller.makeButton("<svg/>", "Home", 10, 20);
             expect(container.setAttribute).toHaveBeenCalledWith("id", "Home");
@@ -643,11 +680,19 @@ describe("ContextMenuController", () => {
         });
 
         test("_showHideAuxMenu opens the aux toolbar and repositions containers", () => {
+            const canvasButton = { style: { top: "76px" } };
+            mockElement.offsetHeight = 128;
+            document.querySelectorAll.mockReturnValue([canvasButton]);
             controller._showHideAuxMenu(false);
-            expect(activity.toolbarHeight).toBeGreaterThan(0);
-            expect(activity.palettes.deltaY).toHaveBeenCalled();
-            expect(activity.turtles.deltaY).toHaveBeenCalled();
+            expect(mockElement.style.display).toBe("block");
+            expect(activity.toolbarHeight).toBe(128);
+            expect(activity.palettes.deltaY).toHaveBeenCalledWith(128);
+            expect(activity.turtles.deltaY).toHaveBeenCalledWith(128);
+            expect(canvasButton.style.top).toBe("204px");
             expect(activity.refreshCanvas).toHaveBeenCalled();
+
+            controller._showHideAuxMenu(true);
+            expect(canvasButton.style.top).toBe("76px");
         });
 
         test("_showHideAuxMenu closes the aux toolbar when already open", () => {
@@ -724,6 +769,65 @@ describe("ContextMenuController", () => {
             const after = activity.helpfulWheelItems.map(ele => ele.label).sort();
 
             expect(after).toEqual(before);
+        });
+
+        test("tears down the old buttons' tooltips before removing their container", () => {
+            // Materialize parks each tooltip node in <body>, so removing
+            // #buttoncontainerBOTTOM without a "remove" first strands them
+            // there -- a tooltip that was visible at that moment never gets a
+            // mouseleave and stays on screen until the page is reloaded.
+            const calls = [];
+            window.jQuery = jest.fn(selector => ({
+                tooltip: jest.fn(options => calls.push({ selector, options }))
+            }));
+            mockElement.parentNode.removeChild = jest.fn(() =>
+                calls.push({ selector: "REMOVED_CONTAINER" })
+            );
+
+            controller.setupPaletteMenu();
+
+            const teardown = calls.findIndex(
+                c => c.selector === "#buttoncontainerBOTTOM .tooltipped" && c.options === "remove"
+            );
+            const removal = calls.findIndex(c => c.selector === "REMOVED_CONTAINER");
+            expect(teardown).toBeGreaterThanOrEqual(0);
+            expect(removal).toBeGreaterThan(teardown);
+        });
+
+        test("re-initialises the rebuilt buttons' tooltips once the row is complete", () => {
+            const calls = [];
+            window.jQuery = jest.fn(selector => ({
+                tooltip: jest.fn(options => calls.push({ selector, options }))
+            }));
+
+            controller.setupPaletteMenu();
+
+            const initializations = calls.filter(c => c.options !== "remove");
+            expect(initializations).toHaveLength(1);
+            expect(initializations[0].selector).toBe("#buttoncontainerBOTTOM .tooltipped");
+            expect(initializations[0].options).toEqual({ html: true, delay: 100 });
+        });
+
+        test("does not re-initialise tooltips when they are disabled", () => {
+            const calls = [];
+            window.jQuery = jest.fn(selector => ({
+                tooltip: jest.fn(options => calls.push({ selector, options }))
+            }));
+            activity.toolbar.tooltipsDisabled = true;
+
+            controller.setupPaletteMenu();
+
+            expect(calls).toContainEqual({
+                selector: "#buttoncontainerBOTTOM .tooltipped",
+                options: "remove"
+            });
+            expect(
+                calls.some(
+                    c =>
+                        c.selector === "#buttoncontainerBOTTOM .tooltipped" &&
+                        c.options !== "remove"
+                )
+            ).toBe(false);
         });
     });
 });

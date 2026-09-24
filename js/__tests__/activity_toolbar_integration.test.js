@@ -9,137 +9,41 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-const fs = require("fs");
-const path = require("path");
-const vm = require("vm");
+const { loadActivitySandbox } = require("./helpers/activity-vm-sandbox");
 
-const loadActivityClass = () => {
-    const activityPath = path.resolve(__dirname, "../activity.js");
-    let code = fs.readFileSync(activityPath, "utf8");
-
-    const splitPoint = code.indexOf("const activity = new Activity();");
-    if (splitPoint !== -1) {
-        code = code.substring(0, splitPoint);
-    }
-
-    code += "\nthis.Activity = Activity;";
-
-    const sandbox = {
-        window: global.window,
-        document: global.document,
-        console: global.console,
-        navigator: global.navigator,
-        _: key => key,
-        define: () => {},
-        require: () => {},
-        setTimeout,
-        setInterval,
-        createjs: {
-            DOMElement: class {
-                constructor() {}
-            }
-        },
-        jQuery: {
-            browser: { mozilla: false }
-        },
-        Turtles: class {},
-        Palettes: class {},
-        Blocks: class {},
-        Logo: class {},
-        LanguageBox: class {},
-        ThemeBox: class {},
-        SaveInterface: class {},
-        StatsWindow: class {},
-        Trashcan: class {},
-        PasteBox: class {},
-        HelpWidget: class {},
-        PluginDialog: class {
-            constructor() {}
-        },
-        GIFAnimator: class {},
-        i18next: {
-            changeLanguage: jest.fn()
-        },
-        ErrorHandler: {
-            capture: jest.fn(),
-            recoverable: jest.fn()
-        },
-        setupActivityIdleWatcher: jest.fn(),
-        setupProjectManager: jest.fn(activity => {
-            activity.projectManager = {
-                doLoadAnimation: jest.fn(),
-                stopLoadAnimation: jest.fn(),
-                prepareExport: jest.fn(),
-                runProject: jest.fn(),
-                getClosestStandardNoteValue: jest.fn(),
-                _loadProject: jest.fn(),
-                loadStartWrapper: jest.fn(),
-                showContents: jest.fn(),
-                justLoadStart: jest.fn(),
-                saveLocally: jest.fn(),
-                newProject: jest.fn(),
-                doLoad: jest.fn(),
-                doMergeLoad: jest.fn(),
-                start: jest.fn()
-            };
-        }),
-        setupKeyboardController: jest.fn(activity => {
-            activity.keyboardController = {
-                getCurrentKeyCode: jest.fn(),
-                clearCurrentKeyCode: jest.fn(),
-                __keyPressed: jest.fn(),
-                dispose: jest.fn()
-            };
-        }),
-        setupPluginController: jest.fn(),
-        setupToolbarController: jest.fn(),
-        setupAlertController: jest.fn(),
-        setupAlertRenderer: jest.fn(),
-        setupPaletteLoader: jest.fn(),
-        setupSearchUI: jest.fn(() => ({
-            createSearchUI: jest.fn(),
-            show: jest.fn(),
-            hide: jest.fn(),
-            focusInput: jest.fn(),
-            updateQuery: jest.fn(),
-            helpfulSearchDiv: null
-        })),
-        setupSearchController: jest.fn(),
-        setupWorkspaceLayoutController: jest.fn(),
-        setupSelectionController: jest.fn(),
-        setupTrashController: jest.fn(),
-        setupHelpController: jest.fn(),
-        setupBlockScaleController: jest.fn(),
-        setupContextMenuController: jest.fn(),
-        hideDOMLabel: jest.fn(),
-        setupActivityRecorder: jest.fn(),
-        setupActivityAbcParser: jest.fn(),
-        AlertController: {
-            MSG_TIMEOUT: 60000,
-            ERROR_MSG_TIMEOUT: 15000
-        },
-        performance: global.performance || { now: () => Date.now() },
-        platformColor: { stopIconcolor: "red" },
-        globalActivity: null,
-        LEADING: 0,
-        MYDEFINES: []
-    };
-
-    vm.createContext(sandbox);
-    vm.runInContext(code, sandbox);
-    return sandbox.Activity;
-};
+// This test only exercises Activity's own toolbar-delegation methods, so
+// setupProjectManager stays mocked (the shared helper's default) rather than
+// wiring in the real ProjectManager - that real wiring is covered by
+// activity-projectmanager-integration.test.js.
+const loadActivityClass = (overrides = {}) =>
+    loadActivitySandbox({
+        overrides: {
+            createjs: {
+                Tween: {
+                    hasActiveTweens: jest.fn(() => false)
+                }
+            },
+            requestAnimationFrame: (...args) => global.requestAnimationFrame(...args),
+            cancelAnimationFrame: (...args) => global.cancelAnimationFrame(...args),
+            ...overrides
+        }
+    });
 
 describe("Activity Toolbar Integration", () => {
     let Activity;
     let activity;
     let mockElement;
+    let announceToScreenReader;
 
     beforeAll(() => {
-        Activity = loadActivityClass();
+        const sandbox = loadActivityClass();
+        Activity = sandbox.Activity;
+        announceToScreenReader = sandbox.announceToScreenReader;
     });
 
     beforeEach(() => {
+        announceToScreenReader.mockClear();
+
         // Setup clean mocks for each test
         mockElement = {
             id: "",
@@ -223,6 +127,8 @@ describe("Activity Toolbar Integration", () => {
             style: { visibility: "hidden" }
         };
 
+        activity.textMsg = jest.fn();
+
         global.window.widgetWindows = {
             isOpen: jest.fn(() => false),
             openWindows: {}
@@ -300,6 +206,309 @@ describe("Activity Toolbar Integration", () => {
             activity.onStopTurtle();
 
             expect(activity.toolbar.resetStop).toHaveBeenCalled();
+        });
+
+        test("announces that execution stopped without showing a visible notification", () => {
+            activity.onStopTurtle();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Program stopped.");
+            expect(activity.textMsg).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("onRunTurtle", () => {
+        test("announces that execution started without showing a visible notification", () => {
+            activity.onRunTurtle();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Program running.");
+            expect(activity.textMsg).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("onRunTurtle", () => {
+        // Logo calls onRunTurtle() from runLogoCommands(), which is the one
+        // point every way of starting a project passes through -- including a
+        // click on a Start block, which never goes near the toolbar handlers.
+        test("shows the stop button when execution starts", () => {
+            activity.onRunTurtle();
+
+            expect(activity.toolbar.highlightStop).toHaveBeenCalledWith("red");
+        });
+
+        test("is the mirror image of onStopTurtle", () => {
+            activity.onRunTurtle();
+            expect(activity.toolbar.highlightStop).toHaveBeenCalledTimes(1);
+            expect(activity.toolbar.resetStop).not.toHaveBeenCalled();
+
+            activity.onStopTurtle();
+            expect(activity.toolbar.resetStop).toHaveBeenCalledTimes(1);
+            expect(activity.toolbar.highlightStop).toHaveBeenCalledTimes(1);
+        });
+    });
+    describe("beforeunload event", () => {
+        test("calls __saveLocally", () => {
+            activity.__saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+
+            activity._handleBeforeUnload();
+
+            expect(activity.__saveLocally).toHaveBeenCalled();
+        });
+
+        test("calls saveLocally when it differs from __saveLocally", () => {
+            activity.__saveLocally = jest.fn();
+            activity.saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+
+            activity._handleBeforeUnload();
+
+            expect(activity.saveLocally).toHaveBeenCalled();
+        });
+
+        test("calls _stopAutoSave if it exists", () => {
+            activity.__saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+            activity._stopAutoSave = jest.fn();
+
+            activity._handleBeforeUnload();
+
+            expect(activity._stopAutoSave).toHaveBeenCalled();
+        });
+    });
+
+    describe("Render Loop (_startRenderLoop and _stopRenderLoop)", () => {
+        let rafCallbacks;
+        let nextRafId;
+        let originalRaf;
+        let originalCaf;
+
+        beforeEach(() => {
+            rafCallbacks = new Map();
+            nextRafId = 1;
+            originalRaf = global.requestAnimationFrame;
+            originalCaf = global.cancelAnimationFrame;
+
+            global.requestAnimationFrame = jest.fn(cb => {
+                const id = nextRafId++;
+                rafCallbacks.set(id, cb);
+                return id;
+            });
+            global.cancelAnimationFrame = jest.fn(id => {
+                rafCallbacks.delete(id);
+            });
+            window.requestAnimationFrame = global.requestAnimationFrame;
+            window.cancelAnimationFrame = global.cancelAnimationFrame;
+
+            activity.stage = {
+                update: jest.fn()
+            };
+            activity.selectionController = {
+                isDragging: false,
+                isSelecting: false
+            };
+            activity.gifAnimator = null;
+            activity.blocks = null;
+            activity.blocksContainer = null;
+            activity.stageDirty = false;
+            activity._renderLoopRunning = false;
+            activity._renderLoopRafId = null;
+        });
+
+        afterEach(() => {
+            global.requestAnimationFrame = originalRaf;
+            global.cancelAnimationFrame = originalCaf;
+            window.requestAnimationFrame = originalRaf;
+            window.cancelAnimationFrame = originalCaf;
+        });
+
+        const flushRaf = id => {
+            const cb = rafCallbacks.get(id);
+            if (cb) {
+                rafCallbacks.delete(id);
+                cb();
+            }
+        };
+
+        test("does not schedule a new RAF when already running", () => {
+            activity._renderLoopRunning = true;
+            activity._startRenderLoop();
+            expect(global.requestAnimationFrame).not.toHaveBeenCalled();
+        });
+
+        test("renderLoop returns early if loop was stopped before callback executes", () => {
+            activity._startRenderLoop();
+            const rafId = activity._renderLoopRafId;
+            activity._renderLoopRunning = false;
+
+            flushRaf(rafId);
+            expect(activity.stage.update).not.toHaveBeenCalled();
+        });
+
+        test("re-queues RAF when stage is not yet initialized", () => {
+            activity.stage = null;
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+            expect(activity._renderLoopRafId).not.toBeNull();
+            expect(activity._renderLoopRafId).not.toBe(firstId);
+        });
+
+        test("performs clean render, clears stageDirty before update, and transitions to idle when clean", () => {
+            let stageDirtyDuringUpdate = null;
+            activity.stage.update = jest.fn(() => {
+                stageDirtyDuringUpdate = activity.stageDirty;
+            });
+            activity.stageDirty = true;
+
+            activity._startRenderLoop();
+            const rafId = activity._renderLoopRafId;
+
+            flushRaf(rafId);
+
+            expect(activity.stage.update).toHaveBeenCalledTimes(1);
+            expect(stageDirtyDuringUpdate).toBe(false);
+            expect(activity.stageDirty).toBe(false);
+            expect(activity._renderLoopRunning).toBe(false);
+            expect(activity._renderLoopRafId).toBeNull();
+        });
+
+        test("transitions to idle immediately when called with clean stage and no active animations", () => {
+            activity.stageDirty = false;
+
+            activity._startRenderLoop();
+            const rafId = activity._renderLoopRafId;
+
+            flushRaf(rafId);
+
+            expect(activity.stage.update).not.toHaveBeenCalled();
+            expect(activity._renderLoopRunning).toBe(false);
+            expect(activity._renderLoopRafId).toBeNull();
+        });
+
+        test("re-queues next frame if stageDirty is set during stage.update()", () => {
+            activity.stage.update = jest.fn(() => {
+                activity.stageDirty = true;
+            });
+            activity.stageDirty = true;
+
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+
+            expect(activity.stage.update).toHaveBeenCalledTimes(1);
+            expect(activity._renderLoopRunning).toBe(true);
+            expect(activity._renderLoopRafId).not.toBeNull();
+            expect(activity._renderLoopRafId).not.toBe(firstId);
+        });
+
+        test("recomputes viewport culling when container position changes", () => {
+            const updateCullingSpy = jest.fn();
+            activity.blocks = { _updateViewportCulling: updateCullingSpy };
+            activity.blocksContainer = { x: 120, y: 340 };
+            activity._lastCullContainerX = 0;
+            activity._lastCullContainerY = 0;
+            activity.stageDirty = true;
+
+            activity._startRenderLoop();
+            const rafId = activity._renderLoopRafId;
+
+            flushRaf(rafId);
+
+            expect(updateCullingSpy).toHaveBeenCalledTimes(1);
+            expect(activity._lastCullContainerX).toBe(120);
+            expect(activity._lastCullContainerY).toBe(340);
+        });
+
+        test("catches error during stage.update, sets stageDirty to retry, logs error, and retries in next frame", () => {
+            const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            const renderError = new Error("Stage update failed");
+            let updateAttempts = 0;
+            activity.stage.update = jest.fn(() => {
+                updateAttempts++;
+                if (updateAttempts === 1) {
+                    throw renderError;
+                }
+            });
+            activity.stageDirty = true;
+
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                "Music Blocks: render frame failed",
+                renderError
+            );
+            expect(activity.stageDirty).toBe(true);
+            expect(activity._renderLoopRunning).toBe(true);
+            const secondId = activity._renderLoopRafId;
+            expect(secondId).not.toBeNull();
+            expect(secondId).not.toBe(firstId);
+
+            // Second frame retries stage.update and completes cleanly
+            flushRaf(secondId);
+
+            expect(activity.stage.update).toHaveBeenCalledTimes(2);
+            expect(activity.stageDirty).toBe(false);
+            expect(activity._renderLoopRunning).toBe(false);
+            expect(activity._renderLoopRafId).toBeNull();
+
+            consoleErrorSpy.mockRestore();
+        });
+
+        test("keeps loop running when active tweens, active gifs, or interactions are ongoing", () => {
+            activity.stageDirty = true;
+            activity.selectionController.isDragging = true;
+
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+
+            expect(activity.stage.update).toHaveBeenCalledTimes(1);
+            expect(activity._renderLoopRunning).toBe(true);
+            expect(activity._renderLoopRafId).not.toBeNull();
+            expect(activity._renderLoopRafId).not.toBe(firstId);
+        });
+
+        test("keeps loop running when selection is active", () => {
+            activity.stageDirty = true;
+            activity.selectionController.isSelecting = true;
+
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+
+            expect(activity._renderLoopRunning).toBe(true);
+            expect(activity._renderLoopRafId).not.toBeNull();
+        });
+
+        test("keeps loop running when active GIFs are playing", () => {
+            activity.stageDirty = true;
+            activity.gifAnimator = { getActiveCount: () => 2 };
+
+            activity._startRenderLoop();
+            const firstId = activity._renderLoopRafId;
+
+            flushRaf(firstId);
+
+            expect(activity._renderLoopRunning).toBe(true);
+            expect(activity._renderLoopRafId).not.toBeNull();
+        });
+
+        test("_stopRenderLoop stops running state and cancels active RAF", () => {
+            activity._renderLoopRunning = true;
+            activity._renderLoopRafId = 99;
+
+            activity._stopRenderLoop();
+
+            expect(activity._renderLoopRunning).toBe(false);
+            expect(activity._renderLoopRafId).toBeNull();
+            expect(global.cancelAnimationFrame).toHaveBeenCalledWith(99);
         });
     });
 });

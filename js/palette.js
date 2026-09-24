@@ -161,7 +161,7 @@ class Palettes {
 
             // Exit palette keyboard navigation without allowing Escape to reach
             // the global play shortcut.
-            const isEscape = key === "Escape" || key === "Esc" || event.keyCode === 27;
+            const isEscape = key === "Escape" || key === "Esc";
             if (isEscape) {
                 const searchWidget = document.getElementById("search");
                 if (searchWidget && document.activeElement === searchWidget) return;
@@ -661,22 +661,37 @@ class Palettes {
             element.style.top = this.top + "px";
             element.style.transition = "transform 0.3s ease";
 
-            element.innerHTML = `<div style="height:fit-content">
-                    <table width="${1.5 * this.cellSize}" bgcolor="white" role="presentation">
-                        <thead role="presentation">
-                            <tr role="tablist" aria-label="${_("Palette Categories")}"></tr>
-                        </thead>
-                    </table>
-                    <table width ="${4.5 * this.cellSize}" bgcolor="white">
-                        <thead>
-                            <tr>
-                                <td style="width:28px"></td>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>`;
+            const containerDiv = document.createElement("div");
+            containerDiv.style.height = "fit-content";
 
+            const table1 = document.createElement("table");
+            table1.setAttribute("width", 1.5 * this.cellSize);
+            table1.setAttribute("bgcolor", "white");
+            table1.setAttribute("role", "presentation");
+            const thead1 = document.createElement("thead");
+            thead1.setAttribute("role", "presentation");
+            const tr1 = document.createElement("tr");
+            tr1.setAttribute("role", "tablist");
+            tr1.setAttribute("aria-label", _("Palette Categories"));
+            thead1.appendChild(tr1);
+            table1.appendChild(thead1);
+            containerDiv.appendChild(table1);
+
+            const table2 = document.createElement("table");
+            table2.setAttribute("width", 4.5 * this.cellSize);
+            table2.setAttribute("bgcolor", "white");
+            const thead2 = document.createElement("thead");
+            const tr2 = document.createElement("tr");
+            const td2 = document.createElement("td");
+            td2.style.width = "28px";
+            tr2.appendChild(td2);
+            thead2.appendChild(tr2);
+            const tbody2 = document.createElement("tbody");
+            table2.appendChild(thead2);
+            table2.appendChild(tbody2);
+            containerDiv.appendChild(table2);
+
+            element.appendChild(containerDiv);
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
 
             document.body.appendChild(element);
@@ -929,11 +944,17 @@ class Palettes {
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
+        img.style.flexShrink = "0";
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
         row.style.borderBottom = "1px solid #0CAFFF";
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
+        label.style.overflow = "hidden";
+        label.style.textOverflow = "ellipsis";
+        label.style.whiteSpace = "nowrap";
+        label.style.maxWidth = "75px";
+        label.style.display = "inline-block";
         row.style.display = "flex";
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
@@ -970,10 +991,16 @@ class Palettes {
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
+        img.style.flexShrink = "0";
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
+        label.style.overflow = "hidden";
+        label.style.textOverflow = "ellipsis";
+        label.style.whiteSpace = "nowrap";
+        label.style.maxWidth = "75px";
+        label.style.display = "inline-block";
         row.style.display = "flex";
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
@@ -1021,6 +1048,9 @@ class Palettes {
         // Hide the menu buttons and the palettes themselves.
 
         this.activity.hideSearchWidget(true);
+        if (this.activePalette !== null) {
+            this.lastActivePalette = this.activePalette;
+        }
         this.activePalette = null;
 
         if (docById("PaletteBody"))
@@ -1522,10 +1552,37 @@ class Palette {
         this._hideMenuItems();
     }
 
+    /**
+     * Vertical scroll offset of the open block list, negative when scrolled
+     * down. Kept in the sign convention of the pre-HTML palette so the
+     * keyboard controller's Home handler (which passes -scrollDiff) still
+     * scrolls back to the top.
+     * @returns {number}
+     */
+    get scrollDiff() {
+        const items = docById("PaletteBody_items");
+        return items ? -items.scrollTop : 0;
+    }
+
+    /**
+     * Scroll the open block list. A positive direction moves the list down
+     * (revealing blocks above), a negative one moves it up.
+     * @param {number} direction - signed pixel amount
+     * @param {number} scrollSpeed - multiplier
+     * @returns {void}
+     */
+    scrollEvent(direction, scrollSpeed) {
+        const items = docById("PaletteBody_items");
+        if (!items) {
+            return;
+        }
+        items.scrollTop -= direction * scrollSpeed;
+    }
+
     showMenu(createHeader) {
         const palDiv = docById("palette");
         palDiv.childNodes[0].style.borderRight = "0";
-        if (docById("PaletteBody")) palDiv.removeChild(docById("PaletteBody"));
+        if (docById("PaletteBody")) docById("PaletteBody").remove();
         const palBody = document.createElement("table");
         palBody.id = "PaletteBody";
         const palBodyHeight = window.innerHeight - this.palettes.top - this.palettes.cellSize - 26;
@@ -1540,13 +1597,17 @@ class Palette {
         palBody.style.minWidth = "180px";
         palBody.style.background = platformColor.paletteBackground;
         palBody.style.float = "left";
+        palBody.style.position = "fixed";
+        palBody.style.left = `${palDiv.offsetLeft + palDiv.children[0].offsetWidth}px`;
+        palBody.style.top = `${palDiv.offsetTop}px`;
+        palBody.style.zIndex = palDiv.style.zIndex;
 
         palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
         [palBody.childNodes[0], palBody.childNodes[1]].forEach(item => {
             item.style.boxSizing = "border-box";
             item.style.padding = "8px";
         });
-        palDiv.appendChild(palBody);
+        palDiv.parentNode.appendChild(palBody);
 
         this.menuContainer = palBody;
 
@@ -1600,6 +1661,11 @@ class Palette {
         }
 
         this._showMenuItems();
+        if (this.palettes.mobile) {
+            return;
+        }
+        const paletteItems = docById("PaletteBody_items");
+        paletteItems.style.height = `${window.innerHeight - paletteItems.getBoundingClientRect().top}px`;
 
         // Close palette menu on outside click
         // Remove any existing outside-click listener
@@ -1627,7 +1693,7 @@ class Palette {
         if (this.name === "search" && this.activity.hideSearchWidget !== null) {
             this.activity.hideSearchWidget(true);
         }
-        if (docById("PaletteBody")) docById("palette").removeChild(docById("PaletteBody"));
+        if (docById("PaletteBody")) docById("PaletteBody").remove();
     }
 
     _showMenuItems() {
@@ -1979,6 +2045,11 @@ class Palette {
     }
 
     _makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY) {
+        // Prevent block creation from triggering a 'move' undo action
+        // by clearing the palette block's drag start coordinates
+        this.activity.blocks.dragStartX = undefined;
+        this.activity.blocks.dragStartY = undefined;
+
         let newBlock;
         const __myCallback = newBlock => {
             // Move the drag group under the cursor.
@@ -2120,6 +2191,18 @@ class Palette {
                 }
 
                 initializeStatusMatrix(topBlk);
+
+                // Add block creation to the undo history
+                if (
+                    this.activity.blocks.actionHistory &&
+                    !this.activity.blocks.isUndoingOrRedoing
+                ) {
+                    this.activity.blocks.actionHistory.push({
+                        type: "restore",
+                        blockId: topBlk
+                    });
+                    this.activity.blocks.redoActionHistory = [];
+                }
             } else if (this.name === "myblocks") {
                 // If we are on the myblocks palette, it is a macro.
                 const macroName = blkname.replace("macro_", "");
@@ -2185,6 +2268,18 @@ class Palette {
                 setTimeout(() => {
                     this.activity.blocks.blockList[topBlk].collapseToggle();
                 }, 500);
+
+                // Add block creation to the undo history
+                if (
+                    this.activity.blocks.actionHistory &&
+                    !this.activity.blocks.isUndoingOrRedoing
+                ) {
+                    this.activity.blocks.actionHistory.push({
+                        type: "restore",
+                        blockId: topBlk
+                    });
+                    this.activity.blocks.redoActionHistory = [];
+                }
             } else {
                 newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback);
                 // Ensure that the newly created block is not under
@@ -2198,6 +2293,18 @@ class Palette {
                         this.activity.palettes.paletteWidth * 2,
                         this.activity.blocks.blockList[newBlock].container.y
                     );
+                }
+
+                // Add block creation to the undo history
+                if (
+                    this.activity.blocks.actionHistory &&
+                    !this.activity.blocks.isUndoingOrRedoing
+                ) {
+                    this.activity.blocks.actionHistory.push({
+                        type: "restore",
+                        blockId: newBlock
+                    });
+                    this.activity.blocks.redoActionHistory = [];
                 }
             }
         }

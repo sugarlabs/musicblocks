@@ -46,6 +46,10 @@ class HelpController {
      * Toggles display of javaScript editor widget.
      */
     async toggleJSEditor() {
+        if (window.widgetWindows?.isOpen("JavaScript Editor")) {
+            return;
+        }
+
         await lazyLoad([
             "widgets/jseditor",
             "activity/js-export/samples/sample",
@@ -55,6 +59,7 @@ class HelpController {
             "activity/js-export/ASTutils",
             "activity/js-export/generate",
             "activity/js-export/ast2blocklist",
+            "activity/js-export/ast2blocks.config",
             "activity/js-export/API/GraphicsBlocksAPI",
             "activity/js-export/API/PenBlocksAPI",
             "activity/js-export/API/RhythmBlocksAPI",
@@ -231,6 +236,13 @@ class HelpController {
                     {
                         keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
                         action: _("Maximize or restore the focused widget window.")
+                    },
+                    {
+                        keys: platformKeys(
+                            _("Shift + Arrow Up / Arrow Down"),
+                            _("Shift + Arrow Up / Arrow Down")
+                        ),
+                        action: _("Shift keyboard octave up or down in Music Keyboard widget.")
                     }
                 ]
             },
@@ -319,6 +331,21 @@ class HelpController {
         });
 
         widgetBody.appendChild(wrapper);
+
+        const stopWidgetWheel = event => {
+            event.stopPropagation();
+        };
+        wrapper.addEventListener("wheel", stopWidgetWheel);
+        wrapper.addEventListener("DOMMouseScroll", stopWidgetWheel);
+
+        widgetWindow.onclose = () => {
+            wrapper.removeEventListener("wheel", stopWidgetWheel);
+            wrapper.removeEventListener("DOMMouseScroll", stopWidgetWheel);
+            if (typeof widgetWindow.destroy === "function") {
+                widgetWindow.destroy();
+            }
+        };
+
         widgetWindow.sendToCenter();
         requestAnimationFrame(() => widgetWindow.sendToCenter());
     }

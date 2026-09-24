@@ -21,6 +21,7 @@ Please complete the sections below to help us review your changes efficiently.
 
 - [ ] Bug Fix — Fixes a bug or incorrect behavior
 - [ ] Feature — Adds new functionality
+- [ ] UI/UX — Changes to the user interface or user experience
 - [ ] Performance — Improves load time, memory, rendering, etc.
 - [ ] Tests — Adds or updates test coverage
 - [ ] Documentation — Updates to docs, comments, or README
@@ -35,9 +36,13 @@ Please complete the sections below to help us review your changes efficiently.
 
 ---
 
+## Steps to Reproduce
+
+<!-- For bug fixes, please provide clear steps and relevant details to reproduce the issue. Leave blank if not applicable. -->
+
 ## Visual Changes
 
-<!-- If this PR introduces visual or UI changes, provide before and after screenshots or videos. Remove this entire section if not applicable. -->
+<!-- If this PR introduces visual or UI changes, please provide before and after screenshots or videos. Remove this entire section if not applicable. -->
 
 ### Before
 

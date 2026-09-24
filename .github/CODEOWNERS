@@ -1,14 +1,19 @@
+# Area: Other
 # Default owner for paths that do not have an area approver yet.
 * @walterbender
 
+# Area: General JS
 # General JavaScript fallback. More specific JavaScript rules below override
 # this for owned areas.
 /js/ @walterbender
 
+# Area: Blocks & Runtime
 # Blocks and runtime
 /js/blocks/ @ssz2605
 /js/js-export/ @ssz2605
+/js/activity.js @walterbender @pikurasa @vanshika2720
 
+# Area: Music & UI
 # Music, pedagogy, and user-facing interface
 /js/widgets/ @walterbender @pikurasa
 /css/ @walterbender @pikurasa
@@ -35,46 +40,51 @@
 /js/blocks/ToneBlocks.js @walterbender @pikurasa
 /js/blocks/VolumeBlocks.js @walterbender @pikurasa
 
+# Area: Planet
 # Planet and project sharing
 /planet/ @zealot-zew
 /js/planetInterface.js @zealot-zew
 /js/SaveInterface.js @zealot-zew
 
+# Area: Tests & CI
 # Tests and CI infrastructure. These rules come after source rules so shared
 # test paths do not fall back to Walter or Devin.
-/.github/workflows/ @omsuneri @Ashutoshx7
-/.husky/ @omsuneri @Ashutoshx7
-/cypress/ @omsuneri @Ashutoshx7
-/test/ @omsuneri @Ashutoshx7
-/cypress.config.js @omsuneri @Ashutoshx7
-/jest.config.js @omsuneri @Ashutoshx7
-/eslint.config.mjs @omsuneri @Ashutoshx7
-/commitlint.config.js @omsuneri @Ashutoshx7
-/lighthouserc.js @omsuneri @Ashutoshx7
-/.prettierignore @omsuneri @Ashutoshx7
-/.prettierrc @omsuneri @Ashutoshx7
-/js/__tests__/ @omsuneri @Ashutoshx7
-/js/activity/__tests__/ @omsuneri @Ashutoshx7
-/js/palette/__tests__/ @omsuneri @Ashutoshx7
-/js/utils/__tests__/ @omsuneri @Ashutoshx7
-/js/widgets/__tests__/ @omsuneri @Ashutoshx7
-/js/turtleactions/__tests__/ @omsuneri @Ashutoshx7
+/.github/workflows/ @omsuneri @Ashutoshx7 @vanshika2720
+/.husky/ @omsuneri @Ashutoshx7 @vanshika2720
+/cypress/ @omsuneri @Ashutoshx7 @vanshika2720
+/test/ @omsuneri @Ashutoshx7 @vanshika2720
+/cypress.config.js @omsuneri @Ashutoshx7 @vanshika2720
+/jest.config.js @omsuneri @Ashutoshx7 @vanshika2720
+/eslint.config.mjs @omsuneri @Ashutoshx7 @vanshika2720
+/commitlint.config.js @omsuneri @Ashutoshx7 @vanshika2720
+/lighthouserc.js @omsuneri @Ashutoshx7 @vanshika2720
+/.prettierignore @omsuneri @Ashutoshx7 @vanshika2720
+/.prettierrc @omsuneri @Ashutoshx7 @vanshika2720
+/js/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
+/js/activity/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
+/js/palette/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
+/js/utils/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
+/js/widgets/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
+/js/turtleactions/__tests__/ @omsuneri @Ashutoshx7 @vanshika2720
 
+# Area: Planet
 # Planet feature tests that live outside the Planet directory.
 /js/__tests__/planetInterface.test.js @zealot-zew
 /js/__tests__/SaveInterface.test.js @zealot-zew
 
-/js/blocks/__tests__/DrumBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/EnsembleBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/IntervalsBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/MeterBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/OrnamentBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/PitchBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/RhythmBlockPaletteBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/RhythmBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/ToneBlocks*.test.js @omsuneri @Ashutoshx7
-/js/blocks/__tests__/VolumeBlocks*.test.js @omsuneri @Ashutoshx7
+# Area: Tests & CI
+/js/blocks/__tests__/DrumBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/EnsembleBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/IntervalsBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/MeterBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/OrnamentBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/PitchBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/RhythmBlockPaletteBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/RhythmBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/ToneBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
+/js/blocks/__tests__/VolumeBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
 
+# Area: Governance
 # Ownership and governance
 /.github/CODEOWNERS @walterbender @pikurasa
 /GOVERNANCE.md @walterbender @pikurasa

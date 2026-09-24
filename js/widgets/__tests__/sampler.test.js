@@ -22,14 +22,16 @@ global._ = s => s;
 global.instruments = [{}];
 global.TunerUtils = {
     calculatePlaybackRate: jest.fn(),
-    frequencyToPitch: jest.fn()
+    frequencyToPitch: jest.fn(),
+    frequencyToNote: jest.fn()
 };
 
 global.cancelAnimationFrame = jest.fn();
 global.setTimeout = setTimeout;
 global.Tone = {
     Analyser: jest.fn(() => ({
-        connect: jest.fn()
+        connect: jest.fn(),
+        dispose: jest.fn()
     }))
 };
 global.requestAnimationFrame = jest.fn(() => 1);
@@ -77,7 +79,34 @@ global.TunerDisplay = class {
     }
 };
 
-const { SampleWidget, PitchSmoother } = require("../sampler.js");
+const { SampleWidget, PitchSmoother, resolveBackendURL } = require("../sampler.js");
+
+describe("resolveBackendURL", () => {
+    test("returns window.AI_SAMPLE_ENDPOINT when defined and strips trailing slashes", () => {
+        window.AI_SAMPLE_ENDPOINT = "https://custom.endpoint.org///";
+        expect(resolveBackendURL()).toBe("https://custom.endpoint.org");
+        delete window.AI_SAMPLE_ENDPOINT;
+    });
+
+    test("respects backend query param override and strips trailing slashes", () => {
+        expect(resolveBackendURL({ search: "?backend=http://custom-api:9000/" })).toBe(
+            "http://custom-api:9000"
+        );
+
+        expect(
+            resolveBackendURL({
+                search: "?backend_url=https://staging.musicblocks.sugarlabs.org///"
+            })
+        ).toBe("https://staging.musicblocks.sugarlabs.org");
+    });
+
+    test("returns empty string when no endpoint is configured", () => {
+        delete window.AI_SAMPLE_ENDPOINT;
+        expect(resolveBackendURL(null)).toBe("");
+        expect(resolveBackendURL({})).toBe("");
+        expect(resolveBackendURL({ search: "" })).toBe("");
+    });
+});
 
 describe("SampleWidget.dependencies", () => {
     test("includes the tuner module used by the sampler", () => {
@@ -110,6 +139,7 @@ describe("Sampler Widget", () => {
         global.DOUBLESHARP = "x";
         global.DOUBLEFLAT = "bb";
         global.NATURAL = "n";
+        window.AI_SAMPLE_ENDPOINT = "https://samples.example";
 
         document.body.innerHTML = `
             <div id="wheelDiv"></div>
@@ -211,7 +241,8 @@ describe("Sampler Widget", () => {
                 },
                 canvas: { width: 1000, height: 800 },
                 getStageScale: () => 1,
-                textMsg: jest.fn()
+                textMsg: jest.fn(),
+                errorMsg: jest.fn()
             };
             global.activity = mockActivity;
             widget.activity = mockActivity;
@@ -696,6 +727,20 @@ describe("Sampler Widget", () => {
 
             await widget._recordBtn.onclick();
             expect(widget.is_recording).toBe(true);
+
+            // Reset for mic denial test
+            widget.is_recording = false;
+            mockActivity.logo.synth.startRecording.mockRejectedValueOnce(
+                new Error("Permission denied")
+            );
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(_("Microphone access denied."));
+
+            // Resume normal recording for subsequent tests
+            mockActivity.logo.synth.startRecording.mockResolvedValue();
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording).toBe(true);
             await widget._recordBtn.onclick();
             expect(widget.is_recording).toBe(false);
 
@@ -788,6 +833,65 @@ describe("Sampler Widget", () => {
             expect(mockActivity.logo.synth.stopTuner).not.toHaveBeenCalled();
         });
 
+        test("onclose disposes the pitch analysers and disconnects the synths", () => {
+            widget.init(mockActivity, 1);
+            widget.originalSampleName = "test";
+            global.instruments[0] = {
+                "electronic synth": { connect: jest.fn(), disconnect: jest.fn() },
+                "customsample_test": { connect: jest.fn(), disconnect: jest.fn() }
+            };
+
+            widget.reconnectSynthsToAnalyser();
+            const analysers = Object.values(widget.pitchAnalysers);
+            expect(analysers).toHaveLength(2);
+
+            widgetWindow.onclose();
+
+            for (const analyser of analysers) {
+                expect(analyser.dispose).toHaveBeenCalled();
+                const synth1 = global.instruments[0]["electronic synth"];
+                const synth2 = global.instruments[0].customsample_test;
+
+                expect(synth1.disconnect).toHaveBeenCalledWith(analyser);
+                expect(synth2.disconnect).toHaveBeenCalledWith(analyser);
+
+                const synth1CallIdx = synth1.disconnect.mock.calls.findIndex(
+                    c => c[0] === analyser
+                );
+                const synth2CallIdx = synth2.disconnect.mock.calls.findIndex(
+                    c => c[0] === analyser
+                );
+                const synth1Order = synth1.disconnect.mock.invocationCallOrder[synth1CallIdx];
+                const synth2Order = synth2.disconnect.mock.invocationCallOrder[synth2CallIdx];
+                const disposeOrder = analyser.dispose.mock.invocationCallOrder[0];
+
+                expect(synth1Order).toBeLessThan(disposeOrder);
+                expect(synth2Order).toBeLessThan(disposeOrder);
+            }
+            expect(widget.pitchAnalysers).toEqual({});
+        });
+
+        test("onclose safely ignores errors when synth disconnect throws", () => {
+            widget.init(mockActivity, 1);
+            const analyserDispose = jest.fn();
+            widget.pitchAnalysers = {
+                0: {
+                    dispose: analyserDispose
+                }
+            };
+            global.instruments[0] = {
+                "failing synth": {
+                    disconnect: jest.fn(() => {
+                        throw new Error("InvalidAccessError");
+                    })
+                }
+            };
+
+            expect(() => widgetWindow.onclose()).not.toThrow();
+            expect(analyserDispose).toHaveBeenCalled();
+            expect(widget.pitchAnalysers).toEqual({});
+        });
+
         test("prompt UI handles submit, preview, and save", async () => {
             widget.init(mockActivity, 1);
             widget._promptBtn.onclick();
@@ -810,6 +914,10 @@ describe("Sampler Widget", () => {
             await submit.onclick();
             jest.runOnlyPendingTimers();
 
+            expect(global.fetch).toHaveBeenCalledWith(
+                "https://samples.example/generate?prompt=hello"
+            );
+
             preview.disabled = false;
             save.disabled = false;
             const playSpy = jest.fn();
@@ -828,6 +936,19 @@ describe("Sampler Widget", () => {
             expect(clickSpy).toHaveBeenCalled();
             clickSpy.mockRestore();
             jest.useRealTimers();
+        });
+
+        test("prompt reports unavailable AI sample generation without a configured endpoint", () => {
+            delete window.AI_SAMPLE_ENDPOINT;
+            mockActivity.errorMsg = jest.fn();
+            widget.init(mockActivity, 1);
+
+            widget._promptBtn.onclick();
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "AI sample generation is not available."
+            );
+            expect(docById("samplerPrompt")).toBeNull();
         });
 
         test("prompt submit handles failure and errors", async () => {
@@ -930,7 +1051,7 @@ describe("Sampler Widget", () => {
                 0: { getValue: jest.fn(() => [0, 0.5, -0.5]), dispose: jest.fn() },
                 1: { getValue: jest.fn(() => [0, 0.5, -0.5]), dispose: jest.fn() }
             };
-            global.TunerUtils.frequencyToPitch.mockReturnValue(["A4", 0]);
+            global.TunerUtils.frequencyToNote.mockReturnValue({ note: "A", cents: 0 });
             global.detectPitch = jest.fn(() => 440);
             widget.tunerSegments = [{ setAttribute: jest.fn() }, { setAttribute: jest.fn() }];
             const querySelectorAll = jest.spyOn(document, "querySelectorAll");
@@ -938,7 +1059,7 @@ describe("Sampler Widget", () => {
             widget.makeCanvas(400, 300, 0, true);
 
             expect(widget.tunerDisplay).toBeTruthy();
-            expect(widget.tunerDisplay.update).toHaveBeenCalled();
+            expect(widget.tunerDisplay.update).toHaveBeenCalledWith("A", 0, 0);
             expect(widget.tunerSegments[0].setAttribute).toHaveBeenCalledWith("fill", "#0000ff");
             expect(querySelectorAll).not.toHaveBeenCalled();
             querySelectorAll.mockRestore();
@@ -972,13 +1093,14 @@ describe("Sampler Widget", () => {
                 100,
                 100
             );
-            global.TunerUtils.frequencyToPitch.mockReturnValue(["A4", 0]);
+            global.TunerUtils.frequencyToNote.mockReturnValue({ note: "A", cents: 0 });
             global.detectPitch = jest.fn(() => 440);
             widget.tunerSegments = [{ setAttribute: jest.fn() }];
             const querySelectorAll = jest.spyOn(document, "querySelectorAll");
 
             widget.makeCanvas(400, 300, 0, true);
             expect(widget.tunerDisplay.canvas).toBeTruthy();
+            expect(widget.tunerDisplay.update).toHaveBeenCalledWith("A", 0, 0);
             expect(widget.tunerSegments[0].setAttribute).toHaveBeenCalledWith("fill", "#0000ff");
             expect(querySelectorAll).not.toHaveBeenCalled();
             querySelectorAll.mockRestore();
@@ -1024,6 +1146,8 @@ describe("Sampler Widget", () => {
 
         test("startPitchDetection handles getUserMedia failure", async () => {
             widget.widgetWindow = widgetWindow;
+            mockActivity.errorMsg = jest.fn();
+            widget.activity = mockActivity;
             const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
             global.AudioContext = jest.fn(() => ({
                 sampleRate: 44100,
@@ -1042,15 +1166,22 @@ describe("Sampler Widget", () => {
                 },
                 configurable: true
             });
-            global.alert = jest.fn();
-
             widget.makeTuner(400, 300);
             const startButton = document.getElementById("start");
             startButton.click();
 
             await Promise.resolve();
-            expect(global.alert).toHaveBeenCalled();
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith("Microphone access failed: no mic");
             errorSpy.mockRestore();
+        });
+    });
+
+    describe("endpoint safety", () => {
+        test("sampler.js contains no hardcoded HTTP IP addresses", () => {
+            const fs = require("fs");
+            const path = require("path");
+            const source = fs.readFileSync(path.resolve(__dirname, "../sampler.js"), "utf8");
+            expect(source).not.toMatch(/http:\/\/\d+\.\d+\.\d+\.\d+/);
         });
     });
 });

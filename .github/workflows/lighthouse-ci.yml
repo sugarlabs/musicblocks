@@ -19,6 +19,13 @@ jobs:
     name: Lighthouse Performance Audit (${{ matrix.preset }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Lighthouse is a UX/performance audit — not meaningful for a
+    # lockfile-only dependency bump. Skip it for all Renovate bot PRs.
+    # Uses branch name (head_ref) instead of github.actor because our
+    # owner, not 'renovate[bot]'. For the main repository, the Mend App
+    # uses 'renovate[bot]' as the actor, preventing malicious PRs from
+    # bypassing checks by forging branch names.
+    if: "github.actor != 'renovate[bot]'"
     strategy:
       fail-fast: false
       matrix:

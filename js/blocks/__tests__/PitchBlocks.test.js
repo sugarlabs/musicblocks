@@ -106,10 +106,13 @@ describe("setupPitchBlocks", () => {
         global.DOUBLEFLAT = "bb";
         global.DOUBLESHARP = "##";
         global.NATURAL = "n";
+        global.NOTESSHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        global.NOTESFLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
 
         // Test-specific overrides
         global.INTERVALVALUES = { "major third": [0, 0, 1.25], "minor third": [0, 0, 1.2] };
         global.NOTESTEP = { C: 1, D: 3, E: 5, F: 6, G: 8, A: 10, B: 12 };
+        global.getCurrentEDO = jest.fn(() => 12);
         global.SOLFEGECONVERSIONTABLE = {
             C: "do",
             D: "re",
@@ -154,6 +157,7 @@ describe("setupPitchBlocks", () => {
         global.nthDegreeToPitch = jest.fn(() => ["C", 0]);
         global.calcOctave = jest.fn(() => 4);
         global.scaleDegreeToPitchMapping = jest.fn(() => "C");
+        global.noteToObj = require("../../utils/musicutils").noteToObj;
 
         global.Singer = {
             processPitch: jest.fn(),
@@ -513,6 +517,15 @@ describe("setupPitchBlocks", () => {
             turtles.ithTurtle(0).singer.lastNotePlayed = ["C#4", 0.5];
             expect(block.arg(logo, 0, 10)).toBeDefined();
 
+            // Branch: lastNotePlayed with multi-digit and negative octaves
+            turtles.ithTurtle(0).singer.lastNotePlayed = ["C10", 0.5];
+            expect(block.arg(logo, 0, 10)).toBeDefined();
+            expect(global.pitchToNumber).toHaveBeenCalledWith("C", 10, expect.anything());
+
+            turtles.ithTurtle(0).singer.lastNotePlayed = ["A-1", 0.5];
+            expect(block.arg(logo, 0, 10)).toBeDefined();
+            expect(global.pitchToNumber).toHaveBeenCalledWith("A", -1, expect.anything());
+
             // Branch: lastNotePlayed is Hertz
             turtles.ithTurtle(0).singer.lastNotePlayed = [440, 0.5];
             expect(block.arg(logo, 0, 10)).toBeDefined();
@@ -531,6 +544,10 @@ describe("setupPitchBlocks", () => {
             turtles.ithTurtle(0).singer.lastNotePlayed = ["C4", 0.5];
             block.setter(logo, 60, 0);
             expect(turtles.ithTurtle(0).singer.lastNotePlayed).toBeDefined();
+
+            turtles.ithTurtle(0).singer.lastNotePlayed = null;
+            block.setter(logo, 60, 0);
+            expect(turtles.ithTurtle(0).singer.lastNotePlayed).toEqual(["C5", 4]);
         });
     });
 
@@ -668,6 +685,14 @@ describe("setupPitchBlocks", () => {
         });
     });
 
+    describe("OutputToolsBlocks null-connection repro", () => {
+        it("arg does not crash when the note input is unconnected", () => {
+            const block = createdBlocks["outputtools"];
+            activity.blocks.blockList[10].connections[1] = null;
+            expect(block.arg(logo, 0, 10)).toBe("G4");
+        });
+    });
+
     describe("StaffYToPitch", () => {
         it("arg with all connection combinations", () => {
             const block = createdBlocks["ytopitch"];
@@ -705,6 +730,36 @@ describe("setupPitchBlocks", () => {
     });
 
     describe("PitchBlock Complex Branches", () => {
+        it("applies the accidental from a scale degree block to the played pitch", () => {
+            const block = createdBlocks["pitch"];
+            activity.blocks.blockList[10].connections[1] = 20;
+            global.scaleDegreeToPitchMapping.mockReturnValue("G");
+
+            activity.blocks.blockList[20] = { name: "scaledegree2", value: "5#" };
+            block.flow(["1", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                "G#",
+                4,
+                0,
+                0,
+                10
+            );
+
+            activity.blocks.blockList[20] = { name: "scaledegree2", value: "5b" };
+            block.flow(["1", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                "Gb",
+                4,
+                0,
+                0,
+                10
+            );
+
+            activity.blocks.blockList[20] = { name: "scaledegree2", value: "5n" };
+            block.flow(["1", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+        });
+
         it("flow", () => {
             const block = createdBlocks["pitch"];
 
@@ -750,6 +805,23 @@ describe("setupPitchBlocks", () => {
             if (cpBlock instanceof DummyFlowBlock) return;
             cpBlock.flow(["D(+25" + CENTSSYMBOL + ")", 2], logo, 0, 10);
             expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("D", 2, 25, 0, 10);
+        });
+
+        it("pitch numbers >12 are scale degrees (not Hz) when EDO >12", () => {
+            const block = createdBlocks["pitch"];
+            global.getCurrentEDO.mockReturnValue(19);
+            global.nthDegreeToPitch.mockReturnValue(["C", 0]);
+
+            // Pitch number 13 should be treated as a scale degree, not Hz
+            block.flow([13, 4], logo, 0, 10);
+            expect(global.nthDegreeToPitch).toHaveBeenCalledWith("C", 13, 19);
+
+            // Pitch number 19 (the octave) should also be a scale degree
+            block.flow([19, 4], logo, 0, 10);
+            expect(global.nthDegreeToPitch).toHaveBeenCalledWith("C", 19, 19);
+
+            // Restore default
+            global.getCurrentEDO.mockReturnValue(12);
         });
     });
 
@@ -1321,6 +1393,16 @@ describe("setupPitchBlocks", () => {
                     block.setter(logo, 60, 0);
                     expect(turtles.ithTurtle(0).singer.lastNotePlayed).toBeDefined();
                     expect(turtles.ithTurtle(0).singer.previousNotePlayed).toBeDefined();
+                }
+            });
+
+            it("MyPitchBlock setter does not crash when lastNotePlayed is null", () => {
+                const block = createdBlocks["mypitch"];
+                if (block && block.setter) {
+                    turtles.ithTurtle(0).singer.lastNotePlayed = null;
+                    expect(() => block.setter(logo, 60, 0)).not.toThrow();
+                    expect(turtles.ithTurtle(0).singer.lastNotePlayed).toBeDefined();
+                    expect(turtles.ithTurtle(0).singer.lastNotePlayed[1]).toBe(4);
                 }
             });
         });

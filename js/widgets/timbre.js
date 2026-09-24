@@ -17,7 +17,7 @@
    DEFAULTOSCILLATORTYPE, platformColor, rationalToFraction, last,
    Singer, instrumentsEffects:writeable, instrumentsFilters:writeable,
    docById, DEFAULTFILTERTYPE, docByName, OSCTYPES, FILTERTYPES,
-   oneHundredToFraction, delayExecution, ManagedTimer
+   oneHundredToFraction, delayExecution, ManagedTimer, announceToScreenReader
  */
 
 /*
@@ -500,7 +500,7 @@ class TimbreWidget {
                     timbreEffects["chorusDepth"] !== undefined
                         ? timbreEffects["chorusDepth"]
                         : this.chorusParams && this.chorusParams.length > 2
-                          ? parseFloat(this.chorusParams[2])
+                          ? parseFloat(this.chorusParams[2]) / 100
                           : 0.7;
                 paramsEffects.doChorus = true;
             }
@@ -851,6 +851,7 @@ class TimbreWidget {
         this._playing = false;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "timbre", "timbre", true);
+        announceToScreenReader(_("Timbre Widget opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -869,6 +870,7 @@ class TimbreWidget {
             // Clean up all event listeners
             this._cleanupEventListeners();
             this.activity.hideMsgs();
+            announceToScreenReader(_("Timbre Widget closed"));
             widgetWindow.destroy();
         };
 
@@ -932,7 +934,11 @@ class TimbreWidget {
             this._setActiveExclusive("oscillator");
 
             if (this.osc.length === 0) {
-                const topOfClamp = this.activity.blocks.blockList[this.blockNo].connections[2];
+                const targetBlock = this.activity.blocks.blockList[this.blockNo];
+                if (!targetBlock) {
+                    return;
+                }
+                const topOfClamp = targetBlock.connections[2];
                 const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                 const OSCILLATOROBJ = [
@@ -979,7 +985,11 @@ class TimbreWidget {
             this._setActiveExclusive("envelope");
 
             if (this.env.length === 0) {
-                const topOfClamp = this.activity.blocks.blockList[this.blockNo].connections[2];
+                const targetBlock = this.activity.blocks.blockList[this.blockNo];
+                if (!targetBlock) {
+                    return;
+                }
+                const topOfClamp = targetBlock.connections[2];
                 const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                 const ENVOBJ = [
@@ -1035,7 +1045,11 @@ class TimbreWidget {
             this._setActiveExclusive("filter");
 
             if (this.fil.length === 0) {
-                const topOfClamp = this.activity.blocks.blockList[this.blockNo].connections[2];
+                const targetBlock = this.activity.blocks.blockList[this.blockNo];
+                if (!targetBlock) {
+                    return;
+                }
+                const topOfClamp = targetBlock.connections[2];
                 const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                 const FILTEROBJ = [
@@ -1113,8 +1127,12 @@ class TimbreWidget {
      * @returns {void}
      */
     clampConnection = async (n, clamp, topOfClamp) => {
+        const targetBlock = this.activity.blocks.blockList[this.blockNo];
+        if (!targetBlock) {
+            return;
+        }
         // Connect the clamp to the Widget block.
-        this.activity.blocks.blockList[this.blockNo].connections[2] = n;
+        targetBlock.connections[2] = n;
         this.activity.blocks.blockList[n].connections[0] = this.blockNo;
 
         // If there were blocks in the Widget, move them inside the clamp.
@@ -1135,8 +1153,12 @@ class TimbreWidget {
      * @returns {void}
      */
     clampConnectionVspace = async (n, vspace, topOfClamp) => {
+        const targetBlock = this.activity.blocks.blockList[this.blockNo];
+        if (!targetBlock) {
+            return;
+        }
         // Connect the clamp to the Widget block.
-        this.activity.blocks.blockList[this.blockNo].connections[2] = n;
+        targetBlock.connections[2] = n;
         this.activity.blocks.blockList[n].connections[0] = this.blockNo;
 
         // If there were blocks in the Widget, move them inside the clamp.

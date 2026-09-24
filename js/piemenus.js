@@ -13,17 +13,17 @@
 /*
    global
 
-   platformColor, docById, Singer, slicePath, wheelnav,
-   DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
-   PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS,
-   getSavedCustomModes, getModeNamesForGroup, getModeLabel,
-   getModeNameFromLabel, getModeSliceColors, updateModeWheelItems,
-   getModeGroupTitleFont, getModeSliceFont, configureWheel,
-   MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
-   INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
-   getMunsellColor, COLORS40, frequencyToPitch, instruments,
-   DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
-   FIXEDSOLFEGE, NOTENAMES, numberToPitch,
+    platformColor, docById, Singer, slicePath, wheelnav,
+    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
+    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS,
+    getSavedCustomModes, getModeNamesForGroup, getModeLabel,
+    getModeNameFromLabel, getModeSliceColors, updateModeWheelItems,
+    getModeGroupTitleFont, getModeSliceFont, configureWheel,
+    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
+    getMunsellColor, COLORS40, frequencyToPitch, pitchToFrequency,
+    TEMPERAMENT, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, instruments,
+    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
+    FIXEDSOLFEGE, NOTENAMES, numberToPitch,
     nthDegreeToPitch, SOLFEGENAMES, buildScale, getCurrentEDO, generateNoteNames,
     _THIS_IS_TURTLE_BLOCKS_,
     CHORDNAMES, Synth, Tone, activity, announceToScreenReader
@@ -58,7 +58,7 @@
 
    piemenuModes, piemenuPitches, piemenuCustomNotes, piemenuGrid,
    piemenuIntervals, piemenuVoices, piemenuBoolean,
-   piemenuBasic, piemenuColor, piemenuNumber, piemenuNthModalPitch,
+   piemenuBasic, piemenuColor, piemenuNumber,
    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords,
    piemenuDissectNumber
 */
@@ -176,40 +176,55 @@ const isInteractive = target => {
     return false;
 };
 
+const dismissActivePieMenu = () => {
+    if (
+        activeExitWheel &&
+        activeExitWheel.navItems &&
+        activeExitWheel.navItems[0] &&
+        typeof activeExitWheel.navItems[0].navigateFunction === "function"
+    ) {
+        activeExitWheel.navItems[0].navigateFunction();
+    } else {
+        for (let i = 0; i < PIE_MENU_CONTAINERS.length; i++) {
+            const div = docById(PIE_MENU_CONTAINERS[i]);
+            if (div && div.style && div.style.display !== "none") {
+                if (PIE_MENU_CONTAINERS[i] === "wheelDiv") {
+                    hideWheelDiv();
+                } else {
+                    div.style.display = "none";
+                }
+            }
+        }
+        const movable = docById("movable");
+        if (movable) {
+            movable.style.display = "none";
+        }
+    }
+    document.removeEventListener("mousedown", handleOutsideClick);
+    document.removeEventListener("keydown", handleEscapeKey, true);
+    activeExitWheel = null;
+};
+
 const handleOutsideClick = event => {
     if (!isAnyPieMenuVisible()) {
         return;
     }
 
     if (!isInteractive(event.target)) {
-        if (
-            activeExitWheel &&
-            activeExitWheel.navItems &&
-            activeExitWheel.navItems[0] &&
-            typeof activeExitWheel.navItems[0].navigateFunction === "function"
-        ) {
-            activeExitWheel.navItems[0].navigateFunction();
-            document.removeEventListener("mousedown", handleOutsideClick);
-            activeExitWheel = null;
-        } else {
-            for (let i = 0; i < PIE_MENU_CONTAINERS.length; i++) {
-                const div = docById(PIE_MENU_CONTAINERS[i]);
-                if (div && div.style && div.style.display !== "none") {
-                    if (PIE_MENU_CONTAINERS[i] === "wheelDiv") {
-                        hideWheelDiv();
-                    } else {
-                        div.style.display = "none";
-                    }
-                }
-            }
-            const movable = docById("movable");
-            if (movable) {
-                movable.style.display = "none";
-            }
-            document.removeEventListener("mousedown", handleOutsideClick);
-            activeExitWheel = null;
-        }
+        dismissActivePieMenu();
     }
+};
+
+// Capture-phase Escape handler: keyboard-controller disables all of its own
+// shortcuts while a pie menu is open, so without this a keyboard user has no
+// way to close the menu at all.
+const handleEscapeKey = event => {
+    if (event.key !== "Escape" || !isAnyPieMenuVisible()) {
+        return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    dismissActivePieMenu();
 };
 
 const showWheelDiv = () => {
@@ -221,6 +236,7 @@ const showWheelDiv = () => {
     setTimeout(() => {
         if (isAnyPieMenuVisible()) {
             document.addEventListener("mousedown", handleOutsideClick);
+            document.addEventListener("keydown", handleEscapeKey, true);
         }
     }, 50);
 
@@ -233,8 +249,16 @@ const hideWheelDiv = () => {
     wheelDiv.style.display = "none";
     disableWheelResizeHandling();
 
+    // enableWheelScroll() hangs this listener on the persistent wheelDiv, so it
+    // outlives the wheel and block it closes over unless we take it off here.
+    if (wheelDiv._scrollHandler) {
+        wheelDiv.removeEventListener("wheel", wheelDiv._scrollHandler);
+        wheelDiv._scrollHandler = null;
+    }
+
     if (!isAnyPieMenuVisible()) {
         document.removeEventListener("mousedown", handleOutsideClick);
+        document.removeEventListener("keydown", handleEscapeKey, true);
         activeExitWheel = null;
     }
 
@@ -318,10 +342,11 @@ const configureExitWheel = exitWheel => {
     }
     activeExitWheel = exitWheel;
 
-    // Register mousedown listener after 50ms if any pie menu is visible
+    // Register dismissal listeners after 50ms if any pie menu is visible
     setTimeout(() => {
         if (isAnyPieMenuVisible()) {
             document.addEventListener("mousedown", handleOutsideClick);
+            document.addEventListener("keydown", handleEscapeKey, true);
         }
     }, 50);
 
@@ -348,6 +373,7 @@ const configureExitWheel = exitWheel => {
             item.navigateFunction();
         }
         document.removeEventListener("mousedown", handleOutsideClick);
+        document.removeEventListener("keydown", handleEscapeKey, true);
         if (activeExitWheel === exitWheel) {
             activeExitWheel = null;
         }
@@ -419,7 +445,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
     wheelnav.cssMode = true;
 
-    block._pitchWheel.keynavigateEnabled = false;
+    block._pitchWheel.keynavigateEnabled = true;
 
     block._pitchWheel.colors = platformColor.pitchWheelcolors;
     block._pitchWheel.slicePathFunction = slicePath().DonutSlice;
@@ -546,7 +572,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             )
         ) + "px";
 
-    // Navigate to a the current note value.
+    // Navigate to the current note value.
     let i = noteValues.indexOf(note);
     if (i === -1) {
         if (custom) {
@@ -603,11 +629,10 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         !pitchHasAccidental &&
         ((!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
             (block.name === "notename" &&
-                (block.connections[0] !== undefined
-                    ? !["setkey", "setkey2"].includes(
-                          block.blocks.blockList[block.connections[0]].name
-                      )
-                    : true)))
+                // A note name block on its own has a null parent, not undefined.
+                !["setkey", "setkey2"].includes(
+                    block.blocks.blockList[block.connections[0]]?.name
+                )))
     ) {
         if (
             scale[scale.length - 1 - i][0] === FIXEDSOLFEGE[note] ||
@@ -645,7 +670,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     }
 
     if (hasOctaveWheel) {
-        // Use the octave associated with block block, if available.
+        // Use the octave associated with the block, if available.
         const pitchOctave = block.blocks.findPitchOctave(block.connections[0]);
 
         // Navigate to current octave.
@@ -847,11 +872,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         if (
             (!block.activity.KeySignatureEnv[2] && that.name === "solfege") ||
             (that.name === "notename" &&
-                (that.connections[0] !== undefined
-                    ? !["setkey", "setkey2"].includes(
-                          that.blocks.blockList[that.connections[0]].name
-                      )
-                    : true))
+                !["setkey", "setkey2"].includes(that.blocks.blockList[that.connections[0]]?.name))
         ) {
             let i = scale.indexOf(selection["note"]);
             if (i === -1) {
@@ -943,8 +964,8 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
 
         if (selection["attr"] === "♮") {
-            that.text.text = selection["note"];
             that.value = selectedNoteValue;
+            that.text.text = selection["note"];
         } else {
             that.value = selectedNoteValue + selection["attr"];
             that.text.text = selection["note"] + selection["attr"];
@@ -1035,12 +1056,12 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
         if (selectedAccidental === "♮" || selectedAccidental === "") {
             // Natural or no accidental: display only the note
-            that.text.text = selectedNote;
             that.value = selectedNoteValue;
+            that.text.text = selectedNote;
         } else {
             // Combine note and accidental for display
-            that.text.text = selectedNote + selectedAccidental;
             that.value = selectedNoteValue + selectedAccidental;
+            that.text.text = selectedNote + selectedAccidental;
         }
 
         // Ensure proper layering of the text element
@@ -1074,6 +1095,12 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         that._exitWheel.removeWheel();
         if (hasOctaveWheel) {
             that._octavesWheel.removeWheel();
+        }
+        if (that.label) {
+            that.label.style.display = "none";
+        }
+        if (docById("labelDiv") && docById("labelDiv").classList) {
+            docById("labelDiv").classList.remove("hasKeyboard");
         }
     };
 };
@@ -1118,7 +1145,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     wheelnav.cssMode = true;
 
-    block._customWheel.keynavigateEnabled = false;
+    block._customWheel.keynavigateEnabled = true;
 
     //Customize slicePaths for proper size
     block._customWheel.colors = platformColor.intervalNameWheelcolors;
@@ -1280,7 +1307,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         ) + "px";
 
     if (hasOctaveWheel) {
-        // Use the octave associated with block block, if available.
+        // Use the octave associated with the block, if available.
         const pitchOctave = block.blocks.findPitchOctave(block.connections[0]);
 
         // Navigate to current octave
@@ -1421,268 +1448,6 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 };
 
 /**
- * Builds the scale-degree (nth modal pitch) pie menu.
- *
- * @param {Object} block Block instance invoking the menu
- * @param {number[]} noteValues Scale degree values to display
- * @param {number} note Currently selected degree (rounded if fractional)
- * @returns {void}
- */
-const piemenuNthModalPitch = (block, noteValues, note) => {
-    // wheelNav pie menu for scale degree pitch selection
-
-    // check if a non-integer value is connected to note argument
-    // Pie menu would crash; so in such case navigate to closest integer
-
-    if (note % 1 !== 0) {
-        note = Math.floor(note + 0.5);
-    }
-
-    if (block.blocks.stageClick) {
-        return;
-    }
-
-    const noteLabels = [];
-    for (let i = 0; i < noteValues.length; i++) {
-        noteLabels.push(noteValues[i].toString());
-    }
-    noteLabels.push(null);
-
-    showWheelDiv();
-
-    const wheelSize = getPieMenuSize(block);
-    block._pitchWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
-    block._octavesWheel = new wheelnav("_octavesWheel", block._pitchWheel.raphael);
-    block._exitWheel = new wheelnav("_exitWheel", block._pitchWheel.raphael);
-
-    wheelnav.cssMode = true;
-
-    block._pitchWheel.keynavigateEnabled = false;
-
-    block._pitchWheel.colors = platformColor.pitchWheelcolors;
-    block._pitchWheel.slicePathFunction = slicePath().DonutSlice;
-    block._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    block._pitchWheel.slicePathCustom.minRadiusPercent = 0.35;
-    block._pitchWheel.slicePathCustom.maxRadiusPercent = 0.72;
-    block._pitchWheel.sliceSelectedPathCustom = block._pitchWheel.slicePathCustom;
-    block._pitchWheel.sliceInitPathCustom = block._pitchWheel.slicePathCustom;
-
-    block._pitchWheel.animatetime = 0; // 300;
-    block._pitchWheel.createWheel(noteLabels);
-
-    block._exitWheel.colors = platformColor.exitWheelcolors;
-    block._exitWheel.slicePathFunction = slicePath().DonutSlice;
-    block._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    block._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-    block._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-    block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
-    block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
-    block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
-    block._exitWheel.navItems[1].enabled = false;
-    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
-    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
-    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
-    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
-    block._exitWheel.createWheel();
-    configureExitWheel(block._exitWheel);
-
-    block._octavesWheel.colors = platformColor.octavesWheelcolors;
-    block._octavesWheel.slicePathFunction = slicePath().DonutSlice;
-    block._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    block._octavesWheel.slicePathCustom.minRadiusPercent = 0.8;
-    block._octavesWheel.slicePathCustom.maxRadiusPercent = 1.0;
-    block._octavesWheel.sliceSelectedPathCustom = block._octavesWheel.slicePathCustom;
-    block._octavesWheel.sliceInitPathCustom = block._octavesWheel.slicePathCustom;
-    const octaveLabels = [
-        "8",
-        "7",
-        "6",
-        "5",
-        "4",
-        "3",
-        "2",
-        "1",
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-    ];
-    block._octavesWheel.animatetime = 0; // 300;
-    block._octavesWheel.createWheel(octaveLabels);
-
-    // enable changing values while pie-menu is open
-    const labelElem = docById("labelDiv");
-    labelElem.replaceChildren(createNumberLabelInput(note));
-    labelElem.classList.add("hasKeyboard");
-
-    block.label = docById("numberLabel");
-    block.label.addEventListener("keypress", block._exitKeyPressed.bind(block));
-
-    // Position the widget above/below note block.
-    const x = block.container.x;
-    const y = block.container.y;
-
-    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
-
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
-    const halfWheelSize = wheelSize / 2;
-
-    const selectorWidth = 150;
-    const left = Math.round(
-        (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
-    );
-    const top = Math.round(
-        (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
-    );
-    block.label.style.left = left + "px";
-    block.label.style.top = top + "px";
-
-    docById("wheelDiv").style.left =
-        Math.min(
-            Math.max(left - (300 - selectorWidth) / 2, 0),
-            block.blocks.turtles._canvas.width - 300
-        ) + "px";
-
-    if (top - 300 < 0) {
-        docById("wheelDiv").style.top = top + 40 + "px";
-    } else {
-        docById("wheelDiv").style.top = top - 300 + "px";
-    }
-
-    block.label.style.width =
-        (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
-
-    block.label.style.fontSize =
-        Math.round((20 * block.blocks.blockScale * block.protoblock.scale) / 2) + "px";
-
-    // Navigate to a the current note value.
-    const i = noteValues.indexOf(note);
-
-    block._pitchWheel.navigateWheel(i);
-
-    // Use the octave associated with block block, if available.
-    const pitchOctave = block.blocks.findPitchOctave(block.connections[0]);
-
-    // Navigate to current octave
-    block._octavesWheel.navigateWheel(8 - pitchOctave);
-
-    // Set up event handlers
-    const that = block;
-
-    block.label.addEventListener("change", () => {
-        that._labelChanged(false, false);
-    });
-
-    /*
-     * Change selection and set value to notevalue
-     * @return{void}
-     * @private
-     */
-    const __selectionChanged = () => {
-        const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-        const i = noteLabels.indexOf(label);
-        that.value = noteValues[i];
-        that.text.text = label;
-
-        // Make sure text is on top.
-        that.container.setChildIndex(that.text, that.container.children.length - 1);
-        that.updateCache();
-
-        // Set the octave of the pitch block if available
-        const octave = Number(
-            that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
-        );
-        that.blocks.setPitchOctave(that.connections[0], octave);
-    };
-
-    /*
-     * Preview pitch
-     * @return{void}
-     * @private
-     */
-    const __pitchPreview = () => {
-        const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-        const i = noteLabels.indexOf(label);
-
-        /* We're using a default of C major ==> -7 to -1 should be one octave lower
-           than the reference, 0-6 in the same octave and 7 should be once octave higher
-        */
-        let deltaOctave;
-        let note;
-
-        // Use C major as of now; fix block to use current keySignature once that feature is in place
-        const keySignature =
-            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
-        if (noteValues[i] >= 0) {
-            [note, deltaOctave] = nthDegreeToPitch(keySignature, noteValues[i]);
-        } else {
-            [note, deltaOctave] = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
-        }
-
-        let octave = Number(
-            that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
-        );
-        octave += deltaOctave;
-        if (octave < 1) {
-            octave = 1;
-        } else if (octave > 8) {
-            octave = 8;
-        }
-
-        const tur = that.activity.turtles.ithTurtle(0);
-
-        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
-            that.activity.logo.synth.createDefaultSynth(0);
-            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
-        }
-
-        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
-
-        //Play sample note and prevent extra sounds from playing
-        if (!that._triggerLock) {
-            that._triggerLock = true;
-            that.activity.logo.synth.trigger(
-                0,
-                [note.replace(SHARP, "#").replace(FLAT, "b") + octave],
-                1 / 8,
-                DEFAULTVOICE,
-                null,
-                null
-            );
-        }
-
-        setTimeout(() => {
-            that._triggerLock = false;
-        }, 125); // 1/8 second in milliseconds
-
-        __selectionChanged();
-    };
-    // Set up handlers for pitch preview.
-    for (let i = 0; i < noteValues.length; i++) {
-        block._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
-    }
-
-    for (let i = 0; i < 8; i++) {
-        block._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
-    }
-
-    // Hide the widget when the exit button is clicked.
-    block._exitWheel.navItems[0].navigateFunction = () => {
-        that._piemenuExitTime = new Date().getTime();
-        hideWheelDiv();
-        that._pitchWheel.removeWheel();
-        that._exitWheel.removeWheel();
-        that._octavesWheel.removeWheel();
-    };
-};
-
-/**
  * Builds the accidental selection pie menu.
  *
  * @param {Object} block Block instance invoking the menu
@@ -1715,7 +1480,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
 
     wheelnav.cssMode = true;
 
-    block._accidentalWheel.keynavigateEnabled = false;
+    block._accidentalWheel.keynavigateEnabled = true;
 
     block._accidentalWheel.colors = platformColor.accidentalsWheelcolors;
     block._accidentalWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1804,7 +1569,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
             )
         ) + "px";
 
-    // Navigate to a the current accidental value.
+    // Navigate to the current accidental value.
     let i = accidentalValues.indexOf(accidental);
     if (i === -1) {
         i = 2;
@@ -1883,7 +1648,7 @@ const piemenuNoteValue = (block, noteValue) => {
 
     wheelnav.cssMode = true;
 
-    block._noteValueWheel.keynavigateEnabled = false;
+    block._noteValueWheel.keynavigateEnabled = true;
 
     block._noteValueWheel.colors = platformColor.noteValueWheelcolors;
     block._noteValueWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1941,8 +1706,9 @@ const piemenuNoteValue = (block, noteValue) => {
      * @private
      */
     const __selectionChanged = () => {
-        that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
-        that.value = Number(that.text.text);
+        const newText = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
+        that.value = Number(newText);
+        that.text.text = newText;
 
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -1959,7 +1725,12 @@ const piemenuNoteValue = (block, noteValue) => {
         hideWheelDiv();
         that._noteValueWheel.removeWheel();
         that._exitWheel.removeWheel();
-        that.label.style.display = "none";
+        if (that.label) {
+            that.label.style.display = "none";
+        }
+        if (docById("labelDiv") && docById("labelDiv").classList) {
+            docById("labelDiv").classList.remove("hasKeyboard");
+        }
         if (that._check_meter_block !== null) {
             that.blocks.meter_block_changed(that._check_meter_block);
         }
@@ -2028,7 +1799,7 @@ const piemenuNoteValue = (block, noteValue) => {
         block._noteValueWheel.navItems[i].navigateFunction = __showHide;
     }
 
-    // Navigate to a the current noteValue value.
+    // Navigate to the current noteValue value.
     // Special case 1 to use power of 2.
     if (noteValue === 1) {
         block._noteValueWheel.navigateWheel(1);
@@ -2103,7 +1874,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     wheelnav.cssMode = true;
 
-    block._numberWheel.keynavigateEnabled = false;
+    block._numberWheel.keynavigateEnabled = true;
 
     block._numberWheel.colors = platformColor.numberWheelcolors;
     block._numberWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2198,7 +1969,12 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         hideWheelDiv();
         that._numberWheel.removeWheel();
         that._exitWheel.removeWheel();
-        that.label.style.display = "none";
+        if (that.label) {
+            that.label.style.display = "none";
+        }
+        if (docById("labelDiv") && docById("labelDiv").classList) {
+            docById("labelDiv").classList.remove("hasKeyboard");
+        }
 
         if (that._check_meter_block !== null) {
             that.blocks.meter_block_changed(that._check_meter_block);
@@ -2249,7 +2025,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     block.label.style.width =
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
-    // Navigate to a the current number value.
+    // Navigate to the current number value.
     let i = wheelValues.indexOf(selectedValue);
     if (i === -1) {
         // Find the closest valid value from the wheelValues array
@@ -2471,7 +2247,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
 
     wheelnav.cssMode = true;
 
-    block._numberWheel.keynavigateEnabled = false;
+    block._numberWheel.keynavigateEnabled = true;
 
     block._numberWheel.colors = [];
     if (mode === "setcolor" || mode === "setturtlecolor") {
@@ -2546,7 +2322,12 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
         hideWheelDiv();
         that._numberWheel.removeWheel();
         that._exitWheel.removeWheel();
-        that.label.style.display = "none";
+        if (that.label) {
+            that.label.style.display = "none";
+        }
+        if (docById("labelDiv") && docById("labelDiv").classList) {
+            docById("labelDiv").classList.remove("hasKeyboard");
+        }
     };
 
     const labelElem = docById("labelDiv");
@@ -2594,7 +2375,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block.label.style.width =
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
 
-    // Navigate to a the current number value.
+    // Navigate to the current number value.
     let i = wheelValues.indexOf(selectedValue);
     if (i === -1) {
         i = 0;
@@ -2666,7 +2447,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
 
     wheelnav.cssMode = true;
 
-    block._basicWheel.keynavigateEnabled = false;
+    block._basicWheel.keynavigateEnabled = true;
 
     block._basicWheel.colors = colors;
     block._basicWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2754,7 +2535,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
             )
         ) + "px";
 
-    // Navigate to a the current selectedValue value.
+    // Navigate to the current selectedValue value.
     let i = menuValues.indexOf(selectedValue);
     if (i === -1) {
         i = 1;
@@ -2804,7 +2585,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
 
     wheelnav.cssMode = true;
 
-    block._booleanWheel.keynavigateEnabled = false;
+    block._booleanWheel.keynavigateEnabled = true;
 
     block._booleanWheel.colors = platformColor.booleanWheelcolors;
     block._booleanWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2868,7 +2649,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
             )
         ) + "px";
 
-    // Navigate to a the current boolean value.
+    // Navigate to the current boolean value.
     let i = booleanValues.indexOf(boolean);
     if (i === -1) {
         i = 0;
@@ -2919,7 +2700,7 @@ const piemenuChords = (block, selectedChord) => {
     }
     wheelnav.cssMode = true;
 
-    block._chordWheel.keynavigateEnabled = false;
+    block._chordWheel.keynavigateEnabled = true;
 
     block._chordWheel.colors = platformColor.modeWheelcolors;
     block._chordWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2957,8 +2738,8 @@ const piemenuChords = (block, selectedChord) => {
     const that = block;
 
     const __selectionChanged = () => {
-        that.text.text = that._chordWheel.navItems[that._chordWheel.selectedNavItemIndex].title;
         that.value = CHORDNAMES[that._chordWheel.selectedNavItemIndex];
+        that.text.text = that._chordWheel.navItems[that._chordWheel.selectedNavItemIndex].title;
 
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -3003,7 +2784,7 @@ const piemenuChords = (block, selectedChord) => {
             )
         ) + "px";
 
-    // Navigate to a the current chord value.
+    // Navigate to the current chord value.
     let i = chordLabels.indexOf(selectedChord);
     if (i === -1) {
         i = 0;
@@ -3066,7 +2847,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
 
     wheelnav.cssMode = true;
 
-    block._voiceWheel.keynavigateEnabled = false;
+    block._voiceWheel.keynavigateEnabled = true;
 
     block._voiceWheel.colors = colors;
     block._voiceWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3129,6 +2910,10 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
         that.updateCache();
     };
 
+    // A preview of an unloaded voice is deferred to give the synth time to
+    // load. Held here so the exit handler can cancel one that is still pending.
+    let voicePreviewTimeout = null;
+
     /*
      * Preview voice
      * @return{void}
@@ -3153,7 +2938,9 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
             timeout = 500;
         }
 
-        setTimeout(() => {
+        clearTimeout(voicePreviewTimeout);
+        voicePreviewTimeout = setTimeout(() => {
+            voicePreviewTimeout = null;
             Singer.setSynthVolume(that.activity.logo, 0, voice, DEFAULTVOLUME);
             that.activity.logo.synth.trigger(0, "G4", 1 / 4, voice, null, null, false);
             that.activity.logo.synth.start();
@@ -3214,6 +3001,19 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
         hideWheelDiv();
+        // A preview scheduled just before the menu closed would otherwise play
+        // into a dismissed menu.
+        clearTimeout(voicePreviewTimeout);
+        voicePreviewTimeout = null;
+        // Remove the wheels so wheelnav detaches the window keydown listener it
+        // installs for keynavigateEnabled. Without this the closed menu keeps
+        // responding to the arrow keys.
+        that._voiceWheel.removeWheel();
+        that._exitWheel.removeWheel();
+        // The pie menu covers the canvas, so the block never receives the
+        // mouseout that would normally clear this. Left set, the arrow keys
+        // move the block instead of doing nothing.
+        that.blocks.activeBlock = null;
     };
 };
 
@@ -3246,7 +3046,7 @@ const piemenuIntervals = (block, selectedInterval) => {
 
     wheelnav.cssMode = true;
 
-    block._intervalNameWheel.keynavigateEnabled = false;
+    block._intervalNameWheel.keynavigateEnabled = true;
 
     //Customize slicePaths for proper size
     block._intervalNameWheel.colors = platformColor.intervalNameWheelcolors;
@@ -3342,14 +3142,11 @@ const piemenuIntervals = (block, selectedInterval) => {
 
     let isInitialized = false;
     // Add function to each main menu for show/hide sub menus
-    // TODO: Add all tabs to each interval
     const __setupAction = (i, activeTabs) => {
         that._intervalNameWheel.navItems[i].navigateFunction = () => {
             for (let l = 0; l < labels.length; l++) {
                 for (let j = 0; j < 8; j++) {
-                    if (l !== i) {
-                        that._intervalWheel.navItems[l * 8 + j].navItem.hide();
-                    } else if (!activeTabs.includes(j + 1)) {
+                    if (l !== i || !activeTabs.includes(j + 1)) {
                         that._intervalWheel.navItems[l * 8 + j].navItem.hide();
                     } else {
                         that._intervalWheel.navItems[l * 8 + j].navItem.show();
@@ -3389,9 +3186,9 @@ const piemenuIntervals = (block, selectedInterval) => {
 
     const j = Number(obj[1]);
     if (INTERVALS[i][2].includes(j)) {
-        block._intervalWheel.navigateWheel(j - 1);
+        block._intervalWheel.navigateWheel(i * 8 + j - 1);
     } else {
-        block._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
+        block._intervalWheel.navigateWheel(i * 8 + INTERVALS[i][2][0] - 1);
     }
     isInitialized = true;
 
@@ -3406,6 +3203,9 @@ const piemenuIntervals = (block, selectedInterval) => {
         const number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
 
         that.value = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] + " " + number;
+        if (!INTERVALVALUES[that.value]) {
+            return;
+        }
         if (label === "perfect 1") {
             that.text.text = _("unison");
         } else {
@@ -3460,12 +3260,15 @@ const piemenuIntervals = (block, selectedInterval) => {
  *
  * @param {Object} block Block instance invoking the menu
  * @param {string} selectedMode Currently selected mode value
+ * @param {Function} [onSelect] Optional callback invoked with (modeName, label) when a mode is chosen
  * @returns {void}
  */
-const piemenuModes = (block, selectedMode) => {
+const piemenuModes = (block, selectedMode, onSelect) => {
     // pie menu for mode selection
 
     wheelnav.cssMode = true;
+    let isInitialized = false;
+    let isRebuilding = false;
 
     if (block.blocks.stageClick) {
         return;
@@ -3501,6 +3304,8 @@ const piemenuModes = (block, selectedMode) => {
     block._exitWheel = new wheelnav("_exitWheel", block._modeWheel.raphael);
 
     const currentEDO = getCurrentEDO(block.activity.logo.synth.inTemperament);
+    const inTemperament = block.activity.logo.synth.inTemperament;
+    const nonEDO = isNonEDO(inTemperament);
     const modeWheelLabels = Array.from({ length: currentEDO }, (_, i) => String(i));
 
     configureWheel(block._modeWheel, {
@@ -3515,8 +3320,8 @@ const piemenuModes = (block, selectedMode) => {
     block._modeGroupWheel = new wheelnav("_modeGroupWheel", block._modeWheel.raphael);
     configureWheel(block._modeGroupWheel, {
         colors: platformColor.modeGroupWheelcolors,
-        minRadius: MODEPIEMENU_GROUP_RING.minRadius,
-        maxRadius: MODEPIEMENU_GROUP_RING.maxRadius,
+        minRadius: 0.15,
+        maxRadius: 0.3,
         titleFont: getModeGroupTitleFont(block._modeWheel.wheelRadius),
         selectionPaths: true
     });
@@ -3575,6 +3380,9 @@ const piemenuModes = (block, selectedMode) => {
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
+            if (isInitialized && !isRebuilding && typeof onSelect === "function") {
+                onSelect(that.value, that.text.text);
+            }
         }
     };
 
@@ -3601,11 +3409,11 @@ const piemenuModes = (block, selectedMode) => {
             that._modeNameWheel = new wheelnav("_modeNameWheel", that._modeWheel.raphael);
             configureWheel(that._modeNameWheel, {
                 colors: [],
-                minRadius: MODEPIEMENU_NAME_RING.minRadius,
-                maxRadius: MODEPIEMENU_NAME_RING.maxRadius,
+                minRadius: 0.3,
+                maxRadius: 0.85,
                 selectionPaths: true
             });
-            that._modeNameWheel.keynavigateEnabled = false;
+            that._modeNameWheel.keynavigateEnabled = true;
             newWheel = true;
         }
 
@@ -3648,7 +3456,9 @@ const piemenuModes = (block, selectedMode) => {
             const modename = modes[j];
             const activeTabs = [0];
             if (modename !== " " && MUSICALMODES[modename]) {
-                const mode = MUSICALMODES[modename];
+                const mode =
+                    (nonEDO && getNonEDOModeSteps(modename, inTemperament)) ||
+                    MUSICALMODES[modename];
                 for (let k = 0; k < mode.length; k++) {
                     activeTabs.push(last(activeTabs) + mode[k]);
                 }
@@ -3687,14 +3497,11 @@ const piemenuModes = (block, selectedMode) => {
     };
 
     const __playNote = () => {
+        const i = that._modeWheel.selectedNavItemIndex;
         let o = 0;
         if (octave) {
             o = currentEDO;
         }
-
-        const i = that._modeWheel.selectedNavItemIndex;
-        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null, null, true);
-        obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
         const tur = that.activity.turtles.ithTurtle(0);
 
@@ -3705,6 +3512,25 @@ const piemenuModes = (block, selectedMode) => {
 
         that.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
         that.activity.logo.synth.setVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
+
+        if (nonEDO) {
+            const result = getNonEDOFrequency(i + o, 4, inTemperament, key + " chromatic");
+            if (result) {
+                that.activity.logo.synth.trigger(
+                    0,
+                    [result.freq],
+                    1 / 12,
+                    DEFAULTVOICE,
+                    null,
+                    null
+                );
+                return;
+            }
+        }
+
+        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null, null, true);
+        obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
+
         that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
     };
 
@@ -3823,15 +3649,23 @@ const piemenuModes = (block, selectedMode) => {
     const __buildModeWheel = () => {
         const i = that._modeGroupWheel.selectedNavItemIndex;
         modeGroup = that._modeGroupWheel.navItems[i].title;
+        isRebuilding = true;
         __buildModeNameWheel(modeGroup);
+        isRebuilding = false;
     };
 
     for (let i = 0; i < block._modeGroupWheel.navItems.length; i++) {
         block._modeGroupWheel.navItems[i].navigateFunction = __buildModeWheel;
+    }
+
+    for (let i = 0; i < block._modeGroupWheel.navItems.length; i++) {
         if (block._modeGroupWheel.navItems[i].title === modeGroup) {
             block._modeGroupWheel.navigateWheel(i);
+            break;
         }
     }
+
+    isInitialized = true;
 
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
     block._exitWheel.navItems[1].navigateFunction = __prepScale;
@@ -3902,7 +3736,7 @@ const piemenuGrid = activity => {
     activity.turtles.gridWheel = new wheelnav("wheelDivptm", null, 300, 300);
     activity.turtles._exitWheel = new wheelnav("_exitWheel", activity.turtles.gridWheel.raphael);
 
-    activity.turtles.gridWheel.keynavigateEnabled = false;
+    activity.turtles.gridWheel.keynavigateEnabled = true;
     activity.turtles.gridWheel.slicePathFunction = slicePath().DonutSlice;
     activity.turtles.gridWheel.slicePathCustom = slicePath().DonutSliceCustomization();
     activity.turtles.gridWheel.colors = platformColor.gridWheelcolors.wheel;
@@ -3967,6 +3801,105 @@ const piemenuGrid = activity => {
     document.addEventListener("mousedown", clickOutsideHandler);
 };
 
+/** Sync setkey2 block with activity.KeySignatureEnv (create or update in place). */
+const syncKeySignatureBlocks = activity => {
+    const setKeyBlock =
+        Object.values(activity.blocks.blockList).find(b => b && b.name === "setkey2" && !b.trash) ||
+        null;
+
+    if (setKeyBlock === null) {
+        activity.blocks.findStacks();
+        const stacks = activity.blocks.stackList;
+        stacks.sort();
+        for (const stackId of stacks) {
+            if (activity.blocks.blockList[stackId].name === "start") {
+                const bottomBlock = activity.blocks.blockList[stackId].connections[1];
+                let connectionsSetKey;
+                let movable;
+                if (activity.KeySignatureEnv[2]) {
+                    activity.blocks._makeNewBlockWithConnections(
+                        "movable",
+                        0,
+                        [stackId, null, null],
+                        null,
+                        null
+                    );
+                    movable = activity.logo.blocks.blockList.length - 1;
+                    activity.blocks._makeNewBlockWithConnections(
+                        "boolean",
+                        0,
+                        [movable],
+                        null,
+                        null
+                    );
+                    activity.blocks.blockList[movable].connections[1] =
+                        activity.blocks.blockList.length - 1;
+                    connectionsSetKey = [movable, null, null, bottomBlock];
+                } else {
+                    connectionsSetKey = [stackId, null, null, bottomBlock];
+                }
+
+                activity.blocks._makeNewBlockWithConnections(
+                    "setkey2",
+                    0,
+                    connectionsSetKey,
+                    null,
+                    null
+                );
+                const setKey = activity.blocks.blockList.length - 1;
+                activity.blocks.blockList[bottomBlock].connections[0] = setKey;
+
+                if (activity.KeySignatureEnv[2]) {
+                    activity.blocks.blockList[stackId].connections[1] = movable;
+                    activity.blocks.blockList[movable].connections[2] = setKey;
+                } else {
+                    activity.blocks.blockList[stackId].connections[1] = setKey;
+                }
+
+                activity.blocks.adjustExpandableClampBlock();
+
+                activity.blocks._makeNewBlockWithConnections("notename", 0, [setKey], null, null);
+                activity.blocks.blockList[setKey].connections[1] =
+                    activity.blocks.blockList.length - 1;
+                activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
+                    activity.KeySignatureEnv[0];
+                activity.blocks._makeNewBlockWithConnections("modename", 0, [setKey], null, null);
+                activity.blocks.blockList[setKey].connections[2] =
+                    activity.blocks.blockList.length - 1;
+                activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
+                    activity.KeySignatureEnv[1];
+                activity.textMsg(
+                    `${_("You have chosen key for your pitch preview.")} ${
+                        activity.KeySignatureEnv[0]
+                    } ${activity.KeySignatureEnv[1]}`
+                );
+                break;
+            }
+        }
+        return;
+    }
+
+    const conn1 = setKeyBlock.connections[1];
+    const conn2 = setKeyBlock.connections[2];
+    if (
+        conn1 !== null &&
+        activity.blocks.blockList[conn1] &&
+        activity.blocks.blockList[conn1].name === "notename"
+    ) {
+        activity.blocks.blockList[conn1].value = activity.KeySignatureEnv[0];
+        activity.blocks.updateBlockText(conn1);
+    }
+    if (
+        conn2 !== null &&
+        activity.blocks.blockList[conn2] &&
+        activity.blocks.blockList[conn2].name === "modename"
+    ) {
+        activity.blocks.blockList[conn2].value = activity.KeySignatureEnv[1];
+        activity.blocks.updateBlockText(conn2);
+    }
+    activity.refreshCanvas();
+};
+
 const piemenuKey = activity => {
     docById("chooseKeyDiv").style.display = "block";
     docById("movable").style.display = "block";
@@ -4027,7 +3960,15 @@ const piemenuKey = activity => {
     keyNameWheel2.createWheel(keys2);
 
     const modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
-    const modes = ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"];
+    // Mode list mirrors the mode-widget pie menu (all MODE_PIE_MENUS groups + custom).
+    const savedCustomModes = getSavedCustomModes();
+    const modes = [
+        ...new Set(
+            Object.entries(MODE_PIE_MENUS).flatMap(([grp, grpModes]) =>
+                grp === "custom" ? savedCustomModes.map(m => m.name) : grpModes
+            )
+        )
+    ].filter(m => m && m !== " ");
     modenameWheel.slicePathFunction = slicePath().DonutSlice;
     modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
     modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
@@ -4035,9 +3976,21 @@ const piemenuKey = activity => {
     modenameWheel.sliceSelectedPathCustom = modenameWheel.slicePathCustom;
     modenameWheel.sliceInitPathCustom = modenameWheel.slicePathCustom;
     modenameWheel.titleRotateAngle = 0;
-    modenameWheel.colors = platformColor.modeGroupWheelcolors;
+    modenameWheel.colors = getModeSliceColors(modes, {
+        emptyColor: platformColor.modePieMenusIfColorPush,
+        filledColor: platformColor.modePieMenusElseColorPush
+    });
     modenameWheel.animatetime = 0;
     modenameWheel.createWheel(modes);
+
+    // Fit each label to its slice arc; default font overflows on ~40 thin slices.
+    for (let i = 0; i < modenameWheel.navItems.length; i++) {
+        const font = getModeSliceFont(modenameWheel.wheelRadius, modes.length, modes[i].length);
+        ["titleAttr", "titleHoverAttr", "titleSelectedAttr"].forEach(
+            k => (modenameWheel.navItems[i][k].font = font)
+        );
+    }
+    modenameWheel.refreshWheel();
 
     const exitWheel = new wheelnav("exitWheel", keyNameWheel.raphael);
     exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -4061,104 +4014,6 @@ const piemenuKey = activity => {
     docById("movable").style.left = x - 110 + "px";
     docById("movable").style.top = y + 400 + "px";
 
-    const __generateSetKeyBlocks = () => {
-        // Find all setkey blocks in the code.
-        let isSetKeyBlockPresent = false;
-        const setKeyBlocks = [];
-        for (const i in activity.blocks.blockList) {
-            if (
-                activity.blocks.blockList[i].name === "setkey2" &&
-                !activity.blocks.blockList[i].trash
-            ) {
-                isSetKeyBlockPresent = true;
-                setKeyBlocks.push(i);
-            }
-        }
-
-        if (!isSetKeyBlockPresent) {
-            activity.blocks.findStacks();
-            const stacks = activity.blocks.stackList;
-            stacks.sort();
-            let connectionsSetKey;
-            let movable;
-            for (const stackId of stacks) {
-                if (activity.blocks.blockList[stackId].name === "start") {
-                    const bottomBlock = activity.blocks.blockList[stackId].connections[1];
-                    if (activity.KeySignatureEnv[2]) {
-                        activity.blocks._makeNewBlockWithConnections(
-                            "movable",
-                            0,
-                            [stackId, null, null],
-                            null,
-                            null
-                        );
-                        movable = activity.logo.blocks.blockList.length - 1;
-                        activity.blocks._makeNewBlockWithConnections(
-                            "boolean",
-                            0,
-                            [movable],
-                            null,
-                            null
-                        );
-                        activity.blocks.blockList[movable].connections[1] =
-                            activity.blocks.blockList.length - 1;
-                        connectionsSetKey = [movable, null, null, bottomBlock];
-                    } else {
-                        connectionsSetKey = [stackId, null, null, bottomBlock];
-                    }
-
-                    activity.blocks._makeNewBlockWithConnections(
-                        "setkey2",
-                        0,
-                        connectionsSetKey,
-                        null,
-                        null
-                    );
-
-                    const setKey = activity.blocks.blockList.length - 1;
-                    activity.blocks.blockList[bottomBlock].connections[0] = setKey;
-
-                    if (activity.KeySignatureEnv[2]) {
-                        activity.blocks.blockList[stackId].connections[1] = movable;
-                        activity.blocks.blockList[movable].connections[2] = setKey;
-                    } else {
-                        activity.blocks.blockList[stackId].connections[1] = setKey;
-                    }
-
-                    activity.blocks.adjustExpandableClampBlock();
-
-                    activity.blocks._makeNewBlockWithConnections(
-                        "notename",
-                        0,
-                        [setKey],
-                        null,
-                        null
-                    );
-                    activity.blocks.blockList[setKey].connections[1] =
-                        activity.blocks.blockList.length - 1;
-                    activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
-                        activity.KeySignatureEnv[0];
-                    activity.blocks._makeNewBlockWithConnections(
-                        "modename",
-                        0,
-                        [setKey],
-                        null,
-                        null
-                    );
-                    activity.blocks.blockList[setKey].connections[2] =
-                        activity.blocks.blockList.length - 1;
-                    activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
-                        activity.KeySignatureEnv[1];
-                    activity.textMsg(
-                        `${_("You have chosen key for your pitch preview.")} ${
-                            activity.KeySignatureEnv[0]
-                        } ${activity.KeySignatureEnv[1]}`
-                    );
-                }
-            }
-        }
-    };
-
     const __exitMenu = () => {
         docById("chooseKeyDiv").style.display = "none";
         docById("movable").style.display = "none";
@@ -4172,7 +4027,7 @@ const piemenuKey = activity => {
         keyNameWheel2.removeWheel();
         modenameWheel.removeWheel();
         activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
-        __generateSetKeyBlocks();
+        syncKeySignatureBlocks(activity);
     };
 
     exitWheel.navItems[0].navigateFunction = __exitMenu;
@@ -4338,7 +4193,7 @@ const piemenuDissectNumber = widget => {
     wheelLabels.push(null); // spacer
 
     wheelnav.cssMode = true;
-    numberWheel.keynavigateEnabled = false;
+    numberWheel.keynavigateEnabled = true;
     numberWheel.colors = platformColor.numberWheelcolors;
     numberWheel.slicePathFunction = slicePath().DonutSlice;
     numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -4451,5 +4306,17 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches, piemenuKey, piemenuNumber, piemenuModes };
+    module.exports = {
+        piemenuPitches,
+        piemenuIntervals,
+        piemenuKey,
+        piemenuNumber,
+        piemenuModes,
+        piemenuVoices,
+        handleEscapeKey,
+        dismissActivePieMenu,
+        showWheelDiv,
+        hideWheelDiv,
+        syncKeySignatureBlocks
+    };
 }

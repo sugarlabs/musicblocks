@@ -208,7 +208,7 @@ class SearchUI {
      * All callbacks are provided by SearchController so no logic lives here.
      *
      * @param {Function} sourceFn  (term:string) => Array  — returns filtered suggestions
-     * @param {Function} selectCb  (item, keyCode) => void — called when user picks a result
+     * @param {Function} selectCb  (item, key) => void — called when user picks a result
      * @param {Function} dropCb   (protoblk, x, y) => void — called when user drag-drops a result
      */
     setupMainAutocomplete(sourceFn, selectCb, dropCb) {
@@ -230,7 +230,7 @@ class SearchUI {
                 activity.searchWidget.value = ui.item.label;
                 activity.searchWidget.idInput_custom = ui.item.value;
                 activity.searchWidget.protoblk = ui.item.specialDict;
-                selectCb(ui.item, event.keyCode);
+                selectCb(ui.item, event.key);
             },
             focus: event => {
                 event.preventDefault();
@@ -240,7 +240,32 @@ class SearchUI {
         const instance = $search.autocomplete("instance");
         if (instance) {
             instance._renderItem = (ul, item) => this._renderMainItem($j, ul, item, dropCb);
+            if (instance.menu && instance.menu.element) {
+                instance.menu.element.on("mousedown mouseup click dblclick pointerdown", event => {
+                    event.stopPropagation();
+                    if (event.type === "mousedown" || event.type === "pointerdown") {
+                        event.preventDefault();
+                        $search.focus();
+                    }
+                });
+            }
+            const origClose = instance.close;
+            instance.close = function (event) {
+                if (event && event.target && window.jQuery) {
+                    const $target = window.jQuery(event.target);
+                    if (
+                        typeof $target.is === "function" &&
+                        ($target.is("#ui-id-1") ||
+                            (typeof $target.closest === "function" &&
+                                $target.closest("#ui-id-1").length > 0))
+                    ) {
+                        return;
+                    }
+                }
+                return origClose.apply(this, arguments);
+            };
         }
+
         $search.data("autocomplete-init", true);
     }
 

@@ -236,25 +236,30 @@ var LCD = (a, b) => {
 
 /**
  * Convert float to its approximate fractional representation.
+ *
+ * Returns a reduced [numerator, denominator] pair with a positive denominator.
+ * Values above 1 are handled by inverting on entry and swapping back on
+ * every exit path (including the iteration-cap path); the sign of the
+ * input is carried on the numerator.
  */
 function rationalToFraction(d) {
     if (d === 0 || isNaN(d) || !isFinite(d)) {
         return [0, 1];
     }
 
-    let invert;
-    if (d > 1) {
-        invert = true;
+    const sign = Math.sign(d);
+    d = Math.abs(d);
+
+    let invert = d > 1;
+    if (invert) {
         d = 1 / d;
-    } else {
-        invert = false;
     }
 
     let df = 1.0;
     let top = 1;
+    let bot = 1;
     let iterations = 0;
     const maxIterations = 10000;
-    let bot = 1;
 
     while (Math.abs(df - d) > 0.00000001 && iterations < maxIterations) {
         if (df < d) {
@@ -268,47 +273,59 @@ function rationalToFraction(d) {
         iterations++;
     }
 
-    if (iterations === maxIterations) {
-        return [top, bot];
+    // Swap back on every exit path, including the iteration cap.
+    if (invert) {
+        const temp = top;
+        top = bot;
+        bot = temp;
     }
 
     if (bot === 0 || top === 0) {
         return [0, 1];
     }
 
-    if (invert) {
-        return [bot, top];
-    } else {
-        return [top, bot];
-    }
+    // Reduce the result so it comes back in standard musical subdivision form.
+    const divisor = GCD(top, bot);
+    top /= divisor;
+    bot /= divisor;
+
+    return [sign * top, bot];
 }
 
 /**
  * Converts a number to a mixed fraction string.
+ *
+ * The whole and fractional parts are taken from the magnitude and the sign is
+ * carried on the front, so -1.5 reads as "-1 1/2". Working straight off the
+ * signed value instead would floor -1.5 to -2 and render "-2 1/2", which reads
+ * as -2.5.
  */
 var mixedNumber = d => {
-    if (typeof d === "number") {
-        const floor = Math.floor(d);
-        if (d > floor) {
-            const obj = rationalToFraction(d - floor);
-            if (floor === 0) {
-                return obj[0] + "/" + obj[1];
+    if (typeof d !== "number") {
+        return d;
+    }
+
+    const sign = d < 0 ? "-" : "";
+    const magnitude = Math.abs(d);
+    const floor = Math.floor(magnitude);
+
+    if (magnitude > floor) {
+        const obj = rationalToFraction(magnitude - floor);
+        if (floor === 0) {
+            return sign + obj[0] + "/" + obj[1];
+        } else {
+            if (obj[0] === 1 && obj[1] === 1) {
+                return sign + (floor + 1).toString();
             } else {
-                if (obj[0] === 1 && obj[1] === 1) {
-                    return (floor + 1).toString();
+                if (obj[1] > 99) {
+                    return sign + magnitude.toFixed(2);
                 } else {
-                    if (obj[1] > 99) {
-                        return d.toFixed(2);
-                    } else {
-                        return floor + " " + obj[0] + "/" + obj[1];
-                    }
+                    return sign + floor + " " + obj[0] + "/" + obj[1];
                 }
             }
-        } else if (floor === d) {
-            return d.toString() + "/1";
         }
-    } else {
-        return d;
+    } else if (floor === magnitude) {
+        return sign + magnitude.toString() + "/1";
     }
 };
 

@@ -298,7 +298,16 @@ class FocusCycleManager {
         // keyboard users can Tab to the close button naturally.
         const printText = document.getElementById("printText");
         const errorText = document.getElementById("errorText");
-        const isVisible = el => el instanceof Element && getComputedStyle(el).display !== "none";
+        // The popups live in the DOM permanently and are toggled with
+        // `visibility` (see the .popupMsg / #printText.show rules in
+        // css/activities.css), so a `display` test alone is always true for
+        // them and would bypass every Tab. Check both, since errorText is
+        // additionally given display:none in activity.js.
+        const isVisible = el => {
+            if (!(el instanceof Element)) return false;
+            const style = getComputedStyle(el);
+            return style.display !== "none" && style.visibility !== "hidden";
+        };
         if (isVisible(printText) || isVisible(errorText)) {
             return true;
         }

@@ -23,7 +23,7 @@
     EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
    getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
     getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
-   i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
+    i18nSolfege, INVERTMODES, isCustomTemperament, isEquallyTempered, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
    piemenuAccidentals, piemenuBasic, piemenuBlockContext,
@@ -32,8 +32,9 @@
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
    retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
-    topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
-   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
+    updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
+   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_,
+   widgetWindows
  */
 
 /*
@@ -166,7 +167,41 @@ class Block {
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
         this.text = null; // A dynamically generated text label on block itself.
-        this.value = null; // Value for number, text, and media blocks.
+        this.valueInitialized = false;
+
+        let _value = null;
+        Object.defineProperty(this, "value", {
+            get: () => _value,
+            set: newVal => {
+                if (
+                    this.blocks &&
+                    this.blocks.actionHistory &&
+                    !this.blocks.isUndoingOrRedoing &&
+                    _value !== newVal &&
+                    this.valueInitialized &&
+                    this.loadComplete &&
+                    this.blockIndex !== undefined
+                ) {
+                    const historyItem = {
+                        type: "value_change",
+                        blockId: this.blockIndex,
+                        oldValue: _value,
+                        newValue: newVal,
+                        oldText: this.text ? this.text.text : null,
+                        newText: null
+                    };
+                    this.blocks.actionHistory.push(historyItem);
+                    Promise.resolve().then(() => {
+                        historyItem.newText = this.text ? this.text.text : null;
+                    });
+                    this.blocks.redoActionHistory = [];
+                }
+                this.valueInitialized = true;
+                _value = newVal;
+            },
+            enumerable: true,
+            configurable: true
+        }); // Value for number, text, and media blocks.
         this.privateData = null; // A block may have some private data,
         // e.g., nameboxes use this field to store
         // the box name associated with the block.
@@ -716,7 +751,7 @@ class Block {
         }
 
         if (this._viewportVisible !== false) {
-            this.container.updateCache();
+            this.updateCache();
         }
     }
 
@@ -800,7 +835,7 @@ class Block {
         }
 
         if (this._viewportVisible !== false) {
-            this.container.updateCache();
+            this.updateCache();
         }
     }
 
@@ -810,7 +845,7 @@ class Block {
             if (!this.collapsed) {
                 this.disconnectedBitmap.visible = true;
             }
-            this.container.updateCache();
+            this.updateCache();
         }
     }
 
@@ -1591,7 +1626,7 @@ class Block {
             }
 
             // this.activity.refreshCanvas();
-            this.blocks.cleanupAfterLoad(this.name);
+            this.blocks.cleanupAfterLoad(this._loadGeneration);
         } else {
             // Some blocks, e.g., Start blocks and Action blocks can
             // collapse, so add an event handler.
@@ -1651,7 +1686,7 @@ class Block {
             }
 
             that.activity.refreshCanvas();
-            that.blocks.cleanupAfterLoad(that.name);
+            that.blocks.cleanupAfterLoad(that._loadGeneration);
             if (that.trash) {
                 that.collapseText.visible = false;
                 that.collapseButtonBitmap.visible = false;
@@ -1776,13 +1811,6 @@ class Block {
                     case "pitchdrummatrix":
                         that.collapseText = new createjs.Text(
                             _("drum mapper"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "rhythmruler":
-                        that.collapseText = new createjs.Text(
-                            _("ruler"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
@@ -3135,6 +3163,7 @@ class Block {
         // This avoids redundant O(N) findDragGroup and O(D) rest2 chain walks
         // on every mouse move event (which fires 60+ times per second).
         let _dragHasRest2 = false;
+        let _dragSpatialGridDirty = false;
 
         /**
          * Handles the click event on the block container.
@@ -3155,6 +3184,7 @@ class Block {
                     piemenuBlockContext(that);
                     return;
                 } else if ("shiftKey" in event.nativeEvent && event.nativeEvent.shiftKey) {
+                    const topBlock = that.blocks.findTopBlock(thisBlock);
                     if (that.activity.turtles.running()) {
                         that.activity.logo.doStopTurtles();
 
@@ -3258,9 +3288,14 @@ class Block {
             // Reset any stale hover-scaling state from prior drags.
             this._trashHoverGroupState = null;
             this._dragPointerDown = true;
+            _dragSpatialGridDirty = false;
 
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
+
+            // Record original coordinates for undoing positional changes
+            that.blocks.dragStartX = that.container.x;
+            that.blocks.dragStartY = that.container.y;
 
             that.blocks.longPressTimeout = setTimeout(() => {
                 that.blocks.activeBlock = that.blockIndex;
@@ -3452,7 +3487,8 @@ class Block {
             }
 
             // Move the dragged block itself (batched — no checkBounds).
-            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy);
+            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy, true);
+            _dragSpatialGridDirty ||= dx !== 0 || dy !== 0;
 
             // If we are over the trash, warn the user.
             const overTrash = that.activity.trashcan.overTrashcan(
@@ -3464,6 +3500,29 @@ class Block {
             } else {
                 that.activity.trashcan.stopHighlightAnimation();
             }
+
+            // Visual dock snap indicator (throttled to ~60fps).
+            // 16ms corresponds to one frame at ~60fps (1000ms / 60 ≈ 16.6ms), preventing
+            // expensive spatial dock candidate scans on every high-frequency pointer move event.
+            const SNAP_CHECK_INTERVAL_MS = 16;
+            if (!overTrash && typeof that.blocks.findDockCandidate === "function") {
+                if (
+                    !that.blocks._lastSnapCheckTime ||
+                    now - that.blocks._lastSnapCheckTime >= SNAP_CHECK_INTERVAL_MS
+                ) {
+                    that.blocks._lastSnapCheckTime = now;
+                    const candidate = that.blocks.findDockCandidate(thisBlock);
+                    if (candidate && typeof that.blocks.showSnapIndicator === "function") {
+                        that.blocks.showSnapIndicator(candidate);
+                    } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                        that.blocks.hideSnapIndicator();
+                    }
+                }
+            } else if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks._lastSnapCheckTime = 0;
+                that.blocks.hideSnapIndicator();
+            }
+
             if (that.isValueBlock() && that.name !== "media") {
                 // Ensure text is on top
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -3476,7 +3535,7 @@ class Block {
                 for (let b = 0; b < cachedGroup.length; b++) {
                     const blk = cachedGroup[b];
                     if (blk !== thisBlock) {
-                        that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                        that.blocks.moveBlockRelativeBatched(blk, dx, dy, true);
                     }
                 }
             } else {
@@ -3486,7 +3545,7 @@ class Block {
                     for (let b = 0; b < that.blocks.dragGroup.length; b++) {
                         const blk = that.blocks.dragGroup[b];
                         if (b !== 0) {
-                            that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                            that.blocks.moveBlockRelativeBatched(blk, dx, dy, true);
                         }
                     }
                 }
@@ -3515,6 +3574,10 @@ class Block {
                 }
                 that.blocks.clearLongPress();
                 return;
+            }
+
+            if (!that.blocks.isBlockMoving && typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
             }
 
             if (!that.blocks.getLongPressStatus()) {
@@ -3546,9 +3609,14 @@ class Block {
          */
         this.container.on("pressup", event => {
             that._dragPointerDown = false;
+            that.blocks._lastSnapCheckTime = 0;
+
+            if (typeof that.blocks.hideSnapIndicator === "function") {
+                that.blocks.hideSnapIndicator();
+            }
 
             if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false, true);
+                that._mouseoutCallback(event, moved, haveClick, false, true, _dragSpatialGridDirty);
             } else {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
@@ -3563,6 +3631,7 @@ class Block {
 
             // Clear cached drag state.
             _dragHasRest2 = false;
+            _dragSpatialGridDirty = false;
             moved = false;
             that._announced = false;
         });
@@ -3601,10 +3670,18 @@ class Block {
      * @param {boolean} haveClick - Indicates if a click event occurred.
      * @param {boolean} hideDOM - Indicates whether to hide DOM elements.
      * @param {boolean} dragEnded - Indicates whether this callback is from drag release.
+     * @param {boolean} spatialGridDirty - Indicates whether grid reconciliation was deferred.
      * Sets cursor style to default.
      * @returns {void}
      */
-    _mouseoutCallback(event, moved, haveClick, hideDOM, dragEnded = false) {
+    _mouseoutCallback(
+        event,
+        moved,
+        haveClick,
+        hideDOM,
+        dragEnded = false,
+        spatialGridDirty = false
+    ) {
         const thisBlock = this.blockIndex;
         if (!this.activity.logo.runningLilypond) {
             document.body.style.cursor = "default";
@@ -3613,6 +3690,10 @@ class Block {
         // Restore drag scaling only when drag interaction actually ends.
         if (dragEnded) {
             this._setDragGroupTrashHoverScale(false, 0, 0, true);
+        }
+
+        if (spatialGridDirty) {
+            this.blocks.syncDragGroupSpatialGrid();
         }
 
         // Always hide the trash when there is no block selected.
@@ -3634,15 +3715,13 @@ class Block {
                     event.stageY / this.activity.getStageScale()
                 )
             ) {
-                if (this.activity.trashcan.isVisible) {
-                    this.blocks.sendStackToTrash(this);
-                    this.activity.textMsg(
-                        _(
-                            "You can restore deleted blocks from the trash with the Restore From Trash button."
-                        ),
-                        3000
-                    );
-                }
+                this.blocks.sendStackToTrash(this);
+                this.activity.textMsg(
+                    _(
+                        "You can restore deleted blocks from the trash with the Restore From Trash button."
+                    ),
+                    3000
+                );
             } else {
                 // Otherwise, process move.
                 // Also, keep track of the time of the last move.
@@ -3982,16 +4061,13 @@ class Block {
                     if (temperament && typeof temperament === "object") {
                         noteLabels[keys[i]] = temperament;
                     }
-                    if (isCustomTemperament(keys[i]) && temperament && !temperament.isEDO) {
+                    if (isCustomTemperament(keys[i]) && temperament && !isEquallyTempered(keys[i]))
                         customLabels.push(keys[i]);
-                    }
                 }
+                if (!customLabels.length) return;
                 let selectedCustom;
-                if (this.customID !== null) {
-                    selectedCustom = this.customID;
-                } else {
-                    selectedCustom = customLabels[0];
-                }
+                if (this.customID !== null) selectedCustom = this.customID;
+                else selectedCustom = customLabels[0];
 
                 if (this.value !== null) {
                     selectedNote = this.value;
@@ -4580,7 +4656,7 @@ class Block {
              * @returns {void}
              */
             let __keypress = event => {
-                if ([13, 10, 9].includes(event.keyCode)) {
+                if (["Enter", "Tab"].includes(event.key)) {
                     __blur(event);
                 }
             };
@@ -4630,10 +4706,11 @@ class Block {
      * @returns {void}
      */
     _exitKeyPressed(event) {
-        if ([13, 10, 9].includes(event.keyCode)) {
+        if (["Enter", "Tab"].includes(event.key)) {
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener("keypress", this._exitKeyPressed);
+            docById("labelDiv").classList.remove("hasKeyboard");
         }
     }
 
@@ -4643,6 +4720,14 @@ class Block {
      * @returns {boolean} - True if pie menu is okay to launch, false otherwise.
      */
     piemenuOKtoLaunch() {
+        // The drawing libraries are fetched in the background once the app is
+        // up (see loadPieMenuLibs in loader.js). Declining here for the short
+        // window before they land keeps an early click harmless: this method
+        // already exists to say "not right now".
+        if (typeof wheelnav === "undefined" || typeof Raphael === "undefined") {
+            return false;
+        }
+
         if (this._piemenuExitTime === null) {
             return true;
         }
@@ -4651,44 +4736,28 @@ class Block {
     }
 
     /**
-     * Checks and reinitializes widget windows if their labels are changed.
-     * @param {boolean} closeInput - Flag indicating whether to close input.
+     * Reinitialize an open widget when a block in its stack changes.
+     * Uses widgetWindows.REINIT_WIDGET_TITLES; only locks after a real
+     * title/staticLabels match so unrelated open widgets cannot block.
+     * @param {boolean} closeInput - Skip when true.
      */
     _checkWidgets(closeInput) {
-        // Detect if label is changed, then reinit widget windows
-        // if they are open.
         const thisBlock = this.blockIndex;
         const topBlock = this.blocks.findTopBlock(thisBlock);
         const widgetTitle = document.getElementsByClassName("wftTitle");
         let lockInit = false;
         if (closeInput === false) {
+            const topProto = this.blocks.blockList[topBlock].protoblock;
+            const topLabel =
+                topProto && topProto.staticLabels ? topProto.staticLabels[0] : undefined;
             for (let i = 0; i < widgetTitle.length; i++) {
-                if (lockInit === false) {
-                    switch (widgetTitle[i].innerHTML) {
-                        case "oscilloscope":
-                        case "tempo":
-                        case "rhythm maker":
-                        case "pitch slider":
-                        case "pitch staircase":
-                        case "status":
-                        case "phrase maker":
-                        case "lego bricks":
-                        case "custom mode":
-                        case "music keyboard":
-                        case "pitch drum":
-                        case "meter":
-                        case "temperament":
-                        case "mode":
-                        case "timbre":
-                            lockInit = true;
-                            if (
-                                this.blocks.blockList[topBlock].protoblock.staticLabels[0] ===
-                                widgetTitle[i].innerHTML
-                            ) {
-                                this.blocks.reInitWidget(topBlock, 1500);
-                            }
-                            break;
-                    }
+                if (lockInit) {
+                    break;
+                }
+                const title = widgetTitle[i].innerHTML;
+                if (widgetWindows.isReinitWidgetTitle(title) && topLabel === title) {
+                    lockInit = true;
+                    this.blocks.reInitWidget(topBlock, 1500);
                 }
             }
         }

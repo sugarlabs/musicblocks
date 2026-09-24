@@ -239,7 +239,8 @@ function createMockTurtle(overrides = {}) {
         listeners: {},
         endOfClampSignals: {},
         butNotThese: {},
-        embeddedGraphicsFinished: true,
+        embeddedGraphicsPending: 0,
+        embeddedGraphicsGeneration: 0,
         running: false,
         inTrash: false,
         waitTime: 0,
@@ -307,7 +308,6 @@ function createMockActivity(turtle) {
         showBlocksAfterRun: false,
         onStopTurtle: jest.fn(),
         onRunTurtle: jest.fn(),
-        meSpeak: { speak: jest.fn() },
         save: {
             afterSaveLilypond: jest.fn(),
             afterSaveAbc: jest.fn(),
@@ -516,7 +516,6 @@ describe("Logo constructor", () => {
             storage: { saveLocally: jest.fn() },
             config: { showBlocksAfterRun: false },
             callbacks: { onStopTurtle: jest.fn(), onRunTurtle: jest.fn() },
-            meSpeak: { speak: jest.fn() },
             classes: {
                 Notation: jest.fn(() => ({})),
                 Synth: jest.fn(() => ({}))
@@ -680,6 +679,89 @@ describe("Logo setTurtleListener", () => {
             false
         );
     });
+
+    test("defaults a listener to non-persistent", () => {
+        const listener = jest.fn();
+        mockActivity.turtles.ithTurtle = jest.fn(() => ({ listeners: {} }));
+
+        logo.setTurtleListener(0, "testListener", listener);
+
+        expect(listener.persistent).toBe(false);
+    });
+
+    test("marks a listener persistent when requested", () => {
+        const listener = jest.fn();
+        mockActivity.turtles.ithTurtle = jest.fn(() => ({ listeners: {} }));
+
+        logo.setTurtleListener(0, "testListener", listener, true);
+
+        expect(listener.persistent).toBe(true);
+    });
+});
+
+// ─── Logo clearTurtleListeners ─────────────────────────────────────────────────
+
+describe("Logo clearTurtleListeners", () => {
+    let logo;
+    let mockActivity;
+    let turtle;
+
+    beforeEach(() => {
+        setupLogoEnv();
+        turtle = createMockTurtle();
+        mockActivity = createMockActivity(turtle);
+        logo = new Logo(mockActivity);
+    });
+
+    afterEach(() => jest.restoreAllMocks());
+
+    test("removes every listener when preservePersistent is not set", () => {
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        const ephemeralListener = jest.fn();
+        turtle.listeners = { clickListener: persistentListener, beatListener: ephemeralListener };
+
+        logo.clearTurtleListeners();
+
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "beatListener",
+            ephemeralListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({});
+    });
+
+    test("preserves persistent listeners when preservePersistent is true", () => {
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        const ephemeralListener = jest.fn();
+        turtle.listeners = { clickListener: persistentListener, beatListener: ephemeralListener };
+
+        logo.clearTurtleListeners(true);
+
+        expect(mockActivity.stage.removeEventListener).not.toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "beatListener",
+            ephemeralListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({ clickListener: persistentListener });
+    });
+
+    test("does nothing when a turtle has no listeners object", () => {
+        mockActivity.turtles.turtleList = [null, { listeners: null }];
+
+        expect(() => logo.clearTurtleListeners()).not.toThrow();
+    });
 });
 
 // ─── Logo initTurtle ─────────────────────────────────────────────────────────
@@ -705,6 +787,16 @@ describe("Logo initTurtle", () => {
         expect(logo.connectionStore[1]).toEqual({});
         expect(logo.returns[0]).toEqual([]);
         expect(logo.returns[1]).toEqual([]);
+    });
+
+    test("delegates turtle-owned initialization to Turtle.initTurtle", () => {
+        const turtleInit = jest.fn();
+        mockActivity.turtles.ithTurtle.mockReturnValue({ initTurtle: turtleInit });
+
+        logo.initTurtle(3);
+
+        expect(mockActivity.turtles.ithTurtle).toHaveBeenCalledWith(3);
+        expect(turtleInit).toHaveBeenCalledWith(false);
     });
 });
 
@@ -996,6 +1088,64 @@ describe("Logo doStopTurtles", () => {
         expect(clearAllSpy).toHaveBeenCalled();
     });
 
+    test("clears unhighlight timers on turtle.singer on stop", () => {
+        turtle.singer = { _unhighlightTimers: { blk1: 123 } };
+
+        logo.doStopTurtles();
+
+        expect(turtle.singer._unhighlightTimers).toEqual({});
+    });
+
+    test("unhighlights all blocks on stop when blocks are visible", () => {
+        mockActivity.blocks.visible = true;
+        mockActivity.blocks.unhighlightAll = jest.fn();
+
+        logo.doStopTurtles();
+
+        expect(mockActivity.blocks.unhighlightAll).toHaveBeenCalled();
+    });
+
+    test("removes active turtle listeners from stage and clears listeners object on stop", () => {
+        const mockListener = jest.fn();
+        turtle.listeners = { __beat_1_0__: mockListener };
+
+        logo.doStopTurtles();
+
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "__beat_1_0__",
+            mockListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({});
+    });
+
+    test("keeps a persistent listener attached on stop (#8367)", () => {
+        // A listener set up by a Listen block is marked persistent so it keeps
+        // responding to its event (e.g. a click) after Stop is pressed, the
+        // same way it did before #8244 started sweeping all listeners here.
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        const ephemeralListener = jest.fn();
+        turtle.listeners = {
+            clickListener: persistentListener,
+            __beat_1_0__: ephemeralListener
+        };
+
+        logo.doStopTurtles();
+
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "__beat_1_0__",
+            ephemeralListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).not.toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({ clickListener: persistentListener });
+    });
+
     describe("with Transport and audio streams", () => {
         let turtle0;
         let turtle1;
@@ -1103,6 +1253,141 @@ describe("Logo runLogoCommands", () => {
             timeoutSpy = null;
         }
         jest.restoreAllMocks();
+    });
+
+    describe("performance mode detection from the URL", () => {
+        // window.location cannot be reassigned in this jsdom, so drive the query
+        // string through history.replaceState, which jsdom does support.
+        const withSearch = (search, fn) => {
+            const before = window.location.search;
+            window.history.replaceState({}, "", search || "/");
+            try {
+                fn();
+            } finally {
+                window.history.replaceState({}, "", before || "/");
+            }
+        };
+
+        const trackerRequestedFor = search => {
+            const requirejsSpy = jest.fn();
+            const originalRequirejs = global.requirejs;
+            const savedTracker = global.performanceTracker;
+            global.requirejs = requirejsSpy;
+            // The lazy-load branch only runs when the tracker is not yet loaded,
+            // which is the situation this URL check exists to decide.
+            delete global.performanceTracker;
+            logo._restoreConnections = jest.fn();
+            logo.runFromBlock = jest.fn();
+            logo.blockList = [];
+            try {
+                withSearch(search, () => logo.runLogoCommands(null, null));
+            } finally {
+                global.requirejs = originalRequirejs;
+                global.performanceTracker = savedTracker;
+            }
+            return requirejsSpy.mock.calls.some(
+                call => Array.isArray(call[0]) && call[0].includes("utils/performanceTracker")
+            );
+        };
+
+        test("loads the tracker for ?performance=true", () => {
+            expect(trackerRequestedFor("?performance=true")).toBe(true);
+        });
+
+        test("loads the tracker when the parameter is not first", () => {
+            expect(trackerRequestedFor("?a=1&performance=true")).toBe(true);
+        });
+
+        test("ignores a parameter that merely ends in performance=true", () => {
+            // A substring search matches "?noperformance=true", which asks for
+            // no such thing.
+            expect(trackerRequestedFor("?noperformance=true")).toBe(false);
+        });
+
+        test("ignores a value that merely starts with true", () => {
+            expect(trackerRequestedFor("?performance=truex")).toBe(false);
+        });
+
+        test("ignores performance=false and an absent parameter", () => {
+            expect(trackerRequestedFor("?performance=false")).toBe(false);
+            expect(trackerRequestedFor("")).toBe(false);
+        });
+    });
+
+    test("a turtle added because every turtle is in the trash gets its synth set up", () => {
+        // With the start block trashed, clicking a lone stack adds a fresh
+        // turtle. It must exist before prepSynths() runs, or its first note
+        // has no instrument to play on.
+        const newTurtle = createMockTurtle();
+        const seenByPrepSynths = [];
+        mockActivity.turtles.turtleCount = jest.fn(() => 0);
+        mockActivity.turtles.addTurtle = jest.fn(() => {
+            mockActivity.turtles.turtleList.push(newTurtle);
+        });
+        logo.prepSynths = jest.fn(() => {
+            seenByPrepSynths.push(...mockActivity.turtles.turtleList);
+        });
+        logo._restoreConnections = jest.fn();
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [{ name: "newnote", trash: false, connections: [null] }];
+
+        logo.runLogoCommands(0, null);
+
+        expect(mockActivity.turtles.addTurtle).toHaveBeenCalledTimes(1);
+        expect(seenByPrepSynths).toContain(newTurtle);
+    });
+
+    describe("the Stop button is shown however a project is started", () => {
+        // walterbender asked how #8494 was tested, given the many ways a run
+        // can begin. These drive runLogoCommands the way each of those ways
+        // does, and assert the activity callback that lights the Stop button
+        // actually fires -- rather than calling onRunTurtle() directly, which
+        // would prove only that the handler works when something calls it.
+        const startWith = (startHere, blockList) => {
+            logo._restoreConnections = jest.fn();
+            logo.runFromBlock = jest.fn();
+            logo.blockList = blockList;
+            logo.runLogoCommands(startHere, null);
+            return mockActivity.onRunTurtle;
+        };
+
+        test("clicking a single Start block", () => {
+            // block.js -> logo.runLogoCommands(topBlock), the path a click takes.
+            const onRun = startWith(0, [
+                { name: "start", value: 0, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("a project holding several Start blocks", () => {
+            // The case in the screenshot: more than one stack, started together.
+            const onRun = startWith(null, [
+                { name: "start", value: 0, trash: false, connections: [] },
+                { name: "start", value: 1, trash: false, connections: [] },
+                { name: "start", value: 2, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("the toolbar play button, with no block singled out", () => {
+            // toolbar-controller.js -> runLogoCommands(null, env).
+            const onRun = startWith(null, [
+                { name: "start", value: 0, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("an action stack rather than a Start block", () => {
+            const onRun = startWith(0, [
+                { name: "action", value: 0, trash: false, connections: [] }
+            ]);
+            expect(onRun).toHaveBeenCalled();
+        });
+
+        test("a project with no blocks at all", () => {
+            const onRun = startWith(null, []);
+            expect(onRun).toHaveBeenCalled();
+        });
     });
 
     test("executes startHere path", () => {
@@ -1305,6 +1590,25 @@ describe("Logo runLogoCommands", () => {
         expect(disposeSpy).toHaveBeenCalledTimes(1);
 
         global.Tone = savedTone;
+    });
+
+    test("keeps a persistent listener attached after natural playback completion (#8367)", () => {
+        // Before #8244, a Listen block's click listener stayed on the stage once
+        // a project finished playing on its own. _cleanupAfterCompletion() now
+        // runs clearTurtleListeners() automatically, so listeners marked
+        // persistent must survive this path too, not just an explicit Stop.
+        const persistentListener = jest.fn();
+        persistentListener.persistent = true;
+        turtle0.listeners = { clickListener: persistentListener };
+
+        logo._cleanupAfterCompletion();
+
+        expect(mockActivity.stage.removeEventListener).not.toHaveBeenCalledWith(
+            "clickListener",
+            persistentListener,
+            false
+        );
+        expect(turtle0.listeners).toEqual({ clickListener: persistentListener });
     });
 
     describe("performance instrumentation", () => {
@@ -1697,6 +2001,128 @@ describe("Logo runFromBlockNow", () => {
 
             expect(mockActivity.textMsg).toHaveBeenCalledWith("width: 77");
             expect(logo.stopTurtle).toBe(true);
+        });
+
+        test("a value clamp block with no flow() shows its value instead of throwing", () => {
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 6;
+            });
+            logo.parseArg = jest.fn(() => 3);
+            logo.blockList = [
+                {
+                    name: "notecounter",
+                    value: 3,
+                    protoblock: { args: 1, dockTypes: ["anyout", "in"], arg: jest.fn() },
+                    connections: [null, null],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                }
+            ];
+
+            expect(() => logo.runFromBlockNow(logo, 0, 0, 0, null)).not.toThrow();
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("3");
+        });
+
+        test("standalone arg-block echo forwards the real receivedArg, not a stale logo.receivedArg (#8690)", () => {
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 6;
+            });
+            // logo.receivedArg is left holding a leftover value from some
+            // earlier, unrelated call so a bug that reads that field instead
+            // of the receivedArg passed into this call would be caught.
+            logo.receivedArg = ["stale"];
+            const argSpy = jest.fn((_, __, ___, receivedArg) =>
+                receivedArg ? receivedArg[0] : "MISSING"
+            );
+            logo.blockList = [
+                {
+                    name: "myarg",
+                    value: null,
+                    protoblock: { args: 0, dockTypes: ["anyout"], arg: argSpy },
+                    connections: [],
+                    isValueBlock: () => false,
+                    isArgBlock: () => true
+                }
+            ];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, ["fresh"]);
+
+            expect(argSpy).toHaveBeenCalledWith(logo, 0, 0, ["fresh"]);
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("fresh");
+        });
+
+        test("a second value display within 3s extends the valueBarVisible window instead of being cut short", () => {
+            jest.useFakeTimers();
+            logo.parseArg = jest.fn(() => 77);
+            const widthBlock = {
+                name: "width",
+                value: 77,
+                protoblock: { args: 0, dockTypes: ["numberout"] },
+                connections: [],
+                isValueBlock: () => false,
+                isArgBlock: () => true
+            };
+            logo.blockList = [widthBlock];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            jest.advanceTimersByTime(2000);
+            logo.stopTurtle = false;
+            logo.runFromBlockNow(logo, 0, 0, 0, null); // second display, 2s into the first window
+
+            jest.advanceTimersByTime(2000); // 4s since first display, but only 2s since second
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            jest.advanceTimersByTime(1000); // 3s since the second display
+            expect(mockActivity.valueBarVisible).toBe(false);
+
+            jest.useRealTimers();
+        });
+
+        test("doStopTurtles resets valueBarVisible even if it interrupts the window", () => {
+            jest.useFakeTimers();
+            logo.parseArg = jest.fn(() => 77);
+            const widthBlock = {
+                name: "width",
+                value: 77,
+                protoblock: { args: 0, dockTypes: ["numberout"] },
+                connections: [],
+                isValueBlock: () => false,
+                isArgBlock: () => true
+            };
+            logo.blockList = [widthBlock];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            logo.doStopTurtles();
+            expect(mockActivity.valueBarVisible).toBe(false);
+
+            // A new value display 2s after stop starts its own 3s window,
+            // due to end at t=5000 (relative to the run above).
+            jest.advanceTimersByTime(2000);
+            logo.stopTurtle = false;
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            // t=3000: this is when the FIRST (stopped) display's original
+            // timer would have fired, if doStopTurtles() had failed to
+            // cancel it via _timerManager. If that stale callback fires here,
+            // it wrongly clears valueBarVisible mid-way through the second
+            // display's own window - this is what actually proves
+            // cancellation happened, not just that doStopTurtles() sets the
+            // flag directly.
+            jest.advanceTimersByTime(1000);
+            expect(mockActivity.valueBarVisible).toBe(true);
+
+            // t=5000: the second display's own timer fires on schedule.
+            jest.advanceTimersByTime(2000);
+            expect(mockActivity.valueBarVisible).toBe(false);
+
+            jest.useRealTimers();
         });
     });
 
@@ -2669,6 +3095,34 @@ describe("Logo initMediaDevices", () => {
         );
         expect(logo.mic).toBeNull();
     });
+
+    test("closes the previous mic stream instead of dropping the reference", () => {
+        const firstClose = jest.fn();
+        logo.deps.Tone = {
+            UserMedia: jest.fn(() => ({ open: jest.fn(), close: firstClose }))
+        };
+
+        // Simulate a loudness/pitchness block being created a second time
+        // (e.g. a second such block in the same project, or the project
+        // being reloaded) while the first mic stream is still open.
+        logo.initMediaDevices();
+        expect(firstClose).not.toHaveBeenCalled();
+
+        logo.deps.Tone = {
+            UserMedia: jest.fn(() => ({ open: jest.fn(), close: jest.fn() }))
+        };
+        logo.initMediaDevices();
+
+        expect(firstClose).toHaveBeenCalledTimes(1);
+    });
+
+    test("does not throw when the previous mic has no close method", () => {
+        logo.deps.Tone = { UserMedia: jest.fn(() => ({ open: jest.fn() })) };
+        logo.initMediaDevices();
+
+        logo.deps.Tone = { UserMedia: jest.fn(() => ({ open: jest.fn() })) };
+        expect(() => logo.initMediaDevices()).not.toThrow();
+    });
 });
 
 describe("Logo processShow", () => {
@@ -2721,5 +3175,274 @@ describe("Logo processShow", () => {
 
         global.CAMERAVALUE = originalCameraValue;
         global.VIDEOVALUE = originalVideoValue;
+    });
+});
+describe("Logo.processSpeak", () => {
+    let logo;
+    let speakMock;
+    let cancelMock;
+    let utterances;
+    let originalHref;
+
+    // A tiny stand-in for the Web Speech API. We capture the utterances that
+    // get spoken so the assertions can look at what the browser would have said.
+    function installSpeechSynthesis(voices = []) {
+        utterances = [];
+        speakMock = jest.fn(u => utterances.push(u));
+        cancelMock = jest.fn();
+
+        global.window.speechSynthesis = {
+            speak: speakMock,
+            cancel: cancelMock,
+            getVoices: () => voices
+        };
+
+        // jsdom doesn't provide SpeechSynthesisUtterance, so give it a plain
+        // constructor that just records the text.
+        global.SpeechSynthesisUtterance = function (text) {
+            this.text = text;
+            this.lang = "";
+            this.voice = null;
+            this.rate = null;
+            this.pitch = null;
+            this.volume = null;
+            this.onerror = null;
+        };
+    }
+
+    // jsdom's navigator.language is read-only, so reassigning global.navigator
+    // does nothing. Redefine the property instead.
+    function setLanguage(lang) {
+        Object.defineProperty(global.navigator, "language", {
+            value: lang,
+            configurable: true
+        });
+    }
+
+    // Switch the neural voice on and hand back the fake engine it will use.
+    function enableKokoro() {
+        const engine = { speak: jest.fn(), cancel: jest.fn() };
+        global.window.KokoroSpeech = function () {
+            return engine;
+        };
+        window.localStorage.setItem("kokoroSpeech", "on");
+        return engine;
+    }
+
+    function enableKokoroFromURL() {
+        const engine = { speak: jest.fn(), cancel: jest.fn() };
+        global.window.KokoroSpeech = function (options) {
+            engine.onProgress = options.onProgress;
+            return engine;
+        };
+        window.history.pushState({}, "", "/?kokoro=true");
+        return engine;
+    }
+
+    beforeEach(() => {
+        setupLogoEnv();
+        logo = new Logo(createMockActivity());
+        setLanguage("en-US");
+        originalHref = window.location.href;
+    });
+
+    afterEach(() => {
+        window.history.replaceState({}, "", originalHref);
+        window.localStorage.removeItem("kokoroSpeech");
+        delete global.window.KokoroSpeech;
+        delete global.window.speechSynthesis;
+        delete global.SpeechSynthesisUtterance;
+        jest.restoreAllMocks();
+    });
+
+    describe("with the built-in browser voice, the default", () => {
+        test("speaks the given text through the synthesizer", () => {
+            installSpeechSynthesis();
+            logo.processSpeak("hello world");
+            expect(speakMock).toHaveBeenCalledTimes(1);
+            expect(utterances[0].text).toBe("hello world");
+        });
+
+        test("queues consecutive phrases instead of cutting the first one off", () => {
+            installSpeechSynthesis();
+            logo.processSpeak("first");
+            logo.processSpeak("second");
+            // Two Speak blocks in a row should both be heard, in order, so
+            // nothing is cancelled between them.
+            expect(cancelMock).not.toHaveBeenCalled();
+            expect(speakMock).toHaveBeenCalledTimes(2);
+            expect(utterances.map(u => u.text)).toEqual(["first", "second"]);
+        });
+
+        test("clears queued speech when Stop is pressed", () => {
+            installSpeechSynthesis();
+            logo.processSpeak("left over from the last run");
+            expect(cancelMock).not.toHaveBeenCalled();
+
+            logo.doStopTurtles();
+
+            expect(cancelMock).toHaveBeenCalledTimes(1);
+        });
+
+        test("cancels speech before waiting for the performance tracker", () => {
+            installSpeechSynthesis();
+            logo.processSpeak("left over from the last run");
+            const requirejsSpy = jest.fn();
+            const originalRequirejs = global.requirejs;
+            const savedTracker = global.performanceTracker;
+            global.requirejs = requirejsSpy;
+            delete global.performanceTracker;
+            window.history.pushState({}, "", "/?performance=true");
+
+            try {
+                logo.runLogoCommands(null, null);
+
+                expect(cancelMock).toHaveBeenCalledTimes(1);
+                expect(requirejsSpy).toHaveBeenCalledWith(
+                    ["utils/performanceTracker"],
+                    expect.any(Function),
+                    expect.any(Function)
+                );
+            } finally {
+                global.requirejs = originalRequirejs;
+                global.performanceTracker = savedTracker;
+            }
+        });
+
+        test("cancelling speech is safe when the API is unavailable", () => {
+            expect(() => logo._cancelSpeech()).not.toThrow();
+        });
+
+        test("ignores empty or whitespace-only text", () => {
+            installSpeechSynthesis();
+            logo.processSpeak("");
+            logo.processSpeak("   ");
+            expect(speakMock).not.toHaveBeenCalled();
+        });
+
+        test("coerces non-string input to a string", () => {
+            installSpeechSynthesis();
+            logo.processSpeak(42);
+            expect(utterances[0].text).toBe("42");
+        });
+
+        test("does nothing and does not throw when the API is unavailable", () => {
+            // No speechSynthesis on window at all.
+            expect(() => logo.processSpeak("hello")).not.toThrow();
+        });
+
+        test("prefers a voice matching the current locale", () => {
+            installSpeechSynthesis([
+                { lang: "en-US", name: "US English" },
+                { lang: "hi-IN", name: "Hindi India" }
+            ]);
+            setLanguage("hi-IN");
+            logo.processSpeak("नमस्ते");
+            expect(utterances[0].voice.name).toBe("Hindi India");
+            expect(utterances[0].lang).toBe("hi-IN");
+        });
+
+        test("falls back to a same-language voice when the region differs", () => {
+            installSpeechSynthesis([
+                { lang: "en-US", name: "US English" },
+                { lang: "es-MX", name: "Spanish Mexico" }
+            ]);
+            setLanguage("es-ES");
+            logo.processSpeak("hola");
+            expect(utterances[0].voice.name).toBe("Spanish Mexico");
+        });
+
+        test("lets the browser choose when no voices are loaded yet", () => {
+            installSpeechSynthesis([]); // empty, as on Chrome's first call
+            logo.processSpeak("hello");
+            expect(utterances[0].voice).toBeNull();
+            expect(utterances[0].lang).toBe("en-US");
+        });
+    });
+
+    describe("with the neural voice switched on", () => {
+        test("sends the phrase to Kokoro instead of the browser", () => {
+            installSpeechSynthesis();
+            const engine = enableKokoro();
+
+            logo.processSpeak("hello world");
+
+            expect(engine.speak).toHaveBeenCalledWith("hello world");
+            expect(speakMock).not.toHaveBeenCalled();
+        });
+
+        test("enables Kokoro for the current page with a URL flag", () => {
+            installSpeechSynthesis();
+            const engine = enableKokoroFromURL();
+
+            logo.processSpeak("hello world");
+
+            expect(engine.speak).toHaveBeenCalledWith("hello world");
+            expect(speakMock).not.toHaveBeenCalled();
+            expect(window.localStorage.getItem("kokoroSpeech")).toBeNull();
+        });
+
+        test("shows Kokoro model-loading progress in the Music Blocks popup", () => {
+            installSpeechSynthesis();
+            const engine = enableKokoroFromURL();
+            const textMsg = jest.spyOn(logo.deps, "textMsg");
+            const originalTranslate = global._;
+            const translate = jest.fn(message =>
+                message === "Downloading Kokoro voice: %s"
+                    ? "Descargando la voz de Kokoro: %s"
+                    : message
+            );
+            global._ = translate;
+
+            try {
+                logo.processSpeak("hello world");
+                engine.onProgress({ progress: 42 });
+
+                expect(translate).toHaveBeenCalledWith("Downloading Kokoro voice: %s");
+                expect(textMsg).toHaveBeenCalledWith("Descargando la voz de Kokoro: 42%");
+            } finally {
+                global._ = originalTranslate;
+            }
+        });
+
+        test("is off unless it has been explicitly switched on", () => {
+            installSpeechSynthesis();
+            const engine = { speak: jest.fn(), cancel: jest.fn() };
+            global.window.KokoroSpeech = function () {
+                return engine;
+            };
+            // No "kokoroSpeech" entry in localStorage: nothing should be
+            // downloaded, so the browser voice does the talking.
+            logo.processSpeak("hello world");
+
+            expect(engine.speak).not.toHaveBeenCalled();
+            expect(speakMock).toHaveBeenCalledTimes(1);
+        });
+
+        test("builds the engine once and reuses it", () => {
+            const engine = enableKokoro();
+            logo.processSpeak("first");
+            logo.processSpeak("second");
+            expect(engine.speak.mock.calls.map(c => c[0])).toEqual(["first", "second"]);
+        });
+
+        test("falls back to the browser voice if the engine isn't loaded", () => {
+            installSpeechSynthesis();
+            window.localStorage.setItem("kokoroSpeech", "on");
+            // Switched on, but js/kokoro-speech.js never loaded.
+            logo.processSpeak("hello world");
+            expect(speakMock).toHaveBeenCalledTimes(1);
+        });
+
+        test("cancelling stops both engines", () => {
+            installSpeechSynthesis();
+            const engine = enableKokoro();
+            logo.processSpeak("something");
+
+            logo._cancelSpeech();
+
+            expect(engine.cancel).toHaveBeenCalledTimes(1);
+            expect(cancelMock).toHaveBeenCalledTimes(1);
+        });
     });
 });

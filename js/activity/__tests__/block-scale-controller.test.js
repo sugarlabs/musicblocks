@@ -196,6 +196,32 @@ describe("doLargerBlocks", () => {
         await expect(controller.doLargerBlocks()).resolves.toBeUndefined();
         expect(activity.__tick).not.toHaveBeenCalled();
     });
+
+    test.each([null, undefined])(
+        "no-ops and leaves activity state unchanged when activity.blocks is %s",
+        async blocksValue => {
+            const activity = makeActivity(DEFAULT_INDEX);
+            activity.blocks = blocksValue;
+            const controller = setupBlockScaleController(activity);
+
+            await expect(controller.doLargerBlocks()).resolves.toBeUndefined();
+            expect(activity.blockscale).toBe(DEFAULT_INDEX);
+            expect(activity.stageDirty).toBe(false);
+            expect(activity.clearCache).not.toHaveBeenCalled();
+            expect(activity.refreshCanvas).not.toHaveBeenCalled();
+            expect(activity.__tick).not.toHaveBeenCalled();
+            expect(global.changeImage).not.toHaveBeenCalled();
+        }
+    );
+
+    test.each([null, undefined])(
+        "no-ops and does not throw when controller.activity is %s",
+        async activityValue => {
+            const controller = new BlockScaleController(activityValue);
+
+            await expect(controller.doLargerBlocks()).resolves.toBeUndefined();
+        }
+    );
 });
 
 // ---------------------------------------------------------------------------
@@ -243,6 +269,32 @@ describe("doSmallerBlocks", () => {
         expect(document.getElementById("helpfulWheelDiv").style.display).toBe("none");
         expect(activity.__tick).toHaveBeenCalledTimes(1);
     });
+
+    test.each([null, undefined])(
+        "no-ops and leaves activity state unchanged when activity.blocks is %s",
+        async blocksValue => {
+            const activity = makeActivity(DEFAULT_INDEX);
+            activity.blocks = blocksValue;
+            const controller = setupBlockScaleController(activity);
+
+            await expect(controller.doSmallerBlocks()).resolves.toBeUndefined();
+            expect(activity.blockscale).toBe(DEFAULT_INDEX);
+            expect(activity.stageDirty).toBe(false);
+            expect(activity.clearCache).not.toHaveBeenCalled();
+            expect(activity.refreshCanvas).not.toHaveBeenCalled();
+            expect(activity.__tick).not.toHaveBeenCalled();
+            expect(global.changeImage).not.toHaveBeenCalled();
+        }
+    );
+
+    test.each([null, undefined])(
+        "no-ops and does not throw when controller.activity is %s",
+        async activityValue => {
+            const controller = new BlockScaleController(activityValue);
+
+            await expect(controller.doSmallerBlocks()).resolves.toBeUndefined();
+        }
+    );
 });
 
 // ---------------------------------------------------------------------------
@@ -329,9 +381,8 @@ describe("scale limits", () => {
 // ---------------------------------------------------------------------------
 
 describe("setSmallerLargerStatus", () => {
-    test("enables the smaller-blocks icon when scale is below the default", async () => {
-        const belowDefaultIndex = DEFAULT_INDEX - 1;
-        const activity = makeActivity(belowDefaultIndex);
+    test("disables the smaller-blocks icon at the minimum scale", async () => {
+        const activity = makeActivity(0);
         const controller = setupBlockScaleController(activity);
 
         await controller.setSmallerLargerStatus();
@@ -343,8 +394,35 @@ describe("setSmallerLargerStatus", () => {
         );
     });
 
-    test("disables the smaller-blocks icon when scale is at or above the default", async () => {
+    test("enables the smaller-blocks icon below the default scale", async () => {
+        const belowDefaultIndex = DEFAULT_INDEX - 1;
+        const activity = makeActivity(belowDefaultIndex);
+        const controller = setupBlockScaleController(activity);
+
+        await controller.setSmallerLargerStatus();
+
+        expect(global.changeImage).toHaveBeenCalledWith(
+            activity.smallerContainer.children[0],
+            SMALLERDISABLEBUTTON,
+            SMALLERBUTTON
+        );
+    });
+
+    test("enables the smaller-blocks icon at the default scale", async () => {
         const activity = makeActivity(DEFAULT_INDEX);
+        const controller = setupBlockScaleController(activity);
+
+        await controller.setSmallerLargerStatus();
+
+        expect(global.changeImage).toHaveBeenCalledWith(
+            activity.smallerContainer.children[0],
+            SMALLERDISABLEBUTTON,
+            SMALLERBUTTON
+        );
+    });
+
+    test("enables the smaller-blocks icon above the default scale", async () => {
+        const activity = makeActivity(DEFAULT_INDEX + 1);
         const controller = setupBlockScaleController(activity);
 
         await controller.setSmallerLargerStatus();

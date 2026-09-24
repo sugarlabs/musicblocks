@@ -134,18 +134,39 @@ describe("ProjectStorage", () => {
             expect(primary).toEqual({ Projects: { 1: { ProjectName: "Updated" } } });
         });
 
-        it("should not crash when save encounters an error", async () => {
+        it("should reject and log when the write fails", async () => {
             const consoleSpy = jest.spyOn(console, "error").mockImplementation();
             storage.data = { Projects: {} };
-            // Make setItem throw
             mockLocalforage.setItem.mockRejectedValueOnce(new Error("Disk full"));
 
-            // Should not throw
-            await storage.save();
+            await expect(storage.save()).rejects.toThrow("Disk full");
             expect(consoleSpy).toHaveBeenCalledWith(
                 "[ProjectStorage] Save failed:",
                 expect.any(Error)
             );
+        });
+
+        it("should not advance TimeLastSaved when the write fails", async () => {
+            jest.spyOn(console, "error").mockImplementation();
+            storage.data = { Projects: {} };
+            mockLocalforage.setItem.mockRejectedValueOnce(new Error("Disk full"));
+
+            await storage.save().catch(() => {});
+            expect(storage.TimeLastSaved).toBe(-1);
+        });
+
+        it("should keep accepting saves after a failed save", async () => {
+            jest.spyOn(console, "error").mockImplementation();
+            storage.data = { Projects: { 1: { ProjectName: "First" } } };
+            mockLocalforage.setItem.mockRejectedValueOnce(new Error("Disk full"));
+
+            await storage.save().catch(() => {});
+
+            storage.data = { Projects: { 1: { ProjectName: "Second" } } };
+            await storage.save();
+
+            const saved = await storage.get(storage.LocalStorageKey);
+            expect(saved).toEqual({ Projects: { 1: { ProjectName: "Second" } } });
         });
 
         it("should queue concurrent saves instead of dropping them", async () => {

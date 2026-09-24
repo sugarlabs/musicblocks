@@ -205,6 +205,10 @@ class MusicBlocks {
 
         Mouse.MouseList = [];
         Mouse.TurtleMouseMap = {};
+        // Every run pushes onto AddedTurtles, so it has to be reset alongside
+        // its siblings. Otherwise it keeps the removed turtles referenced and
+        // the loop above re-walks every turtle from every previous run.
+        Mouse.AddedTurtles = [];
     }
 
     /**
@@ -430,8 +434,8 @@ class MusicBlocks {
             return;
         }
 
-        if (typeof index !== "number" || typeof value !== "number") {
-            JSEditor.logConsole("Heap index and value must be numbers.", "maroon");
+        if (typeof index !== "number") {
+            JSEditor.logConsole("Heap index must be a number.", "maroon");
             return;
         }
 

@@ -1505,6 +1505,8 @@ class SVG {
             "|" +
             (this._bool ? 1 : 0) +
             "|" +
+            (this._porch ? 1 : 0) +
+            "|" +
             this._clampCount +
             "|" +
             JSON.stringify(this._clampSlots) +

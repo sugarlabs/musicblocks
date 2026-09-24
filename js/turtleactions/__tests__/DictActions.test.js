@@ -64,10 +64,8 @@ describe("setupDictActions", () => {
                 color: "red",
                 value: 10,
                 chroma: 0.5,
-                pensize: 2,
                 stroke: 2,
                 font: "Arial",
-                orientation: 90,
                 turtle: {
                     orientation: 90
                 },
@@ -161,9 +159,20 @@ describe("setupDictActions", () => {
             expect(pitchNumber).toBe(60 - 15);
         });
 
-        it("should return undefined for an unsupported key", () => {
-            const result = Turtle.DictActions._GetDict(0, turtle, "unsupportedKey");
-            expect(result).toBeUndefined();
+        it("should return 0 and show error with literal key in message", () => {
+            // Use "$&" as the key — with string replacement, $& expands to the
+            // matched text ("%s") and would produce "Unknown key: %s", corrupting
+            // the message. The callback replacer preserves it literally.
+            const result = Turtle.DictActions._GetDict(0, turtle, "$&", 5);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Unknown key: $&", 5);
+        });
+
+        it("should pass blk to errorMsg and preserve $$ literally", () => {
+            // "$$" inserts a literal "$" in string replacement — callback ensures
+            // the key is embedded verbatim without any special-character expansion.
+            Turtle.DictActions._GetDict(0, turtle, "$$", 99);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Unknown key: $$", 99);
         });
     });
 
@@ -197,6 +206,11 @@ describe("setupDictActions", () => {
             painterMethods.forEach(method => {
                 expect(targetTurtle.painter[method]).not.toHaveBeenCalled();
             });
+        });
+
+        it("should support lowercase setDictValue alias", () => {
+            Turtle.DictActions.setDictValue(0, turtle, "color", "blue");
+            expect(targetTurtle.painter.doSetColor).toHaveBeenCalledWith("blue");
         });
     });
 

@@ -27,7 +27,8 @@
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
     docById, define, BlocksDependencies, deepClone, pubsub,
     MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
-    CAMERAVALUE, VIDEOVALUE, setupBlockDragController
+    CAMERAVALUE, VIDEOVALUE, setupBlockDragController,
+    announceToScreenReader
 */
 
 /* global showZoomOverlay */
@@ -160,6 +161,9 @@ class Blocks {
 
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
+        this.actionHistory = [];
+        this.redoActionHistory = [];
+        this.isUndoingOrRedoing = false;
         /** We keep a list of previews of stacks in the trash. */
         this.trashPreviews = {};
 
@@ -211,6 +215,23 @@ class Blocks {
         this._expandablesList = [];
         /** Number of blocks to load */
         this._loadCounter = 0;
+        /**
+         * loadNewBlocks() is not re-entrant: it tracks the in-progress load
+         * on _loadCounter/_adjustTheseStacks/_adjustTheseDocks below, shared
+         * instance state. A second call made while one is still chunking
+         * through blocks would otherwise reset that state out from under the
+         * first (issue #8392), so calls are queued and run one at a time.
+         */
+        this._loadQueue = [];
+        this._loadInProgress = false;
+        /**
+         * Bumped once per load attempt (see _loadNewBlocksNow). Every block
+         * created during a load is tagged with the value active at the time,
+         * so a completion callback that lands after its own load has already
+         * been abandoned (queue advanced past it on failure) can recognize
+         * itself as stale and skip touching the next load's _loadCounter.
+         */
+        this._activeLoadGeneration = 0;
         /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
@@ -297,6 +318,27 @@ class Blocks {
         };
 
         /**
+         * Removes a block index from every spatial-grid cell it currently
+         * occupies, per _blockGridCell. Leaves the _blockGridCell entry
+         * itself untouched; callers that are relocating the block overwrite
+         * it with the new cells right after, callers that are removing the
+         * block for good (e.g. disposeBlock) delete it explicitly.
+         * @param {number} idx - Block index, already normalized to a number
+         * @returns {void}
+         */
+        this._removeFromSpatialGrid = idx => {
+            const oldKeys = this._blockGridCell.get(idx);
+            if (!oldKeys) return;
+            for (const oldKey of oldKeys) {
+                const oldSet = this._spatialGrid.get(oldKey);
+                if (oldSet) {
+                    oldSet.delete(idx);
+                    if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
+                }
+            }
+        };
+
+        /**
          * Updates the spatial grid position for a given block index.
          * Registers the block in every cell that any of its dock
          * positions falls into, so that nearby-dock searches always
@@ -306,6 +348,13 @@ class Blocks {
         this._updateSpatialGrid = blkIdx => {
             const block = this.blockList[blkIdx];
             if (!block || !block.container) return;
+
+            // The grid is keyed by block index, and Map and Set compare keys
+            // strictly. A caller iterating blockList with for...in hands over
+            // a string, which would register the block a second time and
+            // orphan the entry already held under its number, leaving it
+            // listed at a position it has left. Key on the number always.
+            const idx = Number(blkIdx);
 
             // Compute the set of cells this block should occupy
             const newKeys = new Set();
@@ -325,7 +374,7 @@ class Blocks {
             }
 
             // Check if cells changed; skip update if identical
-            const oldKeys = this._blockGridCell.get(blkIdx);
+            const oldKeys = this._blockGridCell.get(idx);
             if (oldKeys && oldKeys.size === newKeys.size) {
                 let same = true;
                 for (const k of newKeys) {
@@ -337,16 +386,7 @@ class Blocks {
                 if (same) return;
             }
 
-            // Remove from all old cells
-            if (oldKeys) {
-                for (const oldKey of oldKeys) {
-                    const oldSet = this._spatialGrid.get(oldKey);
-                    if (oldSet) {
-                        oldSet.delete(blkIdx);
-                        if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
-                    }
-                }
-            }
+            this._removeFromSpatialGrid(idx);
 
             // Add to all new cells
             for (const key of newKeys) {
@@ -355,9 +395,9 @@ class Blocks {
                     cellSet = new Set();
                     this._spatialGrid.set(key, cellSet);
                 }
-                cellSet.add(blkIdx);
+                cellSet.add(idx);
             }
-            this._blockGridCell.set(blkIdx, newKeys);
+            this._blockGridCell.set(idx, newKeys);
         };
 
         /**
@@ -372,7 +412,9 @@ class Blocks {
             if (this._spatialGrid.size === 0) {
                 const all = [];
                 for (let i = 0; i < this.blockList.length; i++) {
-                    all.push(i);
+                    if (this.blockList[i]) {
+                        all.push(i);
+                    }
                 }
                 return all;
             }
@@ -2526,6 +2568,114 @@ class Blocks {
             }
         };
 
+        this._snapTargetBlock = null;
+        this._snapIndicatorShape = null;
+
+        /**
+         * Resolves snap indicator colors from CSS tokens in tokens.css,
+         * falling back to default golden values if tokens or computed styles are unavailable.
+         * @private
+         * @returns {{ stroke: string, fill: string }}
+         */
+        this._getSnapIndicatorColors = () => {
+            let stroke = "";
+            let fill = "";
+            if (
+                typeof getComputedStyle !== "undefined" &&
+                typeof document !== "undefined" &&
+                document.body
+            ) {
+                const style = getComputedStyle(document.body);
+                stroke = style.getPropertyValue("--color-snap-indicator-stroke").trim();
+                fill = style.getPropertyValue("--color-snap-indicator-fill").trim();
+            }
+            // Primary values come from tokens.css; fallback for headless test environments
+            return {
+                stroke: stroke || "rgba(255, 215, 0, 0.95)",
+                fill: fill || "rgba(255, 215, 0, 0.35)"
+            };
+        };
+
+        /**
+         * Show visual snap indicator on target block and connection point.
+         * @param {object} candidate - { targetBlock, connectionIndex, dockX, dockY }
+         * @public
+         * @returns {void}
+         */
+        this.showSnapIndicator = candidate => {
+            if (!candidate) {
+                this.hideSnapIndicator();
+                return;
+            }
+
+            // Highlight target block
+            if (this._snapTargetBlock !== candidate.targetBlock) {
+                if (this._snapTargetBlock !== null && this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
+                this._snapTargetBlock = candidate.targetBlock;
+                if (this.blockList[candidate.targetBlock]) {
+                    this.blockList[candidate.targetBlock].highlight();
+                }
+            }
+
+            // Create or position glowing docking indicator circle
+            if (!this._snapIndicatorShape && typeof createjs !== "undefined" && createjs.Shape) {
+                this._snapIndicatorShape = new createjs.Shape();
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.addChild === "function"
+                ) {
+                    this.activity.blocksContainer.addChild(this._snapIndicatorShape);
+                }
+            }
+
+            if (this._snapIndicatorShape) {
+                const colors = this._getSnapIndicatorColors();
+                if (typeof this._snapIndicatorShape.graphics.clear === "function") {
+                    this._snapIndicatorShape.graphics.clear();
+                }
+                this._snapIndicatorShape.graphics
+                    .setStrokeStyle(3)
+                    .beginStroke(colors.stroke)
+                    .beginFill(colors.fill)
+                    .drawCircle(0, 0, 10);
+
+                this._snapIndicatorShape.x = candidate.dockX;
+                this._snapIndicatorShape.y = candidate.dockY;
+                this._snapIndicatorShape.visible = true;
+                if (
+                    this.activity &&
+                    this.activity.blocksContainer &&
+                    typeof this.activity.blocksContainer.setChildIndex === "function" &&
+                    Array.isArray(this.activity.blocksContainer.children)
+                ) {
+                    this.activity.blocksContainer.setChildIndex(
+                        this._snapIndicatorShape,
+                        this.activity.blocksContainer.children.length - 1
+                    );
+                }
+            }
+        };
+
+        /**
+         * Hide visual snap indicator and unhighlight target block.
+         * @public
+         * @returns {void}
+         */
+        this.hideSnapIndicator = () => {
+            if (this._snapTargetBlock !== null) {
+                if (this.blockList[this._snapTargetBlock]) {
+                    this.blockList[this._snapTargetBlock].unhighlight();
+                }
+                this._snapTargetBlock = null;
+            }
+            if (this._snapIndicatorShape) {
+                this._snapIndicatorShape.visible = false;
+            }
+        };
+
         /**
          * Hide all of the blocks.
          * @public
@@ -2639,6 +2789,10 @@ class Blocks {
             // Cache the block's index for O(1) lookups instead of
             // O(N) blockList.indexOf() scans.
             myBlock.blockIndex = this.blockList.length - 1;
+            // Tag with the load this block belongs to, so a stale
+            // cleanupAfterLoad() completion from an abandoned load can be
+            // told apart from one belonging to whatever load is active now.
+            myBlock._loadGeneration = this._activeLoadGeneration;
             myBlock.copySize();
 
             /** We may need to do some postProcessing to the block */
@@ -3493,7 +3647,11 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             /** Named dos are modified in a separate function below. */
-            for (const blk in this.blockList) {
+            // Indexed numerically. Both the skipBlock check below and the
+            // connections.indexOf slot check further down compare against
+            // block numbers, and for...in would hand them a string, which is
+            // never strictly equal to the number it is matched against.
+            for (let blk = 0; blk < this.blockList.length; blk++) {
                 if (blk === skipBlock) {
                     continue;
                 }
@@ -3554,17 +3712,15 @@ class Blocks {
                 return;
             }
 
+            const namedBlocks = new Set(["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"]);
+
             /** Update the blocks, do->oldName should be do->newName */
             for (const blk in this.blockList) {
                 if (this.blockList[blk].trash) {
                     continue;
                 }
 
-                if (
-                    ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
-                        this.blockList[blk].name
-                    )
-                ) {
+                if (namedBlocks.has(this.blockList[blk].name)) {
                     const targetBlock = this.blockList[blk];
 
                     let activeName = targetBlock.privateData || targetBlock.overrideName;
@@ -3586,8 +3742,7 @@ class Blocks {
             for (let blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
                 const block = actionsPalette.protoList[blockId];
                 if (
-                    ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(block.name) !==
-                        -1 /** && block.defaults[0] !== _('action') */ &&
+                    namedBlocks.has(block.name) /** && block.defaults[0] !== _('action') */ &&
                     block.defaults[0] === oldName
                 ) {
                     block.defaults[0] = newName;
@@ -4348,6 +4503,21 @@ class Blocks {
 
             const myBlock = this.blockList[blk];
             const dblk = myBlock.connections[0];
+
+            /**
+             * Read the number in the divide block's denominator slot. The
+             * slot is empty whenever the user pulls that block out, so fall
+             * back to the same default the rest of this function returns.
+             */
+            const denominatorValue = () => {
+                const nblk = this.blockList[dblk].connections[2];
+                if (nblk === null || nblk === undefined || !this.blockList[nblk]) {
+                    return 1;
+                }
+
+                return this.blockList[nblk].value;
+            };
+
             /** We are connected to a divide block. */
             /** Is the divide block connected to a note value block? */
             let cblk = this.blockList[dblk].connections[0];
@@ -4361,18 +4531,13 @@ class Blocks {
                     case "newslur":
                     case "elapsednotes2":
                         if (this.blockList[cblk].connections[1] === dblk) {
-                            cblk = this.blockList[dblk].connections[2];
-                            return this.blockList[cblk].value;
+                            return denominatorValue();
                         }
                         return 1;
                     case "meter":
                         this.blockList[blk]._check_meter_block = cblk;
                         if (this.blockList[cblk].connections[2] === dblk) {
-                            if (this.blockList[cblk].connections[1] === dblk) {
-                                cblk = this.blockList[dblk].connections[2];
-                                return this.blockList[cblk].value;
-                            }
-                            return 1;
+                            return denominatorValue();
                         }
                         return 1;
                     case "setbpm3":
@@ -4385,11 +4550,7 @@ class Blocks {
                     case "neighbor":
                     case "neighbor2":
                         if (this.blockList[cblk].connections[2] === dblk) {
-                            if (this.blockList[cblk].connections[1] === dblk) {
-                                cblk = this.blockList[dblk].connections[2];
-                                return this.blockList[cblk].value;
-                            }
-                            return 1;
+                            return denominatorValue();
                         }
                         return 1;
                     default:
@@ -4715,10 +4876,14 @@ class Blocks {
             for (let b = 0; b < this.dragGroup.length; b++) {
                 const myBlock = this.blockList[this.dragGroup[b]];
                 for (let c = 0; c < myBlock.connections.length; c++) {
-                    if (myBlock.connections[c] === null) {
+                    const connection = myBlock.connections[c];
+                    if (
+                        connection === null ||
+                        !Object.prototype.hasOwnProperty.call(blockMap, connection)
+                    ) {
                         blockObjs[b][4].push(null);
                     } else {
-                        blockObjs[b][4].push(blockMap[myBlock.connections[c]]);
+                        blockObjs[b][4].push(blockMap[connection]);
                     }
                 }
             }
@@ -4765,14 +4930,54 @@ class Blocks {
         };
 
         /**
-         * Load new blocks.
+         * Load new blocks. Queues the call instead of running it immediately
+         * if another load is still in progress, so the two loads' bookkeeping
+         * never overlaps (issue #8392).
          * @param - blockObj - Block Objects
          * @public
          * return {void}
          */
         this.loadNewBlocks = blockObjs => {
+            if (this._loadInProgress) {
+                this._loadQueue.push(blockObjs);
+                return;
+            }
+
+            this._loadInProgress = true;
+            this._loadNewBlocksNow(blockObjs);
+        };
+
+        /**
+         * Marks the current load as finished and, if another load was
+         * queued while it ran, starts that one.
+         * @private
+         * @returns {void}
+         */
+        this._advanceLoadQueue = () => {
+            this._loadInProgress = false;
+
+            if (this._loadQueue.length > 0) {
+                const nextBlockObjs = this._loadQueue.shift();
+                this._loadInProgress = true;
+                this._loadNewBlocksNow(nextBlockObjs);
+            }
+        };
+
+        /**
+         * Does the actual work of loading new blocks. Only ever runs for one
+         * call to loadNewBlocks at a time, see _advanceLoadQueue above.
+         * @private
+         * @param - blockObj - Block Objects
+         * @returns {void}
+         */
+        this._loadNewBlocksNow = blockObjs => {
             /** Suppress intermediate canvas redraws during block loading. */
             this.activity._suppressRefresh = true;
+            // Every load attempt gets its own generation, win or lose, so a
+            // completion that lands after this one has been abandoned can be
+            // told apart from a completion belonging to whatever load is
+            // active by the time it fires.
+            this._activeLoadGeneration += 1;
 
             try {
                 /**
@@ -4813,22 +5018,110 @@ class Blocks {
                     blockObjs.pop();
                 }
 
-                /** Check for blocks connected to themselves, */
-                /** and for action blocks not connected to text blocks. */
-                for (let b = 0; b < blockObjs.length; b++) {
-                    const blkData = blockObjs[b];
+                /** Check for circular connections in block data using iterative DFS. */
+                const hasCycle = () => {
+                    const adj = new Map();
+                    for (let b = 0; b < blockObjs.length; b++) {
+                        const blkData = blockObjs[b];
+                        const id = blkData[0];
+                        const connections = blkData[4] || [];
 
-                    for (const c in blkData[4]) {
-                        if (blkData[4][c] === blkData[0]) {
-                            console.debug("Circular connection in block data: " + blkData);
+                        // Self-loop check: reject if any dock points to the block itself.
+                        for (let c = 0; c < connections.length; c++) {
+                            if (connections[c] === id) {
+                                return true;
+                            }
+                        }
 
-                            console.debug("Punting loading of new blocks!");
+                        // Build directed adjacency from child docks only (index >= 1).
+                        // Dock 0 is the parent back-pointer and must be excluded
+                        // to avoid false cycles in normal parent-child trees.
+                        const children = [];
+                        for (let c = 1; c < connections.length; c++) {
+                            const connId = connections[c];
+                            if (connId !== null && connId !== undefined) {
+                                children.push(connId);
+                            }
+                        }
+                        adj.set(id, children);
+                    }
 
-                            console.debug(blockObjs);
-                            this.activity._suppressRefresh = false;
-                            return;
+                    const visited = new Set();
+                    const activeStack = new Set();
+
+                    for (let b = 0; b < blockObjs.length; b++) {
+                        const startId = blockObjs[b][0];
+                        if (visited.has(startId)) {
+                            continue;
+                        }
+
+                        // Stack stores tuple: [nodeId, neighborIndex]
+                        const stack = [[startId, 0]];
+                        visited.add(startId);
+                        activeStack.add(startId);
+
+                        while (stack.length > 0) {
+                            const top = stack[stack.length - 1];
+                            const nodeId = top[0];
+                            const neighborIndex = top[1];
+                            const neighbors = adj.get(nodeId) || [];
+
+                            if (neighborIndex < neighbors.length) {
+                                top[1]++;
+                                const neighborId = neighbors[neighborIndex];
+
+                                if (activeStack.has(neighborId)) {
+                                    return true;
+                                }
+
+                                if (!visited.has(neighborId)) {
+                                    visited.add(neighborId);
+                                    activeStack.add(neighborId);
+                                    stack.push([neighborId, 0]);
+                                }
+                            } else {
+                                activeStack.delete(nodeId);
+                                stack.pop();
+                            }
                         }
                     }
+                    return false;
+                };
+
+                /**
+                 * Abandon a project we cannot load safely, telling the user
+                 * rather than crashing partway through the load.
+                 * @param - warning - console warning describing the problem
+                 * @param - data - the offending block data
+                 * @returns {void}
+                 */
+                const abortLoad = (warning, data) => {
+                    console.warn(warning);
+                    console.debug(data);
+                    if (this.activity && typeof this.activity.errorMsg === "function") {
+                        this.activity.errorMsg(
+                            _("Something went wrong reading JSON-encoded project data.")
+                        );
+                    }
+                    this.activity._suppressRefresh = false;
+                    /**
+                     * The load queue cleared the workspace and started the
+                     * loading animation, so put the UI back the way the
+                     * successful path leaves it.
+                     */
+                    document.body.style.cursor = "default";
+                    if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
+                        this.activity.stopLoadAnimation();
+                    }
+                    this._advanceLoadQueue();
+                };
+
+                if (hasCycle()) {
+                    abortLoad(
+                        "Circular connection detected in block data. Punting loading of new blocks!",
+                        blockObjs
+                    );
+                    return;
                 }
 
                 /** We'll need a list of existing storein and action names. */
@@ -5116,6 +5409,25 @@ class Blocks {
                         case "tuplet2":
                         case "vibrato":
                             len = blockObjs[b][4].length;
+                            /**
+                             * Dock 0 is the parent and the last dock is the next
+                             * block, so these blocks always have at least two
+                             * connections. With fewer, the repairs below would
+                             * write the hidden block into the parent slot, leaving
+                             * the block and its hidden block pointing at each
+                             * other -- a loop that overflows the stack the next
+                             * time anything walks up the parents (#8679).
+                             */
+                            if (len < 2) {
+                                abortLoad(
+                                    "Too few connections for " +
+                                        name +
+                                        ": punting loading of new blocks!",
+                                    blockObjs[b]
+                                );
+                                return;
+                            }
+
                             if (last(blockObjs[b][4]) === null) {
                                 /** If there is no next block, add a hidden block; */
 
@@ -5135,6 +5447,16 @@ class Blocks {
                                 extraBlocksLength += 1;
                             } else {
                                 const nextBlock = blockObjs[b][4][len - 1];
+                                if (blockObjs[nextBlock] === undefined) {
+                                    abortLoad(
+                                        "Last connection of " +
+                                            name +
+                                            " is not a block in this project: punting loading of new blocks!",
+                                        blockObjs[b]
+                                    );
+                                    return;
+                                }
+
                                 let nextName;
                                 if (typeof blockObjs[nextBlock][1] === "object") {
                                     nextName = blockObjs[nextBlock][1][0];
@@ -5166,6 +5488,20 @@ class Blocks {
                             }
 
                             if (["note", "slur", "staccato", "swing"].includes(name)) {
+                                /**
+                                 * The conversion below reads the argument and
+                                 * clamp docks, so it needs three connections.
+                                 */
+                                if (len < 3) {
+                                    abortLoad(
+                                        "Too few connections to convert " +
+                                            name +
+                                            " to newnote style: punting loading of new blocks!",
+                                        blockObjs[b]
+                                    );
+                                    return;
+                                }
+
                                 /** We need to convert to newnote style: */
                                 /** (1) add a vspace to the start of the clamp of a note block. */
                                 const clampBlock = blockObjs[b][4][2];
@@ -5359,13 +5695,44 @@ class Blocks {
                     }
                     bIndex = chunkEnd;
                     if (bIndex < totalBlocks) {
-                        window.requestAnimationFrame(processChunk);
+                        // requestAnimationFrame does not reliably fire in a hidden or
+                        // backgrounded window (e.g. headless/CI browser runs), which
+                        // silently stalls loading after the first chunk. setTimeout(0)
+                        // still yields to the main thread but keeps running regardless
+                        // of tab visibility.
+                        //
+                        //
+                        // A deferred chunk runs on its own event-loop turn, outside
+                        // the synchronous try/catch below that only covers the very
+                        // first, synchronous processChunk() call. Without catching
+                        // here too, a throw from block 21 onward would leave
+                        // _loadInProgress stuck true forever, silently blocking
+                        // every future loadNewBlocks() call.
+                        setTimeout(() => {
+                            try {
+                                processChunk();
+                            } catch (e) {
+                                this.activity._suppressRefresh = false;
+                                this._advanceLoadQueue();
+                                throw e;
+                            }
+                        }, 0);
                     }
                 };
 
-                processChunk();
+                if (totalBlocks === 0) {
+                    // No blocks means no per-block async completion will ever
+                    // call cleanupAfterLoad, so nothing would otherwise mark
+                    // this load finished. Route through the same finalize
+                    // path a normal load ends on so finishedLoading still
+                    // fires and the queue still advances.
+                    this.cleanupAfterLoad();
+                } else {
+                    processChunk();
+                }
             } catch (e) {
                 this.activity._suppressRefresh = false;
+                this._advanceLoadQueue();
                 throw e;
             }
         };
@@ -6219,11 +6586,21 @@ class Blocks {
 
         /**
          * If all the blocks are loaded, we can make the final adjustments.
-         * @param - name
+         * @param {Number} [loadGeneration] - the calling block's _loadGeneration
+         *  (see makeNewBlock). A load that failed mid-chunk advances the queue
+         *  immediately rather than waiting for its remaining blocks, so a
+         *  completion arriving afterward belongs to an already-abandoned
+         *  load; ignore it instead of decrementing whatever load is active
+         *  now. Callers that don't pass this (e.g. existing direct calls)
+         *  are treated as always belonging to the current load.
          * @public
          * @returns {void}
          */
-        this.cleanupAfterLoad = async () => {
+        this.cleanupAfterLoad = async loadGeneration => {
+            if (loadGeneration !== undefined && loadGeneration !== this._activeLoadGeneration) {
+                return;
+            }
+
             this._loadCounter -= 1;
             // Early return BEFORE the try block is intentional:
             // intermediate calls must not run the finally, which resets
@@ -6311,6 +6688,7 @@ class Blocks {
                 /** All blocks loaded — allow canvas redraws again. */
                 this.activity._suppressRefresh = false;
                 this.activity.refreshCanvas();
+                this._advanceLoadQueue();
             }
         };
 
@@ -6614,7 +6992,12 @@ class Blocks {
                 }
             });
 
-            return canvas.toDataURL("image/png");
+            try {
+                return canvas.toDataURL("image/png");
+            } catch (error) {
+                if (error.name === "SecurityError") return null;
+                throw error;
+            }
         };
 
         /**
@@ -6637,6 +7020,12 @@ class Blocks {
             if (this.blockCollapseArt && this.blockCollapseArt[blkIdx]) {
                 delete this.blockCollapseArt[blkIdx];
             }
+            // The block is gone for good, so drop it from the spatial grid too --
+            // otherwise _getNearbyBlocks keeps handing out this index after
+            // blockList[blkIdx] has been nulled out below (issue #8610).
+            const idx = Number(blkIdx);
+            this._removeFromSpatialGrid(idx);
+            this._blockGridCell.delete(idx);
             this.blockList[blkIdx] = null;
         };
 
@@ -6646,6 +7035,89 @@ class Blocks {
          * @public
          * @returns {void}
          */
+        this.undoAction = () => {
+            if (!this.actionHistory || this.actionHistory.length === 0) {
+                this.activity.textMsg(_("Nothing to undo."), 3000);
+                return;
+            }
+
+            const action = this.actionHistory.pop();
+            this.isUndoingOrRedoing = true;
+
+            if (action.type === "move") {
+                this.moveBlock(action.blockId, action.oldX, action.oldY);
+                this.blockMoved(action.blockId);
+                this.activity.refreshCanvas();
+            } else if (action.type === "trash") {
+                this.activity._restoreTrashById(action.blockId);
+            } else if (action.type === "restore") {
+                const block = this.blockList[action.blockId];
+                if (block) this.sendStackToTrash(block);
+            } else if (action.type === "value_change") {
+                const block = this.blockList[action.blockId];
+                if (block) {
+                    if (!block.label) block.label = { value: action.oldValue, style: {} };
+                    block.label.value = action.oldValue;
+                    block._labelChanged(true, true);
+
+                    block.value = action.oldValue;
+                    if (action.oldText !== null && block.text) {
+                        block.text.text = action.oldText;
+                    }
+                    block.updateCache();
+                    this.activity.refreshCanvas();
+                }
+            }
+
+            this.redoActionHistory.push(action);
+            this.isUndoingOrRedoing = false;
+
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
+                this.activity.__tick();
+            }
+        };
+
+        this.redoAction = () => {
+            if (!this.redoActionHistory || this.redoActionHistory.length === 0) {
+                this.activity.textMsg(_("Nothing to redo."), 3000);
+                return;
+            }
+
+            const action = this.redoActionHistory.pop();
+            this.isUndoingOrRedoing = true;
+
+            if (action.type === "move") {
+                this.moveBlock(action.blockId, action.newX, action.newY);
+                this.blockMoved(action.blockId);
+                this.activity.refreshCanvas();
+            } else if (action.type === "trash") {
+                const block = this.blockList[action.blockId];
+                if (block) this.sendStackToTrash(block);
+            } else if (action.type === "restore") {
+                this.activity._restoreTrashById(action.blockId);
+            } else if (action.type === "value_change") {
+                const block = this.blockList[action.blockId];
+                if (block) {
+                    if (!block.label) block.label = { value: action.newValue, style: {} };
+                    block.label.value = action.newValue;
+                    block._labelChanged(true, true);
+
+                    block.value = action.newValue;
+                    if (action.newText !== null && block.text) {
+                        block.text.text = action.newText;
+                    }
+                    block.updateCache();
+                    this.activity.refreshCanvas();
+                }
+            }
+
+            this.actionHistory.push(action);
+            this.isUndoingOrRedoing = false;
+        };
+
         this.sendStackToTrash = myBlock => {
             /** First, hide the palettes as they may need updating. */
             for (const name in this.activity.palettes.dict) {
@@ -6664,6 +7136,10 @@ class Blocks {
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
+            if (!this.isUndoingOrRedoing) {
+                this.actionHistory.push({ type: "trash", blockId: thisBlock });
+                this.redoActionHistory = [];
+            }
 
             // Cap the undo history to prevent unbounded memory growth.
             // Keep the 100 most recent trashed stacks.
@@ -6741,9 +7217,11 @@ class Blocks {
                     delete this.blockCollapseArt[blk];
                 }
 
-                const title = this.blockList[blk].protoblock.staticLabels
-                    ? this.blockList[blk].protoblock.staticLabels[0]
-                    : this.blockList[blk].name;
+                const pb = this.blockList[blk] && this.blockList[blk].protoblock;
+                const title =
+                    pb && pb.staticLabels && pb.staticLabels[0]
+                        ? pb.staticLabels[0]
+                        : this.blockList[blk] && this.blockList[blk].name;
                 if (title && window.widgetWindows && window.widgetWindows.closeBlkWidgets) {
                     window.widgetWindows.closeBlkWidgets(_(title));
                 }
@@ -6752,22 +7230,11 @@ class Blocks {
 
             // Announce block sent to trash to screen readers (aria-live only, no visual message)
             const blockLabel =
-                (myBlock.protoblock.staticLabels && myBlock.protoblock.staticLabels[0]) ||
+                (myBlock.protoblock &&
+                    myBlock.protoblock.staticLabels &&
+                    myBlock.protoblock.staticLabels[0]) ||
                 myBlock.name;
-            const liveRegion =
-                document.getElementById("mbA11yLiveRegion") ||
-                (() => {
-                    const r = document.createElement("div");
-                    r.id = "mbA11yLiveRegion";
-                    r.setAttribute("role", "status");
-                    r.setAttribute("aria-live", "polite");
-                    r.setAttribute("aria-atomic", "true");
-                    r.style.cssText =
-                        "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
-                    document.body.appendChild(r);
-                    return r;
-                })();
-            liveRegion.textContent = blockLabel + " " + _("block sent to trash");
+            announceToScreenReader(blockLabel + " " + _("block sent to trash"));
 
             /** Adjust the stack from which we just deleted blocks. */
             if (parentBlock !== null) {
@@ -6959,12 +7426,20 @@ class Blocks {
                     block._viewportVisible = true;
                     continue;
                 }
+                const wasViewportVisible = block._viewportVisible;
                 block._viewportVisible = !(
                     c.x + block.width <= vpLeft ||
                     c.x >= vpRight ||
                     c.y + block.height <= vpTop ||
                     c.y >= vpBottom
                 );
+                if (wasViewportVisible === false && block._viewportVisible && c.bitmapCache) {
+                    // Visual state may have changed while its cache update was culled.
+                    // The bitmap cache can legitimately be missing here: regenerating a
+                    // block's artwork uncaches the container and rebuilds it
+                    // asynchronously, and updateCache() throws if we land in that window.
+                    c.updateCache();
+                }
             }
         };
 

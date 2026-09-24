@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container">
+      <div id="content">
+<h1 id="guide-to-programming-with-turtle-art">Guide to Programming with Turtle Art</h1>
+<p>Turtle Blocks expands upon what children can do with Logo and how it
+can be used as the underlying motivator for “improving” programming
+languages and programmable devices.</p>
+<p>In this guide, we illustrate this point by both walking the reader
+through numerous examples, but also by discussing some of our favorite
+explorations of Turtle Blocks, including multi-media, the Internet
+(both as a forum for collaboration and data collection), and a broad
+collection of sensors.</p>
+<h2 id="getting-started">Getting Started</h2>
+<p>Turtle Blocks Javascript is designed to run in a browser. Most of the
+development has been done in Chrome, but it should also work in
+Firefox. You can run it from a <a href="http://turtle.sugarlabs.org">server maintained by Sugar
+Labs</a>, from the <a href="http://sugarlabs.github.io/turtleblocksjs">github
+repo</a>, or by setting up a
+<a href="https://github.com/sugarlabs/turtleblocksjs/blob/master/server.md">local
+server</a>.</p>
+<p>You can also open it directly from <code>file://</code> with some browsers, e.g.,
+FireFox.</p>
+<p>Once you&#39;ve launched it in your browser, start by clicking on (or
+dragging) blocks from the <em>Turtle</em> palette. Use multiple blocks to
+create drawings; as the turtle moves under your control, colorful
+lines are drawn.</p>
+<p>You add blocks to your program by clicking on or dragging them from
+the palette to the main area. You can delete a block by dragging it
+back onto the palette. Click anywhere on a &quot;stack&quot; of blocks to start
+executing that stack or by clicking in the <em>Rabbit</em> (fast) or <em>Turtle</em>
+(slow) on the Main Toolbar. The <em>Snail</em> will step through your
+program, one block per click.</p>
+<p>For more details on how to use Turtle Blocks JS, see <a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation">Using Turtle
+Blocks
+JS</a>
+for more details.</p>
+<h2 id="about-this-guide">ABOUT THIS GUIDE</h2>
+<p>Many of the examples given in the guide have links to code you can
+run. Look for RUN LIVE links that will take you to
+<a href="http://turtle.sugarlabs.org">http://turtle.sugarlabs.org</a>.</p>
+<h2 id="to-square">TO SQUARE</h2>
+<p>The traditional introduction to Logo has been to draw a square. Often
+times when running a workshop, I have the learners form a circle
+around one volunteer, the &quot;turtle&quot;, and invite them to instruct the
+turtle to draw a square. (I coach the volunteer beforehand to take
+every command literally, as does our graphical turtle.) Eventually the
+group converges on &quot;go forward some number of steps&quot;, &quot;turn right (or
+left) 90 degrees&quot;, &quot;go forward some number of steps&quot;, &quot;turn right (or
+left) 90 degrees&quot;, &quot;go forward some number of steps&quot;, &quot;turn right (or
+left) 90 degrees&quot;, &quot;go forward some number of steps&quot;. It is only on
+rare occasions that the group includes a final &quot;turn right (or left)
+90 degrees&quot; in order to return the turtle to its original
+orientation. At this point I introduce the concept of &quot;repeat&quot; and
+then we start in with programming with Turtle Blocks.</p>
+<h2 id="1-turtle-basics">1. Turtle Basics</h2>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/basics1.svg' /></p>
+<p>A single line of length 100 <a href="https://turtle.sugarlabs.org/index.html?id=1523359934621848&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/basics2.svg' /></p>
+<p>Changing the line length to 200 <a href="https://turtle.sugarlabs.org/index.html?id=1523360071975585&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/basics3.svg' /></p>
+<p>Adding a right turn of 90 degrees. Running this stack four times
+produces a square. <a href="https://turtle.sugarlabs.org/index.html?id=1523360268417654&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/basics4.svg' /></p>
+<p>Forward, right, forward, right, ... <a href="https://turtle.sugarlabs.org/index.html?id=1523360327901636&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/basics5.svg' /></p>
+<p>Using the <em>Repeat</em> block from the <em>Flow</em> palette <a href="https://turtle.sugarlabs.org/index.html?id=1523294074349148&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/basics6.svg' /></p>
+<p>Using the <em>Arc</em> block to make rounded corners <a href="https://turtle.sugarlabs.org/index.html?id=1523360547665676&amp;run=True">RUN LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/basics7.svg' /></p>
+<p>Using the <em>Fill</em> blocks from the Pen palette to make a solid square
+(what ever is drawn inside the <em>Fill</em> clamp will be filled upon
+exiting the clamp.) <a href="https://turtle.sugarlabs.org/index.html?id=1523360674936456&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/basics8.svg' /></p>
+<p>Changing the color to 70 (blue) using the <em>Set Color</em> block from the
+<em>Pen</em> palette <a href="https://turtle.sugarlabs.org/index.html?id=1523360821674406&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/basics9.svg' /></p>
+<p>Using the <em>Random</em> block from the <em>Numbers</em> palette to select a random
+color (0 to 100) <a href="https://turtle.sugarlabs.org/index.html?id=1523360917773878&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="a-shoebox">A SHOEBOX</h2>
+<p>When explaining boxes in workshops, I often use a shoebox. I have
+someone write a number on a piece of paper and put it in the
+shoebox. I then ask repeatedly, &quot;What is the number in the box?&quot; Once
+it is clear that we can reference the number in the shoebox, I have
+someone put a different number in the shoebox. Again I ask, &quot;What is
+the number in the box?&quot; The power of the box is that you can refer to
+it multiple times from multiple places in your program.</p>
+<h2 id="2-boxes">2. Boxes</h2>
+<p>Boxes let you store an object, e.g., a number, and then refer to the
+object by using the name of the box. (Whenever you name a box, a new
+block is created on the Boxes palette that lets you access the content
+of the box.) This is used in a trivial way in the first example below:
+putting 100 in the box and then referencing the box from the Forward
+block. In the second example, we increase the value of the number
+stored in the box so each time the box is referenced by the Forward
+block, the value is larger.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/boxes1.svg' /></p>
+<p>Putting a value in a <em>Box</em> and then referring to the value in <em>Box</em>
+<a href="https://turtle.sugarlabs.org/index.html?id=1523361053378823&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/boxes2.svg' /></p>
+<p>We can change the value in a <em>Box</em> as the program runs. Here we add 10
+to the value in the <em>Box</em> with each iteration. The result in this case
+is a spiral, since the turtle goes forward further with each
+step. <a href="https://turtle.sugarlabs.org/index.html?id=1523361248940557&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/boxes3.svg' /></p>
+<p>If we want to make a more complex change, we can store in the <em>Box</em> some
+computed value based on the current content of the <em>Box</em>. Here we
+multiply the content of the box by 1.2 and store the result in the
+<em>Box</em>. The result in this case is also a spiral, but one that grows
+geometrically instead of arithmetically.</p>
+<p>In practice, the use of boxes is not unlike the use of keyword-value
+pairs in text-based programming languages. The keyword is the name of
+the <em>Box</em> and the value associated with the keyword is the value
+stored in the <em>Box</em>. You can have as many boxes as you&#39;d like (until
+you run out of memory) and treat the boxes as if they were a
+dictionary. Note that the boxes are global, meaning all turtles and
+all action stacks share the same collection of boxes. <a href="https://turtle.sugarlabs.org/index.html?id=1523368886737682&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="3-action-stacks">3. Action Stacks</h2>
+<p>With Turtle Blocks there is an opportunity for the learner to expand
+upon the language, taking the conversation in directions unanticipated
+by the Turtle Block developers.</p>
+<p><em>Action</em> stacks let you extend the Turtle Blocks language by defining
+new blocks. For example, if you draw lots of squares, you may want a
+block to draw squares. In the examples below, we define an action
+that draws a square (repeat 4 forward 100 right 90), which in turn
+results in a new block on the <em>Actions</em> palette that we can use whenever
+we want to draw a square. Every new <em>Action</em> stack results in a new
+block.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/actions1.svg' /></p>
+<p>Defining an action to create a new block, &quot;<em>Square</em>&quot; <a href="https://turtle.sugarlabs.org/index.html?id=1523369101107025&amp;run=True">RUN LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/actions2.svg' /></p>
+<p>Using the &quot;<em>Square</em>&quot; block <a href="https://turtle.sugarlabs.org/index.html?id=1523369182696942&amp;run=True">RUN LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/actions3.svg' /></p>
+<p>The <em>Do</em> block lets you specify an action by name. In this example, we
+choose &quot;one of&quot; two names, &quot;<em>Square</em>&quot; and &quot;<em>Triangle</em>&quot; to determine which
+action to take. <a href="https://turtle.sugarlabs.org/index.html?id=1523369272178072&amp;run=True">RUN LIVE</a></p>
+<h2 id="4-parameters">4. Parameters</h2>
+<p>Parameter blocks hold a value that represents the state of some turtle
+attribute, e.g., the x or y position of the turtle, the heading of the
+turtle, the color of the pen, the size of the pen, etc. You can use
+parameter blocks interchangeably with number blocks. You can change
+their values with the <em>Add</em> block or with the corresponding set blocks.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/parameters1.svg' /></p>
+<p>Using the <em>Heading</em> parameter, which changes each time the turtle
+changes direction, to change the color of a spiral <a href="https://turtle.sugarlabs.org/index.html?id=1523369515049913&amp;run=True">RUN LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/parameters2.svg' /></p>
+<p>&quot;Squiral&quot; by Brian Silverman uses the <em>Heading</em> and <em>X</em> parameter
+blocks. <a href="https://walterbender.github.io/musicblocks/index.html?id=1523410445476847&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/parameters3.svg' /></p>
+<p>Often you want to just increment a parameter by 1. For this, use the
+<em>Add-1-to</em> block. <a href="https://turtle.sugarlabs.org/index.html?id=1523369660208921&amp;run=True">RUN LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/parameters4.svg' /></p>
+<p>To increment (or decrement) a parameter by an arbitrary value, use the
+<em>Add-to</em> block. <a href="https://turtle.sugarlabs.org/index.html?id=1523370184642548&amp;run=True">RUN LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/parameters5.svg' /></p>
+<p>To make other changes to a parameter based on the current value, use
+the parameter&#39;s <em>Set</em> block. In this example, the pen size is doubled
+with each step in the iteration. <a href="https://turtle.sugarlabs.org/index.html?id=1523370273985275&amp;run=True">RUN LIVE</a></p>
+<h2 id="5-conditionals">5. Conditionals</h2>
+<p>Conditionals are a powerful tool in computing. They let your program
+behave differently under differing circumstances. The basic idea is
+that if a condition is true, then take some action. Variants include
+if-then-else, while, until, and forever. Turtle Blocks provides
+logical constructs such as equal, greater than, less than, and, or,
+and not.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/conditionals1.svg' /></p>
+<p>Using a conditional to select a color: Once the heading &gt; 179, the
+color changes. <a href="https://turtle.sugarlabs.org/index.html?id=1523370501577900&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/conditionals2.svg' /></p>
+<p>Conditionals along with the <em>Random</em> block can be used to simulate a
+coin toss. <a href="https://turtle.sugarlabs.org/index.html?id=1523370743897698&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/conditionals3.svg' /></p>
+<p>A coin toss is such a common operation that we added the <em>One-of</em> block
+as a convenience. <a href="https://turtle.sugarlabs.org/index.html?id=1523370862902481&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="6-multimedia">6. Multimedia</h2>
+<p>Turtle Blocks provides rich-media tools that enable the incorporation
+of sound, typography, images, and video.</p>
+<p>At the heart of the multimedia extensions is the <em>Show</em> block. It can be
+used to show text, image data from the web or the local file system,
+or a web camera. Other extensions include blocks for synthetic speech,
+tone generation, and video playback.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/media1.svg' /></p>
+<p>Using the <em>Show</em> block to display text; the orientation of the text
+matches the orientation of the turtle. <a href="https://turtle.sugarlabs.org/index.html?id=1523370990567304&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/media2.svg' /></p>
+<p>You can also use the <em>Show</em> block to show images. Clicking on the Image
+block (left) will open a file browser. After selecting an image file
+(PNG, JPG, SVG, etc.) a thumbnail will appear on the <em>Image</em> block
+(right).</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/media3.svg' /></p>
+<p>The <em>Show</em> block in combination with the <em>Camera</em> block will capture and
+display an image from a webcam. <a href="https://turtle.sugarlabs.org/index.html?id=1523371139976408&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/media4.svg' /></p>
+<p>The <em>Show</em> block can also be used in conjunction with a URL that
+points to media. <a href="https://turtle.sugarlabs.org/index.html?id=1523371406381048&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="7-sensors">7. Sensors</h2>
+<p>Seymour Papert’s idea of learning through making is well supported in
+Turtle Blocks. According to Papert, “learning happens especially
+felicitously in a context where the learner is consciously engaged in
+constructing a public entity, whether it’s a sand castle on the beach
+or a theory of the universe”. Research and development that supports
+and demonstrates the children’s learning benefits as they interact
+with the physical world continues to grow. In similar ways, children
+can communicate with the physical world using a variety of sensors in
+Turtle Blocks. Sensor blocks include keyboard input, sound, time,
+camera, mouse location, color that the turtle sees. For example,
+children may want to build a burglar alarm and save photos of the
+thief to a file. Turtle Blocks also makes it possible to save and
+restore sensor data from a file. Children may use a “URL” block to
+import data from a web page.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/sensors1.svg' /></p>
+<p>Using sensors. The <em>Loudness</em> block is used to determine if there is an
+intruder. A loud sound triggers the alarm action: the turtle shouts
+“intruder” and takes a picture of the intruder.</p>
+<p>Teachers from the Sugar community have developed extensive collection
+of examples using Turtle Block sensors. Guzmán Trinidad, a physics
+teacher from Uruguay, wrote a book, <em>Physics of the XO</em>, which includes
+a wide variety of sensors and experiments. Tony Forster, an engineer
+from Australia, has also made remarkable contributions to the
+community by documenting examples using Turtle Blocks. In one example,
+Tony uses the series of switches to measure gravitational
+acceleration; a ball rolling down a ramp trips the switches in
+sequence. Examining the time between switch events can be used to
+determine the gravitational constant.</p>
+<p>One of the typical challenges of using sensors is calibration. This is
+true as well in Turtle Blocks. The typical project life-cycle
+includes: (1) reading values; (2) plotting values as they change over
+time; (3) finding minimum and maximum values; and finally (4)
+incorporating the sensor block in a Turtle program.</p>
+<h2 id="example-paint">Example: Paint</h2>
+<p>As described in the Sensors section, Turtle Blocks enables the
+programmer/artist to incorporate sensors into their work. Among the
+sensors available are the mouse button and mouse x and y
+position. These can be used to create a simple paint program, as
+illustrated below. Writing your own paint program is empowering: it
+demystifies a commonly used tool. At the same time, it places the
+burden of responsibility on the programmer: once we write it, it
+belongs to us, and we are responsible for making it cool. Some
+variations of paint are also shown below, including using microphone
+levels to vary the pen size as ambient sound-levels change. Once
+learners realize that they can make changes to the behavior of their
+paint program, they become deeply engaged. How will you modify paint?</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/paint1.svg' /></p>
+<p>In its simplest form, paint is just a matter of moving the turtle to
+wherever the mouse is positioned. <a href="https://turtle.sugarlabs.org/index.html?id=1523371509276932&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/paint2.svg' /></p>
+<p>Adding a test for the mouse button lets us move the turtle without
+leaving a trail of ink. <a href="https://turtle.sugarlabs.org/index.html?id=1523371673939089&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/paint3.svg' /></p>
+<p>In this example, we change the pen size based on the volume of
+microphone input. <a href="https://turtle.sugarlabs.org/index.html?id=1523371754657228&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/paint4.svg' /></p>
+<p>In another example, inspired by a student in a workshop in Colombia,
+we use time to change both the pen color and the pen size. <a href="https://turtle.sugarlabs.org/index.html?id=1523371935195761&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="example-slide-show">Example: Slide Show</h2>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/slideshow1.svg' /></p>
+<p>Why use Powerpoint when you can write Powerpoint? In this example, an
+Action stack is used to detect keyboard input: if the keyboard value
+is zero, then no key has been pressed, so we call the action again. If
+a key is pressed, the keyboard value is greater than zero, so we
+return from the action and show the next image.</p>
+<h2 id="example-keyboard">Example: Keyboard</h2>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/keyboard.svg' /></p>
+<p>In order to grab keycodes from the keyboard, you need to use a <em>While</em>
+block. In the above example, we store the keyboard value in a box,
+test it, and if it is &gt; 0, return the value. <a href="https://turtle.sugarlabs.org/index.html?id=1523376704342158&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/keyboard2.svg' /></p>
+<p>If you want to convert the keycode to a alphanumeric character, you
+need to use the <em>To ASCII</em> block. E.g., <em>toASCII(65) = A</em> <a href="https://turtle.sugarlabs.org/index.html?id=1523377042822413&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="8-turtles-sprites-buttons-and-events">8. Turtles, Sprites, Buttons, and Events</h2>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/turtles1.svg' /></p>
+<p>A separate turtle is created for each <em>Start</em> block. The turtles run
+their code in parallel with each other whenever the <em>Run</em> button is
+clicked. Each turtle maintains its own set of parameters for position,
+color, pen size, pen state, etc. In this example, three different
+turtles draw three different shapes. <a href="https://turtle.sugarlabs.org/index.html?id=1523377203344616&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/turtles2.svg' /></p>
+<p>Custom graphics can be applied to the turtles, using the <em>Shell</em> block
+on the <em>Media</em> palette. Thus you can treat turtles as sprites that can
+be moved around the screen. In this example, the sprite changes back
+and forth between two states as it moves across the screen. <a href="https://turtle.sugarlabs.org/index.html?id=1523377357693679&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/turtles3.svg' /></p>
+<p>Turtles can be programmed to respond to a &quot;click&quot; event, so they can
+be used as buttons. In this example, each time the turtle is clicked,
+the action is run, which move the turtle to a random location on the
+screen. <a href="https://turtle.sugarlabs.org/index.html?id=1523377513682595&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/turtles4.svg' /></p>
+<p>Events can be broadcast as well. In this example, another variant on
+Paint, turtle &quot;buttons&quot;, which listen for &quot;click&quot; events, are used to
+broadcast change-color events. The turtle used as the paintbrush is
+listening for these events. <a href="https://turtle.sugarlabs.org/index.html?id=1523378142359724&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="9-advanced-actions">9. Advanced Actions</h2>
+<p>Sometime you might want an action to not just run a stack of blocks
+but also to return a value. This is the role of the return block. If
+you put a return block into a stack, then the action stack becomes a
+calculate stack.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/actions4.svg' /></p>
+<p>In this example, a <em>Calculate</em> stack is used to return the current
+distance of the turtle from the center of the screen. Renaming an
+action stack that has a <em>Return</em> block will cause the creation of a new
+block in the <em>Actions</em> palette that can be used to reference the return
+value: in this case, a <em>Distance</em> block is created. <a href="https://turtle.sugarlabs.org/index.html?id=1523383380320451&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/actions6.svg' /></p>
+<p>You can also pass arguments to an <em>Action</em> stack. In this example, we
+calculate the distance between the turtle and an arbitrary point on
+the screen by passing x and y coordinates in the <em>Calculate</em>
+block. You add additional arguments by dragging them into the &quot;clamp&quot;.</p>
+<p>Note that args are local to <em>Action</em> stacks, but boxes are not. If you
+planned to use an action in a recursive function, you had best avoid
+boxes. <a href="https://turtle.sugarlabs.org/index.html?id=1523382801625028&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="example-fibonacci">Example: Fibonacci</h2>
+<p>Calculating the Fibonacci sequence is often done using a recursive
+method. In the example below, we pass an argument to the <em>Fib</em> action,
+which returns a value if the argument is &lt; 2; otherwise it returns
+the sum of the result of calling the <em>Fib</em> action with argument - 1 and
+argument - 2.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/fibonacci1.svg' /></p>
+<p>Calculating Fibonacci <a href="https://turtle.sugarlabs.org/index.html?id=1523388667520324&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/fibonacci2.svg' /></p>
+<p>In the second example, we use a <em>Repeat</em> loop to generate the first six
+Fibonacci numbers and use them to draw a nautilus.</p>
+<p>Draw a nautilus <a href="https://turtle.sugarlabs.org/index.html?id=1523388775236172&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="example-reflection-paint">Example: Reflection Paint</h2>
+<p>By combining multiple turtles and passing arguments to actions, we can
+have some more fun with paint. In the example below, the <em>Paint Action</em>
+uses <em>Arg 1</em> and <em>Arg 2</em> to reflect the mouse coordinates about the y and
+x axes. The result is that the painting is reflected into all four
+quadrants.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/turtles5.svg' /></p>
+<p>Reflection Paint <a href="https://turtle.sugarlabs.org/index.html?id=1523389168734406&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="10-advanced-boxes">10. Advanced Boxes</h2>
+<p>Sometimes it is more convenient to compute the name of a <em>Box</em> than to
+specify it explicitly. (Note that the <em>Do</em> block affords a similar
+mechanism for computing the names of actions.)</p>
+<p>In the following examples, we use this to accumulate the results of
+toss a pair of dice 1600 times (example inspired by Tony Forster).</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/boxes4.svg' /></p>
+<p>Rather than specifying a box to hold each possible result (2 through
+12), we use a <em>Box</em> as a counter (index) and create a box with the name
+of the current value in the counter and store in that box a value of
+0.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/boxes5.svg' /></p>
+<p>Next we add an <em>Action</em> to toss the dice 1600 times. To simulate tossing
+a pair of dice, we sum two random numbers between 1 and 6. We use the
+result as the name of the box we want to increment. So for example, if
+we throw a 7, we add one to the <em>Box</em> named 7. In this way we increment
+the value in the appropriate <em>Box</em>.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/boxes6.svg' /></p>
+<p>Finally, we plot the results. Again, we use a <em>Box</em> as a counter (&quot;index&quot;)
+and call the <em>Plot Action</em> in a loop. In the <em>Bar Action</em>, we draw a
+rectangle of length value stored in the <em>Box</em> with the name of the
+current value of the index. E.g., when the value in the index <em>Box</em> equals
+2, the turtle goes forward by the value in <em>Box 2</em>, which is the
+accumulated number of times that the dice toss resulted in a 2; when
+the value in the <em>Index Box</em> is 3, the turtle goes forward by the value
+in <em>Box 3</em>, which is the accumulated number of times that the dice toss
+resulted in a 3; etc. <a href="https://turtle.sugarlabs.org/index.html?id=1523299313972510&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="11-the-heap">11. The Heap</h2>
+<p>Sometimes you need a place to temporarily store data. One way to do it
+is with boxes (as mentioned at the end of the Boxes section of this
+guide, they can be used as a dictionary or individual keyword-value
+pairs). However, sometimes it is nice to simply use a heap.</p>
+<p>A heap is a essential a pile. The first thing you put on the heap is
+on the bottom. The last thing you put on the heap is on the top. You
+put things onto the heap using the <em>Push</em> block. You take things off of
+the heap using the <em>Pop</em> block. In Turtle Blocks, the heap is first-in
+last-out (FILO), so you pop things off of the heap in the reverse
+order in which you put them onto the heap.</p>
+<p>There is also an <em>Index</em> block that lets you refer to an item in the
+heap by an index. This essentially lets you treat the heap as an
+array. Some other useful blocks include a block to empty the heap, a
+block that returns the length of the heap, a block that saves the heap
+to a file, and a block that loads the heap from a file.</p>
+<p>In the examples below we use the heap to store a drawing made with a
+paint program similar to the previous examples and then to playback
+the drawing by popping points off of the heap.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/heap1.svg' /></p>
+<p>In the first example, we simply push the turtle position whenever we
+draw, along with the pen state. Note since we pop in the reverse order
+that we push, we push y, then x, then the mouse state.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/heap2.svg' /></p>
+<p>In the second example, we pop pen state, x, and y off of the heap and
+playback our drawing. <a href="https://turtle.sugarlabs.org/index.html?id=1523389420306919&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/heap3.svg' /></p>
+<p>Use the <em>Save Heap</em> block to save the state of the heap to a file. In
+this example, we save our drawing to a file for playback later. <a href="https://turtle.sugarlabs.org/index.html?id=1523390553182986&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/heap4.svg' /></p>
+<p>Use the <em>Load Heap</em> block to load the heap from data saved in a
+file. In this example, we playback the drawing from data stored in a
+file. <a href="https://turtle.sugarlabs.org/index.html?id=1523389601597904&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="12-extras">12. Extras</h2>
+<p>The <em>Extras</em> palette is full of utilities that help you use your
+project&#39;s output in different ways.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/extras1.svg' /></p>
+<p>The <em>Save as SVG</em> block will save your drawing as simple vector graphics
+(SVG), a format compatible with HTML5 and many image manipulation
+programs, e.g., Inkscape. In the example above, we use it to save a
+design in a from that can be converted to STL, a common file format
+used by 3D printers. A few things to take note of: (1) the <em>No
+Background</em> block is used to suppress the inclusion of the background
+fill in the SVG output; (2) <em>Hollow lines</em> are used to make graphic have
+dimension; and (3) the <em>Save as SVG</em> block writes to the Downloads
+directory on your computer. (Josh Burker introduced me to Tinkercad, a
+website that can be used to convert SVG to STL.) <a href="https://turtle.sugarlabs.org/index.html?id=1523390883477748&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="13-debugging-aids">13. Debugging Aids</h2>
+<p>Probably the most oft-used debugging aid in any language is the print
+statement. In Turtle Blocks, it is also quite useful. You can use it
+to examine the value of parameters and variables (boxes) and to
+monitor progress through a program.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/debugging1.svg' /></p>
+<p>In this example, we use the addition operator to concatinate strings
+in a print statement. The mouse x + &quot;, &quot; + mouse y are printed in the
+inner loop. <a href="https://turtle.sugarlabs.org/index.html?id=1523391206069261&amp;run=True">RUN
+LIVE</a></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/status1.svg' /></p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/status2.svg' /></p>
+<p>There is also a <em>Status</em> widget that can be programmed to show various
+paramters as per the figures above. <a href="https://turtle.sugarlabs.org/index.html?id=1523391401761720&amp;run=True">RUN
+LIVE</a></p>
+<p>Parameter blocks, boxes, arithmetic and boolean operators, and many
+sensor blocks will print their current value as the program runs when
+running in &quot;slow&quot; or &quot;step-by-step&quot; mode, obviating the need to use
+the Print block in many situations.</p>
+<p>The <em>Wait</em> block will pause program execution for some number (or
+fractions) of seconds.</p>
+<p>The <em>Hide</em> and <em>Show</em> blocks can be used to set &quot;break points&quot;. When a
+<em>Hide</em> block is encountered, the blocks are hidden and the program
+proceeds at full speed. When a <em>Show</em> block is encountered, the program
+proceeds at a slower pace an the block values are shown.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/debugging2.svg' /></p>
+<p>A <em>Show</em> block is used to slow down execution of the code in an <em>Action</em>
+stack in order to facilitate debugging. In this case, we slow down
+during playback in order to watch the values popped off the heap. <a href="https://turtle.sugarlabs.org/index.html?id=1523391034295213&amp;run=True">RUN
+LIVE</a></p>
+<h2 id="14-advanced-color">14. Advanced Color</h2>
+<p>The internal representation of color in Turtle Blocks is based on the
+<a href="http://en.wikipedia.org/wiki/Munsell_color_system">Munsell color
+system</a>. It is a
+three-dimensional system: (1) hue (red, yellow, green, blue, and
+purple), (2) value (black to white), and (3) chroma (gray to vivid).</p>
+<p>There are parameters for each color dimension and corresponding
+&quot;setters&quot;. All three dimensions have been normalized to run from 0 to</p>
+<ol>
+<li>For Hue, 0 maps to Munsell 0R. For Value, 0 maps to Munsell value
+0 (black) and 100 maps to Munsell value 10 (white). For chroma, 0 maps
+to Munsell chroma 0 (gray) and 100 maps to Munsell chroma 26 (spectral
+color).</li>
+</ol>
+<p>A note about Chroma: In the Munsell system, the maximum chroma of
+each hue varies with value. To simplify the model, if the chroma
+specified is greater than the maximum chroma available for a hue/value
+pair, the maximum chroma available is used.</p>
+<p>The <em>Set Color</em> block maps the three dimensions of the Munsell color
+space into one dimension. It always returns the maximum value/chroma
+pair for a given hue, ensuring vivid colors. If you want to more
+subtle colors, be sure to use the <em>Set Hue</em> block rather than the <em>Set
+Color</em> block.</p>
+<p><img src='https://rawgithub.com/sugarlabs/turtleblocksjs/master/guide/color1.svg' /></p>
+<p>Color vs. hue example <a href="https://turtle.sugarlabs.org/index.html?id=1523391601724568&amp;run=True">RUN LIVE</a></p>
+<p>To set the background color, use the <em>Background</em> block. It will set the
+background to the current hue/value/chroma triplet.</p>
+<h2 id="15-plugins">15. Plugins</h2>
+<p>There are a growing number of extensions to Turtle Blocks in the from
+of plugins. See
+<a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/plugins">Plugins</a>
+for more details.</p>
+      </div>
+    </div>
+  </body>
+</html>

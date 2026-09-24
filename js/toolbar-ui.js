@@ -11,7 +11,7 @@
 
 /*
   global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  makeKeyboardAccessible, RECORDBUTTON, saveButton, saveButtonAdvanced
+  makeKeyboardAccessible, saveButton, saveButtonAdvanced
 */
 
 /* exported ToolbarUI */
@@ -187,6 +187,7 @@ class ToolbarUI {
                 ["zhCN", "中文", "innerHTML"],
                 ["th", "ภาษาไทย", "innerHTML"],
                 ["tr", "Türkçe", "innerHTML"],
+                ["az", "azərbaycanca", "innerHTML"],
                 ["ayc", "aymara", "innerHTML"],
                 ["quz", "quechua", "innerHTML"],
                 ["gug", "guarani", "innerHTML"],
@@ -316,6 +317,7 @@ class ToolbarUI {
                 ["zhCN", "中文", "innerHTML"],
                 ["th", "ภาษาไทย", "innerHTML"],
                 ["tr", "Türkçe", "innerHTML"],
+                ["az", "azərbaycanca", "innerHTML"],
                 ["ayc", "aymara", "innerHTML"],
                 ["quz", "quechua", "innerHTML"],
                 ["gug", "guarani", "innerHTML"],
@@ -381,11 +383,19 @@ class ToolbarUI {
         const advancedMode = docById("advancedMode");
         if (this.activity.beginnerMode) {
             // || mode === "null") {
-            advancedMode.style.display = "block";
-            beginnerMode.style.display = "none";
+            if (advancedMode) {
+                advancedMode.style.display = "block";
+            }
+            if (beginnerMode) {
+                beginnerMode.style.display = "none";
+            }
         } else {
-            advancedMode.style.display = "none";
-            beginnerMode.style.display = "block";
+            if (advancedMode) {
+                advancedMode.style.display = "none";
+            }
+            if (beginnerMode) {
+                beginnerMode.style.display = "block";
+            }
         }
 
         for (let i = 0; i < strings.length; i++) {
@@ -416,8 +426,10 @@ class ToolbarUI {
             });
         }
 
+        // Materialize has no "close" command. Its mouseleave handler cancels
+        // a pending show and hides an active tooltip without resetting options.
         $j(".tooltipped").on("click", function () {
-            $j(this).tooltip("close");
+            $j(this).trigger("mouseleave.tooltip");
         });
 
         const restoreWidgetFocus = () => {
@@ -548,7 +560,7 @@ class ToolbarUI {
             saveButtonAdvanced.disabled = true;
             saveButton.className = "grey-text inactiveLink";
             saveButtonAdvanced.className = "grey-text inactiveLink";
-            recordButton.className = "grey-text inactiveLink";
+            recordButton.classList.add("grey-text", "inactiveLink");
             isPlayIconRunning = true;
             play_button_debounce_timeout = setTimeout(function () {
                 handleClick();
@@ -586,7 +598,7 @@ class ToolbarUI {
             saveButtonAdvanced.disabled = false;
             saveButton.className = "";
             saveButtonAdvanced.className = "";
-            recordButton.className = "";
+            recordButton.classList.remove("grey-text", "inactiveLink");
         };
     }
 
@@ -799,20 +811,43 @@ class ToolbarUI {
         const icon = docById("themeSelectIcon");
         if (!icon) return;
 
-        themes.forEach(theme => {
-            if (safeStorageGet("themePreference") === theme) {
-                icon.textContent = "";
-                Array.from(docById(theme).childNodes).forEach(node =>
-                    icon.appendChild(node.cloneNode(true))
-                );
-            }
-        });
+        const updateThemeIcon = theme => {
+            const option = docById(theme);
+            if (!option) return;
 
-        icon.onclick = () => {
+            icon.textContent = "";
+            Array.from(option.childNodes).forEach(node => icon.appendChild(node.cloneNode(true)));
+        };
+
+        const updateThemeOptions = () => {
             themes.forEach(theme => {
-                docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
+                const option = docById(theme);
+                if (!option) return;
+
+                const listItem = option.parentElement;
+                if (listItem) {
+                    listItem.style.display = theme === themeBox._theme ? "none" : "";
+                }
             });
         };
+
+        themes.forEach(theme => {
+            const option = docById(theme);
+            if (!option) return;
+
+            if (themeBox._theme === theme || safeStorageGet("themePreference") === theme) {
+                updateThemeIcon(theme);
+            }
+
+            option.onclick = () => {
+                themeBox[`${theme}_onclick`](this.activity);
+                updateThemeIcon(theme);
+                updateThemeOptions();
+                $j(icon).dropdown("close");
+            };
+        });
+
+        icon.onclick = updateThemeOptions;
     }
 
     /**
@@ -1063,7 +1098,12 @@ class ToolbarUI {
     updateRecordButton(rec_onclick) {
         const Record = docById("record");
         const RecordDropdownArrow = docById("recordDropdownArrow");
-        const browser = fnBrowserDetect();
+        const browser =
+            typeof fnBrowserDetect === "function"
+                ? fnBrowserDetect()
+                : typeof window !== "undefined" && typeof window.fnBrowserDetect === "function"
+                  ? window.fnBrowserDetect()
+                  : "unknown";
         const hideIn = ["firefox", "safari"];
 
         this._cleanupRecordDropdownListeners();
@@ -1083,7 +1123,6 @@ class ToolbarUI {
             Record.classList.remove("hide");
             Record.style.display = "block";
         }
-        Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
 
         // Remove any existing onclick handler
         Record.onclick = null;
@@ -1677,6 +1716,7 @@ class ToolbarUI {
             "te",
             "ibo",
             "tr",
+            "az",
             "ar",
             "bn",
             "ur",
@@ -2448,7 +2488,9 @@ class ToolbarUI {
 // ToolbarUI so existing consumers (toolbar.js shim, tests, plugins) keep
 // working unchanged.
 if (typeof define === "function" && define.amd) {
-    define(["activity/focus-cycle-manager"], function (FocusCycleManager) {
+    define(["activity/focus-cycle-manager", "utils/utils", "utils/dom-helpers"], function (
+        FocusCycleManager
+    ) {
         // Expose under the legacy Toolbar name so that
         // instance.constructor.name === "Toolbar" continues to work for
         // any downstream plugin that checks it.

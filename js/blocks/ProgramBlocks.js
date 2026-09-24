@@ -12,12 +12,30 @@
 /*
    global
 
-   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl
+   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl, isUnsafeObjectKey
  */
 
 /* exported setupProgramBlocks */
 
 function setupProgramBlocks(activity) {
+    /**
+     * Determines whether a dictionary key is a built-in turtle status property.
+     *
+     * @param {string} key - The dictionary key to check.
+     * @returns {boolean} True if the key represents a turtle status property, false otherwise.
+     */
+    function isTurtleStatusKey(key) {
+        return (
+            key === _("color") ||
+            key === _("shade") ||
+            key === _("grey") ||
+            key === _("pen size") ||
+            key === _("font") ||
+            key === _("heading") ||
+            key === "x" ||
+            key === "y"
+        );
+    }
     /**
      * Represents a block that loads the heap from a web page in the logo programming language.
      * @extends {FlowBlock}
@@ -90,25 +108,22 @@ function setupProgramBlocks(activity) {
             fetch(url)
                 .then(response => {
                     if (!response.ok) {
-                        console.debug("fetched the wrong page or network error...");
                         activity.errorMsg(_("404: Page not found"), blk);
                         throw new Error("Network response was not ok");
                     }
                     return response.text();
                 })
                 .then(responseText => {
-                    console.debug(responseText);
                     try {
                         const data = JSON.parse(responseText);
                         logo.turtleHeaps[name] = data;
                     } catch (e) {
-                        console.debug(e);
                         activity.errorMsg(`${_("Error parsing JSON data:")} ${e}`, blk);
                         logo.turtleHeaps[name] = oldHeap;
                     }
                 })
                 .catch(error => {
-                    console.debug("Fetch error:", error);
+                    console.error("Fetch error:", error);
                     logo.turtleHeaps[name] = oldHeap;
                 });
         }
@@ -420,6 +435,10 @@ function setupProgramBlocks(activity) {
             }
 
             const a = args[0];
+            if (isUnsafeObjectKey(a)) {
+                activity.errorMsg(_("The dictionary name is reserved."), blk);
+                return;
+            }
             // Not sure this can happen.
             if (!(turtle in logo.turtleDicts)) {
                 logo.turtleDicts[turtle] = {};
@@ -432,16 +451,30 @@ function setupProgramBlocks(activity) {
                 } else {
                     try {
                         const d = JSON.parse(activity.blocks.blockList[c].value[1]);
+                        if (typeof d !== "object" || d === null || Array.isArray(d)) {
+                            throw new Error("not an object");
+                        }
                         // Is the dictionary the same as a turtle name?
                         const target = getTargetTurtle(activity.turtles, a);
                         if (target !== null) {
                             // Copy any internal entries now.
                             const k = Object.keys(d);
                             for (let i = 0; i < k.length; i++) {
-                                Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
+                                Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
+                                if (!isTurtleStatusKey(k[i])) {
+                                    if (
+                                        !Object.prototype.hasOwnProperty.call(
+                                            logo.turtleDicts[turtle],
+                                            target
+                                        )
+                                    ) {
+                                        logo.turtleDicts[turtle][target] = {};
+                                    }
+                                    logo.turtleDicts[turtle][target][k[i]] = d[k[i]];
+                                }
                             }
-                        } else if (!(a in logo.turtleDicts[turtle])) {
-                            logo.turtleDicts[turtle][a] = {};
+                        } else {
+                            logo.turtleDicts[turtle][a] = d;
                         }
                     } catch (e) {
                         activity.errorMsg(
@@ -526,6 +559,10 @@ function setupProgramBlocks(activity) {
             }
 
             const a = args[0];
+            if (isUnsafeObjectKey(a)) {
+                activity.errorMsg(_("The dictionary name is reserved."), blk);
+                return;
+            }
             // Not sure this can happen.
             if (!(turtle in logo.turtleDicts)) {
                 logo.turtleDicts[turtle] = {};
@@ -535,16 +572,30 @@ function setupProgramBlocks(activity) {
             if (c !== null) {
                 try {
                     const d = JSON.parse(activity.blocks.blockList[c].value);
+                    if (typeof d !== "object" || d === null || Array.isArray(d)) {
+                        throw new Error("not an object");
+                    }
                     // Is the dictionary the same as a turtle name?
                     const target = getTargetTurtle(activity.turtles, a);
                     if (target !== null) {
                         // Copy any internal entries now.
                         const k = Object.keys(d);
                         for (let i = 0; i < k.length; i++) {
-                            Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
+                            Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
+                            if (!isTurtleStatusKey(k[i])) {
+                                if (
+                                    !Object.prototype.hasOwnProperty.call(
+                                        logo.turtleDicts[turtle],
+                                        target
+                                    )
+                                ) {
+                                    logo.turtleDicts[turtle][target] = {};
+                                }
+                                logo.turtleDicts[turtle][target][k[i]] = d[k[i]];
+                            }
                         }
-                    } else if (!(a in logo.turtleDicts[turtle])) {
-                        logo.turtleDicts[turtle][a] = {};
+                    } else {
+                        logo.turtleDicts[turtle][a] = d;
                     }
                 } catch (e) {
                     activity.errorMsg(
@@ -704,9 +755,14 @@ function setupProgramBlocks(activity) {
             // Is the dictionary the same as a turtle name?
             const target = getTargetTurtle(activity.turtles, a);
             if (target === null) {
+                const dictData =
+                    Object.prototype.hasOwnProperty.call(logo.turtleDicts[turtle], a) &&
+                    logo.turtleDicts[turtle][a] !== undefined
+                        ? logo.turtleDicts[turtle][a]
+                        : {};
                 activity.save.download(
                     "json",
-                    "data:text/json;charset-utf-8," + JSON.stringify(logo.turtleDicts[turtle][a]),
+                    "data:text/json;charset-utf-8," + JSON.stringify(dictData),
                     args[1]
                 );
             } else {
@@ -1009,8 +1065,6 @@ function setupProgramBlocks(activity) {
                 const thisTurtle = activity.blocks.blockList[args[0]].value;
                 const tur = activity.turtles.ithTurtle(thisTurtle);
 
-                console.debug("run start " + thisTurtle);
-
                 logo.initTurtle(thisTurtle);
                 tur.queue = [];
                 tur.parentFlowQueue = [];
@@ -1068,25 +1122,21 @@ function setupProgramBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (args.length < 3) {
-                console.debug(args.length + " < 3");
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
-                console.debug(args[0] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[0] === args[2]) {
-                console.debug(args[0] + " == " + args[2]);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[2] < 0 || args[2] > activity.blocks.blockList.length - 1) {
-                console.debug(args[2] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -1098,7 +1148,6 @@ function setupProgramBlocks(activity) {
                 args[1] < 1 ||
                 args[1] > activity.blocks.blockList[args[0]].connections.length - 1
             ) {
-                console.debug(args[1] + " out of bounds");
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -1340,8 +1389,6 @@ function setupProgramBlocks(activity) {
                 const protoName = obj[2];
                 if (protoblk === null) {
                     activity.errorMsg(`${_("Cannot find block")} ${name}`, blk);
-
-                    console.debug("Cannot find block " + name);
                     return 0;
                 } else {
                     const newBlock = [[0, protoName, x, y, [null]]];
@@ -1397,8 +1444,6 @@ function setupProgramBlocks(activity) {
                     }
 
                     activity.blocks.loadNewBlocks(newBlock);
-
-                    console.debug("BLOCKNUMBER " + blockNumber);
                     return blockNumber;
                 }
             }

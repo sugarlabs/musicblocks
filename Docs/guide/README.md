@@ -5,7 +5,7 @@ music and graphics. It expands upon Turtle Blocks by adding a
 collection of features relating to pitch and rhythm.
 
 The [Turtle Blocks
-guide](https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md)
+guide](https://github.com/sugarlabs/musicblocks/blob/master/TurtleDocs/guide/README.md)
 is a good place to start learning about the basics. In this guide, we
 illustrate the musical features by walking the reader through numerous
 examples.
@@ -117,7 +117,7 @@ Guide](https://github.com/sugarlabs/turtleblocksjs/tree/master/guide),
 which reviews many programming features common to both projects.
 
 For more details on how to use Music Blocks, see [Using Music
-Blocks](https://github.com/sugarlabs/musicblocks/tree/master/documentation).
+Blocks](https://github.com/sugarlabs/musicblocks/tree/master/Docs/documentation).
 For more details on how to use Turtle Blocks, see [Using Turtle Blocks
 JS](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
@@ -370,7 +370,9 @@ recent note played.
 
 In this example, we are using the *Mode length* block, which returns
 the number of scalar steps in the current mode (7 for Major and Minor
-modes). [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733192676935416&run=True)
+modes). Note that the number of scalar steps depends on the current
+EDO setting — modes in higher-EDO temperaments may have more steps.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733192676935416&run=True)
 
 #### <a name="SHARPS-AND-FLATS">3.2.2 Sharps And Flats</a>
 
@@ -507,7 +509,7 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 
 The *Set key* block is used to change both the mode and key of the
 current scale. (The current scale is used to define the mapping of
-Solfege [when set Movable Do = True] to notes and also the number of half steps take by the the
+Solfege [when set Movable Do = True] to notes and also the number of half steps take by the
 *Scalar step* block.) For example, by setting the key to C Major, the
 scale is defined by starting at C (or Do) and applying the pattern of half
 steps defined by a Major mode. In this case, the pattern of steps
@@ -1523,6 +1525,8 @@ above, the *One-of* block is used to randomly assign either `Do` or
 above, the *One-of* block is used to randomly select between `chunk1`
 and `chunk2`.
 
+<a name="musical-paint"></a>
+
 Musical Paint has been a popular activity dating back to programs such
 as Dan Franzblau's *Vidsizer* (1979) or Morwaread Farbood's
 *Hyperscore* (2002). Music Blocks can be used to create musical paint
@@ -1561,7 +1565,7 @@ stack can be copied and pasted into another composition.
 While a bit fanciful, this example, which can be run by clicking on
 the link below, takes musical paint in a novel direction.
 
-[RUN LIVE](https://sugarlabs.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
+[RUN LIVE](https://sugarlabs.github.io/musicblocks/index.html?id=1523896294964170&run=True)
 
 ### <a name="ENSEMBLE">3.8 Ensemble</a>
 
@@ -1643,7 +1647,7 @@ be used within Music Blocks to enhance your experience.
 
 Every widget has a menu with at least two buttons.
 
-![widget](../header-icons/close-button.svg "close button")
+![widget](../../header-icons/close-button.svg "close button")
 
 You can hide the widget by clicking on the *Close* button.
 
@@ -1712,13 +1716,13 @@ individual notes (or chords if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
-![widget](../header-icons/play-button.svg "play button")
+![widget](../../header-icons/play-button.svg "play button")
 
 If you click on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `Re 4`,
 `Mi 4`, `Sol 4`.
 
-![widget](../header-icons/export-chunk.svg "save button")
+![widget](../../header-icons/export-chunk.svg "save button")
 
 Once you have a group of notes (a "chunk") that you like, click on the
 *Save* button (just to the right of the *Play* button). This will
@@ -1728,12 +1732,12 @@ programmatically. (More on that below.)
 You can rearrange the selected notes in the grid and save other chunks
 as well.
 
-![widget](../header-icons/sort.svg "sort button")
+![widget](../../header-icons/sort.svg "sort button")
 
 The *Sort* button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate *Pitch* blocks.
 
-![widget](../header-icons/erase-button.svg "erase button")
+![widget](../../header-icons/erase-button.svg "erase button")
 
 There is also an Erase button that will clear the grid.
 
@@ -2013,24 +2017,24 @@ modes. You invoke the widget with the *Custom mode* block. The mode
 specified in the *Set key* block will be the default mode when the
 widget launches.
 
-![widget](./mode2.svg "launching widget with Major mode")
+![widget](./mode_scalar_overview.svg "mode widget overview")
 
 In the above example, the widget has been launched with *Major* mode
 (the default). Note that the notes included in the mode are indicated
 by the protruding sectors with 'X's, which are arrayed in a circular
-pattern of twelve half-steps to complete the octave.
+pattern. The number of slices in the wheel matches the current EDO
+setting (12 by default).
 
-Since the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`, the
-notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`, and `12` (one octave
-above `0`).
+In 12-EDO, the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2,
+1` (half-steps), so the notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`,
+and `12` (one octave above `0`). Other EDOs use different step counts
+that sum to their respective division count.
 
-The widget controls run along the toolbar at the top. From left to
-right are:
+The widget controls are arranged in two areas. The left column contains:
 
-*Play all*, which will play a scale using the current mode;
+*Play*, which will play a scale using the current mode;
 
-*Save*, which will save the current mode as the *Custom* mode and save
-a stack of *Pitch* blocks that can be used with the *Phrase Maker* block;
+*Clear*, which will reset all notes to blank;
 
 *Rotate counter-clockwise*, which will rotate the mode
 counter-clockwise (See the example below);
@@ -2038,13 +2042,75 @@ counter-clockwise (See the example below);
 *Rotate clockwise*, which will rotate the mode clockwise (See the
 example below);
 
-*Invert*, which will invert the mode (See the example below);
+*Invert*, which will invert the mode (See the example below); and
 
-*Undo*, which will restore the mode to the previous version; and
+*Undo*, which will restore the mode to the previous version.
 
-*Close*, which will close the widget.
+The bottom row contains:
+
+*Temperament* (hamburger icon), which opens the EDO/Temperament
+dropdown to control how the octave is divided;
+
+*Mode menu* (pie-chart icon), which will open the mode selection
+pie menu;
+
+*Name field*, where you can type a name for a custom mode before
+saving;
+
+*Save*, which will save the current mode as a custom mode and export
+an *Action* block and a *Define Mode* block to the workspace; and
+
+*Delete*, which will remove the currently loaded custom mode from
+saved modes.
+
+![widget](./mode_scalar_edo_dropdown.svg "EDO/Temperament dropdown")
+
+The *EDO/Temperament* dropdown lets you select how many equal
+divisions the octave is split into. The default is `12-EDO` (standard
+Western tuning). Selecting a different EDO (such as `5`, `17`, `19`,
+or `31`) redraws the pie wheel with that many slices. The mode wheel
+shows numeric indices (`0`, `1`, `2`, ...) while the note wheel uses
+`x` markers to indicate selected scale degrees.
+
+Non-EDO temperaments (*5-limit Just Intonation*, *Pythagorean
+Tuning*, *1/3 Comma Meantone*, *1/4 Comma Meantone*) use ratio-based
+tuning rather than equal divisions. The pie wheel shows the closest
+scale degrees for the selected temperament.
+
+State is cached per-EDO when switching between equally-tempered
+settings, so switching back to a previous EDO restores your previous
+notes. Selecting a non-EDO temperament replaces the current tuning
+state entirely. When playing under non-EDO temperaments, frequencies
+are computed from the temperament's ratios rather than
+equal-temperament formulas.
+
+![widget](./mode_scalar_21edo.svg "widget with 1/4 Comma Meantone selected")
+
+In the above example, the widget has been switched to the *1/4 Comma
+Meantone* temperament, which uses 21 pitches per octave based on
+ratio-based tuning. The pie wheel now shows more slices, allowing
+finer-grained mode construction.
 
 You can also click on individual notes to activate or deactivate them.
+
+The *Mode menu* button opens a two-ring pie menu for selecting
+built-in modes:
+
+![widget](./mode_scalar_pie_menu.svg "mode pie menu")
+
+The inner ring shows mode categories grouped by note count: `5`, `6`,
+`7`, `7a`, `7b`, `8`, `12`, and `custom` (your saved modes). The
+outer ring shows the modes within the selected category, with names
+like *major*, *minor*, *Dorian*, etc. Clicking a mode applies it to
+the wheel immediately. Use the *Play* button to hear the scale.
+
+To save a custom mode, type a name in the *Name* field, adjust the
+notes on the wheel, then click *Save*. Saving exports two blocks to
+the workspace: an *Action* block containing the mode pattern and a
+*Define Mode* block that registers it. Saved custom modes appear in
+the mode pie menu under the `custom` category in the inner ring. To
+delete a saved custom mode, load it via the pie menu and click
+*Delete*.
 
 Note that the mode inside the *Custom mode* block is updated whenever
 the mode is changed inside the widget.
@@ -2069,8 +2135,11 @@ Note: The build-in modes in Music Blocks can be found in
 
 ![widget](./mode6.svg "phrase maker block")
 
-The *Save* button exports a stack of blocks representing the mode that
-can be used inside the *Phrase maker* block.
+The *Save* button creates an *Action* block (with the mode name) and a
+*Define Mode* block on the workspace. The *Action* block contains the
+mode pattern and can be used with the *Phrase Maker* block or any
+pitch stack. The *Define Mode* block registers the custom mode so it
+can be used with the *Set Key* block.
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725877046734200&run=True)
 
 ### <a name="meters">4.5 Meters</a>
@@ -2226,6 +2295,13 @@ You can also update the tempo by clicking twice in spaced succession
 in the widget: the new beats per minute (BPM) is determined as the
 time between the two clicks. For example, if there is `1/2` second
 between clicks, the new BPM will be set as `120`.
+
+Additionally, you can use the *Tap Tempo* button in the widget toolbar
+to set the tempo by tapping a rhythm. Click the *Tap Tempo* button
+repeatedly and the tempo will be calculated from the average interval
+between your taps. You can also press the `T` key on your keyboard as
+an alternative to clicking the button. After a brief pause in tapping,
+the tempo is automatically applied.
 
 ### <a name="timbre">4.10 Custom Timbres</a>
 

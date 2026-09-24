@@ -264,6 +264,7 @@ describe("Toolbar Class", () => {
             },
             record: {
                 className: "",
+                classList: { add: jest.fn(), remove: jest.fn() },
                 setAttribute: jest.fn()
             }
         };
@@ -287,7 +288,7 @@ describe("Toolbar Class", () => {
         expect(elements.stop.style.color).toBe(toolbar.stopIconColorWhenPlaying);
         expect(global.saveButtonAdvanced.disabled).toBe(true);
         expect(global.saveButton.className).toBe("grey-text inactiveLink");
-        expect(elements.record.className).toBe("grey-text inactiveLink");
+        expect(elements.record.classList.add).toHaveBeenCalledWith("grey-text", "inactiveLink");
         expect(elements.stop.removeEventListener).toHaveBeenCalledWith(
             "click",
             expect.any(Function)
@@ -309,7 +310,10 @@ describe("Toolbar Class", () => {
             setAttribute: jest.fn(),
             addEventListener: jest.fn()
         };
-        const recordButton = { className: "recording" };
+        const recordButton = {
+            className: "recording",
+            classList: { add: jest.fn(), remove: jest.fn() }
+        };
 
         global.docById.mockImplementation(id =>
             id === "stop"
@@ -330,7 +334,7 @@ describe("Toolbar Class", () => {
         expect(global.saveButtonAdvanced.disabled).toBe(false);
         expect(global.saveButton.className).toBe("");
         expect(global.saveButtonAdvanced.className).toBe("");
-        expect(recordButton.className).toBe("");
+        expect(recordButton.classList.remove).toHaveBeenCalledWith("grey-text", "inactiveLink");
     });
 
     test("renderNewProjectIcon displays modal and handles confirmation", () => {
@@ -409,29 +413,57 @@ describe("Toolbar Class", () => {
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
     });
 
-    test("renderThemeSelectIcon sets onclick and updates theme selection", () => {
+    test("renderThemeSelectIcon hides the active theme and closes after selection", () => {
         const themeSelectIcon = {
             onclick: null,
             textContent: "",
             childNodes: [],
-            appendChild: jest.fn(),
-            cloneNode: jest.fn()
+            appendChild: jest.fn()
         };
         const themes = ["light", "dark"];
-        const themeBox = { setAttribute: jest.fn() };
+        const options = Object.fromEntries(
+            themes.map(theme => [
+                theme,
+                {
+                    childNodes: [{ cloneNode: jest.fn(() => `${theme}-icon`) }],
+                    onclick: null,
+                    parentElement: { style: {} }
+                }
+            ])
+        );
+        const themeBox = {
+            _theme: "light",
+            light_onclick: jest.fn(),
+            dark_onclick: jest.fn(() => {
+                themeBox._theme = "dark";
+            })
+        };
+        const dropdown = jest.fn();
+        global.jQuery.mockReturnValue({
+            dropdown,
+            on: jest.fn(),
+            tooltip: jest.fn(),
+            trigger: jest.fn()
+        });
         global.docById.mockImplementation(id => {
             if (id === "themeSelectIcon") return themeSelectIcon;
-            return { childNodes: [], cloneNode: jest.fn() };
+            return options[id];
         });
         global.localStorage.themePreference = "light";
+
         toolbar.renderThemeSelectIcon(themeBox, themes);
+
         expect(themeSelectIcon.onclick).toBeInstanceOf(Function);
         themeSelectIcon.onclick();
-        themes.forEach(theme => {
-            if (theme === "light") {
-                expect(global.localStorage.themePreference).toBe("light");
-            }
-        });
+        expect(options.light.parentElement.style.display).toBe("none");
+        expect(options.dark.parentElement.style.display).toBe("");
+
+        options.dark.onclick();
+        expect(themeBox.dark_onclick).toHaveBeenCalledWith(toolbar.activity);
+        expect(themeSelectIcon.appendChild).toHaveBeenLastCalledWith("dark-icon");
+        expect(options.light.parentElement.style.display).toBe("");
+        expect(options.dark.parentElement.style.display).toBe("none");
+        expect(dropdown).toHaveBeenCalledWith("close");
     });
 
     test("renderWrapIcon toggles WRAP and updates tooltip", () => {
@@ -614,10 +646,7 @@ describe("Toolbar Class", () => {
     test("updateRecordButton hides record button", () => {
         const recordButton = {
             classList: { add: jest.fn() },
-            style: { display: "" },
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn()
+            style: { display: "" }
         };
         global.docById.mockReturnValue(recordButton);
         global.fnBrowserDetect = jest.fn(() => "firefox");
@@ -626,15 +655,40 @@ describe("Toolbar Class", () => {
         expect(recordButton.style.display).toBe("");
     });
 
-    test("updateRecordButton keeps only one outside-click listener and dispose removes it", () => {
-        global.RECORDBUTTON = "fiber_manual_record";
+    test("updateRecordButton configures record button state when fnBrowserDetect is undefined", () => {
+        const recordButton = {
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" }
+        };
+        const recordDropdownArrow = {
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" },
+            appendChild: jest.fn(),
+            addEventListener: jest.fn(),
+            querySelector: jest.fn(() => ({ textContent: "arrow_drop_down" }))
+        };
+        global.docById.mockImplementation(id => {
+            if (id === "record") return recordButton;
+            if (id === "recordDropdownArrow") return recordDropdownArrow;
+            return null;
+        });
+        toolbar.activity = { beginnerMode: false };
+        const originalFnBrowserDetect = global.fnBrowserDetect;
+        delete global.fnBrowserDetect;
 
+        expect(() => toolbar.updateRecordButton(jest.fn())).not.toThrow();
+        expect(recordButton.style.display).toBe("block");
+        expect(typeof recordButton.onclick).toBe("function");
+
+        if (originalFnBrowserDetect) {
+            global.fnBrowserDetect = originalFnBrowserDetect;
+        }
+    });
+
+    test("updateRecordButton keeps only one outside-click listener and dispose removes it", () => {
         const recordButton = {
             classList: { add: jest.fn(), remove: jest.fn() },
             style: { display: "" },
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn(),
             onclick: null
         };
 

@@ -489,6 +489,15 @@ describe("Block Foundation", () => {
                 expect(block.container.updateCache).toHaveBeenCalled();
             });
 
+            it("should not update a cache that has not been created yet", () => {
+                block.container.bitmapCache = null;
+
+                expect(() => block.highlight()).not.toThrow();
+                expect(block.highlightBitmap.visible).toBe(true);
+                expect(block.bitmap.visible).toBe(false);
+                expect(block.container.updateCache).not.toHaveBeenCalled();
+            });
+
             it("should do nothing if trashed", () => {
                 block.trash = true;
                 block.highlight();
@@ -503,6 +512,28 @@ describe("Block Foundation", () => {
                 block.unhighlight();
                 expect(block.bitmap.visible).toBe(true);
                 expect(block.highlightBitmap.visible).toBe(false);
+            });
+
+            it("should not update a cache that has not been created yet", () => {
+                block.container.bitmapCache = null;
+
+                expect(() => block.unhighlight()).not.toThrow();
+                expect(block.bitmap.visible).toBe(true);
+                expect(block.highlightBitmap.visible).toBe(false);
+                expect(block.container.updateCache).not.toHaveBeenCalled();
+            });
+        });
+
+        describe("unhighlightSelectedBlocks()", () => {
+            it("should not update a cache that has not been created yet", () => {
+                mockBlocks.unhighlight = jest.fn();
+                block.disconnectedBitmap = { visible: false };
+                block.container.bitmapCache = null;
+
+                expect(() => block.unhighlightSelectedBlocks(0, true)).not.toThrow();
+                expect(mockBlocks.unhighlight).toHaveBeenCalledWith(0, true);
+                expect(block.disconnectedBitmap.visible).toBe(true);
+                expect(block.container.updateCache).not.toHaveBeenCalled();
             });
         });
 
@@ -852,6 +883,309 @@ describe("Block Foundation", () => {
         });
     });
 
+    describe("drag spatial-grid deferral", () => {
+        const makeEventBlock = () => {
+            const handlers = {};
+            const block = new Block(mockProtoBlock, mockBlocks);
+
+            block.blockIndex = 0;
+            block.connections = [null, null];
+            block.container = {
+                x: 100,
+                y: 100,
+                children: [],
+                on: jest.fn((type, handler) => {
+                    handlers[type] = handler;
+                }),
+                setChildIndex: jest.fn()
+            };
+            block.original = { x: 100, y: 100 };
+            block.offset = { x: 0, y: 0 };
+            block._calculateBlockHitArea = jest.fn();
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.isValueBlock = jest.fn().mockReturnValue(false);
+
+            mockBlocks.blockList = [block, { container: { x: 100, y: 120 } }];
+            mockBlocks._cachedDragGroup = [0, 1];
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.selectionModeOn = false;
+            mockBlocks.getLongPressStatus = jest.fn().mockReturnValue(false);
+            mockBlocks.clearLongPress = jest.fn();
+            mockBlocks.cacheDragGroup = jest.fn();
+            mockBlocks.raiseStackToTop = jest.fn();
+            mockBlocks.moveBlockRelativeBatched = jest.fn();
+            mockBlocks.scheduleCheckBounds = jest.fn();
+            mockBlocks.clearCachedDragGroup = jest.fn();
+            mockBlocks.invalidateTopBlockCache = jest.fn();
+            mockBlocks.unhighlight = jest.fn();
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.blocksContainer = { y: 0 };
+            block.activity.scrollBlockContainer = false;
+            block.activity.trashcan = {
+                show: jest.fn(),
+                hide: jest.fn(),
+                overTrashcan: jest.fn().mockReturnValue(false),
+                startHighlightAnimation: jest.fn(),
+                stopHighlightAnimation: jest.fn()
+            };
+
+            block._loadEventHandlers();
+            global.docById.mockReturnValue({ style: {} });
+            return { block, handlers };
+        };
+
+        it("defers cached drag-group updates and marks the release dirty", () => {
+            const { handlers } = makeEventBlock();
+
+            handlers.mousedown({ stageX: 100, stageY: 100 });
+
+            handlers.pressmove({
+                stageX: 110,
+                stageY: 100,
+                nativeEvent: { preventDefault: jest.fn() }
+            });
+
+            expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+
+            handlers.pressup({ stageX: 110, stageY: 100 });
+
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(0, 10, 0, true);
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(1, 10, 0, true);
+            expect(mockBlocks.syncDragGroupSpatialGrid).toHaveBeenCalledTimes(1);
+        });
+
+        it("defers drag-group updates when the cached group is unavailable", () => {
+            const { handlers } = makeEventBlock();
+            handlers.mousedown({ stageX: 100, stageY: 100 });
+            mockBlocks._cachedDragGroup = null;
+            mockBlocks.dragGroup = [0, 1];
+            mockBlocks.findDragGroup = jest.fn();
+
+            handlers.pressmove({
+                stageX: 100,
+                stageY: 110,
+                nativeEvent: { preventDefault: jest.fn() }
+            });
+
+            expect(mockBlocks.findDragGroup).toHaveBeenCalledWith(0);
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(0, 0, 10, true);
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(1, 0, 10, true);
+        });
+
+        it("reports a clean grid when release follows no coordinate movement", () => {
+            const { handlers } = makeEventBlock();
+
+            handlers.mousedown({ stageX: 100, stageY: 100 });
+            handlers.pressup({ stageX: 100, stageY: 100 });
+
+            expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+        });
+
+        it("reconciles the grid after restoring trash-hover positions and before docking", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            const order = [];
+
+            block.blockIndex = 0;
+            block._setDragGroupTrashHoverScale = jest.fn(() => order.push("restore"));
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.trashcan = {
+                hide: jest.fn(),
+                isVisible: true,
+                overTrashcan: jest.fn(() => {
+                    order.push("query-trash");
+                    return false;
+                })
+            };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn(() => order.push("sync-grid"));
+            mockBlocks.blockMoved = jest.fn(() => order.push("dock"));
+            mockBlocks.adjustDocks = jest.fn(() => order.push("adjust"));
+
+            block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true, true);
+
+            expect(order).toEqual(["restore", "sync-grid", "query-trash", "dock", "adjust"]);
+        });
+
+        it("sends a moved block to trash without waiting for the highlight", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.textMsg = jest.fn();
+            block.activity.trashcan = {
+                hide: jest.fn(),
+                isVisible: false,
+                overTrashcan: jest.fn().mockReturnValue(true)
+            };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.sendStackToTrash = jest.fn();
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+
+            block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true);
+
+            expect(mockBlocks.sendStackToTrash).toHaveBeenCalledWith(block);
+        });
+
+        it("does not reconcile a clean grid", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.trashcan = { hide: jest.fn() };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+
+            block._mouseoutCallback({}, false, false, false, true, false);
+
+            expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("shift+click", () => {
+        const makeClickBlock = running => {
+            const handlers = {};
+            const block = new Block(mockProtoBlock, mockBlocks);
+
+            block.blockIndex = 3;
+            block.connections = [null, null];
+            block.container = {
+                x: 100,
+                y: 100,
+                children: [],
+                on: jest.fn((type, handler) => {
+                    handlers[type] = handler;
+                }),
+                setChildIndex: jest.fn()
+            };
+            block._calculateBlockHitArea = jest.fn();
+
+            mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            block.activity.closeHelpfulWheel = jest.fn();
+            block.activity.turtles = { running: jest.fn().mockReturnValue(running) };
+            block.activity.logo.runLogoCommands = jest.fn();
+            block.activity.logo.doStopTurtles = jest.fn();
+            block.activity.toolbar = { highlightStop: jest.fn() };
+
+            block._loadEventHandlers();
+            return { block, handlers };
+        };
+
+        it("runs the stack from its top block", () => {
+            const { block, handlers } = makeClickBlock(false);
+
+            expect(() =>
+                handlers.click({ nativeEvent: { button: 0, shiftKey: true } })
+            ).not.toThrow();
+
+            expect(mockBlocks.findTopBlock).toHaveBeenCalledWith(3);
+            expect(block.activity.logo.runLogoCommands).toHaveBeenCalledWith(0);
+            expect(block.activity.toolbar.highlightStop).toHaveBeenCalled();
+        });
+
+        it("stops the running project and restarts it from the top block", () => {
+            jest.useFakeTimers();
+            try {
+                const { block, handlers } = makeClickBlock(true);
+
+                handlers.click({ nativeEvent: { button: 0, shiftKey: true } });
+
+                expect(block.activity.logo.doStopTurtles).toHaveBeenCalled();
+                expect(block.activity.logo.runLogoCommands).not.toHaveBeenCalled();
+
+                jest.advanceTimersByTime(250);
+
+                expect(block.activity.logo.runLogoCommands).toHaveBeenCalledWith(0);
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+    });
+
+    describe("_checkWidgets()", () => {
+        let getElementsSpy;
+
+        beforeAll(() => {
+            // widgetWindows.js attaches to the environment window; also expose
+            // the bare global that block.js reads via /* global widgetWindows */.
+            require("../widgets/widgetWindows.js");
+            const ww =
+                (typeof window !== "undefined" && window.widgetWindows) || global.widgetWindows;
+            global.widgetWindows = ww;
+            if (typeof window !== "undefined") {
+                window.widgetWindows = ww;
+            }
+        });
+
+        afterEach(() => {
+            if (getElementsSpy) {
+                getElementsSpy.mockRestore();
+                getElementsSpy = null;
+            }
+        });
+
+        const makeTitleEl = title => {
+            const el = document.createElement("div");
+            el.className = "wftTitle";
+            el.innerHTML = title;
+            return el;
+        };
+
+        const makeWidgetBlock = label => {
+            const proto = {
+                ...mockProtoBlock,
+                name: label,
+                staticLabels: [label]
+            };
+            const block = new Block(proto, mockBlocks);
+            block.blockIndex = 0;
+            mockBlocks.blockList = [block];
+            mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            mockBlocks.reInitWidget = jest.fn();
+            return block;
+        };
+
+        it("reinitializes when an open widget title matches the top block", () => {
+            const block = makeWidgetBlock("arpeggio");
+            getElementsSpy = jest
+                .spyOn(document, "getElementsByClassName")
+                .mockReturnValue([makeTitleEl("arpeggio")]);
+
+            block._checkWidgets(false);
+
+            expect(mockBlocks.reInitWidget).toHaveBeenCalledWith(0, 1500);
+        });
+
+        it("reinitializes when an unrelated recognized title appears first", () => {
+            const block = makeWidgetBlock("arpeggio");
+            getElementsSpy = jest
+                .spyOn(document, "getElementsByClassName")
+                .mockReturnValue([makeTitleEl("tempo"), makeTitleEl("arpeggio")]);
+
+            block._checkWidgets(false);
+
+            expect(mockBlocks.reInitWidget).toHaveBeenCalledTimes(1);
+            expect(mockBlocks.reInitWidget).toHaveBeenCalledWith(0, 1500);
+        });
+
+        it("does nothing when closeInput is true", () => {
+            const block = makeWidgetBlock("tempo");
+            getElementsSpy = jest
+                .spyOn(document, "getElementsByClassName")
+                .mockReturnValue([makeTitleEl("tempo")]);
+
+            block._checkWidgets(true);
+
+            expect(mockBlocks.reInitWidget).not.toHaveBeenCalled();
+        });
+    });
+
     describe("dispose()", () => {
         it("should clean up connections, DOM nodes, containers, bitmaps, and parent pointers", () => {
             const block = new Block(mockProtoBlock, mockBlocks);
@@ -915,6 +1249,139 @@ describe("Block Foundation", () => {
             expect(parent.children).toHaveLength(0);
             expect(disposedContainer.parent).toBeNull();
             expect(block.container).toBeNull();
+        });
+    });
+
+    describe("value setter undo/redo tracking", () => {
+        it("records value_change in actionHistory when value changes after initialization", async () => {
+            const mockBlocksObj = {
+                ...mockBlocks,
+                actionHistory: [],
+                redoActionHistory: [{ type: "move", blockId: 0 }],
+                isUndoingOrRedoing: false
+            };
+            const block = new Block(mockProtoBlock, mockBlocksObj);
+            block.blockIndex = 2;
+            block.text = { text: "initial" };
+            block.valueInitialized = true;
+            block.loadComplete = true;
+
+            block.value = "updated";
+            block.text.text = "updated";
+
+            expect(mockBlocksObj.actionHistory.length).toBe(1);
+            expect(mockBlocksObj.actionHistory[0].type).toBe("value_change");
+            expect(mockBlocksObj.actionHistory[0].blockId).toBe(2);
+            expect(mockBlocksObj.actionHistory[0].newValue).toBe("updated");
+            expect(mockBlocksObj.redoActionHistory).toEqual([]);
+
+            await Promise.resolve();
+            expect(mockBlocksObj.actionHistory[0].newText).toBe("updated");
+        });
+    });
+
+    describe("_exitKeyPressed()", () => {
+        it("handles Enter and Tab keys correctly", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.label = { removeEventListener: jest.fn() };
+            block._labelChanged = jest.fn();
+
+            document.body.innerHTML = '<div id="labelDiv" class="hasKeyboard"></div>';
+            const originalDocById = global.docById;
+            global.docById = jest.fn(id => document.getElementById(id));
+
+            const eventEnter = { key: "Enter", preventDefault: jest.fn() };
+            block._exitKeyPressed(eventEnter);
+            expect(block._labelChanged).toHaveBeenCalledWith(true, false);
+            expect(eventEnter.preventDefault).toHaveBeenCalled();
+            expect(block.label.removeEventListener).toHaveBeenCalledWith(
+                "keypress",
+                block._exitKeyPressed
+            );
+            expect(document.getElementById("labelDiv").classList.contains("hasKeyboard")).toBe(
+                false
+            );
+
+            document.getElementById("labelDiv").classList.add("hasKeyboard");
+
+            const eventTab = { key: "Tab", preventDefault: jest.fn() };
+            block._exitKeyPressed(eventTab);
+            expect(block._labelChanged).toHaveBeenCalledTimes(2);
+            expect(eventTab.preventDefault).toHaveBeenCalled();
+            expect(document.getElementById("labelDiv").classList.contains("hasKeyboard")).toBe(
+                false
+            );
+
+            global.docById = originalDocById;
+        });
+
+        it("ignores other keys", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.label = { removeEventListener: jest.fn() };
+            block._labelChanged = jest.fn();
+            const event = { key: "Escape", preventDefault: jest.fn() };
+
+            block._exitKeyPressed(event);
+            expect(block._labelChanged).not.toHaveBeenCalled();
+            expect(event.preventDefault).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("_changeLabel() keypress handler", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+            jest.restoreAllMocks();
+        });
+
+        it("handles Enter and Tab keys correctly", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block._usePiemenu = jest.fn().mockReturnValue(false);
+            block.activity = {
+                blocksContainer: { x: 0, y: 0, update: jest.fn() },
+                getStageScale: jest.fn().mockReturnValue(1),
+                canvas: { offsetLeft: 0, offsetTop: 0 }
+            };
+            block._labelChanged = jest.fn();
+            block.blocks = { blockScale: 1 };
+            block.protoblock = { scale: 1 };
+            block.name = "text";
+            block.value = "test";
+            block.container = { x: 0, y: 0 };
+
+            document.body.innerHTML = '<div id="labelDiv"></div>';
+            const originalDocById = global.docById;
+            global.docById = jest.fn(id => document.getElementById(id));
+
+            let keypressHandler;
+            jest.spyOn(HTMLInputElement.prototype, "addEventListener").mockImplementation(
+                function (event, handler) {
+                    if (event === "keypress") {
+                        keypressHandler = handler;
+                    }
+                }
+            );
+
+            block._changeLabel();
+
+            jest.advanceTimersByTime(100);
+
+            expect(keypressHandler).toBeDefined();
+
+            const eventEnter = { key: "Enter", preventDefault: jest.fn() };
+            keypressHandler(eventEnter);
+            expect(block._labelChanged).toHaveBeenCalledWith(true, true);
+            expect(eventEnter.preventDefault).toHaveBeenCalled();
+
+            const eventTab = { key: "Tab", preventDefault: jest.fn() };
+            keypressHandler(eventTab);
+            expect(block._labelChanged).toHaveBeenCalledTimes(2);
+            expect(eventTab.preventDefault).toHaveBeenCalled();
+
+            global.docById = originalDocById;
         });
     });
 });

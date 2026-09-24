@@ -119,6 +119,10 @@ function LegoWidget() {
     this.synth = null;
     this.selectedInstrument = "electronic synth";
     this.hasGeneratedVisualization = false; // Flag to prevent double PNG downloads
+    this._polyphonicTimeout = null;
+    this._resolvePolyphonicWait = null;
+    this._playingNotes = new Set();
+    this._polyphonicPlaybackId = 0;
 
     // Eye dropper and background color properties
     this.eyeDropperMode = false;
@@ -307,7 +311,7 @@ function LegoWidget() {
      * @returns {object} The created widget window.
      */
     this._createWidgetWindow = function () {
-        const widgetWindow = window.widgetWindows.windowFor(this, "LEGO BRICKS");
+        const widgetWindow = window.widgetWindows.windowFor(this, "LEGO Bricks");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -707,7 +711,7 @@ function LegoWidget() {
 
         const spacingIn = document.createElement("button");
         spacingIn.textContent = "+";
-        spacingIn.onclick = () => this._adjustVerticalSpacing(1);
+        spacingIn.onclick = () => this._adjustVerticalSpacing(5);
 
         this.spacingValue = document.createElement("span");
         this.spacingValue.textContent = "50px";
@@ -811,6 +815,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._initializeMatrix = function () {
+        if (!this.matrixTable) return;
         this.matrixTable.replaceChildren();
 
         this.matrixData.rows.forEach((rowData, rowIndex) => {
@@ -1109,10 +1114,15 @@ function LegoWidget() {
             // The time gets absorbed into the adjacent larger segment
         }
 
-        // Ensure we have at least start and end boundaries
-        if (filteredBoundaries.length === 1 && boundaries.length > 1) {
-            // If we filtered out everything, add the final boundary to create one long segment
-            filteredBoundaries.push(boundaries[boundaries.length - 1]);
+        // Always end on the final boundary so a short trailing segment is merged
+        // into the previous one instead of being cut off
+        const finalBoundary = boundaries[boundaries.length - 1];
+        if (filteredBoundaries[filteredBoundaries.length - 1] !== finalBoundary) {
+            if (filteredBoundaries.length === 1) {
+                filteredBoundaries.push(finalBoundary);
+            } else {
+                filteredBoundaries[filteredBoundaries.length - 1] = finalBoundary;
+            }
         }
 
         return filteredBoundaries;
@@ -1213,19 +1223,53 @@ function LegoWidget() {
     };
 
     /**
-     * Clears all selected cells.
+     * Clears the current phrase, stopping playback and removing scanned data and overlay lines.
      * @private
      * @returns {void}
      */
     this._clearPhrase = function () {
-        this.matrixData.selectedCells.clear();
-        const selectedCells = this.matrixTable.querySelectorAll("[data-cell-id]");
-        selectedCells.forEach(cell => {
-            cell.style.backgroundColor = "";
-            const dot = cell.querySelector(".cell-dot");
-            if (dot) cell.removeChild(dot);
-        });
-        this.activity.textMsg(_("Phrase cleared"));
+        if (this.isPlaying) {
+            // Temporarily set flag to suppress automatic PNG visualization download
+            // triggered by _stopPlayback() during cancellation of an active phrase.
+            this.hasGeneratedVisualization = true;
+            this._stopPlayback();
+        }
+        this._stopPolyphonicPlayback();
+
+        if (this.scanningLines) {
+            this.scanningLines.forEach(line => {
+                if (line.element && line.element.parentNode) {
+                    line.element.parentNode.removeChild(line.element);
+                }
+            });
+            this.scanningLines = null;
+        }
+
+        if (this.gridOverlay) {
+            const columnLines = this.gridOverlay.querySelectorAll(".column-line");
+            columnLines.forEach(line => line.remove());
+        }
+
+        this.colorData = [];
+        this._notesToPlay = [];
+        this.hasGeneratedVisualization = false;
+
+        if (this.matrixData && this.matrixData.selectedCells) {
+            this.matrixData.selectedCells.clear();
+        }
+
+        if (this.matrixTable) {
+            const selectedCells = this.matrixTable.querySelectorAll("[data-cell-id]");
+            selectedCells.forEach(cell => {
+                cell.style.backgroundColor = "";
+                const dot = cell.querySelector(".cell-dot");
+                if (dot) cell.removeChild(dot);
+            });
+        }
+
+        if (this.activity && typeof this.activity.textMsg === "function") {
+            this.activity.textMsg(_("Phrase cleared"));
+        }
     };
 
     /**
@@ -1502,8 +1546,16 @@ function LegoWidget() {
             return null;
         }
 
-        // Sample the pixel
-        const pixelData = ctx.getImageData(Math.floor(imageX), Math.floor(imageY), 1, 1).data;
+        // Sample the pixel. A cross-origin media element taints the canvas
+        // silently: drawImage above succeeds and the SecurityError is raised
+        // here, on the first read, so this call needs its own guard.
+        let pixelData;
+        try {
+            pixelData = ctx.getImageData(Math.floor(imageX), Math.floor(imageY), 1, 1).data;
+        } catch (e) {
+            console.warn("Could not read pixel data for color sampling:", e);
+            return null;
+        }
         const [r, g, b] = pixelData;
 
         // Convert to color family
@@ -2147,7 +2199,9 @@ function LegoWidget() {
     this._drawGridLines = function () {
         if (!this.rowHeaderTable.rows.length || !this.gridOverlay) return;
 
-        this.gridOverlay.replaceChildren();
+        // Keep the scanning lines of an in-progress playback attached to the overlay
+        const scanningElements = (this.scanningLines || []).map(line => line.element);
+        this.gridOverlay.replaceChildren(...scanningElements);
 
         const numRows = this.matrixData.rows.length;
 
@@ -2434,16 +2488,44 @@ function LegoWidget() {
     };
 
     /**
+     * Stops ongoing polyphonic audio playback, cancels pending note timers,
+     * and silences any currently playing synthesizer notes.
+     * @private
+     * @returns {void}
+     */
+    this._stopPolyphonicPlayback = function () {
+        this._polyphonicPlaybackId++;
+        if (this._polyphonicTimeout) {
+            clearTimeout(this._polyphonicTimeout);
+            this._polyphonicTimeout = null;
+        }
+        if (typeof this._resolvePolyphonicWait === "function") {
+            const resolve = this._resolvePolyphonicWait;
+            this._resolvePolyphonicWait = null;
+            resolve();
+        }
+        if (this._playingNotes && this._playingNotes.size > 0 && this.synth) {
+            this._playingNotes.forEach(note => {
+                this.synth.stopSound(0, this.selectedInstrument, note);
+            });
+            this._playingNotes.clear();
+        }
+    };
+
+    /**
      * Stops the current playback animation.
      * @private
      */
     this._stopPlayback = function () {
         this.isPlaying = false;
+        this._stopPolyphonicPlayback();
 
         this.activity.hideMsgs();
 
-        const img = this.playButton.querySelector("img");
-        if (img) img.src = "header-icons/play-button.svg";
+        if (this.playButton) {
+            const img = this.playButton.querySelector("img");
+            if (img) img.src = "header-icons/play-button.svg";
+        }
 
         // Save final color segments for all lines
         if (this.scanningLines) {
@@ -3011,6 +3093,9 @@ function LegoWidget() {
      * @param {Array} colorData - The colorData array from scanning.
      */
     this.playColorMusicPolyphonic = async function (colorData) {
+        this._stopPolyphonicPlayback();
+        const currentPlaybackId = this._polyphonicPlaybackId;
+
         if (!this.synth) this._initAudio();
 
         // Use the same boundary analysis and filtering as export
@@ -3085,19 +3170,33 @@ function LegoWidget() {
         events.sort((a, b) => a.time - b.time);
 
         // Track which notes are currently playing
-        let playingNotes = new Set();
+        this._playingNotes = new Set();
         let lastTime = 0;
 
         for (let i = 0; i < events.length; i++) {
+            if (currentPlaybackId !== this._polyphonicPlaybackId) {
+                return;
+            }
+
             const evt = events[i];
             const waitTime = evt.time - lastTime;
             if (waitTime > 0) {
                 // Wait for the time until the next event
-                await new Promise(resolve => setTimeout(resolve, waitTime));
+                await new Promise(resolve => {
+                    this._resolvePolyphonicWait = resolve;
+                    this._polyphonicTimeout = setTimeout(() => {
+                        this._polyphonicTimeout = null;
+                        this._resolvePolyphonicWait = null;
+                        resolve();
+                    }, waitTime);
+                });
+                if (currentPlaybackId !== this._polyphonicPlaybackId) {
+                    return;
+                }
             }
             if (evt.type === "on") {
                 // Start note (if not already playing)
-                if (!playingNotes.has(evt.note)) {
+                if (!this._playingNotes.has(evt.note)) {
                     this.synth.trigger(
                         0,
                         evt.note,
@@ -3108,19 +3207,27 @@ function LegoWidget() {
                         false,
                         0
                     ); // Long duration, will stop manually
-                    playingNotes.add(evt.note);
+                    this._playingNotes.add(evt.note);
                 }
             } else if (evt.type === "off") {
                 // Stop note
                 this.synth.stopSound(0, this.selectedInstrument, evt.note);
-                playingNotes.delete(evt.note);
+                this._playingNotes.delete(evt.note);
             }
             lastTime = evt.time;
         }
+
+        if (currentPlaybackId !== this._polyphonicPlaybackId) {
+            return;
+        }
+
         // Ensure all notes are stopped at the end
-        playingNotes.forEach(note => {
-            this.synth.stopSound(0, this.selectedInstrument, note);
-        });
+        if (this._playingNotes && this.synth) {
+            this._playingNotes.forEach(note => {
+                this.synth.stopSound(0, this.selectedInstrument, note);
+            });
+            this._playingNotes.clear();
+        }
     };
 }
 
