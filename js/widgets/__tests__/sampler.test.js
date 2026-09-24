@@ -901,6 +901,8 @@ describe("Sampler Widget", () => {
 
             const resetButton = container.querySelector("button");
             resetButton.onclick();
+            expect(widget.centAdjustmentValue).toBe(0);
+            expect(slider.value).toBe("0");
 
             widget.centsSliderBtn.onclick();
             expect(
