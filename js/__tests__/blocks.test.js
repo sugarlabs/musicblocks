@@ -1813,6 +1813,24 @@ describe("Blocks Foundation", () => {
             expect(blocks._loadQueue).toHaveLength(1);
         });
 
+        it("assigns a queued call its own token immediately, distinct from the running load's", () => {
+            // A caller needs its own request's token the moment it calls
+            // loadNewBlocks(), not whatever load happens to be active once
+            // this one finally runs — otherwise a caller that queues up
+            // behind an unrelated load would watch that other load's events
+            // instead of its own (issue #8855 review comment).
+            const firstToken = blocks.loadNewBlocks(makeBatch(25));
+            expect(blocks._loadInProgress).toBe(true);
+
+            const secondToken = blocks.loadNewBlocks(makeBatch(3));
+
+            expect(blocks._loadQueue).toHaveLength(1);
+            expect(secondToken).not.toBe(firstToken);
+            // The queued token travels with the request, not recomputed
+            // later from whatever's active when it's dequeued.
+            expect(blocks._loadQueue[0].loadToken).toBe(secondToken);
+        });
+
         it("does not lose the first call's in-flight _adjustTheseStacks entries when a second call arrives mid-load", async () => {
             // Both the first load and the queued second load fire their own
             // finishedLoading event; wait for both instead of a fixed delay
@@ -1930,13 +1948,89 @@ describe("Blocks Foundation", () => {
             expect(windowErrors.length).toBeGreaterThan(0);
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(blocks._loadInProgress).toBe(false);
+            // Autosave (js/activity/idle-watcher.js) checks this flag before
+            // persisting blockList, so it doesn't overwrite a good saved
+            // session with the truncated result of this failed load
+            // (issue #8855).
+            expect(blocks._lastLoadFailed).toBe(true);
 
-            // A load issued after the failure must not be stranded behind it.
+            // A load issued after the failure must not be stranded behind it,
+            // and must clear the failure flag now that a fresh attempt is
+            // underway.
             blocks._processOneBlock = stubProcessOneBlock();
             blocks.loadNewBlocks(makeBatch(2));
 
             expect(blocks._loadInProgress).toBe(true);
+            expect(blocks._lastLoadFailed).toBe(false);
             expect(blocks._processOneBlock).toHaveBeenCalledTimes(2);
+        });
+
+        it("emits a 'loadFailed' pubsub event when a deferred chunk (block 21+) throws", async () => {
+            // Unlike the first, synchronous chunk (whose throw still reaches
+            // whatever try/catch called loadNewBlocks() directly), a
+            // deferred chunk's throw has no such caller to reach. This event
+            // is how a caller like ProjectManager._loadStart() can still
+            // find out and run its recovery logic (issue #8855).
+            let callCount = 0;
+            const thrownError = new Error("deferred chunk failure");
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+                if (callCount === 21) {
+                    throw thrownError;
+                }
+                const thisBlock = blockOffset + b;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+            const loadFailedEvents = [];
+            global.pubsub.on("loadFailed", payload => loadFailedEvents.push(payload));
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
+
+            const loadToken = blocks.loadNewBlocks(makeBatch(25));
+            await new Promise(r => setTimeout(r, 50));
+
+            window.removeEventListener("error", onWindowError);
+
+            expect(loadFailedEvents).toHaveLength(1);
+            expect(loadFailedEvents[0].error).toBe(thrownError);
+            expect(loadFailedEvents[0].token).toBe(loadToken);
+        });
+
+        it("does not emit 'loadFailed' when the first, synchronous chunk throws", () => {
+            // The synchronous throw already reaches whatever try/catch
+            // called loadNewBlocks() directly, so a listener that also
+            // reacted to "loadFailed" here would run the same recovery
+            // twice for one failure.
+            blocks._processOneBlock = jest.fn(() => {
+                throw new Error("first chunk failure");
+            });
+
+            const loadFailedEvents = [];
+            global.pubsub.on("loadFailed", payload => loadFailedEvents.push(payload));
+
+            expect(() => blocks.loadNewBlocks(makeBatch(2))).toThrow("first chunk failure");
+
+            expect(loadFailedEvents).toHaveLength(0);
+            expect(blocks._lastLoadFailed).toBe(true);
+        });
+
+        it("tags 'finishedLoading' with the load's token, like 'loadFailed'", async () => {
+            // A listener scoped to one particular loadNewBlocks() call (e.g.
+            // ProjectManager._loadStart()'s recovery watcher) needs this to
+            // tell its own load's completion apart from some other,
+            // unrelated load's — including one that was still queued behind
+            // it when the listener was set up.
+            const finishedLoadingEvents = [];
+            global.pubsub.on("finishedLoading", payload => finishedLoadingEvents.push(payload));
+
+            const loadToken = blocks.loadNewBlocks(makeBatch(2));
+            await new Promise(r => setTimeout(r, 10));
+
+            expect(finishedLoadingEvents).toHaveLength(1);
+            expect(finishedLoadingEvents[0].token).toBe(loadToken);
         });
 
         it("does not let a stale completion from a failed load corrupt the next queued load's counter", async () => {
@@ -2017,6 +2111,191 @@ describe("Blocks Foundation", () => {
             } finally {
                 window.removeEventListener("error", onWindowError);
             }
+        });
+    });
+
+    describe("ProjectManager recovery keeps _loadInProgress correct end to end (#8855)", () => {
+        // The tests above cover blocks.js's own _loadInProgress bookkeeping in
+        // isolation. project-manager.test.js covers ProjectManager's recovery
+        // logic against a mocked loadNewBlocks(). Neither proves the two
+        // actually stay in sync: that when ProjectManager's real recovery path
+        // calls justLoadStart() after a deferred chunk failure, the real
+        // Blocks instance is no longer stuck mid-load and actually runs the
+        // fallback immediately instead of queuing it forever behind the
+        // failed attempt (reviewer question on PR #8856).
+        const { PubSub } = require("../pubsub");
+        const { ProjectManager } = require("../project-manager");
+
+        const makeBatch = n =>
+            Array.from({ length: n }, (_, i) => [i, "forward", 0, 0, [null, null, null]]);
+
+        const stubProcessOneBlock = blocksRef =>
+            jest.fn((b, blockObjs, blockOffset) => {
+                const thisBlock = blockOffset + b;
+                blocksRef.blockList[thisBlock] = { connections: null, trash: false };
+                blocksRef._adjustTheseStacks.push(thisBlock);
+                setTimeout(() => blocksRef.cleanupAfterLoad(), 0);
+            });
+
+        let activity, blocks, pm, loadContainer;
+
+        beforeAll(() => {
+            global._ = key => key;
+            global.ErrorHandler = {
+                recoverable: jest.fn(),
+                capture: jest.fn(),
+                warn: jest.fn(),
+                userFacing: jest.fn()
+            };
+            global.platformColor = {
+                headingColor: "#333",
+                blueButton: "#0066cc",
+                blueButtonText: "#fff"
+            };
+            global.Midi = class {
+                constructor() {}
+            };
+            global.ABCJS = { parseOnly: jest.fn(() => [{ header: {} }]) };
+            global.ensureABCJS = jest.fn().mockResolvedValue(undefined);
+            global.extractProjectDataFromHTML = jest.fn();
+            global.unescapeHTML = jest.fn(x => x);
+            global.doSVG = jest.fn(() => "<svg></svg>");
+            global.base64Encode = jest.fn(x => x);
+            global.debugLog = jest.fn();
+            global.getTemperament = jest.fn(() => [440]);
+            global.getOctaveRatio = jest.fn(() => 2);
+            global.transcribeMidi = jest.fn();
+            global.amdRequire = jest.fn((deps, cb) => cb && cb());
+            global.DATAOBJS = makeBatch(1);
+        });
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+
+            activity = {
+                storage: { currentProject: "Recovery Test", removeItem: jest.fn() },
+                trashcan: {},
+                turtles: { running: jest.fn(() => true) },
+                stage: { update: jest.fn() },
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: { synth: { loadSynth: jest.fn(), preloadProjectSamples: jest.fn() } },
+                blocksContainer: { x: 0, y: 0 },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false,
+                planet: undefined,
+                sessionStorageManager: undefined,
+                sendAllToTrash: jest.fn(),
+                doLoadAnimation: jest.fn(),
+                keyboardEnableFlag: 0,
+                update: false
+            };
+
+            blocks = new Blocks(activity);
+            blocks.blockList = [];
+            blocks.customTemperamentDefined = true;
+            blocks._findDrumURLs = jest.fn();
+            blocks.updateBlockPositions = jest.fn();
+            blocks._rebuildSpatialGrid = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+            activity.blocks = blocks;
+
+            pm = new ProjectManager(activity);
+            activity.justLoadStart = (...args) => pm.justLoadStart(...args);
+
+            activity.sessionData = JSON.stringify(makeBatch(25));
+            activity.storage["SESSIONRecovery Test"] = activity.sessionData;
+        });
+
+        afterEach(async () => {
+            await new Promise(r => setTimeout(r, 50));
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("lets justLoadStart's fallback load run immediately, not queue behind the failed one", async () => {
+            let callCount = 0;
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+                if (callCount === 21) {
+                    throw new Error("malformed chunk");
+                }
+                const thisBlock = blockOffset + b;
+                blocks.blockList[thisBlock] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(thisBlock);
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+            // Once the failed load's fallback attempt requests DATAOBJS, hand
+            // off to the well-behaved stub for that request's own blocks, and
+            // capture the state loadNewBlocks() saw at the exact moment it
+            // was called — before it has a chance to mutate _loadInProgress
+            // itself. This is what actually answers the reviewer's question,
+            // independent of how long any of this takes to run.
+            const originalLoadNewBlocks = blocks.loadNewBlocks;
+            let fallbackCallState = null;
+            let fallbackToken = null;
+            blocks.loadNewBlocks = blockObjs => {
+                if (blockObjs === global.DATAOBJS) {
+                    fallbackCallState = {
+                        loadInProgress: blocks._loadInProgress,
+                        queueLength: blocks._loadQueue.length
+                    };
+                    blocks._processOneBlock = stubProcessOneBlock(blocks);
+                }
+                fallbackToken = originalLoadNewBlocks(blockObjs);
+                return fallbackToken;
+            };
+
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
+
+            const fallbackFinished = new Promise(resolve => {
+                global.pubsub.on("finishedLoading", payload => {
+                    if (fallbackToken !== null && payload && payload.token === fallbackToken) {
+                        resolve();
+                    }
+                });
+            });
+
+            await pm._loadStart(activity);
+            // Let the deferred (setTimeout 0) second chunk run and throw,
+            // which triggers recoverFromLoadFailure() -> justLoadStart().
+            await fallbackFinished;
+
+            window.removeEventListener("error", onWindowError);
+
+            expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+            expect(activity.errorMsg).toHaveBeenCalled();
+
+            // The fallback's own load (DATAOBJS) must have found the flag
+            // already released and run immediately, not sat queued behind
+            // the dead one: if recoverFromLoadFailure()'s justLoadStart()
+            // call had found _loadInProgress still stuck true from the
+            // failed load, this request would have been pushed onto
+            // _loadQueue instead of running right away.
+            expect(fallbackCallState).toEqual({ loadInProgress: false, queueLength: 0 });
+
+            // And once the fallback's own (single, valid) block finishes,
+            // the flag is released again rather than left stuck true.
+            expect(blocks._loadInProgress).toBe(false);
+            expect(blocks._lastLoadFailed).toBe(false);
         });
     });
 
