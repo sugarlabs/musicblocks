@@ -53,6 +53,7 @@ global.PALETTEICONS = {
     artwork: "<svg background_fill_color stroke_color fill_color></svg>"
 };
 global.MULTIPALETTEICONS = ["music", "logic", "artwork"];
+global.MULTIPALETTENAMES = ["music", "logic", "artwork"];
 global.SKIPPALETTES = ["heap", "dictionary"];
 
 global.platformColor = {
@@ -241,6 +242,43 @@ describe("Palettes Class", () => {
             expect(appendSpy).toHaveBeenCalled();
             expect(palettes.showSelection).toHaveBeenCalled();
             expect(palettes.makePalettes).toHaveBeenCalled();
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("role", "tab");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("aria-selected", "true");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith(
+                "aria-label",
+                global.MULTIPALETTENAMES[0]
+            );
+        });
+
+        test("sets aria-selected to false for a nonzero index tab", () => {
+            const tdMock = { style: {}, appendChild: jest.fn(), setAttribute: jest.fn() };
+            const trMock = {
+                insertCell: jest.fn(() => tdMock),
+                children: [{}, { children: [] }],
+                setAttribute: jest.fn()
+            };
+            const paletteElement = {
+                children: [
+                    {
+                        children: [{ children: [{ children: [trMock] }] }, { children: [{}, {}] }],
+                        style: { border: "" }
+                    }
+                ]
+            };
+
+            global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
+            global.document.getElementById = jest.fn(() => null);
+            jest.spyOn(document.body, "appendChild");
+            palettes.showSelection = jest.fn();
+            palettes.makePalettes = jest.fn();
+
+            palettes._makeSelectorButton(2);
+
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("aria-selected", "false");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith(
+                "aria-label",
+                global.MULTIPALETTENAMES[2]
+            );
         });
     });
 

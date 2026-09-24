@@ -13,7 +13,7 @@ const _paletteIconCache = new Map();
 
 /* global
    docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
-   PALETTEICONS, MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
+   PALETTEICONS, MULTIPALETTEICONS, MULTIPALETTENAMES, SKIPPALETTES, toTitleCase,
    i18nSolfege, NUMBERBLOCKDEFAULT, TEXTWIDTH, STRINGLEN,
    DEFAULTBLOCKSCALE, SVG, DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
@@ -762,7 +762,7 @@ class Palettes {
         td.style.position = "relative";
         td.style.backgroundColor = platformColor.paletteBackground;
         td.setAttribute("role", "tab");
-        td.setAttribute("aria-label", _(MULTIPALETTEICONS[i]));
+        td.setAttribute("aria-label", MULTIPALETTENAMES[i]);
         td.setAttribute("aria-selected", i === 0 ? "true" : "false");
         td.tabIndex = i === 0 ? 0 : -1; // Make only the first tab focusable by default
 
