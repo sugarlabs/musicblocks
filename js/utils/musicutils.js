@@ -5581,7 +5581,8 @@ function getNote(
                 noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1),
                 10
             );
-            noteArg = noteArg.slice(0, noteArg.indexOf("<"));
+            const noteEnd = noteArg.indexOf("<");
+            noteArg = noteEnd === -1 ? "" : noteArg.slice(0, noteEnd);
         }
         if (
             noteArg.toLowerCase().slice(0, 4) === "rest" ||
