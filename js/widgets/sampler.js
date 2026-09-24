@@ -694,9 +694,15 @@ function SampleWidget() {
 
         // Function to update container positions based on window state
         this._updateContainerPositions = function () {
-            const tunerContainer = docById("tunerContainer");
-            const centAdjustmentContainer = docById("centAdjustmentContainer");
-            const valueDisplay = docById("centValueDisplay");
+            const tunerContainer = this.widgetWindow
+                .getWidgetBody()
+                .querySelector("#tunerContainer");
+            const centAdjustmentContainer = this.widgetWindow
+                .getWidgetBody()
+                .querySelector("#centAdjustmentContainer");
+            const valueDisplay = this.widgetWindow
+                .getWidgetBody()
+                .querySelector("#centValueDisplay");
 
             if (tunerContainer) {
                 if (this.widgetWindow.isMaximized()) {
@@ -825,7 +831,9 @@ function SampleWidget() {
                 activity.textMsg(_("Tuner stopped."), 3000);
                 this.activity.logo.synth.stopTuner();
                 tunerOn = false;
-                const tunerContainer = docById("tunerContainer");
+                const tunerContainer = this.widgetWindow
+                    .getWidgetBody()
+                    .querySelector("#tunerContainer");
                 if (tunerContainer) {
                     tunerContainer.remove();
                 }
@@ -1183,13 +1191,18 @@ function SampleWidget() {
         this._tunerBtn = widgetWindow.addButton("tuner.svg", ICONSIZE, _("Tuner"), "");
 
         this._tunerBtn.onclick = async () => {
-            if (docById("tunerContainer") && !tunerOn) {
-                docById("tunerContainer").remove();
+            const existingTuner = this.widgetWindow
+                .getWidgetBody()
+                .querySelector("#tunerContainer");
+            if (existingTuner && !tunerOn) {
+                existingTuner.remove();
                 this.tunerSegments = [];
             }
 
             // Close the cent adjustment window if it's open
-            const centAdjustmentContainer = docById("centAdjustmentContainer");
+            const centAdjustmentContainer = this.widgetWindow
+                .getWidgetBody()
+                .querySelector("#centAdjustmentContainer");
             if (centAdjustmentContainer) {
                 centAdjustmentContainer.remove();
                 this.centAdjustmentOn = false;
@@ -1387,7 +1400,9 @@ function SampleWidget() {
         this.centsSliderBtn.onclick = () => {
             stopTuner();
             // Hide the cent adjustment window if it's already open
-            const existingCentAdjustmentContainer = docById("centAdjustmentContainer");
+            const existingCentAdjustmentContainer = this.widgetWindow
+                .getWidgetBody()
+                .querySelector("#centAdjustmentContainer");
             if (existingCentAdjustmentContainer) {
                 existingCentAdjustmentContainer.remove();
                 this.centAdjustmentOn = false;
@@ -1403,7 +1418,9 @@ function SampleWidget() {
             }
 
             // Close the tuner window if it's open
-            const tunerContainer = docById("tunerContainer");
+            const tunerContainer = this.widgetWindow
+                .getWidgetBody()
+                .querySelector("#tunerContainer");
             if (tunerContainer) {
                 tunerContainer.remove();
                 this.activity.logo.synth.stopTuner();
@@ -1586,12 +1603,6 @@ function SampleWidget() {
                 };
             } else {
                 this.centAdjustmentOn = false;
-
-                // Remove the cent adjustment container
-                const centAdjustmentContainer = docById("centAdjustmentContainer");
-                if (centAdjustmentContainer) {
-                    centAdjustmentContainer.remove();
-                }
 
                 // Show the sampler canvas
                 const samplerCanvas = this.widgetWindow

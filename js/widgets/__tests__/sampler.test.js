@@ -884,10 +884,24 @@ describe("Sampler Widget", () => {
             await widget._tunerBtn.onclick();
 
             widget.centsSliderBtn.onclick();
-            const slider = docById("centAdjustmentContainer").querySelector("input[type=range]");
+            const container = docById("centAdjustmentContainer");
+            console.log("In test: container after first click is", !!container);
+            const slider = container.querySelector("input[type=range]");
             slider.value = "10";
             slider.oninput();
+
+            const resetButton = container.querySelector("button");
+            resetButton.onclick();
+
             widget.centsSliderBtn.onclick();
+            expect(
+                widget.widgetWindow.getWidgetBody().querySelector("#centAdjustmentContainer")
+            ).toBeNull();
+
+            // Edge case: centAdjustmentOn is true but container is missing
+            widget.centAdjustmentOn = true;
+            widget.centsSliderBtn.onclick();
+            expect(widget.centAdjustmentOn).toBe(false);
 
             expect(addSpy).toHaveBeenCalled();
             addSpy.mockRestore();
@@ -1104,10 +1118,10 @@ describe("Sampler Widget", () => {
             widget.init(mockActivity, 1);
             const tunerContainer = document.createElement("div");
             tunerContainer.id = "tunerContainer";
-            document.body.appendChild(tunerContainer);
+            widget.widgetWindow.getWidgetBody().appendChild(tunerContainer);
             const valueDisplay = document.createElement("div");
             valueDisplay.id = "centValueDisplay";
-            document.body.appendChild(valueDisplay);
+            widget.widgetWindow.getWidgetBody().appendChild(valueDisplay);
 
             widget.widgetWindow.isMaximized.mockReturnValue(true);
             widget._updateContainerPositions();
