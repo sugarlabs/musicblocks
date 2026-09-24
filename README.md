@@ -7,7 +7,7 @@
 </a>
 
 <a href="https://github.com/sugarlabs/musicblocks/actions/workflows/ci.yml" alt="CI">
-    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/ci.yml/badge.svg" />
+    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/ci.yml/badge.svg" alt="CI status" />
 </a>
 
 # Music Blocks
