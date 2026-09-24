@@ -2017,10 +2017,10 @@ function setupPitchBlocks(activity) {
                     }
                     scaledegree = Math.abs(scaledegree);
 
-                    let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
-                    if (obj[0].substr(1) === FLAT) {
+                    let ref = NOTESTEP[obj[0].slice(0, 1)] - 1;
+                    if (obj[0].slice(1) === FLAT) {
                         ref--;
-                    } else if (obj[0].substr(1) === SHARP) {
+                    } else if (obj[0].slice(1) === SHARP) {
                         ref++;
                     }
                     note = scaleDegreeToPitchMapping(
@@ -2127,7 +2127,7 @@ function setupPitchBlocks(activity) {
                     if (![SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT].includes(accSym)) {
                         accSym = NATURAL;
                     } else {
-                        arg0 = arg0.substr(0, arg0.length - 1);
+                        arg0 = arg0.slice(0, arg0.length - 1);
                     }
                     note = NOTENAMES.includes(arg0.toUpperCase())
                         ? SOLFEGECONVERSIONTABLE[arg0.toUpperCase()]

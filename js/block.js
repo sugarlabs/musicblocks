@@ -1368,7 +1368,7 @@ class Block {
             ) {
                 block_label = this.overrideName;
                 if (getTextWidth(block_label, "bold 20pt Sans") > TEXTWIDTH) {
-                    block_label = block_label.substr(0, STRINGLEN) + "...";
+                    block_label = block_label.slice(0, STRINGLEN) + "...";
                 }
             } else {
                 block_label = this.overrideName;
@@ -1572,7 +1572,7 @@ class Block {
             }
 
             if (!this.hasWideLabel() && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                label = label.substr(0, STRINGLEN) + "...";
+                label = label.slice(0, STRINGLEN) + "...";
             }
 
             this.text.text = label;
@@ -2671,7 +2671,7 @@ class Block {
             if (this.connections[1] !== null) {
                 let text = this.blocks.blockList[this.connections[1]].value;
                 if (getTextWidth(text, "bold 20pt Sans") > TEXTWIDTH) {
-                    text = text.substr(0, STRINGLEN) + "...";
+                    text = text.slice(0, STRINGLEN) + "...";
                 }
 
                 this.collapseText.text = text;
@@ -4300,7 +4300,7 @@ class Block {
                 if (!EFFECTSNAMES.includes(DRUMNAMES[i][1])) {
                     const label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "bold 30pt Sans") > 400) {
-                        drumLabels.push(label.substr(0, 8) + "...");
+                        drumLabels.push(label.slice(0, 8) + "...");
                     } else {
                         drumLabels.push(label);
                     }
@@ -4331,7 +4331,7 @@ class Block {
                 if (EFFECTSNAMES.includes(DRUMNAMES[i][1])) {
                     const label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "Bold 30pt Sans") > 400) {
-                        effectLabels.push(label.substr(0, 8) + "...");
+                        effectLabels.push(label.slice(0, 8) + "...");
                     } else {
                         effectLabels.push(label);
                     }
@@ -4402,7 +4402,7 @@ class Block {
 
                 const label = _(VOICENAMES[i][1]);
                 if (getTextWidth(label, "bold 30pt Sans") > 400) {
-                    voiceLabels.push(label.substr(0, 8) + "...");
+                    voiceLabels.push(label.slice(0, 8) + "...");
                 } else {
                     voiceLabels.push(label);
                 }
@@ -4431,7 +4431,7 @@ class Block {
             for (let i = 0; i < NOISENAMES.length; i++) {
                 const label = NOISENAMES[i][0];
                 if (getTextWidth(label, "bold 30pt Sans") > 600) {
-                    noiseLabels.push(label.substr(0, 16) + "...");
+                    noiseLabels.push(label.slice(0, 16) + "...");
                 } else {
                     noiseLabels.push(label);
                 }
@@ -4971,7 +4971,7 @@ class Block {
                             this.value = newValue;
                             let label = this.value.toString();
                             if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                                label = label.substr(0, STRINGLEN) + "...";
+                                label = label.slice(0, STRINGLEN) + "...";
                             }
                             this.text.text = label;
                             this.label.value = newValue;
@@ -5004,7 +5004,7 @@ class Block {
                     // eslint-disable-next-line no-case-declarations
                     let label = this.value.toString();
                     if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                        label = label.substr(0, STRINGLEN) + "...";
+                        label = label.slice(0, STRINGLEN) + "...";
                     }
                     this.text.text = label;
                     this.label.value = newValue;
@@ -5098,10 +5098,10 @@ class Block {
 
         if (!this.hasWideLabel() && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
             let slen = label.length - 5;
-            let nlabel = "" + label.substr(0, slen) + "...";
+            let nlabel = "" + label.slice(0, slen) + "...";
             while (getTextWidth(nlabel, "bold 20pt Sans") > TEXTWIDTH) {
                 slen -= 1;
-                nlabel = "" + label.substr(0, slen) + "...";
+                nlabel = "" + label.slice(0, slen) + "...";
                 // const foo = getTextWidth(nlabel, "bold 20pt Sans");
                 if (slen <= STRINGLEN) {
                     break;
