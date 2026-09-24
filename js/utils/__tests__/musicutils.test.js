@@ -619,10 +619,10 @@ describe("getDrum", () => {
     beforeEach(() => {
         DRUMNAMES = [
             ["snare drum", "snare drum", "images/snaredrum.svg", "sn", "drum"],
-            ["kick drum", "kick drum", "images/kick.svg", "hh", "drum"],
+            ["kick drum", "kick drum", "images/kick.svg", "bd", "drum"],
             ["tom tom", "tom tom", "images/tom.svg", "tomml", "drum"],
             ["floor tom", "floor tom", "images/floortom.svg", "tomfl", "drum"],
-            ["bass drum", "bass drum", "images/kick.svg", "tomfl", "drum"],
+            ["bass drum", "bass drum", "images/kick.svg", "bd", "drum"],
             ["hi hat", "hi hat", "images/hihat.svg", "hh", "bell"]
         ];
         DEFAULTDRUM = "kick drum";
@@ -722,7 +722,7 @@ describe("getDrum", () => {
     describe("getDrumSymbol", () => {
         it("should return the correct symbol for a valid drum name", () => {
             expect(getDrumSymbol("snare drum")).toBe("sn");
-            expect(getDrumSymbol("kick drum")).toBe("hh");
+            expect(getDrumSymbol("kick drum")).toBe("bd");
             expect(getDrumSymbol("floor tom")).toBe("tomfl");
         });
 
@@ -736,12 +736,12 @@ describe("getDrum", () => {
 
         it('should return "hh" for a name matching the second element of DRUMNAMES', () => {
             expect(getDrumSymbol("snare drum")).toBe("sn");
-            expect(getDrumSymbol("kick drum")).toBe("hh"); // As per logic
+            expect(getDrumSymbol("kick drum")).toBe("bd"); // As per logic
         });
 
         it("should ignore case sensitivity when matching drum names", () => {
             expect(getDrumSymbol("SNARE DRUM")).toBe("sn");
-            expect(getDrumSymbol("KICK DRUM")).toBe("hh");
+            expect(getDrumSymbol("KICK DRUM")).toBe("bd");
         });
     });
 });
