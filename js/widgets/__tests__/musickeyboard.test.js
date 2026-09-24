@@ -1579,6 +1579,30 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
         expect(keyboard._timerManager.activeTimeoutCount).toBe(0);
     });
 
+    test("_playChord schedules and triggers every note of a chord larger than four", () => {
+        jest.useFakeTimers();
+        try {
+            const trigger = jest.fn();
+            const keyboard = new MusicKeyboard({});
+            keyboard.activity = { logo: { synth: { trigger } } };
+
+            const notes = ["C", "E", "G", "B", "D", "F"];
+            const instruments = notes.map(() => "piano");
+            keyboard._playChord(notes, [1], instruments);
+
+            // One scheduled timeout per note, not capped at four.
+            expect(keyboard._timerManager.activeTimeoutCount).toBe(notes.length);
+
+            jest.advanceTimersByTime(1);
+
+            expect(trigger).toHaveBeenCalledTimes(notes.length);
+            expect(trigger).toHaveBeenCalledWith(0, "D", 1, "piano", null, null);
+            expect(trigger).toHaveBeenCalledWith(0, "F", 1, "piano", null, null);
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
     test("_clearPlaybackTimers clears playback timeouts while preserving other widget timers", () => {
         const keyboard = new MusicKeyboard({});
         keyboard.activity = {
