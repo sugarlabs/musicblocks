@@ -863,30 +863,32 @@ describe("Blocks Foundation", () => {
             document.getElementById = originalGetElementById;
         });
 
-        it("should undo and redo a value_change action", () => {
+        it("should undo and redo changing a number from 10 to 20", () => {
             const blocks = new Blocks(mockActivity);
             blocks.activity.refreshCanvas = jest.fn();
             const mockBlock = {
-                label: { value: "old", style: {} },
+                label: { value: "20", style: {} },
                 _labelChanged: jest.fn(),
-                text: { text: "old" },
+                text: { text: "20" },
                 updateCache: jest.fn(),
-                value: "old"
+                value: 20
             };
             blocks.blockList = [null, mockBlock];
 
             blocks.actionHistory.push({
                 type: "value_change",
                 blockId: 1,
-                oldValue: "old",
-                newValue: "new",
-                oldText: "old",
-                newText: "new"
+                oldValue: 10,
+                newValue: 20,
+                oldText: "10",
+                newText: "20"
             });
 
             // Undo value change
             blocks.undoAction();
-            expect(mockBlock.label.value).toBe("old");
+            expect(mockBlock.label.value).toBe(10);
+            expect(mockBlock.value).toBe(10);
+            expect(mockBlock.text.text).toBe("10");
             expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, true);
             expect(mockBlock.updateCache).toHaveBeenCalled();
             expect(blocks.activity.refreshCanvas).toHaveBeenCalled();
@@ -894,9 +896,81 @@ describe("Blocks Foundation", () => {
 
             // Redo value change
             blocks.redoAction();
-            expect(mockBlock.label.value).toBe("new");
+            expect(mockBlock.label.value).toBe(20);
+            expect(mockBlock.value).toBe(20);
+            expect(mockBlock.text.text).toBe("20");
             expect(mockBlock.actionHistory || blocks.actionHistory.length).toBeTruthy();
         });
+
+        it("reloads media artwork when undoing and redoing a media value", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = {
+                name: "media",
+                label: { value: "new-image", style: {} },
+                _labelChanged: jest.fn(),
+                text: null,
+                loadThumbnail: jest.fn(),
+                updateCache: jest.fn(),
+                value: "new-image"
+            };
+            blocks.blockList = [mockBlock];
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 0,
+                oldValue: "old-image",
+                newValue: "new-image",
+                oldText: null,
+                newText: null
+            });
+
+            blocks.undoAction();
+            expect(mockBlock.value).toBe("old-image");
+            expect(mockBlock.loadThumbnail).toHaveBeenLastCalledWith(null);
+
+            blocks.redoAction();
+            expect(mockBlock.value).toBe("new-image");
+            expect(mockBlock.loadThumbnail).toHaveBeenLastCalledWith(null);
+            expect(mockBlock.loadThumbnail).toHaveBeenCalledTimes(2);
+            expect(mockBlock._labelChanged).not.toHaveBeenCalled();
+        });
+
+        it.each(["audiofile", "loadFile"])(
+            "refreshes the %s label when undoing and redoing its value",
+            name => {
+                const blocks = new Blocks(mockActivity);
+                const mockBlock = {
+                    name,
+                    label: { value: ["new-file", "new-content"], style: {} },
+                    _labelChanged: jest.fn(),
+                    text: { text: "new-file" },
+                    hasWideLabel: () => false,
+                    container: {
+                        children: { length: 1 },
+                        setChildIndex: jest.fn(),
+                        updateCache: jest.fn()
+                    },
+                    loadComplete: true,
+                    updateCache: jest.fn(),
+                    value: ["new-file", "new-content"]
+                };
+                blocks.blockList = [mockBlock];
+                blocks.actionHistory.push({
+                    type: "value_change",
+                    blockId: 0,
+                    oldValue: ["old-file", "old-content"],
+                    newValue: ["new-file", "new-content"],
+                    oldText: null,
+                    newText: null
+                });
+
+                blocks.undoAction();
+                expect(mockBlock.text.text).toBe("old-file");
+
+                blocks.redoAction();
+                expect(mockBlock.text.text).toBe("new-file");
+                expect(mockBlock._labelChanged).not.toHaveBeenCalled();
+            }
+        );
 
         it("should undo a restore action (send newly created block to trash)", () => {
             const blocks = new Blocks(mockActivity);

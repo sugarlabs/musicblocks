@@ -766,6 +766,326 @@ describe("Block Foundation", () => {
             expect(mockCache).toHaveBeenCalledWith(0, 0, 100, 100);
             expect(block.value).toBe("fallback-cached");
         });
+
+        it("records the effective converted value for a user selection", () => {
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 1 }];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("old-cached-value", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            mockImageInstance.onload();
+
+            expect(block.blocks.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 0,
+                    oldValue: "old-cached-value",
+                    newValue: "cached-data-url",
+                    oldText: null,
+                    newText: null
+                }
+            ]);
+            expect(block.blocks.redoActionHistory).toEqual([]);
+        });
+
+        it("preserves redo history when conversion produces the existing value", () => {
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 1 }];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("cached-data-url", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            mockImageInstance.onload();
+
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([{ type: "move", blockId: 1 }]);
+        });
+
+        it("cancels a failed selection and restores its previous history state", () => {
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 1 }];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("old-image", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            mockImageInstance.onerror();
+
+            expect(block.value).toBe("old-image");
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([{ type: "move", blockId: 1 }]);
+        });
+
+        it("does not cancel history when an older image load fails", () => {
+            const images = [];
+            global.Image = jest.fn(() => {
+                const image = {
+                    src: "",
+                    width: 100,
+                    height: 100,
+                    naturalWidth: 100,
+                    naturalHeight: 100,
+                    onload: null,
+                    onerror: null
+                };
+                images.push(image);
+                return image;
+            });
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("old-image", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            block.blocks.actionHistory.pop();
+            block.blocks.redoActionHistory.push(reservation.action);
+            block.value = "old-image";
+            block.loadThumbnail(null);
+            images[0].onerror();
+
+            expect(block.value).toBe("old-image");
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([reservation.action]);
+        });
+
+        it("does not reapply a pending selection after it has been undone", () => {
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("old-image", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            block.blocks.actionHistory.pop();
+            block.blocks.redoActionHistory.push(reservation.action);
+            block.value = "old-image";
+            mockImageInstance.onload();
+
+            expect(block.value).toBe("old-image");
+            expect(reservation.action.newValue).toBe("cached-data-url");
+        });
+
+        it("does not let an older image load overwrite a newer selection", () => {
+            const images = [];
+            global.Image = jest.fn(() => {
+                const image = {
+                    src: "",
+                    width: 100,
+                    height: 100,
+                    naturalWidth: 100,
+                    naturalHeight: 100,
+                    onload: null,
+                    onerror: null
+                };
+                images.push(image);
+                return image;
+            });
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [];
+            block.blocks.isUndoingOrRedoing = false;
+            block.blocks.blockList[0] = block;
+
+            const first = block._reserveValueChange("old-image", "first.gif");
+            block.value = "first.gif";
+            block.loadThumbnail("first.gif", first);
+
+            const second = block._reserveValueChange("first.gif", "second.gif");
+            block.value = "second.gif";
+            block.loadThumbnail("second.gif", second);
+            const completeValueChange = jest.spyOn(block, "_completeValueChange");
+
+            images[1].onload();
+            images[0].onload();
+
+            expect(block.value).toBe("second.gif");
+            expect(completeValueChange).toHaveBeenCalledTimes(1);
+            expect(completeValueChange).toHaveBeenCalledWith(second, "second.gif");
+            expect(block.blocks.actionHistory.map(action => action.newValue)).toEqual([
+                "first.gif",
+                "second.gif"
+            ]);
+        });
+    });
+
+    describe("media selection undo history", () => {
+        it("reserves a built-in image history entry before thumbnail conversion", () => {
+            const selectCallbacks = [];
+            global.openSvgAssetSelector = jest.fn(onSelect => selectCallbacks.push(onSelect));
+            const block = new Block(
+                { ...mockProtoBlock, name: "media", capabilities: Object.create(null) },
+                {
+                    ...mockBlocks,
+                    actionHistory: [],
+                    redoActionHistory: [{ type: "move", blockId: 0 }],
+                    isUndoingOrRedoing: false
+                }
+            );
+            block.blockIndex = 2;
+            block.value = "old-image";
+            block.loadThumbnail = jest.fn();
+
+            block._doOpenMedia(2);
+            selectCallbacks[0]("selected-image");
+
+            expect(block.blocks.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 2,
+                    oldValue: "old-image",
+                    newValue: "selected-image",
+                    oldText: null,
+                    newText: null
+                }
+            ]);
+            expect(block.blocks.redoActionHistory).toEqual([]);
+            const reservation = block.loadThumbnail.mock.calls[0][1];
+            expect(reservation.action).toBe(block.blocks.actionHistory[0]);
+
+            const laterAction = { type: "move", blockId: 1 };
+            block.blocks.actionHistory.push(laterAction);
+            block._completeValueChange(reservation, "converted-image");
+
+            expect(block.blocks.actionHistory).toEqual([
+                expect.objectContaining({
+                    type: "value_change",
+                    oldValue: "old-image",
+                    newValue: "converted-image"
+                }),
+                laterAction
+            ]);
+
+            delete global.openSvgAssetSelector;
+        });
+
+        it("records an uploaded image selection", () => {
+            const originalFileReader = global.FileReader;
+            const originalScroll = window.scroll;
+            let changeHandler;
+            const fileChooser = {
+                value: "",
+                files: [{ name: "photo.png" }],
+                addEventListener: jest.fn((event, handler) => {
+                    if (event === "change") changeHandler = handler;
+                }),
+                removeEventListener: jest.fn(),
+                focus: jest.fn(),
+                click: jest.fn()
+            };
+            global.docById = jest.fn().mockReturnValue(fileChooser);
+            window.scroll = jest.fn();
+            global.FileReader = class {
+                constructor() {
+                    this.result = "uploaded-image";
+                }
+
+                readAsDataURL() {
+                    this.onloadend();
+                }
+            };
+            const block = new Block(
+                { ...mockProtoBlock, name: "media", capabilities: Object.create(null) },
+                {
+                    ...mockBlocks,
+                    actionHistory: [],
+                    redoActionHistory: [],
+                    isUndoingOrRedoing: false
+                }
+            );
+            block.blockIndex = 3;
+            block.value = "old-image";
+            block.loadThumbnail = jest.fn();
+
+            block._doOpenMediaFromDevice(3);
+            changeHandler();
+
+            expect(block.blocks.actionHistory).toHaveLength(1);
+            expect(block.loadThumbnail.mock.calls[0][1].action).toBe(block.blocks.actionHistory[0]);
+
+            global.FileReader = originalFileReader;
+            window.scroll = originalScroll;
+        });
+
+        it.each(["audiofile", "loadFile"])("records a %s upload and clears redo history", name => {
+            const originalFileReader = global.FileReader;
+            const originalScroll = window.scroll;
+            let changeHandler;
+            const fileChooser = {
+                value: "",
+                files: [{ name: "lesson.dat" }],
+                addEventListener: jest.fn((event, handler) => {
+                    if (event === "change") changeHandler = handler;
+                }),
+                removeEventListener: jest.fn(),
+                focus: jest.fn(),
+                click: jest.fn()
+            };
+            global.docById = jest.fn().mockReturnValue(fileChooser);
+            window.scroll = jest.fn();
+            const expectedResult =
+                name === "audiofile" ? "data:audio/mock;base64,AAAA" : "plain text";
+            global.FileReader = class {
+                constructor() {
+                    this.result = null;
+                }
+
+                readAsDataURL() {
+                    this.result = "data:audio/mock;base64,AAAA";
+                    this.onloadend();
+                }
+
+                readAsText() {
+                    this.result = "plain text";
+                    this.onloadend();
+                }
+            };
+            const block = new Block(
+                { ...mockProtoBlock, name, capabilities: Object.create(null) },
+                {
+                    ...mockBlocks,
+                    actionHistory: [],
+                    redoActionHistory: [{ type: "move", blockId: 0 }],
+                    isUndoingOrRedoing: false,
+                    updateBlockText: jest.fn()
+                }
+            );
+            block.blockIndex = 4;
+            block.value = ["old.dat", "old-contents"];
+
+            block._doOpenMediaFromDevice(4);
+            changeHandler();
+
+            expect(block.blocks.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 4,
+                    oldValue: ["old.dat", "old-contents"],
+                    newValue: ["lesson.dat", expectedResult],
+                    oldText: null,
+                    newText: null
+                }
+            ]);
+            expect(block.blocks.redoActionHistory).toEqual([]);
+            expect(block.blocks.updateBlockText).toHaveBeenCalledWith(4);
+
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 0 }];
+            changeHandler();
+
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
+
+            global.FileReader = originalFileReader;
+            window.scroll = originalScroll;
+        });
     });
 
     describe("hide", () => {
@@ -1252,31 +1572,63 @@ describe("Block Foundation", () => {
         });
     });
 
-    describe("value setter undo/redo tracking", () => {
-        it("records value_change in actionHistory when value changes after initialization", async () => {
+    describe("value change undo/redo tracking", () => {
+        it("does not record runtime value assignments", () => {
             const mockBlocksObj = {
                 ...mockBlocks,
-                actionHistory: [],
+                actionHistory: [{ type: "move", blockId: 1 }],
                 redoActionHistory: [{ type: "move", blockId: 0 }],
                 isUndoingOrRedoing: false
             };
             const block = new Block(mockProtoBlock, mockBlocksObj);
             block.blockIndex = 2;
             block.text = { text: "initial" };
-            block.valueInitialized = true;
             block.loadComplete = true;
 
             block.value = "updated";
-            block.text.text = "updated";
 
-            expect(mockBlocksObj.actionHistory.length).toBe(1);
-            expect(mockBlocksObj.actionHistory[0].type).toBe("value_change");
-            expect(mockBlocksObj.actionHistory[0].blockId).toBe(2);
-            expect(mockBlocksObj.actionHistory[0].newValue).toBe("updated");
+            expect(mockBlocksObj.actionHistory).toEqual([{ type: "move", blockId: 1 }]);
+            expect(mockBlocksObj.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
+        });
+
+        it("records one change for input followed by blur", () => {
+            const mockBlocksObj = {
+                ...mockBlocks,
+                actionHistory: [],
+                redoActionHistory: [{ type: "move", blockId: 0 }],
+                isUndoingOrRedoing: false
+            };
+            const block = new Block(
+                { ...mockProtoBlock, name: "number", capabilities: Object.create(null) },
+                mockBlocksObj
+            );
+            block.blockIndex = 2;
+            block.value = 10;
+            block._capturedInitialValue = 10;
+            block._capturedInitialText = "10";
+            block.label = { value: "20", style: { display: "" } };
+            block.text = { text: "10" };
+            block.connections = [null];
+            block.container = { setChildIndex: jest.fn(), children: [] };
+            block.updateCache = jest.fn();
+            global.docById = jest.fn().mockReturnValue({ style: {} });
+
+            block._labelChanged(false, true);
+            expect(mockBlocksObj.actionHistory).toEqual([]);
+
+            block._labelChanged(true, true);
+
+            expect(mockBlocksObj.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 2,
+                    oldValue: 10,
+                    newValue: 20,
+                    oldText: "10",
+                    newText: "20"
+                }
+            ]);
             expect(mockBlocksObj.redoActionHistory).toEqual([]);
-
-            await Promise.resolve();
-            expect(mockBlocksObj.actionHistory[0].newText).toBe("updated");
         });
     });
 
