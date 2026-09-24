@@ -635,8 +635,7 @@ class ASTUtils {
             neg: ["unexp", "-"],
             abs: ["method", "Math.abs"],
             sqrt: ["method", "Math.sqrt"],
-            power: ["method", "Math.pow"],
-            int: ["method", "Math.round"]
+            power: ["method", "Math.pow"]
         };
 
         function getBinaryExpAST(operator, operand1, operand2) {
