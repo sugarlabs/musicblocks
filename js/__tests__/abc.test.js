@@ -261,6 +261,20 @@ describe("processABCNotes - Control Strings", () => {
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).toBe("B,4 (C4 D4) ");
     });
+
+    it("should handle nested slurs with consecutive begin slur markers", () => {
+        logo.notation.notationStaging["0"] = [
+            "begin slur",
+            "begin slur",
+            [["C4"], 4, 0, null, null, -1, false],
+            [["D4"], 4, 0, null, null, -1, false],
+            "end slur",
+            [["E4"], 4, 0, null, null, -1, false],
+            "end slur"
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("((C4 D4) E4) ");
+    });
 });
 
 describe("processABCNotes - Chords", () => {

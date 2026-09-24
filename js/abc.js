@@ -213,7 +213,7 @@ class AbcExporter {
         this.lastNoteStart = null;
         this.pendingAnnotations = [];
         this.prefixStart = null;
-        this.queueSlur = false;
+        this.queueSlur = 0;
 
         const { field: keyField, alterations: keyAlterations } = abcKeySignature(keySignature);
         this.keyField = keyField;
@@ -305,9 +305,9 @@ class AbcExporter {
     __beginNote() {
         this.lastNoteStart = this.parts.length;
         this.prefixStart = null;
-        if (this.queueSlur) {
-            this.parts.push("(");
-            this.queueSlur = false;
+        if (this.queueSlur > 0) {
+            this.parts.push("(".repeat(this.queueSlur));
+            this.queueSlur = 0;
         }
         this.parts.push(...this.pendingAnnotations);
         this.pendingAnnotations = [];
@@ -371,7 +371,7 @@ class AbcExporter {
                 this.__pushPrefix("!>)!");
                 break;
             case "begin slur":
-                this.queueSlur = true;
+                this.queueSlur++;
                 break;
             case "end slur":
                 if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
