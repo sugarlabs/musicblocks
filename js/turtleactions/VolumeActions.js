@@ -272,11 +272,11 @@ function setupVolumeActions(activity) {
             if (!tur.singer.instrumentNames.includes(synth)) {
                 tur.singer.instrumentNames.push(synth);
                 activity.logo.synth.loadSynth(turtle, synth);
+            }
 
-                if (tur.singer.synthVolume[synth] === undefined) {
-                    tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
-                    tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
-                }
+            if (tur.singer.synthVolume[synth] === undefined) {
+                tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
+                tur.singer.crescendoInitialVolume[synth] = [DEFAULTVOLUME];
             }
 
             volume = clampNumber(volume, 0, 100);
