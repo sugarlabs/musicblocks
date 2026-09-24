@@ -5622,15 +5622,16 @@ function getNote(
                 console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
             }
         }
+        const pitchIndex = (((noteArg + kOffset) % octaveLength) + octaveLength) % octaveLength;
         if (octaveLength === 12) {
             if (getSharpFlatPreference(keySignature) === "sharp") {
-                noteArg = PITCHES2[(noteArg + kOffset) % octaveLength];
+                noteArg = PITCHES2[pitchIndex];
             } else {
-                noteArg = PITCHES[(noteArg + kOffset) % octaveLength];
+                noteArg = PITCHES[pitchIndex];
             }
         } else {
             const edoNames = generateNoteNames(octaveLength);
-            noteArg = edoNames[(noteArg + kOffset) % octaveLength];
+            noteArg = edoNames[pitchIndex];
         }
     }
 
