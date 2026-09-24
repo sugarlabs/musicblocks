@@ -53,7 +53,7 @@ global.PALETTEICONS = {
     artwork: "<svg background_fill_color stroke_color fill_color></svg>"
 };
 global.MULTIPALETTEICONS = ["music", "logic", "artwork"];
-global.MULTIPALETTENAMES = ["music", "logic", "artwork"];
+global.MULTIPALETTENAMES = ["Music", "Logic", "Arts"];
 global.SKIPPALETTES = ["heap", "dictionary"];
 
 global.platformColor = {
