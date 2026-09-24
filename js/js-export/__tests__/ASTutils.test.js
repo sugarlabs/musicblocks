@@ -556,6 +556,20 @@ describe("ASTUtils", () => {
                 arguments: ASTUtils._getArgsAST(args)
             });
         });
+
+        // The Int block rounds half up (MathUtility.doInt), so the exported
+        // call has to compute the same value. Math.floor did not (#8894).
+        it.each([2.2, 2.7, 3.5, 4, -1.5, -2.5, -2.7])(
+            "should export int(%p) as a call that matches the Int block",
+            x => {
+                const result = ASTUtils._getArgExpAST("int", [x]);
+                expect(result.callee.name).toBe("Math.round");
+
+                const fn = result.callee.name.split(".").reduce((obj, key) => obj[key], globalThis);
+                const exported = fn(...result.arguments.map(arg => arg.value));
+                expect(exported).toBe(MathUtility.doInt(x));
+            }
+        );
     });
 
     describe("_getArgsAST", () => {
