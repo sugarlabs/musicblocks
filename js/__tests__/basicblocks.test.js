@@ -100,6 +100,7 @@ describe("initBasicProtoBlocks", () => {
             palettes: {}
         };
         expect(() => initBasicProtoBlocks(emptyActivity)).not.toThrow();
+        expect(emptyActivity.blocks.palettes).toBe(emptyActivity.palettes);
     });
 });
 
