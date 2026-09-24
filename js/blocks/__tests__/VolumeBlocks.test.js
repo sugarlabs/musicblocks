@@ -325,6 +325,22 @@ describe("setupVolumeBlocks", () => {
             expect(logo.setTurtleListener).toHaveBeenCalled();
             expect(ret).toEqual([100, 1]);
         });
+
+        it("should set volume for an instrument already in instrumentNames", () => {
+            const blk = "blkSSV2b";
+            const args = ["piano", 90, 100];
+            const setSynthVol2Block = createdBlocks["setsynthvolume2"];
+            const turtleObj = activity.turtles.ithTurtle(turtleIndex);
+            // e.g. after "set default instrument": name registered, no volume entry.
+            turtleObj.singer.instrumentNames = ["piano"];
+            turtleObj.singer.synthVolume = {};
+            turtleObj.singer.crescendoInitialVolume = {};
+            const ret = setSynthVol2Block.flow(args, logo, turtleIndex, blk);
+            expect(turtleObj.singer.synthVolume.piano).toEqual([70, 90]);
+            expect(turtleObj.singer.crescendoInitialVolume.piano).toEqual([70]);
+            expect(logo.synth.loadSynth).not.toHaveBeenCalled();
+            expect(ret).toEqual([100, 1]);
+        });
     });
 
     describe("SetSynthVolumeBlock", () => {
