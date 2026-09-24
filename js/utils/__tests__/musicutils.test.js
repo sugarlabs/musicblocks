@@ -2528,18 +2528,23 @@ describe("pitchToFrequency", () => {
         expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
     });
 
-    it("uses the configured octave ratio for equal temperaments", () => {
+    it("uses the configured octave ratio only for the active custom temperament", () => {
         setOctaveRatio(3);
-        const c4 = pitchToFrequency("C", 4, 0, "C");
-        const c5 = pitchToFrequency("C", 5, 0, "C");
-        const c4With1200Cents = pitchToFrequency("C", 4, 1200, "C");
-        const justC4 = pitchToFrequency("C", 4, 0, "C", "just intonation");
-        const justC5 = pitchToFrequency("C", 5, 0, "C", "just intonation");
+        TEMPERAMENT["customOctaveRatio"] = { pitchNumber: 12 };
+        try {
+            const equalC4 = pitchToFrequency("C", 4, 0, "C", "equal");
+            const equalC5 = pitchToFrequency("C", 5, 0, "C", "equal");
+            const customC4 = pitchToFrequency("C", 4, 0, "C", "customOctaveRatio");
+            const customC5 = pitchToFrequency("C", 5, 0, "C", "customOctaveRatio");
+            const customC4With1200Cents = pitchToFrequency("C", 4, 1200, "C", "customOctaveRatio");
 
-        expect(c5 / c4).toBeCloseTo(3, 10);
-        expect(c4With1200Cents / c4).toBeCloseTo(3, 10);
-        expect(justC5 / justC4).toBeCloseTo(3, 10);
-        setOctaveRatio(2);
+            expect(equalC5 / equalC4).toBeCloseTo(2, 10);
+            expect(customC5 / customC4).toBeCloseTo(3, 10);
+            expect(customC4With1200Cents / customC4).toBeCloseTo(3, 10);
+        } finally {
+            delete TEMPERAMENT["customOctaveRatio"];
+            setOctaveRatio(2);
+        }
     });
 
     it("plays just intonation intervals at their true ratios (non-EDO accuracy)", () => {

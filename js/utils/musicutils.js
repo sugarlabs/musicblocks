@@ -7397,8 +7397,8 @@ const noteToPitchOctave = note => {
  */
 const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
-    const octaveBase = getOctaveRatio();
     const t = getTemperament(temperament);
+    const octaveBase = t && isCustomTemperament(temperament) ? getOctaveRatio() : 2;
     if (t && !t.isEDO && t.noteLabels && t.ratios) {
         const noteIdx = t.noteLabels.indexOf(pitch);
         if (noteIdx !== -1) {
