@@ -1280,6 +1280,8 @@ function SampleWidget() {
 
                 // Create chromatic mode button
                 const chromaticButton = document.createElement("div");
+                chromaticButton.setAttribute("role", "button");
+                chromaticButton.setAttribute("tabindex", "0");
                 chromaticButton.style.flex = "1";
                 chromaticButton.style.display = "flex";
                 chromaticButton.style.alignItems = "center";
@@ -1292,6 +1294,8 @@ function SampleWidget() {
 
                 // Create target pitch mode button
                 const targetPitchButton = document.createElement("div");
+                targetPitchButton.setAttribute("role", "button");
+                targetPitchButton.setAttribute("tabindex", "0");
                 targetPitchButton.style.flex = "1";
                 targetPitchButton.style.display = "flex";
                 targetPitchButton.style.alignItems = "center";
@@ -1305,6 +1309,7 @@ function SampleWidget() {
                 // Create icons
                 const chromaticIcon = document.createElement("img");
                 chromaticIcon.src = "header-icons/chromatic-mode.svg";
+                chromaticIcon.alt = _("Chromatic mode");
                 chromaticIcon.style.width = "32px";
                 chromaticIcon.style.height = "32px";
                 chromaticIcon.style.filter = "brightness(0)";
@@ -1312,6 +1317,7 @@ function SampleWidget() {
 
                 const targetIcon = document.createElement("img");
                 targetIcon.src = "header-icons/target-pitch-mode.svg";
+                targetIcon.alt = _("Target pitch mode");
                 targetIcon.style.width = "32px";
                 targetIcon.style.height = "32px";
                 targetIcon.style.filter = "brightness(0)";
@@ -1349,6 +1355,20 @@ function SampleWidget() {
 
                 chromaticButton.onclick = () => handleClick("chromatic");
                 targetPitchButton.onclick = () => handleClick("target");
+
+                chromaticButton.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleClick("chromatic");
+                    }
+                };
+
+                targetPitchButton.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleClick("target");
+                    }
+                };
 
                 // Assemble the toggle
                 chromaticButton.appendChild(chromaticIcon);

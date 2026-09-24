@@ -1151,6 +1151,11 @@ describe("Sampler Widget", () => {
             jest.advanceTimersByTime(200);
             buttons[1].onclick();
             jest.advanceTimersByTime(200);
+            // Test onkeydown
+            buttons[0].onkeydown({ key: "Enter", preventDefault: jest.fn() });
+            jest.advanceTimersByTime(200);
+            buttons[1].onkeydown({ key: " ", preventDefault: jest.fn() });
+            jest.advanceTimersByTime(200);
             jest.useRealTimers();
         });
 
