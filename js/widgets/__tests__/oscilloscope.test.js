@@ -1221,8 +1221,8 @@ describe("Oscilloscope", () => {
 
             expect(osc.isFrozen).toBe(false);
             expect(osc.freezeButton.children[0].src).toContain("header-icons/pause-button.svg");
-            expect(osc.freezeButton.title).toBe("Freeze");
-            expect(osc.freezeButton.getAttribute("aria-label")).toBe("Freeze");
+            expect(osc.freezeButton.title).toBe("Pause");
+            expect(osc.freezeButton.getAttribute("aria-label")).toBe("Pause");
             expect(startSpy).toHaveBeenCalled();
             startSpy.mockRestore();
         });

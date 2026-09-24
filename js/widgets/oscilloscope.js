@@ -105,7 +105,7 @@ class Oscilloscope {
         )}`;
 
         // Freeze button
-        this.freezeButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Freeze"));
+        this.freezeButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Pause"));
         this.freezeButton.onclick = this.toggleFreeze;
         this._updateFreezeButton();
 
@@ -210,7 +210,7 @@ class Oscilloscope {
         if (!this.freezeButton) return;
         const iconSrc = this.isFrozen ? "play-button.svg" : "pause-button.svg";
         this.freezeButton.children[0].src = `header-icons/${iconSrc}`;
-        const label = this.isFrozen ? _("Resume") : _("Freeze");
+        const label = this.isFrozen ? _("Resume") : _("Pause");
         this.freezeButton.title = label;
         this.freezeButton.setAttribute("aria-label", label);
     }
