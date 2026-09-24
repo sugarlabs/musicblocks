@@ -931,18 +931,25 @@ describe("Blocks Foundation", () => {
             expect(mockBlock.value).toBe("new-image");
             expect(mockBlock.loadThumbnail).toHaveBeenLastCalledWith(null);
             expect(mockBlock.loadThumbnail).toHaveBeenCalledTimes(2);
+            expect(mockBlock._labelChanged).not.toHaveBeenCalled();
         });
 
         it.each(["audiofile", "loadFile"])(
             "refreshes the %s label when undoing and redoing its value",
             name => {
                 const blocks = new Blocks(mockActivity);
-                blocks.updateBlockText = jest.fn();
                 const mockBlock = {
                     name,
                     label: { value: ["new-file", "new-content"], style: {} },
                     _labelChanged: jest.fn(),
-                    text: null,
+                    text: { text: "new-file" },
+                    hasWideLabel: () => false,
+                    container: {
+                        children: { length: 1 },
+                        setChildIndex: jest.fn(),
+                        updateCache: jest.fn()
+                    },
+                    loadComplete: true,
                     updateCache: jest.fn(),
                     value: ["new-file", "new-content"]
                 };
@@ -957,11 +964,11 @@ describe("Blocks Foundation", () => {
                 });
 
                 blocks.undoAction();
-                expect(blocks.updateBlockText).toHaveBeenLastCalledWith(0);
+                expect(mockBlock.text.text).toBe("old-file");
 
                 blocks.redoAction();
-                expect(blocks.updateBlockText).toHaveBeenLastCalledWith(0);
-                expect(blocks.updateBlockText).toHaveBeenCalledTimes(2);
+                expect(mockBlock.text.text).toBe("new-file");
+                expect(mockBlock._labelChanged).not.toHaveBeenCalled();
             }
         );
 

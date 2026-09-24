@@ -2379,11 +2379,13 @@ class Block {
             that.updateCache();
         };
         image.onerror = () => {
+            if (loadGeneration !== that._thumbnailLoadGeneration) {
+                return;
+            }
+
             if (valueChangeReservation) {
                 that._cancelValueChange(valueChangeReservation);
-                if (loadGeneration === that._thumbnailLoadGeneration) {
-                    that.value = valueChangeReservation.action.oldValue;
-                }
+                that.value = valueChangeReservation.action.oldValue;
             }
         };
 

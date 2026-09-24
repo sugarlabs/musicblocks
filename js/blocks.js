@@ -7056,9 +7056,11 @@ class Blocks {
             } else if (action.type === "value_change") {
                 const block = this.blockList[action.blockId];
                 if (block) {
-                    if (!block.label) block.label = { value: action.oldValue, style: {} };
-                    block.label.value = action.oldValue;
-                    block._labelChanged(true, true);
+                    if (!["media", "audiofile", "loadFile"].includes(block.name)) {
+                        if (!block.label) block.label = { value: action.oldValue, style: {} };
+                        block.label.value = action.oldValue;
+                        block._labelChanged(true, true);
+                    }
 
                     block.value = action.oldValue;
                     if (action.oldText !== null && block.text) {
@@ -7106,9 +7108,11 @@ class Blocks {
             } else if (action.type === "value_change") {
                 const block = this.blockList[action.blockId];
                 if (block) {
-                    if (!block.label) block.label = { value: action.newValue, style: {} };
-                    block.label.value = action.newValue;
-                    block._labelChanged(true, true);
+                    if (!["media", "audiofile", "loadFile"].includes(block.name)) {
+                        if (!block.label) block.label = { value: action.newValue, style: {} };
+                        block.label.value = action.newValue;
+                        block._labelChanged(true, true);
+                    }
 
                     block.value = action.newValue;
                     if (action.newText !== null && block.text) {

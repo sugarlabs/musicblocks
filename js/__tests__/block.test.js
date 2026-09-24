@@ -822,6 +822,40 @@ describe("Block Foundation", () => {
             expect(block.blocks.redoActionHistory).toEqual([{ type: "move", blockId: 1 }]);
         });
 
+        it("does not cancel history when an older image load fails", () => {
+            const images = [];
+            global.Image = jest.fn(() => {
+                const image = {
+                    src: "",
+                    width: 100,
+                    height: 100,
+                    naturalWidth: 100,
+                    naturalHeight: 100,
+                    onload: null,
+                    onerror: null
+                };
+                images.push(image);
+                return image;
+            });
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("old-image", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            block.blocks.actionHistory.pop();
+            block.blocks.redoActionHistory.push(reservation.action);
+            block.value = "old-image";
+            block.loadThumbnail(null);
+            images[0].onerror();
+
+            expect(block.value).toBe("old-image");
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([reservation.action]);
+        });
+
         it("does not reapply a pending selection after it has been undone", () => {
             block.blocks.actionHistory = [];
             block.blocks.redoActionHistory = [];
