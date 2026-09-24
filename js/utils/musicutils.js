@@ -7397,15 +7397,16 @@ const noteToPitchOctave = note => {
  */
 const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
+    const octaveBase = getOctaveRatio();
     const t = getTemperament(temperament);
     if (t && !t.isEDO && t.noteLabels && t.ratios) {
         const noteIdx = t.noteLabels.indexOf(pitch);
         if (noteIdx !== -1) {
             const aIdx = t.noteLabels.indexOf("A");
             const baseRefFreq = A0 / t.ratios[aIdx];
-            let freq = baseRefFreq * t.ratios[noteIdx] * Math.pow(2, octave);
+            let freq = baseRefFreq * t.ratios[noteIdx] * Math.pow(octaveBase, octave);
             if (cents !== 0) {
-                freq *= Math.pow(2, cents / 1200);
+                freq *= Math.pow(octaveBase, cents / 1200);
             }
             return freq;
         }
@@ -7413,16 +7414,15 @@ const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
 
     const pitchNumber = pitchToNumber(pitch, octave, keySignature, temperament);
 
-    // NOTE: stretched-octave powerBase (widget) vs engine getOctaveRatio() diverge here — this function hard-codes base 2; widget ratioToCents generalizes to powerBase. Full unification deferred.
-    // Frequency = A0 * 2^(pitchNumber / currentEDO)
-    // With cents offset: Frequency = A0 * 2^((pitchNumber * 100 + cents) / (currentEDO * 100))
-    // This works because 1 semitone = 100 cents, and 2^(1/1200) is the cents resolution.
+    // Frequency = A0 * octaveBase^(pitchNumber / currentEDO)
+    // With cents offset: Frequency = A0 * octaveBase^((pitchNumber * 100 + cents) / (currentEDO * 100))
+    // This works because 1 semitone is 100 cents and 1200 cents span the configured octave.
     // Example: 19-EDO, A4 (pitchNumber=48), 0 cents → 27.5 * 2^(48/19) ≈ 440 Hz
     // Example: 19-EDO, A4 + 50 cents → 27.5 * 2^((48*100+50)/(19*100)) ≈ 447.8 Hz
     if (cents === 0) {
-        return A0 * Math.pow(2, 1 / currentEDO) ** pitchNumber;
+        return A0 * Math.pow(octaveBase, 1 / currentEDO) ** pitchNumber;
     } else {
-        return A0 * Math.pow(2, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
+        return A0 * Math.pow(octaveBase, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
     }
 };
 

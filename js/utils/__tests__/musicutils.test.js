@@ -203,6 +203,7 @@ describe("musicutils", () => {
         setOctaveRatio(4);
         const octaveR = getOctaveRatio();
         expect(octaveR).toBe(4);
+        setOctaveRatio(2);
     });
 });
 
@@ -2525,6 +2526,20 @@ describe("pitchToFrequency", () => {
         global.TEMPERAMENT = {};
         const result = pitchToFrequency("A", 4, 0, "C", undefined);
         expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
+    });
+
+    it("uses the configured octave ratio for equal temperaments", () => {
+        setOctaveRatio(3);
+        const c4 = pitchToFrequency("C", 4, 0, "C");
+        const c5 = pitchToFrequency("C", 5, 0, "C");
+        const c4With1200Cents = pitchToFrequency("C", 4, 1200, "C");
+        const justC4 = pitchToFrequency("C", 4, 0, "C", "just intonation");
+        const justC5 = pitchToFrequency("C", 5, 0, "C", "just intonation");
+
+        expect(c5 / c4).toBeCloseTo(3, 10);
+        expect(c4With1200Cents / c4).toBeCloseTo(3, 10);
+        expect(justC5 / justC4).toBeCloseTo(3, 10);
+        setOctaveRatio(2);
     });
 
     it("plays just intonation intervals at their true ratios (non-EDO accuracy)", () => {
