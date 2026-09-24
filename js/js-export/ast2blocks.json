@@ -208,7 +208,6 @@
             "name_map": {
                 "abs": "abs",
                 "pow": "power",
-                "round": "int",
                 "sqrt": "sqrt"
             }
         },
@@ -238,6 +237,7 @@
             },
             "name_map": {
                 "doCalculateDistance": "distance",
+                "doInt": "int",
                 "doOneOf": "oneOf",
                 "doRandom": "random"
             }
