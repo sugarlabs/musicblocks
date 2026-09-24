@@ -43,6 +43,8 @@ function TunerDisplay(canvas, width, height) {
 
     // Create chromatic mode button
     this.chromaticButton = document.createElement("div");
+    this.chromaticButton.setAttribute("role", "button");
+    this.chromaticButton.setAttribute("tabindex", "0");
     Object.assign(this.chromaticButton.style, {
         width: "40px",
         height: "32px",
@@ -58,13 +60,15 @@ function TunerDisplay(canvas, width, height) {
         src: "header-icons/chromatic-mode.svg",
         width: "20",
         height: "20",
-        alt: ""
+        alt: "Chromatic mode"
     });
     this.chromaticButton.appendChild(chromaticIcon);
     buttonsWrapper.appendChild(this.chromaticButton);
 
     // Create target pitch mode button
     this.targetPitchButton = document.createElement("div");
+    this.targetPitchButton.setAttribute("role", "button");
+    this.targetPitchButton.setAttribute("tabindex", "0");
     Object.assign(this.targetPitchButton.style, {
         width: "40px",
         height: "32px",
@@ -80,7 +84,7 @@ function TunerDisplay(canvas, width, height) {
         src: "header-icons/target-pitch-mode.svg",
         width: "20",
         height: "20",
-        alt: ""
+        alt: "Target pitch mode"
     });
     this.targetPitchButton.appendChild(targetIcon);
     buttonsWrapper.appendChild(this.targetPitchButton);
