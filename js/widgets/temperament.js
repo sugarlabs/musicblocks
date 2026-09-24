@@ -1948,6 +1948,12 @@ function TemperamentWidget() {
             const compareRatios = [];
             that.tempRatios = that.ratios.slice();
 
+            /**
+             * Recursively calculates ratios to ensure they fit within the octave space.
+             * Inserts the resulting ratio into the sorted tempRatios array.
+             *
+             * @param {number} i - The current iteration index.
+             */
             const calculateRatios = function (i) {
                 if (frequency[i] < that.frequencies[len - 1]) {
                     for (let j = 0; j < that.tempRatios.length; j++) {
