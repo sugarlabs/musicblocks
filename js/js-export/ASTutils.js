@@ -234,17 +234,44 @@ class ASTUtils {
     static _getForLoopAST(args, flow, iteratorNum) {
         if (iteratorNum === undefined) iteratorNum = 0;
 
-        // Repeat runs its body MathUtility.doRepeatCount(n) times, but `i < n`
-        // runs Math.ceil(n) times. Only an integer literal can stay as it is.
-        let limit = ASTUtils._getArgsAST(args)[0];
-        if (!(limit.type === "Literal" && Number.isInteger(limit.value))) {
-            limit = {
-                type: "CallExpression",
-                callee: {
+        const declarations = [
+            {
+                type: "VariableDeclarator",
+                id: {
                     type: "Identifier",
-                    name: "MathUtility.doRepeatCount"
+                    name: "i" + iteratorNum
                 },
-                arguments: [limit]
+                init: {
+                    type: "Literal",
+                    value: 0
+                }
+            }
+        ];
+
+        // Repeat works out its count once, as MathUtility.doRepeatCount(n),
+        // but `i < n` re-evaluates n every pass and runs Math.ceil(n) times.
+        // Only a non-negative integer literal can stay as it is (a negative
+        // one prints as a unary minus, which doesn't convert back to Repeat).
+        let limit = ASTUtils._getArgsAST(args)[0];
+        if (!(limit.type === "Literal" && Number.isInteger(limit.value) && limit.value >= 0)) {
+            declarations.push({
+                type: "VariableDeclarator",
+                id: {
+                    type: "Identifier",
+                    name: "limit" + iteratorNum
+                },
+                init: {
+                    type: "CallExpression",
+                    callee: {
+                        type: "Identifier",
+                        name: "MathUtility.doRepeatCount"
+                    },
+                    arguments: [limit]
+                }
+            });
+            limit = {
+                type: "Identifier",
+                name: "limit" + iteratorNum
             };
         }
 
@@ -253,19 +280,7 @@ class ASTUtils {
             init: {
                 type: "VariableDeclaration",
                 kind: "let",
-                declarations: [
-                    {
-                        type: "VariableDeclarator",
-                        id: {
-                            type: "Identifier",
-                            name: "i" + iteratorNum
-                        },
-                        init: {
-                            type: "Literal",
-                            value: 0
-                        }
-                    }
-                ]
+                declarations
             },
             test: {
                 type: "BinaryExpression",

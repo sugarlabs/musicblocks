@@ -333,7 +333,7 @@ let action = async mouse => {
     });
     let box1 = 0;
     let box2 = 360 / mouse.MODELENGTH;
-    for (let i0 = 0; i0 < MathUtility.doRepeatCount(mouse.MODELENGTH * 2); i0++) {
+    for (let i0 = 0, limit0 = MathUtility.doRepeatCount(mouse.MODELENGTH * 2); i0 < limit0; i0++) {
         await mouse.playNote(1 / 4, async () => {
             if (box1 < mouse.MODELENGTH) {
                 await mouse.stepPitch(1);

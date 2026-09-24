@@ -503,32 +503,46 @@ window.ast2blocklist_config = {
         {
             name: "repeat",
             comment:
-                "Repeat block as exported: for (let i0 = 0; i0 < MathUtility.doRepeatCount(n); i0++)",
+                "Repeat block as exported: for (let i0 = 0, limit0 = MathUtility.doRepeatCount(n); i0 < limit0; i0++)",
             arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ForStatement" },
+                    { property: "init.declarations.length", value: 2 },
                     { property: "init.declarations[0].init.value", value: 0 },
+                    {
+                        property: "init.declarations[1].init.callee.object.name",
+                        value: "MathUtility"
+                    },
+                    {
+                        property: "init.declarations[1].init.callee.property.name",
+                        value: "doRepeatCount"
+                    },
                     { property: "test.operator", value: "<" },
+                    { property: "test.left.name", same_as: "init.declarations[0].id.name" },
+                    { property: "test.right.name", same_as: "init.declarations[1].id.name" },
                     { property: "update.operator", value: "++" },
-                    { property: "test.right.callee.object.name", value: "MathUtility" },
-                    { property: "test.right.callee.property.name", value: "doRepeatCount" }
+                    { property: "update.argument.name", same_as: "init.declarations[0].id.name" }
                 ],
-                argument_properties: ["test.right.arguments[0]"],
+                argument_properties: ["init.declarations[1].init.arguments[0]"],
                 children_properties: ["body.body"]
             },
             default_vspaces: { argument: 1 }
         },
         {
             name: "repeat",
-            comment: "Repeat block in the Flow palette: for (let i = 0; i < n; i++)",
+            comment: "Repeat block in the Flow palette: for (let i = 0; i < 4; i++)",
             arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ForStatement" },
+                    { property: "init.declarations.length", value: 1 },
                     { property: "init.declarations[0].init.value", value: 0 },
                     { property: "test.operator", value: "<" },
-                    { property: "update.operator", value: "++" }
+                    { property: "test.left.name", same_as: "init.declarations[0].id.name" },
+                    { property: "test.right.value", integer: true },
+                    { property: "update.operator", value: "++" },
+                    { property: "update.argument.name", same_as: "init.declarations[0].id.name" }
                 ],
                 argument_properties: ["test.right"],
                 children_properties: ["body.body"]

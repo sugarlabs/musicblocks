@@ -181,6 +181,21 @@ describe("ASTUtils", () => {
                                 type: "Literal",
                                 value: 0
                             }
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "limit" + iteratorNum
+                            },
+                            init: {
+                                type: "CallExpression",
+                                callee: {
+                                    type: "Identifier",
+                                    name: "MathUtility.doRepeatCount"
+                                },
+                                arguments: ASTUtils._getArgsAST(args)
+                            }
                         }
                     ]
                 },
@@ -191,12 +206,8 @@ describe("ASTUtils", () => {
                         name: "i" + iteratorNum
                     },
                     right: {
-                        type: "CallExpression",
-                        callee: {
-                            type: "Identifier",
-                            name: "MathUtility.doRepeatCount"
-                        },
-                        arguments: ASTUtils._getArgsAST(args)
+                        type: "Identifier",
+                        name: "limit" + iteratorNum
                     },
                     operator: "<"
                 },
@@ -216,9 +227,23 @@ describe("ASTUtils", () => {
             });
         });
 
-        it("should keep an integer literal count as a plain loop bound", () => {
+        it("should keep a non-negative integer literal count as a plain loop bound", () => {
             const result = ASTUtils._getForLoopAST([4], [], 0);
+            expect(result.init.declarations).toHaveLength(1);
             expect(result.test.right).toEqual({ type: "Literal", value: 4 });
+        });
+
+        // Repeat works out its count once before running the body, so a body
+        // that changes the value the count came from mustn't change it.
+        it("should work out a non-literal count once, before the loop runs", () => {
+            const code = astring.generate(ASTUtils._getForLoopAST(["box_n"], [], 0));
+            let runs = 0;
+            new Function(
+                "MathUtility",
+                "tick",
+                `let n = 3; ${code.replace("{}", "{ n++; tick(); }")}`
+            )(MathUtility, () => runs++);
+            expect(runs).toBe(3);
         });
 
         // `i < n` runs Math.ceil(n) times, but Repeat runs Math.floor(n)

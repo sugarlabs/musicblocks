@@ -137,6 +137,21 @@ class AST2BlockList {
                                     groupMatched = true;
                                     break;
                                 }
+                            } else if ("same_as" in identifier) {
+                                // Two parts of the statement must be the same
+                                // node, e.g. the loop variable in init, test and update.
+                                if (
+                                    value !== undefined &&
+                                    value === _getPropertyValue(bodyAST, identifier.same_as)
+                                ) {
+                                    groupMatched = true;
+                                    break;
+                                }
+                            } else if ("integer" in identifier) {
+                                if (Number.isInteger(value) === identifier.integer) {
+                                    groupMatched = true;
+                                    break;
+                                }
                             } else if (
                                 "has_value" in identifier &&
                                 ((!identifier.has_value && value === null) ||

@@ -185,7 +185,9 @@ describe("AST2BlockList Class", () => {
             } finally {
                 delete global.JSInterface;
             }
-            expect(loop).toBe("for (let i0 = 0; i0 < MathUtility.doRepeatCount(7 / 2); i0++) {}");
+            expect(loop).toBe(
+                "for (let i0 = 0, limit0 = MathUtility.doRepeatCount(7 / 2); i0 < limit0; i0++) {}"
+            );
 
             const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
             expect(AST2BlockList.toBlockList(AST, config)).toEqual([
@@ -196,6 +198,23 @@ describe("AST2BlockList Class", () => {
                 [4, ["number", { value: 2 }], 0, 0, [2]]
             ]);
         });
+
+        test.each([4, 0, -2, 3.5, "box_n"])(
+            "should convert the exported loop for Repeat %p back to a Repeat block",
+            count => {
+                const ASTUtils = require("../ASTutils");
+                const astring = require("../../../lib/astring.min");
+                global.JSInterface = require("../interface");
+                let loop;
+                try {
+                    loop = astring.generate(ASTUtils._getForLoopAST([count], [], 0));
+                } finally {
+                    delete global.JSInterface;
+                }
+                const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+                expect(AST2BlockList.toBlockList(AST, config)[1][1]).toBe("repeat");
+            }
+        );
 
         test("should convert a plain counting loop to a Repeat block", () => {
             const AST = acorn.parse(wrap("for (let i = 0; i < 4; i++) {}"), {
@@ -214,7 +233,15 @@ describe("AST2BlockList Class", () => {
             "for (let i = 5; i < 10; i++) {}",
             "for (let i = 10; i > 0; i--) {}",
             "for (i = 0; i < 4; i++) {}",
-            "for (;;) {}"
+            "for (;;) {}",
+            "for (let i = 0; i < 2.5; i++) {}",
+            "for (let i = 0; i < n; i++) {}",
+            "for (let i = 0; i < MathUtility.doRandom(1, 5); i++) {}",
+            "for (let i = 0; j < 5; i++) {}",
+            "for (let i = 0; i < 5; j++) {}",
+            "for (let i = 0, n = 5; i < n; i++) {}",
+            "for (let i = 0, n = MathUtility.doRepeatCount(5); j < n; i++) {}",
+            "for (let i = 0, n = MathUtility.doRepeatCount(5); i < i; i++) {}"
         ])("should reject %s instead of converting it to a Repeat block", loop => {
             const code = wrap(loop);
             const AST = acorn.parse(code, { ecmaVersion: 2020 });
@@ -315,7 +342,7 @@ describe("AST2BlockList Class", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("clarinet", async () => {
-                for (let i0 = 0; i0 < MathUtility.doRandom(1, 5); i0++) {
+                for (let i0 = 0, limit0 = MathUtility.doRepeatCount(MathUtility.doRandom(1, 5)); i0 < limit0; i0++) {
                     await mouse.playNote(1 / 4, async () => {
                         await mouse.playPitch("fa", 2 * 2);
                         return mouse.ENDFLOW;
