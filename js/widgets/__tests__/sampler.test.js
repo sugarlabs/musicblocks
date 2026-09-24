@@ -459,8 +459,8 @@ describe("Sampler Widget", () => {
             expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
         });
 
-        test("applyCentAdjustment logs when instrument missing", () => {
-            const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+        test("applyCentAdjustment logs debug when instrument missing", () => {
+            const logSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
             widget.sampleName = "customsample_test";
             widget.originalSampleName = "test";
             widget.isMoving = false;
