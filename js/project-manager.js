@@ -593,7 +593,11 @@ class ProjectManager {
             that.gitDropdownUI._syncMenuState();
         }
 
-        if (that.planet !== undefined && that.planet.planet !== null) {
+        if (
+            that.planet !== undefined &&
+            that.planet.planet !== null &&
+            that.planet.getCurrentProjectName() !== _("My Project")
+        ) {
             // Save the current project before switching away from it.
             that.planet.saveLocally();
             // Create the new project slot and clear the canvas synchronously.
@@ -601,14 +605,19 @@ class ProjectManager {
             // _loadStart is async: it fires loadNewBlocks and then emits
             // "finishedLoading". We save the NEW project only after that
             // event fires so we capture the fresh start blocks, not stale data.
-            pm._loadStart(that)
-                .then(() => {
-                    that.planet.saveLocally();
-                })
-                .catch(() => {
-                    // Best-effort — ignore if _loadStart rejects unexpectedly.
-                    that.planet.saveLocally();
-                });
+            const loadPromise = pm._loadStart(that);
+            if (loadPromise && typeof loadPromise.then === "function") {
+                loadPromise
+                    .then(() => {
+                        that.planet.saveLocally();
+                    })
+                    .catch(() => {
+                        // Best-effort — ignore if _loadStart rejects unexpectedly.
+                        that.planet.saveLocally();
+                    });
+            } else {
+                that.planet.saveLocally();
+            }
         } else {
             that.toolbar.closeAuxToolbar((act, resize) => act._showHideAuxMenu(resize));
 

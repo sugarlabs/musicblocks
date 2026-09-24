@@ -69,16 +69,16 @@ class Publisher {
         const tags = [];
 
         //Pitch, Tone, and/or Rhythm
-        if (score[1] && score[2]) tags.push("music"); // music
+        if (score[1] && score[2]) tags.push("2"); // music
 
         //pen,mouse
-        if (score[3] && score[4]) tags.push("art"); // art
+        if (score[3] && score[4]) tags.push("3"); // art
 
         //sensors
-        if (score[8]) tags.push("interactive"); // interactive
+        if (score[8]) tags.push("5"); // interactive
 
         //number
-        if (score[5]) tags.push("math"); // math
+        if (score[5]) tags.push("4"); // math
 
         return tags;
     }

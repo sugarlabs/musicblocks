@@ -46,7 +46,7 @@ class GlobalPlanet {
         this.cache = {};
         this.loadCount = 0;
         this.cards = [];
-        this.loadButtonShown = false;
+        this.loadButtonShown = true;
         this.searching = false;
         this.searchString = "";
         this.oldSearchString = "";
@@ -139,7 +139,7 @@ class GlobalPlanet {
                 this.oldSearchString,
                 this.sortBy,
                 this.index,
-                this.index + this.page,
+                this.index + this.page + 1,
                 this.afterRefreshProjects.bind(this)
             );
         } else {
@@ -147,7 +147,7 @@ class GlobalPlanet {
                 this.searchMode,
                 this.sortBy,
                 this.index,
-                this.index + this.page,
+                this.index + this.page + 1,
                 this.afterRefreshProjects.bind(this)
             );
         }
@@ -164,7 +164,7 @@ class GlobalPlanet {
                 this.oldSearchString,
                 this.sortBy,
                 this.index,
-                this.index + this.page,
+                this.index + this.page + 1,
                 this.afterRefreshProjects.bind(this)
             );
         } else {
@@ -172,7 +172,7 @@ class GlobalPlanet {
                 this.searchMode,
                 this.sortBy,
                 this.index,
-                this.index + this.page,
+                this.index + this.page + 1,
                 this.afterRefreshProjects.bind(this)
             );
         }
@@ -205,7 +205,7 @@ class GlobalPlanet {
             this.oldSearchString,
             this.sortBy,
             this.index,
-            this.index + this.page,
+            this.index + this.page + 1,
             this.afterRefreshProjects.bind(this)
         );
     }
@@ -244,9 +244,8 @@ class GlobalPlanet {
         this.loadCount = toDownload.length;
         const l = data.length;
 
-        // A full page returned means there may be more projects to load.
-        // (limit === this.page so l === this.page is the maximum possible)
-        const hasMore = l >= this.page;
+        if (l === this.page + 1) data.pop();
+        const hasMore = l >= this.page + 1;
 
         if (l === 0) {
             if (this.index === 0) {
@@ -303,7 +302,7 @@ class GlobalPlanet {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
         } else {
-            console.warn(`[GlobalPlanet] Skipping project ${id} - failed to load details.`);
+            this.throwOfflineError();
         }
 
         this.loadCount -= 1;
@@ -444,8 +443,11 @@ class GlobalPlanet {
     }
 
     showLoadMore() {
-        // Keep the fallback button hidden — infinite scroll handles paging.
-        document.getElementById("load-more-projects").style.display = "none";
+        const l = document.getElementById("load-more-projects");
+        if (l) {
+            l.style.display = "block";
+            l.classList.remove("disabled");
+        }
         this.loadButtonShown = true;
         this._attachScrollObserver();
     }

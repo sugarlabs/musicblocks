@@ -351,15 +351,18 @@ class GlobalCard {
         clearTimeout(this.likeTimeout);
         const like = !Planet.ProjectStorage.isLiked(this.id);
         this.likePending = true;
-        // Optimistic UI update before the round-trip
-        this.setLike(like);
+        // Optimistic UI update — only when card DOM is present
+        const likesEl = document.getElementById(`global-project-likes-${this.id}`);
+        if (likesEl) this.setLike(like);
         this.likeTimeout = setTimeout(() => {
             // GitServerInterface.likeProject uses repoName (this.id) directly
             Planet.ServerInterface.likeProject(this.id, like, data => {
                 this.likePending = false;
                 if (!data.success) {
                     // Roll back optimistic update on failure
-                    this.setLike(!like);
+                    if (document.getElementById(`global-project-likes-${this.id}`)) {
+                        this.setLike(!like);
+                    }
                 }
             });
         }, 500);
@@ -382,8 +385,10 @@ class GlobalCard {
         }
 
         const l = document.getElementById(`global-project-likes-${this.id}`);
+        if (!l) return;
         l.textContent = (parseInt(l.textContent) + incr).toString();
-        document.getElementById(`global-like-icon-${this.id}`).textContent = text;
+        const iconEl = document.getElementById(`global-like-icon-${this.id}`);
+        if (iconEl) iconEl.textContent = text;
     }
 
     init(id) {

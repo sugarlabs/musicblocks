@@ -96,14 +96,71 @@ class ServerInterface {
 
         // localStorage key prefix for ownership keys
         this._KEY_PREFIX = "mb_git_key_";
+
+        this.APIKey = window.MB_PLANET_API_KEY || null;
+        this.URL = window.MB_PLANET_URL || "";
+        this.disablePlanetCache = this.shouldDisablePlanetCache();
+    }
+
+    shouldDisablePlanetCache() {
+        return window.MB_ENV !== "production";
+    }
+
+    request(data, callback) {
+        if (this.APIKey) {
+            data["api-key"] = this.APIKey;
+        }
+        if (typeof jQuery !== "undefined" && jQuery.ajax) {
+            jQuery
+                .ajax({
+                    type: "POST",
+                    url: this.URL || this.BaseURL,
+                    data: data,
+                    dataType: "json"
+                })
+                .done(res => callback(res))
+                .fail(() => callback(this.ConnectionFailureData));
+        } else {
+            callback(this.ConnectionFailureData);
+        }
+    }
+
+    async throttledRequest(data, callback) {
+        if (this.requestManager) {
+            try {
+                await this.requestManager.throttledRequest(data, resolve => {
+                    this.request(data, result => {
+                        resolve();
+                        callback(result);
+                    });
+                });
+            } catch (err) {
+                console.error("[ServerInterface] throttledRequest error:", err);
+                callback(this.ConnectionFailureData);
+            }
+        } else {
+            this.request(data, callback);
+        }
+    }
+
+    convertFile(From, To, Data, callback) {
+        const obj = {
+            action: "convertFile",
+            From: From,
+            To: To,
+            Data: Data
+        };
+        this.throttledRequest(obj, callback);
     }
 
     // ── Initialisation ─────────────────────────────────────────────────────
 
     async init() {
-        this._initCache().catch(err =>
-            console.warn("[ServerInterface] Cache init failed (non-fatal):", err)
-        );
+        if (!this.disablePlanetCache) {
+            this._initCache().catch(err =>
+                console.warn("[ServerInterface] Cache init failed (non-fatal):", err)
+            );
+        }
         console.debug("[ServerInterface] Initialised — backend:", this.BaseURL);
     }
 

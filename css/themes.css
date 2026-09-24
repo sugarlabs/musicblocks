@@ -96,8 +96,8 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 /* Override the above rule for our git/mb-dialog modals — they need fg text, not border-colour */
 .dark #floatingWindows > .windowFrame.mb-system-dialog > .wfWinBody .wfbWidget,
 .dark .mb-system-dialog .wfbWidget {
-    color: var(--fg) !important;
-    background-color: var(--panel-bg) !important;
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-secondary) !important;
 }
 
 .dark .popupMsg {
@@ -1160,20 +1160,20 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
    MBDialog (alert / prompt modals) — dark & high-contrast
    ========================================================================== */
 
-/* Message text inherits --fg via widget.style.color in mb-dialog.js already,
+/* Message text inherits color-text-primary via widget.style.color in mb-dialog.js already,
    but ensure it overrides any computed white-on-white / black-on-black */
 .dark .mb-system-dialog .wfbWidget,
 .dark .mb-system-dialog .wfbWidget p,
 .dark .mb-system-dialog .wfbWidget div {
-    color: var(--fg) !important;
-    background-color: var(--panel-bg) !important;
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-secondary) !important;
 }
 
 .highcontrast .mb-system-dialog .wfbWidget,
 .highcontrast .mb-system-dialog .wfbWidget p,
 .highcontrast .mb-system-dialog .wfbWidget div {
-    color: var(--fg) !important;
-    background-color: var(--panel-bg) !important;
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-secondary) !important;
 }
 
 /* Input field inside MBDialog prompt */
@@ -1221,7 +1221,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 /* In dark/HC modes the hardcoded 'color: black' on .cancel-button is invisible */
 .dark .cancel-button,
 .highcontrast .cancel-button {
-    color: var(--fg) !important;
+    color: var(--color-text-primary) !important;
     background-color: var(--color-bg-tertiary, #3a3a3d) !important;
 }
 .dark .cancel-button:hover,
@@ -1244,13 +1244,13 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 
 .dark .git-system-dialog,
 .dark .git-system-widget {
-    background-color: var(--bg) !important;
-    color: var(--fg) !important;
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
 }
 
 .dark .git-system-widget p,
 .dark .git-system-widget span {
-    color: var(--fg) !important;
+    color: var(--color-text-primary) !important;
 }
 
 .highcontrast .git-system-dialog,
