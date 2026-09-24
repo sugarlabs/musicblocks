@@ -497,6 +497,25 @@ describe("ASTUtils", () => {
                 arguments: ASTUtils._getArgsAST(args)
             });
         });
+        // Every operator the JS importer turns into a block has to come back out as an operator
+        // that imports to the same block. A block missing from the export table falls through to
+        // JSInterface.getMethodName, which returns null in the app, so it exports as `null(a, b)`.
+        describe("round-trips every operator block through ast2blocks.json", () => {
+            const { argument_blocks: argumentBlocks } = require("../ast2blocks.json");
+            const operatorMap = type =>
+                argumentBlocks.find(entry =>
+                    entry.ast.identifiers.some(id => id.property === "type" && id.value === type)
+                ).name_map;
+            const binary = operatorMap("BinaryExpression");
+            const logical = operatorMap("LogicalExpression");
+
+            it.each(Object.entries(binary))("%s imports as %s and exports back", (op, block) => {
+                const result = ASTUtils._getArgExpAST(block, ["arg1", "arg2"]);
+                expect(["BinaryExpression", "LogicalExpression"]).toContain(result.type);
+                const imported = result.type === "LogicalExpression" ? logical : binary;
+                expect(imported[result.operator]).toBe(block);
+            });
+        });
     });
 
     describe("_getArgsAST", () => {
