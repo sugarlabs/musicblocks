@@ -234,6 +234,20 @@ class ASTUtils {
     static _getForLoopAST(args, flow, iteratorNum) {
         if (iteratorNum === undefined) iteratorNum = 0;
 
+        // Repeat runs its body MathUtility.doRepeatCount(n) times, but `i < n`
+        // runs Math.ceil(n) times. Only an integer literal can stay as it is.
+        let limit = ASTUtils._getArgsAST(args)[0];
+        if (!(limit.type === "Literal" && Number.isInteger(limit.value))) {
+            limit = {
+                type: "CallExpression",
+                callee: {
+                    type: "Identifier",
+                    name: "MathUtility.doRepeatCount"
+                },
+                arguments: [limit]
+            };
+        }
+
         return {
             type: "ForStatement",
             init: {
@@ -259,7 +273,7 @@ class ASTUtils {
                     type: "Identifier",
                     name: "i" + iteratorNum
                 },
-                right: ASTUtils._getArgsAST(args)[0],
+                right: limit,
                 operator: "<"
             },
             update: {

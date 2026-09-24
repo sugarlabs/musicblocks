@@ -165,6 +165,72 @@ describe("AST2BlockList Class", () => {
         }
     });
 
+    // A for loop only becomes a Repeat block when the block would run it the
+    // same number of times (#8910).
+    describe("Repeat and for loops", () => {
+        const wrap = loop => `
+        new Mouse(async mouse => {
+            ${loop}
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        test("should convert an exported Repeat back to the same block", () => {
+            const ASTUtils = require("../ASTutils");
+            const astring = require("../../../lib/astring.min");
+            global.JSInterface = require("../interface");
+            let loop;
+            try {
+                loop = astring.generate(ASTUtils._getForLoopAST([["divide", [7, 2]]], [], 0));
+            } finally {
+                delete global.JSInterface;
+            }
+            expect(loop).toBe("for (let i0 = 0; i0 < MathUtility.doRepeatCount(7 / 2); i0++) {}");
+
+            const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual([
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, "divide", 0, 0, [1, 3, 4]],
+                [3, ["number", { value: 7 }], 0, 0, [2]],
+                [4, ["number", { value: 2 }], 0, 0, [2]]
+            ]);
+        });
+
+        test("should convert a plain counting loop to a Repeat block", () => {
+            const AST = acorn.parse(wrap("for (let i = 0; i < 4; i++) {}"), {
+                ecmaVersion: 2020
+            });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual([
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, ["number", { value: 4 }], 0, 0, [1]]
+            ]);
+        });
+
+        test.each([
+            "for (let i = 0; i <= 5; i++) {}",
+            "for (let i = 0; i < 10; i += 2) {}",
+            "for (let i = 5; i < 10; i++) {}",
+            "for (let i = 10; i > 0; i--) {}",
+            "for (i = 0; i < 4; i++) {}",
+            "for (;;) {}"
+        ])("should reject %s instead of converting it to a Repeat block", loop => {
+            const code = wrap(loop);
+            const AST = acorn.parse(code, { ecmaVersion: 2020 });
+            let error;
+            try {
+                AST2BlockList.toBlockList(AST, config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix + code.substring(error.start, error.end)).toBe(
+                "Unsupported statement: " + loop
+            );
+        });
+    });
+
     // Test unsupported argument type should throw an error.
     test("should throw error for unsupported argument type", () => {
         const code = `

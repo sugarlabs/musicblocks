@@ -1035,7 +1035,7 @@
         },
         {
             "name": "repeat",
-            "comment": "Repeat block in the Flow palette",
+            "comment": "Repeat block as exported: for (let i0 = 0; i0 < MathUtility.doRepeatCount(n); i0++)",
             "arguments": [
                 {
                     "type": "NumberExpression"
@@ -1046,6 +1046,64 @@
                     {
                         "property": "type",
                         "value": "ForStatement"
+                    },
+                    {
+                        "property": "init.declarations[0].init.value",
+                        "value": 0
+                    },
+                    {
+                        "property": "test.operator",
+                        "value": "<"
+                    },
+                    {
+                        "property": "update.operator",
+                        "value": "++"
+                    },
+                    {
+                        "property": "test.right.callee.object.name",
+                        "value": "MathUtility"
+                    },
+                    {
+                        "property": "test.right.callee.property.name",
+                        "value": "doRepeatCount"
+                    }
+                ],
+                "argument_properties": [
+                    "test.right.arguments[0]"
+                ],
+                "children_properties": [
+                    "body.body"
+                ]
+            },
+            "default_vspaces": {
+                "argument": 1
+            }
+        },
+        {
+            "name": "repeat",
+            "comment": "Repeat block in the Flow palette: for (let i = 0; i < n; i++)",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ForStatement"
+                    },
+                    {
+                        "property": "init.declarations[0].init.value",
+                        "value": 0
+                    },
+                    {
+                        "property": "test.operator",
+                        "value": "<"
+                    },
+                    {
+                        "property": "update.operator",
+                        "value": "++"
                     }
                 ],
                 "argument_properties": [

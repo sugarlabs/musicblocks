@@ -18,6 +18,8 @@
  */
 
 const ASTUtils = require("../ASTutils");
+const MathUtility = require("../../utils/mathutils");
+const astring = require("../../../lib/astring.min");
 
 global.last = jest.fn(array => array[array.length - 1]);
 global.JSInterface = {
@@ -188,7 +190,14 @@ describe("ASTUtils", () => {
                         type: "Identifier",
                         name: "i" + iteratorNum
                     },
-                    right: ASTUtils._getArgsAST(args)[0],
+                    right: {
+                        type: "CallExpression",
+                        callee: {
+                            type: "Identifier",
+                            name: "MathUtility.doRepeatCount"
+                        },
+                        arguments: ASTUtils._getArgsAST(args)
+                    },
                     operator: "<"
                 },
                 update: {
@@ -205,6 +214,31 @@ describe("ASTUtils", () => {
                     body: ASTUtils._getBlockAST(flow, iteratorNum + 1)
                 }
             });
+        });
+
+        it("should keep an integer literal count as a plain loop bound", () => {
+            const result = ASTUtils._getForLoopAST([4], [], 0);
+            expect(result.test.right).toEqual({ type: "Literal", value: 4 });
+        });
+
+        // `i < n` runs Math.ceil(n) times, but Repeat runs Math.floor(n)
+        // times and skips counts below 1 (#8910).
+        it.each([
+            [4, 4],
+            [3.5, 3],
+            [2.2, 2],
+            [0.5, 0],
+            [0, 0],
+            [-2, 0],
+            [["divide", [7, 2]], 3]
+        ])("should export Repeat %j as a loop that runs %i times", (count, expected) => {
+            const code = astring.generate(ASTUtils._getForLoopAST([count], [], 0));
+            let runs = 0;
+            new Function("MathUtility", "tick", code.replace("{}", "{ tick(); }"))(
+                MathUtility,
+                () => runs++
+            );
+            expect(runs).toBe(expected);
         });
     });
 

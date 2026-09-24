@@ -364,6 +364,20 @@ class MathUtility {
         const n = Number(a);
         return Number.isNaN(n) ? NaN : Math.floor(n + 0.5);
     }
+
+    /**
+     * Returns how many times a Repeat block runs its body for count a (see
+     * RepeatBlock.flow): the count rounded down, or 0 when it is below 1 or
+     * not a number. Exported JavaScript uses it as the for-loop bound, since
+     * `i < a` alone runs Math.ceil(a) times.
+     *
+     * @static
+     * @param {*} a
+     * @returns {number} - Number of repetitions.
+     */
+    static doRepeatCount(a) {
+        return typeof a === "number" && a >= 1 ? Math.floor(a) : 0;
+    }
 }
 // Ensure mathutils.js exports the MathUtility class
 if (typeof module !== "undefined" && module.exports) {

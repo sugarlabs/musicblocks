@@ -90,13 +90,21 @@ class AST2BlockList {
                 const steps = path.split(".");
                 let current = obj;
                 for (let step of steps) {
+                    // A missing node (e.g. the null init of `for (;;)`) means the
+                    // path doesn't exist, so the entry just doesn't match.
+                    if (current === null || current === undefined) {
+                        return undefined;
+                    }
                     // Regex matching to handle array case such as arguments[0]
                     const matchStep = step.match(/(\w+)\[(\d+)\]/);
                     if (matchStep) {
                         // Following the example above, the output of matchStep will have
                         // 'arguments' at index 1 and the index (0) will be at index 2
                         current = current[matchStep[1]];
-                        current = current[matchStep[2]];
+                        current =
+                            current === null || current === undefined
+                                ? undefined
+                                : current[matchStep[2]];
                     } else {
                         current = current[step];
                     }
