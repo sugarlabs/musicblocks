@@ -75,6 +75,14 @@ describe("parseSclFile", () => {
         expect(result.pitches[0].ratio).toBeCloseTo(2, 10);
         expect(result.pitches[0].cents).toBeCloseTo(1200, 6);
     });
+
+    it("ignores text after a pitch value per the Scala spec (#8871)", () => {
+        const content = ["! major.scl", "!", "Major", "2", "200.0 D", "5/4   E"].join("\n");
+        const result = parseSclFile(content);
+        expect(result.pitchCount).toBe(2);
+        expect(result.pitches[0].cents).toBeCloseTo(200, 6);
+        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 10);
+    });
 });
 
 describe("parseModeJson", () => {

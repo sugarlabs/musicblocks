@@ -67,7 +67,9 @@ const parseSclFile = content => {
         const line = lines[idx];
         idx++;
 
-        const cleaned = line.replace(/\s*cents?\s*$/i, "").trim();
+        // Scala spec: anything after a valid pitch value should be ignored
+        // (e.g. "100.0 C#", "5/4 E", "100.0 cents").
+        const cleaned = line.split(/\s+/)[0].trim();
 
         let ratio, cents;
         if (cleaned.includes(".")) {
