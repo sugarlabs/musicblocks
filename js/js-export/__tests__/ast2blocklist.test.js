@@ -290,6 +290,53 @@ describe("AST2BlockList Class", () => {
         });
     });
 
+    // The Int block rounds half up, which is what Math.round computes, so that
+    // is the call that maps back to it (#8894).
+    test("should convert Math.round to an int block", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.print(Math.round(7 / 2));
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "print", 0, 0, [0, 2, 6]],
+            [2, "int", 0, 0, [1, 3]],
+            [3, "divide", 0, 0, [2, 4, 5]],
+            [4, ["number", { value: 7 }], 0, 0, [3]],
+            [5, ["number", { value: 2 }], 0, 0, [3]],
+            [6, "vspace", 0, 0, [1, null]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        expect(AST2BlockList.toBlockList(AST, config)).toEqual(expectedBlockList);
+    });
+
+    // Math.floor truncates and no block does that. Turning it into the
+    // rounding Int block would change what the program computes.
+    test("should reject Math.floor instead of converting it to an int block", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.print(Math.floor(7 / 2));
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        let error;
+        try {
+            AST2BlockList.toBlockList(AST, config);
+        } catch (e) {
+            error = e;
+        }
+        expect(error).toBeDefined();
+        expect(error.prefix + code.substring(error.start, error.end)).toEqual(
+            "Unsupported operator floor: Math.floor(7 / 2)"
+        );
+    });
+
     // Test unsupported argument type should throw an error.
     test("should throw error for unsupported argument type", () => {
         const code = `
