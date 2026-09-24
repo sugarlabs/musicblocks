@@ -1,7 +1,6 @@
-const TemperamentWidget = require("../temperament");
 const ManagedTimer = require("../../utils/ManagedTimer");
-
 global.ManagedTimer = ManagedTimer;
+const TemperamentWidget = require("../temperament");
 describe("TemperamentWidget basic tests", () => {
     let widget;
     const createMockElement = id => ({
@@ -733,7 +732,8 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget.editMode).toBe("octave");
     });
 
-    test("_save executes without crash", () => {
+    test("_save executes without crash and loads both stacks even if widget timers are cleared", () => {
+        jest.useFakeTimers();
         global.setOctaveRatio = jest.fn();
         global.rationalToFraction = jest.fn(() => [1, 1]);
         global.getOctaveRatio = jest.fn(() => 2);
@@ -754,6 +754,7 @@ describe("TemperamentWidget basic tests", () => {
         };
 
         widget.activity = {
+            textMsg: jest.fn(),
             blocks: {
                 loadNewBlocks: jest.fn(),
                 findUniqueTemperamentName: jest.fn(() => "custom1")
@@ -762,7 +763,15 @@ describe("TemperamentWidget basic tests", () => {
 
         widget._save();
 
-        expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+
+        // Closing the widget clears widget timers, but save's delayed loadNewBlocks must stay alive
+        widget._clearWidgetTimers();
+        jest.advanceTimersByTime(500);
+
+        expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalledTimes(2);
+        expect(widget.activity.textMsg).toHaveBeenCalled();
+        jest.useRealTimers();
     });
 
     test("_save clears the pitch-to-frequency cache when saving a custom temperament", () => {
@@ -1647,6 +1656,118 @@ describe("TemperamentWidget basic tests", () => {
                 expect.stringContaining("57"),
                 3000
             );
+        });
+    });
+
+    describe("timer fallback without ManagedTimer", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            widget = new TemperamentWidget();
+            widget._timerManager = null;
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("_setWidgetTimeout tracks the timeout and runs the callback, then stops tracking it", () => {
+            const callback = jest.fn();
+
+            const id = widget._setWidgetTimeout(callback, 500);
+            expect(widget._activeTimeouts.has(id)).toBe(true);
+
+            jest.advanceTimersByTime(500);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(widget._activeTimeouts.has(id)).toBe(false);
+        });
+
+        test("_clearWidgetTimeout returns false for null, undefined, or untracked ids", () => {
+            expect(widget._clearWidgetTimeout(null)).toBe(false);
+            expect(widget._clearWidgetTimeout(undefined)).toBe(false);
+            expect(widget._clearWidgetTimeout(999999)).toBe(false);
+        });
+
+        test("_clearWidgetTimeout cancels a tracked timeout before it fires", () => {
+            const callback = jest.fn();
+            const id = widget._setWidgetTimeout(callback, 500);
+
+            expect(widget._clearWidgetTimeout(id)).toBe(true);
+            expect(widget._activeTimeouts.has(id)).toBe(false);
+
+            jest.advanceTimersByTime(500);
+            expect(callback).not.toHaveBeenCalled();
+        });
+
+        test("_clearWidgetTimers cancels tracked timeouts, resets _playTimeout, and returns count", () => {
+            widget._setWidgetTimeout(jest.fn(), 500);
+            widget._setWidgetTimeout(jest.fn(), 700);
+            widget._playTimeout = 123;
+
+            const count = widget._clearWidgetTimers();
+
+            expect(count).toBe(2);
+            expect(widget._activeTimeouts.size).toBe(0);
+            expect(widget._playTimeout).toBeNull();
+        });
+    });
+
+    describe("timer delegation to ManagedTimer", () => {
+        beforeEach(() => {
+            widget = new TemperamentWidget();
+        });
+
+        afterEach(() => {
+            widget._clearWidgetTimers();
+        });
+
+        test("initializes with ManagedTimer when available", () => {
+            expect(widget._timerManager).toBeInstanceOf(ManagedTimer);
+        });
+
+        test("_setWidgetTimeout delegates to the timer manager", () => {
+            const callback = jest.fn();
+            widget._timerManager = {
+                setTimeout: jest.fn().mockReturnValue(42),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(widget._setWidgetTimeout(callback, 500)).toBe(42);
+            expect(widget._timerManager.setTimeout).toHaveBeenCalledWith(callback, 500);
+        });
+
+        test("_clearWidgetTimeout delegates to the timer manager", () => {
+            widget._timerManager = {
+                clearTimeout: jest.fn().mockReturnValue(true),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(widget._clearWidgetTimeout(5)).toBe(true);
+            expect(widget._timerManager.clearTimeout).toHaveBeenCalledWith(5);
+        });
+
+        test("_clearWidgetTimers delegates to the timer manager clearAll and resets _playTimeout", () => {
+            widget._timerManager = {
+                clearAll: jest.fn().mockReturnValue(3)
+            };
+            widget._playTimeout = 55;
+
+            const count = widget._clearWidgetTimers();
+
+            expect(widget._timerManager.clearAll).toHaveBeenCalledTimes(1);
+            expect(count).toBe(3);
+            expect(widget._playTimeout).toBeNull();
+        });
+
+        test("playAll delegates to _playAll when the visualizer is open", () => {
+            // With the upstream refactor, this.playAll() is a thin shell that
+            // delegates to this._playAll(), which is set by _visualizerView().
+            // Verify the delegation contract: if _playAll is defined, it is called.
+            widget._playAll = jest.fn();
+
+            widget.playAll();
+
+            expect(widget._playAll).toHaveBeenCalledTimes(1);
         });
     });
 });

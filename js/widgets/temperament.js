@@ -127,35 +127,86 @@ function TemperamentWidget() {
      */
     this.inTemperament = null;
     this._playTimeout = null;
-    if (typeof ManagedTimer !== "undefined") {
-        this._timerManager = new ManagedTimer();
-    } else if (typeof require !== "undefined") {
-        try {
-            const ManagedTimerCtor = require("../utils/ManagedTimer");
-            this._timerManager = new ManagedTimerCtor();
-        } catch (e) {
-            this._timerManager = null;
-        }
-    } else {
-        this._timerManager = null;
-    }
 
+    /**
+     * Timer manager for managing all widget timeouts safely.
+     * @type {ManagedTimer|null}
+     * @private
+     */
+    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+    /**
+     * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeTimeouts = new Set();
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
     this._setWidgetTimeout = function (callback, delay) {
         if (this._timerManager !== null) {
             return this._timerManager.setTimeout(callback, delay);
         }
-        return setTimeout(callback, delay);
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
     };
 
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
     this._clearWidgetTimeout = function (id) {
         if (id === null || id === undefined) {
             return false;
         }
-        if (this._timerManager !== null) {
-            return this._timerManager.clearTimeout(id);
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
         }
-        clearTimeout(id);
-        return true;
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers cleared.
+     */
+    this._clearWidgetTimers = function () {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+        this._playTimeout = null;
+
+        return count;
     };
 
     /**
@@ -1333,7 +1384,7 @@ function TemperamentWidget() {
         let longPressTimer = null;
         const _clearLongPress = () => {
             if (longPressTimer) {
-                clearTimeout(longPressTimer);
+                that._clearWidgetTimeout(longPressTimer);
                 longPressTimer = null;
             }
         };
@@ -1430,7 +1481,7 @@ function TemperamentWidget() {
             document.body.appendChild(menu);
             that._vizMenu = menu;
             that._vizMenuClose = _closeMenu;
-            setTimeout(function () {
+            that._setWidgetTimeout(function () {
                 if (that._vizMenu) document.addEventListener("mousedown", _closeMenu);
             }, 0);
         };
@@ -1526,7 +1577,7 @@ function TemperamentWidget() {
                 _clearLongPress();
                 const tx = e.touches[0].clientX;
                 const ty = e.touches[0].clientY;
-                longPressTimer = setTimeout(() => {
+                longPressTimer = that._setWidgetTimeout(() => {
                     if (!dragMoved && dragIndex === hit) {
                         _showMenu({ clientX: tx, clientY: ty, preventDefault: () => {} }, hit);
                         dragIndex = -1;
@@ -2928,10 +2979,9 @@ function TemperamentWidget() {
         const that = this;
 
         widgetWindow.onclose = function () {
-            if (that._playAllTimer) {
-                that._clearWidgetTimeout(that._playAllTimer);
-                that._playAllTimer = null;
-            }
+            that._clearWidgetTimers();
+            that._playing = false;
+            that._playAllTimer = null;
             that._playAllRunning = false;
             if (that._vizMenu && that._vizMenu.parentNode) {
                 that._vizMenu.parentNode.removeChild(that._vizMenu);
@@ -2940,13 +2990,6 @@ function TemperamentWidget() {
             if (that._vizMenuClose) {
                 document.removeEventListener("mousedown", that._vizMenuClose);
                 that._vizMenuClose = null;
-            }
-            if (that._playTimeout) {
-                that._clearWidgetTimeout(that._playTimeout);
-                that._playTimeout = null;
-            }
-            if (that._timerManager !== null) {
-                that._timerManager.clearAll();
             }
             that._logo.synth.stop();
             that._logo.synth.setMasterVolume(last(Singer.masterVolume));
