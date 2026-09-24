@@ -213,6 +213,7 @@ class AbcExporter {
         this.lastNoteStart = null;
         this.pendingAnnotations = [];
         this.prefixStart = null;
+        this.queueSlur = 0;
 
         const { field: keyField, alterations: keyAlterations } = abcKeySignature(keySignature);
         this.keyField = keyField;
@@ -304,6 +305,10 @@ class AbcExporter {
     __beginNote() {
         this.lastNoteStart = this.parts.length;
         this.prefixStart = null;
+        if (this.queueSlur > 0) {
+            this.parts.push("(".repeat(this.queueSlur));
+            this.queueSlur = 0;
+        }
         this.parts.push(...this.pendingAnnotations);
         this.pendingAnnotations = [];
     }
@@ -366,16 +371,23 @@ class AbcExporter {
                 this.__pushPrefix("!>)!");
                 break;
             case "begin slur":
-                if (this.lastNoteStart !== null) {
-                    this.parts.splice(this.lastNoteStart, 0, "(");
-                    if (this.prefixStart !== null) this.prefixStart++;
-                }
+                this.queueSlur++;
                 break;
             case "end slur":
-                this.parts.push(")");
+                if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
+                    const last = this.parts[this.parts.length - 1];
+                    this.parts[this.parts.length - 1] = last.slice(0, -1) + ") ";
+                } else {
+                    this.parts.push(")");
+                }
                 break;
             case "tie":
-                this.parts.push("-");
+                if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
+                    const last = this.parts[this.parts.length - 1];
+                    this.parts[this.parts.length - 1] = last.slice(0, -1) + "- ";
+                } else {
+                    this.parts.push("-");
+                }
                 break;
             case "meter":
                 if (Number(this.staging[i + 1]) > 0 && Number(this.staging[i + 2]) > 0) {
