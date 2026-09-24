@@ -243,6 +243,96 @@ describe("AST2BlockList Class", () => {
         expect(blockList).toEqual(expectedBlockList);
     });
 
+    // The Int block is round-half-up, so Math.round maps to it.
+    test("should import Math.round as an int block", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.setInstrument("guitar", async () => {
+                await mouse.playNote(Math.round(2.7), async () => {
+                    await mouse.playPitch("G♭", 3);
+                    return mouse.ENDFLOW;
+                });
+                return mouse.ENDFLOW;
+            });
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "settimbre", 0, 0, [0, 2, 3, null]],
+            [2, ["voicename", { value: "guitar" }], 0, 0, [1]],
+            [3, "newnote", 0, 0, [1, 4, 6, null]],
+            [4, "int", 0, 0, [3, 5]],
+            [5, ["number", { value: 2.7 }], 0, 0, [4]],
+            [6, "pitch", 0, 0, [3, 7, 8, null]],
+            [7, ["notename", { value: "G♭" }], 0, 0, [6]],
+            [8, ["number", { value: 3 }], 0, 0, [6]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        let blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList).toEqual(expectedBlockList);
+    });
+
+    // MathUtility.doInt is what the Int block computes; exported JS uses it.
+    test("should import MathUtility.doInt as an int block", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.setInstrument("guitar", async () => {
+                await mouse.playNote(MathUtility.doInt(2.7), async () => {
+                    await mouse.playPitch("G♭", 3);
+                    return mouse.ENDFLOW;
+                });
+                return mouse.ENDFLOW;
+            });
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "settimbre", 0, 0, [0, 2, 3, null]],
+            [2, ["voicename", { value: "guitar" }], 0, 0, [1]],
+            [3, "newnote", 0, 0, [1, 4, 6, null]],
+            [4, "int", 0, 0, [3, 5]],
+            [5, ["number", { value: 2.7 }], 0, 0, [4]],
+            [6, "pitch", 0, 0, [3, 7, 8, null]],
+            [7, ["notename", { value: "G♭" }], 0, 0, [6]],
+            [8, ["number", { value: 3 }], 0, 0, [6]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        let blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList).toEqual(expectedBlockList);
+    });
+
+    // Math.floor truncates, which is not what the Int block computes.
+    test("should throw error for Math.floor", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.setInstrument("guitar", async () => {
+                await mouse.playNote(Math.floor(1), async () => {
+                    await mouse.playPitch("G♭", 3);
+                    return mouse.ENDFLOW;
+                });
+                return mouse.ENDFLOW;
+            });
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        expect.assertions(1);
+        try {
+            AST2BlockList.toBlockList(AST, config);
+        } catch (e) {
+            expect(e.prefix + code.substring(e.start, e.end)).toEqual(
+                "Unsupported operator floor: Math.floor(1)"
+            );
+        }
+    });
+
     // Test repeat statement.
     // Support number expressions, including built-in math functions, for number of repeats.
     test("should generate correct blockList for repeat", () => {

@@ -497,6 +497,18 @@ describe("ASTUtils", () => {
                 arguments: ASTUtils._getArgsAST(args)
             });
         });
+
+        it("should export the int block as MathUtility.doInt", () => {
+            const result = ASTUtils._getArgExpAST("int", ["arg1"]);
+            expect(result).toEqual({
+                type: "CallExpression",
+                callee: {
+                    type: "Identifier",
+                    name: "MathUtility.doInt"
+                },
+                arguments: ASTUtils._getArgsAST(["arg1"])
+            });
+        });
     });
 
     describe("_getArgsAST", () => {
