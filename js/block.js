@@ -2289,13 +2289,14 @@ class Block {
     /**
      * Loads a thumbnail image onto the block.
      * @param {string} imagePath - The path to the image to load as a thumbnail.
-     * @param {*} [oldValue] - Value before a user-selected image was applied.
+     * @param {object} [valueChangeReservation] - Reserved user-selection history entry.
      */
-    loadThumbnail(imagePath, oldValue) {
+    loadThumbnail(imagePath, valueChangeReservation) {
         // Load an image thumbnail onto block.
         const thisBlock = this.blockIndex;
         const that = this;
-        const recordSelection = arguments.length > 1;
+        this._thumbnailLoadGeneration = (this._thumbnailLoadGeneration || 0) + 1;
+        const loadGeneration = this._thumbnailLoadGeneration;
 
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
             return;
@@ -2303,9 +2304,6 @@ class Block {
         const image = new Image();
 
         image.onload = () => {
-            // Before adding new artwork, remove any old artwork.
-            that.removeChildBitmap("media");
-
             const bitmap = new createjs.Bitmap(image);
             bitmap.name = "media";
 
@@ -2326,11 +2324,11 @@ class Block {
             }
             // CRITICAL FIX: PRESERVE GIF
             const src = image.src || "";
+            let effectiveValue;
 
             if (src.startsWith("data:image/gif") || src.toLowerCase().endsWith(".gif")) {
                 // DO NOT cache GIF , keeps animation
-                that.value = src;
-                that.imageBitmap = bitmap;
+                effectiveValue = src;
             } else {
                 let bounds = myContainer.getBounds();
                 if (!bounds) {
@@ -2342,9 +2340,31 @@ class Block {
                     };
                 }
                 myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                that.value = myContainer.bitmapCache.getCacheDataURL();
-                that.imageBitmap = bitmap;
+                effectiveValue = myContainer.bitmapCache.getCacheDataURL();
             }
+
+            if (valueChangeReservation) {
+                if (!that._completeValueChange(valueChangeReservation, effectiveValue)) {
+                    if (loadGeneration === that._thumbnailLoadGeneration) {
+                        that.value = valueChangeReservation.action.oldValue;
+                    }
+                    return;
+                }
+            }
+
+            if (
+                loadGeneration !== that._thumbnailLoadGeneration ||
+                (valueChangeReservation &&
+                    !that.blocks.actionHistory.includes(valueChangeReservation.action))
+            ) {
+                return;
+            }
+
+            // Before adding new artwork, remove any old artwork.
+            that.removeChildBitmap("media");
+            that.value = effectiveValue;
+            that.imageBitmap = bitmap;
+
             // Next, scale the bitmap for the thumbnail.
             that._positionMedia(
                 bitmap,
@@ -2354,8 +2374,13 @@ class Block {
             );
             that.container.addChild(bitmap);
             that.updateCache();
-            if (recordSelection) {
-                that._recordValueChange(oldValue, that.value);
+        };
+        image.onerror = () => {
+            if (valueChangeReservation) {
+                that._cancelValueChange(valueChangeReservation);
+                if (loadGeneration === that._thumbnailLoadGeneration) {
+                    that.value = valueChangeReservation.action.oldValue;
+                }
             }
         };
 
@@ -2395,6 +2420,74 @@ class Block {
     }
 
     /**
+     * Reserves a history position while an asynchronous user edit completes.
+     * @param {*} oldValue - Value before the edit.
+     * @param {*} newValue - Provisional value selected by the user.
+     * @returns {object|null} Reserved action and prior redo history.
+     */
+    _reserveValueChange(oldValue, newValue) {
+        if (!this.blocks.actionHistory || this.blocks.isUndoingOrRedoing || this.blockIndex < 0) {
+            return null;
+        }
+
+        const action = {
+            type: "value_change",
+            blockId: this.blockIndex,
+            oldValue,
+            newValue,
+            oldText: null,
+            newText: null
+        };
+        const reservation = {
+            action,
+            redoActionHistory: this.blocks.redoActionHistory
+        };
+        this.blocks.actionHistory.push(action);
+        this.blocks.redoActionHistory = [];
+        return reservation;
+    }
+
+    /**
+     * Completes a reserved value change.
+     * @param {object} reservation - Reservation returned by _reserveValueChange.
+     * @param {*} newValue - Effective value after asynchronous processing.
+     * @returns {boolean} Whether the effective value changed.
+     */
+    _completeValueChange(reservation, newValue) {
+        if (reservation.action.oldValue === newValue) {
+            this._cancelValueChange(reservation);
+            return false;
+        }
+
+        reservation.action.newValue = newValue;
+        return true;
+    }
+
+    /**
+     * Removes an unused reservation and restores redo history when still safe.
+     * @param {object} reservation - Reservation returned by _reserveValueChange.
+     */
+    _cancelValueChange(reservation) {
+        const actionIndex = this.blocks.actionHistory.indexOf(reservation.action);
+        if (actionIndex === -1) {
+            const redoIndex = this.blocks.redoActionHistory.indexOf(reservation.action);
+            if (redoIndex !== -1) {
+                this.blocks.redoActionHistory.splice(redoIndex, 1);
+                if (this.blocks.redoActionHistory.length === 0) {
+                    this.blocks.redoActionHistory = reservation.redoActionHistory;
+                }
+            }
+            return;
+        }
+
+        const wasLatestAction = actionIndex === this.blocks.actionHistory.length - 1;
+        this.blocks.actionHistory.splice(actionIndex, 1);
+        if (wasLatestAction && this.blocks.redoActionHistory.length === 0) {
+            this.blocks.redoActionHistory = reservation.redoActionHistory;
+        }
+    }
+
+    /**
      * Opens media for the block.
      * Shows a chooser modal for media blocks that lets the user
      * either select a built-in SVG image or upload from their device.
@@ -2416,8 +2509,9 @@ class Block {
                 // Callback when a built-in image is selected
                 function (dataURL) {
                     const oldValue = that.value;
+                    const reservation = that._reserveValueChange(oldValue, dataURL);
                     that.value = dataURL;
-                    that.loadThumbnail(null, oldValue);
+                    that.loadThumbnail(null, reservation);
                 },
                 // Callback when the user chooses to upload from device
                 function () {
@@ -2448,8 +2542,9 @@ class Block {
                 if (reader.result) {
                     if (that.name === "media") {
                         const oldValue = that.value;
+                        const reservation = that._reserveValueChange(oldValue, reader.result);
                         that.value = reader.result;
-                        that.loadThumbnail(null, oldValue);
+                        that.loadThumbnail(null, reservation);
                         fileChooser.value = "";
                         return;
                     }

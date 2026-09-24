@@ -7064,6 +7064,9 @@ class Blocks {
                     if (action.oldText !== null && block.text) {
                         block.text.text = action.oldText;
                     }
+                    if (block.name === "media" && typeof block.loadThumbnail === "function") {
+                        block.loadThumbnail(null);
+                    }
                     block.updateCache();
                     this.activity.refreshCanvas();
                 }
@@ -7108,6 +7111,9 @@ class Blocks {
                     block.value = action.newValue;
                     if (action.newText !== null && block.text) {
                         block.text.text = action.newText;
+                    }
+                    if (block.name === "media" && typeof block.loadThumbnail === "function") {
+                        block.loadThumbnail(null);
                     }
                     block.updateCache();
                     this.activity.refreshCanvas();

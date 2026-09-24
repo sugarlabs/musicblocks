@@ -902,6 +902,37 @@ describe("Blocks Foundation", () => {
             expect(mockBlock.actionHistory || blocks.actionHistory.length).toBeTruthy();
         });
 
+        it("reloads media artwork when undoing and redoing a media value", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = {
+                name: "media",
+                label: { value: "new-image", style: {} },
+                _labelChanged: jest.fn(),
+                text: null,
+                loadThumbnail: jest.fn(),
+                updateCache: jest.fn(),
+                value: "new-image"
+            };
+            blocks.blockList = [mockBlock];
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 0,
+                oldValue: "old-image",
+                newValue: "new-image",
+                oldText: null,
+                newText: null
+            });
+
+            blocks.undoAction();
+            expect(mockBlock.value).toBe("old-image");
+            expect(mockBlock.loadThumbnail).toHaveBeenLastCalledWith(null);
+
+            blocks.redoAction();
+            expect(mockBlock.value).toBe("new-image");
+            expect(mockBlock.loadThumbnail).toHaveBeenLastCalledWith(null);
+            expect(mockBlock.loadThumbnail).toHaveBeenCalledTimes(2);
+        });
+
         it("should undo a restore action (send newly created block to trash)", () => {
             const blocks = new Blocks(mockActivity);
             const mockBlock = { trash: false };
