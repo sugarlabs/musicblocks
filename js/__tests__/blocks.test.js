@@ -933,6 +933,38 @@ describe("Blocks Foundation", () => {
             expect(mockBlock.loadThumbnail).toHaveBeenCalledTimes(2);
         });
 
+        it.each(["audiofile", "loadFile"])(
+            "refreshes the %s label when undoing and redoing its value",
+            name => {
+                const blocks = new Blocks(mockActivity);
+                blocks.updateBlockText = jest.fn();
+                const mockBlock = {
+                    name,
+                    label: { value: ["new-file", "new-content"], style: {} },
+                    _labelChanged: jest.fn(),
+                    text: null,
+                    updateCache: jest.fn(),
+                    value: ["new-file", "new-content"]
+                };
+                blocks.blockList = [mockBlock];
+                blocks.actionHistory.push({
+                    type: "value_change",
+                    blockId: 0,
+                    oldValue: ["old-file", "old-content"],
+                    newValue: ["new-file", "new-content"],
+                    oldText: null,
+                    newText: null
+                });
+
+                blocks.undoAction();
+                expect(blocks.updateBlockText).toHaveBeenLastCalledWith(0);
+
+                blocks.redoAction();
+                expect(blocks.updateBlockText).toHaveBeenLastCalledWith(0);
+                expect(blocks.updateBlockText).toHaveBeenCalledTimes(2);
+            }
+        );
+
         it("should undo a restore action (send newly created block to trash)", () => {
             const blocks = new Blocks(mockActivity);
             const mockBlock = { trash: false };

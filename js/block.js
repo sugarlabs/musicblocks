@@ -2304,6 +2304,10 @@ class Block {
         const image = new Image();
 
         image.onload = () => {
+            if (loadGeneration !== that._thumbnailLoadGeneration) {
+                return;
+            }
+
             const bitmap = new createjs.Bitmap(image);
             bitmap.name = "media";
 
@@ -2353,9 +2357,8 @@ class Block {
             }
 
             if (
-                loadGeneration !== that._thumbnailLoadGeneration ||
-                (valueChangeReservation &&
-                    !that.blocks.actionHistory.includes(valueChangeReservation.action))
+                valueChangeReservation &&
+                !that.blocks.actionHistory.includes(valueChangeReservation.action)
             ) {
                 return;
             }
@@ -2399,8 +2402,15 @@ class Block {
      * @param {string|null} newText - Displayed text after the edit.
      */
     _recordValueChange(oldValue, newValue, oldText = null, newText = null) {
-        if (
+        const valuesMatch =
             oldValue === newValue ||
+            (Array.isArray(oldValue) &&
+                Array.isArray(newValue) &&
+                oldValue.length === newValue.length &&
+                oldValue.every((value, index) => value === newValue[index]));
+
+        if (
+            valuesMatch ||
             !this.blocks.actionHistory ||
             this.blocks.isUndoingOrRedoing ||
             this.blockIndex < 0

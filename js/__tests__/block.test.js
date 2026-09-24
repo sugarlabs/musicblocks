@@ -867,11 +867,14 @@ describe("Block Foundation", () => {
             const second = block._reserveValueChange("first.gif", "second.gif");
             block.value = "second.gif";
             block.loadThumbnail("second.gif", second);
+            const completeValueChange = jest.spyOn(block, "_completeValueChange");
 
             images[1].onload();
             images[0].onload();
 
             expect(block.value).toBe("second.gif");
+            expect(completeValueChange).toHaveBeenCalledTimes(1);
+            expect(completeValueChange).toHaveBeenCalledWith(second, "second.gif");
             expect(block.blocks.actionHistory.map(action => action.newValue)).toEqual([
                 "first.gif",
                 "second.gif"
@@ -1038,6 +1041,13 @@ describe("Block Foundation", () => {
             ]);
             expect(block.blocks.redoActionHistory).toEqual([]);
             expect(block.blocks.updateBlockText).toHaveBeenCalledWith(4);
+
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 0 }];
+            changeHandler();
+
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
 
             global.FileReader = originalFileReader;
             window.scroll = originalScroll;

@@ -7066,6 +7066,8 @@ class Blocks {
                     }
                     if (block.name === "media" && typeof block.loadThumbnail === "function") {
                         block.loadThumbnail(null);
+                    } else if (["audiofile", "loadFile"].includes(block.name)) {
+                        this.updateBlockText(action.blockId);
                     }
                     block.updateCache();
                     this.activity.refreshCanvas();
@@ -7114,6 +7116,8 @@ class Blocks {
                     }
                     if (block.name === "media" && typeof block.loadThumbnail === "function") {
                         block.loadThumbnail(null);
+                    } else if (["audiofile", "loadFile"].includes(block.name)) {
+                        this.updateBlockText(action.blockId);
                     }
                     block.updateCache();
                     this.activity.refreshCanvas();
