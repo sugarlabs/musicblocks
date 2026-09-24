@@ -721,11 +721,21 @@ class Tempo {
                 );
                 this._widgetNextTimes[i] += this._intervals[i];
 
-                // Ensure we are at the edge.
-                if (this._directions[i] === -1) {
-                    this._directions[i] = 1;
-                } else {
-                    this._directions[i] = -1;
+                // If the loop fell behind (e.g. a throttled background tab), skip the
+                // missed beats instead of replaying them one per frame. Keep the
+                // beat phase so the next beat still lands on the original grid.
+                let beatsPassed = 1;
+                if (this._intervals[i] > 0 && d.getTime() >= this._widgetNextTimes[i]) {
+                    const missed =
+                        Math.floor((d.getTime() - this._widgetNextTimes[i]) / this._intervals[i]) +
+                        1;
+                    this._widgetNextTimes[i] += missed * this._intervals[i];
+                    beatsPassed += missed;
+                }
+
+                // Ensure we are at the edge (flip once per beat that went by).
+                if (beatsPassed % 2 === 1) {
+                    this._directions[i] = this._directions[i] === -1 ? 1 : -1;
                 }
             } else {
                 // Determine new x position based on delta time.
