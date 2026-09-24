@@ -810,6 +810,15 @@ describe("Sampler Widget", () => {
             expect(widget.handleFiles).toHaveBeenCalledWith("file");
         });
 
+        test("drag_and_drop does nothing if samplerCanvas is not found", () => {
+            widget.widgetWindow = widgetWindow;
+            // Clear the widget body so it has no canvas
+            widgetWindow.getWidgetBody().innerHTML = "";
+            widget.drag_and_drop();
+            // Should not throw an error and _dropZone should be undefined/null
+            expect(widget._dropZone).toBeUndefined();
+        });
+
         test("_addSample updates or inserts custom samples", () => {
             widget.sampleName = "sample1";
             widget.sampleData = "data1";
