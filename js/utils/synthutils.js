@@ -163,13 +163,13 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_("snare drum"), "snare drum", "images/snaredrum.svg", "sn", "drum"],
     //.TRANS: musical instrument
-    [_("kick drum"), "kick drum", "images/kick.svg", "hh", "drum"],
+    [_("kick drum"), "kick drum", "images/kick.svg", "bd", "drum"],
     //.TRANS: musical instrument
     [_("tom tom"), "tom tom", "images/tom.svg", "tomml", "drum"],
     //.TRANS: musical instrument
     [_("floor tom"), "floor tom", "images/floortom.svg", "tomfl", "drum"],
     //.TRANS: musical instrument
-    [_("bass drum"), "bass drum", "images/kick.svg", "tomfl", "drum"],
+    [_("bass drum"), "bass drum", "images/kick.svg", "bd", "drum"],
     //.TRANS: a drum made from an inverted cup
     [_("cup drum"), "cup drum", "images/cup.svg", "hh", "drum"],
     //.TRANS: musical instrument

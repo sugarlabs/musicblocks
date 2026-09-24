@@ -4101,3 +4101,19 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
         });
     });
 });
+
+describe("DRUMNAMES Lilypond symbols", () => {
+    const { DRUMNAMES } = synthutilsModule;
+
+    const symbolFor = name => DRUMNAMES.find(drum => drum[1] === name)[3];
+
+    it("writes the kick drum and the bass drum as bd", () => {
+        expect(symbolFor("kick drum")).toBe("bd");
+        expect(symbolFor("bass drum")).toBe("bd");
+    });
+
+    it("leaves the snare drum and the hi hat alone", () => {
+        expect(symbolFor("snare drum")).toBe("sn");
+        expect(symbolFor("hi hat")).toBe("hh");
+    });
+});
