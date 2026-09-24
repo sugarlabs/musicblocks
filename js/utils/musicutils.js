@@ -3314,10 +3314,11 @@ const getDrumSymbol = name => {
     }
 
     for (let drum = 0; drum < DRUMNAMES.length; drum++) {
-        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+        if (
+            DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() ||
+            DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()
+        ) {
             return DRUMNAMES[drum][3];
-        } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-            return "hh";
         }
     }
 

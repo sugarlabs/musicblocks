@@ -656,10 +656,11 @@ describe("getDrum", () => {
             if (name === "") return "hh";
 
             for (let drum = 0; drum < DRUMNAMES.length; drum++) {
-                if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+                if (
+                    DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() ||
+                    DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()
+                ) {
                     return DRUMNAMES[drum][3];
-                } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-                    return "hh";
                 }
             }
 
@@ -723,6 +724,7 @@ describe("getDrum", () => {
         it("should return the correct symbol for a valid drum name", () => {
             expect(getDrumSymbol("snare drum")).toBe("sn");
             expect(getDrumSymbol("kick drum")).toBe("bd");
+            expect(getDrumSymbol("bass drum")).toBe("bd");
             expect(getDrumSymbol("floor tom")).toBe("tomfl");
         });
 
@@ -734,9 +736,9 @@ describe("getDrum", () => {
             expect(getDrumSymbol("invalid drum")).toBe("hh");
         });
 
-        it('should return "hh" for a name matching the second element of DRUMNAMES', () => {
+        it("should return the symbol for a name matching the second element of DRUMNAMES", () => {
             expect(getDrumSymbol("snare drum")).toBe("sn");
-            expect(getDrumSymbol("kick drum")).toBe("bd"); // As per logic
+            expect(getDrumSymbol("kick drum")).toBe("bd");
         });
 
         it("should ignore case sensitivity when matching drum names", () => {
@@ -3991,8 +3993,9 @@ describe("actual drum lookup helpers", () => {
     beforeEach(() => {
         global.DRUMNAMES = [
             ["snare drum", "snare drum", "images/snaredrum.svg", "sn", "snare"],
-            ["kick drum", "kick drum", "images/kick.svg", "hh", "kick"],
-            ["floor tom", "floor tom", "images/floortom.svg", "tomfl", "tom"]
+            ["kick drum", "kick drum", "images/kick.svg", "bd", "kick"],
+            ["floor tom", "floor tom", "images/floortom.svg", "tomfl", "tom"],
+            ["キックドラム", "taiko", "images/tom.svg", "tomml", "taiko"]
         ];
     });
 
@@ -4007,7 +4010,14 @@ describe("actual drum lookup helpers", () => {
     it("returns drum symbols with default and fallback handling", () => {
         expect(actualMusicUtils.getDrumSymbol("")).toBe("hh");
         expect(actualMusicUtils.getDrumSymbol("snare drum")).toBe("sn");
+        expect(actualMusicUtils.getDrumSymbol("kick drum")).toBe("bd");
         expect(actualMusicUtils.getDrumSymbol("missing")).toBe("hh");
+    });
+
+    it("resolves the canonical name to the drum's own symbol when localized names differ", () => {
+        // DRUMNAMES[3][0] is a localized label that does not equal "taiko";
+        // the canonical DRUMNAMES[3][1] must still reach that row's symbol.
+        expect(actualMusicUtils.getDrumSymbol("taiko")).toBe("tomml");
     });
 
     describe("_parse_pitch_string", () => {
