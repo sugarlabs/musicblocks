@@ -3439,12 +3439,44 @@ describe("getPitchInfo", () => {
     it("returns color", () => {
         const color = getPitchInfo(activity, "pitch to color", "C4", tur);
         expect(typeof color).toBe("number");
+
+        const turFlat = { singer: { keySignature: "F major", movable: false } };
+        const flatColor = getPitchInfo(activity, "pitch to color", "Bb4", turFlat);
+        expect(typeof flatColor).toBe("number");
+
+        const unknownColor = getPitchInfo(activity, "pitch to color", "X4", tur);
+        expect(unknownColor).toBe(0);
+    });
+
+    it("handles errors during getPitchInfo smoothly", () => {
+        // Mock _getFrequency to throw an error so the try/catch inside getPitchInfo is hit
+        activity.logo.synth._getFrequency.mockImplementationOnce(() => {
+            throw new Error("Mock error");
+        });
+        getPitchInfo(activity, "pitch in hertz", "C4", tur);
+        // The error should be caught and logged (or at least not crash the test)
     });
 
     it("returns shade", () => {
         // octave * 12.5 -> 4 * 12.5 = 50
         const shade = getPitchInfo(activity, "pitch to shade", "C4", tur);
         expect(shade).toBe(50);
+    });
+
+    it("handles solfege class with accidental", () => {
+        expect(getPitchInfo(activity, "solfege class", "C#4", tur)).toBe("re");
+    });
+
+    it("returns pitch number", () => {
+        const pNum = getPitchInfo(activity, "pitch number", "C4", tur);
+        expect(typeof pNum).toBe("number");
+    });
+
+    it("handles equivalent sharps mapping", () => {
+        // "Db" translates to "D♭". In C major, "D♭" is not in the scale.
+        // It should look it up in EQUIVALENTSHARPS and convert to "C♯".
+        const pitch = getPitchInfo(activity, "alphabet", "Db4", tur);
+        expect(pitch).toBe("C♯");
     });
 
     it("handles invalid type", () => {
