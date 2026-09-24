@@ -133,6 +133,13 @@ function LegoWidget() {
     this._dragMoveHandler = null;
     this._dragUpHandler = null;
 
+    // Off-screen canvas for pixel sampling — created once per media load and
+    // reused across all animation frames to avoid per-frame canvas allocations.
+    this._offscreenCanvas = null;
+    this._offscreenCtx = null;
+    this._offscreenIsVideo = false;
+    this._offscreenMediaElement = null;
+
     // Pitch block handling properties (similar to PhraseMaker)
     this.rowLabels = [];
     this.rowArgs = [];
@@ -323,6 +330,9 @@ function LegoWidget() {
             this._cleanupDragListeners(); // Clean up drag event listeners
             this.imageWrapper = null;
             this.webcamVideo = null;
+            this._offscreenCanvas = null;
+            this._offscreenCtx = null;
+            this._offscreenMediaElement = null;
             this.running = false;
             widgetWindow.destroy();
         };
@@ -1303,6 +1313,8 @@ function LegoWidget() {
                 img.style.objectFit = "contain";
                 img.style.borderRadius = "8px";
                 img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+                // Rebuild the off-screen canvas once natural dimensions are available.
+                img.onload = () => this._buildOffscreenCanvas();
 
                 this.imageWrapper.appendChild(img);
                 this.imageDisplayArea.appendChild(this.imageWrapper);
@@ -1322,6 +1334,11 @@ function LegoWidget() {
      */
     this._startWebcam = function () {
         this.imageDisplayArea.replaceChildren();
+
+        this._offscreenCanvas = null;
+        this._offscreenCtx = null;
+        this._offscreenIsVideo = false;
+        this._offscreenMediaElement = null;
 
         this.imageWrapper = createImageWrapper();
 
@@ -1359,6 +1376,8 @@ function LegoWidget() {
                     img.style.objectFit = "contain";
                     img.style.borderRadius = "8px";
                     img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+                    // Rebuild off-screen canvas once photo dimensions are available.
+                    img.onload = () => this._buildOffscreenCanvas();
                     this.imageWrapper.replaceChildren(img);
                     captureBtn.remove();
 
@@ -1715,6 +1734,79 @@ function LegoWidget() {
     };
 
     /**
+     * Builds (or rebuilds) the shared off-screen canvas used by _sampleAndDetectColor.
+     *
+     * For <img> elements the full image is drawn to the canvas once here and the
+     * canvas is reused for the entire scan — zero per-frame allocations.
+     * For <video> elements only the canvas object is created here; pixels are
+     * redrawn into it each animation tick because the webcam frame changes.
+     *
+     * Call this whenever a new media element is set (image upload, webcam capture).
+     * It is also called lazily from _sampleAndDetectColor as a safety fallback.
+     * @private
+     * @returns {void}
+     */
+    this._buildOffscreenCanvas = function () {
+        let mediaElement = null;
+        if (this.imageWrapper) {
+            mediaElement =
+                this.imageWrapper.querySelector("img") || this.imageWrapper.querySelector("video");
+        }
+
+        if (!mediaElement) {
+            this._offscreenCanvas = null;
+            this._offscreenCtx = null;
+            this._offscreenIsVideo = false;
+            this._offscreenMediaElement = null;
+            return;
+        }
+
+        const isVideo = mediaElement.tagName === "VIDEO";
+        const w = isVideo
+            ? mediaElement.videoWidth || mediaElement.clientWidth
+            : mediaElement.naturalWidth || mediaElement.clientWidth;
+        const h = isVideo
+            ? mediaElement.videoHeight || mediaElement.clientHeight
+            : mediaElement.naturalHeight || mediaElement.clientHeight;
+
+        if (w === 0 || h === 0) {
+            // Dimensions not available yet (image still decoding); the img.onload
+            // callback registered in _handleImageUpload will call us again.
+            this._offscreenCanvas = null;
+            this._offscreenCtx = null;
+            this._offscreenIsVideo = false;
+            this._offscreenMediaElement = null;
+            return;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+        if (!isVideo) {
+            // Static image — draw once, reuse across every animation frame.
+            try {
+                ctx.drawImage(mediaElement, 0, 0, w, h);
+            } catch (e) {
+                console.warn("Could not draw media element to off-screen canvas:", e);
+                this._offscreenCanvas = null;
+                this._offscreenCtx = null;
+                this._offscreenIsVideo = false;
+                this._offscreenMediaElement = null;
+                return;
+            }
+        }
+        // For video the canvas dimensions are set but pixels are drawn per-frame
+        // in _sampleAndDetectColor to capture the live webcam feed.
+
+        this._offscreenCanvas = canvas;
+        this._offscreenCtx = ctx;
+        this._offscreenIsVideo = isVideo;
+        this._offscreenMediaElement = mediaElement;
+    };
+
+    /**
      * Activates the image/webcam display area: makes it draggable and
      * refreshes the zoom controls and grid overlay for the new media.
      * @private
@@ -1724,6 +1816,11 @@ function LegoWidget() {
         this._makeImageDraggable(this.imageWrapper);
         this._showZoomControls();
         this._drawGridLines();
+        // Pre-build the off-screen sampling canvas for the newly loaded media.
+        // img.onload in _handleImageUpload will rebuild if dimensions are not
+        // yet available at this point (data-URL decode is typically synchronous,
+        // but we defend against the async case).
+        this._buildOffscreenCanvas();
     };
 
     /**
@@ -2678,32 +2775,45 @@ function LegoWidget() {
             return; // Don't sample pixels, just use the bound color
         }
 
-        // Create a temporary canvas to sample pixel data
-        const tempCanvas = document.createElement("canvas");
-        const ctx = tempCanvas.getContext("2d", { willReadFrequently: true });
-
-        // Set canvas size to match the media element's display size
-        const mediaRect = mediaElement.getBoundingClientRect();
-        const overlayRect = this.gridOverlay.getBoundingClientRect();
-
-        tempCanvas.width = mediaElement.naturalWidth || mediaElement.videoWidth || mediaRect.width;
-        tempCanvas.height =
-            mediaElement.naturalHeight || mediaElement.videoHeight || mediaRect.height;
-
-        // Draw the media element to the canvas
-        try {
-            ctx.drawImage(mediaElement, 0, 0, tempCanvas.width, tempCanvas.height);
-        } catch (e) {
-            console.error("Error drawing image to canvas:", e);
+        // Resolve the shared off-screen canvas (pre-built in _activateMediaDisplay /
+        // img.onload). Rebuild lazily if it was cleared, if the media element changed,
+        // or if video dimensions updated once metadata loaded.
+        const needsRebuild =
+            !this._offscreenCanvas ||
+            this._offscreenMediaElement !== mediaElement ||
+            (this._offscreenIsVideo &&
+                mediaElement.videoWidth > 0 &&
+                (this._offscreenCanvas.width !== mediaElement.videoWidth ||
+                    this._offscreenCanvas.height !== mediaElement.videoHeight));
+        if (needsRebuild) {
+            this._buildOffscreenCanvas();
+        }
+        if (!this._offscreenCanvas) {
+            console.warn("No off-screen canvas available for color sampling");
             return;
         }
 
-        // Get overlay and image positioning
-        const imageRect = mediaElement.getBoundingClientRect();
+        const tempCanvas = this._offscreenCanvas;
+        const ctx = this._offscreenCtx;
+
+        // For live video, capture the current webcam frame into the shared canvas.
+        // Static <img> pixels do not change between frames — no redraw needed.
+        if (this._offscreenIsVideo) {
+            try {
+                ctx.drawImage(mediaElement, 0, 0, tempCanvas.width, tempCanvas.height);
+            } catch (e) {
+                console.error("Error updating off-screen canvas for video frame:", e);
+                return;
+            }
+        }
+
+        // Single layout-flush for both the media bounds and the overlay bounds.
+        const mediaRect = mediaElement.getBoundingClientRect();
+        const overlayRect = this.gridOverlay.getBoundingClientRect();
 
         // Calculate image position relative to overlay
-        const imageOffsetX = imageRect.left - overlayRect.left;
-        const imageOffsetY = imageRect.top - overlayRect.top;
+        const imageOffsetX = mediaRect.left - overlayRect.left;
+        const imageOffsetY = mediaRect.top - overlayRect.top;
 
         // Convert overlay coordinates to image coordinates
         const overlayX = line.currentX;
@@ -2717,14 +2827,14 @@ function LegoWidget() {
 
         // Early return if we're outside the horizontal image bounds
         // (The animation loop will handle stopping the line when it reaches the edge)
-        if (imageX < 0 || imageX >= imageRect.width) {
+        if (imageX < 0 || imageX >= mediaRect.width) {
             // We're outside the image horizontally - no need to sample
             return;
         }
 
         // Calculate canvas coordinates with proper scaling
-        const scaleX = tempCanvas.width / imageRect.width;
-        const scaleY = tempCanvas.height / imageRect.height;
+        const scaleX = tempCanvas.width / mediaRect.width;
+        const scaleY = tempCanvas.height / mediaRect.height;
 
         const canvasX = Math.floor(imageX * scaleX);
         const canvasY1 = Math.max(0, Math.floor(imageY1 * scaleY));
