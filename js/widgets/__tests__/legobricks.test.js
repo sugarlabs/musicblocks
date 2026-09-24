@@ -2341,3 +2341,443 @@ describe("LegoWidget — _clearPhrase and _initializeMatrix safety (Issue #8609)
         });
     });
 });
+
+// =============================================================================
+// BUG-1: per-frame canvas allocation in _sampleAndDetectColor
+//
+// Before the fix, _sampleAndDetectColor created a brand-new <canvas> element
+// on every requestAnimationFrame tick (once per scanning line). For a 10-row
+// scan at 60 fps that is ~600 allocations / second, each backed by a full
+// drawImage of the source media — enough GC pressure to stutter the animation
+// on low-end classroom devices.
+//
+// The fix introduces _buildOffscreenCanvas, which creates ONE canvas per media
+// load and stores it on this._offscreenCanvas / this._offscreenCtx.
+// _sampleAndDetectColor then uses that shared canvas:
+//   • <img>   — pixels already drawn at build time; zero per-frame redraw.
+//   • <video> — canvas object reused; only pixels redrawn each frame.
+// =============================================================================
+describe("LegoWidget — BUG-1: shared off-screen canvas (_buildOffscreenCanvas)", () => {
+    let legoWidget;
+
+    /** Minimal img stub with controllable dimensions. */
+    const makeImg = ({ w = 200, h = 100, crossOrigin = false } = {}) => {
+        const img = document.createElement("img");
+        Object.defineProperty(img, "naturalWidth", { value: w, configurable: true });
+        Object.defineProperty(img, "naturalHeight", { value: h, configurable: true });
+        img.getBoundingClientRect = () => ({ left: 0, top: 0, width: w, height: h });
+        img._crossOrigin = crossOrigin;
+        return img;
+    };
+
+    /** Minimal video stub with controllable dimensions. */
+    const makeVideo = ({ w = 320, h = 240 } = {}) => {
+        const video = document.createElement("video");
+        Object.defineProperty(video, "videoWidth", { value: w, configurable: true });
+        Object.defineProperty(video, "videoHeight", { value: h, configurable: true });
+        Object.defineProperty(video, "tagName", { value: "VIDEO" });
+        return video;
+    };
+
+    /** Mount a media element into a fresh imageWrapper and attach to the widget. */
+    const mountMedia = mediaElement => {
+        const wrapper = document.createElement("div");
+        wrapper.appendChild(mediaElement);
+        legoWidget.imageWrapper = wrapper;
+    };
+
+    beforeEach(() => {
+        global._ = val => val;
+        global.Synth = jest.fn().mockImplementation(() => ({
+            loadSamples: jest.fn(),
+            createSynth: jest.fn(),
+            trigger: jest.fn(),
+            stopSound: jest.fn()
+        }));
+        legoWidget = new LegoWidget();
+    });
+
+    afterEach(() => {
+        delete global._;
+        delete global.Synth;
+        jest.restoreAllMocks();
+    });
+
+    // -------------------------------------------------------------------------
+    // _buildOffscreenCanvas: initial state
+    // -------------------------------------------------------------------------
+
+    it("initialises with all off-screen canvas properties null", () => {
+        expect(legoWidget._offscreenCanvas).toBeNull();
+        expect(legoWidget._offscreenCtx).toBeNull();
+        expect(legoWidget._offscreenIsVideo).toBe(false);
+        expect(legoWidget._offscreenMediaElement).toBeNull();
+    });
+
+    // -------------------------------------------------------------------------
+    // _buildOffscreenCanvas: no imageWrapper → clears everything
+    // -------------------------------------------------------------------------
+
+    it("_buildOffscreenCanvas clears all properties when imageWrapper is null", () => {
+        legoWidget.imageWrapper = null;
+        // Seed with dummy values to confirm they are cleared.
+        legoWidget._offscreenCanvas = document.createElement("canvas");
+        legoWidget._offscreenCtx = {};
+        legoWidget._offscreenIsVideo = true;
+        legoWidget._offscreenMediaElement = document.createElement("img");
+
+        legoWidget._buildOffscreenCanvas();
+
+        expect(legoWidget._offscreenCanvas).toBeNull();
+        expect(legoWidget._offscreenCtx).toBeNull();
+        expect(legoWidget._offscreenIsVideo).toBe(false);
+        expect(legoWidget._offscreenMediaElement).toBeNull();
+    });
+
+    // -------------------------------------------------------------------------
+    // _buildOffscreenCanvas: <img> — draws ONCE, marks isVideo false
+    // -------------------------------------------------------------------------
+
+    it("_buildOffscreenCanvas builds a canvas sized to naturalWidth × naturalHeight for an <img>", () => {
+        const img = makeImg({ w: 400, h: 300 });
+        mountMedia(img);
+
+        const drawImageSpy = jest.fn();
+        const realCreate = document.createElement.bind(document);
+        let builtCanvas = null;
+        jest.spyOn(document, "createElement").mockImplementation(tag => {
+            const el = realCreate(tag);
+            if (tag === "canvas") {
+                builtCanvas = el;
+                el.getContext = jest.fn(() => ({ drawImage: drawImageSpy }));
+            }
+            return el;
+        });
+
+        legoWidget._buildOffscreenCanvas();
+
+        expect(builtCanvas).not.toBeNull();
+        expect(builtCanvas.width).toBe(400);
+        expect(builtCanvas.height).toBe(300);
+        expect(legoWidget._offscreenCanvas).toBe(builtCanvas);
+        expect(legoWidget._offscreenIsVideo).toBe(false);
+        expect(legoWidget._offscreenMediaElement).toBe(img);
+        // Static image must be drawn exactly once at build time.
+        expect(drawImageSpy).toHaveBeenCalledTimes(1);
+        expect(drawImageSpy).toHaveBeenCalledWith(img, 0, 0, 400, 300);
+    });
+
+    // -------------------------------------------------------------------------
+    // _buildOffscreenCanvas: <video> — canvas created but NOT drawn yet
+    // -------------------------------------------------------------------------
+
+    it("_buildOffscreenCanvas creates a canvas for a <video> but does NOT draw pixels", () => {
+        const video = makeVideo({ w: 640, h: 480 });
+        mountMedia(video);
+
+        const drawImageSpy = jest.fn();
+        const realCreate = document.createElement.bind(document);
+        let builtCanvas = null;
+        jest.spyOn(document, "createElement").mockImplementation(tag => {
+            const el = realCreate(tag);
+            if (tag === "canvas") {
+                builtCanvas = el;
+                el.getContext = jest.fn(() => ({ drawImage: drawImageSpy }));
+            }
+            return el;
+        });
+
+        legoWidget._buildOffscreenCanvas();
+
+        expect(builtCanvas).not.toBeNull();
+        expect(builtCanvas.width).toBe(640);
+        expect(builtCanvas.height).toBe(480);
+        expect(legoWidget._offscreenIsVideo).toBe(true);
+        // Video frames are drawn per-tick in _sampleAndDetectColor, not here.
+        expect(drawImageSpy).not.toHaveBeenCalled();
+    });
+
+    // -------------------------------------------------------------------------
+    // _buildOffscreenCanvas: dimensions not ready → no canvas created
+    // -------------------------------------------------------------------------
+
+    it("_buildOffscreenCanvas does not create a canvas when image dimensions are 0", () => {
+        const img = makeImg({ w: 0, h: 0 });
+        mountMedia(img);
+
+        const realCreate = document.createElement.bind(document);
+        const canvasCreateSpy = jest.fn(tag => realCreate(tag));
+        jest.spyOn(document, "createElement").mockImplementation(canvasCreateSpy);
+
+        legoWidget._buildOffscreenCanvas();
+
+        // No canvas should have been created for a zero-dimension image.
+        const canvasCalls = canvasCreateSpy.mock.calls.filter(([t]) => t === "canvas");
+        expect(canvasCalls).toHaveLength(0);
+        expect(legoWidget._offscreenCanvas).toBeNull();
+    });
+
+    // -------------------------------------------------------------------------
+    // _buildOffscreenCanvas: cross-origin image taints canvas → graceful bail
+    // -------------------------------------------------------------------------
+
+    it("_buildOffscreenCanvas bails gracefully when drawImage throws for a cross-origin image", () => {
+        const img = makeImg({ w: 100, h: 100 });
+        mountMedia(img);
+
+        const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        const realCreate = document.createElement.bind(document);
+        jest.spyOn(document, "createElement").mockImplementation(tag => {
+            const el = realCreate(tag);
+            if (tag === "canvas") {
+                el.getContext = jest.fn(() => ({
+                    drawImage: jest.fn(() => {
+                        throw new DOMException("Cross-origin", "SecurityError");
+                    })
+                }));
+            }
+            return el;
+        });
+
+        expect(() => legoWidget._buildOffscreenCanvas()).not.toThrow();
+        // When drawImage fails the canvas must NOT be stored.
+        expect(legoWidget._offscreenCanvas).toBeNull();
+        expect(warnSpy).toHaveBeenCalled();
+    });
+
+    // -------------------------------------------------------------------------
+    // _activateMediaDisplay integration
+    // -------------------------------------------------------------------------
+
+    it("_activateMediaDisplay calls _buildOffscreenCanvas after media is mounted", () => {
+        legoWidget._makeImageDraggable = jest.fn();
+        legoWidget._showZoomControls = jest.fn();
+        legoWidget._drawGridLines = jest.fn();
+        legoWidget._buildOffscreenCanvas = jest.fn();
+        legoWidget.imageWrapper = document.createElement("div");
+
+        legoWidget._activateMediaDisplay();
+
+        expect(legoWidget._buildOffscreenCanvas).toHaveBeenCalledTimes(1);
+    });
+
+    // -------------------------------------------------------------------------
+    // _sampleAndDetectColor: reuses shared canvas — no extra createElement
+    // -------------------------------------------------------------------------
+
+    it("_sampleAndDetectColor reuses the shared canvas without calling document.createElement('canvas')", () => {
+        const img = makeImg({ w: 200, h: 100 });
+        mountMedia(img);
+
+        const getImageDataResult = { data: [0, 0, 255, 255] }; // blue pixel
+        const mockCtx = {
+            drawImage: jest.fn(),
+            getImageData: jest.fn(() => getImageDataResult)
+        };
+        const mockCanvas = { width: 200, height: 100, getContext: jest.fn(() => mockCtx) };
+
+        legoWidget._offscreenCanvas = mockCanvas;
+        legoWidget._offscreenCtx = mockCtx;
+        legoWidget._offscreenIsVideo = false;
+        legoWidget._offscreenMediaElement = img;
+
+        const overlayEl = {
+            getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 400 })
+        };
+        legoWidget.gridOverlay = overlayEl;
+
+        // Spy: any call to createElement("canvas") in this code path is a regression.
+        const canvasCreateSpy = jest.fn();
+        const realCreate = document.createElement.bind(document);
+        jest.spyOn(document, "createElement").mockImplementation(tag => {
+            if (tag === "canvas") canvasCreateSpy(tag);
+            return realCreate(tag);
+        });
+
+        const line = {
+            topPos: 0,
+            bottomPos: 40,
+            currentX: 50,
+            currentColor: null,
+            colorStartTime: null,
+            lastColorChangeTime: null,
+            rowIndex: 0
+        };
+        legoWidget.colorData = [{ note: "C4", colorSegments: [] }];
+        legoWidget._getColorForCanvasRow = jest.fn(() => null); // inside image bounds
+        legoWidget._addColorSegment = jest.fn();
+        legoWidget.selectedBackgroundColor = { name: "green" };
+        legoWidget._getColorFamily = jest.fn(() => ({ name: "blue", hue: 240 }));
+        legoWidget._getColorFamilyByName = jest.fn(name => ({ name, hue: 240 }));
+        legoWidget._colorsAreSimilar = jest.fn(() => false);
+
+        legoWidget._sampleAndDetectColor(line, Date.now());
+
+        // The canvas element must NOT have been created inside the hot path.
+        expect(canvasCreateSpy).not.toHaveBeenCalled();
+        // Static image: drawImage must NOT be called during scan (only at build time).
+        expect(mockCtx.drawImage).not.toHaveBeenCalled();
+    });
+
+    // -------------------------------------------------------------------------
+    // _sampleAndDetectColor: video path redraws each call
+    // -------------------------------------------------------------------------
+
+    it("_sampleAndDetectColor redraws into the shared canvas on each call for a <video>", () => {
+        const video = makeVideo({ w: 320, h: 240 });
+        mountMedia(video);
+
+        const getImageDataResult = { data: [255, 0, 0, 255] }; // red pixel
+        const mockCtx = {
+            drawImage: jest.fn(),
+            getImageData: jest.fn(() => getImageDataResult)
+        };
+        const mockCanvas = { width: 320, height: 240, getContext: jest.fn(() => mockCtx) };
+
+        legoWidget._offscreenCanvas = mockCanvas;
+        legoWidget._offscreenCtx = mockCtx;
+        legoWidget._offscreenIsVideo = true;
+        legoWidget._offscreenMediaElement = video;
+
+        legoWidget.gridOverlay = {
+            getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 400 })
+        };
+        legoWidget._getColorForCanvasRow = jest.fn(() => null);
+        legoWidget._addColorSegment = jest.fn();
+        legoWidget.selectedBackgroundColor = { name: "green" };
+        legoWidget._getColorFamily = jest.fn(() => ({ name: "red", hue: 0 }));
+        legoWidget._getColorFamilyByName = jest.fn(name => ({ name, hue: 0 }));
+        legoWidget._colorsAreSimilar = jest.fn(() => false);
+        legoWidget.colorData = [{ note: "C4", colorSegments: [] }];
+
+        const line = {
+            topPos: 0,
+            bottomPos: 40,
+            currentX: 50,
+            currentColor: null,
+            colorStartTime: null,
+            lastColorChangeTime: null,
+            rowIndex: 0
+        };
+
+        // First call
+        legoWidget._sampleAndDetectColor(line, Date.now());
+        // Second call (next animation frame)
+        legoWidget._sampleAndDetectColor(line, Date.now());
+
+        // drawImage must be called once per _sampleAndDetectColor call for video.
+        expect(mockCtx.drawImage).toHaveBeenCalledTimes(2);
+        expect(mockCtx.drawImage).toHaveBeenCalledWith(video, 0, 0, 320, 240);
+    });
+
+    // -------------------------------------------------------------------------
+    // _sampleAndDetectColor: <img> path does NOT redraw
+    // -------------------------------------------------------------------------
+
+    it("_sampleAndDetectColor does NOT call drawImage on repeated calls for a static <img>", () => {
+        const img = makeImg({ w: 200, h: 100 });
+        mountMedia(img);
+
+        const mockCtx = {
+            drawImage: jest.fn(),
+            getImageData: jest.fn(() => ({ data: [0, 255, 0, 255] })) // green
+        };
+        const mockCanvas = { width: 200, height: 100 };
+
+        legoWidget._offscreenCanvas = mockCanvas;
+        legoWidget._offscreenCtx = mockCtx;
+        legoWidget._offscreenIsVideo = false;
+        legoWidget._offscreenMediaElement = img;
+
+        legoWidget.gridOverlay = {
+            getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 400 })
+        };
+        legoWidget._getColorForCanvasRow = jest.fn(() => null);
+        legoWidget._addColorSegment = jest.fn();
+        legoWidget.selectedBackgroundColor = { name: "blue" };
+        legoWidget._getColorFamily = jest.fn(() => ({ name: "green", hue: 120 }));
+        legoWidget._getColorFamilyByName = jest.fn(name => ({ name, hue: 120 }));
+        legoWidget._colorsAreSimilar = jest.fn(() => false);
+        legoWidget.colorData = [{ note: "C4", colorSegments: [] }];
+
+        const line = {
+            topPos: 0,
+            bottomPos: 40,
+            currentX: 50,
+            currentColor: null,
+            colorStartTime: null,
+            lastColorChangeTime: null,
+            rowIndex: 0
+        };
+
+        // Three "frames"
+        legoWidget._sampleAndDetectColor(line, Date.now());
+        legoWidget._sampleAndDetectColor(line, Date.now());
+        legoWidget._sampleAndDetectColor(line, Date.now());
+
+        // Static image: drawImage must never be called during scanning.
+        expect(mockCtx.drawImage).not.toHaveBeenCalled();
+    });
+
+    // -------------------------------------------------------------------------
+    // _sampleAndDetectColor: lazy rebuild when offscreenCanvas is null
+    // -------------------------------------------------------------------------
+
+    it("_sampleAndDetectColor triggers a lazy _buildOffscreenCanvas when _offscreenCanvas is null", () => {
+        const img = makeImg({ w: 200, h: 100 });
+        mountMedia(img);
+
+        legoWidget._offscreenCanvas = null; // simulate cleared state
+        legoWidget._buildOffscreenCanvas = jest.fn(); // track the call
+
+        legoWidget._getColorForCanvasRow = jest.fn(() => null);
+        legoWidget.gridOverlay = {
+            getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 400 })
+        };
+
+        const line = { topPos: 0, bottomPos: 40, currentX: 50 };
+        // After mock _buildOffscreenCanvas runs, _offscreenCanvas is still null
+        // so the method will warn and return early — that is the expected path.
+        const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+        legoWidget._sampleAndDetectColor(line, Date.now());
+
+        expect(legoWidget._buildOffscreenCanvas).toHaveBeenCalledTimes(1);
+        expect(warnSpy).toHaveBeenCalledWith("No off-screen canvas available for color sampling");
+    });
+
+    // -------------------------------------------------------------------------
+    // onclose: nulls out all off-screen canvas properties
+    // -------------------------------------------------------------------------
+
+    it("onclose nulls out _offscreenCanvas, _offscreenCtx, and _offscreenMediaElement", () => {
+        const mockWindow = {
+            clear: jest.fn(),
+            show: jest.fn(),
+            destroy: jest.fn()
+        };
+        const originalWidgetWindows = window.widgetWindows;
+        window.widgetWindows = { windowFor: jest.fn(() => mockWindow) };
+
+        legoWidget._stopPlayback = jest.fn();
+        legoWidget._stopWebcam = jest.fn();
+        legoWidget._deactivateEyeDropper = jest.fn();
+        legoWidget._cleanupDragListeners = jest.fn();
+        legoWidget._scale = jest.fn();
+
+        legoWidget._createWidgetWindow();
+
+        // Seed live values as if a scan just finished.
+        legoWidget._offscreenCanvas = document.createElement("canvas");
+        legoWidget._offscreenCtx = { drawImage: jest.fn() };
+        legoWidget._offscreenMediaElement = document.createElement("img");
+
+        mockWindow.onclose();
+
+        expect(legoWidget._offscreenCanvas).toBeNull();
+        expect(legoWidget._offscreenCtx).toBeNull();
+        expect(legoWidget._offscreenMediaElement).toBeNull();
+
+        window.widgetWindows = originalWidgetWindows;
+    });
+});
