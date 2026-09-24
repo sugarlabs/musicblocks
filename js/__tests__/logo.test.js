@@ -506,6 +506,24 @@ describe("Logo constructor", () => {
         expect(logo.evalOnStopList).toEqual({});
     });
 
+    test("keeps widget context, export buffers, and resources on Logo", () => {
+        logo.inMatrix = true;
+        logo.inTimbre = true;
+        logo.inPitchDrumMatrix = true;
+        logo.notationOutput = "notation";
+        logo.notationNotes[0] = "C4";
+        logo.cameraID = "camera123";
+        logo.mic = { stop: jest.fn() };
+
+        expect(logo.inMatrix).toBe(true);
+        expect(logo.inTimbre).toBe(true);
+        expect(logo.inPitchDrumMatrix).toBe(true);
+        expect(logo.notationOutput).toBe("notation");
+        expect(logo.notationNotes[0]).toBe("C4");
+        expect(logo.cameraID).toBe("camera123");
+        expect(logo.mic).toEqual({ stop: expect.any(Function) });
+    });
+
     test("supports explicit dependency object mode", () => {
         const deps = {
             blocks: mockActivity.blocks,
@@ -971,6 +989,18 @@ describe("Logo synth lifecycle", () => {
     });
 
     afterEach(() => jest.restoreAllMocks());
+
+    test("keeps synth and transport shared across turtles", () => {
+        const sharedSynth = logo.synth;
+        const sharedTransport = sharedSynth.transport;
+
+        logo.prepSynths();
+
+        expect(logo.synth).toBe(sharedSynth);
+        expect(logo.synth.transport).toBe(sharedTransport);
+        expect(sharedSynth.createDefaultSynth).toHaveBeenCalledWith("0");
+        expect(sharedSynth.createDefaultSynth).toHaveBeenCalledWith("1");
+    });
 
     test("prepSynths initializes synths and copies instruments per turtle", () => {
         logo.prepSynths();

@@ -138,6 +138,22 @@ describe("Turtle", () => {
             expect(secondTurtle.singer.currentOctave).toBe(4);
             expect(secondTurtle.painter.cp1x).toBe(0);
         });
+
+        test("keeps transport state independent between turtles", () => {
+            const secondTurtle = new Turtle(mockActivity, 1, "turtle2", {}, null);
+            const firstModel = new Turtle.TurtleModel(mockActivity, 0, "turtle1", {}, null);
+            const secondModel = new Turtle.TurtleModel(mockActivity, 1, "turtle2", {}, null);
+
+            turtle._transportTime = 12;
+            turtle._transportEventId = "event-a";
+            secondTurtle._transportTime = 24;
+            secondTurtle._transportEventId = "event-b";
+            firstModel._queue.push({ blk: 1 });
+
+            expect(turtle._transportTime).not.toBe(secondTurtle._transportTime);
+            expect(turtle._transportEventId).not.toBe(secondTurtle._transportEventId);
+            expect(secondModel._queue).toEqual([]);
+        });
     });
 
     describe("blinking()", () => {
