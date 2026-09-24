@@ -1227,6 +1227,13 @@ describe("Sampler Widget", () => {
             widget.widgetWindow = widgetWindow;
             widget.tunerEnabled = false;
             widget.drawVisualIDs = {};
+
+            const otherBody = document.createElement("div");
+            const otherTunerCanvas = document.createElement("canvas");
+            otherTunerCanvas.className = "tunerCanvas";
+            otherBody.appendChild(otherTunerCanvas);
+            document.body.insertBefore(otherBody, widget.widgetWindow.getWidgetBody());
+
             const tunerCanvas = document.createElement("canvas");
             tunerCanvas.className = "tunerCanvas";
             widget.widgetWindow.getWidgetBody().appendChild(tunerCanvas);
@@ -1235,6 +1242,8 @@ describe("Sampler Widget", () => {
             widget.makeCanvas(400, 300, 0, false);
 
             expect(widget.tunerDisplay).toBeNull();
+            expect(tunerCanvas.parentNode).toBeNull();
+            expect(otherTunerCanvas.parentNode).toBe(otherBody);
         });
 
         test("makeCanvas updates existing tuner display and draws non-recording path", () => {
@@ -1271,7 +1280,11 @@ describe("Sampler Widget", () => {
                 createMediaStreamSource: jest.fn(() => ({ connect: jest.fn() })),
                 createAnalyser: jest.fn(() => ({
                     fftSize: 0,
-                    getFloatTimeDomainData: jest.fn()
+                    getFloatTimeDomainData: jest.fn(buffer => {
+                        for (let i = 0; i < buffer.length; i++) {
+                            buffer[i] = Math.sin((2 * Math.PI * 440 * i) / 44100);
+                        }
+                    })
                 })),
                 close: jest.fn().mockResolvedValue()
             };
@@ -1300,6 +1313,49 @@ describe("Sampler Widget", () => {
 
             await Promise.resolve();
             expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalled();
+        });
+
+        test("makeTuner handles zero pitch properly", async () => {
+            widget.widgetWindow = widgetWindow;
+            const audioContext = {
+                sampleRate: 44100,
+                createMediaStreamSource: jest.fn(() => ({ connect: jest.fn() })),
+                createAnalyser: jest.fn(() => ({
+                    fftSize: 0,
+                    getFloatTimeDomainData: jest.fn(buffer => {
+                        for (let i = 0; i < buffer.length; i++) {
+                            buffer[i] = 0;
+                        }
+                    })
+                })),
+                close: jest.fn().mockResolvedValue()
+            };
+            global.AudioContext = jest.fn(() => audioContext);
+            const stream = { getTracks: jest.fn(() => [{ stop: jest.fn() }]) };
+            Object.defineProperty(window, "navigator", {
+                value: {
+                    mediaDevices: {
+                        getUserMedia: jest.fn().mockResolvedValue(stream)
+                    }
+                },
+                configurable: true
+            });
+
+            let rafCalls = 0;
+            global.requestAnimationFrame = jest.fn(cb => {
+                rafCalls += 1;
+                if (rafCalls === 1) cb();
+                return rafCalls;
+            });
+
+            widget.makeTuner(400, 300);
+
+            const startButton = document.getElementById("start");
+            startButton.click();
+
+            await Promise.resolve();
+            const pitchElement = document.getElementById("pitch");
+            expect(pitchElement.textContent).toBe("---");
         });
 
         test("startPitchDetection handles getUserMedia failure", async () => {
@@ -1600,6 +1656,24 @@ describe("Sampler Widget", () => {
 
             delete window.AI_SAMPLE_ENDPOINT;
             jest.useRealTimers();
+        });
+    });
+
+    describe("PitchSmoother", () => {
+        test("shifts history when exceeding smoothingSize", () => {
+            const smoother = new PitchSmoother(2);
+            smoother.addPitch(440);
+            smoother.addPitch(441);
+            smoother.addPitch(442);
+            expect(smoother.pitchHistory).toEqual([441, 442]);
+            expect(smoother.getSmoothedPitch()).toBeGreaterThan(0);
+        });
+
+        test("returns -1 for empty or invalid history", () => {
+            const smoother = new PitchSmoother(2);
+            expect(smoother.getSmoothedPitch()).toBe(-1);
+            smoother.addPitch(-50); // should be ignored
+            expect(smoother.getSmoothedPitch()).toBe(-1);
         });
     });
 });
