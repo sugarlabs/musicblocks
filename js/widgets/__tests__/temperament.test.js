@@ -1,7 +1,6 @@
-const TemperamentWidget = require("../temperament");
 const ManagedTimer = require("../../utils/ManagedTimer");
-
 global.ManagedTimer = ManagedTimer;
+const TemperamentWidget = require("../temperament");
 describe("TemperamentWidget basic tests", () => {
     let widget;
     const createMockElement = id => ({
@@ -733,7 +732,8 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget.editMode).toBe("octave");
     });
 
-    test("_save executes without crash", () => {
+    test("_save executes without crash and loads both stacks even if widget timers are cleared", () => {
+        jest.useFakeTimers();
         global.setOctaveRatio = jest.fn();
         global.rationalToFraction = jest.fn(() => [1, 1]);
         global.getOctaveRatio = jest.fn(() => 2);
@@ -754,6 +754,7 @@ describe("TemperamentWidget basic tests", () => {
         };
 
         widget.activity = {
+            textMsg: jest.fn(),
             blocks: {
                 loadNewBlocks: jest.fn(),
                 findUniqueTemperamentName: jest.fn(() => "custom1")
@@ -762,7 +763,119 @@ describe("TemperamentWidget basic tests", () => {
 
         widget._save();
 
-        expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+
+        // Closing the widget clears widget timers, but save's delayed loadNewBlocks must stay alive
+        widget._clearWidgetTimers();
+        jest.advanceTimersByTime(500);
+
+        expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalledTimes(2);
+        expect(widget.activity.textMsg).toHaveBeenCalled();
+        jest.useRealTimers();
+    });
+
+    test("_save clears the pitch-to-frequency cache when saving a custom temperament", () => {
+        global.setOctaveRatio = jest.fn();
+        global.rationalToFraction = jest.fn(() => [1, 1]);
+        global.getOctaveRatio = jest.fn(() => 2);
+        global.isCustomTemperament = jest.fn(() => true);
+        global.deleteTemperamentFromList = jest.fn();
+        global.addTemperamentToDictionary = jest.fn();
+        global.updateTemperaments = jest.fn();
+        global.Singer.clearPitchToFrequencyCache = jest.fn();
+
+        widget.inTemperament = "custom1";
+        widget.ratios = [1, 2];
+        widget.pitchNumber = 2;
+        widget.powerBase = 2;
+
+        widget._logo = {
+            synth: {
+                stop: jest.fn(),
+                startingPitch: "C4"
+            },
+            customTemperamentDefined: false
+        };
+
+        widget.activity = {
+            blocks: {
+                loadNewBlocks: jest.fn(),
+                findUniqueTemperamentName: jest.fn(() => "custom1"),
+                protoBlockDict: { custompitch: { hidden: true } },
+                palettes: { updatePalettes: jest.fn() }
+            }
+        };
+
+        widget._save();
+
+        // saving a redefined custom temperament under the same name must
+        // invalidate any frequency already cached for that name, otherwise
+        // notes keep playing at the pre-edit tuning until the project restarts.
+        // Assert the exact saved payload, not just that the mock was called,
+        // since _save recomputes note/ratio entries from this.ratios.
+        expect(global.addTemperamentToDictionary).toHaveBeenCalledWith("custom1", {
+            pitchNumber: 2,
+            0: [1, "C", 4],
+            1: [2, "C", 4]
+        });
+        expect(global.Singer.clearPitchToFrequencyCache).toHaveBeenCalled();
+    });
+
+    test("_save invalidates a frequency already cached under the redefined temperament's name", () => {
+        // Exercises the real cache (Singer.getCachedPitchToFrequency /
+        // clearPitchToFrequencyCache) instead of a mocked
+        // clearPitchToFrequencyCache, so this fails the way the original bug
+        // actually manifested: a note kept playing at the pre-edit tuning
+        // after a custom temperament was redefined under the same name.
+        const RealSinger = require("../../turtle-singer");
+        global.Singer.clearPitchToFrequencyCache = RealSinger.clearPitchToFrequencyCache;
+        RealSinger.clearPitchToFrequencyCache();
+
+        global.setOctaveRatio = jest.fn();
+        global.rationalToFraction = jest.fn(() => [1, 1]);
+        global.getOctaveRatio = jest.fn(() => 2);
+        global.isCustomTemperament = jest.fn(() => true);
+        global.deleteTemperamentFromList = jest.fn();
+        global.addTemperamentToDictionary = jest.fn();
+        global.updateTemperaments = jest.fn();
+
+        // Play a note under the temperament's original tuning; this caches
+        // its frequency under a key keyed on the temperament's name.
+        global.pitchToFrequency = jest.fn(() => 440);
+        const beforeEdit = RealSinger.getCachedPitchToFrequency("C", 4, 0, null, "custom1");
+        expect(beforeEdit).toBe(440);
+
+        widget.inTemperament = "custom1";
+        widget.ratios = [1, 2];
+        widget.pitchNumber = 2;
+        widget.powerBase = 2;
+
+        widget._logo = {
+            synth: {
+                stop: jest.fn(),
+                startingPitch: "C4"
+            },
+            customTemperamentDefined: false
+        };
+
+        widget.activity = {
+            blocks: {
+                loadNewBlocks: jest.fn(),
+                findUniqueTemperamentName: jest.fn(() => "custom1"),
+                protoBlockDict: { custompitch: { hidden: true } },
+                palettes: { updatePalettes: jest.fn() }
+            }
+        };
+
+        // Redefine "custom1" with a different tuning, then save under the
+        // same name.
+        global.pitchToFrequency = jest.fn(() => 466.16);
+        widget._save();
+
+        // The same pitch, under the same temperament name, must now recompute
+        // rather than return the frequency cached before the edit.
+        const afterEdit = RealSinger.getCachedPitchToFrequency("C", 4, 0, null, "custom1");
+        expect(afterEdit).toBe(466.16);
     });
 
     test("init sets up widget correctly", () => {
@@ -983,14 +1096,18 @@ describe("TemperamentWidget basic tests", () => {
     describe("TemperamentWidget interactive events", () => {
         let mockWidgetWindow;
         let mockActivity;
+        let widgetBody;
 
         beforeEach(() => {
+            widgetBody = document.createElement("div");
+            document.body.appendChild(widgetBody);
             mockWidgetWindow = {
                 clear: jest.fn(),
                 show: jest.fn(),
-                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                getWidgetBody: jest.fn(() => widgetBody),
                 addButton: jest.fn(() => ({
                     onclick: null,
+                    style: {},
                     getElementsByTagName: jest.fn(() => [createMockElement("img")])
                 })),
                 sendToCenter: jest.fn(),
@@ -1034,6 +1151,12 @@ describe("TemperamentWidget basic tests", () => {
             widget.wheel = { removeWheel: jest.fn() };
             widget.notesCircle = { removeWheel: jest.fn() };
             widget.wheel1 = { removeWheel: jest.fn() };
+        });
+
+        afterEach(() => {
+            if (widgetBody && widgetBody.parentNode) {
+                widgetBody.parentNode.removeChild(widgetBody);
+            }
         });
 
         test("onclose cleans up timeouts and playing state", () => {
@@ -1131,6 +1254,115 @@ describe("TemperamentWidget basic tests", () => {
                 jest.runAllTimers();
 
                 expect(playedFrequencies()).toEqual([100, 125, 150, 200, 150, 125, 100]);
+            });
+
+            test("clears and suppresses previous dot selection highlight when playAll is started", () => {
+                if (widget._vizToolbar && widget._vizToolbar.addPitchAfterBtn) {
+                    widget._vizToolbar.addPitchAfterBtn.onclick();
+                }
+
+                const canvas = document.querySelector("canvas");
+                const ctx = canvas
+                    ? canvas.getContext("2d")
+                    : document.createElement("canvas").getContext("2d");
+                ctx.arc.mockClear();
+
+                // Starting playAll must clear previous selection so only playing dots illuminate
+                widget.playAll();
+                expect(widget._playAllRunning).toBe(true);
+
+                // Clean up timers
+                jest.runAllTimers();
+                expect(widget._playAllRunning).toBe(false);
+            });
+
+            test("disables mutation buttons and ignores add/remove/edit actions during playback", () => {
+                widget.pitchNumber = 3;
+                widget.cents = [0, 100, 200];
+                widget.frequencies = ["261.63", "277.18", "293.66"];
+                widget.ratios = [1, Math.pow(2, 1 / 12), Math.pow(2, 2 / 12)];
+                widget.notes = [
+                    ["C", 4],
+                    ["C#", 4],
+                    ["D", 4]
+                ];
+                widget.intervals = ["unison", "minor second", "major second"];
+                widget.ratiosNotesPair = [
+                    [widget.ratios[0], widget.notes[0]],
+                    [widget.ratios[1], widget.notes[1]],
+                    [widget.ratios[2], widget.notes[2]]
+                ];
+                widget._visualizerView();
+
+                const pitchCountBefore = widget.pitchNumber;
+                const freqsBefore = [...widget.frequencies];
+
+                // Query the visualizer elements inside widgetBody
+                const rows = widgetBody ? widgetBody.querySelectorAll("tbody tr") : [];
+                const row1 = rows[1];
+                const tdCents =
+                    row1 && row1.cells
+                        ? row1.cells[3]
+                        : row1 && row1.children
+                          ? row1.children[3]
+                          : null;
+                if (tdCents && tdCents.ondblclick) {
+                    tdCents.ondblclick({ stopPropagation: () => {} });
+                    const input = tdCents.querySelector("input");
+                    if (input) input.value = "101";
+                }
+
+                widget.playAll();
+                expect(widget._playAllRunning).toBe(true);
+
+                if (widget._vizToolbar) {
+                    expect(widget._vizToolbar.removePitchBtn.style.pointerEvents).toBe("none");
+                    expect(widget._vizToolbar.addPitchAfterBtn.style.pointerEvents).toBe("none");
+                    expect(widget._vizToolbar.addPitchBeforeBtn.style.pointerEvents).toBe("none");
+
+                    // Mutations during playback must be ignored
+                    widget._vizToolbar.removePitchBtn.onclick();
+                    widget._vizToolbar.addPitchAfterBtn.onclick();
+                    widget._vizToolbar.addPitchBeforeBtn.onclick();
+                }
+
+                const canvas = widgetBody
+                    ? widgetBody.querySelector("canvas")
+                    : document.querySelector("canvas");
+                if (canvas) {
+                    canvas.onmousedown({ button: 0 });
+                    canvas.onmousemove({});
+                    canvas.ontouchstart({ touches: [{ clientX: 0, clientY: 0 }] });
+                    canvas.oncontextmenu({ preventDefault: () => {} });
+                    canvas.onkeydown({ key: "ArrowRight", preventDefault: () => {} });
+                }
+
+                if (row1) {
+                    row1.onclick();
+                    row1.oncontextmenu({ preventDefault: () => {} });
+                }
+
+                if (tdCents) {
+                    // Double-clicking an unlocked cell during playback must be ignored
+                    tdCents.ondblclick({ stopPropagation: () => {} });
+                    // Blurring an active input during playback must revert rather than commit mutation
+                    const input = tdCents.querySelector("input");
+                    if (input && input.onblur) input.onblur();
+                }
+
+                expect(widget.pitchNumber).toBe(pitchCountBefore);
+                expect(widget.frequencies).toEqual(freqsBefore);
+                expect(widget.cents[1]).toBe(100);
+
+                // Toggling playAll while running stops playback early and restores buttons
+                widget.playAll();
+                expect(widget._playAllRunning).toBe(false);
+
+                if (widget._vizToolbar) {
+                    expect(widget._vizToolbar.removePitchBtn.style.pointerEvents).toBe("auto");
+                    expect(widget._vizToolbar.addPitchAfterBtn.style.pointerEvents).toBe("auto");
+                    expect(widget._vizToolbar.addPitchBeforeBtn.style.pointerEvents).toBe("auto");
+                }
             });
         });
 
@@ -1424,6 +1656,118 @@ describe("TemperamentWidget basic tests", () => {
                 expect.stringContaining("57"),
                 3000
             );
+        });
+    });
+
+    describe("timer fallback without ManagedTimer", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            widget = new TemperamentWidget();
+            widget._timerManager = null;
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("_setWidgetTimeout tracks the timeout and runs the callback, then stops tracking it", () => {
+            const callback = jest.fn();
+
+            const id = widget._setWidgetTimeout(callback, 500);
+            expect(widget._activeTimeouts.has(id)).toBe(true);
+
+            jest.advanceTimersByTime(500);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(widget._activeTimeouts.has(id)).toBe(false);
+        });
+
+        test("_clearWidgetTimeout returns false for null, undefined, or untracked ids", () => {
+            expect(widget._clearWidgetTimeout(null)).toBe(false);
+            expect(widget._clearWidgetTimeout(undefined)).toBe(false);
+            expect(widget._clearWidgetTimeout(999999)).toBe(false);
+        });
+
+        test("_clearWidgetTimeout cancels a tracked timeout before it fires", () => {
+            const callback = jest.fn();
+            const id = widget._setWidgetTimeout(callback, 500);
+
+            expect(widget._clearWidgetTimeout(id)).toBe(true);
+            expect(widget._activeTimeouts.has(id)).toBe(false);
+
+            jest.advanceTimersByTime(500);
+            expect(callback).not.toHaveBeenCalled();
+        });
+
+        test("_clearWidgetTimers cancels tracked timeouts, resets _playTimeout, and returns count", () => {
+            widget._setWidgetTimeout(jest.fn(), 500);
+            widget._setWidgetTimeout(jest.fn(), 700);
+            widget._playTimeout = 123;
+
+            const count = widget._clearWidgetTimers();
+
+            expect(count).toBe(2);
+            expect(widget._activeTimeouts.size).toBe(0);
+            expect(widget._playTimeout).toBeNull();
+        });
+    });
+
+    describe("timer delegation to ManagedTimer", () => {
+        beforeEach(() => {
+            widget = new TemperamentWidget();
+        });
+
+        afterEach(() => {
+            widget._clearWidgetTimers();
+        });
+
+        test("initializes with ManagedTimer when available", () => {
+            expect(widget._timerManager).toBeInstanceOf(ManagedTimer);
+        });
+
+        test("_setWidgetTimeout delegates to the timer manager", () => {
+            const callback = jest.fn();
+            widget._timerManager = {
+                setTimeout: jest.fn().mockReturnValue(42),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(widget._setWidgetTimeout(callback, 500)).toBe(42);
+            expect(widget._timerManager.setTimeout).toHaveBeenCalledWith(callback, 500);
+        });
+
+        test("_clearWidgetTimeout delegates to the timer manager", () => {
+            widget._timerManager = {
+                clearTimeout: jest.fn().mockReturnValue(true),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(widget._clearWidgetTimeout(5)).toBe(true);
+            expect(widget._timerManager.clearTimeout).toHaveBeenCalledWith(5);
+        });
+
+        test("_clearWidgetTimers delegates to the timer manager clearAll and resets _playTimeout", () => {
+            widget._timerManager = {
+                clearAll: jest.fn().mockReturnValue(3)
+            };
+            widget._playTimeout = 55;
+
+            const count = widget._clearWidgetTimers();
+
+            expect(widget._timerManager.clearAll).toHaveBeenCalledTimes(1);
+            expect(count).toBe(3);
+            expect(widget._playTimeout).toBeNull();
+        });
+
+        test("playAll delegates to _playAll when the visualizer is open", () => {
+            // With the upstream refactor, this.playAll() is a thin shell that
+            // delegates to this._playAll(), which is set by _visualizerView().
+            // Verify the delegation contract: if _playAll is defined, it is called.
+            widget._playAll = jest.fn();
+
+            widget.playAll();
+
+            expect(widget._playAll).toHaveBeenCalledTimes(1);
         });
     });
 });

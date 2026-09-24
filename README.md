@@ -6,8 +6,8 @@
     <img src="https://img.shields.io/github/license/sugarlabs/musicblocks" />
 </a>
 
-<a href="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml" alt="CI">
-    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml/badge.svg" />
+<a href="https://github.com/sugarlabs/musicblocks/actions/workflows/ci.yml" alt="CI">
+    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/ci.yml/badge.svg" alt="CI status" />
 </a>
 
 # Music Blocks

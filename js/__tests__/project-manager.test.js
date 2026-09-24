@@ -437,6 +437,35 @@ describe("_loadStart", () => {
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
 
+    it("calls justLoadStart for whitespace-formatted empty JSON, not loadNewBlocks([])", async () => {
+        // " [ ]" parses to an empty array but doesn't match the literal
+        // "[]" string check above it. loadNewBlocks([]) completes
+        // synchronously inside blocks.js's own zero-block fast path,
+        // emitting "finishedLoading" before this call even returns — so if
+        // it were reached here, watchForDeferredLoadFailure() would
+        // register its listeners too late to ever see that completion,
+        // leaving them stranded (review comment on issue #8855's fix).
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: " [ ]",
+                removeItem: jest.fn()
+            }
+        });
+        activity.sessionData = " [ ]";
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.justLoadStart).toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+
+        // No watcher should have been left registered: a later, unrelated
+        // "loadFailed" must not trigger this session's recovery.
+        global.pubsub.emit("loadFailed", { error: new Error("unrelated") });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
+    });
+
     it("recovers from malformed JSON and removes the bad session key", async () => {
         const removeItem = jest.fn();
         const activity = makeActivity({
@@ -455,6 +484,11 @@ describe("_loadStart", () => {
             { operation: "loadSessionData" }
         );
         expect(removeItem).toHaveBeenCalledWith("SESSIONBad");
+        // Any blocks a partially-successful load left behind must be
+        // cleared before justLoadStart()/the fallback attempt runs, or the
+        // new stack renders on top of the leftovers instead of replacing
+        // them (reported against this fix).
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
 
@@ -518,6 +552,141 @@ describe("_loadStart", () => {
         const firstUpdateCount = activity.stage.update.mock.calls.length;
         global.pubsub.emit("finishedLoading"); // should be a no-op — listener removed
         expect(activity.stage.update).toHaveBeenCalledTimes(firstUpdateCount);
+    });
+
+    // A failure past loadNewBlocks()'s first ~20 blocks throws from inside a
+    // deferred setTimeout, so it can never reach the synchronous try/catch
+    // around tryParseAndLoad() below — it can only be reported through the
+    // "loadFailed" pubsub event instead (see issue #8855).
+    it("recovers via a 'loadFailed' event reporting a deferred chunk failure", async () => {
+        const sessionData = JSON.stringify([{ name: "start" }]);
+        const removeItem = jest.fn();
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: sessionData,
+                removeItem
+            }
+        });
+        activity.sessionData = sessionData;
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith([{ name: "start" }]);
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+
+        const deferredError = new Error("deferred chunk failure");
+        global.pubsub.emit("loadFailed", { error: deferredError });
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(deferredError, {
+            operation: "loadSessionData"
+        });
+        expect(removeItem).toHaveBeenCalledWith("SESSIONTest");
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+        expect(activity.errorMsg).toHaveBeenCalled();
+        expect(activity.justLoadStart).toHaveBeenCalled();
+    });
+
+    it("ignores a 'loadFailed' event tagged with a different load's token", async () => {
+        // loadNewBlocks() tags "loadFailed"/"finishedLoading" with the token
+        // it returned for the request they belong to; a listener registered
+        // for one load must not react to some other, unrelated load's event
+        // just because the names match (review comment on issue #8855's
+        // fix). The token comes from loadNewBlocks()'s own return value —
+        // not some "currently active load" counter read afterward — since
+        // this request could still be sitting queued behind an unrelated
+        // one at that point.
+        const sessionData = JSON.stringify([{ name: "start" }]);
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: sessionData,
+                removeItem: jest.fn()
+            }
+        });
+        activity.sessionData = sessionData;
+        activity.blocks.loadNewBlocks = jest.fn(() => 7);
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith([{ name: "start" }]);
+
+        global.pubsub.emit("loadFailed", { token: 999, error: new Error("unrelated") });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
+
+        const deferredError = new Error("deferred chunk failure");
+        global.pubsub.emit("loadFailed", { token: 7, error: deferredError });
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(deferredError, {
+            operation: "loadSessionData"
+        });
+        expect(activity.justLoadStart).toHaveBeenCalled();
+    });
+
+    it("watches its own request's token, not whatever load is active, when queued behind another (issue #8855)", async () => {
+        // Reproduces the race a reviewer flagged: loadNewBlocks() queues
+        // this request behind an unrelated one already in progress, so
+        // nothing is "currently active" for this request yet when
+        // _loadStart() registers its watcher. The token returned by
+        // loadNewBlocks() itself — not a counter read afterward — is what
+        // lets the watcher still find its own request's eventual outcome.
+        const sessionData = JSON.stringify([{ name: "start" }]);
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: sessionData,
+                removeItem: jest.fn()
+            }
+        });
+        activity.sessionData = sessionData;
+        // This request (token 42) is queued behind an unrelated load that's
+        // still running (so an "active load" counter would point at that
+        // other load, not this one, if read right after this call).
+        activity.blocks.loadNewBlocks = jest.fn(() => 42);
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        // The unrelated, already-running load fails first.
+        global.pubsub.emit("loadFailed", { token: 1, error: new Error("unrelated load") });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+
+        // This request is dequeued and fails on its own later.
+        const ownError = new Error("this request's own failure");
+        global.pubsub.emit("loadFailed", { token: 42, error: ownError });
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(ownError, {
+            operation: "loadSessionData"
+        });
+        expect(activity.justLoadStart).toHaveBeenCalled();
+    });
+
+    it("ignores a 'loadFailed' event that arrives after the load already succeeded", async () => {
+        const sessionData = JSON.stringify([{ name: "start" }]);
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: sessionData,
+                removeItem: jest.fn()
+            }
+        });
+        activity.sessionData = sessionData;
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        global.pubsub.emit("finishedLoading");
+        // A stray "loadFailed" for some unrelated, later load must not run
+        // this session's recovery — the listener should already be gone.
+        global.pubsub.emit("loadFailed", { error: new Error("unrelated") });
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
     });
 });
 

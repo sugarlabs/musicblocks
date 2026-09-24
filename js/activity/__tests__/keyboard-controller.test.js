@@ -134,6 +134,7 @@ const makeEvent = (overrides = {}) => ({
     key: "",
     altKey: false,
     ctrlKey: false,
+    metaKey: false,
     shiftKey: false,
     preventDefault: jest.fn(),
     stopPropagation: jest.fn(),
@@ -396,6 +397,20 @@ describe("KeyboardController", () => {
             expect(activity.paste.style.visibility).toBe("visible");
         });
     });
+    it("Cmd+V opens the paste box at the current scale", () => {
+        const activity = makeActivity();
+        const controller = createController(activity);
+
+        controller.__keyPressed(makeEvent({ keyCode: KEYCODE.V, metaKey: true }));
+
+        expect(activity.pasteBox.createBox).toHaveBeenCalledWith(
+            activity.turtleBlocksScale,
+            200,
+            200
+        );
+        expect(activity.pasteBox.show).toHaveBeenCalled();
+        expect(activity.paste.style.visibility).toBe("visible");
+    });
 
     describe("tempo widget integration", () => {
         it("speeds up tempo on the up arrow while the tempo widget is active", () => {
@@ -510,6 +525,37 @@ describe("KeyboardController", () => {
             expect(activity.blocks.undoAction).toHaveBeenCalled();
         });
 
+        it("Cmd+Z triggers undoAction on macOS", () => {
+            const activity = makeActivity();
+            activity.blocks.undoAction = jest.fn();
+            activity.blocks.redoAction = jest.fn();
+            const controller = createController(activity);
+            const event = makeEvent({ keyCode: 90, metaKey: true });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity.blocks.undoAction).toHaveBeenCalled();
+            expect(activity.blocks.redoAction).not.toHaveBeenCalled();
+        });
+        it("Cmd+Shift+Z triggers redoAction on macOS", () => {
+            const activity = makeActivity();
+            activity.blocks.redoAction = jest.fn();
+            activity.blocks.undoAction = jest.fn();
+            const controller = createController(activity);
+            const event = makeEvent({
+                keyCode: 90,
+                metaKey: true,
+                shiftKey: true
+            });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity.blocks.redoAction).toHaveBeenCalled();
+            expect(activity.blocks.undoAction).not.toHaveBeenCalled();
+        });
+
         it("Ctrl+Y triggers redoAction", () => {
             const activity = makeActivity();
             activity.blocks.redoAction = jest.fn();
@@ -521,6 +567,48 @@ describe("KeyboardController", () => {
             expect(event.preventDefault).toHaveBeenCalled();
             expect(activity.blocks.redoAction).toHaveBeenCalled();
         });
+    });
+    it("Cmd+Y triggers redoAction on macOS", () => {
+        const activity = makeActivity();
+        activity.blocks.redoAction = jest.fn();
+        const controller = createController(activity);
+        const event = makeEvent({ keyCode: 89, metaKey: true });
+
+        controller.__keyPressed(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(activity.blocks.redoAction).toHaveBeenCalled();
+    });
+    it("does not trigger undo on Cmd+Z when paste input is active", () => {
+        const activity = makeActivity();
+        activity.blocks.undoAction = jest.fn();
+        activity.paste.style.visibility = "visible";
+
+        const controller = createController(activity);
+        const event = makeEvent({
+            keyCode: 90,
+            metaKey: true
+        });
+
+        controller.__keyPressed(event);
+
+        expect(activity.blocks.undoAction).not.toHaveBeenCalled();
+    });
+
+    it("does not trigger redo on Cmd+Y when paste input is active", () => {
+        const activity = makeActivity();
+        activity.blocks.redoAction = jest.fn();
+        activity.paste.style.visibility = "visible";
+
+        const controller = createController(activity);
+        const event = makeEvent({
+            keyCode: 89,
+            metaKey: true
+        });
+
+        controller.__keyPressed(event);
+
+        expect(activity.blocks.redoAction).not.toHaveBeenCalled();
     });
 
     describe("ignores shortcuts while a text input is active", () => {

@@ -62,7 +62,7 @@ try {
    MUSICALMODES, getSavedCustomModes, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode
+   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode, announceToScreenReader
  */
 
 /*
@@ -107,6 +107,8 @@ let MYDEFINES = [
     "utils/http-utils",
     "utils/utils",
     "utils/camera-utils",
+    "utils/plugin-utils",
+    "utils/macro-utils",
     "utils/retryWithBackoff",
     "utils/error-handler",
     "utils/debugLog",
@@ -157,9 +159,12 @@ let MYDEFINES = [
     "search-ui",
     "activity/keyboard-controller",
     "widgets/plugin-dialog",
+    "utils/musicutils-constants",
+    "utils/musicutils-i18n",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
+    "utils/tuningformats",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
@@ -617,6 +622,8 @@ class Activity {
                         this.selectionController.isDragging || this.selectionController.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
+                        let frameErrored = false;
+                        this.stageDirty = false;
                         try {
                             // Recompute culling when container moved.
                             if (
@@ -636,11 +643,27 @@ class Activity {
                             // with no frame queued, and _startRenderLoop() refuses to
                             // restart on that flag, so the canvas stopped repainting for
                             // the rest of the session. Report the frame and keep going.
+                            frameErrored = true;
+                            this.stageDirty = true;
                             console.error("Music Blocks: render frame failed", err);
-                        } finally {
-                            this.stageDirty = false;
-                            // Continue the loop if there's work or ongoing interaction
+                        }
+
+                        // On error: always keep the loop alive (prevents canvas freeze).
+                        // On success: continue only if there is still outstanding work.
+                        // Clearing stageDirty before stage.update() catches the edge case
+                        // where stage.update() itself synchronously re-dirtied the stage.
+                        if (
+                            frameErrored ||
+                            this.stageDirty ||
+                            hasActiveTweens ||
+                            hasActiveGifs ||
+                            isInteracting
+                        ) {
                             this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                        } else {
+                            // Nothing to render — let the loop go idle
+                            this._renderLoopRunning = false;
+                            this._renderLoopRafId = null;
                         }
                     } else {
                         // Nothing to render — let the loop go idle
@@ -892,16 +915,13 @@ class Activity {
             this.toolbarController.runFast(env, currentDelay);
 
             // Keep DOM queries, colors, and block visibilities in activity.js
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-
-                    this.logo.tempo.resume();
-                    break;
+            const tempoTitle = document.getElementById("tempoWidgetID");
+            if (tempoTitle) {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
+
+                this.logo.tempo.resume();
             }
 
             if (!this.turtles.running()) {
@@ -994,13 +1014,10 @@ class Activity {
 
             this.toolbar.resetStop();
 
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-                    break;
+            const tempoTitle = document.getElementById("tempoWidgetID");
+            if (tempoTitle) {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
             }
         };
@@ -2190,7 +2207,7 @@ class Activity {
                 recordBtn.classList.remove("grey-text", "inactiveLink");
             }
             // Announce program stop to screen readers
-            this.textMsg && this.textMsg(_("Program stopped."));
+            announceToScreenReader(_("Program stopped."));
             // TODO: plugin support
         };
 
@@ -2210,7 +2227,7 @@ class Activity {
 
             // TODO: plugin support
             // Announce program start to screen readers
-            this.textMsg && this.textMsg(_("Program running."));
+            announceToScreenReader(_("Program running."));
         };
 
         /*

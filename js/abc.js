@@ -178,64 +178,57 @@ const getABCHeader = function () {
     return ABCHEADER;
 };
 
-/**
- * Processes musical notes and converts them into ABC notation format.
- * @param {object} logo - The logo object containing notationNotes to update.
- * @param {string} turtle - The identifier for the turtle.
- * @param {string} [keySignature] - the key the tune is written in, e.g. "G major". Staged
- *   pitches are absolute, so this is what the accidentals are written against.
- */
-const processABCNotes = function (logo, turtle, keySignature = "C major") {
-    // obj = [instructions] or
-    // obj = [[notes], duration, dotCount, tupletValue, roundDown,
-    //        insideChord, staccato]
-    const parts = [];
+const isSameTuplet = (a, b) =>
+    Array.isArray(a) && Array.isArray(b) && a[0] === b[0] && a[1] === b[1];
 
-    const __sameTuplet = (a, b) =>
-        Array.isArray(a) && Array.isArray(b) && a[0] === b[0] && a[1] === b[1];
+const getTupletTime = count => 2 ** Math.floor(Math.log2(Math.max(2, count)));
 
-    const __tupletTime = count => 2 ** Math.floor(Math.log2(Math.max(2, count)));
+const convertDuration = function (duration, dotCount = 0) {
+    if (isNaN(Number(duration))) return duration.toString();
 
-    const __convertDuration = function (duration) {
-        const durationMap = {
-            64: "1/4",
-            32: "1/2",
-            16: "1",
-            8: "2",
-            4: "4",
-            2: "8",
-            1: "16"
-        };
-        return durationMap[duration] || duration.toString();
-    };
+    let num = 16 * (2 ** (dotCount + 1) - 1);
+    let den = Number(duration) * 2 ** dotCount;
 
-    // The key the notes are written against, and the alteration last written for each
-    // pitch, which stays in force: this exporter writes no bar lines to end its reach.
-    let { field: keyField, alterations: keyAlterations } = abcKeySignature(keySignature);
-    const accidentalsInForce = {};
-    // Pitches whose accidental is in doubt, and so must be written out again. ABC readers
-    // differ over whether the voices of a tune carry their own accidentals, so after a
-    // voice change every accidental still in force is written again for the new voice.
-    let pitchesInDoubt = new Set();
+    const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+    const d = gcd(Math.abs(num), Math.abs(den));
+    num /= d;
+    den /= d;
 
-    const __voiceChanged = () => {
-        pitchesInDoubt = new Set(Object.keys(accidentalsInForce));
-    };
+    if (den === 1) return num.toString();
+    if (num === 1) return `1/${den}`;
+    return `${num}/${den}`;
+};
 
-    /**
-     * Converts a staged pitch name to ABC, writing an accidental wherever the key signature
-     * or an accidental still in force would otherwise sound a different pitch.
-     * @param {Array} staged - STAGED_PITCH_PATTERN match: letter, accidentals, octave, and
-     *   the accidentals of a courtesy natural written after the octave.
-     * @returns {string|null} The note in ABC notation, or null for an alteration ABC has no
-     *   accidental for, which is left to the caller to write symbol by symbol.
-     */
-    const __toKeyedABCnote = staged => {
+class AbcExporter {
+    constructor(logo, turtle, keySignature) {
+        this.logo = logo;
+        this.turtle = turtle;
+        this.keySignature = keySignature;
+        this.staging = logo.notation.notationStaging[turtle] || [];
+
+        this.parts = [];
+        this.counter = 0;
+        this.articulationDepth = 0;
+        this.harmonicsDepth = 0;
+        this.lastNoteStart = null;
+        this.pendingAnnotations = [];
+        this.prefixStart = null;
+        this.queueSlur = 0;
+
+        const { field: keyField, alterations: keyAlterations } = abcKeySignature(keySignature);
+        this.keyField = keyField;
+        this.keyAlterations = keyAlterations;
+        this.accidentalsInForce = {};
+        this.pitchesInDoubt = new Set();
+    }
+
+    __voiceChanged() {
+        this.pitchesInDoubt = new Set(Object.keys(this.accidentalsInForce));
+    }
+
+    __toKeyedABCnote(staged) {
         const letter = staged[1].toUpperCase();
         const symbols = Array.from(staged[2] + staged[4]);
-        // A natural cancels the accidentals beside it; anything else adds up. It is written
-        // out even where the key calls for nothing, since it was asked for: Music Blocks
-        // stages one for the accidental block and for a courtesy natural alike.
         const courtesy = symbols.includes("♮");
         const alteration = courtesy
             ? 0
@@ -250,51 +243,34 @@ const processABCNotes = function (logo, turtle, keySignature = "C major") {
         let accidental = "";
         if (
             courtesy ||
-            alteration !== keyAlterations[letter] ||
-            pitchesInDoubt.has(pitch) ||
-            (accidentalsInForce[pitch] !== undefined && accidentalsInForce[pitch] !== alteration)
+            alteration !== this.keyAlterations[letter] ||
+            this.pitchesInDoubt.has(pitch) ||
+            (this.accidentalsInForce[pitch] !== undefined &&
+                this.accidentalsInForce[pitch] !== alteration)
         ) {
-            // Written even where one already in force would do, so that the pitch survives
-            // bar lines added to the tune later.
             accidental = ALTERATION_ACCIDENTALS[alteration] ?? "";
-            accidentalsInForce[pitch] = alteration;
-            pitchesInDoubt.delete(pitch);
+            this.accidentalsInForce[pitch] = alteration;
+            this.pitchesInDoubt.delete(pitch);
         }
 
-        // The same octave marks as OCTAVE_NOTATION_MAP, counted out so that an octave
-        // outside its range still lands in the right one.
         return (
             accidental +
             (octave >= 5
                 ? letter.toLowerCase() + "'".repeat(octave - 5)
                 : letter + ",".repeat(4 - octave))
         );
-    };
+    }
 
-    /**
-     * Converts a musical note into ABC notation format.
-     * @param {string|number} note - The musical note to convert. It can be a string note (e.g., 'C#') or a frequency (number).
-     * @returns {string} The note converted to ABC notation.
-     */
+    __toABCnote(note) {
+        if (note === "R" || note === "r") return "z";
 
-    const __toABCnote = note => {
-        // beams -- no space between notes
-        // ties use ()
-        // % comment
-
-        // Abc notes use is for sharp, es for flat,
-        // , and ' for shifts in octave.
-        // Also, notes must be lowercase.
-        // And the octave boundary is at C, not A.
-
-        // Handle frequency conversion
         if (typeof note === "number") {
             const pitchObj = frequencyToPitch(note);
             note = pitchObj[0] + pitchObj[1];
         }
 
         const staged = String(note).match(STAGED_PITCH_PATTERN);
-        const keyed = staged === null ? null : __toKeyedABCnote(staged);
+        const keyed = staged === null ? null : this.__toKeyedABCnote(staged);
         if (keyed !== null) {
             return keyed;
         }
@@ -310,14 +286,12 @@ const processABCNotes = function (logo, turtle, keySignature = "C major") {
             note = note.replace(accidentalSymbols, "");
         }
 
-        // Handle octave notation
         const match = note.match(/\d+$/);
         const octave = match ? parseInt(match[0], 10) : null;
         if (octave !== null && OCTAVE_NOTATION_MAP[octave] !== undefined) {
             note = note.replace(/\d+$/, OCTAVE_NOTATION_MAP[octave]);
         }
 
-        // Convert case based on octave
         if (octave !== null) {
             return accidental + (octave >= 5 ? note.toLowerCase() : note.toUpperCase());
         } else {
@@ -326,366 +300,348 @@ const processABCNotes = function (logo, turtle, keySignature = "C major") {
                 (note.includes("'") || note === "" ? note.toLowerCase() : note.toUpperCase())
             );
         }
-    };
+    }
 
-    let counter = 0;
-    let queueSlur = false;
-    // Nesting depth of the relative-volume and harmonic blocks around the current note.
-    let articulationDepth = 0;
-    let harmonicsDepth = 0;
-    // Where in parts the most recent note, chord or tuplet starts. Markup is staged right
-    // after its note, but ABC wants an annotation in front of the note, so it goes here.
-    let lastNoteStart = null;
-    // Annotations for the next note: swing, or markup staged before any note.
-    let pendingAnnotations = [];
-    // Where the decorations written since the last note start. A decoration must be
-    // directly followed by its note, so fields staged after one are written before it.
-    let prefixStart = null;
-    let notes;
-
-    const staging = logo.notation.notationStaging[turtle];
-
-    const __beginNote = () => {
-        lastNoteStart = parts.length;
-        prefixStart = null;
-        parts.push(...pendingAnnotations);
-        pendingAnnotations = [];
-    };
-
-    const __pushPrefix = decoration => {
-        if (prefixStart === null) {
-            prefixStart = parts.length;
+    __beginNote() {
+        this.lastNoteStart = this.parts.length;
+        this.prefixStart = null;
+        if (this.queueSlur > 0) {
+            this.parts.push("(".repeat(this.queueSlur));
+            this.queueSlur = 0;
         }
-        parts.push(decoration);
-    };
+        this.parts.push(...this.pendingAnnotations);
+        this.pendingAnnotations = [];
+    }
 
-    // Writes a field ahead of any decorations still waiting for their note. A field on
-    // its own line gets a line break before it unless one is already there; an empty
-    // line would end the tune.
-    const __pushField = (field, ownLine = false) => {
-        const at = prefixStart === null ? parts.length : prefixStart;
-        const written = parts.slice(0, at).join("");
+    __pushPrefix(decoration) {
+        if (this.prefixStart === null) {
+            this.prefixStart = this.parts.length;
+        }
+        this.parts.push(decoration);
+    }
+
+    __pushField(field, ownLine = false) {
+        const at = this.prefixStart === null ? this.parts.length : this.prefixStart;
+        const written = this.parts.slice(0, at).join("");
         const insert =
             ownLine && written !== "" && !written.endsWith("\n") ? ["\n", field] : [field];
-        parts.splice(at, 0, ...insert);
-        if (prefixStart !== null) {
-            prefixStart += insert.length;
-        }
-    };
-
-    // Decorations for a note, or a whole chord, inside open marker blocks.
-    const __decorations = () =>
-        (articulationDepth > 0 ? "!accent!" : "") + (harmonicsDepth > 0 ? "!open!" : "");
-
-    for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
-        const obj = logo.notation.notationStaging[turtle][i];
-        if (typeof obj === "string") {
-            switch (obj) {
-                case "break":
-                    // Only end a line that has something on it; an empty line ends the tune.
-                    if (i > 0 && parts.join("") !== "" && !parts.join("").endsWith("\n")) {
-                        parts.push("\n");
-                    }
-                    counter = 0;
-                    break;
-                case "begin articulation":
-                    articulationDepth++;
-                    break;
-                case "end articulation":
-                    articulationDepth = Math.max(0, articulationDepth - 1);
-                    break;
-                case "begin harmonics":
-                    harmonicsDepth++;
-                    break;
-                case "end harmonics":
-                    harmonicsDepth = Math.max(0, harmonicsDepth - 1);
-                    break;
-                case "begin crescendo":
-                    __pushPrefix("!<(!");
-                    break;
-                case "end crescendo":
-                    __pushPrefix("!<)!");
-                    break;
-                case "begin decrescendo":
-                    __pushPrefix("!>(!");
-                    break;
-                case "end decrescendo":
-                    __pushPrefix("!>)!");
-                    break;
-                case "begin slur":
-                    queueSlur = true;
-                    break;
-                case "end slur":
-                    parts.push("");
-                    break;
-                case "tie":
-                    parts.push("");
-                    break;
-                // A field changed mid-tune must be inline ("[Q:1/4=90]") or start its own
-                // line; a bare "M:3/4" after a note is not read as a field.
-                case "meter":
-                    if (Number(staging[i + 1]) > 0 && Number(staging[i + 2]) > 0) {
-                        // On its own line rather than inline: abcjs 6.3.0 throws on an
-                        // inline [M:] right after switching back to a voice on a later line.
-                        __pushField(`M:${staging[i + 1]}/${staging[i + 2]}\n`, true);
-                        // The field already ended the line.
-                        counter = 0;
-                    }
-                    i += 2;
-                    break;
-                case "tempo": {
-                    const bpm = staging[i + 1];
-                    const lengths = lilypondDurationToAbcLengths(staging[i + 2]);
-                    if (lengths !== null && Number(bpm) > 0) {
-                        __pushField(`[Q:${lengths}=${bpm}]`);
-                    }
-                    i += 2;
-                    break;
-                }
-                case "pickup":
-                    // This exporter writes no bar lines, so there is no first measure for a
-                    // pickup to shorten.
-                    i += 1;
-                    break;
-                case "key": {
-                    // Staged pitches are absolute ("F4" is F natural in any key), and so are
-                    // written against whichever signature is in force from here on.
-                    const changed = abcKeySignature(`${staging[i + 1]} ${staging[i + 2]}`);
-                    if (changed.field !== keyField) {
-                        __pushField(`[K:${changed.field}]`);
-                        keyField = changed.field;
-                        keyAlterations = changed.alterations;
-                        // Accidentals already written stay in force over the new signature,
-                        // so what is in force is still known.
-                    }
-                    i += 2;
-                    break;
-                }
-                case "markup":
-                case "markdown": {
-                    const text = staging[i + 1];
-                    if (text !== undefined) {
-                        const annotation = abcAnnotation(text, obj === "markup" ? "^" : "_");
-                        if (lastNoteStart === null) {
-                            pendingAnnotations.push(annotation);
-                        } else {
-                            parts.splice(lastNoteStart, 0, annotation);
-                            if (prefixStart !== null) {
-                                prefixStart++;
-                            }
-                        }
-                    }
-                    i += 1;
-                    break;
-                }
-                case "swing":
-                    pendingAnnotations.push(abcAnnotation("swing", "^"));
-                    break;
-                case "voice one":
-                    __pushField("[V:1]");
-                    __voiceChanged();
-                    break;
-                case "voice two":
-                    __pushField("[V:2]");
-                    __voiceChanged();
-                    break;
-                case "voice three":
-                    __pushField("[V:3]");
-                    __voiceChanged();
-                    break;
-                case "voice four":
-                    __pushField("[V:4]");
-                    __voiceChanged();
-                    break;
-                case "one voice":
-                    // Return to a single voice
-                    __pushField("[V:1]");
-                    __voiceChanged();
-                    break;
-                default:
-                    // A marker with no ABC counterpart. Writing it would put its name into
-                    // the tune as stray characters.
-                    break;
-            }
-        } else if (Array.isArray(obj)) {
-            if (counter % 8 === 0 && counter > 0) {
-                parts.push("\n");
-            }
-            counter += 1;
-
-            notes = typeof obj[NOTATIONNOTE] === "string" ? [obj[NOTATIONNOTE]] : obj[NOTATIONNOTE];
-            if (notes.length === 0) {
-                notes = ["R"];
-            }
-
-            let incompleteTuplet = 0; // An incomplete tuplet
-
-            // If it is a tuplet, look ahead to see if it is complete.
-            if (obj[NOTATIONTUPLETVALUE] !== null) {
-                let j = 1;
-                let k = 1;
-                while (k < obj[NOTATIONTUPLETVALUE][0]) {
-                    if (i + j >= logo.notation.notationStaging[turtle].length) {
-                        incompleteTuplet = j;
-                        break;
-                    }
-
-                    if (
-                        logo.notation.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0 &&
-                        logo.notation.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] ===
-                            logo.notation.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD]
-                    ) {
-                        // In a chord, so jump to next note.
-                        j++;
-                    } else if (
-                        !__sameTuplet(
-                            logo.notation.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE],
-                            obj[NOTATIONTUPLETVALUE]
-                        )
-                    ) {
-                        incompleteTuplet = j;
-                        break;
-                    } else {
-                        j++; // Jump to next note.
-                        k++; // Increment notes in tuplet.
-                    }
-                }
-            }
-
-            /**
-             * Processes an incomplete tuplet and appends the corresponding ABC notation to the notation string.
-             * @param {object} logo - The logo object containing notation information.
-             * @param {string} turtle - The identifier for the turtle.
-             * @param {number} i - The index of the current note within the notation staging.
-             * @param {number} count - The number of notes in the incomplete tuplet.
-             * @returns {number} The number of notes processed within the tuplet.
-             * @private
-             */
-            const __processTuplet = (logo, turtle, i, count) => {
-                let j = 0;
-                let k = 0;
-
-                while (k < count) {
-                    // const tupletDuration = 2 *
-                    //     logo.notation.notationStaging[turtle][i + j][
-                    //         NOTATIONDURATION];
-
-                    const tupletNotes = logo.notation.notationStaging[turtle][i + j];
-
-                    if (typeof tupletNotes[NOTATIONNOTE] === "object") {
-                        parts.push(__decorations());
-                        if (tupletNotes[NOTATIONSTACCATO]) {
-                            parts.push(".");
-                        }
-
-                        if (tupletNotes[NOTATIONNOTE].length > 1) {
-                            parts.push("[");
-                        }
-
-                        for (let ii = 0; ii < tupletNotes[NOTATIONNOTE].length; ii++) {
-                            parts.push(__toABCnote(tupletNotes[NOTATIONNOTE][ii]));
-                        }
-
-                        if (tupletNotes[NOTATIONNOTE].length > 1) {
-                            parts.push("]");
-                        }
-
-                        parts.push(__convertDuration(tupletNotes[NOTATIONROUNDDOWN]));
-                    }
-                    j++; // Jump to next note.
-                    k++; // Increment notes in tuplet.
-                }
-
-                return j;
-            };
-
-            if (obj[NOTATIONTUPLETVALUE] !== null) {
-                const inTuplet = obj[NOTATIONTUPLETVALUE][0];
-                const count = incompleteTuplet === 0 ? inTuplet : incompleteTuplet;
-
-                __beginNote();
-                parts.push(
-                    "(" +
-                        inTuplet +
-                        ":" +
-                        __tupletTime(inTuplet) +
-                        (count === inTuplet ? "" : ":" + count)
-                );
-
-                i += Math.max(1, __processTuplet(logo, turtle, i, count)) - 1;
-            } else {
-                if (obj[NOTATIONINSIDECHORD] <= 0) {
-                    __beginNote();
-                    parts.push(__decorations());
-                    if (obj[NOTATIONSTACCATO]) {
-                        parts.push(".");
-                    }
-
-                    if (notes.length > 1) {
-                        parts.push("[");
-                    }
-
-                    for (let ii = 0; ii < notes.length; ii++) {
-                        parts.push(__toABCnote(notes[ii]));
-                    }
-
-                    if (notes.length > 1) {
-                        parts.push("]");
-                    }
-
-                    parts.push(__convertDuration(obj[NOTATIONDURATION]));
-                    for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                        parts.push(".");
-                    }
-                }
-
-                if (obj[NOTATIONINSIDECHORD] > 0) {
-                    // Is logo the first note in the chord?
-                    if (
-                        i === 0 ||
-                        logo.notation.notationStaging[turtle][i - 1][NOTATIONINSIDECHORD] !==
-                            obj[NOTATIONINSIDECHORD]
-                    ) {
-                        // Open the chord.
-                        __beginNote();
-                        parts.push(__decorations());
-                        if (obj[NOTATIONSTACCATO]) {
-                            parts.push(".");
-                        }
-
-                        parts.push("[");
-                    }
-
-                    parts.push(__toABCnote(notes[0]));
-
-                    // Is logo the last note in the chord?
-                    if (
-                        i === logo.notation.notationStaging[turtle].length - 1 ||
-                        logo.notation.notationStaging[turtle][i + 1][NOTATIONINSIDECHORD] !==
-                            obj[NOTATIONINSIDECHORD]
-                    ) {
-                        // Close the chord and add note duration.
-                        parts.push("]");
-                        parts.push(__convertDuration(obj[NOTATIONDURATION]));
-                        for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                            parts.push(" ");
-                        }
-
-                        parts.push(" ");
-                    }
-                }
-            }
-
-            parts.push(" ");
-
-            if (queueSlur) {
-                queueSlur = false;
-                parts.push("");
-            }
+        this.parts.splice(at, 0, ...insert);
+        if (this.prefixStart !== null) {
+            this.prefixStart += insert.length;
         }
     }
 
-    logo.notationNotes[turtle] = parts.join("");
+    __decorations() {
+        return (
+            (this.articulationDepth > 0 ? "!accent!" : "") +
+            (this.harmonicsDepth > 0 ? "!open!" : "")
+        );
+    }
+
+    processStringMarker(obj, i) {
+        switch (obj) {
+            case "break":
+                if (i > 0 && this.parts.join("") !== "" && !this.parts.join("").endsWith("\n")) {
+                    this.parts.push("\n");
+                }
+                this.counter = 0;
+                break;
+            case "begin articulation":
+                this.articulationDepth++;
+                break;
+            case "end articulation":
+                this.articulationDepth = Math.max(0, this.articulationDepth - 1);
+                break;
+            case "begin harmonics":
+                this.harmonicsDepth++;
+                break;
+            case "end harmonics":
+                this.harmonicsDepth = Math.max(0, this.harmonicsDepth - 1);
+                break;
+            case "begin crescendo":
+                this.__pushPrefix("!<(!");
+                break;
+            case "end crescendo":
+                this.__pushPrefix("!<)!");
+                break;
+            case "begin decrescendo":
+                this.__pushPrefix("!>(!");
+                break;
+            case "end decrescendo":
+                this.__pushPrefix("!>)!");
+                break;
+            case "begin slur":
+                this.queueSlur++;
+                break;
+            case "end slur":
+                if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
+                    const last = this.parts[this.parts.length - 1];
+                    this.parts[this.parts.length - 1] = last.slice(0, -1) + ") ";
+                } else {
+                    this.parts.push(")");
+                }
+                break;
+            case "tie":
+                if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
+                    const last = this.parts[this.parts.length - 1];
+                    this.parts[this.parts.length - 1] = last.slice(0, -1) + "- ";
+                } else {
+                    this.parts.push("-");
+                }
+                break;
+            case "meter":
+                if (Number(this.staging[i + 1]) > 0 && Number(this.staging[i + 2]) > 0) {
+                    this.__pushField(`M:${this.staging[i + 1]}/${this.staging[i + 2]}\n`, true);
+                    this.counter = 0;
+                }
+                i += 2;
+                break;
+            case "tempo": {
+                const bpm = this.staging[i + 1];
+                const lengths = lilypondDurationToAbcLengths(this.staging[i + 2]);
+                if (lengths !== null && Number(bpm) > 0) {
+                    this.__pushField(`[Q:${lengths}=${bpm}]`);
+                }
+                i += 2;
+                break;
+            }
+            case "pickup":
+                i += 1;
+                break;
+            case "key": {
+                const changed = abcKeySignature(`${this.staging[i + 1]} ${this.staging[i + 2]}`);
+                if (changed.field !== this.keyField) {
+                    this.__pushField(`[K:${changed.field}]`);
+                    this.keyField = changed.field;
+                    this.keyAlterations = changed.alterations;
+                }
+                i += 2;
+                break;
+            }
+            case "markup":
+            case "markdown": {
+                const text = this.staging[i + 1];
+                if (text !== undefined) {
+                    const annotation = abcAnnotation(text, obj === "markup" ? "^" : "_");
+                    if (this.lastNoteStart === null) {
+                        this.pendingAnnotations.push(annotation);
+                    } else {
+                        this.parts.splice(this.lastNoteStart, 0, annotation);
+                        if (this.prefixStart !== null) {
+                            this.prefixStart++;
+                        }
+                    }
+                }
+                i += 1;
+                break;
+            }
+            case "swing":
+                this.pendingAnnotations.push(abcAnnotation("swing", "^"));
+                break;
+            case "voice one":
+                this.__pushField("[V:1]");
+                this.__voiceChanged();
+                break;
+            case "voice two":
+                this.__pushField("[V:2]");
+                this.__voiceChanged();
+                break;
+            case "voice three":
+                this.__pushField("[V:3]");
+                this.__voiceChanged();
+                break;
+            case "voice four":
+                this.__pushField("[V:4]");
+                this.__voiceChanged();
+                break;
+            case "one voice":
+                this.__pushField("[V:1]");
+                this.__voiceChanged();
+                break;
+            default:
+                break;
+        }
+        return i;
+    }
+
+    processTupletNotes(i, count) {
+        let j = 0;
+        let k = 0;
+
+        while (k < count) {
+            const tupletNotes = this.staging[i + j];
+
+            if (typeof tupletNotes[NOTATIONNOTE] === "object") {
+                this.parts.push(this.__decorations());
+                if (tupletNotes[NOTATIONSTACCATO]) {
+                    this.parts.push(".");
+                }
+
+                if (tupletNotes[NOTATIONNOTE].length > 1) {
+                    this.parts.push("[");
+                }
+
+                for (let ii = 0; ii < tupletNotes[NOTATIONNOTE].length; ii++) {
+                    this.parts.push(this.__toABCnote(tupletNotes[NOTATIONNOTE][ii]));
+                }
+
+                if (tupletNotes[NOTATIONNOTE].length > 1) {
+                    this.parts.push("]");
+                }
+
+                this.parts.push(
+                    convertDuration(
+                        tupletNotes[NOTATIONROUNDDOWN],
+                        tupletNotes[NOTATIONDOTCOUNT] || 0
+                    )
+                );
+            }
+            j++;
+            k++;
+        }
+
+        return j;
+    }
+
+    processNoteArray(obj, i) {
+        const inChordContinuation =
+            obj[NOTATIONINSIDECHORD] > 0 &&
+            i > 0 &&
+            Array.isArray(this.staging[i - 1]) &&
+            this.staging[i - 1][NOTATIONINSIDECHORD] === obj[NOTATIONINSIDECHORD];
+
+        if (this.counter % 8 === 0 && this.counter > 0 && !inChordContinuation) {
+            this.parts.push("\n");
+        }
+        if (!inChordContinuation) {
+            this.counter += 1;
+        }
+
+        let notes = typeof obj[NOTATIONNOTE] === "string" ? [obj[NOTATIONNOTE]] : obj[NOTATIONNOTE];
+        if (notes.length === 0) {
+            notes = ["R"];
+        }
+
+        let incompleteTuplet = 0;
+
+        if (obj[NOTATIONTUPLETVALUE] !== null) {
+            let j = 1;
+            let k = 1;
+            while (k < obj[NOTATIONTUPLETVALUE][0]) {
+                if (i + j >= this.staging.length) {
+                    incompleteTuplet = j;
+                    break;
+                }
+
+                if (
+                    this.staging[i + j][NOTATIONINSIDECHORD] > 0 &&
+                    this.staging[i + j][NOTATIONINSIDECHORD] ===
+                        this.staging[i + j - 1][NOTATIONINSIDECHORD]
+                ) {
+                    j++;
+                } else if (
+                    !isSameTuplet(
+                        this.staging[i + j][NOTATIONTUPLETVALUE],
+                        obj[NOTATIONTUPLETVALUE]
+                    )
+                ) {
+                    incompleteTuplet = j;
+                    break;
+                } else {
+                    j++;
+                    k++;
+                }
+            }
+        }
+
+        if (obj[NOTATIONTUPLETVALUE] !== null) {
+            const inTuplet = obj[NOTATIONTUPLETVALUE][0];
+            const count = incompleteTuplet === 0 ? inTuplet : incompleteTuplet;
+
+            this.__beginNote();
+            this.parts.push(
+                "(" +
+                    inTuplet +
+                    ":" +
+                    getTupletTime(inTuplet) +
+                    (count === inTuplet ? "" : ":" + count)
+            );
+
+            i += Math.max(1, this.processTupletNotes(i, count)) - 1;
+        } else {
+            if (obj[NOTATIONINSIDECHORD] <= 0) {
+                this.__beginNote();
+                this.parts.push(this.__decorations());
+                if (obj[NOTATIONSTACCATO]) {
+                    this.parts.push(".");
+                }
+
+                if (notes.length > 1) {
+                    this.parts.push("[");
+                }
+
+                for (let ii = 0; ii < notes.length; ii++) {
+                    this.parts.push(this.__toABCnote(notes[ii]));
+                }
+
+                if (notes.length > 1) {
+                    this.parts.push("]");
+                }
+
+                this.parts.push(convertDuration(obj[NOTATIONDURATION], obj[NOTATIONDOTCOUNT]));
+            }
+
+            if (obj[NOTATIONINSIDECHORD] > 0) {
+                if (
+                    i === 0 ||
+                    this.staging[i - 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]
+                ) {
+                    this.__beginNote();
+                    this.parts.push(this.__decorations());
+                    if (obj[NOTATIONSTACCATO]) {
+                        this.parts.push(".");
+                    }
+                    this.parts.push("[");
+                }
+
+                this.parts.push(this.__toABCnote(notes[0]));
+
+                if (
+                    i === this.staging.length - 1 ||
+                    this.staging[i + 1][NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]
+                ) {
+                    this.parts.push("]");
+                    this.parts.push(convertDuration(obj[NOTATIONDURATION], obj[NOTATIONDOTCOUNT]));
+                }
+            }
+        }
+
+        this.parts.push(" ");
+        return i;
+    }
+
+    process() {
+        for (let i = 0; i < this.staging.length; i++) {
+            const obj = this.staging[i];
+            if (typeof obj === "string") {
+                i = this.processStringMarker(obj, i);
+            } else if (Array.isArray(obj)) {
+                i = this.processNoteArray(obj, i);
+            }
+        }
+        this.logo.notationNotes[this.turtle] = this.parts.join("");
+    }
+}
+
+/**
+ * Processes musical notes and converts them into ABC notation format.
+ * @param {object} logo - The logo object containing notationNotes to update.
+ * @param {string} turtle - The identifier for the turtle.
+ * @param {string} [keySignature] - the key the tune is written in, e.g. "G major". Staged
+ *   pitches are absolute, so this is what the accidentals are written against.
+ */
+const processABCNotes = function (logo, turtle, keySignature = "C major") {
+    new AbcExporter(logo, turtle, keySignature).process();
 };
 
 /**

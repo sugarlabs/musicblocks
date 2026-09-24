@@ -883,7 +883,7 @@ class BlockDragController {
                                 myBlock.value = name;
                                 let label = name;
                                 if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                                    label = label.substr(0, STRINGLEN) + "...";
+                                    label = label.slice(0, STRINGLEN) + "...";
                                 }
                                 myBlock.text.text = label;
                                 myBlock.container.updateCache();
@@ -1002,7 +1002,7 @@ class BlockDragController {
                                 );
                                 let label = blocks.blockList[thisBlock].value;
                                 if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                                    label = label.substr(0, STRINGLEN) + "...";
+                                    label = label.slice(0, STRINGLEN) + "...";
                                 }
                                 blocks.blockList[thisBlock].text.text = label;
                                 blocks.blockList[thisBlock].container.updateCache();

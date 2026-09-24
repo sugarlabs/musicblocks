@@ -14,6 +14,12 @@
             "draft": false,
             "prerelease": false,
             "changelog-type": "github",
+            "extra-files": [
+                {
+                    "type": "generic",
+                    "path": "js/turtledefs.js"
+                }
+            ],
             "changelog-sections": [
                 { "type": "feat", "section": "Features" },
                 { "type": "fix", "section": "Bug Fixes", "hidden": true },

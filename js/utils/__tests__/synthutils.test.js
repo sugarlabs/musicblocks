@@ -106,6 +106,8 @@ describe("Utility Functions (logic-only)", () => {
             "../utils.js",
             "../../logoconstants.js",
             "../platformstyle.js",
+            "../musicutils-constants.js",
+            "../musicutils-i18n.js",
             "../musicutils.js",
             "../../logo.js",
             "../../turtle-singer.js"
@@ -1433,6 +1435,8 @@ describe("Utility Functions (logic-only)", () => {
             expect(_parseSampleCenterNo("do", 5)).toBe("60");
             expect(_parseSampleCenterNo("A", 5)).toBe("69");
             expect(_parseSampleCenterNo("A", 2)).toBe("33");
+            expect(_parseSampleCenterNo("^G" + SHARP, 4)).toBe("56");
+            expect(_parseSampleCenterNo("vla" + FLAT, 4)).toBe("56");
         });
     });
 
@@ -1952,6 +1956,31 @@ describe("Utility Functions (logic-only)", () => {
             // Non-continuation notes (setNote=false) should still play normally.
             expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
             expect(mockSynth.setNote).not.toHaveBeenCalled();
+        });
+
+        it("should play a filtered note on a basic oscillator (paramsEffects null) without throwing", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                chain: jest.fn().mockReturnThis(),
+                disconnect: jest.fn(),
+                connect: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            // Basic oscillators (sine/sawtooth/...) reach _performNotes with
+            // paramsEffects === null but a live filter. A non-empty filter forces
+            // the slow graph-rewire path, which must not dereference paramsEffects.
+            const paramsFilters = [
+                { filterType: "lowpass", filterRolloff: -12, filterFrequency: 400 }
+            ];
+
+            // Awaiting directly: if the slow path threw (as it did before the
+            // fix), the rejection fails the test. The triggerAttackRelease
+            // assertion then verifies the note actually played.
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, null, paramsFilters, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
         });
 
         it("should route plain (non-portamento) notes through the fast path unaffected", async () => {
@@ -3266,6 +3295,87 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             synthInstance.tunerAnalyser = null;
             expect(synthInstance.getTunerFrequency()).toBe(440);
         });
+
+        test("startTuner initializes with provided initialTargetPitch and starts in target mode", async () => {
+            // Do NOT mock computeTargetPitchFrequency to test real calculation for non-default octaves
+            await synthInstance.startTuner("C6");
+            await new Promise(r => setTimeout(r, 10)); // wait for rAF
+            expect(synthInstance._tunerActive).toBe(true);
+
+            // Should be in target pitch mode
+            let modeToggle = document.getElementById("modeToggle");
+            let chromaticButton = modeToggle.children[0];
+            let targetPitchButton = modeToggle.children[1];
+            expect(targetPitchButton.getAttribute("aria-pressed")).toBe("true");
+
+            // Assert display results for C6
+            const targetNoteSelector = document.getElementById("targetNoteSelector");
+            expect(targetNoteSelector.textContent).toBe("C6");
+
+            // Also test invalid pitch falls back
+            synthInstance.stopTuner();
+            // Clear DOM to force recreation of tuner elements
+            document.body.innerHTML = "";
+            let newTunerContainer = document.createElement("div");
+            newTunerContainer.id = "tunerContainer";
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            for (let i = 0; i < 11; i++)
+                svg.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "path"));
+            newTunerContainer.appendChild(svg);
+            document.body.appendChild(newTunerContainer);
+
+            await synthInstance.startTuner("INVALID_PITCH");
+            await new Promise(r => setTimeout(r, 10)); // wait for rAF
+
+            // Should fallback to chromatic mode because invalid pitch doesn't set target mode
+            modeToggle = document.getElementById("modeToggle");
+            if (!modeToggle) {
+                console.log("Tuner display:", document.getElementById("tuner-display"));
+            }
+            chromaticButton = modeToggle.children[0];
+            expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
+        });
+
+        test("tuner mode toggle buttons respond to keyboard events (Enter and Space)", async () => {
+            await synthInstance.startTuner();
+            await new Promise(r => setTimeout(r, 10)); // wait for rAF
+            const modeToggle = document.getElementById("modeToggle");
+            const chromaticButton = modeToggle.children[0];
+            const targetPitchButton = modeToggle.children[1];
+
+            // Initially chromatic mode is active
+            expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
+
+            // Press Space on Target Pitch button
+            const spaceEvent = new KeyboardEvent("keydown", { key: " " });
+            // Must mock preventDefault
+            spaceEvent.preventDefault = jest.fn();
+            targetPitchButton.onkeydown(spaceEvent);
+            expect(targetPitchButton.getAttribute("aria-pressed")).toBe("true");
+            expect(chromaticButton.getAttribute("aria-pressed")).toBe("false");
+            expect(spaceEvent.preventDefault).toHaveBeenCalled();
+
+            // Wait for debounce (200ms in source)
+            await new Promise(resolve => setTimeout(resolve, 250));
+
+            // Press Enter on Chromatic button
+            const enterEvent = new KeyboardEvent("keydown", { key: "Enter" });
+            enterEvent.preventDefault = jest.fn();
+            chromaticButton.onkeydown(enterEvent);
+            expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
+            expect(targetPitchButton.getAttribute("aria-pressed")).toBe("false");
+            expect(enterEvent.preventDefault).toHaveBeenCalled();
+
+            // Wait for debounce before next keypress
+            await new Promise(resolve => setTimeout(resolve, 250));
+
+            // Press a different key, should not do anything (no preventDefault, mode stays chromatic)
+            const otherEvent = new KeyboardEvent("keydown", { key: "a" });
+            otherEvent.preventDefault = jest.fn();
+            targetPitchButton.onkeydown(otherEvent);
+            expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
+            expect(otherEvent.preventDefault).not.toHaveBeenCalled();
+        });
     });
 
     describe("Cents Slider Interface", () => {
@@ -3557,6 +3667,15 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             expect(synth._parseSampleCenterNo("re", 4)).toBe("50");
             expect(synth._parseSampleCenterNo("D", 4)).toBe("50");
             expect(synth._parseSampleCenterNo("unknown", 4)).toBe("48");
+            // Non-zero chromatic degrees must strip the accidental glyph before
+            // the dictionary lookup, otherwise the lookup misses and the degree
+            // wrongly falls back to 0 (e.g. sol#4 -> C#4).
+            expect(synth._parseSampleCenterNo("sol" + SHARP, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("G" + SHARP, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("la" + FLAT, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("A" + FLAT, 4)).toBe("56");
+            expect(synth._parseSampleCenterNo("mi" + DOUBLEFLAT, 4)).toBe("50");
+            expect(synth._parseSampleCenterNo("ti" + DOUBLESHARP, 4)).toBe("61");
         });
 
         test("resolveInstrumentName resolves translated names and internal keys", () => {
@@ -4090,5 +4209,21 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             synth.stopPlayBackRecording();
             expect(synth.player).toBeNull();
         });
+    });
+});
+
+describe("DRUMNAMES Lilypond symbols", () => {
+    const { DRUMNAMES } = synthutilsModule;
+
+    const symbolFor = name => DRUMNAMES.find(drum => drum[1] === name)[3];
+
+    it("writes the kick drum and the bass drum as bd", () => {
+        expect(symbolFor("kick drum")).toBe("bd");
+        expect(symbolFor("bass drum")).toBe("bd");
+    });
+
+    it("leaves the snare drum and the hi hat alone", () => {
+        expect(symbolFor("snare drum")).toBe("sn");
+        expect(symbolFor("hi hat")).toBe("hh");
     });
 });

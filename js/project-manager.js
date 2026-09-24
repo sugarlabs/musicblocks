@@ -275,15 +275,32 @@ class ProjectManager {
 
         pubsub.on("finishedLoading", __afterLoad);
 
+        // Returns the loadToken loadNewBlocks() assigns this request (see
+        // js/blocks.js), or null when no load was actually started (the
+        // empty/undefined-session shortcuts below already route through
+        // justLoadStart() instead).
         const tryParseAndLoad = data => {
             if (data === "undefined" || data === "[]") {
                 that.justLoadStart();
-                return true;
+                return null;
             }
             const parsed = JSON.parse(data);
+            if (Array.isArray(parsed) && parsed.length === 0) {
+                // Any whitespace/formatting variant of "[]" (e.g. " [ ]")
+                // still parses to an empty array here, past the literal
+                // string check above. loadNewBlocks([]) completes
+                // synchronously inside blocks.js's own zero-block fast
+                // path, emitting "finishedLoading" before this call even
+                // returns — before a caller could register a watcher for
+                // it. Treating a parsed-empty array the same as the
+                // literal "[]" case keeps that synchronous emit from
+                // leaving watchForDeferredLoadFailure()'s listeners
+                // stranded (review comment on issue #8855's fix).
+                that.justLoadStart();
+                return null;
+            }
             window.loadedSession = data;
-            that.blocks.loadNewBlocks(parsed);
-            return true;
+            return that.blocks.loadNewBlocks(parsed);
         };
 
         const deleteFromSource = async source => {
@@ -316,41 +333,109 @@ class ProjectManager {
             }
         };
 
-        if (that.sessionData) {
-            that.doLoadAnimation();
-            let loaded = false;
-            try {
-                loaded = tryParseAndLoad(that.sessionData);
-            } catch (e) {
-                ErrorHandler.recoverable(e, { operation: "loadSessionData" });
-                await deleteFromSource(sessionSource);
+        // A block-processing failure past the first ~20 blocks throws from
+        // inside loadNewBlocks()'s deferred setTimeout chunking
+        // (js/blocks.js), which no synchronous try/catch around
+        // tryParseAndLoad() below can ever observe: that throw has no
+        // caller left to reach (see issue #8855). loadNewBlocks() reports
+        // that case through this "loadFailed" pubsub event instead (the
+        // same channel "finishedLoading" already uses for success), so it
+        // can still reach the same delete-and-fallback recovery a
+        // synchronous failure gets below.
+        //
+        // Both events carry the loadToken loadNewBlocks() returned for the
+        // request they belong to (js/blocks.js), which is assigned the
+        // moment that request is made — whether it then runs immediately or
+        // sits queued behind another, unrelated load already in progress.
+        // Filtering on it (rather than just the event name) keeps this from
+        // reacting to that other load's own completion or failure, which a
+        // reviewer flagged: reading a "currently active load" counter after
+        // the fact isn't safe here, since this request may still be queued
+        // at that point.
+        const watchForDeferredLoadFailure = (source, expectedToken) => {
+            const belongsToThisLoad = payload =>
+                !payload || payload.token === undefined ? true : payload.token === expectedToken;
+            const stopWatching = () => {
+                pubsub.off("finishedLoading", onSucceeded);
+                pubsub.off("loadFailed", onFailed);
+            };
+            const onFailed = payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+                recoverFromLoadFailure(
+                    source,
+                    (payload && payload.error) || new Error("loadNewBlocks failed")
+                );
+            };
+            const onSucceeded = payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+            };
+            pubsub.on("finishedLoading", onSucceeded);
+            pubsub.on("loadFailed", onFailed);
+        };
 
-                // Attempt fallback to the alternative source if available
-                let fallbackData = null;
-                let fallbackSource = null;
-                if (sessionSource === "idb" && localData) {
+        // Runs the delete-and-fallback recovery for a failed session load,
+        // whether that failure was caught synchronously below or reported
+        // asynchronously via "loadFailed" above. Attempts at most one
+        // fallback (the same bound the original synchronous-only version of
+        // this logic had) so two independently bad storage tiers can't
+        // bounce off each other indefinitely.
+        let fallbackAttempted = false;
+        const recoverFromLoadFailure = async (failedSource, error) => {
+            ErrorHandler.recoverable(error, { operation: "loadSessionData" });
+            await deleteFromSource(failedSource);
+
+            // The failed load may have only partially populated blockList
+            // before it threw. Clear those leftover blocks before loading
+            // anything else, or the next attempt's blocks render on top of
+            // them instead of replacing them (reported against this fix).
+            if (typeof that.sendAllToTrash === "function") {
+                that.sendAllToTrash(false, false);
+            }
+
+            let fallbackData = null;
+            let fallbackSource = null;
+            if (!fallbackAttempted) {
+                if (failedSource === "idb" && localData) {
                     fallbackData = localData;
                     fallbackSource = "local";
-                } else if (sessionSource === "local" && idbPayload && idbPayload.data) {
+                } else if (failedSource === "local" && idbPayload && idbPayload.data) {
                     fallbackData = idbPayload.data;
                     fallbackSource = "idb";
                 }
+            }
 
-                if (fallbackData) {
-                    try {
-                        that.sessionData = fallbackData;
-                        loaded = tryParseAndLoad(fallbackData);
-                    } catch (fallbackErr) {
-                        ErrorHandler.recoverable(fallbackErr, {
-                            operation: "loadFallbackSessionData"
-                        });
-                        await deleteFromSource(fallbackSource);
+            if (fallbackData) {
+                fallbackAttempted = true;
+                try {
+                    that.sessionData = fallbackData;
+                    const loadToken = tryParseAndLoad(fallbackData);
+                    if (loadToken !== null) {
+                        watchForDeferredLoadFailure(fallbackSource, loadToken);
                     }
+                    return;
+                } catch (fallbackErr) {
+                    ErrorHandler.recoverable(fallbackErr, {
+                        operation: "loadFallbackSessionData"
+                    });
+                    await deleteFromSource(fallbackSource);
                 }
+            }
 
-                if (!loaded) {
-                    that.justLoadStart();
+            that.errorMsg(_("Your saved project could not be loaded. Starting a new project."));
+            that.justLoadStart();
+        };
+
+        if (that.sessionData) {
+            that.doLoadAnimation();
+            try {
+                const loadToken = tryParseAndLoad(that.sessionData);
+                if (loadToken !== null) {
+                    watchForDeferredLoadFailure(sessionSource, loadToken);
                 }
+            } catch (e) {
+                await recoverFromLoadFailure(sessionSource, e);
             }
         } else {
             that.justLoadStart();
@@ -1006,10 +1091,14 @@ class ProjectManager {
                                     if (that.planet) {
                                         that.planet.closePlanet();
                                         that.planet.initialiseNewProject(
-                                            that.fileChooser.files[0].name.substr(
-                                                0,
-                                                that.fileChooser.files[0].name.lastIndexOf(".")
-                                            )
+                                            that.fileChooser.files[0].name.lastIndexOf(".") === -1
+                                                ? that.fileChooser.files[0].name
+                                                : that.fileChooser.files[0].name.slice(
+                                                      0,
+                                                      that.fileChooser.files[0].name.lastIndexOf(
+                                                          "."
+                                                      )
+                                                  )
                                         );
                                     }
                                 } else {
@@ -1130,7 +1219,9 @@ class ProjectManager {
                             that.sendAllToTrash(false, false);
                             if (that.planet !== undefined) {
                                 that.planet.initialiseNewProject(
-                                    files[0].name.substr(0, files[0].name.lastIndexOf("."))
+                                    files[0].name.lastIndexOf(".") === -1
+                                        ? files[0].name
+                                        : files[0].name.slice(0, files[0].name.lastIndexOf("."))
                                 );
                             }
 

@@ -375,6 +375,30 @@ describe("JSEditor", () => {
                 expect(countLinks()).toBe(baseline);
             }
         });
+
+        test("onclose removes tooltip elements from document.body", () => {
+            const beforeCount = document.body.children.length;
+            const editor = createEditor();
+
+            // 6 tooltips were added to document.body
+            expect(document.body.children.length).toBe(beforeCount + 6);
+
+            editor.widgetWindow.onclose();
+
+            // After close, all 6 tooltips should be removed from document.body
+            expect(document.body.children.length).toBe(beforeCount);
+        });
+
+        test("repeated open/close cycles do not leak tooltip containers into document.body", () => {
+            const baseline = document.body.children.length;
+
+            for (let i = 0; i < 5; i++) {
+                const editor = createEditor();
+                expect(document.body.children.length).toBe(baseline + 6);
+                editor.widgetWindow.onclose();
+                expect(document.body.children.length).toBe(baseline);
+            }
+        });
     });
 
     describe("code editing functions", () => {
@@ -561,15 +585,69 @@ describe("JSEditor", () => {
             expect(editorEl.innerHTML).toContain("defg");
         });
 
-        test("_addDebuggerToLine inserts debugger statement", () => {
+        test("_addDebuggerToLine inserts debugger statement after specified 0-based line", () => {
             const editor = createEditor();
-
             editor._code = "const x = 1;\nconst y = 2;\nconst z = 3;";
 
-            // lineNumber is 1-based (insertIndex = lineNumber - 1)
-            editor._addDebuggerToLine(1);
+            editor._addDebuggerToLine(0);
 
-            expect(editor._code).toContain("debugger;");
+            const lines = editor._code.split("\n");
+            expect(lines[0]).toBe("const x = 1;");
+            expect(lines[1].trim()).toBe("debugger;");
+            expect(lines[2]).toBe("const y = 2;");
+        });
+
+        test("_addDebuggerToLine inserts debugger after line ending with brace and indents", () => {
+            const editor = createEditor();
+            editor._code = "function test() {\n    return 1;\n}";
+
+            editor._addDebuggerToLine(0);
+
+            const lines = editor._code.split("\n");
+            expect(lines[0]).toBe("function test() {");
+            expect(lines[1]).toBe("\tdebugger;");
+        });
+
+        test("_addDebuggerToLine does not crash when lineNumber is out of bounds", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;";
+
+            expect(() => editor._addDebuggerToLine(-1)).not.toThrow();
+            expect(() => editor._addDebuggerToLine(999)).not.toThrow();
+            expect(editor._code).toBe("const x = 1;");
+        });
+
+        test("_addDebuggerToLine rejects line not ending with semicolon or brace", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1\nconst y = 2;";
+
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
+            editor._addDebuggerToLine(0);
+
+            expect(editor._code).toBe("const x = 1\nconst y = 2;");
+            expect(logSpy).toHaveBeenCalledWith(
+                expect.stringContaining(
+                    "Breakpoints can only be added after lines ending with '{' or ';'"
+                ),
+                "red"
+            );
+            logSpy.mockRestore();
+        });
+
+        test("_addDebuggerToLine prevents adjacent breakpoints", () => {
+            const editor = createEditor();
+            const initialCode = "const x = 1;\ndebugger;\nconst y = 2;";
+            editor._code = initialCode;
+
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
+            editor._addDebuggerToLine(0);
+
+            expect(editor._code).toBe(initialCode);
+            expect(logSpy).toHaveBeenCalledWith(
+                expect.stringContaining("already a breakpoint on an adjacent line"),
+                "red"
+            );
+            logSpy.mockRestore();
         });
 
         test("_removeDebuggerFromLine removes debugger statement", () => {
@@ -580,6 +658,24 @@ describe("JSEditor", () => {
             editor._removeDebuggerFromLine(1);
 
             expect(editor._code).not.toContain("debugger;");
+        });
+
+        test("_removeDebuggerFromLine does not crash on out of bounds line", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;";
+
+            expect(() => editor._removeDebuggerFromLine(-1)).not.toThrow();
+            expect(() => editor._removeDebuggerFromLine(999)).not.toThrow();
+            expect(editor._code).toBe("const x = 1;");
+        });
+
+        test("_removeDebuggerFromLine ignores line that is not a debugger statement", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;\nconst y = 2;";
+
+            editor._removeDebuggerFromLine(0);
+
+            expect(editor._code).toBe("const x = 1;\nconst y = 2;");
         });
     });
 

@@ -554,6 +554,10 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     color: var(--color-text-primary) !important;
 }
 
+.highcontrast #floatingWindows > .windowFrame > .wfTopBar .wftButton.wftMaxmin img {
+    filter: invert(1);
+}
+
 .highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
     color: var(--color-text-primary) !important;
     background-color: var(--color-bg-secondary) !important;
@@ -682,12 +686,12 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .highcontrast #newdropdown {
-    border: #ffffff;
-    background-color: var(--color-text-inverse);
+    border: 1px solid #ffffff;
+    background-color: var(--color-bg-primary);
 }
 
 .highcontrast #confirmation-message {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .material-tooltip {

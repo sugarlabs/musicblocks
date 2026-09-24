@@ -128,6 +128,16 @@ describe("Painter Class", () => {
             expect(painter._penDown).toBe(true);
         });
 
+        test("keeps Painter state isolated between turtles", () => {
+            const secondPainter = new Painter(createMockTurtle());
+
+            painter.color = 75;
+            painter.penState = false;
+
+            expect(secondPainter.color).toBe(0);
+            expect(secondPainter.penState).toBe(true);
+        });
+
         test("should initialize value to DEFAULTVALUE (50)", () => {
             expect(painter._value).toBe(50);
         });

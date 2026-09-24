@@ -34,6 +34,7 @@ class JSEditor {
         this.activity = activity;
         this.isOpen = true;
         this._showingHelp = false;
+        this._tooltips = [];
 
         this.widgetWindow = window.widgetWindows.windowFor(
             this,
@@ -327,6 +328,12 @@ class JSEditor {
             // Each open() adds a fresh set of theme <link> elements to
             // document.head (see constructor); remove this instance's set
             // on close so repeated open/close cycles don't leak them.
+            if (this._tooltips) {
+                for (const tooltipBox of this._tooltips) {
+                    tooltipBox.remove();
+                }
+                this._tooltips = null;
+            }
             if (this._styles) {
                 for (const link of this._styles) {
                     link.remove();
@@ -366,13 +373,16 @@ class JSEditor {
         menuLeft.style.justifyContent = "end";
         menuLeft.style.alignItems = "center";
 
-        function generateTooltip(targetButton, tooltipText, positionOfTooltip = "bottom") {
+        const generateTooltip = (targetButton, tooltipText, positionOfTooltip = "bottom") => {
             const tooltipBox = document.createElement("div");
             const tooltip = document.createElement("div");
 
             tooltipBox.appendChild(tooltip);
 
             document.body.appendChild(tooltipBox);
+            if (this._tooltips) {
+                this._tooltips.push(tooltipBox);
+            }
 
             targetButton.addEventListener("mouseover", () => {
                 const rect = targetButton.getBoundingClientRect();
@@ -407,7 +417,7 @@ class JSEditor {
             });
 
             return tooltip;
-        }
+        };
 
         const helpBtn = document.createElement("span");
         helpBtn.id = "js_editor_help_btn";
@@ -1192,10 +1202,12 @@ class JSEditor {
      */
     _addDebuggerToLine(lineNumber) {
         const lines = this._code.split("\n");
-        const insertIndex = lineNumber - 1;
+        if (lineNumber < 0 || lineNumber >= lines.length || !lines[lineNumber]) {
+            return;
+        }
 
         // Check if the line ends with '{' or ';'
-        const currentLine = lines[insertIndex].trim();
+        const currentLine = lines[lineNumber].trim();
         if (!currentLine.endsWith("{") && !currentLine.endsWith(";")) {
             JSEditor.logConsole(
                 `Cannot add breakpoint to line ${
@@ -1208,8 +1220,8 @@ class JSEditor {
 
         // Prevent adding two breakpoints right next to each other
         if (
-            (lines[insertIndex] && lines[insertIndex].trim() === "debugger;") ||
-            (lines[insertIndex + 1] && lines[insertIndex + 1].trim() === "debugger;")
+            (lines[lineNumber] && lines[lineNumber].trim() === "debugger;") ||
+            (lines[lineNumber + 1] && lines[lineNumber + 1].trim() === "debugger;")
         ) {
             JSEditor.logConsole(
                 `Cannot add breakpoint to line ${
@@ -1222,10 +1234,10 @@ class JSEditor {
 
         let indent = "";
         let extraIndent = "";
-        if (insertIndex >= 0 && lines[insertIndex]) {
-            const match = lines[insertIndex].match(/^(\s*)/);
+        if (lines[lineNumber]) {
+            const match = lines[lineNumber].match(/^(\s*)/);
             if (match) indent = match[1];
-            if (lines[insertIndex].trim().endsWith("{")) {
+            if (lines[lineNumber].trim().endsWith("{")) {
                 extraIndent = "\t";
             }
         } else if (lines.length > 0) {
@@ -1233,7 +1245,7 @@ class JSEditor {
             if (match) indent = match[1];
         }
         // Insert debugger statement after the specified line, with matching indentation
-        lines.splice(insertIndex + 1, 0, indent + extraIndent + "debugger;");
+        lines.splice(lineNumber + 1, 0, indent + extraIndent + "debugger;");
         this._code = lines.join("\n");
         this._jar.updateCode(this._code);
         this._setLinesCount(this._code);
@@ -1249,6 +1261,9 @@ class JSEditor {
     _removeDebuggerFromLine(lineNumber) {
         // Allow removing breakpoints at any time
         const lines = this._code.split("\n");
+        if (lineNumber < 0 || lineNumber >= lines.length || !lines[lineNumber]) {
+            return;
+        }
         const currentLine = lines[lineNumber].trim();
         if (currentLine === "debugger;") {
             lines.splice(lineNumber, 1);

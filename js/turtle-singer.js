@@ -90,15 +90,9 @@ const getOctaveInterval = activity => {
  * Class pertaining to music related actions for each turtle.
  *
  * @class
- * @classdesc This is the prototype of the Singer for each Turtle component. It is responsible
- * for the music related actions of the Turtle, including playing them while using utility functions
- * in utils/musicutils.js.
- *
- * @todo move music related states from logo.js to here eventually.
- * As of now, the state variables are completely present in logo.js. To ensure modularity and
- * independence of components, Logo should contain members only related to execution of blocks while
- * the logic of execution of blocks should be present in respective files in blocks/ directory,
- * which should eventually use members of this file and turtle-painter.js to proceed.
+ * @classdesc This is the prototype of the Singer for each Turtle component. It owns the
+ * per-turtle music state and actions, including playing music with utility functions in
+ * utils/musicutils.js.
  *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
@@ -400,7 +394,6 @@ class Singer {
                           );
                 // getStepSizeUp returns EDO-step counts off 12-EDO; normalize to
                 // a semitone offset (isAlreadyEdoSteps=false) so getNote remaps it.
-                // ponytail: linear 12/modeEdo rescale, per-ratio lookup if cents drift matters
                 const stepSemis = (stepCount * 12) / modeEdo;
                 noteObj = getNote(
                     noteObj[0],
@@ -2271,13 +2264,6 @@ class Singer {
                             }
 
                             notes.push(note);
-                            console.log(
-                                i +
-                                    "]=" +
-                                    note +
-                                    " temperament=" +
-                                    activity.logo.synth.inTemperament
-                            );
                         }
 
                         if (duration > 0) {
@@ -2791,6 +2777,10 @@ class Singer {
         pitchToFrequencyCache.clear();
     }
 }
+
+// Exposed for tests that need to exercise the real cache alongside
+// clearPitchToFrequencyCache(), rather than mocking the class methods.
+Singer.getCachedPitchToFrequency = getCachedPitchToFrequency;
 
 // Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {

@@ -1269,58 +1269,19 @@ function MusicKeyboard(activity) {
             return;
         }
 
-        const id0 = this._setWidgetTimeout(() => {
-            this.activity.logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
-        }, 1);
-        if (id0) {
-            this._chordTimeouts.push(id0);
-        }
-
-        if (notes.length > 1) {
-            const id1 = this._setWidgetTimeout(() => {
+        for (let i = 0; i < notes.length; i++) {
+            const id = this._setWidgetTimeout(() => {
                 this.activity.logo.synth.trigger(
                     0,
-                    notes[1],
+                    notes[i],
                     noteValue[0],
-                    instruments[1],
+                    instruments[i],
                     null,
                     null
                 );
             }, 1);
-            if (id1) {
-                this._chordTimeouts.push(id1);
-            }
-        }
-
-        if (notes.length > 2) {
-            const id2 = this._setWidgetTimeout(() => {
-                this.activity.logo.synth.trigger(
-                    0,
-                    notes[2],
-                    noteValue[0],
-                    instruments[2],
-                    null,
-                    null
-                );
-            }, 1);
-            if (id2) {
-                this._chordTimeouts.push(id2);
-            }
-        }
-
-        if (notes.length > 3) {
-            const id3 = this._setWidgetTimeout(() => {
-                this.activity.logo.synth.trigger(
-                    0,
-                    notes[3],
-                    noteValue[0],
-                    instruments[3],
-                    null,
-                    null
-                );
-            }, 1);
-            if (id3) {
-                this._chordTimeouts.push(id3);
+            if (id) {
+                this._chordTimeouts.push(id);
             }
         }
     };
@@ -2894,7 +2855,7 @@ function MusicKeyboard(activity) {
             for (let i = 0; i < accidentals.length; i++) {
                 if (noteValue.includes(accidentals[i])) {
                     accidentalsValue = i;
-                    noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                    noteValue = noteValue.slice(0, noteValue.indexOf(accidentals[i]));
                     break;
                 }
             }

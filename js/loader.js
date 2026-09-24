@@ -77,6 +77,12 @@ requirejs.config({
         "p5-sound-adapter": {
             deps: ["p5.sound.min"]
         },
+        "utils/plugin-utils": {
+            exports: "PluginUtils"
+        },
+        "utils/macro-utils": {
+            exports: "MacroUtils"
+        },
         "utils/utils-logic": {
             exports: "UtilsLogic"
         },
@@ -95,7 +101,9 @@ requirejs.config({
                 "utils/utils-logic",
                 "utils/dom-helpers",
                 "utils/browser-utils",
-                "utils/http-utils"
+                "utils/http-utils",
+                "utils/plugin-utils",
+                "utils/macro-utils"
             ],
             exports: "_"
         },
@@ -155,6 +163,16 @@ requirejs.config({
         },
         "activity/notation": {
             exports: "Notation"
+        },
+        "utils/musicutils-constants": {
+            exports: "MusicUtilsConstants"
+        },
+        "utils/musicutils-i18n": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsI18n"
+        },
+        "utils/musicutils": {
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"]
         },
         "utils/synthutils": {
             deps: ["utils/utils", "activity/activity-context"],
@@ -262,15 +280,14 @@ requirejs.config({
         "utils/ai-widget-lifecycle": {
             exports: "createWidgetLifecycle"
         },
+        "utils/tuningformats": {
+            exports: "TuningFormats"
+        },
         "widgets/reflection": {
             deps: ["utils/ai-widget-lifecycle"]
         },
         "widgets/aidebugger": {
             deps: ["utils/ai-widget-lifecycle"]
-        },
-        "widgets/widgetWindows": {
-            deps: ["utils/dom-helpers"],
-            exports: "widgetWindows"
         }
     },
     paths: {
@@ -609,6 +626,8 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "utils/dom-helpers",
                 "utils/utils",
                 "utils/camera-utils",
+                "utils/plugin-utils",
+                "utils/macro-utils",
                 "activity/pubsub",
                 "activity/turtledefs",
                 "activity/block",

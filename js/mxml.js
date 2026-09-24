@@ -136,549 +136,571 @@ const _musicXmlPitch = note => {
     return { step: match[1], alter, octave: match[3] ?? "4" };
 };
 
-saveMxmlOutput = logo => {
-    const ignore = ["voice one", "voice two", "voice three", "voice four", "one voice"];
-    let res = "";
-    let indent = 0;
+class MusicXMLExporter {
+    constructor(logo) {
+        this.logo = logo;
+        this.ignore = ["voice one", "voice two", "voice three", "voice four", "one voice"];
+        this.res = "";
+        this.indent = 0;
+    }
 
-    const add = str => {
-        res += "    ".repeat(indent) + str + "\n";
-    };
+    add(str) {
+        this.res += "    ".repeat(this.indent) + str + "\n";
+    }
 
-    const addDirection = type => {
-        add('<direction placement="above">');
-        indent++;
-        add("<direction-type>");
-        indent++;
-        add(`<wedge type="${type}"/>`);
-        indent--;
-        add("</direction-type>");
-        indent--;
-        add("</direction>");
-    };
+    addDirection(type) {
+        this.add('<direction placement="above">');
+        this.indent++;
+        this.add("<direction-type>");
+        this.indent++;
+        this.add(`<wedge type="${type}"/>`);
+        this.indent--;
+        this.add("</direction-type>");
+        this.indent--;
+        this.add("</direction>");
+    }
 
-    const addWords = (text, placement) => {
-        add(`<direction placement="${placement}">`);
-        indent++;
-        add("<direction-type>");
-        indent++;
-        add(`<words>${_escapeWords(text)}</words>`);
-        indent--;
-        add("</direction-type>");
-        indent--;
-        add("</direction>");
-    };
+    addWords(text, placement) {
+        this.add(`<direction placement="${placement}">`);
+        this.indent++;
+        this.add("<direction-type>");
+        this.indent++;
+        this.add(`<words>${_escapeWords(text)}</words>`);
+        this.indent--;
+        this.add("</direction-type>");
+        this.indent--;
+        this.add("</direction>");
+    }
 
-    const addWedgeStop = () => {
-        add("<direction>");
-        indent++;
-        add("<direction-type>");
-        indent++;
-        add('<wedge type="stop"/>');
-        indent--;
-        add("</direction-type>");
-        indent--;
-        add("</direction>");
-    };
+    addWedgeStop() {
+        this.add("<direction>");
+        this.indent++;
+        this.add("<direction-type>");
+        this.indent++;
+        this.add('<wedge type="stop"/>');
+        this.indent--;
+        this.add("</direction-type>");
+        this.indent--;
+        this.add("</direction>");
+    }
 
-    const addMeasureAttributes = (
-        measure,
-        div,
-        beats,
-        beatType,
-        implicit = false,
-        isPercussion = false
-    ) => {
-        add(
+    addMeasureAttributes(measure, div, beats, beatType, implicit = false, isPercussion = false) {
+        this.add(
             isPercussion
                 ? `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef> <sign>percussion</sign> </clef> </attributes>`
                 : `<measure number="${measure}"${implicit ? ' implicit="yes"' : ""}> <attributes> <divisions>${div}</divisions> <key> <fifths>0</fifths> </key> <time> <beats>${beats}</beats> <beat-type>${beatType}</beat-type> </time> <clef>  <sign>G</sign> <line>2</line> </clef> </attributes>`
         );
-    };
+    }
 
-    const staging =
-        logo && logo.notation && logo.notation.notationStaging ? logo.notation.notationStaging : {};
-    // A voice is only written when it stages a pitched note. One with only markers, or
-    // only drum hits (whose pitch list is empty), would produce an empty <part>; one with
-    // only rests, or drum hits and rests, would produce a staff of rests with the drum
-    // hits missing.
-    const activeVoices = Object.keys(staging).filter(
-        voice =>
-            Array.isArray(staging[voice]) &&
-            staging[voice].some(
-                entry =>
-                    Array.isArray(entry) &&
-                    Array.isArray(entry[0]) &&
-                    (entry[MXML_DRUM] || entry[0].some(pitch => pitch[0] !== "R"))
-            )
-    );
-    const parts = [];
-    activeVoices.forEach((voice, index) => {
-        const notes = staging[voice];
-        const partNum = index + 1;
-        const drums = [
-            ...new Set(
-                notes
-                    .filter(Array.isArray)
-                    .map(entry => entry[MXML_DRUM])
-                    .filter(Boolean)
-            )
-        ];
-        if (
-            drums.length === 0 ||
-            notes.some(entry => Array.isArray(entry) && entry[0].some(pitch => pitch[0] !== "R"))
-        ) {
-            parts.push({ id: `P${partNum}`, notes, isPercussion: false });
-        }
-        if (drums.length === 0) return;
-        const instruments = new Map(
-            drums.map((name, instrumentIndex) => [name, `D${partNum}-X${instrumentIndex + 1}`])
+    export() {
+        const staging =
+            this.logo && this.logo.notation && this.logo.notation.notationStaging
+                ? this.logo.notation.notationStaging
+                : {};
+        // A voice is only written when it stages a pitched note. One with only markers, or
+        // only drum hits (whose pitch list is empty), would produce an empty <part>; one with
+        // only rests, or drum hits and rests, would produce a staff of rests with the drum
+        // hits missing.
+        const activeVoices = Object.keys(staging).filter(
+            voice =>
+                Array.isArray(staging[voice]) &&
+                staging[voice].some(
+                    entry =>
+                        Array.isArray(entry) &&
+                        Array.isArray(entry[0]) &&
+                        (entry[MXML_DRUM] || entry[0].some(pitch => pitch[0] !== "R"))
+                )
         );
-        const drumNotes = notes.map(entry => {
-            if (!Array.isArray(entry)) return entry;
-            const drumEntry = entry.slice();
-            drumEntry[0] = [entry[MXML_DRUM] || "R"];
-            return drumEntry;
-        });
-        parts.push({ id: `D${partNum}`, notes: drumNotes, isPercussion: true, instruments });
-    });
-
-    add("<?xml version='1.0' encoding='UTF-8'?>");
-    add(
-        '<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">'
-    );
-    add('<score-partwise version="3.1">');
-    indent++;
-    add("<part-list>");
-    indent++;
-
-    if (parts.length === 0) {
-        add('<score-part id="P1">');
-        indent++;
-        add("<part-name> Voice #1 </part-name>");
-        indent--;
-        add("</score-part>");
-    } else {
-        parts.forEach(part => {
-            add(`<score-part id="${part.id}">`);
-            indent++;
-            add(
-                part.isPercussion
-                    ? "<part-name>Percussion</part-name>"
-                    : `<part-name> Voice #${part.id.slice(1)} </part-name>`
+        const parts = [];
+        activeVoices.forEach((voice, index) => {
+            const notes = staging[voice];
+            const partNum = index + 1;
+            const drums = [
+                ...new Set(
+                    notes
+                        .filter(Array.isArray)
+                        .map(entry => entry[MXML_DRUM])
+                        .filter(Boolean)
+                )
+            ];
+            if (
+                drums.length === 0 ||
+                notes.some(
+                    entry => Array.isArray(entry) && entry[0].some(pitch => pitch[0] !== "R")
+                )
+            ) {
+                parts.push({ id: `P${partNum}`, notes, isPercussion: false });
+            }
+            if (drums.length === 0) return;
+            const instruments = new Map(
+                drums.map((name, instrumentIndex) => [name, `D${partNum}-X${instrumentIndex + 1}`])
             );
-            if (part.isPercussion) {
-                part.instruments.forEach((id, name) => {
-                    const midiNote = getMidiDrum()[name];
-                    add(`<score-instrument id="${id}">`);
-                    indent++;
-                    add(
-                        `<instrument-name>${Number.isInteger(midiNote) ? name : "Percussion"}</instrument-name>`
-                    );
-                    indent--;
-                    add("</score-instrument>");
-                });
-                part.instruments.forEach((id, name) => {
-                    const midiNote = getMidiDrum()[name];
-                    if (Number.isInteger(midiNote)) {
-                        add(`<midi-instrument id="${id}">`);
-                        indent++;
-                        add("<midi-channel>10</midi-channel>");
-                        add(`<midi-unpitched>${midiNote + 1}</midi-unpitched>`);
-                        indent--;
-                        add("</midi-instrument>");
-                    }
-                });
-            }
-            indent--;
-            add("</score-part>");
+            const drumNotes = notes.map(entry => {
+                if (!Array.isArray(entry)) return entry;
+                const drumEntry = entry.slice();
+                drumEntry[0] = [entry[MXML_DRUM] || "R"];
+                return drumEntry;
+            });
+            parts.push({ id: `D${partNum}`, notes: drumNotes, isPercussion: true, instruments });
         });
-    }
-    indent--;
-    add("</part-list>");
-    indent--;
 
-    if (parts.length === 0) {
-        indent++;
-        add('<part id="P1">');
-        indent++;
-        addMeasureAttributes(1, DIVISIONS_PER_WHOLE_NOTE / 4, 4, 4);
-        indent++;
-        add("<barline>");
-        indent++;
-        add("<bar-style>light-heavy</bar-style>");
-        indent--;
-        add("</barline>");
-        indent--;
-        add("</measure>");
-        indent--;
-        add("</part>");
-        indent--;
-    } else {
-        parts.forEach(part => {
-            indent++;
-            add(`<part id="${part.id}">`);
-            indent++;
+        this.add("<?xml version='1.0' encoding='UTF-8'?>");
+        this.add(
+            '<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">'
+        );
+        this.add('<score-partwise version="3.1">');
+        this.indent++;
+        this.add("<part-list>");
+        this.indent++;
 
-            const notes = part.notes;
-            // Scaled once per voice so every tuplet note in it gets an exact <duration>
-            // instead of a rounded one; identical to DIVISIONS_PER_WHOLE_NOTE (32, this
-            // file's long-standing resolution) when the voice has no tuplets at all.
-            const divisionsPerWholeNote = _resolveDivisionsPerWholeNote(notes);
-            const divisionsPerQuarterNote = divisionsPerWholeNote / 4;
-
-            let currMeasure = 1,
-                divisions = divisionsPerWholeNote,
-                beats = 4,
-                beatType = 4;
-            let beatsChanged = false,
-                newDivisions = -1,
-                newBeats = -1,
-                newBeatType = -1;
-            let openedMeasureTag = false,
-                firstMeasure = true;
-            // Length of the pickup in divisions, or 0 when the first measure is a full one.
-            let pickupDivisions = 0;
-            // Nesting depth of the relative-volume and harmonic blocks around the current note.
-            let articulationDepth = 0,
-                harmonicsDepth = 0;
-            // Index of the last staged note, or -1 before the first.
-            let previousNote = -1;
-            // <direction> and <sound> belong inside a <measure>, at the note they precede.
-            // Markers are staged before it's known whether that note still fits the current
-            // measure, so they're held here and written just ahead of the next note.
-            let pendingDirections = [];
-            const flushPendingDirections = () => {
-                pendingDirections.forEach(write => write());
-                pendingDirections = [];
-            };
-            indent++;
-            let divisionsLeft = divisions;
-
-            for (let i = 0; i < notes.length; i++) {
-                const obj = notes[i];
-                if (["tie", "begin slur", "end slur"].includes(obj) || ignore.includes(obj))
-                    continue;
-
-                if (obj === "key") {
-                    i += 2;
-                    continue;
-                }
-
-                if (obj === "begin crescendo") {
-                    pendingDirections.push(() => addDirection("crescendo"));
-                    continue;
-                }
-
-                if (obj === "begin decrescendo") {
-                    pendingDirections.push(() => addDirection("diminuendo"));
-                    continue;
-                }
-
-                if (obj === "end crescendo" || obj === "end decrescendo") {
-                    pendingDirections.push(addWedgeStop);
-                    continue;
-                }
-
-                if (obj === "tempo") {
-                    const bpm = notes[i + 1];
-                    // The beat is staged as a LilyPond duration ("4", "4.", "4 16"), not a number.
-                    const beatWholeNotes = _lilypondDurationToWholeNotes(notes[i + 2]);
-                    // MusicXML tempo is a decimal, so a dotted beat can give e.g. 67.5; rounding
-                    // only trims floating-point noise.
-                    const bpmAdjusted = Math.round(bpm * beatWholeNotes * 4 * 1000) / 1000;
-                    if (Number.isFinite(bpmAdjusted) && bpmAdjusted > 0) {
-                        pendingDirections.push(() => add(`<sound tempo="${bpmAdjusted}"/>`));
-                    }
-                    i += 2;
-                    continue;
-                }
-
-                if (obj === "meter") {
-                    newBeats = notes[i + 1];
-                    newBeatType = notes[i + 2];
-                    newDivisions = newBeats * (1 / newBeatType / (1 / divisionsPerWholeNote));
-                    i += 2;
-                    beatsChanged = true;
-                    continue;
-                }
-
-                if (obj === "pickup") {
-                    // Only a pickup staged before the first note can shorten the first measure.
-                    const pickupWholeNotes = _lilypondDurationToWholeNotes(notes[i + 1]);
-                    if (firstMeasure && pickupWholeNotes > 0) {
-                        pickupDivisions = pickupWholeNotes * divisionsPerWholeNote;
-                    }
-                    i += 1;
-                    continue;
-                }
-
-                // Markup normally follows the note it annotates and is written together with
-                // that note; this handles markup that no note claimed.
-                if (obj === "markup" || obj === "markdown") {
-                    const text = notes[i + 1];
-                    const placement = obj === "markup" ? "above" : "below";
-                    if (text !== undefined) {
-                        pendingDirections.push(() => addWords(text, placement));
-                    }
-                    i += 1;
-                    continue;
-                }
-
-                if (obj === "swing") {
-                    pendingDirections.push(() => addWords("swing", "above"));
-                    continue;
-                }
-
-                if (obj === "begin articulation") {
-                    articulationDepth++;
-                    continue;
-                }
-
-                if (obj === "end articulation") {
-                    articulationDepth = Math.max(0, articulationDepth - 1);
-                    continue;
-                }
-
-                if (obj === "begin harmonics") {
-                    harmonicsDepth++;
-                    continue;
-                }
-
-                if (obj === "end harmonics") {
-                    harmonicsDepth = Math.max(0, harmonicsDepth - 1);
-                    continue;
-                }
-
-                // Anything else that isn't a staged note is a marker with no MusicXML
-                // counterpart here. Iterating it as a pitch list would turn its characters
-                // into notes, so it's skipped.
-                if (!Array.isArray(obj)) continue;
-
-                // Notation.doUpdateNotation stages a note's markup (a Hertz value, or print
-                // block text) immediately after the note.
-                const attachedWords = [];
-                let next = i + 1;
-                while (notes[next] === "markup" || notes[next] === "markdown") {
-                    if (notes[next + 1] !== undefined) {
-                        const placement = notes[next] === "markup" ? "above" : "below";
-                        attachedWords.push([notes[next + 1], placement]);
-                    }
-                    next += 2;
-                }
-
-                // Ties and slurs are markers staged between notes, in whatever order the blocks
-                // produced them and possibly among other markers, so every marker in the gap is
-                // read rather than only the adjacent entry.
-                const markersBefore = _markersUntilNextNote(notes, previousNote + 1);
-                const markersAfter = _markersUntilNextNote(notes, i + 1);
-                const tieStop = markersBefore.includes("tie");
-                const slurStart = markersBefore.includes("begin slur");
-                const tieStart = markersAfter.includes("tie");
-                const slurStop = markersAfter.includes("end slur");
-                previousNote = i;
-
-                let isChordNote = false;
-                for (const p of obj[0]) {
-                    // obj[2] is the dot count; 2 - 1/2^dotCount is the same multiplier
-                    // durationToNoteValue() (musicutils.js) uses to derive it, so this stays
-                    // consistent with how the dot count was assigned in the first place.
-                    //
-                    // A tuplet note (e.g. from Simple/Advanced Tuplet) doesn't have a
-                    // power-of-two note value, so durationToNoteValue() can't express it as
-                    // obj[1]/obj[2] and instead returns the sentinel obj[1] = 1, obj[2] = 0,
-                    // carrying the note's real shape in obj[MXML_TUPLETVALUE] (an
-                    // [oddFactor, powerOfTwoFactor] factoring of its note-value denominator)
-                    // and obj[MXML_ROUNDDOWN] (the nearest power-of-two note value). Treating
-                    // the sentinel as a real note value previously collapsed every tuplet
-                    // note's duration to a full measure (32 divisions) and threw off measure
-                    // boundaries for the rest of the voice -- see issue #8559.
-                    const tupletRatio = obj[MXML_TUPLETVALUE];
-                    let preciseDur, dur, timeModification;
-
-                    if (Array.isArray(tupletRatio)) {
-                        const { actualNotes, normalNotes } = _tupletNotesRatio(
-                            tupletRatio,
-                            obj[MXML_ROUNDDOWN]
+        if (parts.length === 0) {
+            this.add('<score-part id="P1">');
+            this.indent++;
+            this.add("<part-name> Voice #1 </part-name>");
+            this.indent--;
+            this.add("</score-part>");
+        } else {
+            parts.forEach(part => {
+                this.add(`<score-part id="${part.id}">`);
+                this.indent++;
+                this.add(
+                    part.isPercussion
+                        ? "<part-name>Percussion</part-name>"
+                        : `<part-name> Voice #${part.id.slice(1)} </part-name>`
+                );
+                if (part.isPercussion) {
+                    part.instruments.forEach((id, name) => {
+                        const midiNote = getMidiDrum()[name];
+                        this.add(`<score-instrument id="${id}">`);
+                        this.indent++;
+                        this.add(
+                            `<instrument-name>${Number.isInteger(midiNote) ? name : "Percussion"}</instrument-name>`
                         );
-                        // divisionsPerWholeNote was scaled (see _resolveDivisionsPerWholeNote)
-                        // to be an exact multiple of every tuplet's actualNotes count in this
-                        // voice, so this is already a whole number, not an approximation.
-                        preciseDur =
-                            (divisionsPerWholeNote / obj[MXML_ROUNDDOWN]) *
-                            (normalNotes / actualNotes);
-                        // Rounding only guards extreme cases (e.g. a tuplet fine enough that
-                        // divisionsPerWholeNote can't represent it exactly); it's a no-op here.
-                        dur = Math.max(1, Math.round(preciseDur));
-                        timeModification = { actualNotes, normalNotes };
-                    } else {
-                        preciseDur =
-                            (divisionsPerWholeNote / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
-                        dur = preciseDur;
-                        timeModification = null;
-                    }
-
-                    if (divisionsLeft < preciseDur - DIVISIONS_EPSILON && !isChordNote) {
-                        if (openedMeasureTag) {
-                            add("</measure>");
-                            currMeasure++;
-                            divisionsLeft = divisions;
-                            openedMeasureTag = false;
+                        this.indent--;
+                        this.add("</score-instrument>");
+                    });
+                    part.instruments.forEach((id, name) => {
+                        const midiNote = getMidiDrum()[name];
+                        if (Number.isInteger(midiNote)) {
+                            this.add(`<midi-instrument id="${id}">`);
+                            this.indent++;
+                            this.add("<midi-channel>10</midi-channel>");
+                            this.add(`<midi-unpitched>${midiNote + 1}</midi-unpitched>`);
+                            this.indent--;
+                            this.add("</midi-instrument>");
                         }
-                    }
-
-                    if (!isChordNote) {
-                        if (!openedMeasureTag) {
-                            // Applying a pending meter here, rather than only on later
-                            // measures, keeps a meter staged before the first note from
-                            // being deferred to the second measure.
-                            if (beatsChanged) {
-                                beats = newBeats;
-                                beatType = newBeatType;
-                                divisions = newDivisions;
-                                divisionsLeft = divisions;
-                            }
-                            if (firstMeasure || beatsChanged) {
-                                // A pickup shorter than a full measure becomes implicit
-                                // measure 0, so the first full measure is still numbered 1.
-                                const isPickup =
-                                    firstMeasure &&
-                                    pickupDivisions > 0 &&
-                                    pickupDivisions < divisions - DIVISIONS_EPSILON;
-                                if (isPickup) {
-                                    currMeasure = 0;
-                                    divisionsLeft = pickupDivisions;
-                                }
-                                addMeasureAttributes(
-                                    currMeasure,
-                                    divisionsPerQuarterNote,
-                                    beats,
-                                    beatType,
-                                    isPickup,
-                                    part.isPercussion
-                                );
-                                firstMeasure = false;
-                                beatsChanged = false;
-                            } else {
-                                add(`<measure number="${currMeasure}">`);
-                            }
-                            openedMeasureTag = true;
-                        }
-                        divisionsLeft -= preciseDur;
-                    }
-
-                    let pitch;
-                    if (typeof p === "number") {
-                        const [note, octave, cents] = frequencyToPitch(p);
-                        pitch = _musicXmlPitch(note + octave);
-                        pitch.alter = Math.round((pitch.alter + cents / 100) * 1000) / 1000;
-                    } else {
-                        pitch = _musicXmlPitch(p) ?? {
-                            step: p[0],
-                            alter: p[1] === "♭" ? -1 : p[1] === "♯" ? 1 : 0,
-                            octave: p[p.length - 1]
-                        };
-                    }
-
-                    if (!isChordNote) {
-                        flushPendingDirections();
-                        attachedWords.forEach(([text, placement]) => addWords(text, placement));
-                    }
-                    add("<note>");
-                    indent++;
-                    if (isChordNote) add("<chord/>");
-
-                    if (part.isPercussion ? !obj[MXML_DRUM] : p[0] === "R") {
-                        add("<rest/>");
-                    } else if (part.isPercussion) {
-                        add("<unpitched/>");
-                    } else {
-                        add("<pitch>");
-                        indent++;
-                        add(`<step>${pitch.step}</step>`);
-                        if (pitch.alter !== 0) add(`<alter>${pitch.alter}</alter>`);
-                        add(`<octave>${pitch.octave}</octave>`);
-                        indent--;
-                        add("</pitch>");
-                    }
-
-                    add(`<duration>${dur}</duration>`);
-                    // The middle of three tied notes both stops one tie and starts the next.
-                    if (tieStop) add('<tie type="stop"/>');
-                    if (tieStart) add('<tie type="start"/>');
-                    if (part.isPercussion && obj[MXML_DRUM]) {
-                        add(`<instrument id="${part.instruments.get(p)}"/>`);
-                    }
-                    if (timeModification) {
-                        add("<time-modification>");
-                        indent++;
-                        add(`<actual-notes>${timeModification.actualNotes}</actual-notes>`);
-                        add(`<normal-notes>${timeModification.normalNotes}</normal-notes>`);
-                        indent--;
-                        add("</time-modification>");
-                    }
-                    indent--;
-
-                    add("<notations>");
-                    indent++;
-                    // <tie> only sets playback; notation programs draw the tie from <tied>.
-                    if (tieStop) add('<tied type="stop"/>');
-                    if (tieStart) add('<tied type="start"/>');
-                    add("<articulations>");
-                    indent++;
-                    if (articulationDepth > 0) add("<accent/>");
-                    if (obj[6]) add('<staccato placement="below"/>');
-                    indent--;
-                    add("</articulations>");
-                    if (harmonicsDepth > 0) {
-                        add("<technical>");
-                        indent++;
-                        add("<harmonic/>");
-                        indent--;
-                        add("</technical>");
-                    }
-                    indent--;
-                    if (slurStart) {
-                        indent++;
-                        add('<slur type="start"/>');
-                        indent--;
-                    }
-                    if (slurStop) {
-                        indent++;
-                        add('<slur type="stop"/>');
-                        indent--;
-                    }
-                    add("</notations>");
-                    add("</note>");
-                    isChordNote = true;
+                    });
                 }
-                // The markup attached to this note has already been written. A note with no
-                // pitches (drum only) writes nothing, so its markup is left for the next note.
-                if (obj[0].length > 0) i = next - 1;
-            }
+                this.indent--;
+                this.add("</score-part>");
+            });
+        }
+        this.indent--;
+        this.add("</part-list>");
+        this.indent--;
 
-            indent--;
-            if (openedMeasureTag) {
-                indent++;
-                // Markers staged after the last note still belong to the final measure.
-                flushPendingDirections();
-                add("<barline>");
-                indent++;
-                add("<bar-style>light-heavy</bar-style>");
-                indent--;
-                add("</barline>");
-                indent--;
-                add("</measure>");
-            }
-            indent--;
-            add("</part>");
-            indent--;
-        });
+        if (parts.length === 0) {
+            this.indent++;
+            this.add('<part id="P1">');
+            this.indent++;
+            this.addMeasureAttributes(1, DIVISIONS_PER_WHOLE_NOTE / 4, 4, 4);
+            this.indent++;
+            this.add("<barline>");
+            this.indent++;
+            this.add("<bar-style>light-heavy</bar-style>");
+            this.indent--;
+            this.add("</barline>");
+            this.indent--;
+            this.add("</measure>");
+            this.indent--;
+            this.add("</part>");
+            this.indent--;
+        } else {
+            parts.forEach(part => {
+                this.indent++;
+                this.add(`<part id="${part.id}">`);
+                this.indent++;
+
+                const notes = part.notes;
+                // Scaled once per voice so every tuplet note in it gets an exact <duration>
+                // instead of a rounded one; identical to DIVISIONS_PER_WHOLE_NOTE (32, this
+                // file's long-standing resolution) when the voice has no tuplets at all.
+                const divisionsPerWholeNote = _resolveDivisionsPerWholeNote(notes);
+                const divisionsPerQuarterNote = divisionsPerWholeNote / 4;
+
+                let currMeasure = 1,
+                    divisions = divisionsPerWholeNote,
+                    beats = 4,
+                    beatType = 4;
+                let beatsChanged = false,
+                    newDivisions = -1,
+                    newBeats = -1,
+                    newBeatType = -1;
+                let openedMeasureTag = false,
+                    firstMeasure = true;
+                // Length of the pickup in divisions, or 0 when the first measure is a full one.
+                let pickupDivisions = 0;
+                // Nesting depth of the relative-volume and harmonic blocks around the current note.
+                let articulationDepth = 0,
+                    harmonicsDepth = 0;
+                // Index of the last staged note, or -1 before the first.
+                let previousNote = -1;
+                // <direction> and <sound> belong inside a <measure>, at the note they precede.
+                // Markers are staged before it's known whether that note still fits the current
+                // measure, so they're held here and written just ahead of the next note.
+                let pendingDirections = [];
+                const flushPendingDirections = () => {
+                    pendingDirections.forEach(write => write());
+                    pendingDirections = [];
+                };
+                this.indent++;
+                let divisionsLeft = divisions;
+
+                for (let i = 0; i < notes.length; i++) {
+                    const obj = notes[i];
+                    if (
+                        ["tie", "begin slur", "end slur"].includes(obj) ||
+                        this.ignore.includes(obj)
+                    )
+                        continue;
+
+                    if (obj === "key") {
+                        i += 2;
+                        continue;
+                    }
+
+                    if (obj === "begin crescendo") {
+                        pendingDirections.push(() => this.addDirection("crescendo"));
+                        continue;
+                    }
+
+                    if (obj === "begin decrescendo") {
+                        pendingDirections.push(() => this.addDirection("diminuendo"));
+                        continue;
+                    }
+
+                    if (obj === "end crescendo" || obj === "end decrescendo") {
+                        pendingDirections.push(() => this.addWedgeStop());
+                        continue;
+                    }
+
+                    if (obj === "tempo") {
+                        const bpm = notes[i + 1];
+                        // The beat is staged as a LilyPond duration ("4", "4.", "4 16"), not a number.
+                        const beatWholeNotes = _lilypondDurationToWholeNotes(notes[i + 2]);
+                        // MusicXML tempo is a decimal, so a dotted beat can give e.g. 67.5; rounding
+                        // only trims floating-point noise.
+                        const bpmAdjusted = Math.round(bpm * beatWholeNotes * 4 * 1000) / 1000;
+                        if (Number.isFinite(bpmAdjusted) && bpmAdjusted > 0) {
+                            pendingDirections.push(() =>
+                                this.add(`<sound tempo="${bpmAdjusted}"/>`)
+                            );
+                        }
+                        i += 2;
+                        continue;
+                    }
+
+                    if (obj === "meter") {
+                        newBeats = notes[i + 1];
+                        newBeatType = notes[i + 2];
+                        newDivisions = newBeats * (1 / newBeatType / (1 / divisionsPerWholeNote));
+                        i += 2;
+                        beatsChanged = true;
+                        continue;
+                    }
+
+                    if (obj === "pickup") {
+                        // Only a pickup staged before the first note can shorten the first measure.
+                        const pickupWholeNotes = _lilypondDurationToWholeNotes(notes[i + 1]);
+                        if (firstMeasure && pickupWholeNotes > 0) {
+                            pickupDivisions = pickupWholeNotes * divisionsPerWholeNote;
+                        }
+                        i += 1;
+                        continue;
+                    }
+
+                    // Markup normally follows the note it annotates and is written together with
+                    // that note; this handles markup that no note claimed.
+                    if (obj === "markup" || obj === "markdown") {
+                        const text = notes[i + 1];
+                        const placement = obj === "markup" ? "above" : "below";
+                        if (text !== undefined) {
+                            pendingDirections.push(() => this.addWords(text, placement));
+                        }
+                        i += 1;
+                        continue;
+                    }
+
+                    if (obj === "swing") {
+                        pendingDirections.push(() => this.addWords("swing", "above"));
+                        continue;
+                    }
+
+                    if (obj === "begin articulation") {
+                        articulationDepth++;
+                        continue;
+                    }
+
+                    if (obj === "end articulation") {
+                        articulationDepth = Math.max(0, articulationDepth - 1);
+                        continue;
+                    }
+
+                    if (obj === "begin harmonics") {
+                        harmonicsDepth++;
+                        continue;
+                    }
+
+                    if (obj === "end harmonics") {
+                        harmonicsDepth = Math.max(0, harmonicsDepth - 1);
+                        continue;
+                    }
+
+                    // Anything else that isn't a staged note is a marker with no MusicXML
+                    // counterpart here. Iterating it as a pitch list would turn its characters
+                    // into notes, so it's skipped.
+                    if (!Array.isArray(obj)) continue;
+
+                    // Notation.doUpdateNotation stages a note's markup (a Hertz value, or print
+                    // block text) immediately after the note.
+                    const attachedWords = [];
+                    let next = i + 1;
+                    while (notes[next] === "markup" || notes[next] === "markdown") {
+                        if (notes[next + 1] !== undefined) {
+                            const placement = notes[next] === "markup" ? "above" : "below";
+                            attachedWords.push([notes[next + 1], placement]);
+                        }
+                        next += 2;
+                    }
+
+                    // Ties and slurs are markers staged between notes, in whatever order the blocks
+                    // produced them and possibly among other markers, so every marker in the gap is
+                    // read rather than only the adjacent entry.
+                    const markersBefore = _markersUntilNextNote(notes, previousNote + 1);
+                    const markersAfter = _markersUntilNextNote(notes, i + 1);
+                    const tieStop = markersBefore.includes("tie");
+                    const slurStart = markersBefore.includes("begin slur");
+                    const tieStart = markersAfter.includes("tie");
+                    const slurStop = markersAfter.includes("end slur");
+                    previousNote = i;
+
+                    let isChordNote = false;
+                    const isFillerRest = obj[0].length === 0 && !part.isPercussion;
+                    const pitches = isFillerRest ? ["R"] : obj[0];
+                    for (const p of pitches) {
+                        // obj[2] is the dot count; 2 - 1/2^dotCount is the same multiplier
+                        // durationToNoteValue() (musicutils.js) uses to derive it, so this stays
+                        // consistent with how the dot count was assigned in the first place.
+                        //
+                        // A tuplet note (e.g. from Simple/Advanced Tuplet) doesn't have a
+                        // power-of-two note value, so durationToNoteValue() can't express it as
+                        // obj[1]/obj[2] and instead returns the sentinel obj[1] = 1, obj[2] = 0,
+                        // carrying the note's real shape in obj[MXML_TUPLETVALUE] (an
+                        // [oddFactor, powerOfTwoFactor] factoring of its note-value denominator)
+                        // and obj[MXML_ROUNDDOWN] (the nearest power-of-two note value). Treating
+                        // the sentinel as a real note value previously collapsed every tuplet
+                        // note's duration to a full measure (32 divisions) and threw off measure
+                        // boundaries for the rest of the voice -- see issue #8559.
+                        const tupletRatio = obj[MXML_TUPLETVALUE];
+                        let preciseDur, dur, timeModification;
+
+                        if (Array.isArray(tupletRatio)) {
+                            const { actualNotes, normalNotes } = _tupletNotesRatio(
+                                tupletRatio,
+                                obj[MXML_ROUNDDOWN]
+                            );
+                            // divisionsPerWholeNote was scaled (see _resolveDivisionsPerWholeNote)
+                            // to be an exact multiple of every tuplet's actualNotes count in this
+                            // voice, so this is already a whole number, not an approximation.
+                            preciseDur =
+                                (divisionsPerWholeNote / obj[MXML_ROUNDDOWN]) *
+                                (normalNotes / actualNotes);
+                            // Rounding only guards extreme cases (e.g. a tuplet fine enough that
+                            // divisionsPerWholeNote can't represent it exactly); it's a no-op here.
+                            dur = Math.max(1, Math.round(preciseDur));
+                            timeModification = { actualNotes, normalNotes };
+                        } else {
+                            preciseDur =
+                                (divisionsPerWholeNote / obj[1]) * (2 - 1 / Math.pow(2, obj[2]));
+                            dur = preciseDur;
+                            timeModification = null;
+                        }
+
+                        if (divisionsLeft < preciseDur - DIVISIONS_EPSILON && !isChordNote) {
+                            if (openedMeasureTag) {
+                                this.add("</measure>");
+                                currMeasure++;
+                                divisionsLeft = divisions;
+                                openedMeasureTag = false;
+                            }
+                        }
+
+                        if (!isChordNote) {
+                            if (!openedMeasureTag) {
+                                // Applying a pending meter here, rather than only on later
+                                // measures, keeps a meter staged before the first note from
+                                // being deferred to the second measure.
+                                if (beatsChanged) {
+                                    beats = newBeats;
+                                    beatType = newBeatType;
+                                    divisions = newDivisions;
+                                    divisionsLeft = divisions;
+                                }
+                                if (firstMeasure || beatsChanged) {
+                                    // A pickup shorter than a full measure becomes implicit
+                                    // measure 0, so the first full measure is still numbered 1.
+                                    const isPickup =
+                                        firstMeasure &&
+                                        pickupDivisions > 0 &&
+                                        pickupDivisions < divisions - DIVISIONS_EPSILON;
+                                    if (isPickup) {
+                                        currMeasure = 0;
+                                        divisionsLeft = pickupDivisions;
+                                    }
+                                    this.addMeasureAttributes(
+                                        currMeasure,
+                                        divisionsPerQuarterNote,
+                                        beats,
+                                        beatType,
+                                        isPickup,
+                                        part.isPercussion
+                                    );
+                                    firstMeasure = false;
+                                    beatsChanged = false;
+                                } else {
+                                    this.add(`<measure number="${currMeasure}">`);
+                                }
+                                openedMeasureTag = true;
+                            }
+                            divisionsLeft -= preciseDur;
+                        }
+
+                        let pitch;
+                        if (typeof p === "number") {
+                            const [note, octave, cents] = frequencyToPitch(p);
+                            pitch = _musicXmlPitch(note + octave);
+                            pitch.alter = Math.round((pitch.alter + cents / 100) * 1000) / 1000;
+                        } else {
+                            pitch = _musicXmlPitch(p) ?? {
+                                step: p[0],
+                                alter: p[1] === "♭" ? -1 : p[1] === "♯" ? 1 : 0,
+                                octave: p[p.length - 1]
+                            };
+                        }
+
+                        if (!isChordNote) {
+                            flushPendingDirections();
+                            if (!isFillerRest) {
+                                attachedWords.forEach(([text, placement]) =>
+                                    this.addWords(text, placement)
+                                );
+                            }
+                        }
+                        this.add("<note>");
+                        this.indent++;
+                        if (isChordNote) this.add("<chord/>");
+
+                        if (part.isPercussion ? !obj[MXML_DRUM] : p[0] === "R") {
+                            this.add("<rest/>");
+                        } else if (part.isPercussion) {
+                            this.add("<unpitched/>");
+                        } else {
+                            this.add("<pitch>");
+                            this.indent++;
+                            this.add(`<step>${pitch.step}</step>`);
+                            if (pitch.alter !== 0) this.add(`<alter>${pitch.alter}</alter>`);
+                            this.add(`<octave>${pitch.octave}</octave>`);
+                            this.indent--;
+                            this.add("</pitch>");
+                        }
+
+                        this.add(`<duration>${dur}</duration>`);
+                        // The middle of three tied notes both stops one tie and starts the next.
+                        if (tieStop) this.add('<tie type="stop"/>');
+                        if (tieStart) this.add('<tie type="start"/>');
+                        if (part.isPercussion && obj[MXML_DRUM]) {
+                            this.add(`<instrument id="${part.instruments.get(p)}"/>`);
+                        }
+                        if (timeModification) {
+                            this.add("<time-modification>");
+                            this.indent++;
+                            this.add(
+                                `<actual-notes>${timeModification.actualNotes}</actual-notes>`
+                            );
+                            this.add(
+                                `<normal-notes>${timeModification.normalNotes}</normal-notes>`
+                            );
+                            this.indent--;
+                            this.add("</time-modification>");
+                        }
+                        this.indent--;
+
+                        this.add("<notations>");
+                        this.indent++;
+                        // <tie> only sets playback; notation programs draw the tie from <tied>.
+                        if (tieStop) this.add('<tied type="stop"/>');
+                        if (tieStart) this.add('<tied type="start"/>');
+                        this.add("<articulations>");
+                        this.indent++;
+                        if (articulationDepth > 0) this.add("<accent/>");
+                        if (obj[6]) this.add('<staccato placement="below"/>');
+                        this.indent--;
+                        this.add("</articulations>");
+                        if (harmonicsDepth > 0) {
+                            this.add("<technical>");
+                            this.indent++;
+                            this.add("<harmonic/>");
+                            this.indent--;
+                            this.add("</technical>");
+                        }
+                        this.indent--;
+                        if (slurStart) {
+                            this.indent++;
+                            this.add('<slur type="start"/>');
+                            this.indent--;
+                        }
+                        if (slurStop) {
+                            this.indent++;
+                            this.add('<slur type="stop"/>');
+                            this.indent--;
+                        }
+                        this.add("</notations>");
+                        this.add("</note>");
+                        isChordNote = true;
+                    }
+                    // The markup attached to this note has already been written. A note with no
+                    // pitches (drum only) writes nothing, so its markup is left for the next note.
+                    if (obj[0].length > 0) i = next - 1;
+                }
+
+                this.indent--;
+                if (openedMeasureTag) {
+                    this.indent++;
+                    // Markers staged after the last note still belong to the final measure.
+                    flushPendingDirections();
+                    this.add("<barline>");
+                    this.indent++;
+                    this.add("<bar-style>light-heavy</bar-style>");
+                    this.indent--;
+                    this.add("</barline>");
+                    this.indent--;
+                    this.add("</measure>");
+                }
+                this.indent--;
+                this.add("</part>");
+                this.indent--;
+            });
+        }
+        this.add("</score-partwise>");
+
+        return this.res;
     }
-    add("</score-partwise>");
+}
 
-    return res;
+saveMxmlOutput = logo => {
+    return new MusicXMLExporter(logo).export();
 };
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = saveMxmlOutput;
 }

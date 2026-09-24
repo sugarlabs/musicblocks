@@ -129,17 +129,19 @@ const {
     getTextWidth,
     doSVG,
     isSVGEmpty,
-    prepareMacroExports,
-    processMacroData,
-    updatePluginObj,
-    processRawPluginData,
-    preparePluginExports,
     hideDOMLabel,
     displayMsg,
     makeKeyboardAccessible,
     announceToScreenReader,
     _
 } = require("../utils.js");
+
+const { processMacroData, prepareMacroExports } = require("../macro-utils.js");
+const {
+    updatePluginObj,
+    processRawPluginData,
+    preparePluginExports
+} = require("../plugin-utils.js");
 
 describe("makeKeyboardAccessible()", () => {
     test("adds button semantics and activates on Enter and Space", () => {
@@ -1453,6 +1455,18 @@ describe("Plugin and Macro Utilities", () => {
             expect(spy).toHaveBeenCalled();
             spy.mockRestore();
         });
+
+        it("handles unexpected errors gracefully", async () => {
+            const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            // Passing "true" makes JSON.parse succeed (returns boolean true), but triggers a
+            // TypeError in processPluginData ("PALETTEPLUGINS" in obj) which then hits the catch block.
+            const rawData = "true";
+            const res = await processRawPluginData(mockActivity, rawData, "localStorage:plugins");
+            expect(res).toBeNull();
+            expect(spy).toHaveBeenCalledWith(rawData);
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            spy.mockRestore();
+        });
     });
 
     describe("preparePluginExports()", () => {
@@ -1496,7 +1510,7 @@ describe("Plugin and Macro Utilities", () => {
             const blocks = { addToMyPalette: jest.fn() };
             const macroDict = {};
 
-            const spy = jest.spyOn(console, "log").mockImplementation(() => {});
+            const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
             processMacroData("invalid json", palettes, blocks, macroDict);
             expect(spy).toHaveBeenCalledWith("invalid json");
             spy.mockRestore();

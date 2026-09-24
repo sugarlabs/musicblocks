@@ -27,9 +27,8 @@
  * Class pertaining to each turtle.
  *
  * @class
- * @classdesc This is the prototype of the Turtles controller which
- * acts as a bridge between the Turtle model and the Turtle view, and
- * serves as a gateway to any external code.
+ * @classdesc This is the prototype of an individual Turtle. It owns per-turtle lifecycle state
+ * and its Singer and Painter components, and acts as a bridge between the Turtle model and view.
  *
  * External code instantiates this class, and can access all the members
  * of TurtleView and TurtleModel.

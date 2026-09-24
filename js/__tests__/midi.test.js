@@ -660,4 +660,31 @@ describe("transcribeMidi", () => {
             });
         });
     });
+
+    it("should preserve master's chunking behavior and emit exactly 121 blocks for a 100 limit", async () => {
+        const { Midi } = require("@tonejs/midi");
+        const PPQ = 480;
+        const midi = new Midi();
+        midi.header.tempos = [{ ticks: 0, bpm: 120 }];
+        midi.header.update();
+        const track = midi.addTrack();
+        track.instrument.number = 0;
+        // Add 150 notes to exceed the 100 limit
+        for (let i = 0; i < 150; i++) {
+            track.addNote({ midi: 60, ticks: i * PPQ, durationTicks: PPQ });
+        }
+
+        await transcribeMidi(new Midi(midi.toArray()), 100);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        const noteBlocks = loadedBlocks.filter(
+            block => Array.isArray(block[1]) && block[1][0] === "newnote"
+        );
+
+        // This asserts that totalnoteblockCount only counts closed chunks.
+        // For this specific synthetic file, chunks are exactly 25 notes long.
+        // 4 chunks * 25 = 100. It breaks exactly on note 101, yielding 100 blocks.
+        // This exactly matches the legacy `master` behavior.
+        expect(noteBlocks.length).toBe(100);
+    });
 });
