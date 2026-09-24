@@ -100,6 +100,23 @@ function TunerDisplay(canvas, width, height) {
         this.updateButtonStyles();
     };
 
+    // Add keyboard handlers
+    this.chromaticButton.onkeydown = e => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            this.chromaticMode = true;
+            this.updateButtonStyles();
+        }
+    };
+
+    this.targetPitchButton.onkeydown = e => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            this.chromaticMode = false;
+            this.updateButtonStyles();
+        }
+    };
+
     // Initial button styles
     this.updateButtonStyles();
 }
@@ -161,13 +178,17 @@ TunerDisplay.prototype._indicatorColor = function (cents, colors) {
 TunerDisplay.prototype.updateButtonStyles = function () {
     if (this.chromaticMode) {
         this.chromaticButton.style.backgroundColor = "var(--color-selector-bg)";
+        this.chromaticButton.setAttribute("aria-pressed", "true");
         this.chromaticButton.querySelector("img").style.filter = "brightness(0) invert(1)";
         this.targetPitchButton.style.backgroundColor = "transparent";
+        this.targetPitchButton.setAttribute("aria-pressed", "false");
         this.targetPitchButton.querySelector("img").style.filter = "none";
     } else {
         this.targetPitchButton.style.backgroundColor = "var(--color-selector-bg)";
+        this.targetPitchButton.setAttribute("aria-pressed", "true");
         this.targetPitchButton.querySelector("img").style.filter = "brightness(0) invert(1)";
         this.chromaticButton.style.backgroundColor = "transparent";
+        this.chromaticButton.setAttribute("aria-pressed", "false");
         this.chromaticButton.querySelector("img").style.filter = "none";
     }
 };

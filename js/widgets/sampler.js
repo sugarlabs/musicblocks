@@ -1332,10 +1332,14 @@ function SampleWidget() {
                     const inactiveColor = platformColor.fillColor || "#FFFFFF";
                     if (tunerMode === "chromatic") {
                         chromaticButton.style.backgroundColor = activeColor;
+                        chromaticButton.setAttribute("aria-pressed", "true");
                         targetPitchButton.style.backgroundColor = inactiveColor;
+                        targetPitchButton.setAttribute("aria-pressed", "false");
                     } else {
                         chromaticButton.style.backgroundColor = inactiveColor;
+                        chromaticButton.setAttribute("aria-pressed", "false");
                         targetPitchButton.style.backgroundColor = activeColor;
+                        targetPitchButton.setAttribute("aria-pressed", "true");
                     }
                 };
 
