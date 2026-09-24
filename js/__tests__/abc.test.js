@@ -228,6 +228,39 @@ describe("processABCNotes - Control Strings", () => {
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).not.toContain("K:");
     });
+
+    it("should handle slurs beginning before the first note", () => {
+        logo.notation.notationStaging["0"] = [
+            "begin slur",
+            [["C4"], 4, 0, null, null, -1, false],
+            [["D4"], 4, 0, null, null, -1, false],
+            "end slur"
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("(C4 D4) ");
+    });
+
+    it("should attach tie directly to preceding note without whitespace", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C4"], 4, 0, null, null, -1, false],
+            "tie",
+            [["C4"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("C4- C4 ");
+    });
+
+    it("should place opening slur on the correct note when preceded by another note", () => {
+        logo.notation.notationStaging["0"] = [
+            [["B3"], 4, 0, null, null, -1, false],
+            "begin slur",
+            [["C4"], 4, 0, null, null, -1, false],
+            [["D4"], 4, 0, null, null, -1, false],
+            "end slur"
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toBe("B,4 (C4 D4) ");
+    });
 });
 
 describe("processABCNotes - Chords", () => {
