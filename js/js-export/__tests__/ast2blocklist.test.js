@@ -22,6 +22,7 @@
 
 const acorn = require("../../../lib/acorn.min");
 const { AST2BlockList } = require("../ast2blocklist");
+const MathUtility = require("../../utils/mathutils");
 const fs = require("fs");
 const path = require("path");
 
@@ -215,6 +216,37 @@ describe("AST2BlockList Class", () => {
                 expect(AST2BlockList.toBlockList(AST, config)[1][1]).toBe("repeat");
             }
         );
+
+        // A box can have any valid name, including the one the exporter would
+        // give the loop limit, so the limit must not shadow it.
+        test("should not let the loop limit shadow a box with the same name", async () => {
+            const ASTUtils = require("../ASTutils");
+            const astring = require("../../../lib/astring.min");
+            global.JSInterface = require("../interface");
+            let loop;
+            try {
+                loop = astring.generate(
+                    ASTUtils._getForLoopAST(["box_limit0"], [["print", ["box_limit0"]]], 0)
+                );
+            } finally {
+                delete global.JSInterface;
+            }
+
+            const printed = [];
+            const mouse = { print: async value => printed.push(value) };
+            await new Function(
+                "MathUtility",
+                "mouse",
+                `return (async () => {
+                let limit0 = 3;
+                ${loop}
+            })();`
+            )(MathUtility, mouse);
+            expect(printed).toEqual([3, 3, 3]);
+
+            const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)[1][1]).toBe("repeat");
+        });
 
         test("should convert a plain counting loop to a Repeat block", () => {
             const AST = acorn.parse(wrap("for (let i = 0; i < 4; i++) {}"), {
