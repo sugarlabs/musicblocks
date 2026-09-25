@@ -10,94 +10,11 @@ function TunerDisplay(canvas, width, height) {
     this.note = "A";
     this.cents = 0;
     this.frequency = 440;
-    this.chromaticMode = true; // Default to chromatic mode
     this._cachedTheme = null;
     this._selectorBg = null;
     this._textColor = null;
     this._successColor = null;
     this._errorColor = null;
-
-    // Create mode toggle container
-    this.modeContainer = document.createElement("div");
-    Object.assign(this.modeContainer.style, {
-        position: "absolute",
-        top: "20px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        display: "flex",
-        backgroundColor: "#FFFFFF",
-        borderRadius: "20px",
-        padding: "4px",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-    });
-    canvas.parentElement.appendChild(this.modeContainer);
-
-    // Create mode buttons wrapper
-    const buttonsWrapper = document.createElement("div");
-    Object.assign(buttonsWrapper.style, {
-        display: "flex",
-        gap: "4px",
-        position: "relative"
-    });
-    this.modeContainer.appendChild(buttonsWrapper);
-
-    // Create chromatic mode button
-    this.chromaticButton = document.createElement("div");
-    Object.assign(this.chromaticButton.style, {
-        width: "40px",
-        height: "32px",
-        borderRadius: "16px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-        transition: "all 0.3s ease"
-    });
-    const chromaticIcon = document.createElement("img");
-    Object.assign(chromaticIcon, {
-        src: "header-icons/chromatic-mode.svg",
-        width: "20",
-        height: "20",
-        alt: ""
-    });
-    this.chromaticButton.appendChild(chromaticIcon);
-    buttonsWrapper.appendChild(this.chromaticButton);
-
-    // Create target pitch mode button
-    this.targetPitchButton = document.createElement("div");
-    Object.assign(this.targetPitchButton.style, {
-        width: "40px",
-        height: "32px",
-        borderRadius: "16px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-        transition: "all 0.3s ease"
-    });
-    const targetIcon = document.createElement("img");
-    Object.assign(targetIcon, {
-        src: "header-icons/target-pitch-mode.svg",
-        width: "20",
-        height: "20",
-        alt: ""
-    });
-    this.targetPitchButton.appendChild(targetIcon);
-    buttonsWrapper.appendChild(this.targetPitchButton);
-
-    // Add click handlers
-    this.chromaticButton.onclick = () => {
-        this.chromaticMode = true;
-        this.updateButtonStyles();
-    };
-
-    this.targetPitchButton.onclick = () => {
-        this.chromaticMode = false;
-        this.updateButtonStyles();
-    };
-
-    // Initial button styles
-    this.updateButtonStyles();
 }
 
 /**
@@ -149,23 +66,6 @@ TunerDisplay.prototype._indicatorColor = function (cents, colors) {
     return Math.abs(cents) <= TunerDisplay.IN_TUNE_CENTS
         ? palette.successColor
         : palette.errorColor;
-};
-
-/**
- * Updates the styles of mode toggle buttons based on current mode
- */
-TunerDisplay.prototype.updateButtonStyles = function () {
-    if (this.chromaticMode) {
-        this.chromaticButton.style.backgroundColor = "var(--color-selector-bg)";
-        this.chromaticButton.querySelector("img").style.filter = "brightness(0) invert(1)";
-        this.targetPitchButton.style.backgroundColor = "transparent";
-        this.targetPitchButton.querySelector("img").style.filter = "none";
-    } else {
-        this.targetPitchButton.style.backgroundColor = "var(--color-selector-bg)";
-        this.targetPitchButton.querySelector("img").style.filter = "brightness(0) invert(1)";
-        this.chromaticButton.style.backgroundColor = "transparent";
-        this.chromaticButton.querySelector("img").style.filter = "none";
-    }
 };
 
 /**

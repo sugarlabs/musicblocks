@@ -2833,9 +2833,10 @@ function Synth() {
 
     /**
      * Starts the tuner by initializing microphone input
+     * @param {string} [initialTargetPitch=null] - The initial pitch to use for target pitch mode (e.g. "C4")
      * @returns {Promise<void>}
      */
-    this.startTuner = async () => {
+    this.startTuner = async (initialTargetPitch = null) => {
         const getSafeActivity = () => {
             try {
                 if (
@@ -3007,6 +3008,462 @@ function Synth() {
         let tunerMode = "chromatic"; // Add mode state
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
+        if (initialTargetPitch) {
+            try {
+                const freq = computeTargetPitchFrequency(initialTargetPitch);
+                if (!isNaN(freq) && freq > 0) {
+                    targetPitch = { note: initialTargetPitch, frequency: freq };
+                    tunerMode = "target"; // Start in target mode if an initial target is provided
+                }
+            } catch (error) {
+                console.warn("Invalid initial target pitch:", initialTargetPitch);
+            }
+        }
+
+        const tunerContainer = document.getElementById("tunerContainer");
+        if (tunerContainer && !document.getElementById("noteDisplayContainer")) {
+            // Initialize display elements if they don't exist
+            let noteDisplayContainer = document.getElementById("noteDisplayContainer");
+
+            if (!noteDisplayContainer && tunerContainer) {
+                // Create container
+                noteDisplayContainer = document.createElement("div");
+                noteDisplayContainer.id = "noteDisplayContainer";
+                noteDisplayContainer.style.position = "absolute";
+                noteDisplayContainer.style.top = "62%";
+                noteDisplayContainer.style.left = "50%";
+                noteDisplayContainer.style.transform = "translate(-50%, -50%)";
+                noteDisplayContainer.style.textAlign = "center";
+                noteDisplayContainer.style.fontFamily = "Arial, sans-serif";
+                noteDisplayContainer.style.zIndex = "1000";
+
+                // Create target note selector (only for target mode)
+                const targetNoteSelector = document.createElement("div");
+                targetNoteSelector.id = "targetNoteSelector";
+                targetNoteSelector.style.position = "absolute";
+                targetNoteSelector.style.top = "-40px"; // Moved down from -60px
+                targetNoteSelector.style.left = "50%";
+                targetNoteSelector.style.transform = "translateX(-50%)";
+                targetNoteSelector.style.color = "#666666";
+                targetNoteSelector.style.fontSize = "24px"; // Increased from 16px
+                targetNoteSelector.style.cursor = "pointer";
+                targetNoteSelector.style.transition = "opacity 0.2s ease";
+                targetNoteSelector.style.opacity = "0.7";
+                targetNoteSelector.textContent = targetPitch.note;
+
+                // Hover effects
+                targetNoteSelector.addEventListener("mouseenter", () => {
+                    targetNoteSelector.style.opacity = "1";
+                });
+
+                targetNoteSelector.addEventListener("mouseleave", () => {
+                    targetNoteSelector.style.opacity = "0.7";
+                });
+
+                // Create the wheel div if it doesn't exist
+                let wheelDiv = docById("wheelDiv");
+                if (!wheelDiv) {
+                    wheelDiv = document.createElement("div");
+                    wheelDiv.id = "wheelDiv";
+                    wheelDiv.style.position = "absolute";
+                    wheelDiv.style.display = "none";
+                    wheelDiv.style.zIndex = "1500";
+                    document.body.appendChild(wheelDiv);
+                }
+
+                // Click handler to open pie menu
+                targetNoteSelector.addEventListener("click", () => {
+                    // Only show in target mode
+                    if (tunerMode === "target") {
+                        // Setup parameters for piemenuPitches
+                        const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
+                        const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
+                        const SOLFATTRS = ["𝄪", "♯", "♮", "♭", "𝄫"];
+
+                        // Get current note, accidental and octave from targetPitch
+                        let selectedNote = "A";
+                        let selectedAttr = "♮";
+                        let selectedOctave = 4;
+
+                        if (targetPitch && targetPitch.note) {
+                            const noteMatch = targetPitch.note.match(
+                                /^([a-zA-Z])([♯♭𝄪𝄫♮#b]*)(-?\d+)?$/iu
+                            );
+                            if (noteMatch) {
+                                selectedNote = noteMatch[1].toUpperCase();
+                                selectedAttr = noteMatch[2] || "♮";
+                                if (selectedAttr === "#") selectedAttr = "♯";
+                                else if (selectedAttr === "b") selectedAttr = "♭";
+                                if (noteMatch[3]) {
+                                    selectedOctave = parseInt(noteMatch[3], 10);
+                                }
+                            }
+                        }
+
+                        // Convert letter note to solfege for initial selection
+                        let selectedSolfege = SOLFNOTES[NOTENOTES.indexOf(selectedNote)];
+                        if (!selectedSolfege) selectedSolfege = "la"; // fallback
+
+                        try {
+                            // Prepare a non-mutating activity proxy with a local logo fallback
+                            const defaultLogo = {
+                                synth: {
+                                    createDefaultSynth: () => {},
+                                    loadSynth: () => {},
+                                    setMasterVolume: () => {},
+                                    trigger: () => {},
+                                    inTemperament: "equal"
+                                },
+                                errorMsg: msg => {
+                                    console.warn(msg);
+                                }
+                            };
+
+                            const logo = activity.logo || defaultLogo;
+                            const activityProxy = Object.create(activity);
+                            activityProxy.logo = logo;
+
+                            const tempBlock = {
+                                activity: activityProxy,
+                                blocks: {
+                                    blockList: [
+                                        {
+                                            name: "pitch",
+                                            connections: [null, null],
+                                            value: targetPitch.note,
+                                            container: {
+                                                x: targetNoteSelector.offsetLeft,
+                                                y: targetNoteSelector.offsetTop
+                                            }
+                                        }
+                                    ],
+                                    stageClick: false,
+                                    setPitchOctave: () => {},
+                                    findPitchOctave: () => selectedOctave,
+                                    turtles: {
+                                        _canvas: {
+                                            width: window.innerWidth,
+                                            height: window.innerHeight
+                                        },
+                                        ithTurtle: i => ({
+                                            singer: {
+                                                instrumentNames: ["default"]
+                                            }
+                                        })
+                                    }
+                                },
+                                connections: [0], // Connect to the pitch block
+                                value: targetPitch.note,
+                                text: { text: targetPitch.note },
+                                updateCache: () => {},
+                                _exitWheel: null,
+                                _pitchWheel: null,
+                                _accidentalsWheel: null,
+                                _octavesWheel: null,
+                                piemenuOKtoLaunch: () => true,
+                                _piemenuExitTime: 0,
+                                container: {
+                                    x: targetNoteSelector.offsetLeft,
+                                    y: targetNoteSelector.offsetTop,
+                                    setChildIndex: () => {}
+                                },
+                                prevAccidental: "♮",
+                                name: "pitch", // This is needed for pitch preview
+                                _triggerLock: false // This is needed for pitch preview
+                            };
+
+                            // Add key signature environment (on proxy, not real activity)
+                            activityProxy.KeySignatureEnv = ["C", "major", false];
+
+                            // Make sure wheelDiv is properly positioned and visible
+                            const wheelDiv = docById("wheelDiv");
+                            if (wheelDiv) {
+                                const rect = targetNoteSelector.getBoundingClientRect();
+                                wheelDiv.style.position = "absolute";
+                                wheelDiv.style.left = rect.left - 250 + "px";
+                                wheelDiv.style.top = rect.top - 250 + "px";
+                                wheelDiv.style.width = "600px";
+                                wheelDiv.style.height = "600px";
+                                wheelDiv.style.zIndex = "1500";
+                                wheelDiv.style.backgroundColor = "transparent";
+                                wheelDiv.style.display = "block";
+                            }
+
+                            // Call piemenuPitches with solfege labels but note values
+                            piemenuPitches(
+                                tempBlock,
+                                SOLFNOTES,
+                                NOTENOTES,
+                                SOLFATTRS,
+                                selectedSolfege,
+                                selectedAttr
+                            );
+
+                            // Create a state object to track selections
+                            const selectionState = {
+                                note: selectedNote,
+                                accidental: selectedAttr,
+                                octave: selectedOctave
+                            };
+
+                            // Update target pitch when a note is selected
+                            if (tempBlock._pitchWheel && tempBlock._pitchWheel.navItems) {
+                                // Add navigation function to each note in the pitch wheel
+                                for (let i = 0; i < tempBlock._pitchWheel.navItems.length; i++) {
+                                    tempBlock._pitchWheel.navItems[i].navigateFunction = () => {
+                                        // Get the selected note
+                                        const solfegeNote = tempBlock._pitchWheel.navItems[i].title;
+                                        if (solfegeNote && SOLFNOTES.includes(solfegeNote)) {
+                                            const noteIndex = SOLFNOTES.indexOf(solfegeNote);
+                                            selectionState.note = NOTENOTES[noteIndex];
+                                            updateTargetNote();
+                                        }
+                                    };
+                                }
+                            }
+
+                            // Add handlers for accidentals wheel
+                            if (
+                                tempBlock._accidentalsWheel &&
+                                tempBlock._accidentalsWheel.navItems
+                            ) {
+                                for (
+                                    let i = 0;
+                                    i < tempBlock._accidentalsWheel.navItems.length;
+                                    i++
+                                ) {
+                                    tempBlock._accidentalsWheel.navItems[i].navigateFunction =
+                                        () => {
+                                            selectionState.accidental =
+                                                tempBlock._accidentalsWheel.navItems[i].title;
+                                            updateTargetNote();
+                                        };
+                                }
+                            }
+
+                            // Add handlers for octaves wheel
+                            if (tempBlock._octavesWheel && tempBlock._octavesWheel.navItems) {
+                                for (let i = 0; i < tempBlock._octavesWheel.navItems.length; i++) {
+                                    tempBlock._octavesWheel.navItems[i].navigateFunction = () => {
+                                        const octave = tempBlock._octavesWheel.navItems[i].title;
+                                        if (octave && !isNaN(octave)) {
+                                            selectionState.octave = parseInt(octave, 10);
+                                            updateTargetNote();
+                                        }
+                                    };
+                                }
+                            }
+
+                            // Function to update the target note display
+                            const updateTargetNote = () => {
+                                if (!selectionState.note) return;
+
+                                // Convert accidental symbols to notation
+                                let noteWithAccidental = selectionState.note;
+                                if (selectionState.accidental === "♯") noteWithAccidental += "#";
+                                else if (selectionState.accidental === "♭")
+                                    noteWithAccidental += "b";
+                                else if (selectionState.accidental === "𝄪")
+                                    noteWithAccidental += "##";
+                                else if (selectionState.accidental === "𝄫")
+                                    noteWithAccidental += "bb";
+
+                                const noteWithOctave = noteWithAccidental + selectionState.octave;
+
+                                // Update target pitch
+                                targetPitch.note = noteWithOctave;
+
+                                // Calculate the frequency for the target pitch
+                                try {
+                                    const freq = computeTargetPitchFrequency(noteWithOctave);
+                                    if (!isNaN(freq) && freq > 0) {
+                                        targetPitch.frequency = freq;
+                                    } else {
+                                        console.error("Invalid frequency calculated:", freq);
+                                        targetPitch.frequency = 440; // Default to A4 if calculation fails
+                                    }
+                                } catch (error) {
+                                    console.error("Error calculating frequency:", error);
+                                    targetPitch.frequency = 440; // Default to A4 if calculation fails
+                                }
+
+                                // Update display
+                                targetNoteSelector.textContent = noteWithOctave;
+                            };
+
+                            // Update exit wheel handler
+                            if (tempBlock._exitWheel && tempBlock._exitWheel.navItems) {
+                                tempBlock._exitWheel.navItems[0].navigateFunction = () => {
+                                    // Clean up the wheels
+                                    if (tempBlock._pitchWheel) {
+                                        tempBlock._pitchWheel.removeWheel();
+                                    }
+                                    if (tempBlock._accidentalsWheel) {
+                                        tempBlock._accidentalsWheel.removeWheel();
+                                    }
+                                    if (tempBlock._octavesWheel) {
+                                        tempBlock._octavesWheel.removeWheel();
+                                    }
+                                    if (tempBlock._exitWheel) {
+                                        tempBlock._exitWheel.removeWheel();
+                                    }
+
+                                    // Hide the wheel div
+                                    wheelDiv.style.display = "none";
+                                };
+                            }
+                        } catch (error) {
+                            console.error("Error opening pie menu:", error);
+                        }
+                    }
+                });
+
+                noteDisplayContainer.appendChild(targetNoteSelector);
+
+                // Create mode toggle button
+                const modeToggle = document.createElement("div");
+                modeToggle.id = "modeToggle";
+                modeToggle.style.position = "absolute";
+                modeToggle.style.top = "30px";
+                modeToggle.style.left = "50%";
+                modeToggle.style.transform = "translateX(-50%)";
+                modeToggle.style.display = "flex";
+                modeToggle.style.backgroundColor = "#FFFFFF";
+                modeToggle.style.borderRadius = "25px"; // Increased pill shape radius
+                modeToggle.style.padding = "3px"; // Slightly more padding
+                modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+                modeToggle.style.width = "120px"; // Increased width
+                modeToggle.style.height = "44px"; // Increased height
+                modeToggle.style.cursor = "pointer"; // Added cursor pointer
+
+                // Create chromatic mode button
+                const chromaticButton = document.createElement("div");
+                chromaticButton.setAttribute("role", "button");
+                chromaticButton.setAttribute("tabindex", "0");
+                chromaticButton.style.flex = "1";
+                chromaticButton.style.display = "flex";
+                chromaticButton.style.alignItems = "center";
+                chromaticButton.style.justifyContent = "center";
+                chromaticButton.style.borderRadius = "22px"; // Increased radius
+                chromaticButton.style.cursor = "pointer";
+                chromaticButton.style.transition = "all 0.2s ease"; // Faster transition
+                chromaticButton.style.userSelect = "none"; // Prevent text selection
+                chromaticButton.title = _("Chromatic");
+
+                // Create target pitch mode button
+                const targetPitchButton = document.createElement("div");
+                targetPitchButton.setAttribute("role", "button");
+                targetPitchButton.setAttribute("tabindex", "0");
+                targetPitchButton.style.flex = "1";
+                targetPitchButton.style.display = "flex";
+                targetPitchButton.style.alignItems = "center";
+                targetPitchButton.style.justifyContent = "center";
+                targetPitchButton.style.borderRadius = "22px"; // Increased radius
+                targetPitchButton.style.cursor = "pointer";
+                targetPitchButton.style.transition = "all 0.2s ease"; // Faster transition
+                targetPitchButton.style.userSelect = "none"; // Prevent text selection
+                targetPitchButton.title = _("Target pitch");
+
+                // Create icons
+                const chromaticIcon = document.createElement("img");
+                chromaticIcon.src = "header-icons/chromatic-mode.svg";
+                chromaticIcon.alt = _("Chromatic mode");
+                chromaticIcon.style.width = "32px"; // Increased icon size further
+                chromaticIcon.style.height = "32px";
+                chromaticIcon.style.filter = "brightness(0)"; // Make icon black
+                chromaticIcon.style.pointerEvents = "none"; // Prevent icon from interfering with clicks
+
+                const targetIcon = document.createElement("img");
+                targetIcon.src = "header-icons/target-pitch-mode.svg";
+                targetIcon.alt = _("Target pitch mode");
+                targetIcon.style.width = "32px"; // Increased icon size further
+                targetIcon.style.height = "32px";
+                targetIcon.style.filter = "brightness(0)"; // Make icon black
+                targetIcon.style.pointerEvents = "none"; // Prevent icon from interfering with clicks
+
+                // Function to update button styles
+                const updateButtonStyles = () => {
+                    if (tunerMode === "chromatic") {
+                        chromaticButton.style.backgroundColor = "#A6CEFF"; // Blue for active
+                        chromaticButton.setAttribute("aria-pressed", "true");
+                        targetPitchButton.style.backgroundColor = "#FFFFFF"; // White for inactive
+                        targetPitchButton.setAttribute("aria-pressed", "false");
+                    } else {
+                        chromaticButton.style.backgroundColor = "#FFFFFF"; // White for inactive
+                        chromaticButton.setAttribute("aria-pressed", "false");
+                        targetPitchButton.style.backgroundColor = "#A6CEFF"; // Blue for active
+                        targetPitchButton.setAttribute("aria-pressed", "true");
+                    }
+                };
+
+                // Add click handlers with debounce to prevent double clicks
+                let isClickable = true;
+                const handleClick = mode => {
+                    if (!isClickable) return;
+                    isClickable = false;
+                    tunerMode = mode;
+                    updateButtonStyles();
+                    setTimeout(() => {
+                        isClickable = true;
+                    }, 200); // Re-enable after 200ms
+                };
+
+                chromaticButton.onclick = () => handleClick("chromatic");
+                targetPitchButton.onclick = () => handleClick("target");
+
+                chromaticButton.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleClick("chromatic");
+                    }
+                };
+
+                targetPitchButton.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleClick("target");
+                    }
+                };
+
+                // Assemble the toggle
+                chromaticButton.appendChild(chromaticIcon);
+                targetPitchButton.appendChild(targetIcon);
+                modeToggle.appendChild(chromaticButton);
+                modeToggle.appendChild(targetPitchButton);
+
+                // Initial style update
+                updateButtonStyles();
+
+                tunerContainer.appendChild(modeToggle);
+
+                // Create note display
+                const noteText = document.createElement("div");
+                noteText.id = "noteText";
+                noteText.style.fontSize = "64px";
+                noteText.style.fontWeight = "bold";
+                noteText.style.marginBottom = "5px";
+
+                // Create cents deviation display
+                const centsText = document.createElement("div");
+                centsText.id = "centsText";
+                centsText.style.fontSize = "14px";
+                centsText.style.color = "#666666";
+                centsText.style.marginBottom = "5px";
+
+                // Create tune direction display
+                const tuneDirection = document.createElement("div");
+                tuneDirection.id = "tuneDirection";
+                tuneDirection.style.fontSize = "18px";
+                tuneDirection.style.color = "#FF4500";
+
+                // Append all elements
+                noteDisplayContainer.appendChild(noteText);
+                noteDisplayContainer.appendChild(centsText);
+                noteDisplayContainer.appendChild(tuneDirection);
+                tunerContainer.appendChild(noteDisplayContainer);
+            }
+        }
+
         const updatePitch = () => {
             if (!this._tunerActive) return;
 
@@ -3073,424 +3530,6 @@ function Synth() {
                         cents = 0;
                         this.displayText = "0 cents";
                     }
-                }
-
-                // Initialize display elements if they don't exist
-                let noteDisplayContainer = document.getElementById("noteDisplayContainer");
-
-                if (!noteDisplayContainer && tunerContainer) {
-                    // Create container
-                    noteDisplayContainer = document.createElement("div");
-                    noteDisplayContainer.id = "noteDisplayContainer";
-                    noteDisplayContainer.style.position = "absolute";
-                    noteDisplayContainer.style.top = "62%";
-                    noteDisplayContainer.style.left = "50%";
-                    noteDisplayContainer.style.transform = "translate(-50%, -50%)";
-                    noteDisplayContainer.style.textAlign = "center";
-                    noteDisplayContainer.style.fontFamily = "Arial, sans-serif";
-                    noteDisplayContainer.style.zIndex = "1000";
-
-                    // Create target note selector (only for target mode)
-                    const targetNoteSelector = document.createElement("div");
-                    targetNoteSelector.id = "targetNoteSelector";
-                    targetNoteSelector.style.position = "absolute";
-                    targetNoteSelector.style.top = "-40px"; // Moved down from -60px
-                    targetNoteSelector.style.left = "50%";
-                    targetNoteSelector.style.transform = "translateX(-50%)";
-                    targetNoteSelector.style.color = "#666666";
-                    targetNoteSelector.style.fontSize = "24px"; // Increased from 16px
-                    targetNoteSelector.style.cursor = "pointer";
-                    targetNoteSelector.style.transition = "opacity 0.2s ease";
-                    targetNoteSelector.style.opacity = "0.7";
-                    targetNoteSelector.textContent = targetPitch.note;
-
-                    // Hover effects
-                    targetNoteSelector.addEventListener("mouseenter", () => {
-                        targetNoteSelector.style.opacity = "1";
-                    });
-
-                    targetNoteSelector.addEventListener("mouseleave", () => {
-                        targetNoteSelector.style.opacity = "0.7";
-                    });
-
-                    // Create the wheel div if it doesn't exist
-                    let wheelDiv = docById("wheelDiv");
-                    if (!wheelDiv) {
-                        wheelDiv = document.createElement("div");
-                        wheelDiv.id = "wheelDiv";
-                        wheelDiv.style.position = "absolute";
-                        wheelDiv.style.display = "none";
-                        wheelDiv.style.zIndex = "1500";
-                        document.body.appendChild(wheelDiv);
-                    }
-
-                    // Click handler to open pie menu
-                    targetNoteSelector.addEventListener("click", () => {
-                        // Only show in target mode
-                        if (tunerMode === "target") {
-                            // Setup parameters for piemenuPitches
-                            const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
-                            const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
-                            const SOLFATTRS = ["𝄪", "♯", "♮", "♭", "𝄫"];
-
-                            // Get current note and accidental
-                            let selectedNote = targetPitch.note[0];
-                            let selectedAttr =
-                                targetPitch.note.length > 1 ? targetPitch.note.substring(1) : "♮";
-
-                            // Convert letter note to solfege for initial selection
-                            let selectedSolfege = SOLFNOTES[NOTENOTES.indexOf(selectedNote)];
-
-                            if (selectedAttr === "") {
-                                selectedAttr = "♮";
-                            }
-
-                            try {
-                                // Prepare a non-mutating activity proxy with a local logo fallback
-                                const defaultLogo = {
-                                    synth: {
-                                        createDefaultSynth: () => {},
-                                        loadSynth: () => {},
-                                        setMasterVolume: () => {},
-                                        trigger: () => {},
-                                        inTemperament: "equal"
-                                    },
-                                    errorMsg: msg => {
-                                        console.warn(msg);
-                                    }
-                                };
-
-                                const logo = activity.logo || defaultLogo;
-                                const activityProxy = Object.create(activity);
-                                activityProxy.logo = logo;
-
-                                const tempBlock = {
-                                    activity: activityProxy,
-                                    blocks: {
-                                        blockList: [
-                                            {
-                                                name: "pitch",
-                                                connections: [null, null],
-                                                value: targetPitch.note,
-                                                container: {
-                                                    x: targetNoteSelector.offsetLeft,
-                                                    y: targetNoteSelector.offsetTop
-                                                }
-                                            }
-                                        ],
-                                        stageClick: false,
-                                        setPitchOctave: () => {},
-                                        findPitchOctave: () => 4,
-                                        turtles: {
-                                            _canvas: {
-                                                width: window.innerWidth,
-                                                height: window.innerHeight
-                                            },
-                                            ithTurtle: i => ({
-                                                singer: {
-                                                    instrumentNames: ["default"]
-                                                }
-                                            })
-                                        }
-                                    },
-                                    connections: [0], // Connect to the pitch block
-                                    value: targetPitch.note,
-                                    text: { text: targetPitch.note },
-                                    updateCache: () => {},
-                                    _exitWheel: null,
-                                    _pitchWheel: null,
-                                    _accidentalsWheel: null,
-                                    _octavesWheel: null,
-                                    piemenuOKtoLaunch: () => true,
-                                    _piemenuExitTime: 0,
-                                    container: {
-                                        x: targetNoteSelector.offsetLeft,
-                                        y: targetNoteSelector.offsetTop,
-                                        setChildIndex: () => {}
-                                    },
-                                    prevAccidental: "♮",
-                                    name: "pitch", // This is needed for pitch preview
-                                    _triggerLock: false // This is needed for pitch preview
-                                };
-
-                                // Add key signature environment (on proxy, not real activity)
-                                activityProxy.KeySignatureEnv = ["C", "major", false];
-
-                                // Make sure wheelDiv is properly positioned and visible
-                                const wheelDiv = docById("wheelDiv");
-                                if (wheelDiv) {
-                                    const rect = targetNoteSelector.getBoundingClientRect();
-                                    wheelDiv.style.position = "absolute";
-                                    wheelDiv.style.left = rect.left - 250 + "px";
-                                    wheelDiv.style.top = rect.top - 250 + "px";
-                                    wheelDiv.style.width = "600px";
-                                    wheelDiv.style.height = "600px";
-                                    wheelDiv.style.zIndex = "1500";
-                                    wheelDiv.style.backgroundColor = "transparent";
-                                    wheelDiv.style.display = "block";
-                                }
-
-                                // Call piemenuPitches with solfege labels but note values
-                                piemenuPitches(
-                                    tempBlock,
-                                    SOLFNOTES,
-                                    NOTENOTES,
-                                    SOLFATTRS,
-                                    selectedSolfege,
-                                    selectedAttr
-                                );
-
-                                // Create a state object to track selections
-                                const selectionState = {
-                                    note: selectedNote,
-                                    accidental: selectedAttr,
-                                    octave: 4
-                                };
-
-                                // Update target pitch when a note is selected
-                                if (tempBlock._pitchWheel && tempBlock._pitchWheel.navItems) {
-                                    // Add navigation function to each note in the pitch wheel
-                                    for (
-                                        let i = 0;
-                                        i < tempBlock._pitchWheel.navItems.length;
-                                        i++
-                                    ) {
-                                        tempBlock._pitchWheel.navItems[i].navigateFunction = () => {
-                                            // Get the selected note
-                                            const solfegeNote =
-                                                tempBlock._pitchWheel.navItems[i].title;
-                                            if (solfegeNote && SOLFNOTES.includes(solfegeNote)) {
-                                                const noteIndex = SOLFNOTES.indexOf(solfegeNote);
-                                                selectionState.note = NOTENOTES[noteIndex];
-                                                updateTargetNote();
-                                            }
-                                        };
-                                    }
-                                }
-
-                                // Add handlers for accidentals wheel
-                                if (
-                                    tempBlock._accidentalsWheel &&
-                                    tempBlock._accidentalsWheel.navItems
-                                ) {
-                                    for (
-                                        let i = 0;
-                                        i < tempBlock._accidentalsWheel.navItems.length;
-                                        i++
-                                    ) {
-                                        tempBlock._accidentalsWheel.navItems[i].navigateFunction =
-                                            () => {
-                                                selectionState.accidental =
-                                                    tempBlock._accidentalsWheel.navItems[i].title;
-                                                updateTargetNote();
-                                            };
-                                    }
-                                }
-
-                                // Add handlers for octaves wheel
-                                if (tempBlock._octavesWheel && tempBlock._octavesWheel.navItems) {
-                                    for (
-                                        let i = 0;
-                                        i < tempBlock._octavesWheel.navItems.length;
-                                        i++
-                                    ) {
-                                        tempBlock._octavesWheel.navItems[i].navigateFunction =
-                                            () => {
-                                                const octave =
-                                                    tempBlock._octavesWheel.navItems[i].title;
-                                                if (octave && !isNaN(octave)) {
-                                                    selectionState.octave = parseInt(octave, 10);
-                                                    updateTargetNote();
-                                                }
-                                            };
-                                    }
-                                }
-
-                                // Function to update the target note display
-                                const updateTargetNote = () => {
-                                    if (!selectionState.note) return;
-
-                                    // Convert accidental symbols to notation
-                                    let noteWithAccidental = selectionState.note;
-                                    if (selectionState.accidental === "♯")
-                                        noteWithAccidental += "#";
-                                    else if (selectionState.accidental === "♭")
-                                        noteWithAccidental += "b";
-                                    else if (selectionState.accidental === "𝄪")
-                                        noteWithAccidental += "##";
-                                    else if (selectionState.accidental === "𝄫")
-                                        noteWithAccidental += "bb";
-
-                                    const noteWithOctave =
-                                        noteWithAccidental + selectionState.octave;
-
-                                    // Update target pitch
-                                    targetPitch.note = noteWithOctave;
-
-                                    // Calculate the frequency for the target pitch
-                                    try {
-                                        const freq = computeTargetPitchFrequency(noteWithOctave);
-                                        if (!isNaN(freq) && freq > 0) {
-                                            targetPitch.frequency = freq;
-                                        } else {
-                                            console.error("Invalid frequency calculated:", freq);
-                                            targetPitch.frequency = 440; // Default to A4 if calculation fails
-                                        }
-                                    } catch (error) {
-                                        console.error("Error calculating frequency:", error);
-                                        targetPitch.frequency = 440; // Default to A4 if calculation fails
-                                    }
-
-                                    // Update display
-                                    targetNoteSelector.textContent = noteWithOctave;
-                                };
-
-                                // Update exit wheel handler
-                                if (tempBlock._exitWheel && tempBlock._exitWheel.navItems) {
-                                    tempBlock._exitWheel.navItems[0].navigateFunction = () => {
-                                        // Clean up the wheels
-                                        if (tempBlock._pitchWheel) {
-                                            tempBlock._pitchWheel.removeWheel();
-                                        }
-                                        if (tempBlock._accidentalsWheel) {
-                                            tempBlock._accidentalsWheel.removeWheel();
-                                        }
-                                        if (tempBlock._octavesWheel) {
-                                            tempBlock._octavesWheel.removeWheel();
-                                        }
-                                        if (tempBlock._exitWheel) {
-                                            tempBlock._exitWheel.removeWheel();
-                                        }
-
-                                        // Hide the wheel div
-                                        wheelDiv.style.display = "none";
-                                    };
-                                }
-                            } catch (error) {
-                                console.error("Error opening pie menu:", error);
-                            }
-                        }
-                    });
-
-                    noteDisplayContainer.appendChild(targetNoteSelector);
-
-                    // Create mode toggle button
-                    const modeToggle = document.createElement("div");
-                    modeToggle.id = "modeToggle";
-                    modeToggle.style.position = "absolute";
-                    modeToggle.style.top = "30px";
-                    modeToggle.style.left = "50%";
-                    modeToggle.style.transform = "translateX(-50%)";
-                    modeToggle.style.display = "flex";
-                    modeToggle.style.backgroundColor = "#FFFFFF";
-                    modeToggle.style.borderRadius = "25px"; // Increased pill shape radius
-                    modeToggle.style.padding = "3px"; // Slightly more padding
-                    modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
-                    modeToggle.style.width = "120px"; // Increased width
-                    modeToggle.style.height = "44px"; // Increased height
-                    modeToggle.style.cursor = "pointer"; // Added cursor pointer
-
-                    // Create chromatic mode button
-                    const chromaticButton = document.createElement("div");
-                    chromaticButton.style.flex = "1";
-                    chromaticButton.style.display = "flex";
-                    chromaticButton.style.alignItems = "center";
-                    chromaticButton.style.justifyContent = "center";
-                    chromaticButton.style.borderRadius = "22px"; // Increased radius
-                    chromaticButton.style.cursor = "pointer";
-                    chromaticButton.style.transition = "all 0.2s ease"; // Faster transition
-                    chromaticButton.style.userSelect = "none"; // Prevent text selection
-                    chromaticButton.title = "Chromatic";
-
-                    // Create target pitch mode button
-                    const targetPitchButton = document.createElement("div");
-                    targetPitchButton.style.flex = "1";
-                    targetPitchButton.style.display = "flex";
-                    targetPitchButton.style.alignItems = "center";
-                    targetPitchButton.style.justifyContent = "center";
-                    targetPitchButton.style.borderRadius = "22px"; // Increased radius
-                    targetPitchButton.style.cursor = "pointer";
-                    targetPitchButton.style.transition = "all 0.2s ease"; // Faster transition
-                    targetPitchButton.style.userSelect = "none"; // Prevent text selection
-                    targetPitchButton.title = "Target pitch";
-
-                    // Create icons
-                    const chromaticIcon = document.createElement("img");
-                    chromaticIcon.src = "header-icons/chromatic-mode.svg";
-                    chromaticIcon.style.width = "32px"; // Increased icon size further
-                    chromaticIcon.style.height = "32px";
-                    chromaticIcon.style.filter = "brightness(0)"; // Make icon black
-                    chromaticIcon.style.pointerEvents = "none"; // Prevent icon from interfering with clicks
-
-                    const targetIcon = document.createElement("img");
-                    targetIcon.src = "header-icons/target-pitch-mode.svg";
-                    targetIcon.style.width = "32px"; // Increased icon size further
-                    targetIcon.style.height = "32px";
-                    targetIcon.style.filter = "brightness(0)"; // Make icon black
-                    targetIcon.style.pointerEvents = "none"; // Prevent icon from interfering with clicks
-
-                    // Function to update button styles
-                    const updateButtonStyles = () => {
-                        if (tunerMode === "chromatic") {
-                            chromaticButton.style.backgroundColor = "#A6CEFF"; // Blue for active
-                            targetPitchButton.style.backgroundColor = "#FFFFFF"; // White for inactive
-                        } else {
-                            chromaticButton.style.backgroundColor = "#FFFFFF"; // White for inactive
-                            targetPitchButton.style.backgroundColor = "#A6CEFF"; // Blue for active
-                        }
-                    };
-
-                    // Add click handlers with debounce to prevent double clicks
-                    let isClickable = true;
-                    const handleClick = mode => {
-                        if (!isClickable) return;
-                        isClickable = false;
-                        tunerMode = mode;
-                        updateButtonStyles();
-                        setTimeout(() => {
-                            isClickable = true;
-                        }, 200); // Re-enable after 200ms
-                    };
-
-                    chromaticButton.onclick = () => handleClick("chromatic");
-                    targetPitchButton.onclick = () => handleClick("target");
-
-                    // Assemble the toggle
-                    chromaticButton.appendChild(chromaticIcon);
-                    targetPitchButton.appendChild(targetIcon);
-                    modeToggle.appendChild(chromaticButton);
-                    modeToggle.appendChild(targetPitchButton);
-
-                    // Initial style update
-                    updateButtonStyles();
-
-                    tunerContainer.appendChild(modeToggle);
-
-                    // Create note display
-                    const noteText = document.createElement("div");
-                    noteText.id = "noteText";
-                    noteText.style.fontSize = "64px";
-                    noteText.style.fontWeight = "bold";
-                    noteText.style.marginBottom = "5px";
-
-                    // Create cents deviation display
-                    const centsText = document.createElement("div");
-                    centsText.id = "centsText";
-                    centsText.style.fontSize = "14px";
-                    centsText.style.color = "#666666";
-                    centsText.style.marginBottom = "5px";
-
-                    // Create tune direction display
-                    const tuneDirection = document.createElement("div");
-                    tuneDirection.id = "tuneDirection";
-                    tuneDirection.style.fontSize = "18px";
-                    tuneDirection.style.color = "#FF4500";
-
-                    // Append all elements
-                    noteDisplayContainer.appendChild(noteText);
-                    noteDisplayContainer.appendChild(centsText);
-                    noteDisplayContainer.appendChild(tuneDirection);
-                    tunerContainer.appendChild(noteDisplayContainer);
                 }
 
                 // Update displays if they exist

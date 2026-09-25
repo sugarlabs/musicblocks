@@ -416,83 +416,6 @@ describe("Tuner Widget", () => {
 
                 expect(display.frequency).toBe(440);
             });
-
-            test("defaults to chromatic mode", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-
-                expect(display.chromaticMode).toBe(true);
-            });
-
-            test("creates mode container element", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-
-                expect(display.modeContainer).toBeDefined();
-            });
-
-            test("appends mode container to canvas parent", () => {
-                new TunerDisplay(mockCanvas, 400, 300);
-
-                expect(mockCanvas.parentElement.appendChild).toHaveBeenCalled();
-            });
-
-            test("creates chromatic button", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-
-                expect(display.chromaticButton).toBeDefined();
-            });
-
-            test("creates target pitch button", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-
-                expect(display.targetPitchButton).toBeDefined();
-            });
-
-            test("calls updateButtonStyles on initialization", () => {
-                // Can't easily spy on prototype method before constructor,
-                // but we can verify the button styles are set
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-
-                // Chromatic mode is true by default
-                expect(display.chromaticMode).toBe(true);
-            });
-        });
-
-        describe("updateButtonStyles", () => {
-            test("highlights chromatic button when in chromatic mode", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = true;
-
-                display.updateButtonStyles();
-                // Color may be set as hex or converted to rgb by browser
-                expect(display.chromaticButton.style.backgroundColor).toBeTruthy();
-            });
-
-            test("removes highlight from target button when in chromatic mode", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = true;
-
-                display.updateButtonStyles();
-
-                expect(display.targetPitchButton.style.backgroundColor).toBe("transparent");
-            });
-
-            test("highlights target button when not in chromatic mode", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = false;
-
-                display.updateButtonStyles();
-                // Color may be set as hex or converted to rgb by browser
-                expect(display.targetPitchButton.style.backgroundColor).toBeTruthy();
-            });
-
-            test("removes highlight from chromatic button when not in chromatic mode", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = false;
-
-                display.updateButtonStyles();
-
-                expect(display.chromaticButton.style.backgroundColor).toBe("transparent");
-            });
         });
 
         describe("update", () => {
@@ -673,44 +596,6 @@ describe("Tuner Widget", () => {
                 display.cents = -6;
                 display.draw();
                 expect(fillStyles[2]).toBe("#ef4444");
-            });
-        });
-
-        describe("button click handlers", () => {
-            test("clicking chromatic button sets chromaticMode to true", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = false;
-
-                display.chromaticButton.onclick();
-
-                expect(display.chromaticMode).toBe(true);
-            });
-
-            test("clicking target pitch button sets chromaticMode to false", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = true;
-
-                display.targetPitchButton.onclick();
-
-                expect(display.chromaticMode).toBe(false);
-            });
-
-            test("clicking chromatic button updates button styles", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                const updateSpy = jest.spyOn(display, "updateButtonStyles");
-
-                display.chromaticButton.onclick();
-
-                expect(updateSpy).toHaveBeenCalled();
-            });
-
-            test("clicking target pitch button updates button styles", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                const updateSpy = jest.spyOn(display, "updateButtonStyles");
-
-                display.targetPitchButton.onclick();
-
-                expect(updateSpy).toHaveBeenCalled();
             });
         });
 
