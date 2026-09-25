@@ -152,6 +152,10 @@ const DOUBLEFLAT = "\ud834\udd2b";
 describe("musicutils", () => {
     describe("getNonEDOFrequency browser runtime", () => {
         it("returns a ratio-temperament preview frequency without Node global", () => {
+            const constants = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-constants.js"),
+                "utf8"
+            );
             const source = fs.readFileSync(path.join(__dirname, "..", "musicutils.js"), "utf8");
             const sandbox = {
                 TextEncoder,
@@ -161,6 +165,7 @@ describe("musicutils", () => {
             };
 
             vm.createContext(sandbox);
+            vm.runInContext(constants, sandbox);
             vm.runInContext(source, sandbox);
 
             expect(
