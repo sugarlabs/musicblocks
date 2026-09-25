@@ -528,6 +528,7 @@ describe("KeyboardController", () => {
         it("Cmd+Z triggers undoAction on macOS", () => {
             const activity = makeActivity();
             activity.blocks.undoAction = jest.fn();
+            activity.blocks.redoAction = jest.fn();
             const controller = createController(activity);
             const event = makeEvent({ keyCode: 90, metaKey: true });
 
@@ -535,6 +536,7 @@ describe("KeyboardController", () => {
 
             expect(event.preventDefault).toHaveBeenCalled();
             expect(activity.blocks.undoAction).toHaveBeenCalled();
+            expect(activity.blocks.redoAction).not.toHaveBeenCalled();
         });
         it("Cmd+Shift+Z triggers redoAction on macOS", () => {
             const activity = makeActivity();
