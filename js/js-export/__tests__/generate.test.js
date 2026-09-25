@@ -357,8 +357,9 @@ describe("JSGenerate Class", () => {
 
     test("should generate stack trees with various block types and arguments", () => {
         globalActivity.blocks.stackList = [1, 20];
-        window.BooleanBlock = class BooleanBlock {};
-        const booleanProtoblock = new window.BooleanBlock();
+        // In the browser BooleanBlock is a global binding from protoblocks.js, not a window property.
+        global.BooleanBlock = class BooleanBlock {};
+        const booleanProtoblock = new global.BooleanBlock();
         booleanProtoblock.style = "value";
         const standardGrandParent = { constructor: { name: "StandardBlock" } };
         const standardParent = Object.create(standardGrandParent);
