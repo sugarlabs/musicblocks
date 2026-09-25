@@ -1148,4 +1148,46 @@ describe("Oscilloscope", () => {
             makeCanvasSpy.mockRestore();
         });
     });
+
+    describe("Zoom Controls and Page Visibility Edge Cases", () => {
+        test("zoom buttons increase and decrease zoomFactor with lower bound clamping", () => {
+            const osc = createOscilloscope([]);
+            const initialZoom = osc.zoomFactor;
+
+            const buttons = mockWidgetWindow.addButton.mock.results;
+            const zoomInBtn = buttons[0].value;
+            const zoomOutBtn = buttons[1].value;
+
+            zoomInBtn.onclick();
+            expect(osc.zoomFactor).toBeGreaterThan(initialZoom);
+
+            osc.zoomFactor = 0.5;
+            zoomOutBtn.onclick();
+            expect(osc.zoomFactor).toBe(1);
+        });
+
+        test("handleVisibilityChange handles visible and hidden states", () => {
+            const osc = createOscilloscope([]);
+            osc._running = true;
+            const wakeUpSpy = jest.spyOn(osc, "_wakeUp");
+            const throttleSpy = jest.spyOn(osc, "_throttle");
+
+            Object.defineProperty(document, "visibilityState", {
+                configurable: true,
+                value: "visible"
+            });
+            osc._handleVisibilityChange();
+            expect(wakeUpSpy).toHaveBeenCalled();
+
+            Object.defineProperty(document, "visibilityState", {
+                configurable: true,
+                value: "hidden"
+            });
+            osc._handleVisibilityChange();
+            expect(throttleSpy).toHaveBeenCalled();
+
+            wakeUpSpy.mockRestore();
+            throttleSpy.mockRestore();
+        });
+    });
 });
