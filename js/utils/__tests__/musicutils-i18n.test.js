@@ -60,7 +60,7 @@ describe("musicutils-i18n", () => {
         const remaining = readSource("musicutils.js");
         for (const name of Object.keys(i18n)) {
             if (name === "MusicUtilsI18n") continue;
-            expect(remaining).not.toMatch(new RegExp(`^(const|let|var) ${name}\b`, "m"));
+            expect(remaining).not.toMatch(new RegExp(`^(const|let|var) ${name}\\b`, "m"));
         }
     });
 
