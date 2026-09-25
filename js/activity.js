@@ -160,6 +160,7 @@ let MYDEFINES = [
     "activity/keyboard-controller",
     "widgets/plugin-dialog",
     "utils/musicutils-constants",
+    "utils/musicutils-i18n",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
