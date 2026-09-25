@@ -14,6 +14,8 @@ function TunerDisplay(canvas, width, height) {
     this._cachedTheme = null;
     this._selectorBg = null;
     this._textColor = null;
+    this._successColor = null;
+    this._errorColor = null;
 
     // Create mode toggle container
     this.modeContainer = document.createElement("div");
@@ -102,7 +104,7 @@ function TunerDisplay(canvas, width, height) {
  * Resolves and caches CSS token colors for Canvas 2D rendering,
  * updating only when document theme changes.
  * @private
- * @returns {{ selectorBg: string, textColor: string }}
+ * @returns {{ selectorBg: string, textColor: string, successColor: string, errorColor: string }}
  */
 TunerDisplay.prototype._getCanvasColors = function () {
     const currentTheme =
@@ -113,15 +115,40 @@ TunerDisplay.prototype._getCanvasColors = function () {
             const style = getComputedStyle(document.body);
             this._selectorBg = style.getPropertyValue("--color-selector-bg").trim() || "#8cc6ff";
             this._textColor = style.getPropertyValue("--color-text-primary").trim() || "#000000";
+            this._successColor = style.getPropertyValue("--color-success").trim() || "#10b981";
+            this._errorColor = style.getPropertyValue("--color-error").trim() || "#ef4444";
         } else {
             this._selectorBg = "#8cc6ff";
             this._textColor = "#000000";
+            this._successColor = "#10b981";
+            this._errorColor = "#ef4444";
         }
     }
     return {
         selectorBg: this._selectorBg,
-        textColor: this._textColor
+        textColor: this._textColor,
+        successColor: this._successColor,
+        errorColor: this._errorColor
     };
+};
+
+/**
+ * Standard student-tuner window: within ±5 cents is treated as in tune.
+ */
+TunerDisplay.IN_TUNE_CENTS = 5;
+
+/**
+ * Needle color for the current cents offset. Green when in tune, red otherwise.
+ *
+ * @param {number} cents
+ * @param {{ successColor: string, errorColor: string }} [colors]
+ * @returns {string}
+ */
+TunerDisplay.prototype._indicatorColor = function (cents, colors) {
+    const palette = colors || this._getCanvasColors();
+    return Math.abs(cents) <= TunerDisplay.IN_TUNE_CENTS
+        ? palette.successColor
+        : palette.errorColor;
 };
 
 /**
@@ -161,7 +188,7 @@ TunerDisplay.prototype.draw = function () {
     const ctx = this.ctx;
     const width = this.width;
     const height = this.height;
-    const { selectorBg, textColor } = this._getCanvasColors();
+    const { selectorBg, textColor, successColor, errorColor } = this._getCanvasColors();
 
     // Clear the canvas
     ctx.clearRect(0, 0, width, height);
@@ -182,7 +209,7 @@ TunerDisplay.prototype.draw = function () {
 
     // Draw the indicator
     const indicatorX = meterX + meterWidth / 2 + (this.cents / 50) * (meterWidth / 2);
-    ctx.fillStyle = "#ff0000";
+    ctx.fillStyle = this._indicatorColor(this.cents, { successColor, errorColor });
     ctx.fillRect(indicatorX - 2, meterY - 5, 4, meterHeight + 10);
 
     // Position text much lower in the canvas

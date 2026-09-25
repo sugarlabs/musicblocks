@@ -22,7 +22,9 @@
 
 const cssTokens = {
     "--color-selector-bg": "#8cc6ff",
-    "--color-text-primary": "#000000"
+    "--color-text-primary": "#000000",
+    "--color-success": "#10b981",
+    "--color-error": "#ef4444"
 };
 
 global.getComputedStyle = jest.fn().mockReturnValue({
@@ -633,6 +635,45 @@ describe("Tuner Widget", () => {
 
                 expect(mockCtx.textAlign).toBe("center");
             });
+
+            test("draws the needle in the success color when cents are within ±5", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const fillStyles = [];
+                mockCtx.fillRect = jest.fn(function () {
+                    fillStyles.push(mockCtx.fillStyle);
+                });
+
+                display.cents = 0;
+                display.draw();
+                expect(fillStyles[2]).toBe("#10b981");
+
+                fillStyles.length = 0;
+                display.cents = 5;
+                display.draw();
+                expect(fillStyles[2]).toBe("#10b981");
+
+                fillStyles.length = 0;
+                display.cents = -5;
+                display.draw();
+                expect(fillStyles[2]).toBe("#10b981");
+            });
+
+            test("draws the needle in the error color when cents are outside ±5", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const fillStyles = [];
+                mockCtx.fillRect = jest.fn(function () {
+                    fillStyles.push(mockCtx.fillStyle);
+                });
+
+                display.cents = 6;
+                display.draw();
+                expect(fillStyles[2]).toBe("#ef4444");
+
+                fillStyles.length = 0;
+                display.cents = -6;
+                display.draw();
+                expect(fillStyles[2]).toBe("#ef4444");
+            });
         });
 
         describe("button click handlers", () => {
@@ -680,6 +721,8 @@ describe("Tuner Widget", () => {
 
                 expect(colors.selectorBg).toBe("#8cc6ff");
                 expect(colors.textColor).toBe("#000000");
+                expect(colors.successColor).toBe("#10b981");
+                expect(colors.errorColor).toBe("#ef4444");
             });
 
             test("caches colors when theme class has not changed", () => {
@@ -708,6 +751,57 @@ describe("Tuner Widget", () => {
                 expect(darkColors.textColor).toBe("#f9fafb");
 
                 global.document.body.className = "";
+            });
+
+            test("falls back to default success and error colors without getComputedStyle", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const originalGetComputedStyle = global.getComputedStyle;
+
+                display._cachedTheme = null;
+                display._selectorBg = null;
+                global.getComputedStyle = undefined;
+
+                try {
+                    const colors = display._getCanvasColors();
+
+                    expect(colors.successColor).toBe("#10b981");
+                    expect(colors.errorColor).toBe("#ef4444");
+                } finally {
+                    global.getComputedStyle = originalGetComputedStyle;
+                }
+            });
+        });
+
+        describe("_indicatorColor", () => {
+            test("uses the success color at the ±5 cent boundary", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const colors = {
+                    successColor: "#10b981",
+                    errorColor: "#ef4444"
+                };
+
+                expect(display._indicatorColor(0, colors)).toBe("#10b981");
+                expect(display._indicatorColor(5, colors)).toBe("#10b981");
+                expect(display._indicatorColor(-5, colors)).toBe("#10b981");
+            });
+
+            test("uses the error color outside the in-tune window", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const colors = {
+                    successColor: "#10b981",
+                    errorColor: "#ef4444"
+                };
+
+                expect(display._indicatorColor(6, colors)).toBe("#ef4444");
+                expect(display._indicatorColor(-6, colors)).toBe("#ef4444");
+                expect(display._indicatorColor(15, colors)).toBe("#ef4444");
+            });
+
+            test("reads success and error colors from the token cache when omitted", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                expect(display._indicatorColor(0)).toBe("#10b981");
+                expect(display._indicatorColor(12)).toBe("#ef4444");
             });
         });
     });
