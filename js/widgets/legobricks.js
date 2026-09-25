@@ -1982,13 +1982,6 @@ function LegoWidget() {
      * @param {HTMLElement} mediaElement - The image or video element
      * @returns {object|null} Color family object or null if should continue with normal sampling
      */
-    /**
-     * Checks if a canvas row is within the actual image bounds and returns appropriate color
-     * @private
-     * @param {object} line - The scanning line object
-     * @param {HTMLElement} mediaElement - The image or video element
-     * @returns {object|null} Color family object or null if should continue with normal sampling
-     */
     this._getColorForCanvasRow = function (line, mediaElement) {
         // Get the actual image display area
         const imageRect = mediaElement.getBoundingClientRect();
