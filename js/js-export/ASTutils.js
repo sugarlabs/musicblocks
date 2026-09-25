@@ -625,7 +625,7 @@ class ASTUtils {
             multiply: ["binexp", "*"],
             divide: ["binexp", "/"],
             mod: ["binexp", "%"],
-            equal: ["binexp", "=="],
+            equal: ["binexp", "==="],
             less: ["binexp", "<"],
             greater: ["binexp", ">"],
             or: ["binexp", "||"],

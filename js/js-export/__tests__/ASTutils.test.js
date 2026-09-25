@@ -531,6 +531,17 @@ describe("ASTUtils", () => {
             });
         });
 
+        it("should preserve strict equality semantics in exported code", () => {
+            const result = ASTUtils._getArgExpAST("equal", [1, "1"]);
+
+            expect(result).toEqual({
+                type: "BinaryExpression",
+                left: { type: "Literal", value: 1 },
+                right: { type: "Literal", value: "1" },
+                operator: "==="
+            });
+        });
+
         it("should return the AST for a unary expression", () => {
             const methodName = "not";
             const args = ["arg1"];
