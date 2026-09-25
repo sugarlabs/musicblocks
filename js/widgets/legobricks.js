@@ -409,8 +409,8 @@ function LegoWidget() {
         widgetWindow.show();
 
         widgetWindow.onclose = () => {
-            this._clearWidgetTimers();
             this._stopPlayback();
+            this._clearWidgetTimers();
             this._stopWebcam();
             this._deactivateEyeDropper(); // Clean up eye dropper mode
             this._cleanupDragListeners(); // Clean up drag event listeners

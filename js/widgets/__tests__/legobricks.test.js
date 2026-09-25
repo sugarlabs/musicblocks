@@ -2990,6 +2990,33 @@ describe("LegoWidget — BUG-1: shared off-screen canvas (_buildOffscreenCanvas)
             expect(legoWidget._stopPlayback).toHaveBeenCalledTimes(1);
             expect(mockWindow.destroy).toHaveBeenCalledTimes(1);
         });
+
+        it("onclose cancels visualization timeouts scheduled during _stopPlayback", () => {
+            const mockWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                onclose: null,
+                onmaximize: null
+            };
+            if (!global.window) global.window = {};
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue(mockWindow)
+            };
+            legoWidget._stopWebcam = jest.fn();
+            legoWidget._deactivateEyeDropper = jest.fn();
+            legoWidget._cleanupDragListeners = jest.fn();
+
+            legoWidget._stopPlayback = jest.fn(() => {
+                legoWidget._setWidgetTimeout(jest.fn(), 100);
+            });
+
+            const win = legoWidget._createWidgetWindow();
+            win.onclose();
+
+            expect(legoWidget._stopPlayback).toHaveBeenCalledTimes(1);
+            expect(legoWidget._activeTimeouts.size).toBe(0);
+        });
     });
 
     describe("timer delegation to ManagedTimer", () => {
