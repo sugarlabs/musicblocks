@@ -15,14 +15,28 @@ if (typeof global._ !== "function") {
     global._ = s => s;
 }
 
-const { renderClearConfirmation } = require("../clear-confirmation.js");
+const { renderClearConfirmation, requestClear } = require("../clear-confirmation.js");
 
 function makeActivity() {
     return {
         addEventListener: jest.fn((target, event, handler) => {
             target.addEventListener(event, handler);
+        }),
+        removeEventListener: jest.fn((target, event, handler) => {
+            target.removeEventListener(event, handler);
         })
     };
+}
+
+function dispatchKey(key, extra = {}) {
+    document.dispatchEvent(
+        new KeyboardEvent("keydown", {
+            key,
+            bubbles: true,
+            cancelable: true,
+            ...extra
+        })
+    );
 }
 
 describe("renderClearConfirmation", () => {
@@ -35,12 +49,17 @@ describe("renderClearConfirmation", () => {
         onClearAll = jest.fn();
     });
 
+    afterEach(() => {
+        document.body.replaceChildren();
+    });
+
     test("creates the dialog with canvas, all, and cancel actions", () => {
         renderClearConfirmation(makeActivity(), { onClearCanvas, onClearAll });
 
         const modal = document.getElementById("clear-confirm");
         expect(modal).not.toBeNull();
         expect(modal.getAttribute("role")).toBe("dialog");
+        expect(modal.getAttribute("aria-modal")).toBe("true");
         expect(modal.querySelector("h2").textContent).toBe("Clear workspace");
         expect(modal.querySelector(".confirm-button").textContent).toBe("Clear canvas");
         expect(modal.querySelector(".clear-all-button").textContent).toBe("Clear all");
@@ -56,13 +75,15 @@ describe("renderClearConfirmation", () => {
     });
 
     test("Clear canvas closes the dialog and leaves blocks alone", () => {
-        renderClearConfirmation(makeActivity(), { onClearCanvas, onClearAll });
+        const activity = makeActivity();
+        renderClearConfirmation(activity, { onClearCanvas, onClearAll });
 
         document.querySelector(".confirm-button").click();
 
         expect(document.getElementById("clear-confirm")).toBeNull();
         expect(onClearCanvas).toHaveBeenCalledTimes(1);
         expect(onClearAll).not.toHaveBeenCalled();
+        expect(activity.removeEventListener).toHaveBeenCalledTimes(3);
     });
 
     test("Clear all closes the dialog and asks to trash blocks", () => {
@@ -83,5 +104,151 @@ describe("renderClearConfirmation", () => {
         expect(document.getElementById("clear-confirm")).toBeNull();
         expect(onClearCanvas).not.toHaveBeenCalled();
         expect(onClearAll).not.toHaveBeenCalled();
+    });
+
+    test("moves focus into the dialog and restores it on close", () => {
+        const invoker = document.createElement("button");
+        invoker.id = "clear-invoker";
+        document.body.appendChild(invoker);
+        invoker.focus();
+
+        renderClearConfirmation(makeActivity(), { onClearCanvas, onClearAll });
+
+        expect(document.activeElement).toBe(document.querySelector(".confirm-button"));
+
+        document.querySelector(".cancel-button").click();
+
+        expect(document.activeElement).toBe(invoker);
+    });
+
+    test("Escape closes the dialog without running a clear action", () => {
+        renderClearConfirmation(makeActivity(), { onClearCanvas, onClearAll });
+
+        dispatchKey("Escape");
+
+        expect(document.getElementById("clear-confirm")).toBeNull();
+        expect(onClearCanvas).not.toHaveBeenCalled();
+        expect(onClearAll).not.toHaveBeenCalled();
+    });
+
+    test("Tab keeps keyboard focus on the dialog buttons", () => {
+        renderClearConfirmation(makeActivity(), { onClearCanvas, onClearAll });
+
+        const canvasBtn = document.querySelector(".confirm-button");
+        const allBtn = document.querySelector(".clear-all-button");
+        const cancelBtn = document.querySelector(".cancel-button");
+
+        cancelBtn.focus();
+        dispatchKey("Tab");
+        expect(document.activeElement).toBe(canvasBtn);
+
+        dispatchKey("Tab");
+        expect(document.activeElement).toBe(allBtn);
+
+        canvasBtn.focus();
+        dispatchKey("Tab", { shiftKey: true });
+        expect(document.activeElement).toBe(cancelBtn);
+    });
+
+    test("binds clicks locally when activity does not track listeners", () => {
+        renderClearConfirmation({}, { onClearCanvas, onClearAll });
+
+        document.querySelector(".confirm-button").click();
+
+        expect(document.getElementById("clear-confirm")).toBeNull();
+        expect(onClearCanvas).toHaveBeenCalledTimes(1);
+    });
+
+    test("ignores a second close after the dialog is already gone", () => {
+        const activity = makeActivity();
+        renderClearConfirmation(activity, { onClearCanvas, onClearAll });
+
+        const cancelHandler = activity.addEventListener.mock.calls.find(call =>
+            call[0].classList.contains("cancel-button")
+        )[2];
+
+        cancelHandler();
+        cancelHandler();
+
+        expect(document.getElementById("clear-confirm")).toBeNull();
+        expect(onClearCanvas).not.toHaveBeenCalled();
+        expect(onClearAll).not.toHaveBeenCalled();
+    });
+
+    test("ignores non-Tab keys while the dialog is open", () => {
+        renderClearConfirmation(makeActivity(), { onClearCanvas, onClearAll });
+
+        dispatchKey("ArrowDown");
+
+        expect(document.getElementById("clear-confirm")).not.toBeNull();
+        expect(onClearCanvas).not.toHaveBeenCalled();
+    });
+
+    test("Tab from the dialog frame focuses the first action", () => {
+        renderClearConfirmation(makeActivity(), { onClearCanvas, onClearAll });
+
+        document.getElementById("clear-confirm").focus();
+        dispatchKey("Tab");
+
+        expect(document.activeElement).toBe(document.querySelector(".confirm-button"));
+    });
+
+    test("removes listeners from the buttons when activity cannot untrack them", () => {
+        const activity = {
+            addEventListener: (target, event, handler) => {
+                target.addEventListener(event, handler);
+            }
+        };
+
+        renderClearConfirmation(activity, { onClearCanvas, onClearAll });
+        document.querySelector(".cancel-button").click();
+
+        expect(document.getElementById("clear-confirm")).toBeNull();
+    });
+});
+
+describe("requestClear", () => {
+    test("runs the canvas action immediately when confirmation is skipped", () => {
+        const onClearCanvas = jest.fn();
+        const onClearAll = jest.fn();
+
+        requestClear(makeActivity(), true, onClearCanvas, onClearAll);
+
+        expect(onClearCanvas).toHaveBeenCalledTimes(1);
+        expect(onClearAll).not.toHaveBeenCalled();
+        expect(document.getElementById("clear-confirm")).toBeNull();
+    });
+
+    test("opens the dialog when confirmation is required", () => {
+        const onClearCanvas = jest.fn();
+        const onClearAll = jest.fn();
+
+        requestClear(makeActivity(), false, onClearCanvas, onClearAll);
+
+        expect(document.getElementById("clear-confirm")).not.toBeNull();
+        expect(onClearCanvas).not.toHaveBeenCalled();
+        expect(onClearAll).not.toHaveBeenCalled();
+    });
+});
+
+describe("AMD export", () => {
+    test("registers the dialog helpers on window", () => {
+        const previousDefine = global.define;
+
+        try {
+            jest.isolateModules(() => {
+                const define = jest.fn(factory => factory());
+                define.amd = true;
+                global.define = define;
+
+                require("../clear-confirmation.js");
+
+                expect(define).toHaveBeenCalledTimes(1);
+                expect(typeof window.renderClearConfirmation).toBe("function");
+                expect(typeof window.requestClear).toBe("function");
+            });
+        } finally {
+            global.define = previousDefine;
+        }
     });
 });

@@ -39,7 +39,7 @@ try {
    setupHelpController,
    setupBlockScaleController,
    setupContextMenuController,
-   renderClearConfirmation,
+   requestClear,
    setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -771,10 +771,6 @@ class Activity {
         /*
          * Clears "canvas"
          */
-        const renderClearConfirmationDialog = (onClearCanvas, onClearAll) => {
-            renderClearConfirmation(this, { onClearCanvas, onClearAll });
-        };
-
         this._allClear = (noErase, skipConfirmation = false) => {
             const clearCanvasAction = () => {
                 this.blocks.activeBlock = null;
@@ -832,13 +828,9 @@ class Activity {
                 }
             };
 
-            if (skipConfirmation) {
-                clearCanvasAction();
-            } else {
-                renderClearConfirmationDialog(clearCanvasAction, () =>
-                    this.sendAllToTrash(true, true)
-                );
-            }
+            requestClear(this, skipConfirmation, clearCanvasAction, () =>
+                this.sendAllToTrash(true, true)
+            );
         };
         /**
          * Sets up play button functionality; runs Music Blocks.
