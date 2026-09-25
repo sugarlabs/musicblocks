@@ -815,11 +815,16 @@ const getStatsFromNotation = activity => {
                             note,
                             activity.logo.synth.inTemperament
                         );
-                        const test = getTemperament(activity.logo.synth.inTemperament).filter(
-                            ele => ele[3] === note.slice(0, note.length - 1)
-                        );
-                        if (test.length > 0) {
-                            note = test[0][1] + note[note.length - 1];
+                        const temperament = getTemperament(activity.logo.synth.inTemperament);
+                        if (temperament) {
+                            const pitchName = note.slice(0, note.length - 1);
+                            for (const key in temperament) {
+                                const ele = temperament[key];
+                                if (Array.isArray(ele) && ele.length > 3 && ele[3] === pitchName) {
+                                    note = ele[1] + note[note.length - 1];
+                                    break;
+                                }
+                            }
                         }
                     } else {
                         freq = activity.logo.synth._getFrequency(note);
