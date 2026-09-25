@@ -397,6 +397,20 @@ describe("KeyboardController", () => {
             expect(activity.paste.style.visibility).toBe("visible");
         });
     });
+    it("Cmd+V opens the paste box at the current scale", () => {
+        const activity = makeActivity();
+        const controller = createController(activity);
+
+        controller.__keyPressed(makeEvent({ keyCode: KEYCODE.V, metaKey: true }));
+
+        expect(activity.pasteBox.createBox).toHaveBeenCalledWith(
+            activity.turtleBlocksScale,
+            200,
+            200
+        );
+        expect(activity.pasteBox.show).toHaveBeenCalled();
+        expect(activity.paste.style.visibility).toBe("visible");
+    });
 
     describe("tempo widget integration", () => {
         it("speeds up tempo on the up arrow while the tempo widget is active", () => {
@@ -522,6 +536,23 @@ describe("KeyboardController", () => {
             expect(event.preventDefault).toHaveBeenCalled();
             expect(activity.blocks.undoAction).toHaveBeenCalled();
         });
+        it("Cmd+Shift+Z triggers redoAction on macOS", () => {
+            const activity = makeActivity();
+            activity.blocks.redoAction = jest.fn();
+            activity.blocks.undoAction = jest.fn();
+            const controller = createController(activity);
+            const event = makeEvent({
+                keyCode: 90,
+                metaKey: true,
+                shiftKey: true
+            });
+
+            controller.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(activity.blocks.redoAction).toHaveBeenCalled();
+            expect(activity.blocks.undoAction).not.toHaveBeenCalled();
+        });
 
         it("Ctrl+Y triggers redoAction", () => {
             const activity = makeActivity();
@@ -534,6 +565,17 @@ describe("KeyboardController", () => {
             expect(event.preventDefault).toHaveBeenCalled();
             expect(activity.blocks.redoAction).toHaveBeenCalled();
         });
+    });
+    it("Cmd+Y triggers redoAction on macOS", () => {
+        const activity = makeActivity();
+        activity.blocks.redoAction = jest.fn();
+        const controller = createController(activity);
+        const event = makeEvent({ keyCode: 89, metaKey: true });
+
+        controller.__keyPressed(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(activity.blocks.redoAction).toHaveBeenCalled();
     });
 
     describe("ignores shortcuts while a text input is active", () => {
