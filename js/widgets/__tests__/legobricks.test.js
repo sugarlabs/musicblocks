@@ -523,6 +523,45 @@ describe("LegoWidget Core Logic", () => {
             jest.useRealTimers();
         });
 
+        it("should not throw when _stopPlayback is called and activity is null", () => {
+            legoWidget.activity = null;
+            legoWidget.isPlaying = true;
+            legoWidget._polyphonicPlaybackId = 0;
+            legoWidget._playingNotes = new Set();
+            legoWidget.scanningLines = null;
+            legoWidget.colorData = [];
+
+            expect(() => legoWidget._stopPlayback()).not.toThrow();
+            expect(legoWidget.isPlaying).toBe(false);
+        });
+
+        it("should call activity.hideMsgs when activity is provided to _stopPlayback", () => {
+            const mockHideMsgs = jest.fn();
+            legoWidget.activity = { hideMsgs: mockHideMsgs };
+            legoWidget.isPlaying = true;
+            legoWidget._polyphonicPlaybackId = 0;
+            legoWidget._playingNotes = new Set();
+            legoWidget.scanningLines = null;
+            legoWidget.colorData = [];
+
+            legoWidget._stopPlayback();
+
+            expect(mockHideMsgs).toHaveBeenCalledTimes(1);
+            expect(legoWidget.isPlaying).toBe(false);
+        });
+
+        it("should safely handle _clearPhrase when active playback is stopped with null activity", () => {
+            legoWidget.activity = null;
+            legoWidget.isPlaying = true;
+            legoWidget._polyphonicPlaybackId = 0;
+            legoWidget._playingNotes = new Set();
+            legoWidget.scanningLines = null;
+            legoWidget.colorData = [];
+
+            expect(() => legoWidget._clearPhrase()).not.toThrow();
+            expect(legoWidget.isPlaying).toBe(false);
+        });
+
         it("should safely generate color visualization", () => {
             const originalCreateObjectURL = global.URL.createObjectURL;
             const originalRevokeObjectURL = global.URL.revokeObjectURL;
@@ -1798,6 +1837,46 @@ describe("LegoWidget Eye Dropper Listener Safety", () => {
             legoWidget.colorPreviewTooltip = null;
 
             expect(() => legoWidget._handleEyeDropperLeave({})).not.toThrow();
+        });
+    });
+
+    describe("_removeColorPreviewTooltip", () => {
+        beforeEach(() => {
+            const freshWidget = new LegoWidget();
+            legoWidget._removeColorPreviewTooltip =
+                freshWidget._removeColorPreviewTooltip.bind(legoWidget);
+        });
+
+        it("should safely remove tooltip when attached to document.body and clear references", () => {
+            const tooltip = document.createElement("div");
+            document.body.appendChild(tooltip);
+            legoWidget.colorPreviewTooltip = tooltip;
+            legoWidget.colorSwatch = document.createElement("div");
+            legoWidget.colorPreviewText = document.createElement("span");
+
+            legoWidget._removeColorPreviewTooltip();
+
+            expect(document.body.contains(tooltip)).toBe(false);
+            expect(legoWidget.colorPreviewTooltip).toBeNull();
+            expect(legoWidget.colorSwatch).toBeNull();
+            expect(legoWidget.colorPreviewText).toBeNull();
+        });
+
+        it("should not throw when tooltip is not attached to document.body (e.g. detached node)", () => {
+            const unattachedTooltip = document.createElement("div");
+            legoWidget.colorPreviewTooltip = unattachedTooltip;
+            legoWidget.colorSwatch = document.createElement("div");
+            legoWidget.colorPreviewText = document.createElement("span");
+
+            expect(() => legoWidget._removeColorPreviewTooltip()).not.toThrow();
+            expect(legoWidget.colorPreviewTooltip).toBeNull();
+            expect(legoWidget.colorSwatch).toBeNull();
+            expect(legoWidget.colorPreviewText).toBeNull();
+        });
+
+        it("should be a no-op when colorPreviewTooltip is null", () => {
+            legoWidget.colorPreviewTooltip = null;
+            expect(() => legoWidget._removeColorPreviewTooltip()).not.toThrow();
         });
     });
 
