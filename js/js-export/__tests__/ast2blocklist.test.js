@@ -431,6 +431,55 @@ describe("AST2BlockList Class", () => {
             expect(result).toBe("ENDFLOW");
         });
 
+        // The importer only undoes the flags and labels the exporter writes;
+        // the same shapes in hand-written code must not turn into Stop blocks.
+        test.each([
+            [
+                "a hand-written flag set in a clamp",
+                `let done = false;
+                await mouse.playNote(1 / 4, async () => {
+                    done = true;
+                    return mouse.ENDFLOW;
+                });
+                if (done) return mouse.ENDMOUSE;`,
+                "done = true;"
+            ],
+            [
+                "a hand-written loop flag",
+                `{
+                    var stopLoop = false;
+                    while (1000) {
+                        stopLoop = true;
+                        if (stopLoop) break;
+                    }
+                }`,
+                "{"
+            ],
+            [
+                "a hand-written label",
+                `if (true) outer: {
+                    await mouse.print("w");
+                }`,
+                "outer:"
+            ]
+        ])("leaves %s alone", (_, body, unsupported) => {
+            const code = `
+            new Mouse(async mouse => {
+                ${body}
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+            let error;
+            try {
+                AST2BlockList.toBlockList(acorn.parse(code, { ecmaVersion: 2020 }), config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix).toBe("Unsupported statement: ");
+            expect(code.substring(error.start, error.end).startsWith(unsupported)).toBe(true);
+        });
+
         test("exports valid code for a Stop in Start and in an action", () => {
             const start = exportStart([["print", ["x"]], ["break"]]);
             const action = exportAction([["print", ["x"]], ["break"]]);

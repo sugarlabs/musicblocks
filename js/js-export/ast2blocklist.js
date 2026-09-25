@@ -50,6 +50,14 @@ class AST2BlockList {
     static _normalizeStops(node, isFunctionBody = false) {
         if (node === null || typeof node !== "object") return;
 
+        // Only the names ASTUtils generates for Stop blocks (and `let`, which
+        // exported boxes don't use), so hand-written flags and labels are
+        // left alone.
+        const isStopLabel = label => /^stop\d+$/.test(label.name);
+        const isStopFlag = declaration =>
+            declaration.kind === "let" &&
+            /^(?:_*stopLoop|stop\d+)$/.test(declaration.declarations[0].id.name);
+
         const isFunction = ["ArrowFunctionExpression", "FunctionExpression"].includes(node.type);
         for (const [key, value] of Object.entries(node)) {
             if (Array.isArray(value)) {
@@ -72,11 +80,16 @@ class AST2BlockList {
         if (node.type === "IfStatement") {
             for (const key of ["consequent", "alternate"]) {
                 const branch = node[key];
-                if (
-                    branch &&
-                    branch.type === "LabeledStatement" &&
-                    branch.body.type === "BlockStatement"
-                ) {
+                if (branch && branch.type === "LabeledStatement") {
+                    // Any other label here would reach the if mapping, which
+                    // expects a block, so report it like other unsupported code.
+                    if (!isStopLabel(branch.label) || branch.body.type !== "BlockStatement") {
+                        throw {
+                            prefix: "Unsupported statement: ",
+                            start: branch.start,
+                            end: branch.end
+                        };
+                    }
                     node[key] = branch.body;
                 }
             }
@@ -93,7 +106,11 @@ class AST2BlockList {
         // Labeled blocks that only exist so a Stop can leave them.
         for (let i = list.length - 1; i >= 0; i--) {
             const statement = list[i];
-            if (statement.type === "LabeledStatement" && statement.body.type === "BlockStatement") {
+            if (
+                statement.type === "LabeledStatement" &&
+                isStopLabel(statement.label) &&
+                statement.body.type === "BlockStatement"
+            ) {
                 if (node.type === "SwitchCase") {
                     list.splice(i, 1, ...statement.body.body);
                 } else {
@@ -131,7 +148,8 @@ class AST2BlockList {
             statement.declarations.length === 1 &&
             statement.declarations[0].id.type === "Identifier" &&
             statement.declarations[0].init !== null &&
-            statement.declarations[0].init.value === false
+            statement.declarations[0].init.value === false &&
+            isStopFlag(statement)
                 ? statement.declarations[0].id.name
                 : null;
 
