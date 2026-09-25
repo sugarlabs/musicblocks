@@ -21,6 +21,8 @@
  */
 
 const LegoWidget = require("../legobricks");
+const ManagedTimer = require("../../utils/ManagedTimer.js");
+global.ManagedTimer = ManagedTimer;
 
 describe("LegoWidget Core Logic", () => {
     let legoWidget;
@@ -2898,5 +2900,170 @@ describe("LegoWidget — BUG-1: shared off-screen canvas (_buildOffscreenCanvas)
         expect(legoWidget._offscreenMediaElement).toBeNull();
 
         navigator.mediaDevices = originalMediaDevices;
+    });
+
+    describe("timer fallback without ManagedTimer", () => {
+        let callbacks;
+
+        beforeEach(() => {
+            callbacks = new Map();
+            let nextId = 1;
+            jest.spyOn(global, "setTimeout").mockImplementation(cb => {
+                const id = nextId++;
+                callbacks.set(id, cb);
+                return id;
+            });
+            jest.spyOn(global, "clearTimeout").mockImplementation(id => {
+                callbacks.delete(id);
+            });
+            legoWidget = new LegoWidget();
+            legoWidget._timerManager = null;
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it("_setWidgetTimeout tracks the timeout and runs the callback, then stops tracking it", () => {
+            const callback = jest.fn();
+
+            const id = legoWidget._setWidgetTimeout(callback, 500);
+            expect(legoWidget._activeTimeouts.has(id)).toBe(true);
+            expect(callbacks.has(id)).toBe(true);
+
+            callbacks.get(id)();
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(legoWidget._activeTimeouts.has(id)).toBe(false);
+        });
+
+        it("_clearWidgetTimeout returns false for null, undefined, or untracked ids", () => {
+            expect(legoWidget._clearWidgetTimeout(null)).toBe(false);
+            expect(legoWidget._clearWidgetTimeout(undefined)).toBe(false);
+            expect(legoWidget._clearWidgetTimeout(999999)).toBe(false);
+        });
+
+        it("_clearWidgetTimeout cancels a tracked timeout before it fires", () => {
+            const callback = jest.fn();
+            const id = legoWidget._setWidgetTimeout(callback, 500);
+
+            expect(legoWidget._clearWidgetTimeout(id)).toBe(true);
+            expect(legoWidget._activeTimeouts.has(id)).toBe(false);
+            expect(callbacks.has(id)).toBe(false);
+        });
+
+        it("_clearWidgetTimers cancels tracked timeouts, clears _polyphonicTimeout, and returns count", () => {
+            legoWidget._setWidgetTimeout(jest.fn(), 500);
+            legoWidget._setWidgetTimeout(jest.fn(), 700);
+            legoWidget._polyphonicTimeout = legoWidget._setWidgetTimeout(jest.fn(), 1000);
+
+            const count = legoWidget._clearWidgetTimers();
+
+            expect(count).toBe(3);
+            expect(legoWidget._activeTimeouts.size).toBe(0);
+            expect(legoWidget._polyphonicTimeout).toBeNull();
+        });
+
+        it("onclose invokes _clearWidgetTimers and stops playback", () => {
+            const mockWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                onclose: null,
+                onmaximize: null
+            };
+            if (!global.window) global.window = {};
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue(mockWindow)
+            };
+            legoWidget._stopPlayback = jest.fn();
+            legoWidget._stopWebcam = jest.fn();
+            legoWidget._deactivateEyeDropper = jest.fn();
+            legoWidget._cleanupDragListeners = jest.fn();
+
+            const win = legoWidget._createWidgetWindow();
+            legoWidget._setWidgetTimeout(jest.fn(), 500);
+
+            win.onclose();
+
+            expect(legoWidget._activeTimeouts.size).toBe(0);
+            expect(legoWidget._stopPlayback).toHaveBeenCalledTimes(1);
+            expect(mockWindow.destroy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("timer delegation to ManagedTimer", () => {
+        beforeEach(() => {
+            legoWidget = new LegoWidget();
+        });
+
+        afterEach(() => {
+            legoWidget._clearWidgetTimers();
+        });
+
+        it("initializes with ManagedTimer when available", () => {
+            expect(legoWidget._timerManager).toBeInstanceOf(ManagedTimer);
+        });
+
+        it("_setWidgetTimeout delegates to the timer manager", () => {
+            const callback = jest.fn();
+            legoWidget._timerManager = {
+                setTimeout: jest.fn().mockReturnValue(42),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(legoWidget._setWidgetTimeout(callback, 500)).toBe(42);
+            expect(legoWidget._timerManager.setTimeout).toHaveBeenCalledWith(callback, 500);
+        });
+
+        it("_clearWidgetTimeout delegates to the timer manager", () => {
+            legoWidget._timerManager = {
+                clearTimeout: jest.fn().mockReturnValue(true),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(legoWidget._clearWidgetTimeout(5)).toBe(true);
+            expect(legoWidget._timerManager.clearTimeout).toHaveBeenCalledWith(5);
+        });
+
+        it("_clearWidgetTimers delegates to the timer manager clearAll", () => {
+            legoWidget._timerManager = {
+                clearAll: jest.fn().mockReturnValue(3),
+                clearTimeout: jest.fn()
+            };
+
+            const count = legoWidget._clearWidgetTimers();
+
+            expect(legoWidget._timerManager.clearAll).toHaveBeenCalledTimes(1);
+            expect(count).toBe(3);
+        });
+
+        it("onclose invokes _clearWidgetTimers and delegates to clearAll", () => {
+            const mockWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                onclose: null,
+                onmaximize: null
+            };
+            window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue(mockWindow)
+            };
+            legoWidget._stopPlayback = jest.fn();
+            legoWidget._stopWebcam = jest.fn();
+            legoWidget._deactivateEyeDropper = jest.fn();
+            legoWidget._cleanupDragListeners = jest.fn();
+
+            legoWidget._timerManager = {
+                clearAll: jest.fn().mockReturnValue(1),
+                clearTimeout: jest.fn()
+            };
+
+            const win = legoWidget._createWidgetWindow();
+            win.onclose();
+
+            expect(legoWidget._timerManager.clearAll).toHaveBeenCalledTimes(1);
+            expect(mockWindow.destroy).toHaveBeenCalledTimes(1);
+        });
     });
 });
