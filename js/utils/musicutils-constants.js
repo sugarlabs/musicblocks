@@ -25,7 +25,17 @@
    SEMITONES, CENTS_PER_SEMITONE, CENTS_PER_OCTAVE, POWER2, TWELTHROOT2,
    TWELVEHUNDRETHROOT2, A0, C8, C10, YSTAFFNOTEHEIGHT, YSTAFFOCTAVEHEIGHT,
    MATRIXSOLFEWIDTH, EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
-   MATRIXSOLFEHEIGHT, MusicUtilsConstants
+   MATRIXSOLFEHEIGHT, ACCIDENTALNAMES, ACCIDENTALVALUES, CHORDNAMES,
+   DEFAULTCHORD, INTERVALVALUES, MODE_PIE_MENUS, MODEPIEMENU_SLOT_COUNT,
+   MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
+   MODEPIEMENU_NAME_TITLE_RADIUS, MODEPIEMENU_FONT_FAMILY,
+   MODEPIEMENU_GROUP_FONT_RATIO, MODEPIEMENU_NAME_FONT_MIN_RATIO,
+   MODEPIEMENU_NAME_FONT_MAX_RATIO, PITCH_COLLECTIONS,
+   PITCH_COLLECTION_ALIASES, MAQAMTABLE, MIDI_INSTRUMENTS, DRUM_MIDI_MAP,
+   REVERSE_DRUM_MIDI_MAP, DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTVOICE,
+   DEFAULTNOISE, DEFAULTDRUM, DEFAULTEFFECT, DEFAULTMODE, DEFAULTTEMPERAMENT,
+   DEFAULTFILTERTYPE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL, SOLFMAPPER,
+   ACCIDENTAL_SEMITONE_MAP, MusicUtilsConstants
  */
 
 // var, not const: a hoisted var in musicutils.js cannot redeclare a top-level const.
@@ -855,6 +865,439 @@ var MATRIXBUTTONHEIGHT2 = 66;
  */
 var MATRIXSOLFEHEIGHT = 30;
 
+/**
+ * Names and symbols for accidentals.
+ * @constant {Array<string>}
+ */
+var ACCIDENTALNAMES = [
+    "double sharp" + " " + DOUBLESHARP,
+    "sharp" + " " + SHARP,
+    "natural" + " " + NATURAL,
+    "flat" + " " + FLAT,
+    "double flat" + " " + DOUBLEFLAT
+];
+
+/**
+ * Numeric values associated with accidentals.
+ * @constant {Array<number>}
+ */
+var ACCIDENTALVALUES = [2, 1, 0, -1, -2];
+
+/**
+ * Names of various chord types.
+ * @constant {Array<string>}
+ */
+var CHORDNAMES = [
+    // scalar
+    "triad (root position)",
+    "triad (1st inversion)",
+    "triad (2nd inversion)",
+    "seventh (root position)",
+    "seventh (1st inversion)",
+    "seventh (2nd inversion)",
+    "seventh (3rd inversion)",
+    "ninth (root position)",
+    "thirteenth (root position)",
+    // semitone
+    "major",
+    "minor",
+    "augmented",
+    "diminished",
+    "major 7th",
+    "minor 7th",
+    "dominant 7th",
+    "minor-major 7th",
+    "fully-diminished 7th",
+    "half-diminished 7th",
+    // custom must always be at the end of the list.
+    "custom"
+];
+
+/**
+ * Default chord for the "major" scale.
+ * @constant {string}
+ */
+var DEFAULTCHORD = CHORDNAMES[9];
+
+/**
+ * Values associated with specific musical intervals.
+ * @constant {Object}
+ */
+var INTERVALVALUES = {
+    "perfect 1": [0, 0, 1 / 1],
+    "diminished 2": [0, -1, 128 / 125],
+    "augmented 1": [1, 1, 25 / 24],
+    "chromatic semitone": [1, 1, 25 / 24],
+    "minor 2": [1, -1, 16 / 15],
+    "major 2": [2, 1, 9 / 8],
+    "whole tone": [2, 1, 9 / 8],
+    "diminished 3": [2, -1, 144 / 125],
+    "augmented 2": [3, 1, 75 / 64],
+    "minor 3": [3, -1, 6 / 5],
+    "major 3": [4, 1, 5 / 4],
+    "diminished 4": [4, -1, 32 / 25],
+    "augmented 3": [5, 1, 125 / 96],
+    "perfect 4": [5, 0, 4 / 3],
+    "augmented 4": [6, 1, 25 / 18],
+    "diminished 5": [6, -1, 36 / 25],
+    "perfect 5": [7, 0, 3 / 2],
+    "diminished 6": [7, -1, 192 / 125],
+    "augmented 5": [8, 1, 25 / 16],
+    "minor 6": [8, -1, 8 / 5],
+    "major 6": [9, 1, 5 / 3],
+    "diminished 7": [9, -1, 128 / 75],
+    "augmented 6": [10, 1, 125 / 72],
+    "minor 7": [10, -1, 16 / 9],
+    "major 7": [11, 1, 15 / 8],
+    "diminished 8": [11, -1, 48 / 25],
+    "diminished octave": [11, -1, 48 / 25],
+    "augmented 7": [12, 1, 125 / 64],
+    "perfect 8": [12, 0, 2 / 1],
+    "octave": [12, 0, 2 / 1],
+    "augmented 8": [13, 1, 25 / 12]
+};
+
+/**
+ * Modes available in the pie menu associated with the mode name block.
+ * @constant {Object}
+ */
+var MODE_PIE_MENUS = {
+    "5": [
+        "minor pentatonic",
+        "major pentatonic",
+        " ",
+        "chinese",
+        "egyptian",
+        " ",
+        "hirajoshi",
+        "in",
+        "minyo",
+        " ",
+        "fibonacci",
+        " "
+    ],
+    "6": ["minor blues", " ", " ", " ", "major blues", " ", " ", " ", "whole tone", " ", " ", " "],
+    "7": [
+        "ionian",
+        " ",
+        "dorian",
+        " ",
+        "phrygian",
+        "lydian",
+        " ",
+        "mixolydian",
+        " ",
+        "aeolian",
+        " ",
+        "locrian"
+    ],
+    "7a": [
+        "major",
+        " ",
+        "harmonic major",
+        " ",
+        "natural minor",
+        " ",
+        "harmonic minor",
+        " ",
+        "melodic minor",
+        " ",
+        " ",
+        " "
+    ],
+    "7b": [
+        "jazz minor",
+        " ",
+        "arabic",
+        "byzantine",
+        "enigmatic",
+        "ethiopian",
+        "geez",
+        "hindu",
+        "hungarian",
+        "maqam",
+        "romanian minor",
+        "spanish gypsy"
+    ],
+    "8": [
+        "octatonic",
+        " ",
+        "spanish",
+        " ",
+        "bebop",
+        " ",
+        "diminished",
+        " ",
+        " ",
+        "algerian",
+        " ",
+        " "
+    ],
+    "12": ["chromatic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+    "custom": [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+};
+
+/** Slot count shared by every mode pie menu ring. */
+var MODEPIEMENU_SLOT_COUNT = 12;
+
+/** Ring geometry shared by mode-selection pie menus. */
+var MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
+
+var MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
+
+/** Mid-radius of the mode-name ring, used to size labels to slice arcs. */
+var MODEPIEMENU_NAME_TITLE_RADIUS = 0.575;
+
+/** Shared font family and group-ring size (px = ratio * wheelRadius). */
+var MODEPIEMENU_FONT_FAMILY = "sans-serif";
+
+var MODEPIEMENU_GROUP_FONT_RATIO = 0.08;
+
+/** Min/max name-ring font sizes as a fraction of wheel radius. */
+var MODEPIEMENU_NAME_FONT_MIN_RATIO = 0.06;
+
+var MODEPIEMENU_NAME_FONT_MAX_RATIO = 0.12;
+
+var PITCH_COLLECTIONS = {
+    12: {
+        chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    },
+    8: {
+        algerian: [2, 1, 2, 1, 1, 1, 3, 1],
+        diminished: [2, 1, 2, 1, 2, 1, 2, 1],
+        spanish: [1, 2, 1, 1, 1, 2, 2, 2],
+        octatonic: [1, 2, 1, 2, 1, 2, 1, 2],
+        bebop: [1, 1, 1, 2, 2, 1, 2, 2]
+    },
+    7: {
+        "major": [2, 2, 1, 2, 2, 2, 1],
+        "harmonic major": [2, 2, 1, 2, 1, 3, 1],
+        "natural minor": [2, 1, 2, 2, 1, 2, 2],
+        "harmonic minor": [2, 1, 2, 2, 1, 3, 1],
+        "melodic minor": [2, 1, 2, 2, 2, 2, 1],
+        "dorian": [2, 1, 2, 2, 2, 1, 2],
+        "phrygian": [1, 2, 2, 2, 1, 2, 2],
+        "lydian": [2, 2, 2, 1, 2, 2, 1],
+        "mixolydian": [2, 2, 1, 2, 2, 1, 2],
+        "locrian": [1, 2, 2, 1, 2, 2, 2],
+        "arabic": [2, 2, 1, 1, 2, 2, 2],
+        "byzantine": [1, 3, 1, 2, 1, 3, 1],
+        "enigmatic": [1, 3, 2, 2, 2, 1, 1],
+        "hindu": [2, 2, 1, 2, 1, 2, 2],
+        "hungarian": [2, 1, 3, 1, 1, 3, 1],
+        "romanian minor": [2, 1, 3, 1, 2, 1, 2],
+        "spanish gypsy": [1, 3, 1, 2, 1, 2, 2]
+    },
+    6: {
+        "minor blues": [3, 2, 1, 1, 3, 2],
+        "major blues": [2, 1, 1, 3, 2, 3],
+        "whole tone": [2, 2, 2, 2, 2, 2]
+    },
+    5: {
+        "major pentatonic": [2, 2, 3, 2, 3],
+        "minor pentatonic": [3, 2, 2, 3, 2],
+        "chinese": [4, 2, 1, 4, 1],
+        "egyptian": [2, 3, 2, 3, 2],
+        "hirajoshi": [1, 4, 1, 4, 2],
+        "in": [1, 4, 2, 1, 4],
+        "fibonacci": [1, 1, 2, 3, 5],
+        "alt pentatonic": [2, 3, 2, 2, 3]
+    }
+};
+
+var PITCH_COLLECTION_ALIASES = {
+    "ionian": "major",
+    "minor": "natural minor",
+    "aeolian": "natural minor",
+    "ethiopian": "natural minor",
+    "geez": "natural minor",
+    "jazz minor": "melodic minor",
+    "maqam": "byzantine",
+    "minyo": "minor pentatonic"
+};
+
+/**
+ * Maqam table mapping specific maqams to their corresponding keys.
+ * @constant {Object}
+ */
+var MAQAMTABLE = {
+    "hijaz kar": "C maqam",
+    "hijaz kar maqam": "C maqam",
+    "shahnaz": "D maqam",
+    "maqam mustar": "Eb maqam",
+    "maqam jiharkah": "F maqam",
+    "shadd araban": "G maqam",
+    "suzidil": "A maqam",
+    "ajam": "Bb maqam",
+    "ajam maqam": "Bb maqam"
+};
+
+var MIDI_INSTRUMENTS = {
+    "default": 0, // Acoustic Grand Piano
+    "piano": 0,
+    "violin": 40,
+    "viola": 41,
+    "cello": 42,
+    "double bass": 43,
+    "bass": 32,
+    "sitar": 104,
+    "guitar": 24,
+    "acoustic guitar": 25,
+    "electric guitar": 27,
+    "flute": 73,
+    "clarinet": 71,
+    "saxophone": 65,
+    "tuba": 58,
+    "trumpet": 56,
+    "oboe": 68,
+    "trombone": 57,
+    "banjo": 105,
+    "koto": 107,
+    "dulcimer": 15,
+    "bassoon": 70,
+    "celeste": 8,
+    "xylophone": 13,
+    "electronic synth": 81,
+    "sine": 81, // Approximate with Lead 2 (Sawtooth)
+    "square": 80,
+    "sawtooth": 81,
+    "triangle": 81, // Approximate with Lead 2 (Sawtooth)
+    "vibraphone": 11
+};
+
+var DRUM_MIDI_MAP = {
+    "snare drum": 38,
+    "kick drum": 36,
+    "tom tom": 41,
+    "floor tom tom": 43,
+    "cup drum": 47, // Closest: Low-Mid Tom
+    "darbuka drum": 50, // Closest: High Tom
+    "japanese drum": 56, // Closest: Cowbell or Tambourine
+    "hi hat": 42,
+    "ride bell": 53,
+    "cow bell": 56,
+    "triangle bell": 81,
+    "finger cymbals": 69, // Closest: Open Hi-Hat
+    "chime": 82, // Closest: Shaker
+    "gong": 52, // Closest: Chinese Cymbal
+    "clang": 55, // Closest: Splash Cymbal
+    "crash": 49,
+    "clap": 39,
+    "slap": 40,
+    "raindrop": 88 // Custom mapping (not in GM), can use melodic notes
+};
+
+var REVERSE_DRUM_MIDI_MAP = {
+    38: ["snare drum"],
+    36: ["kick drum"],
+    41: ["tom tom"],
+    43: ["floor tom tom"],
+    47: ["cup drum"],
+    50: ["darbuka drum"],
+    56: ["japanese drum", "cow bell"],
+    42: ["hi hat"],
+    53: ["ride bell"],
+    81: ["triangle bell"],
+    69: ["finger cymbals"],
+    82: ["chime"],
+    52: ["gong"],
+    55: ["clang"],
+    49: ["crash"],
+    39: ["clap"],
+    40: ["slap"],
+    88: ["raindrop"]
+};
+
+/**
+ * Default invert mode.
+ * @constant {string}
+ */
+var DEFAULTINVERT = "even";
+
+/**
+ * Default interval for the mode.
+ * @constant {string}
+ */
+var DEFAULTINTERVAL = "perfect" + " 5";
+
+/**
+ * Default voice for audio synthesis.
+ * @constant {string}
+ */
+var DEFAULTVOICE = "electronic synth";
+
+/**
+ * Default noise type for audio synthesis.
+ * @constant {string}
+ */
+var DEFAULTNOISE = "noise1";
+
+/**
+ * Default drum type for audio synthesis.
+ * @constant {string}
+ */
+var DEFAULTDRUM = "kick drum";
+
+/**
+ * Default effect for audio synthesis.
+ * @constant {string}
+ */
+var DEFAULTEFFECT = "duck";
+
+/**
+ * Default musical mode.
+ * @constant {string}
+ */
+var DEFAULTMODE = "major";
+
+/**
+ * Default temperament.
+ * @constant {string}
+ */
+var DEFAULTTEMPERAMENT = "equal";
+
+/**
+ * Default filter type for audio processing.
+ * @constant {string}
+ */
+var DEFAULTFILTERTYPE = "highpass";
+
+/**
+ * Default oscillator type for audio synthesis.
+ * @constant {string}
+ */
+var DEFAULTOSCILLATORTYPE = "sine";
+
+/**
+ * Default accidental for musical notation.
+ * @constant {string}
+ */
+var DEFAULTACCIDENTAL = "natural" + " " + NATURAL;
+
+/**
+ * Approximate mapping of mode to solfege (Used by modes where the
+ * length !== 7).
+ * @constant
+ * @type {Array}
+ */
+var SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la", "la", "ti"];
+
+/**
+ * Maps accidental characters to their semitone offsets.
+ * Named distinctly to avoid collision with the ACCIDENTAL_MAP in abc.js
+ * (which maps accidentals to ABC notation strings, not semitone offsets).
+ * @constant {Object.<string, number>}
+ */
+var ACCIDENTAL_SEMITONE_MAP = {
+    "#": 1,
+    "♯": 1,
+    "b": -1,
+    "♭": -1,
+    "x": 2, // double-sharp (textual)
+    "𝄪": 2, // double-sharp (Unicode)
+    "𝄫": -2 // double-flat (Unicode)
+};
+
 var MusicUtilsConstants = {
     SYNTHSVG,
     WHOLENOTE,
@@ -924,7 +1367,40 @@ var MusicUtilsConstants = {
     EIGHTHNOTEWIDTH,
     MATRIXBUTTONHEIGHT,
     MATRIXBUTTONHEIGHT2,
-    MATRIXSOLFEHEIGHT
+    MATRIXSOLFEHEIGHT,
+    ACCIDENTALNAMES,
+    ACCIDENTALVALUES,
+    CHORDNAMES,
+    DEFAULTCHORD,
+    INTERVALVALUES,
+    MODE_PIE_MENUS,
+    MODEPIEMENU_SLOT_COUNT,
+    MODEPIEMENU_GROUP_RING,
+    MODEPIEMENU_NAME_RING,
+    MODEPIEMENU_NAME_TITLE_RADIUS,
+    MODEPIEMENU_FONT_FAMILY,
+    MODEPIEMENU_GROUP_FONT_RATIO,
+    MODEPIEMENU_NAME_FONT_MIN_RATIO,
+    MODEPIEMENU_NAME_FONT_MAX_RATIO,
+    PITCH_COLLECTIONS,
+    PITCH_COLLECTION_ALIASES,
+    MAQAMTABLE,
+    MIDI_INSTRUMENTS,
+    DRUM_MIDI_MAP,
+    REVERSE_DRUM_MIDI_MAP,
+    DEFAULTINVERT,
+    DEFAULTINTERVAL,
+    DEFAULTVOICE,
+    DEFAULTNOISE,
+    DEFAULTDRUM,
+    DEFAULTEFFECT,
+    DEFAULTMODE,
+    DEFAULTTEMPERAMENT,
+    DEFAULTFILTERTYPE,
+    DEFAULTOSCILLATORTYPE,
+    DEFAULTACCIDENTAL,
+    SOLFMAPPER,
+    ACCIDENTAL_SEMITONE_MAP
 };
 
 if (typeof module !== "undefined" && module.exports) {

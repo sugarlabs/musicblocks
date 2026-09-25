@@ -36,8 +36,25 @@ describe("musicutils-constants", () => {
         expect(constants.A0).toBe(27.5);
     });
 
+    it("keeps the chord, default and mode tables intact", () => {
+        expect(constants.ACCIDENTALVALUES).toEqual([2, 1, 0, -1, -2]);
+        expect(constants.DEFAULTCHORD).toBe(constants.CHORDNAMES[9]);
+        expect(constants.DEFAULTMODE).toBe("major");
+        expect(constants.DEFAULTACCIDENTAL).toBe("natural " + constants.NATURAL);
+        expect(constants.SOLFMAPPER).toHaveLength(12);
+        expect(Object.keys(constants.PITCH_COLLECTIONS)).toContain("12");
+        expect(constants.MODEPIEMENU_SLOT_COUNT).toBe(12);
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
-        for (const name of ["SHARP", "FLAT", "NATURAL", "NOTESSHARP", "NOTESFLAT", "PITCHES"]) {
+        for (const name of [
+            "SHARP",
+            "NOTESFLAT",
+            "PITCHES",
+            "ACCIDENTALNAMES",
+            "INTERVALVALUES",
+            "DEFAULTMODE"
+        ]) {
             expect(musicutils[name]).toBe(constants[name]);
         }
     });
