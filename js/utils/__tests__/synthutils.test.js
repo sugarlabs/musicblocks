@@ -3296,13 +3296,8 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
         });
 
         test("startTuner initializes with provided initialTargetPitch and starts in target mode", async () => {
-            const origCompute = global.computeTargetPitchFrequency;
-            global.computeTargetPitchFrequency = jest.fn(pitch => {
-                if (pitch === "C5") return 523.25;
-                throw new Error("Invalid pitch");
-            });
-
-            await synthInstance.startTuner("C5");
+            // Do NOT mock computeTargetPitchFrequency to test real calculation for non-default octaves
+            await synthInstance.startTuner("C6");
             await new Promise(r => setTimeout(r, 10)); // wait for rAF
             expect(synthInstance._tunerActive).toBe(true);
 
@@ -3311,6 +3306,10 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             let chromaticButton = modeToggle.children[0];
             let targetPitchButton = modeToggle.children[1];
             expect(targetPitchButton.getAttribute("aria-pressed")).toBe("true");
+
+            // Assert display results for C6
+            const targetNoteSelector = document.getElementById("targetNoteSelector");
+            expect(targetNoteSelector.textContent).toBe("C6");
 
             // Also test invalid pitch falls back
             synthInstance.stopTuner();
@@ -3334,8 +3333,6 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             }
             chromaticButton = modeToggle.children[0];
             expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
-
-            global.computeTargetPitchFrequency = origCompute;
         });
 
         test("tuner mode toggle buttons respond to keyboard events (Enter and Space)", async () => {
