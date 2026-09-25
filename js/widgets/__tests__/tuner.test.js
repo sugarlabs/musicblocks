@@ -752,6 +752,24 @@ describe("Tuner Widget", () => {
 
                 global.document.body.className = "";
             });
+
+            test("falls back to default success and error colors without getComputedStyle", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const originalGetComputedStyle = global.getComputedStyle;
+
+                display._cachedTheme = null;
+                display._selectorBg = null;
+                global.getComputedStyle = undefined;
+
+                try {
+                    const colors = display._getCanvasColors();
+
+                    expect(colors.successColor).toBe("#10b981");
+                    expect(colors.errorColor).toBe("#ef4444");
+                } finally {
+                    global.getComputedStyle = originalGetComputedStyle;
+                }
+            });
         });
 
         describe("_indicatorColor", () => {
@@ -777,6 +795,13 @@ describe("Tuner Widget", () => {
                 expect(display._indicatorColor(6, colors)).toBe("#ef4444");
                 expect(display._indicatorColor(-6, colors)).toBe("#ef4444");
                 expect(display._indicatorColor(15, colors)).toBe("#ef4444");
+            });
+
+            test("reads success and error colors from the token cache when omitted", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                expect(display._indicatorColor(0)).toBe("#10b981");
+                expect(display._indicatorColor(12)).toBe("#ef4444");
             });
         });
     });
