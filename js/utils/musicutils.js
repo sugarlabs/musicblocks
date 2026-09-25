@@ -5302,7 +5302,7 @@ const getNoteFromSolfege = (
     transpositionFloor
 ) => {
     let sharpFlat = false;
-    if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
+    if (["#", SHARP, FLAT, "b"].includes(noteArg.slice(-1))) {
         sharpFlat = true;
     }
 
@@ -5351,24 +5351,24 @@ const getNoteFromSolfege = (
     }
 
     if (sharpFlat) {
-        if (noteArg.substr(-1) === "#") {
+        if (noteArg.slice(-1) === "#") {
             offset += 1;
-        } else if (noteArg.substr(-1) === SHARP) {
+        } else if (noteArg.slice(-1) === SHARP) {
             offset += 1;
-        } else if (noteArg.substr(-1) === FLAT) {
+        } else if (noteArg.slice(-1) === FLAT) {
             offset -= 1;
-        } else if (noteArg.substr(-1) === "b") {
+        } else if (noteArg.slice(-1) === "b") {
             offset -= 1;
         }
     }
 
     let solfegePart;
-    if (halfSteps.includes(noteArg.substr(0, 1).toLowerCase())) {
-        solfegePart = noteArg.substr(0, 1).toLowerCase();
-    } else if (halfSteps.includes(noteArg.substr(0, 2).toLowerCase())) {
-        solfegePart = noteArg.substr(0, 2).toLowerCase();
-    } else if (halfSteps.includes(noteArg.substr(0, 3).toLowerCase())) {
-        solfegePart = noteArg.substr(0, 3).toLowerCase();
+    if (halfSteps.includes(noteArg.slice(0, 1).toLowerCase())) {
+        solfegePart = noteArg.slice(0, 1).toLowerCase();
+    } else if (halfSteps.includes(noteArg.slice(0, 2).toLowerCase())) {
+        solfegePart = noteArg.slice(0, 2).toLowerCase();
+    } else if (halfSteps.includes(noteArg.slice(0, 3).toLowerCase())) {
+        solfegePart = noteArg.slice(0, 3).toLowerCase();
     } else {
         // The note should already be translated, but just in case...
         // Reverse any i18n
@@ -5377,7 +5377,7 @@ const getNoteFromSolfege = (
         if (SOLFNOTES.includes(i18nObj[0])) {
             solfegePart = i18nObj[0];
         } else {
-            solfegePart = noteArg.substr(0, 2).toLowerCase();
+            solfegePart = noteArg.slice(0, 2).toLowerCase();
         }
     }
 
@@ -5486,7 +5486,7 @@ const getNoteFromSolfege = (
         // In non-12 EDO temperaments, enharmonic spellings are distinct
         // pitches, so the resolved note must honor the input's accidental.
         if (octaveLength !== 12 && sharpFlat) {
-            if (noteArg.substr(-1) === "#" || noteArg.substr(-1) === SHARP) {
+            if (noteArg.slice(-1) === "#" || noteArg.slice(-1) === SHARP) {
                 note = NOTESSHARP[index];
             } else {
                 note = NOTESFLAT[index];
@@ -5575,29 +5575,30 @@ function getNote(
 
     if (typeof noteArg !== "number") {
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
-        if (noteArg.substr(-1) === ">") {
+        if (noteArg.slice(-1) === ">") {
             // Read octave and solfege from HTML
             octave = parseInt(
                 noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1),
                 10
             );
-            noteArg = noteArg.substr(0, noteArg.indexOf("<"));
+            const noteEnd = noteArg.indexOf("<");
+            noteArg = noteEnd === -1 ? "" : noteArg.slice(0, noteEnd);
         }
         if (
-            noteArg.toLowerCase().substr(0, 4) === "rest" ||
-            noteArg.toLowerCase().substr(0, 4) === "r"
+            noteArg.toLowerCase().slice(0, 4) === "rest" ||
+            noteArg.toLowerCase().slice(0, 4) === "r"
         ) {
             return ["R", "", 0];
         }
         // Could be a number as a string (with or without an accidental.
         let noteAsNumber = noteArg;
-        if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
+        if (["#", SHARP, FLAT, "b"].includes(noteArg.slice(-1))) {
             noteAsNumber = noteArg.slice(0, noteArg.length - 1);
         }
         if (!isNaN(noteAsNumber)) {
-            if (["#", SHARP].includes(noteArg.substr(-1))) {
+            if (["#", SHARP].includes(noteArg.slice(-1))) {
                 transpositionFloor += Math.round(octaveLength / 12);
-            } else if (["b", FLAT].includes(noteArg.substr(-1))) {
+            } else if (["b", FLAT].includes(noteArg.slice(-1))) {
                 transpositionFloor -= Math.round(octaveLength / 12);
             }
             noteArg = Number(noteAsNumber);
