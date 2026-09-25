@@ -5622,7 +5622,12 @@ function getNote(
                 console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
             }
         }
-        const pitchIndex = (((noteArg + kOffset) % octaveLength) + octaveLength) % octaveLength;
+        const pitchValue = noteArg + kOffset;
+        const pitchIndex = ((pitchValue % octaveLength) + octaveLength) % octaveLength;
+
+        if (pitchValue < 0) {
+            octave += Math.floor(pitchValue / octaveLength);
+        }
         if (octaveLength === 12) {
             if (getSharpFlatPreference(keySignature) === "sharp") {
                 noteArg = PITCHES2[pitchIndex];

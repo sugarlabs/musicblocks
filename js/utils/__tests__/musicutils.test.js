@@ -3708,17 +3708,19 @@ describe("getNote additional paths", () => {
         expect(getNote("1#", 4, 0, "C major", false)).toEqual(["D", 4, 0]);
         expect(getNote("1b", 4, 0, "C major", false)).toEqual(["C", 4, 0]);
     });
+    it("normalizes negative pitch numbers across octave boundaries", () => {
+        expect(getNote(-1, 4, 0, "C major", false)).toEqual(["B", 3, 0]);
+        expect(getNote(-12, 4, 0, "C major", false)).toEqual(["C", 3, 0]);
+        expect(getNote(-13, 4, 0, "C major", false)).toEqual(["B", 2, 0]);
 
-    it("normalizes negative pitch numbers cyclically within octave", () => {
-        expect(getNote(-1, 4, 0, "C major", false)).toEqual(["B", 4, 0]);
-        expect(getNote(-12, 4, 0, "C major", false)).toEqual(["C", 4, 0]);
-        expect(getNote(-13, 4, 0, "C major", false)).toEqual(["B", 4, 0]);
-        expect(getNote("-1", 4, 0, "C major", false)).toEqual(["B", 4, 0]);
+        expect(getNote("-1", 4, 0, "C major", false)).toEqual(["B", 3, 0]);
+
         expect(getNote(-1, 4, 0, "G major", true)).toEqual(["F♯", 4, 0]);
-        expect(getNote(-8, 4, 0, "G major", true)).toEqual(["B", 4, 0]);
+        expect(getNote(-8, 4, 0, "G major", true)).toEqual(["B", 3, 0]);
+
         expect(getNote(-1, 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
             "B♯",
-            4,
+            3,
             0
         ]);
     });
