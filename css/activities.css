@@ -139,7 +139,9 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 .clear-button-container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-start;
+    gap: 8px;
 }
 
 .confirm-button {
@@ -150,12 +152,26 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     cursor: pointer;
     background-color: var(--color-brand-primary);
     color: var(--color-text-inverse);
-    margin-right: 16px;
     transition: background-color 0.2s ease;
 }
 
 .confirm-button:hover {
     background-color: var(--color-brand-primary-hover);
+}
+
+.clear-all-button {
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: var(--color-error);
+    color: var(--color-text-inverse);
+    transition: background-color 0.2s ease;
+}
+
+.clear-all-button:hover {
+    opacity: 0.9;
 }
 
 .cancel-button {
