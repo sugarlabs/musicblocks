@@ -3914,12 +3914,23 @@ class PhraseMaker {
         noteToDivide = parseInt(noteToDivide, 10);
         oldTupletValue = parseInt(oldTupletValue, 10);
         newTupletValue = parseInt(newTupletValue, 10);
+        if (
+            !this.activity ||
+            !this.activity.logo ||
+            !Array.isArray(this.activity.logo.tupletRhythms) ||
+            isNaN(noteToDivide) ||
+            noteToDivide < 0 ||
+            noteToDivide >= this.activity.logo.tupletRhythms.length ||
+            !this.activity.logo.tupletRhythms[noteToDivide]
+        ) {
+            return;
+        }
         this._blockMapHelper = [];
 
         let k = 0;
         let l;
         if (oldTupletValue < newTupletValue) {
-            for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }
@@ -3955,7 +3966,7 @@ class PhraseMaker {
             }
         } else {
             k = 0;
-            for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }
