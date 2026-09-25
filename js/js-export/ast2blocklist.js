@@ -36,6 +36,10 @@ class AST2BlockList {
      *   the loop, with `break` for each `f = true`;
      * - `return mouse.ENDFLOW` / `return mouse.ENDMOUSE` that is not the last
      *   statement of a function (a Stop with no loop around it) becomes `break`;
+     * - `let f = false; <clamp>; if (f) <leave>` drops the flag and the check,
+     *   with `break` for each `f = true` inside the clamp;
+     * - a labeled block (`stop0: { ... }`) becomes the plain block, and its
+     *   labeled `break` stays a Stop block;
      * - the `break` that ends every switch case is dropped, since cases don't
      *   fall through and it isn't a Stop block.
      *
@@ -65,6 +69,18 @@ class AST2BlockList {
                 list.pop();
             }
         }
+        if (node.type === "IfStatement") {
+            for (const key of ["consequent", "alternate"]) {
+                const branch = node[key];
+                if (
+                    branch &&
+                    branch.type === "LabeledStatement" &&
+                    branch.body.type === "BlockStatement"
+                ) {
+                    node[key] = branch.body;
+                }
+            }
+        }
         if (list === null) return;
 
         const toBreak = statement => ({
@@ -73,6 +89,69 @@ class AST2BlockList {
             start: statement.start,
             end: statement.end
         });
+
+        // Labeled blocks that only exist so a Stop can leave them.
+        for (let i = list.length - 1; i >= 0; i--) {
+            const statement = list[i];
+            if (statement.type === "LabeledStatement" && statement.body.type === "BlockStatement") {
+                if (node.type === "SwitchCase") {
+                    list.splice(i, 1, ...statement.body.body);
+                } else {
+                    list[i] = statement.body;
+                }
+            }
+        }
+
+        // `f = true` statements for flag f, anywhere inside node, become break.
+        const replaceFlagSets = (inside, flag) => {
+            const setsFlag = child =>
+                child.type === "ExpressionStatement" &&
+                child.expression.type === "AssignmentExpression" &&
+                child.expression.operator === "=" &&
+                child.expression.left.type === "Identifier" &&
+                child.expression.left.name === flag &&
+                child.expression.right.value === true;
+            const visit = child => {
+                if (Array.isArray(child)) {
+                    child.forEach((item, j) => {
+                        if (item && typeof item === "object" && setsFlag(item)) {
+                            child[j] = toBreak(item);
+                        } else {
+                            visit(item);
+                        }
+                    });
+                } else if (child !== null && typeof child === "object") {
+                    Object.values(child).forEach(visit);
+                }
+            };
+            visit(inside);
+        };
+        const falseFlag = statement =>
+            statement.type === "VariableDeclaration" &&
+            statement.declarations.length === 1 &&
+            statement.declarations[0].id.type === "Identifier" &&
+            statement.declarations[0].init !== null &&
+            statement.declarations[0].init.value === false
+                ? statement.declarations[0].id.name
+                : null;
+
+        // let f = false; <clamp>; if (f) return mouse.END... / break label;
+        for (let i = list.length - 3; i >= 0; i--) {
+            const flag = falseFlag(list[i]);
+            const check = list[i + 2];
+            if (
+                flag !== null &&
+                check.type === "IfStatement" &&
+                check.test.type === "Identifier" &&
+                check.test.name === flag &&
+                !check.alternate &&
+                ["ReturnStatement", "BreakStatement"].includes(check.consequent.type)
+            ) {
+                replaceFlagSets(list[i + 1], flag);
+                list.splice(i + 2, 1);
+                list.splice(i, 1);
+            }
+        }
 
         list.forEach((statement, i) => {
             const returnsEnd =
@@ -89,14 +168,7 @@ class AST2BlockList {
             // { let f = false; loop { ...; if (f) break; } }
             if (statement.type !== "BlockStatement" || statement.body.length !== 2) return;
             const [declaration, loop] = statement.body;
-            const flag =
-                declaration.type === "VariableDeclaration" &&
-                declaration.declarations.length === 1 &&
-                declaration.declarations[0].id.type === "Identifier" &&
-                declaration.declarations[0].init !== null &&
-                declaration.declarations[0].init.value === false
-                    ? declaration.declarations[0].id.name
-                    : null;
+            const flag = falseFlag(declaration);
             if (
                 flag === null ||
                 !["ForStatement", "WhileStatement", "DoWhileStatement"].includes(loop.type) ||
@@ -118,27 +190,7 @@ class AST2BlockList {
             }
 
             loop.body.body.pop();
-            const setsFlag = child =>
-                child.type === "ExpressionStatement" &&
-                child.expression.type === "AssignmentExpression" &&
-                child.expression.operator === "=" &&
-                child.expression.left.type === "Identifier" &&
-                child.expression.left.name === flag &&
-                child.expression.right.value === true;
-            const replaceSets = child => {
-                if (Array.isArray(child)) {
-                    child.forEach((item, j) => {
-                        if (item && typeof item === "object" && setsFlag(item)) {
-                            child[j] = toBreak(item);
-                        } else {
-                            replaceSets(item);
-                        }
-                    });
-                } else if (child !== null && typeof child === "object") {
-                    Object.values(child).forEach(replaceSets);
-                }
-            };
-            replaceSets(loop.body);
+            replaceFlagSets(loop.body, flag);
             list[i] = loop;
         });
     }

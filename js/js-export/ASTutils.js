@@ -882,36 +882,161 @@ class ASTUtils {
     }
 
     /**
-     * Turns Stop block markers that no loop took over into a return, which
-     * ends the current stack like Logo.doBreak does when there is no loop.
+     * Resolves the Stop block markers that no loop took over. With no loop,
+     * Logo.doBreak drops the next pending continuation, so a Stop skips the
+     * rest of the stack one level above the clamp it is in, and the program
+     * carries on after that. For example, in `Start { Note { Stop }; X }` X
+     * doesn't run, and in `Start { if { if { Stop }; W }; X }` W doesn't but
+     * X does.
+     *
+     * That outer stack is left with `return` when it is a function body
+     * (Start, an action or a clamp callback), or with a labeled `break` when
+     * it is a block. When the Stop is inside a clamp callback, which a return
+     * or break can't leave, it sets a flag that is checked after the clamp.
+     * A Stop directly in Start or an action just returns.
      *
      * @static
-     * @param {Object} node - Abstract Syntax Tree of a Start or action body
+     * @param {Object} body - BlockStatement of a Start or action function
      * @param {String} end - "ENDMOUSE" or "ENDFLOW", the value the body returns
      * @returns {void}
      */
-    static _stopBlocksToReturn(node, end) {
-        if (Array.isArray(node)) {
-            node.forEach(child => ASTUtils._stopBlocksToReturn(child, end));
-        } else if (node !== null && typeof node === "object") {
-            if (node.stopBlock) {
-                delete node.label;
-                delete node.stopBlock;
-                Object.assign(node, {
-                    type: "ReturnStatement",
-                    argument: {
-                        type: "MemberExpression",
-                        object: { type: "Identifier", name: "mouse" },
-                        computed: false,
-                        property: { type: "Identifier", name: end }
-                    }
-                });
-                return;
+    static _resolveStopBlocks(body, end) {
+        const used = ASTUtils._getIdentifierNames(body);
+        let count = 0;
+        const newName = () => {
+            let name;
+            do {
+                name = "stop" + count++;
+            } while (used.has(name));
+            used.add(name);
+            return name;
+        };
+
+        const identifier = name => ({ type: "Identifier", name });
+        const returnEnd = value => ({
+            type: "ReturnStatement",
+            argument: {
+                type: "MemberExpression",
+                object: identifier("mouse"),
+                computed: false,
+                property: identifier(value)
             }
-            // Clamp callbacks return mouse.ENDFLOW.
-            const inner = node.type === "ArrowFunctionExpression" ? "ENDFLOW" : end;
-            Object.values(node).forEach(child => ASTUtils._stopBlocksToReturn(child, inner));
-        }
+        });
+        const replace = (node, replacement) => {
+            Object.keys(node).forEach(key => delete node[key]);
+            Object.assign(node, replacement);
+        };
+
+        // Leaves a stack: return from a function body, or break out of a
+        // block, which gets a label the first time it is needed.
+        const exitStatement = stack => {
+            if (stack.end !== null) return returnEnd(stack.end);
+            if (stack.label === null) {
+                stack.label = newName();
+                stack.wrap(stack.label);
+            }
+            return { type: "BreakStatement", label: identifier(stack.label) };
+        };
+
+        // Every statement list directly inside statement (if/else branches,
+        // switch cases, clamp callbacks), without looking inside those lists.
+        const innerStacks = statement => {
+            const stacks = [];
+            const visit = (node, parent, key) => {
+                if (Array.isArray(node)) {
+                    node.forEach((child, i) => visit(child, node, i));
+                } else if (node !== null && typeof node === "object") {
+                    if (node.type === "ArrowFunctionExpression") {
+                        stacks.push({ list: node.body.body, end: "ENDFLOW" });
+                    } else if (node.type === "BlockStatement") {
+                        stacks.push({
+                            list: node.body,
+                            end: null,
+                            wrap: label => {
+                                parent[key] = {
+                                    type: "LabeledStatement",
+                                    label: identifier(label),
+                                    body: node
+                                };
+                            }
+                        });
+                    } else if (node.type === "SwitchCase") {
+                        stacks.push({
+                            list: node.consequent,
+                            end: null,
+                            wrap: label => {
+                                // Keep the break that ends the case outside.
+                                const statements = node.consequent.splice(
+                                    0,
+                                    node.consequent.length - 1
+                                );
+                                node.consequent.unshift({
+                                    type: "LabeledStatement",
+                                    label: identifier(label),
+                                    body: { type: "BlockStatement", body: statements }
+                                });
+                            }
+                        });
+                    } else {
+                        Object.entries(node).forEach(([k, child]) => visit(child, node, k));
+                    }
+                }
+            };
+            visit(statement, null, null);
+            return stacks;
+        };
+
+        const resolve = (stack, outer) => {
+            for (const statement of [...stack.list]) {
+                if (statement.stopBlock) {
+                    if (outer === null) {
+                        replace(statement, returnEnd(stack.end));
+                    } else if (stack.end === null) {
+                        // No function in between: leave the outer stack directly.
+                        replace(statement, exitStatement(outer.stack));
+                    } else {
+                        // Inside a clamp callback: set a flag the outer stack checks.
+                        if (!outer.flag) {
+                            outer.flag = newName();
+                            const at = outer.stack.list.indexOf(outer.statement);
+                            outer.stack.list.splice(at, 0, {
+                                type: "VariableDeclaration",
+                                kind: "let",
+                                declarations: [
+                                    {
+                                        type: "VariableDeclarator",
+                                        id: identifier(outer.flag),
+                                        init: { type: "Literal", value: false }
+                                    }
+                                ]
+                            });
+                            outer.stack.list.splice(at + 2, 0, {
+                                type: "IfStatement",
+                                test: identifier(outer.flag),
+                                consequent: exitStatement(outer.stack),
+                                alternate: null
+                            });
+                        }
+                        replace(statement, {
+                            type: "ExpressionStatement",
+                            expression: {
+                                type: "AssignmentExpression",
+                                operator: "=",
+                                left: identifier(outer.flag),
+                                right: { type: "Literal", value: true }
+                            }
+                        });
+                    }
+                    continue;
+                }
+                const context = { stack, statement, flag: null };
+                for (const inner of innerStacks(statement)) {
+                    resolve({ label: null, ...inner }, context);
+                }
+            }
+        };
+
+        resolve({ list: body.body, end, label: null }, null);
     }
 
     /**
@@ -1113,7 +1238,7 @@ class ASTUtils {
         for (const i in ASTs) {
             AST["declarations"][0]["init"]["body"]["body"].splice(i, 0, ASTs[i]);
         }
-        ASTUtils._stopBlocksToReturn(AST["declarations"][0]["init"]["body"], "ENDFLOW");
+        ASTUtils._resolveStopBlocks(AST["declarations"][0]["init"]["body"], "ENDFLOW");
 
         return AST;
     }
@@ -1132,7 +1257,7 @@ class ASTUtils {
         for (const i in ASTs) {
             AST["expression"]["arguments"][0]["body"]["body"].splice(i, 0, ASTs[i]);
         }
-        ASTUtils._stopBlocksToReturn(AST["expression"]["arguments"][0]["body"], "ENDMOUSE");
+        ASTUtils._resolveStopBlocks(AST["expression"]["arguments"][0]["body"], "ENDMOUSE");
 
         return AST;
     }

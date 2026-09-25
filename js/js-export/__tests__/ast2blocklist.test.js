@@ -376,6 +376,52 @@ describe("AST2BlockList Class", () => {
             expect(printed).toEqual(["i", "o", "i", "o"]);
         });
 
+        const note = flow => ["newnote", [["divide", [1, 4]]], flow];
+
+        // With no loop, Logo.doBreak drops the next pending continuation: the
+        // rest of the stack one level above the Stop's clamp is skipped, and
+        // the program carries on after that.
+        test.each([
+            ["inside a note", [note([["print", ["n"]], ["break"]]), ["print", ["x"]]], ["n"]],
+            [
+                "inside an if inside an if",
+                [
+                    [
+                        "if",
+                        ["bool_true"],
+                        [
+                            ["if", ["bool_true"], [["break"]]],
+                            ["print", ["w"]]
+                        ]
+                    ],
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ],
+            [
+                "inside a note inside an if",
+                [
+                    ["if", ["bool_true"], [note([["break"]]), ["print", ["w"]]]],
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ],
+            [
+                "inside an if inside a note",
+                [
+                    note([
+                        ["if", ["bool_true"], [["break"]]],
+                        ["print", ["w"]]
+                    ]),
+                    ["print", ["x"]]
+                ],
+                ["x"]
+            ]
+        ])("skips the rest of the stack above a Stop %s", async (_, tree, expected) => {
+            const { printed } = await runAction(tree);
+            expect(printed).toEqual(expected);
+        });
+
         test("ends the stack when there is no loop", async () => {
             const { printed, result } = await runAction([
                 ["if", ["bool_true"], [["break"]]],
@@ -433,6 +479,69 @@ describe("AST2BlockList Class", () => {
                 "a Stop with no loop",
                 [["print", ["x"]], ["break"]],
                 ["start", "print", "text", "break"]
+            ],
+            [
+                "a Stop inside a note with no loop",
+                [note([["print", ["n"]], ["break"]]), ["print", ["x"]]],
+                [
+                    "start",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "print",
+                    "text",
+                    "break",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a Stop inside an if inside an if",
+                [
+                    [
+                        "if",
+                        ["bool_true"],
+                        [
+                            ["if", ["bool_true"], [["break"]]],
+                            ["print", ["w"]]
+                        ]
+                    ],
+                    ["print", ["x"]]
+                ],
+                [
+                    "start",
+                    "if",
+                    "boolean",
+                    "if",
+                    "boolean",
+                    "break",
+                    "print",
+                    "text",
+                    "print",
+                    "text"
+                ]
+            ],
+            [
+                "a Stop inside a note inside an if",
+                [
+                    ["if", ["bool_true"], [note([["break"]]), ["print", ["w"]]]],
+                    ["print", ["x"]]
+                ],
+                [
+                    "start",
+                    "if",
+                    "boolean",
+                    "newnote",
+                    "divide",
+                    "number",
+                    "number",
+                    "break",
+                    "print",
+                    "text",
+                    "print",
+                    "text"
+                ]
             ],
             [
                 "a switch with no Stop in it",
