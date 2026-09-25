@@ -579,6 +579,37 @@ describe("KeyboardController", () => {
         expect(event.preventDefault).toHaveBeenCalled();
         expect(activity.blocks.redoAction).toHaveBeenCalled();
     });
+    it("does not trigger undo on Cmd+Z when paste input is active", () => {
+        const activity = makeActivity();
+        activity.blocks.undoAction = jest.fn();
+        activity.paste.style.visibility = "visible";
+
+        const controller = createController(activity);
+        const event = makeEvent({
+            keyCode: 90,
+            metaKey: true
+        });
+
+        controller.__keyPressed(event);
+
+        expect(activity.blocks.undoAction).not.toHaveBeenCalled();
+    });
+
+    it("does not trigger redo on Cmd+Y when paste input is active", () => {
+        const activity = makeActivity();
+        activity.blocks.redoAction = jest.fn();
+        activity.paste.style.visibility = "visible";
+
+        const controller = createController(activity);
+        const event = makeEvent({
+            keyCode: 89,
+            metaKey: true
+        });
+
+        controller.__keyPressed(event);
+
+        expect(activity.blocks.redoAction).not.toHaveBeenCalled();
+    });
 
     describe("ignores shortcuts while a text input is active", () => {
         it("does nothing when the keyboard is disabled", () => {

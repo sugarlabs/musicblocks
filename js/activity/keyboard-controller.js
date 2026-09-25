@@ -297,7 +297,9 @@ class KeyboardController {
             }
         } else if (
             event.ctrlKey ||
-            (event.metaKey && (event.keyCode === 90 || event.keyCode === 89 || event.keyCode === V))
+            (event.metaKey &&
+                !disableKeys &&
+                (event.keyCode === 90 || event.keyCode === 89 || event.keyCode === V))
         ) {
             switch (event.keyCode) {
                 case 90: // 'Z'
