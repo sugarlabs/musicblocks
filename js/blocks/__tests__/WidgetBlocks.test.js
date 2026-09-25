@@ -288,6 +288,34 @@ describe("setupWidgetBlocks", () => {
             expect(getBlock("timbre")).toBeDefined();
             expect(getBlock("tempo")).toBeDefined();
             expect(getBlock("meterwidget")).toBeDefined();
+	    expect(activity.blockTypes).toEqual([
+		"aidebugger",
+		"envelope",
+		"filter",
+		"reflection",
+		"aimusic",
+		"legobricks",
+		"timbre",
+		"temperament",
+		"modewidget",
+		"meterwidget",
+		"tempo",
+		"sampler",
+		"oscilloscope",
+		"pitchdrummatrix",
+		"arpeggiomatrix",
+		"pitchstaircase",
+		"pitchslider",
+		"chromatic",
+		"musickeyboard2",
+		"musickeyboard",
+		"rhythmruler3",
+		"rhythmruler2",
+		"matrixgmajor",
+		"matrixcmajor",
+		"matrix",
+		"status"
+	    ]);
         });
     });
 
