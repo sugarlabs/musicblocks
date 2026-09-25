@@ -1682,6 +1682,7 @@ describe("Block Foundation", () => {
     describe("_changeLabel() keypress handler", () => {
         beforeEach(() => {
             jest.useFakeTimers();
+            global.window.scroll = jest.fn();
         });
 
         afterEach(() => {
@@ -1734,6 +1735,87 @@ describe("Block Foundation", () => {
             expect(eventTab.preventDefault).toHaveBeenCalled();
 
             global.docById = originalDocById;
+        });
+    });
+
+    describe("Coverage for slice migration in block.js", () => {
+        let block;
+        let mockBlocksForRename;
+        beforeEach(() => {
+            mockBlocksForRename = {
+                activity: {
+                    palettes: { updatePalettes: jest.fn(), dict: {} },
+                    refreshCanvas: jest.fn(),
+                    beginnerMode: false,
+                    logo: {
+                        synth: { getSynthData: jest.fn().mockReturnValue([]), loadSynth: jest.fn() }
+                    }
+                },
+                blockList: [],
+                trashStacks: [],
+                actionHistory: [],
+                isUndoingOrRedoing: false,
+                reInitWidget: jest.fn(),
+                findTopBlock: jest.fn().mockReturnValue(0)
+            };
+            mockBlocksForRename.blockList[0] = { protoblock: { staticLabels: ["test"] } };
+            block = new Block({ x: 0, y: 0 }, "text", mockBlocksForRename);
+            block.text = { text: "" };
+            block.label = { value: "", style: {} };
+            block.container = { setChildIndex: jest.fn(), children: { length: 2 } };
+            block.connections = [null, null, null, null];
+            block.updateCache = jest.fn();
+            global.DEFAULTVOICE = "voice1";
+            global.DEFAULTNOISE = "noise1";
+            global.TEXTWIDTH = 200;
+            global.window.scroll = jest.fn();
+        });
+
+        it("_labelChanged text wideLabel truncation", () => {
+            global.getTextWidth.mockReturnValue(500); // Forces > TEXTWIDTH
+            block.value = "this is a very long string that should be sliced";
+            block.label.value = "this is a very long string that should be sliced";
+            block._capturedInitialValue = "old string";
+            block.hasWideLabel = () => false;
+            block._labelChanged(true, true);
+            expect(block.text.text.includes("...")).toBe(true);
+        });
+
+        it("_labelChanged storein/action wideLabel truncation", () => {
+            global.getTextWidth.mockReturnValue(500); // Forces > TEXTWIDTH
+            block.name = "storein";
+            block.value = "this is a very long string that should be sliced";
+            block.label.value = "this is a very long string that should be sliced";
+            block._capturedInitialValue = "old string";
+            block._labelChanged(true, true);
+            expect(block.text.text.includes("...")).toBe(true);
+        });
+        it("_changeLabel voiceLabels truncation", () => {
+            global.getTextWidth.mockReturnValue(500); // Forces > 400
+            global.piemenuVoices = jest.fn();
+            global.VOICENAMES = [["1", "voice1", "label", "cat"]];
+            block.name = "voicename";
+            block.activity = { canvas: { offsetLeft: 0, offsetTop: 0 }, blocksContainer: { y: 0 } };
+            block.blocks = { blockScale: 1 };
+            block.container = { x: 0, y: 0 };
+            block.piemenuOKtoLaunch = jest.fn().mockReturnValue(true);
+            block._usePiemenu = jest.fn().mockReturnValue(true);
+            block._changeLabel();
+            expect(global.piemenuVoices).toHaveBeenCalled();
+        });
+
+        it("_changeLabel noiseLabels truncation", () => {
+            global.getTextWidth.mockReturnValue(700); // Forces > 600
+            global.piemenuVoices = jest.fn(); // It uses piemenuVoices under the hood
+            global.NOISENAMES = [["noise1", "val1", "", "cat"]];
+            block.name = "noisename";
+            block.activity = { canvas: { offsetLeft: 0, offsetTop: 0 }, blocksContainer: { y: 0 } };
+            block.blocks = { blockScale: 1 };
+            block.container = { x: 0, y: 0 };
+            block.piemenuOKtoLaunch = jest.fn().mockReturnValue(true);
+            block._usePiemenu = jest.fn().mockReturnValue(true);
+            block._changeLabel();
+            expect(global.piemenuVoices).toHaveBeenCalled();
         });
     });
 });
