@@ -20,14 +20,52 @@
 const Turtles = require("../turtles");
 const { setupGridController } = require("../activity/grid-controller.js");
 
+const mockGraphics = () => ({
+    clear: jest.fn().mockReturnThis(),
+    beginFill: jest.fn().mockReturnThis(),
+    setStrokeStyle: jest.fn().mockReturnThis(),
+    beginStroke: jest.fn().mockReturnThis(),
+    drawCircle: jest.fn().mockReturnThis(),
+    moveTo: jest.fn().mockReturnThis(),
+    lineTo: jest.fn().mockReturnThis(),
+    closePath: jest.fn().mockReturnThis(),
+    drawRoundRect: jest.fn().mockReturnThis()
+});
+
 global.createjs = {
     Container: jest.fn().mockImplementation(() => ({
         addChild: jest.fn(),
+        removeChild: jest.fn(),
         removeAllChildren: jest.fn(),
         on: jest.fn(),
-        removeAllEventListeners: jest.fn()
+        removeAllEventListeners: jest.fn(),
+        contains: jest.fn().mockReturnValue(false),
+        setChildIndex: jest.fn(),
+        numChildren: 0
     })),
-    Bitmap: jest.fn().mockImplementation(() => ({}))
+    Bitmap: jest.fn().mockImplementation(() => ({})),
+    Shape: jest.fn().mockImplementation(() => ({
+        graphics: mockGraphics()
+    })),
+    Text: jest.fn().mockImplementation((text, font, color) => ({
+        text,
+        font,
+        color,
+        x: 0,
+        y: 0,
+        textAlign: "center",
+        textBaseline: "middle",
+        getBounds: jest.fn(() => ({ width: 60, height: 12 }))
+    })),
+    Tween: {
+        get: jest.fn().mockReturnValue({
+            to: jest.fn().mockReturnThis(),
+            call: jest.fn(function (cb) {
+                if (typeof cb === "function") cb();
+                return this;
+            })
+        })
+    }
 };
 
 global.importMembers = jest.fn();
@@ -1075,5 +1113,331 @@ describe("TurtlesModel.removeTurtle", () => {
 
         expect(model._turtleList).toEqual([turtle]);
         expect(stage.removeChild).not.toHaveBeenCalled();
+    });
+});
+
+describe("Turtle Heading & Coordinate HUD", () => {
+    let mockActivity;
+    let turtles;
+    let stage;
+    let mockTurtle;
+
+    beforeEach(() => {
+        stage = {
+            addChild: jest.fn(),
+            removeChild: jest.fn(),
+            contains: jest.fn().mockReturnValue(false),
+            setChildIndex: jest.fn(),
+            numChildren: 5,
+            dispatchEvent: jest.fn()
+        };
+
+        mockActivity = {
+            stage: stage,
+            refreshCanvas: jest.fn(),
+            textMsg: jest.fn()
+        };
+
+        turtles = new Turtles(mockActivity);
+        mixinPrototypes(turtles);
+        turtles.activity = mockActivity;
+        turtles._turtleList = [];
+        turtles.pushTurtle = jest.fn(t => turtles._turtleList.push(t));
+        turtles.getTurtle = jest.fn(i => turtles._turtleList[i]);
+        turtles.getTurtleCount = jest.fn(() => turtles._turtleList.length);
+        document.body.innerHTML = '<div id="loader"></div>';
+        turtles._stage = stage;
+
+        const eventHandlers = {};
+        mockTurtle = {
+            id: 1,
+            name: "testTurtle",
+            x: 50,
+            y: -30,
+            orientation: 90,
+            running: false,
+            container: {
+                x: 100,
+                y: 150,
+                scaleX: 1,
+                scaleY: 1,
+                scale: 1,
+                on: jest.fn((event, handler) => {
+                    eventHandlers[event] = handler;
+                }),
+                removeAllEventListeners: jest.fn()
+            },
+            _eventHandlers: eventHandlers
+        };
+    });
+
+    describe("_getTurtleHudColors", () => {
+        it("returns fallback theme colors when CSS variables are empty or missing", () => {
+            const colors = turtles._getTurtleHudColors();
+            expect(colors).toEqual({
+                ring: "rgba(37, 99, 235, 0.45)",
+                pointer: "#2563eb",
+                bg: "rgba(17, 24, 39, 0.85)",
+                text: "#ffffff"
+            });
+        });
+
+        it("reads theme colors from document.body CSS custom properties", () => {
+            const originalGetComputedStyle = window.getComputedStyle;
+            window.getComputedStyle = jest.fn().mockReturnValue({
+                getPropertyValue: jest.fn(prop => {
+                    const map = {
+                        "--color-turtle-hud-ring": "rgba(96, 165, 250, 0.55)",
+                        "--color-turtle-hud-pointer": "#60a5fa",
+                        "--color-turtle-hud-bg": "rgba(31, 41, 55, 0.9)",
+                        "--color-turtle-hud-text": "#f9fafb"
+                    };
+                    return map[prop] || "";
+                })
+            });
+
+            const colors = turtles._getTurtleHudColors();
+            expect(colors.ring).toBe("rgba(96, 165, 250, 0.55)");
+            expect(colors.pointer).toBe("#60a5fa");
+            expect(colors.bg).toBe("rgba(31, 41, 55, 0.9)");
+            expect(colors.text).toBe("#f9fafb");
+
+            window.getComputedStyle = originalGetComputedStyle;
+        });
+    });
+
+    describe("_showTurtleHUD", () => {
+        it("does not display HUD if turtle is running or null", () => {
+            mockTurtle.running = true;
+            turtles._showTurtleHUD(mockTurtle);
+            expect(turtles._hudContainer).toBeUndefined();
+
+            turtles._showTurtleHUD(null);
+            expect(turtles._hudContainer).toBeUndefined();
+        });
+
+        it("initializes HUD container, shapes, and text on first show", () => {
+            turtles._showTurtleHUD(mockTurtle);
+
+            expect(turtles._hudContainer).toBeDefined();
+            expect(turtles._hudShape).toBeDefined();
+            expect(turtles._hudPill).toBeDefined();
+            expect(turtles._hudText).toBeDefined();
+            expect(stage.addChild).toHaveBeenCalledWith(turtles._hudContainer);
+            expect(turtles._hudContainer.visible).toBe(true);
+            expect(turtles._hudContainer.x).toBe(100);
+            expect(turtles._hudContainer.y).toBe(150);
+        });
+
+        it("renders the heading and coordinates into text and pill", () => {
+            mockTurtle.orientation = 45;
+            mockTurtle.x = 25;
+            mockTurtle.y = -75;
+            turtles._showTurtleHUD(mockTurtle);
+
+            expect(turtles._hudText.text).toBe("45°  (25, -75)");
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("testTurtle: 45°, (25, -75)", 1500);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("normalizes negative or wrapped orientation angles", () => {
+            mockTurtle.orientation = -90;
+            turtles._showTurtleHUD(mockTurtle);
+            expect(turtles._hudText.text).toContain("270°");
+        });
+
+        it("adjusts pill placement above turtle when near bottom boundary", () => {
+            turtles._h = 300;
+            mockTurtle.container.y = 260;
+            turtles._showTurtleHUD(mockTurtle);
+
+            expect(turtles._hudText.y).toBe(-54);
+        });
+
+        it("clamps HUD center horizontally within stage width when near edges", () => {
+            turtles._w = 500;
+            mockTurtle.container.x = 10;
+            turtles._showTurtleHUD(mockTurtle);
+            expect(turtles._hudContainer.x).toBeGreaterThanOrEqual(42);
+
+            mockTurtle.container.x = 490;
+            turtles._updateTurtleHUD(mockTurtle);
+            expect(turtles._hudContainer.x).toBeLessThanOrEqual(500 - 42);
+        });
+
+        it("respects prefers-reduced-motion on show without scheduling a tween", () => {
+            const originalMatchMedia = window.matchMedia;
+            window.matchMedia = jest.fn().mockImplementation(query => ({
+                matches: query.includes("prefers-reduced-motion")
+            }));
+            createjs.Tween.get.mockClear();
+
+            turtles._showTurtleHUD(mockTurtle);
+            expect(turtles._hudContainer.visible).toBe(true);
+            expect(turtles._hudContainer.alpha).toBe(1.0);
+            expect(createjs.Tween.get).not.toHaveBeenCalled();
+
+            window.matchMedia = originalMatchMedia;
+        });
+    });
+
+    describe("_updateTurtleHUD", () => {
+        it("updates HUD position and text coordinates during movement", () => {
+            turtles._showTurtleHUD(mockTurtle);
+
+            mockTurtle.container.x = 200;
+            mockTurtle.container.y = 300;
+            mockTurtle.x = 120;
+            mockTurtle.y = 80;
+            mockTurtle.orientation = 180;
+
+            turtles._updateTurtleHUD(mockTurtle);
+
+            expect(turtles._hudContainer.x).toBe(200);
+            expect(turtles._hudContainer.y).toBe(300);
+            expect(turtles._hudText.text).toBe("180°  (120, 80)");
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("does nothing if HUD container is not yet initialized or invisible", () => {
+            turtles._updateTurtleHUD(mockTurtle);
+            expect(turtles._hudContainer).toBeUndefined();
+        });
+    });
+
+    describe("_hideTurtleHUD", () => {
+        it("hides HUD container and triggers canvas refresh", () => {
+            turtles._showTurtleHUD(mockTurtle);
+            expect(turtles._hudContainer.visible).toBe(true);
+
+            turtles._hideTurtleHUD();
+            expect(turtles._hudContainer.visible).toBe(false);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("respects prefers-reduced-motion on hide without scheduling a tween", () => {
+            turtles._showTurtleHUD(mockTurtle);
+            const originalMatchMedia = window.matchMedia;
+            window.matchMedia = jest.fn().mockImplementation(query => ({
+                matches: query.includes("prefers-reduced-motion")
+            }));
+            createjs.Tween.get.mockClear();
+
+            turtles._hideTurtleHUD();
+            expect(turtles._hudContainer.visible).toBe(false);
+            expect(turtles._hudContainer.alpha).toBe(0);
+            expect(createjs.Tween.get).not.toHaveBeenCalled();
+
+            window.matchMedia = originalMatchMedia;
+        });
+
+        it("uses createjs.Tween when prefers-reduced-motion is false", () => {
+            const originalMatchMedia = window.matchMedia;
+            window.matchMedia = jest.fn().mockImplementation(() => ({
+                matches: false
+            }));
+            createjs.Tween.get.mockClear();
+
+            turtles._showTurtleHUD(mockTurtle);
+            expect(createjs.Tween.get).toHaveBeenCalledWith(turtles._hudContainer, {
+                override: true
+            });
+
+            createjs.Tween.get.mockClear();
+            turtles._hideTurtleHUD();
+            expect(createjs.Tween.get).toHaveBeenCalledWith(turtles._hudContainer, {
+                override: true
+            });
+
+            window.matchMedia = originalMatchMedia;
+        });
+
+        it("safely handles being called when _hudContainer is not created", () => {
+            expect(() => turtles._hideTurtleHUD()).not.toThrow();
+        });
+    });
+
+    describe("Interaction and lifecycle events", () => {
+        it("hides HUD when markAllAsStopped is invoked", () => {
+            turtles._showTurtleHUD(mockTurtle);
+            expect(turtles._hudContainer.visible).toBe(true);
+
+            turtles.markAllAsStopped();
+            expect(turtles._hudContainer.visible).toBe(false);
+        });
+
+        it("wires and triggers mouseover, mousedown, pressmove, mouseout, and pressup handlers", () => {
+            const startBlock = { name: "start", value: 0 };
+            turtles.createArtwork = jest.fn();
+            turtles.createHitArea = jest.fn();
+            turtles.addTurtleGraphicProps = jest.fn();
+            turtles._scale = 1;
+            turtles.screenX2turtleX = jest.fn(x => x);
+            turtles.screenY2turtleY = jest.fn(y => y);
+            turtles.isShrunk = jest.fn().mockReturnValue(false);
+
+            const listeners = {};
+            turtles.addTurtleStageProps = jest.fn(turtle => {
+                turtle.container = {
+                    x: 10,
+                    y: 20,
+                    scaleX: 1,
+                    scaleY: 1,
+                    scale: 1,
+                    on: jest.fn((evt, fn) => {
+                        listeners[evt] = fn;
+                    }),
+                    removeAllEventListeners: jest.fn()
+                };
+            });
+
+            turtles.add(startBlock, {});
+
+            const addedTurtle = turtles.getTurtle(turtles.getTurtleCount() - 1);
+            expect(listeners.mouseover).toBeDefined();
+            expect(listeners.mouseout).toBeDefined();
+            expect(listeners.mousedown).toBeDefined();
+            expect(listeners.pressup).toBeDefined();
+
+            // 1. mouseover while stopped shows HUD and scales up
+            listeners.mouseover();
+            expect(addedTurtle.container.scaleX).toBeCloseTo(1.2);
+            expect(turtles._hudContainer).toBeDefined();
+            expect(turtles._hudContainer.visible).toBe(true);
+
+            // 2. mouseover while running does not scale or re-show
+            addedTurtle.running = true;
+            const currentScale = addedTurtle.container.scaleX;
+            listeners.mouseover();
+            expect(addedTurtle.container.scaleX).toBe(currentScale);
+            addedTurtle.running = false;
+
+            // 3. mousedown starts drag and shows HUD
+            listeners.mousedown({ stageX: 10, stageY: 20 });
+            expect(turtles._isDraggingTurtle).toBe(true);
+            expect(listeners.pressmove).toBeDefined();
+
+            // 4. pressmove moves container and updates HUD
+            listeners.pressmove({ stageX: 50, stageY: 60 });
+            expect(addedTurtle.container.x).toBe(50);
+            expect(addedTurtle.container.y).toBe(60);
+            expect(turtles._hudContainer.x).toBe(50);
+            expect(turtles._hudContainer.y).toBe(60);
+
+            // 5. mouseout while dragging scales down container but keeps HUD visible
+            listeners.mouseout();
+            expect(addedTurtle.container.scaleX).toBeCloseTo(1.0);
+            expect(turtles._mouseOverTurtle).toBeNull();
+            expect(turtles._hudContainer.visible).toBe(true);
+
+            // 6. pressup ends drag and since mouse is out, hides HUD
+            listeners.pressup();
+            expect(turtles._isDraggingTurtle).toBe(false);
+            expect(turtles._hudContainer.visible).toBe(false);
+
+            // 7. click dispatches event
+            listeners.click();
+            expect(stage.dispatchEvent).toHaveBeenCalledWith(expect.stringContaining("click"));
+        });
     });
 });
