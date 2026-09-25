@@ -295,7 +295,10 @@ class KeyboardController {
                         activity.stageDirty = true;
                     }
             }
-        } else if (event.ctrlKey || event.metaKey) {
+        } else if (
+            event.ctrlKey ||
+            (event.metaKey && (event.keyCode === 90 || event.keyCode === 89 || event.keyCode === V))
+        ) {
             switch (event.keyCode) {
                 case 90: // 'Z'
                     event.preventDefault();
