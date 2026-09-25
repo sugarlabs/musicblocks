@@ -193,7 +193,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
             // and handled via whitelist in safePluginExecute.
             if (isVettedPlugin(pluginSource)) {
                 const flowCode = obj["FLOWPLUGINS"][flow];
-                const registryName = `flow_${flow}_${Math.random().toString(36).substr(2, 9)}`;
+                const registryName = `flow_${flow}_${Math.random().toString(36).slice(2, 11)}`;
                 blobScriptContent += `
 window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, receivedArg, actionArgs, args, isflow) {
     ${flowCode}
@@ -212,7 +212,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, rec
             if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const argCode = obj["ARGPLUGINS"][arg];
-                const registryName = `arg_${arg}_${Math.random().toString(36).substr(2, 9)}`;
+                const registryName = `arg_${arg}_${Math.random().toString(36).slice(2, 11)}`;
                 blobScriptContent += `
 window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, parentBlk, receivedArg, tur) {
     ${argCode}
@@ -246,7 +246,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
             if (isUnsafeObjectKey(setter)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const setterCode = obj["SETTERPLUGINS"][setter];
-                const registryName = `setter_${setter}_${Math.random().toString(36).substr(2, 9)}`;
+                const registryName = `setter_${setter}_${Math.random().toString(36).slice(2, 11)}`;
                 blobScriptContent += `
 window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turtle) {
     ${setterCode}
@@ -280,7 +280,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
                 const paramCode = obj["PARAMETERPLUGINS"][parameter];
                 const registryName = `param_${parameter}_${Math.random()
                     .toString(36)
-                    .substr(2, 9)}`;
+                    .slice(2, 11)}`;
                 blobScriptContent += `
 window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
     ${paramCode}
@@ -307,7 +307,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
             if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const onStartCode = obj["ONSTART"][arg];
-                const registryName = `onstart_${arg}_${Math.random().toString(36).substr(2, 9)}`;
+                const registryName = `onstart_${arg}_${Math.random().toString(36).slice(2, 11)}`;
                 blobScriptContent += `
 window.__mb_plugin_registry["${registryName}"] = function(logo) {
     ${onStartCode}
@@ -326,7 +326,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
             if (isUnsafeObjectKey(arg)) continue;
             if (isVettedPlugin(pluginSource)) {
                 const onStopCode = obj["ONSTOP"][arg];
-                const registryName = `onstop_${arg}_${Math.random().toString(36).substr(2, 9)}`;
+                const registryName = `onstop_${arg}_${Math.random().toString(36).slice(2, 11)}`;
                 blobScriptContent += `
 window.__mb_plugin_registry["${registryName}"] = function(logo) {
     ${onStopCode}
@@ -398,7 +398,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
     for (const item of pendingSafeEvals) {
         const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random()
             .toString(36)
-            .substr(2, 9)}`;
+            .slice(2, 11)}`;
         const setupScript = `
 window.__mb_plugin_registry = window.__mb_plugin_registry || {};
 window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivity) {
