@@ -167,8 +167,12 @@ requirejs.config({
         "utils/musicutils-constants": {
             exports: "MusicUtilsConstants"
         },
+        "utils/musicutils-i18n": {
+            deps: ["utils/utils", "utils/musicutils-constants"],
+            exports: "MusicUtilsI18n"
+        },
         "utils/musicutils": {
-            deps: ["utils/utils", "utils/musicutils-constants"]
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-i18n"]
         },
         "utils/synthutils": {
             deps: ["utils/utils", "activity/activity-context"],

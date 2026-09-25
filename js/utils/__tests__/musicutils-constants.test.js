@@ -46,6 +46,13 @@ describe("musicutils-constants", () => {
         expect(constants.MODEPIEMENU_SLOT_COUNT).toBe(12);
     });
 
+    it("exports every table the file declares", () => {
+        const declared = [...readSource("musicutils-constants.js").matchAll(/^var (\w+) =/gm)]
+            .map(match => match[1])
+            .filter(name => name !== "MusicUtilsConstants");
+        expect(Object.keys(constants).sort()).toEqual(declared.sort());
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of [
             "SHARP",
@@ -83,11 +90,17 @@ describe("musicutils-constants", () => {
         it("loads before musicutils.js without redeclaration errors", () => {
             // A hoisted `var` in musicutils.js cannot redeclare a top-level `const`,
             // which would stop the whole app from starting.
-            expect(() => load(["musicutils-constants.js", "musicutils.js"])).not.toThrow();
+            expect(() =>
+                load(["musicutils-constants.js", "musicutils-i18n.js", "musicutils.js"])
+            ).not.toThrow();
         });
 
         it("leaves every constant visible as a bare global to later scripts", () => {
-            const sandbox = load(["musicutils-constants.js", "musicutils.js"]);
+            const sandbox = load([
+                "musicutils-constants.js",
+                "musicutils-i18n.js",
+                "musicutils.js"
+            ]);
             for (const name of Object.keys(constants)) {
                 expect(vm.runInContext(`typeof ${name}`, sandbox)).not.toBe("undefined");
             }
