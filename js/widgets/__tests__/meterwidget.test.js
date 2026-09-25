@@ -501,4 +501,85 @@ describe("Meter Widget", () => {
 
         jest.useRealTimers();
     });
+
+    describe("Drum Playback and Beat Distinction", () => {
+        test("plays snare drum for strong beat and kick drum for weak beat", () => {
+            meterWidget._playing = true;
+            meterWidget._strongBeats = [true, false];
+
+            meterWidget.__playOneBeat(0, 500);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                expect.any(Number),
+                "snare drum",
+                null,
+                null
+            );
+
+            mockActivity.logo.synth.trigger.mockClear();
+
+            meterWidget.__playOneBeat(1, 500);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                expect.any(Number),
+                "kick drum",
+                null,
+                null
+            );
+        });
+    });
+
+    describe("Block Export with _save()", () => {
+        test("generates onbeatdo block stack and calls loadNewBlocks", () => {
+            meterWidget._strongBeats = [true, false, true, false];
+            meterWidget._save();
+
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith(expect.any(Array));
+            const generatedStack = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(generatedStack.length).toBeGreaterThan(0);
+            expect(generatedStack[0][1]).toBe("onbeatdo");
+        });
+    });
+
+    describe("Scaling and Timeout Helpers", () => {
+        test("scales SVG element when window is maximized", () => {
+            const mockSvg = {
+                style: {},
+                setAttribute: jest.fn()
+            };
+            const mockFrame = { offsetHeight: 500 };
+            const mockDrag = { offsetHeight: 100 };
+
+            meterWidget.getWidgetFrame = jest.fn().mockReturnValue(mockFrame);
+            meterWidget.getDragElement = jest.fn().mockReturnValue(mockDrag);
+            meterWidget.getWidgetBody = jest.fn().mockReturnValue({
+                getElementsByTagName: jest.fn().mockReturnValue([mockSvg])
+            });
+            meterWidget.isMaximized = jest.fn().mockReturnValue(true);
+
+            meterWidget._scale();
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith(
+                "height",
+                expect.stringContaining("px")
+            );
+            expect(mockSvg.setAttribute).toHaveBeenCalledWith(
+                "width",
+                expect.stringContaining("px")
+            );
+        });
+
+        test("clears and sets widget timeout correctly", () => {
+            jest.useFakeTimers();
+            const callback = jest.fn();
+            const timerId = meterWidget._setWidgetTimeout(callback, 100);
+
+            expect(timerId).toBeDefined();
+            expect(meterWidget._clearWidgetTimeout(timerId)).toBe(true);
+
+            expect(meterWidget._clearWidgetTimeout(null)).toBe(false);
+            jest.useRealTimers();
+        });
+    });
 });
