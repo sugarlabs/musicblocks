@@ -1778,7 +1778,7 @@ describe("Block Foundation", () => {
             block._capturedInitialValue = "old string";
             block.hasWideLabel = () => false;
             block._labelChanged(true, true);
-            expect(block.text.text.includes("...")).toBe(true);
+            expect(block.text.text).toBe("this is a...");
         });
 
         it("_labelChanged storein/action wideLabel truncation", () => {
@@ -1788,7 +1788,7 @@ describe("Block Foundation", () => {
             block.label.value = "this is a very long string that should be sliced";
             block._capturedInitialValue = "old string";
             block._labelChanged(true, true);
-            expect(block.text.text.includes("...")).toBe(true);
+            expect(block.text.text).toBe("this is a...");
         });
         it("_changeLabel voiceLabels truncation", () => {
             global.getTextWidth.mockReturnValue(500); // Forces > 400
@@ -1802,6 +1802,7 @@ describe("Block Foundation", () => {
             block._usePiemenu = jest.fn().mockReturnValue(true);
             block._changeLabel();
             expect(global.piemenuVoices).toHaveBeenCalled();
+            expect(global.piemenuVoices.mock.calls[0][1]).toEqual(["voice1..."]);
         });
 
         it("_changeLabel noiseLabels truncation", () => {
@@ -1816,6 +1817,7 @@ describe("Block Foundation", () => {
             block._usePiemenu = jest.fn().mockReturnValue(true);
             block._changeLabel();
             expect(global.piemenuVoices).toHaveBeenCalled();
+            expect(global.piemenuVoices.mock.calls[0][1]).toEqual(["noise1..."]);
         });
     });
 });
