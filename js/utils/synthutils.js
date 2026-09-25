@@ -2833,9 +2833,10 @@ function Synth() {
 
     /**
      * Starts the tuner by initializing microphone input
+     * @param {string} [initialTargetPitch=null] - The initial pitch to use for target pitch mode (e.g. "C4")
      * @returns {Promise<void>}
      */
-    this.startTuner = async () => {
+    this.startTuner = async (initialTargetPitch = null) => {
         const getSafeActivity = () => {
             try {
                 if (
@@ -3006,6 +3007,18 @@ function Synth() {
         this.detectPitch = YIN(Tone.context.sampleRate);
         let tunerMode = "chromatic"; // Add mode state
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
+
+        if (initialTargetPitch) {
+            try {
+                const freq = computeTargetPitchFrequency(initialTargetPitch);
+                if (!isNaN(freq) && freq > 0) {
+                    targetPitch = { note: initialTargetPitch, frequency: freq };
+                    tunerMode = "target"; // Start in target mode if an initial target is provided
+                }
+            } catch (error) {
+                console.warn("Invalid initial target pitch:", initialTargetPitch);
+            }
+        }
 
         const updatePitch = () => {
             if (!this._tunerActive) return;
@@ -3392,6 +3405,8 @@ function Synth() {
 
                     // Create chromatic mode button
                     const chromaticButton = document.createElement("div");
+                    chromaticButton.setAttribute("role", "button");
+                    chromaticButton.setAttribute("tabindex", "0");
                     chromaticButton.style.flex = "1";
                     chromaticButton.style.display = "flex";
                     chromaticButton.style.alignItems = "center";
@@ -3400,10 +3415,12 @@ function Synth() {
                     chromaticButton.style.cursor = "pointer";
                     chromaticButton.style.transition = "all 0.2s ease"; // Faster transition
                     chromaticButton.style.userSelect = "none"; // Prevent text selection
-                    chromaticButton.title = "Chromatic";
+                    chromaticButton.title = _("Chromatic");
 
                     // Create target pitch mode button
                     const targetPitchButton = document.createElement("div");
+                    targetPitchButton.setAttribute("role", "button");
+                    targetPitchButton.setAttribute("tabindex", "0");
                     targetPitchButton.style.flex = "1";
                     targetPitchButton.style.display = "flex";
                     targetPitchButton.style.alignItems = "center";
@@ -3412,11 +3429,12 @@ function Synth() {
                     targetPitchButton.style.cursor = "pointer";
                     targetPitchButton.style.transition = "all 0.2s ease"; // Faster transition
                     targetPitchButton.style.userSelect = "none"; // Prevent text selection
-                    targetPitchButton.title = "Target pitch";
+                    targetPitchButton.title = _("Target pitch");
 
                     // Create icons
                     const chromaticIcon = document.createElement("img");
                     chromaticIcon.src = "header-icons/chromatic-mode.svg";
+                    chromaticIcon.alt = _("Chromatic mode");
                     chromaticIcon.style.width = "32px"; // Increased icon size further
                     chromaticIcon.style.height = "32px";
                     chromaticIcon.style.filter = "brightness(0)"; // Make icon black
@@ -3424,6 +3442,7 @@ function Synth() {
 
                     const targetIcon = document.createElement("img");
                     targetIcon.src = "header-icons/target-pitch-mode.svg";
+                    targetIcon.alt = _("Target pitch mode");
                     targetIcon.style.width = "32px"; // Increased icon size further
                     targetIcon.style.height = "32px";
                     targetIcon.style.filter = "brightness(0)"; // Make icon black
@@ -3433,10 +3452,14 @@ function Synth() {
                     const updateButtonStyles = () => {
                         if (tunerMode === "chromatic") {
                             chromaticButton.style.backgroundColor = "#A6CEFF"; // Blue for active
+                            chromaticButton.setAttribute("aria-pressed", "true");
                             targetPitchButton.style.backgroundColor = "#FFFFFF"; // White for inactive
+                            targetPitchButton.setAttribute("aria-pressed", "false");
                         } else {
                             chromaticButton.style.backgroundColor = "#FFFFFF"; // White for inactive
+                            chromaticButton.setAttribute("aria-pressed", "false");
                             targetPitchButton.style.backgroundColor = "#A6CEFF"; // Blue for active
+                            targetPitchButton.setAttribute("aria-pressed", "true");
                         }
                     };
 
@@ -3454,6 +3477,20 @@ function Synth() {
 
                     chromaticButton.onclick = () => handleClick("chromatic");
                     targetPitchButton.onclick = () => handleClick("target");
+
+                    chromaticButton.onkeydown = e => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleClick("chromatic");
+                        }
+                    };
+
+                    targetPitchButton.onkeydown = e => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleClick("target");
+                        }
+                    };
 
                     // Assemble the toggle
                     chromaticButton.appendChild(chromaticIcon);

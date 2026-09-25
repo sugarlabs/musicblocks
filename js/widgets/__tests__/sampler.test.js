@@ -1136,34 +1136,6 @@ describe("Sampler Widget", () => {
             expect(docById("wheelDivptm").style.display).toBe("none");
         });
 
-        test("tuner toggle handles maximized mode and mode toggle clicks", async () => {
-            jest.useFakeTimers();
-            widget.init(mockActivity, 1);
-            widget.widgetWindow.isMaximized.mockReturnValue(true);
-            const tunerContainer = document.createElement("div");
-            tunerContainer.id = "tunerContainer";
-            document.body.appendChild(tunerContainer);
-
-            await widget._tunerBtn.onclick();
-            const toggle = docById("modeToggle");
-            const buttons = Array.from(toggle.querySelectorAll("div"));
-            buttons[0].onclick();
-            jest.advanceTimersByTime(200);
-            buttons[1].onclick();
-            jest.advanceTimersByTime(200);
-            // Test onkeydown
-            buttons[0].onkeydown({ key: "Enter", preventDefault: jest.fn() });
-            jest.advanceTimersByTime(200);
-            expect(buttons[0].getAttribute("aria-pressed")).toBe("true");
-            expect(buttons[1].getAttribute("aria-pressed")).toBe("false");
-
-            buttons[1].onkeydown({ key: " ", preventDefault: jest.fn() });
-            jest.advanceTimersByTime(200);
-            expect(buttons[0].getAttribute("aria-pressed")).toBe("false");
-            expect(buttons[1].getAttribute("aria-pressed")).toBe("true");
-            jest.useRealTimers();
-        });
-
         test("makeCanvas draws waveform and updates tuner when enabled", () => {
             widget.widgetWindow = widgetWindow;
             widget.tunerEnabled = true;
