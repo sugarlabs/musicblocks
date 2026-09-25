@@ -480,6 +480,19 @@ describe("AST2BlockList Class", () => {
             expect(code.substring(error.start, error.end).startsWith(unsupported)).toBe(true);
         });
 
+        test("leaves the AST alone, so converting it twice gives the same blocks", () => {
+            const AST = acorn.parse(
+                exportStart([["forever", null, [["switch", [1], [["case", [1], [["break"]]]]]]]]),
+                { ecmaVersion: 2020 }
+            );
+            const before = JSON.stringify(AST);
+            const first = AST2BlockList.toBlockList(AST, config);
+            const second = AST2BlockList.toBlockList(AST, config);
+            expect(second).toEqual(first);
+            expect(first.some(block => block[1] === "break")).toBe(true);
+            expect(JSON.stringify(AST)).toBe(before);
+        });
+
         test("exports valid code for a Stop in Start and in an action", () => {
             const start = exportStart([["print", ["x"]], ["break"]]);
             const action = exportAction([["print", ["x"]], ["break"]]);

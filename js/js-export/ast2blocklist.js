@@ -30,6 +30,23 @@
  */
 class AST2BlockList {
     /**
+     * Returns a deep copy of an AST. Regular expression literal values are
+     * shared, since nothing here changes them.
+     *
+     * @param {*} node - Acorn-generated AST (or part of one)
+     * @returns {*} copy of node
+     */
+    static _copyAST(node) {
+        if (Array.isArray(node)) return node.map(AST2BlockList._copyAST);
+        if (node === null || typeof node !== "object" || node instanceof RegExp) return node;
+        const copy = {};
+        for (const [key, value] of Object.entries(node)) {
+            copy[key] = AST2BlockList._copyAST(value);
+        }
+        return copy;
+    }
+
+    /**
      * Rewrites, in place, the code JSGenerate writes for Stop blocks back to
      * plain `break` statements, which the config maps to the Stop block:
      * - `{ let f = false; loop { ...; f = true; ...; if (f) break; } }` becomes
@@ -221,6 +238,9 @@ class AST2BlockList {
      * @returns {Array} List of block specifications ready to be loaded via loadNewBlocks
      */
     static toBlockList(AST, config) {
+        // Normalize a copy, so the caller's AST is untouched and converting it
+        // again gives the same blocks.
+        AST = AST2BlockList._copyAST(AST);
         AST2BlockList._normalizeStops(AST);
         let trees = _astToTree(AST, config);
         return _treeToBlockList(trees, config);
