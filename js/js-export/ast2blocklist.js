@@ -30,6 +30,120 @@
  */
 class AST2BlockList {
     /**
+     * Rewrites, in place, the code JSGenerate writes for Stop blocks back to
+     * plain `break` statements, which the config maps to the Stop block:
+     * - `{ let f = false; loop { ...; f = true; ...; if (f) break; } }` becomes
+     *   the loop, with `break` for each `f = true`;
+     * - `return mouse.ENDFLOW` / `return mouse.ENDMOUSE` that is not the last
+     *   statement of a function (a Stop with no loop around it) becomes `break`;
+     * - the `break` that ends every switch case is dropped, since cases don't
+     *   fall through and it isn't a Stop block.
+     *
+     * @param {Object} node - Acorn-generated AST (or part of one)
+     * @param {Boolean} [isFunctionBody=false] - whether node is a function body
+     * @returns {void}
+     */
+    static _normalizeStops(node, isFunctionBody = false) {
+        if (node === null || typeof node !== "object") return;
+
+        const isFunction = ["ArrowFunctionExpression", "FunctionExpression"].includes(node.type);
+        for (const [key, value] of Object.entries(node)) {
+            if (Array.isArray(value)) {
+                value.forEach(child => AST2BlockList._normalizeStops(child));
+            } else {
+                AST2BlockList._normalizeStops(value, isFunction && key === "body");
+            }
+        }
+
+        let list = null;
+        if (node.type === "Program" || node.type === "BlockStatement") {
+            list = node.body;
+        } else if (node.type === "SwitchCase") {
+            list = node.consequent;
+            const lastStatement = list[list.length - 1];
+            if (lastStatement && lastStatement.type === "BreakStatement" && !lastStatement.label) {
+                list.pop();
+            }
+        }
+        if (list === null) return;
+
+        const toBreak = statement => ({
+            type: "BreakStatement",
+            label: null,
+            start: statement.start,
+            end: statement.end
+        });
+
+        list.forEach((statement, i) => {
+            const returnsEnd =
+                statement.type === "ReturnStatement" &&
+                statement.argument &&
+                statement.argument.type === "MemberExpression" &&
+                statement.argument.object.name === "mouse" &&
+                ["ENDFLOW", "ENDMOUSE"].includes(statement.argument.property.name);
+            if (returnsEnd && !(isFunctionBody && i === list.length - 1)) {
+                list[i] = toBreak(statement);
+                return;
+            }
+
+            // { let f = false; loop { ...; if (f) break; } }
+            if (statement.type !== "BlockStatement" || statement.body.length !== 2) return;
+            const [declaration, loop] = statement.body;
+            const flag =
+                declaration.type === "VariableDeclaration" &&
+                declaration.declarations.length === 1 &&
+                declaration.declarations[0].id.type === "Identifier" &&
+                declaration.declarations[0].init !== null &&
+                declaration.declarations[0].init.value === false
+                    ? declaration.declarations[0].id.name
+                    : null;
+            if (
+                flag === null ||
+                !["ForStatement", "WhileStatement", "DoWhileStatement"].includes(loop.type) ||
+                loop.body.type !== "BlockStatement"
+            ) {
+                return;
+            }
+            const check = loop.body.body[loop.body.body.length - 1];
+            if (
+                !check ||
+                check.type !== "IfStatement" ||
+                check.test.type !== "Identifier" ||
+                check.test.name !== flag ||
+                check.consequent.type !== "BreakStatement" ||
+                check.consequent.label ||
+                check.alternate
+            ) {
+                return;
+            }
+
+            loop.body.body.pop();
+            const setsFlag = child =>
+                child.type === "ExpressionStatement" &&
+                child.expression.type === "AssignmentExpression" &&
+                child.expression.operator === "=" &&
+                child.expression.left.type === "Identifier" &&
+                child.expression.left.name === flag &&
+                child.expression.right.value === true;
+            const replaceSets = child => {
+                if (Array.isArray(child)) {
+                    child.forEach((item, j) => {
+                        if (item && typeof item === "object" && setsFlag(item)) {
+                            child[j] = toBreak(item);
+                        } else {
+                            replaceSets(item);
+                        }
+                    });
+                } else if (child !== null && typeof child === "object") {
+                    Object.values(child).forEach(replaceSets);
+                }
+            };
+            replaceSets(loop.body);
+            list[i] = loop;
+        });
+    }
+
+    /**
      * Converts a JavaScript AST into an array of block specifications for Music Blocks.
      *
      * @param {Object} AST - Acorn-generated AST object representing the JavaScript code
@@ -37,6 +151,7 @@ class AST2BlockList {
      * @returns {Array} List of block specifications ready to be loaded via loadNewBlocks
      */
     static toBlockList(AST, config) {
+        AST2BlockList._normalizeStops(AST);
         let trees = _astToTree(AST, config);
         return _treeToBlockList(trees, config);
 

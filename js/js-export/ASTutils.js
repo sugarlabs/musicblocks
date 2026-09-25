@@ -799,6 +799,122 @@ class ASTUtils {
     }
 
     /**
+     * Returns every Stop block marker inside node, including ones in nested
+     * clamp callbacks. Markers a nested loop took over are no longer markers.
+     *
+     * @static
+     * @param {Object} node - Abstract Syntax Tree to search
+     * @returns {[Object]} Stop block markers
+     */
+    static _findStopBlocks(node) {
+        const stops = [];
+        const visit = child => {
+            if (Array.isArray(child)) {
+                child.forEach(visit);
+            } else if (child !== null && typeof child === "object") {
+                if (child.stopBlock) stops.push(child);
+                Object.values(child).forEach(visit);
+            }
+        };
+        visit(node);
+        return stops;
+    }
+
+    /**
+     * Returns the loop so that a Stop block inside it works as it does in
+     * Music Blocks (Logo.doBreak): the rest of the current iteration still
+     * runs and then the loop ends. A bare `break` would leave at once, only
+     * leave a switch, or be a syntax error inside a clamp callback, so each
+     * Stop sets a flag that the loop checks at the end of every iteration:
+     * `{ let stopLoop = false; loop { ...; stopLoop = true; ...; if (stopLoop) break; } }`
+     *
+     * @static
+     * @param {Object} loop - Abstract Syntax Tree of a for, while or do-while loop
+     * @returns {Object} the loop, or a block holding the flag and the loop
+     */
+    static _getStoppableLoopAST(loop) {
+        const stops = ASTUtils._findStopBlocks(loop.body);
+        if (stops.length === 0) return loop;
+
+        // A box can have any valid name, so pick one the loop doesn't use.
+        const used = ASTUtils._getIdentifierNames(loop);
+        let flag = "stopLoop";
+        while (used.has(flag)) flag = "_" + flag;
+
+        for (const stop of stops) {
+            delete stop.label;
+            delete stop.stopBlock;
+            Object.assign(stop, {
+                type: "ExpressionStatement",
+                expression: {
+                    type: "AssignmentExpression",
+                    operator: "=",
+                    left: { type: "Identifier", name: flag },
+                    right: { type: "Literal", value: true }
+                }
+            });
+        }
+
+        loop.body.body.push({
+            type: "IfStatement",
+            test: { type: "Identifier", name: flag },
+            consequent: { type: "BreakStatement", label: null },
+            alternate: null
+        });
+
+        return {
+            type: "BlockStatement",
+            body: [
+                {
+                    type: "VariableDeclaration",
+                    kind: "let",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: { type: "Identifier", name: flag },
+                            init: { type: "Literal", value: false }
+                        }
+                    ]
+                },
+                loop
+            ]
+        };
+    }
+
+    /**
+     * Turns Stop block markers that no loop took over into a return, which
+     * ends the current stack like Logo.doBreak does when there is no loop.
+     *
+     * @static
+     * @param {Object} node - Abstract Syntax Tree of a Start or action body
+     * @param {String} end - "ENDMOUSE" or "ENDFLOW", the value the body returns
+     * @returns {void}
+     */
+    static _stopBlocksToReturn(node, end) {
+        if (Array.isArray(node)) {
+            node.forEach(child => ASTUtils._stopBlocksToReturn(child, end));
+        } else if (node !== null && typeof node === "object") {
+            if (node.stopBlock) {
+                delete node.label;
+                delete node.stopBlock;
+                Object.assign(node, {
+                    type: "ReturnStatement",
+                    argument: {
+                        type: "MemberExpression",
+                        object: { type: "Identifier", name: "mouse" },
+                        computed: false,
+                        property: { type: "Identifier", name: end }
+                    }
+                });
+                return;
+            }
+            // Clamp callbacks return mouse.ENDFLOW.
+            const inner = node.type === "ArrowFunctionExpression" ? "ENDFLOW" : end;
+            Object.values(node).forEach(child => ASTUtils._stopBlocksToReturn(child, inner));
+        }
+    }
+
+    /**
      * Returns list of Abstract Syntax Trees corresponding to each flow statement.
      *
      * @static
@@ -821,17 +937,36 @@ class ASTUtils {
             } else if (flow[0] === "ifthenelse") {
                 ASTs.push(ASTUtils._getIfAST(flow[1], flow[2], flow[3], iterMax));
             } else if (flow[0] === "repeat") {
-                ASTs.push(ASTUtils._getForLoopAST(flow[1], flow[2], iterMax));
+                ASTs.push(
+                    ASTUtils._getStoppableLoopAST(
+                        ASTUtils._getForLoopAST(flow[1], flow[2], iterMax)
+                    )
+                );
             } else if (flow[0] === "while") {
-                ASTs.push(ASTUtils._getWhileLoopAST(flow[1], flow[2], iterMax));
+                ASTs.push(
+                    ASTUtils._getStoppableLoopAST(
+                        ASTUtils._getWhileLoopAST(flow[1], flow[2], iterMax)
+                    )
+                );
             } else if (flow[0] === "forever") {
-                ASTs.push(ASTUtils._getWhileLoopAST([1000], flow[2], iterMax));
+                ASTs.push(
+                    ASTUtils._getStoppableLoopAST(
+                        ASTUtils._getWhileLoopAST([1000], flow[2], iterMax)
+                    )
+                );
             } else if (flow[0] === "until") {
-                ASTs.push(ASTUtils._getDoWhileLoopAST(flow[1], flow[2], iterMax));
+                ASTs.push(
+                    ASTUtils._getStoppableLoopAST(
+                        ASTUtils._getDoWhileLoopAST(flow[1], flow[2], iterMax)
+                    )
+                );
             } else if (flow[0] === "break") {
+                // The Stop block. Its loop (or the enclosing Start or action,
+                // if there is no loop) turns this marker into real code.
                 ASTs.push({
                     type: "BreakStatement",
-                    label: null
+                    label: null,
+                    stopBlock: true
                 });
             } else if (flow[0] === "switch") {
                 ASTs.push({
@@ -978,6 +1113,7 @@ class ASTUtils {
         for (const i in ASTs) {
             AST["declarations"][0]["init"]["body"]["body"].splice(i, 0, ASTs[i]);
         }
+        ASTUtils._stopBlocksToReturn(AST["declarations"][0]["init"]["body"], "ENDFLOW");
 
         return AST;
     }
@@ -996,6 +1132,7 @@ class ASTUtils {
         for (const i in ASTs) {
             AST["expression"]["arguments"][0]["body"]["body"].splice(i, 0, ASTs[i]);
         }
+        ASTUtils._stopBlocksToReturn(AST["expression"]["arguments"][0]["body"], "ENDMOUSE");
 
         return AST;
     }
