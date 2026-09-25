@@ -632,6 +632,31 @@ describe("MathUtility", () => {
         });
     });
 
+    describe("doRepeatCount", () => {
+        test("keeps whole counts", () => {
+            expect(MathUtility.doRepeatCount(4)).toBe(4);
+            expect(MathUtility.doRepeatCount(1)).toBe(1);
+        });
+
+        test("rounds fractional counts down", () => {
+            expect(MathUtility.doRepeatCount(3.5)).toBe(3);
+            expect(MathUtility.doRepeatCount(2.9)).toBe(2);
+        });
+
+        test("returns 0 for counts below 1", () => {
+            expect(MathUtility.doRepeatCount(0.5)).toBe(0);
+            expect(MathUtility.doRepeatCount(0)).toBe(0);
+            expect(MathUtility.doRepeatCount(-3)).toBe(0);
+        });
+
+        test("returns 0 for values that are not numbers", () => {
+            expect(MathUtility.doRepeatCount("4")).toBe(0);
+            expect(MathUtility.doRepeatCount(null)).toBe(0);
+            expect(MathUtility.doRepeatCount(undefined)).toBe(0);
+            expect(MathUtility.doRepeatCount(NaN)).toBe(0);
+        });
+    });
+
     describe("edge cases - Infinity, NaN, and boundary values", () => {
         test("doMod throws an error when divisor is zero", () => {
             expect(() => MathUtility.doMod(5, 0)).toThrow("DivByZeroError");
