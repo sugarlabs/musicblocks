@@ -1504,7 +1504,7 @@ class ModeWidget {
             }
         };
         popup._closeHandler = closeHandler;
-        this._setWidgetTimeout(() => {
+        setTimeout(() => {
             document.addEventListener("mousedown", closeHandler);
         }, 0);
     }

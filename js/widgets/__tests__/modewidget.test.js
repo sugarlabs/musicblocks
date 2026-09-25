@@ -954,6 +954,7 @@ describe("ModeWidget", () => {
         modeWidget._playing = true;
         modeWidget._timeouts = [123, 456];
         modeWidget._setWidgetTimeout(jest.fn(), 500);
+        expect(modeWidget._timerManager.activeTimeoutCount).toBe(1);
         modeWidget._newPattern = [true, false];
         modeWidget._notesToPlay = [0, 2];
 
@@ -962,6 +963,7 @@ describe("ModeWidget", () => {
         expect(modeWidget._locked).toBe(false);
         expect(modeWidget._playing).toBe(false);
         expect(modeWidget._timeouts).toEqual([]);
+        expect(modeWidget._timerManager.activeTimeoutCount).toBe(0);
         expect(modeWidget._activeTimeouts.size).toBe(0);
         expect(modeWidget._newPattern).toBeNull();
         expect(modeWidget._notesToPlay).toBeNull();
