@@ -1,0 +1,1072 @@
+{
+    "theme": {
+        "title": "The Lost Melody Islands",
+        "subtitle": "Quest for the Hidden Treasure",
+        "intro": "\n      <section class=\"story-card\">\n      <h4>The Story Begins</h4>\n\n      <div class=\"character-row\" aria-label=\"Meet Lyra and Choon\">\n      <span class=\"character-token lyra-token\">\n        <span class=\"character-name\">\n            Lyra\n        </span>\n\n        <span class=\"character-role\">\n            Explorer\n        </span>\n      </span>\n\n      <span class=\"character-token beat-token\">\n        <span class=\"character-name\">\n            Choon\n        </span>\n        <span class=\"character-role\">\n            Music Robot\n        </span>\n      </span>\n    </div>\n\n      <p>\n        Every adventure needs a team! <b>Lyra</b> is a fearless explorer, and\n        <b>Choon</b> is her cheerful music robot who can hear melodies hidden\n        everywhere.\n      </p>\n\n      <p>\n        The magical <b>Grand Melody</b> that once connected all the islands has\n        disappeared. Its pieces are scattered across the sea. Solve musical puzzles,\n        discover hidden melodies, and help your new friends restore the song before\n        the islands fall silent forever.\n      </p>\n    </section>\n    ",
+        "bigBadges": {
+            "echo_island": {
+                "id": "echo_island_guardian",
+                "label": "Echo Island Guardian",
+                "shortLabel": "Guardian",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Echo Island Guardian. The island can hear music again!"
+            },
+            "harmony_geometry_reef": {
+                "id": "geometry_reef_navigator",
+                "label": "Geometry Reef Navigator",
+                "shortLabel": "Navigator",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Geometry Reef Navigator. Lyra can now read the reef's shape-rhythm map!"
+            },
+            "broadcast_bay": {
+                "id": "broadcast_bay_signalkeeper",
+                "label": "Broadcast Bay Signalkeeper",
+                "shortLabel": "Signal",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Broadcast Bay Signalkeeper. Every mouse in the bay answers its own call now!"
+            },
+            "starlight_summit": {
+                "id": "grand_melody_keeper",
+                "label": "Keeper of the Grand Melody",
+                "shortLabel": "Grand Melody",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Keeper of the Grand Melody. The song that once joined every island is whole again."
+            },
+            "pulse_lighthouse": {
+                "id": "pulse_lighthouse_keeper",
+                "label": "Pulse Lighthouse Keeper",
+                "shortLabel": "Keeper",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Pulse Lighthouse Keeper. The beacon turns in perfect time, and every island can find its way home again."
+            },
+            "singing_stones": {
+                "id": "singing_stones_keeper",
+                "label": "Singing Stones Keeper",
+                "shortLabel": "Stones",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Singing Stones Keeper. The whole shore answers your touch, and the last of the Grand Melody comes home."
+            }
+        }
+    },
+    "problems": [
+        {
+            "level": 1,
+            "island": "echo_island",
+            "title": "The Bridge of Echo Island",
+            "journal": {
+                "title": "Echo Island",
+                "island": "Echo Island",
+                "learned": ["Patterns", "Repeat Blocks"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          Lyra and Choon step onto Echo Island. The bridge is gone, but the sea\n          is still humming. Choon points to an old song-map carved in stone.\n        </p>\n        <div class=\"bridge-map\" aria-label=\"Bridge song pattern A A B A\">\n          <div class=\"bridge-gate\"></div>\n          <div class=\"bridge-letters\">\n            <span>A</span>\n            <span>A</span>\n            <span>B</span>\n            <span>A</span>\n          </div>\n          <div class=\"bridge-waves\"></div>\n        </div>\n        <p>\n          \"These marks are sounds,\" Choon whispers. \"If we hear them first, we\n          can wake the bridge.\"\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Bridge Song</h4>\n        <p>\n          Try playing the loose <b>A</b> and <b>B</b> chunks. When their sounds\n          feel familiar, place them under <b>Start</b> to match the song-map\n          above.\n        </p>\n        <p>\n          Press <b>Play</b>. If the bridge starts to glow, press\n          <b>Check My Work</b>.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Secret Paths</h4>\n        <p>\n          After the bridge rises, try one small change. The island may answer.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"changeOctave\">Change octave</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">Use transpose</button>\n          <button type=\"button\" data-secret-help=\"makeLonger\">Make it longer</button>\n          <button type=\"button\" data-secret-help=\"renameChunks\">Rename chunks</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "changeOctave": {
+                    "title": "Change octave",
+                    "type": "block",
+                    "blockName": "pitch"
+                },
+                "useTranspose": {
+                    "title": "Use transpose",
+                    "type": "block",
+                    "blockName": "settransposition"
+                },
+                "makeLonger": {
+                    "title": "Make it longer",
+                    "heading": "Make the sound last longer",
+                    "description": "You can make a tone or path longer by adding another action chunk after the song, repeating a favorite chunk, or placing more notes inside an action before you play it again.<br>Musically, this gives the melody more time to travel without changing the main idea.",
+                    "singlePage": true
+                },
+                "renameChunks": {
+                    "title": "Rename chunks",
+                    "type": "block",
+                    "blockName": "action"
+                }
+            },
+            "expected": {
+                "pattern": ["A", "A", "B", "A"],
+                "chunkNames": ["A", "B"],
+                "octaves": [4, 4, 4, 4, 4]
+            },
+            "rewards": [
+                "Melody Fragment #1",
+                "Captain's Journal Page #1",
+                "Treasure Clue: The first path begins where echoes answer twice."
+            ],
+            "badges": [
+                {
+                    "id": "bridge_builder",
+                    "label": "Bridge Builder",
+                    "shortLabel": "Bridge",
+                    "iconKey": "bridge",
+                    "criterion": "completePattern",
+                    "message": "The stone tablet begins to glow. Music echoes across the island, and a shining bridge slowly rises from the ocean."
+                },
+                {
+                    "id": "name_keeper",
+                    "label": "Name Keeper",
+                    "shortLabel": "Names",
+                    "iconKey": "name",
+                    "criterion": "renamedChunks",
+                    "message": "Hidden Discovery: Name Keeper. Lyra labels the music map in her own explorer style."
+                },
+                {
+                    "id": "sky_builder",
+                    "label": "Sky Builder",
+                    "shortLabel": "Sky",
+                    "iconKey": "sky",
+                    "criterion": "changedOctave",
+                    "message": "Hidden Discovery: Sky Builder. The bridge stretches higher into the clouds."
+                },
+                {
+                    "id": "melody_shifter",
+                    "label": "Melody Shifter",
+                    "shortLabel": "Shift",
+                    "iconKey": "shift",
+                    "criterion": "usedTranspose",
+                    "message": "Hidden Discovery: Melody Shifter. The bridge glows with a new color."
+                },
+                {
+                    "id": "secret_treasure_coin",
+                    "label": "Secret Treasure Coin",
+                    "shortLabel": "Coin",
+                    "iconKey": "coin",
+                    "criterion": "createdVariation",
+                    "message": "Secret Treasure Coin found. You discovered a path Captain Cadence never recorded."
+                }
+            ],
+            "bigBadgeId": "echo_island"
+        },
+        {
+            "level": 2,
+            "island": "echo_island",
+            "title": "The Sakura Grove Echo",
+            "journal": {
+                "title": "Sakura Grove",
+                "island": "Echo Island",
+                "learned": ["Longer melodies", "Melody chunks"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          Across the new bridge, Lyra and Choon find a silent Sakura grove. A\n          journal page flutters from one branch: \"Sing the old blossom melody,\n          and the petals will show the next clue.\"\n        </p>\n        <div class=\"sakura-grove\" aria-label=\"Silent Sakura grove\">\n          <div class=\"sakura-sky-note\"></div>\n          <div class=\"sakura-tree sakura-tree-left\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"sakura-tree sakura-tree-right\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"journal-page\">#2</div>\n          <div class=\"petal petal-one\"></div>\n          <div class=\"petal petal-two\"></div>\n          <div class=\"petal petal-three\"></div>\n        </div>\n        <p>\n          Choon hears four sleepy chunks from <b>Sakura Sakura</b>. Play them\n          once, then guide them along the petal trail.\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Petal Song</h4>\n        <div class=\"petal-song-map\" aria-label=\"Sakura melody path\">\n          <span>Sakura</span>\n          <span>yayoi</span>\n          <span>miwatasu</span>\n          <span>yayoi</span>\n          <span>miwatasu</span>\n          <span>Sakura</span>\n          <span>miniyukan</span>\n        </div>\n        <p>\n          Place the chunks under <b>Start</b> in the trail shown above. Let the\n          trail bloom <b>4 times</b>, press <b>Play</b>, then check the grove.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Petals</h4>\n        <p>\n          When the trees answer, try one new twist. Some petals hide secret\n          badges.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"renameChunks\">Rename chunks</button>\n          <button type=\"button\" data-secret-help=\"changeOctave\">Lift petals</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">Use transpose</button>\n          <button type=\"button\" data-secret-help=\"makeLonger\">Make a longer path</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "renameChunks": {
+                    "title": "Rename chunks",
+                    "type": "block",
+                    "blockName": "action"
+                },
+                "changeOctave": {
+                    "title": "Lift petals",
+                    "type": "block",
+                    "blockName": "pitch"
+                },
+                "useTranspose": {
+                    "title": "Use transpose",
+                    "type": "block",
+                    "blockName": "settransposition"
+                },
+                "makeLonger": {
+                    "title": "Make a longer path",
+                    "heading": "Extend the petal trail",
+                    "description": "You can make the path longer by adding another action chunk, repeating a favorite Sakura chunk, or placing more notes inside an action before you use it again.<br>Musically, a longer path gives the melody more time to bloom while the pattern still feels connected.",
+                    "singlePage": true
+                }
+            },
+            "expected": {
+                "pattern": [
+                    "Sakura",
+                    "yayoi",
+                    "miwatasu",
+                    "yayoi",
+                    "miwatasu",
+                    "Sakura",
+                    "miniyukan",
+                    "Sakura",
+                    "yayoi",
+                    "miwatasu",
+                    "yayoi",
+                    "miwatasu",
+                    "Sakura",
+                    "miniyukan",
+                    "Sakura",
+                    "yayoi",
+                    "miwatasu",
+                    "yayoi",
+                    "miwatasu",
+                    "Sakura",
+                    "miniyukan",
+                    "Sakura",
+                    "yayoi",
+                    "miwatasu",
+                    "yayoi",
+                    "miwatasu",
+                    "Sakura",
+                    "miniyukan"
+                ],
+                "chunkNames": ["Sakura", "yayoi", "miwatasu", "miniyukan"],
+                "octaves": [
+                    3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5
+                ]
+            },
+            "rewards": [
+                "Melody Fragment #2",
+                "Captain's Journal Page #2",
+                "Treasure Clue: Follow the petals when the old grove sings four times."
+            ],
+            "badges": [
+                {
+                    "id": "sakura_echo",
+                    "label": "Sakura Echo",
+                    "shortLabel": "Sakura",
+                    "iconKey": "blossom",
+                    "criterion": "completePattern",
+                    "message": "The Sakura trees begin to sing. Petals swirl into the air and reveal Captain Cadence's next journal page."
+                },
+                {
+                    "id": "grove_name_keeper",
+                    "label": "Grove Name Keeper",
+                    "shortLabel": "Names",
+                    "iconKey": "name",
+                    "criterion": "renamedChunks",
+                    "message": "Hidden Discovery: Grove Name Keeper. Lyra adds her own names to the Sakura map."
+                },
+                {
+                    "id": "petal_lifter",
+                    "label": "Petal Lifter",
+                    "shortLabel": "Petals",
+                    "iconKey": "sky",
+                    "criterion": "changedOctave",
+                    "message": "Hidden Discovery: Petal Lifter. The blossoms float higher as the melody climbs."
+                },
+                {
+                    "id": "grove_shifter",
+                    "label": "Grove Shifter",
+                    "shortLabel": "Shift",
+                    "iconKey": "shift",
+                    "criterion": "usedTranspose",
+                    "message": "Hidden Discovery: Grove Shifter. The Sakura grove glows with a new color."
+                },
+                {
+                    "id": "petal_trail_coin",
+                    "label": "Petal Trail Coin",
+                    "shortLabel": "Coin",
+                    "iconKey": "coin",
+                    "criterion": "createdVariation",
+                    "message": "Secret Treasure Coin found. Your longer Sakura path reveals petals Captain Cadence never followed."
+                }
+            ],
+            "bigBadgeId": "echo_island"
+        },
+        {
+            "level": 3,
+            "island": "echo_island",
+            "title": "The Pulse Cave Rhythm",
+            "journal": {
+                "title": "Pulse Cave",
+                "island": "Echo Island",
+                "completeTitle": "Pulse Cave Complete",
+                "learned": ["Beat", "Rhythm Maker", "Exported rhythm actions"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          Past the Sakura grove, Lyra and Choon hear a soft tapping inside a\n          blue cave. The treasure map is quiet, but the cave walls blink like a\n          heartbeat.\n        </p>\n        <div class=\"rhythm-cave\" aria-label=\"Pulse Cave beat map\">\n          <div class=\"cave-mouth\"></div>\n          <div class=\"pulse-lights\">\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"rhythm-river\">\n            <span></span>\n            <span></span>\n            <span></span>\n          </div>\n          <div class=\"journal-page rhythm-journal-page\">#3</div>\n        </div>\n        <p>\n          \"This clue is not a melody first,\" Choon says. \"It is a pulse. We\n          need to build the beat before the next song can wake up.\"\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Pulse Cave Beat</h4>\n        <p>\n          Open <b>Rhythm Maker</b>. Create a steady beat, try a few long and\n          short rhythm changes, then click <b>Save rhythms</b>.\n        </p>\n        <p>\n          Find the exported rhythm action in the <b>Action</b> palette, place\n          it under <b>Start</b>, press <b>Play</b>, and listen for the cave's\n          heartbeat.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Secret Beats</h4>\n        <p>\n          After the cave starts blinking, try a rhythm experiment. These\n          discoveries are about beat, length, and drum color.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openMaker\">Open Rhythm Maker</button>\n          <button type=\"button\" data-secret-help=\"saveRhythm\">Save rhythms</button>\n          <button type=\"button\" data-secret-help=\"changeLength\">Change note lengths</button>\n          <button type=\"button\" data-secret-help=\"swapDrum\">Try another drum</button>\n          <button type=\"button\" data-secret-help=\"drumMachine\">Save drum machine</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "openMaker": {
+                    "title": "Open Rhythm Maker",
+                    "type": "block",
+                    "blockName": "rhythmruler2"
+                },
+                "saveRhythm": {
+                    "title": "Save rhythms",
+                    "heading": "Turn your beat into a chunk",
+                    "description": "Use Rhythm Maker to shape the pulse, then press Save rhythms. Music Blocks creates a new action called rhythm. Put that action under Start so your program can play it.<br>Musically, exporting turns your rhythm idea into a reusable pattern.",
+                    "singlePage": true
+                },
+                "changeLength": {
+                    "title": "Change note lengths",
+                    "heading": "Stretch or shorten the beat",
+                    "description": "Open Rhythm Maker and change one rhythm value so the pulse is no longer all the same length. Try changing the rhythm from 1/1 to 1/2, 1/4, or another value, then listen again.<br>This unlocks the Beat Shaper discovery because longer and shorter notes change the rhythm pattern while the beat keeps moving.",
+                    "singlePage": true
+                },
+                "swapDrum": {
+                    "title": "Try another drum",
+                    "type": "block",
+                    "blockName": "setdrum"
+                },
+                "drumMachine": {
+                    "title": "Save drum machine",
+                    "heading": "Make the cave answer with drums",
+                    "description": "After trying a rhythm, press Save drum machine in Rhythm Maker. This creates an action that plays drum sounds directly. Use it when you want the beat to sound like a percussion pattern, not just a rhythm guide.",
+                    "singlePage": true
+                }
+            },
+            "expected": {
+                "rhythmMakerWorkflow": true
+            },
+            "incomplete": {
+                "title": "The Pulse Cave Is Still Quiet",
+                "message": "Choon hears the beat in Rhythm Maker, but Start is not playing the exported rhythm yet. Click Save rhythms, find the rhythm action, place it under Start, then press Check My Work."
+            },
+            "rewards": [
+                "Melody Fragment #3",
+                "Captain's Journal Page #3",
+                "Treasure Clue: The next path opens when a steady pulse carries a changing rhythm."
+            ],
+            "badges": [
+                {
+                    "id": "pulse_cave_keeper",
+                    "label": "Pulse Cave Keeper",
+                    "shortLabel": "Pulse",
+                    "iconKey": "rhythm",
+                    "criterion": "completeRhythmWorkflow",
+                    "message": "The cave lights blink in time. Lyra and Choon save the rhythm path in Captain Cadence's journal."
+                },
+                {
+                    "id": "beat_shaper",
+                    "label": "Beat Shaper",
+                    "shortLabel": "Beat",
+                    "iconKey": "beat",
+                    "criterion": "changedRhythmLength",
+                    "message": "Hidden Discovery: Beat Shaper. The cave pulse stretches and snaps as your notes become longer and shorter."
+                },
+                {
+                    "id": "drum_taster",
+                    "label": "Drum Taster",
+                    "shortLabel": "Drum",
+                    "iconKey": "drum",
+                    "criterion": "changedDrumSound",
+                    "message": "Hidden Discovery: Drum Taster. A new drum color echoes from the cave wall."
+                },
+                {
+                    "id": "drum_machine_builder",
+                    "label": "Drum Machine Builder",
+                    "shortLabel": "Machine",
+                    "iconKey": "machine",
+                    "criterion": "savedDrumMachine",
+                    "message": "Hidden Discovery: Drum Machine Builder. The cave answers with a full percussion pattern."
+                }
+            ],
+            "bigBadgeId": "echo_island"
+        },
+        {
+            "level": 4,
+            "island": "echo_island",
+            "title": "Chest, Snap, Clap - Build the Rhythm",
+            "journal": {
+                "title": "Body Beat Cove",
+                "island": "Echo Island",
+                "completeTitle": "Body Beat Cove Complete",
+                "learned": ["Phrase Maker", "Two-part form", "Body percussion"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          The Pulse Cave opens onto a bright stone cove. Three carvings glow on\n          the sand: <b>chest</b>, <b>snap</b>, and <b>clap</b>. Choon taps the\n          pattern on his metal shell, and the rocks answer back.\n        </p>\n        <div class=\"body-beat-cove\" aria-label=\"Chest snap clap rhythm map\">\n          <div class=\"cove-sun\"></div>\n          <div class=\"body-beat-row\">\n            <span>Chest</span>\n            <span>Snap</span>\n            <span>Clap</span>\n          </div>\n          <div class=\"body-beat-grid\">\n            <span></span><span></span><span></span><span></span>\n            <span></span><span></span><span></span><span></span>\n          </div>\n          <div class=\"journal-page body-beat-journal-page\">#4</div>\n        </div>\n        <p>\n          \"This rhythm has two halves,\" Lyra says. \"If we map the body sounds\n          over time, the cove can show the next treasure mark.\"\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Body Beat Map</h4>\n        <p>This is the rhythm the cove is tapping. Say it out loud with Choon first, one body sound for every box.</p>\n        <div class=\"rhythm-chart\" aria-label=\"The rhythm to copy, eight boxes in each half\">\n          <h5>Half 1</h5>\n          <div class=\"rhythm-bar\"><span class=\"beat-chest\">Chest</span><span class=\"beat-clap\">Clap</span><span class=\"beat-snap\">Snap</span><span class=\"beat-clap\">Clap</span></div>\n          <div class=\"rhythm-bar\"><span class=\"beat-chest\">Chest</span><span class=\"beat-clap\">Clap</span><span class=\"beat-snap\">Snap</span><span class=\"beat-clap\">Clap</span></div>\n          <h5>Half 2</h5>\n          <div class=\"rhythm-bar\"><span class=\"beat-chest\">Chest</span><span class=\"beat-clap\">Clap</span><span class=\"beat-snap\">Snap</span><span class=\"beat-clap\">Clap</span></div>\n          <div class=\"rhythm-bar\"><span class=\"beat-chest\">Chest</span><span class=\"beat-clap\">Clap</span><span class=\"beat-snap\">Snap</span><span class=\"beat-clap beat-quick\"><i>Clap</i><i>Clap</i></span></div>\n        </div>\n        <p>Both halves are the same until the very last box. There the single clap becomes <b>two quick claps</b> in the same amount of time, so the rhythm runs straight on into the next round. Musicians call that quick pair two sixteenth notes.</p>\n        <p>Open <b>Phrase Maker</b> and give each body sound its own drum row. Tap the boxes so the drums play in that order, then save <b>Half 1</b> as an <b>action</b> chunk. Build <b>Half 2</b> the same way.</p>\n        <p>Put both chunks under <b>Start</b>, wrap them in a <b>repeat</b> block, and press <b>Play</b>. The cove should clap back.</p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Secret Body Beats</h4>\n        <p>\n          Once the cove starts clapping back, try a body-rhythm twist. These\n          discoveries are about form, loops, sound choices, and remixing.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"openPhraseMaker\">Open Phrase Maker</button>\n          <button type=\"button\" data-secret-help=\"exportHalves\">Export two halves</button>\n          <button type=\"button\" data-secret-help=\"loopGroove\">Loop the groove</button>\n          <button type=\"button\" data-secret-help=\"swapBodySounds\">Swap body sounds</button>\n          <button type=\"button\" data-secret-help=\"remixGroove\">Make your own groove</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "openPhraseMaker": {
+                    "title": "Open Phrase Maker",
+                    "type": "block",
+                    "blockName": "matrix"
+                },
+                "exportHalves": {
+                    "title": "Export two halves",
+                    "heading": "Make two rhythm chunks",
+                    "description": "Use Phrase Maker to build the first half, then save it as an action. Build the second half with its shorter sixteenth-note ending and save that too. Place both action chunks under Start.<br>Musically, two chunks make a call-and-answer shape: the first half sets the pattern, and the second half changes the ending.",
+                    "singlePage": true
+                },
+                "loopGroove": {
+                    "title": "Loop the groove",
+                    "heading": "Make the body beat repeat",
+                    "description": "Put a repeat block under Start and place both Phrase Maker action chunks inside it. Try repeating the full groove 2 or 4 times.<br>This unlocks the Loop Leader discovery because a rhythm becomes easier to feel when it comes around again.",
+                    "singlePage": true
+                },
+                "swapBodySounds": {
+                    "title": "Swap body sounds",
+                    "heading": "Change the cove's body sounds",
+                    "description": "Click a drum name inside your Phrase Maker action and choose a different sound from the pie menu. For example, replace one drum with a bell, clap, or another percussion sound.<br>Musically, the timing stays the same, but the color of the rhythm changes.",
+                    "singlePage": true
+                },
+                "remixGroove": {
+                    "title": "Make your own groove",
+                    "heading": "Add one extra body-beat idea",
+                    "description": "After your two-part rhythm works, add another exported Phrase Maker action or call one of your actions one more time under Start.<br>This unlocks the Cove Remixer discovery because you are extending the form beyond the required rhythm.",
+                    "singlePage": true
+                }
+            },
+            "expected": {
+                "blocks": ["repeat", "playdrum"],
+                "phraseMakerWorkflow": true,
+                "twoPartForm": true,
+                "minNotes": 6
+            },
+            "incomplete": {
+                "title": "The Body Beat Cove Is Waiting",
+                "message": "Choon hears some taps, but the cove needs two Phrase Maker action chunks under Start, looped with a repeat block. Export both halves, place both actions in the loop, then check again."
+            },
+            "rewards": [
+                "Melody Fragment #4",
+                "Captain's Journal Page #4",
+                "Treasure Clue: The treasure door listens for two body-beat answers inside one loop."
+            ],
+            "badges": [
+                {
+                    "id": "body_beat_builder",
+                    "label": "Body Beat Builder",
+                    "shortLabel": "Body",
+                    "iconKey": "body",
+                    "criterion": "completePhraseWorkflow",
+                    "message": "The cove claps back in two parts. Lyra records the body rhythm in Captain Cadence's journal."
+                },
+                {
+                    "id": "two_part_mapper",
+                    "label": "Two-Part Mapper",
+                    "shortLabel": "Parts",
+                    "iconKey": "parts",
+                    "criterion": "completedTwoPartForm",
+                    "message": "Hidden Discovery: Two-Part Mapper. Your first half and second half answer each other clearly."
+                },
+                {
+                    "id": "loop_leader",
+                    "label": "Loop Leader",
+                    "shortLabel": "Loop",
+                    "iconKey": "loop",
+                    "criterion": "usedRepeatLoop",
+                    "message": "Hidden Discovery: Loop Leader. The body beat circles around until everyone can feel the groove."
+                },
+                {
+                    "id": "body_sound_designer",
+                    "label": "Body Sound Designer",
+                    "shortLabel": "Sound",
+                    "iconKey": "sound",
+                    "criterion": "changedPhraseDrums",
+                    "message": "Hidden Discovery: Body Sound Designer. The same rhythm speaks with a new sound color."
+                },
+                {
+                    "id": "cove_remixer",
+                    "label": "Cove Remixer",
+                    "shortLabel": "Remix",
+                    "iconKey": "remix",
+                    "criterion": "createdPhraseVariation",
+                    "message": "Secret Treasure Coin found. Your extra body-beat idea makes the cove dance in a new way."
+                }
+            ],
+            "bigBadgeId": "echo_island"
+        },
+        {
+            "level": 5,
+            "island": "harmony_geometry_reef",
+            "title": "The Shape Drum Reef",
+            "journal": {
+                "title": "Shape Drum Reef",
+                "island": "Harmony Geometry Reef",
+                "completeTitle": "Shape Drum Reef Complete",
+                "learned": ["360 degree turns", "Polygons", "Geometry and rhythm"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          After the Body Beat Cove claps back, Captain Cadence's map folds into\n          three glowing outlines. Choon hears each shape like a rhythm: one whole\n          circle split into equal beats.\n        </p>\n        <div class=\"geometry-reef\" aria-label=\"Triangle square and pentagon reef map\">\n          <div class=\"geometry-orbit\"></div>\n          <div class=\"geometry-shape geometry-triangle\"></div>\n          <div class=\"geometry-shape geometry-square\"></div>\n          <div class=\"geometry-shape geometry-pentagon\"></div>\n          <div class=\"journal-page geometry-journal-page\">#5</div>\n        </div>\n        <p>\n          \"A full turn is <b>360 degrees</b>,\" Choon says. \"Split the turn into\n          sides, and the turtle draws the rhythm of a shape.\"\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Shape Rhythm</h4>\n        <p>\n          The loose <b>repeat</b>, <b>forward</b>, and <b>right</b> blocks belong\n          under the <b>Start</b> block that is already on the canvas. Build the\n          square first, then drag two more <b>Start</b> blocks out of the palette\n          and build the other two shapes beside it.\n        </p>\n        <div class=\"beat-map\" aria-label=\"Blocks and numbers for each shape\">\n          <span>Triangle - repeat 3, forward 100, right 120</span>\n          <span>Square - repeat 4, forward 100, right 90</span>\n          <span>Pentagon - repeat 5, forward 100, right 72</span>\n        </div>\n        <p>\n          Every turn is one whole circle shared out between the sides: 360 shared\n          by 3 is 120, by 4 is 90, by 5 is 72. Turning <b>left</b> draws the same\n          shape the other way round, and that counts too.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Shape Beats</h4>\n        <p>\n          Once the three shapes appear, try one deeper geometry trick. Each one\n          hides a badge.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"divideCircle\">Share out the circle</button>\n          <button type=\"button\" data-secret-help=\"useBox\">Keep the sides in a box</button>\n          <button type=\"button\" data-secret-help=\"colorShape\">Color each shape</button>\n          <button type=\"button\" data-secret-help=\"extraPolygon\">Draw a sixth shape</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "divideCircle": {
+                    "title": "Share out the circle",
+                    "heading": "Let the blocks do the dividing",
+                    "description": "Instead of typing the angle into the right block, drop a divide block into it with 360 on top and the number of sides underneath. The blocks work the angle out for you.<br>It works for any shape, so the only number you ever change is the one at the bottom.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Sharing one whole circle between equal sides is the same move as sharing one whole beat between equal notes.",
+                    "singlePage": true
+                },
+                "useBox": {
+                    "title": "Keep the sides in a box",
+                    "heading": "One number, used twice",
+                    "description": "Put a store in block above the repeat, give the box any name you like, and put the number of sides in it. Then drop a box block into the repeat count, and another under the 360 in a divide block.<br>Now one number decides the whole shape, and you only ever edit it in one place.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "A box is how a musician writes a part once and uses it in several places, so one edit changes every copy.",
+                    "singlePage": true
+                },
+                "colorShape": {
+                    "title": "Color each shape",
+                    "type": "block",
+                    "blockName": "setcolor"
+                },
+                "extraPolygon": {
+                    "title": "Draw a sixth shape",
+                    "heading": "Try a new split of the circle",
+                    "description": "Copy one Start program and change the repeat number and the turn together. Six sides turn by 60, eight by 45, and for seven you can round 360 divided by 7 down to 51 - close is close enough.<br>Any number of sides counts, and the more you add the nearer the shape creeps to a circle.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Splitting a whole into more and more equal parts is how note values work too, all the way down from a whole note.",
+                    "singlePage": true
+                }
+            },
+            "expected": {
+                "basicShapeSet": true
+            },
+            "incomplete": {
+                "title": "The Shape Reef Is Still Faint",
+                "message": "Choon sees part of the reef, but it needs all three shapes: repeat 3 with right 120, repeat 4 with right 90, and repeat 5 with right 72, each with a forward inside the repeat. Build them under Start blocks, then press Check My Work."
+            },
+            "rewards": [
+                "Melody Fragment #5",
+                "Captain's Journal Page #5",
+                "Treasure Clue: The Heart of Harmony listens for circles split into equal shape beats."
+            ],
+            "badges": [
+                {
+                    "id": "shape_reef_builder",
+                    "label": "Shape Reef Builder",
+                    "shortLabel": "Shapes",
+                    "iconKey": "shape",
+                    "criterion": "completeBasicShapeSet",
+                    "message": "The reef lights up with triangle, square, and pentagon rhythms. Lyra saves the shape clue in Captain Cadence's journal."
+                },
+                {
+                    "id": "circle_divider",
+                    "label": "Circle Divider",
+                    "shortLabel": "Divide",
+                    "iconKey": "divide",
+                    "criterion": "usedGeometryDivision",
+                    "message": "Hidden Discovery: Circle Divider. You split 360 degrees like a whole note divided into beats."
+                },
+                {
+                    "id": "box_geometer",
+                    "label": "Box Geometer",
+                    "shortLabel": "Box",
+                    "iconKey": "box",
+                    "criterion": "usedBoxVariable",
+                    "message": "Hidden Discovery: Box Geometer. One stored number now guides the shape's repeat and turn."
+                },
+                {
+                    "id": "reef_colorist",
+                    "label": "Reef Colorist",
+                    "shortLabel": "Color",
+                    "iconKey": "color",
+                    "criterion": "changedShapeColor",
+                    "message": "Hidden Discovery: Reef Colorist. The geometry reef glows with a new color."
+                },
+                {
+                    "id": "polygon_explorer",
+                    "label": "Polygon Explorer",
+                    "shortLabel": "Polygon",
+                    "iconKey": "polygon",
+                    "criterion": "createdExtraPolygon",
+                    "message": "Secret Treasure Coin found. You drew a new shape Captain Cadence did not mark on the reef."
+                }
+            ],
+            "bigBadgeId": "harmony_geometry_reef"
+        },
+        {
+            "level": 6,
+            "island": "harmony_geometry_reef",
+            "title": "The Spinning Polyrhythm Lagoon",
+            "journal": {
+                "title": "Spinning Polyrhythm Lagoon",
+                "island": "Harmony Geometry Reef",
+                "completeTitle": "Polyrhythm Lagoon Complete",
+                "learned": ["Polyrhythms", "Duplets and triplets", "Sound-sync animation"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          Beyond the Shape Drum Reef, Lyra finds a lagoon where two ripples dance\n          at once. One ripple taps in <b>2</b>. The other taps in <b>3</b>.\n          Choon whispers, \"That is a <b>polyrhythm</b>: two rhythms moving\n          together, meeting, and separating.\"\n        </p>\n        <div class=\"polyrhythm-lagoon\" aria-label=\"Two rhythm ripples and a spinning avatar\">\n          <div class=\"lagoon-ring lagoon-ring-two\"><span>2</span></div>\n          <div class=\"lagoon-ring lagoon-ring-three\"><span>3</span></div>\n          <div class=\"avatar-orb\"></div>\n          <div class=\"journal-page lagoon-journal-page\">#6</div>\n        </div>\n        <p>\n          Captain Cadence's page says: \"When the beats move differently, let an\n          avatar show the motion so your eyes can hear the rhythm too.\"\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Lagoon Mission</h4>\n        <p>\n          The two rhythm rulers on the canvas already tap in <b>2</b> and in\n          <b>3</b>, so leave them as they are. Everything else is lying loose and\n          has to be snapped together.\n        </p>\n        <ol>\n          <li>\n            Snap the <b>avatar</b> block under the <b>Start</b> block, so there is\n            a mouse on the screen to watch.\n          </li>\n          <li>\n            Snap <b>on every note do</b> underneath it, in the same Start stack.\n            Both blocks have to sit in that stack or nothing will run.\n          </li>\n          <li>\n            Drag an <b>action</b> block out of the Actions palette, leave its name\n            as <b>action</b>, and put something inside that moves the mouse. The\n            loose <b>right</b> and <b>divide</b> blocks beside the canvas are\n            there for exactly that.\n          </li>\n        </ol>\n        <p>\n          Press Play and listen for the moment when the 2-beat ripple and the\n          3-beat ripple meet again.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Ripple Tricks</h4>\n        <p>\n          The lagoon has extra marks for explorers who make the rhythm visible in\n          new ways.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"turnMotion\">Turn on every note</button>\n          <button type=\"button\" data-secret-help=\"noteMotion\">Let note length steer</button>\n          <button type=\"button\" data-secret-help=\"pitchVoice\">Give a ripple a voice</button>\n          <button type=\"button\" data-secret-help=\"extraRipple\">Add a third ripple</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "turnMotion": {
+                    "title": "Turn on every note",
+                    "heading": "Make the turn fit the rhythm",
+                    "description": "Put a turn block inside your action and give it any angle you like. 360 divided by 4 carries the mouse right around in four notes, while a smaller angle draws a slow spiral instead.<br>Try a few and watch what each one does to the path.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "When the turn closes at the same moment the rhythm repeats, you can see the length of the pattern instead of counting it.",
+                    "singlePage": true
+                },
+                "noteMotion": {
+                    "title": "Let note length steer",
+                    "heading": "Short notes, small moves",
+                    "description": "Drop a note value block into the number slot of your turn block, so a short note makes a small turn and a long one makes a big turn. Note value, elapsed notes and note counter all work.<br>The mouse stops turning evenly and starts tracing the actual rhythm.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Note length is the part of rhythm that is easiest to hear and hardest to see, so drawing it is worth doing once.",
+                    "singlePage": true
+                },
+                "pitchVoice": {
+                    "title": "Give a ripple a voice",
+                    "heading": "Swap a drum for a note",
+                    "description": "Open one of the rhythm rulers and put a note block where its drum block sits. A pitch block, a note name or a scale degree all give it a voice.<br>Leave the other ripple on a drum so you can still hear the two rhythms pulling apart.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "A polyrhythm is much easier to follow when the two parts have different voices, which is why drum circles mix high and low drums.",
+                    "singlePage": true
+                },
+                "extraRipple": {
+                    "title": "Add a third ripple",
+                    "heading": "One more rhythm on top",
+                    "description": "Copy a rhythm ruler and change its number to anything that is not 2 or 3. Four, five, seven - each one meets the other two at a different moment.<br>Count the beats until all three line up again and see how far your choice pushes it.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Rhythms meeting again after a long stretch is how a groove can feel both steady and surprising at the same time.",
+                    "singlePage": true
+                }
+            },
+            "expected": {
+                "animatedPolyrhythm": true
+            },
+            "incomplete": {
+                "title": "The Lagoon Is Still Quiet",
+                "message": "Choon hears the 2-beat and 3-beat ripples, but nothing is moving yet. The avatar block and the on every note do block both have to be snapped under the Start block, not left loose on the canvas. Connect them, then press Check My Work."
+            },
+            "rewards": [
+                "Melody Fragment #6",
+                "Captain's Journal Page #6",
+                "Treasure Clue: The Heart of Harmony appears when different beats move together without losing their own path."
+            ],
+            "badges": [
+                {
+                    "id": "lagoon_conductor",
+                    "label": "Lagoon Conductor",
+                    "shortLabel": "Lagoon",
+                    "iconKey": "polyrhythm",
+                    "criterion": "completeAnimatedPolyrhythm",
+                    "message": "The duplet and triplet ripples begin to spin together. Lyra adds the lagoon's moving rhythm to Captain Cadence's journal."
+                },
+                {
+                    "id": "extra_ripple_maker",
+                    "label": "Extra Ripple Maker",
+                    "shortLabel": "Ripple",
+                    "iconKey": "sync",
+                    "criterion": "createdExtraPolyrhythmDivisor",
+                    "message": "Hidden Discovery: Extra Ripple Maker. You added a rhythm ripple beyond the lagoon's 2 and 3 pattern."
+                },
+                {
+                    "id": "avatar_spark",
+                    "label": "Avatar Spark",
+                    "shortLabel": "Avatar",
+                    "iconKey": "avatar",
+                    "criterion": "usedAvatarAnimation",
+                    "message": "Hidden Discovery: Avatar Spark. The lagoon has a performer now."
+                },
+                {
+                    "id": "note_motion_mapper",
+                    "label": "Note Motion Mapper",
+                    "shortLabel": "Motion",
+                    "iconKey": "motion",
+                    "criterion": "usedNoteValueMotion",
+                    "message": "Hidden Discovery: Note Motion Mapper. Your animation listens to note values, just like Captain Cadence hinted."
+                },
+                {
+                    "id": "singing_ripple",
+                    "label": "Singing Ripple",
+                    "shortLabel": "Voice",
+                    "iconKey": "voice",
+                    "criterion": "createdPitchPolyrhythm",
+                    "message": "Hidden Discovery: Singing Ripple. You added a pitched voice to the moving rhythm."
+                },
+                {
+                    "id": "spin_choreographer",
+                    "label": "Spin Choreographer",
+                    "shortLabel": "Spin",
+                    "iconKey": "spin",
+                    "criterion": "changedAnimationTurn",
+                    "message": "Secret Treasure Coin found. Your avatar turns with the rhythm and shows the lagoon's phase shift."
+                }
+            ],
+            "bigBadgeId": "harmony_geometry_reef"
+        },
+        {
+            "level": 7,
+            "island": "broadcast_bay",
+            "title": "The Conductor's Signal Ring",
+            "journal": {
+                "title": "Conductor's Signal Ring",
+                "island": "Broadcast Bay",
+                "completeTitle": "Signal Ring Complete",
+                "learned": [
+                    "Broadcast and listen",
+                    "Event names built with plus",
+                    "Counting with mod"
+                ]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          The spinning lagoon carries Lyra and Choon into <b>Broadcast Bay</b>.\n          Twelve small drum mice sit in a wide circle holding their drums, and\n          not one of them makes a sound. \"They cannot feel the beat,\" Choon\n          says. \"Each mouse is waiting to hear its own name.\"\n        </p>\n        <div class=\"signal-ring\" aria-label=\"Twelve drum mice in a circle around the conductor mouse\">\n          <div class=\"signal-ring-track\"></div>\n          <span class=\"ring-drum ring-drum-active\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <span class=\"ring-drum\"></span>\n          <div class=\"ring-conductor\"></div>\n          <div class=\"journal-page ring-journal-page\">#7</div>\n        </div>\n        <p>\n          In the middle stands <b>Mr. Mouse</b>, the conductor. Captain\n          Cadence's page says: \"One caller, many listeners. Send a name into the\n          air, and only the mouse who owns that name will answer.\"\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Two Tricks for the Ring</h4>\n        <p>\n          <b>Adding words.</b> The <b>plus (+)</b> block adds numbers, but it\n          can also stick words together. \"event\" + \"5\" becomes\n          <span class=\"tablet-code\">event5</span>. That is how one broadcast can\n          call a different mouse every time around.\n        </p>\n        <p>\n          <b>Counting in a circle.</b> The <b>mod</b> block counts and then\n          starts over. Mod 12 only ever gives 0, 1, 2 ... 11, and then goes back\n          to 0. It works like counting beats in a measure, except the ring\n          starts at 0 instead of 1.\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Ring Mission</h4>\n        <p>\n          The two action chunks on the canvas already belong to the drum mice,\n          and the loose blocks beside them are your ingredients. Your job is to\n          wake up the conductor.\n        </p>\n        <ol>\n          <li>\n            Snap the <b>forever</b> loop under Mr. Mouse's Start block, then put\n            the <b>arc</b> block inside it so the conductor keeps walking around\n            the ring.\n          </li>\n          <li>\n            Add a <b>broadcast</b> whose name is built by the <b>plus (+)</b>\n            block, so it calls event0, event1, event2, and onward.\n          </li>\n          <li>\n            Use the <b>mod</b> block so the count wraps back to 0 after 11 and\n            the conductor never runs out of mice to call.\n          </li>\n          <li>\n            Keep the <b>mouse setup</b> chunk, which uses <b>listen</b> and\n            <b>setxy</b> so each drum mouse jumps into the ring when it hears\n            its name.\n          </li>\n        </ol>\n        <p>\n          Press Play, then click a drum mouse to change the sound it answers\n          with.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Think About</h4>\n        <ul>\n          <li>What does broadcast mean outside of computers? Who listens?</li>\n          <li>\n            How is Mr. Mouse like a conductor counting 1, 2, 3 around a circle\n            of drummers?\n          </li>\n          <li>Why can mod 12 never reach 12?</li>\n          <li>What would happen if two mice listened for the same name?</li>\n        </ul>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Signals</h4>\n        <p>\n          Once the ring turns, try one new trick. Each one hides a badge.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"makeMice\">Add more mice</button>\n          <button type=\"button\" data-secret-help=\"ringDrum\">Give a mouse its drum</button>\n          <button type=\"button\" data-secret-help=\"toggleTrick\">Flip between two drums</button>\n          <button type=\"button\" data-secret-help=\"readBox\">Read what the box holds</button>\n          <button type=\"button\" data-secret-help=\"mouseDance\">Make the mice dance</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "makeMice": {
+                    "title": "Add more mice",
+                    "heading": "Every drum in the ring is its own mouse",
+                    "description": "Add a Start block, use a set name block to give it a number, then call the mouse setup chunk so it listens for that name. Repeat for as many mice as you want.<br>Two or three mice are already enough to hear the beat travel, and twelve makes the full circle.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "A drum circle is many players holding one part each, not one player juggling all of them.",
+                    "singlePage": true
+                },
+                "ringDrum": {
+                    "title": "Give a mouse its drum",
+                    "heading": "Put the sound inside the mouse",
+                    "description": "Open the mouse setup chunk and drop a drum block in beside the listen block, so the mouse makes a sound when its name is called. Any drum or noise will do.<br>Give each mouse a different one and the ring turns into a whole kit.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Different drums around the circle are what turn a row of taps into a rhythm you can actually follow.",
+                    "singlePage": true
+                },
+                "toggleTrick": {
+                    "title": "Flip between two drums",
+                    "heading": "One number that flips itself",
+                    "description": "Inside the change action, store a sum that can only ever land on 0 or 1: 1 minus the box, or the box plus 1 counted mod 2. Either way the number flips every time the mouse is clicked.<br>That one number chooses which of two drums the mouse answers with.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Alternating two sounds on one player is how a drummer keeps a backbeat going without a second pair of hands.",
+                    "singlePage": true
+                },
+                "readBox": {
+                    "title": "Read what the box holds",
+                    "heading": "Look inside before you play",
+                    "description": "Drop a box block anywhere a number goes and Music Blocks reads what was stored there instead of a fixed value. The drum, the turn, the next mouse to call - any of them can come out of a box.<br>Change the box once and every place that reads it changes with it.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "A conductor keeps the count in their head and the whole group reads it; a box is that shared count written down.",
+                    "singlePage": true
+                },
+                "mouseDance": {
+                    "title": "Make the mice dance",
+                    "heading": "Move on the beat, not just play it",
+                    "description": "Add a turn block inside the mouse setup chunk so every mouse moves a little when its name is called. Any angle works, and 30 degrees is an easy first try.<br>The ring stops looking still and starts looking like it is keeping time.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Players move on the beat before they play it, which is how a group stays together without counting out loud.",
+                    "singlePage": true
+                }
+            },
+            "expected": {
+                "circularRhythmRing": true
+            },
+            "incomplete": {
+                "title": "The Ring Is Still Silent",
+                "message": "Choon can see the mice, but nobody is calling them. The conductor needs an arc inside a loop, a broadcast whose name is built with the plus (+) block, and a mod block so the count wraps back to 0. Keep the mouse setup chunk with its listen and setxy blocks."
+            },
+            "rewards": [
+                "Melody Fragment #7",
+                "Captain's Journal Page #7",
+                "Treasure Clue: The last door opens where one voice calls and many answer, each in its turn."
+            ],
+            "badges": [
+                {
+                    "id": "ring_conductor",
+                    "label": "Ring Conductor",
+                    "shortLabel": "Ring",
+                    "iconKey": "ring",
+                    "criterion": "completeCircularRhythmRing",
+                    "message": "Mr. Mouse calls a name, a drum mouse answers, and the ring begins to turn. Lyra copies the signal circle into Captain Cadence's journal."
+                },
+                {
+                    "id": "toggle_trickster",
+                    "label": "Toggle Trickster",
+                    "shortLabel": "Toggle",
+                    "iconKey": "toggle",
+                    "criterion": "usedOneMinusToggle",
+                    "message": "Hidden Discovery: Toggle Trickster. One small subtraction now flips a drum between two sounds."
+                },
+                {
+                    "id": "ring_drummer",
+                    "label": "Ring Drummer",
+                    "shortLabel": "Drum",
+                    "iconKey": "drum",
+                    "criterion": "playedRingDrum",
+                    "message": "Hidden Discovery: Ring Drummer. Broadcast Bay finally hears the beat it was waiting for."
+                },
+                {
+                    "id": "mouse_ringmaker",
+                    "label": "Mouse Ringmaker",
+                    "shortLabel": "Mice",
+                    "iconKey": "mice",
+                    "criterion": "builtMouseRing",
+                    "message": "Hidden Discovery: Mouse Ringmaker. Your ring has enough mice to pass the beat all the way around."
+                },
+                {
+                    "id": "box_reader",
+                    "label": "Box Reader",
+                    "shortLabel": "Box",
+                    "iconKey": "box",
+                    "criterion": "readBoxValue",
+                    "message": "Hidden Discovery: Box Reader. The conductor can look inside a box and learn which drum to call for."
+                },
+                {
+                    "id": "ring_dancer",
+                    "label": "Ring Dancer",
+                    "shortLabel": "Dance",
+                    "iconKey": "spin",
+                    "criterion": "changedAnimationTurn",
+                    "message": "Secret Treasure Coin found. The drum mice do not only play now, they dance when their name is called."
+                }
+            ],
+            "bigBadgeId": "broadcast_bay"
+        },
+        {
+            "level": 8,
+            "island": "starlight_summit",
+            "title": "The Starlight Sky Song",
+            "journal": {
+                "title": "Starlight Sky Song",
+                "island": "Starlight Summit",
+                "completeTitle": "Starlight Sky Complete",
+                "learned": ["Pitch over time", "Phrase Maker melodies", "Song form A1 A2 B B A1 A2"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          The signal ring's last call swings open the door at the top of the\n          world. Beyond it Lyra and Choon climb to <b>Starlight Summit</b>,\n          where the Grand Melody was first sung. The sky above is dark. \"The\n          stars went quiet when the song was lost,\" Choon says. \"Sing them back\n          and they will shine.\"\n        </p>\n        <div class=\"star-sky\" aria-label=\"Pitch over time graph of the first Twinkle Twinkle phrase\">\n          <div class=\"star-graph\">\n            <div class=\"star-graph-labels\">\n              <span>La</span><span>Sol</span><span>Fa</span>\n              <span>Mi</span><span>Re</span><span>Do</span>\n            </div>\n            <div class=\"star-graph-plot\">\n            <span class=\"star-note star-beat-1 star-pitch-do\"></span>\n            <span class=\"star-note star-beat-2 star-pitch-do\"></span>\n            <span class=\"star-note star-beat-3 star-pitch-sol\"></span>\n            <span class=\"star-note star-beat-4 star-pitch-sol\"></span>\n            <span class=\"star-note star-beat-5 star-pitch-la\"></span>\n            <span class=\"star-note star-beat-6 star-pitch-la\"></span>\n            <span class=\"star-note star-beat-7 star-pitch-sol\"></span>\n            </div>\n          </div>\n          <div class=\"journal-page star-journal-page\">#8</div>\n        </div>\n        <p>\n          Every star sits at its own height. A star low in the sky is a low\n          note, and a star high in the sky is a high note. Reading left to right\n          is reading forward in time. That is <b>pitch over time</b>, and the\n          stars above spell the first phrase of the star song.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>The Star Song</h4>\n        <p>\n          Sing it once before you build it, so your ears know where it goes.\n          Twinkle Twinkle has three phrases:\n        </p>\n        <ul>\n          <li><b>A1:</b> Do Do Sol Sol La La Sol</li>\n          <li><b>A2:</b> Fa Fa Mi Mi Re Re Do</li>\n          <li><b>B:</b> Sol Sol Fa Fa Mi Mi Re</li>\n        </ul>\n        <p>\n          Every pitch uses octave <b>4</b>, and Phrase Maker's rhythm already\n          fits: six short notes and one long one, exactly seven stars per\n          phrase.\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Summit Mission</h4>\n        <p>\n          Phrase Maker is already set up with Do, Re, Mi, Fa, Sol and La. You\n          only need to place the stars.\n        </p>\n        <ol>\n          <li>\n            Click the <b>Phrase Maker</b> block to open the grid, then click\n            squares to build phrase <b>A1</b>.\n          </li>\n          <li>\n            Press <b>Save</b> to turn that phrase into an action block, then\n            build and save <b>A2</b> and <b>B</b> the same way.\n          </li>\n          <li>\n            Find your three saved actions in the <b>Actions</b> palette and\n            stack them under <b>Start</b> in song order:\n            <b>A1 A2 B B A1 A2</b>.\n          </li>\n          <li>\n            Press Play. If it sounds like the star song, the sky lights up.\n          </li>\n        </ol>\n        <p>\n          Choon's trick for remembering the order: it is a sandwich. The two\n          <b>A</b> phrases are the bread on the outside, and <b>B</b> is the\n          peanut butter and jelly in the middle.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Think About</h4>\n        <ul>\n          <li>Which part of the song climbs, and which part comes back down?</li>\n          <li>Why does the B phrase get played twice in the middle?</li>\n          <li>\n            If a star moved one row higher, would the song sound higher or\n            lower there?\n          </li>\n        </ul>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Starlight</h4>\n        <p>\n          Once the sky lights up, try one new idea. Each one hides a badge.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"renameChunks\">Name your three phrases</button>\n          <button type=\"button\" data-secret-help=\"changeOctave\">Send one star higher</button>\n          <button type=\"button\" data-secret-help=\"useTranspose\">Move the whole song</button>\n          <button type=\"button\" data-secret-help=\"starDance\">Draw while it sings</button>\n          <button type=\"button\" data-secret-help=\"harmonize\">Add a second voice</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "renameChunks": {
+                    "title": "Name your three phrases",
+                    "heading": "Call them what they are",
+                    "description": "Phrase Maker calls your saved phrases action, action1 and action2. Click a name and type whatever you want over it.<br>A1, A2 and B keep the shape of the song readable, but Twinkle and Sparkle work just as well.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Musicians label sections with letters for exactly this reason: the letters show the form at a glance.",
+                    "singlePage": true
+                },
+                "changeOctave": {
+                    "title": "Send one star higher",
+                    "heading": "The number beside the note",
+                    "description": "Every pitch block carries a note name and an octave number, and this song uses 4 all the way through. Change one of them to any other number: 5 sends that note up, 3 sends it down.<br>Try it on the last note of a phrase and listen to where the phrase lands.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "The same note name in a different octave is the same star seen from further away: higher, but still that note.",
+                    "singlePage": true
+                },
+                "useTranspose": {
+                    "title": "Move the whole song",
+                    "type": "block",
+                    "blockName": "settransposition"
+                },
+                "starDance": {
+                    "title": "Draw while it sings",
+                    "heading": "Let the melody steer the mouse",
+                    "description": "Put a turn block inside one of your phrase actions so the mouse moves on every note, then add a forward block underneath it. Any angle draws something.<br>Each phrase leaves its own shape on the screen as it is sung.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Seeing the phrases drawn side by side makes it obvious that A1 and A2 are the same shape starting from different notes.",
+                    "singlePage": true
+                },
+                "harmonize": {
+                    "title": "Add a second voice",
+                    "heading": "Two mice singing at once",
+                    "description": "Add a second Start block and stack the same phrase actions under it, so both mice sing together the moment you press Play.<br>Put a transposition block above the second stack and the voices move apart into harmony, by whatever distance you choose.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Two voices singing one tune a fixed distance apart is the oldest kind of harmony there is.",
+                    "singlePage": true
+                }
+            },
+            "expected": {
+                "twinklePhraseMaker": true,
+                "chunkNames": ["action", "action1", "action2", "action3", "action4", "action5"]
+            },
+            "incomplete": {
+                "title": "The Stars Are Still Dim",
+                "message": "Choon hears part of the star song. Phrase Maker needs all three phrases saved as action blocks - Do Do Sol Sol La La Sol, then Fa Fa Mi Mi Re Re Do, then Sol Sol Fa Fa Mi Mi Re - and those actions stacked under Start as A1 A2 B B A1 A2."
+            },
+            "rewards": [
+                "Melody Fragment #8",
+                "Captain's Journal Page #8",
+                "Treasure Found: The Grand Melody is whole again, and every island you woke up sings it back."
+            ],
+            "badges": [
+                {
+                    "id": "star_song_keeper",
+                    "label": "Star Song Keeper",
+                    "shortLabel": "Star",
+                    "iconKey": "star",
+                    "criterion": "completeTwinkleForm",
+                    "message": "Star by star the summit lights up, and the Grand Melody returns. Lyra writes the last page of Captain Cadence's journal."
+                },
+                {
+                    "id": "sandwich_namer",
+                    "label": "Sandwich Namer",
+                    "shortLabel": "Names",
+                    "iconKey": "name",
+                    "criterion": "renamedChunks",
+                    "message": "Hidden Discovery: Sandwich Namer. Your phrases have names you chose, so the form reads like a recipe."
+                },
+                {
+                    "id": "high_star",
+                    "label": "High Star",
+                    "shortLabel": "Higher",
+                    "iconKey": "sky",
+                    "criterion": "changedOctave",
+                    "message": "Hidden Discovery: High Star. One note now shines from a different octave."
+                },
+                {
+                    "id": "star_variation",
+                    "label": "Star Variation",
+                    "shortLabel": "Shift",
+                    "iconKey": "shift",
+                    "criterion": "usedTranspose",
+                    "message": "Hidden Discovery: Star Variation. You moved the whole song to a new place, the way Mozart did with this very tune."
+                },
+                {
+                    "id": "star_dancer",
+                    "label": "Star Dancer",
+                    "shortLabel": "Dance",
+                    "iconKey": "spin",
+                    "criterion": "changedAnimationTurn",
+                    "message": "Hidden Discovery: Star Dancer. The mouse turns with the melody and draws the sky as it sings."
+                },
+                {
+                    "id": "second_voice",
+                    "label": "Second Voice",
+                    "shortLabel": "Voice",
+                    "iconKey": "voice",
+                    "criterion": "addedHarmonyVoice",
+                    "message": "Secret Treasure Coin found. A second Start block joins in, and the star song has harmony."
+                }
+            ],
+            "bigBadgeId": "starlight_summit"
+        },
+        {
+            "level": 9,
+            "island": "pulse_lighthouse",
+            "title": "The Pulse Lighthouse",
+            "journal": {
+                "title": "Pulse Lighthouse",
+                "island": "Pulse Lighthouse",
+                "completeTitle": "The Beacon Beats Again",
+                "learned": ["Pulse", "Beat", "Meter"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          Past the summit the sea turns dark. A lighthouse stands there with its\n          great lamp still, because the keeper who counted its turns is long gone.\n          \"Every island set its clocks by that light,\" says Choon. \"Give it a\n          heartbeat and it will wake.\"\n        </p>\n        <div class=\"metronome-scene\" aria-label=\"Silent lighthouse metronome\">\n          <div class=\"metronome-beam\"></div>\n          <div class=\"metronome-body\">\n            <span class=\"metronome-arm\"></span>\n            <span class=\"metronome-weight\"></span>\n          </div>\n          <div class=\"metronome-tick metronome-tick-left\"></div>\n          <div class=\"metronome-tick metronome-tick-right\"></div>\n        </div>\n        <p>\n          Lyra puts a hand on her chest and feels her own pulse: one, two, one, two.\n          \"That is what the lamp needs,\" she says. \"A beat that never wanders.\"\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Tick and Tock</h4>\n        <div class=\"beat-map\" aria-label=\"Metronome beat pattern\">\n          <span>Beat 1 - low drum</span>\n          <span>Beat 2 - bright drum</span>\n        </div>\n        <p>\n          A <b>Forever</b> block is already turning on your canvas with one drum\n          inside it. Add a second <b>note value drum</b> and give it a\n          <b>different drum sound</b>, so the lamp ticks and tocks instead of\n          repeating itself. Press <b>Play</b>, then check the lighthouse.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Gears</h4>\n        <p>\n          Once the lamp is turning, try one new gear. Each one hides a badge.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"swingPendulum\">Swing the pendulum</button>\n          <button type=\"button\" data-secret-help=\"changeTempo\">Change the tempo</button>\n          <button type=\"button\" data-secret-help=\"setMeter\">Set the meter</button>\n          <button type=\"button\" data-secret-help=\"colorBeat\">Color every beat</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "swingPendulum": {
+                    "title": "Swing the pendulum",
+                    "type": "block",
+                    "blockName": "setheading"
+                },
+                "changeTempo": {
+                    "title": "Change the tempo",
+                    "type": "block",
+                    "blockName": "setmasterbpm2"
+                },
+                "setMeter": {
+                    "title": "Set the meter",
+                    "type": "block",
+                    "blockName": "meter"
+                },
+                "colorBeat": {
+                    "title": "Color every beat",
+                    "heading": "Paint the light with the beat count",
+                    "description": "Once a Meter block is counting, the Beat Count block reports which beat you are on. Drop Beat Count into Set Color and the lamp changes colour on every beat.<br>Multiply it first if the colours look too alike, because the colour scale runs from 0 to 100.",
+                    "musicHeading": "Why it matters",
+                    "musicDescription": "Hearing the beat and seeing it at the same time makes the difference between beat and rhythm much easier to feel.",
+                    "singlePage": true
+                }
+            },
+            "expected": {
+                "metronomeWorkflow": true
+            },
+            "rewards": [
+                "Melody Fragment #9",
+                "Captain's Journal Page #9",
+                "Treasure Clue: The light keeps time for every island at once."
+            ],
+            "badges": [
+                {
+                    "id": "beacon_keeper",
+                    "label": "Beacon Keeper",
+                    "shortLabel": "Beacon",
+                    "iconKey": "beat",
+                    "criterion": "completeMetronome",
+                    "message": "Tick, tock. The great lamp turns with your beat and a beam sweeps out across the water."
+                },
+                {
+                    "id": "pendulum_swinger",
+                    "label": "Pendulum Swinger",
+                    "shortLabel": "Swing",
+                    "iconKey": "spin",
+                    "criterion": "swungThePendulum",
+                    "message": "Hidden Discovery: Pendulum Swinger. Choon leans left and right with the beat, exactly like a real metronome."
+                },
+                {
+                    "id": "tempo_master",
+                    "label": "Tempo Master",
+                    "shortLabel": "Tempo",
+                    "iconKey": "sync",
+                    "criterion": "changedTempo",
+                    "message": "Hidden Discovery: Tempo Master. The beacon can race like a running heart or rest like a sleeping one."
+                },
+                {
+                    "id": "meter_marker",
+                    "label": "Meter Marker",
+                    "shortLabel": "Meter",
+                    "iconKey": "rhythm",
+                    "criterion": "setTheMeter",
+                    "message": "Hidden Discovery: Meter Marker. Lyra writes how many beats and what kind, and the lamp starts counting in measures."
+                },
+                {
+                    "id": "beat_painter",
+                    "label": "Beat Painter",
+                    "shortLabel": "Color",
+                    "iconKey": "color",
+                    "criterion": "paintedTheBeat",
+                    "message": "Hidden Discovery: Beat Painter. The beam changes colour on every beat, so you can see the pulse as well as hear it."
+                }
+            ],
+            "bigBadgeId": "pulse_lighthouse",
+            "incomplete": {
+                "title": "The Lamp Still Sleeps",
+                "message": "Choon hears one drum going round and round, but a metronome needs two different sounds to tick and tock. Add another note value drum inside the Forever block and give it a different drum, then press Check My Work."
+            }
+        },
+        {
+            "level": 10,
+            "island": "singing_stones",
+            "title": "The Singing Stones",
+            "journal": {
+                "title": "Singing Stones",
+                "island": "Singing Stones",
+                "completeTitle": "The Stones Answer Your Hand",
+                "learned": ["Click Events", "Actions", "Interactivity"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          On the last shore, a row of tall stones stands in the sand. Lyra taps\n          one and nothing happens. \"They are not broken,\" says Choon. \"They are\n          waiting. A stone like this only sings when someone touches it, and\n          somebody has to tell it what to sing.\"\n        </p>\n        <div class=\"piano-scene\" aria-label=\"Row of silent singing stones\">\n          <span class=\"piano-key piano-key-1\"></span>\n          <span class=\"piano-key piano-key-2\"></span>\n          <span class=\"piano-key piano-key-3\"></span>\n          <span class=\"piano-key piano-key-4\"></span>\n          <span class=\"piano-hand\"></span>\n        </div>\n        <p>\n          On a real piano a key pushes a hammer, the hammer strikes a string,\n          and the string sings. Here a <b>click</b> is the hammer, and the note\n          you choose is the string.\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Two Stones, Two Voices</h4>\n        <div class=\"beat-map\" aria-label=\"The keys of your piano\">\n          <span>Key 1 - sol (already built for you)</span>\n          <span>Key 2 - a note of your own</span>\n        </div>\n        <p>\n          One stone already works. Its mouse listens with\n          <b>on click do</b>, and the matching <b>action</b> plays sol. Copy the\n          <b>Start</b> and <b>action</b> blocks to build a <b>second key</b>\n          with its own note, press <b>Play</b>, then click your stones.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Voices</h4>\n        <p>\n          Once two stones answer you, try one new idea. Each one hides a badge.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"nameKeys\">Name your keys</button>\n          <button type=\"button\" data-secret-help=\"spreadKeys\">Spread the keys</button>\n          <button type=\"button\" data-secret-help=\"addDrum\">Add a drum</button>\n          <button type=\"button\" data-secret-help=\"addAvatar\">Add an avatar</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "nameKeys": {
+                    "title": "Name your keys",
+                    "type": "block",
+                    "blockName": "setturtlename2"
+                },
+                "spreadKeys": {
+                    "title": "Spread the keys",
+                    "type": "block",
+                    "blockName": "setxy"
+                },
+                "addDrum": {
+                    "title": "Add a drum",
+                    "type": "block",
+                    "blockName": "playdrum"
+                },
+                "addAvatar": {
+                    "title": "Add an avatar",
+                    "type": "block",
+                    "blockName": "turtleshell"
+                }
+            },
+            "expected": {
+                "pianoKeysWorkflow": true
+            },
+            "rewards": [
+                "Melody Fragment #10",
+                "Captain's Journal Page #10",
+                "Treasure Clue: A stone answers only the hand that touches it."
+            ],
+            "badges": [
+                {
+                    "id": "stone_singer",
+                    "label": "Stone Singer",
+                    "shortLabel": "Stones",
+                    "iconKey": "sound",
+                    "criterion": "completePianoKeys",
+                    "message": "You touch the first stone and it sings, then the second answers in a different voice. The shore has a piano again."
+                },
+                {
+                    "id": "key_namer",
+                    "label": "Key Namer",
+                    "shortLabel": "Names",
+                    "iconKey": "name",
+                    "criterion": "namedTheKeys",
+                    "message": "Hidden Discovery: Key Namer. Every stone knows its own name now, so Lyra can call any of them."
+                },
+                {
+                    "id": "key_spacer",
+                    "label": "Key Spacer",
+                    "shortLabel": "Space",
+                    "iconKey": "motion",
+                    "criterion": "spacedTheKeys",
+                    "message": "Hidden Discovery: Key Spacer. The stones stand apart along the sand, so your hand never hits two at once."
+                },
+                {
+                    "id": "drum_key",
+                    "label": "Drum Key",
+                    "shortLabel": "Drum",
+                    "iconKey": "drum",
+                    "criterion": "playedRingDrum",
+                    "message": "Hidden Discovery: Drum Key. A stone answers with a drum beneath its note, and the sand shakes a little."
+                },
+                {
+                    "id": "avatar_key",
+                    "label": "Face of the Stone",
+                    "shortLabel": "Face",
+                    "iconKey": "avatar",
+                    "criterion": "usedAvatarAnimation",
+                    "message": "Hidden Discovery: Face of the Stone. Each key wears a face of its own, and the shore looks back at you."
+                }
+            ],
+            "bigBadgeId": "singing_stones",
+            "incomplete": {
+                "title": "The Stones Stay Quiet",
+                "message": "Choon hears one stone answer your hand, but a piano needs more than one key. Copy the Start and action blocks to build a second key with its own note, then press Check My Work."
+            }
+        }
+    ]
+}

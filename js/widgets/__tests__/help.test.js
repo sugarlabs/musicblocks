@@ -699,7 +699,7 @@ describe("HelpWidget", () => {
             expect(link).toBeNull();
         });
 
-        test("_showPage sets helpBody text color", () => {
+        test("_showPage leaves helpBody color to theme CSS", () => {
             const activity = createMockActivity();
             const hw = new HelpWidget(activity, false);
             jest.runAllTimers();
@@ -707,7 +707,19 @@ describe("HelpWidget", () => {
             hw._showPage(0);
 
             const helpBody = document.getElementById("helpBodyDiv");
-            expect(helpBody.style.color).toBe("rgb(80, 80, 80)");
+            expect(helpBody.style.color).toBe("");
+        });
+
+        test("_showPage titles the card with the page heading", () => {
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            jest.runAllTimers();
+
+            hw._showPage(0);
+
+            const heading = document.getElementById("helpBodyDiv").querySelector("h1.heading");
+            expect(heading).not.toBeNull();
+            expect(heading.textContent).toBe(HELPCONTENT[0][0]);
         });
 
         test("_showPage calls takeFocus", () => {
@@ -768,6 +780,111 @@ describe("HelpWidget", () => {
             // After showing page 1, should not contain page 0 title
             expect(helpBody.innerHTML).not.toContain("Welcome to Music Blocks");
             expect(helpBody.innerHTML).toContain("Meet Mr. Mouse!");
+        });
+    });
+
+    describe("custom help cards", () => {
+        test("showCard renders standalone card content without changing HELPCONTENT", () => {
+            const activity = createMockActivity();
+            const originalLength = HELPCONTENT.length;
+            const hw = HelpWidget.showCard(activity, {
+                title: "Change octave",
+                heading: "Try a higher or lower version",
+                description: "Change one pitch octave.",
+                musicHeading: "What changes musically?",
+                musicDescription: "The same note sounds higher or lower."
+            });
+            jest.runAllTimers();
+
+            const helpBody = document.getElementById("helpBodyDiv");
+            expect(hw).toBeInstanceOf(HelpWidget);
+            expect(HELPCONTENT).toHaveLength(originalLength);
+            expect(mockWidgetWindow.updateTitle).toHaveBeenCalledWith("Change octave");
+            expect(helpBody.textContent).toContain("Try a higher or lower version");
+            expect(helpBody.textContent).toContain("Change one pitch octave.");
+        });
+
+        test("custom card flip button swaps to musical meaning", () => {
+            const activity = createMockActivity();
+            HelpWidget.showCard(activity, {
+                title: "Change octave",
+                heading: "How do I do it?",
+                description: "Change one pitch octave.",
+                musicHeading: "What changes musically?",
+                musicDescription: "The same note sounds higher or lower."
+            });
+            jest.runAllTimers();
+
+            document.querySelector("#helpBodyDiv button").click();
+
+            const helpBody = document.getElementById("helpBodyDiv");
+            expect(helpBody.textContent).toContain("What changes musically?");
+            expect(helpBody.textContent).toContain("The same note sounds higher or lower.");
+            expect(helpBody.textContent).not.toContain("Change one pitch octave.");
+        });
+
+        test("single-page custom card does not render a flip button", () => {
+            const activity = createMockActivity();
+            HelpWidget.showCard(activity, {
+                title: "Make it longer",
+                heading: "Make the sound last longer",
+                description: "Add another chunk or repeat a favorite chunk.",
+                singlePage: true
+            });
+            jest.runAllTimers();
+
+            const helpBody = document.getElementById("helpBodyDiv");
+            expect(helpBody.textContent).toContain("Make the sound last longer");
+            expect(helpBody.querySelector("button")).toBeNull();
+        });
+
+        test("showBlockHelp opens an existing proto block help entry", () => {
+            const block = {
+                name: "pitch",
+                staticLabels: ["pitch"],
+                helpString: ["Pitch help", "documentation"],
+                beginnerModeBlock: true,
+                palette: {
+                    name: "pitch",
+                    palettes: {
+                        showPalette: jest.fn()
+                    }
+                }
+            };
+            const activity = createMockActivity({
+                protoBlockDict: {
+                    pitch: block
+                }
+            });
+            const blockHelpSpy = jest
+                .spyOn(HelpWidget.prototype, "_blockHelp")
+                .mockImplementation(function (protoBlock) {
+                    this.widgetWindow.updateTitle(protoBlock.staticLabels[0]);
+                });
+
+            const hw = HelpWidget.showBlockHelp(activity, "pitch");
+            jest.runAllTimers();
+
+            expect(hw).toBeInstanceOf(HelpWidget);
+            expect(hw._standaloneBlockHelp).toBe(true);
+            expect(hw.appendedBlockList).toEqual(["pitch"]);
+            expect(blockHelpSpy).toHaveBeenCalledWith(block);
+            expect(mockWidgetWindow.updateTitle).toHaveBeenCalledWith("pitch");
+
+            blockHelpSpy.mockRestore();
+        });
+
+        test("closing a custom card does not show the tour starter hint", () => {
+            const activity = createMockActivity();
+            HelpWidget.showCard(activity, {
+                title: "Change octave",
+                description: "Change one pitch octave."
+            });
+            jest.runAllTimers();
+
+            mockWidgetWindow.onclose();
+
+            expect(activity.textMsg).not.toHaveBeenCalled();
         });
     });
 

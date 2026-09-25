@@ -143,6 +143,8 @@ class ToolbarUI {
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["practiceLessonsItem", _("Practice levels"), "innerHTML"],
+                ["explorerJournalItem", _("Explorer Journal"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -279,6 +281,8 @@ class ToolbarUI {
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["practiceLessonsItem", _("Practice levels"), "innerHTML"],
+                ["explorerJournalItem", _("Explorer Journal"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -1317,7 +1321,13 @@ class ToolbarUI {
         const helpIcon = docById("helpIcon");
         const helpGuideItem = docById("helpGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
-        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
+        const practiceLessonsItem = docById("practiceLessonsItem");
+        const explorerJournalItem = docById("explorerJournalItem");
+        const hasDropdownMenu =
+            !!helpGuideItem ||
+            !!shortcutsGuideItem ||
+            !!practiceLessonsItem ||
+            !!explorerJournalItem;
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1337,6 +1347,30 @@ class ToolbarUI {
                 }
                 if (shortcutsOnclick) {
                     shortcutsOnclick(this.activity);
+                }
+            };
+        }
+
+        if (practiceLessonsItem) {
+            practiceLessonsItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (typeof window.startPracticeMode === "function") {
+                    window.startPracticeMode();
+                }
+            };
+        }
+
+        if (explorerJournalItem) {
+            explorerJournalItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (typeof window.openExplorerJournal === "function") {
+                    window.openExplorerJournal();
                 }
             };
         }
