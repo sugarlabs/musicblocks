@@ -17,8 +17,8 @@ module.exports = {
         "!planet/js/__tests__/**"
     ],
     coverageReporters: ["text-summary", "text", "lcov", "json-summary"]
-    // No hard-coded coverageThreshold: CI's "Coverage delta vs base" job
-    // compares this PR's coverage-summary.json against the base branch's
-    // and fails if statements/branches/functions/lines drop, instead of a
-    // static floor that needs manual bumps as coverage grows.
+    // No hard-coded coverageThreshold here: .github/workflows/coverage-delta.yml
+    // runs Jest on both the base branch and the PR head, then compares the
+    // coverage-summary.json output. The workflow fails the PR if statements,
+    // branches, functions, or lines drop — no static floor to manually bump.
 };
