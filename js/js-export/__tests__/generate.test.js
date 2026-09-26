@@ -456,6 +456,42 @@ describe("JSGenerate Class", () => {
         expect(tree[1][3][0][1][0]).toBe("box_box1");
     });
 
+    test("should export a do block with a text name as a call to that action", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: {
+                name: "start",
+                trash: false,
+                connections: [null, 2, null],
+                protoblock: { style: "hat" }
+            },
+            2: {
+                name: "do",
+                connections: [1, 3, 4],
+                protoblock: { style: "command", args: 1 }
+            },
+            3: { name: "text", value: "chorus", connections: [2], protoblock: { style: "value" } },
+            4: {
+                name: "do",
+                connections: [2, 5, null],
+                protoblock: { style: "command", args: 1 }
+            },
+            5: {
+                name: "namedbox",
+                privateData: "box1",
+                connections: [4],
+                protoblock: { style: "value" }
+            }
+        };
+
+        JSGenerate.generateStacksTree();
+
+        const tree = JSGenerate.startTrees[0];
+        expect(tree[0]).toEqual(["nameddo_chorus", null, null]);
+        // A name read from a box is only known at run time, so it stays a "do" block.
+        expect(tree[1][0]).toBe("do");
+    });
+
     test("should warn when clamp block flows left", () => {
         globalActivity.blocks.stackList = [1];
         globalActivity.blocks.blockList = {
