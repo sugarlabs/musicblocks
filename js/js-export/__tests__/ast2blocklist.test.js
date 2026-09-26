@@ -1198,44 +1198,82 @@ describe("AST2BlockList Class", () => {
             [59, "pitch", 0, 0, [58, 60, 61, null]],
             [60, ["solfege", { value: "sol" }], 0, 0, [59]],
             [61, ["number", { value: 4 }], 0, 0, [59]],
-            [62, "until", 0, 0, [53, 63, 64, 72]],
-            [63, ["boolean", { value: true }], 0, 0, [62]],
-            [64, "newnote", 0, 0, [62, 65, 68, null]],
-            [65, "divide", 0, 0, [64, 66, 67]],
-            [66, ["number", { value: 1 }], 0, 0, [65]],
-            [67, ["number", { value: 4 }], 0, 0, [65]],
-            [68, "vspace", 0, 0, [64, 69]],
-            [69, "pitch", 0, 0, [68, 70, 71, null]],
-            [70, ["solfege", { value: "sol" }], 0, 0, [69]],
-            [71, ["number", { value: 4 }], 0, 0, [69]],
-            [72, "switch", 0, 0, [62, 73, 74, null]],
-            [73, ["number", { value: 1 }], 0, 0, [72]],
-            [74, "case", 0, 0, [72, 75, 76, 87]],
-            [75, ["number", { value: 1 }], 0, 0, [74]],
-            [76, "newnote", 0, 0, [74, 77, 80, 84]],
-            [77, "divide", 0, 0, [76, 78, 79]],
-            [78, ["number", { value: 1 }], 0, 0, [77]],
-            [79, ["number", { value: 4 }], 0, 0, [77]],
-            [80, "vspace", 0, 0, [76, 81]],
-            [81, "pitch", 0, 0, [80, 82, 83, null]],
-            [82, ["solfege", { value: "sol" }], 0, 0, [81]],
-            [83, ["number", { value: 4 }], 0, 0, [81]],
-            [84, "break", 0, 0, [76, 85]],
-            [85, "break", 0, 0, [84, 86]],
-            [86, "break", 0, 0, [85, null]],
-            [87, "defaultcase", 0, 0, [74, 88, null]],
-            [88, "newnote", 0, 0, [87, 89, 92, null]],
-            [89, "divide", 0, 0, [88, 90, 91]],
-            [90, ["number", { value: 1 }], 0, 0, [89]],
-            [91, ["number", { value: 4 }], 0, 0, [89]],
-            [92, "vspace", 0, 0, [88, 93]],
-            [93, "pitch", 0, 0, [92, 94, 95, null]],
-            [94, ["solfege", { value: "5" }], 0, 0, [93]],
-            [95, ["number", { value: 4 }], 0, 0, [93]]
+            [62, "until", 0, 0, [53, 63, 65, 73]],
+            [63, "not", 0, 0, [62, 64]],
+            [64, ["boolean", { value: true }], 0, 0, [63]],
+            [65, "newnote", 0, 0, [62, 66, 69, null]],
+            [66, "divide", 0, 0, [65, 67, 68]],
+            [67, ["number", { value: 1 }], 0, 0, [66]],
+            [68, ["number", { value: 4 }], 0, 0, [66]],
+            [69, "vspace", 0, 0, [65, 70]],
+            [70, "pitch", 0, 0, [69, 71, 72, null]],
+            [71, ["solfege", { value: "sol" }], 0, 0, [70]],
+            [72, ["number", { value: 4 }], 0, 0, [70]],
+            [73, "switch", 0, 0, [62, 74, 75, null]],
+            [74, ["number", { value: 1 }], 0, 0, [73]],
+            [75, "case", 0, 0, [73, 76, 77, 88]],
+            [76, ["number", { value: 1 }], 0, 0, [75]],
+            [77, "newnote", 0, 0, [75, 78, 81, 85]],
+            [78, "divide", 0, 0, [77, 79, 80]],
+            [79, ["number", { value: 1 }], 0, 0, [78]],
+            [80, ["number", { value: 4 }], 0, 0, [78]],
+            [81, "vspace", 0, 0, [77, 82]],
+            [82, "pitch", 0, 0, [81, 83, 84, null]],
+            [83, ["solfege", { value: "sol" }], 0, 0, [82]],
+            [84, ["number", { value: 4 }], 0, 0, [82]],
+            [85, "break", 0, 0, [77, 86]],
+            [86, "break", 0, 0, [85, 87]],
+            [87, "break", 0, 0, [86, null]],
+            [88, "defaultcase", 0, 0, [75, 89, null]],
+            [89, "newnote", 0, 0, [88, 90, 93, null]],
+            [90, "divide", 0, 0, [89, 91, 92]],
+            [91, ["number", { value: 1 }], 0, 0, [90]],
+            [92, ["number", { value: 4 }], 0, 0, [90]],
+            [93, "vspace", 0, 0, [89, 94]],
+            [94, "pitch", 0, 0, [93, 95, 96, null]],
+            [95, ["solfege", { value: "5" }], 0, 0, [94]],
+            [96, ["number", { value: 4 }], 0, 0, [94]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         let blockList = AST2BlockList.toBlockList(AST, config);
+        expect(blockList).toEqual(expectedBlockList);
+    });
+
+    // The `until` block repeats while its condition is false, so a JS
+    // `do { ... } while (test)` imports as `until (!test)`. A test that is
+    // already negated collapses so a blocks -> JS -> blocks round-trip is stable.
+    test("should import do-while as until with a collapsed negated condition", () => {
+        const code = `
+        new Mouse(async mouse => {
+            do {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+            } while (!(2 < 1));
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "until", 0, 0, [0, 2, 5, null]],
+            [2, "less", 0, 0, [1, 3, 4]],
+            [3, ["number", { value: 2 }], 0, 0, [2]],
+            [4, ["number", { value: 1 }], 0, 0, [2]],
+            [5, "newnote", 0, 0, [1, 6, 9, null]],
+            [6, "divide", 0, 0, [5, 7, 8]],
+            [7, ["number", { value: 1 }], 0, 0, [6]],
+            [8, ["number", { value: 4 }], 0, 0, [6]],
+            [9, "vspace", 0, 0, [5, 10]],
+            [10, "pitch", 0, 0, [9, 11, 12, null]],
+            [11, ["solfege", { value: "sol" }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
 
