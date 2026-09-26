@@ -3724,7 +3724,11 @@ describe("getNote additional paths", () => {
             0
         ]);
     });
-
+    it("handles positive pitch numbers", () => {
+        expect(getNote(1, 4, 0, "C major", false)).toEqual(["D♭", 4, 0]);
+        expect(getNote(6, 4, 0, "C major", false)).toEqual(["G♭", 4, 0]);
+        expect(getNote(11, 4, 0, "C major", false)).toEqual(["B", 4, 0]);
+    });
     it("returns rests before attempting pitch conversion", () => {
         expect(getNote("rest", 4, 7, "C major", false)).toEqual(["R", "", 0]);
         expect(getNote("r", 4, 7, "C major", false)).toEqual(["R", "", 0]);
