@@ -971,7 +971,8 @@ const saveLilypondOutput = function (activity) {
                 tNumber = Number(t);
             }
 
-            if (clef[tNumber] === CLEFS[c]) {
+            // Drum parts are written in \drummode, which a TabStaff cannot read.
+            if (clef[tNumber] === CLEFS[c] && tNumber < startDrums) {
                 if (activity.logo.notation.notationStaging[t].length > 0) {
                     activity.logo.notationOutput +=
                         '         \\context TabVoice = "' +

@@ -548,6 +548,16 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain("sn4 r4 sn4 sn4");
     });
 
+    test("should keep drum voices out of the guitar tablature", () => {
+        activity.logo.notation.notationDrumStaging = {
+            0: [[["sn"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("\\drumzeroVoice\n");
+        expect(result).toContain('\\context TabVoice = "Turtlezero"');
+        expect(result).not.toContain('\\context TabVoice = "drumzero"');
+    });
+
     test("should handle empty drum staging correctly", () => {
         activity.logo.notation.notationDrumStaging = {
             0: []
