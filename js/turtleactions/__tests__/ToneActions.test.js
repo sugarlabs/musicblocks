@@ -483,6 +483,27 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.chorusDepth).toEqual([]);
         });
 
+        it("should show error for non-finite chorus parameters (NaN)", () => {
+            activity.errorMsg.mockClear();
+            activity.logo.stopTurtle = false;
+            Singer.ToneActions.doChorus(NaN, 20, 50, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
+            expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.chorusRate).toEqual([]);
+
+            activity.errorMsg.mockClear();
+            activity.logo.stopTurtle = false;
+            Singer.ToneActions.doChorus(1.5, NaN, 50, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
+            expect(activity.logo.stopTurtle).toBe(true);
+
+            activity.errorMsg.mockClear();
+            activity.logo.stopTurtle = false;
+            Singer.ToneActions.doChorus(1.5, 20, NaN, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
+            expect(activity.logo.stopTurtle).toBe(true);
+        });
+
         it("should show error for negative chorus depth", () => {
             Singer.ToneActions.doChorus(1.5, 20, -10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
