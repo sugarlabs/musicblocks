@@ -4,20 +4,19 @@
 # and the base branch. The job fails (and prints a clear report) when any
 # metric regresses. Never runs on direct pushes to master or on Renovate bot PRs.
 #
-# How it works:
-#   1. Check out the base SHA into ./base-checkout/, run Jest, save summary.
-#   2. Check out the PR head SHA into ./pr-checkout/, run Jest, save summary.
-#   3. A small inline Node script reads both files and exits non-zero if any
-#      of the four standard metrics has gone down.
+# Three-job design for isolation:
+#   measure-base  -- runs in a fresh VM; uploads base summary as an artifact
+#   measure-pr    -- runs in a fresh VM; uploads PR summary as an artifact
+#   compare       -- downloads both artifacts; compares the four metrics
 #
-# Each checkout is fully isolated in its own directory so no source or test
-# files from one run ever affect the other.
+# Because each job gets its own runner, PR code (npm ci / jest in measure-pr)
+# is never co-located with the base summary file, and lifecycle scripts in the
+# PR cannot overwrite it.
 
 on:
     pull_request:
         branches: [master]
 
-# Cancel any in-flight run for the same PR when a new commit is pushed.
 concurrency:
     group: coverage-delta-${{ github.event.pull_request.number }}
     cancel-in-progress: true
@@ -26,66 +25,105 @@ permissions:
     contents: read
 
 jobs:
-    coverage-delta:
-        name: Coverage delta vs base
+    # ── Job 1: measure coverage on the BASE branch ────────────────────────────
+    measure-base:
+        name: Coverage – base branch
         runs-on: ubuntu-latest
-        # Check the actual bot actor, not the branch name.
-        # Renovate bumps only update package versions; they never delete tests.
         if: github.actor != 'renovate[bot]'
         timeout-minutes: 30
-
         steps:
-            - name: Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: "22"
-
-            # ── Step 1: coverage on the BASE branch ──────────────────────────
             - name: Checkout base branch
               uses: actions/checkout@v4
               with:
                   ref: ${{ github.event.pull_request.base.sha }}
-                  # Do not persist the job token; PR code must not be able to
-                  # read it when npm ci / jest runs against the base.
                   persist-credentials: false
-                  path: base-checkout
 
-            - name: Run Jest on base branch
-              working-directory: base-checkout
-              run: |
-                  npm ci --silent
-                  rm -rf coverage
-                  npx jest --coverage --coverageReporters=json-summary --ci \
-                      --passWithNoTests
-                  cp coverage/coverage-summary.json /tmp/base-coverage.json
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: "22"
+                  cache: "npm"
+
+            - name: Install dependencies
+              run: npm ci
               shell: bash
 
-            # ── Step 2: coverage on the PR HEAD ──────────────────────────────
+            - name: Run Jest with coverage
+              run: |
+                  npx jest --coverage --coverageReporters=json-summary --ci \
+                      --passWithNoTests
+              shell: bash
+
+            - name: Upload base coverage summary
+              uses: actions/upload-artifact@v4
+              with:
+                  name: base-coverage-summary
+                  path: coverage/coverage-summary.json
+                  retention-days: 1
+
+    # ── Job 2: measure coverage on the PR HEAD ────────────────────────────────
+    measure-pr:
+        name: Coverage – PR head
+        runs-on: ubuntu-latest
+        if: github.actor != 'renovate[bot]'
+        timeout-minutes: 30
+        steps:
             - name: Checkout PR head
               uses: actions/checkout@v4
               with:
                   ref: ${{ github.event.pull_request.head.sha }}
                   persist-credentials: false
-                  path: pr-checkout
 
-            - name: Run Jest on PR head
-              working-directory: pr-checkout
-              run: |
-                  npm ci --silent
-                  rm -rf coverage
-                  npx jest --coverage --coverageReporters=json-summary --ci \
-                      --passWithNoTests
-                  cp coverage/coverage-summary.json /tmp/pr-coverage.json
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: "22"
+                  cache: "npm"
+
+            - name: Install dependencies
+              run: npm ci
               shell: bash
 
-            # ── Step 3: compare and fail on any regression ───────────────────
+            - name: Run Jest with coverage
+              run: |
+                  npx jest --coverage --coverageReporters=json-summary --ci \
+                      --passWithNoTests
+              shell: bash
+
+            - name: Upload PR coverage summary
+              uses: actions/upload-artifact@v4
+              with:
+                  name: pr-coverage-summary
+                  path: coverage/coverage-summary.json
+                  retention-days: 1
+
+    # ── Job 3: compare the two summaries ─────────────────────────────────────
+    compare:
+        name: Coverage delta vs base
+        runs-on: ubuntu-latest
+        needs: [measure-base, measure-pr]
+        if: github.actor != 'renovate[bot]'
+        timeout-minutes: 5
+        steps:
+            - name: Download base coverage summary
+              uses: actions/download-artifact@v4
+              with:
+                  name: base-coverage-summary
+                  path: base
+
+            - name: Download PR coverage summary
+              uses: actions/download-artifact@v4
+              with:
+                  name: pr-coverage-summary
+                  path: pr
+
             - name: Compare coverage metrics
               run: |
                   node - <<'EOF'
                   const fs = require("fs");
 
-                  const base = JSON.parse(fs.readFileSync("/tmp/base-coverage.json")).total;
-                  const pr   = JSON.parse(fs.readFileSync("/tmp/pr-coverage.json")).total;
+                  const base = JSON.parse(fs.readFileSync("base/coverage-summary.json")).total;
+                  const pr   = JSON.parse(fs.readFileSync("pr/coverage-summary.json")).total;
 
                   const metrics = ["statements", "branches", "functions", "lines"];
                   let failed = false;
