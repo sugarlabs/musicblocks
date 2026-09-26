@@ -109,6 +109,7 @@ describe("Utility Functions (logic-only)", () => {
             "../musicutils-constants.js",
             "../musicutils-i18n.js",
             "../musicutils-temperament.js",
+            "../musicutils-pitch.js",
             "../musicutils.js",
             "../../logo.js",
             "../../turtle-singer.js"

@@ -161,6 +161,10 @@ describe("musicutils", () => {
                 path.join(__dirname, "..", "musicutils-temperament.js"),
                 "utf8"
             );
+            const pitch = fs.readFileSync(
+                path.join(__dirname, "..", "musicutils-pitch.js"),
+                "utf8"
+            );
             const source = fs.readFileSync(path.join(__dirname, "..", "musicutils.js"), "utf8");
             const sandbox = {
                 TextEncoder,
@@ -173,6 +177,7 @@ describe("musicutils", () => {
             vm.runInContext(constants, sandbox);
             vm.runInContext(i18n, sandbox);
             vm.runInContext(temperament, sandbox);
+            vm.runInContext(pitch, sandbox);
             vm.runInContext(source, sandbox);
 
             expect(
