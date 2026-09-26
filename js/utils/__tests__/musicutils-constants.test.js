@@ -95,6 +95,7 @@ describe("musicutils-constants", () => {
                     "musicutils-constants.js",
                     "musicutils-i18n.js",
                     "musicutils-temperament.js",
+                    "musicutils-pitch.js",
                     "musicutils.js"
                 ])
             ).not.toThrow();
@@ -105,6 +106,7 @@ describe("musicutils-constants", () => {
                 "musicutils-constants.js",
                 "musicutils-i18n.js",
                 "musicutils-temperament.js",
+                "musicutils-pitch.js",
                 "musicutils.js"
             ]);
             for (const name of Object.keys(constants)) {

@@ -80,6 +80,7 @@ describe("musicutils-i18n", () => {
             "musicutils-constants.js",
             "musicutils-i18n.js",
             "musicutils-temperament.js",
+            "musicutils-pitch.js",
             "musicutils.js"
         ];
 
