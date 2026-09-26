@@ -309,7 +309,7 @@ function AIDebuggerWidget() {
 
         // Send button
         this.sendButton = document.createElement("button");
-        this.sendButton.textContent = "Send";
+        this.sendButton.textContent = _("Send");
         this.sendButton.style.padding = "12px 20px";
         this.sendButton.style.backgroundColor = "#2196F3";
         this.sendButton.style.color = "white";
@@ -560,13 +560,13 @@ function AIDebuggerWidget() {
         typingDiv.style.marginBottom = "8px";
         typingDiv.style.fontSize = "14px";
         typingDiv.style.fontStyle = "italic";
-        typingDiv.textContent = "Debugger is typing...";
+        typingDiv.textContent = _("Debugger is typing...");
 
         // Add animation
         let dots = 0;
         const animateTyping = setInterval(() => {
             dots = (dots + 1) % 4;
-            typingDiv.textContent = "Debugger is typing" + ".".repeat(dots);
+            typingDiv.textContent = _("Debugger is typing") + ".".repeat(dots);
         }, 500);
 
         typingDiv.setAttribute("data-animation-id", animateTyping);
@@ -726,7 +726,7 @@ function AIDebuggerWidget() {
             // Show loading message
             const loadingMessage = {
                 type: "system",
-                content: "Loading your current project and initializing AI assistant...",
+                content: _("Loading your current project and initializing AI assistant..."),
                 timestamp: new Date().toISOString()
             };
             this._addMessageToUI(loadingMessage);
@@ -742,7 +742,7 @@ function AIDebuggerWidget() {
             // Show error message and fall back to simple welcome
             const errorMessage = {
                 type: "system",
-                content: "Could not load project data. Starting with basic assistant...",
+                content: _("Could not load project data. Starting with basic assistant..."),
                 timestamp: new Date().toISOString()
             };
             this._addMessageToUI(errorMessage);
