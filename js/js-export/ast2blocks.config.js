@@ -983,7 +983,7 @@ window.ast2blocklist_config = {
         {
             name: "setscalartransposition",
             comment: "Set scalar transposition block",
-            arguments: [{ type: "modelength" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1138,7 +1138,7 @@ window.ast2blocklist_config = {
         {
             name: "semitoneinterval",
             comment: "Set semitone interval block",
-            arguments: [{ type: "intervalname" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1730,7 +1730,7 @@ window.ast2blocklist_config = {
         {
             name: "scrollxy",
             comment: "Scroll XY block",
-            arguments: [{ type: "x" }, { type: "y" }],
+            arguments: [{ type: "NumberExpression" }, { type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1771,7 +1771,7 @@ window.ast2blocklist_config = {
         {
             name: "setgrey",
             comment: "Set grey block",
-            arguments: [{ type: "grey" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1787,7 +1787,7 @@ window.ast2blocklist_config = {
         {
             name: "setshade",
             comment: "Set shade block",
-            arguments: [{ type: "shade" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1803,7 +1803,7 @@ window.ast2blocklist_config = {
         {
             name: "sethue",
             comment: "Set hue block",
-            arguments: [{ type: "color" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1838,7 +1838,7 @@ window.ast2blocklist_config = {
         {
             name: "setpensize",
             comment: "Set pen size block",
-            arguments: [{ type: "pensize" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
