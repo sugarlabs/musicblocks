@@ -449,6 +449,41 @@ conditional expression, each `&&` / `||` / `??`, and each non-default `switch`
 case. It is **not** cyclomatic complexity or branch coverage: `a && b && c`
 counts as two and loops are not counted.
 
+## Choosing modules for generated-test assistance
+
+Pure utility modules under `js/utils/` are a good starting point for this
+pipeline: they are stateless, take primitive inputs, and return primitive
+outputs, so a candidate is easy to both generate a prompt for and judge on
+review. That does not make the pipeline utility-only, and it should not be
+used to justify generating tests for every module in the repository.
+
+The extractor is useful anywhere a module exposes deterministic, inspectable
+behaviour, including outside `js/utils/`. Before pointing it at a non-utility
+module, run the same inspection the contributor workflow above describes
+(`--module`, then `--emit` for a dry run) and weigh the exports against the
+project's usual line: functions that are pure given their arguments, don't
+reach into DOM/canvas/`createjs` state, don't depend on Tone.js or timing, and
+don't require a live `activity`/`logo`/widget instance to call meaningfully
+are good fits. A class or function that only makes sense wired into the
+running application's lifecycle is not — write that test by hand against a
+real or minimally-mocked instance instead, the way the integration-phase
+tests under `js/__tests__/` already do.
+
+A generated candidate is a starting point regardless of which kind of module
+it targets, and with no model-backed provider configured it is rejected on
+`--emit` by default — see [Example review report](#contributor-workflow)
+above for what that looks like and why it's expected. From there:
+
+- Turn the placeholder's `it.todo` lines into real assertions by hand, using
+  the module's own documented contract (a header comment, a JSDoc block, an
+  inline comment explaining a fallback) or an external, independently-known
+  reference (a fixed table of values, a documented ordering) to ground the
+  expected value — never the target function's own formula fed back at
+  itself.
+- Skip branches that are only reachable in an environment the test runner
+  can't represent (for example, a `typeof window === "undefined"` fallback
+  under Jest's jsdom environment) rather than forcing coverage of them.
+
 ## Deliberate limitations
 
 - Everything is derived syntactically. The target file is never required,
