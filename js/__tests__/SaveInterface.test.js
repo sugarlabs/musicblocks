@@ -82,8 +82,9 @@ global.normalizeNoteAccidentals = note => {
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
     return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 };
-const { LILYPONDHEADER } = require("../lilypond");
+const { LILYPONDHEADER, escapeLilypondString } = require("../lilypond");
 global.LILYPONDHEADER = LILYPONDHEADER;
+global.escapeLilypondString = escapeLilypondString;
 
 describe("SaveInterface", () => {
     let mockActivity;
@@ -1117,6 +1118,16 @@ describe("saveLilypond Methods", () => {
     it("should save a Lilypond file with default settings", () => {
         saveInterface.saveLYFile();
         expect(global.docById).toHaveBeenCalledWith("fileName");
+    });
+
+    it("should escape quotes and backslashes in the Lilypond title and author", () => {
+        document.getElementById("title").value = 'My "Best" Song';
+        document.getElementById("author").value = "A\\B";
+
+        saveInterface.saveLYFile();
+
+        expect(mockActivity.logo.notationOutput).toContain('title = "My \\"Best\\" Song"');
+        expect(mockActivity.logo.notationOutput).toContain('composer = "A\\\\B"');
     });
 
     it("should save a Lilypond file with PDF conversion", () => {
