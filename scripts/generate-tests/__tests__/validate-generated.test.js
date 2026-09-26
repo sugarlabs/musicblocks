@@ -162,6 +162,37 @@ describe("clampNumber", () => {
         }
     );
 
+    it.each([
+        "./utils-logic",
+        "./utils-logic.js",
+        "../../utils-logic",
+        "../../../../../../tmp/evil/utils-logic",
+        "js/utils/utils-logic",
+        "js/utils/utils-logic.js",
+        "utils-logic"
+    ])("rejects %p, which shares the basename but resolves somewhere else", spec => {
+        const source =
+            `const { clampNumber } = require("${spec}");\n` +
+            'describe("clampNumber", () => {\n' +
+            '    it("clamps", () => { expect(clampNumber(9, 0, 3)).toBe(3); });\n' +
+            "});\n";
+        const result = validateGeneratedTest(source, { plan: utilsLogicPlan() });
+        expect(result.valid).toBe(false);
+        expect(result.errors.join(" ")).toMatch(
+            /does not resolve to the module under test from js\/utils\/__tests__\/; require "\.\.\/utils-logic" instead/
+        );
+    });
+
+    it("does not let a wrong-depth require stand in for the module import", () => {
+        const source =
+            'const { clampNumber } = require("./utils-logic");\n' +
+            'describe("clampNumber", () => {\n' +
+            '    it("clamps", () => { expect(clampNumber(9, 0, 3)).toBe(3); });\n' +
+            "});\n";
+        const result = validateGeneratedTest(source, { plan: utilsLogicPlan() });
+        expect(result.errors.join(" ")).toMatch(/does not import the module under test/);
+    });
+
     it("does not accept a look-alike module whose basename only shares a prefix", () => {
         const source =
             'const x = require("../utils-logic-extra");\n' +
