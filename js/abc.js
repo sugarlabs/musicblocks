@@ -652,18 +652,26 @@ const processABCNotes = function (logo, turtle, keySignature = "C major") {
 const saveAbcOutput = function (activity) {
     const outputParts = [getABCHeader()];
     let atLineStart = true;
+    let voice = 0;
 
     for (const t in activity.logo.notation.notationStaging) {
         const keySignature = activity.turtles.ithTurtle(t).singer.keySignature;
-        // A K: field is only a field at the start of a line.
+        processABCNotes(activity.logo, t, keySignature);
+        const notes = activity.logo.notationNotes[t];
+        if (notes === "") {
+            continue;
+        }
+
+        voice += 1;
+        // A V: or K: field is only a field at the start of a line.
         if (!atLineStart) {
             outputParts.push("\n");
         }
+        // Without a V: field every turtle lands in one voice, one after another.
+        outputParts.push("V:" + voice + "\n");
         outputParts.push("K:" + abcKeySignature(keySignature).field + "\n");
-        processABCNotes(activity.logo, t, keySignature);
-        const notes = activity.logo.notationNotes[t];
         outputParts.push(notes);
-        atLineStart = notes === "" || notes.endsWith("\n");
+        atLineStart = notes.endsWith("\n");
     }
 
     outputParts.push("\n");
