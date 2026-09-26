@@ -1,15 +1,17 @@
 ﻿name: Coverage delta
 
 # Compares Jest statement/branch/function/line coverage between the PR branch
-# and its merge-base on master. The job fails (and prints a clear report) when
-# any metric regresses. Never runs on direct pushes to master or on Renovate
-# dependency-bump branches (those touch no logic).
+# and the base branch. The job fails (and prints a clear report) when any
+# metric regresses. Never runs on direct pushes to master or on Renovate bot PRs.
 #
 # How it works:
-#   1. Check out the base branch, run Jest with coverage, save summary JSON.
-#   2. Check out the PR head, run Jest with coverage, save summary JSON.
+#   1. Check out the base SHA into ./base-checkout/, run Jest, save summary.
+#   2. Check out the PR head SHA into ./pr-checkout/, run Jest, save summary.
 #   3. A small inline Node script reads both files and exits non-zero if any
 #      of the four standard metrics has gone down.
+#
+# Each checkout is fully isolated in its own directory so no source or test
+# files from one run ever affect the other.
 
 on:
     pull_request:
@@ -27,47 +29,52 @@ jobs:
     coverage-delta:
         name: Coverage delta vs base
         runs-on: ubuntu-latest
+        # Check the actual bot actor, not the branch name.
         # Renovate bumps only update package versions; they never delete tests.
-        # Skip the expensive double-jest run on those branches.
-        if: "!startsWith(github.head_ref, 'renovate/')"
+        if: github.actor != 'renovate[bot]'
         timeout-minutes: 30
 
         steps:
-            - name: Checkout PR head
-              uses: actions/checkout@v4
-              with:
-                  ref: ${{ github.event.pull_request.head.sha }}
-                  # Enough history to reach the base commit.
-                  fetch-depth: 0
-
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
                   node-version: "22"
-                  cache: "npm"
-
-            - name: Install dependencies (PR head)
-              run: npm ci
-              shell: bash
 
             # ── Step 1: coverage on the BASE branch ──────────────────────────
+            - name: Checkout base branch
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.base.sha }}
+                  # Do not persist the job token; PR code must not be able to
+                  # read it when npm ci / jest runs against the base.
+                  persist-credentials: false
+                  path: base-checkout
+
             - name: Run Jest on base branch
+              working-directory: base-checkout
               run: |
-                  BASE_SHA="${{ github.event.pull_request.base.sha }}"
-                  git checkout "$BASE_SHA" -- .
                   npm ci --silent
+                  rm -rf coverage
                   npx jest --coverage --coverageReporters=json-summary --ci \
-                      --passWithNoTests 2>/dev/null || true
+                      --passWithNoTests
                   cp coverage/coverage-summary.json /tmp/base-coverage.json
               shell: bash
 
             # ── Step 2: coverage on the PR HEAD ──────────────────────────────
+            - name: Checkout PR head
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha }}
+                  persist-credentials: false
+                  path: pr-checkout
+
             - name: Run Jest on PR head
+              working-directory: pr-checkout
               run: |
-                  git checkout ${{ github.event.pull_request.head.sha }} -- .
                   npm ci --silent
+                  rm -rf coverage
                   npx jest --coverage --coverageReporters=json-summary --ci \
-                      --passWithNoTests 2>/dev/null || true
+                      --passWithNoTests
                   cp coverage/coverage-summary.json /tmp/pr-coverage.json
               shell: bash
 
