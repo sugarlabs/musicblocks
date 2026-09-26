@@ -139,7 +139,9 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 .clear-button-container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-start;
+    gap: 8px;
 }
 
 .confirm-button {
@@ -150,7 +152,6 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     cursor: pointer;
     background-color: var(--color-brand-primary);
     color: var(--color-text-inverse);
-    margin-right: 16px;
     transition: background-color 0.2s ease;
 }
 
