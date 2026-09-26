@@ -75,6 +75,51 @@ describe("parseSclFile", () => {
         expect(result.pitches[0].ratio).toBeCloseTo(2, 10);
         expect(result.pitches[0].cents).toBeCloseTo(1200, 6);
     });
+
+    it("ignores text after a valid pitch value per the Scala spec", () => {
+        const content = [
+            "! labels.scl",
+            "!",
+            "Labelled",
+            "4",
+            " 100.0 C#",
+            " 5/4   E\\",
+            "3/2\tG",
+            "2 octave"
+        ].join("\n");
+        const result = parseSclFile(content);
+        expect(result.pitchCount).toBe(4);
+        expect(result.pitches[0].cents).toBeCloseTo(100, 6);
+        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 10);
+        expect(result.pitches[2].ratio).toBeCloseTo(1.5, 10);
+        expect(result.pitches[3].ratio).toBeCloseTo(2, 10);
+    });
+
+    it("still accepts a trailing cents unit", () => {
+        const content = [
+            "! unit.scl",
+            "!",
+            "Unit",
+            "3",
+            "100.0 cents",
+            "200.0cents",
+            "300.0cents D#"
+        ].join("\n");
+        const result = parseSclFile(content);
+        expect(result.pitches[0].cents).toBeCloseTo(100, 6);
+        expect(result.pitches[1].cents).toBeCloseTo(200, 6);
+        expect(result.pitches[2].cents).toBeCloseTo(300, 6);
+    });
+
+    it("still rejects an invalid pitch value followed by text", () => {
+        const content = ["! bad.scl", "!", "Bad", "1", "abc 100.0"].join("\n");
+        expect(() => parseSclFile(content)).toThrow("invalid pitch value: abc");
+    });
+
+    it("still rejects a negative ratio followed by text", () => {
+        const content = ["! neg.scl", "!", "Neg", "1", "-3/2 G"].join("\n");
+        expect(() => parseSclFile(content)).toThrow("invalid ratio: -3/2");
+    });
 });
 
 describe("parseModeJson", () => {
