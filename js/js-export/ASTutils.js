@@ -861,7 +861,13 @@ class ASTUtils {
                 ASTs.push({
                     type: "SwitchCase",
                     test: null,
-                    consequent: ASTUtils._getBlockAST(flow[2], iterMax)
+                    consequent: [
+                        ...ASTUtils._getBlockAST(flow[2], iterMax),
+                        {
+                            type: "BreakStatement",
+                            label: null
+                        }
+                    ]
                 });
             } else if (flow[0] === "increment") {
                 ASTs.push(ASTUtils._getIncrementStmntAST(flow[1], true));

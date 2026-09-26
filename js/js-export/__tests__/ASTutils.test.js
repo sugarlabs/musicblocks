@@ -789,6 +789,25 @@ describe("ASTUtils", () => {
             ]);
         });
 
+        it("should stop after a default case instead of falling through", () => {
+            const flows = [["defaultcase", null, ["flow"]]];
+            const iteratorNum = 0;
+            const result = ASTUtils._getBlockAST(flows, iteratorNum);
+            expect(result).toEqual([
+                {
+                    type: "SwitchCase",
+                    test: null,
+                    consequent: [
+                        ...ASTUtils._getBlockAST(["flow"], iteratorNum),
+                        {
+                            type: "BreakStatement",
+                            label: null
+                        }
+                    ]
+                }
+            ]);
+        });
+
         it("should return the AST for an increment block", () => {
             const flows = [["increment", ["testIdentifier", "testArg"]]];
             const result = ASTUtils._getBlockAST(flows);
