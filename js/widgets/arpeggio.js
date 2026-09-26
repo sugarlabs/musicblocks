@@ -703,7 +703,7 @@ class Arpeggio {
         for (let n = 0; n < notesToPlay.length; n++) {
             const noteValue = notesToPlay[n][1];
             const letter = notesToPlay[n][0].slice(0, -1);
-            const octave = Number(notesToPlay[n][0].substr(notesToPlay[n][0].length - 1));
+            const octave = Number(notesToPlay[n][0].slice(notesToPlay[n][0].length - 1));
             for (let i = 0; i < pairs.length; i++) {
                 if (pairs[i][0] === -1) {
                     this._playList.push(["", noteValue]);

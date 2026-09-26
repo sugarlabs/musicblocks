@@ -16,6 +16,98 @@
    CUSTOMSAMPLES, globalActivity, isUnsafeObjectKey
  */
 
+if (typeof module !== "undefined" && module.exports) {
+    var MusicUtilsConstants =
+        (typeof window !== "undefined" && window.MusicUtilsConstants) ||
+        (typeof require !== "undefined" ? require("./musicutils-constants") : {});
+    var {
+        WHOLENOTE,
+        HALFNOTE,
+        QUARTERNOTE,
+        EIGHTHNOTE,
+        SIXTEENTHNOTE,
+        THIRTYSECONDNOTE,
+        SIXTYFOURTHNOTE,
+        SHARP,
+        FLAT,
+        CENTSSYMBOL,
+        NATURAL,
+        DOUBLESHARP,
+        DOUBLEFLAT,
+        NSYMBOLS,
+        BTOFLAT,
+        STOSHARP,
+        CHROMATIC_SOLFEGE,
+        NOTESSHARP,
+        NOTESFLAT,
+        NOTESFLAT2,
+        EQUIVALENTFLATS,
+        EQUIVALENTSHARPS,
+        EQUIVALENTNATURALS,
+        EQUIVALENTACCIDENTALS,
+        CONVERT_DOWN,
+        CONVERT_DOUBLE_DOWN,
+        CONVERT_UP,
+        CONVERT_DOUBLE_UP,
+        EXTRATRANSPOSITIONS,
+        SOLFEGENAMES,
+        SOLFEGENAMES1,
+        NOTENAMES,
+        ALLNOTENAMES,
+        NOTENAMES1,
+        PITCHES,
+        PITCHES1,
+        PITCHES2,
+        PITCHES3,
+        NOTESTABLE,
+        FIXEDSOLFEGE,
+        NOTESTEP,
+        ALLNOTESTEP,
+        SHARPPREFERENCE,
+        FLATPREFERENCE,
+        SOLFNOTES,
+        SCALENOTES,
+        SEMITONES,
+        POWER2,
+        A0,
+        C10,
+        YSTAFFNOTEHEIGHT,
+        YSTAFFOCTAVEHEIGHT,
+        ACCIDENTALNAMES,
+        ACCIDENTALVALUES,
+        INTERVALVALUES,
+        MODE_PIE_MENUS,
+        MODEPIEMENU_GROUP_RING,
+        MODEPIEMENU_NAME_RING,
+        PITCH_COLLECTIONS,
+        PITCH_COLLECTION_ALIASES,
+        MAQAMTABLE,
+        MIDI_INSTRUMENTS,
+        DRUM_MIDI_MAP,
+        REVERSE_DRUM_MIDI_MAP,
+        DEFAULTINVERT,
+        DEFAULTVOICE,
+        DEFAULTNOISE,
+        DEFAULTDRUM,
+        DEFAULTMODE,
+        DEFAULTTEMPERAMENT,
+        DEFAULTFILTERTYPE,
+        SOLFMAPPER,
+        ACCIDENTAL_SEMITONE_MAP
+    } = MusicUtilsConstants;
+    var MusicUtilsI18n =
+        (typeof window !== "undefined" && window.MusicUtilsI18n) ||
+        (typeof require !== "undefined" ? require("./musicutils-i18n") : {});
+    var {
+        SOLFEGECONVERSIONTABLE,
+        FIXEDSOLFEGE1,
+        SEMITONETOINTERVALMAP,
+        INVERTMODES,
+        FILTERTYPES,
+        OSCTYPES
+    } = MusicUtilsI18n;
+}
+
 const _b64Cache = new Map();
 
 /*
@@ -86,856 +178,18 @@ function normalizeNoteAccidentals(note) {
     return stripMicrotonalPrefix(note).replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 }
 
-/**
- * Scalable sinewave graphic.
- * @const
- * @type {string}
- */
-const SYNTHSVG =
-    '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" y="0px" xml:space="preserve" x="0px" width="SVGWIDTHpx" viewBox="0 0 SVGWIDTH 55" version="1.1" height="55px" enable-background="new 0 0 SVGWIDTH 55"><g transform="scale(XSCALE,1)"><path d="m 1.5,27.5 c 0,0 2.2,-17.5 6.875,-17.5 4.7,0.0 6.25,11.75 6.875,17.5 0.75,6.67 2.3,17.5 6.875,17.5 4.1,0.0 6.25,-13.6 6.875,-17.5 C 29.875,22.65 31.1,10 35.875,10 c 4.1,0.0 5.97,13.0 6.875,17.5 1.15,5.7 1.75,17.5 6.875,17.5 4.65,0.0 6.875,-17.5 6.875,-17.5" style="stroke:#90c100;fill-opacity:1;fill:none;stroke-width:STROKEWIDTHpx;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /></g></svg>';
-
-/**
- * Notes graphics.
- * @const
- * @type {string}
- */
-const WHOLENOTE =
-    '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="svg6468" viewBox="0 0 5.1680003 12.432" height="12.432" width="5.1680002"> <g transform="translate(-375.23523,-454.37592)"> <g transform="translate(7.9606,5.6125499)" style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"> <path d="m 369.80263,457.99537 q 1.104,0 1.872,0.432 0.768,0.416 0.768,1.2 0,0.752 -0.752,1.168 -0.752,0.4 -1.808,0.4 -1.104,0 -1.856,-0.416 -0.752,-0.416 -0.752,-1.232 0,-0.576 0.464,-0.944 0.48,-0.368 1.008,-0.48 0.528,-0.128 1.056,-0.128 z m -0.864,1.136 q 0,0.672 0.304,1.184 0.304,0.512 0.784,0.512 0.736,0 0.736,-0.8 0,-0.64 -0.304,-1.136 -0.288,-0.512 -0.8,-0.512 -0.72,0 -0.72,0.752 z" /> </g> </g> </svg>';
-
-const HALFNOTE =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3.84 12.432" height="3.5085866mm" width="1.0837333mm"> <g transform="translate(-375.23523,-454.37592)"> <g style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"> <path d="m 375.23523,465.70392 q 0,-0.832 0.816,-1.472 0.816,-0.656 1.728,-0.656 0.528,0 0.944,0.272 l 0,-9.472 0.352,0 0,10.352 q 0,0.896 -0.784,1.488 -0.784,0.592 -1.728,0.592 -0.528,0 -0.928,-0.304 -0.4,-0.32 -0.4,-0.8 z m 0.736,0.48 q 0.848,0 1.712,-0.72 0.88,-0.72 0.88,-1.072 0,-0.224 -0.192,-0.224 -0.592,0 -1.632,0.688 -1.024,0.672 -1.024,1.12 0,0.208 0.256,0.208 z" /> </g> </g> </svg>';
-
-const QUARTERNOTE =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4.0859801 11.74224" height="3.313921mm" width="1.1531544mm"> <g transform="translate(-226.1339,-457.841)"> <g style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"> <path d="m 229.60268,457.841 0.5625,0 0.0547,0.0625 0,10.02344 q 0,1.27344 -1.53125,1.625 l -0.375,0.0313 -0.27343,0 q -1.65625,0 -1.875,-1.03906 l -0.0313,-0.24219 q 0,-1.01562 1.64843,-1.20312 l 0.25782,-0.0391 q 0.77343,0 1.47656,0.5 l 0.0313,0 0,-9.65625 0.0547,-0.0625 z" /> </g> </g> </svg>';
-
-const EIGHTHNOTE =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7.5234898 11.7422" height="3.3139098mm" width="2.123296mm"> <g transform="translate(-244.80575,-403.5553)"> <g style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"> <path d="m 248.14955,403.5553 0.67969,0 0.0625,0.0547 0,0.30468 q 0.21094,0.42188 1.5625,0.91407 1.875,0.54687 1.875,1.625 0,1.14062 -0.95313,1.89062 l -0.0313,0 -0.23437,-0.25 q 0.47656,-0.38281 0.47656,-1.03906 0,-0.54688 -1.78125,-1.10156 -0.71875,-0.32813 -0.91406,-0.53125 l 0,8.32812 q 0,1.19531 -1.75,1.54688 l -0.44531,0 q -1.89063,0 -1.89063,-1.3125 0,-1.02344 1.65625,-1.20313 l 0.17969,0 q 0.75,0 1.44531,0.5 l 0,-9.67187 0.0625,-0.0547 z" /> </g> </g> </svg>';
-
-const SIXTEENTHNOTE =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7.0080001 12.432" height="3.5085866mm" width="1.9778134mm"> <g transform="translate(-182.21292,-431.51877)"> <g style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"> <path d="m 182.21292,442.84677 q 0,-0.832 0.816,-1.472 0.816,-0.656 1.728,-0.656 0.528,0 0.944,0.272 l 0,-9.472 0.336,0 q 0.064,0.56 0.4,1.088 0.352,0.512 0.8,0.944 0.448,0.416 0.88,0.864 0.448,0.432 0.752,1.024 0.304,0.576 0.304,1.232 0,0.544 -0.256,1.104 0.304,0.448 0.304,1.184 0,1.232 -0.608,2.24 l -0.384,0 q 0.56,-1.12 0.56,-2.032 0,-0.512 -0.256,-0.96 -0.24,-0.448 -0.752,-0.816 -0.496,-0.368 -0.832,-0.56 -0.32,-0.192 -0.896,-0.48 l 0,5.52 q 0,0.896 -0.784,1.488 -0.784,0.592 -1.728,0.592 -0.528,0 -0.928,-0.304 -0.4,-0.32 -0.4,-0.8 z m 6.464,-5.904 q 0,-1.648 -2.624,-3.072 0,0.464 0.192,0.88 0.192,0.416 0.512,0.752 0.32,0.32 0.656,0.592 0.336,0.272 0.688,0.608 0.352,0.32 0.544,0.608 0.032,-0.256 0.032,-0.368 z" /> </g> </g> </svg>';
-
-const THIRTYSECONDNOTE =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7.0080001 14.496001" height="4.0910935mm" width="1.9778134mm"> <g transform="translate(-630.78433,-240.88335)">  <g  style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1">  <path  d="m 630.78433,254.27535 q 0,-0.832 0.816,-1.472 0.816,-0.656 1.728,-0.656 0.528,0 0.944,0.272 l 0,-11.536 0.352,0 q 0.048,0.56 0.384,1.072 0.336,0.496 0.768,0.912 0.432,0.4 0.864,0.848 0.432,0.448 0.72,1.104 0.304,0.656 0.304,1.456 0,0.48 -0.16,1.056 0.224,0.416 0.224,0.912 0,0.512 -0.24,0.976 0.304,0.448 0.304,1.168 0,1.232 -0.608,2.24 l -0.384,0 q 0.56,-1.12 0.56,-2.032 0,-0.512 -0.256,-0.96 -0.24,-0.448 -0.752,-0.816 -0.496,-0.368 -0.832,-0.56 -0.32,-0.192 -0.896,-0.48 l 0,5.52 q 0,0.896 -0.784,1.488 -0.784,0.592 -1.728,0.592 -0.528,0 -0.928,-0.304 -0.4,-0.32 -0.4,-0.8 z m 6.448,-7.872 q 0,-0.496 -0.208,-0.928 -0.192,-0.432 -0.64,-0.832 -0.432,-0.416 -0.784,-0.672 -0.352,-0.256 -0.976,-0.656 0.032,0.448 0.352,0.896 0.32,0.432 0.704,0.752 0.4,0.32 0.848,0.8 0.464,0.464 0.704,0.912 l 0,-0.272 z m 0,2.096 q 0,-0.4 -0.16,-0.768 -0.144,-0.368 -0.32,-0.608 -0.16,-0.256 -0.592,-0.608 -0.416,-0.352 -0.672,-0.528 -0.256,-0.176 -0.848,-0.576 0.064,0.48 0.4,0.976 0.336,0.48 0.72,0.816 0.4,0.336 0.832,0.784 0.448,0.432 0.64,0.784 l 0,-0.272 z" /> </g> </g> </svg>';
-
-const SIXTYFOURTHNOTE =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7.0080001 14.528" height="4.1001244mm" width="1.9778134mm"> <g transform="translate(-345.3223,-325.39492)"> <g transform="translate(3.1093785,1.6864426)" style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"> <path d="m 342.21292,337.13248 q 0,-0.832 0.816,-1.472 0.816,-0.656 1.728,-0.656 0.528,0 0.944,0.272 l 0,-11.568 0.336,0 q 0.064,0.64 0.384,1.104 0.336,0.464 0.752,0.768 0.416,0.304 0.832,0.656 0.416,0.336 0.688,0.928 0.288,0.592 0.288,1.44 0,0.24 -0.144,0.768 0.256,0.608 0.256,1.376 0,0.32 -0.16,0.896 0.224,0.416 0.224,0.912 0,0.496 -0.24,0.96 0.304,0.448 0.304,1.024 0,0.384 -0.08,0.688 -0.08,0.304 -0.16,0.448 -0.08,0.144 -0.368,0.608 l -0.384,0 q 0.08,-0.16 0.192,-0.368 0.112,-0.224 0.16,-0.32 0.064,-0.096 0.112,-0.24 0.064,-0.144 0.08,-0.288 0.016,-0.144 0.016,-0.32 0,-0.272 -0.096,-0.512 -0.08,-0.256 -0.176,-0.432 -0.096,-0.192 -0.32,-0.4 -0.224,-0.208 -0.368,-0.32 -0.144,-0.128 -0.464,-0.304 -0.304,-0.192 -0.432,-0.256 -0.128,-0.064 -0.48,-0.224 -0.336,-0.176 -0.4,-0.208 l 0,4.064 q 0,0.896 -0.784,1.488 -0.784,0.592 -1.728,0.592 -0.528,0 -0.928,-0.304 -0.4,-0.32 -0.4,-0.8 z m 6.352,-8.384 q 0,-0.352 -0.144,-0.688 -0.128,-0.352 -0.288,-0.576 -0.16,-0.224 -0.48,-0.496 -0.32,-0.272 -0.512,-0.4 -0.192,-0.144 -0.592,-0.384 -0.384,-0.24 -0.496,-0.32 0.032,0.432 0.352,0.832 0.32,0.384 0.704,0.656 0.4,0.272 0.816,0.72 0.432,0.432 0.624,0.912 0.016,-0.176 0.016,-0.256 z m 0.016,2.128 q 0,-0.208 -0.048,-0.4 -0.032,-0.192 -0.08,-0.336 -0.048,-0.16 -0.176,-0.336 -0.128,-0.176 -0.208,-0.288 -0.08,-0.112 -0.272,-0.272 -0.192,-0.176 -0.288,-0.256 -0.096,-0.08 -0.352,-0.256 -0.24,-0.176 -0.336,-0.224 -0.096,-0.064 -0.384,-0.24 -0.288,-0.192 -0.384,-0.256 0.032,0.464 0.368,0.88 0.336,0.416 0.736,0.704 0.4,0.272 0.816,0.688 0.416,0.416 0.576,0.864 0.032,-0.192 0.032,-0.272 z m -0.016,1.936 q 0,-0.848 -0.624,-1.504 -0.608,-0.672 -1.872,-1.392 0.064,0.464 0.384,0.896 0.336,0.416 0.72,0.688 0.4,0.272 0.8,0.704 0.4,0.416 0.576,0.88 0.016,-0.064 0.016,-0.272 z" /> </g> </g> </svg>';
-
 // Is there a "proper" double-sharp symbol as well? I see this from wikipedia: U+1D12A 𝄪 MUSICAL SYMBOL DOUBLE SHARP (HTML &#119082;) (https://en.wikipedia.org/wiki/Double_sharp)
-
-/**
- * Symbol for a sharp note.
- * @constant {string}
- * @default
- */
-const SHARP = "♯";
-
-/**
- * Symbol for a flat note.
- * @constant {string}
- * @default
- */
-const FLAT = "♭";
-
-/**
- * Symbol for cents.
- *
- * Cents are a logarithmic unit for measuring musical intervals:
- *   - 1 cent = 1/1200 of an octave (12-EDO semitone = 100 cents)
- *   - To convert a ratio to cents: cents = 1200 * log2(ratio)
- *   - To convert cents to a frequency multiplier: multiplier = 2^(cents/1200)
- *
- * Examples:
- *   12-EDO step = 100 ¢ (1200 / 12)
- *   5-EDO  step = 240 ¢ (1200 / 5)
- *   19-EDO step ≈ 63.16 ¢ (1200 / 19)
- *
- * Example: A4 = 440 Hz, A4 + 33 ¢ = 440 * 2^(33/1200) ≈ 448.17 Hz
- *
- * @constant {string}
- * @default
- */
-const CENTSSYMBOL = "\u00A2";
-
-/**
- * Symbol for a natural note.
- * @constant {string}
- * @default
- */
-const NATURAL = "♮";
-
-/**
- * Symbol for a double sharp note.
- * @constant {string}
- * @default
- */
-const DOUBLESHARP = "𝄪";
-
-/**
- * Symbol for a double flat note.
- * @constant {string}
- * @default
- */
-const DOUBLEFLAT = "𝄫";
-
-/**
- * Symbols representing different note durations.
- * @constant {Object.<number, string>}
- * @default
- */
-const NSYMBOLS = { 1: "𝅝", 2: "𝅗𝅥", 4: "♩", 8: "♪", 16: "𝅘𝅥𝅯" };
-
-/**
- * Symbols representing different rest durations.
- * @constant {Object.<number, string>}
- * @default
- */
-const RSYMBOLS = { 1: "𝄻", 2: "𝄼", 4: "𝄽", 8: "𝄾", 16: "𝄿" };
-
-/**
- * Maps from notes with flats to their corresponding notes with '♭' (flat) symbol.
- * @constant {Object.<string, string>}
- */
-const BTOFLAT = {
-    Eb: "E" + FLAT,
-    Gb: "G" + FLAT,
-    Ab: "A" + FLAT,
-    Bb: "B" + FLAT,
-    Db: "D" + FLAT,
-    Cb: "C" + FLAT,
-    Fb: "F" + FLAT,
-    eb: "E" + FLAT,
-    gb: "G" + FLAT,
-    ab: "A" + FLAT,
-    bb: "B" + FLAT,
-    db: "D" + FLAT,
-    cb: "C" + FLAT,
-    fb: "F" + FLAT
-};
-
-/**
- * Maps from notes with flats to their corresponding notes with '♯' (sharp) symbol.
- * @constant {Object.<string, string>}
- */
-const STOSHARP = {
-    "E#": "E" + SHARP,
-    "G#": "G" + SHARP,
-    "A#": "A" + SHARP,
-    "B#": "B" + SHARP,
-    "D#": "D" + SHARP,
-    "C#": "C" + SHARP,
-    "F#": "F" + SHARP,
-    "e#": "E" + SHARP,
-    "g#": "G" + SHARP,
-    "a#": "A" + SHARP,
-    "b#": "B" + SHARP,
-    "d#": "D" + SHARP,
-    "c#": "C" + SHARP,
-    "f#": "F" + SHARP
-};
-
-/**
- * Array containing the solfege names for the chromatic scale.
- * @constant {string[]}
- */
-const CHROMATIC_SOLFEGE = [
-    "Do", // 0
-    "Di", // 1
-    "Re", // 2
-    "Ri", // 3
-    "Mi", // 4
-    "Fa", // 5
-    "Fi", // 6
-    "Sol", // 7
-    "Si", // 8
-    "La", // 9
-    "Li", // 10
-    "Ti" // 11
-];
-
-/**
- * Array of notes with sharps.
- * @constant {string[]}
- */
-const NOTESSHARP = [
-    "C",
-    "C" + SHARP,
-    "D",
-    "D" + SHARP,
-    "E",
-    "F",
-    "F" + SHARP,
-    "G",
-    "G" + SHARP,
-    "A",
-    "A" + SHARP,
-    "B"
-];
-
-/**
- * Array of notes with flats.
- * @constant {string[]}
- */
-const NOTESFLAT = [
-    "C",
-    "D" + FLAT,
-    "D",
-    "E" + FLAT,
-    "E",
-    "F",
-    "G" + FLAT,
-    "G",
-    "A" + FLAT,
-    "A",
-    "B" + FLAT,
-    "B"
-];
-
-/**
- * Array of lowercase notes with flats.
- * @constant {string[]}
- */
-const NOTESFLAT2 = [
-    "c",
-    "d" + FLAT,
-    "d",
-    "e" + FLAT,
-    "e",
-    "f",
-    "g" + FLAT,
-    "g",
-    "a" + FLAT,
-    "a",
-    "b" + FLAT,
-    "b"
-];
-
-/**
- * Equivalent flats for various notes.
- * @const
- * @type {Object.<string, string>}
- */
-const EQUIVALENTFLATS = {
-    "C♯": "D" + FLAT,
-    "D♯": "E" + FLAT,
-    "F♯": "G" + FLAT,
-    "G♯": "A" + FLAT,
-    "A♯": "B" + FLAT
-};
-
-/**
- * Equivalent sharps for various notes.
- * @const
- * @type {Object.<string, string>}
- */
-const EQUIVALENTSHARPS = {
-    "D♭": "C" + SHARP,
-    "E♭": "D" + SHARP,
-    "G♭": "F" + SHARP,
-    "A♭": "G" + SHARP,
-    "B♭": "A" + SHARP
-};
-
-/**
- * Maps from notes with specific accidentals to their equivalent natural notes.
- * @constant {Object.<string, string>}
- */
-const EQUIVALENTNATURALS = {
-    "E♯": "F",
-    "B♯": "C",
-    "C♭": "B",
-    "F♭": "E",
-    "D𝄪": "E",
-    "A𝄪": "B",
-    "G𝄪": "A",
-    "E𝄪": "F♯",
-    "C𝄪": "D",
-    "F𝄪": "G",
-    "B𝄪": "C♯",
-    "C𝄫": "B♭",
-    "D𝄫": "C",
-    "E𝄫": "D",
-    "F𝄫": "E♭",
-    "G𝄫": "F",
-    "A𝄫": "G",
-    "B𝄫": "A",
-    // Two-character forms (from _parse_pitch_string normalization)
-    "D♯♯": "E",
-    "A♯♯": "B",
-    "G♯♯": "A",
-    "E♯♯": "F♯",
-    "C♯♯": "D",
-    "F♯♯": "G",
-    "B♯♯": "C♯",
-    "C♭♭": "B♭",
-    "D♭♭": "C",
-    "E♭♭": "D",
-    "F♭♭": "E♭",
-    "G♭♭": "F",
-    "A♭♭": "G",
-    "B♭♭": "A"
-};
-
-/**
- * Maps from natural notes to their equivalent notes with specific accidentals.
- * @constant {Object.<string, string>}
- */
-const EQUIVALENTACCIDENTALS = { F: "E♯", C: "B♯", B: "C♭", E: "F♭", G: "F𝄪", D: "C𝄪", A: "G𝄪" };
-
-/**
- * Converts a note down to a flat note.
- * @const
- * @type {Object.<string, string>}
- */
-const CONVERT_DOWN = {
-    "C": "B" + SHARP,
-    "C♭": "B",
-    "D♭": "C" + SHARP,
-    "E♭": "D" + SHARP,
-    "F": "E" + SHARP,
-    "F♭": "E",
-    "G♭": "F" + SHARP,
-    "A♭": "G" + SHARP,
-    "B♭": "A" + SHARP
-};
-
-/**
- * Maps from notes with specific accidentals to their equivalent notes after a double-down transposition.
- * @constant {Object.<string, string>}
- */
-const CONVERT_DOUBLE_DOWN = {
-    "C♯": "B" + DOUBLESHARP,
-    "D": "C" + DOUBLESHARP,
-    "E": "D" + DOUBLESHARP,
-    "F♯": "E" + DOUBLESHARP,
-    "G": "F" + DOUBLESHARP,
-    "A": "G" + DOUBLESHARP,
-    "B": "A" + DOUBLESHARP
-};
-
-/**
- * Maps from notes with specific accidentals to their equivalent notes after an up transposition.
- * @constant {Object.<string, string>}
- */
-const CONVERT_UP = {
-    "C♯": "D" + FLAT,
-    "D♯": "E" + FLAT,
-    "E♯": "F",
-    "E": "F" + FLAT,
-    "F♯": "G" + FLAT,
-    "G♯": "A" + FLAT,
-    "A♯": "B" + FLAT,
-    "B♯": "C",
-    "B": "C" + FLAT
-};
-
-/**
- * Maps from notes with specific accidentals to their equivalent notes after a double-up transposition.
- * @constant {Object.<string, string>}
- */
-const CONVERT_DOUBLE_UP = {
-    "C": "D" + DOUBLEFLAT,
-    "D": "E" + DOUBLEFLAT,
-    "E♭": "F" + DOUBLEFLAT,
-    "F": "G" + DOUBLEFLAT,
-    "G": "A" + DOUBLEFLAT,
-    "A": "B" + DOUBLEFLAT,
-    "B♭": "C" + DOUBLEFLAT
-};
-
-/**
- * Extra transpositions for specific notes with accidentals.
- * @constant {Object.<string, [string, number]>}
- */
-const EXTRATRANSPOSITIONS = {
-    "E♯": ["F", 0],
-    "B♯": ["C", 1],
-    "C♭": ["B", -1],
-    "F♭": ["E", 0],
-    "e♯": ["F", 0],
-    "b♯": ["C", 1],
-    "c♭": ["B", -1],
-    "f♭": ["E", 0]
-};
-
-/**
- * Array containing the solfege names for the diatonic scale.
- * @constant {string[]}
- */
-const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
-
-/**
- * Array containing the solfege names for the chromatic scale.
- * @constant {string[]}
- */
-const SOLFEGENAMES1 = [
-    "do",
-    "do" + SHARP,
-    "do" + DOUBLESHARP,
-    "re" + DOUBLEFLAT,
-    "re" + FLAT,
-    "re",
-    "re" + SHARP,
-    "re" + DOUBLESHARP,
-    "mi" + DOUBLEFLAT,
-    "mi" + FLAT,
-    "mi",
-    "fa",
-    "fa" + SHARP,
-    "fa" + DOUBLESHARP,
-    "sol" + DOUBLEFLAT,
-    "sol" + FLAT,
-    "sol",
-    "sol" + SHARP,
-    "sol" + DOUBLESHARP,
-    "la" + DOUBLEFLAT,
-    "la" + FLAT,
-    "la",
-    "la" + SHARP,
-    "la" + DOUBLESHARP,
-    "ti" + DOUBLEFLAT,
-    "ti" + FLAT,
-    "ti"
-];
-
-/**
- * Array containing the basic note names (without accidentals).
- * @constant {string[]}
- */
-const NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
-
-/**
- * Array containing all possible note names, including double sharps/flats and triple sharps/flats.
- * @constant {string[]}
- */
-const ALLNOTENAMES = [
-    "C",
-    "C#",
-    "Cx",
-    "Dbb",
-    "Db",
-    "D",
-    "D#",
-    "Dx",
-    "Ebb",
-    "Eb",
-    "E",
-    "E#",
-    "Ex",
-    "Fbb",
-    "Fb",
-    "F",
-    "F#",
-    "Fx",
-    "Gbb",
-    "Gb",
-    "G",
-    "G#",
-    "Gx",
-    "Abb",
-    "Ab",
-    "A",
-    "A#",
-    "Ax",
-    "Bbb",
-    "Bb",
-    "B",
-    "B#",
-    "Bx",
-    "Cbb",
-    "Cb"
-];
-
-/**
- * Array containing note names with various accidentals (sharps and flats).
- * @constant {string[]}
- */
-const NOTENAMES1 = [
-    "C",
-    "C" + SHARP,
-    "C" + DOUBLESHARP,
-    "D" + DOUBLEFLAT,
-    "D" + FLAT,
-    "D",
-    "D" + SHARP,
-    "D" + DOUBLESHARP,
-    "E" + DOUBLEFLAT,
-    "E" + FLAT,
-    "E",
-    "F",
-    "F" + SHARP,
-    "F" + DOUBLESHARP,
-    "G" + DOUBLEFLAT,
-    "G" + FLAT,
-    "G",
-    "G" + SHARP,
-    "G" + DOUBLESHARP,
-    "A" + DOUBLEFLAT,
-    "A" + FLAT,
-    "A",
-    "A" + SHARP,
-    "A" + DOUBLESHARP,
-    "B" + DOUBLEFLAT,
-    "B" + FLAT,
-    "B"
-];
-
-/**
- * Maps from Western note names to their corresponding solfege names.
- * @constant {Object.<string, string>}
- */
-const SOLFEGECONVERSIONTABLE = {
-    "C♭": "do" + FLAT,
-    "C": "do",
-    "C♯": "do" + SHARP,
-    "D♭": "re" + FLAT,
-    "D": "re",
-    "D♯": "re" + SHARP,
-    "E♭": "mi" + FLAT,
-    "E": "mi",
-    "F": "fa",
-    "F♯": "fa" + SHARP,
-    "G♭": "sol" + FLAT,
-    "G": "sol",
-    "G♯": "sol" + SHARP,
-    "A♭": "la" + FLAT,
-    "A": "la",
-    "A♯": "la" + SHARP,
-    "B♭": "ti" + FLAT,
-    "B": "ti",
-    "B♯": "ti" + SHARP,
-    "R": _("rest")
-};
-
-/**
- * Maps from Western solfege names to their corresponding Carnatic solfege names.
- * @constant {Object.<string, string>}
- */
-const WESTERN2EISOLFEGENAMES = {
-    do: "sa",
-    re: "re",
-    mi: "ga",
-    fa: "ma",
-    sol: "pa",
-    la: "dha",
-    ti: "ni"
-};
-
-/**
- * Array containing pitches with flats.
- * @constant {string[]}
- */
-const PITCHES = [
-    "C",
-    "D" + FLAT,
-    "D",
-    "E" + FLAT,
-    "E",
-    "F",
-    "G" + FLAT,
-    "G",
-    "A" + FLAT,
-    "A",
-    "B" + FLAT,
-    "B"
-];
-
-/**
- * Array containing pitches with flats and sharps.
- * @constant {string[]}
- */
-const PITCHES1 = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
-
-/**
- * Array containing pitches with sharps.
- * @constant {string[]}
- */
-const PITCHES2 = [
-    "C",
-    "C" + SHARP,
-    "D",
-    "D" + SHARP,
-    "E",
-    "F",
-    "F" + SHARP,
-    "G",
-    "G" + SHARP,
-    "A",
-    "A" + SHARP,
-    "B"
-];
-
-/**
- * Array containing pitches with sharps.
- * @constant {string[]}
- */
-const PITCHES3 = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-/**
- * Maps from numerical values to solfege names.
- * @constant {Object.<number, string>}
- */
-const NOTESTABLE = {
-    1: "do",
-    2: "do" + SHARP,
-    3: "re",
-    4: "re" + SHARP,
-    5: "mi",
-    6: "fa",
-    7: "fa" + SHARP,
-    8: "sol",
-    9: "sol" + SHARP,
-    10: "la",
-    11: "la" + SHARP,
-    0: "ti"
-};
-
-/**
- * Maps from fixed solfege names to their corresponding Western note names.
- * @constant {Object.<string, string>}
- */
-const FIXEDSOLFEGE = {
-    do: "C",
-    re: "D",
-    mi: "E",
-    fa: "F",
-    sol: "G",
-    la: "A",
-    ti: "B"
-};
-
-/**
- * Maps from fixed solfege names with accidentals to their corresponding Western note names.
- * @constant {Object.<string, string>}
- */
-const FIXEDSOLFEGE1 = {
-    "do𝄫": "B" + FLAT,
-    "do♭": "C" + FLAT,
-    "do": "C",
-    "do♯": "C" + SHARP,
-    "do𝄪": "D",
-    "re𝄫": "C",
-    "re♭": "D" + FLAT,
-    "re": "D",
-    "re♯": "D" + SHARP,
-    "re𝄪": "E",
-    "mi𝄫": "D",
-    "mi♭": "E" + FLAT,
-    "mi": "E",
-    "mi♯": "E" + SHARP,
-    "mi𝄪": "F" + SHARP,
-    "fa𝄫": "E" + FLAT,
-    "fa♭": "F" + FLAT,
-    "fa": "F",
-    "fa♯": "F" + SHARP,
-    "fa𝄪": "G",
-    "sol𝄫": "F",
-    "sol♭": "G" + FLAT,
-    "sol": "G",
-    "sol♯": "G" + SHARP,
-    "sol𝄪": "A",
-    "la𝄫": "G",
-    "la♭": "A" + FLAT,
-    "la": "A",
-    "la♯": "A" + SHARP,
-    "la𝄪": "B",
-    "ti𝄫": "A",
-    "ti♭": "B" + FLAT,
-    "ti": "B",
-    "ti♯": "B" + SHARP,
-    "ti𝄪": "C" + SHARP,
-    "R": _("rest")
-};
-
-/**
- * Maps from note names to their corresponding step numbers.
- * @constant {Object.<string, number>}
- */
-const NOTESTEP = { C: 1, D: 3, E: 5, F: 6, G: 8, A: 10, B: 12 };
-
-/**
- * Maps note names to their corresponding step numbers, including enharmonic equivalents.
- * @constant {Object.<number, string>}
- */
-const ALLNOTESTEP = {
-    "Cb": 0,
-    "C": 1,
-    "C#": 2,
-    "Db": 2,
-    "D": 3,
-    "D#": 4,
-    "Eb": 4,
-    "E": 5,
-    "E#": 6,
-    "Fb": 5,
-    "F": 6,
-    "F#": 7,
-    "Gb": 7,
-    "G": 8,
-    "G#": 9,
-    "Ab": 9,
-    "A": 10,
-    "A#": 11,
-    "Bb": 11,
-    "B": 12,
-    "B#": 0
-};
 
 /**
  * semitone/intervalnumber --> lettergap/notenamesgap -->intervalnames
  * @constant {Object.<number, Object.<number,string>}
  */
 
-const SEMITONETOINTERVALMAP = {
-    0: { 0: _("Perfect unison"), 1: _("Diminished second") },
-    1: { 1: _("Minor second"), 0: _("Augmented unison") },
-    2: { 1: _("Major second"), 2: _("Diminished third") },
-    3: { 2: _("Minor third"), 1: _("Augmented second") },
-    4: { 2: _("Major third"), 3: _("Diminished fourth") },
-    5: { 3: _("Perfect fourth"), 2: _("Augmented third") },
-    6: { 4: _("Diminished fifth"), 3: _("Augmented fourth") },
-    7: { 4: _("Perfect fifth"), 5: _("Diminished sixth") },
-    8: { 5: _("Minor sixth"), 4: _("Augmented fifth") },
-    9: { 5: _("Major sixth"), 6: _("Diminished seventh") },
-    10: { 6: _("Minor seventh"), 5: _("Augmented sixth") },
-    11: { 6: _("Major seventh"), 0: _("Diminished octave") },
-    12: { 0: _("Perfect octave"), 6: _("Augmented seventh") },
-    13: { 1: _("Minor ninth"), 0: _("Augmented octave") },
-    14: { 1: _("Major ninth"), 2: _("Diminished tenth") },
-    15: { 2: _("Minor tenth"), 1: _("Augmented ninth") },
-    16: { 2: _("Major tenth"), 3: _("Diminished eleventh") },
-    17: { 3: _("Perfect eleventh"), 2: _("Augmented tenth") },
-    18: { 4: _("Diminished twelfth"), 3: _("Augmented eleventh") },
-    19: { 4: _("Perfect twelfth"), 5: _("Diminished thirteenth") },
-    20: { 5: _("Minor thirteenth"), 4: _("Augmented fifth, plus an octave") },
-    21: { 5: _("Major thirteenth"), 6: _("Diminished seventh, plus an octave") }
-};
-
-/**
- * Array containing preferences for keys with sharps.
- * @constant {string[]}
- */
-const SHARPPREFERENCE = [
-    "g major",
-    "d major",
-    "a major",
-    "e major",
-    "b major",
-    "f# major",
-    "c# major",
-    "e minor",
-    "b minor",
-    "f# minor",
-    "c# minor",
-    "g# minor",
-    "d# minor"
-];
-
-/**
- * Array containing preferences for keys with flats.
- * @constant {string[]}
- */
-const FLATPREFERENCE = [
-    "f major",
-    "bb major",
-    "eb major",
-    "ab major",
-    "db major",
-    "gb major",
-    "cb major",
-    "d minor",
-    "g minor",
-    "c minor",
-    "f minor",
-    "bb minor",
-    "eb minor",
-    "d harmonic minor",
-    "g harmonic minor",
-    "c harmonic minor",
-    "f harmonic minor",
-    "bb harmonic minor",
-    "eb harmonic minor"
-];
-
-/**
- * Internal representation of solfege notes used in selectors.
- * @constant {string[]}
- */
-const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
-
-/**
- * Scale notes used in selectors.
- * @constant {string[]}
- */
-const SCALENOTES = ["7", "6", "5", "4", "3", "2", "1"];
-
-/**
- * Carnatic solfege notes.
- * @constant {string[]}
- */
-const EASTINDIANSOLFNOTES = ["ni", "dha", "pa", "ma", "ga", "re", "sa"];
-
-/**
- * Drum names used in selectors.
- * @constant {string[]}
- */
-const DRUMS = [
-    "snare drum",
-    "kick drum",
-    "tom tom",
-    "floor tom",
-    "bass drum",
-    "cup drum",
-    "darbuka drum",
-    "japanese drum",
-    "hi hat",
-    "ride bell",
-    "cow bell",
-    "triangle bell",
-    "finger cymbals",
-    "chime",
-    "gong",
-    "clang",
-    "crash",
-    "clap",
-    "slap"
-];
-
-/**
- * Graphics names used in selectors.
- * @constant {string[]}
- */
-const GRAPHICS = [
-    "forward",
-    "back",
-    "right",
-    "left",
-    "set heading",
-    "set color",
-    "set shade",
-    "set hue",
-    "set grey",
-    "set translucency",
-    "set pen size"
-];
-
 //The "original solfege" https://en.wikipedia.org/wiki/Solf%C3%A8ge#Origin
 // const ARETINIANSOLFNOTES = ['si', 'la', 'sol', 'fa', 'mi', 're', 'ut'];
 // https://en.wikipedia.org/wiki/Iroha
 // const IROHASOLFNOTES = ['ro', 'i', 'to', 'he', 'ho', 'ni', 'ha'];
 // const IROHASOLFNOTESJA = ['ロ','イ','ト','へ','ホ','二','ハ'];
-
-/**
- * Solfège attributes including double sharp, sharp, natural, flat, and double flat.
- * @constant {string[]}
- */
-const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
-
-//.TRANS: ordinal number. Please keep exactly one space between each number.
-/**
- * Ordinal numbers for degrees.
- * @constant {string}
- */
-const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
 
 /**
  * Returns the number of pitches in the given temperament's octave.
@@ -1113,98 +367,10 @@ function getEdoNoteNamePosition(name, edo) {
 }
 
 /**
- * Number of semitones in an octave.
- * @constant {number}
- */
-const SEMITONES = 12;
-
-/**
- * Number of cents per semitone in 12-TET tuning.
- * @constant {number}
- */
-const CENTS_PER_SEMITONE = 100;
-
-/**
- * Number of cents in an octave.
- * Derived from SEMITONES for future temperament support.
- * @constant {number}
- */
-const CENTS_PER_OCTAVE = SEMITONES * CENTS_PER_SEMITONE;
-
-/**
- * Array representing powers of 2.
- * @constant {number[]}
- */
-const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
-
-const TWELTHROOT2 = 1.0594630943592953;
-const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
-
-/**
- * Frequency of A in octave 0, in Hz.
- * @constant {number}
- */
-const A0 = 27.5;
-
-/**
- * Frequency of C in octave 8, in Hz.
- * @constant {number}
- */
-const C8 = 4186.01;
-
-/**
- * Frequency of C in octave 10, in Hz.
- * @constant {number}
- */
-const C10 = 16744.04;
-
-/**
  * Octave ratio.
  * @type {number}
  */
 let octaveRatio = 2;
-
-/**
- * Height of a staff note.
- * @constant {number}
- */
-const YSTAFFNOTEHEIGHT = 12.5;
-
-/**
- * Height of a staff octave.
- * @constant {number}
- */
-const YSTAFFOCTAVEHEIGHT = 87.5;
-
-/**
- * Width of matrix solfege.
- * @constant {number}
- */
-const MATRIXSOLFEWIDTH = 52;
-
-/**
- * Width of an eighth note.
- * @constant {number}
- */
-const EIGHTHNOTEWIDTH = 24;
-
-/**
- * Height of matrix buttons.
- * @constant {number}
- */
-const MATRIXBUTTONHEIGHT = 40;
-
-/**
- * Height of matrix buttons.
- * @constant {number}
- */
-const MATRIXBUTTONHEIGHT2 = 66;
-
-/**
- * Height of matrix solfege.
- * @constant {number}
- */
-const MATRIXSOLFEHEIGHT = 30;
 
 /**
  * Image URL for a whole note.
@@ -1234,277 +400,6 @@ const NOTESYMBOLS = {
     32: thirtysecondNoteImg,
     64: sixtyfourthNoteImg
 };
-
-/**
- * Musical terms used in selectors that may require translation.
- * @constant {Array<string>}
- */
-const SELECTORSTRINGS = [
-    //.TRANS: unison is a music term related to intervals
-    _("unison"),
-    //.TRANS: augmented is a music term related to intervals
-    _("augmented"),
-    //.TRANS: diminished is a music term related to intervals and mode
-    _("diminished"),
-    //.TRANS: minor is a music term related to intervals and mode
-    _("minor"),
-    //.TRANS: major is a music term related to intervals and mode
-    _("major"),
-    //.TRANS: perfect is a music term related to intervals
-    _("perfect"),
-    //.TRANS: twelve semi-tone scale for music
-    _("chromatic"),
-    _("algerian"),
-    _("spanish"),
-    //.TRANS: modal scale in music
-    _("octatonic"),
-    //.TRANS: harmonic major scale in music
-    _("harmonic major"),
-    //.TRANS: natural minor scales in music
-    _("natural minor"),
-    //.TRANS: harmonic minor scale in music
-    _("harmonic minor"),
-    //.TRANS: melodic minor scale in music
-    _("melodic minor"),
-    //.TRANS: modal scale for music
-    _("ionian"),
-    //.TRANS: modal scale for music
-    _("dorian"),
-    //.TRANS: modal scale for music
-    _("phrygian"),
-    //.TRANS: modal scale for music
-    _("lydian"),
-    //.TRANS: modal scale for music
-    _("mixolydian"),
-    //.TRANS: modal scale for music
-    _("aeolian"),
-    //.TRANS: modal scale for music
-    _("locrian"),
-    //.TRANS: minor jazz scale for music
-    _("jazz minor"),
-    //.TRANS: bebop scale for music
-    _("bebop"),
-    _("arabic"),
-    _("byzantine"),
-    //.TRANS: musical scale for music by Verdi
-    _("enigmatic"),
-    _("ethiopian"),
-    //.TRANS: Ethiopic scale for music
-    _("geez"),
-    _("hindu"),
-    _("hungarian"),
-    //.TRANS: minor Romanian scale for music
-    _("romanian minor"),
-    _("spanish gypsy"),
-    //.TRANS: musical scale for Mid-Eastern music
-    _("maqam"),
-    //.TRANS: minor blues scale for music
-    _("minor blues"),
-    //.TRANS: major blues scale for music
-    _("major blues"),
-    _("whole tone"),
-    //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
-    _("minor pentatonic"),
-    //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
-    _("major pentatonic"),
-    _("chinese"),
-    _("egyptian"),
-    //.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
-    _("hirajoshi"),
-    _("Japan"),
-    //.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
-    _("in"),
-    //.TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
-    _("minyo"),
-    //.TRANS: Italian mathematician
-    _("fibonacci"),
-    _("custom"),
-    //.TRANS: highpass filter
-    _("highpass"),
-    //.TRANS: lowpass filter
-    _("lowpass"),
-    //.TRANS: bandpass filter
-    _("bandpass"),
-    //.TRANS: high-shelf filter
-    _("highshelf"),
-    //.TRANS: low-shelf filter
-    _("lowshelf"),
-    //.TRANS: notch-shelf filter
-    _("notch"),
-    //.TRANS: all-pass filter
-    _("allpass"),
-    //.TRANS: peaking filter
-    _("peaking"),
-    _("sine"),
-    _("square"),
-    _("triangle"),
-    _("sawtooth"),
-    //.TRANS: even numbers
-    _("even"),
-    //.TRANS: odd numbers
-    _("odd"),
-    _("scalar"),
-    _("piano"),
-    _("violin"),
-    _("viola"),
-    _("xylophone"),
-    _("vibraphone"),
-    _("cello"),
-    _("bass"),
-    _("double bass"),
-    _("guitar"),
-    _("sitar"),
-    _("harmonium"),
-    _("mandolin"),
-    _("acoustic guitar"),
-    _("flute"),
-    _("clarinet"),
-    _("saxophone"),
-    _("tuba"),
-    _("trumpet"),
-    _("oboe"),
-    _("trombone"),
-    _("electronic synth"),
-    _("simple 1"),
-    _("simple 2"),
-    _("simple 3"),
-    _("simple 4"),
-    _("white noise"),
-    _("brown noise"),
-    _("pink noise"),
-    _("custom"),
-    _("snare drum"),
-    _("kick drum"),
-    _("tom tom"),
-    _("floor tom"),
-    _("bass drum"),
-    _("cup drum"),
-    _("darbuka drum"),
-    _("hi hat"),
-    _("ride bell"),
-    _("cow bell"),
-    _("japanese drum"),
-    // _('japanese bell'),
-    _("triangle bell"),
-    _("finger cymbals"),
-    _("chime"),
-    _("gong"),
-    _("clang"),
-    _("crash"),
-    _("bottle"),
-    _("clap"),
-    _("slap"),
-    _("splash"),
-    _("bubbles"),
-    _("raindrop"),
-    _("cat"),
-    _("cricket"),
-    _("dog"),
-    _("duck"),
-    _("banjo"),
-    _("koto"),
-    _("dulcimer"),
-    _("electric guitar"),
-    _("bassoon"),
-    _("celeste"),
-    //.TRANS: musical temperament
-    _("equal"),
-    //.TRANS: musical temperament
-    _("Pythagorean"),
-    //.TRANS: musical temperament
-    _("just intonation"),
-    //.TRANS: musical temperament
-    _("Meantone").toLowerCase(),
-    _("custom"),
-    //.TRANS: double flat is a music term related to pitch
-    _("double flat"),
-    //.TRANS: flat is a music term related to pitch
-    _("flat"),
-    //.TRANS: natural is a music term related to pitch
-    _("natural"),
-    //.TRANS: sharp is a music term related to pitch
-    _("sharp"),
-    //.TRANS: double sharp is a music term related to pitch
-    _("double sharp"),
-    // Chord names
-    _("major"),
-    _("minor"),
-    _("augmented"),
-    _("diminished"),
-    _("major 7th"),
-    _("minor 7th"),
-    _("dominant 7th"),
-    _("minor-major 7th"),
-    _("fully-diminished 7th"),
-    _("half-diminished 7th"),
-    _("custom")
-];
-
-/**
- * Labels for accidentals, including their names and symbols.
- * @constant {Array<string>}
- */
-const ACCIDENTALLABELS = [
-    _("double sharp") + " " + DOUBLESHARP,
-    _("sharp") + " " + SHARP,
-    _("natural") + " " + NATURAL,
-    _("flat") + " " + FLAT,
-    _("double flat") + " " + DOUBLEFLAT
-];
-
-/**
- * Names and symbols for accidentals.
- * @constant {Array<string>}
- */
-const ACCIDENTALNAMES = [
-    "double sharp" + " " + DOUBLESHARP,
-    "sharp" + " " + SHARP,
-    "natural" + " " + NATURAL,
-    "flat" + " " + FLAT,
-    "double flat" + " " + DOUBLEFLAT
-];
-
-/**
- * Numeric values associated with accidentals.
- * @constant {Array<number>}
- */
-const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
-
-/**
- * Names of various chord types.
- * @constant {Array<string>}
- */
-const CHORDNAMES = [
-    // scalar
-    "triad (root position)",
-    "triad (1st inversion)",
-    "triad (2nd inversion)",
-    "seventh (root position)",
-    "seventh (1st inversion)",
-    "seventh (2nd inversion)",
-    "seventh (3rd inversion)",
-    "ninth (root position)",
-    "thirteenth (root position)",
-    // semitone
-    "major",
-    "minor",
-    "augmented",
-    "diminished",
-    "major 7th",
-    "minor 7th",
-    "dominant 7th",
-    "minor-major 7th",
-    "fully-diminished 7th",
-    "half-diminished 7th",
-    // custom must always be at the end of the list.
-    "custom"
-];
-
-/**
- * Default chord for the "major" scale.
- * @constant {string}
- */
-const DEFAULTCHORD = CHORDNAMES[9];
 
 /**
  * Numeric values representing the intervals in different chords.
@@ -1639,164 +534,6 @@ const setCustomChord = chord => {
     CHORDVALUES[CHORDVALUES.length - 1] = chord;
 };
 
-/**
- * Modes for inverting chords.
- * @constant {Array<Array<string>>}
- */
-const INVERTMODES = [
-    [_("even"), "even"],
-    [_("odd"), "odd"],
-    [_("scalar"), "scalar"]
-];
-
-/**
- * Musical intervals and their characteristics.
- * @constant {Array<Array<string>>}
- */
-const INTERVALS = [
-    [_("perfect"), "perfect", [1, 4, 5, 8]],
-    [_("minor"), "minor", [2, 3, 6, 7]],
-    [_("diminished"), "diminished", [2, 3, 4, 5, 6, 7, 8]],
-    [_("augmented"), "augmented", [1, 2, 3, 4, 5, 6, 7, 8]],
-    [_("major"), "major", [2, 3, 6, 7]]
-];
-
-/**
- * Values associated with specific musical intervals.
- * @constant {Object}
- */
-const INTERVALVALUES = {
-    "perfect 1": [0, 0, 1 / 1],
-    "diminished 2": [0, -1, 128 / 125],
-    "augmented 1": [1, 1, 25 / 24],
-    "chromatic semitone": [1, 1, 25 / 24],
-    "minor 2": [1, -1, 16 / 15],
-    "major 2": [2, 1, 9 / 8],
-    "whole tone": [2, 1, 9 / 8],
-    "diminished 3": [2, -1, 144 / 125],
-    "augmented 2": [3, 1, 75 / 64],
-    "minor 3": [3, -1, 6 / 5],
-    "major 3": [4, 1, 5 / 4],
-    "diminished 4": [4, -1, 32 / 25],
-    "augmented 3": [5, 1, 125 / 96],
-    "perfect 4": [5, 0, 4 / 3],
-    "augmented 4": [6, 1, 25 / 18],
-    "diminished 5": [6, -1, 36 / 25],
-    "perfect 5": [7, 0, 3 / 2],
-    "diminished 6": [7, -1, 192 / 125],
-    "augmented 5": [8, 1, 25 / 16],
-    "minor 6": [8, -1, 8 / 5],
-    "major 6": [9, 1, 5 / 3],
-    "diminished 7": [9, -1, 128 / 75],
-    "augmented 6": [10, 1, 125 / 72],
-    "minor 7": [10, -1, 16 / 9],
-    "major 7": [11, 1, 15 / 8],
-    "diminished 8": [11, -1, 48 / 25],
-    "diminished octave": [11, -1, 48 / 25],
-    "augmented 7": [12, 1, 125 / 64],
-    "perfect 8": [12, 0, 2 / 1],
-    "octave": [12, 0, 2 / 1],
-    "augmented 8": [13, 1, 25 / 12]
-};
-
-/**
- * Modes available in the pie menu associated with the mode name block.
- * @constant {Object}
- */
-const MODE_PIE_MENUS = {
-    "5": [
-        "minor pentatonic",
-        "major pentatonic",
-        " ",
-        "chinese",
-        "egyptian",
-        " ",
-        "hirajoshi",
-        "in",
-        "minyo",
-        " ",
-        "fibonacci",
-        " "
-    ],
-    "6": ["minor blues", " ", " ", " ", "major blues", " ", " ", " ", "whole tone", " ", " ", " "],
-    "7": [
-        "ionian",
-        " ",
-        "dorian",
-        " ",
-        "phrygian",
-        "lydian",
-        " ",
-        "mixolydian",
-        " ",
-        "aeolian",
-        " ",
-        "locrian"
-    ],
-    "7a": [
-        "major",
-        " ",
-        "harmonic major",
-        " ",
-        "natural minor",
-        " ",
-        "harmonic minor",
-        " ",
-        "melodic minor",
-        " ",
-        " ",
-        " "
-    ],
-    "7b": [
-        "jazz minor",
-        " ",
-        "arabic",
-        "byzantine",
-        "enigmatic",
-        "ethiopian",
-        "geez",
-        "hindu",
-        "hungarian",
-        "maqam",
-        "romanian minor",
-        "spanish gypsy"
-    ],
-    "8": [
-        "octatonic",
-        " ",
-        "spanish",
-        " ",
-        "bebop",
-        " ",
-        "diminished",
-        " ",
-        " ",
-        "algerian",
-        " ",
-        " "
-    ],
-    "12": ["chromatic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-    "custom": [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
-};
-
-/** Slot count shared by every mode pie menu ring. */
-const MODEPIEMENU_SLOT_COUNT = 12;
-
-/** Ring geometry shared by mode-selection pie menus. */
-const MODEPIEMENU_GROUP_RING = { minRadius: 0.15, maxRadius: 0.3 };
-const MODEPIEMENU_NAME_RING = { minRadius: 0.3, maxRadius: 0.85 };
-
-/** Mid-radius of the mode-name ring, used to size labels to slice arcs. */
-const MODEPIEMENU_NAME_TITLE_RADIUS = 0.575;
-
-/** Shared font family and group-ring size (px = ratio * wheelRadius). */
-const MODEPIEMENU_FONT_FAMILY = "sans-serif";
-const MODEPIEMENU_GROUP_FONT_RATIO = 0.08;
-
-/** Min/max name-ring font sizes as a fraction of wheel radius. */
-const MODEPIEMENU_NAME_FONT_MIN_RATIO = 0.06;
-const MODEPIEMENU_NAME_FONT_MAX_RATIO = 0.12;
-
 /** Custom modes saved by the mode widget; corrupt data yields []. */
 const getSavedCustomModes = () => {
     try {
@@ -1925,64 +662,6 @@ const configureWheel = (wheel, opts) => {
 // All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org <== this is in no way definitive
 
-const PITCH_COLLECTIONS = {
-    12: {
-        chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    },
-    8: {
-        algerian: [2, 1, 2, 1, 1, 1, 3, 1],
-        diminished: [2, 1, 2, 1, 2, 1, 2, 1],
-        spanish: [1, 2, 1, 1, 1, 2, 2, 2],
-        octatonic: [1, 2, 1, 2, 1, 2, 1, 2],
-        bebop: [1, 1, 1, 2, 2, 1, 2, 2]
-    },
-    7: {
-        "major": [2, 2, 1, 2, 2, 2, 1],
-        "harmonic major": [2, 2, 1, 2, 1, 3, 1],
-        "natural minor": [2, 1, 2, 2, 1, 2, 2],
-        "harmonic minor": [2, 1, 2, 2, 1, 3, 1],
-        "melodic minor": [2, 1, 2, 2, 2, 2, 1],
-        "dorian": [2, 1, 2, 2, 2, 1, 2],
-        "phrygian": [1, 2, 2, 2, 1, 2, 2],
-        "lydian": [2, 2, 2, 1, 2, 2, 1],
-        "mixolydian": [2, 2, 1, 2, 2, 1, 2],
-        "locrian": [1, 2, 2, 1, 2, 2, 2],
-        "arabic": [2, 2, 1, 1, 2, 2, 2],
-        "byzantine": [1, 3, 1, 2, 1, 3, 1],
-        "enigmatic": [1, 3, 2, 2, 2, 1, 1],
-        "hindu": [2, 2, 1, 2, 1, 2, 2],
-        "hungarian": [2, 1, 3, 1, 1, 3, 1],
-        "romanian minor": [2, 1, 3, 1, 2, 1, 2],
-        "spanish gypsy": [1, 3, 1, 2, 1, 2, 2]
-    },
-    6: {
-        "minor blues": [3, 2, 1, 1, 3, 2],
-        "major blues": [2, 1, 1, 3, 2, 3],
-        "whole tone": [2, 2, 2, 2, 2, 2]
-    },
-    5: {
-        "major pentatonic": [2, 2, 3, 2, 3],
-        "minor pentatonic": [3, 2, 2, 3, 2],
-        "chinese": [4, 2, 1, 4, 1],
-        "egyptian": [2, 3, 2, 3, 2],
-        "hirajoshi": [1, 4, 1, 4, 2],
-        "in": [1, 4, 2, 1, 4],
-        "fibonacci": [1, 1, 2, 3, 5],
-        "alt pentatonic": [2, 3, 2, 2, 3]
-    }
-};
-
-const PITCH_COLLECTION_ALIASES = {
-    "ionian": "major",
-    "minor": "natural minor",
-    "aeolian": "natural minor",
-    "ethiopian": "natural minor",
-    "geez": "natural minor",
-    "jazz minor": "melodic minor",
-    "maqam": "byzantine",
-    "minyo": "minor pentatonic"
-};
-
 const MUSICALMODES = {};
 for (const count in PITCH_COLLECTIONS) {
     const collections = PITCH_COLLECTIONS[count];
@@ -1997,48 +676,6 @@ for (const alias in PITCH_COLLECTION_ALIASES) {
 
 // User definition overrides this constant.
 MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-
-/**
- * Maqam table mapping specific maqams to their corresponding keys.
- * @constant {Object}
- */
-const MAQAMTABLE = {
-    "hijaz kar": "C maqam",
-    "hijaz kar maqam": "C maqam",
-    "shahnaz": "D maqam",
-    "maqam mustar": "Eb maqam",
-    "maqam jiharkah": "F maqam",
-    "shadd araban": "G maqam",
-    "suzidil": "A maqam",
-    "ajam": "Bb maqam",
-    "ajam maqam": "Bb maqam"
-};
-
-/**
- * Filter types used in audio processing.
- * @constant {Array<Array<string>>}
- */
-const FILTERTYPES = [
-    [_("highpass"), "highpass"],
-    [_("lowpass"), "lowpass"],
-    [_("bandpass"), "bandpass"],
-    [_("highshelf"), "highshelf"],
-    [_("lowshelf"), "lowshelf"],
-    [_("notch"), "notch"],
-    [_("allpass"), "allpass"],
-    [_("peaking"), "peaking"]
-];
-
-/**
- * Oscillator types used in audio synthesis.
- * @constant {Array<Array<string>>}
- */
-const OSCTYPES = [
-    [_("sine"), "sine"],
-    [_("square"), "square"],
-    [_("triangle"), "triangle"],
-    [_("sawtooth"), "sawtooth"]
-];
 
 /**
  * Initial temperaments available for selection.
@@ -2874,82 +1511,6 @@ const TEMPERAMENT = {
     }
 };
 
-const MIDI_INSTRUMENTS = {
-    "default": 0, // Acoustic Grand Piano
-    "piano": 0,
-    "violin": 40,
-    "viola": 41,
-    "cello": 42,
-    "double bass": 43,
-    "bass": 32,
-    "sitar": 104,
-    "guitar": 24,
-    "acoustic guitar": 25,
-    "electric guitar": 27,
-    "flute": 73,
-    "clarinet": 71,
-    "saxophone": 65,
-    "tuba": 58,
-    "trumpet": 56,
-    "oboe": 68,
-    "trombone": 57,
-    "banjo": 105,
-    "koto": 107,
-    "dulcimer": 15,
-    "bassoon": 70,
-    "celeste": 8,
-    "xylophone": 13,
-    "electronic synth": 81,
-    "sine": 81, // Approximate with Lead 2 (Sawtooth)
-    "square": 80,
-    "sawtooth": 81,
-    "triangle": 81, // Approximate with Lead 2 (Sawtooth)
-    "vibraphone": 11
-};
-
-const DRUM_MIDI_MAP = {
-    "snare drum": 38,
-    "kick drum": 36,
-    "tom tom": 41,
-    "floor tom tom": 43,
-    "cup drum": 47, // Closest: Low-Mid Tom
-    "darbuka drum": 50, // Closest: High Tom
-    "japanese drum": 56, // Closest: Cowbell or Tambourine
-    "hi hat": 42,
-    "ride bell": 53,
-    "cow bell": 56,
-    "triangle bell": 81,
-    "finger cymbals": 69, // Closest: Open Hi-Hat
-    "chime": 82, // Closest: Shaker
-    "gong": 52, // Closest: Chinese Cymbal
-    "clang": 55, // Closest: Splash Cymbal
-    "crash": 49,
-    "clap": 39,
-    "slap": 40,
-    "raindrop": 88 // Custom mapping (not in GM), can use melodic notes
-};
-
-const REVERSE_DRUM_MIDI_MAP = {
-    38: ["snare drum"],
-    36: ["kick drum"],
-    41: ["tom tom"],
-    43: ["floor tom tom"],
-    47: ["cup drum"],
-    50: ["darbuka drum"],
-    56: ["japanese drum", "cow bell"],
-    42: ["hi hat"],
-    53: ["ride bell"],
-    81: ["triangle bell"],
-    69: ["finger cymbals"],
-    82: ["chime"],
-    52: ["gong"],
-    55: ["clang"],
-    49: ["crash"],
-    39: ["clap"],
-    40: ["slap"],
-    88: ["raindrop"]
-};
-
 /**
  * Get midi map for Instruments.
  * @function
@@ -3105,62 +1666,6 @@ const updateTemperaments = () => {
 };
 
 /**
- * Default invert mode.
- * @constant {string}
- */
-const DEFAULTINVERT = "even";
-/**
- * Default interval for the mode.
- * @constant {string}
- */
-const DEFAULTINTERVAL = "perfect" + " 5";
-/**
- * Default voice for audio synthesis.
- * @constant {string}
- */
-const DEFAULTVOICE = "electronic synth";
-/**
- * Default noise type for audio synthesis.
- * @constant {string}
- */
-const DEFAULTNOISE = "noise1";
-/**
- * Default drum type for audio synthesis.
- * @constant {string}
- */
-const DEFAULTDRUM = "kick drum";
-/**
- * Default effect for audio synthesis.
- * @constant {string}
- */
-const DEFAULTEFFECT = "duck";
-/**
- * Default musical mode.
- * @constant {string}
- */
-const DEFAULTMODE = "major";
-/**
- * Default temperament.
- * @constant {string}
- */
-const DEFAULTTEMPERAMENT = "equal";
-/**
- * Default filter type for audio processing.
- * @constant {string}
- */
-const DEFAULTFILTERTYPE = "highpass";
-/**
- * Default oscillator type for audio synthesis.
- * @constant {string}
- */
-const DEFAULTOSCILLATORTYPE = "sine";
-/**
- * Default accidental for musical notation.
- * @constant {string}
- */
-const DEFAULTACCIDENTAL = "natural" + " " + NATURAL;
-
-/**
  * Custom mode from the musical modes dictionary.
  * @constant {Object}
  */
@@ -3314,10 +1819,11 @@ const getDrumSymbol = name => {
     }
 
     for (let drum = 0; drum < DRUMNAMES.length; drum++) {
-        if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
+        if (
+            DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase() ||
+            DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()
+        ) {
             return DRUMNAMES[drum][3];
-        } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-            return "hh";
         }
     }
 
@@ -4054,14 +2560,6 @@ const keySignatureToMode = keySignature => {
         return [key, "major"];
     }
 };
-
-/**
- * Approximate mapping of mode to solfege (Used by modes where the
- * length !== 7).
- * @constant
- * @type {Array}
- */
-const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la", "la", "ti"];
 
 /**
  * Get the scale and solfege with half-steps for a given key signature.
@@ -5301,7 +3799,7 @@ const getNoteFromSolfege = (
     transpositionFloor
 ) => {
     let sharpFlat = false;
-    if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
+    if (["#", SHARP, FLAT, "b"].includes(noteArg.slice(-1))) {
         sharpFlat = true;
     }
 
@@ -5350,24 +3848,24 @@ const getNoteFromSolfege = (
     }
 
     if (sharpFlat) {
-        if (noteArg.substr(-1) === "#") {
+        if (noteArg.slice(-1) === "#") {
             offset += 1;
-        } else if (noteArg.substr(-1) === SHARP) {
+        } else if (noteArg.slice(-1) === SHARP) {
             offset += 1;
-        } else if (noteArg.substr(-1) === FLAT) {
+        } else if (noteArg.slice(-1) === FLAT) {
             offset -= 1;
-        } else if (noteArg.substr(-1) === "b") {
+        } else if (noteArg.slice(-1) === "b") {
             offset -= 1;
         }
     }
 
     let solfegePart;
-    if (halfSteps.includes(noteArg.substr(0, 1).toLowerCase())) {
-        solfegePart = noteArg.substr(0, 1).toLowerCase();
-    } else if (halfSteps.includes(noteArg.substr(0, 2).toLowerCase())) {
-        solfegePart = noteArg.substr(0, 2).toLowerCase();
-    } else if (halfSteps.includes(noteArg.substr(0, 3).toLowerCase())) {
-        solfegePart = noteArg.substr(0, 3).toLowerCase();
+    if (halfSteps.includes(noteArg.slice(0, 1).toLowerCase())) {
+        solfegePart = noteArg.slice(0, 1).toLowerCase();
+    } else if (halfSteps.includes(noteArg.slice(0, 2).toLowerCase())) {
+        solfegePart = noteArg.slice(0, 2).toLowerCase();
+    } else if (halfSteps.includes(noteArg.slice(0, 3).toLowerCase())) {
+        solfegePart = noteArg.slice(0, 3).toLowerCase();
     } else {
         // The note should already be translated, but just in case...
         // Reverse any i18n
@@ -5376,7 +3874,7 @@ const getNoteFromSolfege = (
         if (SOLFNOTES.includes(i18nObj[0])) {
             solfegePart = i18nObj[0];
         } else {
-            solfegePart = noteArg.substr(0, 2).toLowerCase();
+            solfegePart = noteArg.slice(0, 2).toLowerCase();
         }
     }
 
@@ -5485,7 +3983,7 @@ const getNoteFromSolfege = (
         // In non-12 EDO temperaments, enharmonic spellings are distinct
         // pitches, so the resolved note must honor the input's accidental.
         if (octaveLength !== 12 && sharpFlat) {
-            if (noteArg.substr(-1) === "#" || noteArg.substr(-1) === SHARP) {
+            if (noteArg.slice(-1) === "#" || noteArg.slice(-1) === SHARP) {
                 note = NOTESSHARP[index];
             } else {
                 note = NOTESFLAT[index];
@@ -5574,29 +4072,30 @@ function getNote(
 
     if (typeof noteArg !== "number") {
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
-        if (noteArg.substr(-1) === ">") {
+        if (noteArg.slice(-1) === ">") {
             // Read octave and solfege from HTML
             octave = parseInt(
                 noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1),
                 10
             );
-            noteArg = noteArg.substr(0, noteArg.indexOf("<"));
+            const noteEnd = noteArg.indexOf("<");
+            noteArg = noteEnd === -1 ? "" : noteArg.slice(0, noteEnd);
         }
         if (
-            noteArg.toLowerCase().substr(0, 4) === "rest" ||
-            noteArg.toLowerCase().substr(0, 4) === "r"
+            noteArg.toLowerCase().slice(0, 4) === "rest" ||
+            noteArg.toLowerCase().slice(0, 4) === "r"
         ) {
             return ["R", "", 0];
         }
         // Could be a number as a string (with or without an accidental.
         let noteAsNumber = noteArg;
-        if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
+        if (["#", SHARP, FLAT, "b"].includes(noteArg.slice(-1))) {
             noteAsNumber = noteArg.slice(0, noteArg.length - 1);
         }
         if (!isNaN(noteAsNumber)) {
-            if (["#", SHARP].includes(noteArg.substr(-1))) {
+            if (["#", SHARP].includes(noteArg.slice(-1))) {
                 transpositionFloor += Math.round(octaveLength / 12);
-            } else if (["b", FLAT].includes(noteArg.substr(-1))) {
+            } else if (["b", FLAT].includes(noteArg.slice(-1))) {
                 transpositionFloor -= Math.round(octaveLength / 12);
             }
             noteArg = Number(noteAsNumber);
@@ -6037,22 +4536,6 @@ function getNote(
         return [note, octave, transpositionCents];
     }
 }
-
-/**
- * Maps accidental characters to their semitone offsets.
- * Named distinctly to avoid collision with the ACCIDENTAL_MAP in abc.js
- * (which maps accidentals to ABC notation strings, not semitone offsets).
- * @constant {Object.<string, number>}
- */
-const ACCIDENTAL_SEMITONE_MAP = {
-    "#": 1,
-    "♯": 1,
-    "b": -1,
-    "♭": -1,
-    "x": 2, // double-sharp (textual)
-    "𝄪": 2, // double-sharp (Unicode)
-    "𝄫": -2 // double-flat (Unicode)
-};
 
 /**
  * Parses a pitch string into its note name and octave components.

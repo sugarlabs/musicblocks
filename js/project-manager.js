@@ -1053,10 +1053,14 @@ class ProjectManager {
                                     if (that.planet) {
                                         that.planet.closePlanet();
                                         that.planet.initialiseNewProject(
-                                            that.fileChooser.files[0].name.substr(
-                                                0,
-                                                that.fileChooser.files[0].name.lastIndexOf(".")
-                                            )
+                                            that.fileChooser.files[0].name.lastIndexOf(".") === -1
+                                                ? that.fileChooser.files[0].name
+                                                : that.fileChooser.files[0].name.slice(
+                                                      0,
+                                                      that.fileChooser.files[0].name.lastIndexOf(
+                                                          "."
+                                                      )
+                                                  )
                                         );
                                     }
                                 } else {
@@ -1177,7 +1181,9 @@ class ProjectManager {
                             that.sendAllToTrash(false, false);
                             if (that.planet !== undefined) {
                                 that.planet.initialiseNewProject(
-                                    files[0].name.substr(0, files[0].name.lastIndexOf("."))
+                                    files[0].name.lastIndexOf(".") === -1
+                                        ? files[0].name
+                                        : files[0].name.slice(0, files[0].name.lastIndexOf("."))
                                 );
                             }
 

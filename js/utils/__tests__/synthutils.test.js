@@ -106,6 +106,8 @@ describe("Utility Functions (logic-only)", () => {
             "../utils.js",
             "../../logoconstants.js",
             "../platformstyle.js",
+            "../musicutils-constants.js",
+            "../musicutils-i18n.js",
             "../musicutils.js",
             "../../logo.js",
             "../../turtle-singer.js"
@@ -3292,6 +3294,87 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
         test("getTunerFrequency returns 440 default when analyser is null", () => {
             synthInstance.tunerAnalyser = null;
             expect(synthInstance.getTunerFrequency()).toBe(440);
+        });
+
+        test("startTuner initializes with provided initialTargetPitch and starts in target mode", async () => {
+            // Do NOT mock computeTargetPitchFrequency to test real calculation for non-default octaves
+            await synthInstance.startTuner("C6");
+            await new Promise(r => setTimeout(r, 10)); // wait for rAF
+            expect(synthInstance._tunerActive).toBe(true);
+
+            // Should be in target pitch mode
+            let modeToggle = document.getElementById("modeToggle");
+            let chromaticButton = modeToggle.children[0];
+            let targetPitchButton = modeToggle.children[1];
+            expect(targetPitchButton.getAttribute("aria-pressed")).toBe("true");
+
+            // Assert display results for C6
+            const targetNoteSelector = document.getElementById("targetNoteSelector");
+            expect(targetNoteSelector.textContent).toBe("C6");
+
+            // Also test invalid pitch falls back
+            synthInstance.stopTuner();
+            // Clear DOM to force recreation of tuner elements
+            document.body.innerHTML = "";
+            let newTunerContainer = document.createElement("div");
+            newTunerContainer.id = "tunerContainer";
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            for (let i = 0; i < 11; i++)
+                svg.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "path"));
+            newTunerContainer.appendChild(svg);
+            document.body.appendChild(newTunerContainer);
+
+            await synthInstance.startTuner("INVALID_PITCH");
+            await new Promise(r => setTimeout(r, 10)); // wait for rAF
+
+            // Should fallback to chromatic mode because invalid pitch doesn't set target mode
+            modeToggle = document.getElementById("modeToggle");
+            if (!modeToggle) {
+                console.log("Tuner display:", document.getElementById("tuner-display"));
+            }
+            chromaticButton = modeToggle.children[0];
+            expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
+        });
+
+        test("tuner mode toggle buttons respond to keyboard events (Enter and Space)", async () => {
+            await synthInstance.startTuner();
+            await new Promise(r => setTimeout(r, 10)); // wait for rAF
+            const modeToggle = document.getElementById("modeToggle");
+            const chromaticButton = modeToggle.children[0];
+            const targetPitchButton = modeToggle.children[1];
+
+            // Initially chromatic mode is active
+            expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
+
+            // Press Space on Target Pitch button
+            const spaceEvent = new KeyboardEvent("keydown", { key: " " });
+            // Must mock preventDefault
+            spaceEvent.preventDefault = jest.fn();
+            targetPitchButton.onkeydown(spaceEvent);
+            expect(targetPitchButton.getAttribute("aria-pressed")).toBe("true");
+            expect(chromaticButton.getAttribute("aria-pressed")).toBe("false");
+            expect(spaceEvent.preventDefault).toHaveBeenCalled();
+
+            // Wait for debounce (200ms in source)
+            await new Promise(resolve => setTimeout(resolve, 250));
+
+            // Press Enter on Chromatic button
+            const enterEvent = new KeyboardEvent("keydown", { key: "Enter" });
+            enterEvent.preventDefault = jest.fn();
+            chromaticButton.onkeydown(enterEvent);
+            expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
+            expect(targetPitchButton.getAttribute("aria-pressed")).toBe("false");
+            expect(enterEvent.preventDefault).toHaveBeenCalled();
+
+            // Wait for debounce before next keypress
+            await new Promise(resolve => setTimeout(resolve, 250));
+
+            // Press a different key, should not do anything (no preventDefault, mode stays chromatic)
+            const otherEvent = new KeyboardEvent("keydown", { key: "a" });
+            otherEvent.preventDefault = jest.fn();
+            targetPitchButton.onkeydown(otherEvent);
+            expect(chromaticButton.getAttribute("aria-pressed")).toBe("true");
+            expect(otherEvent.preventDefault).not.toHaveBeenCalled();
         });
     });
 

@@ -219,10 +219,10 @@ describe("Oscilloscope", () => {
             expect(osc.widgetWindow).toBe(mockWidgetWindow);
         });
 
-        test("adds two zoom buttons", () => {
+        test("adds three buttons (zoom in, zoom out, freeze)", () => {
             createOscilloscope();
 
-            expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(2);
+            expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(3);
         });
 
         test("calls sendToCenter", () => {
@@ -323,6 +323,18 @@ describe("Oscilloscope", () => {
             osc._stopAnimation();
 
             expect(cancelAnimationFrame).not.toHaveBeenCalled();
+        });
+
+        test("cancels _timeoutId when set", () => {
+            const osc = createOscilloscope();
+            osc._timeoutId = 555;
+            const clearSpy = jest.spyOn(global, "clearTimeout");
+
+            osc._stopAnimation();
+
+            expect(clearSpy).toHaveBeenCalledWith(555);
+            expect(osc._timeoutId).toBeNull();
+            clearSpy.mockRestore();
         });
 
         test("cancels per-turtle drawVisualIDs", () => {
@@ -515,6 +527,16 @@ describe("Oscilloscope", () => {
             osc.close();
 
             expect(removeSpy).toHaveBeenCalledWith("visibilitychange", osc._handleVisibilityChange);
+            removeSpy.mockRestore();
+        });
+
+        test("removes keydown event listener", () => {
+            const removeSpy = jest.spyOn(document, "removeEventListener");
+            const osc = createOscilloscope();
+
+            osc.close();
+
+            expect(removeSpy).toHaveBeenCalledWith("keydown", osc._keyHandler);
             removeSpy.mockRestore();
         });
     });
@@ -937,32 +959,35 @@ describe("Oscilloscope", () => {
     });
 
     describe("_renderFrame", () => {
-        test("skips entry when no analyser exists", () => {
+        test("draws entry by automatically creating analyser if none exists", () => {
             const osc = createOscilloscope();
             const ctx = makeCtx();
             osc._canvasState[0] = {
                 canvasCtx: ctx,
                 width: 400,
                 height: 200,
-                turtle: { running: true, painter: { _canvasColor: "#f00" } },
+                turtle: { painter: { _canvasColor: "#f00" } },
                 turtleIdx: 0,
                 resizedOnce: false
             };
-            osc.pitchAnalysers = {};
+            osc.pitchAnalysers = {}; // Start empty
 
             osc._renderFrame();
 
-            expect(ctx.fillRect).not.toHaveBeenCalled();
+            // It should have created the analyser and drawn
+            expect(osc.pitchAnalysers[0]).toBeDefined();
+            expect(ctx.fillRect).toHaveBeenCalled();
         });
 
-        test("skips when turtle not running and resizedOnce is false", () => {
+        test("draws using reconnected analyser data when not frozen", () => {
             const osc = createOscilloscope();
+            osc.reconnectSynthsToAnalyser = jest.fn();
             const ctx = makeCtx();
             osc._canvasState[0] = {
                 canvasCtx: ctx,
                 width: 400,
                 height: 200,
-                turtle: { running: false, painter: { _canvasColor: "#f00" } },
+                turtle: { painter: { _canvasColor: "#0f0" } },
                 turtleIdx: 0,
                 resizedOnce: false
             };
@@ -970,44 +995,46 @@ describe("Oscilloscope", () => {
 
             osc._renderFrame();
 
-            expect(ctx.fillRect).not.toHaveBeenCalled();
+            expect(osc.reconnectSynthsToAnalyser).toHaveBeenCalledWith(0);
+            expect(ctx.fillRect).toHaveBeenCalled();
+            expect(ctx.stroke).toHaveBeenCalled();
+            expect(osc._frozenWaveforms[0]).toBeInstanceOf(Float32Array);
         });
 
-        test("draws when turtle is running", () => {
+        test("skips when frozen and no cached waveform exists", () => {
             const osc = createOscilloscope();
+            osc.isFrozen = true;
             const ctx = makeCtx();
             osc._canvasState[0] = {
                 canvasCtx: ctx,
                 width: 400,
                 height: 200,
-                turtle: { running: true, painter: { _canvasColor: "#0f0" } },
-                turtleIdx: 0,
-                resizedOnce: false
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0
             };
-            osc.pitchAnalysers[0] = { getValue: jest.fn(() => new Float32Array(128)) };
+
+            osc._renderFrame();
+
+            expect(ctx.fillRect).not.toHaveBeenCalled();
+        });
+
+        test("draws using cached waveform when frozen", () => {
+            const osc = createOscilloscope();
+            osc.isFrozen = true;
+            const ctx = makeCtx();
+            osc._canvasState[0] = {
+                canvasCtx: ctx,
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0
+            };
+            osc._frozenWaveforms[0] = new Float32Array(128);
 
             osc._renderFrame();
 
             expect(ctx.fillRect).toHaveBeenCalled();
             expect(ctx.stroke).toHaveBeenCalled();
-        });
-
-        test("draws when resizedOnce is true even if turtle not running", () => {
-            const osc = createOscilloscope();
-            const ctx = makeCtx();
-            osc._canvasState[0] = {
-                canvasCtx: ctx,
-                width: 400,
-                height: 200,
-                turtle: { running: false, painter: { _canvasColor: "#00f" } },
-                turtleIdx: 0,
-                resizedOnce: true
-            };
-            osc.pitchAnalysers[0] = { getValue: jest.fn(() => new Float32Array(128)) };
-
-            osc._renderFrame();
-
-            expect(ctx.fillRect).toHaveBeenCalled();
         });
 
         test("resets resizedOnce to false after drawing", () => {
@@ -1017,7 +1044,7 @@ describe("Oscilloscope", () => {
                 canvasCtx: ctx,
                 width: 400,
                 height: 200,
-                turtle: { running: true, painter: { _canvasColor: "#000" } },
+                turtle: { painter: { _canvasColor: "#000" } },
                 turtleIdx: 0,
                 resizedOnce: true
             };
@@ -1087,6 +1114,22 @@ describe("Oscilloscope", () => {
             const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
             const osc = createOscilloscope([turtle]);
             osc._running = true;
+            const startSpy = jest.spyOn(osc, "_startAnimation");
+            const renderSpy = jest.spyOn(osc, "_renderFrame");
+
+            osc._scale();
+
+            expect(startSpy).not.toHaveBeenCalled();
+            expect(renderSpy).toHaveBeenCalled();
+            startSpy.mockRestore();
+            renderSpy.mockRestore();
+        });
+
+        test("only calls _renderFrame and not _startAnimation when isFrozen is true", () => {
+            const turtle = { inTrash: false, running: false, painter: { _canvasColor: "#000" } };
+            const osc = createOscilloscope([turtle]);
+            osc.isFrozen = true;
+            osc._running = false;
             const startSpy = jest.spyOn(osc, "_startAnimation");
             const renderSpy = jest.spyOn(osc, "_renderFrame");
 

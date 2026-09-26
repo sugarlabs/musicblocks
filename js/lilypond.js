@@ -291,15 +291,15 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                             for (let ii = 0; ii < obj[1].length; ii++) {
                                 if (obj[1][ii] !== "") {
                                     // Are we repeating notes, e.g., Db and D?
-                                    if (obj[0][ii].substr(0, 1) === prevNote) {
+                                    if (obj[0][ii].slice(0, 1) === prevNote) {
                                         modeDef = "";
                                         break;
                                     } else {
-                                        prevNote = obj[0][ii].substr(0, 1);
+                                        prevNote = obj[0][ii].slice(0, 1);
                                     }
 
                                     n = ["C", "D", "E", "F", "G", "A", "B"].indexOf(
-                                        obj[0][ii].substr(0, 1)
+                                        obj[0][ii].slice(0, 1)
                                     );
 
                                     // Did we skip any notes?
@@ -315,7 +315,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                                         if (obj[0][ii].length === 1) {
                                             modeDef += "(" + n + " . ,NATURAL) ";
                                         } else {
-                                            if (obj[0][ii].substr(1, 1) === FLAT) {
+                                            if (obj[0][ii].slice(1, 2) === FLAT) {
                                                 modeDef += "(" + n + " . ,FLAT) ";
                                             } else {
                                                 modeDef += "(" + n + " . ,SHARP) ";
@@ -694,7 +694,7 @@ const saveLilypondOutput = function (activity) {
                         if (obj[0][ii] === "R") {
                             continue;
                         } else if (typeof obj[0][ii] === "string") {
-                            octaveTotal += Number(obj[0][ii].substr(-1));
+                            octaveTotal += Number(obj[0][ii].slice(-1));
                         } else {
                             const pitchObj = frequencyToPitch(obj[0][ii]);
                             octaveTotal += pitchObj[1];

@@ -580,6 +580,16 @@ describe("FlowBlocks integration", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith(POSNUMBER, 9);
     });
 
+    // Exported JavaScript uses MathUtility.doRepeatCount as the loop bound, so
+    // it has to agree with the block about how many times the body runs.
+    test("RepeatBlock count matches MathUtility.doRepeatCount", () => {
+        const MathUtility = require("../../utils/mathutils");
+        const block = getBlock("repeat");
+        for (const count of [4, 1, 3.5, 2.2, 0.5, 0, -1, null, "4"]) {
+            expect(block.flow([count, 90], logo, 0, 9)[1]).toBe(MathUtility.doRepeatCount(count));
+        }
+    });
+
     test("DuplicateFactorBlock exposes singer value or status field", () => {
         const block = getBlock("duplicatefactor");
         const blk = 11;

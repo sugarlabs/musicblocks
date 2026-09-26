@@ -1361,7 +1361,7 @@ class Blocks {
                         that.blockList[blk].value = that.findUniqueActionName(_("action"));
                         let label = that.blockList[blk].value;
                         if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                            label = label.substr(0, STRINGLEN) + "...";
+                            label = label.slice(0, STRINGLEN) + "...";
                         }
 
                         that.blockList[blk].text.text = label;
@@ -1571,7 +1571,7 @@ class Blocks {
                         that.blockList[blk].value = _("box");
                         let label = that.blockList[blk].value;
                         if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                            label = label.substr(0, STRINGLEN) + "...";
+                            label = label.slice(0, STRINGLEN) + "...";
                         }
                         that.blockList[blk].text.text = label;
                         that.blockList[blk].container.updateCache();
@@ -2026,7 +2026,7 @@ class Blocks {
                         } else {
                             label = myBlock.value[0].toString();
                             if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                                label = label.substr(0, STRINGLEN) + "...";
+                                label = label.slice(0, STRINGLEN) + "...";
                             }
                         }
                     } catch (e) {
@@ -2167,7 +2167,7 @@ class Blocks {
             }
 
             if (!myBlock.hasWideLabel() && label.length > maxLength) {
-                label = label.substr(0, maxLength - 1) + "...";
+                label = label.slice(0, maxLength - 1) + "...";
             }
 
             myBlock.text.text = label;
@@ -3207,7 +3207,7 @@ class Blocks {
                                 !that.blockList[b].hasWideLabel() &&
                                 getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
                             ) {
-                                l = l.substr(0, STRINGLEN) + "...";
+                                l = l.slice(0, STRINGLEN) + "...";
                             }
                             that.blockList[b].text.text = l;
                             that.blockList[b].container.updateCache();
@@ -3234,7 +3234,7 @@ class Blocks {
                             !that.blockList[b].hasWideLabel() &&
                             getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
                         ) {
-                            l = l.substr(0, STRINGLEN) + "...";
+                            l = l.slice(0, STRINGLEN) + "...";
                         }
                         that.blockList[b].text.text = l;
                     };
@@ -3723,7 +3723,7 @@ class Blocks {
                     myBlock.value = newName;
                     let label = myBlock.value;
                     if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                        label = label.substr(0, STRINGLEN) + "...";
+                        label = label.slice(0, STRINGLEN) + "...";
                     }
                     myBlock.text.text = label;
                     myBlock.container.updateCache();
@@ -7432,7 +7432,7 @@ class Blocks {
                     text.text = "";
                 } else if (typeof value === "string") {
                     if (value.length > 6) {
-                        value = value.substr(0, 5) + "...";
+                        value = value.slice(0, 5) + "...";
                     }
                     text.text = value;
                 } else if (name === "divide") {

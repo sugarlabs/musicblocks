@@ -1416,7 +1416,7 @@ class PaletteModel {
             label != null
         ) {
             if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                label = label.substr(0, STRINGLEN) + "...";
+                label = label.slice(0, STRINGLEN) + "...";
             }
         }
 
@@ -1587,12 +1587,19 @@ class Palette {
         palBody.id = "PaletteBody";
         const palBodyHeight = window.innerHeight - this.palettes.top - this.palettes.cellSize - 26;
 
-        // palBody.innerHTML = `<thead></thead><tbody style = "display: block; height: ${palBodyHeight}px; overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`;
+        const thead = document.createElement("thead");
+        const tbody = document.createElement("tbody");
+        tbody.id = "PaletteBody_items";
+        tbody.className = "PalScrol";
+        tbody.style.display = "block";
+        tbody.style.width = "100%";
+        tbody.style.height = "auto";
+        tbody.style.maxHeight = `${palBodyHeight}px`;
+        tbody.style.overflow = "auto";
+        tbody.style.overflowX = "hidden";
 
-        palBody.insertAdjacentHTML(
-            "afterbegin",
-            `<thead></thead><tbody style = "display: block;   width: 100% ; height:auto ; max-height: ${palBodyHeight}px;  overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`
-        );
+        palBody.appendChild(thead);
+        palBody.appendChild(tbody);
 
         palBody.style.minWidth = "180px";
         palBody.style.background = platformColor.paletteBackground;

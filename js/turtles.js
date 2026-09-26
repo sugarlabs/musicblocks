@@ -193,10 +193,12 @@ class Turtles {
             // console.debug("--> [mouseover " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOver" + turtle.id);
 
-            if (turtle.running) {
+            if (turtle.running || turtle._isHovered) {
                 return;
             }
 
+            turtle._isHovered = true;
+            turtle._baseScale = turtle.container.scaleX;
             turtle.container.scaleX *= 1.2;
             turtle.container.scaleY = turtle.container.scaleX;
             turtle.container.scale = turtle.container.scaleX;
@@ -207,13 +209,16 @@ class Turtles {
             // console.debug("--> [mouseout " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOut" + turtle.id);
 
-            if (turtle.running) {
+            if (!turtle._isHovered) {
                 return;
             }
 
-            turtle.container.scaleX /= 1.2;
-            turtle.container.scaleY = turtle.container.scaleX;
-            turtle.container.scale = turtle.container.scaleX;
+            turtle._isHovered = false;
+            const targetScale =
+                turtle._baseScale !== undefined ? turtle._baseScale : turtle.container.scaleX / 1.2;
+            turtle.container.scaleX = targetScale;
+            turtle.container.scaleY = targetScale;
+            turtle.container.scale = targetScale;
             this.activity.refreshCanvas();
         });
 

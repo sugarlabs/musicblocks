@@ -462,6 +462,20 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain("\\drummode {");
     });
 
+    test("should preserve drum rests in drummode when drum staging contains rests", () => {
+        activity.logo.notation.notationDrumStaging = {
+            0: [
+                [["sn"], 4, 0, null, 0, -1, false],
+                [["R"], 4, 0, null, 0, -1, false],
+                [["sn"], 4, 0, null, 0, -1, false],
+                [["sn"], 4, 0, null, 0, -1, false]
+            ]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("\\drummode {");
+        expect(result).toContain("sn4 r4 sn4 sn4");
+    });
+
     test("should handle empty drum staging correctly", () => {
         activity.logo.notation.notationDrumStaging = {
             0: []
