@@ -85,7 +85,12 @@ function setupDictActions(activity) {
             } else if (key === _("note value")) {
                 return Singer.RhythmActions.getNoteValue(target);
             } else if (key === _("current pitch")) {
-                return targetTur.singer.lastNotePlayed[0];
+                if (targetTur.singer.lastNotePlayed !== null) {
+                    return targetTur.singer.lastNotePlayed[0];
+                } else {
+                    activity.errorMsg(INVALIDPITCH, blk);
+                    return "G";
+                }
             } else if (key === _("pitch number")) {
                 let obj;
                 if (targetTur.singer.lastNotePlayed !== null) {
