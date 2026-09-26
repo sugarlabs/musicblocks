@@ -110,10 +110,17 @@ describe("Temperament widget", () => {
     const expectScalePlayedUpAndBack = table => {
         const ascending = [...table].reverse();
         const expected = [...ascending, ascending[0] * 2, ...[...ascending].reverse()];
+        // Playback must have started, then finished, before the notes are counted;
+        // otherwise a run that is still going, or one that emits extra notes, could pass.
         cy.get("@trigger", { timeout: 30000 }).should(spy => {
-            expect(spy.callCount).to.be.at.least(expected.length);
+            expect(spy.callCount, "playback started").to.be.greaterThan(0);
+        });
+        cy.window({ timeout: 30000 }).should(win => {
+            const widget = win.ActivityContext.getActivity().logo.temperament;
+            expect(widget._playAllRunning, "play all finished").to.equal(false);
         });
         cy.get("@trigger").then(spy => {
+            expect(spy.callCount, "notes played").to.equal(expected.length);
             expected.forEach((frequency, i) => {
                 expect(spy.getCall(i).args[1], `note ${i + 1}`).to.be.closeTo(frequency, 0.02);
             });
