@@ -1799,5 +1799,10 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Send": "Send",
+  "Debugger is typing...": "Debugger is typing...",
+  "Debugger is typing": "Debugger is typing",
+  "Loading your current project and initializing AI assistant...": "Loading your current project and initializing AI assistant...",
+  "Could not load project data. Starting with basic assistant...": "Could not load project data. Starting with basic assistant..."
 }
