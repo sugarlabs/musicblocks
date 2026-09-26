@@ -148,7 +148,14 @@ class JSGenerate {
                             }
                         }
                     } else if (arg.protoblock.style === "arg") {
-                        args.push([arg.name, ParseArg(arg)]);
+                        if (arg.name === "namedarg") {
+                            // The "arg N" palette block keeps its index in privateData
+                            // and its value is null, so export it like the generic
+                            // arg block, which becomes actionArgs[N] downstream.
+                            args.push(["arg", [Number(arg.privateData)]]);
+                        } else {
+                            args.push([arg.name, ParseArg(arg)]);
+                        }
                     }
                 }
 
