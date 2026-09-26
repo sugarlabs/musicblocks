@@ -15,7 +15,11 @@ if (typeof global._ !== "function") {
     global._ = s => s;
 }
 
-const { renderClearConfirmation, requestClear } = require("../clear-confirmation.js");
+const {
+    renderClearConfirmation,
+    requestClear,
+    dismissClearConfirmation
+} = require("../clear-confirmation.js");
 
 function makeActivity() {
     return {
@@ -48,6 +52,7 @@ describe("renderClearConfirmation", () => {
     });
 
     afterEach(() => {
+        dismissClearConfirmation();
         document.body.replaceChildren();
     });
 
@@ -191,6 +196,11 @@ describe("renderClearConfirmation", () => {
 });
 
 describe("requestClear", () => {
+    afterEach(() => {
+        dismissClearConfirmation();
+        document.body.replaceChildren();
+    });
+
     test("runs the canvas action immediately when confirmation is skipped", () => {
         const onClearCanvas = jest.fn();
 
@@ -207,6 +217,22 @@ describe("requestClear", () => {
 
         expect(document.getElementById("clear-confirm")).not.toBeNull();
         expect(onClearCanvas).not.toHaveBeenCalled();
+    });
+
+    test("dismisses a pending dialog before a skip-confirmation clear", () => {
+        const pendingClear = jest.fn();
+        const projectLoadClear = jest.fn();
+        const activity = makeActivity();
+
+        requestClear(activity, false, pendingClear);
+        expect(document.getElementById("clear-confirm")).not.toBeNull();
+
+        requestClear(activity, true, projectLoadClear);
+
+        expect(document.getElementById("clear-confirm")).toBeNull();
+        expect(projectLoadClear).toHaveBeenCalledTimes(1);
+        expect(pendingClear).not.toHaveBeenCalled();
+        expect(activity.removeEventListener).toHaveBeenCalled();
     });
 });
 
@@ -225,6 +251,7 @@ describe("AMD export", () => {
                 expect(define).toHaveBeenCalledTimes(1);
                 expect(typeof window.renderClearConfirmation).toBe("function");
                 expect(typeof window.requestClear).toBe("function");
+                expect(typeof window.dismissClearConfirmation).toBe("function");
             });
         } finally {
             global.define = previousDefine;

@@ -11,7 +11,20 @@
 
 /* global _ */
 
-/* exported renderClearConfirmation, requestClear */
+/* exported renderClearConfirmation, requestClear, dismissClearConfirmation */
+
+let dismissActiveDialog = null;
+
+/**
+ * Closes a pending clear confirmation without running its Confirm action.
+ * Used when a later skip-confirmation clear would otherwise leave the old
+ * dialog open against a new workspace.
+ */
+function dismissClearConfirmation() {
+    if (typeof dismissActiveDialog === "function") {
+        dismissActiveDialog();
+    }
+}
 
 /**
  * Opens the canvas-clear confirmation, or runs the action immediately.
@@ -22,6 +35,7 @@
  */
 function requestClear(activity, skipConfirmation, onClearCanvas) {
     if (skipConfirmation) {
+        dismissClearConfirmation();
         onClearCanvas();
         return;
     }
@@ -79,6 +93,9 @@ function renderClearConfirmation(activity, handlers) {
             return;
         }
         closed = true;
+        if (dismissActiveDialog === closeModal) {
+            dismissActiveDialog = null;
+        }
 
         if (onKeyDown) {
             document.removeEventListener("keydown", onKeyDown, true);
@@ -162,6 +179,7 @@ function renderClearConfirmation(activity, handlers) {
     modal.appendChild(buttonContainer);
     document.body.appendChild(modal);
     document.addEventListener("keydown", onKeyDown, true);
+    dismissActiveDialog = closeModal;
     confirmBtn.focus();
 }
 
@@ -169,8 +187,9 @@ if (typeof define === "function" && define.amd) {
     define(function () {
         window.renderClearConfirmation = renderClearConfirmation;
         window.requestClear = requestClear;
-        return { renderClearConfirmation, requestClear };
+        window.dismissClearConfirmation = dismissClearConfirmation;
+        return { renderClearConfirmation, requestClear, dismissClearConfirmation };
     });
 } else if (typeof module !== "undefined" && module.exports) {
-    module.exports = { renderClearConfirmation, requestClear };
+    module.exports = { renderClearConfirmation, requestClear, dismissClearConfirmation };
 }
