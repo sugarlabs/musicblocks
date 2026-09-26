@@ -155,6 +155,13 @@ function setupDictActions(activity) {
             } else if (key === "x") {
                 const y = activity.turtles.screenY2turtleY(targetTur.container.y);
                 targetTur.painter.doSetXY(value, y);
+            } else if (
+                key === _("notes played") ||
+                key === _("note value") ||
+                key === _("current pitch") ||
+                key === _("pitch number")
+            ) {
+                activity.errorMsg(_("Cannot set read-only key: %s").replace(/%s/g, () => key));
             }
         }
 

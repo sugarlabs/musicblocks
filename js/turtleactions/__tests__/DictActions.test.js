@@ -192,8 +192,8 @@ describe("setupDictActions", () => {
             expect(targetTurtle.painter[method]).toHaveBeenCalledWith(...args);
         });
 
-        it("should handle unsupported key gracefully without doing anything", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "unsupportedKey", "value");
+        it("should handle read-only key by showing an error message", () => {
+            Turtle.DictActions.SetDictValue(0, turtle, "notes played", "value");
             const painterMethods = [
                 "doSetColor",
                 "doSetValue",
@@ -206,6 +206,14 @@ describe("setupDictActions", () => {
             painterMethods.forEach(method => {
                 expect(targetTurtle.painter[method]).not.toHaveBeenCalled();
             });
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot set read-only key: notes played"
+            );
+        });
+
+        it("should ignore unsupported custom keys without errors", () => {
+            Turtle.DictActions.SetDictValue(0, turtle, "unsupportedKey", "value");
+            expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
         it("should support lowercase setDictValue alias", () => {
