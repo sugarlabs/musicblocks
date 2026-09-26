@@ -290,6 +290,87 @@ describe("AST2BlockList Class", () => {
         });
     });
 
+    // The Int block computes MathUtility.doInt, so the exported code has to
+    // call that same function and convert back to an Int block (#8894).
+    describe("Int block export and import", () => {
+        const ASTUtils = require("../ASTutils");
+        const JSInterface = require("../interface");
+        const MathUtility = require("../../utils/mathutils");
+        const astring = require("../../../lib/astring.min");
+
+        beforeAll(() => {
+            global.JSInterface = JSInterface;
+        });
+
+        afterAll(() => {
+            delete global.JSInterface;
+        });
+
+        const exportArg = arg => astring.generate(ASTUtils._getArgsAST([arg])[0]);
+
+        test.each([2.7, 3.5, -1.5, -2.5, -0.4, 0.49999999999999994, 4503599627370497])(
+            "exported int(%p) computes the same value as the Int block",
+            x => {
+                const code = exportArg(["int", [x]]);
+                const exported = new Function("MathUtility", `return ${code};`)(MathUtility);
+                expect(exported).toBe(MathUtility.doInt(x));
+            }
+        );
+
+        test("should convert exported int back to an int block", () => {
+            expect(exportArg(["int", [["divide", [7, 2]]]])).toBe("MathUtility.doInt(7 / 2)");
+
+            // Repeat [Int(7 / 2)], exactly as the exporter writes it.
+            const loop = astring.generate(
+                ASTUtils._getForLoopAST([["int", [["divide", [7, 2]]]]], [], 0)
+            );
+            const code = `
+            new Mouse(async mouse => {
+                ${loop}
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+
+            const expectedBlockList = [
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, "int", 0, 0, [1, 3]],
+                [3, "divide", 0, 0, [2, 4, 5]],
+                [4, ["number", { value: 7 }], 0, 0, [3]],
+                [5, ["number", { value: 2 }], 0, 0, [3]]
+            ];
+
+            const AST = acorn.parse(code, { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual(expectedBlockList);
+        });
+
+        // Neither call computes exactly what the Int block does, so converting
+        // either one to an Int block would change the program's values.
+        test.each(["floor", "round"])(
+            "should reject Math.%s instead of making an int block",
+            fn => {
+                const code = `
+            new Mouse(async mouse => {
+                await mouse.print(Math.${fn}(7 / 2));
+                return mouse.ENDMOUSE;
+            });
+            MusicBlocks.run();`;
+
+                const AST = acorn.parse(code, { ecmaVersion: 2020 });
+                let error;
+                try {
+                    AST2BlockList.toBlockList(AST, config);
+                } catch (e) {
+                    error = e;
+                }
+                expect(error).toBeDefined();
+                expect(error.prefix + code.substring(error.start, error.end)).toEqual(
+                    `Unsupported operator ${fn}: Math.${fn}(7 / 2)`
+                );
+            }
+        );
+    });
+
     // Test unsupported argument type should throw an error.
     test("should throw error for unsupported argument type", () => {
         const code = `
