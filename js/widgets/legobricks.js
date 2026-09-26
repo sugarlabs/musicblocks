@@ -1719,7 +1719,9 @@ function LegoWidget() {
      */
     this._removeColorPreviewTooltip = function () {
         if (this.colorPreviewTooltip) {
-            document.body.removeChild(this.colorPreviewTooltip);
+            if (this.colorPreviewTooltip.parentNode) {
+                this.colorPreviewTooltip.parentNode.removeChild(this.colorPreviewTooltip);
+            }
             this.colorPreviewTooltip = null;
             this.colorSwatch = null;
             this.colorPreviewText = null;
@@ -2061,13 +2063,6 @@ function LegoWidget() {
         return false;
     };
 
-    /**
-     * Checks if a canvas row is within the actual image bounds and returns appropriate color
-     * @private
-     * @param {object} line - The scanning line object
-     * @param {HTMLElement} mediaElement - The image or video element
-     * @returns {object|null} Color family object or null if should continue with normal sampling
-     */
     /**
      * Checks if a canvas row is within the actual image bounds and returns appropriate color
      * @private
@@ -2703,7 +2698,9 @@ function LegoWidget() {
         this.isPlaying = false;
         this._stopPolyphonicPlayback();
 
-        this.activity.hideMsgs();
+        if (this.activity && typeof this.activity.hideMsgs === "function") {
+            this.activity.hideMsgs();
+        }
 
         if (this.playButton) {
             const img = this.playButton.querySelector("img");
