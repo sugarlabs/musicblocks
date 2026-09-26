@@ -1160,10 +1160,25 @@ describe("saveAbcOutput - one voice per turtle", () => {
         turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) }
     });
 
-    it("gives each turtle its own numbered V: field", () => {
+    it("gives each turtle its own V: field", () => {
         const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
 
-        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:1", "V:2"]);
+        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:t1", "V:t2"]);
+    });
+
+    it("keeps the id off the numbers a staged voice marker uses", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: ["voice one", note("D4")] }));
+
+        // processStringMarker writes [V:1] for "voice one". A turtle voice of
+        // V:1 would hand it these notes.
+        expect(result).toContain("[V:1]");
+        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:t1", "V:t2"]);
+    });
+
+    it("skips a turtle that staged fields but no notes", () => {
+        const result = saveAbcOutput(build({ 0: ["meter", 3, 4], 1: [note("D4")] }));
+
+        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:t1"]);
     });
 
     it("starts each V: field on its own line", () => {
