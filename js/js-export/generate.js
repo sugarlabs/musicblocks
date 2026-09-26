@@ -99,6 +99,10 @@ class JSGenerate {
              * @returns {[*]} tree representation
              */
             function ParseArg(blk) {
+                if (!blk || !blk.protoblock) {
+                    return [];
+                }
+
                 let argLen = blk.protoblock.args;
                 if (blk.protoblock.style === "clamp") {
                     argLen -= 1;
@@ -171,9 +175,9 @@ class JSGenerate {
                     const args = ParseArg(nextBlk);
                     last(tree).push(args.length === 0 ? null : args);
 
-                    if (nextBlk.protoblock.style === "clamp") {
+                    if (nextBlk.protoblock && nextBlk.protoblock.style === "clamp") {
                         last(tree).push(GenerateStackTree(nextBlk, []));
-                    } else if (nextBlk.protoblock.style === "doubleclamp") {
+                    } else if (nextBlk.protoblock && nextBlk.protoblock.style === "doubleclamp") {
                         last(tree).push(GenerateStackTree(nextBlk, [], 1));
                         last(tree).push(GenerateStackTree(nextBlk, [], 0));
                     } else {

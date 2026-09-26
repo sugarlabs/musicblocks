@@ -153,6 +153,24 @@ describe("JSGenerate Class", () => {
         expect(JSGenerate.startTrees).toEqual([[]]);
     });
 
+    test("should handle a block without a protoblock", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: {
+                name: "start",
+                trash: false,
+                connections: [null, 2, null],
+                protoblock: { style: "hat" }
+            },
+            2: {
+                name: "forward",
+                connections: [1, null]
+            }
+        };
+
+        expect(() => JSGenerate.generateStacksTree()).not.toThrow();
+    });
+
     test("should run code generator with print options", () => {
         JSGenerate.actionTrees = [[["action", null, null]]];
         JSGenerate.actionNames = ["action1"];
