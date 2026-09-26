@@ -372,4 +372,179 @@ describe("Activity Core Behaviors and Lifecycle", () => {
             expect(capturedPluginDialogConfig.getActivePlugin()).toBeNull();
         });
     });
+
+    describe("Performance Marks and Measures (Lines 3028–3068)", () => {
+        it("records performance marks in __mbPerf.marks and calculates measures accurately", () => {
+            const sandbox = loadActivitySandbox();
+            const act = new sandbox.Activity();
+
+            let time = 100.0;
+            sandbox.window.__mbPerf = {
+                enabled: true,
+                marks: {},
+                measures: {}
+            };
+            sandbox.performance = {
+                now: () => time
+            };
+
+            act._perfMark("startLoad");
+            expect(sandbox.window.__mbPerf.marks["startLoad"]).toBe(100.0);
+
+            time = 245.567;
+            act._perfMark("endLoad");
+            expect(sandbox.window.__mbPerf.marks["endLoad"]).toBe(245.567);
+
+            act._perfMeasure("loadDuration", "startLoad", "endLoad");
+            expect(sandbox.window.__mbPerf.measures["loadDuration"]).toBe(145.57);
+        });
+
+        it("gracefully no-ops when performance tracking is disabled or marks are missing", () => {
+            const sandbox = loadActivitySandbox();
+            const act = new sandbox.Activity();
+
+            // Disabled __mbPerf
+            sandbox.window.__mbPerf = { enabled: false, marks: {}, measures: {} };
+            expect(() => act._perfMark("test")).not.toThrow();
+            expect(sandbox.window.__mbPerf.marks["test"]).toBeUndefined();
+
+            // Missing marks for measure
+            sandbox.window.__mbPerf.enabled = true;
+            act._perfMeasure("unmeasured", "nonexistentA", "nonexistentB");
+            expect(sandbox.window.__mbPerf.measures["unmeasured"]).toBeUndefined();
+        });
+    });
+
+    describe("Managed Event Listeners Lifecycle (Lines 3070–3156)", () => {
+        it("adds, removes, and cleans up managed listeners correctly with options comparison", () => {
+            const sandbox = loadActivitySandbox();
+            const act = new sandbox.Activity();
+
+            const target = {
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
+            };
+            const handler = jest.fn();
+
+            const initialListenerCount = act._listeners.length;
+
+            // Add listener
+            act.addEventListener(target, "click", handler, { capture: true });
+            expect(target.addEventListener).toHaveBeenCalledWith("click", handler, {
+                capture: true
+            });
+            expect(act._listeners).toHaveLength(initialListenerCount + 1);
+
+            // Removing with mismatched capture option does not remove
+            act.removeEventListener(target, "click", handler, { capture: false });
+            expect(act._listeners).toHaveLength(initialListenerCount + 1);
+
+            // Removing with matching boolean / capture option removes it
+            act.removeEventListener(target, "click", handler, true);
+            expect(target.removeEventListener).toHaveBeenCalledWith("click", handler, true);
+            expect(act._listeners).toHaveLength(initialListenerCount);
+
+            // Add multiple listeners and cleanupEventListeners
+            const stopIdleSpy = jest.fn();
+            act._stopIdleWatcher = stopIdleSpy;
+            act.addEventListener(target, "keydown", handler);
+            act.addEventListener(target, "keyup", handler);
+            expect(act._listeners).toHaveLength(initialListenerCount + 2);
+
+            act.cleanupEventListeners();
+            expect(act._listeners).toHaveLength(0);
+            expect(target.removeEventListener).toHaveBeenCalledWith("keyup", handler, undefined);
+            expect(target.removeEventListener).toHaveBeenCalledWith("keydown", handler, undefined);
+            expect(stopIdleSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("Global Bridges hidePrintText and hideErrorText (Lines 312–322)", () => {
+        it("delegates hidePrintText and hideErrorText to globalActivity", () => {
+            const sandbox = loadActivitySandbox();
+            const act = sandbox.activity;
+
+            const printDiv = document.createElement("div");
+            printDiv.id = "printText";
+            printDiv.classList.add("show");
+            document.body.appendChild(printDiv);
+            act.printText = printDiv;
+
+            const errorDiv = document.createElement("div");
+            errorDiv.id = "errorText";
+            errorDiv.style.display = "block";
+            document.body.appendChild(errorDiv);
+            act.errorText = errorDiv;
+
+            sandbox.window.hidePrintText();
+            expect(printDiv.classList.contains("show")).toBe(false);
+
+            sandbox.window.hideErrorText();
+            expect(errorDiv.style.display).toBe("none");
+        });
+    });
+
+    describe("SaveLocally & Session Lifecycle (Lines 2570–2648 & 3159–3169)", () => {
+        it("calls saveLocally method on Activity class and handles recoverable exceptions", () => {
+            const recoverableMock = jest.fn();
+            const mockStorage = {
+                setItem: jest.fn((k, v) => {
+                    mockStorage[k] = v;
+                })
+            };
+            const sandbox = loadActivitySandbox({
+                overrides: {
+                    localStorage: mockStorage,
+                    ErrorHandler: {
+                        recoverable: recoverableMock,
+                        capture: jest.fn()
+                    }
+                }
+            });
+            const { Activity } = sandbox;
+            const act = new Activity();
+            act.beginnerMode = false;
+            act.themePreference = "dark";
+
+            Activity.prototype.saveLocally.call(act);
+            expect(mockStorage.setItem).toHaveBeenCalledWith("beginnerMode", "false");
+            expect(mockStorage.setItem).toHaveBeenCalledWith("themePreference", "dark");
+
+            mockStorage.setItem.mockImplementationOnce(() => {
+                throw new Error("QuotaExceededError");
+            });
+            expect(() => Activity.prototype.saveLocally.call(act)).not.toThrow();
+            expect(recoverableMock).toHaveBeenCalledWith(
+                expect.any(Error),
+                expect.objectContaining({ operation: "saveLocalStorage" })
+            );
+        });
+
+        it("saveSessionAsync coordinates saving to sessionStorageManager with project timestamp", async () => {
+            const mockStorage = {
+                currentProject: "TestSong",
+                SESSION_TIMESTAMPTestSong: "12345"
+            };
+            const mockSessionStorageManager = {
+                saveSession: jest.fn().mockResolvedValue()
+            };
+            const sandbox = loadActivitySandbox({
+                overrides: {
+                    localStorage: mockStorage
+                }
+            });
+            const act = sandbox.activity;
+            act.sessionStorageManager = mockSessionStorageManager;
+            act.prepareExport = jest.fn(() => '{"blocks":[]}');
+            act.storage = mockStorage;
+
+            await act.saveSessionAsync();
+
+            expect(mockSessionStorageManager.saveSession).toHaveBeenCalledWith(
+                "SESSIONTestSong",
+                '{"blocks":[]}',
+                12345
+            );
+        });
+    });
 });
