@@ -3176,6 +3176,12 @@ describe("Logo processShow", () => {
         global.CAMERAVALUE = originalCameraValue;
         global.VIDEOVALUE = originalVideoValue;
     });
+
+    test("shows nothing rather than throwing when the obj slot is empty", () => {
+        logo.blockList = [{ connections: [null, null, null] }];
+        expect(() => logo.processShow(0, 0, 12, null)).not.toThrow();
+        expect(turtle0.doShowText).toHaveBeenCalledWith(12, null);
+    });
 });
 describe("Logo.processSpeak", () => {
     let logo;
