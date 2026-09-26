@@ -614,8 +614,9 @@ class AST2BlockList {
                     if (!argConfig) {
                         throw new Error(`Missing argument configuration for: ${block_name}`);
                     }
-                    if (argConfig.type === "note_or_solfege") {
-                        // Handle pitch notes (solfege or note names)
+                    if (argConfig.type === "note_or_solfege" && typeof arg === "string") {
+                        // Handle pitch notes (solfege or note names). A pitch read from a box
+                        // or computed is handled below like any other value.
                         const notes = new Set(["A", "B", "C", "D", "E", "F", "G"]);
                         vspaces += _addNthArgToBlockList(
                             [notes.has(arg.charAt(0)) ? "notename" : "solfege", { value: arg }],
@@ -632,6 +633,7 @@ class AST2BlockList {
                             parentBlockNumber
                         );
                     } else if (
+                        argConfig.type === "note_or_solfege" ||
                         argConfig.type === "NumberExpression" ||
                         argConfig.type === "BooleanExpression"
                     ) {

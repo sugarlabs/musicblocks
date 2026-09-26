@@ -1312,6 +1312,36 @@ describe("AST2BlockList Class", () => {
         expect(blockList).toEqual(expectedBlockList);
     });
 
+    test("should convert a pitch that isn't a note name literal", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playPitch(pitch, 4);
+            await mouse.playPitch(box1 + 1, 4);
+            await mouse.playPitch(5, 4);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "pitch", 0, 0, [0, 2, 3, 4]],
+            [2, ["namedbox", { value: "pitch" }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "pitch", 0, 0, [1, 5, 8, 9]],
+            [5, "plus", 0, 0, [4, 6, 7]],
+            [6, ["namedbox", { value: "box1" }], 0, 0, [5]],
+            [7, ["number", { value: 1 }], 0, 0, [5]],
+            [8, ["number", { value: 4 }], 0, 0, [4]],
+            [9, "vspace", 0, 0, [4, 10]],
+            [10, "pitch", 0, 0, [9, 11, 12, null]],
+            [11, ["number", { value: 5 }], 0, 0, [10]],
+            [12, ["number", { value: 4 }], 0, 0, [10]]
+        ]);
+    });
+
     test("should convert the current meter getter", () => {
         const code = `
         new Mouse(async mouse => {
