@@ -1145,7 +1145,7 @@ window.ast2blocklist_config = {
         {
             name: "semitoneinterval",
             comment: "Set semitone interval block",
-            arguments: [{ type: "intervalname" }],
+            arguments: [{ type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
