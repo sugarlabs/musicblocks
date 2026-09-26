@@ -929,6 +929,50 @@ describe("ASTUtils", () => {
         });
     });
 
+    describe("action names", () => {
+        const acorn = require("../../../lib/acorn.min");
+
+        // Exports an action with this name plus a call to it, and parses the result back.
+        const exportAction = name => {
+            const program = {
+                type: "Program",
+                sourceType: "script",
+                body: [
+                    ASTUtils.getMethodAST(name, []),
+                    ASTUtils._getBlockAST([["nameddo_" + name, null, null]])[0]
+                ]
+            };
+            const code = astring.generate(program);
+            const parsed = acorn.parse(`(async () => { ${code} })`, { ecmaVersion: 2020 });
+            const body = parsed.body[0].expression.body.body;
+            return {
+                code,
+                defined: body[0].declarations[0].id.name,
+                called: body[1].expression.argument.callee.name
+            };
+        };
+
+        it("keeps names that are already identifiers", () => {
+            for (const name of ["action", "chorus2", "verse_1", "ドレミ"]) {
+                expect(exportAction(name).defined).toBe(name);
+            }
+        });
+
+        it.each([
+            ["La Marseilles1", "La_Marseilles1"],
+            ["1st verse", "_1st_verse"],
+            ["chorus-2", "chorus_2"],
+            ["do", "_do"],
+            ["delete", "_delete"],
+            ["mouse", "_mouse"],
+            ["Math", "_Math"]
+        ])("exports %p as %p, defined and called the same way", (name, identifier) => {
+            const { defined, called } = exportAction(name);
+            expect(defined).toBe(identifier);
+            expect(called).toBe(identifier);
+        });
+    });
+
     describe("getMouseAST", () => {
         it("should return the AST for a mouse", () => {
             const tree = ["flow"];
