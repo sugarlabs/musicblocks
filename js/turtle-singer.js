@@ -1767,7 +1767,7 @@ class Singer {
                 activity.logo.phraseMaker.addColBlock(blk, 1);
 
                 // block ID of parent "matrix" block
-                const mat_block = activity.logo.phraseMaker.blockNo || -1;
+                const mat_block = activity.logo.phraseMaker.blockNo ?? -1;
 
                 for (let i = 0; i < activity.logo.pitchBlocks.length; i++) {
                     activity.logo.phraseMaker.addNode(
