@@ -964,6 +964,60 @@ describe("PhraseMaker Widget", () => {
 
         expect(phraseMaker._update).toHaveBeenCalled();
     });
+    test("_updateTupletValue safely handles out-of-bounds or invalid noteToDivide", () => {
+        phraseMaker._mapNotesBlocks = jest.fn(() => [0]);
+        phraseMaker._restartGrid = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._update = jest.fn();
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [["notes", 0, 4, 4]]
+            }
+        };
+
+        expect(() => phraseMaker._updateTupletValue(-1, 1, 3)).not.toThrow();
+        expect(() => phraseMaker._updateTupletValue(5, 1, 3)).not.toThrow();
+        expect(() => phraseMaker._updateTupletValue(NaN, 1, 3)).not.toThrow();
+        expect(() => phraseMaker._updateTupletValue("invalid", 1, 3)).not.toThrow();
+        expect(phraseMaker._update).not.toHaveBeenCalled();
+
+        phraseMaker.activity = null;
+        expect(() => phraseMaker._updateTupletValue(0, 1, 3)).not.toThrow();
+    });
+    test("_updateTupletValue handles multiple rhythms when noteToDivide > 0", () => {
+        phraseMaker._mapNotesBlocks = jest.fn(() => [0, 1]);
+        phraseMaker._restartGrid = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._update = jest.fn();
+
+        phraseMaker._colBlocks = [
+            [0, 0],
+            [0, 1],
+            [1, 0],
+            [1, 1]
+        ];
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [
+                    ["notes", 0, 4, 4],
+                    ["notes", 1, 4, 4]
+                ]
+            }
+        };
+
+        // Increase path with noteToDivide = 1 (exercises i < noteToDivide loop for i = 0)
+        expect(() => phraseMaker._updateTupletValue(1, 2, 3)).not.toThrow();
+        expect(phraseMaker._update).toHaveBeenCalledWith(1, null, 3, "stupletvalue");
+        expect(phraseMaker.activity.logo.tupletRhythms[1]).toEqual(["notes", 1, 4, 4, 4]);
+
+        // Decrease path with noteToDivide = 1
+        phraseMaker._update.mockClear();
+        expect(() => phraseMaker._updateTupletValue(1, 3, 2)).not.toThrow();
+        expect(phraseMaker._update).toHaveBeenCalledWith(1, null, 2, "stupletvalue");
+        expect(phraseMaker.activity.logo.tupletRhythms[1]).toEqual(["notes", 1, 4, 4]);
+    });
     test("_tieNotes merges note durations", async () => {
         phraseMaker._readjustNotesBlocks = jest.fn();
         phraseMaker._syncMarkedBlocks = jest.fn();
