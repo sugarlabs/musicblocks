@@ -1799,5 +1799,17 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Syntax Error at position %s:": "Syntax Error at position %s:",
+  "CONSOLE": "CONSOLE",
+  "Syntax Error:": "Syntax Error:",
+  "Code executed successfully!": "Code executed successfully!",
+  "Sandbox Error:": "Sandbox Error:",
+  "Stack trace:": "Stack trace:",
+  "Cannot add breakpoint to line %s. Breakpoints can only be added after lines ending with '{' or ';'": "Cannot add breakpoint to line %s. Breakpoints can only be added after lines ending with '{' or ';'",
+  "Cannot add breakpoint to line %s because there is already a breakpoint on an adjacent line.": "Cannot add breakpoint to line %s because there is already a breakpoint on an adjacent line.",
+  "Debugger added to line %s": "Debugger added to line %s",
+  "Debugger removed from line %s": "Debugger removed from line %s",
+  "Status window is already open.": "Status window is already open.",
+  "Status window opened.": "Status window opened."
 }

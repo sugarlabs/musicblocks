@@ -186,7 +186,9 @@ class JSEditor {
                 this._markErrorAtPosition(editor, error.pos, error.message);
             }
 
-            JSEditor.logConsole(`Syntax Error at position ${error.pos}: ${error.message}`);
+            JSEditor.logConsole(
+                _("Syntax Error at position %s:").replace("%s", error.pos) + ` ${error.message}`
+            );
         }
     }
 
@@ -592,7 +594,7 @@ class JSEditor {
         consolelabel.style.background = "white";
         consolelabel.style.display = "flex";
         consolelabel.style.justifyContent = "space-between";
-        consolelabel.textContent = "\u00a0\u00a0\u00a0\u00a0CONSOLE";
+        consolelabel.textContent = "\u00a0\u00a0\u00a0\u00a0" + _("CONSOLE");
         this._editor.appendChild(consolelabel);
 
         const arrowBtn = document.createElement("span");
@@ -995,22 +997,22 @@ class JSEditor {
         try {
             acorn.parse(this._code, { ecmaVersion: 2020 });
         } catch (e) {
-            JSEditor.logConsole(`Syntax Error: ${e.message}`, "red");
+            JSEditor.logConsole(_("Syntax Error:") + ` ${e.message}`, "red");
             return;
         }
 
         try {
             await this._codeToBlocks();
-            JSEditor.logConsole("Code executed successfully!", "green");
+            JSEditor.logConsole(_("Code executed successfully!"), "green");
 
             const playNativeBtn = docById("play");
             if (playNativeBtn) {
                 playNativeBtn.click();
             }
         } catch (e) {
-            JSEditor.logConsole(`Sandbox Error: ${e.message}`, "maroon");
+            JSEditor.logConsole(_("Sandbox Error:") + ` ${e.message}`, "maroon");
             if (e.stack) {
-                JSEditor.logConsole(`Stack trace: ${e.stack}`, "maroon");
+                JSEditor.logConsole(_("Stack trace:") + ` ${e.stack}`, "maroon");
             }
         }
     }
@@ -1210,9 +1212,9 @@ class JSEditor {
         const currentLine = lines[lineNumber].trim();
         if (!currentLine.endsWith("{") && !currentLine.endsWith(";")) {
             JSEditor.logConsole(
-                `Cannot add breakpoint to line ${
-                    lineNumber + 1
-                }. Breakpoints can only be added after lines ending with '{' or ';'`,
+                _(
+                    "Cannot add breakpoint to line %s. Breakpoints can only be added after lines ending with '{' or ';'"
+                ).replace("%s", lineNumber + 1),
                 "red"
             );
             return;
@@ -1224,9 +1226,9 @@ class JSEditor {
             (lines[lineNumber + 1] && lines[lineNumber + 1].trim() === "debugger;")
         ) {
             JSEditor.logConsole(
-                `Cannot add breakpoint to line ${
-                    lineNumber + 1
-                } because there is already a breakpoint on an adjacent line.`,
+                _(
+                    "Cannot add breakpoint to line %s because there is already a breakpoint on an adjacent line."
+                ).replace("%s", lineNumber + 1),
                 "red"
             );
             return;
@@ -1249,7 +1251,7 @@ class JSEditor {
         this._code = lines.join("\n");
         this._jar.updateCode(this._code);
         this._setLinesCount(this._code);
-        JSEditor.logConsole(`Debugger added to line ${lineNumber + 1}`, "green");
+        JSEditor.logConsole(_("Debugger added to line %s").replace("%s", lineNumber + 1), "green");
     }
 
     /**
@@ -1271,7 +1273,10 @@ class JSEditor {
         this._code = lines.join("\n");
         this._jar.updateCode(this._code);
         this._setLinesCount(this._code);
-        JSEditor.logConsole(`Debugger removed from line ${lineNumber + 1}`, "orange");
+        JSEditor.logConsole(
+            _("Debugger removed from line %s").replace("%s", lineNumber + 1),
+            "orange"
+        );
     }
 
     /**
@@ -1365,7 +1370,7 @@ class JSEditor {
     _triggerStatusWindow() {
         // Check if status window is already open
         if (window.widgetWindows.isOpen("status")) {
-            JSEditor.logConsole("Status window is already open.", "blue");
+            JSEditor.logConsole(_("Status window is already open."), "blue");
             return;
         }
 
@@ -1377,7 +1382,7 @@ class JSEditor {
         // this.activity.logo.statusFields = [];
         this.activity.logo.inStatusMatrix = true;
 
-        JSEditor.logConsole("Status window opened.", "green");
+        JSEditor.logConsole(_("Status window opened."), "green");
     }
 }
 
