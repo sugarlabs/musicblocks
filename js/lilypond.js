@@ -35,7 +35,7 @@
         NOTATIONDOTCOUNT
  */
 
-/* exported saveLilypondOutput */
+/* exported saveLilypondOutput, escapeLilypondString */
 
 // This header is prepended to the Lilypond output.
 const LILYPONDHEADER =
@@ -48,6 +48,12 @@ const LILYPONDHEADER =
 const getLilypondHeader = () => {
     return LILYPONDHEADER;
 };
+
+// Inside a double-quoted LilyPond string only \ and " are special, so
+// quoting user text keeps characters like { } # % from being parsed.
+const escapeLilypondString = text => String(text).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
+const toLilypondString = text => '"' + escapeLilypondString(text) + '"';
 
 const processLilypondNotes = (lilypond, logo, turtle) => {
     // obj = [instructions] or
@@ -67,8 +73,14 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             note = pitchObj[0] + pitchObj[1];
         }
 
+        // A natural is the plain note name. The ! that forces it to be
+        // printed has to follow the octave marks, e.g. c'! and not c!'.
+        const natural = note.includes("♮");
+
         const replacements = {
-            "♮": "!",
+            "♮": "",
+            "𝄪": "isis",
+            "𝄫": "eses",
             "♯": "is",
             "♭": "es",
             "10": "'''''''",
@@ -83,7 +95,10 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "9": "''''''"
         };
 
-        return note.replace(/[♮♯♭]|10|[1-9]/g, match => replacements[match]).toLowerCase();
+        return (
+            note.replace(/[♮♯♭𝄪𝄫]|10|[1-9]/gu, match => replacements[match]).toLowerCase() +
+            (natural ? "!" : "")
+        );
     };
 
     let noteCounter = 0;
@@ -180,24 +195,27 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                     logo.notationNotes[turtle] += "\\tempo swing\n";
                     break;
                 case "tempo":
+                    // Lilypond only accepts a whole number of beats per minute.
                     logo.notationNotes[turtle] +=
                         "\\tempo " +
                         logo.notation.notationStaging[turtle][i + 2] +
                         " = " +
-                        logo.notation.notationStaging[turtle][i + 1] +
+                        Math.round(logo.notation.notationStaging[turtle][i + 1]) +
                         "\n";
                     i += 2;
                     break;
                 case "markup":
                     logo.notationNotes[turtle] +=
                         "^\\markup { \\abs-fontsize #6 { " +
-                        logo.notation.notationStaging[turtle][i + 1] +
+                        toLilypondString(logo.notation.notationStaging[turtle][i + 1]) +
                         " } } ";
                     i += 1;
                     break;
                 case "markdown":
                     logo.notationNotes[turtle] +=
-                        "_\\markup { " + logo.notation.notationStaging[turtle][i + 1] + " } ";
+                        "_\\markup { " +
+                        toLilypondString(logo.notation.notationStaging[turtle][i + 1]) +
+                        " } ";
                     i += 1;
                     break;
                 case "break":
@@ -991,6 +1009,7 @@ if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         LILYPONDHEADER,
         getLilypondHeader,
+        escapeLilypondString,
         processLilypondNotes,
         saveLilypondOutput
     };

@@ -178,6 +178,37 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("g' 8 \\staccato ");
     });
 
+    test("should write a natural as the plain note name followed by !", () => {
+        logo.notation.notationStaging[turtle] = [[["C♮4"], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("c'!4 ");
+    });
+
+    test("should write double sharps and double flats", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C𝄪4"], 4, 0, null, 0, -1, false],
+            [["E𝄫4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("cisis'4 eeses'4 ");
+    });
+
+    test("should round the tempo to a whole number of beats per minute", () => {
+        logo.notation.notationStaging[turtle] = ["tempo", 90.5, "4"];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tempo 4 = 91\n");
+    });
+
+    test("should quote markup text so Lilypond does not parse it", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C4"], 4, 0, null, 0, -1, false],
+            "markdown",
+            '50% "loud" {x} a\\b'
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain('_\\markup { "50% \\"loud\\" {x} a\\\\b" } ');
+    });
+
     test("should place staccato after the chord on notes inside a tuplet", () => {
         logo.notation.notationStaging[turtle] = [[["C4", "E4"], 4, 8, [3, 2], 8, -1, true]];
         processLilypondNotes(lilypond, logo, turtle);
@@ -188,14 +219,14 @@ describe("processLilypondNotes", () => {
         logo.notation.notationStaging[turtle] = ["markup", "Test Markup"];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain(
-            "^\\markup { \\abs-fontsize #6 { Test Markup } } "
+            '^\\markup { \\abs-fontsize #6 { "Test Markup" } } '
         );
     });
 
     test("should process a markdown command correctly", () => {
         logo.notation.notationStaging[turtle] = ["markdown", "Test Markdown"];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("_\\markup { Test Markdown } ");
+        expect(logo.notationNotes[turtle]).toContain('_\\markup { "Test Markdown" } ');
     });
 
     test("should process a break command correctly", () => {
