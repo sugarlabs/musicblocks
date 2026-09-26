@@ -364,6 +364,48 @@ describe("JSGenerate Class", () => {
         expect(JSGenerate.actionTrees).toEqual([[["turnright", [["arg", [2]]], null]]]);
     });
 
+    test("should carry namedarg through the real tree to AST path", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: { name: "action", trash: false, connections: [null, 2, 3, null] },
+            2: { name: "text", value: "myAction", connections: [1] },
+            3: {
+                name: "forward",
+                connections: [1, 4, null],
+                protoblock: { args: 1, style: "arg" }
+            },
+            4: {
+                name: "namedarg",
+                value: null,
+                privateData: 1,
+                connections: [3],
+                protoblock: { args: 0, style: "arg" }
+            }
+        };
+
+        JSGenerate.generateStacksTree();
+
+        expect(JSGenerate.actionTrees).toEqual([[["forward", [["arg", [1]]], null]]]);
+
+        const RealASTUtils = require("../ASTutils");
+        const RealJSInterface = require("../interface");
+        const savedInterface = global.JSInterface;
+        global.JSInterface = RealJSInterface;
+        let methodAST;
+        try {
+            methodAST = RealASTUtils.getMethodAST(
+                JSGenerate.actionNames[0],
+                JSGenerate.actionTrees[0]
+            );
+        } finally {
+            global.JSInterface = savedInterface;
+        }
+
+        expect(JSON.stringify(methodAST)).toContain(
+            '{"type":"MemberExpression","object":{"type":"Identifier","name":"actionArgs"}'
+        );
+    });
+
     test("should print tree with nested args including null and object", () => {
         JSGenerate.startTrees = [[["forward", [100, null, ["add", [3, 4]]], null]]];
         JSGenerate.actionTrees = [];
