@@ -530,8 +530,35 @@ Feel free. But, please don't spam :p.
 
 _Please note there is no need to ask permission to work on an
 issue. You should check for pull requests linked to an issue you are
-addressing; if there are none, then assume nobody has done
-anything. Begin to fix the problem, test, make your commits, push your
+addressing and read its discussion; finding none does not prove that
+nobody else is working on it. Begin to fix the problem, test, make
+your commits, push your
 commits, then make a pull request. Mention an issue number in the pull
 request, but not the commit message. These practices allow the
 competition of ideas (Sugar Labs is a meritocracy)._
+
+### Before starting work on an issue
+
+To see the context around a specific issue before you start, run:
+
+```bash
+python3 .github/scripts/issue-context.py \
+  --repo sugarlabs/musicblocks \
+  --issue <ISSUE_NUMBER>
+```
+
+Where detected, the output shows:
+
+- linked open pull requests
+- open pull requests that reference the issue in their title or description
+- previous linked pull requests that were closed without being merged
+- recent human discussion on the issue
+- comments that may indicate contributor intent
+
+This is context, not ownership or permission. It does not decide who may
+work on an issue, and alternative implementations remain welcome. If no
+pull request or intent signal is detected, that does not prove nobody else
+is working on the issue; the output also lists what it could not check.
+
+The command needs Python 3 and the [GitHub CLI](https://cli.github.com/)
+(`gh`), signed in with `gh auth login`.
