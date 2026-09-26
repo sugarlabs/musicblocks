@@ -12,7 +12,7 @@
 /* global
 
    Singer, _, last, platformColor, docById, wheelnav, slicePath,
-   PREVIEWVOLUME, TONEBPM, clampNumber
+   PREVIEWVOLUME, TONEBPM, clampNumber, ManagedTimer
 */
 
 /*
@@ -22,6 +22,9 @@
      
      - js/utils/utils.js
          _, last, docById
+
+     - js/utils/ManagedTimer.js
+         ManagedTimer
      
      - js/turtle-singer.js
          Singer
@@ -117,6 +120,20 @@ class MeterWidget {
          */
         this._playing = false;
 
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("../utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
+        this._playBeatTimeout = null;
+
         /**
          * Flag indicating if the widget is locked for clicks.
          *
@@ -168,6 +185,13 @@ class MeterWidget {
          */
         widgetWindow.onclose = () => {
             this._playing = false;
+            if (this._playBeatTimeout) {
+                this._clearWidgetTimeout(this._playBeatTimeout);
+                this._playBeatTimeout = null;
+            }
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
+            }
             if (Singer && Singer.masterVolume && Singer.masterVolume.length > 0) {
                 this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
             }
@@ -198,14 +222,21 @@ class MeterWidget {
                     playBtn.textContent = "\u00A0\u00A0";
                     const img = document.createElement("img");
                     img.src = "header-icons/play-button.svg";
-                    img.title = _("Play all");
-                    img.alt = _("Play all");
+                    img.title = _("Play");
+                    img.alt = _("Play");
                     img.setAttribute("height", MeterWidget.ICONSIZE);
                     img.setAttribute("width", MeterWidget.ICONSIZE);
                     img.setAttribute("vertical-align", "middle");
                     playBtn.appendChild(img);
                     playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
                     this._playing = false;
+                    if (this._playBeatTimeout) {
+                        this._clearWidgetTimeout(this._playBeatTimeout);
+                        this._playBeatTimeout = null;
+                    }
+                    if (this._timerManager !== null) {
+                        this._timerManager.clearAll();
+                    }
                 } else {
                     playBtn.textContent = "\u00A0\u00A0";
                     const img = document.createElement("img");
@@ -253,6 +284,7 @@ class MeterWidget {
         if (this._meterBlock !== null && this.activity.blocks.blockList[this._meterBlock]) {
             c1 = this.activity.blocks.blockList[this._meterBlock].connections[1];
             v1 = c1 !== null ? this.activity.blocks.blockList[c1].value : 4;
+            v1 = isNaN(v1) ? 4 : clampNumber(v1, 1, 16);
             c2 = this.activity.blocks.blockList[this._meterBlock].connections[2];
             c3 =
                 c2 !== null &&
@@ -298,6 +330,13 @@ class MeterWidget {
         widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset")).onclick = () => {
             //change Values of blocks in stack.
             this._playing = false;
+            if (this._playBeatTimeout) {
+                this._clearWidgetTimeout(this._playBeatTimeout);
+                this._playBeatTimeout = null;
+            }
+            if (this._timerManager !== null) {
+                this._timerManager.clearAll();
+            }
             const el = divInput.children[0];
             const el2 = divInput2.children[0];
 
@@ -332,6 +371,24 @@ class MeterWidget {
         activity.textMsg(_("Click in the circle to select strong beats for the meter."), 3000);
         widgetWindow.sendToCenter();
         this._scale.call(this.widgetWindow);
+    }
+
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+        return setTimeout(callback, delay);
+    }
+
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+        if (this._timerManager !== null) {
+            return this._timerManager.clearTimeout(id);
+        }
+        clearTimeout(id);
+        return true;
     }
 
     /**
@@ -442,7 +499,7 @@ class MeterWidget {
             this.__playDrum("kick drum");
         }
 
-        setTimeout(() => {
+        this._playBeatTimeout = this._setWidgetTimeout(() => {
             if (this._playing) {
                 this.__playOneBeat((i + 1) % this._strongBeats.length, ms);
             }

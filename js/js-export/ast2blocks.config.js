@@ -132,7 +132,7 @@ window.ast2blocklist_config = {
                 MODELENGTH: "modelength",
                 SCALARCHANGEINPITCH: "deltapitch2",
                 CHANGEINPITCH: "deltapitch",
-                CURRENTKEY: "currentkey",
+                CURRENTKEY: "key",
                 CURRENTMODE: "currentmode",
                 X: "x",
                 Y: "y",
@@ -145,12 +145,15 @@ window.ast2blocklist_config = {
                 COLOR: "color",
                 BOTTOMPOS: "bottompos",
                 CAMERA: "camera",
-                BEATCOUNT: "nopValueBlock",
+                BEATCOUNT: "beatvalue",
                 MEASURECOUNT: "nopValueBlock",
-                BPM: "nopValueBlock",
+                BPM: "bpmfactor",
+                CURRENTMETER: "currentmeter",
+                HEADING: "heading",
                 WHOLENOTESPLAYED: "elapsednotes",
                 BEATFACTOR: "beatfactor",
-                NOTEVALUE: "notevalue"
+                NOTEVALUE: "notevalue",
+                MASTERVOLUME: "notevolumefactor"
             }
         },
         {
@@ -499,10 +502,48 @@ window.ast2blocklist_config = {
         },
         {
             name: "repeat",
-            comment: "Repeat block in the Flow palette",
+            comment:
+                "Repeat block as exported: for (let i0 = 0, limit0 = MathUtility.doRepeatCount(n); i0 < limit0; i0++)",
             arguments: [{ type: "NumberExpression" }],
             ast: {
-                identifiers: [{ property: "type", value: "ForStatement" }],
+                identifiers: [
+                    { property: "type", value: "ForStatement" },
+                    { property: "init.declarations.length", value: 2 },
+                    { property: "init.declarations[0].init.value", value: 0 },
+                    {
+                        property: "init.declarations[1].init.callee.object.name",
+                        value: "MathUtility"
+                    },
+                    {
+                        property: "init.declarations[1].init.callee.property.name",
+                        value: "doRepeatCount"
+                    },
+                    { property: "test.operator", value: "<" },
+                    { property: "test.left.name", same_as: "init.declarations[0].id.name" },
+                    { property: "test.right.name", same_as: "init.declarations[1].id.name" },
+                    { property: "update.operator", value: "++" },
+                    { property: "update.argument.name", same_as: "init.declarations[0].id.name" }
+                ],
+                argument_properties: ["init.declarations[1].init.arguments[0]"],
+                children_properties: ["body.body"]
+            },
+            default_vspaces: { argument: 1 }
+        },
+        {
+            name: "repeat",
+            comment: "Repeat block in the Flow palette: for (let i = 0; i < 4; i++)",
+            arguments: [{ type: "NumberExpression" }],
+            ast: {
+                identifiers: [
+                    { property: "type", value: "ForStatement" },
+                    { property: "init.declarations.length", value: 1 },
+                    { property: "init.declarations[0].init.value", value: 0 },
+                    { property: "test.operator", value: "<" },
+                    { property: "test.left.name", same_as: "init.declarations[0].id.name" },
+                    { property: "test.right.value", integer: true },
+                    { property: "update.operator", value: "++" },
+                    { property: "update.argument.name", same_as: "init.declarations[0].id.name" }
+                ],
                 argument_properties: ["test.right"],
                 children_properties: ["body.body"]
             },

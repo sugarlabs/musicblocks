@@ -1,0 +1,73 @@
+//* comment *//
+
+Copyright (C) 2015 Ignacio Rodríguez
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+This plugin provides logical bit operations in Turtle Art,
+such as AND, OR, XOR, NOT, logical shift left, logical shift right.
+
+
+//* arg-globals *//
+var block = logo.blocks.blockList[blk];
+var conns = block.connections;
+
+//* block-globals *//
+var LogicTwoArgBlock = function (name, label) {
+    var block = new ProtoBlock(name);
+    block.palette = palettes.dict['logic'];
+    blocks.protoBlockDict[name] = block;
+    block.staticLabels.push(label);
+    block.adjustWidthToLabel();
+    block.twoArgMathBlock();
+    block.defaults.push(1);
+    block.defaults.push(1);
+};
+
+var LogicArgBlock = function (name, label) {
+    var block = new ProtoBlock(name);
+    block.palette = palettes.dict['logic'];
+    blocks.protoBlockDict[name] = block;
+    block.staticLabels.push(label);
+    block.adjustWidthToLabel();
+    block.oneArgMathBlock();
+    block.defaults.push(0);
+};
+
+//* block:myxor *// LogicTwoArgBlock('myxor', 'XOR');
+//* arg:myxor *// block.value = logo.parseArg(logo, turtle, conns[1]) >> logo.parseArg(logo, turtle, conns[2]);
+
+//* block:myand *// LogicTwoArgBlock('myand', 'AND');
+//* arg:myand *// block.value = logo.parseArg(logo, turtle, conns[1]) & logo.parseArg(logo, turtle, conns[2]);
+
+//* block:myor *// LogicTwoArgBlock('myor', 'OR');
+//* arg:myor *// block.value = logo.parseArg(logo, turtle, conns[1]) | logo.parseArg(logo, turtle, conns[2]);
+
+//* block:mysl *// LogicTwoArgBlock('mysl', '&lt;&lt;');
+//* arg:mysl *// block.value = logo.parseArg(logo, turtle, conns[1]) << logo.parseArg(logo, turtle, conns[2]);
+
+//* block:mysr *// LogicTwoArgBlock('mysr', '&gt;&gt;');
+//* arg:mysr *// block.value = logo.parseArg(logo, turtle, conns[1]) >> logo.parseArg(logo, turtle, conns[2]);
+
+//* block:mynot *// LogicArgBlock('mynot', 'NOT');
+//* arg:mynot *// block.value = ~ logo.parseArg(logo, turtle, conns[1]);
+
+//* palette-icon:logic *//
+<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" viewBox="0 0 55 55"><g transform="matrix(1.25 0 0 1.25-7.5-6.25)"><g font-family="Sans" word-spacing="0" line-height="125%" letter-spacing="0" font-size="11"><text x="33.891" y="39.844"><tspan x="33.891" y="39.844" fill="#fff">0</tspan></text><g fill="#000"><text x="33.792" y="27"><tspan x="33.792" y="27" fill="#fff">1</tspan></text><text x="19.18" y="40"><tspan x="19.18" y="40" fill="#fff">1</tspan></text><text x="19.275" y="26.844"><tspan x="19.275" y="26.844" fill="#fff">0</tspan></text></g></g><g fill="#fff" stroke="#fff"><path d="m10.5 14.5h35"/><path d="m15.5 44.5v-35"/></g></g></svg>
+
+//* palette-fill:logic *// #ff00ff
+//* palette-stroke:logic *// #C700D3
+//* palette-highlight:logic *// #FF9FFF
+//* palette-stroke-highlight:logic *// #000000
+

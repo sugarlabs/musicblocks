@@ -20,7 +20,7 @@
     YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
     nthDegreeToPitch, getCurrentEDO, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
      NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
-     INTERVALVALUES, CENTSSYMBOL
+     INTERVALVALUES, CENTSSYMBOL, noteToObj
   */
 
 /* exported setupPitchBlocks */
@@ -302,10 +302,7 @@ function setupPitchBlocks(activity) {
                 let obj;
                 if (tur.singer.lastNotePlayed !== null) {
                     if (typeof tur.singer.lastNotePlayed[0] === "string") {
-                        const len = tur.singer.lastNotePlayed[0].length;
-                        const pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                        const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
-                        obj = [pitch, octave];
+                        obj = noteToObj(tur.singer.lastNotePlayed[0]);
                     } else {
                         // Hertz?
                         obj = frequencyToPitch(tur.singer.lastNotePlayed[0]);
@@ -495,7 +492,9 @@ function setupPitchBlocks(activity) {
                 if (cblk1 !== null) {
                     arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 }
-                if (activity.blocks.blockList[cblk1].name === "notename") {
+                if (cblk1 === null) {
+                    notePlayed = "G4";
+                } else if (activity.blocks.blockList[cblk1].name === "notename") {
                     notePlayed = arg1 + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else if (
                     activity.blocks.blockList[cblk1].name === "solfege" ||
@@ -2018,10 +2017,10 @@ function setupPitchBlocks(activity) {
                     }
                     scaledegree = Math.abs(scaledegree);
 
-                    let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
-                    if (obj[0].substr(1) === FLAT) {
+                    let ref = NOTESTEP[obj[0].slice(0, 1)] - 1;
+                    if (obj[0].slice(1) === FLAT) {
                         ref--;
-                    } else if (obj[0].substr(1) === SHARP) {
+                    } else if (obj[0].slice(1) === SHARP) {
                         ref++;
                     }
                     note = scaleDegreeToPitchMapping(
@@ -2128,7 +2127,7 @@ function setupPitchBlocks(activity) {
                     if (![SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT].includes(accSym)) {
                         accSym = NATURAL;
                     } else {
-                        arg0 = arg0.substr(0, arg0.length - 1);
+                        arg0 = arg0.slice(0, arg0.length - 1);
                     }
                     note = NOTENAMES.includes(arg0.toUpperCase())
                         ? SOLFEGECONVERSIONTABLE[arg0.toUpperCase()]

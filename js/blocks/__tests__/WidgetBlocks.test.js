@@ -288,6 +288,34 @@ describe("setupWidgetBlocks", () => {
             expect(getBlock("timbre")).toBeDefined();
             expect(getBlock("tempo")).toBeDefined();
             expect(getBlock("meterwidget")).toBeDefined();
+            expect(activity.blockTypes).toEqual([
+                "aidebugger",
+                "envelope",
+                "filter",
+                "reflection",
+                "aimusic",
+                "legobricks",
+                "timbre",
+                "temperament",
+                "modewidget",
+                "meterwidget",
+                "tempo",
+                "sampler",
+                "oscilloscope",
+                "pitchdrummatrix",
+                "arpeggiomatrix",
+                "pitchstaircase",
+                "pitchslider",
+                "chromatic",
+                "musickeyboard2",
+                "musickeyboard",
+                "rhythmruler3",
+                "rhythmruler2",
+                "matrixgmajor",
+                "matrixcmajor",
+                "matrix",
+                "status"
+            ]);
         });
     });
 
@@ -444,6 +472,39 @@ describe("setupWidgetBlocks", () => {
         });
     });
 
+    describe("SamplerBlock", () => {
+        it("lazy-loads sample widget and returns child block on replay", () => {
+            const sampler = getBlock("sampler");
+
+            const interruption = sampler.flow(["childBlk"], logo, 0, "samplerBlk", "received");
+            expect(interruption).toEqual([null, 0, true]);
+            expect(global.SampleWidget).toHaveBeenCalledTimes(1);
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(
+                logo,
+                0,
+                "samplerBlk",
+                true,
+                "received"
+            );
+
+            const result = sampler.flow(["childBlk"], logo, 0, "samplerBlk");
+            expect(logo.inSample).toBe(true);
+            expect(logo.sample).toBeDefined();
+            expect(result).toEqual(["childBlk", 1]);
+        });
+
+        it("lazy-loads sample widget when logo.sample is undefined", () => {
+            const sampler = getBlock("sampler");
+            delete logo.sample;
+
+            const result = sampler.flow(["childBlk"], logo, 0, "samplerBlk", "received");
+
+            expect(result).toEqual([null, 0, true]);
+            expect(global.SampleWidget).toHaveBeenCalledTimes(1);
+            expect(logo.sample).toBeDefined();
+        });
+    });
+
     describe("AIDebuggerBlock", () => {
         it("uses its own widget instance instead of sampler state", () => {
             const sampler = getBlock("sampler");
@@ -461,6 +522,21 @@ describe("setupWidgetBlocks", () => {
             expect(logo.sample).not.toBe(logo.aiDebugger);
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
         });
+
+        it("does not depend on sampler state being initialized", () => {
+            const aiDebugger = getBlock("aidebugger");
+
+            const interruption = aiDebugger.flow(["childBlk"], logo, 0, "debuggerBlk", "received");
+            expect(interruption).toEqual([null, 0, true]);
+            expect(global.AIDebuggerWidget).toHaveBeenCalledTimes(1);
+            expect(logo.aiDebugger).toBeDefined();
+            expect(logo.sample).toBeNull();
+            expect(logo.inSample).toBe(false);
+
+            const result = aiDebugger.flow(["childBlk"], logo, 0, "debuggerBlk");
+            expect(result).toEqual(["childBlk", 1]);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
+        });
     });
 
     describe("First-Click Flow (Lazy Loading)", () => {
@@ -470,6 +546,28 @@ describe("setupWidgetBlocks", () => {
             const res = temperament.flow([0, "childBlk"], logo, 0, "tempBlk", "received");
             expect(res).toEqual([null, 0, true]);
             expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "tempBlk", true, "received");
+        });
+
+        it("returns interruption and triggers runFromBlockNow for MusicKeyboardBlock", () => {
+            const keyboard = getBlock("musickeyboard");
+            logo.musicKeyboard = null;
+            const res = keyboard.flow(["childBlk"], logo, 0, "kbdBlk", "received");
+            expect(res).toEqual([null, 0, true]);
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "kbdBlk", true, "received");
+        });
+
+        it("returns interruption and triggers runFromBlockNow for MatrixBlock (PhraseMaker)", () => {
+            const matrix = getBlock("matrix");
+            logo.phraseMaker = null;
+            const res = matrix.flow(["childBlk"], logo, 0, "matrixBlk", "received");
+            expect(res).toEqual([null, 0, true]);
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(
+                logo,
+                0,
+                "matrixBlk",
+                true,
+                "received"
+            );
         });
 
         it("returns interruption if widget is already loading (guard check)", () => {
@@ -695,6 +793,24 @@ describe("setupWidgetBlocks", () => {
 
         // Exercise the previously-untested call sites so dependency
         // resolution actually executes, not just gets matched textually above.
+        it.each([
+            ["arpeggiomatrix", "arpBlk", "arpeggio", global.Arpeggio],
+            ["pitchdrummatrix", "pdmBlk", "pitchDrumMatrix", global.PitchDrumMatrix],
+            ["pitchslider", "psBlk", "pitchSlider", global.PitchSlider],
+            ["pitchstaircase", "pstBlk", "pitchStaircase", global.PitchStaircase],
+            ["rhythmruler2", "rrBlk", "rhythmRuler", global.RhythmRuler],
+            ["reflection", "reflBlk", "reflection", global.ReflectionMatrix],
+            ["legobricks", "legoBlk", "legoWidget", global.LegoWidget]
+        ])("%s lazy-loads its widget on first use", (type, blk, logoKey, Widget) => {
+            const block = getBlock(type);
+
+            const interruption = block.flow(["childBlk"], logo, 0, blk, "received");
+
+            expect(interruption).toEqual([null, 0, true]);
+            expect(Widget).toHaveBeenCalledTimes(1);
+            expect(logo[logoKey]).toBeDefined();
+        });
+
         it.each([
             ["meterwidget", "meterBlk", "meterWidget", global.MeterWidget],
             ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],

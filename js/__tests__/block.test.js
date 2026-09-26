@@ -766,6 +766,326 @@ describe("Block Foundation", () => {
             expect(mockCache).toHaveBeenCalledWith(0, 0, 100, 100);
             expect(block.value).toBe("fallback-cached");
         });
+
+        it("records the effective converted value for a user selection", () => {
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 1 }];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("old-cached-value", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            mockImageInstance.onload();
+
+            expect(block.blocks.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 0,
+                    oldValue: "old-cached-value",
+                    newValue: "cached-data-url",
+                    oldText: null,
+                    newText: null
+                }
+            ]);
+            expect(block.blocks.redoActionHistory).toEqual([]);
+        });
+
+        it("preserves redo history when conversion produces the existing value", () => {
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 1 }];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("cached-data-url", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            mockImageInstance.onload();
+
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([{ type: "move", blockId: 1 }]);
+        });
+
+        it("cancels a failed selection and restores its previous history state", () => {
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 1 }];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("old-image", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            mockImageInstance.onerror();
+
+            expect(block.value).toBe("old-image");
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([{ type: "move", blockId: 1 }]);
+        });
+
+        it("does not cancel history when an older image load fails", () => {
+            const images = [];
+            global.Image = jest.fn(() => {
+                const image = {
+                    src: "",
+                    width: 100,
+                    height: 100,
+                    naturalWidth: 100,
+                    naturalHeight: 100,
+                    onload: null,
+                    onerror: null
+                };
+                images.push(image);
+                return image;
+            });
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("old-image", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            block.blocks.actionHistory.pop();
+            block.blocks.redoActionHistory.push(reservation.action);
+            block.value = "old-image";
+            block.loadThumbnail(null);
+            images[0].onerror();
+
+            expect(block.value).toBe("old-image");
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([reservation.action]);
+        });
+
+        it("does not reapply a pending selection after it has been undone", () => {
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [];
+            block.blocks.isUndoingOrRedoing = false;
+            block.value = "selected-source";
+            block.blocks.blockList[0] = block;
+            const reservation = block._reserveValueChange("old-image", "selected-source");
+
+            block.loadThumbnail(null, reservation);
+            block.blocks.actionHistory.pop();
+            block.blocks.redoActionHistory.push(reservation.action);
+            block.value = "old-image";
+            mockImageInstance.onload();
+
+            expect(block.value).toBe("old-image");
+            expect(reservation.action.newValue).toBe("cached-data-url");
+        });
+
+        it("does not let an older image load overwrite a newer selection", () => {
+            const images = [];
+            global.Image = jest.fn(() => {
+                const image = {
+                    src: "",
+                    width: 100,
+                    height: 100,
+                    naturalWidth: 100,
+                    naturalHeight: 100,
+                    onload: null,
+                    onerror: null
+                };
+                images.push(image);
+                return image;
+            });
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [];
+            block.blocks.isUndoingOrRedoing = false;
+            block.blocks.blockList[0] = block;
+
+            const first = block._reserveValueChange("old-image", "first.gif");
+            block.value = "first.gif";
+            block.loadThumbnail("first.gif", first);
+
+            const second = block._reserveValueChange("first.gif", "second.gif");
+            block.value = "second.gif";
+            block.loadThumbnail("second.gif", second);
+            const completeValueChange = jest.spyOn(block, "_completeValueChange");
+
+            images[1].onload();
+            images[0].onload();
+
+            expect(block.value).toBe("second.gif");
+            expect(completeValueChange).toHaveBeenCalledTimes(1);
+            expect(completeValueChange).toHaveBeenCalledWith(second, "second.gif");
+            expect(block.blocks.actionHistory.map(action => action.newValue)).toEqual([
+                "first.gif",
+                "second.gif"
+            ]);
+        });
+    });
+
+    describe("media selection undo history", () => {
+        it("reserves a built-in image history entry before thumbnail conversion", () => {
+            const selectCallbacks = [];
+            global.openSvgAssetSelector = jest.fn(onSelect => selectCallbacks.push(onSelect));
+            const block = new Block(
+                { ...mockProtoBlock, name: "media", capabilities: Object.create(null) },
+                {
+                    ...mockBlocks,
+                    actionHistory: [],
+                    redoActionHistory: [{ type: "move", blockId: 0 }],
+                    isUndoingOrRedoing: false
+                }
+            );
+            block.blockIndex = 2;
+            block.value = "old-image";
+            block.loadThumbnail = jest.fn();
+
+            block._doOpenMedia(2);
+            selectCallbacks[0]("selected-image");
+
+            expect(block.blocks.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 2,
+                    oldValue: "old-image",
+                    newValue: "selected-image",
+                    oldText: null,
+                    newText: null
+                }
+            ]);
+            expect(block.blocks.redoActionHistory).toEqual([]);
+            const reservation = block.loadThumbnail.mock.calls[0][1];
+            expect(reservation.action).toBe(block.blocks.actionHistory[0]);
+
+            const laterAction = { type: "move", blockId: 1 };
+            block.blocks.actionHistory.push(laterAction);
+            block._completeValueChange(reservation, "converted-image");
+
+            expect(block.blocks.actionHistory).toEqual([
+                expect.objectContaining({
+                    type: "value_change",
+                    oldValue: "old-image",
+                    newValue: "converted-image"
+                }),
+                laterAction
+            ]);
+
+            delete global.openSvgAssetSelector;
+        });
+
+        it("records an uploaded image selection", () => {
+            const originalFileReader = global.FileReader;
+            const originalScroll = window.scroll;
+            let changeHandler;
+            const fileChooser = {
+                value: "",
+                files: [{ name: "photo.png" }],
+                addEventListener: jest.fn((event, handler) => {
+                    if (event === "change") changeHandler = handler;
+                }),
+                removeEventListener: jest.fn(),
+                focus: jest.fn(),
+                click: jest.fn()
+            };
+            global.docById = jest.fn().mockReturnValue(fileChooser);
+            window.scroll = jest.fn();
+            global.FileReader = class {
+                constructor() {
+                    this.result = "uploaded-image";
+                }
+
+                readAsDataURL() {
+                    this.onloadend();
+                }
+            };
+            const block = new Block(
+                { ...mockProtoBlock, name: "media", capabilities: Object.create(null) },
+                {
+                    ...mockBlocks,
+                    actionHistory: [],
+                    redoActionHistory: [],
+                    isUndoingOrRedoing: false
+                }
+            );
+            block.blockIndex = 3;
+            block.value = "old-image";
+            block.loadThumbnail = jest.fn();
+
+            block._doOpenMediaFromDevice(3);
+            changeHandler();
+
+            expect(block.blocks.actionHistory).toHaveLength(1);
+            expect(block.loadThumbnail.mock.calls[0][1].action).toBe(block.blocks.actionHistory[0]);
+
+            global.FileReader = originalFileReader;
+            window.scroll = originalScroll;
+        });
+
+        it.each(["audiofile", "loadFile"])("records a %s upload and clears redo history", name => {
+            const originalFileReader = global.FileReader;
+            const originalScroll = window.scroll;
+            let changeHandler;
+            const fileChooser = {
+                value: "",
+                files: [{ name: "lesson.dat" }],
+                addEventListener: jest.fn((event, handler) => {
+                    if (event === "change") changeHandler = handler;
+                }),
+                removeEventListener: jest.fn(),
+                focus: jest.fn(),
+                click: jest.fn()
+            };
+            global.docById = jest.fn().mockReturnValue(fileChooser);
+            window.scroll = jest.fn();
+            const expectedResult =
+                name === "audiofile" ? "data:audio/mock;base64,AAAA" : "plain text";
+            global.FileReader = class {
+                constructor() {
+                    this.result = null;
+                }
+
+                readAsDataURL() {
+                    this.result = "data:audio/mock;base64,AAAA";
+                    this.onloadend();
+                }
+
+                readAsText() {
+                    this.result = "plain text";
+                    this.onloadend();
+                }
+            };
+            const block = new Block(
+                { ...mockProtoBlock, name, capabilities: Object.create(null) },
+                {
+                    ...mockBlocks,
+                    actionHistory: [],
+                    redoActionHistory: [{ type: "move", blockId: 0 }],
+                    isUndoingOrRedoing: false,
+                    updateBlockText: jest.fn()
+                }
+            );
+            block.blockIndex = 4;
+            block.value = ["old.dat", "old-contents"];
+
+            block._doOpenMediaFromDevice(4);
+            changeHandler();
+
+            expect(block.blocks.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 4,
+                    oldValue: ["old.dat", "old-contents"],
+                    newValue: ["lesson.dat", expectedResult],
+                    oldText: null,
+                    newText: null
+                }
+            ]);
+            expect(block.blocks.redoActionHistory).toEqual([]);
+            expect(block.blocks.updateBlockText).toHaveBeenCalledWith(4);
+
+            block.blocks.actionHistory = [];
+            block.blocks.redoActionHistory = [{ type: "move", blockId: 0 }];
+            changeHandler();
+
+            expect(block.blocks.actionHistory).toEqual([]);
+            expect(block.blocks.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
+
+            global.FileReader = originalFileReader;
+            window.scroll = originalScroll;
+        });
     });
 
     describe("hide", () => {
@@ -883,6 +1203,309 @@ describe("Block Foundation", () => {
         });
     });
 
+    describe("drag spatial-grid deferral", () => {
+        const makeEventBlock = () => {
+            const handlers = {};
+            const block = new Block(mockProtoBlock, mockBlocks);
+
+            block.blockIndex = 0;
+            block.connections = [null, null];
+            block.container = {
+                x: 100,
+                y: 100,
+                children: [],
+                on: jest.fn((type, handler) => {
+                    handlers[type] = handler;
+                }),
+                setChildIndex: jest.fn()
+            };
+            block.original = { x: 100, y: 100 };
+            block.offset = { x: 0, y: 0 };
+            block._calculateBlockHitArea = jest.fn();
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.isValueBlock = jest.fn().mockReturnValue(false);
+
+            mockBlocks.blockList = [block, { container: { x: 100, y: 120 } }];
+            mockBlocks._cachedDragGroup = [0, 1];
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.selectionModeOn = false;
+            mockBlocks.getLongPressStatus = jest.fn().mockReturnValue(false);
+            mockBlocks.clearLongPress = jest.fn();
+            mockBlocks.cacheDragGroup = jest.fn();
+            mockBlocks.raiseStackToTop = jest.fn();
+            mockBlocks.moveBlockRelativeBatched = jest.fn();
+            mockBlocks.scheduleCheckBounds = jest.fn();
+            mockBlocks.clearCachedDragGroup = jest.fn();
+            mockBlocks.invalidateTopBlockCache = jest.fn();
+            mockBlocks.unhighlight = jest.fn();
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.blocksContainer = { y: 0 };
+            block.activity.scrollBlockContainer = false;
+            block.activity.trashcan = {
+                show: jest.fn(),
+                hide: jest.fn(),
+                overTrashcan: jest.fn().mockReturnValue(false),
+                startHighlightAnimation: jest.fn(),
+                stopHighlightAnimation: jest.fn()
+            };
+
+            block._loadEventHandlers();
+            global.docById.mockReturnValue({ style: {} });
+            return { block, handlers };
+        };
+
+        it("defers cached drag-group updates and marks the release dirty", () => {
+            const { handlers } = makeEventBlock();
+
+            handlers.mousedown({ stageX: 100, stageY: 100 });
+
+            handlers.pressmove({
+                stageX: 110,
+                stageY: 100,
+                nativeEvent: { preventDefault: jest.fn() }
+            });
+
+            expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+
+            handlers.pressup({ stageX: 110, stageY: 100 });
+
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(0, 10, 0, true);
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(1, 10, 0, true);
+            expect(mockBlocks.syncDragGroupSpatialGrid).toHaveBeenCalledTimes(1);
+        });
+
+        it("defers drag-group updates when the cached group is unavailable", () => {
+            const { handlers } = makeEventBlock();
+            handlers.mousedown({ stageX: 100, stageY: 100 });
+            mockBlocks._cachedDragGroup = null;
+            mockBlocks.dragGroup = [0, 1];
+            mockBlocks.findDragGroup = jest.fn();
+
+            handlers.pressmove({
+                stageX: 100,
+                stageY: 110,
+                nativeEvent: { preventDefault: jest.fn() }
+            });
+
+            expect(mockBlocks.findDragGroup).toHaveBeenCalledWith(0);
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(0, 0, 10, true);
+            expect(mockBlocks.moveBlockRelativeBatched).toHaveBeenCalledWith(1, 0, 10, true);
+        });
+
+        it("reports a clean grid when release follows no coordinate movement", () => {
+            const { handlers } = makeEventBlock();
+
+            handlers.mousedown({ stageX: 100, stageY: 100 });
+            handlers.pressup({ stageX: 100, stageY: 100 });
+
+            expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+        });
+
+        it("reconciles the grid after restoring trash-hover positions and before docking", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            const order = [];
+
+            block.blockIndex = 0;
+            block._setDragGroupTrashHoverScale = jest.fn(() => order.push("restore"));
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.trashcan = {
+                hide: jest.fn(),
+                isVisible: true,
+                overTrashcan: jest.fn(() => {
+                    order.push("query-trash");
+                    return false;
+                })
+            };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn(() => order.push("sync-grid"));
+            mockBlocks.blockMoved = jest.fn(() => order.push("dock"));
+            mockBlocks.adjustDocks = jest.fn(() => order.push("adjust"));
+
+            block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true, true);
+
+            expect(order).toEqual(["restore", "sync-grid", "query-trash", "dock", "adjust"]);
+        });
+
+        it("sends a moved block to trash without waiting for the highlight", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.getStageScale = jest.fn().mockReturnValue(1);
+            block.activity.textMsg = jest.fn();
+            block.activity.trashcan = {
+                hide: jest.fn(),
+                isVisible: false,
+                overTrashcan: jest.fn().mockReturnValue(true)
+            };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.sendStackToTrash = jest.fn();
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+
+            block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true);
+
+            expect(mockBlocks.sendStackToTrash).toHaveBeenCalledWith(block);
+        });
+
+        it("does not reconcile a clean grid", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block._setDragGroupTrashHoverScale = jest.fn();
+            block.hasValueDrivenLabel = jest.fn().mockReturnValue(false);
+            block.activity.logo.runningLilypond = false;
+            block.activity.trashcan = { hide: jest.fn() };
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+
+            block._mouseoutCallback({}, false, false, false, true, false);
+
+            expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("shift+click", () => {
+        const makeClickBlock = running => {
+            const handlers = {};
+            const block = new Block(mockProtoBlock, mockBlocks);
+
+            block.blockIndex = 3;
+            block.connections = [null, null];
+            block.container = {
+                x: 100,
+                y: 100,
+                children: [],
+                on: jest.fn((type, handler) => {
+                    handlers[type] = handler;
+                }),
+                setChildIndex: jest.fn()
+            };
+            block._calculateBlockHitArea = jest.fn();
+
+            mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            block.activity.closeHelpfulWheel = jest.fn();
+            block.activity.turtles = { running: jest.fn().mockReturnValue(running) };
+            block.activity.logo.runLogoCommands = jest.fn();
+            block.activity.logo.doStopTurtles = jest.fn();
+            block.activity.toolbar = { highlightStop: jest.fn() };
+
+            block._loadEventHandlers();
+            return { block, handlers };
+        };
+
+        it("runs the stack from its top block", () => {
+            const { block, handlers } = makeClickBlock(false);
+
+            expect(() =>
+                handlers.click({ nativeEvent: { button: 0, shiftKey: true } })
+            ).not.toThrow();
+
+            expect(mockBlocks.findTopBlock).toHaveBeenCalledWith(3);
+            expect(block.activity.logo.runLogoCommands).toHaveBeenCalledWith(0);
+            expect(block.activity.toolbar.highlightStop).toHaveBeenCalled();
+        });
+
+        it("stops the running project and restarts it from the top block", () => {
+            jest.useFakeTimers();
+            try {
+                const { block, handlers } = makeClickBlock(true);
+
+                handlers.click({ nativeEvent: { button: 0, shiftKey: true } });
+
+                expect(block.activity.logo.doStopTurtles).toHaveBeenCalled();
+                expect(block.activity.logo.runLogoCommands).not.toHaveBeenCalled();
+
+                jest.advanceTimersByTime(250);
+
+                expect(block.activity.logo.runLogoCommands).toHaveBeenCalledWith(0);
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+    });
+
+    describe("_checkWidgets()", () => {
+        let getElementsSpy;
+
+        beforeAll(() => {
+            // widgetWindows.js attaches to the environment window; also expose
+            // the bare global that block.js reads via /* global widgetWindows */.
+            require("../widgets/widgetWindows.js");
+            const ww =
+                (typeof window !== "undefined" && window.widgetWindows) || global.widgetWindows;
+            global.widgetWindows = ww;
+            if (typeof window !== "undefined") {
+                window.widgetWindows = ww;
+            }
+        });
+
+        afterEach(() => {
+            if (getElementsSpy) {
+                getElementsSpy.mockRestore();
+                getElementsSpy = null;
+            }
+        });
+
+        const makeTitleEl = title => {
+            const el = document.createElement("div");
+            el.className = "wftTitle";
+            el.innerHTML = title;
+            return el;
+        };
+
+        const makeWidgetBlock = label => {
+            const proto = {
+                ...mockProtoBlock,
+                name: label,
+                staticLabels: [label]
+            };
+            const block = new Block(proto, mockBlocks);
+            block.blockIndex = 0;
+            mockBlocks.blockList = [block];
+            mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
+            mockBlocks.reInitWidget = jest.fn();
+            return block;
+        };
+
+        it("reinitializes when an open widget title matches the top block", () => {
+            const block = makeWidgetBlock("arpeggio");
+            getElementsSpy = jest
+                .spyOn(document, "getElementsByClassName")
+                .mockReturnValue([makeTitleEl("arpeggio")]);
+
+            block._checkWidgets(false);
+
+            expect(mockBlocks.reInitWidget).toHaveBeenCalledWith(0, 1500);
+        });
+
+        it("reinitializes when an unrelated recognized title appears first", () => {
+            const block = makeWidgetBlock("arpeggio");
+            getElementsSpy = jest
+                .spyOn(document, "getElementsByClassName")
+                .mockReturnValue([makeTitleEl("tempo"), makeTitleEl("arpeggio")]);
+
+            block._checkWidgets(false);
+
+            expect(mockBlocks.reInitWidget).toHaveBeenCalledTimes(1);
+            expect(mockBlocks.reInitWidget).toHaveBeenCalledWith(0, 1500);
+        });
+
+        it("does nothing when closeInput is true", () => {
+            const block = makeWidgetBlock("tempo");
+            getElementsSpy = jest
+                .spyOn(document, "getElementsByClassName")
+                .mockReturnValue([makeTitleEl("tempo")]);
+
+            block._checkWidgets(true);
+
+            expect(mockBlocks.reInitWidget).not.toHaveBeenCalled();
+        });
+    });
+
     describe("dispose()", () => {
         it("should clean up connections, DOM nodes, containers, bitmaps, and parent pointers", () => {
             const block = new Block(mockProtoBlock, mockBlocks);
@@ -946,6 +1569,255 @@ describe("Block Foundation", () => {
             expect(parent.children).toHaveLength(0);
             expect(disposedContainer.parent).toBeNull();
             expect(block.container).toBeNull();
+        });
+    });
+
+    describe("value change undo/redo tracking", () => {
+        it("does not record runtime value assignments", () => {
+            const mockBlocksObj = {
+                ...mockBlocks,
+                actionHistory: [{ type: "move", blockId: 1 }],
+                redoActionHistory: [{ type: "move", blockId: 0 }],
+                isUndoingOrRedoing: false
+            };
+            const block = new Block(mockProtoBlock, mockBlocksObj);
+            block.blockIndex = 2;
+            block.text = { text: "initial" };
+            block.loadComplete = true;
+
+            block.value = "updated";
+
+            expect(mockBlocksObj.actionHistory).toEqual([{ type: "move", blockId: 1 }]);
+            expect(mockBlocksObj.redoActionHistory).toEqual([{ type: "move", blockId: 0 }]);
+        });
+
+        it("records one change for input followed by blur", () => {
+            const mockBlocksObj = {
+                ...mockBlocks,
+                actionHistory: [],
+                redoActionHistory: [{ type: "move", blockId: 0 }],
+                isUndoingOrRedoing: false
+            };
+            const block = new Block(
+                { ...mockProtoBlock, name: "number", capabilities: Object.create(null) },
+                mockBlocksObj
+            );
+            block.blockIndex = 2;
+            block.value = 10;
+            block._capturedInitialValue = 10;
+            block._capturedInitialText = "10";
+            block.label = { value: "20", style: { display: "" } };
+            block.text = { text: "10" };
+            block.connections = [null];
+            block.container = { setChildIndex: jest.fn(), children: [] };
+            block.updateCache = jest.fn();
+            global.docById = jest.fn().mockReturnValue({ style: {} });
+
+            block._labelChanged(false, true);
+            expect(mockBlocksObj.actionHistory).toEqual([]);
+
+            block._labelChanged(true, true);
+
+            expect(mockBlocksObj.actionHistory).toEqual([
+                {
+                    type: "value_change",
+                    blockId: 2,
+                    oldValue: 10,
+                    newValue: 20,
+                    oldText: "10",
+                    newText: "20"
+                }
+            ]);
+            expect(mockBlocksObj.redoActionHistory).toEqual([]);
+        });
+    });
+
+    describe("_exitKeyPressed()", () => {
+        it("handles Enter and Tab keys correctly", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.label = { removeEventListener: jest.fn() };
+            block._labelChanged = jest.fn();
+
+            document.body.innerHTML = '<div id="labelDiv" class="hasKeyboard"></div>';
+            const originalDocById = global.docById;
+            global.docById = jest.fn(id => document.getElementById(id));
+
+            const eventEnter = { key: "Enter", preventDefault: jest.fn() };
+            block._exitKeyPressed(eventEnter);
+            expect(block._labelChanged).toHaveBeenCalledWith(true, false);
+            expect(eventEnter.preventDefault).toHaveBeenCalled();
+            expect(block.label.removeEventListener).toHaveBeenCalledWith(
+                "keypress",
+                block._exitKeyPressed
+            );
+            expect(document.getElementById("labelDiv").classList.contains("hasKeyboard")).toBe(
+                false
+            );
+
+            document.getElementById("labelDiv").classList.add("hasKeyboard");
+
+            const eventTab = { key: "Tab", preventDefault: jest.fn() };
+            block._exitKeyPressed(eventTab);
+            expect(block._labelChanged).toHaveBeenCalledTimes(2);
+            expect(eventTab.preventDefault).toHaveBeenCalled();
+            expect(document.getElementById("labelDiv").classList.contains("hasKeyboard")).toBe(
+                false
+            );
+
+            global.docById = originalDocById;
+        });
+
+        it("ignores other keys", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.label = { removeEventListener: jest.fn() };
+            block._labelChanged = jest.fn();
+            const event = { key: "Escape", preventDefault: jest.fn() };
+
+            block._exitKeyPressed(event);
+            expect(block._labelChanged).not.toHaveBeenCalled();
+            expect(event.preventDefault).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("_changeLabel() keypress handler", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            global.window.scroll = jest.fn();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+            jest.restoreAllMocks();
+        });
+
+        it("handles Enter and Tab keys correctly", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block._usePiemenu = jest.fn().mockReturnValue(false);
+            block.activity = {
+                blocksContainer: { x: 0, y: 0, update: jest.fn() },
+                getStageScale: jest.fn().mockReturnValue(1),
+                canvas: { offsetLeft: 0, offsetTop: 0 }
+            };
+            block._labelChanged = jest.fn();
+            block.blocks = { blockScale: 1 };
+            block.protoblock = { scale: 1 };
+            block.name = "text";
+            block.value = "test";
+            block.container = { x: 0, y: 0 };
+
+            document.body.innerHTML = '<div id="labelDiv"></div>';
+            const originalDocById = global.docById;
+            global.docById = jest.fn(id => document.getElementById(id));
+
+            let keypressHandler;
+            jest.spyOn(HTMLInputElement.prototype, "addEventListener").mockImplementation(
+                function (event, handler) {
+                    if (event === "keypress") {
+                        keypressHandler = handler;
+                    }
+                }
+            );
+
+            block._changeLabel();
+
+            jest.advanceTimersByTime(100);
+
+            expect(keypressHandler).toBeDefined();
+
+            const eventEnter = { key: "Enter", preventDefault: jest.fn() };
+            keypressHandler(eventEnter);
+            expect(block._labelChanged).toHaveBeenCalledWith(true, true);
+            expect(eventEnter.preventDefault).toHaveBeenCalled();
+
+            const eventTab = { key: "Tab", preventDefault: jest.fn() };
+            keypressHandler(eventTab);
+            expect(block._labelChanged).toHaveBeenCalledTimes(2);
+            expect(eventTab.preventDefault).toHaveBeenCalled();
+
+            global.docById = originalDocById;
+        });
+    });
+
+    describe("Coverage for slice migration in block.js", () => {
+        let block;
+        let mockBlocksForRename;
+        beforeEach(() => {
+            mockBlocksForRename = {
+                activity: {
+                    palettes: { updatePalettes: jest.fn(), dict: {} },
+                    refreshCanvas: jest.fn(),
+                    beginnerMode: false,
+                    logo: {
+                        synth: { getSynthData: jest.fn().mockReturnValue([]), loadSynth: jest.fn() }
+                    }
+                },
+                blockList: [],
+                trashStacks: [],
+                actionHistory: [],
+                isUndoingOrRedoing: false,
+                reInitWidget: jest.fn(),
+                findTopBlock: jest.fn().mockReturnValue(0)
+            };
+            mockBlocksForRename.blockList[0] = { protoblock: { staticLabels: ["test"] } };
+            block = new Block({ x: 0, y: 0 }, "text", mockBlocksForRename);
+            block.text = { text: "" };
+            block.label = { value: "", style: {} };
+            block.container = { setChildIndex: jest.fn(), children: { length: 2 } };
+            block.connections = [null, null, null, null];
+            block.updateCache = jest.fn();
+            global.DEFAULTVOICE = "voice1";
+            global.DEFAULTNOISE = "noise1";
+            global.TEXTWIDTH = 200;
+            global.window.scroll = jest.fn();
+        });
+
+        it("_labelChanged text wideLabel truncation", () => {
+            global.getTextWidth.mockReturnValue(500); // Forces > TEXTWIDTH
+            block.value = "this is a very long string that should be sliced";
+            block.label.value = "this is a very long string that should be sliced";
+            block._capturedInitialValue = "old string";
+            block.hasWideLabel = () => false;
+            block._labelChanged(true, true);
+            expect(block.text.text).toBe("this is a...");
+        });
+
+        it("_labelChanged storein/action wideLabel truncation", () => {
+            global.getTextWidth.mockReturnValue(500); // Forces > TEXTWIDTH
+            block.name = "storein";
+            block.value = "this is a very long string that should be sliced";
+            block.label.value = "this is a very long string that should be sliced";
+            block._capturedInitialValue = "old string";
+            block._labelChanged(true, true);
+            expect(block.text.text).toBe("this is a...");
+        });
+        it("_changeLabel voiceLabels truncation", () => {
+            global.getTextWidth.mockReturnValue(500); // Forces > 400
+            global.piemenuVoices = jest.fn();
+            global.VOICENAMES = [["1", "voice1", "label", "cat"]];
+            block.name = "voicename";
+            block.activity = { canvas: { offsetLeft: 0, offsetTop: 0 }, blocksContainer: { y: 0 } };
+            block.blocks = { blockScale: 1 };
+            block.container = { x: 0, y: 0 };
+            block.piemenuOKtoLaunch = jest.fn().mockReturnValue(true);
+            block._usePiemenu = jest.fn().mockReturnValue(true);
+            block._changeLabel();
+            expect(global.piemenuVoices).toHaveBeenCalled();
+            expect(global.piemenuVoices.mock.calls[0][1]).toEqual(["voice1..."]);
+        });
+
+        it("_changeLabel noiseLabels truncation", () => {
+            global.getTextWidth.mockReturnValue(700); // Forces > 600
+            global.piemenuVoices = jest.fn(); // It uses piemenuVoices under the hood
+            global.NOISENAMES = [["noise1", "val1", "", "cat"]];
+            block.name = "noisename";
+            block.activity = { canvas: { offsetLeft: 0, offsetTop: 0 }, blocksContainer: { y: 0 } };
+            block.blocks = { blockScale: 1 };
+            block.container = { x: 0, y: 0 };
+            block.piemenuOKtoLaunch = jest.fn().mockReturnValue(true);
+            block._usePiemenu = jest.fn().mockReturnValue(true);
+            block._changeLabel();
+            expect(global.piemenuVoices).toHaveBeenCalled();
+            expect(global.piemenuVoices.mock.calls[0][1]).toEqual(["noise1..."]);
         });
     });
 });

@@ -15,7 +15,8 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor, TunerDisplay, TunerUtils
+   instruments, slicePath, platformColor, TunerDisplay, TunerUtils,
+   ManagedTimer
 */
 
 /* exported SampleWidget, resolveBackendURL */
@@ -176,6 +177,191 @@ function SampleWidget() {
     this.isPitchDetectionRunning = false;
 
     /**
+     * Tracks timers owned by this widget so they can be cancelled when the widget closes.
+     * @type {ManagedTimer|null}
+     * @private
+     */
+    this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+    /**
+     * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeTimeouts = new Set();
+
+    /**
+     * Fallback interval tracking for test/runtime environments where ManagedTimer is unavailable.
+     * @type {Set<number>}
+     * @private
+     */
+    this._activeIntervals = new Set();
+
+    /**
+     * Interval ID for blinking status message during prompt generation.
+     * @type {number|null}
+     * @private
+     */
+    this._promptBlinkInterval = null;
+
+    /**
+     * Timeout ID for debouncing the save sample button.
+     * @type {number|null}
+     * @private
+     */
+    this._saveTimeout = null;
+
+    /**
+     * Timeout ID for debouncing tuner mode toggle.
+     * @type {number|null}
+     * @private
+     */
+    this._tunerModeTimeout = null;
+
+    /**
+     * Timeout ID for restarting reference pitch after cent adjustment.
+     * @type {number|null}
+     * @private
+     */
+    this._restartPitchTimeout = null;
+
+    /**
+     * Timeout ID for the _waitAndPlaySample delay.
+     * Cleared in pause() so a stale timer cannot fire during a subsequent play.
+     * @type {number|null}
+     * @private
+     */
+    this._playbackWaitTimeout = null;
+
+    /**
+     * Timeout ID for the _waitAndEndPlaying delay.
+     * Cleared in pause() so a stale end-of-play timer cannot call pause() again.
+     * @type {number|null}
+     * @private
+     */
+    this._endPlayingTimeout = null;
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    this._setWidgetTimeout = function (callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    };
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    this._clearWidgetTimeout = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Schedules an interval owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run repeatedly.
+     * @param {number} interval - Interval in milliseconds.
+     * @returns {number} Interval ID.
+     */
+    this._setWidgetInterval = function (callback, interval) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setInterval(callback, interval);
+        }
+
+        const id = setInterval(callback, interval);
+        this._activeIntervals.add(id);
+        return id;
+    };
+
+    /**
+     * Clears an interval owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Interval ID returned by _setWidgetInterval.
+     * @returns {boolean} Whether the interval was tracked and cleared.
+     */
+    this._clearWidgetInterval = function (id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearInterval(id)) {
+            return true;
+        }
+
+        if (this._activeIntervals.has(id)) {
+            clearInterval(id);
+            this._activeIntervals.delete(id);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers and intervals cleared.
+     */
+    this._clearWidgetTimers = function () {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        for (const id of this._activeIntervals) {
+            clearInterval(id);
+            count++;
+        }
+        this._activeIntervals.clear();
+
+        this._promptBlinkInterval = null;
+        this._saveTimeout = null;
+        this._tunerModeTimeout = null;
+        this._restartPitchTimeout = null;
+        this._playbackWaitTimeout = null;
+        this._endPlayingTimeout = null;
+
+        return count;
+    };
+
+    /**
      * Updates the blocks related to the sample.
      * @private
      * @returns {void}
@@ -250,9 +436,16 @@ function SampleWidget() {
 
     /**
      * Pauses the sample playback.
+     * Cancels any pending playback timers so a stale timer from a previous play
+     * cannot fire after this pause and corrupt the next play sequence.
      * @returns {void}
      */
     this.pause = function () {
+        this._clearWidgetTimeout(this._playbackWaitTimeout);
+        this._playbackWaitTimeout = null;
+        this._clearWidgetTimeout(this._endPlayingTimeout);
+        this._endPlayingTimeout = null;
+
         const img = this.playBtn ? this.playBtn.getElementsByTagName("img")[0] : null;
         if (img) {
             img.src = "header-icons/play-button.svg";
@@ -366,7 +559,7 @@ function SampleWidget() {
      */
     this.__save = function () {
         const that = this;
-        setTimeout(function () {
+        this._setWidgetTimeout(function () {
             that._addSample();
 
             // Include the cent adjustment value in the sample block
@@ -529,6 +722,8 @@ function SampleWidget() {
         };
 
         widgetWindow.onclose = () => {
+            this._clearWidgetTimers();
+
             if (this.drawVisualIDs) {
                 for (const id of Object.keys(this.drawVisualIDs)) {
                     cancelAnimationFrame(this.drawVisualIDs[id]);
@@ -582,11 +777,25 @@ function SampleWidget() {
             }
             // Dispose Tone.Analyser nodes to free Web Audio resources
             for (const key in this.pitchAnalysers) {
-                if (
-                    this.pitchAnalysers[key] &&
-                    typeof this.pitchAnalysers[key].dispose === "function"
-                ) {
-                    this.pitchAnalysers[key].dispose();
+                const analyser = this.pitchAnalysers[key];
+                if (analyser) {
+                    if (typeof instruments !== "undefined" && instruments[0]) {
+                        for (const synth in instruments[0]) {
+                            try {
+                                if (
+                                    instruments[0][synth] &&
+                                    typeof instruments[0][synth].disconnect === "function"
+                                ) {
+                                    instruments[0][synth].disconnect(analyser);
+                                }
+                            } catch (_) {
+                                // Synth may not have been connected to this analyser.
+                            }
+                        }
+                    }
+                    if (typeof analyser.dispose === "function") {
+                        analyser.dispose();
+                    }
                 }
             }
             this.pitchAnalysers = {};
@@ -697,8 +906,10 @@ function SampleWidget() {
                 if (!that._get_save_lock()) {
                     that._save_lock = true;
                     that._saveSample();
-                    setTimeout(function () {
+                    that._clearWidgetTimeout(that._saveTimeout);
+                    that._saveTimeout = that._setWidgetTimeout(function () {
                         that._save_lock = false;
+                        that._saveTimeout = null;
                     }, 1000);
                 }
             };
@@ -835,20 +1046,20 @@ function SampleWidget() {
                 const encodedPrompt = encodeURIComponent(prompt);
                 const url = `${aiSampleEndpoint}/generate?prompt=${encodedPrompt}`;
 
-                let blinkInterval;
-
                 try {
                     generating = true;
                     activity.textMsg(_("Generating audio... (It may take up to 1 minute)"), 2500);
 
-                    blinkInterval = setInterval(() => {
+                    that._clearWidgetInterval(that._promptBlinkInterval);
+                    that._promptBlinkInterval = that._setWidgetInterval(() => {
                         activity.textMsg(_("Generating audio..."), 1000);
                     }, 5000);
 
                     const response = await fetch(url);
                     const result = await response.json();
 
-                    clearInterval(blinkInterval);
+                    that._clearWidgetInterval(that._promptBlinkInterval);
+                    that._promptBlinkInterval = null;
 
                     if (result.status === "success") {
                         generating = false;
@@ -862,7 +1073,8 @@ function SampleWidget() {
                     }
                 } catch (error) {
                     generating = false;
-                    clearInterval(blinkInterval);
+                    that._clearWidgetInterval(that._promptBlinkInterval);
+                    that._promptBlinkInterval = null;
                     activity.textMsg(_("An error occurred."), 3000);
                     setPromptBtnState(submit, false);
                 }
@@ -921,11 +1133,16 @@ function SampleWidget() {
         this._recordBtn.onclick = async () => {
             stopTuner();
             if (!this.is_recording) {
-                await this.activity.logo.synth.startRecording();
-                this.is_recording = true;
-                this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
-                this.displayRecordingStartMessage();
-                this.activity.logo.synth.LiveWaveForm();
+                try {
+                    await this.activity.logo.synth.startRecording();
+                    this.is_recording = true;
+                    this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
+                    this.displayRecordingStartMessage();
+                    this.activity.logo.synth.LiveWaveForm();
+                } catch (err) {
+                    console.error(err);
+                    this.activity.errorMsg(_("Microphone access denied."));
+                }
             } else {
                 this.recordingURL = await this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
@@ -1045,106 +1262,9 @@ function SampleWidget() {
                     tunerSvg.appendChild(segment);
                 });
 
-                // Create mode toggle button
-                const modeToggle = document.createElement("div");
-                modeToggle.id = "modeToggle";
-                modeToggle.style.position = "absolute";
-                modeToggle.style.top = "30px";
-                modeToggle.style.left = "50%";
-                modeToggle.style.transform = "translateX(-50%)";
-                modeToggle.style.display = "flex";
-                modeToggle.style.backgroundColor = platformColor.fillColor || "#FFFFFF";
-                modeToggle.style.borderRadius = "25px";
-                modeToggle.style.padding = "3px";
-                modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
-                modeToggle.style.width = "120px";
-                modeToggle.style.height = "44px";
-                modeToggle.style.cursor = "pointer";
-
-                // Create chromatic mode button
-                const chromaticButton = document.createElement("div");
-                chromaticButton.style.flex = "1";
-                chromaticButton.style.display = "flex";
-                chromaticButton.style.alignItems = "center";
-                chromaticButton.style.justifyContent = "center";
-                chromaticButton.style.borderRadius = "22px";
-                chromaticButton.style.cursor = "pointer";
-                chromaticButton.style.transition = "all 0.2s ease";
-                chromaticButton.style.userSelect = "none";
-                chromaticButton.title = _("Chromatic");
-
-                // Create target pitch mode button
-                const targetPitchButton = document.createElement("div");
-                targetPitchButton.style.flex = "1";
-                targetPitchButton.style.display = "flex";
-                targetPitchButton.style.alignItems = "center";
-                targetPitchButton.style.justifyContent = "center";
-                targetPitchButton.style.borderRadius = "22px";
-                targetPitchButton.style.cursor = "pointer";
-                targetPitchButton.style.transition = "all 0.2s ease";
-                targetPitchButton.style.userSelect = "none";
-                targetPitchButton.title = _("Target pitch");
-
-                // Create icons
-                const chromaticIcon = document.createElement("img");
-                chromaticIcon.src = "header-icons/chromatic-mode.svg";
-                chromaticIcon.style.width = "32px";
-                chromaticIcon.style.height = "32px";
-                chromaticIcon.style.filter = "brightness(0)";
-                chromaticIcon.style.pointerEvents = "none";
-
-                const targetIcon = document.createElement("img");
-                targetIcon.src = "header-icons/target-pitch-mode.svg";
-                targetIcon.style.width = "32px";
-                targetIcon.style.height = "32px";
-                targetIcon.style.filter = "brightness(0)";
-                targetIcon.style.pointerEvents = "none";
-
-                // Initial mode state
-                let tunerMode = "chromatic";
-
-                // Function to update button styles
-                const updateButtonStyles = () => {
-                    const activeColor = platformColor.selectorSelected || "#A6CEFF";
-                    const inactiveColor = platformColor.fillColor || "#FFFFFF";
-                    if (tunerMode === "chromatic") {
-                        chromaticButton.style.backgroundColor = activeColor;
-                        targetPitchButton.style.backgroundColor = inactiveColor;
-                    } else {
-                        chromaticButton.style.backgroundColor = inactiveColor;
-                        targetPitchButton.style.backgroundColor = activeColor;
-                    }
-                };
-
-                // Add click handlers with debounce
-                let isClickable = true;
-                const handleClick = mode => {
-                    if (!isClickable) return;
-                    isClickable = false;
-                    tunerMode = mode;
-                    updateButtonStyles();
-                    setTimeout(() => {
-                        isClickable = true;
-                    }, 200);
-                };
-
-                chromaticButton.onclick = () => handleClick("chromatic");
-                targetPitchButton.onclick = () => handleClick("target");
-
-                // Assemble the toggle
-                chromaticButton.appendChild(chromaticIcon);
-                targetPitchButton.appendChild(targetIcon);
-                modeToggle.appendChild(chromaticButton);
-                modeToggle.appendChild(targetPitchButton);
-
-                // Initial style update
-                updateButtonStyles();
-
-                tunerContainer.appendChild(modeToggle);
-
                 this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
 
-                await this.activity.logo.synth.startTuner();
+                await this.activity.logo.synth.startTuner(this.pitchName);
                 activity.textMsg(_("Tuner started."), 3000);
             } else {
                 activity.textMsg(_("Tuner stopped."), 3000);
@@ -1568,11 +1688,14 @@ function SampleWidget() {
 
     /**
      * Waits for a specified time and then plays the sample.
+     * Stores its timer ID in _playbackWaitTimeout so pause() can cancel it.
      * @returns {Promise<string>} A promise that resolves once the sample is played.
      */
     this._waitAndPlaySample = function () {
         return new Promise(resolve => {
-            setTimeout(() => {
+            this._clearWidgetTimeout(this._playbackWaitTimeout);
+            this._playbackWaitTimeout = this._setWidgetTimeout(() => {
+                this._playbackWaitTimeout = null;
                 this._playSample();
                 resolve("played");
                 this._endPlaying();
@@ -1590,11 +1713,14 @@ function SampleWidget() {
 
     /**
      * Waits for the sample to finish playing.
+     * Stores its timer ID in _endPlayingTimeout so pause() can cancel it.
      * @returns {Promise<string>} A promise that resolves once the sample playback ends.
      */
     this._waitAndEndPlaying = function () {
         return new Promise(resolve => {
-            setTimeout(() => {
+            this._clearWidgetTimeout(this._endPlayingTimeout);
+            this._endPlayingTimeout = this._setWidgetTimeout(() => {
+                this._endPlayingTimeout = null;
                 this.pause();
                 resolve("ended");
             }, this.sampleLength);
@@ -2011,7 +2137,7 @@ function SampleWidget() {
                         if (dataArray && dataArray.length > 0) {
                             const pitch = detectPitch(dataArray);
                             if (pitch > 0) {
-                                const { note, cents } = frequencyToNote(pitch);
+                                const { note, cents } = TunerUtils.frequencyToNote(pitch);
                                 this.tunerDisplay.update(note, cents, this.centsValue);
 
                                 // Update segments
@@ -2148,19 +2274,6 @@ function SampleWidget() {
     };
 
     /**
-     * Convert frequency to note and cents
-     */
-    const frequencyToNote = (frequency, edo) => {
-        if (frequency <= 0) return { note: "---", cents: 0 };
-
-        const result = TunerUtils.frequencyToPitch(frequency, edo);
-        const noteName = result[0] + result[1];
-        const centsOffset = result[2];
-
-        return { note: noteName, cents: centsOffset };
-    };
-
-    /**
      * Stops pitch detection and releases all associated resources.
      * This prevents memory leaks from AudioContext, MediaStream, and animation frames.
      * @returns {void}
@@ -2232,7 +2345,7 @@ function SampleWidget() {
                 // Update widget-local DOM elements (passed in from makeTuner — no global query)
                 if (pitchElement && noteElement) {
                     if (pitch > 0) {
-                        const { note, cents } = frequencyToNote(pitch);
+                        const { note, cents } = TunerUtils.frequencyToNote(pitch);
                         pitchElement.textContent = pitch.toFixed(2);
                         noteElement.textContent =
                             cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;
@@ -2348,15 +2461,17 @@ function SampleWidget() {
                 instruments[0][instrumentName].playbackRate.value = playbackRate;
             } else {
                 // If the instrument doesn't exist yet, we'll apply the adjustment when playing
-                console.log("Instrument not found, will apply cent adjustment during playback");
+                console.debug("Instrument not found, will apply cent adjustment during playback");
             }
         }
 
         // If we're currently playing, restart with the new adjustment
         if (this.isMoving) {
             this.pause();
-            setTimeout(() => {
+            this._clearWidgetTimeout(this._restartPitchTimeout);
+            this._restartPitchTimeout = this._setWidgetTimeout(() => {
                 this._playReferencePitch();
+                this._restartPitchTimeout = null;
             }, 100);
         }
     };

@@ -157,6 +157,7 @@ describe("setupPitchBlocks", () => {
         global.nthDegreeToPitch = jest.fn(() => ["C", 0]);
         global.calcOctave = jest.fn(() => 4);
         global.scaleDegreeToPitchMapping = jest.fn(() => "C");
+        global.noteToObj = require("../../utils/musicutils").noteToObj;
 
         global.Singer = {
             processPitch: jest.fn(),
@@ -516,6 +517,15 @@ describe("setupPitchBlocks", () => {
             turtles.ithTurtle(0).singer.lastNotePlayed = ["C#4", 0.5];
             expect(block.arg(logo, 0, 10)).toBeDefined();
 
+            // Branch: lastNotePlayed with multi-digit and negative octaves
+            turtles.ithTurtle(0).singer.lastNotePlayed = ["C10", 0.5];
+            expect(block.arg(logo, 0, 10)).toBeDefined();
+            expect(global.pitchToNumber).toHaveBeenCalledWith("C", 10, expect.anything());
+
+            turtles.ithTurtle(0).singer.lastNotePlayed = ["A-1", 0.5];
+            expect(block.arg(logo, 0, 10)).toBeDefined();
+            expect(global.pitchToNumber).toHaveBeenCalledWith("A", -1, expect.anything());
+
             // Branch: lastNotePlayed is Hertz
             turtles.ithTurtle(0).singer.lastNotePlayed = [440, 0.5];
             expect(block.arg(logo, 0, 10)).toBeDefined();
@@ -672,6 +682,14 @@ describe("setupPitchBlocks", () => {
 
             logo.parseArg.mockReturnValue(20);
             block.arg(logo, 0, 10);
+        });
+    });
+
+    describe("OutputToolsBlocks null-connection repro", () => {
+        it("arg does not crash when the note input is unconnected", () => {
+            const block = createdBlocks["outputtools"];
+            activity.blocks.blockList[10].connections[1] = null;
+            expect(block.arg(logo, 0, 10)).toBe("G4");
         });
     });
 

@@ -478,7 +478,7 @@ function setupIntervalsBlocks(activity) {
 
             // Restore previous state
             logo.boxes = saveBoxes;
-            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? [];
             logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
             tur.painter.doPenUp();
@@ -599,7 +599,7 @@ function setupIntervalsBlocks(activity) {
 
             // Restore previous state
             logo.boxes = saveBoxes;
-            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? [];
             logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
             tur.painter.doPenUp();
@@ -1503,6 +1503,12 @@ function setupIntervalsBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (args.length === 2) {
+                // An empty key slot has no note for getNote to read
+                if (args[0] === null) {
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
+                    return;
+                }
+
                 // Get the mode name and set the mode block connection
                 const modename = Singer.IntervalsActions.GetModename(args[1]);
                 logo.modeBlock = activity.blocks.blockList[blk].connections[2];

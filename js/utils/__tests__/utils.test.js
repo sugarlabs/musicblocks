@@ -129,18 +129,19 @@ const {
     getTextWidth,
     doSVG,
     isSVGEmpty,
-    prepareMacroExports,
-    processMacroData,
-    updatePluginObj,
-    processRawPluginData,
-    preparePluginExports,
     hideDOMLabel,
     displayMsg,
     makeKeyboardAccessible,
-    CameraManager,
     announceToScreenReader,
     _
 } = require("../utils.js");
+
+const { processMacroData, prepareMacroExports } = require("../macro-utils.js");
+const {
+    updatePluginObj,
+    processRawPluginData,
+    preparePluginExports
+} = require("../plugin-utils.js");
 
 describe("makeKeyboardAccessible()", () => {
     test("adds button semantics and activates on Enter and Space", () => {
@@ -276,7 +277,31 @@ describe("Utility Functions (logic-only)", () => {
             expect(mixedNumber(2)).toBe("2/1");
         });
         it("handles negative fraction", () => {
-            expect(mixedNumber(-1.5)).toBe("-2 1/2");
+            // The sign is carried on the front and the whole/fractional parts
+            // come from the magnitude, so this reads as -1.5 and not -2.5.
+            expect(mixedNumber(-1.5)).toBe("-1 1/2");
+            expect(mixedNumber(-2.75)).toBe("-2 3/4");
+        });
+
+        it("keeps a negative proper fraction below one", () => {
+            expect(mixedNumber(-0.25)).toBe("-1/4");
+            expect(mixedNumber(-0.5)).toBe("-1/2");
+            expect(mixedNumber(-0.875)).toBe("-7/8");
+        });
+
+        it("handles negative integers", () => {
+            expect(mixedNumber(-2)).toBe("-2/1");
+            expect(mixedNumber(-1)).toBe("-1/1");
+        });
+
+        it("formats negatives as the mirror of their positive counterpart", () => {
+            for (const n of [0.25, 0.5, 0.875, 1.5, 2.25, 2.75, 3, 1.9999999999, 2.123456]) {
+                expect(mixedNumber(-n)).toBe("-" + mixedNumber(n));
+            }
+        });
+
+        it("treats negative zero as zero", () => {
+            expect(mixedNumber(-0)).toBe("0/1");
         });
 
         it("handles zero", () => {
@@ -383,6 +408,19 @@ describe("Utility Functions (logic-only)", () => {
 
         it("handles numbers greater than 1", () => {
             expect(rationalToFraction(2)).toEqual([2, 1]);
+            expect(rationalToFraction(4 / 3)).toEqual([4, 3]);
+        });
+
+        it("handles negative numbers", () => {
+            expect(rationalToFraction(-0.5)).toEqual([-1, 2]);
+            expect(rationalToFraction(-2.5)).toEqual([-5, 2]);
+        });
+
+        it("handles numbers exceeding iteration cap without returning reciprocal", () => {
+            const [n, d] = rationalToFraction(Math.PI);
+            expect(n / d).toBeGreaterThan(1);
+            expect(Math.abs(n / d - Math.PI)).toBeLessThan(0.001);
+            expect(d).toBeGreaterThan(0);
         });
     });
 
@@ -1309,66 +1347,6 @@ describe("announceToScreenReader()", () => {
     });
 });
 
-describe("CameraManager", () => {
-    beforeEach(() => {
-        CameraManager.reset();
-        jest.useFakeTimers();
-    });
-
-    afterEach(() => {
-        CameraManager.reset();
-        jest.useRealTimers();
-    });
-
-    it("starts and stops capture correctly", () => {
-        const drawFn = jest.fn();
-        const id = CameraManager.startCapture(drawFn, 100);
-        expect(id).not.toBeNull();
-        expect(CameraManager.intervalId).toBe(id);
-
-        jest.advanceTimersByTime(250);
-        expect(drawFn).toHaveBeenCalledTimes(2);
-
-        CameraManager.stopCapture();
-        expect(CameraManager.intervalId).toBeNull();
-
-        jest.advanceTimersByTime(200);
-        expect(drawFn).toHaveBeenCalledTimes(2); // Should not increase
-    });
-
-    it("startCapture is idempotent", () => {
-        const id1 = CameraManager.startCapture(jest.fn(), 100);
-        const id2 = CameraManager.startCapture(jest.fn(), 100);
-        expect(id1).toBe(id2);
-    });
-
-    it("sets and clears canplay listener", () => {
-        const video = {
-            addEventListener: jest.fn(),
-            removeEventListener: jest.fn()
-        };
-        const handler = jest.fn();
-
-        CameraManager.setCanplayListener(video, handler);
-        expect(video.addEventListener).toHaveBeenCalledWith("canplay", handler, false);
-        expect(CameraManager.canPlayHandler).toBe(handler);
-        expect(CameraManager.listenerVideoElement).toBe(video);
-
-        CameraManager.clearCanplayListener();
-        expect(video.removeEventListener).toHaveBeenCalledWith("canplay", handler, false);
-        expect(CameraManager.canPlayHandler).toBeNull();
-        expect(CameraManager.listenerVideoElement).toBeNull();
-    });
-
-    it("reset clears interval and listener", () => {
-        CameraManager.intervalId = 123;
-        CameraManager.isSetup = true;
-        CameraManager.reset();
-        expect(CameraManager.intervalId).toBeNull();
-        expect(CameraManager.isSetup).toBe(false);
-    });
-});
-
 describe("Plugin and Macro Utilities", () => {
     let mockActivity;
 
@@ -1477,6 +1455,18 @@ describe("Plugin and Macro Utilities", () => {
             expect(spy).toHaveBeenCalled();
             spy.mockRestore();
         });
+
+        it("handles unexpected errors gracefully", async () => {
+            const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            // Passing "true" makes JSON.parse succeed (returns boolean true), but triggers a
+            // TypeError in processPluginData ("PALETTEPLUGINS" in obj) which then hits the catch block.
+            const rawData = "true";
+            const res = await processRawPluginData(mockActivity, rawData, "localStorage:plugins");
+            expect(res).toBeNull();
+            expect(spy).toHaveBeenCalledWith(rawData);
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            spy.mockRestore();
+        });
     });
 
     describe("preparePluginExports()", () => {
@@ -1520,7 +1510,7 @@ describe("Plugin and Macro Utilities", () => {
             const blocks = { addToMyPalette: jest.fn() };
             const macroDict = {};
 
-            const spy = jest.spyOn(console, "log").mockImplementation(() => {});
+            const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
             processMacroData("invalid json", palettes, blocks, macroDict);
             expect(spy).toHaveBeenCalledWith("invalid json");
             spy.mockRestore();

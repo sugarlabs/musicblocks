@@ -202,6 +202,17 @@ class ContextMenuController {
 
         const removeButtonContainer = document.getElementById("buttoncontainerBOTTOM");
         if (removeButtonContainer) {
+            // Materialize keeps a tooltip's node in <body>, not inside the
+            // button it belongs to, so removing the container below orphans
+            // the nodes of the buttons it holds. An orphan that happened to be
+            // visible at that moment has no element left to fire mouseleave
+            // on, so it stays on screen at its old coordinates until the page
+            // is reloaded -- e.g. hovering Home and then zooming (which fires
+            // resize, which rebuilds these buttons) leaves a stray
+            // "Home [HOME]" tooltip floating over the canvas. "remove" is the
+            // only teardown Materialize recognises; the rebuilt buttons are
+            // re-initialised at the end of this function.
+            window.jQuery("#buttoncontainerBOTTOM .tooltipped").tooltip("remove");
             removeButtonContainer.parentNode.removeChild(removeButtonContainer);
         }
 
@@ -420,6 +431,14 @@ class ContextMenuController {
                 display: true,
                 fn: this._hideHelpfulSearchWidget.bind(this)
             });
+
+        // Initialize tooltips after all bottom-toolbar buttons have been appended.
+        if (!(activity.toolbar && activity.toolbar.tooltipsDisabled)) {
+            window.jQuery("#buttoncontainerBOTTOM .tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
+        }
     }
 
     /*
@@ -482,8 +501,7 @@ class ContextMenuController {
         makeKeyboardAccessible(container, label);
         if (typeof container.addEventListener === "function") {
             container.addEventListener("keydown", event => {
-                const isEscape =
-                    event.key === "Escape" || event.key === "Esc" || event.keyCode === 27;
+                const isEscape = event.key === "Escape" || event.key === "Esc";
                 if (!isEscape) return;
 
                 event.preventDefault();
@@ -498,10 +516,6 @@ class ContextMenuController {
                 container.blur?.();
             });
         }
-        window.jQuery(".tooltipped").tooltip({
-            html: true,
-            delay: 100
-        });
 
         container.onmouseover = () => {
             if (!activity.loading) {
@@ -592,22 +606,23 @@ class ContextMenuController {
     _showHideAuxMenu(resize) {
         const activity = this.activity;
         const cellsize = 55;
+        const auxToolbar = document.getElementById("aux-toolbar");
         let dy;
 
         // function to increase or decrease the "top" property of the top-right corner buttons
 
         const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
-        const gridElement = document.getElementById("Grid");
-        const btnY = gridElement ? gridElement.getBoundingClientRect().top : 70 + LEADING + 6;
 
         this.changeTopButtonsPosition = value => {
             topRightButtons.forEach(child => {
+                const btnY = Number.parseFloat(child.style.top) || 70 + LEADING + 6;
                 child.style.top = `${btnY + value}px`;
             });
         };
 
         if (!resize && activity.toolbarHeight === 0) {
-            dy = cellsize + LEADING + 5;
+            auxToolbar.style.display = "block";
+            dy = auxToolbar.offsetHeight || cellsize + LEADING + 5;
 
             activity.toolbarHeight = dy;
             activity.palettes.deltaY(dy);

@@ -6737,12 +6737,12 @@ const interpColor = (hex1, hex2, p) => {
     } else if (p === 1) {
         return hex1;
     } else {
-        const r1 = parseInt(hex1.substr(1, 2), 16);
-        const g1 = parseInt(hex1.substr(3, 2), 16);
-        const b1 = parseInt(hex1.substr(5, 2), 16);
-        const r2 = parseInt(hex2.substr(1, 2), 16);
-        const g2 = parseInt(hex2.substr(3, 2), 16);
-        const b2 = parseInt(hex2.substr(5, 2), 16);
+        const r1 = parseInt(hex1.slice(1, 3), 16);
+        const g1 = parseInt(hex1.slice(3, 5), 16);
+        const b1 = parseInt(hex1.slice(5, 7), 16);
+        const r2 = parseInt(hex2.slice(1, 3), 16);
+        const g2 = parseInt(hex2.slice(3, 5), 16);
+        const b2 = parseInt(hex2.slice(5, 7), 16);
 
         const nr = Math.floor(r1 * p + r2 * (1 - p));
         const ng = Math.floor(g1 * p + g2 * (1 - p));
@@ -6833,14 +6833,46 @@ let getcolor = color => {
  * @param {number} b - Intensity of blue.
  * @returns {number} The color value of the nearest match.
  */
+/**
+ * Parses a color string produced by getcolor()/interpColor() into RGB
+ * components. getcolor() returns "#rrggbb" only when the interpolation
+ * parameter lands exactly on 0 or 1, and "rgba(r, g, b, a)" for every
+ * intermediate value.
+ *
+ * @param {string} color - The color string to parse.
+ * @returns {Array|null} An array [r, g, b], or null if it cannot be parsed.
+ */
+const parseColorToRGB = color => {
+    if (typeof color !== "string") {
+        return null;
+    }
+
+    if (color.charAt(0) === "#") {
+        return [
+            parseInt(color.slice(1, 3), 16),
+            parseInt(color.slice(3, 5), 16),
+            parseInt(color.slice(5, 7), 16)
+        ];
+    }
+
+    const match = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+    if (match) {
+        return [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10)];
+    }
+
+    return null;
+};
+
 let searchColors = (r, g, b) => {
     let nearestColor = -1;
     let distance = 10000000;
     for (let i = 0; i < 100; i++) {
         const color = getcolor(i);
-        const r1 = parseInt(color[2].substr(1, 2), 16);
-        const g1 = parseInt(color[2].substr(3, 2), 16);
-        const b1 = parseInt(color[2].substr(5, 2), 16);
+        const rgb = parseColorToRGB(color[2]);
+        if (rgb === null) {
+            continue;
+        }
+        const [r1, g1, b1] = rgb;
         const distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
         if (distSquared < distance) {
             distance = distSquared;
@@ -6864,9 +6896,9 @@ if (typeof module !== "undefined" && module.exports) {
 //     let distance = 10000000;
 //     for (let i = 0; i < MUNSELL.length; i++) {
 //         const color = MUNSELL[i];
-//         const r1 = parseInt(color.substr(1, 2), 16);
-//         const g1 = parseInt(color.substr(3, 2), 16);
-//         const b1 = parseInt(color.substr(5, 2), 16);
+//         const r1 = parseInt(color.slice(1, 3), 16);
+//         const g1 = parseInt(color.slice(3, 5), 16);
+//         const b1 = parseInt(color.slice(5, 7), 16);
 //         const distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
 //         if (distSquared < distance) {
 //             distance = distSquared;

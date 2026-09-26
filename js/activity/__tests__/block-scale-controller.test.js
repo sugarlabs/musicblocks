@@ -196,6 +196,32 @@ describe("doLargerBlocks", () => {
         await expect(controller.doLargerBlocks()).resolves.toBeUndefined();
         expect(activity.__tick).not.toHaveBeenCalled();
     });
+
+    test.each([null, undefined])(
+        "no-ops and leaves activity state unchanged when activity.blocks is %s",
+        async blocksValue => {
+            const activity = makeActivity(DEFAULT_INDEX);
+            activity.blocks = blocksValue;
+            const controller = setupBlockScaleController(activity);
+
+            await expect(controller.doLargerBlocks()).resolves.toBeUndefined();
+            expect(activity.blockscale).toBe(DEFAULT_INDEX);
+            expect(activity.stageDirty).toBe(false);
+            expect(activity.clearCache).not.toHaveBeenCalled();
+            expect(activity.refreshCanvas).not.toHaveBeenCalled();
+            expect(activity.__tick).not.toHaveBeenCalled();
+            expect(global.changeImage).not.toHaveBeenCalled();
+        }
+    );
+
+    test.each([null, undefined])(
+        "no-ops and does not throw when controller.activity is %s",
+        async activityValue => {
+            const controller = new BlockScaleController(activityValue);
+
+            await expect(controller.doLargerBlocks()).resolves.toBeUndefined();
+        }
+    );
 });
 
 // ---------------------------------------------------------------------------
@@ -243,6 +269,32 @@ describe("doSmallerBlocks", () => {
         expect(document.getElementById("helpfulWheelDiv").style.display).toBe("none");
         expect(activity.__tick).toHaveBeenCalledTimes(1);
     });
+
+    test.each([null, undefined])(
+        "no-ops and leaves activity state unchanged when activity.blocks is %s",
+        async blocksValue => {
+            const activity = makeActivity(DEFAULT_INDEX);
+            activity.blocks = blocksValue;
+            const controller = setupBlockScaleController(activity);
+
+            await expect(controller.doSmallerBlocks()).resolves.toBeUndefined();
+            expect(activity.blockscale).toBe(DEFAULT_INDEX);
+            expect(activity.stageDirty).toBe(false);
+            expect(activity.clearCache).not.toHaveBeenCalled();
+            expect(activity.refreshCanvas).not.toHaveBeenCalled();
+            expect(activity.__tick).not.toHaveBeenCalled();
+            expect(global.changeImage).not.toHaveBeenCalled();
+        }
+    );
+
+    test.each([null, undefined])(
+        "no-ops and does not throw when controller.activity is %s",
+        async activityValue => {
+            const controller = new BlockScaleController(activityValue);
+
+            await expect(controller.doSmallerBlocks()).resolves.toBeUndefined();
+        }
+    );
 });
 
 // ---------------------------------------------------------------------------

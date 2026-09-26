@@ -963,14 +963,15 @@ function setupWidgetBlocks(activity) {
                 [0, "arpeggiomatrix", x, y, [null, 1, 3, 2]],
                 [1, ["number", { value: 4 }], 0, 0, [0]],
                 [2, "hiddennoflow", 0, 0, [0, null]],
-                [3, "newnote", 0, 0, [0, 4, 7, null]],
+                [3, "newnote", 0, 0, [0, 4, 7, 11]],
                 [4, "divide", 0, 0, [3, 5, 6]],
                 [5, ["number", { value: 1 }], 0, 0, [4]],
                 [6, ["number", { value: 16 }], 0, 0, [4]],
                 [7, "vspace", 0, 0, [3, 8]],
                 [8, "pitch", 0, 0, [7, 9, 10, null]],
                 [9, ["solfege", { value: "do" }], 0, 0, [8]],
-                [10, ["number", { value: 4 }], 0, 0, [8]]
+                [10, ["number", { value: 4 }], 0, 0, [8]],
+                [11, "hidden", 0, 0, [3, null]]
             ]);
         }
 
@@ -1038,7 +1039,7 @@ function setupWidgetBlocks(activity) {
                 ""
             ]);
             //.TRANS: makes a mapping between pitches and drum sounds
-            this.formBlock({ name: _("pitch-drum mapper"), canCollapse: true });
+            this.formBlock({ name: _("pitch drum"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "pitchdrummatrix", x, y, [null, 1, 16]],
                 [1, "pitch", 0, 0, [0, 2, 3, 4]],
@@ -2109,7 +2110,7 @@ function setupWidgetBlocks(activity) {
                 "reflection",
                 _getWidgetDependencies(
                     typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
-                    ["widgets/reflection"]
+                    ["utils/ai-widget-lifecycle", "widgets/reflection"]
                 ),
                 () => new ReflectionMatrix(),
                 turtle,
@@ -2270,7 +2271,7 @@ function setupWidgetBlocks(activity) {
                 "aiDebugger",
                 _getWidgetDependencies(
                     typeof AIDebuggerWidget !== "undefined" ? AIDebuggerWidget : null,
-                    ["widgets/aidebugger"]
+                    ["utils/ai-widget-lifecycle", "widgets/aidebugger"]
                 ),
                 () => new AIDebuggerWidget(),
                 turtle,
@@ -2297,23 +2298,23 @@ function setupWidgetBlocks(activity) {
     if (_THIS_IS_MUSIC_BLOCKS_) {
         new EnvelopeBlock().setup(activity);
         new FilterBlock().setup(activity);
-        new TemperamentBlock().setup(activity);
+        new ReflectionBlock().setup(activity);
+        new AIMusicBlocks().setup(activity);
+        new LegoBricksBlock().setup(activity);
         new TimbreBlock().setup(activity);
-        new MeterWidgetBlock().setup(activity);
+        new TemperamentBlock().setup(activity);
         new ModeWidgetBlock().setup(activity);
+        new MeterWidgetBlock().setup(activity);
         new TempoBlock().setup(activity);
         new SamplerBlock().setup(activity);
-        new ArpeggioMatrixBlock().setup(activity);
-        new PitchDrumMatrixBlock().setup(activity);
         new OscilloscopeWidgetBlock().setup(activity);
+        new PitchDrumMatrixBlock().setup(activity);
+        new ArpeggioMatrixBlock().setup(activity);
+        new PitchStaircaseBlock().setup(activity);
         new PitchSliderBlock().setup(activity);
         new ChromaticBlock().setup(activity);
-        new LegoBricksBlock().setup(activity);
-        new AIMusicBlocks().setup(activity);
-        new ReflectionBlock().setup(activity);
         new MusicKeyboard2Block().setup(activity);
         new MusicKeyboardBlock().setup(activity);
-        new PitchStaircaseBlock().setup(activity);
         new RhythmRuler3Block().setup(activity);
         new RhythmRuler2Block().setup(activity);
         new MatrixGMajorBlock().setup(activity);

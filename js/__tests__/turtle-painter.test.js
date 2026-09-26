@@ -128,6 +128,16 @@ describe("Painter Class", () => {
             expect(painter._penDown).toBe(true);
         });
 
+        test("keeps Painter state isolated between turtles", () => {
+            const secondPainter = new Painter(createMockTurtle());
+
+            painter.color = 75;
+            painter.penState = false;
+
+            expect(secondPainter.color).toBe(0);
+            expect(secondPainter.penState).toBe(true);
+        });
+
         test("should initialize value to DEFAULTVALUE (50)", () => {
             expect(painter._value).toBe(50);
         });
@@ -141,7 +151,10 @@ describe("Painter Class", () => {
         });
 
         test("should initialize canvas color and alpha", () => {
-            expect(painter._canvasColor).toBe("rgba(255,0,49,1)");
+            // Hex, not rgba: _processColor() converts _canvasColor on every
+            // stroke, so storing a pre-converted rgba string here made the
+            // default pen color come out black.
+            expect(painter._canvasColor).toBe("#ff0031");
             expect(painter._canvasAlpha).toBe(1.0);
         });
 
@@ -498,11 +511,15 @@ describe("Drawing - doForward", () => {
         expect(mockTurtle.container.x).toBe(startX + 20);
     });
 
-    test("doForward should trigger view media position updates if view exists", () => {
-        const mockView = { _updateMediaPositions: jest.fn() };
-        mockTurtle._view = mockView;
+    test("doForward repositions the turtle's media", () => {
+        mockTurtle._updateMediaPositions = jest.fn();
         painter.doForward(10);
-        expect(mockView._updateMediaPositions).toHaveBeenCalled();
+        expect(mockTurtle._updateMediaPositions).toHaveBeenCalled();
+    });
+
+    test("doForward does not throw when the turtle has no media hook", () => {
+        delete mockTurtle._updateMediaPositions;
+        expect(() => painter.doForward(10)).not.toThrow();
     });
 });
 
@@ -580,6 +597,45 @@ describe("Drawing - doArc", () => {
         mockTurtle.turtles.activity.errorMsg.mockClear();
         painter.doArc(10, Infinity);
         expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+    });
+
+    test("doArc should reject a very large positive angle instead of looping unbounded", () => {
+        const arcSpy = jest.spyOn(painter, "_doArcPart");
+        painter.doArc(9000000, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(arcSpy).not.toHaveBeenCalled();
+    });
+
+    test("doArc should reject a very large negative angle instead of looping unbounded", () => {
+        const arcSpy = jest.spyOn(painter, "_doArcPart");
+        painter.doArc(-9000000, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(arcSpy).not.toHaveBeenCalled();
+    });
+
+    test("doArc should reject an angle just past the cap and accept one just at it", () => {
+        const arcSpy = jest.spyOn(painter, "_doArcPart");
+        painter.doArc(45001, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(arcSpy).not.toHaveBeenCalled();
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doArc(45000, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).not.toHaveBeenCalled();
+        expect(arcSpy).toHaveBeenCalled();
+    });
+
+    test("doArc rejects an out-of-range angle regardless of caller, closing the embedded-playback gap", () => {
+        // embedded-graphics-scheduler.js re-reads an Arc block's angle from its
+        // block connections at note-playback time via logo.parseArg(), so a
+        // dynamic input (e.g. a random or box block) can hand doArc() a value
+        // that never went through ArcBlock.flow()'s own dispatch-time check.
+        // doArc() must reject a runaway angle on its own, independent of caller.
+        const arcSpy = jest.spyOn(painter, "_doArcPart");
+        const dynamicAngleFromPlayback = 9000000;
+        painter.doArc(dynamicAngleFromPlayback, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(arcSpy).not.toHaveBeenCalled();
     });
 });
 
@@ -961,11 +1017,15 @@ describe("doSetXY operations", () => {
         expect(mockTurtle.ctx.beginPath).not.toHaveBeenCalled();
     });
 
-    test("doSetXY should trigger view update if view exists", () => {
-        const mockView = { _updateMediaPositions: jest.fn() };
-        mockTurtle._view = mockView;
+    test("doSetXY repositions the turtle's media", () => {
+        mockTurtle._updateMediaPositions = jest.fn();
         painter.doSetXY(100, 200);
-        expect(mockView._updateMediaPositions).toHaveBeenCalled();
+        expect(mockTurtle._updateMediaPositions).toHaveBeenCalled();
+    });
+
+    test("doSetXY does not throw when the turtle has no media hook", () => {
+        delete mockTurtle._updateMediaPositions;
+        expect(() => painter.doSetXY(100, 200)).not.toThrow();
     });
 
     test("doSetXY should handle NaN or Infinity gracefully", () => {
@@ -1301,5 +1361,107 @@ describe("Additional Robustness & Missing Coverage Tests", () => {
         painter._hollowState = true;
         painter._arc(0, 0, 0, 0, 100, 200, 10, 0, Math.PI, false, false);
         expect(mockTurtle.ctx.lineCap).toBe("round");
+    });
+});
+
+describe("Canvas color representation (regression: turtle colors lost on Run)", () => {
+    // The mocks at the top of this file stub getMunsellColor() and hex2rgb()
+    // with constant return values, which hides any format mismatch between the
+    // code that writes _canvasColor and the code that reads it. These tests
+    // deliberately restore the real implementations.
+    const realUtils = require("../utils/utils-logic.js");
+    let painter;
+    let mockTurtle;
+    let savedHex2rgb;
+    let savedGetMunsellColor;
+
+    // The real getMunsellColor(20, 50, 100) from js/utils/munsell.js.
+    const MUNSELL_HEX = "#b06d00";
+
+    beforeEach(() => {
+        savedHex2rgb = global.hex2rgb;
+        savedGetMunsellColor = global.getMunsellColor;
+        global.hex2rgb = realUtils.hex2rgb;
+        global.getMunsellColor = jest.fn(() => MUNSELL_HEX);
+
+        setupRafMock();
+        mockTurtle = createMockTurtle();
+        painter = new Painter(mockTurtle);
+    });
+
+    afterEach(() => {
+        global.hex2rgb = savedHex2rgb;
+        global.getMunsellColor = savedGetMunsellColor;
+        teardownRafMock();
+        jest.clearAllMocks();
+    });
+
+    test("the default pen color draws as red, not black", () => {
+        painter._processColor();
+
+        expect(mockTurtle.ctx.strokeStyle).toBe("rgba(255,0,49,1)");
+    });
+
+    test("drawing after doClear keeps the turtle's color instead of going black", () => {
+        // This is the Run path: the toolbar clears every turtle before running,
+        // and every stroke afterwards came out black.
+        painter.turtles.c1ctx = { beginPath: jest.fn(), clearRect: jest.fn() };
+        painter.doClear(true, false, false);
+
+        painter._processColor();
+
+        expect(mockTurtle.ctx.strokeStyle).toBe("rgba(176,109,0,1)");
+        expect(mockTurtle.ctx.strokeStyle).not.toBe("rgba(0,0,0,1)");
+        expect(mockTurtle.ctx.fillStyle).toBe("rgba(176,109,0,1)");
+    });
+
+    test("doClear leaves _canvasColor in the same hex form the doSet* methods use", () => {
+        painter.turtles.c1ctx = { beginPath: jest.fn(), clearRect: jest.fn() };
+        painter.doClear(true, false, false);
+
+        expect(painter._canvasColor).toBe(MUNSELL_HEX);
+    });
+
+    test("_processColor applies the pen alpha to a hex canvas color", () => {
+        painter._canvasColor = MUNSELL_HEX;
+        painter._canvasAlpha = 0.5;
+
+        painter._processColor();
+
+        expect(mockTurtle.ctx.strokeStyle).toBe("rgba(176,109,0,0.5)");
+    });
+
+    test("_processColor tolerates an rgba canvas color and still applies the alpha", () => {
+        painter._canvasColor = "rgba(176,109,0,1)";
+        painter._canvasAlpha = 0.25;
+
+        painter._processColor();
+
+        expect(mockTurtle.ctx.strokeStyle).toBe("rgba(176,109,0,0.25)");
+    });
+
+    test("closeSVG emits a well-formed rgb() color from a hex canvas color", () => {
+        painter._canvasColor = MUNSELL_HEX;
+        painter._canvasAlpha = 1;
+        painter._svgPath = true;
+        painter._fillState = true;
+        painter.svgOutput = "M 0,0 ";
+
+        painter.closeSVG();
+
+        expect(painter.svgOutput).toContain("fill:rgb(176,109,0);");
+        expect(painter.svgOutput).toContain("stroke:rgb(176,109,0);");
+    });
+
+    test("closeSVG still handles an rgba canvas color", () => {
+        painter._canvasColor = "rgba(176,109,0,1)";
+        painter._canvasAlpha = 1;
+        painter._svgPath = true;
+        painter._fillState = false;
+        painter.svgOutput = "M 0,0 ";
+
+        painter.closeSVG();
+
+        expect(painter.svgOutput).toContain("stroke:rgb(176,109,0);");
     });
 });

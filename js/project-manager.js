@@ -185,35 +185,138 @@ class ProjectManager {
         that.keyboardEnableFlag = 0;
 
         that.sessionData = null;
-        const currentProject = that.storage.currentProject;
-        const sessionKey = currentProject !== undefined ? "SESSION" + currentProject : null;
+        let sessionSource = null;
+        let currentProject = "My Project";
+        try {
+            currentProject = (that.storage && that.storage.currentProject) || "My Project";
+        } catch (e) {
+            currentProject = "My Project";
+        }
+        const sessionKey = "SESSION" + currentProject;
+        const sessionTimestampKey = "SESSION_TIMESTAMP" + currentProject;
+
+        let idbPayload = null;
+        if (that.sessionStorageManager) {
+            try {
+                idbPayload = await that.sessionStorageManager.loadSession(sessionKey);
+            } catch (e) {
+                console.error("Failed to load session from IndexedDB:", e);
+            }
+        }
+
+        let localData = null;
+        let localTimestamp = 0;
+        try {
+            if (that.storage) {
+                localData = that.storage[sessionKey] || null;
+                let localTimestampStr = that.storage[sessionTimestampKey];
+                let parsedLocalTimestamp = localTimestampStr ? parseInt(localTimestampStr, 10) : 0;
+                localTimestamp = Number.isFinite(parsedLocalTimestamp) ? parsedLocalTimestamp : 0;
+            }
+        } catch (storageReadErr) {
+            console.warn(
+                "[ProjectManager] Failed to read session from local storage:",
+                storageReadErr
+            );
+            localData = null;
+            localTimestamp = 0;
+        }
 
         if (that.planet) {
             that.sessionData = await that.planet.openCurrentProject();
-            if (!that.sessionData) {
-                if (currentProject !== undefined) {
-                    that.sessionData = that.storage[sessionKey];
+            if (that.sessionData) {
+                sessionSource = "planet";
+            } else {
+                if (idbPayload && idbPayload.data) {
+                    if (!localData || idbPayload.timestamp >= localTimestamp) {
+                        that.sessionData = idbPayload.data;
+                        sessionSource = "idb";
+                    } else {
+                        that.sessionData = localData;
+                        sessionSource = "local";
+                    }
+                } else if (localData) {
+                    that.sessionData = localData;
+                    sessionSource = "local";
                 }
             }
+            // Fix #1+#4: Restore Git state keys if repo data exists in Planet storage
+            try {
+                const repoData =
+                    that.planet.getCurrentGitRepoData && that.planet.getCurrentGitRepoData();
+                if (repoData && repoData.repoName) {
+                    that.storage.mbGitRepoName = repoData.repoName;
+                    that.storage.mbGitHashedKey = repoData.hashedKey || "";
+                    that.storage.mbGitCurrentProjectId = repoData.projectId || "";
+                    if (repoData.displayName) {
+                        that.storage.mbGitDisplayName = repoData.displayName;
+                    }
+                }
+            } catch (gitRestoreErr) {
+                console.warn(
+                    "[ProjectManager] Could not restore git session state:",
+                    gitRestoreErr
+                );
+            }
         } else {
-            if (sessionKey !== null) {
-                that.sessionData = that.storage[sessionKey];
+            if (idbPayload && idbPayload.data) {
+                if (!localData || idbPayload.timestamp >= localTimestamp) {
+                    that.sessionData = idbPayload.data;
+                    sessionSource = "idb";
+                } else {
+                    that.sessionData = localData;
+                    sessionSource = "local";
+                }
+            } else if (localData) {
+                that.sessionData = localData;
+                sessionSource = "local";
             }
         }
 
         pubsub.on("finishedLoading", __afterLoad);
 
-        if (that.sessionData) {
-            that.doLoadAnimation();
-            try {
-                if (that.sessionData === "undefined" || that.sessionData === "[]") {
-                    that.justLoadStart();
-                } else {
-                    window.loadedSession = that.sessionData;
-                    that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
+        // Returns the loadToken loadNewBlocks() assigns this request (see
+        // js/blocks.js), or null when no load was actually started (the
+        // empty/undefined-session shortcuts below already route through
+        // justLoadStart() instead).
+        const tryParseAndLoad = data => {
+            if (data === "undefined" || data === "[]") {
+                that.justLoadStart();
+                return null;
+            }
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed) && parsed.length === 0) {
+                // Any whitespace/formatting variant of "[]" (e.g. " [ ]")
+                // still parses to an empty array here, past the literal
+                // string check above. loadNewBlocks([]) completes
+                // synchronously inside blocks.js's own zero-block fast
+                // path, emitting "finishedLoading" before this call even
+                // returns — before a caller could register a watcher for
+                // it. Treating a parsed-empty array the same as the
+                // literal "[]" case keeps that synchronous emit from
+                // leaving watchForDeferredLoadFailure()'s listeners
+                // stranded (review comment on issue #8855's fix).
+                that.justLoadStart();
+                return null;
+            }
+            window.loadedSession = data;
+            return that.blocks.loadNewBlocks(parsed);
+        };
+
+        const deleteFromSource = async source => {
+            if (source === "idb") {
+                if (
+                    that.sessionStorageManager &&
+                    typeof that.sessionStorageManager.deleteSession === "function" &&
+                    sessionKey
+                ) {
+                    try {
+                        await that.sessionStorageManager.deleteSession(sessionKey);
+                    } catch (idbErr) {
+                        ErrorHandler.recoverable(idbErr, { operation: "removeBadIdbSessionKey" });
+                    }
                 }
-            } catch (e) {
-                ErrorHandler.recoverable(e, { operation: "loadSessionData" });
+            } else if (source === "local") {
                 if (sessionKey !== null) {
                     try {
                         if (typeof that.storage.removeItem === "function") {
@@ -227,7 +330,112 @@ class ProjectManager {
                         });
                     }
                 }
-                that.justLoadStart();
+            }
+        };
+
+        // A block-processing failure past the first ~20 blocks throws from
+        // inside loadNewBlocks()'s deferred setTimeout chunking
+        // (js/blocks.js), which no synchronous try/catch around
+        // tryParseAndLoad() below can ever observe: that throw has no
+        // caller left to reach (see issue #8855). loadNewBlocks() reports
+        // that case through this "loadFailed" pubsub event instead (the
+        // same channel "finishedLoading" already uses for success), so it
+        // can still reach the same delete-and-fallback recovery a
+        // synchronous failure gets below.
+        //
+        // Both events carry the loadToken loadNewBlocks() returned for the
+        // request they belong to (js/blocks.js), which is assigned the
+        // moment that request is made — whether it then runs immediately or
+        // sits queued behind another, unrelated load already in progress.
+        // Filtering on it (rather than just the event name) keeps this from
+        // reacting to that other load's own completion or failure, which a
+        // reviewer flagged: reading a "currently active load" counter after
+        // the fact isn't safe here, since this request may still be queued
+        // at that point.
+        const watchForDeferredLoadFailure = (source, expectedToken) => {
+            const belongsToThisLoad = payload =>
+                !payload || payload.token === undefined ? true : payload.token === expectedToken;
+            const stopWatching = () => {
+                pubsub.off("finishedLoading", onSucceeded);
+                pubsub.off("loadFailed", onFailed);
+            };
+            const onFailed = payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+                recoverFromLoadFailure(
+                    source,
+                    (payload && payload.error) || new Error("loadNewBlocks failed")
+                );
+            };
+            const onSucceeded = payload => {
+                if (!belongsToThisLoad(payload)) return;
+                stopWatching();
+            };
+            pubsub.on("finishedLoading", onSucceeded);
+            pubsub.on("loadFailed", onFailed);
+        };
+
+        // Runs the delete-and-fallback recovery for a failed session load,
+        // whether that failure was caught synchronously below or reported
+        // asynchronously via "loadFailed" above. Attempts at most one
+        // fallback (the same bound the original synchronous-only version of
+        // this logic had) so two independently bad storage tiers can't
+        // bounce off each other indefinitely.
+        let fallbackAttempted = false;
+        const recoverFromLoadFailure = async (failedSource, error) => {
+            ErrorHandler.recoverable(error, { operation: "loadSessionData" });
+            await deleteFromSource(failedSource);
+
+            // The failed load may have only partially populated blockList
+            // before it threw. Clear those leftover blocks before loading
+            // anything else, or the next attempt's blocks render on top of
+            // them instead of replacing them (reported against this fix).
+            if (typeof that.sendAllToTrash === "function") {
+                that.sendAllToTrash(false, false);
+            }
+
+            let fallbackData = null;
+            let fallbackSource = null;
+            if (!fallbackAttempted) {
+                if (failedSource === "idb" && localData) {
+                    fallbackData = localData;
+                    fallbackSource = "local";
+                } else if (failedSource === "local" && idbPayload && idbPayload.data) {
+                    fallbackData = idbPayload.data;
+                    fallbackSource = "idb";
+                }
+            }
+
+            if (fallbackData) {
+                fallbackAttempted = true;
+                try {
+                    that.sessionData = fallbackData;
+                    const loadToken = tryParseAndLoad(fallbackData);
+                    if (loadToken !== null) {
+                        watchForDeferredLoadFailure(fallbackSource, loadToken);
+                    }
+                    return;
+                } catch (fallbackErr) {
+                    ErrorHandler.recoverable(fallbackErr, {
+                        operation: "loadFallbackSessionData"
+                    });
+                    await deleteFromSource(fallbackSource);
+                }
+            }
+
+            that.errorMsg(_("Your saved project could not be loaded. Starting a new project."));
+            that.justLoadStart();
+        };
+
+        if (that.sessionData) {
+            that.doLoadAnimation();
+            try {
+                const loadToken = tryParseAndLoad(that.sessionData);
+                if (loadToken !== null) {
+                    watchForDeferredLoadFailure(sessionSource, loadToken);
+                }
+            } catch (e) {
+                await recoverFromLoadFailure(sessionSource, e);
             }
         } else {
             that.justLoadStart();
@@ -521,7 +729,7 @@ class ProjectManager {
                     case "action":
                     case "matrix":
                     case "pitchdrummatrix":
-                    case "rhythmruler":
+                    case "rhythmruler2":
                     case "timbre":
                     case "pitchstaircase":
                     case "tempo":
@@ -616,7 +824,11 @@ class ProjectManager {
         try {
             p = activity.storage.currentProject;
             activity.storage["SESSION" + p] = data;
+            activity.storage["SESSION_TIMESTAMP" + p] = Date.now().toString();
         } catch (e) {
+            // If it hits QuotaExceededError, it fails gracefully because saveSessionAsync
+            // (IndexedDB) handles large payloads.
+            console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
         }
 
@@ -664,7 +876,6 @@ class ProjectManager {
         const title = document.createElement("h2");
         title.textContent = _("Import MIDI");
         title.classList.add("modal-title");
-        title.style.color = platformColor.headingColor;
         modal.appendChild(title);
 
         const container = document.createElement("div");
@@ -690,8 +901,6 @@ class ProjectManager {
         const importConfirm = document.createElement("button");
         importConfirm.classList.add("confirm-button");
         importConfirm.textContent = _("Confirm");
-        importConfirm.style.backgroundColor = platformColor.blueButton;
-        importConfirm.style.color = platformColor.blueButtonText;
         importConfirm.style.border = "none";
         importConfirm.style.borderRadius = "4px";
         importConfirm.style.padding = "8px 16px";
@@ -844,10 +1053,14 @@ class ProjectManager {
                                     if (that.planet) {
                                         that.planet.closePlanet();
                                         that.planet.initialiseNewProject(
-                                            that.fileChooser.files[0].name.substr(
-                                                0,
-                                                that.fileChooser.files[0].name.lastIndexOf(".")
-                                            )
+                                            that.fileChooser.files[0].name.lastIndexOf(".") === -1
+                                                ? that.fileChooser.files[0].name
+                                                : that.fileChooser.files[0].name.slice(
+                                                      0,
+                                                      that.fileChooser.files[0].name.lastIndexOf(
+                                                          "."
+                                                      )
+                                                  )
                                         );
                                     }
                                 } else {
@@ -968,7 +1181,9 @@ class ProjectManager {
                             that.sendAllToTrash(false, false);
                             if (that.planet !== undefined) {
                                 that.planet.initialiseNewProject(
-                                    files[0].name.substr(0, files[0].name.lastIndexOf("."))
+                                    files[0].name.lastIndexOf(".") === -1
+                                        ? files[0].name
+                                        : files[0].name.slice(0, files[0].name.lastIndexOf("."))
                                 );
                             }
 

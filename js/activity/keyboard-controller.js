@@ -68,6 +68,27 @@ class KeyboardController {
     __keyPressed(event) {
         const activity = this.activity;
 
+        // Alt+S (Option+S) must be able to stop a running program regardless
+        // of any other UI state. It is checked here, before every other
+        // early-return guard in this function (widget-open checks,
+        // keyboardEnableFlag, the hasKeyboard-class check, and critically
+        // the guard further down that returns early whenever
+        // activity.printText has the "show" class). That guard matters
+        // because activity.textMsg() — called by Alt+R when starting
+        // playback — keeps the printText message visible for a full 60
+        // seconds (AlertController.MSG_TIMEOUT), so pressing Alt+S anytime
+        // in that window was previously swallowed before ever reaching the
+        // Alt+S handling further below, and the browser handled the raw
+        // keydown instead of MB. preventDefault() here ensures MB — not
+        // the browser — owns this keystroke.
+        if (event.altKey && event.keyCode === 83 && activity.turtles.running()) {
+            event.preventDefault();
+            activity.textMsg("Alt-S " + _("Stop"));
+            activity.logo.doStopTurtles();
+            activity.currentKeyCode = event.keyCode;
+            return;
+        }
+
         // First, check if the pitch slider is open
         if (this._isWidgetOpen("slider")) {
             // If the event is an arrow key, let the PitchSlider handle it
@@ -92,8 +113,15 @@ class KeyboardController {
         if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
             return;
         }
-        // Skip hotkeys when value bar is visible (prevents accidental block creation)
-        if (activity.printText && activity.printText.classList.contains("show")) {
+        // Skip hotkeys when the screen-dimension block value bar is visible
+        // (prevents accidental block creation, #4931). This used to check
+        // activity.printText's shared "show" class, but that class is set by
+        // every textMsg() call in the app (Alt-R "Play", scroll toggles,
+        // etc.), not just the value bar - which meant any status message
+        // silently blocked every hotkey for up to 60s (AlertController.
+        // MSG_TIMEOUT). valueBarVisible is a dedicated flag set only by the
+        // value-bar display itself (js/logo.js), scoped to a short window.
+        if (activity.valueBarVisible) {
             return;
         }
 
@@ -185,13 +213,7 @@ class KeyboardController {
             pasteEl.style.visibility === "visible" ||
             wheelDiv.style.display === "" ||
             activity.turtles.running();
-        const widgetTitle = document.getElementsByClassName("wftTitle");
-        for (let i = 0; i < widgetTitle.length; i++) {
-            if (widgetTitle[i].innerHTML === "tempo") {
-                activity.inTempoWidget = true;
-                break;
-            }
-        }
+        activity.inTempoWidget = this._isWidgetOpen("tempo");
         if (
             (event.altKey && !disableKeys) ||
             event.keyCode === 13 ||
@@ -273,8 +295,25 @@ class KeyboardController {
                         activity.stageDirty = true;
                     }
             }
-        } else if (event.ctrlKey) {
+        } else if (
+            event.ctrlKey ||
+            (event.metaKey &&
+                !disableKeys &&
+                (event.keyCode === 90 || event.keyCode === 89 || event.keyCode === V))
+        ) {
             switch (event.keyCode) {
+                case 90: // 'Z'
+                    event.preventDefault();
+                    if (event.shiftKey) {
+                        activity.blocks.redoAction();
+                    } else {
+                        activity.blocks.undoAction();
+                    }
+                    break;
+                case 89: // 'Y'
+                    event.preventDefault();
+                    activity.blocks.redoAction();
+                    break;
                 case V:
                     // activity.textMsg("Ctl-V " + _("Paste"));
                     activity.pasteBox.createBox(activity.turtleBlocksScale, 200, 200);
@@ -316,6 +355,14 @@ class KeyboardController {
                     activity._doFastButton();
                 }
             } else if (!disableKeys) {
+                // palettes.activePalette holds the open palette's *name*
+                // (see Palettes.showPalette); resolve it to the object.
+                const activePalette =
+                    activity.palettes.activePalette !== null &&
+                    activity.palettes.dict &&
+                    activity.palettes.dict[activity.palettes.activePalette]
+                        ? activity.palettes.dict[activity.palettes.activePalette]
+                        : null;
                 switch (event.keyCode) {
                     case END:
                         activity.textMsg("END " + _("Jumping to the bottom of the page."));
@@ -350,8 +397,8 @@ class KeyboardController {
                                 );
                                 activity.blocks.blockMoved(activity.blocks.activeBlock);
                                 activity.blocks.adjustDocks(activity.blocks.activeBlock, true);
-                            } else if (activity.palettes.activePalette !== null) {
-                                activity.palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
+                            } else if (activePalette !== null) {
+                                activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
                             } else {
                                 activity.blocksContainer.y += 20;
                             }
@@ -371,11 +418,8 @@ class KeyboardController {
                                 );
                                 activity.blocks.blockMoved(activity.blocks.activeBlock);
                                 activity.blocks.adjustDocks(activity.blocks.activeBlock, true);
-                            } else if (activity.palettes.activePalette !== null) {
-                                activity.palettes.activePalette.scrollEvent(
-                                    -STANDARDBLOCKHEIGHT,
-                                    1
-                                );
+                            } else if (activePalette !== null) {
+                                activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
                             } else {
                                 activity.blocksContainer.y -= 20;
                             }
@@ -422,11 +466,8 @@ class KeyboardController {
                             const dy = Math.max(55 - activity.palettes.buttons["rhythm"].y, 0);
                             activity.palettes.menuScrollEvent(1, dy);
                             activity.palettes.hidePaletteIconCircles();
-                        } else if (activity.palettes.activePalette !== null) {
-                            activity.palettes.activePalette.scrollEvent(
-                                -activity.palettes.activePalette.scrollDiff,
-                                1
-                            );
+                        } else if (activePalette !== null) {
+                            activePalette.scrollEvent(-activePalette.scrollDiff, 1);
                         } else {
                             // Bring all the blocks "home".
                             activity.workspaceLayoutController._findBlocks();

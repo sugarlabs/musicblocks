@@ -114,6 +114,12 @@ function setupDictActions(activity) {
                     pitchToNumber(obj[0], obj[1], targetTur.singer.keySignature) -
                     targetTur.singer.pitchNumberOffset
                 );
+            } else {
+                activity.errorMsg(
+                    _("Unknown key: %s").replace(/%s/g, () => key),
+                    blk
+                );
+                return 0;
             }
         }
 
@@ -150,6 +156,20 @@ function setupDictActions(activity) {
                 const y = activity.turtles.screenY2turtleY(targetTur.container.y);
                 targetTur.painter.doSetXY(value, y);
             }
+        }
+
+        /**
+         * Alias for SetDictValue for backward compatibility.
+         *
+         * @static
+         * @param {Number} target - target Turtle index in turtle.turtleList
+         * @param {Number} turtle - Turtle index in turtle.turtleList
+         * @param {String} key - key
+         * @param {*} value - value
+         * @returns {void}
+         */
+        static setDictValue(target, turtle, key, value) {
+            Turtle.DictActions.SetDictValue(target, turtle, key, value);
         }
 
         /**

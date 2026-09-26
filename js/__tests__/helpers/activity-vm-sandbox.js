@@ -27,6 +27,25 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const { createInstrumenter } = require("istanbul-lib-instrument");
+
+// activity.js is never require()d - it is read as text and run through
+// vm.runInContext below - so jest's babel transform never sees it and every
+// one of its ~1400 statements reports as uncovered however well it is tested.
+// Instrumenting the source here, against the same coverage variable jest
+// reads, makes the file visible to the report. jest.config.js sets
+// collectCoverage: true for every run, so this is not gated on a flag.
+let instrumenter = null;
+const instrumentForCoverage = (source, filename) => {
+    if (!instrumenter) {
+        instrumenter = createInstrumenter({
+            coverageVariable: "__coverage__",
+            esModules: false,
+            compact: true
+        });
+    }
+    return instrumenter.instrumentSync(source, filename);
+};
 
 const ACTIVITY_PATH = path.resolve(__dirname, "../../activity.js");
 
@@ -36,6 +55,7 @@ const createBaseSandbox = () => ({
     console: global.console,
     navigator: global.navigator,
     _: key => key,
+    announceToScreenReader: jest.fn(),
     define: () => {},
     require: () => {},
     setTimeout,
@@ -118,9 +138,20 @@ const createBaseSandbox = () => ({
  */
 const loadActivitySandbox = ({ overrides = {}, prependCode = "" } = {}) => {
     const sandbox = { ...createBaseSandbox(), ...overrides };
+    // Instrument the source on its own, then append the bootstrap statements.
+    // Concatenating them first would hand them to the instrumenter as part of
+    // activity.js, and they would be counted — and always reported as covered —
+    // against a file they are not in.
     const code =
-        fs.readFileSync(ACTIVITY_PATH, "utf8") +
+        instrumentForCoverage(fs.readFileSync(ACTIVITY_PATH, "utf8"), ACTIVITY_PATH) +
         "\nthis.activity = activity;\nthis.Activity = Activity;";
+
+    // The instrumented code increments counters on __coverage__. Point the
+    // context at jest's own global so the reporter reads the same object.
+    if (!global.__coverage__) {
+        global.__coverage__ = {};
+    }
+    sandbox.__coverage__ = global.__coverage__;
 
     vm.createContext(sandbox);
     if (prependCode) {

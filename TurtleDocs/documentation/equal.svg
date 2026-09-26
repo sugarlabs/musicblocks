@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="102"
+   height="84"
+   id="svg3175">
+  <g
+     id="g3280">
+    <g
+       transform="matrix(2,0,0,2,0,-32)"
+       id="g3179-5"
+       style="fill:#d8d100;fill-opacity:1;stroke:#a19a00;stroke-opacity:1">
+      <path
+         d="m 0.5,41.25 c 0,-3.665191 3.3348086,-6.75 7,-6.75 l 1,0 0,-10 c 0,-4.18879 3.81121,-8 8,-8 l 34,0 0,8 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,17 -4,0 0,-3 -4,0 0,10 4,0 0,-3 4,0 0,8 -30,0 -11,0 -1,0 0,-1 0,-8 -1,0 c -3.6651914,0 -7,-2.584809 -7,-6.25 z"
+         id="path3181-7"
+         style="fill:#d8d100;fill-opacity:1;stroke:#a19a00;stroke-width:1;stroke-linecap:round;stroke-opacity:1" />
+    </g>
+    <text
+       id="text3183-1"
+       style="font-size:28px;text-anchor:end;fill:#000000;fill-opacity:1;font-family:sans-serif">
+      <tspan
+         x="82"
+         y="49"
+         id="tspan3185-0"
+         style="fill:#000000;fill-opacity:1">=</tspan>
+    </text>
+  </g>
+</svg>

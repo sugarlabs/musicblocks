@@ -23,19 +23,20 @@
    _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON,
    PLUGINSBUTTON, OPENMERGEBUTTON, PITCHPREVIEWBUTTON, JAVASCRIPTBUTTON,
    RECORDHELPBUTTON, DARKMODEBUTTON, SELECTHELPBUTTON, BLOCKMENUBUTTON,
-   CANVASMENUBUTTON, RHYTHMPALETTEHELPICON, PITCHPREVIEWHELPBUTTON
+   CANVASMENUBUTTON, RHYTHMPALETTEHELPICON, PITCHPREVIEWHELPBUTTON,
+   getSystemThemePreference
 */
 
 /* exported
 
-   createDefaultStack, createHelpContent, LOGOJA1, NUMBERBLOCKDEFAULT,
-   DEFAULTPALETTE, BUILTINPALETTES, MULTIPALETTES, SKIPPALETTES,
-   MULTIPALETTEICONS, MULTIPALETTENAMES, HELPCONTENT, DATAOBJS,
+   createDefaultStack, createHelpContent, getLanguagePreference, LOGODEFAULT, LOGOJA,
+   LOGOJA1, NUMBERBLOCKDEFAULT, DEFAULTPALETTE, BUILTINPALETTES, MULTIPALETTES,
+   SKIPPALETTES, MULTIPALETTEICONS, MULTIPALETTENAMES, HELPCONTENT, DATAOBJS,
    BUILTINPALETTESFORL23N, getMainToolbarButtonNames,
    getAuxToolbarButtonNames, TITLESTRING
  */
 
-const VERSION = "3.7.1";
+const VERSION = "3.8.0"; // x-release-please-version
 let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
@@ -52,8 +53,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     LOGOJA = LOGODEFAULT;
 
     if (GUIDEURL === "guide url" || GUIDEURL === "") {
-        // Fix me: Move turtle guide to MB repo.
-        GUIDEURL = "Docs/guide/README.md";
+        GUIDEURL = "TurtleDocs/guide/index.html";
     }
 
     NUMBERBLOCKDEFAULT = 100;
@@ -308,6 +308,20 @@ const getAuxToolbarButtonNames = name => {
     );
 };
 
+const getLanguagePreference = () => {
+    let language;
+    try {
+        language = localStorage.languagePreference;
+    } catch (e) {
+        // In restricted environments (e.g., Safari private browsing), localStorage may be unavailable
+        language = undefined;
+    }
+    if (language === undefined && typeof navigator !== "undefined") {
+        language = navigator.language;
+    }
+    return language;
+};
+
 const createDefaultStack = () => {
     if (_THIS_IS_TURTLE_BLOCKS_) {
         DATAOBJS = [
@@ -321,10 +335,7 @@ const createDefaultStack = () => {
             [7, ["number", { value: 90 }], 0, 0, [6]]
         ];
     } else {
-        let language = localStorage.languagePreference;
-        if (language === undefined) {
-            language = navigator.language;
-        }
+        const language = getLanguagePreference();
 
         if (language === "ja") {
             DATAOBJS = [
@@ -405,13 +416,13 @@ const createDefaultStack = () => {
             ];
         }
     }
+    if (typeof window !== "undefined") {
+        window.DATAOBJS = DATAOBJS;
+    }
 };
 
 const createHelpContent = activity => {
-    let language = localStorage.languagePreference;
-    if (language === undefined) {
-        language = navigator.language;
-    }
+    const language = getLanguagePreference();
 
     let LOGO = LOGODEFAULT;
     if (language === "ja") {
@@ -652,16 +663,22 @@ const createHelpContent = activity => {
         `data:image/svg+xml;base64,${window.btoa(base64Encode(EXTRACTBUTTON))}`
     ]);
     if (_THIS_IS_MUSIC_BLOCKS_) {
-        const tabButtonSvg =
-            activity.themebox && activity.themebox._theme === "dark"
-                ? TABBUTTON_DARK
-                : TABBUTTON_LIGHT;
         HELPCONTENT.push([
             _("Tab Navigation"),
             _(
                 "Press the Tab key on your keyboard to magically jump between the workspace, toolbar, and palette!"
             ),
-            `data:image/svg+xml;base64,${window.btoa(base64Encode(tabButtonSvg))}`
+            // Resolved when the page is shown rather than here. createHelpContent
+            // runs from setupDependencies(), which is long before activity.themeBox
+            // is constructed, and the theme can also be switched while the help
+            // widget is open. Read the preference the way ThemeBox itself does so
+            // this does not depend on ThemeBox existing yet.
+            () => {
+                const theme = activity.storage.themePreference || getSystemThemePreference();
+                // highcontrast is a black-backgrounded theme, so it wants the dark icon too.
+                const svg = theme === "light" ? TABBUTTON_LIGHT : TABBUTTON_DARK;
+                return `data:image/svg+xml;base64,${window.btoa(base64Encode(svg))}`;
+            }
         ]);
     }
     if (!activity.beginnerMode) {
@@ -789,10 +806,23 @@ const createHelpContent = activity => {
             `data:image/svg+xml;base64,${window.btoa(base64Encode(LOGO))}`
         ]);
     }
+    if (typeof window !== "undefined") {
+        window.HELPCONTENT = HELPCONTENT;
+    }
 };
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         createDefaultStack,
+        createHelpContent,
+        getLanguagePreference,
+        GUIDEURL,
+        LOGOJA,
+        LOGODEFAULT,
+        // A getter: createHelpContent() rebinds HELPCONTENT, so exporting the
+        // array itself would hand out whichever one existed at import time.
+        get HELPCONTENT() {
+            return HELPCONTENT;
+        },
         LOGOJA1,
         NUMBERBLOCKDEFAULT,
         DEFAULTPALETTE,
@@ -801,6 +831,10 @@ if (typeof module !== "undefined" && module.exports) {
 }
 if (typeof window !== "undefined") {
     window.createDefaultStack = createDefaultStack;
+    window.createHelpContent = createHelpContent;
+    window.getLanguagePreference = getLanguagePreference;
+    window.LOGOJA = LOGOJA;
+    window.LOGODEFAULT = LOGODEFAULT;
     window.LOGOJA1 = LOGOJA1;
     window.NUMBERBLOCKDEFAULT = NUMBERBLOCKDEFAULT;
     window.DEFAULTPALETTE = DEFAULTPALETTE;

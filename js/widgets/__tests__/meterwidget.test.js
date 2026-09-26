@@ -25,6 +25,9 @@
  */
 
 const MeterWidget = require("../meterwidget.js");
+const ManagedTimer = require("../../utils/ManagedTimer");
+
+global.ManagedTimer = ManagedTimer;
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
 global._ = msg => msg; // Mock translation function
@@ -476,5 +479,26 @@ describe("Meter Widget", () => {
 
         expect(mockActivity.logo.synth.setMasterVolume).not.toHaveBeenCalled();
         global.Singer.masterVolume = originalMasterVolume;
+    });
+
+    test("should track beat scheduling with ManagedTimer and cancel on stop and close", () => {
+        jest.useFakeTimers();
+        expect(meterWidget._timerManager).toBeInstanceOf(ManagedTimer);
+
+        meterWidget._playing = true;
+        meterWidget._strongBeats = [true, false, false];
+        meterWidget.__playOneBeat(0, 500);
+
+        expect(meterWidget._playBeatTimeout).not.toBeNull();
+        expect(meterWidget._timerManager.activeTimeoutCount).toBe(1);
+
+        const widgetWindow = window.widgetWindows.windowFor();
+        widgetWindow.onclose();
+
+        expect(meterWidget._playing).toBe(false);
+        expect(meterWidget._playBeatTimeout).toBeNull();
+        expect(meterWidget._timerManager.activeTimeoutCount).toBe(0);
+
+        jest.useRealTimers();
     });
 });

@@ -39,10 +39,10 @@ try {
    setupHelpController,
    setupBlockScaleController,
    setupContextMenuController,
-   setupActivityAbcParser, setupActivityIdleWatcher,
+   setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
-   DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
+   DEFAULTDELAY, define, doBrowserCheck, docByClass,
    doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
@@ -59,10 +59,10 @@ try {
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
+   MUSICALMODES, getSavedCustomModes, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode
+   extractProjectDataFromHTML,unescapeHTML, pubsub, normalizeLanguageCode, announceToScreenReader
  */
 
 /*
@@ -102,8 +102,13 @@ let MYDEFINES = [
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
     "utils/utils-logic",
+    "utils/dom-helpers",
+    "utils/browser-utils",
     "utils/http-utils",
     "utils/utils",
+    "utils/camera-utils",
+    "utils/plugin-utils",
+    "utils/macro-utils",
     "utils/retryWithBackoff",
     "utils/error-handler",
     "utils/debugLog",
@@ -154,9 +159,12 @@ let MYDEFINES = [
     "search-ui",
     "activity/keyboard-controller",
     "widgets/plugin-dialog",
+    "utils/musicutils-constants",
+    "utils/musicutils-i18n",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
+    "utils/tuningformats",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
@@ -459,6 +467,9 @@ class Activity {
             ErrorHandler.recoverable(e, { operation: "loadKeySignatureEnv" });
         }
 
+        this.sessionStorageManager =
+            typeof SessionStorageManager !== "undefined" ? new SessionStorageManager() : null;
+
         setupActivityIdleWatcher(this);
         setupProjectManager(this);
         setupKeyboardController(this);
@@ -475,10 +486,27 @@ class Activity {
         setupContextMenuController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
-            onDelete: () => this._deletePlugin(),
+            onDelete: name => this._deletePlugin(name),
             onFileSelected: file => this.handlePluginFileSelected(file),
             closeAuxToolbar: callback => this.toolbar.closeAuxToolbar(callback),
-            showHideAuxMenu: (activity, resize) => activity._showHideAuxMenu(resize)
+            showHideAuxMenu: (activity, resize) => activity._showHideAuxMenu(resize),
+            getLoadedPlugins: () => {
+                return this.pluginObjs && this.pluginObjs["PALETTEPLUGINS"]
+                    ? Object.keys(this.pluginObjs["PALETTEPLUGINS"])
+                    : [];
+            },
+            getActivePlugin: () => {
+                const name = this.palettes.activePalette || this.palettes.lastActivePalette;
+                if (
+                    name &&
+                    this.pluginObjs &&
+                    this.pluginObjs["PALETTEPLUGINS"] &&
+                    name in this.pluginObjs["PALETTEPLUGINS"]
+                ) {
+                    return name;
+                }
+                return null;
+            }
         });
 
         /**
@@ -594,22 +622,49 @@ class Activity {
                         this.selectionController.isDragging || this.selectionController.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
-                        // Recompute culling when container moved.
-                        if (
-                            this.blocks &&
-                            this.blocksContainer &&
-                            (this._lastCullContainerX !== this.blocksContainer.x ||
-                                this._lastCullContainerY !== this.blocksContainer.y)
-                        ) {
-                            this.blocks._updateViewportCulling();
-                            this._lastCullContainerX = this.blocksContainer.x;
-                            this._lastCullContainerY = this.blocksContainer.y;
+                        let frameErrored = false;
+                        this.stageDirty = false;
+                        try {
+                            // Recompute culling when container moved.
+                            if (
+                                this.blocks &&
+                                this.blocksContainer &&
+                                (this._lastCullContainerX !== this.blocksContainer.x ||
+                                    this._lastCullContainerY !== this.blocksContainer.y)
+                            ) {
+                                this.blocks._updateViewportCulling();
+                                this._lastCullContainerX = this.blocksContainer.x;
+                                this._lastCullContainerY = this.blocksContainer.y;
+                            }
+
+                            this.stage.update();
+                        } catch (err) {
+                            // Anything thrown here used to leave _renderLoopRunning set
+                            // with no frame queued, and _startRenderLoop() refuses to
+                            // restart on that flag, so the canvas stopped repainting for
+                            // the rest of the session. Report the frame and keep going.
+                            frameErrored = true;
+                            this.stageDirty = true;
+                            console.error("Music Blocks: render frame failed", err);
                         }
 
-                        this.stage.update();
-                        this.stageDirty = false;
-                        // Continue the loop if there's work or ongoing interaction
-                        this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                        // On error: always keep the loop alive (prevents canvas freeze).
+                        // On success: continue only if there is still outstanding work.
+                        // Clearing stageDirty before stage.update() catches the edge case
+                        // where stage.update() itself synchronously re-dirtied the stage.
+                        if (
+                            frameErrored ||
+                            this.stageDirty ||
+                            hasActiveTweens ||
+                            hasActiveGifs ||
+                            isInteracting
+                        ) {
+                            this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                        } else {
+                            // Nothing to render — let the loop go idle
+                            this._renderLoopRunning = false;
+                            this._renderLoopRafId = null;
+                        }
                     } else {
                         // Nothing to render — let the loop go idle
                         this._renderLoopRunning = false;
@@ -725,7 +780,6 @@ class Activity {
             const title = document.createElement("h2");
             title.textContent = _("Clear workspace");
             title.classList.add("modal-title");
-            title.style.color = platformColor.headingColor;
 
             modal.appendChild(title);
             const message = document.createElement("p");
@@ -739,8 +793,6 @@ class Activity {
             const confirmBtn = document.createElement("button");
             confirmBtn.classList.add("confirm-button");
             confirmBtn.textContent = _("Confirm");
-            confirmBtn.style.backgroundColor = platformColor.blueButton;
-            confirmBtn.style.color = platformColor.blueButtonText;
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";
             confirmBtn.style.padding = "8px 16px";
@@ -755,8 +807,6 @@ class Activity {
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
             cancelBtn.textContent = _("Cancel");
-            cancelBtn.style.backgroundColor = "#f1f1f1";
-            cancelBtn.style.color = "black";
             cancelBtn.style.border = "none";
             cancelBtn.style.borderRadius = "4px";
             cancelBtn.style.padding = "8px 16px";
@@ -865,16 +915,13 @@ class Activity {
             this.toolbarController.runFast(env, currentDelay);
 
             // Keep DOM queries, colors, and block visibilities in activity.js
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-
-                    this.logo.tempo.resume();
-                    break;
+            const tempoTitle = document.getElementById("tempoWidgetID");
+            if (tempoTitle) {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
+
+                this.logo.tempo.resume();
             }
 
             if (!this.turtles.running()) {
@@ -967,13 +1014,10 @@ class Activity {
 
             this.toolbar.resetStop();
 
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-                    break;
+            const tempoTitle = document.getElementById("tempoWidgetID");
+            if (tempoTitle) {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
             }
         };
@@ -991,7 +1035,6 @@ class Activity {
                 activity.save.savePNG.bind(activity.save),
                 activity.save.saveWAV.bind(activity.save),
                 activity.save.saveLilypond.bind(activity.save),
-                activity.save.afterSaveLilypondLY.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
                 activity.save.saveBlockArtwork.bind(activity.save),
@@ -1064,19 +1107,88 @@ class Activity {
         };
 
         /**
-         * Deletes a plugin palette from local storage.
+         * Deletes a plugin palette from local storage and UI.
          */
-        this._deletePlugin = () => {
-            if (this.palettes.activePalette !== null) {
-                const paletteName = this.palettes.activePalette;
-                const protoList = this.palettes.dict[paletteName].protoList;
-                const deleted = this.pluginController.deletePluginFromStorage(
-                    paletteName,
-                    protoList
-                );
-                if (deleted) {
-                    this.textMsg(paletteName + " " + _("plugins will be removed upon restart."));
+        this._deletePlugin = providedName => {
+            const paletteName =
+                providedName || this.palettes.activePalette || this.palettes.lastActivePalette;
+
+            // Ensure the active palette is actually a loaded plugin
+            const isPlugin =
+                this.pluginObjs &&
+                this.pluginObjs["PALETTEPLUGINS"] &&
+                paletteName in this.pluginObjs["PALETTEPLUGINS"];
+
+            if (!paletteName || paletteName === "start" || !isPlugin) {
+                this.textMsg(_("Please open a plugin palette before clicking delete."), 3000);
+                return;
+            }
+
+            // Pass protoList if available
+            const protoList = this.palettes.dict[paletteName]
+                ? this.palettes.dict[paletteName].protoList
+                : undefined;
+            const deleted = this.pluginController.deletePluginFromStorage(paletteName, protoList);
+
+            if (deleted) {
+                // 1. Remove from session memory
+                if (this.pluginObjs && this.pluginObjs["PALETTEPLUGINS"]) {
+                    delete this.pluginObjs["PALETTEPLUGINS"][paletteName];
                 }
+
+                // 2. Remove from palettes dictionary and hide it if it's currently showing
+                if (this.palettes && this.palettes.dict) {
+                    if (this.palettes.dict[paletteName]) {
+                        this.palettes.dict[paletteName].hide();
+                        delete this.palettes.dict[paletteName];
+                    }
+                    // 3. Remove from MULTIPALETTES to ensure it is not re-rendered
+                    if (typeof MULTIPALETTES !== "undefined" && Array.isArray(MULTIPALETTES)) {
+                        for (let i = 0; i < MULTIPALETTES.length; i++) {
+                            if (Array.isArray(MULTIPALETTES[i])) {
+                                const index = MULTIPALETTES[i].indexOf(paletteName);
+                                if (index > -1) {
+                                    MULTIPALETTES[i].splice(index, 1);
+                                }
+                            }
+                        }
+                    }
+
+                    // 4. Reset active palette to start, or first available, or null
+                    const availablePalettes = Object.keys(this.palettes.dict);
+                    this.palettes.activePalette = availablePalettes.includes("start")
+                        ? "start"
+                        : availablePalettes[0];
+                    this.palettes.lastActivePalette = null;
+                }
+
+                // 5. Force UI refresh
+                if (this.palettes) {
+                    // Update the sidebar buttons
+                    if (typeof this.palettes.makePalettes === "function") {
+                        const navIndex =
+                            this.palettes._navTypeIndex !== undefined
+                                ? this.palettes._navTypeIndex
+                                : 0;
+                        this.palettes.makePalettes(navIndex);
+                    }
+                    // Update the blocks container inside
+                    if (typeof this.palettes.updatePalettes === "function") {
+                        this.palettes.updatePalettes();
+                    }
+                    if (
+                        this.palettes.dict["start"] &&
+                        typeof this.palettes.showPalette === "function"
+                    ) {
+                        this.palettes.showPalette("start");
+                    } else if (typeof this.palettes.show === "function") {
+                        this.palettes.show();
+                    }
+                }
+
+                this.textMsg(_("Plugin deleted successfully."), 3000);
+            } else {
+                this.textMsg(_("Plugin could not be deleted or was not found."), 3000);
             }
         };
 
@@ -2094,7 +2206,8 @@ class Activity {
             if (recordBtn) {
                 recordBtn.classList.remove("grey-text", "inactiveLink");
             }
-
+            // Announce program stop to screen readers
+            announceToScreenReader(_("Program stopped."));
             // TODO: plugin support
         };
 
@@ -2102,7 +2215,19 @@ class Activity {
          * When turtle starts running change stop button to running state
          */
         this.onRunTurtle = () => {
+            // Logo calls this from runLogoCommands(), so it covers every way a
+            // project can start -- the toolbar buttons and a click on a Start
+            // block alike. The toolbar handlers highlight the stop button too,
+            // but not all of them do it up front: _doFastButton highlights
+            // after runFast(), and _doStepButton only when runStep() reports
+            // "started". This is what makes the button appear for the paths
+            // that never touch the toolbar at all. Where both run, the second
+            // call is harmless: highlightStop() only assigns display and color.
+            this.toolbar.highlightStop(window.platformColor.stopIconcolor);
+
             // TODO: plugin support
+            // Announce program start to screen readers
+            announceToScreenReader(_("Program running."));
         };
 
         /*
@@ -2234,23 +2359,6 @@ class Activity {
          * @param {string|HTMLElement|DocumentFragment} msg - The message to display.
          * @param {number} [duration=60000] - Duration in milliseconds before message disappears.
          */
-        /**
-         * Ensures a visually hidden aria-live region exists for screen reader announcements.
-         * @returns {HTMLElement} The live region element.
-         */
-        const __ensureA11yLiveRegion = () => {
-            let region = document.getElementById("mbA11yLiveRegion");
-            if (region) return region;
-            region = document.createElement("div");
-            region.id = "mbA11yLiveRegion";
-            region.setAttribute("role", "status");
-            region.setAttribute("aria-live", "polite");
-            region.setAttribute("aria-atomic", "true");
-            region.style.cssText =
-                "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
-            document.body.appendChild(region);
-            return region;
-        };
         this.textMsg = (msg, duration = AlertController.MSG_TIMEOUT) => {
             if (this.msgText === null) {
                 // The container may not be ready yet, so do nothing.
@@ -2260,9 +2368,10 @@ class Activity {
             const showMsg = () => {
                 this.alertRenderer.showTextMsg(msg);
             };
-            // Announce to screen readers via aria-live region
+            // textMsg() also accepts an HTMLElement or a DocumentFragment, and
+            // announcing one of those would read out "[object HTMLDivElement]".
             if (msg && typeof msg === "string") {
-                __ensureA11yLiveRegion().textContent = msg;
+                announceToScreenReader(msg);
             }
 
             const hideMsg = () => {
@@ -2289,9 +2398,10 @@ class Activity {
                 return;
             }
 
-            // Announce errors to screen readers via aria-live region
+            // textMsg() also accepts an HTMLElement or a DocumentFragment, and
+            // announcing one of those would read out "[object HTMLDivElement]".
             if (msg && typeof msg === "string") {
-                __ensureA11yLiveRegion().textContent = msg;
+                announceToScreenReader(msg);
             }
 
             const showMsg = () => {
@@ -2355,6 +2465,7 @@ class Activity {
             const that = this;
             this.pluginController.loadBuiltInPluginFromXHR(name).then(success => {
                 if (success) {
+                    that.textMsg(_("Plugin added"));
                     // Refresh the palettes.
                     setTimeout(() => {
                         if (that.palettes.visible) {
@@ -2365,6 +2476,7 @@ class Activity {
                     ErrorHandler.warn("Could not load built-in plugin: " + name, {
                         operation: "loadPlugin"
                     });
+                    that.textMsg(_("Could not load plugin: ") + name, 5000);
                 }
             });
         };
@@ -2380,6 +2492,8 @@ class Activity {
                 setTimeout(async () => {
                     const source = file.name ? "file:" + file.name : "file:local-file";
                     await that.pluginController.loadPluginFromFileContent(reader.result, source);
+
+                    that.textMsg(_("Plugin added"));
 
                     // Refresh the palettes.
                     setTimeout(() => {
@@ -2471,6 +2585,70 @@ class Activity {
             );
         };
 
+        this._handleBeforeUnload = () => {
+            // Save synchronously to SESSION* keys so manual reload/F5
+            // still has recoverable data even if async saves are cut short.
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            if (typeof this.saveLocally === "function" && this.saveLocally !== this.__saveLocally) {
+                this.saveLocally();
+            }
+            this._stopRenderLoop();
+            if (typeof this._stopAutoSave === "function") {
+                this._stopAutoSave();
+            }
+        };
+
+        this.saveSessionAsync = async () => {
+            // First, trigger __saveLocally for the image thumb and fallback.
+            // If the payload is huge, it will quota exceed but fail silently, which is fine!
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            // Second, save the massive payload safely to IndexedDB.
+            if (this.sessionStorageManager) {
+                const data = this.prepareExport();
+                let p = "My Project";
+                try {
+                    p = (this.storage && this.storage.currentProject) || "My Project";
+                } catch (e) {
+                    p = "My Project";
+                }
+
+                // We use the same timestamp that __saveLocally just wrote,
+                // or generate a new one if it failed or was invalid.
+                let timestampStr = null;
+                try {
+                    timestampStr = this.storage ? this.storage["SESSION_TIMESTAMP" + p] : null;
+                } catch (e) {
+                    timestampStr = null;
+                }
+                let parsedTimestamp = timestampStr ? parseInt(timestampStr, 10) : NaN;
+                let isValidTimestamp = Number.isFinite(parsedTimestamp) && parsedTimestamp > 0;
+                let timestamp = isValidTimestamp ? parsedTimestamp : Date.now();
+
+                try {
+                    await this.sessionStorageManager.saveSession("SESSION" + p, data, timestamp);
+                    if (!isValidTimestamp) {
+                        try {
+                            if (this.storage) {
+                                this.storage["SESSION_TIMESTAMP" + p] = timestamp.toString();
+                            }
+                        } catch (storageErr) {
+                            console.warn(
+                                "Failed to write session timestamp to localStorage:",
+                                storageErr
+                            );
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to save session to IndexedDB:", e);
+                    throw e;
+                }
+            }
+        };
+
         this.__saveLocally = (...args) => this.projectManager.saveLocally(...args);
 
         // 2D drag-selection and multi-selection are owned by
@@ -2514,7 +2692,18 @@ class Activity {
              * increasing/decreasing volume on Firefox)
              */
 
-            doBrowserCheck();
+            // doBrowserCheck (js/utils/browser-utils.js) is a classic-script
+            // global; on a slow RequireJS resolution it can still be pending
+            // here despite the shimmed dependency, so guard the call rather
+            // than let it throw and abort the rest of init(). Exercised
+            // directly in activity_blur_handler.test.js; this whole file is
+            // browser-only and inaccessible from Jest's require(), so
+            // Istanbul/Codecov can never see that coverage - see
+            // Activity constructor's own istanbul-ignore a few lines below.
+            /* istanbul ignore next -- see comment above */
+            if (typeof doBrowserCheck === "function") {
+                doBrowserCheck();
+            }
 
             const that = this;
 
@@ -2551,23 +2740,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
-            this.addEventListener(window, "beforeunload", () => {
-                // Save synchronously to SESSION* keys so manual reload/F5
-                // still has recoverable data even if async saves are cut short.
-                if (typeof this.__saveLocally === "function") {
-                    this.__saveLocally();
-                }
-                if (
-                    typeof this.saveLocally === "function" &&
-                    this.saveLocally !== this.__saveLocally
-                ) {
-                    this.saveLocally();
-                }
-                this._stopRenderLoop();
-                if (typeof this._stopAutoSave === "function") {
-                    this._stopAutoSave();
-                }
-            });
+            this.addEventListener(window, "beforeunload", this._handleBeforeUnload);
 
             this._createMsgContainer(
                 "#ffffff",
@@ -2735,8 +2908,7 @@ class Activity {
 
             // Load custom modes saved in local storage so they survive a reload.
             try {
-                const savedModes = JSON.parse(localStorage.getItem("customModes") || "[]");
-                for (const mode of savedModes) {
+                for (const mode of getSavedCustomModes()) {
                     if (mode && mode.name && Array.isArray(mode.pattern)) {
                         MUSICALMODES[mode.name] = mode.pattern;
                     }
@@ -2917,7 +3089,12 @@ class Activity {
      * @param {Function} doHardStopButton - Shared stop action callback.
      */
     setupWindowBlurHandler(doHardStopButton) {
-        if (jQuery.browser.mozilla) {
+        // jQuery.browser can be unset by the same RequireJS timing race
+        // doBrowserCheck's own guard above documents. Exercised directly in
+        // activity_blur_handler.test.js; Istanbul/Codecov can't see that
+        // coverage for the same browser-only-file reason noted there.
+        /* istanbul ignore next -- see comment above */
+        if (jQuery.browser && jQuery.browser.mozilla) {
             return;
         }
 

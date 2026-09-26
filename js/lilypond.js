@@ -71,7 +71,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "♮": "!",
             "♯": "is",
             "♭": "es",
-            "10": "''''''''",
+            "10": "'''''''",
             "1": ",, ",
             "2": ", ",
             "3": "",
@@ -79,8 +79,8 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "5": "''",
             "6": "'''",
             "7": "''''",
-            "8": "''''''",
-            "9": "'''''''"
+            "8": "'''''",
+            "9": "''''''"
         };
 
         return note.replace(/[♮♯♭]|10|[1-9]/g, match => replacements[match]).toLowerCase();
@@ -121,16 +121,17 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                     }
                 }
 
-                if (logo.notation.notationStaging[turtle][i + j][NOTATIONSTACCATO]) {
-                    logo.notationNotes[turtle] += " \\staccato ";
-                }
-
                 if (notes.length > 1) {
                     logo.notationNotes[turtle] += ">";
                 }
 
                 logo.notationNotes[turtle] +=
                     logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+
+                if (logo.notation.notationStaging[turtle][i + j][NOTATIONSTACCATO]) {
+                    logo.notationNotes[turtle] += " \\staccato ";
+                }
+
                 j++; // Jump to next note.
                 k++; // Increment notes in tuplet.
             } else if (logo.notation.notationStaging[turtle][i + j] === "tie") {
@@ -290,15 +291,15 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                             for (let ii = 0; ii < obj[1].length; ii++) {
                                 if (obj[1][ii] !== "") {
                                     // Are we repeating notes, e.g., Db and D?
-                                    if (obj[0][ii].substr(0, 1) === prevNote) {
+                                    if (obj[0][ii].slice(0, 1) === prevNote) {
                                         modeDef = "";
                                         break;
                                     } else {
-                                        prevNote = obj[0][ii].substr(0, 1);
+                                        prevNote = obj[0][ii].slice(0, 1);
                                     }
 
                                     n = ["C", "D", "E", "F", "G", "A", "B"].indexOf(
-                                        obj[0][ii].substr(0, 1)
+                                        obj[0][ii].slice(0, 1)
                                     );
 
                                     // Did we skip any notes?
@@ -314,7 +315,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                                         if (obj[0][ii].length === 1) {
                                             modeDef += "(" + n + " . ,NATURAL) ";
                                         } else {
-                                            if (obj[0][ii].substr(1, 1) === FLAT) {
+                                            if (obj[0][ii].slice(1, 2) === FLAT) {
                                                 modeDef += "(" + n + " . ,FLAT) ";
                                             } else {
                                                 modeDef += "(" + n + " . ,SHARP) ";
@@ -405,7 +406,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             if (typeof obj[NOTATIONNOTE] === "string") {
                 note = __toLilynote(obj[NOTATIONNOTE]);
             } else {
-                notes = obj[NOTATIONNOTE];
+                notes = obj[NOTATIONNOTE].length > 0 ? obj[NOTATIONNOTE] : ["R"];
                 note = __toLilynote(notes[0]);
             }
 
@@ -693,7 +694,7 @@ const saveLilypondOutput = function (activity) {
                         if (obj[0][ii] === "R") {
                             continue;
                         } else if (typeof obj[0][ii] === "string") {
-                            octaveTotal += Number(obj[0][ii].substr(-1));
+                            octaveTotal += Number(obj[0][ii].slice(-1));
                         } else {
                             const pitchObj = frequencyToPitch(obj[0][ii]);
                             octaveTotal += pitchObj[1];
@@ -929,7 +930,6 @@ const saveLilypondOutput = function (activity) {
     // Add GUITAR TAB in comments.
     activity.logo.notationOutput += activity.logo.guitarOutputHead;
     for (let c = 0; c < CLEFS.length; c++) {
-        const i = 0;
         let instrumentName;
         for (const t in activity.logo.notationNotes) {
             let tNumber = t;
@@ -937,7 +937,7 @@ const saveLilypondOutput = function (activity) {
                 tNumber = Number(t);
             }
 
-            if (clef[i] === CLEFS[c]) {
+            if (clef[tNumber] === CLEFS[c]) {
                 if (activity.logo.notation.notationStaging[t].length > 0) {
                     if (tNumber > startDrums - 1) {
                         instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];

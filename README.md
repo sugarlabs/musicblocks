@@ -6,8 +6,8 @@
     <img src="https://img.shields.io/github/license/sugarlabs/musicblocks" />
 </a>
 
-<a href="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml" alt="CI">
-    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml/badge.svg" />
+<a href="https://github.com/sugarlabs/musicblocks/actions/workflows/ci.yml" alt="CI">
+    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/ci.yml/badge.svg" alt="CI status" />
 </a>
 
 # Music Blocks
@@ -30,9 +30,9 @@ is audio-visual; it produces graphics, artwork and music. Here are a
 couple of screenshots to give you an idea of how the application looks
 like:
 
-![Music Blocks workspace showing block-based music programming](./screenshots/Screenshot-1.png)
+![Music Blocks workspace showing block-based music programming](./screenshots/screenshot-1.png)
 
-![Music Blocks rhythm and melody blocks interface](./screenshots/Screenshot-2.png)
+![Music Blocks rhythm and melody blocks interface](./screenshots/screenshot-2.png)
 
 Visit the Music Blocks website for a hands on experience:
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
@@ -47,6 +47,13 @@ Additional background on why we combine music and programming can be found
 - [Running Music Blocks](#RUNNING-MUSIC-BLOCKS)
 - [How to set up a local server](#HOW-TO-SET-UP-A-LOCAL-SERVER)
 - [Using Music Blocks](#USING-MUSIC-BLOCKS)
+- [Using the Kokoro voice](./Docs/KOKORO_SPEECH.md)
+
+**Turtle Blocks**
+
+Turtle Blocks is a view into Music Blocks that focuses on graphics
+rather than music. You can learn more about Turle Blocks
+[here](./TurtleDocs/README.md).
 
 If you are a developer (beginner, experienced, or pro), you are very
 welcome to participate in the evolution of Music Blocks.
@@ -77,6 +84,14 @@ your browser — _Google Chrome_ (or _Chromium_), _Microsoft Edge_
 
 To run from the most recent master branch (experimental), visit
 [_sugarlabs.github.io/musicblocks_](https://sugarlabs.github.io/musicblocks).
+
+### <a name="RUNNING_TURTLE_BLOCKS"></a>Running Turtle Blocks
+
+Turtle Blocks shares the same codebase as Music Blocks. To access it,
+simply append ?turtle=true to the URL. We also maintain a link to
+[_turtle.sugarlabs.org_](turtle.sugarlabs.org) that redirects to
+[_musicblocks.sugarlabs.org?turtle=true_](https://musicblocks.sugarlabs.org?turtle=true)
+for your convenience.
 
 ### <a name="HOW_TO_SET_UP_A_LOCAL_SERVER"></a>How to set up a _local server_
 
@@ -120,6 +135,8 @@ listening on port 3000.
 
 **NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
 `socket.error:[Errno 48]`_.
+
+For Turtle Blocks, use `localhost:3000?turtle=true` or `http:127.0.0.1:3000?turtle=true`.
 
 ### Local Setup with Docker
 

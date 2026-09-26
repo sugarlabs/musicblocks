@@ -29,6 +29,13 @@
  *   let blockList = AST2BlockList.toBlockList(AST, config);
  */
 class AST2BlockList {
+    /**
+     * Converts a JavaScript AST into an array of block specifications for Music Blocks.
+     *
+     * @param {Object} AST - Acorn-generated AST object representing the JavaScript code
+     * @param {Object} config - Mapping configuration between AST nodes and blocks
+     * @returns {Array} List of block specifications ready to be loaded via loadNewBlocks
+     */
     static toBlockList(AST, config) {
         let trees = _astToTree(AST, config);
         return _treeToBlockList(trees, config);
@@ -73,7 +80,6 @@ class AST2BlockList {
             for (let body of AST.body) {
                 _createNodeAndAddToTree(body, root);
             }
-            console.log(JSON.stringify(root["children"], null, 2));
             return root["children"];
 
             //
@@ -84,13 +90,21 @@ class AST2BlockList {
                 const steps = path.split(".");
                 let current = obj;
                 for (let step of steps) {
+                    // A missing node (e.g. the null init of `for (;;)`) means the
+                    // path doesn't exist, so the entry just doesn't match.
+                    if (current === null || current === undefined) {
+                        return undefined;
+                    }
                     // Regex matching to handle array case such as arguments[0]
                     const matchStep = step.match(/(\w+)\[(\d+)\]/);
                     if (matchStep) {
                         // Following the example above, the output of matchStep will have
                         // 'arguments' at index 1 and the index (0) will be at index 2
                         current = current[matchStep[1]];
-                        current = current[matchStep[2]];
+                        current =
+                            current === null || current === undefined
+                                ? undefined
+                                : current[matchStep[2]];
                     } else {
                         current = current[step];
                     }
@@ -123,6 +137,21 @@ class AST2BlockList {
                                     groupMatched = true;
                                     break;
                                 }
+                            } else if ("same_as" in identifier) {
+                                // Two parts of the statement must be the same
+                                // node, e.g. the loop variable in init, test and update.
+                                if (
+                                    value !== undefined &&
+                                    value === _getPropertyValue(bodyAST, identifier.same_as)
+                                ) {
+                                    groupMatched = true;
+                                    break;
+                                }
+                            } else if ("integer" in identifier) {
+                                if (Number.isInteger(value) === identifier.integer) {
+                                    groupMatched = true;
+                                    break;
+                                }
                             } else if (
                                 "has_value" in identifier &&
                                 ((!identifier.has_value && value === null) ||
@@ -151,7 +180,6 @@ class AST2BlockList {
                                 "expression.argument.callee.property.name"
                             );
                             if (calleePropertyName && entry.name_map[calleePropertyName]) {
-                                console.log(entry.name_map[calleePropertyName]);
                                 entry.name = entry.name_map[calleePropertyName];
                             }
                         }
@@ -560,9 +588,11 @@ class AST2BlockList {
                         for (const name in entry.name_map) {
                             if (block_name === entry.name_map[name]) {
                                 blockConfig = entry;
-                                console.log(entry);
-                                console.log(block_name);
+                                break;
                             }
+                        }
+                        if (blockConfig) {
+                            break;
                         }
                     }
                 }

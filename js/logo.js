@@ -15,9 +15,9 @@
    global
 
    Notation, Synth, instruments, instrumentsFilters,
-   instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
+   instrumentsEffects, Singer, Tone, CAMERAVALUE, 
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
-   mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
+   mixedNumber, rationalToFraction, StatusMatrix,
    getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker,
    requirejs, define, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
    OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
@@ -27,7 +27,7 @@
    EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER, NOTATIONNOTE, NOTATIONDURATION,
    NOTATIONDOTCOUNT, NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN,
    NOTATIONINSIDECHORD, NOTATIONSTACCATO, ManagedTimer,
-   EmbeddedGraphicsScheduler
+   EmbeddedGraphicsScheduler, KokoroSpeech
  */
 
 /*
@@ -51,6 +51,28 @@ const getPerformanceTracker = () =>
     typeof performanceTracker === "undefined" ? null : performanceTracker;
 
 /**
+ * Whether performance profiling was asked for in the URL.
+ *
+ * Parses the query string rather than searching it for a substring, so that
+ * `?noperformance=true`, `?x=performance=true` and `?performance=truex` are not
+ * mistaken for `?performance=true`. `URLSearchParams` is guarded because it is
+ * absent in very old browsers, where the answer should be "not asked for"
+ * rather than a thrown error inside runLogoCommands.
+ *
+ * @returns {boolean}
+ */
+const _performanceRequestedInURL = () => {
+    if (typeof window === "undefined" || !window.location || !window.location.search) {
+        return false;
+    }
+    try {
+        return new URLSearchParams(window.location.search).get("performance") === "true";
+    } catch (e) {
+        return false;
+    }
+};
+
+/**
  * @class
  * @classdesc Queue entry for managing running blocks.
  */
@@ -70,6 +92,10 @@ class Queue {
     }
 }
 
+/**
+ * @classdesc Logo owns global execution, scheduling, widget and session context, notation and
+ * export, synth and transport, camera and shared resources, and orchestration state.
+ */
 class Logo {
     /**
      * @constructor
@@ -200,6 +226,7 @@ class Logo {
 
         // Related to running programs
         this._lastNoteTimeout = null;
+        this._valueBarTimeout = null;
         this._alreadyRunning = false;
         this._prematureRestart = false;
         this._runningBlock = null;
@@ -235,8 +262,8 @@ class Logo {
         // pitch-rhythm matrix
         this.inMatrix = false;
         this.inLegoWidget = false;
-        this.tupletRhythms = [];
-        this.addingNotesToTuplet = false;
+        this.tupletRhythms = {};
+        this.addingNotesToTuplet = {};
         this.drumBlocks = [];
         this.pitchBlocks = [];
 
@@ -245,8 +272,8 @@ class Logo {
         this.connectionStoreLock = false;
 
         // tuplet
-        this.tuplet = false;
-        this.tupletParams = [];
+        this.tuplet = {};
+        this.tupletParams = {};
 
         // object that deals with notations
         this._notation = new this.deps.classes.Notation(this.activity);
@@ -634,13 +661,202 @@ class Logo {
     }
 
     /**
-     * Speaks all characters in the range of comma, full stop, space, A to Z, a to z in the input text.
+     * Speaks the given text aloud.
+     *
+     * Two engines are available. The Web Speech API is the default because it
+     * costs nothing: it is already in the browser, it works offline, and it
+     * starts talking immediately. Kokoro is a neural voice that sounds much
+     * more human, but it has to fetch about 92 MB of weights the first time it
+     * runs, so it is opt-in rather than the default. See js/kokoro-speech.js.
      *
      * @param {string} text
      * @returns {void}
      */
     processSpeak(text) {
-        // meSpeak was removed from the codebase.
+        // The Speak block used to run on meSpeak, a JavaScript port of espeak
+        // that was bundled with the app. It was heavy, it sounded robotic, and
+        // it was eventually dropped, which left the block doing nothing at all.
+
+        const phrase = text === null || text === undefined ? "" : String(text);
+        if (phrase.trim() === "") {
+            return;
+        }
+
+        const kokoro = this._kokoroIfEnabled();
+        if (kokoro !== null) {
+            kokoro.speak(phrase);
+            return;
+        }
+
+        this._speakWithWebSpeech(phrase);
+    }
+
+    /**
+     * Silences anything the Speak block still has queued, whichever engine is
+     * doing the talking.
+     *
+     * Called when a run starts and when Stop is pressed, so speech left over
+     * from a previous run never bleeds into the next one.
+     *
+     * @returns {void}
+     */
+    _cancelSpeech() {
+        if (this._kokoroSpeech) {
+            this._kokoroSpeech.cancel();
+        }
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+    }
+
+    /**
+     * The Kokoro engine, but only if the user has asked for it.
+     *
+     * Turned on for the current page with "?kokoro=true", or persistently by
+     * setting "kokoroSpeech" to "on" in localStorage. The URL flag does not
+     * change localStorage. Building the engine is cheap and downloads nothing;
+     * the weights are only fetched once something is actually spoken.
+     *
+     * @returns {KokoroSpeech|null} null when it is switched off or unavailable
+     */
+    _kokoroIfEnabled() {
+        let enabled = false;
+        try {
+            if (
+                typeof URLSearchParams !== "undefined" &&
+                typeof window !== "undefined" &&
+                window.location &&
+                window.location.search
+            ) {
+                enabled = new URLSearchParams(window.location.search).get("kokoro") === "true";
+            }
+
+            if (!enabled) {
+                enabled =
+                    typeof localStorage !== "undefined" &&
+                    localStorage.getItem("kokoroSpeech") === "on";
+            }
+        } catch (e) {
+            // Storage can be blocked outright in a locked-down profile.
+            return null;
+        }
+        if (!enabled) {
+            return null;
+        }
+
+        if (!this._kokoroSpeech) {
+            const Speech =
+                typeof KokoroSpeech !== "undefined"
+                    ? KokoroSpeech
+                    : typeof window !== "undefined" && window.KokoroSpeech;
+            if (!Speech) {
+                return null;
+            }
+            this._kokoroSpeech = new Speech({
+                onProgress: progress => this._showKokoroProgress(progress)
+            });
+        }
+        return this._kokoroSpeech;
+    }
+
+    /**
+     * Shows Kokoro model-loading progress through Music Blocks' existing popup.
+     *
+     * @param {object} progress - Transformers.js progress information
+     * @returns {void}
+     */
+    _showKokoroProgress(progress) {
+        if (!progress || typeof progress.progress !== "number") {
+            return;
+        }
+
+        const percent = Math.max(0, Math.min(100, Math.round(progress.progress)));
+        this.deps.textMsg(_("Downloading Kokoro voice: %s").replace(/%s/g, `${percent}%`));
+    }
+
+    /**
+     * Speaks a phrase with the browser's built-in synthesizer.
+     *
+     * @param {string} phrase
+     * @returns {void}
+     */
+    _speakWithWebSpeech(phrase) {
+        // Bail quietly if we're somewhere without the API (an older browser, a
+        // test runner, a server-side render). Speaking is a nice-to-have, so a
+        // missing synthesizer should never throw and take a running project down.
+        if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+            return;
+        }
+
+        const synth = window.speechSynthesis;
+
+        // Nothing is cancelled here on purpose. The synthesizer keeps its own
+        // queue, so two Speak blocks one after another are read one after the
+        // other instead of the second cutting the first off mid-word. Leftover
+        // speech from an earlier run is cleared by _cancelSpeech() when the next
+        // run starts or when Stop is pressed.
+        const utterance = new SpeechSynthesisUtterance(phrase);
+
+        // Try to pronounce the words in the child's own language rather than
+        // reading them as if they were English. We look for a voice that
+        // matches the current locale and quietly fall back to the browser
+        // default if there isn't one.
+        const preferredLang = navigator.language || "en-US";
+        const voice = this._pickSpeechVoice(synth, preferredLang);
+        if (voice) {
+            utterance.voice = voice;
+            utterance.lang = voice.lang;
+        } else {
+            utterance.lang = preferredLang;
+        }
+
+        // Calm, clear defaults that read well for kids: normal speed, natural
+        // pitch, full volume.
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        utterance.onerror = event => {
+            // "interrupted" and "canceled" are what a Stop or a fresh Run looks
+            // like from in here, so they aren't worth surfacing.
+            if (event.error === "interrupted" || event.error === "canceled") {
+                return;
+            }
+            console.warn(`Speak block: speech synthesis failed (${event.error}).`);
+        };
+
+        synth.speak(utterance);
+    }
+
+    /**
+     * Picks the best available speech-synthesis voice for a language.
+     *
+     * @param {SpeechSynthesis} synth - the window.speechSynthesis instance
+     * @param {string} preferredLang - a BCP-47 tag like "hi-IN" or "es"
+     * @returns {SpeechSynthesisVoice|null} the best match, or null to let the
+     *     browser choose its own default
+     */
+    _pickSpeechVoice(synth, preferredLang) {
+        // getVoices() is famously empty on the very first call in some browsers:
+        // Chrome loads the list asynchronously and fires 'voiceschanged' a beat
+        // later. By the time a child actually presses Run the list has almost
+        // always populated. If it hasn't yet, returning null just lets the
+        // browser pick its own default, which is still perfectly fine.
+        const voices = synth.getVoices();
+        if (!voices || voices.length === 0) {
+            return null;
+        }
+
+        const wanted = preferredLang.toLowerCase();
+        const base = wanted.split("-")[0];
+
+        // Prefer an exact locale match ("hi-IN"), then any voice for the same
+        // language ("hi-*"), and otherwise let the browser decide.
+        return (
+            voices.find(v => v.lang && v.lang.toLowerCase() === wanted) ||
+            voices.find(v => v.lang && v.lang.toLowerCase().split("-")[0] === base) ||
+            null
+        );
     }
 
     /**
@@ -656,33 +872,37 @@ class Logo {
         const requiredTurtle = this.turtles.getTurtle(turtle);
         if (typeof arg1 === "string") {
             const len = arg1.length;
-            if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
-                this.deps.utils.doUseCamera(
-                    [arg0],
-                    this.turtles,
-                    turtle,
-                    false,
-                    this.cameraID,
-                    this.setCameraID,
-                    (msg, blk) => this.deps.errorHandler(msg, blk)
-                );
-            } else if (len === 13 && arg1.substr(0, 13) === VIDEOVALUE) {
-                this.deps.utils.doUseCamera(
-                    [arg0],
-                    this.turtles,
-                    turtle,
-                    true,
-                    this.cameraID,
-                    this.setCameraID,
-                    (msg, blk) => this.deps.errorHandler(msg, blk)
-                );
-            } else if (len > 10 && arg1.substr(0, 10) === "data:image") {
+            if (len === 14 && arg1.slice(0, 14) === CAMERAVALUE) {
+                if (this.deps.utils.doUseCamera) {
+                    this.deps.utils.doUseCamera(
+                        [arg0],
+                        this.turtles,
+                        turtle,
+                        false,
+                        this.cameraID,
+                        this.setCameraID,
+                        (msg, blk) => this.deps.errorHandler(msg, blk)
+                    );
+                }
+            } else if (len === 13 && arg1.slice(0, 13) === VIDEOVALUE) {
+                if (this.deps.utils.doUseCamera) {
+                    this.deps.utils.doUseCamera(
+                        [arg0],
+                        this.turtles,
+                        turtle,
+                        true,
+                        this.cameraID,
+                        this.setCameraID,
+                        (msg, blk) => this.deps.errorHandler(msg, blk)
+                    );
+                }
+            } else if (len > 10 && arg1.slice(0, 10) === "data:image") {
                 requiredTurtle.doShowImage(arg0, arg1);
-            } else if (len > 8 && arg1.substr(0, 8) === "https://") {
+            } else if (len > 8 && arg1.slice(0, 8) === "https://") {
                 requiredTurtle.doShowURL(arg0, arg1);
-            } else if (len > 7 && arg1.substr(0, 7) === "http://") {
+            } else if (len > 7 && arg1.slice(0, 7) === "http://") {
                 requiredTurtle.doShowURL(arg0, arg1);
-            } else if (len > 7 && arg1.substr(0, 7) === "file://") {
+            } else if (len > 7 && arg1.slice(0, 7) === "file://") {
                 requiredTurtle.doShowURL(arg0, arg1);
             } else {
                 requiredTurtle.doShowText(arg0, arg1);
@@ -886,8 +1106,7 @@ class Logo {
                         } else {
                             const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                             if (typeof a === "number") {
-                                currentBlock.value =
-                                    a < 0 ? "-" + utils.mixedNumber(-a) : utils.mixedNumber(a);
+                                currentBlock.value = utils.mixedNumber(a);
                             } else {
                                 logo.deps.errorHandler(NANERRORMSG, blk);
                                 currentBlock.value = 0;
@@ -1274,7 +1493,9 @@ class Logo {
 
         // eslint-disable-next-line eqeqeq
         if (this.cameraID != null) {
-            this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
+            if (this.deps.utils.doStopVideoCam) {
+                this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
+            }
         }
     }
 
@@ -1287,6 +1508,7 @@ class Logo {
     doStopTurtles() {
         this.stopTurtle = true;
         this.turtles.markAllAsStopped();
+        this._cancelSpeech();
 
         // Cancel all pending timers to prevent zombie graphics and sounds.
         const cancelledTimers = this._timerManager.clearAll();
@@ -1303,6 +1525,12 @@ class Logo {
         // Prevent stale timeout from firing cleanup on next run.
         this._lastNoteTimeout = null;
 
+        // clearAll() above cancels the value-bar timeout without running its
+        // callback, so reset both directly to avoid valueBarVisible getting
+        // stuck true (and hotkeys stuck blocked) if a stop happens mid-window.
+        this._valueBarTimeout = null;
+        if (this.activity) this.activity.valueBarVisible = false;
+
         this._cleanupAfterCompletion();
 
         for (const arg in this.evalOnStopList) {
@@ -1315,12 +1543,22 @@ class Logo {
             this.synth.recorder.stop();
 
         this.onStopTurtle();
+        if (
+            this.blocks &&
+            this.blocks.visible &&
+            typeof this.blocks.unhighlightAll === "function"
+        ) {
+            this.blocks.unhighlightAll();
+        }
         this.blocks.bringToTop();
 
         this._alreadyRunning = false;
         this.stepQueue = {};
         for (const turtle of this.turtles.turtleList) {
             turtle.unhighlightQueue = [];
+            if (turtle.singer) {
+                turtle.singer._unhighlightTimers = {};
+            }
             if (turtle.delayTimeout !== null) {
                 clearTimeout(turtle.delayTimeout);
                 turtle.delayTimeout = null;
@@ -1389,10 +1627,13 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        // Drop any speech the previous run left queued immediately, including
+        // while the optional performance tracker is still loading.
+        this._cancelSpeech();
+
         const performanceModeEnabled =
             typeof window !== "undefined" &&
-            (window.DEBUG_PERFORMANCE === true ||
-                (window.location && window.location.search.includes("performance=true")));
+            (window.DEBUG_PERFORMANCE === true || _performanceRequestedInURL());
 
         if (
             performanceModeEnabled &&
@@ -1462,9 +1703,11 @@ class Logo {
         this.firstNoteTime = null;
         this.firstNoteAudioTime = null;
 
-        // Ensure we have at least one turtle.
-        if (this.turtles.getTurtleCount() === 0) {
-            this.turtles.add(null);
+        // Ensure we have at least one turtle that is not in the trash. This
+        // has to happen before prepSynths() and initTurtle() below, or a
+        // turtle added here gets no synth and no notation state.
+        if (this.turtles.turtleCount() === 0) {
+            this.turtles.addTurtle(null);
         }
 
         this.deps.Singer.masterBPM = TARGETBPM;
@@ -1476,7 +1719,8 @@ class Logo {
         this._exportNotationFinished = false;
 
         for (const turtle of this.turtles.turtleList) {
-            turtle.embeddedGraphicsFinished = true;
+            turtle.embeddedGraphicsPending = 0;
+            turtle.embeddedGraphicsGeneration += 1;
         }
 
         this.prepSynths();
@@ -1535,7 +1779,10 @@ class Logo {
         this.inStatusMatrix = false;
         this.pitchBlocks = [];
         this.drumBlocks = [];
-        this.tuplet = false;
+        this.tuplet = {};
+        this.tupletParams = {};
+        this.tupletRhythms = {};
+        this.addingNotesToTuplet = {};
         this.modeBlock = null;
         this._meterBlock = null;
 
@@ -1614,11 +1861,6 @@ class Logo {
         }
 
         this.onRunTurtle();
-
-        // Make sure that there is atleast one turtle.
-        if (this.turtles.getTurtleCount() === 0) {
-            this.turtles.addTurtle(null);
-        }
 
         // Mark all turtles as not running.
         for (const turtle in this.turtles.turtleList) {
@@ -2022,7 +2264,14 @@ class Logo {
             }
         }
 
-        if (!currentBlock.isArgBlock()) {
+        // Value blocks that are not styled as arg blocks (note counter,
+        // calculate, make block) define arg() but no flow(). Clicking one on
+        // its own should show its value like any other value block.
+        const returnsValue =
+            currentBlock.isArgBlock() ||
+            (!(currentBlock.name in logo.evalFlowDict) && typeof proto.flow !== "function");
+
+        if (!returnsValue) {
             let res = null;
             // Is it a plugin?
             if (currentBlock.name in logo.evalFlowDict) {
@@ -2061,7 +2310,7 @@ class Logo {
                 currentBlock.isArgBlock() ||
                 ["anyout", "numberout", "textout", "booleanout"].includes(proto.dockTypes[0])
             ) {
-                args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
+                args.push(logo.parseArg(logo, turtle, blk, blk, receivedArg));
 
                 const blockLabels = {
                     width: _("width"),
@@ -2081,6 +2330,19 @@ class Logo {
                     const value = blockValue.toString();
                     const displayText = label ? label + ": " + value : value;
                     logo.deps.textMsg(displayText);
+                }
+                // Briefly block hotkeys so a hotkey press right after clicking
+                // this value display can't accidentally spawn a new block
+                // (#4931). Scoped to just this case, not every status message.
+                if (logo.activity) {
+                    logo.activity.valueBarVisible = true;
+                    if (logo._valueBarTimeout !== null) {
+                        logo._timerManager.clearTimeout(logo._valueBarTimeout);
+                    }
+                    logo._valueBarTimeout = logo._timerManager.setTimeout(() => {
+                        logo._valueBarTimeout = null;
+                        if (logo.activity) logo.activity.valueBarVisible = false;
+                    }, 3000);
                 }
             } else {
                 logo.deps.errorHandler("I do not know how to " + blockName + ".", blk);

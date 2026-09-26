@@ -23,6 +23,7 @@
 // --- Global Mocks ---
 
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 global.last = arr => arr[arr.length - 1];
 global.LCD = (a, b) => (a * b) / gcd(a, b);
 function gcd(a, b) {
@@ -74,7 +75,8 @@ global.PhraseMakerAudio = {
     collectNotesToPlay: jest.fn(),
     __playNote: jest.fn(),
     _playChord: jest.fn(),
-    _processGraphics: jest.fn()
+    _processGraphics: jest.fn(),
+    clearPlaybackTimers: jest.fn()
 };
 window.PhraseMakerAudio = global.PhraseMakerAudio;
 global.DEFAULTVOICE = "electronic synth";
@@ -1144,6 +1146,58 @@ describe("PhraseMaker Widget", () => {
 
         phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
     });
+    test("_setNoteCell detects graphics block from MATRIXGRAPHICS", () => {
+        phraseMaker._noteStored = ["forward"];
+        phraseMaker.rowLabels = ["forward"];
+
+        phraseMaker._rows = [{ cells: [{ getAttribute: jest.fn(() => 1), style: {} }] }];
+
+        phraseMaker._deps.Singer = { defaultBPMFactor: 1 };
+        phraseMaker._deps.getDrumName = jest.fn(() => null);
+
+        global.PhraseMakerUtils = {
+            MATRIXSYNTHS: [],
+            MATRIXGRAPHICS: ["forward", "back", "right", "left"],
+            MATRIXGRAPHICS2: ["arc", "setxy"]
+        };
+
+        phraseMaker.activity = {
+            logo: {
+                synth: { trigger: jest.fn() }
+            }
+        };
+
+        phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
+
+        // synth.trigger must NOT be called for a graphics block
+        expect(phraseMaker.activity.logo.synth.trigger).not.toHaveBeenCalled();
+    });
+    test("_setNoteCell detects graphics block from MATRIXGRAPHICS2", () => {
+        phraseMaker._noteStored = ["arc"];
+        phraseMaker.rowLabels = ["arc"];
+
+        phraseMaker._rows = [{ cells: [{ getAttribute: jest.fn(() => 1), style: {} }] }];
+
+        phraseMaker._deps.Singer = { defaultBPMFactor: 1 };
+        phraseMaker._deps.getDrumName = jest.fn(() => null);
+
+        global.PhraseMakerUtils = {
+            MATRIXSYNTHS: [],
+            MATRIXGRAPHICS: ["forward", "back", "right", "left"],
+            MATRIXGRAPHICS2: ["arc", "setxy"]
+        };
+
+        phraseMaker.activity = {
+            logo: {
+                synth: { trigger: jest.fn() }
+            }
+        };
+
+        phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
+
+        // synth.trigger must NOT be called for a graphics block
+        expect(phraseMaker.activity.logo.synth.trigger).not.toHaveBeenCalled();
+    });
     test("_clear resets matrix safely", () => {
         phraseMaker.rowLabels = ["C"];
         phraseMaker._rows = [
@@ -1200,7 +1254,8 @@ describe("PhraseMaker Widget", () => {
             collectNotesToPlay: jest.fn(),
             __playNote: jest.fn(),
             _playChord: jest.fn(),
-            _processGraphics: jest.fn()
+            _processGraphics: jest.fn(),
+            clearPlaybackTimers: jest.fn()
         };
 
         global.PhraseMakerUI = {
@@ -1282,7 +1337,10 @@ describe("PhraseMaker Widget", () => {
         expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalled();
     });
     test("_save wires lastConnection identically across all block types (characterization)", () => {
-        global.PhraseMakerAudio = { collectNotesToPlay: jest.fn() };
+        global.PhraseMakerAudio = {
+            collectNotesToPlay: jest.fn(),
+            clearPlaybackTimers: jest.fn()
+        };
 
         phraseMaker._rows = [];
         phraseMaker._rowBlocks = [];
@@ -1514,7 +1572,9 @@ describe("PhraseMaker Widget", () => {
             resetMatrix: jest.fn()
         };
         phraseMaker.init(mockActivity);
+        phraseMaker.widgetWindow.onclose();
 
+        expect(phraseMaker._stopOrCloseClicked).toBe(true);
         expect(mockActivity.textMsg).toHaveBeenCalled();
     });
     test("isInitial ensures the first-open message fires only once across repeated init() calls", () => {
@@ -1608,6 +1668,89 @@ describe("PhraseMaker Widget", () => {
 
         expect(mockActivity.textMsg).toHaveBeenCalledTimes(1);
         expect(phraseMaker.isInitial).toBe(false);
+    });
+
+    test("announces widget opened to screen readers only on genuine first open", () => {
+        const mockActivity = {
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: {
+                        beatsPerMeasure: 4,
+                        noteValuePerBeat: 4,
+                        keySignature: 0
+                    }
+                }))
+            },
+            logo: {
+                tupletRhythms: [["notes", 0, 4]],
+                synth: {
+                    inTemperament: "equal",
+                    stopSound: jest.fn(),
+                    stop: jest.fn(),
+                    loadSynth: jest.fn()
+                }
+            },
+            blocks: {
+                protoBlockDict: {
+                    forward: { staticLabels: ["Forward"] }
+                }
+            },
+            canvas: { width: 800, height: 600 },
+            getStageScale: jest.fn(() => 1),
+            hideMsgs: jest.fn(),
+            textMsg: jest.fn()
+        };
+
+        phraseMaker._rows = [];
+        phraseMaker._headcols = [];
+        phraseMaker._labelcols = [];
+        phraseMaker._blockMap = {};
+        phraseMaker.blockNo = 0;
+        phraseMaker.rowLabels = ["C", "kick", "forward"];
+        phraseMaker.rowArgs = [4, 4, 100];
+        phraseMaker._deps.getDrumName = jest.fn(name => (name === "kick" ? "kick" : null));
+        phraseMaker.lyricsON = true;
+
+        global.PhraseMakerUtils = {
+            MATRIXGRAPHICS: ["forward"],
+            MATRIXGRAPHICS2: [],
+            MATRIXSYNTHS: []
+        };
+
+        global.window.widgetWindows = {
+            windowFor: jest.fn().mockReturnValue({
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn().mockReturnValue({
+                    onclick: null,
+                    innerHTML: "",
+                    style: {},
+                    setAttribute: jest.fn()
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    appendChild: jest.fn(),
+                    append: jest.fn()
+                }),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn()
+            })
+        };
+        global.PhraseMakerUI = {
+            calculateNoteWidth: jest.fn(() => 80),
+            resetMatrix: jest.fn()
+        };
+
+        global.announceToScreenReader.mockClear();
+        phraseMaker.init(mockActivity);
+        expect(global.announceToScreenReader).toHaveBeenCalledWith("Phrase Maker opened");
+
+        global.announceToScreenReader.mockClear();
+        phraseMaker._rows = [];
+        phraseMaker._headcols = [];
+        phraseMaker._labelcols = [];
+        phraseMaker._blockMap = {};
+        phraseMaker.init(mockActivity);
+        expect(global.announceToScreenReader).not.toHaveBeenCalled();
     });
     test("_createColumnPieSubmenu executes", () => {
         phraseMaker.platformColor = {
@@ -1738,6 +1881,57 @@ describe("PhraseMaker Widget", () => {
         };
 
         phraseMaker._blockReplace(0, 1);
+    });
+
+    describe("_export", () => {
+        const originalOpen = global.window.open;
+
+        afterEach(() => {
+            global.window.open = originalOpen;
+        });
+
+        test("shows a warning and returns safely when the popup is blocked", () => {
+            global.window.open = jest.fn().mockReturnValue(null);
+            phraseMaker.activity = { errorMsg: jest.fn() };
+
+            expect(() => phraseMaker._export()).not.toThrow();
+
+            expect(phraseMaker.activity.errorMsg).toHaveBeenCalledTimes(1);
+            expect(phraseMaker.activity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("export window")
+            );
+        });
+
+        test("builds the export document without warning when the popup succeeds", () => {
+            const makeCell = () => ({ style: {}, appendChild: jest.fn(), setAttribute: jest.fn() });
+            const makeRow = () => ({ insertCell: jest.fn(makeCell) });
+            const exportTableMock = {
+                createTHead: jest.fn(() => ({ insertRow: jest.fn(makeRow) }))
+            };
+            const exportDocumentMock = {
+                createElement: jest.fn(() => ({
+                    style: {},
+                    appendChild: jest.fn(),
+                    setAttribute: jest.fn()
+                })),
+                getElementById: jest.fn(id =>
+                    id === "exportTable" ? exportTableMock : { download: "", href: "" }
+                ),
+                head: { appendChild: jest.fn() },
+                body: { appendChild: jest.fn() },
+                documentElement: { outerHTML: "<html></html>" },
+                close: jest.fn()
+            };
+            global.window.open = jest.fn().mockReturnValue({ document: exportDocumentMock });
+            phraseMaker.activity = { errorMsg: jest.fn() };
+            phraseMaker._noteValueRow = { cells: [] };
+            phraseMaker._generateDataURI = jest.fn(() => "data:text/html;base64,mock");
+
+            expect(() => phraseMaker._export()).not.toThrow();
+
+            expect(phraseMaker.activity.errorMsg).not.toHaveBeenCalled();
+            expect(exportDocumentMock.close).toHaveBeenCalled();
+        });
     });
 
     describe("refreshRowForBlock", () => {
@@ -2394,7 +2588,8 @@ describe("PhraseMaker Widget", () => {
                 collectNotesToPlay: jest.fn(),
                 __playNote: jest.fn(),
                 _playChord: jest.fn(),
-                _processGraphics: jest.fn()
+                _processGraphics: jest.fn(),
+                clearPlaybackTimers: jest.fn()
             };
             global.PhraseMakerUI = {
                 resetMatrix: jest.fn(),
@@ -2940,6 +3135,57 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker._history.length).toBe(2);
             expect(phraseMaker._history.pop()).toEqual({ note: "la4", beat: 2 });
             expect(phraseMaker._history.length).toBe(1);
+        });
+    });
+
+    describe("handleClose", () => {
+        test("cleans up state and calls PhraseMakerAudio.clearPlaybackTimers on close", () => {
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                hideMsgs: jest.fn()
+            };
+            phraseMaker.playingNow = true;
+            phraseMaker._instrumentName = "piano";
+            phraseMaker._rowOffset = [1];
+            phraseMaker._rowMap = [2, 0, 1];
+            phraseMaker.widgetWindow = {
+                destroy: jest.fn()
+            };
+
+            global.PhraseMakerAudio.clearPlaybackTimers.mockClear();
+
+            phraseMaker.handleClose();
+
+            expect(phraseMaker._stopOrCloseClicked).toBe(true);
+            expect(phraseMaker.playingNow).toBe(false);
+            expect(phraseMaker._rowOffset).toEqual([]);
+            expect(phraseMaker._rowMap).toEqual([0, 1, 2]);
+            expect(phraseMaker.activity.hideMsgs).toHaveBeenCalled();
+            expect(global.PhraseMakerAudio.clearPlaybackTimers).toHaveBeenCalledWith(phraseMaker);
+            expect(phraseMaker.activity.logo.synth.stop).toHaveBeenCalled();
+            expect(phraseMaker.activity.logo.synth.stopSound).toHaveBeenCalledWith(0, "piano");
+            expect(phraseMaker.widgetWindow.destroy).toHaveBeenCalled();
+        });
+        test("announces widget closed to screen readers", () => {
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                hideMsgs: jest.fn()
+            };
+            phraseMaker.widgetWindow = { destroy: jest.fn() };
+
+            global.announceToScreenReader.mockClear();
+            phraseMaker.handleClose();
+            expect(global.announceToScreenReader).toHaveBeenCalledWith("Phrase Maker closed");
         });
     });
 });

@@ -98,6 +98,16 @@ describe("setupVolumeActions", () => {
             logo: {
                 setDispatchBlock: jest.fn(),
                 setTurtleListener: jest.fn(),
+                stopTurtle: false,
+                _timerManager: {
+                    setGuardedTimeout: jest.fn((cb, delay, guard) => {
+                        return setTimeout(() => {
+                            if (!guard()) cb();
+                        }, delay);
+                    }),
+                    clearTimeout: jest.fn(id => clearTimeout(id)),
+                    clearAll: jest.fn(() => 0)
+                },
                 synth: {
                     loadSynth: jest.fn(),
                     setMasterVolume: jest.fn(),
@@ -202,8 +212,10 @@ describe("setupVolumeActions", () => {
         ])("listener execution with justCounting %p", (justCounting, noCall) => {
             targetTurtle.singer.justCounting = justCounting;
             Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
+            expect(targetTurtle.singer.inCrescendo.length).toBe(1);
             const listener = activity.logo.setTurtleListener.mock.calls.pop()[2];
             listener();
+            expect(targetTurtle.singer.inCrescendo.length).toBe(0);
             if (!noCall) {
                 expect(crescendoEndSpy).toHaveBeenCalledWith(0, 10);
             } else {
@@ -311,14 +323,56 @@ describe("setupVolumeActions", () => {
             expect(targetTurtle.singer.synthVolume.default).toContain(100);
         });
 
-        it("should clamp relative volume to min -100", () => {
+        it("should clamp relative volume to min 0", () => {
             targetTurtle.singer.synthVolume = {
                 default: [50]
             };
 
             Singer.VolumeActions.setRelativeVolume(-300, 0, 1);
 
-            expect(targetTurtle.singer.synthVolume.default).toContain(-100);
+            expect(targetTurtle.singer.synthVolume.default).toEqual([50, 0]);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "default", 0);
+        });
+
+        it("should keep a further decrease from raising the volume", () => {
+            targetTurtle.singer.synthVolume = {
+                default: [50]
+            };
+
+            // A decrease large enough to bottom out, then another decrease.
+            Singer.VolumeActions.setRelativeVolume(-300, 0, 1);
+            const afterFirst = last(targetTurtle.singer.synthVolume.default);
+            Singer.VolumeActions.setRelativeVolume(-150, 0, 1);
+            const afterSecond = last(targetTurtle.singer.synthVolume.default);
+
+            expect(afterFirst).toBe(0);
+            expect(afterSecond).toBe(0);
+            expect(afterSecond).toBeLessThanOrEqual(afterFirst);
+        });
+
+        it("should stay at 0 once the volume has bottomed out", () => {
+            // Guard, not a regression case: the relative change is multiplicative,
+            // so 0 is absorbing. This held before the clamp change too, and is
+            // scoped to the clamp because the listener pops the value on exit.
+            targetTurtle.singer.synthVolume = {
+                default: [0]
+            };
+
+            Singer.VolumeActions.setRelativeVolume(20, 0, 1);
+
+            expect(last(targetTurtle.singer.synthVolume.default)).toBe(0);
+        });
+
+        it("should never store a negative volume for any argument", () => {
+            for (const arg of [-1000, -300, -201, -200, -199, -100, -50, 0, 50, 1000]) {
+                targetTurtle.singer.synthVolume = { default: [50] };
+
+                Singer.VolumeActions.setRelativeVolume(arg, 0, 1);
+
+                const stored = last(targetTurtle.singer.synthVolume.default);
+                expect(stored).toBeGreaterThanOrEqual(0);
+                expect(stored).toBeLessThanOrEqual(100);
+            }
         });
 
         it("should call notationBeginArticulation when justCounting is empty", () => {
@@ -654,6 +708,22 @@ describe("setupVolumeActions", () => {
 
             expect(targetTurtle.singer.synthVolume.violin).toEqual([DEFAULTVOLUME, 70]);
             expect(targetTurtle.singer.crescendoInitialVolume.violin).toEqual([DEFAULTVOLUME]);
+        });
+
+        it("initializes synthVolume for a voice already in instrumentNames without an entry", () => {
+            // "set default instrument" adds the voice to instrumentNames but
+            // never creates a synthVolume entry, so the includes() check is
+            // true while synthVolume[synth] is still undefined.
+            targetTurtle.singer.instrumentNames = ["default", "violin"];
+            delete targetTurtle.singer.synthVolume.violin;
+            delete targetTurtle.singer.crescendoInitialVolume.violin;
+
+            expect(() =>
+                Singer.VolumeActions.setSynthVolume("violin", 70, 0, "testBlock")
+            ).not.toThrow();
+
+            expect(targetTurtle.singer.synthVolume.violin).toEqual([DEFAULTVOLUME, 70]);
+            expect(loadSynthSpy).not.toHaveBeenCalled();
         });
 
         it("does not reset an already-tracked synth volume when the instrument is newly added", () => {

@@ -49,6 +49,15 @@ class Tempo {
         this.BPMInputs = [];
         this.BPMBlocks = [];
         this.tempoCanvases = [];
+        this.activeBPMIndex = 0;
+        this._keyHandler = null;
+        this.pauseBtn = null;
+        this.tapBtn = null;
+        this._tapTimes = [];
+        this._tapTimeout = null;
+        this._tapButtonTimeout = null;
+        this._lastTapIndex = null;
+        this._lastCanvasIndex = null;
     }
 
     init(activity) {
@@ -56,8 +65,27 @@ class Tempo {
         this._directions = [];
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
-        this._firstClickTimes = null;
+        this._firstClickTime = null;
         this._intervals = [];
+        this._tapTimes = [];
+        this._lastTapIndex = null;
+        this._lastCanvasIndex = null;
+        if (this._tapTimeout) {
+            if (this.widgetWindow && this.widgetWindow.timerManager) {
+                this.widgetWindow.timerManager.clearTimeout(this._tapTimeout);
+            } else {
+                clearTimeout(this._tapTimeout);
+            }
+            this._tapTimeout = null;
+        }
+        if (this._tapButtonTimeout) {
+            if (this.widgetWindow && this.widgetWindow.timerManager) {
+                this.widgetWindow.timerManager.clearTimeout(this._tapButtonTimeout);
+            } else {
+                clearTimeout(this._tapButtonTimeout);
+            }
+            this._tapButtonTimeout = null;
+        }
         this.isMoving = true;
         if (this._intervalID !== undefined && this._intervalID !== null) {
             if (this.widgetWindow && this.widgetWindow.timerManager) {
@@ -70,20 +98,41 @@ class Tempo {
         this._intervalID = null;
         this.activity.logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
 
-        if (this._intervalID !== null) {
-            if (this.widgetWindow && this.widgetWindow.timerManager) {
-                this.widgetWindow.timerManager.clearInterval(this._intervalID);
-            } else {
-                clearInterval(this._intervalID);
-            }
+        if (this._keyHandler) {
+            document.removeEventListener("keydown", this._keyHandler, true);
+            this._keyHandler = null;
         }
-
         const widgetWindow = window.widgetWindows.windowFor(this, "tempo", "tempo", true);
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        if (typeof widgetWindow.takeFocus === "function") {
+            widgetWindow.takeFocus();
+        }
 
         widgetWindow.onclose = () => {
+            if (this._keyHandler) {
+                document.removeEventListener("keydown", this._keyHandler, true);
+                this._keyHandler = null;
+            }
+            if (this._tapTimeout) {
+                if (widgetWindow.timerManager) {
+                    widgetWindow.timerManager.clearTimeout(this._tapTimeout);
+                } else {
+                    clearTimeout(this._tapTimeout);
+                }
+                this._tapTimeout = null;
+            }
+            if (this._tapButtonTimeout) {
+                if (widgetWindow.timerManager) {
+                    widgetWindow.timerManager.clearTimeout(this._tapButtonTimeout);
+                } else {
+                    clearTimeout(this._tapButtonTimeout);
+                }
+                this._tapButtonTimeout = null;
+            }
+            this._tapTimes = [];
+            this._lastTapIndex = null;
             if (this._intervalID !== null) {
                 widgetWindow.timerManager.clearInterval(this._intervalID);
             }
@@ -91,6 +140,7 @@ class Tempo {
         };
 
         const pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, _("Pause"));
+        this.pauseBtn = pauseBtn;
         pauseBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
@@ -139,6 +189,16 @@ class Tempo {
                 }
             };
 
+        const tapBtn = widgetWindow.addButton("tap-button.svg", Tempo.ICONSIZE, _("Tap tempo"));
+        this.tapBtn = tapBtn;
+        tapBtn.onclick = () => {
+            const id =
+                this.activeBPMIndex >= 0 && this.activeBPMIndex < this.BPMs.length
+                    ? this.activeBPMIndex
+                    : 0;
+            this.tapTempo(id);
+        };
+
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
 
@@ -176,6 +236,9 @@ class Tempo {
             )(i);
 
             this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
+            this.BPMInputs[i].addEventListener("focus", () => {
+                this.activeBPMIndex = i;
+            });
             this.tempoCanvases[i] = document.createElement("canvas");
             this.tempoCanvases[i].style.width = Tempo.TEMPOWIDTH + "px";
             this.tempoCanvases[i].style.height = Tempo.TEMPOHEIGHT + "px";
@@ -186,7 +249,14 @@ class Tempo {
             tcCell.setAttribute("rowspan", "3");
 
             // The tempo can be set from the interval between successive clicks on the canvas.
+            this.tempoCanvases[i].style.cursor = "pointer";
+            this.tempoCanvases[i].title = _("Click to tap tempo");
             this.tempoCanvases[i].onclick = (id => () => {
+                if (this._lastCanvasIndex !== id) {
+                    this._firstClickTime = null;
+                    this._lastCanvasIndex = id;
+                }
+                this.activeBPMIndex = id;
                 const d = new Date();
                 let newBPM, BPMInput;
                 if (this._firstClickTime === null) {
@@ -208,12 +278,95 @@ class Tempo {
             this.BPMInputs[i].addEventListener(
                 "keyup",
                 (id => e => {
+                    this.activeBPMIndex = id;
                     if (e.key === "Enter") {
                         this._useBPM(id);
                     }
                 })(i)
             );
         }
+
+        this._keyHandler = event => {
+            if (
+                typeof window === "undefined" ||
+                !window.widgetWindows ||
+                window.widgetWindows.focused !== widgetWindow
+            ) {
+                return;
+            }
+
+            if (
+                this.activity &&
+                this.activity.blocks &&
+                this.activity.blocks.activeBlock !== null &&
+                this.activity.blocks.activeBlock !== undefined
+            ) {
+                return;
+            }
+
+            const activeElement = document.activeElement;
+            if (
+                activeElement &&
+                (activeElement.tagName === "INPUT" ||
+                    activeElement.tagName === "TEXTAREA" ||
+                    activeElement.isContentEditable)
+            ) {
+                return;
+            }
+
+            if (
+                activeElement &&
+                (activeElement.tagName === "BUTTON" || activeElement.tagName === "SELECT")
+            ) {
+                return;
+            }
+
+            if (!this.BPMs || this.BPMs.length === 0) {
+                return;
+            }
+
+            const id =
+                this.activeBPMIndex >= 0 && this.activeBPMIndex < this.BPMs.length
+                    ? this.activeBPMIndex
+                    : 0;
+
+            if (event.key === "ArrowUp" || event.code === "ArrowUp" || event.keyCode === 38) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.shiftKey) {
+                    this.speedUp(id);
+                } else {
+                    this.speedUp(id, 1);
+                }
+                return;
+            }
+
+            if (event.key === "ArrowDown" || event.code === "ArrowDown" || event.keyCode === 40) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.shiftKey) {
+                    this.slowDown(id);
+                } else {
+                    this.slowDown(id, 1);
+                }
+                return;
+            }
+
+            if (event.key === " " || event.code === "Space" || event.keyCode === 32) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.togglePlayPause();
+                return;
+            }
+
+            if (event.key === "t" || event.key === "T" || event.code === "KeyT") {
+                event.preventDefault();
+                event.stopPropagation();
+                this.tapTempo(id);
+            }
+        };
+
+        document.addEventListener("keydown", this._keyHandler, true);
 
         this.activity.textMsg(_("Adjust the tempo with the buttons."), 3000);
         this.resume();
@@ -229,9 +382,12 @@ class Tempo {
     _updateBPM(i) {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
-        if (this.BPMBlocks[i] === null) return;
+        if (!this.BPMBlocks || this.BPMBlocks[i] === null || this.BPMBlocks[i] === undefined) {
+            return;
+        }
 
         const bpmBlock = this.activity.blocks.blockList[this.BPMBlocks[i]];
+        if (!bpmBlock) return;
         const blockNumber = bpmBlock.connections[1];
         if (blockNumber !== null) {
             this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
@@ -312,7 +468,7 @@ class Tempo {
             return;
         }
 
-        this.BPMs[i] = this.BPMInputs[i].value;
+        this.BPMs[i] = Number(this.BPMInputs[i].value);
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
             this.activity.errorMsg(_("The beats per minute must be between 30 and 1000."), 3000);
@@ -327,11 +483,181 @@ class Tempo {
 
     /**
      * @public
-     * @param {number} i
      * @returns {void}
      */
-    speedUp(i) {
-        this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
+    togglePlayPause() {
+        if (this.pauseBtn && typeof this.pauseBtn.onclick === "function") {
+            this.pauseBtn.onclick();
+        } else if (this.isMoving) {
+            this.pause();
+            this.isMoving = false;
+        } else {
+            this.resume();
+            this.isMoving = true;
+        }
+    }
+
+    /**
+     * @private
+     * @returns {void}
+     */
+    _flashTapButton() {
+        if (!this.tapBtn) return;
+        const activeImg = document.createElement("img");
+        activeImg.src = "header-icons/tap-active-button.svg";
+        activeImg.title = _("Tap tempo");
+        activeImg.alt = _("Tap tempo");
+        activeImg.height = Tempo.ICONSIZE;
+        activeImg.width = Tempo.ICONSIZE;
+        activeImg.style.verticalAlign = "middle";
+        if (typeof this.tapBtn.replaceChildren === "function") {
+            this.tapBtn.replaceChildren(activeImg);
+        } else {
+            this.tapBtn.textContent = "";
+            if (typeof this.tapBtn.appendChild === "function") {
+                this.tapBtn.appendChild(activeImg);
+            }
+        }
+
+        if (this._tapButtonTimeout) {
+            if (this.widgetWindow && this.widgetWindow.timerManager) {
+                this.widgetWindow.timerManager.clearTimeout(this._tapButtonTimeout);
+            } else {
+                clearTimeout(this._tapButtonTimeout);
+            }
+            this._tapButtonTimeout = null;
+        }
+
+        const reset = () => {
+            this._tapButtonTimeout = null;
+            if (!this.tapBtn) return;
+            const normalImg = document.createElement("img");
+            normalImg.src = "header-icons/tap-button.svg";
+            normalImg.title = _("Tap tempo");
+            normalImg.alt = _("Tap tempo");
+            normalImg.height = Tempo.ICONSIZE;
+            normalImg.width = Tempo.ICONSIZE;
+            normalImg.style.verticalAlign = "middle";
+            if (typeof this.tapBtn.replaceChildren === "function") {
+                this.tapBtn.replaceChildren(normalImg);
+            } else {
+                this.tapBtn.textContent = "";
+                if (typeof this.tapBtn.appendChild === "function") {
+                    this.tapBtn.appendChild(normalImg);
+                }
+            }
+        };
+
+        if (this.widgetWindow && this.widgetWindow.timerManager) {
+            this._tapButtonTimeout = this.widgetWindow.timerManager.setTimeout(reset, 150);
+        } else {
+            this._tapButtonTimeout = setTimeout(reset, 150);
+        }
+    }
+
+    /**
+     * @private
+     * @returns {void}
+     */
+    _scheduleTapReset() {
+        const resetCallback = () => {
+            this._tapTimes = [];
+            this._tapTimeout = null;
+            this._lastTapIndex = null;
+        };
+        if (this.widgetWindow && this.widgetWindow.timerManager) {
+            this._tapTimeout = this.widgetWindow.timerManager.setTimeout(resetCallback, 2001);
+        } else {
+            this._tapTimeout = setTimeout(resetCallback, 2001);
+        }
+    }
+
+    /**
+     * Sets or adjusts BPM using a rolling average of successive taps.
+     *
+     * @public
+     * @param {number} [id=0] - The index of the BPM to update.
+     * @returns {number|null} The newly calculated BPM, or null on first tap.
+     */
+    tapTempo(id = 0) {
+        if (!this.BPMs || this.BPMs.length === 0) {
+            return null;
+        }
+
+        if (id < 0 || id >= this.BPMs.length) {
+            id = 0;
+        }
+        this.activeBPMIndex = id;
+
+        if (this._lastTapIndex !== id) {
+            this._tapTimes = [];
+            this._lastTapIndex = id;
+        }
+
+        const now = Date.now();
+        this._flashTapButton();
+
+        if (this._tapTimeout) {
+            if (this.widgetWindow && this.widgetWindow.timerManager) {
+                this.widgetWindow.timerManager.clearTimeout(this._tapTimeout);
+            } else {
+                clearTimeout(this._tapTimeout);
+            }
+            this._tapTimeout = null;
+        }
+
+        const lastTap = this._tapTimes[this._tapTimes.length - 1];
+        if (!lastTap || now - lastTap > 2000) {
+            this._tapTimes = [now];
+            if (this.activity && typeof this.activity.textMsg === "function") {
+                this.activity.textMsg(_("Tap again to set tempo"), 1500);
+            }
+            this._scheduleTapReset();
+            return null;
+        }
+
+        this._tapTimes.push(now);
+        if (this._tapTimes.length > 5) {
+            this._tapTimes.shift();
+        }
+
+        let totalInterval = 0;
+        for (let j = 1; j < this._tapTimes.length; j++) {
+            totalInterval += this._tapTimes[j] - this._tapTimes[j - 1];
+        }
+        const avgInterval = totalInterval / (this._tapTimes.length - 1);
+
+        if (avgInterval <= 0) {
+            this._scheduleTapReset();
+            return null;
+        }
+
+        let newBPM = Math.round((60 * 1000) / avgInterval);
+        if (newBPM < 30) {
+            newBPM = 30;
+        } else if (newBPM > 1000) {
+            newBPM = 1000;
+        }
+
+        this.BPMs[id] = newBPM;
+        this._updateBPM(id);
+        if (this.BPMInputs[id]) {
+            this.BPMInputs[id].value = newBPM;
+        }
+
+        this._scheduleTapReset();
+        return newBPM;
+    }
+
+    /**
+     * @public
+     * @param {number} i
+     * @param {number} [step]
+     * @returns {void}
+     */
+    speedUp(i, step) {
+        const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
+        this.BPMs[i] = parseFloat(this.BPMs[i]) + delta;
 
         if (this.BPMs[i] > 1000) {
             this.activity.errorMsg(_("The beats per minute must be below 1000."), 3000);
@@ -345,10 +671,12 @@ class Tempo {
     /**
      * @public
      * @param {number} i
+     * @param {number} [step]
      * @returns {void}
      */
-    slowDown(i) {
-        this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
+    slowDown(i, step) {
+        const delta = step !== undefined ? step : Math.round(0.1 * this.BPMs[i]);
+        this.BPMs[i] = parseFloat(this.BPMs[i]) - delta;
         if (this.BPMs[i] < 30) {
             this.activity.errorMsg(_("The beats per minute must be above 30"), 3000);
             this.BPMs[i] = 30;
@@ -393,11 +721,21 @@ class Tempo {
                 );
                 this._widgetNextTimes[i] += this._intervals[i];
 
-                // Ensure we are at the edge.
-                if (this._directions[i] === -1) {
-                    this._directions[i] = 1;
-                } else {
-                    this._directions[i] = -1;
+                // If the loop fell behind (e.g. a throttled background tab), skip the
+                // missed beats instead of replaying them one per frame. Keep the
+                // beat phase so the next beat still lands on the original grid.
+                let beatsPassed = 1;
+                if (this._intervals[i] > 0 && d.getTime() >= this._widgetNextTimes[i]) {
+                    const missed =
+                        Math.floor((d.getTime() - this._widgetNextTimes[i]) / this._intervals[i]) +
+                        1;
+                    this._widgetNextTimes[i] += missed * this._intervals[i];
+                    beatsPassed += missed;
+                }
+
+                // Ensure we are at the edge (flip once per beat that went by).
+                if (beatsPassed % 2 === 1) {
+                    this._directions[i] = this._directions[i] === -1 ? 1 : -1;
                 }
             } else {
                 // Determine new x position based on delta time.

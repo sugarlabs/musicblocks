@@ -18,6 +18,8 @@
         <link rel="manifest" href="android_chrome_manifest.json" />
 
         <!-- Stylesheets -->
+        <link rel="stylesheet" href="css/tokens.css?v=fixed" />
+        <link rel="stylesheet" href="css/themes.css?v=fixed" />
         <link
             rel="preload"
             href="fonts/material-icons.css"
@@ -99,8 +101,6 @@
 
         <!-- <script src="sounds/samples/manifest.js"></script> -->
 
-        <!-- <script src="lib/mespeak.js"></script> -->
-
         <!-- Release config: resolves Turtle/Music mode from URL/hostname and seeds
      window._THIS_IS_*_ globals. Must load first, synchronously, before
      loader.js and activity.js read those globals. -->
@@ -124,13 +124,15 @@
         <script src="js/utils/jquery-setup.js" defer></script>
         <script src="js/utils/abcLoader.js" defer></script>
         <script src="lib/midi.js" defer></script>
-        <script src="lib/raphael.min.js" defer></script>
-        <script src="lib/wheelnav.js" defer></script>
+        <!-- raphael and wheelnav are loaded from loader.js once the app is up,
+             not here. They are only used to draw the pie menus, which need a
+             block interaction to exist, and as defer scripts they had to run
+             before DOMContentLoaded and so before anything could be painted. -->
         <script src="lib/codejar/codejar.min.js" defer></script>
         <script src="lib/codejar/highlight.pack.js" defer></script>
         <link
             rel="preload"
-            href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
             as="style"
             integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
             crossorigin="anonymous"
@@ -142,7 +144,7 @@
         <noscript
             ><link
                 rel="stylesheet"
-                href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+                href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
                 integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
                 crossorigin="anonymous"
         /></noscript>
@@ -163,6 +165,7 @@
         </script>
         <script src="lib/astring.min.js" defer></script>
         <script src="lib/purify.min.js" defer></script>
+        <script src="js/utils/sessionManager.js" defer></script>
         <script src="js/utils/mb-dialog.js" defer></script>
         <script src="js/svgAssetSelector.js" defer></script>
         <script src="lib/acorn.min.js" defer></script>
@@ -172,48 +175,31 @@
         <script data-main="js/loader" src="lib/require.js" defer></script>
         <link
             rel="preload"
-            href="/fonts/material-icons.woff2"
+            href="fonts/material-icons.woff2"
             as="font"
             type="font/woff2"
             crossorigin="anonymous"
         />
-        <link
-            rel="preload"
-            href="css/tokens.css?v=fixed"
-            as="style"
-            onload="
-                this.onload = null;
-                this.rel = 'stylesheet';
-            "
-        />
-        <noscript><link rel="stylesheet" href="css/tokens.css?v=fixed" /></noscript>
-        <link
-            rel="preload"
-            href="css/themes.css?v=fixed"
-            as="style"
-            onload="
-                this.onload = null;
-                this.rel = 'stylesheet';
-            "
-        />
-        <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
+        <script src="js/js-export/ast2blocks.config.js"></script>
         <script>
             window.ast2blocklist_config_failed = false;
-            window.ast2blocklist_config_ready = new Promise((resolve, reject) => {
-                const script = document.createElement("script");
-                script.src = "js/js-export/ast2blocks.config.js";
-                script.defer = true;
-                script.onload = resolve;
-                script.onerror = () => {
-                    window.ast2blocklist_config_failed = true;
-                    reject(new Error("ast2blocks.config.js failed to load"));
-                };
-                document.head.appendChild(script);
-            });
+            window.ast2blocklist_config_ready = window.ast2blocklist_config
+                ? Promise.resolve(window.ast2blocklist_config)
+                : new Promise((resolve, reject) => {
+                      const script = document.createElement("script");
+                      script.src = "js/js-export/ast2blocks.config.js";
+                      script.defer = true;
+                      script.onload = () => resolve(window.ast2blocklist_config);
+                      script.onerror = () => {
+                          window.ast2blocklist_config_failed = true;
+                          reject(new Error("ast2blocks.config.js failed to load"));
+                      };
+                      document.head.appendChild(script);
+                  });
         </script>
     </head>
 
-    <body id="body" data-title="index" style="background: #f9f9f9">
+    <body id="body" data-title="index">
         <!-- Fallback for browsers that don't support preload -->
         <noscript> JavaScript is required to view this page. </noscript>
         <header>
@@ -397,6 +383,13 @@
                             tabindex="-1"
                         />
                         <input class="file" type="file" id="myOpenAll" tabindex="-1" />
+                        <input
+                            class="file"
+                            type="file"
+                            id="myModeSclFile"
+                            accept=".scl,.json"
+                            tabindex="-1"
+                        />
                     </div>
                 </div>
                 <!-- canvasHolder -->
@@ -412,6 +405,7 @@
                     <iframe
                         src="planet/index.html"
                         id="planet-iframe"
+                        title="Music Blocks Planet — save, load, and share projects"
                         style="display: none"
                     ></iframe>
 
@@ -837,14 +831,6 @@
                                             ><i class="material-icons md-48">code</i></a
                                         >
                                     </li>
-                                    <li
-                                        class="filler"
-                                        id="aligns_merge_under_load"
-                                        style="user-select: none; visibility: hidden"
-                                    >
-                                        <a style="color: transparent">space&nbsp;&nbsp;&nbsp;</a>
-                                    </li>
-
                                     <li>
                                         <a
                                             id="restoreIcon"
@@ -950,6 +936,7 @@
                         <li><a id="zhCN" role="button" tabindex="0"></a></li>
                         <li><a id="th" role="button" tabindex="0"></a></li>
                         <li><a id="tr" role="button" tabindex="0"></a></li>
+                        <li><a id="az" role="button" tabindex="0"></a></li>
                         <li><a id="ayc" role="button" tabindex="0"></a></li>
                         <li><a id="quz" role="button" tabindex="0"></a></li>
                         <li><a id="gug" role="button" tabindex="0"></a></li>
@@ -1125,7 +1112,6 @@
         <!-- Loading Dialog Script -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                window._ = window._ || (x => x);
                 const readStorage = key => {
                     try {
                         return localStorage.getItem(key);
@@ -1157,31 +1143,57 @@
                     }
 
                     const container = document.getElementById("loading-media");
-                    const content = lang.startsWith("ja")
-                        ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
-                        : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
+                    let content;
+                    if (typeof THIS_IS_TURTLE_BLOCKS !== "undefined" && THIS_IS_TURTLE_BLOCKS) {
+                        const splashSrc =
+                            typeof getSplashScreenSrc === "function"
+                                ? getSplashScreenSrc(true)
+                                : "images/logo.svg";
+                        content = `<img src="${splashSrc}" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Turtle Blocks animation">`;
+                    } else if (lang.startsWith("ja")) {
+                        content = `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`;
+                    } else {
+                        content = `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">
                        </video>`;
+                    }
                     container.innerHTML = `<div class="media-wrapper" style="width: 100%; aspect-ratio: 16/9; max-height: 500px; display: flex; justify-content: center; align-items: center;">${content}</div>`;
                 };
 
                 loadL10nSplashScreen();
 
+                requirejs(["utils/utils"], function (_) {
                 setTimeout(function () {
                     const loadingText = document.getElementById("loadingText");
-                    const texts = [
-                        _("Do, Re, Mi, Fa, Sol, La, Ti, Do"),
-                        _("Loading Music Blocks..."),
-                        _("Reading Music...")
-                    ];
+                    const rawTexts =
+                        typeof LOADING_TEXTS !== "undefined" && Array.isArray(LOADING_TEXTS)
+                            ? LOADING_TEXTS
+                            : [
+                                  "Do, Re, Mi, Fa, Sol, La, Ti, Do",
+                                  "Loading Music Blocks...",
+                                  "Reading Music..."
+                              ];
                     let index = 0;
 
+                    const getTranslatedText = function (text) {
+                        if (
+                            typeof window !== "undefined" &&
+                            window.i18next &&
+                            window.i18next.isInitialized &&
+                            typeof _ === "function"
+                        ) {
+                            return _(text);
+                        }
+                        return text;
+                    };
+
                     window.intervalId = setInterval(function () {
-                        loadingText.textContent = texts[index];
-                        index = (index + 1) % texts.length;
+                        loadingText.textContent = getTranslatedText(rawTexts[index]);
+                        index = (index + 1) % rawTexts.length;
                     }, 1500);
                 }, 3000);
+            });
 
                 const languageDropdown = document.getElementById("languagedropdown");
                 if (languageDropdown) {

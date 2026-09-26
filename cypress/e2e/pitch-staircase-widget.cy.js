@@ -37,7 +37,7 @@ describe("Pitch Staircase widget", () => {
         // auto-save from re-triggering the widget on subsequent test runs.
         cy.visit("http://127.0.0.1:3000");
         cy.clearLocalStorage();
-        cy.visit("http://127.0.0.1:3000");
+        cy.reload();
         cy.waitForAppReady();
 
         // Dismiss the first-run "Take a Tour" guide if it appears, so that
@@ -45,7 +45,18 @@ describe("Pitch Staircase widget", () => {
         cy.get("body").then($body => {
             const closeButtons = $body.find(".windowFrame .wftButton.close");
             if (closeButtons.length) {
-                cy.wrap(closeButtons).click({ multiple: true, force: true });
+                cy.wrap(closeButtons).each($btn => {
+                    cy.wrap($btn).click({ force: true });
+                });
+            }
+        });
+    });
+
+    afterEach(() => {
+        // Stop audio playback cleanly before the next test loads.
+        cy.get("body").then($body => {
+            if ($body.find("#stop").length) {
+                cy.get("#stop").click({ force: true });
             }
         });
     });
@@ -103,7 +114,9 @@ describe("Pitch Staircase widget", () => {
         // PitchStaircase.init() wires widgetWindow.onclose to clear all
         // timeouts, stop synth audio, and call widgetWindow.destroy() -
         // which removes the .windowFrame from the DOM.
-        cy.get('[aria-label="pitch staircase"] [role="button"][aria-label="Close window"]').click();
+        cy.get('[aria-label="pitch staircase"] [role="button"][aria-label="Close window"]').click({
+            force: true
+        });
 
         // The window frame should be fully destroyed.
         cy.get('[aria-label="pitch staircase"]').should("not.exist");

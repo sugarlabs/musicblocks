@@ -239,6 +239,54 @@ describe("SVG Class", () => {
         });
     });
 
+    // -----------------------------------------------------------------------
+    // Cache key completeness
+    //
+    // basicClamp() memoises its SVG against a key built from the properties
+    // that change the drawing. A property that alters the output but is absent
+    // from the key makes the first variant rendered win for every later one.
+    // -----------------------------------------------------------------------
+
+    describe("basicClamp cache key", () => {
+        /** A clamp with the given porch setting, everything else equal. */
+        const clampWithPorch = porch => {
+            const s = new SVG();
+            s.setInnies([true, true]);
+            if (porch) {
+                s.setPorch(true);
+            }
+            return s.basicClamp();
+        };
+
+        it("draws a porched clamp differently from an unporched one", () => {
+            // _style() at line 1547 emits a porch only when this._porch is set,
+            // so the two must not be byte-identical whichever order they are
+            // generated in.
+            jest.resetModules();
+            const porched = clampWithPorch(true);
+            const plain = clampWithPorch(false);
+
+            expect(porched).not.toBe(plain);
+        });
+
+        it("does not serve an unporched clamp from a porched cache entry", () => {
+            jest.resetModules();
+            const porchedFirst = clampWithPorch(true);
+            const plainSecond = clampWithPorch(false);
+
+            expect(plainSecond).not.toBe(porchedFirst);
+        });
+
+        it("keeps memoising when the porch setting is unchanged", () => {
+            // The fix must not defeat the cache for identical inputs.
+            jest.resetModules();
+            const first = clampWithPorch(true);
+            const second = clampWithPorch(true);
+
+            expect(second).toBe(first);
+        });
+    });
+
     describe("Dock Coordinate Rounding (Regression Tests)", () => {
         const BLOCKSCALES = [
             0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0

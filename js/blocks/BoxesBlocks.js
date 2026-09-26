@@ -91,6 +91,10 @@ function setupBoxesBlocks(activity) {
             if (args.length > 0) {
                 const cblk = activity.blocks.blockList[blk].connections[1];
 
+                if (cblk === null) {
+                    return;
+                }
+
                 if (activity.blocks.blockList[cblk].name === "text") {
                     // Work-around to #1302
                     // Look for a namedbox with this text value.

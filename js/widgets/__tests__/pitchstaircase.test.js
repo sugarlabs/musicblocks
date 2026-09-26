@@ -21,9 +21,13 @@
  */
 
 const PitchStaircase = require("../pitchstaircase.js");
+const ManagedTimer = require("../../utils/ManagedTimer");
+
+global.ManagedTimer = ManagedTimer;
 
 // --- Global Mocks ---
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 global.platformColor = {
     labelColor: "#90c100",
     selectorBackground: "#f0f0f0",
@@ -129,6 +133,11 @@ describe("PitchStaircase Widget", () => {
 
         test("should have correct DEFAULTFREQUENCY", () => {
             expect(PitchStaircase.DEFAULTFREQUENCY).toBe(220.0);
+        });
+
+        test("should have correct MIN_FREQUENCY and MAX_FREQUENCY", () => {
+            expect(PitchStaircase.MIN_FREQUENCY).toBe(27.5);
+            expect(PitchStaircase.MAX_FREQUENCY).toBe(16744.04);
         });
     });
 
@@ -472,6 +481,92 @@ describe("PitchStaircase Widget", () => {
             expect(psc.Stairs).toHaveLength(2);
             expect(psc._makeStairs).toHaveBeenCalled();
         });
+
+        test("accepts boundary frequency at exactly MAX_FREQUENCY (16744.04 Hz)", () => {
+            const mockTextMsg = jest.fn();
+            psc.activity = { textMsg: mockTextMsg };
+            psc.Stairs = [["A", "", 8372.02, 1, 1, 8372.02, 4]];
+            // inputNum = 1 / 2 = 0.5 => newFrequency = 8372.02 / 0.5 = 16744.04 === MAX_FREQUENCY
+            psc._musicRatio1 = { value: "2" };
+            psc._musicRatio2 = { value: "1" };
+
+            psc._dissectStair(makeEvent(8372.02));
+
+            expect(psc.Stairs).toHaveLength(2);
+            expect(psc.Stairs[0][2]).toBe(PitchStaircase.MAX_FREQUENCY);
+            expect(psc._makeStairs).toHaveBeenCalled();
+            expect(mockTextMsg).not.toHaveBeenCalled();
+        });
+
+        test("accepts boundary frequency at exactly MIN_FREQUENCY (27.5 Hz)", () => {
+            const mockTextMsg = jest.fn();
+            psc.activity = { textMsg: mockTextMsg };
+            psc.Stairs = [["A", "", 55.0, 1, 1, 55.0, 4]];
+            // inputNum = 2 / 1 = 2 => newFrequency = 55.0 / 2 = 27.5 === MIN_FREQUENCY
+            psc._musicRatio1 = { value: "1" };
+            psc._musicRatio2 = { value: "2" };
+
+            psc._dissectStair(makeEvent(55));
+
+            expect(psc.Stairs).toHaveLength(2);
+            expect(psc.Stairs[1][2]).toBe(PitchStaircase.MIN_FREQUENCY);
+            expect(psc._makeStairs).toHaveBeenCalled();
+            expect(mockTextMsg).not.toHaveBeenCalled();
+        });
+
+        test("rejects frequency above MAX_FREQUENCY (16744.04 Hz) and notifies user", () => {
+            const mockTextMsg = jest.fn();
+            psc.activity = { textMsg: mockTextMsg };
+            const initialStairs = [["A", "", 10000.0, 1, 1, 10000.0, 4]];
+            psc.Stairs = [["A", "", 10000.0, 1, 1, 10000.0, 4]];
+            // inputNum = inputNum2 / inputNum1 = 1 / 2 => newFrequency = 10000 / 0.5 = 20000 > 16744.04
+            psc._musicRatio1 = { value: "2" };
+            psc._musicRatio2 = { value: "1" };
+
+            psc._dissectStair(makeEvent(10000));
+
+            expect(psc.Stairs).toEqual(initialStairs);
+            expect(psc._makeStairs).not.toHaveBeenCalled();
+            expect(mockTextMsg).toHaveBeenCalledWith(
+                "Frequency is outside supported range (27.5 Hz - 16744.04 Hz).",
+                3000
+            );
+        });
+
+        test("rejects frequency below MIN_FREQUENCY (27.5 Hz) and notifies user", () => {
+            const mockTextMsg = jest.fn();
+            psc.activity = { textMsg: mockTextMsg };
+            const initialStairs = [["A", "", 40.0, 1, 1, 40.0, 4]];
+            psc.Stairs = [["A", "", 40.0, 1, 1, 40.0, 4]];
+            // inputNum = inputNum2 / inputNum1 = 2 / 1 = 2 => newFrequency = 40 / 2 = 20 < 27.5
+            psc._musicRatio1 = { value: "1" };
+            psc._musicRatio2 = { value: "2" };
+
+            psc._dissectStair(makeEvent(40));
+
+            expect(psc.Stairs).toEqual(initialStairs);
+            expect(psc._makeStairs).not.toHaveBeenCalled();
+            expect(mockTextMsg).toHaveBeenCalledWith(
+                "Frequency is outside supported range (27.5 Hz - 16744.04 Hz).",
+                3000
+            );
+        });
+
+        test("rejects non-finite or NaN frequency and notifies user", () => {
+            const mockTextMsg = jest.fn();
+            psc.activity = { textMsg: mockTextMsg };
+            const initialStairs = [["A", "", Infinity, 1, 1, Infinity, 4]];
+            psc.Stairs = [["A", "", Infinity, 1, 1, Infinity, 4]];
+
+            psc._dissectStair(makeEvent(Infinity));
+
+            expect(psc.Stairs).toEqual(initialStairs);
+            expect(psc._makeStairs).not.toHaveBeenCalled();
+            expect(mockTextMsg).toHaveBeenCalledWith(
+                "Frequency is outside supported range (27.5 Hz - 16744.04 Hz).",
+                3000
+            );
+        });
     });
 
     // --- _makeStairs Tests ---
@@ -563,9 +658,16 @@ describe("PitchStaircase Widget", () => {
         let buttons;
         let widgetWindow;
         let wfbElement;
+        let widgetBodyElement;
+        const originalWindowFor = window.widgetWindows.windowFor;
+
+        afterEach(() => {
+            window.widgetWindows.windowFor = originalWindowFor;
+        });
 
         beforeEach(() => {
             buttons = {};
+            widgetBodyElement = { append: jest.fn(), style: {} };
             widgetWindow = {
                 clear: jest.fn(),
                 show: jest.fn(),
@@ -580,11 +682,12 @@ describe("PitchStaircase Widget", () => {
                 }),
                 addInputButton: jest.fn(value => ({ value, addEventListener: jest.fn() })),
                 addDivider: jest.fn(),
-                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                getWidgetBody: jest.fn(() => widgetBodyElement),
                 destroy: jest.fn(),
                 onclose: null,
                 onmaximize: null,
-                _maximized: false
+                _maximized: false,
+                isMaximized: jest.fn(() => widgetWindow._maximized)
             };
             window.widgetWindows.windowFor = jest.fn(() => widgetWindow);
 
@@ -618,12 +721,12 @@ describe("PitchStaircase Widget", () => {
             expect(psc._undo).toHaveBeenCalled();
         });
 
-        test("Clear button repeatedly undoes until exhausted", () => {
-            psc._undo = jest
-                .fn()
-                .mockReturnValueOnce(true)
-                .mockReturnValueOnce(true)
-                .mockReturnValue(false);
+        test("Clear button calls _undo until false", () => {
+            let count = 0;
+            psc._undo = jest.fn(() => {
+                count++;
+                return count < 3;
+            });
             buttons["Clear"].onclick();
             expect(psc._undo).toHaveBeenCalledTimes(3);
         });
@@ -636,6 +739,7 @@ describe("PitchStaircase Widget", () => {
 
             expect(psc._scaleStepTimeout).not.toBeNull();
             expect(psc._scaleHighlightTimeout).not.toBeNull();
+            expect(psc._timerManager.activeTimeoutCount).toBeGreaterThan(0);
 
             const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
 
@@ -644,6 +748,7 @@ describe("PitchStaircase Widget", () => {
             expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.anything());
             expect(psc._scaleStepTimeout).toBeNull();
             expect(psc._scaleHighlightTimeout).toBeNull();
+            expect(psc._timerManager.activeTimeoutCount).toBe(0);
             expect(psc.closed).toBe(true);
 
             clearTimeoutSpy.mockRestore();
@@ -670,11 +775,32 @@ describe("PitchStaircase Widget", () => {
         test("onmaximize grows the widget body when maximized", () => {
             widgetWindow._maximized = true;
             widgetWindow.onmaximize();
-            expect(wfbElement.style.maxHeight).toBe(16 * PitchStaircase.BUTTONSIZE + "px");
+            expect(widgetBodyElement.style.maxHeight).toBe(16 * PitchStaircase.BUTTONSIZE + "px");
 
             widgetWindow._maximized = false;
             widgetWindow.onmaximize();
-            expect(wfbElement.style.maxHeight).toBe(10 * PitchStaircase.BUTTONSIZE + "px");
+            expect(widgetBodyElement.style.maxHeight).toBe(10 * PitchStaircase.BUTTONSIZE + "px");
+        });
+
+        test("onmaximize scopes to getWidgetBody and does not mutate foreign document elements", () => {
+            const foreignWfb = { style: { maxHeight: "50px" } };
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([foreignWfb]);
+
+            widgetWindow._maximized = true;
+            widgetWindow.onmaximize();
+
+            // Foreign element was untouched
+            expect(foreignWfb.style.maxHeight).toBe("50px");
+            // Own widget body was updated
+            expect(widgetBodyElement.style.maxHeight).toBe(16 * PitchStaircase.BUTTONSIZE + "px");
+        });
+
+        test("onmaximize safely exits if widgetBody or style is missing", () => {
+            widgetWindow.getWidgetBody = jest.fn(() => null);
+            expect(() => widgetWindow.onmaximize()).not.toThrow();
+
+            widgetWindow.getWidgetBody = jest.fn(() => ({}));
+            expect(() => widgetWindow.onmaximize()).not.toThrow();
         });
     });
 

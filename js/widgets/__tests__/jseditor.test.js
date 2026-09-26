@@ -375,6 +375,30 @@ describe("JSEditor", () => {
                 expect(countLinks()).toBe(baseline);
             }
         });
+
+        test("onclose removes tooltip elements from document.body", () => {
+            const beforeCount = document.body.children.length;
+            const editor = createEditor();
+
+            // 6 tooltips were added to document.body
+            expect(document.body.children.length).toBe(beforeCount + 6);
+
+            editor.widgetWindow.onclose();
+
+            // After close, all 6 tooltips should be removed from document.body
+            expect(document.body.children.length).toBe(beforeCount);
+        });
+
+        test("repeated open/close cycles do not leak tooltip containers into document.body", () => {
+            const baseline = document.body.children.length;
+
+            for (let i = 0; i < 5; i++) {
+                const editor = createEditor();
+                expect(document.body.children.length).toBe(baseline + 6);
+                editor.widgetWindow.onclose();
+                expect(document.body.children.length).toBe(baseline);
+            }
+        });
     });
 
     describe("code editing functions", () => {
@@ -561,15 +585,69 @@ describe("JSEditor", () => {
             expect(editorEl.innerHTML).toContain("defg");
         });
 
-        test("_addDebuggerToLine inserts debugger statement", () => {
+        test("_addDebuggerToLine inserts debugger statement after specified 0-based line", () => {
             const editor = createEditor();
-
             editor._code = "const x = 1;\nconst y = 2;\nconst z = 3;";
 
-            // lineNumber is 1-based (insertIndex = lineNumber - 1)
-            editor._addDebuggerToLine(1);
+            editor._addDebuggerToLine(0);
 
-            expect(editor._code).toContain("debugger;");
+            const lines = editor._code.split("\n");
+            expect(lines[0]).toBe("const x = 1;");
+            expect(lines[1].trim()).toBe("debugger;");
+            expect(lines[2]).toBe("const y = 2;");
+        });
+
+        test("_addDebuggerToLine inserts debugger after line ending with brace and indents", () => {
+            const editor = createEditor();
+            editor._code = "function test() {\n    return 1;\n}";
+
+            editor._addDebuggerToLine(0);
+
+            const lines = editor._code.split("\n");
+            expect(lines[0]).toBe("function test() {");
+            expect(lines[1]).toBe("\tdebugger;");
+        });
+
+        test("_addDebuggerToLine does not crash when lineNumber is out of bounds", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;";
+
+            expect(() => editor._addDebuggerToLine(-1)).not.toThrow();
+            expect(() => editor._addDebuggerToLine(999)).not.toThrow();
+            expect(editor._code).toBe("const x = 1;");
+        });
+
+        test("_addDebuggerToLine rejects line not ending with semicolon or brace", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1\nconst y = 2;";
+
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
+            editor._addDebuggerToLine(0);
+
+            expect(editor._code).toBe("const x = 1\nconst y = 2;");
+            expect(logSpy).toHaveBeenCalledWith(
+                expect.stringContaining(
+                    "Breakpoints can only be added after lines ending with '{' or ';'"
+                ),
+                "red"
+            );
+            logSpy.mockRestore();
+        });
+
+        test("_addDebuggerToLine prevents adjacent breakpoints", () => {
+            const editor = createEditor();
+            const initialCode = "const x = 1;\ndebugger;\nconst y = 2;";
+            editor._code = initialCode;
+
+            const logSpy = jest.spyOn(JSEditor, "logConsole");
+            editor._addDebuggerToLine(0);
+
+            expect(editor._code).toBe(initialCode);
+            expect(logSpy).toHaveBeenCalledWith(
+                expect.stringContaining("already a breakpoint on an adjacent line"),
+                "red"
+            );
+            logSpy.mockRestore();
         });
 
         test("_removeDebuggerFromLine removes debugger statement", () => {
@@ -580,6 +658,24 @@ describe("JSEditor", () => {
             editor._removeDebuggerFromLine(1);
 
             expect(editor._code).not.toContain("debugger;");
+        });
+
+        test("_removeDebuggerFromLine does not crash on out of bounds line", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;";
+
+            expect(() => editor._removeDebuggerFromLine(-1)).not.toThrow();
+            expect(() => editor._removeDebuggerFromLine(999)).not.toThrow();
+            expect(editor._code).toBe("const x = 1;");
+        });
+
+        test("_removeDebuggerFromLine ignores line that is not a debugger statement", () => {
+            const editor = createEditor();
+            editor._code = "const x = 1;\nconst y = 2;";
+
+            editor._removeDebuggerFromLine(0);
+
+            expect(editor._code).toBe("const x = 1;\nconst y = 2;");
         });
     });
 
@@ -621,6 +717,64 @@ describe("JSEditor", () => {
                 "JavaScript block conversion is unavailable because its configuration file failed to load."
             );
             expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
+            expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
+        });
+
+        test("_codeToBlocks falls back to require when config is not yet on window", async () => {
+            const editor = createEditor();
+            window.ast2blocklist_config = undefined;
+            global.ast2blocklist_config = undefined;
+            window.ast2blocklist_config_ready = undefined;
+            acorn.parse.mockReturnValue(ast);
+            AST2BlockList.toBlockList.mockReturnValue([[0, "start", 0, 0, [null, null, null]]]);
+
+            window.require = jest.fn((deps, callback) => {
+                window.ast2blocklist_config = { fromRequire: true };
+                callback();
+            });
+
+            await editor._codeToBlocks();
+
+            expect(window.require).toHaveBeenCalledWith(
+                ["activity/js-export/ast2blocks.config"],
+                expect.any(Function),
+                expect.any(Function)
+            );
+            expect(AST2BlockList.toBlockList).toHaveBeenCalledWith(ast, { fromRequire: true });
+            delete window.require;
+        });
+
+        test("_codeToBlocks handles require failure gracefully and sets config_failed", async () => {
+            const editor = createEditor();
+            window.ast2blocklist_config = undefined;
+            global.ast2blocklist_config = undefined;
+            window.ast2blocklist_config_ready = undefined;
+            window.ast2blocklist_config_failed = false;
+
+            window.require = jest.fn((deps, callback, errback) => {
+                errback(new Error("require failed"));
+            });
+
+            await expect(editor._codeToBlocks()).rejects.toThrow(
+                "JavaScript block conversion is unavailable because its configuration file failed to load."
+            );
+
+            expect(window.ast2blocklist_config_failed).toBe(true);
+            expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
+            expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
+            delete window.require;
+        });
+
+        test("_codeToBlocks throws error when no valid blocks are generated", async () => {
+            const editor = createEditor();
+            global.ast2blocklist_config = { loaded: true };
+            window.ast2blocklist_config_ready = Promise.resolve(global.ast2blocklist_config);
+            acorn.parse.mockReturnValue(ast);
+            AST2BlockList.toBlockList.mockReturnValue([]);
+
+            await expect(editor._codeToBlocks()).rejects.toThrow(
+                "No valid blocks could be generated from the code."
+            );
             expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
         });
 
@@ -794,6 +948,279 @@ describe("JSEditor", () => {
             }
 
             expect(editor._currentStyle).toBe(0);
+        });
+    });
+    // -----------------------------------------------------------------------
+    // Syntax error highlighting
+    //
+    // _highlightErrors runs the buffer through acorn and, when it throws,
+    // widens the reported character position out to the whole token so the
+    // marker covers something the user can see rather than one character.
+    // -----------------------------------------------------------------------
+
+    describe("syntax error highlighting", () => {
+        /** An editor element whose textContent is `code`. */
+        const editorWith = code => {
+            const el = document.createElement("div");
+            el.textContent = code;
+            document.body.appendChild(el);
+            return el;
+        };
+
+        /** Run _markErrorAtPosition and report the span it asked for. */
+        const spanFor = (editor, code, position) => {
+            const el = editorWith(code);
+            const spy = jest.spyOn(editor, "_markErrorSpan").mockImplementation(() => {});
+            editor._markErrorAtPosition(el, position, "boom");
+            const call = spy.mock.calls[0];
+            spy.mockRestore();
+            return { start: call[1], end: call[2], text: code.slice(call[1], call[2]) };
+        };
+
+        beforeEach(() => {
+            // The outer beforeEach rebuilds document.body (including the
+            // overlayCanvas the constructor reads), so only the injected
+            // stylesheet needs clearing here.
+            const existing = document.getElementById("js-error-styles");
+            if (existing) existing.remove();
+        });
+
+        describe("_addErrorStyles", () => {
+            test("injects the stylesheet once", () => {
+                const editor = createEditor();
+
+                editor._addErrorStyles();
+                const first = document.getElementById("js-error-styles");
+                expect(first).not.toBeNull();
+                expect(first.tagName).toBe("STYLE");
+
+                editor._addErrorStyles();
+                expect(document.querySelectorAll("#js-error-styles")).toHaveLength(1);
+                expect(document.getElementById("js-error-styles")).toBe(first);
+            });
+
+            test("defines the .error rule the markers rely on", () => {
+                const editor = createEditor();
+                editor._addErrorStyles();
+
+                expect(document.getElementById("js-error-styles").textContent).toContain(".error");
+            });
+        });
+
+        describe("_markErrorAtPosition widens to the whole token", () => {
+            test("expands both ways from inside a word", () => {
+                const editor = createEditor();
+                // position 8 is the "r" of "varx"; the marker should cover the word.
+                expect(spanFor(editor, "let a = varx;", 10).text).toBe("varx");
+            });
+
+            test("stops at the start of the string", () => {
+                const editor = createEditor();
+                const span = spanFor(editor, "banana", 3);
+                expect(span.start).toBe(0);
+                expect(span.end).toBe(6);
+            });
+
+            test.each([
+                [" ", "space"],
+                ["\n", "newline"],
+                ["\t", "tab"],
+                [";", "semicolon"],
+                ["{", "open brace"],
+                ["}", "close brace"],
+                ["(", "open paren"],
+                [")", "close paren"],
+                [",", "comma"]
+            ])("treats %s as a token boundary (%s)", delimiter => {
+                const editor = createEditor();
+                const code = `aa${delimiter}target${delimiter}bb`;
+                // Start inside "target" and check the delimiters bound it.
+                expect(spanFor(editor, code, 5).text).toBe("target");
+            });
+
+            test("falls back to a single character when the position is on a delimiter", () => {
+                const editor = createEditor();
+                // Delimiters on both sides: the left scan sees ";" before the
+                // position and the right scan sees ";" at it, so both stop
+                // immediately and the span would be zero width. It is widened
+                // to one character instead.
+                const span = spanFor(editor, "a;;b", 2);
+                expect(span.start).toBe(2);
+                expect(span.end).toBe(3);
+            });
+
+            test("does not run past the end of the buffer", () => {
+                const editor = createEditor();
+                // The delimiter is the last character, so the one-character
+                // fallback has nothing to widen into.
+                const span = spanFor(editor, "ab;", 3);
+                expect(span.end).toBeLessThanOrEqual(3);
+            });
+        });
+
+        describe("_highlightErrors", () => {
+            test("clears markers from a previous run before re-parsing", () => {
+                const editor = createEditor();
+                const el = editorWith("");
+                el.innerHTML = 'ok <span class="error">bad</span> tail';
+                acorn.parse.mockImplementation(() => {});
+
+                editor._highlightErrors(el);
+
+                expect(el.querySelectorAll(".error")).toHaveLength(0);
+                // The text survives; only the wrapper goes.
+                expect(el.textContent).toContain("bad");
+            });
+
+            test("marks the token when acorn reports a position", () => {
+                const editor = createEditor();
+                const el = editorWith("let a = ;");
+                const spy = jest.spyOn(editor, "_markErrorAtPosition").mockImplementation(() => {});
+                acorn.parse.mockImplementation(() => {
+                    const e = new Error("Unexpected token");
+                    e.pos = 8;
+                    throw e;
+                });
+
+                editor._highlightErrors(el);
+
+                expect(spy).toHaveBeenCalledWith(el, 8, "Unexpected token");
+                spy.mockRestore();
+            });
+
+            test("marks nothing when the error carries no position", () => {
+                const editor = createEditor();
+                const el = editorWith("let a = ;");
+                const spy = jest.spyOn(editor, "_markErrorAtPosition").mockImplementation(() => {});
+                acorn.parse.mockImplementation(() => {
+                    throw new Error("no position on this one");
+                });
+
+                expect(() => editor._highlightErrors(el)).not.toThrow();
+                expect(spy).not.toHaveBeenCalled();
+                spy.mockRestore();
+            });
+
+            test("leaves a clean buffer alone", () => {
+                const editor = createEditor();
+                const el = editorWith("let a = 1;");
+                const spy = jest.spyOn(editor, "_markErrorAtPosition").mockImplementation(() => {});
+                acorn.parse.mockImplementation(() => {});
+
+                editor._highlightErrors(el);
+
+                expect(spy).not.toHaveBeenCalled();
+                spy.mockRestore();
+            });
+        });
+
+        // -----------------------------------------------------------------------
+        // BUG-2 fix: _markErrorSpan must preserve hljs syntax highlighting
+        //
+        // The old implementation did `editor.textContent = ""` which nuked all
+        // hljs <span> elements. The TreeWalker-based fix wraps only the error
+        // range inside the existing DOM tree.
+        // -----------------------------------------------------------------------
+
+        describe("_markErrorSpan preserves hljs highlighting (BUG-2 fix)", () => {
+            test("preserves existing hljs spans when marking an error", () => {
+                const editor = createEditor();
+                const el = document.createElement("div");
+
+                // Simulate hljs-highlighted DOM:
+                // <span class="hljs-keyword">const</span> x = <span class="hljs-number">42</span>
+                // textContent = "const x = 42"
+                const kwSpan = document.createElement("span");
+                kwSpan.className = "hljs-keyword";
+                kwSpan.textContent = "const";
+                el.appendChild(kwSpan);
+                el.appendChild(document.createTextNode(" x = "));
+                const numSpan = document.createElement("span");
+                numSpan.className = "hljs-number";
+                numSpan.textContent = "42";
+                el.appendChild(numSpan);
+
+                // Mark error at "x" (position 6, length 1)
+                editor._markErrorSpan(el, 6, 7, "Unexpected token");
+
+                // hljs-keyword span should still exist
+                expect(el.querySelector(".hljs-keyword")).not.toBeNull();
+                expect(el.querySelector(".hljs-keyword").textContent).toBe("const");
+
+                // hljs-number span should still exist
+                expect(el.querySelector(".hljs-number")).not.toBeNull();
+                expect(el.querySelector(".hljs-number").textContent).toBe("42");
+
+                // Error span should be inserted
+                const errorSpan = el.querySelector(".error");
+                expect(errorSpan).not.toBeNull();
+                expect(errorSpan.textContent).toBe("x");
+                expect(errorSpan.title).toBe("Unexpected token");
+            });
+
+            test("handles error that spans across multiple text nodes", () => {
+                const editor = createEditor();
+                const el = document.createElement("div");
+
+                // DOM: "ab" + <span class="hljs-keyword">"cd"</span> + "ef"
+                // textContent = "abcdef"
+                el.appendChild(document.createTextNode("ab"));
+                const kwSpan = document.createElement("span");
+                kwSpan.className = "hljs-keyword";
+                kwSpan.textContent = "cd";
+                el.appendChild(kwSpan);
+                el.appendChild(document.createTextNode("ef"));
+
+                // Mark error spanning positions 1-5 ("bcde")
+                editor._markErrorSpan(el, 1, 5, "Error");
+
+                // Error spans should exist
+                const errors = el.querySelectorAll(".error");
+                expect(errors.length).toBeGreaterThanOrEqual(1);
+
+                // Collect all error text
+                let errorText = "";
+                errors.forEach(e => {
+                    errorText += e.textContent;
+                });
+                expect(errorText).toBe("bcde");
+                expect(el.querySelector(".hljs-keyword .error").textContent).toBe("cd");
+            });
+
+            test("still works correctly on plain text (no hljs spans)", () => {
+                const editor = createEditor();
+                const el = document.createElement("div");
+                el.textContent = "const x = ;";
+
+                editor._markErrorSpan(el, 10, 11, "Unexpected token");
+
+                expect(el.querySelector(".error")).not.toBeNull();
+                expect(el.querySelector(".error").textContent).toBe(";");
+                expect(el.textContent).toBe("const x = ;");
+            });
+
+            test("handles error at the very start of the content", () => {
+                const editor = createEditor();
+                const el = document.createElement("div");
+
+                const kwSpan = document.createElement("span");
+                kwSpan.className = "hljs-keyword";
+                kwSpan.textContent = "var";
+                el.appendChild(kwSpan);
+                el.appendChild(document.createTextNode(" = 1;"));
+
+                // Mark error at "var" (position 0-3)
+                editor._markErrorSpan(el, 0, 3, "Use const instead");
+
+                const errorSpan = el.querySelector(".error");
+                expect(errorSpan).not.toBeNull();
+                expect(errorSpan.textContent).toBe("var");
+                expect(errorSpan.title).toBe("Use const instead");
+
+                // Full text content should be preserved
+                expect(el.textContent).toBe("var = 1;");
+                expect(el.querySelector(".hljs-keyword .error")).toBe(errorSpan);
+            });
         });
     });
 });

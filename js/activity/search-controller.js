@@ -14,8 +14,9 @@
 /* exported setupSearchController, SearchController */
 
 class SearchController {
-    constructor(activity) {
+    constructor(activity, searchUI) {
         this.activity = activity;
+        this.searchUI = searchUI || activity.searchUI || null;
 
         this.searchSuggestions = [];
         this._searchCache = {};
@@ -280,17 +281,26 @@ class SearchController {
             $search.autocomplete({
                 source: (request, response) => {
                     const term = (request.term || "").toLowerCase().trim();
-                    response(that.filterSuggestions(term));
+                    response(
+                        that.searchUI.wrapEmptySearchResults(
+                            term,
+                            that.filterSuggestions(term),
+                            request.term
+                        )
+                    );
                 },
                 delay: 400,
                 appendTo: "body",
                 select: (event, ui) => {
                     event.preventDefault();
+                    if (that.searchUI.isEmptySearchResult(ui.item)) {
+                        return false;
+                    }
                     activity.searchWidget.value = ui.item.label;
                     activity.searchWidget.idInput_custom = ui.item.value;
                     activity.searchWidget.protoblk = ui.item.specialDict;
                     that.doSearch();
-                    if (event.keyCode === 13) activity.searchWidget.style.visibility = "visible";
+                    if (event.key === "Enter") activity.searchWidget.style.visibility = "visible";
                 },
                 focus: event => {
                     event.preventDefault();
@@ -307,6 +317,9 @@ class SearchController {
             const instance = $search.autocomplete("instance");
             if (instance) {
                 instance._renderItem = (ul, item) => {
+                    if (that.searchUI.isEmptySearchResult(item)) {
+                        return that.searchUI.renderEmptySearchItem($j, ul, item);
+                    }
                     const li = $j("<li></li>");
 
                     const img = document.createElement("img");
@@ -669,12 +682,21 @@ class SearchController {
             $helpfulSearch.autocomplete({
                 source: (request, response) => {
                     const term = (request.term || "").toLowerCase().trim();
-                    response(that.filterSuggestions(term));
+                    response(
+                        that.searchUI.wrapEmptySearchResults(
+                            term,
+                            that.filterSuggestions(term),
+                            request.term
+                        )
+                    );
                 },
                 delay: 400,
                 appendTo: "body",
                 select: (event, ui) => {
                     event.preventDefault();
+                    if (that.searchUI.isEmptySearchResult(ui.item)) {
+                        return false;
+                    }
                     activity.helpfulSearchWidget.value = ui.item.label;
                     activity.helpfulSearchWidget.idInput_custom = ui.item.value;
                     activity.helpfulSearchWidget.protoblk = ui.item.specialDict;
@@ -688,6 +710,9 @@ class SearchController {
             const instance = $helpfulSearch.autocomplete("instance");
             if (instance) {
                 instance._renderItem = (ul, item) => {
+                    if (that.searchUI.isEmptySearchResult(item)) {
+                        return that.searchUI.renderEmptySearchItem($j, ul, item);
+                    }
                     const li = $j("<li></li>");
                     const img = document.createElement("img");
                     img.src = item.artwork || "";
@@ -747,9 +772,10 @@ class SearchController {
  * Installs delegation methods on activity so external callers
  * (palette.js, planetInterface.js) continue to work unchanged.
  * @param {object} activity - The Activity instance.
+ * @param {object} [searchUI] - SearchUI that owns empty-state rendering.
  */
-const setupSearchController = activity => {
-    activity.searchController = new SearchController(activity);
+const setupSearchController = (activity, searchUI) => {
+    activity.searchController = new SearchController(activity, searchUI || activity.searchUI);
 };
 
 if (typeof define === "function" && define.amd) {

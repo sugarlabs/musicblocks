@@ -30,7 +30,8 @@
    EFFECTPALETTEICON, CLEARBUTTON, COLLAPSEBUTTON, EXPANDBUTTON,
    NOGRIDBUTTON, PLAYBUTTON, POLARBUTTON, STEPBUTTON, RUNBUTTON,
    STEPMUSICBUTTON, STOPBUTTON, CARTESIAN, POLAR, TREBLE, SOPRANO,
-   ALTO, TENOR, BASS, GRAND, GRAPHICSICONX, TRASHICON, PALETTEICONS,
+   ALTO, TENOR, BASS, GRAND, GRAPHICSICONX, TRASHICON,
+   TRASH_LID_ICON, TRASH_BODY_ICON, PALETTEICONS,
    CANCELBUTTON, STOPTURTLEBUTTON, NEWBUTTON, LOADBUTTON,
    OPENMERGEBUTTON, OPENBUTTON, PLANETBUTTON, HELPBUTTON, SLOWBUTTON,
    HIDEBLOCKSBUTTON, HIDEBLOCKSFADEDBUTTON, COLLAPSEBLOCKSBUTTON,
@@ -481,8 +482,14 @@ const GRAPHICSICONX =
 const LOGICICON =
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" id="svg28" height="55" width="55" version="1.0"> <rect ry="0" rx="0" y="0" x="0" height="55" width="55" id="rect841" style="fill:background_fill_color;fill-opacity:1;stroke:none;stroke-width:14.53336239;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /> <g id="g26" transform="matrix(0.87134744,0,0,0.87134744,3.2573019,3.5379454)"> <path d="m 14.85,27.1 -0.45,13.15 4.35,-2.4 c 0,0 6.349418,4.294879 10.2,4.05 4.946317,-0.314563 11.65,-7.5 11.65,-7.5 l -2.25,-2.3 c 0,0 -5.615371,6.15399 -9.4,6.65 -2.286298,0.29964 -7.05,-2.5 -7.05,-2.5 L 26,34.1 14.85,27.1 z" style="fill:fill_color;stroke:stroke_color;stroke-width:1.29999995;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" /> <path d="m 40.15,28.955044 0.45,-13.150001 -4.35,2.4 c 0,0 -6.349418,-4.294879 -10.2,-4.05 -4.946317,0.314563 -11.65,7.5 -11.65,7.5 l 2.25,2.3 c 0,0 5.615371,-6.15399 9.4,-6.65 2.286298,-0.29964 7.05,2.5 7.05,2.5 l -4.1,2.15 11.15,7.000001 z" style="fill:fill_color;stroke:stroke_color;stroke-width:1.29999995;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" /> </g> <path id="path843" d="M 0,0.5 H 55" style="fill:none;stroke:stroke_color;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /> <path id="path843-3" d="M 0,54.5 H 55" style="fill:none;stroke:stroke_color;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /> </svg>';
 
+const TRASH_LID_ICON =
+    '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns="http://www.w3.org/2000/svg" height="55" width="55" version="1.1" viewBox="0 0 55.000003 55"> <g transform="translate(3.2399972,2.2500001)"> <path d="M 37.422492,7.0250365 H 33.372495 L 31.932496,5.5850377 A 1.9799983,1.9799983 0 0 0 30.514997,5.0000382 H 18.072508 A 1.9799983,1.9799983 0 0 0 16.655009,5.5850377 L 15.14751,7.0250365 H 11.097514 A 2.0249983,2.0249983 0 0 0 9.0725156,9.0500348 V 11.075033 H 39.44749 V 9.0500348 A 2.0249983,2.0249983 0 0 0 37.422492,7.0250365 Z" style="fill:fill_color;stroke-width:2.24999809" id="path4" /> </g> </svg>';
+
+const TRASH_BODY_ICON =
+    '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns="http://www.w3.org/2000/svg" height="55" width="55" version="1.1" viewBox="0 0 55.000003 55"> <g transform="translate(3.2399972,2.2500001)"> <path id="path6" d="m 11.097656,13.099609 v 10.439453 19.935547 c -2.17e-4,1.118682 0.906709,2.025608 2.025391,2.025391 h 8.121094 6.03125 8.123047 c 1.117919,-8.62e-4 2.023654,-0.907471 2.023437,-2.025391 V 23.539062 13.099609 Z" style="fill:fill_color;stroke-width:2.24999809" /> </g> </svg>';
+
 const TRASHICON =
-    '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" height="55" width="55" id="svg12" version="1.1" viewBox="0 0 55.000003 55"> <g transform="translate(3.2399972,2.2500001)" id="g825"> <path d="M 37.422492,7.0250365 H 33.372495 L 31.932496,5.5850377 A 1.9799983,1.9799983 0 0 0 30.514997,5.0000382 H 18.072508 A 1.9799983,1.9799983 0 0 0 16.655009,5.5850377 L 15.14751,7.0250365 H 11.097514 A 2.0249983,2.0249983 0 0 0 9.0725156,9.0500348 V 11.075033 H 39.44749 V 9.0500348 A 2.0249983,2.0249983 0 0 0 37.422492,7.0250365 Z" style="fill:#808080;stroke-width:2.24999809" id="path4" /> <path id="path6" d="m 11.097656,13.099609 v 10.439453 19.935547 c -2.17e-4,1.118682 0.906709,2.025608 2.025391,2.025391 h 8.121094 6.03125 8.123047 c 1.117919,-8.62e-4 2.023654,-0.907471 2.023437,-2.025391 V 23.539062 13.099609 Z" style="fill:#808080;stroke-width:2.24999809" /> </g> </svg>';
+    '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" height="55" width="55" id="svg12" version="1.1" viewBox="0 0 55.000003 55"> <g transform="translate(3.2399972,2.2500001)" id="g825"> <path d="M 37.422492,7.0250365 H 33.372495 L 31.932496,5.5850377 A 1.9799983,1.9799983 0 0 0 30.514997,5.0000382 H 18.072508 A 1.9799983,1.9799983 0 0 0 16.655009,5.5850377 L 15.14751,7.0250365 H 11.097514 A 2.0249983,2.0249983 0 0 0 9.0725156,9.0500348 V 11.075033 H 39.44749 V 9.0500348 A 2.0249983,2.0249983 0 0 0 37.422492,7.0250365 Z" style="fill:fill_color;stroke-width:2.24999809" id="path4" /> <path id="path6" d="m 11.097656,13.099609 v 10.439453 19.935547 c -2.17e-4,1.118682 0.906709,2.025608 2.025391,2.025391 h 8.121094 6.03125 8.123047 c 1.117919,-8.62e-4 2.023654,-0.907471 2.023437,-2.025391 V 23.539062 13.099609 Z" style="fill:fill_color;stroke-width:2.24999809" /> </g> </svg>';
 
 let PALETTEICONS;
 if (_THIS_IS_TURTLE_BLOCKS_) {
@@ -785,9 +792,29 @@ if (typeof module !== "undefined" && module.exports) {
         hideButtonHighlight,
         hidePaletteNameDisplay,
         COLLAPSEBUTTONXOFF,
+        COLLAPSEBUTTONYOFF,
         STANDARDBLOCKHEIGHT,
+        DEFAULTBLOCKSCALE,
         FILLCOLORS,
-        TURTLESVG
+        STROKECOLORS,
+        TEXTX,
+        TEXTY,
+        VALUETEXTX,
+        COLLAPSETEXTX,
+        COLLAPSETEXTY,
+        MEDIASAFEAREA,
+        MENUWIDTH,
+        PALETTECOLORS,
+        PALETTECOLORS0,
+        TURTLESVG,
+        DRUMSVG,
+        MSGBLOCK,
+        BOUNDARY,
+        MBOUNDARY,
+        BORDER,
+        METRONOMESVG,
+        BACKGROUND,
+        FULLSCREENBUTTON
     };
 }
 

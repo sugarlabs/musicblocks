@@ -76,8 +76,8 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #floatingWindows > .windowFrame {
-    border: 2px solid var(--border);
-    background-color: var(--bg);
+    border: 2px solid var(--color-widget-frame-border);
+    background-color: var(--color-widget-frame-bg);
 }
 
 .dark .wfbtItem {
@@ -89,13 +89,19 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
-    color: var(--color-border-primary) !important;
+    color: var(--color-text-secondary) !important;
     background-color: var(--color-bg-secondary) !important;
 }
 
 .dark .popupMsg {
     background-color: var(--color-brand-primary-hover);
-    color: var(--color-text-secondary);
+    /* --color-text-secondary (#d1d5db) was designed for text on the dark
+       body background, not on this popup's bright blue background — that
+       combination only reaches ~2.5:1 contrast, failing WCAG AA's 4.5:1
+       minimum for normal text. --color-text-inverse is the token meant
+       for text on light/bright surfaces in dark mode and reaches ~4.8:1
+       here. */
+    color: var(--color-text-inverse);
 }
 
 .dark #printText {
@@ -103,7 +109,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #loading-image-container {
-    background-color: var(--bg) !important;
+    background-color: var(--color-bg-primary) !important;
 }
 
 .dark #loadingText {
@@ -115,8 +121,8 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .modal-content {
-    background-color: var(--panel-bg);
-    color: var(--fg);
+    background-color: var(--color-panel-bg);
+    color: var(--color-text-primary);
 }
 
 .dark #submitLilypond {
@@ -200,12 +206,37 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark .modalBox {
-    background-color: var(--color-bg-primary);
+    background-color: var(--color-panel-bg);
 }
 
 .dark .modal-message {
-    color: #e2e2e2;
-    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    background-color: var(--color-panel-bg);
+}
+
+.dark .plugin-modal-select {
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary);
+    border-color: var(--color-border-primary) !important;
+}
+
+.dark .plugin-upload-button {
+    border-color: var(--color-brand-primary);
+    color: var(--color-brand-primary);
+}
+
+.dark .plugin-upload-button:hover {
+    background-color: var(--color-brand-primary);
+    color: var(--color-text-inverse);
+}
+
+.dark .cancel-button {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+}
+
+.dark .cancel-button:hover {
+    background-color: var(--color-border-primary);
 }
 
 .dark #newdropdown {
@@ -222,43 +253,19 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #confirmation-message {
-    color: #e2e2e2;
-}
-
-body {
-    --border: var(--color-border-primary);
-    --bg: #ffffff;
-    --fg: #666666;
-    --panel-bg: #f5f5f5;
-    --accent: var(--color-brand-primary);
-}
-
-body.dark {
-    --border: #000000;
-    --bg: #1d1d20;
-    --fg: var(--color-text-secondary);
-    --panel-bg: var(--color-bg-primary);
-    --accent: var(--color-brand-secondary);
-}
-
-body.highcontrast {
-    --border: #ffffff;
-    --bg: #000000;
-    --fg: #ffffff;
-    --panel-bg: #000000;
-    --accent: var(--color-brand-secondary);
+    color: var(--color-text-primary);
 }
 
 .keyboard-shortcuts-widget {
     background: transparent !important;
-    color: var(--fg) !important;
+    color: var(--color-text-primary) !important;
 }
 
 #helpdropdown.helpdropdown-menu {
     min-width: 220px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--color-border-primary);
     border-radius: 0 0 8px 8px;
-    background: var(--bg);
+    background: var(--color-bg-primary);
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
     overflow: hidden;
 }
@@ -528,8 +535,8 @@ body.highcontrast {
 }
 
 .highcontrast #floatingWindows > .windowFrame {
-    border: 2px solid var(--border);
-    background-color: var(--bg);
+    border: 2px solid var(--color-widget-frame-border);
+    background-color: var(--color-widget-frame-bg);
 }
 
 .highcontrast .wfbtItem {
@@ -540,9 +547,13 @@ body.highcontrast {
     color: var(--color-text-primary) !important;
 }
 
+.highcontrast #floatingWindows > .windowFrame > .wfTopBar .wftButton.wftMaxmin img {
+    filter: invert(1);
+}
+
 .highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
-    color: var(--color-text-inverse) !important;
-    background-color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-secondary) !important;
 }
 
 .highcontrast .popupMsg {
@@ -555,7 +566,7 @@ body.highcontrast {
 }
 
 .highcontrast #loading-image-container {
-    background-color: var(--bg) !important;
+    background-color: var(--color-bg-primary) !important;
 }
 
 .highcontrast #loadingText {
@@ -625,17 +636,48 @@ body.highcontrast {
 }
 
 .highcontrast .modal-message {
+    color: var(--color-text-primary);
+    background-color: var(--color-panel-bg);
+}
+
+.highcontrast .plugin-modal-select {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary);
+    border-color: var(--color-border-primary) !important;
+}
+
+.highcontrast .plugin-upload-button {
+    border-color: var(--color-brand-primary);
+    color: var(--color-brand-primary);
+}
+
+.highcontrast .plugin-upload-button:hover {
+    background-color: var(--color-brand-primary);
     color: var(--color-text-inverse);
-    background-color: var(--color-text-inverse);
+}
+
+.highcontrast .plugin-modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.highcontrast .cancel-button {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 2px solid var(--color-border-primary);
+}
+
+.highcontrast .cancel-button:hover {
+    background-color: var(--color-brand-secondary);
+    color: var(--color-text-inverse);
 }
 
 .highcontrast #newdropdown {
-    border: #ffffff;
-    background-color: var(--color-text-inverse);
+    border: 1px solid #ffffff;
+    background-color: var(--color-bg-primary);
 }
 
 .highcontrast #confirmation-message {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .material-tooltip {

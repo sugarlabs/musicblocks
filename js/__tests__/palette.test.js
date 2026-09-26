@@ -53,6 +53,7 @@ global.PALETTEICONS = {
     artwork: "<svg background_fill_color stroke_color fill_color></svg>"
 };
 global.MULTIPALETTEICONS = ["music", "logic", "artwork"];
+global.MULTIPALETTENAMES = ["Music", "Logic", "Arts"];
 global.SKIPPALETTES = ["heap", "dictionary"];
 
 global.platformColor = {
@@ -241,6 +242,43 @@ describe("Palettes Class", () => {
             expect(appendSpy).toHaveBeenCalled();
             expect(palettes.showSelection).toHaveBeenCalled();
             expect(palettes.makePalettes).toHaveBeenCalled();
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("role", "tab");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("aria-selected", "true");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith(
+                "aria-label",
+                global.MULTIPALETTENAMES[0]
+            );
+        });
+
+        test("sets aria-selected to false for a nonzero index tab", () => {
+            const tdMock = { style: {}, appendChild: jest.fn(), setAttribute: jest.fn() };
+            const trMock = {
+                insertCell: jest.fn(() => tdMock),
+                children: [{}, { children: [] }],
+                setAttribute: jest.fn()
+            };
+            const paletteElement = {
+                children: [
+                    {
+                        children: [{ children: [{ children: [trMock] }] }, { children: [{}, {}] }],
+                        style: { border: "" }
+                    }
+                ]
+            };
+
+            global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
+            global.document.getElementById = jest.fn(() => null);
+            jest.spyOn(document.body, "appendChild");
+            palettes.showSelection = jest.fn();
+            palettes.makePalettes = jest.fn();
+
+            palettes._makeSelectorButton(2);
+
+            expect(tdMock.setAttribute).toHaveBeenCalledWith("aria-selected", "false");
+            expect(tdMock.setAttribute).toHaveBeenCalledWith(
+                "aria-label",
+                global.MULTIPALETTENAMES[2]
+            );
         });
     });
 
@@ -1151,11 +1189,9 @@ describe("Palettes Class", () => {
         });
 
         test("_hideMenuItems hides search widget and removes palette body", () => {
-            const paletteBody = {};
-            const paletteElement = { removeChild: jest.fn() };
+            const paletteBody = { remove: jest.fn() };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody") return paletteBody;
-                if (id === "palette") return paletteElement;
                 return null;
             });
             palettes.add("search");
@@ -1164,7 +1200,7 @@ describe("Palettes Class", () => {
             palette._hideMenuItems();
 
             expect(mockActivity.hideSearchWidget).toHaveBeenCalledWith(true);
-            expect(paletteElement.removeChild).toHaveBeenCalledWith(paletteBody);
+            expect(paletteBody.remove).toHaveBeenCalled();
         });
 
         test("setupGrabScroll updates scrollTop on drag", () => {
@@ -1430,11 +1466,14 @@ describe("Palettes Class", () => {
         test("showMenu creates header and menu container", () => {
             const palDiv = {
                 childNodes: [{ style: {} }],
-                appendChild: jest.fn(),
-                removeChild: jest.fn()
+                children: [{ offsetWidth: 180 }],
+                offsetLeft: 0,
+                offsetTop: 0,
+                style: {},
+                parentNode: { appendChild: jest.fn() }
             };
             const paletteBody = {
-                insertAdjacentHTML: jest.fn(),
+                appendChild: jest.fn(),
                 style: {},
                 childNodes: [{ style: {} }, { style: {} }],
                 children: [
@@ -1450,10 +1489,12 @@ describe("Palettes Class", () => {
                     {}
                 ]
             };
+            paletteBody.childNodes[1].getBoundingClientRect = jest.fn(() => ({ top: 180 }));
             const elementFactory = tag => {
                 if (tag === "table") return paletteBody;
                 return {
                     style: {},
+                    removeAttribute: jest.fn(),
                     setAttribute: jest.fn(),
                     appendChild: jest.fn(),
                     children: [],
@@ -1464,6 +1505,7 @@ describe("Palettes Class", () => {
             global.docById = jest.fn(id => {
                 if (id === "palette") return palDiv;
                 if (id === "PaletteBody") return null;
+                if (id === "PaletteBody_items") return paletteBody.childNodes[1];
                 return null;
             });
 
@@ -1473,9 +1515,89 @@ describe("Palettes Class", () => {
 
             palette.showMenu(true);
 
-            expect(palDiv.appendChild).toHaveBeenCalledWith(paletteBody);
+            expect(palDiv.parentNode.appendChild).toHaveBeenCalledWith(paletteBody);
             expect(palette.menuContainer).toBe(paletteBody);
             expect(palette._showMenuItems).toHaveBeenCalled();
+        });
+
+        test("showMenu sizes the scrollable body from its rendered top", () => {
+            const paletteItems = {
+                style: {},
+                getBoundingClientRect: jest.fn(() => ({ top: 180 }))
+            };
+            const paletteBody = {
+                appendChild: jest.fn(),
+                style: {},
+                childNodes: [{ style: {} }, paletteItems],
+                children: [
+                    {
+                        insertRow: jest.fn(() => ({
+                            style: {},
+                            appendChild: jest.fn(),
+                            children: [{ style: {}, appendChild: jest.fn() }]
+                        }))
+                    }
+                ]
+            };
+            const paletteParent = { appendChild: jest.fn() };
+            const palDiv = {
+                childNodes: [{ style: {} }],
+                children: [{ offsetWidth: 180 }],
+                offsetLeft: 0,
+                offsetTop: 0,
+                style: {},
+                parentNode: paletteParent
+            };
+
+            global.document.createElement = jest.fn(tag => {
+                if (tag === "table") return paletteBody;
+                if (tag === "tbody") return paletteItems;
+                return {
+                    style: {},
+                    children: [],
+                    appendChild: jest.fn(),
+                    removeAttribute: jest.fn(),
+                    setAttribute: jest.fn()
+                };
+            });
+            global.docById = jest.fn(id => {
+                if (id === "palette") return palDiv;
+                if (id === "PaletteBody") return null;
+                if (id === "PaletteBody_items") return paletteItems;
+                return null;
+            });
+            Object.defineProperty(window, "innerHeight", { value: 900, configurable: true });
+
+            palettes.add("test");
+            const palette = palettes.dict.test;
+            palette._showMenuItems = jest.fn();
+
+            palette.showMenu(true);
+
+            expect(paletteItems.style.height).toBe("720px");
+            expect(paletteItems.style.overflow).toBe("auto");
+            expect(paletteItems.style.overflowX).toBe("hidden");
+        });
+
+        test("scrollEvent scrolls the open block list and scrollDiff mirrors it", () => {
+            const paletteItems = { scrollTop: 0 };
+            global.docById = jest.fn(id => (id === "PaletteBody_items" ? paletteItems : null));
+            palettes.add("test");
+            const palette = palettes.dict.test;
+
+            palette.scrollEvent(-20, 1); // arrow down: list moves up
+            expect(paletteItems.scrollTop).toBe(20);
+            expect(palette.scrollDiff).toBe(-20);
+
+            palette.scrollEvent(-palette.scrollDiff, 1); // home: back to the top
+            expect(paletteItems.scrollTop).toBe(0);
+        });
+
+        test("scrollEvent is a no-op when no palette menu is open", () => {
+            global.docById = jest.fn(() => null);
+            palettes.add("test");
+            expect(() => palettes.dict.test.scrollEvent(-20, 1)).not.toThrow();
+            expect(palettes.dict.test.scrollDiff).toBe(0);
         });
 
         test("_showMenuItems renders a basic block", () => {
@@ -2012,13 +2134,22 @@ describe("Palettes Class", () => {
             mockActivity.palettes = palettes;
             mockActivity.blocks = {
                 blockList: [{ container: { x: 0, y: 0 } }],
-                moveBlock: jest.fn()
+                moveBlock: jest.fn(),
+                actionHistory: [],
+                redoActionHistory: [{ type: "move", blockId: 0 }],
+                isUndoingOrRedoing: false,
+                dragStartX: 10,
+                dragStartY: 20
             };
 
             palette._makeBlockFromProtoblock(protoblk, true, "box", null, 10, 20);
 
             expect(palette._makeBlockFromPalette).toHaveBeenCalled();
             expect(mockActivity.blocks.moveBlock).toHaveBeenCalled();
+            expect(mockActivity.blocks.actionHistory).toEqual([{ type: "restore", blockId: 0 }]);
+            expect(mockActivity.blocks.redoActionHistory).toEqual([]);
+            expect(mockActivity.blocks.dragStartX).toBeUndefined();
+            expect(mockActivity.blocks.dragStartY).toBeUndefined();
         });
 
         test("outside click listener hides menu", () => {
@@ -2056,7 +2187,8 @@ describe("Palettes Class", () => {
             };
             const tr = {
                 children: MULTIPALETTES.map(() => ({
-                    children: [{ src: "" }, { style: { background: "" } }]
+                    children: [{ src: "" }, { style: { background: "" } }],
+                    setAttribute: jest.fn()
                 }))
             };
 
@@ -2068,6 +2200,8 @@ describe("Palettes Class", () => {
             expect(tr.children[0].children[1].style.background).toBe(
                 platformColor.paletteLabelBackground
             );
+            expect(tr.children[1].setAttribute).toHaveBeenCalledWith("aria-selected", "true");
+            expect(tr.children[0].setAttribute).toHaveBeenCalledWith("aria-selected", "false");
         });
     });
 

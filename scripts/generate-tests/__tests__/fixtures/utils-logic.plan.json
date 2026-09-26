@@ -495,7 +495,7 @@
       "isGenerator": false,
       "returns": 6,
       "throws": 0,
-      "branches": 7
+      "branches": 8
     },
     {
       "name": "nearestBeat",
@@ -547,9 +547,9 @@
       "hasRestParam": false,
       "isAsync": false,
       "isGenerator": false,
-      "returns": 5,
+      "returns": 3,
       "throws": 0,
-      "branches": 10
+      "branches": 9
     },
     {
       "name": "resolveObject",
@@ -819,7 +819,7 @@
     },
     {
       "target": "mixedNumber",
-      "description": "Converts a number to a mixed fraction string.",
+      "description": "Converts a number to a mixed fraction string. The whole and fractional parts are taken from the magnitude and the sign is carried on the front, so -1.5 reads as \"-1 1/2\". Working straight off the signed value instead would floor -1.5 to -2 and render \"-2 1/2\", which reads as -2.5.",
       "tags": []
     },
     {
@@ -839,7 +839,7 @@
     },
     {
       "target": "rationalToFraction",
-      "description": "Convert float to its approximate fractional representation.",
+      "description": "Convert float to its approximate fractional representation. Returns a reduced [numerator, denominator] pair with a positive denominator. Values above 1 are handled by inverting on entry and swapping back on every exit path (including the iteration-cap path); the sign of the input is carried on the numerator.",
       "tags": []
     },
     {
@@ -922,7 +922,7 @@
   ],
   "totals": {
     "branches": 196,
-    "returns": 107,
+    "returns": 105,
     "throws": 0
   }
 }

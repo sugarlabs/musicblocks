@@ -22,6 +22,7 @@ if (typeof global.STANDARDBLOCKHEIGHT === "undefined") {
 }
 
 const { setupSearchController, SearchController } = require("../search-controller.js");
+const { SearchUI } = require("../../search-ui.js");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -60,7 +61,7 @@ function makeActivity(protoBlocks = {}) {
         focus: jest.fn(),
         placeholder: ""
     };
-    return {
+    const activity = {
         searchWidget,
         helpfulSearchWidget,
         blocks: {
@@ -94,6 +95,8 @@ function makeActivity(protoBlocks = {}) {
         }),
         update: false
     };
+    activity.searchUI = new SearchUI(activity);
+    return activity;
 }
 
 // ---------------------------------------------------------------------------
@@ -118,6 +121,7 @@ describe("setupSearchController", () => {
         expect(sc.searchBlockPosition).toEqual([100, 100]);
         expect(sc.deprecatedBlockNames).toEqual([]);
         expect(sc.helpfulSearchDiv).toBeNull();
+        expect(sc.searchUI).toBe(activity.searchUI);
     });
 });
 
@@ -431,7 +435,7 @@ describe("SearchController.doSearch - result generation", () => {
 // doSearch — autocomplete initialization branches
 // ---------------------------------------------------------------------------
 
-function makeJQueryElem(alreadyInit = false) {
+function makeJQueryElem(alreadyInit = false, instance = null) {
     let capturedOpts = null;
     const initFlag = { value: alreadyInit };
     const elem = {
@@ -441,7 +445,7 @@ function makeJQueryElem(alreadyInit = false) {
         }),
         autocomplete: jest.fn(function (arg) {
             if (typeof arg === "object") capturedOpts = arg;
-            if (arg === "instance") return null;
+            if (arg === "instance") return instance;
         }),
         getOpts: () => capturedOpts
     };
@@ -509,6 +513,67 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         expect(response.mock.calls[0][0].some(r => r.value === "drum")).toBe(true);
     });
 
+    test("source callback keeps an empty-state row when no blocks match", () => {
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        activity.searchWidget.idInput_custom = "";
+        activity.searchWidget.value = "";
+        sc.doSearch();
+
+        const response = jest.fn();
+        $elem.getOpts().source({ term: "zzzznonexistent" }, response);
+        const items = response.mock.calls[0][0];
+        expect(items).toHaveLength(1);
+        expect(items[0].isEmptyState).toBe(true);
+        expect(items[0].label).toBe("No results found for zzzznonexistent");
+    });
+
+    test("renders the empty-state row through SearchUI", () => {
+        const instance = { _renderItem: null };
+        $elem = makeJQueryElem(false, instance);
+        global.window.jQuery = jest.fn(() => $elem);
+
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+        const renderSpy = jest
+            .spyOn(activity.searchUI, "renderEmptySearchItem")
+            .mockReturnValue("empty-row");
+
+        activity.searchWidget.idInput_custom = "";
+        activity.searchWidget.value = "";
+        sc.doSearch();
+
+        const ul = { css: jest.fn() };
+        const item = { isEmptyState: true, label: "No results found for zzz" };
+        expect(instance._renderItem(ul, item)).toBe("empty-row");
+        expect(renderSpy).toHaveBeenCalledWith(global.window.jQuery, ul, item);
+    });
+
+    test("select callback does not place a block for the empty-state row", () => {
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        activity.searchWidget.idInput_custom = "";
+        activity.searchWidget.value = "";
+        sc.doSearch();
+
+        const event = { preventDefault: jest.fn(), keyCode: 13 };
+        const result = $elem.getOpts().select(event, {
+            item: { isEmptyState: true, label: "No results found for zzz", specialDict: null }
+        });
+
+        expect(result).toBe(false);
+        expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).not.toHaveBeenCalled();
+        expect(activity.searchWidget.value).toBe("");
+    });
+
     test("select callback sets widget fields and re-runs doSearch", () => {
         const block = makeProtoBlock("drum", "drum beat");
         const activity = makeActivity({ drum: block });
@@ -520,7 +585,7 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         activity.searchWidget.value = "";
         sc.doSearch();
 
-        const event = { preventDefault: jest.fn(), keyCode: 0 };
+        const event = { preventDefault: jest.fn(), key: "" };
         const ui = { item: { label: "drum beat", value: "drum", specialDict: block } };
         $elem.getOpts().select(event, ui);
 
@@ -530,6 +595,27 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         expect(activity.searchWidget.idInput_custom).toBe("drum");
         expect(activity.searchWidget.protoblk).toBe(block);
         expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
+    });
+
+    test("select callback keeps search widget visible on Enter", () => {
+        const block = makeProtoBlock("drum", "drum beat");
+        const activity = makeActivity({ drum: block });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        // Ensure we start with some initial state to distinguish the change
+        activity.searchWidget.style.visibility = "hidden";
+
+        activity.searchWidget.idInput_custom = "";
+        activity.searchWidget.value = "";
+        sc.doSearch();
+
+        const event = { preventDefault: jest.fn(), key: "Enter" };
+        const ui = { item: { label: "drum beat", value: "drum", specialDict: block } };
+        $elem.getOpts().select(event, ui);
+
+        expect(activity.searchWidget.style.visibility).toBe("visible");
     });
 
     test("focus callback calls preventDefault", () => {
@@ -717,6 +803,67 @@ describe("SearchController.doHelpfulSearch - autocomplete initialization", () =>
         const response = jest.fn();
         $elem.getOpts().source({ term: "drum" }, response);
         expect(response.mock.calls[0][0].some(r => r.value === "drum")).toBe(true);
+    });
+
+    test("source callback keeps an empty-state row when no blocks match", () => {
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        activity.helpfulSearchWidget.idInput_custom = "";
+        activity.helpfulSearchWidget.value = "";
+        sc.doHelpfulSearch();
+
+        const response = jest.fn();
+        $elem.getOpts().source({ term: "zzzznonexistent" }, response);
+        const items = response.mock.calls[0][0];
+        expect(items).toHaveLength(1);
+        expect(items[0].isEmptyState).toBe(true);
+        expect(items[0].label).toBe("No results found for zzzznonexistent");
+    });
+
+    test("select callback does not place a block for the empty-state row", () => {
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        activity.helpfulSearchWidget.idInput_custom = "";
+        activity.helpfulSearchWidget.value = "";
+        sc.doHelpfulSearch();
+
+        const event = { preventDefault: jest.fn() };
+        const result = $elem.getOpts().select(event, {
+            item: { isEmptyState: true, label: "No results found for zzz", specialDict: null }
+        });
+
+        expect(result).toBe(false);
+        expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).not.toHaveBeenCalled();
+        expect(activity.helpfulSearchWidget.value).toBe("");
+    });
+
+    test("renders the empty-state row through SearchUI", () => {
+        const instance = { _renderItem: null };
+        $elem = makeJQueryElem(false, instance);
+        global.window.jQuery = jest.fn(() => $elem);
+
+        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+        const renderSpy = jest
+            .spyOn(activity.searchUI, "renderEmptySearchItem")
+            .mockReturnValue("empty-row");
+
+        activity.helpfulSearchWidget.idInput_custom = "";
+        activity.helpfulSearchWidget.value = "";
+        sc.doHelpfulSearch();
+
+        const ul = { css: jest.fn() };
+        const item = { isEmptyState: true, label: "No results found for zzz" };
+        expect(instance._renderItem(ul, item)).toBe("empty-row");
+        expect(renderSpy).toHaveBeenCalledWith(global.window.jQuery, ul, item);
     });
 
     test("select callback sets helpfulSearchWidget fields and re-runs doHelpfulSearch", () => {

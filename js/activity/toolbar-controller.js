@@ -65,7 +65,7 @@ class ToolbarController {
                 this.activity.logo.doStopTurtles();
 
                 const that = this;
-                setTimeout(() => {
+                this.activity.logo._timerManager.setTimeout(() => {
                     // Stop leaves the drawing in place, so clear here the way
                     // every other Run path does before starting fresh.
                     that._clearAllTurtles();
@@ -116,7 +116,18 @@ class ToolbarController {
                 this.activity.logo.runLogoCommands();
                 started = true;
             }
-            this.activity.logo.step();
+            if (started) {
+                // runLogoCommands() dispatches the start block(s) asynchronously
+                // (via a setTimeout(0) inside runLogoCommands), so the stepQueue
+                // is still empty at this point. Calling step() synchronously here
+                // would iterate over an empty queue and advance nothing, wasting
+                // the very first click and forcing an extra click before the first
+                // block runs. Defer the first step() so it runs after the queue
+                // has been populated.
+                this.activity.logo._timerManager.setTimeout(() => this.activity.logo.step(), 0);
+            } else {
+                this.activity.logo.step();
+            }
             return started ? "started" : null;
         } else {
             const noBlocks = Object.keys(this.activity.logo.stepQueue).every(
