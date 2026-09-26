@@ -392,14 +392,14 @@ class LogoDependencies {
         if (typeof deps.blocks !== "object" || Array.isArray(deps.blocks)) {
             throw new Error("LogoDependencies: 'blocks' must be an object");
         }
-        if (deps.blocks.blockList !== undefined && !Array.isArray(deps.blocks.blockList)) {
+        if (!Array.isArray(deps.blocks.blockList)) {
             throw new Error("LogoDependencies: 'blocks.blockList' must be an array");
         }
 
         if (typeof deps.turtles !== "object" || Array.isArray(deps.turtles)) {
             throw new Error("LogoDependencies: 'turtles' must be an object");
         }
-        if (deps.turtles.turtleList !== undefined && !Array.isArray(deps.turtles.turtleList)) {
+        if (!Array.isArray(deps.turtles.turtleList)) {
             throw new Error("LogoDependencies: 'turtles.turtleList' must be an array");
         }
 
