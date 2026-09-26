@@ -14,7 +14,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global globalActivity, JSInterface, last, ASTUtils, astring */
+/* global globalActivity, JSInterface, last, ASTUtils, astring, BooleanBlock */
 
 /* exported JSGenerate */
 
@@ -132,8 +132,10 @@ class JSGenerate {
                         if (JSInterface.isGetter(arg.name)) {
                             args.push([arg.name, null]);
                         } else if (
-                            window.BooleanBlock &&
-                            arg.protoblock instanceof window.BooleanBlock
+                            // protoblocks.js is a classic script, so its top-level classes are
+                            // global bindings but never properties of window.
+                            typeof BooleanBlock !== "undefined" &&
+                            arg.protoblock instanceof BooleanBlock
                         ) {
                             if (arg.name === "boolean") {
                                 args.push("bool_" + arg.value);
