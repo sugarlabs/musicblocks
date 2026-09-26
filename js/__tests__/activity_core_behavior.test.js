@@ -459,6 +459,286 @@ describe("Activity Core Behaviors and Lifecycle", () => {
         });
     });
 
+    describe("Horizontal Scroller UI Toggle (Lines 1056–1097)", () => {
+        it("toggles horizontal scrolling and updates icons, helpful wheel items, and feedback messages", () => {
+            const sandbox = loadActivitySandbox();
+            const act = sandbox.activity;
+
+            const enableIcon = document.createElement("div");
+            enableIcon.id = "enableHorizScrollIcon";
+            const disableIcon = document.createElement("div");
+            disableIcon.id = "disableHorizScrollIcon";
+            document.body.appendChild(enableIcon);
+            document.body.appendChild(disableIcon);
+
+            act.textMsg = jest.fn();
+            act.blocks = { activeBlock: { id: "block1" } };
+            act.beginnerMode = false;
+            act.scrollBlockContainer = false;
+            act.helpfulWheelItems = [
+                { label: "Enable horizontal scrolling", display: true },
+                { label: "Disable horizontal scrolling", display: false }
+            ];
+
+            // First toggle -> enabled
+            act._setScroller();
+
+            expect(act.scrollBlockContainer).toBe(true);
+            expect(act.blocks.activeBlock).toBeNull();
+            expect(enableIcon.style.display).toBe("none");
+            expect(disableIcon.style.display).toBe("block");
+            expect(act.helpfulWheelItems[0].display).toBe(false);
+            expect(act.helpfulWheelItems[1].display).toBe(true);
+            expect(act.textMsg).toHaveBeenCalledWith("Horizontal scrolling enabled.", 3000);
+
+            // Second toggle -> disabled
+            act._setScroller();
+
+            expect(act.scrollBlockContainer).toBe(false);
+            expect(enableIcon.style.display).toBe("block");
+            expect(disableIcon.style.display).toBe("none");
+            expect(act.helpfulWheelItems[0].display).toBe(true);
+            expect(act.helpfulWheelItems[1].display).toBe(false);
+            expect(act.textMsg).toHaveBeenCalledWith("Horizontal scrolling disabled.", 3000);
+        });
+    });
+
+    describe("Clipboard Block Pasting (Lines 2530–2559)", () => {
+        it("returns early on empty clipboard text", () => {
+            const sandbox = loadActivitySandbox();
+            const act = new sandbox.Activity();
+
+            const pasteInput = document.createElement("textarea");
+            pasteInput.id = "paste";
+            pasteInput.value = "";
+            document.body.appendChild(pasteInput);
+
+            act.blocks = { loadNewBlocks: jest.fn() };
+            act.pasted();
+            expect(act.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        });
+
+        it("displays an error message when clipboard data is invalid JSON", () => {
+            const sandbox = loadActivitySandbox();
+            const act = new sandbox.Activity();
+
+            const pasteInput = document.createElement("textarea");
+            pasteInput.id = "paste";
+            pasteInput.value = "this is not valid json";
+            document.body.appendChild(pasteInput);
+
+            act.errorMsg = jest.fn();
+            act.blocks = { loadNewBlocks: jest.fn() };
+
+            act.pasted();
+
+            expect(act.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("Invalid clipboard data")
+            );
+            expect(act.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        });
+
+        it("successfully parses JSON, hides palette menus, refreshes canvas, loads blocks, and hides pastebox", () => {
+            const sandbox = loadActivitySandbox();
+            const act = new sandbox.Activity();
+
+            const blocksData = [{ name: "start", x: 100, y: 100 }];
+            const pasteInput = document.createElement("textarea");
+            pasteInput.id = "paste";
+            pasteInput.value = JSON.stringify(blocksData);
+            document.body.appendChild(pasteInput);
+
+            const hideMenuMock = jest.fn();
+            act.palettes = {
+                dict: {
+                    main: { hideMenu: hideMenuMock }
+                }
+            };
+            act.refreshCanvas = jest.fn();
+            act.blocks = { loadNewBlocks: jest.fn() };
+            act.pasteBox = { hide: jest.fn() };
+
+            act.pasted();
+
+            expect(hideMenuMock).toHaveBeenCalledWith(true);
+            expect(act.refreshCanvas).toHaveBeenCalledTimes(1);
+            expect(act.blocks.loadNewBlocks).toHaveBeenCalledWith(blocksData);
+            expect(act.pasteBox.hide).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("Plugin Palette Deletion (Lines 1107–1191)", () => {
+        it("guards against deleting start palette or non-plugin palettes", () => {
+            const sandbox = loadActivitySandbox();
+            const act = new sandbox.Activity();
+
+            act.textMsg = jest.fn();
+            act.palettes = { activePalette: "start" };
+            act.pluginObjs = { PALETTEPLUGINS: {} };
+
+            act._deletePlugin("start");
+            expect(act.textMsg).toHaveBeenCalledWith(
+                "Please open a plugin palette before clicking delete.",
+                3000
+            );
+
+            act._deletePlugin("nonExistentPlugin");
+            expect(act.textMsg).toHaveBeenCalledWith(
+                "Please open a plugin palette before clicking delete.",
+                3000
+            );
+        });
+
+        it("successfully deletes plugin, removes from storage and MULTIPALETTES, and updates palettes UI", () => {
+            const sandbox = loadActivitySandbox({
+                overrides: {
+                    MULTIPALETTES: [["customPlugin", "start"]]
+                }
+            });
+            const act = new sandbox.Activity();
+
+            act.textMsg = jest.fn();
+            act.pluginObjs = {
+                PALETTEPLUGINS: {
+                    customPlugin: { name: "customPlugin" }
+                }
+            };
+            const mockPaletteObj = {
+                hide: jest.fn(),
+                protoList: ["blockA"]
+            };
+            act.palettes = {
+                dict: {
+                    customPlugin: mockPaletteObj,
+                    start: { hide: jest.fn() }
+                },
+                makePalettes: jest.fn(),
+                updatePalettes: jest.fn(),
+                showPalette: jest.fn()
+            };
+            act.pluginController = {
+                deletePluginFromStorage: jest.fn((name, protoList) => true)
+            };
+
+            act._deletePlugin("customPlugin");
+
+            expect(act.pluginController.deletePluginFromStorage).toHaveBeenCalledWith(
+                "customPlugin",
+                ["blockA"]
+            );
+            expect(act.pluginObjs["PALETTEPLUGINS"]["customPlugin"]).toBeUndefined();
+            expect(mockPaletteObj.hide).toHaveBeenCalledTimes(1);
+            expect(act.palettes.dict["customPlugin"]).toBeUndefined();
+            expect(act.palettes.activePalette).toBe("start");
+            expect(act.palettes.makePalettes).toHaveBeenCalledTimes(1);
+            expect(act.palettes.updatePalettes).toHaveBeenCalledTimes(1);
+            expect(act.palettes.showPalette).toHaveBeenCalledWith("start");
+            expect(act.textMsg).toHaveBeenCalledWith("Plugin deleted successfully.", 3000);
+        });
+    });
+
+    describe("Clear Workspace Modal & Confirmation (Lines 772–884)", () => {
+        it("renders confirmation modal with Confirm and Cancel buttons; Cancel removes modal without clearing", () => {
+            const sandbox = loadActivitySandbox();
+            const act = new sandbox.Activity();
+
+            act.blocks = { activeBlock: { id: "active" } };
+            act._allClear(false, false);
+
+            const modal = document.getElementById("clear-confirm");
+            expect(modal).not.toBeNull();
+            expect(modal.querySelector(".modal-title").textContent).toBe("Clear workspace");
+
+            const cancelBtn = modal.querySelector(".cancel-button");
+            cancelBtn.click();
+
+            // Modal should be removed from DOM
+            expect(document.getElementById("clear-confirm")).toBeNull();
+            // Active block was NOT cleared
+            expect(act.blocks.activeBlock).not.toBeNull();
+        });
+
+        it("Confirm button in modal clears workspace canvas, logo heaps, and buffers", () => {
+            const sandbox = loadActivitySandbox();
+            const act = new sandbox.Activity();
+
+            const mockPainter = { doClear: jest.fn() };
+            act.blocks = { activeBlock: { id: "active" } };
+            act.blocksContainer = { x: 50, y: 50 };
+            act.logo = {
+                boxes: { a: 1 },
+                time: 10,
+                svgOutput: "svg",
+                notationOutput: "notes",
+                recordingBuffer: {
+                    hasData: true,
+                    notationOutput: "recorded",
+                    notationNotes: { n: 1 },
+                    notationStaging: { s: 1 },
+                    notationDrumStaging: { d: 1 }
+                },
+                turtleHeaps: [],
+                turtleDicts: [],
+                notation: { notationStaging: [], notationDrumStaging: [] }
+            };
+            act.turtles = {
+                setBackgroundColor: jest.fn(),
+                getTurtleCount: () => 1,
+                getTurtle: () => ({ painter: mockPainter })
+            };
+            act.hideMsgs = jest.fn();
+            act.hideGrids = jest.fn();
+            act.closeHelpfulWheel = jest.fn(() => false);
+
+            act._allClear(false, false);
+
+            const modal = document.getElementById("clear-confirm");
+            const confirmBtn = modal.querySelector(".confirm-button");
+            confirmBtn.click();
+
+            // Modal removed
+            expect(document.getElementById("clear-confirm")).toBeNull();
+
+            // Workspace state cleared
+            expect(act.blocks.activeBlock).toBeNull();
+            expect(act.logo.boxes).toEqual({});
+            expect(act.logo.time).toBe(0);
+            expect(act.logo.recordingBuffer.hasData).toBe(false);
+            expect(act.turtles.setBackgroundColor).toHaveBeenCalledWith(-1);
+            expect(mockPainter.doClear).toHaveBeenCalledWith(true, true, true);
+            expect(act.blocksContainer.x).toBe(0);
+            expect(act.blocksContainer.y).toBe(0);
+        });
+
+        it("skipConfirmation = true immediately clears workspace without modal", () => {
+            const sandbox = loadActivitySandbox();
+            const act = new sandbox.Activity();
+
+            act.blocks = { activeBlock: { id: "b1" } };
+            act.blocksContainer = { x: 10, y: 10 };
+            act.logo = {
+                boxes: {},
+                recordingBuffer: {},
+                turtleHeaps: [],
+                turtleDicts: [],
+                notation: { notationStaging: [], notationDrumStaging: [] }
+            };
+            act.turtles = {
+                setBackgroundColor: jest.fn(),
+                getTurtleCount: () => 0
+            };
+            act.hideMsgs = jest.fn();
+            act.hideGrids = jest.fn();
+            act.closeHelpfulWheel = jest.fn(() => false);
+
+            act._allClear(false, true);
+
+            expect(document.getElementById("clear-confirm")).toBeNull();
+            expect(act.blocks.activeBlock).toBeNull();
+            expect(act.blocksContainer.x).toBe(0);
+        });
+    });
+
     describe("Global Bridges hidePrintText and hideErrorText (Lines 312–322)", () => {
         it("delegates hidePrintText and hideErrorText to globalActivity", () => {
             const sandbox = loadActivitySandbox();
