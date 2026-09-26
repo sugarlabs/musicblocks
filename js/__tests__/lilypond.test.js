@@ -558,8 +558,8 @@ describe("saveLilypondOutput", () => {
 
     test("should handle multiple turtles correctly", () => {
         const result = saveLilypondOutput(activity);
-        expect(result).toContain("Turtle0 = {");
-        expect(result).toContain("Turtle1 = {");
+        expect(result).toContain("Turtlezero = {");
+        expect(result).toContain("Turtleone = {");
     });
 
     test("should handle unique short instrument names correctly", () => {
@@ -619,9 +619,9 @@ describe("saveLilypondOutput", () => {
 
         const result = saveLilypondOutput(activity);
 
-        expect(result).toContain('\\context TabVoice = "Turtle0" \\Turtle0');
+        expect(result).toContain('\\context TabVoice = "Turtlezero" \\Turtlezero');
         expect(result).toContain('shortInstrumentName = "Tu"');
-        expect(result).toContain("Turtle1Voice = \\new Staff \\with {");
+        expect(result).toContain("TurtleoneVoice = \\new Staff \\with {");
     });
 
     test("guitar tablature groups each instrument by its own clef, not turtle 0's", () => {
@@ -638,10 +638,10 @@ describe("saveLilypondOutput", () => {
 
         const result = saveLilypondOutput(activity);
 
-        const scoreVoice0 = result.indexOf("\\Turtle0Voice\n");
-        const scoreVoice1 = result.indexOf("\\Turtle1Voice\n");
-        const tab0 = result.indexOf('\\context TabVoice = "Turtle0"');
-        const tab1 = result.indexOf('\\context TabVoice = "Turtle1"');
+        const scoreVoice0 = result.indexOf("\\TurtlezeroVoice\n");
+        const scoreVoice1 = result.indexOf("\\TurtleoneVoice\n");
+        const tab0 = result.indexOf('\\context TabVoice = "Turtlezero"');
+        const tab1 = result.indexOf('\\context TabVoice = "Turtleone"');
 
         expect(scoreVoice0).toBeGreaterThan(-1);
         expect(scoreVoice1).toBeGreaterThan(-1);
@@ -649,7 +649,7 @@ describe("saveLilypondOutput", () => {
         expect(tab1).toBeGreaterThan(-1);
 
         // the score section above already groups treble on top, bass_8 on
-        // the bottom, so Turtle1 (treble) lists before Turtle0 (bass_8)
+        // the bottom, so Turtleone (treble) lists before Turtlezero (bass_8)
         expect(scoreVoice1).toBeLessThan(scoreVoice0);
         // the guitar tablature section must match that same ordering,
         // grouping each instrument by its own clef instead of turtle 0's
@@ -843,5 +843,49 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain('shortInstrumentName = "ft"');
         expect(result).toContain('shortInstrumentName = "ab"');
         expect(result).toContain('shortInstrumentName = "aab"');
+    });
+
+    test("should spell out digits and drop punctuation in voice identifiers", () => {
+        activity.turtles.turtleList = {
+            0: { name: "Voice 1" },
+            1: { name: "Bob's-flute" }
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("Voiceone = {");
+        expect(result).toContain("Bobsflute = {");
+        expect(result).toContain('instrumentName = "Voice 1"');
+        expect(result).toContain('instrumentName = "Bob\'s-flute"');
+        expect(result).toContain("\\VoiceoneVoice\n");
+        expect(result).toContain("\\BobsfluteVoice\n");
+    });
+
+    test("should give turtles with the same name their own voices", () => {
+        activity.turtles.turtleList = {
+            0: { name: "Piano" },
+            1: { name: "Piano" }
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("Piano = {");
+        expect(result).toContain("Pianoone = {");
+        expect(result).toContain("\\PianoVoice\n");
+        expect(result).toContain("\\PianooneVoice\n");
+    });
+
+    test("should list an unnamed turtle under the same voice it was written to", () => {
+        activity.turtles.turtleList = {
+            0: { name: "start" },
+            1: { name: "" }
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("brownrat = {");
+        expect(result).toContain("\\brownratVoice\n");
+        expect(result.match(/\\mouseVoice\n/g)).toHaveLength(1);
+    });
+
+    test("should end the last voice with a bar even when every turtle has a drum slot", () => {
+        activity.logo.notation.notationDrumStaging = { 0: [], 1: [] };
+        const result = saveLilypondOutput(activity);
+        expect(result.match(/\\bar "\|\."/g)).toHaveLength(1);
+        expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar "\|\."/);
     });
 });
