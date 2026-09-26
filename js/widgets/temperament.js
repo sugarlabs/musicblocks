@@ -1996,22 +1996,25 @@ function TemperamentWidget() {
             const ratio = [];
             const frequency = [];
             const ratioDifference = [];
-            const index = [];
             const compareRatios = [];
             that.tempRatios = that.ratios.slice();
 
+            /**
+             * Recursively calculates ratios to ensure they fit within the octave space.
+             * Inserts the resulting ratio into the sorted tempRatios array.
+             *
+             * @param {number} i - The current iteration index.
+             */
             const calculateRatios = function (i) {
                 if (frequency[i] < that.frequencies[len - 1]) {
                     for (let j = 0; j < that.tempRatios.length; j++) {
                         ratioDifference[j] = ratio[i] - that.tempRatios[j];
                         if (ratioDifference[j] < 0) {
-                            index.push(j);
-                            that.tempRatios.splice(index[i], 0, ratio[i]);
+                            that.tempRatios.splice(j, 0, ratio[i]);
                             break;
                         }
                         if (ratioDifference[j] === 0) {
-                            index.push(j);
-                            that.tempRatios.splice(index[i], 1, ratio[i]);
+                            that.tempRatios.splice(j, 1, ratio[i]);
                             break;
                         }
                     }
