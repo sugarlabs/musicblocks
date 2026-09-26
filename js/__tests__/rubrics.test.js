@@ -411,5 +411,61 @@ describe("rubrics.js test suite", () => {
             expect(stats.pitchNames.has("Cff")).toBe(true);
             expect(stats.pitches).toContain(261.6);
         });
+
+        it("resolves custom note names when getTemperament returns a dictionary object", () => {
+            isCustomTemperament.mockReturnValueOnce(true);
+            getTemperament.mockReturnValueOnce({
+                pitchNumber: 12,
+                0: ["idx", "Cff", "ratio", "C"]
+            });
+
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [[["C4"], 4]]
+                        }
+                    },
+                    synth: {
+                        inTemperament: "custom_dict",
+                        getCustomFrequency: jest.fn(() => 261.6),
+                        _getFrequency: jest.fn()
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            const stats = getStatsFromNotation(activity);
+
+            expect(activity.logo.synth.getCustomFrequency).toHaveBeenCalled();
+            expect(stats.pitchNames.has("Cff")).toBe(true);
+            expect(stats.pitches).toContain(261.6);
+        });
+
+        it("handles undefined return from getTemperament gracefully", () => {
+            isCustomTemperament.mockReturnValueOnce(true);
+            getTemperament.mockReturnValueOnce(undefined);
+
+            const activity = {
+                logo: {
+                    notation: {
+                        notationStaging: {
+                            0: [[["C4"], 4]]
+                        }
+                    },
+                    synth: {
+                        inTemperament: "unknown_custom",
+                        getCustomFrequency: jest.fn(() => 261.6),
+                        _getFrequency: jest.fn()
+                    }
+                },
+                blocks: { blockList: [] }
+            };
+
+            const stats = getStatsFromNotation(activity);
+
+            expect(stats.pitchNames.has("C")).toBe(true);
+            expect(stats.pitches).toContain(261.6);
+        });
     });
 });
