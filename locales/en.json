@@ -1799,5 +1799,6 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Block %s is undefined.": "Block %s is undefined."
 }
