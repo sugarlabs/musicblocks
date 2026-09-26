@@ -1,5 +1,5 @@
 <img
-src='https://rawgithub.com/sugarlabs/musicblocks/master/Minsky.jpg'/>
+src='https://raw.githubusercontent.com/sugarlabs/musicblocks/master/Minsky.jpg'/>
 Photo by Cynthia Solomon (CC-BY 2016)
 
 Marvin Minsky, the inventor of the digital synthesizer, inspired a

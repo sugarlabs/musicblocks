@@ -72,8 +72,52 @@ describe("LanguageBox Class", () => {
             reloadSpy.mockRestore();
         });
 
-        it("should wait for saveLocally before reloading", async () => {
+        it("should wait for saveSessionAsync before reloading if it exists", async () => {
+            const reloadSpy = jest.spyOn(languageBox, "_reloadWindow").mockImplementation(() => {});
+            let resolveSave;
+            mockActivity.saveSessionAsync = jest.fn().mockReturnValue(
+                new Promise(resolve => {
+                    resolveSave = resolve;
+                })
+            );
+
+            languageBox.reload();
+
+            expect(mockActivity.saveSessionAsync).toHaveBeenCalled();
+            expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+            expect(reloadSpy).not.toHaveBeenCalled();
+
+            resolveSave();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(reloadSpy).toHaveBeenCalledTimes(1);
+            reloadSpy.mockRestore();
+            delete mockActivity.saveSessionAsync;
+        });
+
+        it("should not reload and should log error when saveSessionAsync fails", async () => {
             const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            const reloadSpy = jest.spyOn(languageBox, "_reloadWindow").mockImplementation(() => {});
+            const saveError = new Error("IndexedDB save failed");
+            mockActivity.saveSessionAsync = jest.fn().mockRejectedValue(saveError);
+
+            languageBox.reload();
+
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(mockActivity.saveSessionAsync).toHaveBeenCalled();
+            expect(reloadSpy).not.toHaveBeenCalled();
+            expect(consoleSpy).toHaveBeenCalledWith(saveError);
+
+            consoleSpy.mockRestore();
+            reloadSpy.mockRestore();
+            delete mockActivity.saveSessionAsync;
+        });
+
+        it("should wait for saveLocally before reloading if saveSessionAsync is missing", async () => {
+            const reloadSpy = jest.spyOn(languageBox, "_reloadWindow").mockImplementation(() => {});
             let resolveSave;
             mockActivity.saveLocally.mockReturnValue(
                 new Promise(resolve => {
@@ -84,14 +128,33 @@ describe("LanguageBox Class", () => {
             languageBox.reload();
 
             expect(mockActivity.saveLocally).toHaveBeenCalled();
-            expect(consoleSpy).not.toHaveBeenCalled();
+            expect(reloadSpy).not.toHaveBeenCalled();
 
             resolveSave();
             await Promise.resolve();
             await Promise.resolve();
 
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(reloadSpy).toHaveBeenCalledTimes(1);
+            reloadSpy.mockRestore();
+        });
+
+        it("should not reload and should log error when saveLocally fails", async () => {
+            const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            const reloadSpy = jest.spyOn(languageBox, "_reloadWindow").mockImplementation(() => {});
+            const saveError = new Error("LocalStorage save failed");
+            mockActivity.saveLocally.mockRejectedValue(saveError);
+
+            languageBox.reload();
+
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(mockActivity.saveLocally).toHaveBeenCalled();
+            expect(reloadSpy).not.toHaveBeenCalled();
+            expect(consoleSpy).toHaveBeenCalledWith(saveError);
+
             consoleSpy.mockRestore();
+            reloadSpy.mockRestore();
         });
     });
 

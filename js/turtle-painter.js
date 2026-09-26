@@ -16,8 +16,8 @@
  */
 
 /*
-   global _, getMunsellColor, getcolor, hex2rgb, STROKECOLORS, FILLCOLORS,
-   TURTLESVG, WRAP
+   global _, getMunsellColor, getcolor, hex2rgb, isValidHex, STROKECOLORS,
+   FILLCOLORS, TURTLESVG, WRAP, clampNumber
  */
 
 /*
@@ -27,7 +27,7 @@
    - js/utils/munsell.js
         getMunsellColor, getcolor
    - js/utils/utils.js
-        hex2rgb
+        hex2rgb, isValidHex
    - js/artwork.js
         STROKECOLORS, FILLCOLORS, TURTLESVG
    - js/toolbar.js
@@ -48,19 +48,24 @@ const DEFAULTFONT = "sans-serif"; // also used in PenBlocks.js
 const SCROLL_CANVAS_SCALE = 3;
 
 /**
+ * Upper bound (in degrees) on the angle argument accepted by doArc().
+ * doArc() draws in chunks of 90 degrees or less, so its draw loop runs
+ * roughly `angle / 90` times; this cap bounds that loop to a few hundred
+ * iterations (125 full rotations) regardless of how the angle was supplied
+ * (block argument, embedded-in-note playback, or JS-authored code), rather
+ * than reusing Wrap Mode's canvas-distance limits, which describe something
+ * unrelated to rotation.
+ */
+const MAX_ARC_ANGLE = 45000;
+
+/**
  * Class pertaining to visual actions for each turtle.
  *
  * @class
- * @classdesc This is the prototype of the Painter for each Turtle component. It is responsible
- * for the visual actions and artworks of the Turtle. It is mostly view specific and communicates
- * with methods of Turtle and Turtles objects. An action may require updating the state of the
- * Turtle or the Turtles object.
- *
- * @todo move visual artwork related states from logo.js to here eventually.
- * As of now, some state variables are present in logo.js. To ensure modularity and independence of
- * components, Logo should contain members only related to execution of blocks while the logic of
- * execution of blocks should be present in respective files in blocks/ directory, which should
- * eventually use members of this file and turtle-singer.js to proceed.
+ * @classdesc This is the prototype of the Painter for each Turtle component. It owns the
+ * per-turtle drawing state and actions. It is mostly view specific and communicates with methods
+ * of Turtle and Turtles objects. An action may require updating the state of the Turtle or the
+ * Turtles object.
  *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
@@ -95,7 +100,9 @@ class Painter {
         this.cp2x = 100;
         this.cp2y = 100;
 
-        this._canvasColor = "rgba(255,0,49,1)"; // '#ff0031';
+        // Kept as a Munsell hex string: _processColor() converts it on every
+        // stroke, and converting an already-converted rgba string yields black.
+        this._canvasColor = "#ff0031";
         this._canvasAlpha = 1.0;
         this._fillState = false;
         this._hollowState = false;
@@ -775,13 +782,15 @@ class Painter {
      * @private
      */
     _processColor() {
-        if (this._canvasColor[0] === "#") {
-            this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
-        }
-
-        const subrgb = this._canvasColor.substr(0, this._canvasColor.length - 2);
-        this.turtle.ctx.strokeStyle = subrgb + this._canvasAlpha + ")";
-        this.turtle.ctx.fillStyle = subrgb + this._canvasAlpha + ")";
+        // _canvasColor is normally a Munsell hex string. Tolerate an
+        // already-converted "rgba(...)" string as well: hex2rgb() fails closed
+        // to black on anything that is not hex, so without this guard a single
+        // stray rgba write turns every later stroke black with no error.
+        const color = isValidHex(this._canvasColor)
+            ? hex2rgb(this._canvasColor, this._canvasAlpha)
+            : this._canvasColor.replace(/,[\d.]+\)$/, `,${this._canvasAlpha})`);
+        this.turtle.ctx.strokeStyle = color;
+        this.turtle.ctx.fillStyle = color;
     }
 
     /**
@@ -792,8 +801,13 @@ class Painter {
             // For the SVG output, we need to replace rgba() with
             // rgb();fill-opacity:1 and rgb();stroke-opacity:1
 
-            let svgColor = this._canvasColor.replace(/rgba/g, "rgb");
-            svgColor = svgColor.substr(0, this._canvasColor.length - 4) + ");";
+            // The opacity travels separately in fill-opacity/stroke-opacity
+            // below, so the color itself is emitted as rgb(...) with the alpha
+            // channel dropped. Accepts either representation of _canvasColor.
+            const rgba = isValidHex(this._canvasColor)
+                ? hex2rgb(this._canvasColor)
+                : this._canvasColor;
+            const svgColor = rgba.replace("rgba(", "rgb(").replace(/,[\d.]+\)$/, ");");
 
             this._svgOutput += '" style="stroke-linecap:round;fill:';
             this._svgOutput += this._fillState
@@ -911,9 +925,8 @@ class Painter {
             this._scheduleCanvasUpdate();
         }
         // Update media positions
-        const view = this.turtle._view;
-        if (view && typeof view._updateMediaPositions === "function") {
-            view._updateMediaPositions();
+        if (typeof this.turtle._updateMediaPositions === "function") {
+            this.turtle._updateMediaPositions();
         }
     }
 
@@ -980,9 +993,8 @@ class Painter {
 
         this._move(ox, oy, nx, ny, true);
         this._scheduleCanvasUpdate();
-        const view = this.turtle._view;
-        if (view && typeof view._updateMediaPositions === "function") {
-            view._updateMediaPositions();
+        if (typeof this.turtle._updateMediaPositions === "function") {
+            this.turtle._updateMediaPositions();
         }
     }
 
@@ -1025,6 +1037,11 @@ class Painter {
         radius = Number(radius);
         if (!Number.isFinite(angle) || !Number.isFinite(radius)) {
             this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
+        if (Math.abs(angle) > MAX_ARC_ANGLE) {
+            this.turtles.activity.errorMsg(_("Arc angle must be within -45000 to 45000 degrees."));
             return;
         }
 
@@ -1400,10 +1417,10 @@ class Painter {
         this._fillState = false;
         this._hollowState = false;
 
+        // Store the hex string, exactly as doSetColor/doSetChroma/doSetValue/
+        // doSetHue do. Pre-converting to rgba here made _processColor() convert
+        // it a second time, which yields black for every stroke after a clear.
         this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
-        if (this._canvasColor[0] === "#") {
-            this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
-        }
 
         this._svgOutput = "";
         this._svgPath = false;
@@ -1466,8 +1483,8 @@ class Painter {
         // Clamp scroll position to stay within buffer canvas bounds
         const maxScrollX = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
         const maxScrollY = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
-        turtles.gx = Math.max(0, Math.min(turtles.gx, maxScrollX));
-        turtles.gy = Math.max(0, Math.min(turtles.gy, maxScrollY));
+        turtles.gx = clampNumber(turtles.gx, 0, maxScrollX);
+        turtles.gy = clampNumber(turtles.gy, 0, maxScrollY);
 
         const newImgData = turtles.c1ctx.getImageData(
             turtles.gx,

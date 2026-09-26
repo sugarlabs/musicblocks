@@ -156,7 +156,7 @@ curl -X POST http://localhost:8000/analyze \
 ### Resources
 
 - **GitHub Issues**: [Music Blocks Issues](https://github.com/sugarlabs/musicblocks/issues)
-- **Documentation**: [Music Blocks Guide](https://github.com/sugarlabs/musicblocks/tree/master/guide)
+- **Documentation**: [Music Blocks Guide](https://github.com/sugarlabs/musicblocks/tree/master/Docs/guide)
 - **Backend Repo**: [AI Debugger Backend](https://github.com/omsuneri/AI-powered-Debugger-for-Music-Blocks)
 
 ---

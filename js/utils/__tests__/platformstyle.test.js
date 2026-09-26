@@ -125,6 +125,29 @@ describe("platformstyle", () => {
         expect(document.querySelector("meta[name=theme-color]").content).toBe("#4DA6FF");
     });
 
+    it.each(["light", "dark", "highcontrast"])(
+        "keeps the graphics boundary visible in %s mode",
+        theme => {
+            localStorage.themePreference = theme;
+            loadModuleWithUA("Chrome/123");
+
+            const luminance = hex => {
+                const channels = hex.match(/[\da-f]{2}/gi).map(channel => {
+                    const value = parseInt(channel, 16) / 255;
+                    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+                });
+                return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+            };
+
+            const { ruleColor, background } = global.window.platformColor;
+            const foreground = luminance(ruleColor);
+            const backdrop = luminance(background);
+            const contrast =
+                (Math.max(foreground, backdrop) + 0.05) / (Math.min(foreground, backdrop) + 0.05);
+            expect(contrast).toBeGreaterThanOrEqual(3);
+        }
+    );
+
     it("honors dark theme preference", () => {
         Object.defineProperty(global.window.navigator, "userAgent", {
             value: "Chrome/123",
@@ -145,5 +168,122 @@ describe("platformstyle", () => {
 
         expect(global.window.platformColor.header).toBe("#1E88E5");
         expect(document.querySelector("meta[name=theme-color]").content).toBe("#1E88E5");
+    });
+
+    it("exports platformThemes and builds 25 palettes per theme via semantic adapter", () => {
+        loadModuleWithUA("Chrome/123");
+        const {
+            platformThemes,
+            SEMANTIC_PALETTE_COLORS,
+            PALETTE_CATEGORY_MAP,
+            buildPaletteColors
+        } = require("../platformstyle");
+
+        expect(platformThemes).toBeDefined();
+        expect(global.window.platformThemes).toBe(platformThemes);
+        expect(SEMANTIC_PALETTE_COLORS).toBeDefined();
+        expect(PALETTE_CATEGORY_MAP).toBeDefined();
+
+        const expectedPalettes = [
+            "widgets",
+            "pitch",
+            "intervals",
+            "rhythm",
+            "meter",
+            "tone",
+            "ornament",
+            "volume",
+            "drum",
+            "graphics",
+            "turtle",
+            "pen",
+            "ensemble",
+            "boxes",
+            "action",
+            "myblocks",
+            "media",
+            "number",
+            "boolean",
+            "flow",
+            "heap",
+            "dictionary",
+            "sensors",
+            "extras",
+            "program"
+        ];
+
+        for (const theme of ["light", "dark", "highcontrast"]) {
+            const paletteColors = buildPaletteColors(theme);
+            expect(Object.keys(paletteColors)).toHaveLength(25);
+            for (const name of expectedPalettes) {
+                expect(paletteColors[name]).toBeDefined();
+                expect(paletteColors[name]).toHaveLength(4);
+                paletteColors[name].forEach(c => {
+                    expect(typeof c).toBe("string");
+                    expect(c).toMatch(/^#[0-9A-Fa-f]{6}$/);
+                });
+            }
+            expect(platformThemes[theme].paletteColors).toEqual(paletteColors);
+        }
+    });
+
+    it("verifies required canvas keys are present and dead keys are pruned", () => {
+        loadModuleWithUA("Chrome/123");
+        const { platformThemes } = require("../platformstyle");
+
+        for (const theme of ["light", "dark", "highcontrast"]) {
+            const themeConfig = platformThemes[theme];
+
+            // Canvas & block rendering keys must be defined
+            expect(themeConfig.background).toBeDefined();
+            expect(themeConfig.blockText).toBeDefined();
+            expect(themeConfig.strokeColor).toBeDefined();
+            expect(themeConfig.fillColor).toBeDefined();
+            expect(themeConfig.paletteBackground).toBeDefined();
+            expect(themeConfig.paletteLabelBackground).toBeDefined();
+            expect(themeConfig.paletteLabelSelected).toBeDefined();
+            expect(themeConfig.paletteText).toBeDefined();
+            expect(themeConfig.selectorBackground).toBeDefined();
+            expect(themeConfig.selectorSelected).toBeDefined();
+            expect(themeConfig.labelColor).toBeDefined();
+            expect(themeConfig.widgetBackground).toBeDefined();
+            expect(themeConfig.rulerHighlight).toBeDefined();
+            expect(themeConfig.stopIconcolor).toBeDefined();
+            expect(themeConfig.hitAreaGraphicsBeginFill).toBeDefined();
+            expect(themeConfig.orange).toBeDefined();
+            expect(Array.isArray(themeConfig.piemenuBasic)).toBe(true);
+            expect(Array.isArray(themeConfig.pitchWheelcolors)).toBe(true);
+            expect(Array.isArray(themeConfig.wheelcolors)).toBe(true);
+
+            // Pruned dead keys must be undefined
+            expect(themeConfig.aux).toBeUndefined();
+            expect(themeConfig.sub).toBeUndefined();
+            expect(themeConfig.rule).toBeUndefined();
+            expect(themeConfig.trashColor).toBeUndefined();
+            expect(themeConfig.paletteSelected).toBeUndefined();
+            expect(themeConfig.doHeaderShadow).toBeUndefined();
+        }
+    });
+
+    it("honors highcontrast theme preference", () => {
+        Object.defineProperty(global.window.navigator, "userAgent", {
+            value: "Chrome/123",
+            configurable: true,
+            writable: true
+        });
+        global.navigator = global.window.navigator;
+        const ls = global.window.localStorage || {};
+        ls.themePreference = "highcontrast";
+        global.localStorage = ls;
+        global.window.localStorage = ls;
+        global.showMaterialHighlight = jest.fn(() => ({ highlight: true }));
+        buildDom();
+
+        jest.isolateModules(() => {
+            require("../platformstyle");
+        });
+
+        expect(global.window.platformColor.header).toBe("#00FFFF");
+        expect(global.window.platformColor.background).toBe("#000000");
     });
 });

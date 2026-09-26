@@ -110,7 +110,12 @@ const PhraseMakerGrid = {
         // When the matrix is changed, we may need to remove nodes.
         const blk = pm.blockNo;
         let obj;
-        for (let i = 0; i < pm._blockMap[blk].length; i++) {
+        // Walked back to front. A cell can hold more than one entry, since
+        // addNode records one per pass of a repeat and tells them apart by
+        // the trailing counter, and this match ignores that counter. Removing
+        // front to back would shift the next match down onto the index just
+        // vacated, which the loop then steps over.
+        for (let i = pm._blockMap[blk].length - 1; i >= 0; i--) {
             obj = pm._blockMap[blk][i];
             if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
                 pm._blockMap[blk].splice(i, 1);

@@ -58,7 +58,7 @@
 
 ミュージック・ブロックスはブラウザーで実行するために作られています。クローム・ブラウザーで一番テストされていますがファイヤーフォックスも実行できます。[github io（ギットハーブ）](https://musicblocks.sugarlabs.org)のウェブサイトから実行でき、ミュージック・ブロックスのソース・コードもダウンロードして自分のパソコンで実行できます。
 
-この案内よりミュージック・ブロックスの細かいを楽しみたかったら、[ミュージック・ブロックスの基本](http://github.com/sugarlabs/musicblocks/tree/master/documentation)をどうぞ、読んでください。
+この案内よりミュージック・ブロックスの細かいを楽しみたかったら、[ミュージック・ブロックスの基本](http://github.com/sugarlabs/musicblocks/tree/master/Docs/documentation)をどうぞ、読んでください。
 ミュージック・ブロックスの元のタートル・ブロックスの細かいを楽しみたかったら、[タートル・ブロックスの基本](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation)をどうぞ読んでください。
 
 ## <a name="音符"></a>
@@ -541,13 +541,13 @@ individual notes (or 和音s if you クリック on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `レ 4`, followed by `ミ 4`, followed by `ソ 4`.
 
-![alt tag](../header-icons/play-button.svg "play button")
+![alt tag](../../header-icons/play-button.svg "play button")
 
 If you クリック on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `レ 4`,
 `ミ 4`, `ソ 4`.
 
-![alt tag](../header-icons/export-chunk.svg "save button")
+![alt tag](../../header-icons/export-chunk.svg "save button")
 
 
 Once you have a group of notes (a "チャンク") that you like, クリック on the
@@ -558,19 +558,19 @@ programmatically. (More on that below.)
 You can rearrange the selected notes in the grid and save other チャンク
 as well.
 
-![alt tag](../header-icons/sort.svg "sort button")
+![alt tag](../../header-icons/sort.svg "sort button")
 
 
 The *Sort* button will reorder the ピッチ in the matrix from highest
 to lowest and eliminate any 重に *ピッチ* blocks.
 
-![alt tag](../header-icons/close-button.svg "close button")
+![alt tag](../../header-icons/close-button.svg "close button")
 
 
 You can hide the matrix by クリックing on the *Close* button (the right-most
 button in the top row of the grid.)
 
-![alt tag](../header-icons/erase-button.svg "erase button")
+![alt tag](../../header-icons/erase-button.svg "erase button")
 
 
 There is also an Erase button that will clear the grid.

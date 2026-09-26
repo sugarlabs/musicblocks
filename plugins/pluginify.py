@@ -73,8 +73,8 @@ To define a block you need to type: //* block:(blockname) *//
 Example:
 //* block:power *//
 var block = new ProtoBlock('power');
-block.palette = palettes.dict['maths'];
-blocks.protoBlockDict['power'] = block;
+block.palette = globalActivity.palettes.dict['maths'];
+globalActivity.blocks.protoBlockDict['power'] = block;
 block.twoArgMathBlock();
 block.defaults.push(10, 2);
 block.staticLabels.push('power', 'base', 'exp.');

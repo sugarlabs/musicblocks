@@ -230,4 +230,4 @@ You have to go to [turtledefs.js](https://github.com/sugarlabs/musicblocks/blob/
 
 Remember to add it under the right `palette`.
 
-You also need to add the `.svg` file (your example of usage of the Block) to the [musiclabs/documentation folder](https://github.com/sugarlabs/musicblocks/tree/master/documentation).
+You also need to add the `.svg` file (your example of usage of the Block) to the [Docs/documentation folder](https://github.com/sugarlabs/musicblocks/tree/master/Docs/documentation).

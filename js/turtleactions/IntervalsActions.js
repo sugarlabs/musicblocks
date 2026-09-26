@@ -21,7 +21,8 @@
 
 /*
    global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
-   getModeLength, isCustomTemperament, TEMPERAMENT
+   getModeLength, isCustomTemperament, TEMPERAMENT, getCurrentEDO, EDOBOUNDEXCEEDED,
+   pitchToNumber
 */
 
 /*
@@ -31,9 +32,9 @@
     js/logo.js
         NOINPUTERRORMSG
     js/utils/musicutils.js
-        MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
-        GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-        isCustomTemperament, TEMPERAMENT
+         MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
+         GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+         isCustomTemperament, TEMPERAMENT, getCurrentEDO, pitchToNumber
     js/turtle-singer.js
         Singer
     js/js-export/export.js
@@ -41,6 +42,20 @@
  */
 
 /* exported setupIntervalsActions*/
+
+/**
+ * Bounds (in scalar steps) on the value accepted by setScalarInterval().
+ * GetNotesForInterval() derives an octave count as `Math.floor(intervals[0] / 7)`,
+ * which GetIntervalNumber() then walks with a `while (octave > 0)` loop that runs
+ * once per octave. These line up with the existing octave range convention used
+ * elsewhere for pitch (see PitchBlocks.js's "Octave must be an integer in [0, 9]"):
+ * 69 is the largest value for which Math.floor(69 / 7) is still 9, and -63 is the
+ * smallest (Math.floor rounds toward -Infinity, so -64 already overshoots to -10).
+ * Anything outside this range corresponds to an octave shift no Pitch block could
+ * represent, rather than an arbitrary cap.
+ */
+const MAX_SCALAR_INTERVAL = 69;
+const MIN_SCALAR_INTERVAL = -63;
 
 /**
  * Sets up all the methods related to different actions for each block in Intervals palette.
@@ -57,8 +72,15 @@ function setupIntervalsActions(activity) {
          */
         static GetModename(mode) {
             let modename = "major";
+            if (typeof mode !== "string") {
+                return modename;
+            }
+            const lowercaseMode = mode.toLowerCase();
             for (const _mode in MUSICALMODES) {
-                if (_mode === mode || _(_mode) === mode) {
+                if (
+                    _mode.toLowerCase() === lowercaseMode ||
+                    _(_mode).toLowerCase() === lowercaseMode
+                ) {
                     modename = _mode;
                     break;
                 }
@@ -74,11 +96,8 @@ function setupIntervalsActions(activity) {
          * @returns {Number}
          */
         static getTemperamentLength() {
-            const currentTemperament = activity.logo.synth.inTemperament;
-            if (!currentTemperament) {
-                return 12; // Default fallback for tests/uninitialized state
-            }
-            return TEMPERAMENT[currentTemperament]["pitchNumber"];
+            const t = TEMPERAMENT[activity.logo.synth.inTemperament];
+            return t?.pitchNumber ?? 12;
         }
 
         /**
@@ -89,7 +108,11 @@ function setupIntervalsActions(activity) {
         static GetIntervalNumber(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
             let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
-            let totalIntervals = Math.abs(ALLNOTESTEP[firstNote] - ALLNOTESTEP[secondNote]);
+            const temperament = activity.logo.synth.inTemperament;
+            const keySig = tur.singer.keySignature;
+            const firstStep = pitchToNumber(firstNote, 0, keySig, temperament);
+            const secondStep = pitchToNumber(secondNote, 0, keySig, temperament);
+            let totalIntervals = Math.abs(firstStep - secondStep);
 
             // Use dynamic temperament length for custom tunings
             const temperamentLength = this.getTemperamentLength();
@@ -97,12 +120,13 @@ function setupIntervalsActions(activity) {
             // Handle octave boundary wrap-around for enharmonic equivalents
             // For cases like B (12) to B#/Cb (0), the raw difference is 12 but should be 1
             // Calculate forward distance across octave boundary using modular arithmetic
-            const forwardDiff =
-                (ALLNOTESTEP[secondNote] - ALLNOTESTEP[firstNote] + temperamentLength) %
-                temperamentLength;
-            // When notes are at octave boundary (forwardDiff === 0), use 1 semitone
-            // Otherwise use the shorter of raw difference or forward distance
-            totalIntervals = forwardDiff === 0 ? 1 : Math.min(totalIntervals, forwardDiff);
+            if (totalIntervals !== 0) {
+                const forwardDiff =
+                    (secondStep - firstStep + temperamentLength) % temperamentLength;
+                // When notes are at octave boundary (forwardDiff === 0), use 1 semitone
+                // Otherwise use the shorter of raw difference or forward distance
+                totalIntervals = forwardDiff === 0 ? 1 : Math.min(totalIntervals, forwardDiff);
+            }
 
             if (octave < 0 && totalIntervals !== 0 && totalIntervals !== temperamentLength)
                 totalIntervals = temperamentLength - totalIntervals;
@@ -157,7 +181,7 @@ function setupIntervalsActions(activity) {
             if (totalIntervals % temperamentLength === 0 && letterGap === 0) {
                 if (octave < 0) {
                     if (octave === -1) os = "";
-                    const a = `${os} ${_("perfect")} ${plural} ${_("below")}`;
+                    const a = `${os ? `${os} ` : ""}${_("perfect")} ${plural} ${_("below")}`;
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
                 if (octave > 1) {
@@ -182,10 +206,15 @@ function setupIntervalsActions(activity) {
                 lastWord += ` ${_("below")}`;
             }
 
+            const mapEntry = SEMITONETOINTERVALMAP[totalIntervals];
+            const intervalName =
+                mapEntry && mapEntry[letterGap] !== undefined
+                    ? mapEntry[letterGap]
+                    : `${totalIntervals} ${_("steps")}`;
             const interval =
                 totalIntervals % temperamentLength === 0 && letterGap === 0
-                    ? SEMITONETOINTERVALMAP[totalIntervals][letterGap]
-                    : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
+                    ? intervalName
+                    : intervalName + lastWord;
             return interval;
         }
 
@@ -291,7 +320,7 @@ function setupIntervalsActions(activity) {
             const listenerName = "_definemode_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -303,8 +332,19 @@ function setupIntervalsActions(activity) {
                     activity.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                const pitchNumbers = tur.singer.defineMode.sort((a, b) => a - b);
                 const temperamentLength = Singer.IntervalsActions.getTemperamentLength();
+
+                // Filter out pitches outside [0, temperamentLength - 1]
+                let pitchNumbers = tur.singer.defineMode.sort((a, b) => a - b);
+                const inBounds = pitchNumbers.filter(p => p >= 0 && p < temperamentLength);
+                if (inBounds.length !== pitchNumbers.length) {
+                    activity.errorMsg(EDOBOUNDEXCEEDED, null);
+                }
+                pitchNumbers = inBounds;
+
+                if (pitchNumbers.length > temperamentLength) {
+                    activity.errorMsg(EDOBOUNDEXCEEDED, null);
+                }
 
                 for (let i = 0; i < pitchNumbers.length; i++) {
                     // Apply mod arithmetic for custom temperaments
@@ -332,9 +372,15 @@ function setupIntervalsActions(activity) {
                     }
                 }
 
-                const cblk = activity.blocks.blockList[blk].connections[1];
-                if (activity.blocks.blockList[cblk].name === "text") {
-                    activity.blocks.updateBlockText(cblk);
+                if (blk !== undefined && blk in activity.blocks.blockList) {
+                    const cblk = activity.blocks.blockList[blk].connections[1];
+                    if (
+                        cblk !== undefined &&
+                        cblk in activity.blocks.blockList &&
+                        activity.blocks.blockList[cblk].name === "text"
+                    ) {
+                        activity.blocks.updateBlockText(cblk);
+                    }
                 }
 
                 tur.singer.inDefineMode = false;
@@ -359,6 +405,9 @@ function setupIntervalsActions(activity) {
             if (arg === null || typeof arg !== "number") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 1;
+            } else if (arg > MAX_SCALAR_INTERVAL || arg < MIN_SCALAR_INTERVAL) {
+                activity.errorMsg(_("Scalar interval must be within -63 to 69."), blk);
+                arg = 1;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -369,7 +418,7 @@ function setupIntervalsActions(activity) {
             const listenerName = "_interval_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -403,7 +452,7 @@ function setupIntervalsActions(activity) {
             const listenerName = "_chord_interval_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -440,7 +489,7 @@ function setupIntervalsActions(activity) {
                 const listenerName = "_semitone_interval_" + turtle;
                 if (blk !== undefined && blk in activity.blocks.blockList) {
                     activity.logo.setDispatchBlock(blk, turtle, listenerName);
-                } else if (MusicBlocks.isRun) {
+                } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                     const mouse = Mouse.getMouseFromTurtle(tur);
                     if (mouse !== null) mouse.MB.listeners.push(listenerName);
                 }
@@ -473,7 +522,7 @@ function setupIntervalsActions(activity) {
             const listenerName = "_ratio_interval_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -494,7 +543,9 @@ function setupIntervalsActions(activity) {
          * @returns {void}
          */
         static setTemperament(temperament, pitch, octave) {
+            const previousStartingPitch = activity.logo.synth.startingPitch;
             activity.logo.synth.inTemperament = temperament;
+            activity.logo._userTemperament = temperament;
             activity.logo.synth.startingPitch = pitch + "" + octave;
 
             activity.logo.temperamentSelected.push(temperament);
@@ -502,9 +553,16 @@ function setupIntervalsActions(activity) {
 
             if (
                 activity.logo.temperamentSelected[len - 1] !==
-                activity.logo.temperamentSelected[len - 2]
+                    activity.logo.temperamentSelected[len - 2] ||
+                (len > 1 && activity.logo.synth.startingPitch !== previousStartingPitch)
             ) {
                 activity.logo.synth.changeInTemperament = true;
+            }
+
+            // Update the default custom mode to match the new EDO's step count.
+            const edo = getCurrentEDO(temperament);
+            if (MUSICALMODES["custom"].length !== edo) {
+                MUSICALMODES["custom"] = new Array(edo).fill(1);
             }
         }
     };

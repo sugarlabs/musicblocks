@@ -197,44 +197,12 @@ function setupFlowBlocks(activity) {
 
                 tur.singer.inDuplicate = true;
 
-                /**
-                 * Acquires the connectionStoreLock with proper waiting.
-                 * Uses a polling mechanism to wait for the lock to be released.
-                 * @param {number} maxRetries - Maximum number of retry attempts
-                 * @param {number} retryInterval - Milliseconds between retries
-                 * @returns {Promise<boolean>} - Resolves to true when lock is acquired
-                 */
-                const __acquireLock = (maxRetries = 100, retryInterval = 10) => {
-                    return new Promise(resolve => {
-                        let retries = 0;
-                        const tryAcquire = () => {
-                            if (!logo.connectionStoreLock) {
-                                logo.connectionStoreLock = true;
-                                resolve(true);
-                            } else if (retries < maxRetries) {
-                                retries++;
-                                setTimeout(tryAcquire, retryInterval);
-                            } else {
-                                // Force acquire after max retries to prevent deadlock
-                                console.warn(
-                                    "connectionStoreLock: Max retries reached, forcing lock acquisition"
-                                );
-                                logo.connectionStoreLock = true;
-                                resolve(true);
-                            }
-                        };
-                        tryAcquire();
-                    });
-                };
-
                 // Listener function for handling the end of duplication
-                const __listener = async event => {
+                const __listener = event => {
                     tur.singer.inDuplicate = false;
                     tur.singer.duplicateFactor /= factor;
 
-                    // Acquire lock with proper waiting
-                    await __acquireLock();
-
+                    logo.connectionStoreLock = true;
                     try {
                         // The last turtle should restore the broken connections
                         if (__lookForOtherTurtles(blk, turtle) === null) {
@@ -257,15 +225,6 @@ function setupFlowBlocks(activity) {
                 // Set the turtle listener
                 logo.setTurtleListener(turtle, listenerName, __listener);
 
-                // Acquire lock for the main flow
-                // JavaScript is single-threaded, so if the lock is held here it means
-                // a previous critical section did not release it (likely due to an error).
-                // We warn and force-acquire since no spin-wait can help in a single thread.
-                if (logo.connectionStoreLock) {
-                    console.warn(
-                        "connectionStoreLock: Lock already held in DuplicateBlock flow, forcing acquisition"
-                    );
-                }
                 logo.connectionStoreLock = true;
 
                 try {
@@ -514,9 +473,12 @@ function setupFlowBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {number} blk - The block number.
+         * @param {*} receivedArg - Argument forwarded from an enclosing action call
+         *     (e.g. the actionArgs array), needed to resolve an `arg` block used as
+         *     the switch's selector.
          * @returns {Array} - An array containing the next block and its count.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             // Push the current switch block and create an empty case for it
@@ -532,7 +494,10 @@ function setupFlowBlocks(activity) {
             const listenerName = "_switch_" + blk + "_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // Define the listener function
+            // Define the listener function. receivedArg is captured here, at the
+            // point the switch actually ran, rather than read back later off
+            // logo.receivedArg, which may have been overwritten by the time this
+            // listener fires (it only runs once the switch's clamp queue drains).
             const __listener = () => {
                 const switchBlk = last(logo.switchBlocks[turtle]);
 
@@ -542,7 +507,7 @@ function setupFlowBlocks(activity) {
                 if (argBlk === null || argBlk === undefined) {
                     switchCase = "__default__";
                 } else {
-                    switchCase = logo.parseArg(logo, turtle, argBlk, logo.receivedArg);
+                    switchCase = logo.parseArg(logo, turtle, argBlk, switchBlk, receivedArg);
                 }
 
                 let caseFlow = null;
@@ -560,7 +525,7 @@ function setupFlowBlocks(activity) {
                 }
 
                 if (caseFlow !== null && caseFlow !== undefined) {
-                    const queueBlock = new Queue(caseFlow, 1, switchBlk, null);
+                    const queueBlock = new Queue(caseFlow, 1, switchBlk, receivedArg);
                     tur.parentFlowQueue.push(switchBlk);
                     tur.queue.push(queueBlock);
                 }
@@ -714,8 +679,11 @@ function setupFlowBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {number} blk - The block number.
+         * @param {*} receivedArg - Argument forwarded from an enclosing action call,
+         *     needed so the condition can still resolve an `arg` block correctly on
+         *     every requeued re-check, not just the first one.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (args.length !== 1) return;
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -726,7 +694,7 @@ function setupFlowBlocks(activity) {
                 // Requeue.
                 const connections = activity.blocks.blockList[blk].connections;
                 const parentBlk = connections[0];
-                const queueBlock = new Queue(blk, 1, parentBlk);
+                const queueBlock = new Queue(blk, 1, parentBlk, receivedArg);
                 parentFlowQueue.push(parentBlk);
                 queue.push(queueBlock);
                 tur.doWait(0.05);
@@ -753,7 +721,7 @@ function setupFlowBlocks(activity) {
                     logo.firstNoteTime = currentTime;
                 }
 
-                const elapsedTime = (currentTime - this.firstNoteTime) / 1000;
+                const elapsedTime = (currentTime - logo.firstNoteTime) / 1000;
                 tur.singer.turtleTime = elapsedTime;
                 tur.singer.previousTurtleTime = elapsedTime;
             }
@@ -800,9 +768,12 @@ function setupFlowBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {number} blk - The block number.
+         * @param {*} receivedArg - Argument forwarded from an enclosing action call,
+         *     needed so the condition can still resolve an `arg` block correctly on
+         *     every requeued re-check, not just the first one.
          * @returns {Array} - An array containing the next block and its count.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (args.length !== 2) return;
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -822,7 +793,7 @@ function setupFlowBlocks(activity) {
                 // Requeue
                 const connections = activity.blocks.blockList[blk].connections;
                 const parentBlk = connections[0];
-                const queueBlock = new Queue(blk, 1, parentBlk);
+                const queueBlock = new Queue(blk, 1, parentBlk, receivedArg);
                 parentFlowQueue.push(parentBlk);
                 queue.push(queueBlock);
             } else {
@@ -883,9 +854,12 @@ function setupFlowBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {number} blk - The block number.
+         * @param {*} receivedArg - Argument forwarded from an enclosing action call,
+         *     needed so the condition can still resolve an `arg` block correctly on
+         *     every requeued re-check, not just the first one.
          * @returns {Array} - An array containing the next block and its count.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             // While is tricky because we need to recalculate
             // args[0] each time, so we requeue the While block
             // itself.
@@ -908,7 +882,7 @@ function setupFlowBlocks(activity) {
 
                 const connections = activity.blocks.blockList[blk].connections;
                 const parentBlk = connections[0];
-                const queueBlock = new Queue(blk, 1, parentBlk);
+                const queueBlock = new Queue(blk, 1, parentBlk, receivedArg);
                 parentFlowQueue.push(parentBlk);
                 queue.push(queueBlock);
 
@@ -1211,6 +1185,7 @@ function setupFlowBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class
             super("hiddennoflow");
+            this.setCapability("noHit");
 
             // Set the palette and activity for the block
             this.setPalette("flow", activity);
@@ -1239,6 +1214,7 @@ function setupFlowBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class
             super("hidden");
+            this.setCapability("noHit");
 
             // Set the palette and activity for the block
             this.setPalette("flow", activity);

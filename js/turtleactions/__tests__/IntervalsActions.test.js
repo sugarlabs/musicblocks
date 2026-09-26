@@ -31,11 +31,18 @@ describe("setupIntervalsActions", () => {
 
         // Mock temperament globals only for this test
         global.isCustomTemperament = jest.fn(() => false);
+        global.isTrueEDO = jest.fn(() => true);
         global.TEMPERAMENT = { equal: { pitchNumber: 12 } };
+
+        // Set up test-specific mocks for SEMITONETOINTERVALMAP and ALLNOTESTEP
+        global.SEMITONETOINTERVALMAP = Array(13)
+            .fill(null)
+            .map(() => Array(7).fill("perfect"));
 
         global.MUSICALMODES = {
             major: [2, 2, 1, 2, 2, 2, 1],
-            minor: [2, 1, 2, 2, 1, 2, 2]
+            minor: [2, 1, 2, 2, 1, 2, 2],
+            custom: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         };
 
         global.ALLNOTESTEP = {
@@ -61,11 +68,10 @@ describe("setupIntervalsActions", () => {
             "B": 12,
             "B#": 0
         };
-        global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
 
-        global.SEMITONETOINTERVALMAP = Array(13)
-            .fill(null)
-            .map(() => Array(7).fill("perfect"));
+        global.pitchToNumber = jest.fn((note, octave, keySig, temperament) => {
+            return global.ALLNOTESTEP[note] || 0;
+        });
 
         global.GetNotesForInterval = jest.fn(() => ({
             firstNote: "C",
@@ -75,6 +81,7 @@ describe("setupIntervalsActions", () => {
 
         global.getNote = jest.fn(() => ["C"]);
         global.getModeLength = jest.fn(() => 7);
+        global.getCurrentEDO = jest.fn(() => 12);
 
         global.MusicBlocks = { isRun: false };
         global.Mouse = { getMouseFromTurtle: jest.fn() };
@@ -127,6 +134,7 @@ describe("setupIntervalsActions", () => {
     afterEach(() => {
         // Clean up globals to prevent test pollution
         delete global.isCustomTemperament;
+        delete global.isTrueEDO;
         delete global.TEMPERAMENT;
     });
 
@@ -316,14 +324,15 @@ describe("setupIntervalsActions", () => {
         });
 
         test("19-EDO overflow with multiple octaves uses correct plural", () => {
-            // C→C (forwardDiff=0 → base=1), octave=2 → totalIntervals = 1 + 19 + 19 = 39
-            // 39 > 28 → trigger overflow, reduce: 39-19=20, 20-19=1
-            const notes = { firstNote: "C", secondNote: "C", octave: 2 };
+            // C→B (diff=11), octave=2 → totalIntervals = 11 + 19 + 19 = 49
+            // 49 > 28 → trigger overflow, reduce: 49-19=30, 30-19=11
+            const notes = { firstNote: "C", secondNote: "B", octave: 2 };
             GetNotesForInterval.mockReturnValueOnce(notes);
             GetNotesForInterval.mockReturnValueOnce(notes);
 
             const result = Singer.IntervalsActions.GetCurrentInterval(0);
             // lastWord = ", plus two octaves"
+            expect(result).toContain("plus");
             expect(result).toContain("two");
             expect(result).toContain("octaves");
         });
@@ -360,15 +369,272 @@ describe("setupIntervalsActions", () => {
         });
     });
 
+    describe("GetModename exact-vs-localized match precedence", () => {
+        afterEach(() => {
+            global._ = x => x;
+        });
+
+        test("prioritizes exact mode name over localized mode name", () => {
+            // With a non-identity _(), "_mode === mode" and "_(_mode) === mode" are genuinely
+            // different conditions. This confirms the exact-match clause is what finds "minor"
+            // here, not an incidental side effect of _() being the identity function elsewhere.
+            global._ = x => `${x}_localized`;
+
+            expect(Singer.IntervalsActions.GetModename("minor")).toBe("minor");
+        });
+    });
+
+    describe("GetIntervalNumber precise octave and wrap-around values", () => {
+        // Same note letter on both ends keeps letterGap out of play, isolating the
+        // octave-sign handling (below-wrap at line ~110, Math.abs at line ~113).
+        test("octave === 0 evaluates identical notes to 0 semitones (unison)", () => {
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: "C",
+                secondNote: "C",
+                octave: 0
+            });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(0);
+        });
+
+        test("octave === -1 wraps a single octave below", () => {
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: "C",
+                secondNote: "C",
+                octave: -1
+            });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(12);
+        });
+
+        test("octave === -2 combines the below-wrap with the Math.abs(octave) accumulation", () => {
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: "C",
+                secondNote: "C",
+                octave: -2
+            });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(24);
+        });
+
+        test("octave === 1 accumulates one temperament length without the below-wrap", () => {
+            GetNotesForInterval.mockReturnValueOnce({ firstNote: "C", secondNote: "C", octave: 1 });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(12);
+        });
+
+        test("overflow-guard boundary: totalIntervals === temperamentLength + 9 is exact, not exceeded", () => {
+            GetNotesForInterval.mockReturnValueOnce({ firstNote: "C", secondNote: "A", octave: 1 });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(21);
+        });
+
+        test("one semitone past the overflow-guard boundary still returns the raw (unreduced) count", () => {
+            // GetIntervalNumber never reduces the value itself; the reduction only
+            // happens later, in GetCurrentInterval. This pins the raw input to that step.
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: "C",
+                secondNote: "A#",
+                octave: 1
+            });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(22);
+        });
+
+        test("uses the absolute step difference, not the sum, when the forward (wrap-around) distance is larger", () => {
+            // G (8) -> E (5): |8-5| = 3, but the forward distance (8 -> ... -> E going up)
+            // is 9. The smaller of the two (3) is correct; the raw sum (13) is not,
+            // and would incorrectly lose out to the forward distance in the min().
+            GetNotesForInterval.mockReturnValueOnce({ firstNote: "G", secondNote: "E", octave: 0 });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(3);
+        });
+    });
+
+    describe("GetCurrentInterval precise wording assertions", () => {
+        test("octave === 0 evaluates identical notes to Perfect unison", () => {
+            const notes = { firstNote: "C", secondNote: "C", octave: 0 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("perfect");
+        });
+
+        test.each([
+            [-2, "Two perfect octaves below"],
+            [-3, "Three perfect octaves below"],
+            [-4, "Four perfect octaves below"],
+            [-5, "Five perfect octaves below"],
+            [-6, "Six perfect octaves below"],
+            [-7, "Seven perfect octaves below"],
+            [-8, "Eight perfect octaves below"],
+            [-9, "Nine perfect octaves below"]
+        ])("octave === %i produces %j", (octave, expected) => {
+            const notes = { firstNote: "C", secondNote: "C", octave };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe(expected);
+        });
+
+        test("octave === -1 omits the octave-count prefix that only applies when octave < -1", () => {
+            const notes = { firstNote: "C", secondNote: "C", octave: -1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("Perfect octave below");
+        });
+
+        test("overflow-guard 'plus one octave' wording uses singular octave and the 'one' word", () => {
+            const notes = { firstNote: "C", secondNote: "B", octave: 1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("perfect, plus one octave");
+        });
+
+        test("overflow-guard boundary: exactly temperamentLength + 9 reports raw step count, unreduced", () => {
+            const notes = { firstNote: "C", secondNote: "A", octave: 1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("21 steps");
+        });
+
+        test("overflow-guard boundary: one past temperamentLength + 9 triggers the reduction and suffix", () => {
+            const notes = { firstNote: "C", secondNote: "A#", octave: 1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("perfect, plus one octave");
+        });
+
+        test("falls back to 'N steps' when SEMITONETOINTERVALMAP has no entry for the interval", () => {
+            // G -> C, octave 1: letter-gap wraps and totalIntervals (17) has no
+            // corresponding row in the default 13-row SEMITONETOINTERVALMAP mock.
+            const notes = { firstNote: "G", secondNote: "C", octave: 1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("17 steps");
+        });
+
+        test("falls back to 'N steps' when the row exists but has no entry for the computed letter gap", () => {
+            // The real SEMITONETOINTERVALMAP (js/utils/musicutils.js) is sparse: each row only
+            // defines the couple of letterGap keys matching that interval's conventional
+            // spellings, not all 7. Mirror that shape here instead of the dense array fixture
+            // used elsewhere in this file, so the missing-key fallback actually gets exercised.
+            global.SEMITONETOINTERVALMAP = {
+                1: { 0: "augmented unison", 1: "minor second" }
+            };
+
+            // B -> C, octave 0: a natural half-step (totalIntervals 1), but spelled with
+            // letters 6 apart (B is index 6, C is index 0), which isn't one of row 1's keys.
+            const notes = { firstNote: "B", secondNote: "C", octave: 0 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            const result = Singer.IntervalsActions.GetCurrentInterval(0);
+            expect(result).toBe("1 steps");
+            expect(result).not.toContain("undefined");
+        });
+
+        describe("letter-gap direction and wrap-around", () => {
+            beforeEach(() => {
+                // Each letterGap column maps to a distinct label so the returned
+                // string directly reveals which letterGap value the code computed.
+                global.SEMITONETOINTERVALMAP = Array(60)
+                    .fill(null)
+                    .map(() => ["lg0", "lg1", "lg2", "lg3", "lg4", "lg5", "lg6"]);
+            });
+
+            afterEach(() => {
+                // Restore the default fixture so it can't leak into other describe blocks.
+                global.SEMITONETOINTERVALMAP = Array(13)
+                    .fill(null)
+                    .map(() => Array(7).fill("perfect"));
+            });
+
+            test("wraps the letter gap when the first letter index exceeds the second and octave !== 0", () => {
+                // G (index 4) -> C (index 0): raw gap 4, wrapped to NOTENAMES.length - 4 = 3.
+                const notes = { firstNote: "G", secondNote: "C", octave: 1 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg3");
+            });
+
+            test("does not wrap the letter gap when octave === 0, even if the first index exceeds the second", () => {
+                const notes = { firstNote: "G", secondNote: "C", octave: 0 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg4");
+            });
+
+            test("computes an asymmetric letter gap correctly (D -> G, no wrap needed)", () => {
+                // D (index 1) -> G (index 4): gap is |4-1| = 3, not index2+index1 = 5.
+                const notes = { firstNote: "D", secondNote: "G", octave: 0 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg3");
+            });
+
+            test("computes an asymmetric wrapped letter gap correctly (G -> D, wrap needed)", () => {
+                // G (index 4) -> D (index 1): raw gap 3, wrapped to NOTENAMES.length - 3 = 4.
+                const notes = { firstNote: "G", secondNote: "D", octave: 1 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg4");
+            });
+
+            test("uses only the note letter, ignoring accidentals, when computing the letter gap", () => {
+                // C# -> G#: substring(0, 1) must strip the "#" so this behaves like C -> G.
+                const notes = { firstNote: "C#", secondNote: "G#", octave: 0 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg4");
+            });
+
+            test("does not wrap when the first letter index equals the second, even with octave !== 0", () => {
+                // C -> C: index1 === index2, so the wrap condition (index1 > index2) must
+                // stay strictly false here rather than treating equal indices as a match.
+                const notes = { firstNote: "C", secondNote: "C", octave: 1 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg0");
+            });
+
+            test("re-derives the letter gap for octave < 0 independently of the earlier wrap", () => {
+                // G -> C, octave -1: the initial wrap (line ~142) sets letterGap to 3,
+                // then the octave < 0 branch (line ~183) re-derives it from scratch to 4.
+                // Skipping that re-derivation would leave the stale value of 3.
+                const notes = { firstNote: "G", secondNote: "C", octave: -1 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg4 below");
+            });
+        });
+    });
+
     test("setKey updates keySignature", () => {
         Singer.IntervalsActions.setKey("C", "major", 0);
-        expect(turtle.singer.keySignature).toContain("C");
-        expect(logo.notation.notationKey).toHaveBeenCalled();
+        expect(getNote).toHaveBeenCalledWith(
+            "C",
+            4,
+            0,
+            "C major",
+            false,
+            null,
+            activity.errorMsg,
+            null
+        );
+        expect(turtle.singer.keySignature).toBe("C major");
+        expect(logo.notation.notationKey).toHaveBeenCalledWith(0, "C", "major");
     });
 
     test("getCurrentKey / Mode / Length", () => {
-        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("C");
-        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("major");
+        turtle.singer.keySignature = "Db dorian";
+        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("Db");
+        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("dorian");
         expect(Singer.IntervalsActions.getModeLength(0)).toBe(7);
     });
 
@@ -380,8 +646,9 @@ describe("setupIntervalsActions", () => {
     test("setScalarInterval push + pop", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
-        Singer.IntervalsActions.setScalarInterval(2, 0, "blk");
-        expect(turtle.singer.intervals.length).toBe(1);
+        Singer.IntervalsActions.setScalarInterval(2.5, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.intervals).toEqual([2]);
         listener();
         expect(turtle.singer.intervals.length).toBe(0);
     });
@@ -389,21 +656,148 @@ describe("setupIntervalsActions", () => {
     test("setScalarInterval error on null", () => {
         Singer.IntervalsActions.setScalarInterval(null, 0, "blk");
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval treats a non-number argument as invalid input", () => {
+        Singer.IntervalsActions.setScalarInterval("two", 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval rounds a negative value up with Math.ceil", () => {
+        Singer.IntervalsActions.setScalarInterval(-2.5, 0, "blk");
+        expect(turtle.singer.intervals).toEqual([-2]);
+    });
+
+    test("setScalarInterval rejects a value far past the bound instead of pushing it unbounded", () => {
+        Singer.IntervalsActions.setScalarInterval(999999999, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval rejects a large negative value past the bound", () => {
+        Singer.IntervalsActions.setScalarInterval(-999999999, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval rejects a value one past the positive bound", () => {
+        Singer.IntervalsActions.setScalarInterval(70, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval accepts a value exactly at the positive bound", () => {
+        Singer.IntervalsActions.setScalarInterval(69, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.intervals).toEqual([69]);
+    });
+
+    test("setScalarInterval rejects a value one past the negative bound", () => {
+        Singer.IntervalsActions.setScalarInterval(-64, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Scalar interval must be within -63 to 69.",
+            "blk"
+        );
+        expect(turtle.singer.intervals).toEqual([1]);
+    });
+
+    test("setScalarInterval accepts a value exactly at the negative bound", () => {
+        Singer.IntervalsActions.setScalarInterval(-63, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.intervals).toEqual([-63]);
+    });
+
+    test("setScalarInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setScalarInterval(2, 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_interval_0");
+    });
+
+    test("setScalarInterval does not dispatch when blk is not registered", () => {
+        Singer.IntervalsActions.setScalarInterval(2, 0, "unregistered_blk");
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setScalarInterval does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        activity.blocks.blockList["undefined"] = {};
+        Singer.IntervalsActions.setScalarInterval(2, 0, undefined);
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setScalarInterval does not throw when MusicBlocks is entirely undefined", () => {
+        delete global.MusicBlocks;
+        expect(() => Singer.IntervalsActions.setScalarInterval(2, 0, undefined)).not.toThrow();
+    });
+
+    test("setScalarInterval does not push a mouse listener when no mouse is found", () => {
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+        expect(() => Singer.IntervalsActions.setScalarInterval(2, 0, undefined)).not.toThrow();
+    });
+
+    test("setScalarInterval MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.setScalarInterval(2, 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_interval_0");
     });
 
     test("setChordInterval push + pop", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
         Singer.IntervalsActions.setChordInterval([1, 0], 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
         expect(turtle.singer.chordIntervals.length).toBe(1);
         listener();
         expect(turtle.singer.chordIntervals.length).toBe(0);
+    });
+
+    test("setChordInterval does not dispatch when blk is not registered", () => {
+        Singer.IntervalsActions.setChordInterval([1, 0], 0, "unregistered_blk");
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setChordInterval does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        activity.blocks.blockList["undefined"] = {};
+        Singer.IntervalsActions.setChordInterval([1, 0], 0, undefined);
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setChordInterval does not throw when MusicBlocks is entirely undefined", () => {
+        delete global.MusicBlocks;
+        expect(() => Singer.IntervalsActions.setChordInterval([1, 0], 0, undefined)).not.toThrow();
+    });
+
+    test("setChordInterval does not push a mouse listener when no mouse is found", () => {
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+        expect(() => Singer.IntervalsActions.setChordInterval([1, 0], 0, undefined)).not.toThrow();
     });
 
     test("setChordInterval error on null", () => {
         Singer.IntervalsActions.setChordInterval(null, 0, "blk");
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
         expect(turtle.singer.chordIntervals).toContainEqual([1, 0]);
+    });
+
+    test("setChordInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setChordInterval([1, 0], 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_chord_interval_0");
     });
 
     test("setChordInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -424,8 +818,9 @@ describe("setupIntervalsActions", () => {
     test("setSemitoneInterval push + pop", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
-        Singer.IntervalsActions.setSemitoneInterval(2, 0, "blk");
-        expect(turtle.singer.semitoneIntervals.length).toBe(1);
+        Singer.IntervalsActions.setSemitoneInterval(2.5, 0, "blk");
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.semitoneIntervals).toEqual([[2, 1]]);
         listener();
         expect(turtle.singer.semitoneIntervals.length).toBe(0);
     });
@@ -437,6 +832,45 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
         // Default value of 1 should be used
         expect(turtle.singer.semitoneIntervals.length).toBe(1);
+    });
+
+    test("setSemitoneInterval treats a non-number argument as invalid input", () => {
+        Singer.IntervalsActions.setSemitoneInterval("two", 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        expect(turtle.singer.semitoneIntervals).toEqual([[1, 1]]);
+    });
+
+    test("setSemitoneInterval rounds a negative value up with Math.ceil", () => {
+        Singer.IntervalsActions.setSemitoneInterval(-2.5, 0, "blk");
+        expect(turtle.singer.semitoneIntervals).toEqual([[-2, 1]]);
+    });
+
+    test("setSemitoneInterval does not dispatch when blk is not registered", () => {
+        Singer.IntervalsActions.setSemitoneInterval(2, 0, "unregistered_blk");
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setSemitoneInterval does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        activity.blocks.blockList["undefined"] = {};
+        Singer.IntervalsActions.setSemitoneInterval(2, 0, undefined);
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setSemitoneInterval does not throw when MusicBlocks is entirely undefined", () => {
+        delete global.MusicBlocks;
+        expect(() => Singer.IntervalsActions.setSemitoneInterval(2, 0, undefined)).not.toThrow();
+    });
+
+    test("setSemitoneInterval does not push a mouse listener when no mouse is found", () => {
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+        expect(() => Singer.IntervalsActions.setSemitoneInterval(2, 0, undefined)).not.toThrow();
+    });
+
+    test("setSemitoneInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setSemitoneInterval(2, 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_semitone_interval_0");
     });
 
     test("setSemitoneInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -453,9 +887,32 @@ describe("setupIntervalsActions", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
         Singer.IntervalsActions.setRatioInterval(1.5, 0, "blk");
-        expect(turtle.singer.ratioIntervals.length).toBe(1);
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(turtle.singer.ratioIntervals).toEqual([1.5]);
         listener();
         expect(turtle.singer.ratioIntervals.length).toBe(0);
+    });
+
+    test("setRatioInterval does not dispatch when blk is not registered", () => {
+        Singer.IntervalsActions.setRatioInterval(1.5, 0, "unregistered_blk");
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setRatioInterval does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        activity.blocks.blockList["undefined"] = {};
+        Singer.IntervalsActions.setRatioInterval(1.5, 0, undefined);
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("setRatioInterval does not throw when MusicBlocks is entirely undefined", () => {
+        delete global.MusicBlocks;
+        expect(() => Singer.IntervalsActions.setRatioInterval(1.5, 0, undefined)).not.toThrow();
+    });
+
+    test("setRatioInterval does not push a mouse listener when no mouse is found", () => {
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+        expect(() => Singer.IntervalsActions.setRatioInterval(1.5, 0, undefined)).not.toThrow();
     });
 
     test("setRatioInterval error on null", () => {
@@ -463,6 +920,18 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
         // Default value of 1 should be used
         expect(turtle.singer.ratioIntervals).toContain(1);
+    });
+
+    test("setRatioInterval treats a non-number argument as invalid input", () => {
+        Singer.IntervalsActions.setRatioInterval("two", 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        expect(turtle.singer.ratioIntervals).toContain(1);
+    });
+
+    test("setRatioInterval dispatches to setDispatchBlock when blk is registered", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.setRatioInterval(1.5, 0, "blk");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_ratio_interval_0");
     });
 
     test("setRatioInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -487,7 +956,114 @@ describe("setupIntervalsActions", () => {
         turtle.singer.defineMode.push(0, 4, 7);
         listener();
 
-        expect(MUSICALMODES.custom).toBeDefined();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(MUSICALMODES.custom).toEqual([4, 3, 5]);
+    });
+
+    test("defineMode does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        activity.blocks.blockList["undefined"] = {};
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("defineMode does not throw when MusicBlocks is entirely undefined", () => {
+        delete global.MusicBlocks;
+        expect(() => Singer.IntervalsActions.defineMode("custom", 0, undefined)).not.toThrow();
+    });
+
+    test("defineMode does not push a mouse listener when no mouse is found", () => {
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+        expect(() => Singer.IntervalsActions.defineMode("custom", 0, undefined)).not.toThrow();
+    });
+
+    test("defineMode excludes negative pitch numbers and flags EDOBOUNDEXCEEDED", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(-5, 3);
+        listener();
+        expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+    });
+
+    test("defineMode raises no errors when every pitch number is already valid and unique", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(0, 3, 5);
+        listener();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(MUSICALMODES.custom).toEqual([3, 2, 7]);
+    });
+
+    test("defineMode does not flag overflow when the pitch count exactly equals the temperament length", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+        listener();
+        expect(activity.errorMsg).not.toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+    });
+
+    test("defineMode keeps a leading duplicate zero's step as 0, not wrapped to the temperament length", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(0, 0, 5);
+        listener();
+        expect(MUSICALMODES.custom).toEqual([0, 7]);
+    });
+
+    test("defineMode listener does not update block text when there is no connected child block", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        activity.blocks.blockList.blk = { connections: [null] };
+        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+        turtle.singer.defineMode.push(0, 4, 7);
+        expect(() => listener()).not.toThrow();
+        expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
+    });
+
+    test("defineMode listener does not update block text when the connected block is not a text block", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        activity.blocks.blockList.blk = { connections: [null, "other1"] };
+        activity.blocks.blockList.other1 = { name: "" };
+        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+        turtle.singer.defineMode.push(0, 4, 7);
+        listener();
+        expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
+    });
+
+    test("defineMode listener does not update block text when blk is not registered", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, "unregistered_blk");
+        turtle.singer.defineMode.push(0, 4, 7);
+        listener();
+        expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
+    });
+
+    test("defineMode listener does not update block text when there is no connection array to read", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        activity.blocks.blockList.blk = { connections: [null] };
+        activity.blocks.blockList["undefined"] = { name: "text" };
+        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+        turtle.singer.defineMode.push(0, 4, 7);
+        listener();
+        expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
+    });
+
+    test("defineMode listener does not update block text when blk is undefined even if 'undefined' is a stray blockList key", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        activity.blocks.blockList["undefined"] = { connections: [null, "text1"] };
+        activity.blocks.blockList.text1 = { name: "text" };
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+        turtle.singer.defineMode.push(0, 4, 7);
+        listener();
+        expect(activity.blocks.updateBlockText).not.toHaveBeenCalled();
     });
 
     test("defineMode error paths", () => {
@@ -498,6 +1074,7 @@ describe("setupIntervalsActions", () => {
         activity.blocks.blockList.text1 = { name: "text" };
 
         Singer.IntervalsActions.defineMode(null, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "blk");
 
         turtle.singer.defineMode.push(4);
         turtle.singer.defineMode.push(12);
@@ -505,7 +1082,80 @@ describe("setupIntervalsActions", () => {
 
         listener();
 
-        expect(activity.errorMsg).toHaveBeenCalled();
+        expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+        // A null mode name still falls back to the "custom" key, not an empty string.
+        expect(MUSICALMODES.custom).toEqual([4, 0]);
+    });
+
+    test("defineMode sets dispatch, resets turtle state, and lowercases the mode name", () => {
+        activity.blocks.blockList.blk = {};
+        Singer.IntervalsActions.defineMode("Custom", 0, "blk");
+
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_definemode_0");
+        expect(turtle.singer.inDefineMode).toBe(true);
+        expect(turtle.singer.defineMode).toEqual([]);
+    });
+
+    test("defineMode does not dispatch when blk is not registered", () => {
+        Singer.IntervalsActions.defineMode("custom", 0, "unregistered_blk");
+        expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+    });
+
+    test("defineMode listener normalizes pitch numbers, auto-adds missing 0, skips duplicates, and updates the linked text block", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        activity.blocks.blockList.blk = { connections: [null, "text1"] };
+        activity.blocks.blockList.text1 = { name: "text" };
+
+        Singer.IntervalsActions.defineMode("Custom", 0, "blk");
+
+        turtle.singer.defineMode.push(9, 7, 4, 7);
+        listener();
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(_("Adding missing pitch number 0."));
+        expect(activity.errorMsg).toHaveBeenCalledWith(_("Ignoring duplicate pitch numbers."));
+        expect(MUSICALMODES.custom).toEqual([4, 3, 0, 3]);
+        expect(activity.blocks.updateBlockText).toHaveBeenCalledWith("text1");
+        expect(turtle.singer.inDefineMode).toBe(false);
+    });
+
+    test("defineMode does not crash when blk is undefined (JS-Export path)", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        // blk is not passed — simulates JS-Export / headless execution
+        Singer.IntervalsActions.defineMode("pentatonic", 0, undefined);
+
+        turtle.singer.defineMode.push(0, 2, 4, 7, 9);
+
+        // Should not throw a TypeError even though blk is undefined
+        expect(() => listener()).not.toThrow();
+        expect(MUSICALMODES.pentatonic).toBeDefined();
+    });
+
+    test("defineMode MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_definemode_0");
+    });
+
+    test("defineMode flags EDOBOUNDEXCEEDED when more pitch numbers than the temperament length are defined", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+
+        // 13 in-range (0-11) pitch numbers for a default 12-EDO temperament
+        // exceeds temperamentLength even though none of them are individually out of bounds.
+        turtle.singer.defineMode.push(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0);
+        listener();
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
     });
 
     test("setTemperament state changes", () => {
@@ -518,5 +1168,96 @@ describe("setupIntervalsActions", () => {
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
         Singer.IntervalsActions.setTemperament("pythagorean", "C", 4);
         expect(logo.synth.changeInTemperament).toBe(true);
+    });
+
+    test.each([
+        ["A", 4],
+        ["C", 5]
+    ])("setTemperament flags a starting-pitch change to %s%s", (pitch, octave) => {
+        Singer.IntervalsActions.setTemperament("just intonation", "C", 4);
+        logo.synth.changeInTemperament = false;
+
+        Singer.IntervalsActions.setTemperament("just intonation", pitch, octave);
+
+        expect(logo.synth.changeInTemperament).toBe(true);
+    });
+
+    test("setTemperament does not flag an unchanged temperament and starting pitch", () => {
+        Singer.IntervalsActions.setTemperament("just intonation", "C", 4);
+        logo.synth.changeInTemperament = false;
+
+        Singer.IntervalsActions.setTemperament("just intonation", "C", 4);
+
+        expect(logo.synth.changeInTemperament).toBe(false);
+    });
+
+    test("setTemperament does not flag a change on the very first call when the temperament is unset", () => {
+        Singer.IntervalsActions.setTemperament(undefined, "C", 4);
+        expect(logo.synth.changeInTemperament).toBe(false);
+    });
+
+    test("setTemperament flags a change once a real temperament follows unset entries", () => {
+        Singer.IntervalsActions.setTemperament(undefined, "C", 4);
+        Singer.IntervalsActions.setTemperament(undefined, "C", 4);
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        expect(logo.synth.changeInTemperament).toBe(true);
+    });
+
+    test("setTemperament rebuilds the custom mode when the EDO changes", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(19).fill(1));
+    });
+
+    test("setTemperament leaves the custom mode untouched when the EDO is unchanged", () => {
+        global.getCurrentEDO = jest.fn(() => 12);
+        // A sentinel value distinct from what a rebuild would produce (Array(12).fill(1))
+        // so an unwanted rebuild is observable.
+        MUSICALMODES.custom = new Array(12).fill(9);
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(12).fill(9));
+    });
+
+    describe("getTemperamentLength", () => {
+        beforeEach(() => {
+            delete global.TEMPERAMENT.custom_edo19;
+            global.TEMPERAMENT = {
+                "equal": { pitchNumber: 12 },
+                "equal19": { pitchNumber: 19 },
+                "equal31": { pitchNumber: 31 },
+                "just intonation": { pitchNumber: 12 },
+                "1/3 comma meantone": { pitchNumber: 19 }
+            };
+        });
+
+        test("returns 12 for equal temperament", () => {
+            logo.synth.inTemperament = "equal";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(12);
+        });
+
+        test("returns 19 for equal19", () => {
+            logo.synth.inTemperament = "equal19";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(19);
+        });
+
+        test("returns 31 for equal31", () => {
+            logo.synth.inTemperament = "equal31";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(31);
+        });
+
+        test("returns 12 for just intonation", () => {
+            logo.synth.inTemperament = "just intonation";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(12);
+        });
+
+        test("returns 19 for 1/3 comma meantone", () => {
+            logo.synth.inTemperament = "1/3 comma meantone";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(19);
+        });
+
+        test("falls back to 12 when no temperament is set", () => {
+            logo.synth.inTemperament = undefined;
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(12);
+        });
     });
 });

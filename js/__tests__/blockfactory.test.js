@@ -238,4 +238,130 @@ describe("SVG Class", () => {
             expect(svgString).toContain("</svg>");
         });
     });
+
+    // -----------------------------------------------------------------------
+    // Cache key completeness
+    //
+    // basicClamp() memoises its SVG against a key built from the properties
+    // that change the drawing. A property that alters the output but is absent
+    // from the key makes the first variant rendered win for every later one.
+    // -----------------------------------------------------------------------
+
+    describe("basicClamp cache key", () => {
+        /** A clamp with the given porch setting, everything else equal. */
+        const clampWithPorch = porch => {
+            const s = new SVG();
+            s.setInnies([true, true]);
+            if (porch) {
+                s.setPorch(true);
+            }
+            return s.basicClamp();
+        };
+
+        it("draws a porched clamp differently from an unporched one", () => {
+            // _style() at line 1547 emits a porch only when this._porch is set,
+            // so the two must not be byte-identical whichever order they are
+            // generated in.
+            jest.resetModules();
+            const porched = clampWithPorch(true);
+            const plain = clampWithPorch(false);
+
+            expect(porched).not.toBe(plain);
+        });
+
+        it("does not serve an unporched clamp from a porched cache entry", () => {
+            jest.resetModules();
+            const porchedFirst = clampWithPorch(true);
+            const plainSecond = clampWithPorch(false);
+
+            expect(plainSecond).not.toBe(porchedFirst);
+        });
+
+        it("keeps memoising when the porch setting is unchanged", () => {
+            // The fix must not defeat the cache for identical inputs.
+            jest.resetModules();
+            const first = clampWithPorch(true);
+            const second = clampWithPorch(true);
+
+            expect(second).toBe(first);
+        });
+    });
+
+    describe("Dock Coordinate Rounding (Regression Tests)", () => {
+        const BLOCKSCALES = [
+            0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0
+        ];
+
+        BLOCKSCALES.forEach(scale => {
+            it(`should round all dock coordinates to integers at scale ${scale} for booleanCompare`, () => {
+                svg.setScale(scale);
+                svg.booleanCompare();
+
+                expect(svg.docks.length).toBeGreaterThan(0);
+                svg.docks.forEach(dock => {
+                    expect(Number.isInteger(dock[0])).toBe(true);
+                    expect(Number.isInteger(dock[1])).toBe(true);
+                });
+            });
+
+            it(`should round all dock coordinates to integers at scale ${scale} for booleanAndOr`, () => {
+                svg.setScale(scale);
+                svg.booleanAndOr();
+
+                expect(svg.docks.length).toBeGreaterThan(0);
+                svg.docks.forEach(dock => {
+                    expect(Number.isInteger(dock[0])).toBe(true);
+                    expect(Number.isInteger(dock[1])).toBe(true);
+                });
+            });
+
+            it(`should round all dock coordinates to integers at scale ${scale} for booleanNot`, () => {
+                svg.setScale(scale);
+                svg.booleanNot(false);
+
+                expect(svg.docks.length).toBeGreaterThan(0);
+                svg.docks.forEach(dock => {
+                    expect(Number.isInteger(dock[0])).toBe(true);
+                    expect(Number.isInteger(dock[1])).toBe(true);
+                });
+            });
+        });
+
+        it("should explicitly prevent fractional dock coordinates at scale 2.25 for booleanCompare", () => {
+            svg.setScale(2.25);
+            svg.booleanCompare();
+
+            // Expected integers matching our local patched build: [[1, 57], [116, 28], [116, 75]]
+            // Verify that none of them match the unrounded pattern (like x.125 or y.375)
+            expect(svg.docks).toEqual([
+                [1, 57],
+                [116, 28],
+                [116, 75]
+            ]);
+        });
+    });
+
+    describe("Slot and Tail Coordinate Rounding", () => {
+        it("should round dock coordinates correctly in _doSlot when _cap is true", () => {
+            svg.setScale(2.25);
+            svg.setSlot(false);
+            svg.setCap(true);
+            svg.clearDocks();
+            svg._doSlot();
+            expect(svg.docks.length).toBe(1);
+            expect(Number.isInteger(svg.docks[0][0])).toBe(true);
+            expect(Number.isInteger(svg.docks[0][1])).toBe(true);
+        });
+
+        it("should round dock coordinates correctly in _doTail when _tail is true", () => {
+            svg.setScale(2.25);
+            svg.setTab(false);
+            svg.setTail(true);
+            svg.clearDocks();
+            svg._doTail();
+            expect(svg.docks.length).toBe(1);
+            expect(Number.isInteger(svg.docks[0][0])).toBe(true);
+            expect(Number.isInteger(svg.docks[0][1])).toBe(true);
+        });
+    });
 });

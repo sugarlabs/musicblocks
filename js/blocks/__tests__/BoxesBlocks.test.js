@@ -191,6 +191,14 @@ describe("setupBoxesBlocks", () => {
                 200
             );
         });
+
+        test("should return without throwing if connection is null", () => {
+            activity.blocks.blockList[blkId] = { connections: [null, null] };
+            activity.blocks.blockSetter = jest.fn();
+            expect(() => incrementBlock.flow([10, 2], logo, "turtle0", blkId)).not.toThrow();
+            expect(activity.blocks.blockSetter).not.toHaveBeenCalled();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
     });
 
     describe("IncrementOneBlock", () => {

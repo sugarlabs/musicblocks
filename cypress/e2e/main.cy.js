@@ -36,9 +36,14 @@ describe("MusicBlocks Application", () => {
     describe("Audio Controls", () => {
         it("should have a functional play button", () => {
             cy.get("#play").should("be.visible").click();
-            cy.window().then(win => {
-                const audioContext = win.Tone.context;
-                cy.wrap(audioContext.state).should("eq", "running");
+            cy.window().should(win => {
+                expect(win.Tone.context.state).to.eq("running");
+            });
+            // Assert the underlying Tone.Transport clock actually started, not only that
+            // the audio context was resumed -- Tone.Transport is the scheduling API
+            // js/logo.js drives playback with (via the wrapper in js/utils/synthutils.js).
+            cy.window().should(win => {
+                expect(win.Tone.Transport.state).to.eq("started");
             });
         });
 
@@ -203,16 +208,30 @@ describe("MusicBlocks Application", () => {
         it("should transition audio context correctly on play and stop", () => {
             cy.get("#play").click();
 
-            cy.window().then(win => {
+            cy.window().should(win => {
                 const ctx = win.Tone.context;
                 expect(ctx.state).to.eq("running");
             });
 
-            cy.get("#stop").click();
+            // Play also starts the underlying Tone.Transport clock, not only the
+            // audio context (js/logo.js runs playback through the transport wrapper
+            // in js/utils/synthutils.js).
+            cy.window().should(win => {
+                expect(win.Tone.Transport.state).to.eq("started");
+            });
 
-            cy.window().then(win => {
+            cy.get("#stop").click({ force: true });
+
+            cy.window().should(win => {
                 const ctx = win.Tone.context;
                 expect(ctx.state === "suspended" || ctx.state === "running").to.be.true;
+            });
+
+            // After Stop the Tone.Transport clock is no longer running: js/logo.js
+            // cancels its scheduled events, rewinds it and calls synth.stop() ->
+            // transport.stop().
+            cy.window().should(win => {
+                expect(win.Tone.Transport.state).to.not.eq("started");
             });
 
             cy.get("#canvas").should("exist").and("be.visible");

@@ -23,6 +23,7 @@ class GenericMockBlock {
         this.label = label;
         this.connections = ["connKey"];
         this.lang = typeof global._mockLang !== "undefined" ? global._mockLang : "en";
+        this.capabilities = Object.create(null);
     }
     setPalette(p) {
         this.palette = p;
@@ -49,6 +50,15 @@ class GenericMockBlock {
     setup(activity) {
         if (activity && activity.addBlock) activity.addBlock(this);
         return this;
+    }
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    }
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
 }
 

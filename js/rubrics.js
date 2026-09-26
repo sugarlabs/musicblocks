@@ -31,8 +31,6 @@ Globals location
    getStatsFromNotation
 */
 
-/* eslint-disable no-dupe-keys */
-
 /**
  * TACAT (Turtle Art Category)
  * Maps individual block names to their category bins.
@@ -91,7 +89,6 @@ const TACAT = {
     register: "transpose",
     settransposition: "transpose",
     setratio: "transpose",
-    interval: "pitch",
     accidental: "pitch",
     hertz: "pitch",
     pitchnumber: "pitch",
@@ -172,13 +169,11 @@ const TACAT = {
     phaser: "tone",
     chorus: "tone",
     vibrato: "tone",
-    setvoice: "tone",
     glide: "tone",
     slur: "tone",
     staccato: "tone",
     newslur: "tone",
     newstaccato: "tone",
-    synthname: "tone",
     voicename: "tone",
     settimbre: "tone",
     settemperament: "tone",
@@ -378,9 +373,6 @@ const TACAT = {
     runblock: "programming",
     dockblock: "programming",
     makeblock: "programming",
-    saveabc: "ignore",
-    savelilypond: "ignore",
-    savesvg: "ignore",
     nobackground: "ignore",
     showblocks: "ignore",
     hideblocks: "ignore",
@@ -529,6 +521,8 @@ const PALS = [
     "micep"
 ];
 
+const PALS_INDEX_MAP = new Map(PALS.map((pal, idx) => [pal, idx]));
+
 const PALLABELS = [
     _("rhythm"),
     _("pitch"),
@@ -563,7 +557,10 @@ const analyzeProject = activity => {
             case "fill":
             case "hollowline":
             case "start":
-                if (activity.blocks.blockList[blk].connections[1] == null) {
+                if (
+                    activity.blocks.blockList[blk].connections[1] === null ||
+                    activity.blocks.blockList[blk].connections[1] === undefined
+                ) {
                     continue;
                 }
                 break;
@@ -584,24 +581,35 @@ const analyzeProject = activity => {
             case "chorus":
             case "phaser":
             case "action":
-                if (activity.blocks.blockList[blk].connections[2] == null) {
+                if (
+                    activity.blocks.blockList[blk].connections[2] === null ||
+                    activity.blocks.blockList[blk].connections[2] === undefined
+                ) {
                     continue;
                 }
                 break;
             case "tuplet2":
-                if (activity.blocks.blockList[blk].connections[3] == null) {
+                if (
+                    activity.blocks.blockList[blk].connections[3] === null ||
+                    activity.blocks.blockList[blk].connections[3] === undefined
+                ) {
                     continue;
                 }
                 break;
             case "invert":
-                if (activity.blocks.blockList[blk].connections[4] == null) {
+                if (
+                    activity.blocks.blockList[blk].connections[4] === null ||
+                    activity.blocks.blockList[blk].connections[4] === undefined
+                ) {
                     continue;
                 }
                 break;
             default:
                 if (
-                    activity.blocks.blockList[blk].connections[0] == null &&
-                    last(activity.blocks.blockList[blk].connections) == null
+                    (activity.blocks.blockList[blk].connections[0] === null ||
+                        activity.blocks.blockList[blk].connections[0] === undefined) &&
+                    (last(activity.blocks.blockList[blk].connections) === null ||
+                        last(activity.blocks.blockList[blk].connections) === undefined)
                 ) {
                     continue;
                 }
@@ -637,8 +645,8 @@ const analyzeProject = activity => {
 
     for (let c = 0; c < cats.length; c++) {
         if (cats[c] in TASCORE) {
-            const idx = PALS.indexOf(TAPAL[cats[c]]);
-            if (idx !== -1) {
+            const idx = PALS_INDEX_MAP.get(TAPAL[cats[c]]);
+            if (idx !== undefined) {
                 scores[idx] += TASCORE[cats[c]];
             } else {
                 console.warn("rubrics: TAPAL value not found in PALS:", TAPAL[cats[c]]);
@@ -648,8 +656,8 @@ const analyzeProject = activity => {
 
     for (let p = 0; p < pals.length; p++) {
         if (pals[p] in TASCORE) {
-            const idx = PALS.indexOf(pals[p]);
-            if (idx !== -1) {
+            const idx = PALS_INDEX_MAP.get(pals[p]);
+            if (idx !== undefined) {
                 scores[idx] += TASCORE[pals[p]];
             } else {
                 console.warn("rubrics: pal not found in PALS:", pals[p]);
@@ -822,7 +830,7 @@ const getStatsFromNotation = activity => {
                         projectStats["pitchNames"].add(note.slice(0, note.length - 1));
                     }
                     projectStats["pitches"].push(freq);
-                    if (projectStats["lowestNote"] == undefined) {
+                    if (projectStats["lowestNote"] === undefined) {
                         if (!isNaN(freq)) {
                             projectStats["lowestNote"] = [note, noteId, freq];
                         }
@@ -831,7 +839,7 @@ const getStatsFromNotation = activity => {
                             projectStats["lowestNote"] = [note, noteId, freq];
                         }
                     }
-                    if (projectStats["highestNote"] == undefined) {
+                    if (projectStats["highestNote"] === undefined) {
                         if (!isNaN(freq)) {
                             projectStats["highestNote"] = [note, noteId, freq];
                         }
@@ -857,7 +865,7 @@ const getStatsFromNotation = activity => {
                 if (item === "begin articulation") {
                     projectStats["articulation"].begin.push(it);
                 } else if (item === "end articulation") {
-                    projectStats["articulation"].begin.push(it);
+                    projectStats["articulation"].end.push(it);
                 }
             }
         }
@@ -895,6 +903,7 @@ if (typeof module !== "undefined" && module.exports) {
         TAPAL,
         TASCORE,
         PALS,
+        PALS_INDEX_MAP,
         PALLABELS,
         analyzeProject,
         scoreToChartData,

@@ -232,10 +232,13 @@ class SaveInterface {
             }
             this.showToast(message);
         };
+
         if (defaultfilename === undefined || defaultfilename === null) {
             const planet = this.getPlanetInterface();
             defaultfilename =
-                planet && typeof planet.getCurrentProjectName === "function"
+                planet &&
+                typeof planet.getCurrentProjectName === "function" &&
+                planet.getCurrentProjectName().length > 0
                     ? planet.getCurrentProjectName()
                     : STR_MY_PROJECT;
 
@@ -357,9 +360,9 @@ class SaveInterface {
      * @instance
      */
     saveHTML(activity) {
-        const html =
-            "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
-        activity.save.download("html", html, null);
+        const blob = new Blob([activity.save.prepareHTML()], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        activity.save.download("html", url, null);
     }
 
     /**
@@ -376,13 +379,15 @@ class SaveInterface {
      */
     saveHTMLNoPrompt(activity) {
         setTimeout(() => {
-            const html =
-                "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
+            const blob = new Blob([activity.save.prepareHTML()], {
+                type: "text/html;charset=utf-8"
+            });
+            const url = URL.createObjectURL(blob);
             const planet = this.getPlanetInterface(activity);
             if (planet && typeof planet.getCurrentProjectName === "function") {
-                activity.save.downloadURL(planet.getCurrentProjectName() + ".html", html);
+                activity.save.downloadURL(planet.getCurrentProjectName() + ".html", url);
             } else {
-                activity.save.downloadURL(STR_MY_PROJECT.replace(" ", "_") + ".html", html);
+                activity.save.downloadURL(STR_MY_PROJECT.replace(" ", "_") + ".html", url);
             }
         }, 500);
     }

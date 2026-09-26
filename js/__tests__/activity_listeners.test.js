@@ -7,11 +7,13 @@ describe("Activity Event Listener Management", () => {
     let activity;
     let target;
     let listener;
+    let setupBlocksContainerEventsBody;
 
     beforeAll(() => {
         // Load activity.js manually to bypass RequireJS/Global complexity
         const activityPath = path.resolve(__dirname, "../activity.js");
         let code = fs.readFileSync(activityPath, "utf8");
+        const fullSource = code;
 
         // Strip the instantiation and require calls at the end to prevent side effects
         // We look for 'const activity = new Activity();'
@@ -19,6 +21,30 @@ describe("Activity Event Listener Management", () => {
         if (splitPoint !== -1) {
             code = code.substring(0, splitPoint);
         }
+
+        // _setupBlocksContainerEvents is assigned inside the constructor, so the
+        // short-circuited constructor below never reaches it. Extract its source
+        // via bracket matching so it can be attached to the test instance directly.
+        const setupBlocksContainerEventsMarker = "this._setupBlocksContainerEvents = () => {";
+        const setupStart = fullSource.indexOf(setupBlocksContainerEventsMarker);
+        if (setupStart === -1) {
+            throw new Error(
+                "Could not find _setupBlocksContainerEvents in activity.js; " +
+                    "it may have been refactored, update this extraction."
+            );
+        }
+        let setupEnd = setupStart + setupBlocksContainerEventsMarker.length;
+        let braceDepth = 1;
+        while (braceDepth > 0) {
+            if (fullSource[setupEnd] === "{") braceDepth++;
+            else if (fullSource[setupEnd] === "}") braceDepth--;
+            setupEnd++;
+        }
+        const setupBody = fullSource.slice(
+            setupStart + setupBlocksContainerEventsMarker.length,
+            setupEnd - 1
+        );
+        setupBlocksContainerEventsBody = new Function(setupBody);
 
         // Short-circuit the constructor to avoid dependencies
         code = code.replace(
@@ -104,10 +130,24 @@ describe("Activity Event Listener Management", () => {
         // Mock a DOM element as target
         target = document.createElement("div");
         listener = jest.fn();
+
+        // Collaborators used by _setupBlocksContainerEvents; not under test,
+        // just need to exist so setup doesn't throw.
+        activity.stage = { on: jest.fn() };
+        activity.resizeDebounce = false;
+        activity.scrollBlockContainer = false;
+        activity.blocksContainer = { x: 0, y: 0 };
+        activity.refreshCanvas = jest.fn();
+        activity.doLargerBlocks = jest.fn();
+        activity.doSmallerBlocks = jest.fn();
+        activity._setupBlocksContainerEvents = setupBlocksContainerEventsBody.bind(activity);
+
+        document.body.innerHTML = '<canvas id="myCanvas"></canvas>';
     });
 
     afterEach(() => {
         activity.cleanupEventListeners();
+        document.body.innerHTML = "";
     });
 
     test("should track listeners when added", () => {
@@ -165,5 +205,38 @@ describe("Activity Event Listener Management", () => {
         activity.removeEventListener(target, "click", listener, { capture: true });
 
         expect(activity._listeners).toHaveLength(0);
+    });
+
+    test("should not stack touch/wheel listeners across repeated _setupBlocksContainerEvents calls", () => {
+        activity._setupBlocksContainerEvents();
+        activity._setupBlocksContainerEvents();
+        activity._setupBlocksContainerEvents();
+
+        const myCanvas = document.getElementById("myCanvas");
+        const countByType = type =>
+            activity._listeners.filter(l => l.type === type && l.target === myCanvas).length;
+
+        expect(countByType("touchstart")).toBe(1);
+        expect(countByType("touchmove")).toBe(1);
+        expect(countByType("touchend")).toBe(1);
+        expect(countByType("wheel")).toBe(1);
+    });
+
+    test("should remove previous touch listeners before adding new ones on rerun", () => {
+        const removeSpy = jest.spyOn(activity, "removeEventListener");
+        const myCanvas = document.getElementById("myCanvas");
+
+        activity._setupBlocksContainerEvents();
+        expect(removeSpy).not.toHaveBeenCalled();
+
+        activity._setupBlocksContainerEvents();
+
+        expect(removeSpy).toHaveBeenCalledWith(myCanvas, "touchstart", expect.any(Function), {
+            passive: true
+        });
+        expect(removeSpy).toHaveBeenCalledWith(myCanvas, "touchmove", expect.any(Function), {
+            passive: false
+        });
+        expect(removeSpy).toHaveBeenCalledWith(myCanvas, "touchend", expect.any(Function));
     });
 });

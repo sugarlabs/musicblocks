@@ -31,6 +31,16 @@ class ToolbarController {
     }
 
     /**
+     * Clears canvas for all turtles before a fresh Run.
+     * Toolbar Run paths only — not on block clicks or widgets.
+     */
+    _clearAllTurtles() {
+        for (const turtle of this.activity.turtles.turtleList) {
+            turtle.painter.doClear(true, true, true);
+        }
+    }
+
+    /**
      * Runs Music Blocks at full speed.
      * @param {object} env - Environment parameters for execution.
      * @param {number} currentDelay - The turtle delay before this button action.
@@ -44,6 +54,7 @@ class ToolbarController {
         }
 
         if (!this.activity.turtles.running()) {
+            this._clearAllTurtles();
             this.activity.logo.runLogoCommands(null, env);
         } else {
             if (currentDelay !== 0) {
@@ -54,7 +65,10 @@ class ToolbarController {
                 this.activity.logo.doStopTurtles();
 
                 const that = this;
-                setTimeout(() => {
+                this.activity.logo._timerManager.setTimeout(() => {
+                    // Stop leaves the drawing in place, so clear here the way
+                    // every other Run path does before starting fresh.
+                    that._clearAllTurtles();
                     that.activity.logo.runLogoCommands(null, env);
                 }, 500);
             }
@@ -72,6 +86,7 @@ class ToolbarController {
         }
 
         if (!this.activity.turtles.running()) {
+            this._clearAllTurtles();
             this.activity.logo.runLogoCommands();
         } else {
             this.activity.logo.step();
@@ -97,10 +112,22 @@ class ToolbarController {
             // Queue and take first step.
             let started = false;
             if (!this.activity.turtles.running()) {
+                this._clearAllTurtles();
                 this.activity.logo.runLogoCommands();
                 started = true;
             }
-            this.activity.logo.step();
+            if (started) {
+                // runLogoCommands() dispatches the start block(s) asynchronously
+                // (via a setTimeout(0) inside runLogoCommands), so the stepQueue
+                // is still empty at this point. Calling step() synchronously here
+                // would iterate over an empty queue and advance nothing, wasting
+                // the very first click and forcing an extra click before the first
+                // block runs. Defer the first step() so it runs after the queue
+                // has been populated.
+                this.activity.logo._timerManager.setTimeout(() => this.activity.logo.step(), 0);
+            } else {
+                this.activity.logo.step();
+            }
             return started ? "started" : null;
         } else {
             const noBlocks = Object.keys(this.activity.logo.stepQueue).every(
@@ -129,7 +156,7 @@ class ToolbarController {
         // Use bare global: set by loader.js as window._THIS_IS_MUSIC_BLOCKS_ = true.
         // All other files in this repo (toolbar.js, status.js, turtledefs.js) access
         // it the same way via /* global _THIS_IS_MUSIC_BLOCKS_ */.
-        if (onblur && _THIS_IS_MUSIC_BLOCKS_) {
+        if (onblur && typeof _THIS_IS_MUSIC_BLOCKS_ !== "undefined" && _THIS_IS_MUSIC_BLOCKS_) {
             return false;
         }
 

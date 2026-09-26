@@ -13,6 +13,7 @@
 
 const { platformColor } = require("../utils/platformstyle");
 global.platformColor = platformColor;
+global.makeKeyboardAccessible = require("../utils/dom-helpers").makeKeyboardAccessible;
 
 jest.mock("../utils/platformstyle", () => ({
     platformColor: { stopIconColor: "#ea174c" }
@@ -53,13 +54,13 @@ const createMockElement = id => ({
     appendChild: jest.fn(),
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
+    querySelectorAll: jest.fn(() => []),
+    contains: jest.fn(() => false),
     click: jest.fn(),
     focus: jest.fn()
 });
 
 document.getElementById = jest.fn(createMockElement);
-jest.spyOn(document, "addEventListener").mockImplementation(() => {});
-jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
 global.docById = id => document.getElementById(id);
 
 describe("ToolbarUI - Visual Helpers", () => {
@@ -153,6 +154,52 @@ describe("ToolbarUI - Visual Helpers", () => {
         expect(mockAdvancedModeBtn.style.display).toBe("block");
         expect(mockStopBtn.style.display).toBe("none"); // resetStop is called
     });
+    test("init sets aria-label alongside data-tooltip so toolbar buttons have an accessible name", () => {
+        const mockActivity = { beginnerMode: true };
+        const mockPlayBtn = createMockElement("play");
+
+        global.document.getElementById = jest.fn(id => {
+            if (id === "play") return mockPlayBtn;
+            if (id === "stop") return mockStopBtn;
+            return createMockElement(id);
+        });
+
+        global.$j = jest.fn(() => ({
+            tooltip: jest.fn(),
+            dropdown: jest.fn(),
+            on: jest.fn()
+        }));
+
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        global._ = jest.fn(x => x);
+
+        toolbar.init(mockActivity);
+
+        expect(mockPlayBtn.setAttribute).toHaveBeenCalledWith("data-tooltip", "Play");
+        expect(mockPlayBtn.setAttribute).toHaveBeenCalledWith("aria-label", "Play");
+    });
+
+    test("renderWrapIcon sets aria-label alongside data-tooltip, and updates both on toggle", () => {
+        const mockWrapIcon = createMockElement("wrapTurtle");
+        global.document.getElementById = jest.fn(id => {
+            if (id === "wrapTurtle") return mockWrapIcon;
+            return createMockElement(id);
+        });
+        global.$j = jest.fn(() => ({ tooltip: jest.fn() }));
+        global._ = jest.fn(x => x);
+        global.WRAP = false;
+
+        toolbar.activity = { helpfulWheelItems: [], textMsg: jest.fn() };
+        toolbar.renderWrapIcon();
+
+        expect(mockWrapIcon.setAttribute).toHaveBeenCalledWith("data-tooltip", "Turtle Wrap Off");
+        expect(mockWrapIcon.setAttribute).toHaveBeenCalledWith("aria-label", "Turtle Wrap Off");
+
+        mockWrapIcon.onclick();
+
+        expect(mockWrapIcon.setAttribute).toHaveBeenCalledWith("data-tooltip", "Turtle Wrap On");
+        expect(mockWrapIcon.setAttribute).toHaveBeenCalledWith("aria-label", "Turtle Wrap On");
+    });
 
     test("resetStop cancels any pending dimThenRestoreStop timer", () => {
         jest.useFakeTimers();
@@ -166,9 +213,34 @@ describe("ToolbarUI - Visual Helpers", () => {
         expect(mockStopBtn.style.color).toBe("white");
         jest.useRealTimers();
     });
+
+    test("renderNewProjectIcon marks the modal container with dialog semantics when shown", () => {
+        // A prior test in this file overrides document.getElementById with a
+        // mock; restore the real jsdom implementation for this test since we
+        // need genuine DOM elements and attributes.
+        delete global.document.getElementById;
+
+        document.body.innerHTML =
+            '<div id="modal-container" style="display: none;"></div>' +
+            '<ul id="newdropdown"></ul>';
+
+        global._ = jest.fn(x => x);
+
+        toolbar.renderNewProjectIcon(jest.fn());
+
+        const modalContainer = document.getElementById("modal-container");
+        expect(modalContainer.getAttribute("role")).toBe("dialog");
+        expect(modalContainer.getAttribute("aria-modal")).toBe("true");
+        expect(modalContainer.getAttribute("aria-label")).toBe("New project confirmation");
+        expect(modalContainer.style.display).toBe("flex");
+    });
 });
 
 describe("FocusCycleManager - dispose", () => {
+    beforeEach(() => {
+        jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+        jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
+    });
     test("dispose removes all document-level event listeners", () => {
         const { FocusCycleManager } = require("../toolbar-ui");
         const manager = new FocusCycleManager();
@@ -183,5 +255,45 @@ describe("FocusCycleManager - dispose", () => {
         expect(events).toContain("keydown");
         expect(events).toContain("mousedown");
         expect(events).toContain("focusin");
+    });
+});
+
+describe("ToolbarUI keyboard activation", () => {
+    test("activates the button that received focus instead of the first button", () => {
+        const toolbarElement = document.createElement("div");
+        toolbarElement.id = "toolbars";
+        const playButton = document.createElement("a");
+        playButton.id = "play";
+        const newFileButton = document.createElement("a");
+        newFileButton.id = "newFile";
+        toolbarElement.append(playButton, newFileButton);
+        document.body.appendChild(toolbarElement);
+
+        const auxToolbar = document.createElement("div");
+        auxToolbar.id = "aux-toolbar";
+        auxToolbar.style.display = "none";
+        document.body.appendChild(auxToolbar);
+
+        const elements = {
+            "toolbars": toolbarElement,
+            "aux-toolbar": auxToolbar,
+            "play": playButton,
+            "newFile": newFileButton
+        };
+        document.getElementById = jest.fn(id => elements[id] || null);
+        global.docById = id => document.getElementById(id);
+
+        playButton.onclick = jest.fn();
+        newFileButton.onclick = jest.fn();
+
+        const toolbar = new ToolbarUI();
+        toolbar.setupKeyboardNavigation();
+        newFileButton.focus();
+        newFileButton.dispatchEvent(
+            new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })
+        );
+
+        expect(newFileButton.onclick).toHaveBeenCalled();
+        expect(playButton.onclick).not.toHaveBeenCalled();
     });
 });

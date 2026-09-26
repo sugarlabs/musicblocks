@@ -1213,10 +1213,10 @@ function setupMeterBlocks(activity) {
 
             if (args.length === 3 && typeof args[0] === "number" && typeof args[1] === "number") {
                 let bpm = (args[0] * args[1]) / 0.25;
-                if (args[0] < 30) {
+                if (bpm < 30) {
                     activity.errorMsg(_("Beats per minute must be > 30."));
                     bpm = 30;
-                } else if (args[0] > 1000) {
+                } else if (bpm > 1000) {
                     activity.errorMsg(_("Maximum beats per minute is 1000."));
                     bpm = 1000;
                 }

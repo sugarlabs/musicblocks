@@ -1,4 +1,8 @@
-# Music examples
+# Turtle examples
+
+Turtle Blocks examples can be found [here](../TurtleDocs/examples/README.md).
+
+# Music Blocks examples
 
 | Example | Description |
 | --- | --- |
@@ -51,6 +55,10 @@
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Music, Examples | 0 | 0 | 0 | R | 80 | R, Hz | R, Hz |
+
+| Example | Description |
+| --- | --- |
+| polyrhythm-drums.html | Polyphonic drum rhythms with graphics |
 
 | Example | Description |
 | --- | --- |
@@ -369,8 +377,6 @@
 | virtual-whiteboard.html | An interactive musical staff "whiteboard" that shows pitch names. With a few tweaks it can show solfege or even frets on the guitar. |
 | harmonic-series.html | A demonstration of the harmonic series that uses the entire screen and maps the nodes to their proper places on a physical instrument (i.e. half, third, forth, fifth, etc.) |
 
-
-
 # Games
 
 | Example | Description |
@@ -427,3 +433,4 @@ Music Blocks has handy widgets for various musical concepts to create musical co
 | Example | Description |
 | --- | --- |
 | test-suite.html | Smoke test for many Music Blocks functions. |
+| test-EDO-chromatic-scales.html | Test of chromatic mode across different EDOs |

@@ -2,7 +2,11 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
-const loadActivity = ({ isMusicBlocks = true, isMozilla = false } = {}) => {
+const loadActivity = ({
+    isMusicBlocks = true,
+    isMozilla = false,
+    jQueryBrowserUndefined = false
+} = {}) => {
     const activityPath = path.resolve(__dirname, "../activity.js");
     let code = fs.readFileSync(activityPath, "utf8");
 
@@ -27,11 +31,13 @@ const loadActivity = ({ isMusicBlocks = true, isMozilla = false } = {}) => {
         require: () => {},
         setTimeout,
         createjs: {},
-        jQuery: {
-            browser: {
-                mozilla: isMozilla
-            }
-        },
+        jQuery: jQueryBrowserUndefined
+            ? {}
+            : {
+                  browser: {
+                      mozilla: isMozilla
+                  }
+              },
         Turtles: class {},
         Palettes: class {},
         Blocks: class {},
@@ -112,5 +118,77 @@ describe("Activity blur handler setup", () => {
         activity._listeners[0].listener();
 
         expect(stopHandler).toHaveBeenCalledWith(activity, true);
+    });
+
+    test("does not throw when jQuery.browser is unavailable (RequireJS timing race)", () => {
+        const Activity = loadActivity({ jQueryBrowserUndefined: true });
+        const activity = new Activity();
+        const stopHandler = jest.fn();
+
+        expect(() => activity.setupWindowBlurHandler(stopHandler)).not.toThrow();
+        expect(activity._listeners).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    target: window,
+                    type: "blur",
+                    listener: expect.any(Function)
+                })
+            ])
+        );
+    });
+});
+
+/**
+ * Commit 9b2d8197c guards `doBrowserCheck()` in Activity.init() the same way
+ * the constructor already guards other timing-variable globals. init() is a
+ * huge, browser-only method (canvas/createjs/Toolbar/Planet setup) that
+ * can't be run whole under Jest, so this extracts just the guarded slice -
+ * from the guard through the immediately-following setupWindowBlurHandler
+ * call, so a false-positive "doesn't throw" can't hide a guard that
+ * silently skipped the rest of init() too - and runs it in a fresh vm
+ * context where `doBrowserCheck` is present or absent on purpose.
+ */
+describe("Activity.init() doBrowserCheck guard", () => {
+    const START_MARKER = 'if (typeof doBrowserCheck === "function") {';
+    const END_MARKER = "this.setupWindowBlurHandler(doHardStopButton);";
+
+    const loadInitGuardSlice = (sandboxExtras = {}) => {
+        const activityPath = path.resolve(__dirname, "../activity.js");
+        const source = fs.readFileSync(activityPath, "utf8");
+        const start = source.indexOf(START_MARKER);
+        const end = source.indexOf(END_MARKER, start);
+        if (start === -1 || end === -1) {
+            throw new Error(
+                "activity_blur_handler.test.js: could not locate the doBrowserCheck " +
+                    "guard in activity.js - has commit 9b2d8197c's guard moved or changed?"
+            );
+        }
+        const guardSlice = source.slice(start, end + END_MARKER.length);
+
+        const sandbox = { runGuard: null, ...sandboxExtras };
+        vm.createContext(sandbox);
+        vm.runInContext(`runGuard = function (doHardStopButton) {\n${guardSlice}\n};`, sandbox);
+        return sandbox.runGuard;
+    };
+
+    test("does not throw and still reaches setupWindowBlurHandler when doBrowserCheck is undefined", () => {
+        const runGuard = loadInitGuardSlice();
+        const fakeActivity = { setupWindowBlurHandler: jest.fn() };
+        const stopHandler = () => {};
+
+        expect(() => runGuard.call(fakeActivity, stopHandler)).not.toThrow();
+        expect(fakeActivity.setupWindowBlurHandler).toHaveBeenCalledWith(stopHandler);
+    });
+
+    test("calls doBrowserCheck when it is available", () => {
+        const doBrowserCheck = jest.fn();
+        const runGuard = loadInitGuardSlice({ doBrowserCheck });
+        const fakeActivity = { setupWindowBlurHandler: jest.fn() };
+        const stopHandler = () => {};
+
+        runGuard.call(fakeActivity, stopHandler);
+
+        expect(doBrowserCheck).toHaveBeenCalledTimes(1);
+        expect(fakeActivity.setupWindowBlurHandler).toHaveBeenCalledWith(stopHandler);
     });
 });

@@ -1,0 +1,23 @@
+{
+    "HIGHLIGHTSTROKECOLORS": {
+        "facebook": "#5f7cb6"
+    }, 
+    "FLOWPLUGINS": {
+        "publish": "if (args.length == 1) {    doPublish(args[0]);};"
+    }, 
+    "PALETTEHIGHLIGHTCOLORS": {
+        "facebook": "#86a0d0"
+    }, 
+    "PALETTEPLUGINS": {
+        "facebook": "<!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd' [\t<!ENTITY stroke_color \"#86a0d0\">\t<!ENTITY fill_color \"#5f7cb6\">]><svg enable-background=\"new 0 0 55.125 55\" height=\"55px\" id=\"Layer_1\" version=\"1.1\" viewBox=\"0 0 55 55\" width=\"55px\" x=\"0px\" xml:space=\"preserve\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" y=\"0px\"><rect     width=\"45\"     height=\"45\"     ry=\"2.9166667\"     x=\"5\"     y=\"5\"     id=\"rect3\"     style=\"fill:&fill_color;;fill-opacity:1\" /><rect     width=\"38.541668\"     height=\"6.4583335\"     ry=\"0\"     x=\"8.333333\"     y=\"39.583332\"     id=\"rect5\"     style=\"fill:&stroke_color;;fill-opacity:1\" /><path     d=\"m 31.197287,46.165937 -7.8e-5,-16.470834 -4.268255,2.69e-4 0,-6.050269 4.268333,0 0,-5.470427 c 0,0 -0.01379,-3.033899 1.989072,-4.972875 0.810184,-0.78434 1.67477,-1.256236 2.693135,-1.740507 1.144374,-0.544193 3.025673,-0.621305 3.025673,-0.621305 l 5.139209,0.206899 -0.124993,5.594882 -4.516927,0 c 0,0 -0.493513,-0.07261 -1.104322,0.399722 -0.687245,0.531438 -0.636185,1.133186 -0.636185,1.133186 l 3.39e-4,5.470164 6.380834,2.62e-4 -0.248334,6.05 -6.1325,0 -0.08322,16.470833 z\"     id=\"path7\"     style=\"fill:#ffffff;fill-opacity:1;stroke:none\" /></svg>"
+    }, 
+    "BLOCKPLUGINS": {
+        "publish": "var pubBlock = new ProtoBlock('publish');pubBlock.palette = palettes.dict['facebook'];blocks.protoBlockDict['publish'] = pubBlock;pubBlock.staticLabels.push(_('publish'));pubBlock.adjustWidthToLabel();pubBlock.oneArgBlock();pubBlock.defaults.push(_('comment'));pubBlock.dockTypes[1] = 'textin';"
+    }, 
+    "PALETTEFILLCOLORS": {
+        "facebook": "#7893c6"
+    }, 
+    "PALETTESTROKECOLORS": {
+        "facebook": "#3a62a5"
+    }
+}

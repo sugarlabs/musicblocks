@@ -59,6 +59,7 @@ class DummyValueBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
         this.extraWidth = 0;
+        this.capabilities = Object.create(null);
     }
     setPalette(palette, activity) {
         return this;
@@ -79,6 +80,15 @@ class DummyValueBlock {
     }
     setup(activity) {
         return this;
+    }
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    }
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
     arg(logo, turtle, blk) {
         return global.activity.blocks.blockList[blk].value;
@@ -231,6 +241,20 @@ describe("setupNumberBlocks", () => {
             logo.inStatusMatrix = false;
         });
 
+        it("should return safely when status-matrix parent is missing (isInStatusMatrix safety)", () => {
+            activity.blocks.blockList[300] = {
+                connections: [null, 302],
+                name: "int"
+            };
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const intBlock = createdBlocks["int"];
+            const result = intBlock.arg(logo, 0, 300, null);
+            expect(result).toBe(0);
+            expect(logo.statusFields.length).toBe(0);
+            logo.inStatusMatrix = false;
+        });
+
         it("should call errorMsg and return 0 when MathUtility.doInt throws", () => {
             activity.blocks.blockList[100] = { connections: [null, "c1"] };
             logo.parseArg = jest.fn(() => "not-a-number");
@@ -280,6 +304,19 @@ describe("setupNumberBlocks", () => {
             const modBlock = createdBlocks["mod"];
             const result = modBlock.arg(logo, 0, 110, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+            global.MathUtility.doMod = (a, b) => Number(a) % Number(b);
+        });
+
+        it("should call errorMsg with ZERODIVIDEERRORMSG when MathUtility.doMod throws DivByZeroError", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn(() => 5);
+            global.MathUtility.doMod = () => {
+                throw new Error("DivByZeroError");
+            };
+            const modBlock = createdBlocks["mod"];
+            const result = modBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.ZERODIVIDEERRORMSG, 110);
             expect(result).toEqual(0);
             global.MathUtility.doMod = (a, b) => Number(a) % Number(b);
         });
@@ -590,6 +627,55 @@ describe("setupNumberBlocks", () => {
             const result = plusBlock.updateParameter(logo, 0, 200);
             expect(result).toEqual(Number(3.14159).toFixed(2));
         });
+
+        const realDoPlus = (a, b) => {
+            if (typeof a === "string" || typeof b === "string") {
+                if (a === null || a === undefined || b === null || b === undefined) {
+                    throw new Error("NanError");
+                }
+                return (
+                    (typeof a === "string" ? a : a.toString()) +
+                    (typeof b === "string" ? b : b.toString())
+                );
+            }
+            return Number(a) + Number(b);
+        };
+
+        it("should show the no-input error instead of crashing when an operand is null", () => {
+            activity.blocks.blockList[200] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return null;
+                if (c === "c2") return "5";
+            });
+            const defaultDoPlus = global.MathUtility.doPlus;
+            try {
+                global.MathUtility.doPlus = realDoPlus;
+                const plusBlock = createdBlocks["plus"];
+                const result = plusBlock.arg(logo, 0, 200, null);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 200);
+                expect(result).toEqual("5");
+            } finally {
+                global.MathUtility.doPlus = defaultDoPlus;
+            }
+        });
+
+        it("should show the no-input error instead of crashing when an operand is undefined", () => {
+            activity.blocks.blockList[200] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return undefined;
+                if (c === "c2") return "5";
+            });
+            const defaultDoPlus = global.MathUtility.doPlus;
+            try {
+                global.MathUtility.doPlus = realDoPlus;
+                const plusBlock = createdBlocks["plus"];
+                const result = plusBlock.arg(logo, 0, 200, null);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 200);
+                expect(result).toEqual("5");
+            } finally {
+                global.MathUtility.doPlus = defaultDoPlus;
+            }
+        });
     });
 
     describe("OneOfBlock - extra branches", () => {
@@ -669,6 +755,50 @@ describe("setupNumberBlocks", () => {
             const randomBlock = createdBlocks["random"];
             const result = randomBlock.arg(logo, 0, 220, null);
             expect(result).toEqual(5);
+            global.MathUtility.doRandom = (a, b, octave) => a;
+        });
+
+        it("should handle hspace block with missing parent connection (null hspace parent)", () => {
+            activity.blocks.blockList[220] = {
+                connections: ["hspace_blk", "c1", "c2"]
+            };
+            activity.blocks.blockList["hspace_blk"] = {
+                name: "hspace",
+                connections: [null]
+            };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 0;
+                if (c === "c2") return 12;
+            });
+            global.MathUtility.doRandom = jest.fn((a, b, octave) =>
+                octave !== undefined ? octave : a
+            );
+            const randomBlock = createdBlocks["random"];
+            const result = randomBlock.arg(logo, 0, 220, null);
+            expect(global.MathUtility.doRandom).toHaveBeenCalledWith(0, 12, undefined);
+            expect(result).toEqual(0);
+            global.MathUtility.doRandom = (a, b, octave) => a;
+        });
+
+        it("should handle pitch block with no octave connection", () => {
+            activity.blocks.blockList[220] = {
+                connections: ["pitch_blk", "c1", "c2"]
+            };
+            activity.blocks.blockList["pitch_blk"] = {
+                name: "pitch",
+                connections: [null, null, null]
+            };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 0;
+                if (c === "c2") return 12;
+            });
+            global.MathUtility.doRandom = jest.fn((a, b, octave) =>
+                octave !== undefined ? octave : a
+            );
+            const randomBlock = createdBlocks["random"];
+            const result = randomBlock.arg(logo, 0, 220, null);
+            expect(global.MathUtility.doRandom).toHaveBeenCalledWith(0, 12, undefined);
+            expect(result).toEqual(0);
             global.MathUtility.doRandom = (a, b, octave) => a;
         });
 
@@ -954,6 +1084,10 @@ describe("setupNumberBlocks", () => {
     });
 
     describe("NumberBlock", () => {
+        it("declares the valueDrivenLabel capability", () => {
+            expect(createdBlocks["number"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
         it("should return the block's numeric value", () => {
             activity.blocks.blockList[230] = { value: "123.45" };
             const numberBlock = createdBlocks["number"];

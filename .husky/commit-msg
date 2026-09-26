@@ -1,1 +1,13 @@
 npx --no-install commitlint --edit "$1"
+
+# Require an explicit DCO sign-off on non-merge commits
+if [ -f "$(git rev-parse --git-path MERGE_HEAD)" ]; then
+    exit 0
+fi
+
+if ! tr -d '\r' < "$1" | grep -qE '^Signed-off-by: .+ <.+>$'; then
+    echo "commit-msg: missing Signed-off-by trailer (DCO)."
+    echo "Sign off explicitly with: git commit -s"
+    echo "See: https://developercertificate.org/"
+    exit 1
+fi

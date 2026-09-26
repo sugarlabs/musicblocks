@@ -40,14 +40,18 @@ class LocalCard {
                     </a>
                         
                         <div class="card-image"> 
-                            <img class="project-image project-card-image" id="local-project-image-{ID}"> 
+                            <img class="project-image project-card-image" alt="${_(
+                                "Project thumbnail"
+                            )}" id="local-project-image-{ID}"> 
                             <a class="btn-floating halfway-fab waves-effect waves-light orange tooltipped" data-position="top" data-delay="50" data-tooltip="${_(
                                 "Publish project"
                             )}" id="local-project-publish-{ID}"><i class="material-icons">cloud_upload</i></a> 
                         </div> 
                             
                         <div class="card-content"> 
-                            <input class="card-title grey-text text-darken-4" id="local-project-input-{ID}" /> 
+                            <input class="card-title grey-text text-darken-4" aria-label="${_(
+                                "Project name"
+                            )}" id="local-project-input-{ID}" /> 
                         </div> 
                             
                         <div class="card-action"> 

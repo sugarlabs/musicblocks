@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="114"
+   height="88"
+   id="svg3479">
+  <metadata
+     id="metadata3516">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3514">
+    <filter
+       height="1.3"
+       color-interpolation-filters="sRGB"
+       id="dropshadow">
+      <feGaussianBlur
+         id="feGaussianBlur3484"
+         stdDeviation="3"
+         in="SourceAlpha" />
+      <feOffset
+         id="feOffset3486"
+         result="offsetblur"
+         dy="2"
+         dx="2" />
+      <feComponentTransfer
+         id="feComponentTransfer3488">
+        <feFuncA
+           id="feFuncA3490"
+           slope="0.2"
+           type="linear" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge3492">
+        <feMergeNode
+           id="feMergeNode3494" />
+        <feMergeNode
+           id="feMergeNode3496"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <path
+     d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 z"
+     id="path3498"
+     style="fill:#7bbbb8;fill-opacity:1;stroke:#4c8585;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3500"
+     style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans">
+    <tspan
+       x="94"
+       y="49"
+       id="tspan3502">show</tspan>
+  </text>
+  <text
+     id="text3504"
+     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans">
+    <tspan
+       x="94"
+       y="22.5"
+       id="tspan3506">size</tspan>
+  </text>
+  <text
+     id="text3508"
+     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans">
+    <tspan
+       x="94"
+       y="64.5"
+       id="tspan3510">obj</tspan>
+  </text>
+</svg>

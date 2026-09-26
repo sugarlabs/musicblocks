@@ -24,9 +24,19 @@ const { setupBooleanBlocks } = require("../BooleanBlocks");
 global._ = jest.fn(str => str);
 global.BooleanBlock = jest.fn().mockImplementation(type => ({
     type,
+    capabilities: Object.create(null),
     setPalette: jest.fn(),
     setHelpString: jest.fn(),
     formBlock: jest.fn(),
+    setCapability: jest.fn(function (name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    }),
+    getCapability: jest.fn(function (name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
+    }),
     updateParameter: jest.fn(function (logo, turtle, blk) {
         if (mockActivity.blocks.blockList[blk].value) {
             return _("true");
@@ -381,6 +391,7 @@ describe("real BooleanBlock instances - direct method coverage", () => {
             constructor(type) {
                 this.type = type;
                 instances[type] = this;
+                this.capabilities = Object.create(null);
             }
             setPalette() {}
             setHelpString() {}
@@ -389,6 +400,15 @@ describe("real BooleanBlock instances - direct method coverage", () => {
             setup() {}
             updateParameter() {}
             arg() {}
+            setCapability(name, value = true) {
+                this.capabilities[name] = !!value;
+                return this;
+            }
+            getCapability(name) {
+                return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                    ? this.capabilities[name]
+                    : undefined;
+            }
         };
         setupBooleanBlocks(mockActivity);
         global.BooleanBlock = origBooleanBlock;
@@ -448,6 +468,7 @@ describe("BooleanBlocks error-handling paths (try-catch coverage)", () => {
             constructor(type) {
                 this.type = type;
                 instances[type] = this;
+                this.capabilities = Object.create(null);
             }
             setPalette() {}
             setHelpString() {}
@@ -456,6 +477,15 @@ describe("BooleanBlocks error-handling paths (try-catch coverage)", () => {
             setup() {}
             updateParameter() {}
             arg() {}
+            setCapability(name, value = true) {
+                this.capabilities[name] = !!value;
+                return this;
+            }
+            getCapability(name) {
+                return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                    ? this.capabilities[name]
+                    : undefined;
+            }
         };
         setupBooleanBlocks(mockActivity);
         global.BooleanBlock = origBooleanBlock;
@@ -554,6 +584,7 @@ describe("BooleanBlocks edge-case inputs", () => {
             constructor(type) {
                 this.type = type;
                 instances[type] = this;
+                this.capabilities = Object.create(null);
             }
             setPalette() {}
             setHelpString() {}
@@ -562,6 +593,15 @@ describe("BooleanBlocks edge-case inputs", () => {
             setup() {}
             updateParameter() {}
             arg() {}
+            setCapability(name, value = true) {
+                this.capabilities[name] = !!value;
+                return this;
+            }
+            getCapability(name) {
+                return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                    ? this.capabilities[name]
+                    : undefined;
+            }
         };
         setupBooleanBlocks(mockActivity);
         global.BooleanBlock = origBooleanBlock;
@@ -702,6 +742,7 @@ describe("StaticBooleanBlock edge cases", () => {
             constructor(type) {
                 this.type = type;
                 instances[type] = this;
+                this.capabilities = Object.create(null);
             }
             setPalette() {}
             setHelpString() {}
@@ -710,6 +751,15 @@ describe("StaticBooleanBlock edge cases", () => {
             setup() {}
             updateParameter() {}
             arg() {}
+            setCapability(name, value = true) {
+                this.capabilities[name] = !!value;
+                return this;
+            }
+            getCapability(name) {
+                return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                    ? this.capabilities[name]
+                    : undefined;
+            }
         };
         setupBooleanBlocks(mockActivity);
         global.BooleanBlock = origBooleanBlock;
@@ -775,6 +825,10 @@ describe("StaticBooleanBlock edge cases", () => {
         const result = instances["boolean"].arg(mockLogo, "turtle1", "blkRandom", null);
         expect(result).toBe(false);
     });
+
+    test("StaticBooleanBlock declares the valueDrivenLabel capability", () => {
+        expect(instances["boolean"].getCapability("valueDrivenLabel")).toBe(true);
+    });
 });
 
 describe("BooleanBlocks single null connection edge cases", () => {
@@ -787,6 +841,7 @@ describe("BooleanBlocks single null connection edge cases", () => {
             constructor(type) {
                 this.type = type;
                 instances[type] = this;
+                this.capabilities = Object.create(null);
             }
             setPalette() {}
             setHelpString() {}
@@ -795,6 +850,15 @@ describe("BooleanBlocks single null connection edge cases", () => {
             setup() {}
             updateParameter() {}
             arg() {}
+            setCapability(name, value = true) {
+                this.capabilities[name] = !!value;
+                return this;
+            }
+            getCapability(name) {
+                return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                    ? this.capabilities[name]
+                    : undefined;
+            }
         };
         setupBooleanBlocks(mockActivity);
         global.BooleanBlock = origBooleanBlock;

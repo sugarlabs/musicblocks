@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="184"
+   height="46"
+   id="svg2">
+  <path
+     d="M 1,17 1,9 C 1,4.8112098 4.8112098,1 9,1 l 8,0 0,4 20,0 0,-4 130,0 8,0 c 4.18879,0 8,3.8112098 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.81121,8 -8,8 l -8,0 -130,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 C 4.8112098,41 1,37.18879 1,33 l 0,-8 z"
+     id="path21"
+     style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     x="66"
+     y="-1.9616699e-07"
+     id="text23"
+     style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans">
+    <tspan
+       x="176"
+       y="28.000002"
+       id="tspan25">begin hollow line</tspan>
+  </text>
+</svg>

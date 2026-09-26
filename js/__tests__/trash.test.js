@@ -23,10 +23,12 @@ const Trashcan = require("../trash");
 const mockActivity = {
     trashContainer: {
         addChild: jest.fn(),
+        addChildAt: jest.fn(),
         setChildIndex: jest.fn()
     },
     cellSize: 50,
-    refreshCanvas: jest.fn()
+    refreshCanvas: jest.fn(),
+    textMsg: jest.fn()
 };
 const mockTo = jest.fn().mockReturnThis();
 const mockSet = jest.fn().mockReturnThis();
@@ -35,6 +37,9 @@ const mockCreatejs = {
     Container: jest.fn(() => ({
         addChild: jest.fn(),
         removeChildAt: jest.fn(),
+        removeAllChildren: jest.fn(function () {
+            this.children = [];
+        }),
         getBounds: jest.fn(() => ({
             width: 100,
             height: 100
@@ -60,8 +65,14 @@ const mockCreatejs = {
     Shape: jest.fn(() => ({
         graphics: {
             beginFill: jest.fn().mockReturnThis(),
-            drawRect: jest.fn().mockReturnThis()
-        }
+            drawRect: jest.fn().mockReturnThis(),
+            clear: jest.fn().mockReturnThis(),
+            drawRoundRect: jest.fn().mockReturnThis()
+        },
+        alpha: 0,
+        x: 0,
+        y: 0,
+        visible: false
     }))
 };
 global.createjs = mockCreatejs;
@@ -73,6 +84,7 @@ global.base64Encode = jest.fn(data => data);
 global.BORDER = "mock_border_svg";
 global.TRASHICON = "mock_trash_icon_svg";
 global.last = jest.fn(array => array[array.length - 1]);
+global._ = jest.fn(s => s);
 
 global.Image = jest.fn(() => {
     const img = {};
@@ -85,7 +97,6 @@ global.Image = jest.fn(() => {
     return img;
 });
 
-jest.spyOn(global.window, "addEventListener").mockImplementation(() => {});
 jest.useFakeTimers();
 
 describe("Trashcan Class", () => {
@@ -111,11 +122,24 @@ describe("Trashcan Class", () => {
         expect(trashcan.shouldResize(100, 100)).toBe(false);
     });
 
-    it("should resize and debounce the event listener", () => {
-        trashcan.resizeEvent(1);
-        const resizeFn = window.addEventListener.mock.calls[0][1];
-        resizeFn(); // simulate resize
+    it("registers one debounced resize listener", () => {
+        const addEventListenerSpy = jest
+            .spyOn(window, "addEventListener")
+            .mockImplementation(() => {});
+        const testTrashcan = new Trashcan(mockActivity);
+        const resizeFn = addEventListenerSpy.mock.calls[0][1];
+        testTrashcan.resizeEvent(2);
+        testTrashcan.resizeEvent(1);
+
+        expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
+
+        const updateContainerPositionSpy = jest.spyOn(testTrashcan, "updateContainerPosition");
+        resizeFn();
         jest.advanceTimersByTime(300);
+        expect(updateContainerPositionSpy).toHaveBeenCalledTimes(1);
+
+        updateContainerPositionSpy.mockRestore();
+        addEventListenerSpy.mockRestore();
     });
 
     it("should hide the trashcan using animation", () => {
@@ -132,10 +156,14 @@ describe("Trashcan Class", () => {
         expect(mockTo).toHaveBeenCalledWith({ alpha: 1.0 }, 200);
     });
 
-    it("should start and stop highlight animation", () => {
+    it("should activate the trash highlight immediately", () => {
+        const highlightSpy = jest.spyOn(trashcan, "_makeBorderHighlight");
+
         trashcan.startHighlightAnimation();
-        jest.advanceTimersByTime(3000);
+
         expect(trashcan._inAnimation).toBe(true);
+        expect(trashcan.isVisible).toBe(true);
+        expect(highlightSpy).toHaveBeenCalledWith(true);
     });
 
     it("should not restart highlight animation if already running", () => {
@@ -193,9 +221,12 @@ describe("overTrashcan edge cases", () => {
         expect(trashcan.overTrashcan(221, 200)).toBe(false);
     });
 
-    it("should return true for a point far below the trashcan (no lower y bound)", () => {
-        // overTrashcan has no lower y bound check
-        expect(trashcan.overTrashcan(150, 10000)).toBe(true);
+    it("should return true for a point exactly at the bottom edge", () => {
+        expect(trashcan.overTrashcan(150, 320)).toBe(true);
+    });
+
+    it("should return false for a point just below the bottom edge", () => {
+        expect(trashcan.overTrashcan(150, 321)).toBe(false);
     });
 
     it("should return true for a point exactly on the left edge", () => {
@@ -400,5 +431,237 @@ describe("scale and container positioning", () => {
 
     it("should initialize animationTime as 500", () => {
         expect(trashcan.animationTime).toBe(500);
+    });
+});
+
+describe("interactive lid open and delete glow affordance", () => {
+    let trashcan;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        trashcan = new Trashcan(mockActivity);
+    });
+
+    describe("_getTrashColors", () => {
+        it("should return fallback platform colors when CSS variables are not present", () => {
+            const colors = trashcan._getTrashColors();
+            expect(colors.border).toBe(global.platformColor.trashBorder);
+            expect(colors.hoverBorder).toBe(global.platformColor.trashActive);
+            expect(colors.hoverBg).toBe("rgba(239, 68, 68, 0.25)");
+        });
+
+        it("should resolve colors from CSS custom properties when document has computed styles", () => {
+            const origGetComputedStyle = window.getComputedStyle;
+            window.getComputedStyle = jest.fn(() => ({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-trash-border") return "#1e88e5";
+                    if (prop === "--color-trash-hover-border") return "#e53935";
+                    if (prop === "--color-trash-hover-bg") return "rgba(229, 57, 53, 0.25)";
+                    return "";
+                })
+            }));
+
+            const colors = trashcan._getTrashColors();
+            expect(colors.border).toBe("#1e88e5");
+            expect(colors.hoverBorder).toBe("#e53935");
+            expect(colors.hoverBg).toBe("rgba(229, 57, 53, 0.25)");
+
+            window.getComputedStyle = origGetComputedStyle;
+        });
+
+        it("should fall back when CSS variable contains an invalid format", () => {
+            const origGetComputedStyle = window.getComputedStyle;
+            window.getComputedStyle = jest.fn(() => ({
+                getPropertyValue: jest.fn(prop => {
+                    if (prop === "--color-trash-border") return "invalid-token;;";
+                    return "";
+                })
+            }));
+
+            const colors = trashcan._getTrashColors();
+            expect(colors.border).toBe(global.platformColor.trashBorder);
+
+            window.getComputedStyle = origGetComputedStyle;
+        });
+    });
+
+    describe("_hoverBgShape", () => {
+        it("should create and position hover glow shape behind container", () => {
+            expect(trashcan._hoverBgShape).toBeDefined();
+            expect(mockActivity.trashContainer.addChild).toHaveBeenCalledWith(
+                trashcan._hoverBgShape
+            );
+            expect(mockActivity.trashContainer.setChildIndex).toHaveBeenCalledWith(
+                trashcan._hoverBgShape,
+                0
+            );
+        });
+
+        it("should synchronize hover glow shape coordinates on updateContainerPosition", () => {
+            trashcan.updateContainerPosition();
+            expect(trashcan._hoverBgShape.x).toBe(trashcan._container.x);
+            expect(trashcan._hoverBgShape.y).toBe(trashcan._container.y);
+        });
+
+        it("should reset hover glow shape visibility and alpha on hide", () => {
+            trashcan._hoverBgShape.alpha = 1;
+            trashcan._hoverBgShape.visible = true;
+
+            trashcan.hide();
+
+            expect(trashcan._hoverBgShape.alpha).toBe(0);
+            expect(trashcan._hoverBgShape.visible).toBe(false);
+        });
+    });
+
+    describe("separated lid and body icons", () => {
+        it("should assemble separate lid and body when TRASH_LID_ICON and TRASH_BODY_ICON are defined", () => {
+            global.TRASH_LID_ICON = "mock_lid_svg";
+            global.TRASH_BODY_ICON = "mock_body_svg";
+
+            const separatedTrashcan = new Trashcan(mockActivity);
+
+            expect(separatedTrashcan._lidContainer).not.toBeNull();
+            expect(separatedTrashcan._lidBitmap).not.toBeNull();
+            expect(separatedTrashcan._bodyBitmap).not.toBeNull();
+
+            delete global.TRASH_LID_ICON;
+            delete global.TRASH_BODY_ICON;
+        });
+
+        it("should fallback gracefully to monolithic TRASHICON when separated icons are absent", () => {
+            delete global.TRASH_LID_ICON;
+            delete global.TRASH_BODY_ICON;
+
+            const fallbackTrashcan = new Trashcan(mockActivity);
+
+            expect(fallbackTrashcan._trashBitmap).not.toBeNull();
+            expect(fallbackTrashcan._lidContainer).toBeNull();
+        });
+    });
+
+    describe("animations", () => {
+        it("should not start highlight animation if artwork is not yet initialized", () => {
+            trashcan._isHighlightInitialized = false;
+            trashcan.startHighlightAnimation();
+            expect(trashcan._inAnimation).toBe(false);
+            expect(trashcan.isVisible).toBe(false);
+        });
+
+        it("should safely handle _switchHighlightVisibility when container children are incomplete", () => {
+            trashcan._container.children = [];
+            expect(() => trashcan._switchHighlightVisibility(true)).not.toThrow();
+            trashcan._container.children = [{}];
+            expect(() => trashcan._switchHighlightVisibility(true)).not.toThrow();
+        });
+
+        it("should announce delete action to screen reader on startHighlightAnimation", () => {
+            mockActivity.textMsg.mockClear();
+            trashcan.startHighlightAnimation();
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("Release to delete the block.");
+        });
+
+        it("should trigger tween for hover glow and lid tilt on startHighlightAnimation", () => {
+            mockTo.mockClear();
+            trashcan._lidContainer = { rotation: 0, y: 0 };
+            trashcan.startHighlightAnimation();
+
+            expect(createjs.Tween.get).toHaveBeenCalledWith(trashcan._hoverBgShape, {
+                override: true
+            });
+            expect(createjs.Tween.get).toHaveBeenCalledWith(trashcan._lidContainer, {
+                override: true
+            });
+            expect(mockTo).toHaveBeenCalledWith(expect.objectContaining({ alpha: 1 }), 150);
+            expect(mockTo).toHaveBeenCalledWith(
+                expect.objectContaining({ rotation: -20, y: -5 }),
+                180
+            );
+        });
+
+        it("should trigger tween resetting hover glow and lid position on stopHighlightAnimation", () => {
+            trashcan._inAnimation = true;
+            trashcan._lidContainer = { rotation: -20, y: -5 };
+            mockTo.mockClear();
+
+            trashcan.stopHighlightAnimation();
+
+            expect(createjs.Tween.get).toHaveBeenCalledWith(trashcan._hoverBgShape, {
+                override: true
+            });
+            expect(createjs.Tween.get).toHaveBeenCalledWith(trashcan._lidContainer, {
+                override: true
+            });
+            expect(mockTo).toHaveBeenCalledWith(expect.objectContaining({ alpha: 0 }), 150);
+            expect(mockTo).toHaveBeenCalledWith(
+                expect.objectContaining({ rotation: 0, y: 0 }),
+                150
+            );
+        });
+    });
+
+    describe("refresh", () => {
+        it("should clear and rebuild container artwork when refreshed", () => {
+            const removeAllSpy = jest.spyOn(trashcan._container, "removeAllChildren");
+            const updateHoverBgSpy = jest.spyOn(trashcan, "_updateHoverBg");
+            const makeTrashSpy = jest.spyOn(trashcan, "_makeTrash");
+
+            trashcan.refresh();
+
+            expect(removeAllSpy).toHaveBeenCalled();
+            expect(updateHoverBgSpy).toHaveBeenCalled();
+            expect(makeTrashSpy).toHaveBeenCalled();
+            expect(trashcan._isHighlightInitialized).toBe(true);
+        });
+
+        it("should stop active animation before refreshing", () => {
+            trashcan._inAnimation = true;
+            const stopAnimationSpy = jest.spyOn(trashcan, "stopHighlightAnimation");
+
+            trashcan.refresh();
+
+            expect(stopAnimationSpy).toHaveBeenCalled();
+        });
+
+        it("should ignore image callbacks from older generations when refreshed in succession", () => {
+            const originalImage = global.Image;
+            const pendingCallbacks = [];
+            global.Image = jest.fn(() => {
+                const img = {
+                    set src(val) {
+                        pendingCallbacks.push(this.onload);
+                    }
+                };
+                return img;
+            });
+
+            try {
+                const testTrashcan = new Trashcan(mockActivity);
+                const gen0Callbacks = [...pendingCallbacks];
+                pendingCallbacks.length = 0;
+
+                testTrashcan.refresh();
+                const gen1Callbacks = [...pendingCallbacks];
+
+                for (const cb of gen1Callbacks) {
+                    if (typeof cb === "function") {
+                        cb();
+                    }
+                }
+                const gen1Lid = testTrashcan._lidBitmap;
+                const gen1ChildrenCount = testTrashcan._container.children.length;
+
+                for (const cb of gen0Callbacks) {
+                    if (typeof cb === "function") {
+                        cb();
+                    }
+                }
+
+                expect(testTrashcan._lidBitmap).toBe(gen1Lid);
+                expect(testTrashcan._container.children.length).toBe(gen1ChildrenCount);
+            } finally {
+                global.Image = originalImage;
+            }
+        });
     });
 });

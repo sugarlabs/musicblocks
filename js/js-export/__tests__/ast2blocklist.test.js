@@ -22,6 +22,7 @@
 
 const acorn = require("../../../lib/acorn.min");
 const { AST2BlockList } = require("../ast2blocklist");
+const MathUtility = require("../../utils/mathutils");
 const fs = require("fs");
 const path = require("path");
 
@@ -165,6 +166,130 @@ describe("AST2BlockList Class", () => {
         }
     });
 
+    // A for loop only becomes a Repeat block when the block would run it the
+    // same number of times (#8910).
+    describe("Repeat and for loops", () => {
+        const wrap = loop => `
+        new Mouse(async mouse => {
+            ${loop}
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        test("should convert an exported Repeat back to the same block", () => {
+            const ASTUtils = require("../ASTutils");
+            const astring = require("../../../lib/astring.min");
+            global.JSInterface = require("../interface");
+            let loop;
+            try {
+                loop = astring.generate(ASTUtils._getForLoopAST([["divide", [7, 2]]], [], 0));
+            } finally {
+                delete global.JSInterface;
+            }
+            expect(loop).toBe(
+                "for (let i0 = 0, limit0 = MathUtility.doRepeatCount(7 / 2); i0 < limit0; i0++) {}"
+            );
+
+            const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual([
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, "divide", 0, 0, [1, 3, 4]],
+                [3, ["number", { value: 7 }], 0, 0, [2]],
+                [4, ["number", { value: 2 }], 0, 0, [2]]
+            ]);
+        });
+
+        test.each([4, 0, -2, 3.5, "box_n"])(
+            "should convert the exported loop for Repeat %p back to a Repeat block",
+            count => {
+                const ASTUtils = require("../ASTutils");
+                const astring = require("../../../lib/astring.min");
+                global.JSInterface = require("../interface");
+                let loop;
+                try {
+                    loop = astring.generate(ASTUtils._getForLoopAST([count], [], 0));
+                } finally {
+                    delete global.JSInterface;
+                }
+                const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+                expect(AST2BlockList.toBlockList(AST, config)[1][1]).toBe("repeat");
+            }
+        );
+
+        // A box can have any valid name, including the one the exporter would
+        // give the loop limit, so the limit must not shadow it.
+        test("should not let the loop limit shadow a box with the same name", async () => {
+            const ASTUtils = require("../ASTutils");
+            const astring = require("../../../lib/astring.min");
+            global.JSInterface = require("../interface");
+            let loop;
+            try {
+                loop = astring.generate(
+                    ASTUtils._getForLoopAST(["box_limit0"], [["print", ["box_limit0"]]], 0)
+                );
+            } finally {
+                delete global.JSInterface;
+            }
+
+            const printed = [];
+            const mouse = { print: async value => printed.push(value) };
+            await new Function(
+                "MathUtility",
+                "mouse",
+                `return (async () => {
+                let limit0 = 3;
+                ${loop}
+            })();`
+            )(MathUtility, mouse);
+            expect(printed).toEqual([3, 3, 3]);
+
+            const AST = acorn.parse(wrap(loop), { ecmaVersion: 2020 });
+            expect(AST2BlockList.toBlockList(AST, config)[1][1]).toBe("repeat");
+        });
+
+        test("should convert a plain counting loop to a Repeat block", () => {
+            const AST = acorn.parse(wrap("for (let i = 0; i < 4; i++) {}"), {
+                ecmaVersion: 2020
+            });
+            expect(AST2BlockList.toBlockList(AST, config)).toEqual([
+                [0, "start", 200, 200, [null, 1, null]],
+                [1, "repeat", 0, 0, [0, 2, null, null]],
+                [2, ["number", { value: 4 }], 0, 0, [1]]
+            ]);
+        });
+
+        test.each([
+            "for (let i = 0; i <= 5; i++) {}",
+            "for (let i = 0; i < 10; i += 2) {}",
+            "for (let i = 5; i < 10; i++) {}",
+            "for (let i = 10; i > 0; i--) {}",
+            "for (i = 0; i < 4; i++) {}",
+            "for (;;) {}",
+            "for (let i = 0; i < 2.5; i++) {}",
+            "for (let i = 0; i < n; i++) {}",
+            "for (let i = 0; i < MathUtility.doRandom(1, 5); i++) {}",
+            "for (let i = 0; j < 5; i++) {}",
+            "for (let i = 0; i < 5; j++) {}",
+            "for (let i = 0, n = 5; i < n; i++) {}",
+            "for (let i = 0, n = MathUtility.doRepeatCount(5); j < n; i++) {}",
+            "for (let i = 0, n = MathUtility.doRepeatCount(5); i < i; i++) {}"
+        ])("should reject %s instead of converting it to a Repeat block", loop => {
+            const code = wrap(loop);
+            const AST = acorn.parse(code, { ecmaVersion: 2020 });
+            let error;
+            try {
+                AST2BlockList.toBlockList(AST, config);
+            } catch (e) {
+                error = e;
+            }
+            expect(error).toBeDefined();
+            expect(error.prefix + code.substring(error.start, error.end)).toBe(
+                "Unsupported statement: " + loop
+            );
+        });
+    });
+
     // Test unsupported argument type should throw an error.
     test("should throw error for unsupported argument type", () => {
         const code = `
@@ -249,7 +374,7 @@ describe("AST2BlockList Class", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("clarinet", async () => {
-                for (let i0 = 0; i0 < MathUtility.doRandom(1, 5); i0++) {
+                for (let i0 = 0, limit0 = MathUtility.doRepeatCount(MathUtility.doRandom(1, 5)); i0 < limit0; i0++) {
                     await mouse.playNote(1 / 4, async () => {
                         await mouse.playPitch("fa", 2 * 2);
                         return mouse.ENDFLOW;
@@ -1165,13 +1290,13 @@ describe("AST2BlockList Class", () => {
             [25, ["text", { value: "action" }], 0, 0, [24]],
             [26, "drift", 0, 0, [24, 27, null]],
             [27, "onbeatdo", 0, 0, [26, 28, 29, 30]],
-            [28, "nopValueBlock", 0, 0, [27]],
+            [28, "beatvalue", 0, 0, [27]],
             [29, ["text", { value: "action" }], 0, 0, [27]],
             [30, "onbeatdo", 0, 0, [27, 31, 32, 33]],
             [31, "nopValueBlock", 0, 0, [30]],
             [32, ["text", { value: "action" }], 0, 0, [30]],
             [33, "onbeatdo", 0, 0, [30, 34, 35, 36]],
-            [34, "nopValueBlock", 0, 0, [33]],
+            [34, "bpmfactor", 0, 0, [33]],
             [35, ["text", { value: "action" }], 0, 0, [33]],
             [36, "onbeatdo", 0, 0, [33, 37, 38, 39]],
             [37, "beatfactor", 0, 0, [36]],
@@ -1185,6 +1310,52 @@ describe("AST2BlockList Class", () => {
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
+    });
+
+    test("should convert the current meter getter", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.onStrongBeatDo(mouse.CURRENTMETER, "action");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "onbeatdo", 0, 0, [0, 2, 3, null]],
+            [2, "currentmeter", 0, 0, [1]],
+            [3, ["text", { value: "action" }], 0, 0, [1]]
+        ]);
+    });
+
+    test("should convert heading, key, and note volume getters", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.onStrongBeatDo(mouse.HEADING, "action");
+            await mouse.onStrongBeatDo(mouse.CURRENTKEY, "action");
+            await mouse.onStrongBeatDo(mouse.MASTERVOLUME, "action");
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList).toEqual([
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "onbeatdo", 0, 0, [0, 2, 3, 4]],
+            [2, "heading", 0, 0, [1]],
+            [3, ["text", { value: "action" }], 0, 0, [1]],
+            [4, "onbeatdo", 0, 0, [1, 5, 6, 7]],
+            [5, "key", 0, 0, [4]],
+            [6, ["text", { value: "action" }], 0, 0, [4]],
+            [7, "onbeatdo", 0, 0, [4, 8, 9, null]],
+            [8, "notevolumefactor", 0, 0, [7]],
+            [9, ["text", { value: "action" }], 0, 0, [7]]
+        ]);
     });
 
     // Test all Pitch Blocks.
@@ -1595,5 +1766,51 @@ describe("AST2BlockList Class", () => {
                 "setHeapEntry"
             ])
         );
+    });
+
+    // Test duplicate name_map entries preserving initial argument configuration.
+    test("should preserve initial argument configuration when duplicate name_map entries exist", () => {
+        const customConfig = JSON.parse(JSON.stringify(config));
+
+        // Create an initial entry in body_blocks whose name_map points to "newnote" with NumberExpression
+        const initialEntry = {
+            comment: "Initial newnote mapping with number expression argument",
+            name_map: {
+                initialPlayNote: "newnote"
+            },
+            arguments: [
+                {
+                    type: "NumberExpression"
+                }
+            ]
+        };
+
+        // Find existing newnote entry and mutate its arguments to a different type ("text")
+        const existingEntry = customConfig.body_blocks.find(
+            entry => entry.name_map && entry.name_map.playNote === "newnote"
+        );
+        existingEntry.arguments = [{ type: "text" }];
+
+        // Insert initialEntry before existingEntry so it is encountered first
+        const existingIndex = customConfig.body_blocks.indexOf(existingEntry);
+        customConfig.body_blocks.splice(existingIndex, 0, initialEntry);
+
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playNote(1, async () => {
+                return mouse.ENDFLOW;
+            });
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, customConfig);
+
+        // Verify the argument block (child of newnote) was created using the initial entry ("number")
+        // rather than the subsequent overridden entry ("text")
+        const argBlock = blockList.find(b => b[0] === 2);
+        expect(argBlock).toBeDefined();
+        expect(argBlock[1]).toEqual(["number", { value: 1 }]);
     });
 });

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="114"
+   height="88"
+   id="svg3105">
+  <path
+     d="M 1,17 1,9 A 8,8 0 0 1 9,1 l 8,0 0,4 20,0 0,-4 60,0 8,0 a 8,8 0 0 1 8,8 l 0,8 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,34 -8,0 0,-6 -8,0 0,20 8,0 0,-6 8,0 0,8 a 8,8 0 0 1 -8,8 l -8,0 -60,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 A 8,8 0 0 1 1,75 L 1,67 1,25 1,17 z"
+     id="path3124"
+     style="fill:#fd6600;fill-opacity:1;stroke:#ac3d00;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text3126"
+     style="font-size:20px;text-anchor:end;fill:#000000;font-family:Sans">
+    <tspan
+       x="94"
+       y="49"
+       id="tspan3128">add</tspan>
+  </text>
+  <text
+     id="text3130"
+     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans">
+    <tspan
+       x="94"
+       y="22.5"
+       id="tspan3132">to</tspan>
+  </text>
+  <text
+     id="text3134"
+     style="font-size:13.33333302px;text-anchor:end;fill:#000000;font-family:Sans">
+    <tspan
+       x="94"
+       y="64.5"
+       id="tspan3136">value</tspan>
+  </text>
+</svg>

@@ -1,0 +1,24 @@
+{
+    "HIGHLIGHTSTROKECOLORS": {
+        "cloud": "#000000"
+    }, 
+    "ARGPLUGINS": {
+        "fetch": "var block = logo.blocks.blockList[blk];var conns = block.connections;var field = logo.parseArg(logo, turtle, conns[2]);var uid = logo.parseArg(logo, turtle, conns[1]);var hoursAgo = logo.parseArg(logo, turtle, conns[3]);var d = new Date();var now = d.getTime() / 1000;var deltaSeconds = now - impactLastFetchTime;var haveData = false;if (deltaSeconds > 3600 || uid != impactUID) {    var apiURL = 'https://sensor-station.appspot.com/sensor_station';    console.log('using server data');    try {        var request = new XMLHttpRequest();        request.open('GET', apiURL, false);        request.send(null);        var response = request.responseText;        console.log(response);    } catch (e) {        logo.errorMsg(_('Impact data not available.'), blk);    }    try {        impactData = JSON.parse(response);        haveData = true;    } catch (e) {        logo.errorMsg(_('Cannot parse Impact data.'), blk);    }} else {    haveData = true;    console.log('using cached data');}var output = 0;if (haveData) {    impactLastFetchTime = now;    impactUID = uid;    var foundUID = false;    var foundTime = false;    if (hoursAgo < 0) {        var minTime = 0;        var maxTime = now;    } else {        var minTime = now - hoursAgo * 3600 - 1800;        var maxTime = now - hoursAgo * 3600 + 1800;    }    try {        for (var i = impactData.length - 1; i > -1; i--) {            if ('uid' in impactData[i] && impactData[i]['uid'] == uid) {                foundUID = true;                if ('tstamp' in impactData[i]) {                    var tstamp = impactData[i]['tstamp'] / 1000;  \t\t    if (tstamp > minTime && tstamp < maxTime) {                        foundTime = true;                        if (field in impactData[i]) {                            output = impactData[i][field];                        } else {                            logo.errorMsg(_('Impact field not found.'), blk);                        }                        break;                    }                }            } else if ('id' in impactData[i] && impactData[i]['id'] == uid) {                foundUID = true;                if ('tstamp' in impactData[i]) {                    var tstamp = impactData[i]['tstamp'] / 1000;  \t\t    if (tstamp > minTime && tstamp < maxTime) {                        foundTime = true;                        if (field in impactData[i]) {                            output = impactData[i][field];                        } else {                            logo.errorMsg(_('Impact field not found.'), blk);                        }                        break;                    }                }            }         }         if (!foundUID) {            logo.errorMsg(_('Impact UID not found.'), blk);         } else if (!foundTime) {            logo.errorMsg(_('Impact Time not found.'), blk);         }    } catch (e) {        logo.errorMsg(_('Impact data not available.'), blk);    }}block.value = Number(output);"
+    }, 
+    "GLOBALS": "impactLastFetchTime = 0;impactUID = '';impactHoursAgo = 0;impactData = null;", 
+    "PALETTEHIGHLIGHTCOLORS": {
+        "cloud": "#ffb1b3"
+    }, 
+    "PALETTEPLUGINS": {
+        "cloud": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"55\" height=\"55\"> <path d=\"m 47.031373,28.122706 c 0.08359,-0.684185 0.126451,-1.382797 0.126451,-2.093434 0,-8.389358 -6.026799,-15.190307 -13.461708,-15.190307 -5.479737,0 -10.194871,3.694469 -12.295784,8.996587 -1.23558,-1.157941 -2.822651,-1.853547 -4.554392,-1.853547 -3.93928,0 -7.1327126,3.603084 -7.1327126,8.047869 0,0.660134 0.070727,1.30163 0.2030723,1.915472 -0.081978,-0.0024 -0.1650298,-0.0036 -0.2475446,-0.0036 -4.9476761,-0.0012 -8.95929097,4.524747 -8.95929097,10.108836 0,5.584087 4.01161487,10.110038 9.00429907,10.210439 L 45.374646,48.160634 c 4.928923,-0.02706 8.91589,-4.542785 8.91589,-10.110039 0,-4.926959 -3.123777,-9.031457 -7.259163,-9.927868 z\" style=\"fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:1.41892922;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none\" /></svg>"
+    }, 
+    "BLOCKPLUGINS": {
+        "fetchdata": "var fetchBlk = new ProtoBlock('fetch');fetchBlk.palette = palettes.dict['cloud'];blocks.protoBlockDict['fetch'] = fetchBlk;fetchBlk.staticLabels.push(_('fetch'), _('UID'), _('field'), _('hours ago'));fetchBlk.adjustWidthToLabel();fetchBlk.threeArgMathBlock();fetchBlk.dockTypes[1] = 'anyin';fetchBlk.dockTypes[2] = 'anyin';fetchBlk.dockTypes[3] = 'numberin';fetchBlk.defaults.push(\"UID\");fetchBlk.defaults.push(\"temp\");fetchBlk.defaults.push(0);"
+    }, 
+    "PALETTEFILLCOLORS": {
+        "cloud": "#ff0066"
+    }, 
+    "PALETTESTROKECOLORS": {
+        "cloud": "#ef003e"
+    }
+}

@@ -31,13 +31,15 @@ const mockContext = {
     restore: jest.fn()
 };
 
-Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
-    configurable: true,
-    writable: true,
-    value: jest.fn(type => {
-        // Return null for non-2d contexts
-        if (type !== "2d") return null;
+if (typeof HTMLCanvasElement !== "undefined") {
+    Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
+        configurable: true,
+        writable: true,
+        value: jest.fn(type => {
+            // Return null for non-2d contexts
+            if (type !== "2d") return null;
 
-        return mockContext;
-    })
-});
+            return mockContext;
+        })
+    });
+}

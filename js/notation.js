@@ -92,20 +92,6 @@ class Notation {
     }
 
     /**
-     * @param {Object.<String[]>} notationMarkup
-     */
-    set notationMarkup(notationMarkup) {
-        this._notationMarkup = notationMarkup;
-    }
-
-    /**
-     * @returns {Object.<String[]>}
-     */
-    get notationMarkup() {
-        return this._notationMarkup;
-    }
-
-    /**
      * @returns {Object.<Boolean>}
      */
     get pickupPOW2() {
@@ -157,6 +143,8 @@ class Notation {
         const obj = durationToNoteValue(duration);
 
         const tur = this.activity.turtles.ithTurtle(turtle);
+        const drumName = drum[0];
+        const isNotatedDrum = drumName && !["noise1", "noise2", "noise3"].includes(drumName);
 
         this._notationStaging[turtle].push([
             note,
@@ -165,14 +153,16 @@ class Notation {
             obj[2],
             obj[3],
             insideChord,
-            tur.singer.staccato.length > 0 && last(tur.singer.staccato) > 0
+            tur.singer.staccato.length > 0 && last(tur.singer.staccato) > 0,
+            isNotatedDrum ? drumName : null
         ]);
 
-        // If no drum is specified, add a rest to the drum line.
-        // Otherwise, add the drum.
-        if (drum.length === 0) {
+        // If an identifiable drum is specified, add the drum.
+        // Otherwise (no drum, or noise), add a rest to the drum line.
+        if (isNotatedDrum) {
+            const drumSymbol = getDrumSymbol(drumName);
             this._notationDrumStaging[turtle].push([
-                ["R"],
+                [drumSymbol],
                 obj[0],
                 obj[1],
                 obj[2],
@@ -180,10 +170,9 @@ class Notation {
                 insideChord,
                 false
             ]);
-        } else if (!["noise1", "noise2", "noise3"].includes(drum[0])) {
-            const drumSymbol = getDrumSymbol(drum[0]);
+        } else {
             this._notationDrumStaging[turtle].push([
-                [drumSymbol],
+                ["R"],
                 obj[0],
                 obj[1],
                 obj[2],
@@ -213,13 +202,14 @@ class Notation {
     }
 
     /**
-     * Adds a markup.
+     * Queues a markup so that it is attached to the next note staged by
+     * doUpdateNotation.
      *
      * @param turtle
      * @param arg
      * @returns {void}
      */
-    static notationMarkup(turtle, arg) {
+    notationMarkup(turtle, arg) {
         if (turtle in this._markup) {
             this._markup[turtle].push(arg);
         } else {
@@ -278,18 +268,18 @@ class Notation {
      * @returns {void}
      */
     notationMeter(turtle, count, value) {
-        if (this._pickupPoint[turtle] != null) {
+        if (this._pickupPoint[turtle] !== null) {
             // Lilypond prefers meter to be before partials.
             const d = this._notationStaging[turtle].length - this._pickupPoint[turtle];
             const pickup = [];
 
-            for (const i in d) {
+            for (let i = 0; i < d; i++) {
                 pickup.push(this._notationStaging[turtle].pop());
             }
 
             this._notationStaging[turtle].push("meter", count, value);
 
-            for (const i in d) {
+            for (let i = 0; i < d; i++) {
                 this._notationStaging[turtle].push(pickup.pop());
             }
         } else {

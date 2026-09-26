@@ -1,0 +1,271 @@
+{
+  "file": "scripts/generate-tests/__tests__/fixtures/class-module.js",
+  "sourceType": "script",
+  "exports": [
+    {
+      "name": "Base",
+      "kind": "class",
+      "superClass": null,
+      "methods": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "isStatic": false,
+          "params": [
+            "name"
+          ],
+          "arity": 1,
+          "hasRestParam": false
+        },
+        {
+          "name": "describe",
+          "kind": "method",
+          "isStatic": false,
+          "params": [],
+          "arity": 0,
+          "hasRestParam": false
+        }
+      ],
+      "via": null
+    },
+    {
+      "name": "Counter",
+      "kind": "class",
+      "superClass": "Base",
+      "methods": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "isStatic": false,
+          "params": [
+            "name",
+            "start",
+            "step"
+          ],
+          "arity": 1,
+          "hasRestParam": false
+        },
+        {
+          "name": "tick",
+          "kind": "method",
+          "isStatic": false,
+          "params": [
+            "times"
+          ],
+          "arity": 0,
+          "hasRestParam": false
+        },
+        {
+          "name": "value",
+          "kind": "get",
+          "isStatic": false,
+          "params": [],
+          "arity": 0,
+          "hasRestParam": false
+        },
+        {
+          "name": "value",
+          "kind": "set",
+          "isStatic": false,
+          "params": [
+            "next"
+          ],
+          "arity": 1,
+          "hasRestParam": false
+        },
+        {
+          "name": "fromArray",
+          "kind": "method",
+          "isStatic": true,
+          "params": [
+            "values"
+          ],
+          "arity": 1,
+          "hasRestParam": false
+        }
+      ],
+      "via": null
+    }
+  ],
+  "functions": [],
+  "classes": [
+    {
+      "name": "Base",
+      "superClass": null,
+      "methods": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "isStatic": false,
+          "params": [
+            "name"
+          ],
+          "arity": 1,
+          "hasRestParam": false
+        },
+        {
+          "name": "describe",
+          "kind": "method",
+          "isStatic": false,
+          "params": [],
+          "arity": 0,
+          "hasRestParam": false
+        }
+      ]
+    },
+    {
+      "name": "Counter",
+      "superClass": "Base",
+      "methods": [
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "isStatic": false,
+          "params": [
+            "name",
+            "start",
+            "step"
+          ],
+          "arity": 1,
+          "hasRestParam": false
+        },
+        {
+          "name": "tick",
+          "kind": "method",
+          "isStatic": false,
+          "params": [
+            "times"
+          ],
+          "arity": 0,
+          "hasRestParam": false
+        },
+        {
+          "name": "value",
+          "kind": "get",
+          "isStatic": false,
+          "params": [],
+          "arity": 0,
+          "hasRestParam": false
+        },
+        {
+          "name": "value",
+          "kind": "set",
+          "isStatic": false,
+          "params": [
+            "next"
+          ],
+          "arity": 1,
+          "hasRestParam": false
+        },
+        {
+          "name": "fromArray",
+          "kind": "method",
+          "isStatic": true,
+          "params": [
+            "values"
+          ],
+          "arity": 1,
+          "hasRestParam": false
+        }
+      ]
+    }
+  ],
+  "dependencies": [],
+  "referencedGlobals": [
+    "TypeError",
+    "module"
+  ],
+  "jsdoc": [
+    {
+      "target": "Base",
+      "description": "Base class with shared behaviour.",
+      "tags": []
+    },
+    {
+      "target": "Base.constructor",
+      "description": "",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{string} name - identifier for the instance."
+        }
+      ]
+    },
+    {
+      "target": "Counter",
+      "description": "A small counter built on top of {@link Base}.",
+      "tags": []
+    },
+    {
+      "target": "Counter.constructor",
+      "description": "",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{string} name - identifier for the counter."
+        },
+        {
+          "tag": "param",
+          "text": "{number} start - initial value."
+        },
+        {
+          "tag": "param",
+          "text": "{number} step - increment applied by `tick`."
+        }
+      ]
+    },
+    {
+      "target": "Counter.fromArray",
+      "description": "",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{number[]} values - starting values."
+        },
+        {
+          "tag": "returns",
+          "text": "{Counter[]} one counter per value."
+        }
+      ]
+    },
+    {
+      "target": "Counter.tick",
+      "description": "Advances the counter, optionally several times.",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{number} times - how many steps to take."
+        },
+        {
+          "tag": "returns",
+          "text": "{number} the updated value."
+        }
+      ]
+    },
+    {
+      "target": "Counter.value",
+      "description": "",
+      "tags": [
+        {
+          "tag": "returns",
+          "text": "{number} the current value."
+        }
+      ]
+    },
+    {
+      "target": "Counter.value",
+      "description": "",
+      "tags": [
+        {
+          "tag": "param",
+          "text": "{number} next - value to set."
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "branches": 3,
+    "returns": 4,
+    "throws": 1
+  }
+}

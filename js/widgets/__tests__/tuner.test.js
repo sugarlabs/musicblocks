@@ -20,8 +20,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global.platformColor = {
-    selectorBackground: "#8bc34a"
+const cssTokens = {
+    "--color-selector-bg": "#8cc6ff",
+    "--color-text-primary": "#000000",
+    "--color-success": "#10b981",
+    "--color-error": "#ef4444"
+};
+
+global.getComputedStyle = jest.fn().mockReturnValue({
+    getPropertyValue: property => cssTokens[property] || ""
+});
+
+global.generateNoteNames = edo => {
+    if (edo === 12) {
+        return ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    }
+    const names = [];
+    for (let i = 0; i < edo; i++) {
+        names.push("N" + i);
+    }
+    return names;
 };
 
 const createMockElement = tagName => ({
@@ -37,6 +55,9 @@ const createMockElement = tagName => ({
 });
 
 global.document = {
+    body: {
+        className: ""
+    },
     createElement: jest.fn().mockImplementation(tagName => {
         const element = createMockElement(tagName);
         if (tagName === "canvas") {
@@ -82,6 +103,11 @@ describe("Tuner Widget", () => {
         test("TunerUtils has frequencyToPitch method", () => {
             expect(TunerUtils.frequencyToPitch).toBeDefined();
             expect(typeof TunerUtils.frequencyToPitch).toBe("function");
+        });
+
+        test("TunerUtils has frequencyToNote method", () => {
+            expect(TunerUtils.frequencyToNote).toBeDefined();
+            expect(typeof TunerUtils.frequencyToNote).toBe("function");
         });
 
         test("TunerUtils has calculatePlaybackRate method", () => {
@@ -212,6 +238,17 @@ describe("Tuner Widget", () => {
 
                 expect(result[2]).toBe(freq);
             });
+        });
+    });
+
+    describe("TunerUtils.frequencyToNote", () => {
+        test.each([
+            [440, { note: "A", cents: 0 }],
+            [438, { note: "A", cents: -8 }],
+            [442, { note: "A", cents: 8 }],
+            [0, { note: "---", cents: 0 }]
+        ])("returns the note and cents for %d Hz", (frequency, expected) => {
+            expect(TunerUtils.frequencyToNote(frequency)).toEqual(expected);
         });
     });
 
@@ -379,83 +416,6 @@ describe("Tuner Widget", () => {
 
                 expect(display.frequency).toBe(440);
             });
-
-            test("defaults to chromatic mode", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-
-                expect(display.chromaticMode).toBe(true);
-            });
-
-            test("creates mode container element", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-
-                expect(display.modeContainer).toBeDefined();
-            });
-
-            test("appends mode container to canvas parent", () => {
-                new TunerDisplay(mockCanvas, 400, 300);
-
-                expect(mockCanvas.parentElement.appendChild).toHaveBeenCalled();
-            });
-
-            test("creates chromatic button", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-
-                expect(display.chromaticButton).toBeDefined();
-            });
-
-            test("creates target pitch button", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-
-                expect(display.targetPitchButton).toBeDefined();
-            });
-
-            test("calls updateButtonStyles on initialization", () => {
-                // Can't easily spy on prototype method before constructor,
-                // but we can verify the button styles are set
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-
-                // Chromatic mode is true by default
-                expect(display.chromaticMode).toBe(true);
-            });
-        });
-
-        describe("updateButtonStyles", () => {
-            test("highlights chromatic button when in chromatic mode", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = true;
-
-                display.updateButtonStyles();
-                // Color may be set as hex or converted to rgb by browser
-                expect(display.chromaticButton.style.backgroundColor).toBeTruthy();
-            });
-
-            test("removes highlight from target button when in chromatic mode", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = true;
-
-                display.updateButtonStyles();
-
-                expect(display.targetPitchButton.style.backgroundColor).toBe("transparent");
-            });
-
-            test("highlights target button when not in chromatic mode", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = false;
-
-                display.updateButtonStyles();
-                // Color may be set as hex or converted to rgb by browser
-                expect(display.targetPitchButton.style.backgroundColor).toBeTruthy();
-            });
-
-            test("removes highlight from chromatic button when not in chromatic mode", () => {
-                const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = false;
-
-                display.updateButtonStyles();
-
-                expect(display.chromaticButton.style.backgroundColor).toBe("transparent");
-            });
         });
 
         describe("update", () => {
@@ -598,43 +558,135 @@ describe("Tuner Widget", () => {
 
                 expect(mockCtx.textAlign).toBe("center");
             });
+
+            test("draws the needle in the success color when cents are within ±5", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const fillStyles = [];
+                mockCtx.fillRect = jest.fn(function () {
+                    fillStyles.push(mockCtx.fillStyle);
+                });
+
+                display.cents = 0;
+                display.draw();
+                expect(fillStyles[2]).toBe("#10b981");
+
+                fillStyles.length = 0;
+                display.cents = 5;
+                display.draw();
+                expect(fillStyles[2]).toBe("#10b981");
+
+                fillStyles.length = 0;
+                display.cents = -5;
+                display.draw();
+                expect(fillStyles[2]).toBe("#10b981");
+            });
+
+            test("draws the needle in the error color when cents are outside ±5", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const fillStyles = [];
+                mockCtx.fillRect = jest.fn(function () {
+                    fillStyles.push(mockCtx.fillStyle);
+                });
+
+                display.cents = 6;
+                display.draw();
+                expect(fillStyles[2]).toBe("#ef4444");
+
+                fillStyles.length = 0;
+                display.cents = -6;
+                display.draw();
+                expect(fillStyles[2]).toBe("#ef4444");
+            });
         });
 
-        describe("button click handlers", () => {
-            test("clicking chromatic button sets chromaticMode to true", () => {
+        describe("_getCanvasColors", () => {
+            test("returns token colors for default theme", () => {
                 const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = false;
+                const colors = display._getCanvasColors();
 
-                display.chromaticButton.onclick();
-
-                expect(display.chromaticMode).toBe(true);
+                expect(colors.selectorBg).toBe("#8cc6ff");
+                expect(colors.textColor).toBe("#000000");
+                expect(colors.successColor).toBe("#10b981");
+                expect(colors.errorColor).toBe("#ef4444");
             });
 
-            test("clicking target pitch button sets chromaticMode to false", () => {
+            test("caches colors when theme class has not changed", () => {
                 const display = new TunerDisplay(mockCanvas, 400, 300);
-                display.chromaticMode = true;
+                global.getComputedStyle.mockClear();
 
-                display.targetPitchButton.onclick();
+                display._getCanvasColors();
+                display._getCanvasColors();
 
-                expect(display.chromaticMode).toBe(false);
+                expect(global.getComputedStyle).toHaveBeenCalledTimes(1);
             });
 
-            test("clicking chromatic button updates button styles", () => {
+            test("updates cached colors when document theme class changes", () => {
                 const display = new TunerDisplay(mockCanvas, 400, 300);
-                const updateSpy = jest.spyOn(display, "updateButtonStyles");
+                display._getCanvasColors();
 
-                display.chromaticButton.onclick();
+                global.document.body.className = "dark";
+                global.getComputedStyle.mockReturnValueOnce({
+                    getPropertyValue: prop =>
+                        prop === "--color-selector-bg" ? "#64b5f6" : "#f9fafb"
+                });
 
-                expect(updateSpy).toHaveBeenCalled();
+                const darkColors = display._getCanvasColors();
+
+                expect(darkColors.selectorBg).toBe("#64b5f6");
+                expect(darkColors.textColor).toBe("#f9fafb");
+
+                global.document.body.className = "";
             });
 
-            test("clicking target pitch button updates button styles", () => {
+            test("falls back to default success and error colors without getComputedStyle", () => {
                 const display = new TunerDisplay(mockCanvas, 400, 300);
-                const updateSpy = jest.spyOn(display, "updateButtonStyles");
+                const originalGetComputedStyle = global.getComputedStyle;
 
-                display.targetPitchButton.onclick();
+                display._cachedTheme = null;
+                display._selectorBg = null;
+                global.getComputedStyle = undefined;
 
-                expect(updateSpy).toHaveBeenCalled();
+                try {
+                    const colors = display._getCanvasColors();
+
+                    expect(colors.successColor).toBe("#10b981");
+                    expect(colors.errorColor).toBe("#ef4444");
+                } finally {
+                    global.getComputedStyle = originalGetComputedStyle;
+                }
+            });
+        });
+
+        describe("_indicatorColor", () => {
+            test("uses the success color at the ±5 cent boundary", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const colors = {
+                    successColor: "#10b981",
+                    errorColor: "#ef4444"
+                };
+
+                expect(display._indicatorColor(0, colors)).toBe("#10b981");
+                expect(display._indicatorColor(5, colors)).toBe("#10b981");
+                expect(display._indicatorColor(-5, colors)).toBe("#10b981");
+            });
+
+            test("uses the error color outside the in-tune window", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const colors = {
+                    successColor: "#10b981",
+                    errorColor: "#ef4444"
+                };
+
+                expect(display._indicatorColor(6, colors)).toBe("#ef4444");
+                expect(display._indicatorColor(-6, colors)).toBe("#ef4444");
+                expect(display._indicatorColor(15, colors)).toBe("#ef4444");
+            });
+
+            test("reads success and error colors from the token cache when omitted", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                expect(display._indicatorColor(0)).toBe("#10b981");
+                expect(display._indicatorColor(12)).toBe("#ef4444");
             });
         });
     });

@@ -1,3 +1,25 @@
+/**
+ * MusicBlocks v3.4.1
+ *
+ * @author Lavjeet Kumar Rai
+ *
+ * @copyright 2026 Lavjeet Kumar Rai
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 // Copyright (c) 2026 Sugarlabs
 //
 // This program is free software; you can redistribute it and/or
@@ -39,16 +61,24 @@ const setupActivityIdleWatcher = activityInstance => {
         activity._stopIdleWatcher();
 
         const IDLE_THRESHOLD = 5000; // 5 seconds
+        const ACTIVE_RESET_INTERVAL = 500;
         const ACTIVE_FPS = 60;
         const IDLE_FPS = 1;
 
         let lastActivity = Date.now();
+        let lastIdleReset = lastActivity;
         activity.isAppIdle = false;
 
         // Wake up function - restores full framerate
         // Stored as instance property for cleanup
         activity._resetIdleTimer = () => {
-            lastActivity = Date.now();
+            const now = Date.now();
+            if (!activity.isAppIdle && now - lastIdleReset < ACTIVE_RESET_INTERVAL) {
+                return;
+            }
+
+            lastActivity = now;
+            lastIdleReset = now;
             if (activity.isAppIdle) {
                 activity.isAppIdle = false;
                 createjs.Ticker.framerate = ACTIVE_FPS;
@@ -67,7 +97,10 @@ const setupActivityIdleWatcher = activityInstance => {
         // Periodic check for idle state - store interval ID for cleanup
         activity._idleWatcherInterval = setInterval(() => {
             // Check if music/code is playing
-            const isMusicPlaying = activity.turtles?.running() || false;
+            const isMusicPlaying =
+                activity.turtles && typeof activity.turtles.running === "function"
+                    ? activity.turtles.running()
+                    : false;
 
             if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
                 if (!activity.isAppIdle) {
@@ -119,14 +152,46 @@ const setupActivityIdleWatcher = activityInstance => {
                         return;
                     }
 
-                    if (activity.saveLocally !== null && activity.saveLocally !== undefined) {
+                    // Don't autosave while a project load is still chunking
+                    // through blocks, or right after one failed partway: in
+                    // both cases activity.blocks.blockList can hold only a
+                    // truncated prefix of the intended project, and saving
+                    // that now would overwrite the last good session with it
+                    // on every storage tier (issue #8855).
+                    if (
+                        activity.blocks &&
+                        (activity.blocks._loadInProgress || activity.blocks._lastLoadFailed)
+                    ) {
+                        return;
+                    }
+
+                    // Fix #7: Use saveSessionAsync (IndexedDB) when available;
+                    // fall back to saveLocally. In both cases, call
+                    // gitDropdownUI.onSaveLocally() so mbGitLastSavedHash is
+                    // updated and the "Mark This Moment" button stays accurate.
+                    if (typeof activity.saveSessionAsync === "function") {
+                        activity.saveSessionAsync().catch(e => {
+                            ErrorHandler.recoverable(e, { operation: "autoSaveAsync" });
+                        });
+                    } else if (
+                        activity.saveLocally !== null &&
+                        activity.saveLocally !== undefined
+                    ) {
                         activity.saveLocally();
+                    }
+
+                    // Always update the git dirty-check hash after any autosave
+                    if (
+                        activity.gitDropdownUI &&
+                        typeof activity.gitDropdownUI.onSaveLocally === "function"
+                    ) {
+                        activity.gitDropdownUI.onSaveLocally();
                     }
                 } catch (e) {
                     ErrorHandler.recoverable(e, { operation: "autoSave" });
                 }
             },
-            5 * 60 * 1000
+            15 * 1000 // 15 seconds
         );
     };
 

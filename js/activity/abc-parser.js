@@ -13,21 +13,84 @@
 
 /* exported setupActivityAbcParser */
 
-// Function to convert ABC pitch to MB pitch
-function _adjustPitch(note, keySignature) {
-    const normalized = note.replace(",", "");
-    const accidental = keySignature.accidentals.find(acc => {
+/**
+ * Maps an abcjs accidental tag to the Music Blocks Unicode suffix.
+ * Double sharp/flat are mapped to the standard MB symbols.
+ * "natural" is an explicit override that cancels the key signature,
+ * so no suffix is appended.
+ */
+const _ABC_ACCIDENTAL_SUFFIX = {
+    sharp: "♯",
+    flat: "♭",
+    dblsharp: "𝄪",
+    dblflat: "𝄫",
+    natural: ""
+};
+
+/**
+ * Maps abcjs key.acc values ("b", "#", "") to the Music Blocks
+ * Unicode suffix appended to the root note name in setkey2 blocks.
+ */
+const _ABC_KEY_ACC_SUFFIX = {
+    "b": "♭",
+    "#": "♯",
+    "": ""
+};
+
+/**
+ * Maps abcjs key.mode abbreviations to Music Blocks mode names that
+ * exist in MUSICALMODES.  Unrecognized values fall back to "major".
+ */
+const _ABC_MODE_MAP = {
+    "": "major",
+    "m": "minor",
+    "Maj": "major",
+    "Min": "minor",
+    "Dor": "dorian",
+    "Phr": "phrygian",
+    "Lyd": "lydian",
+    "Mix": "mixolydian",
+    "Aeo": "aeolian",
+    "Loc": "locrian"
+};
+
+/**
+ * Strips ABC inline accidental prefixes (^, ^^, _, __, =) from a
+ * note name so only the bare letter (plus optional octave comma)
+ * remains.  For example "^^G" becomes "G", "_E" becomes "E".
+ */
+function _stripAbcAccidentalPrefix(name) {
+    return name.replace(/^[\^_=]+/, "");
+}
+
+// Converts an abcjs pitch object to a Music Blocks note name.
+//
+// The function resolves accidentals in two layers, matching standard
+// ABC semantics:
+//   1. An explicit inline accidental on the pitch itself (the
+//      `accidental` field set by abcjs for ^, _, =, ^^, __).
+//   2. A key-signature accidental that applies to the note letter.
+// If neither applies the bare note letter is returned.
+function _adjustPitch(note, keySignature, inlineAccidental) {
+    const bare = _stripAbcAccidentalPrefix(note).replace(",", "");
+
+    // Inline accidental takes priority (ABC rule: it overrides the
+    // key signature for the rest of the bar).
+    if (inlineAccidental && inlineAccidental in _ABC_ACCIDENTAL_SUFFIX) {
+        return bare + _ABC_ACCIDENTAL_SUFFIX[inlineAccidental];
+    }
+
+    // Fall back to the key signature.
+    const ksa = keySignature.accidentals.find(acc => {
         const noteToCompare = acc.note.toUpperCase().replace(",", "");
-        return noteToCompare.toLowerCase() === normalized.toLowerCase();
+        return noteToCompare.toLowerCase() === bare.toLowerCase();
     });
 
-    if (accidental) {
-        return (
-            normalized + (accidental.acc === "sharp" ? "♯" : accidental.acc === "flat" ? "♭" : "")
-        );
-    } else {
-        return normalized;
+    if (ksa && ksa.acc in _ABC_ACCIDENTAL_SUFFIX) {
+        return bare + _ABC_ACCIDENTAL_SUFFIX[ksa.acc];
     }
+
+    return bare;
 }
 
 // When converting to pitch value from ABC to MB there is issue
@@ -49,34 +112,49 @@ function _createPitchBlocks(
     meterDen
 ) {
     const duration = toFraction(pitchDuration);
-    const adjustedNote = _adjustPitch(pitches.name, keySignature).toUpperCase();
+    const hiddenBlockId = blockId + (pitches ? 8 : 6);
     if (triplet !== null) {
         duration[1] = meterDen * triplet;
     }
 
-    actionBlock.push(
+    const noteBlocks = [
         [
             blockId,
             ["newnote", { collapsed: true }],
             0,
             0,
-            [blockId - 1, blockId + 1, blockId + 4, blockId + 8]
+            [blockId - 1, blockId + 1, blockId + 4, hiddenBlockId]
         ],
         [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
         [blockId + 2, ["number", { value: duration[0] }], 0, 0, [blockId + 1]],
         [blockId + 3, ["number", { value: duration[1] }], 0, 0, [blockId + 1]],
-        [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
-        [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-        [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
-        [
-            blockId + 7,
-            ["number", { value: _abcToStandardValue(pitches.pitch) }],
-            0,
-            0,
-            [blockId + 5]
-        ],
-        [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]]
-    );
+        [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]]
+    ];
+
+    if (pitches) {
+        const adjustedNote = _adjustPitch(
+            pitches.name,
+            keySignature,
+            pitches.accidental
+        ).toUpperCase();
+        noteBlocks.push(
+            [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
+            [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
+            [
+                blockId + 7,
+                ["number", { value: _abcToStandardValue(pitches.pitch) }],
+                0,
+                0,
+                [blockId + 5]
+            ]
+        );
+    } else {
+        noteBlocks.push([blockId + 5, "rest2", 0, 0, [blockId + 4, null]]);
+    }
+
+    noteBlocks.push([hiddenBlockId, "hidden", 0, 0, [blockId, hiddenBlockId + 1]]);
+    actionBlock.push(...noteBlocks);
+    return noteBlocks.length;
 }
 
 // Function to search index for particular type of block
@@ -125,6 +203,9 @@ function _organizeStaffs(lines) {
  * @returns {{ startBlock: Array, newBlockId: number }}
  */
 function _buildStartBlock(blockId, staff, title, instruction, staffIdx) {
+    const keyRoot = staff.key.root + (_ABC_KEY_ACC_SUFFIX[staff.key.acc] || "");
+    const keyMode = _ABC_MODE_MAP[staff.key.mode] || "major";
+
     const startBlock = [
         [blockId, ["start", { collapsed: false }], 100, 100, [null, blockId + 1, null]],
         [blockId + 1, "print", 0, 0, [blockId, blockId + 2, blockId + 3]],
@@ -144,14 +225,8 @@ function _buildStartBlock(blockId, staff, title, instruction, staffIdx) {
         [blockId + 9, ["number", { value: staff?.meter?.value[0]?.den || 4 }], 0, 0, [blockId + 7]],
         [blockId + 10, "vspace", 0, 0, [blockId + 5, blockId + 11]],
         [blockId + 11, "setkey2", 0, 0, [blockId + 10, blockId + 12, blockId + 13, blockId + 14]],
-        [blockId + 12, ["notename", { value: staff.key.root }], 0, 0, [blockId + 11]],
-        [
-            blockId + 13,
-            ["modename", { value: staff.key.mode === "m" ? "minor" : "major" }],
-            0,
-            0,
-            [blockId + 11]
-        ],
+        [blockId + 12, ["notename", { value: keyRoot }], 0, 0, [blockId + 11]],
+        [blockId + 13, ["modename", { value: keyMode }], 0, 0, [blockId + 11]],
         // Connection to first nameddo is resolved during finalization.
         [blockId + 14, "settimbre", 0, 0, [blockId + 11, blockId + 15, null, blockId + 16]],
         [blockId + 15, ["voicename", { value: instruction }], 0, 0, [blockId + 14]],
@@ -211,8 +286,8 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
                 tripletFinder = element.startTriplet;
             }
 
-            _createPitchBlocks(
-                element.pitches[0],
+            blockId += _createPitchBlocks(
+                element.pitches?.[0],
                 blockId,
                 element.duration,
                 staff.key,
@@ -225,7 +300,6 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord) {
             if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
                 tripletFinder = null;
             }
-            blockId = blockId + 9;
         } else if (element.el_type === "bar") {
             _handleBarElement(element, staffRecord.repeatArray, staffRecord.baseBlocks.length);
         }

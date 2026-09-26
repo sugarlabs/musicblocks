@@ -27,9 +27,8 @@
  * Class pertaining to each turtle.
  *
  * @class
- * @classdesc This is the prototype of the Turtles controller which
- * acts as a bridge between the Turtle model and the Turtle view, and
- * serves as a gateway to any external code.
+ * @classdesc This is the prototype of an individual Turtle. It owns per-turtle lifecycle state
+ * and its Singer and Painter components, and acts as a bridge between the Turtle model and view.
  *
  * External code instantiates this class, and can access all the members
  * of TurtleView and TurtleModel.
@@ -59,7 +58,14 @@ class Turtle {
         this.painter = new Painter(this); // for drawing logic
 
         this._waitTime = 0;
-        this.embeddedGraphicsFinished = true;
+        // Number of EmbeddedGraphicsScheduler.schedule() calls for this
+        // turtle that are still in flight (0 means none are pending).
+        this.embeddedGraphicsPending = 0;
+        // Bumped whenever embeddedGraphicsPending is reset (turtle init,
+        // run start). A schedule() call started in an earlier generation
+        // that is still running when a reset happens must not decrement
+        // the new generation's count when it eventually finishes.
+        this.embeddedGraphicsGeneration = 0;
 
         // Widget-related attributes
         this.inSetTimbre = false;
@@ -135,17 +141,7 @@ class Turtle {
                 that.container.updateCache();
                 that.activity.refreshCanvas();
             },
-            onRetry: attempt => {
-                console.debug(
-                    "Turtle container for " +
-                        that.name +
-                        " not yet ready (attempt " +
-                        (attempt + 1) +
-                        "/" +
-                        MAX_RETRIES +
-                        ")"
-                );
-            },
+            onRetry: attempt => {},
             maxRetries: MAX_RETRIES,
             initialDelay: INITIAL_DELAY,
             errorMessage:
@@ -209,7 +205,8 @@ class Turtle {
         this.endOfClampSignals = {};
         this.butNotThese = {};
 
-        this.embeddedGraphicsFinished = true;
+        this.embeddedGraphicsPending = 0;
+        this.embeddedGraphicsGeneration += 1;
 
         this.inSetTimbre = false;
 
@@ -725,6 +722,11 @@ Turtle.TurtleView = class {
 
         this._canvas = document.getElementById("overlayCanvas");
         this._ctx = this._canvas.getContext("2d");
+
+        // Bumped on every doShowImage call so a slower, overlapping request
+        // can tell -- once its await resolves -- that a newer one already
+        // won and back off instead of clobbering it.
+        this._imageRequestId = 0;
     }
 
     /**
@@ -742,10 +744,20 @@ Turtle.TurtleView = class {
         }
 
         const gifAnimator = this.activity.gifAnimator;
+        const requestId = ++this._imageRequestId;
 
         // HARD CLEANUP: kill previous GIF before loading a new one
         if (this._activeGifId && gifAnimator) {
             gifAnimator.stopAnimation(this._activeGifId);
+
+            // Drop this turtle's own bookkeeping record for the GIF we just
+            // stopped, too -- stopAnimation() only frees GIFAnimator's side.
+            // Left in place, it lingers in _media until an explicit "clear"
+            // (many looping-animation projects never call one), and every
+            // turtle move iterates the whole array via _updateMediaPositions().
+            this._media = this._media.filter(
+                item => !(item.type === "gif" && item.id === this._activeGifId)
+            );
 
             //Clear the old GIF pixels from overlay canvas
             const ctx = this._ctx;
@@ -776,6 +788,15 @@ Turtle.TurtleView = class {
 
                 // If animation was created successfully
                 if (gifId !== null) {
+                    // A newer doShowImage call already ran while we were
+                    // awaiting createAnimation -- it owns _activeGifId/_media
+                    // now, so stop the animation we just created and bail
+                    // out instead of clobbering the newer request's state.
+                    if (requestId !== this._imageRequestId) {
+                        gifAnimator.stopAnimation(gifId);
+                        return;
+                    }
+
                     // Register as the ONLY active GIF for this turtle
                     this._activeGifId = gifId;
 
@@ -798,6 +819,12 @@ Turtle.TurtleView = class {
         //original static image code (for non-GIFs or static GIFs)
         const image = new Image();
         image.onload = () => {
+            // Same overlap guard as the GIF path above: don't add a stale
+            // static image on top of whatever a newer request set up.
+            if (requestId !== this._imageRequestId) {
+                return;
+            }
+
             const bitmap = new createjs.Bitmap(image);
             this.imageContainer.addChild(bitmap);
             this._media.push(bitmap);

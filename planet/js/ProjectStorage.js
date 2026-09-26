@@ -198,7 +198,7 @@ class ProjectStorage {
     }
 
     async save() {
-        this._saveQueue = this._saveQueue.then(async () => {
+        const run = this._saveQueue.then(async () => {
             this._saveInProgress = true;
             try {
                 // Write backup of current persisted data before overwriting primary.
@@ -207,16 +207,20 @@ class ProjectStorage {
                     await this.set(this.BackupStorageKey, existing);
                 }
 
-                this.TimeLastSaved = Date.now();
                 await this.set(this.LocalStorageKey, this.data);
-            } catch (e) {
-                console.error("[ProjectStorage] Save failed:", e);
+                this.TimeLastSaved = Date.now();
             } finally {
                 this._saveInProgress = false;
             }
         });
 
-        return this._saveQueue;
+        // Keep the queue chain alive for later saves; callers observe the
+        // failure through the returned promise.
+        this._saveQueue = run.catch(e => {
+            console.error("[ProjectStorage] Save failed:", e);
+        });
+
+        return run;
     }
 
     async restore() {
@@ -283,7 +287,12 @@ class ProjectStorage {
     }
 
     async port() {
-        const oldProjectData = localStorage.getItem(this.LocalStorageKey);
+        let oldProjectData = null;
+        try {
+            oldProjectData = localStorage.getItem(this.LocalStorageKey);
+        } catch (e) {
+            console.debug("localStorage unavailable during port(); skipping legacy read.", e);
+        }
         const isPortedAlready = await this.get(this.VersionKey);
         if (isPortedAlready !== this.Version) {
             // port

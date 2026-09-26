@@ -18,6 +18,9 @@
 */
 
 /* exported Abhijeet Singh */
+/** AMD module dependencies for lazy loading. */
+AIWidget.dependencies = ["widgets/aiwidget"];
+
 /**
  * Represents a AI Widget.
  * @constructor
@@ -112,6 +115,24 @@ function AIWidget() {
      * @type {object}
      */
     this.pitchAnalysers = {};
+
+    /**
+     * Disconnects and disposes the pitch analysers.
+     * @private
+     * @returns {void}
+     */
+    this._disposePitchAnalysers = function () {
+        for (const id in this.pitchAnalysers) {
+            const analyser = this.pitchAnalysers[id];
+            if (analyser) {
+                for (const synth in instruments[0]) {
+                    instruments[0][synth].disconnect(analyser);
+                }
+                analyser.dispose();
+            }
+        }
+        this.pitchAnalysers = {};
+    };
 
     /**
      * Pauses the sample playback.
@@ -696,18 +717,15 @@ function AIWidget() {
      * @returns {void}
      */
     this.init = function (activity) {
+        this._disposePitchAnalysers();
         this.activity = activity;
         this._directions = [];
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
         this._firstClickTimes = null;
         this.isMoving = false;
-        this.pitchAnalysers = {};
-
         this.activity.logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
         this.reconnectSynthsToAnalyser();
-
-        this.pitchAnalysers = {};
 
         this.running = true;
         if (this.drawVisualIDs) {
@@ -748,16 +766,7 @@ function AIWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
-            for (const id in this.pitchAnalysers) {
-                const analyser = this.pitchAnalysers[id];
-                if (analyser) {
-                    for (const synth in instruments[0]) {
-                        instruments[0][synth].disconnect(analyser);
-                    }
-                    analyser.dispose();
-                }
-            }
-            this.pitchAnalysers = {};
+            this._disposePitchAnalysers();
             widgetWindow.destroy();
         };
 
@@ -1314,7 +1323,30 @@ function searchIndexForMusicBlock(array, x) {
         _indexMaps.set(array, map);
     }
     const index = map.get(x);
-    return index !== undefined ? index : -1;
+
+    if (index === undefined) {
+        for (let i = 0; i < array.length; i++) {
+            if (array[i]?.[0] === x) {
+                map.set(x, i);
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    if (array[index]?.[0] === x) {
+        return index;
+    }
+
+    // Cache is stale — rebuild and retry
+    map = new Map();
+    for (let i = 0; i < array.length; i++) {
+        if (array[i] && array[i][0] !== undefined) {
+            map.set(array[i][0], i);
+        }
+    }
+    _indexMaps.set(array, map);
+    return map.get(x) ?? -1;
 }
 
 if (typeof module !== "undefined" && module.exports) {

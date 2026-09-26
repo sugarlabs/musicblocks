@@ -118,6 +118,29 @@ body.dark .toolbar-btn-focused,
   background-color: rgba(255, 255, 255, 0.3) !important;
 }
 
+/* Keep the record options focus target from collapsing on narrow toolbars. */
+#recordDropdownArrow i.material-icons.main {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+#recordDropdownArrow {
+  margin-left: 0 !important;
+}
+
+/* Keep the record options focus indicator centered on the arrow icon. */
+#recordDropdownArrow.toolbar-btn-focused,
+#recordDropdownArrow:focus-visible {
+  height: 1em;
+  line-height: 1em;
+}
+
+#recordDropdownArrow.toolbar-btn-focused i.material-icons.main,
+#recordDropdownArrow:focus-visible i.material-icons.main {
+  height: 1em;
+  line-height: 1em;
+}
+
 /* Keyboard navigation focus state for dropdown menu items */
 .dropdown-item-focused {
   background-color: rgba(0, 150, 136, 0.2) !important;

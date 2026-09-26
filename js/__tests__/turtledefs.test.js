@@ -21,21 +21,17 @@ global._ = jest.fn(str => str);
 global._THIS_IS_TURTLE_BLOCKS_ = true;
 const {
     createDefaultStack,
+    GUIDEURL,
     LOGOJA1,
     NUMBERBLOCKDEFAULT,
     DEFAULTPALETTE,
     TITLESTRING
 } = require("../turtledefs");
 
-global.GUIDEURL = "guide url";
 global.RUNBUTTON = "RUNBUTTON";
 global.STOPBUTTON = "STOPBUTTON";
 global.HELPTURTLEBUTTON = "HELPTURTLEBUTTON";
 global.LANGUAGEBUTTON = "LANGUAGEBUTTON";
-
-if (GUIDEURL === "guide url") {
-    GUIDEURL = "https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md";
-}
 
 describe("turtledefs.js", () => {
     test("LOGOJA1 should be properly initialized", () => {
@@ -52,10 +48,8 @@ describe("turtledefs.js", () => {
         expect(DEFAULTPALETTE).toBe("turtle");
     });
 
-    test("GUIDEURL should default to the correct URL", () => {
-        expect(GUIDEURL).toBe(
-            "https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md"
-        );
+    test("GUIDEURL should default to the Turtle Blocks HTML guide", () => {
+        expect(GUIDEURL).toBe("TurtleDocs/guide/index.html");
     });
 
     test("TITLESTRING should be defined", () => {
@@ -101,7 +95,6 @@ describe("Music Blocks mode (_THIS_IS_TURTLE_BLOCKS_ = false)", () => {
             "WRAPTURTLEBUTTON",
             "MOUSEPALETTEICON",
             "FULLSCREENBUTTON",
-            "RECORDBUTTON",
             "PLUGINSBUTTON",
             "OPENMERGEBUTTON",
             "PITCHPREVIEWBUTTON",
@@ -112,7 +105,10 @@ describe("Music Blocks mode (_THIS_IS_TURTLE_BLOCKS_ = false)", () => {
             "BLOCKMENUBUTTON",
             "CANVASMENUBUTTON",
             "RHYTHMPALETTEHELPICON",
-            "PITCHPREVIEWHELPBUTTON"
+            "PITCHPREVIEWHELPBUTTON",
+            "EMPTYTRASHCONFIRMBUTTON",
+            "COPYBUTTON",
+            "EXTRACTBUTTON"
         ];
         buttons.forEach(b => {
             global[b] = b;
@@ -154,5 +150,203 @@ describe("Music Blocks mode (_THIS_IS_TURTLE_BLOCKS_ = false)", () => {
 
     it("createDefaultStack should not throw when called", () => {
         expect(() => mb.createDefaultStack()).not.toThrow();
+    });
+
+    describe("getLanguagePreference & restricted storage (#7005)", () => {
+        afterEach(() => {
+            delete localStorage.languagePreference;
+        });
+
+        const withThrowingLocalStorage = fn => {
+            const originalLocalStorage = global.localStorage;
+            Object.defineProperty(global, "localStorage", {
+                get: () => {
+                    throw new Error("SecurityError: The operation is insecure.");
+                },
+                configurable: true
+            });
+            try {
+                fn();
+            } finally {
+                Object.defineProperty(global, "localStorage", {
+                    value: originalLocalStorage,
+                    configurable: true,
+                    writable: true
+                });
+            }
+        };
+
+        it("should return localStorage.languagePreference when defined", () => {
+            localStorage.languagePreference = "ja";
+            expect(mb.getLanguagePreference()).toBe("ja");
+        });
+
+        it("should fallback to navigator.language when localStorage.languagePreference is undefined", () => {
+            delete localStorage.languagePreference;
+            expect(mb.getLanguagePreference()).toBe(navigator.language);
+        });
+
+        it("should safely fallback to navigator.language when localStorage access throws SecurityError", () => {
+            withThrowingLocalStorage(() => {
+                expect(() => mb.getLanguagePreference()).not.toThrow();
+                expect(mb.getLanguagePreference()).toBe(navigator.language);
+            });
+        });
+
+        it("createDefaultStack should initialize default stack when localStorage access throws SecurityError", () => {
+            withThrowingLocalStorage(() => {
+                expect(() => mb.createDefaultStack()).not.toThrow();
+                expect(window.DATAOBJS).toBeDefined();
+                expect(window.DATAOBJS.length).toBeGreaterThan(0);
+                expect(window.DATAOBJS[10]).toEqual([10, ["solfege", { value: "sol" }], 0, 0, [9]]);
+            });
+        });
+
+        it("createHelpContent should initialize help content when localStorage access throws SecurityError", () => {
+            withThrowingLocalStorage(() => {
+                expect(() => mb.createHelpContent({})).not.toThrow();
+                expect(window.HELPCONTENT).toBeDefined();
+                expect(window.HELPCONTENT.length).toBeGreaterThan(0);
+                expect(window.HELPCONTENT[0][2]).toBe(
+                    `data:image/svg+xml;base64,${window.btoa(base64Encode(mb.LOGODEFAULT))}`
+                );
+            });
+        });
+
+        it("createDefaultStack should execute and produce Japanese stack when language is ja", () => {
+            localStorage.languagePreference = "ja";
+            expect(() => mb.createDefaultStack()).not.toThrow();
+            expect(window.DATAOBJS).toBeDefined();
+            expect(window.DATAOBJS[10]).toEqual([10, ["solfege", { value: "do" }], 0, 0, [9]]);
+        });
+
+        it("createHelpContent should select Japanese logo when language is ja", () => {
+            localStorage.languagePreference = "ja";
+            expect(() => mb.createHelpContent({})).not.toThrow();
+            expect(window.HELPCONTENT).toBeDefined();
+            expect(window.HELPCONTENT[0][2]).toBe(
+                `data:image/svg+xml;base64,${window.btoa(base64Encode(mb.LOGOJA))}`
+            );
+        });
+
+        it("should preserve language suffixes without truncation (e.g. ja-kana, zh-CN, en-US)", () => {
+            localStorage.languagePreference = "ja-kana";
+            expect(mb.getLanguagePreference()).toBe("ja-kana");
+
+            localStorage.languagePreference = "zh-CN";
+            expect(mb.getLanguagePreference()).toBe("zh-CN");
+
+            localStorage.languagePreference = "en-US";
+            expect(mb.getLanguagePreference()).toBe("en-US");
+        });
+    });
+});
+
+describe("Tab Navigation help icon follows the theme", () => {
+    let mb, activity;
+
+    /** Find the entry createHelpContent pushed for Tab Navigation. */
+    const tabEntry = () => mb.HELPCONTENT.find(entry => entry[0] === "Tab Navigation");
+
+    /** Resolve that entry's icon and name the artwork constant it chose. */
+    const chosenIcon = () => atob(tabEntry()[2]().replace("data:image/svg+xml;base64,", ""));
+
+    beforeAll(() => {
+        // Every artwork constant createHelpContent reaches for; each stands in
+        // for itself so an entry's data URI names the icon it chose.
+        [
+            "ADVANCEDBUTTON",
+            "BIGGERBUTTON",
+            "BLOCKMENUBUTTON",
+            "CANVASMENUBUTTON",
+            "CARTESIANBUTTON",
+            "CLEARBUTTON",
+            "COLLAPSEBLOCKSBUTTON",
+            "COLLAPSEBUTTON",
+            "COPYBUTTON",
+            "DARKMODEBUTTON",
+            "EMPTYTRASHCONFIRMBUTTON",
+            "EXTRACTBUTTON",
+            "FULLSCREENBUTTON",
+            "GOHOMEBUTTON",
+            "HELPBUTTON",
+            "HIDEBLOCKSBUTTON",
+            "JAVASCRIPTBUTTON",
+            "LANGUAGEBUTTON",
+            "LOADBUTTON",
+            "LOGO",
+            "MENUBUTTON",
+            "MOUSEPALETTEICON",
+            "NEWBUTTON",
+            "OPENMERGEBUTTON",
+            "PITCHPREVIEWHELPBUTTON",
+            "PLANETBUTTON",
+            "PLUGINSBUTTON",
+            "PLUGINSDELETEBUTTON",
+            "RECORDHELPBUTTON",
+            "RESTORETRASHBUTTON",
+            "RHYTHMPALETTEHELPICON",
+            "RUNBUTTON",
+            "SAVEBUTTON",
+            "SCROLLUNLOCKBUTTON",
+            "SELECTHELPBUTTON",
+            "SLOWBUTTON",
+            "SMALLERBUTTON",
+            "STATSBUTTON",
+            "STEPBUTTON",
+            "STOPTURTLEBUTTON",
+            "WRAPTURTLEBUTTON"
+        ].forEach(b => {
+            global[b] = b;
+        });
+        global._ = jest.fn(str => str);
+        global.base64Encode = jest.fn(str => str);
+        global._THIS_IS_TURTLE_BLOCKS_ = false;
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        global.getSystemThemePreference = jest.fn(() => "light");
+        jest.resetModules();
+        mb = require("../turtledefs");
+    });
+
+    beforeEach(() => {
+        activity = { beginnerMode: false, storage: {} };
+        mb.createHelpContent(activity);
+    });
+
+    test("the entry exists and defers its icon to display time", () => {
+        const entry = tabEntry();
+        expect(entry).toBeDefined();
+        // Not a baked data URI: the theme is not knowable when the help content
+        // is built, so the icon has to be resolved when the page is shown.
+        expect(typeof entry[2]).toBe("function");
+    });
+
+    test("uses the dark icon under the dark theme", () => {
+        activity.storage.themePreference = "dark";
+        expect(chosenIcon()).toBe("TABBUTTON_DARK");
+    });
+
+    test("uses the dark icon under highcontrast, which is black-backgrounded", () => {
+        activity.storage.themePreference = "highcontrast";
+        expect(chosenIcon()).toBe("TABBUTTON_DARK");
+    });
+
+    test("uses the light icon under the light theme", () => {
+        activity.storage.themePreference = "light";
+        expect(chosenIcon()).toBe("TABBUTTON_LIGHT");
+    });
+
+    test("falls back to the system preference when none is stored", () => {
+        getSystemThemePreference.mockReturnValue("dark");
+        expect(chosenIcon()).toBe("TABBUTTON_DARK");
+        getSystemThemePreference.mockReturnValue("light");
+        expect(chosenIcon()).toBe("TABBUTTON_LIGHT");
+    });
+
+    test("re-reads the theme on each call, so switching while open takes effect", () => {
+        activity.storage.themePreference = "light";
+        expect(chosenIcon()).toBe("TABBUTTON_LIGHT");
+        activity.storage.themePreference = "dark";
+        expect(chosenIcon()).toBe("TABBUTTON_DARK");
     });
 });

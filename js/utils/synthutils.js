@@ -15,10 +15,11 @@
 
    last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
-   getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
+   getOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
-   getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
-   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString
+   getArticulation, stripMicrotonalPrefix, piemenuPitches, docById, slicePath, wheelnav, platformColor,
+   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber,
+   computeTargetPitchFrequency
 */
 
 /*
@@ -28,7 +29,8 @@
     - js/utils/musicutils.js
         pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
         isCustomTemperament, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
-        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE, parseNoteString
+        getArticulation, stripMicrotonalPrefix, getOctaveRatio, getTemperament, DEFAULTVOICE, parseNoteString,
+        computeTargetPitchFrequency
     - js/turtle-singer.js
         Singer
     - js/utils/platformstyle.js
@@ -161,13 +163,13 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_("snare drum"), "snare drum", "images/snaredrum.svg", "sn", "drum"],
     //.TRANS: musical instrument
-    [_("kick drum"), "kick drum", "images/kick.svg", "hh", "drum"],
+    [_("kick drum"), "kick drum", "images/kick.svg", "bd", "drum"],
     //.TRANS: musical instrument
     [_("tom tom"), "tom tom", "images/tom.svg", "tomml", "drum"],
     //.TRANS: musical instrument
     [_("floor tom"), "floor tom", "images/floortom.svg", "tomfl", "drum"],
     //.TRANS: musical instrument
-    [_("bass drum"), "bass drum", "images/kick.svg", "tomfl", "drum"],
+    [_("bass drum"), "bass drum", "images/kick.svg", "bd", "drum"],
     //.TRANS: a drum made from an inverted cup
     [_("cup drum"), "cup drum", "images/cup.svg", "hh", "drum"],
     //.TRANS: musical instrument
@@ -472,6 +474,14 @@ const transport = {
     get isAvailable() {
         return typeof Tone !== "undefined" && Tone.Transport;
     },
+    get isClockRunning() {
+        return (
+            this.isAvailable &&
+            typeof Tone.context !== "undefined" &&
+            Tone.context.state === "running" &&
+            Tone.Transport.state === "started"
+        );
+    },
     start() {
         if (this.isAvailable) Tone.Transport.start();
     },
@@ -508,6 +518,157 @@ const transport = {
         return this.seconds;
     }
 };
+
+/**
+ * Class responsible for loading and managing audio samples (Tone.js samplers).
+ */
+class SampleLoader {
+    constructor() {
+        this.samples = null;
+    }
+
+    initStructures() {
+        if (this.samples === null) {
+            this.samples = { voice: {}, drum: {} };
+            // Pre-populate with null to indicate they exist as valid instruments but are not loaded
+            for (const type in SAMPLE_INFO) {
+                for (const name in SAMPLE_INFO[type]) {
+                    this.samples[type][name] = null;
+                }
+            }
+            this.samples.voice["empty"] = () => null;
+        }
+    }
+
+    loadSampleAsync(sampleName) {
+        this.initStructures();
+        return new Promise((resolve, reject) => {
+            let found = false;
+            let sampleType = null;
+            let sampleInfo = null;
+
+            // Find the sample info
+            for (const type in SAMPLE_INFO) {
+                if (SAMPLE_INFO[type][sampleName]) {
+                    sampleType = type;
+                    sampleInfo = SAMPLE_INFO[type][sampleName];
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                // If not found in SAMPLE_INFO, it might be a built-in or custom synth, so we resolve immediately
+                resolve();
+                return;
+            }
+
+            if (this.samples[sampleType][sampleName] !== null) {
+                // Already loaded
+                resolve();
+                return;
+            }
+
+            // Load the sample module using require
+            requirejs(
+                [sampleInfo.path],
+                () => {
+                    try {
+                        const sampleData = window[sampleInfo.global];
+                        if (sampleData) {
+                            this.samples[sampleType][sampleName] = sampleData();
+                            resolve();
+                        } else {
+                            console.error(
+                                `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
+                            );
+                            reject(`Sample global not found: ${sampleName}`);
+                        }
+                    } catch (e) {
+                        console.error(`Error processing sample ${sampleName}:`, e);
+                        reject(e);
+                    }
+                },
+                err => {
+                    console.error(`Failed to load sample module for ${sampleName}:`, err);
+                    reject(err);
+                }
+            );
+        });
+    }
+
+    async preloadProject(blockList) {
+        if (!blockList || !Array.isArray(blockList)) {
+            return;
+        }
+
+        const instrumentsToLoad = new Set();
+
+        // Known instrument block names
+        const instrumentBlockNames = ["settimbre", "setinstrument", "timbre", "instrument"];
+
+        // Scan blocks for instrument references
+        for (const block of blockList) {
+            if (!Array.isArray(block) || block.length < 2) continue;
+
+            const blockName = block[1];
+
+            // Check if this is an instrument-setting block
+            if (instrumentBlockNames.includes(blockName)) {
+                // The instrument name is usually in a connected block
+                // Check the connections for potential instrument names
+                const connections = block[4];
+                if (Array.isArray(connections)) {
+                    for (const connIdx of connections) {
+                        if (connIdx !== null && blockList[connIdx]) {
+                            const connBlock = blockList[connIdx];
+                            // Check if it's a text/value block with an instrument name
+                            if (Array.isArray(connBlock) && connBlock.length > 1) {
+                                const value = connBlock[1];
+                                // Check if this value is a known instrument
+                                if (typeof value === "string") {
+                                    // Check voice samples
+                                    if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[value]) {
+                                        instrumentsToLoad.add(value);
+                                    }
+                                    // Check drum samples
+                                    if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[value]) {
+                                        instrumentsToLoad.add(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Also check if the block name itself is an instrument
+            if (typeof blockName === "string") {
+                if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[blockName]) {
+                    instrumentsToLoad.add(blockName);
+                }
+                if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[blockName]) {
+                    instrumentsToLoad.add(blockName);
+                }
+            }
+        }
+
+        // Preload all found instruments in parallel
+        if (instrumentsToLoad.size > 0) {
+            console.debug(
+                `Preloading ${instrumentsToLoad.size} instruments:`,
+                Array.from(instrumentsToLoad)
+            );
+            const loadPromises = Array.from(instrumentsToLoad).map(name =>
+                this.loadSampleAsync(name).catch(err => {
+                    console.warn(`Failed to preload sample ${name}:`, err);
+                })
+            );
+            await Promise.all(loadPromises);
+            console.debug("Project samples preloaded successfully");
+        }
+    }
+}
 
 /**
  * Synth constructor function.
@@ -553,11 +714,21 @@ function Synth() {
     Tone.Buffer.onload = () => {
         console.debug("sample loaded");
     };
+
     /**
-     * Object to store samples.
-     * @type {Object}
+     * The loader responsible for initializing and fetching sample synths.
+     * @type {SampleLoader}
      */
-    this.samples = null;
+    this.sampleLoader = new SampleLoader();
+
+    // Define a getter/setter for backward compatibility with Synth instance state
+    Object.defineProperty(this, "samples", {
+        get: () => this.sampleLoader.samples,
+        set: val => {
+            this.sampleLoader.samples = val;
+        }
+    });
+
     /**
      * Suffix for sample names.
      * @type {string}
@@ -665,13 +836,29 @@ function Synth() {
             startPitch = startPitch.replace(SHARP, "#");
         }
 
-        const frequency = Tone.Frequency(startPitch).toFrequency();
+        let frequency;
+        if (t && !t.isEDO && t.noteLabels && t.ratios) {
+            // For JI/Pythagorean: compute from A0 reference, not 12-EDO Tone.Frequency
+            const startParsed = parseNoteString(startingPitch);
+            frequency = pitchToFrequency(startParsed[0], startParsed[1], 0, "C major", temperament);
+        } else {
+            frequency = Tone.Frequency(startPitch).toFrequency();
+        }
 
         const startParsed = parseNoteString(startingPitch);
         this.noteFrequencies = {
             // note: [octave, Frequency]
             [startParsed[0]]: [startParsed[1], frequency]
         };
+
+        // EDO temperaments compute frequencies via pitchToFrequency directly
+        // and never use noteFrequencies, so skip building the table.
+        // This also avoids crashing on microtonal interval names (e.g. "mid 2")
+        // that exist in the temperament definition but not in INTERVALVALUES.
+        if (t && (t.isEDO || isEquallyTempered(temperament))) {
+            this.changeInTemperament = false;
+            return;
+        }
 
         for (const interval in t) {
             if (
@@ -687,15 +874,25 @@ function Synth() {
                 interval !== "octaveRatio" &&
                 interval !== "generator"
             ) {
-                const noteInfo = getNoteFromInterval(startingPitch, interval);
+                let noteInfo;
                 let ratio;
-                if (typeof t[interval] === "number") {
+                if (!isNaN(interval)) {
+                    const val = t[interval];
+                    if (Array.isArray(val) && val.length >= 3) {
+                        noteInfo = [val[1], val[2]];
+                        ratio = val[0];
+                    } else {
+                        continue;
+                    }
+                } else if (typeof t[interval] === "number") {
+                    noteInfo = getNoteFromInterval(startingPitch, interval);
                     ratio = t[interval];
                 } else if (
                     t[interval] &&
                     typeof t[interval] === "object" &&
                     typeof t[interval].ratio === "number"
                 ) {
+                    noteInfo = getNoteFromInterval(startingPitch, interval);
                     ratio = t[interval].ratio;
                 } else {
                     continue;
@@ -751,6 +948,7 @@ function Synth() {
                 //To get frequencies in Temperament Widget.
                 this.temperamentChanged(temperament, this.startingPitch);
             }
+            Singer.clearPitchToFrequencyCache();
         }
 
         if (this.inTemperament === "equal") {
@@ -773,9 +971,32 @@ function Synth() {
             }
         }
 
+        const t = getTemperament(this.inTemperament);
+        if (t && (t.isEDO || isEquallyTempered(this.inTemperament))) {
+            if (typeof notes === "string") {
+                const parsed = parseNoteString(notes);
+                return pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament);
+            } else if (typeof notes === "number") {
+                return notes;
+            } else {
+                const results = [];
+                for (let i = 0; i < notes.length; i++) {
+                    if (typeof notes[i] === "string") {
+                        const parsed = parseNoteString(notes[i]);
+                        results.push(
+                            pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament)
+                        );
+                    } else {
+                        results.push(notes[i]);
+                    }
+                }
+                return results;
+            }
+        }
+
         const __getFrequency = oneNote => {
             const parsed = parseNoteString(oneNote);
-            const noteName = parsed[0];
+            const noteName = normalizeNoteAccidentals(parsed[0]);
             const octave = parsed[1];
 
             for (const note in this.noteFrequencies) {
@@ -786,7 +1007,7 @@ function Synth() {
                     } else {
                         //Note to be played is not in the same octave.
                         const power = octave - this.noteFrequencies[note][0];
-                        return this.noteFrequencies[note][1] * Math.pow(2, power);
+                        return this.noteFrequencies[note][1] * Math.pow(getOctaveRatio(), power);
                     }
                 }
             }
@@ -819,6 +1040,7 @@ function Synth() {
      * @returns {number|number[]} - The frequency or frequencies.
      */
     this.getCustomFrequency = (notes, customID) => {
+        const _stripCents = n => (typeof n === "string" ? n.replace(/\(.*\)/, "") : n);
         const __getCustomFrequency = (oneNote, startingPitch) => {
             const parsed = parseNoteString(oneNote);
             const octave = parsed[1];
@@ -833,12 +1055,14 @@ function Synth() {
             );
             if (typeof oneNote !== "number") {
                 const thisTemperament = getTemperament(customID);
+                const target = _stripCents(oneNote);
                 for (const pitchNumber in thisTemperament) {
                     if (pitchNumber !== "pitchNumber") {
+                        const n3 = thisTemperament[pitchNumber][3];
+                        const n1 = thisTemperament[pitchNumber][1];
                         if (
-                            (isCustomTemperament(customID) &&
-                                oneNote === thisTemperament[pitchNumber][3]) ||
-                            oneNote === thisTemperament[pitchNumber][1]
+                            (isCustomTemperament(customID) && target === _stripCents(n3)) ||
+                            target === _stripCents(n1)
                         ) {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
@@ -889,23 +1113,9 @@ function Synth() {
      * @function
      */
     this.loadSamples = () => {
-        if (this.samples === null) {
-            this.samples = { voice: {}, drum: {} };
-            // Pre-populate with null to indicate they exist as valid instruments but are not loaded
-            for (const type in SAMPLE_INFO) {
-                for (const name in SAMPLE_INFO[type]) {
-                    this.samples[type][name] = null;
-                }
-            }
-            this.samples.voice["empty"] = () => null;
-        }
+        this.sampleLoader.initStructures();
     };
 
-    /**
-     * Loads samples into the Synth instance.
-     * @function
-     * @memberof Synth
-     */
     /**
      * Loads a specific sample into the Synth instance asynchronously.
      * @function
@@ -914,59 +1124,7 @@ function Synth() {
      * @returns {Promise<void>} - A promise that resolves when the sample is loaded.
      */
     this._loadSample = sampleName => {
-        return new Promise((resolve, reject) => {
-            let found = false;
-            let sampleType = null;
-            let sampleInfo = null;
-
-            // Find the sample info
-            for (const type in SAMPLE_INFO) {
-                if (SAMPLE_INFO[type][sampleName]) {
-                    sampleType = type;
-                    sampleInfo = SAMPLE_INFO[type][sampleName];
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                // If not found in SAMPLE_INFO, it might be a built-in or custom synth, so we resolve immediately
-                resolve();
-                return;
-            }
-
-            if (this.samples[sampleType][sampleName] !== null) {
-                // Already loaded
-                resolve();
-                return;
-            }
-
-            // Load the sample module using require
-            requirejs(
-                [sampleInfo.path],
-                () => {
-                    try {
-                        const sampleData = window[sampleInfo.global];
-                        if (sampleData) {
-                            this.samples[sampleType][sampleName] = sampleData();
-                            resolve();
-                        } else {
-                            console.error(
-                                `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
-                            );
-                            reject(`Sample global not found: ${sampleName}`);
-                        }
-                    } catch (e) {
-                        console.error(`Error processing sample ${sampleName}:`, e);
-                        reject(e);
-                    }
-                },
-                err => {
-                    console.error(`Failed to load sample module for ${sampleName}:`, err);
-                    reject(err);
-                }
-            );
-        });
+        return this.sampleLoader.loadSampleAsync(sampleName);
     };
 
     /**
@@ -978,75 +1136,7 @@ function Synth() {
      * @returns {Promise<void>} - A promise that resolves when all samples are preloaded.
      */
     this.preloadProjectSamples = async blockList => {
-        if (!blockList || !Array.isArray(blockList)) {
-            return;
-        }
-
-        const instrumentsToLoad = new Set();
-
-        // Known instrument block names
-        const instrumentBlockNames = ["settimbre", "setinstrument", "timbre", "instrument"];
-
-        // Scan blocks for instrument references
-        for (const block of blockList) {
-            if (!Array.isArray(block) || block.length < 2) continue;
-
-            const blockName = block[1];
-
-            // Check if this is an instrument-setting block
-            if (instrumentBlockNames.includes(blockName)) {
-                // The instrument name is usually in a connected block
-                // Check the connections for potential instrument names
-                const connections = block[4];
-                if (Array.isArray(connections)) {
-                    for (const connIdx of connections) {
-                        if (connIdx !== null && blockList[connIdx]) {
-                            const connBlock = blockList[connIdx];
-                            // Check if it's a text/value block with an instrument name
-                            if (Array.isArray(connBlock) && connBlock.length > 1) {
-                                const value = connBlock[1];
-                                // Check if this value is a known instrument
-                                if (typeof value === "string") {
-                                    // Check voice samples
-                                    if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[value]) {
-                                        instrumentsToLoad.add(value);
-                                    }
-                                    // Check drum samples
-                                    if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[value]) {
-                                        instrumentsToLoad.add(value);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Also check if the block name itself is an instrument
-            if (typeof blockName === "string") {
-                if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[blockName]) {
-                    instrumentsToLoad.add(blockName);
-                }
-                if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[blockName]) {
-                    instrumentsToLoad.add(blockName);
-                }
-            }
-        }
-
-        // Preload all found instruments in parallel
-        if (instrumentsToLoad.size > 0) {
-            console.debug(
-                `Preloading ${instrumentsToLoad.size} instruments:`,
-                Array.from(instrumentsToLoad)
-            );
-            const loadPromises = Array.from(instrumentsToLoad).map(name =>
-                this._loadSample(name).catch(err => {
-                    console.warn(`Failed to preload sample ${name}:`, err);
-                })
-            );
-            await Promise.all(loadPromises);
-            console.debug("Project samples preloaded successfully");
-        }
+        return await this.sampleLoader.preloadProject(blockList);
     };
 
     /**
@@ -1352,10 +1442,16 @@ function Synth() {
      */
     this.createDefaultSynth = turtle => {
         console.debug("create default poly/default/custom synth for turtle " + turtle);
-        const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
-        instruments[turtle]["electronic synth"] = default_synth;
+        // "electronic synth" and "custom" must be separate instances. "custom" is a
+        // member of BUILTIN_SYNTHS, so ___createSynth disposes whatever sits under
+        // that key before rebuilding it. Sharing one node meant that rebuilding
+        // "custom" also destroyed the synth "electronic synth" was still pointing at.
+        instruments[turtle]["electronic synth"] = new Tone.PolySynth(
+            Tone.AMSynth,
+            POLYCOUNT
+        ).toDestination();
         instrumentsSource["electronic synth"] = [0, "electronic synth"];
-        instruments[turtle]["custom"] = default_synth;
+        instruments[turtle]["custom"] = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
         instrumentsSource["custom"] = [0, "custom"];
     };
 
@@ -1429,20 +1525,20 @@ function Synth() {
         const solfegeDict = { do: 0, re: 2, mi: 4, fa: 5, sol: 7, la: 9, ti: 11 };
         const letterDict = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
-        let attr = getArticulation(solfege);
-        if (attr === SHARP) {
+        const note = stripMicrotonalPrefix(solfege);
+        const articulation = getArticulation(note);
+        let attr = 0;
+        if (articulation === SHARP) {
             attr = 1;
-        } else if (attr === FLAT) {
+        } else if (articulation === FLAT) {
             attr = -1;
-        } else if (attr === DOUBLESHARP) {
+        } else if (articulation === DOUBLESHARP) {
             attr = 2;
-        } else if (attr === DOUBLEFLAT) {
+        } else if (articulation === DOUBLEFLAT) {
             attr = -2;
-        } else {
-            attr = 0;
         }
 
-        const fragment = solfege.replace(attr, "");
+        const fragment = articulation ? note.replace(articulation, "") : note;
         let chromaticNumber = 0;
         if (fragment in solfegeDict) {
             chromaticNumber = solfegeDict[fragment];
@@ -1734,7 +1830,6 @@ function Synth() {
      * @returns {Tone.Instrument|null} - The loaded synth or null if not loaded.
      */
     this.loadSynth = async (turtle, sourceName) => {
-        /* eslint-disable */
         sourceName = this.resolveInstrumentName(sourceName);
         if (sourceName.substring(0, 13) === "customsample_") {
             console.debug("loading custom " + sourceName);
@@ -1791,25 +1886,22 @@ function Synth() {
             return false;
         };
 
+        // Normalize Unicode accidentals to ASCII so Tone.js can parse the note names.
+        if (typeof notes === "string") {
+            notes = normalizeNoteAccidentals(notes);
+        } else if (Array.isArray(notes)) {
+            notes = notes.map(n => (typeof n === "string" ? normalizeNoteAccidentals(n) : n));
+        }
+
         if (needsFreqConversion()) {
-            if (typeof notes === "number") {
-                notes = notes;
-            } else {
+            if (typeof notes !== "number") {
                 const notes1 = notes;
                 notes = this._getFrequency(notes, this.changeInTemperament);
                 if (notes === undefined) {
-                    if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
-                        notes =
-                            notes1.substring(0, 1) +
-                            "" +
-                            "bb" +
-                            notes1.substring(notes1.length - 1, notes1.length);
+                    if (notes1.substring(1, notes1.length - 1) === DOUBLEFLAT) {
+                        notes = notes1.substring(0, 1) + "bb" + notes1.substring(notes1.length - 1);
                     } else if (notes1.substring(1, notes1.length - 1) === DOUBLESHARP) {
-                        notes =
-                            notes1.substring(0, 1) +
-                            "" +
-                            "x" +
-                            notes1.substring(notes1.length - 1, notes1.length);
+                        notes = notes1.substring(0, 1) + "x" + notes1.substring(notes1.length - 1);
                     } else {
                         notes = notes1;
                     }
@@ -1819,9 +1911,7 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            if (notes.search("[+]") !== -1 || notes.search("[-]") !== -1) {
-                notes = this.getCustomFrequency(notes, this.inTemperament);
-            }
+            notes = this.getCustomFrequency(notes, this.inTemperament);
             if (notes === undefined || notes === "undefined") {
                 notes = notes1;
             }
@@ -1859,7 +1949,8 @@ function Synth() {
                             paramsEffects.doTremolo ||
                             paramsEffects.doPhaser ||
                             paramsEffects.doChorus ||
-                            paramsEffects.doNeighbor));
+                            paramsEffects.doNeighbor ||
+                            (paramsEffects.doPortamento && setNote)));
 
                 if (!_needsGraphRewire) {
                     // Apply in-place property mutations then take the fast path.
@@ -1939,6 +2030,7 @@ function Synth() {
                     if (paramsEffects.doDistortion) {
                         distortion = new Tone.Distortion(paramsEffects.distortionAmount);
                         chainNodes.push(distortion);
+                        effectsToDispose.push(distortion);
                     }
 
                     if (paramsEffects.doTremolo) {
@@ -2027,7 +2119,7 @@ function Synth() {
 
                 synth.chain(...chainNodes, Tone.Destination);
 
-                if (!paramsEffects.doNeighbor) {
+                if (!paramsEffects || !paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
                         if (this._instrumentEpoch !== epoch) return;
                         if (synth.oscillator !== undefined) {
@@ -2049,52 +2141,58 @@ function Synth() {
                     }
                 }
 
+                const timerManager =
+                    this._timerManager ||
+                    (this.activity && this.activity.logo && this.activity.logo._timerManager);
+                const cleanupFn = () => {
+                    try {
+                        // Dispose of effects
+                        effectsToDispose.forEach(effect => {
+                            if (effect && typeof effect.dispose === "function") {
+                                effect.dispose();
+                            }
+                        });
+
+                        // Dispose of filters
+                        if (temp_filters.length > 0) {
+                            temp_filters.forEach(filter => {
+                                if (filter && typeof filter.dispose === "function") {
+                                    filter.dispose();
+                                }
+                            });
+                        }
+
+                        // Re-establish the dry path only when no other effects chain
+                        // is still active on this synth; otherwise the direct
+                        // connection would bypass the in-flight chain.
+                        const remaining = (_effectsInFlight.get(synth) || 1) - 1;
+                        _effectsInFlight.set(synth, remaining);
+                        if (remaining === 0 && synth && typeof synth.toDestination === "function") {
+                            try {
+                                synth.disconnect();
+                            } catch (_) {
+                                // Already disconnected — safe to ignore.
+                            }
+                            synth.toDestination();
+                        }
+                    } catch (e) {
+                        console.debug("Error disposing effects:", e);
+                    }
+                };
+
                 // Schedule cleanup after the note duration.
                 // A 500 ms safety buffer is added beyond the note duration to prevent
                 // premature disposal caused by audio-clock drift or scheduler jitter,
                 // which would otherwise produce crackling artefacts in long sessions.
-                setTimeout(
-                    () => {
-                        try {
-                            // Dispose of effects
-                            effectsToDispose.forEach(effect => {
-                                if (effect && typeof effect.dispose === "function") {
-                                    effect.dispose();
-                                }
-                            });
-
-                            // Dispose of filters
-                            if (temp_filters.length > 0) {
-                                temp_filters.forEach(filter => {
-                                    if (filter && typeof filter.dispose === "function") {
-                                        filter.dispose();
-                                    }
-                                });
-                            }
-
-                            // Re-establish the dry path only when no other effects chain
-                            // is still active on this synth; otherwise the direct
-                            // connection would bypass the in-flight chain.
-                            const remaining = (_effectsInFlight.get(synth) || 1) - 1;
-                            _effectsInFlight.set(synth, remaining);
-                            if (
-                                remaining === 0 &&
-                                synth &&
-                                typeof synth.toDestination === "function"
-                            ) {
-                                try {
-                                    synth.disconnect();
-                                } catch (_) {
-                                    // Already disconnected — safe to ignore.
-                                }
-                                synth.toDestination();
-                            }
-                        } catch (e) {
-                            console.debug("Error disposing effects:", e);
-                        }
-                    },
-                    beatValue * 1000 + 500
-                );
+                if (timerManager && typeof timerManager.setGuardedTimeout === "function") {
+                    timerManager.setGuardedTimeout(cleanupFn, beatValue * 1000 + 500, () =>
+                        Boolean(
+                            this.activity && this.activity.logo && this.activity.logo.stopTurtle
+                        )
+                    );
+                } else {
+                    setTimeout(cleanupFn, beatValue * 1000 + 500);
+                }
             }
         } catch (e) {
             console.error("Error in _performNotes:", e);
@@ -2255,10 +2353,14 @@ function Synth() {
                 future = 0.0;
             }
 
-            // Ensure synth is properly initialized
-            if (!tempSynth) {
-                console.warn("Synth not initialized, creating default synth");
-                this.createDefaultSynth(turtle);
+            // Ensure the requested instrument is properly initialized. It may be
+            // missing because all instruments are disposed on Stop, so reload it
+            // on demand instead of silently playing (or skipping) the note.
+            if (!tempSynth || !(instrumentName in instruments[turtle])) {
+                console.debug("Synth not initialized, loading " + instrumentName);
+                if (!instruments[turtle]["electronic synth"]) {
+                    this.createDefaultSynth(turtle);
+                }
                 await this.loadSynth(turtle, instrumentName);
 
                 // Check if instruments were disposed while we were waiting
@@ -2267,6 +2369,30 @@ function Synth() {
                 }
 
                 tempSynth = instruments[turtle][instrumentName];
+                flag = instrumentsSource[instrumentName] ? instrumentsSource[instrumentName][0] : 0;
+
+                // Wait for the sample buffer to finish decoding so the reloaded
+                // instrument is audible on the first trigger after a Stop.
+                // Tone.js exposes buffer readiness as a boolean `loaded` flag (it
+                // is not a promise), so wait on the global download queue, like
+                // _performNotes() does, when the sample is not ready yet.
+                if (tempSynth && typeof tempSynth.loaded === "boolean" && !tempSynth.loaded) {
+                    try {
+                        await Tone.ToneAudioBuffer.loaded();
+                    } catch (e) {
+                        console.debug("Error waiting for sample to load:", e);
+                    }
+                }
+
+                // Apply any cent adjustment to the freshly loaded sample
+                if (flag === 2 && tempSynth && tempSynth.playbackRate) {
+                    const sampleName = instrumentsSource[instrumentName][1];
+                    if (this.sampleCentAdjustments && this.sampleCentAdjustments[sampleName]) {
+                        const centAdjustment = this.sampleCentAdjustments[sampleName];
+                        const playbackRate = Math.pow(2, centAdjustment / 1200);
+                        tempSynth.playbackRate.value = playbackRate;
+                    }
+                }
             }
 
             // Final validation: ensure synth still exists and is valid
@@ -2360,12 +2486,16 @@ function Synth() {
 
     this.stopSound = (turtle, instrumentName, note) => {
         if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
+        // A disposed node is still truthy and its key is still present, so the guard
+        // above lets it through. Calling into Tone at that point throws.
+        if (instruments[turtle][instrumentName].disposed) return;
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
                 instruments[turtle][instrumentName].stop();
                 break;
             default:
+                // eslint-disable-next-line eqeqeq -- loose on purpose, catches null and undefined
                 if (note == undefined) {
                     instruments[turtle][instrumentName].triggerRelease();
                 } else {
@@ -2382,6 +2512,7 @@ function Synth() {
         const flag = instrumentsSource[instrumentName][0];
         const now = Tone.now();
         const loopA = new Tone.Loop(time => {
+            // eslint-disable-next-line eqeqeq -- flag comes from instrumentsSource and may be "1"
             if (flag == 1) {
                 this.setVolume(turtle, instrumentName, velocity * 100);
                 instruments[turtle][instrumentName].start();
@@ -2400,7 +2531,7 @@ function Synth() {
 
     this.rampTo = (turtle, instrumentName, oldVol, volume, rampTime) => {
         // guard invalid UI/programmatic input (audio boundary safety)
-        volume = Math.max(0, Math.min(volume, 100));
+        volume = clampNumber(volume, 0, 100);
         if (
             percussionInstruments.includes(instrumentName) ||
             stringInstruments.includes(instrumentName)
@@ -2471,7 +2602,7 @@ function Synth() {
         // Resolve instrumentName to internal key
         instrumentName = this.resolveInstrumentName(instrumentName);
         // guard invalid UI/programmatic input (audio boundary safety)
-        volume = Math.max(0, Math.min(volume, 100));
+        volume = clampNumber(volume, 0, 100);
         // We pass in volume as a number from 0 to 100.
         // As per #1697, we adjust the volume of some instruments.
         let nv;
@@ -2522,7 +2653,7 @@ function Synth() {
             }, 200);
         } else {
             // guard invalid UI/programmatic input (audio boundary safety)
-            volume = Math.max(0, Math.min(volume, 100));
+            volume = clampNumber(volume, 0, 100);
             const gain = Math.max(0.0001, volume / 100);
             const db = Tone.gainToDb(gain);
             Tone.Destination.volume.rampTo(db, 0.01);
@@ -2536,20 +2667,33 @@ function Synth() {
      */
     this.startRecording = async () => {
         await Tone.start();
+
+        if (this.mic) {
+            this.mic.close();
+            if (typeof this.mic.dispose === "function") {
+                this.mic.dispose();
+            }
+            this.mic = null;
+        }
+        if (this.recorder) {
+            if (typeof this.recorder.dispose === "function") {
+                this.recorder.dispose();
+            }
+            this.recorder = null;
+        }
+
         this.mic = new Tone.UserMedia();
         this.recorder = new Tone.Recorder();
-        await this.mic
-            .open()
-            .then(() => {
-                this.mic.connect(this.recorder);
-                this.recorder.start();
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        await this.mic.open();
+        this.mic.connect(this.recorder);
+        this.recorder.start();
     };
 
     const _disposeRecordingPlayer = () => {
+        if (this._recordingPlayTimeout) {
+            clearTimeout(this._recordingPlayTimeout);
+            this._recordingPlayTimeout = null;
+        }
         if (this.player) {
             try {
                 if (typeof this.player.stop === "function") {
@@ -2589,10 +2733,21 @@ function Synth() {
      * @memberof Synth
      */
     this.stopRecording = async () => {
+        if (!this.recorder || !this.mic) {
+            return null;
+        }
         _disposeRecordingPlayer();
         _revokeRecordingURL();
         this.recording = await this.recorder.stop();
         this.mic.close();
+        if (typeof this.mic.dispose === "function") {
+            this.mic.dispose();
+        }
+        this.mic = null;
+        if (typeof this.recorder.dispose === "function") {
+            this.recorder.dispose();
+        }
+        this.recorder = null;
         this.audioURL = URL.createObjectURL(this.recording);
         return this.audioURL;
     };
@@ -2602,11 +2757,45 @@ function Synth() {
      * @function
      * @memberof Synth
      */
-    this.playRecording = async () => {
+    this.playRecording = async onEnded => {
         _disposeRecordingPlayer();
+        if (!this.audioURL) {
+            if (typeof onEnded === "function") {
+                onEnded();
+            }
+            return;
+        }
+        await Tone.start();
+        if (
+            Tone.context &&
+            Tone.context.state !== "running" &&
+            typeof Tone.context.resume === "function"
+        ) {
+            await Tone.context.resume();
+        }
         this.player = new Tone.Player().toDestination();
+        let endedCalled = false;
+        const handleEnded = () => {
+            if (endedCalled) return;
+            endedCalled = true;
+            if (this._recordingPlayTimeout) {
+                clearTimeout(this._recordingPlayTimeout);
+                this._recordingPlayTimeout = null;
+            }
+            if (typeof onEnded === "function") {
+                onEnded();
+            }
+        };
+        this.player.onstop = handleEnded;
+        if ("onended" in this.player) {
+            this.player.onended = handleEnded;
+        }
         await this.player.load(this.audioURL);
         this.player.start();
+        if (this.player.buffer && this.player.buffer.duration) {
+            const durationMs = Math.ceil(this.player.buffer.duration * 1000) + 100;
+            this._recordingPlayTimeout = setTimeout(handleEnded, durationMs);
+        }
     };
 
     /**
@@ -2624,6 +2813,10 @@ function Synth() {
      * @memberof Synth
      */
     this.LiveWaveForm = () => {
+        if (this.analyser) {
+            this.mic.disconnect(this.analyser);
+            this.analyser.dispose();
+        }
         this.analyser = new Tone.Analyser("waveform", 8192);
         this.mic.connect(this.analyser);
     };
@@ -2640,9 +2833,10 @@ function Synth() {
 
     /**
      * Starts the tuner by initializing microphone input
+     * @param {string} [initialTargetPitch=null] - The initial pitch to use for target pitch mode (e.g. "C4")
      * @returns {Promise<void>}
      */
-    this.startTuner = async () => {
+    this.startTuner = async (initialTargetPitch = null) => {
         const getSafeActivity = () => {
             try {
                 if (
@@ -2814,6 +3008,462 @@ function Synth() {
         let tunerMode = "chromatic"; // Add mode state
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
+        if (initialTargetPitch) {
+            try {
+                const freq = computeTargetPitchFrequency(initialTargetPitch);
+                if (!isNaN(freq) && freq > 0) {
+                    targetPitch = { note: initialTargetPitch, frequency: freq };
+                    tunerMode = "target"; // Start in target mode if an initial target is provided
+                }
+            } catch (error) {
+                console.warn("Invalid initial target pitch:", initialTargetPitch);
+            }
+        }
+
+        const tunerContainer = document.getElementById("tunerContainer");
+        if (tunerContainer && !document.getElementById("noteDisplayContainer")) {
+            // Initialize display elements if they don't exist
+            let noteDisplayContainer = document.getElementById("noteDisplayContainer");
+
+            if (!noteDisplayContainer && tunerContainer) {
+                // Create container
+                noteDisplayContainer = document.createElement("div");
+                noteDisplayContainer.id = "noteDisplayContainer";
+                noteDisplayContainer.style.position = "absolute";
+                noteDisplayContainer.style.top = "62%";
+                noteDisplayContainer.style.left = "50%";
+                noteDisplayContainer.style.transform = "translate(-50%, -50%)";
+                noteDisplayContainer.style.textAlign = "center";
+                noteDisplayContainer.style.fontFamily = "Arial, sans-serif";
+                noteDisplayContainer.style.zIndex = "1000";
+
+                // Create target note selector (only for target mode)
+                const targetNoteSelector = document.createElement("div");
+                targetNoteSelector.id = "targetNoteSelector";
+                targetNoteSelector.style.position = "absolute";
+                targetNoteSelector.style.top = "-40px"; // Moved down from -60px
+                targetNoteSelector.style.left = "50%";
+                targetNoteSelector.style.transform = "translateX(-50%)";
+                targetNoteSelector.style.color = "#666666";
+                targetNoteSelector.style.fontSize = "24px"; // Increased from 16px
+                targetNoteSelector.style.cursor = "pointer";
+                targetNoteSelector.style.transition = "opacity 0.2s ease";
+                targetNoteSelector.style.opacity = "0.7";
+                targetNoteSelector.textContent = targetPitch.note;
+
+                // Hover effects
+                targetNoteSelector.addEventListener("mouseenter", () => {
+                    targetNoteSelector.style.opacity = "1";
+                });
+
+                targetNoteSelector.addEventListener("mouseleave", () => {
+                    targetNoteSelector.style.opacity = "0.7";
+                });
+
+                // Create the wheel div if it doesn't exist
+                let wheelDiv = docById("wheelDiv");
+                if (!wheelDiv) {
+                    wheelDiv = document.createElement("div");
+                    wheelDiv.id = "wheelDiv";
+                    wheelDiv.style.position = "absolute";
+                    wheelDiv.style.display = "none";
+                    wheelDiv.style.zIndex = "1500";
+                    document.body.appendChild(wheelDiv);
+                }
+
+                // Click handler to open pie menu
+                targetNoteSelector.addEventListener("click", () => {
+                    // Only show in target mode
+                    if (tunerMode === "target") {
+                        // Setup parameters for piemenuPitches
+                        const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
+                        const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
+                        const SOLFATTRS = ["𝄪", "♯", "♮", "♭", "𝄫"];
+
+                        // Get current note, accidental and octave from targetPitch
+                        let selectedNote = "A";
+                        let selectedAttr = "♮";
+                        let selectedOctave = 4;
+
+                        if (targetPitch && targetPitch.note) {
+                            const noteMatch = targetPitch.note.match(
+                                /^([a-zA-Z])([♯♭𝄪𝄫♮#b]*)(-?\d+)?$/iu
+                            );
+                            if (noteMatch) {
+                                selectedNote = noteMatch[1].toUpperCase();
+                                selectedAttr = noteMatch[2] || "♮";
+                                if (selectedAttr === "#") selectedAttr = "♯";
+                                else if (selectedAttr === "b") selectedAttr = "♭";
+                                if (noteMatch[3]) {
+                                    selectedOctave = parseInt(noteMatch[3], 10);
+                                }
+                            }
+                        }
+
+                        // Convert letter note to solfege for initial selection
+                        let selectedSolfege = SOLFNOTES[NOTENOTES.indexOf(selectedNote)];
+                        if (!selectedSolfege) selectedSolfege = "la"; // fallback
+
+                        try {
+                            // Prepare a non-mutating activity proxy with a local logo fallback
+                            const defaultLogo = {
+                                synth: {
+                                    createDefaultSynth: () => {},
+                                    loadSynth: () => {},
+                                    setMasterVolume: () => {},
+                                    trigger: () => {},
+                                    inTemperament: "equal"
+                                },
+                                errorMsg: msg => {
+                                    console.warn(msg);
+                                }
+                            };
+
+                            const logo = activity.logo || defaultLogo;
+                            const activityProxy = Object.create(activity);
+                            activityProxy.logo = logo;
+
+                            const tempBlock = {
+                                activity: activityProxy,
+                                blocks: {
+                                    blockList: [
+                                        {
+                                            name: "pitch",
+                                            connections: [null, null],
+                                            value: targetPitch.note,
+                                            container: {
+                                                x: targetNoteSelector.offsetLeft,
+                                                y: targetNoteSelector.offsetTop
+                                            }
+                                        }
+                                    ],
+                                    stageClick: false,
+                                    setPitchOctave: () => {},
+                                    findPitchOctave: () => selectedOctave,
+                                    turtles: {
+                                        _canvas: {
+                                            width: window.innerWidth,
+                                            height: window.innerHeight
+                                        },
+                                        ithTurtle: i => ({
+                                            singer: {
+                                                instrumentNames: ["default"]
+                                            }
+                                        })
+                                    }
+                                },
+                                connections: [0], // Connect to the pitch block
+                                value: targetPitch.note,
+                                text: { text: targetPitch.note },
+                                updateCache: () => {},
+                                _exitWheel: null,
+                                _pitchWheel: null,
+                                _accidentalsWheel: null,
+                                _octavesWheel: null,
+                                piemenuOKtoLaunch: () => true,
+                                _piemenuExitTime: 0,
+                                container: {
+                                    x: targetNoteSelector.offsetLeft,
+                                    y: targetNoteSelector.offsetTop,
+                                    setChildIndex: () => {}
+                                },
+                                prevAccidental: "♮",
+                                name: "pitch", // This is needed for pitch preview
+                                _triggerLock: false // This is needed for pitch preview
+                            };
+
+                            // Add key signature environment (on proxy, not real activity)
+                            activityProxy.KeySignatureEnv = ["C", "major", false];
+
+                            // Make sure wheelDiv is properly positioned and visible
+                            const wheelDiv = docById("wheelDiv");
+                            if (wheelDiv) {
+                                const rect = targetNoteSelector.getBoundingClientRect();
+                                wheelDiv.style.position = "absolute";
+                                wheelDiv.style.left = rect.left - 250 + "px";
+                                wheelDiv.style.top = rect.top - 250 + "px";
+                                wheelDiv.style.width = "600px";
+                                wheelDiv.style.height = "600px";
+                                wheelDiv.style.zIndex = "1500";
+                                wheelDiv.style.backgroundColor = "transparent";
+                                wheelDiv.style.display = "block";
+                            }
+
+                            // Call piemenuPitches with solfege labels but note values
+                            piemenuPitches(
+                                tempBlock,
+                                SOLFNOTES,
+                                NOTENOTES,
+                                SOLFATTRS,
+                                selectedSolfege,
+                                selectedAttr
+                            );
+
+                            // Create a state object to track selections
+                            const selectionState = {
+                                note: selectedNote,
+                                accidental: selectedAttr,
+                                octave: selectedOctave
+                            };
+
+                            // Update target pitch when a note is selected
+                            if (tempBlock._pitchWheel && tempBlock._pitchWheel.navItems) {
+                                // Add navigation function to each note in the pitch wheel
+                                for (let i = 0; i < tempBlock._pitchWheel.navItems.length; i++) {
+                                    tempBlock._pitchWheel.navItems[i].navigateFunction = () => {
+                                        // Get the selected note
+                                        const solfegeNote = tempBlock._pitchWheel.navItems[i].title;
+                                        if (solfegeNote && SOLFNOTES.includes(solfegeNote)) {
+                                            const noteIndex = SOLFNOTES.indexOf(solfegeNote);
+                                            selectionState.note = NOTENOTES[noteIndex];
+                                            updateTargetNote();
+                                        }
+                                    };
+                                }
+                            }
+
+                            // Add handlers for accidentals wheel
+                            if (
+                                tempBlock._accidentalsWheel &&
+                                tempBlock._accidentalsWheel.navItems
+                            ) {
+                                for (
+                                    let i = 0;
+                                    i < tempBlock._accidentalsWheel.navItems.length;
+                                    i++
+                                ) {
+                                    tempBlock._accidentalsWheel.navItems[i].navigateFunction =
+                                        () => {
+                                            selectionState.accidental =
+                                                tempBlock._accidentalsWheel.navItems[i].title;
+                                            updateTargetNote();
+                                        };
+                                }
+                            }
+
+                            // Add handlers for octaves wheel
+                            if (tempBlock._octavesWheel && tempBlock._octavesWheel.navItems) {
+                                for (let i = 0; i < tempBlock._octavesWheel.navItems.length; i++) {
+                                    tempBlock._octavesWheel.navItems[i].navigateFunction = () => {
+                                        const octave = tempBlock._octavesWheel.navItems[i].title;
+                                        if (octave && !isNaN(octave)) {
+                                            selectionState.octave = parseInt(octave, 10);
+                                            updateTargetNote();
+                                        }
+                                    };
+                                }
+                            }
+
+                            // Function to update the target note display
+                            const updateTargetNote = () => {
+                                if (!selectionState.note) return;
+
+                                // Convert accidental symbols to notation
+                                let noteWithAccidental = selectionState.note;
+                                if (selectionState.accidental === "♯") noteWithAccidental += "#";
+                                else if (selectionState.accidental === "♭")
+                                    noteWithAccidental += "b";
+                                else if (selectionState.accidental === "𝄪")
+                                    noteWithAccidental += "##";
+                                else if (selectionState.accidental === "𝄫")
+                                    noteWithAccidental += "bb";
+
+                                const noteWithOctave = noteWithAccidental + selectionState.octave;
+
+                                // Update target pitch
+                                targetPitch.note = noteWithOctave;
+
+                                // Calculate the frequency for the target pitch
+                                try {
+                                    const freq = computeTargetPitchFrequency(noteWithOctave);
+                                    if (!isNaN(freq) && freq > 0) {
+                                        targetPitch.frequency = freq;
+                                    } else {
+                                        console.error("Invalid frequency calculated:", freq);
+                                        targetPitch.frequency = 440; // Default to A4 if calculation fails
+                                    }
+                                } catch (error) {
+                                    console.error("Error calculating frequency:", error);
+                                    targetPitch.frequency = 440; // Default to A4 if calculation fails
+                                }
+
+                                // Update display
+                                targetNoteSelector.textContent = noteWithOctave;
+                            };
+
+                            // Update exit wheel handler
+                            if (tempBlock._exitWheel && tempBlock._exitWheel.navItems) {
+                                tempBlock._exitWheel.navItems[0].navigateFunction = () => {
+                                    // Clean up the wheels
+                                    if (tempBlock._pitchWheel) {
+                                        tempBlock._pitchWheel.removeWheel();
+                                    }
+                                    if (tempBlock._accidentalsWheel) {
+                                        tempBlock._accidentalsWheel.removeWheel();
+                                    }
+                                    if (tempBlock._octavesWheel) {
+                                        tempBlock._octavesWheel.removeWheel();
+                                    }
+                                    if (tempBlock._exitWheel) {
+                                        tempBlock._exitWheel.removeWheel();
+                                    }
+
+                                    // Hide the wheel div
+                                    wheelDiv.style.display = "none";
+                                };
+                            }
+                        } catch (error) {
+                            console.error("Error opening pie menu:", error);
+                        }
+                    }
+                });
+
+                noteDisplayContainer.appendChild(targetNoteSelector);
+
+                // Create mode toggle button
+                const modeToggle = document.createElement("div");
+                modeToggle.id = "modeToggle";
+                modeToggle.style.position = "absolute";
+                modeToggle.style.top = "30px";
+                modeToggle.style.left = "50%";
+                modeToggle.style.transform = "translateX(-50%)";
+                modeToggle.style.display = "flex";
+                modeToggle.style.backgroundColor = "#FFFFFF";
+                modeToggle.style.borderRadius = "25px"; // Increased pill shape radius
+                modeToggle.style.padding = "3px"; // Slightly more padding
+                modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+                modeToggle.style.width = "120px"; // Increased width
+                modeToggle.style.height = "44px"; // Increased height
+                modeToggle.style.cursor = "pointer"; // Added cursor pointer
+
+                // Create chromatic mode button
+                const chromaticButton = document.createElement("div");
+                chromaticButton.setAttribute("role", "button");
+                chromaticButton.setAttribute("tabindex", "0");
+                chromaticButton.style.flex = "1";
+                chromaticButton.style.display = "flex";
+                chromaticButton.style.alignItems = "center";
+                chromaticButton.style.justifyContent = "center";
+                chromaticButton.style.borderRadius = "22px"; // Increased radius
+                chromaticButton.style.cursor = "pointer";
+                chromaticButton.style.transition = "all 0.2s ease"; // Faster transition
+                chromaticButton.style.userSelect = "none"; // Prevent text selection
+                chromaticButton.title = _("Chromatic");
+
+                // Create target pitch mode button
+                const targetPitchButton = document.createElement("div");
+                targetPitchButton.setAttribute("role", "button");
+                targetPitchButton.setAttribute("tabindex", "0");
+                targetPitchButton.style.flex = "1";
+                targetPitchButton.style.display = "flex";
+                targetPitchButton.style.alignItems = "center";
+                targetPitchButton.style.justifyContent = "center";
+                targetPitchButton.style.borderRadius = "22px"; // Increased radius
+                targetPitchButton.style.cursor = "pointer";
+                targetPitchButton.style.transition = "all 0.2s ease"; // Faster transition
+                targetPitchButton.style.userSelect = "none"; // Prevent text selection
+                targetPitchButton.title = _("Target pitch");
+
+                // Create icons
+                const chromaticIcon = document.createElement("img");
+                chromaticIcon.src = "header-icons/chromatic-mode.svg";
+                chromaticIcon.alt = _("Chromatic mode");
+                chromaticIcon.style.width = "32px"; // Increased icon size further
+                chromaticIcon.style.height = "32px";
+                chromaticIcon.style.filter = "brightness(0)"; // Make icon black
+                chromaticIcon.style.pointerEvents = "none"; // Prevent icon from interfering with clicks
+
+                const targetIcon = document.createElement("img");
+                targetIcon.src = "header-icons/target-pitch-mode.svg";
+                targetIcon.alt = _("Target pitch mode");
+                targetIcon.style.width = "32px"; // Increased icon size further
+                targetIcon.style.height = "32px";
+                targetIcon.style.filter = "brightness(0)"; // Make icon black
+                targetIcon.style.pointerEvents = "none"; // Prevent icon from interfering with clicks
+
+                // Function to update button styles
+                const updateButtonStyles = () => {
+                    if (tunerMode === "chromatic") {
+                        chromaticButton.style.backgroundColor = "#A6CEFF"; // Blue for active
+                        chromaticButton.setAttribute("aria-pressed", "true");
+                        targetPitchButton.style.backgroundColor = "#FFFFFF"; // White for inactive
+                        targetPitchButton.setAttribute("aria-pressed", "false");
+                    } else {
+                        chromaticButton.style.backgroundColor = "#FFFFFF"; // White for inactive
+                        chromaticButton.setAttribute("aria-pressed", "false");
+                        targetPitchButton.style.backgroundColor = "#A6CEFF"; // Blue for active
+                        targetPitchButton.setAttribute("aria-pressed", "true");
+                    }
+                };
+
+                // Add click handlers with debounce to prevent double clicks
+                let isClickable = true;
+                const handleClick = mode => {
+                    if (!isClickable) return;
+                    isClickable = false;
+                    tunerMode = mode;
+                    updateButtonStyles();
+                    setTimeout(() => {
+                        isClickable = true;
+                    }, 200); // Re-enable after 200ms
+                };
+
+                chromaticButton.onclick = () => handleClick("chromatic");
+                targetPitchButton.onclick = () => handleClick("target");
+
+                chromaticButton.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleClick("chromatic");
+                    }
+                };
+
+                targetPitchButton.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleClick("target");
+                    }
+                };
+
+                // Assemble the toggle
+                chromaticButton.appendChild(chromaticIcon);
+                targetPitchButton.appendChild(targetIcon);
+                modeToggle.appendChild(chromaticButton);
+                modeToggle.appendChild(targetPitchButton);
+
+                // Initial style update
+                updateButtonStyles();
+
+                tunerContainer.appendChild(modeToggle);
+
+                // Create note display
+                const noteText = document.createElement("div");
+                noteText.id = "noteText";
+                noteText.style.fontSize = "64px";
+                noteText.style.fontWeight = "bold";
+                noteText.style.marginBottom = "5px";
+
+                // Create cents deviation display
+                const centsText = document.createElement("div");
+                centsText.id = "centsText";
+                centsText.style.fontSize = "14px";
+                centsText.style.color = "#666666";
+                centsText.style.marginBottom = "5px";
+
+                // Create tune direction display
+                const tuneDirection = document.createElement("div");
+                tuneDirection.id = "tuneDirection";
+                tuneDirection.style.fontSize = "18px";
+                tuneDirection.style.color = "#FF4500";
+
+                // Append all elements
+                noteDisplayContainer.appendChild(noteText);
+                noteDisplayContainer.appendChild(centsText);
+                noteDisplayContainer.appendChild(tuneDirection);
+                tunerContainer.appendChild(noteDisplayContainer);
+            }
+        }
+
         const updatePitch = () => {
             if (!this._tunerActive) return;
 
@@ -2880,472 +3530,6 @@ function Synth() {
                         cents = 0;
                         this.displayText = "0 cents";
                     }
-                }
-
-                // Initialize display elements if they don't exist
-                let noteDisplayContainer = document.getElementById("noteDisplayContainer");
-
-                if (!noteDisplayContainer && tunerContainer) {
-                    // Create container
-                    noteDisplayContainer = document.createElement("div");
-                    noteDisplayContainer.id = "noteDisplayContainer";
-                    noteDisplayContainer.style.position = "absolute";
-                    noteDisplayContainer.style.top = "62%";
-                    noteDisplayContainer.style.left = "50%";
-                    noteDisplayContainer.style.transform = "translate(-50%, -50%)";
-                    noteDisplayContainer.style.textAlign = "center";
-                    noteDisplayContainer.style.fontFamily = "Arial, sans-serif";
-                    noteDisplayContainer.style.zIndex = "1000";
-
-                    // Create target note selector (only for target mode)
-                    const targetNoteSelector = document.createElement("div");
-                    targetNoteSelector.id = "targetNoteSelector";
-                    targetNoteSelector.style.position = "absolute";
-                    targetNoteSelector.style.top = "-40px"; // Moved down from -60px
-                    targetNoteSelector.style.left = "50%";
-                    targetNoteSelector.style.transform = "translateX(-50%)";
-                    targetNoteSelector.style.color = "#666666";
-                    targetNoteSelector.style.fontSize = "24px"; // Increased from 16px
-                    targetNoteSelector.style.cursor = "pointer";
-                    targetNoteSelector.style.transition = "opacity 0.2s ease";
-                    targetNoteSelector.style.opacity = "0.7";
-                    targetNoteSelector.textContent = targetPitch.note;
-
-                    // Hover effects
-                    targetNoteSelector.addEventListener("mouseenter", () => {
-                        targetNoteSelector.style.opacity = "1";
-                    });
-
-                    targetNoteSelector.addEventListener("mouseleave", () => {
-                        targetNoteSelector.style.opacity = "0.7";
-                    });
-
-                    // Create the wheel div if it doesn't exist
-                    let wheelDiv = docById("wheelDiv");
-                    if (!wheelDiv) {
-                        wheelDiv = document.createElement("div");
-                        wheelDiv.id = "wheelDiv";
-                        wheelDiv.style.position = "absolute";
-                        wheelDiv.style.display = "none";
-                        wheelDiv.style.zIndex = "1500";
-                        document.body.appendChild(wheelDiv);
-                    }
-
-                    // Click handler to open pie menu
-                    targetNoteSelector.addEventListener("click", () => {
-                        // Only show in target mode
-                        if (tunerMode === "target") {
-                            // Setup parameters for piemenuPitches
-                            const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
-                            const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
-                            const SOLFATTRS = ["𝄪", "♯", "♮", "♭", "𝄫"];
-
-                            // Get current note and accidental
-                            let selectedNote = targetPitch.note[0];
-                            let selectedAttr =
-                                targetPitch.note.length > 1 ? targetPitch.note.substring(1) : "♮";
-
-                            // Convert letter note to solfege for initial selection
-                            let selectedSolfege = SOLFNOTES[NOTENOTES.indexOf(selectedNote)];
-
-                            if (selectedAttr === "") {
-                                selectedAttr = "♮";
-                            }
-
-                            try {
-                                // Prepare a non-mutating activity proxy with a local logo fallback
-                                const defaultLogo = {
-                                    synth: {
-                                        createDefaultSynth: () => {},
-                                        loadSynth: () => {},
-                                        setMasterVolume: () => {},
-                                        trigger: () => {},
-                                        inTemperament: "equal"
-                                    },
-                                    errorMsg: msg => {
-                                        console.warn(msg);
-                                    }
-                                };
-
-                                const logo = activity.logo || defaultLogo;
-                                const activityProxy = Object.create(activity);
-                                activityProxy.logo = logo;
-
-                                const tempBlock = {
-                                    container: {
-                                        x: targetNoteSelector.offsetLeft,
-                                        y: targetNoteSelector.offsetTop
-                                    },
-                                    activity: activityProxy,
-                                    blocks: {
-                                        blockList: [
-                                            {
-                                                name: "pitch",
-                                                connections: [null, null],
-                                                value: targetPitch.note,
-                                                container: {
-                                                    x: targetNoteSelector.offsetLeft,
-                                                    y: targetNoteSelector.offsetTop
-                                                }
-                                            }
-                                        ],
-                                        stageClick: false,
-                                        setPitchOctave: () => {},
-                                        findPitchOctave: () => 4,
-                                        turtles: {
-                                            _canvas: {
-                                                width: window.innerWidth,
-                                                height: window.innerHeight
-                                            },
-                                            ithTurtle: i => ({
-                                                singer: {
-                                                    instrumentNames: ["default"]
-                                                }
-                                            })
-                                        }
-                                    },
-                                    connections: [0], // Connect to the pitch block
-                                    value: targetPitch.note,
-                                    text: { text: targetPitch.note },
-                                    updateCache: () => {},
-                                    _exitWheel: null,
-                                    _pitchWheel: null,
-                                    _accidentalsWheel: null,
-                                    _octavesWheel: null,
-                                    piemenuOKtoLaunch: () => true,
-                                    _piemenuExitTime: 0,
-                                    container: {
-                                        x: targetNoteSelector.offsetLeft,
-                                        y: targetNoteSelector.offsetTop,
-                                        setChildIndex: () => {}
-                                    },
-                                    prevAccidental: "♮",
-                                    name: "pitch", // This is needed for pitch preview
-                                    _triggerLock: false // This is needed for pitch preview
-                                };
-
-                                // Add key signature environment (on proxy, not real activity)
-                                activityProxy.KeySignatureEnv = ["C", "major", false];
-
-                                // Make sure wheelDiv is properly positioned and visible
-                                const wheelDiv = docById("wheelDiv");
-                                if (wheelDiv) {
-                                    const rect = targetNoteSelector.getBoundingClientRect();
-                                    wheelDiv.style.position = "absolute";
-                                    wheelDiv.style.left = rect.left - 250 + "px";
-                                    wheelDiv.style.top = rect.top - 250 + "px";
-                                    wheelDiv.style.width = "600px";
-                                    wheelDiv.style.height = "600px";
-                                    wheelDiv.style.zIndex = "1500";
-                                    wheelDiv.style.backgroundColor = "transparent";
-                                    wheelDiv.style.display = "block";
-                                }
-
-                                // Call piemenuPitches with solfege labels but note values
-                                piemenuPitches(
-                                    tempBlock,
-                                    SOLFNOTES,
-                                    NOTENOTES,
-                                    SOLFATTRS,
-                                    selectedSolfege,
-                                    selectedAttr
-                                );
-
-                                // Create a state object to track selections
-                                const selectionState = {
-                                    note: selectedNote,
-                                    accidental: selectedAttr,
-                                    octave: 4
-                                };
-
-                                // Update target pitch when a note is selected
-                                if (tempBlock._pitchWheel && tempBlock._pitchWheel.navItems) {
-                                    // Add navigation function to each note in the pitch wheel
-                                    for (
-                                        let i = 0;
-                                        i < tempBlock._pitchWheel.navItems.length;
-                                        i++
-                                    ) {
-                                        tempBlock._pitchWheel.navItems[i].navigateFunction = () => {
-                                            // Get the selected note
-                                            const solfegeNote =
-                                                tempBlock._pitchWheel.navItems[i].title;
-                                            if (solfegeNote && SOLFNOTES.includes(solfegeNote)) {
-                                                const noteIndex = SOLFNOTES.indexOf(solfegeNote);
-                                                selectionState.note = NOTENOTES[noteIndex];
-                                                updateTargetNote();
-                                            }
-                                        };
-                                    }
-                                }
-
-                                // Add handlers for accidentals wheel
-                                if (
-                                    tempBlock._accidentalsWheel &&
-                                    tempBlock._accidentalsWheel.navItems
-                                ) {
-                                    for (
-                                        let i = 0;
-                                        i < tempBlock._accidentalsWheel.navItems.length;
-                                        i++
-                                    ) {
-                                        tempBlock._accidentalsWheel.navItems[i].navigateFunction =
-                                            () => {
-                                                selectionState.accidental =
-                                                    tempBlock._accidentalsWheel.navItems[i].title;
-                                                updateTargetNote();
-                                            };
-                                    }
-                                }
-
-                                // Add handlers for octaves wheel
-                                if (tempBlock._octavesWheel && tempBlock._octavesWheel.navItems) {
-                                    for (
-                                        let i = 0;
-                                        i < tempBlock._octavesWheel.navItems.length;
-                                        i++
-                                    ) {
-                                        tempBlock._octavesWheel.navItems[i].navigateFunction =
-                                            () => {
-                                                const octave =
-                                                    tempBlock._octavesWheel.navItems[i].title;
-                                                if (octave && !isNaN(octave)) {
-                                                    selectionState.octave = parseInt(octave, 10);
-                                                    updateTargetNote();
-                                                }
-                                            };
-                                    }
-                                }
-
-                                // Function to update the target note display
-                                const updateTargetNote = () => {
-                                    if (!selectionState.note) return;
-
-                                    // Convert accidental symbols to notation
-                                    let noteWithAccidental = selectionState.note;
-                                    if (selectionState.accidental === "♯")
-                                        noteWithAccidental += "#";
-                                    else if (selectionState.accidental === "♭")
-                                        noteWithAccidental += "b";
-                                    else if (selectionState.accidental === "𝄪")
-                                        noteWithAccidental += "##";
-                                    else if (selectionState.accidental === "𝄫")
-                                        noteWithAccidental += "bb";
-
-                                    const noteWithOctave =
-                                        noteWithAccidental + selectionState.octave;
-
-                                    // Update target pitch
-                                    targetPitch.note = noteWithOctave;
-
-                                    // Calculate the frequency for the target pitch
-                                    try {
-                                        // Define base frequencies for each note (C4 = 261.63 Hz)
-                                        const baseFrequencies = {
-                                            "C": 261.63,
-                                            "C#": 277.18,
-                                            "D": 293.66,
-                                            "D#": 311.13,
-                                            "E": 329.63,
-                                            "F": 349.23,
-                                            "F#": 369.99,
-                                            "G": 392.0,
-                                            "G#": 415.3,
-                                            "A": 440.0,
-                                            "A#": 466.16,
-                                            "B": 493.88
-                                        };
-
-                                        // Extract note and octave
-                                        const noteMatch = noteWithOctave.match(/([A-G][#b]?)(\d+)/);
-                                        if (!noteMatch) {
-                                            throw new Error("Invalid note format");
-                                        }
-
-                                        const [, note, octave] = noteMatch;
-                                        // Convert flats to sharps for lookup
-                                        const lookupNote = note
-                                            .replace("b", "#")
-                                            .replace("bb", "##");
-
-                                        // Get base frequency for the note
-                                        let freq = baseFrequencies[lookupNote];
-                                        if (!freq) {
-                                            throw new Error("Invalid note");
-                                        }
-
-                                        // Adjust for octave (C4 is the reference octave)
-                                        const octaveDiff = parseInt(octave, 10) - 4;
-                                        freq *= Math.pow(2, octaveDiff);
-
-                                        targetPitch.frequency = freq;
-
-                                        // Validate frequency
-                                        if (
-                                            isNaN(targetPitch.frequency) ||
-                                            targetPitch.frequency <= 0
-                                        ) {
-                                            console.error(
-                                                "Invalid frequency calculated:",
-                                                targetPitch.frequency
-                                            );
-                                            targetPitch.frequency = 440; // Default to A4 if calculation fails
-                                        }
-                                    } catch (error) {
-                                        console.error("Error calculating frequency:", error);
-                                        targetPitch.frequency = 440; // Default to A4 if calculation fails
-                                    }
-
-                                    // Update display
-                                    targetNoteSelector.textContent = noteWithOctave;
-                                };
-
-                                // Update exit wheel handler
-                                if (tempBlock._exitWheel && tempBlock._exitWheel.navItems) {
-                                    tempBlock._exitWheel.navItems[0].navigateFunction = () => {
-                                        // Clean up the wheels
-                                        if (tempBlock._pitchWheel) {
-                                            tempBlock._pitchWheel.removeWheel();
-                                        }
-                                        if (tempBlock._accidentalsWheel) {
-                                            tempBlock._accidentalsWheel.removeWheel();
-                                        }
-                                        if (tempBlock._octavesWheel) {
-                                            tempBlock._octavesWheel.removeWheel();
-                                        }
-                                        if (tempBlock._exitWheel) {
-                                            tempBlock._exitWheel.removeWheel();
-                                        }
-
-                                        // Hide the wheel div
-                                        wheelDiv.style.display = "none";
-                                    };
-                                }
-                            } catch (error) {
-                                console.error("Error opening pie menu:", error);
-                            }
-                        }
-                    });
-
-                    noteDisplayContainer.appendChild(targetNoteSelector);
-
-                    // Create mode toggle button
-                    const modeToggle = document.createElement("div");
-                    modeToggle.id = "modeToggle";
-                    modeToggle.style.position = "absolute";
-                    modeToggle.style.top = "30px";
-                    modeToggle.style.left = "50%";
-                    modeToggle.style.transform = "translateX(-50%)";
-                    modeToggle.style.display = "flex";
-                    modeToggle.style.backgroundColor = "#FFFFFF";
-                    modeToggle.style.borderRadius = "25px"; // Increased pill shape radius
-                    modeToggle.style.padding = "3px"; // Slightly more padding
-                    modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
-                    modeToggle.style.width = "120px"; // Increased width
-                    modeToggle.style.height = "44px"; // Increased height
-                    modeToggle.style.cursor = "pointer"; // Added cursor pointer
-
-                    // Create chromatic mode button
-                    const chromaticButton = document.createElement("div");
-                    chromaticButton.style.flex = "1";
-                    chromaticButton.style.display = "flex";
-                    chromaticButton.style.alignItems = "center";
-                    chromaticButton.style.justifyContent = "center";
-                    chromaticButton.style.borderRadius = "22px"; // Increased radius
-                    chromaticButton.style.cursor = "pointer";
-                    chromaticButton.style.transition = "all 0.2s ease"; // Faster transition
-                    chromaticButton.style.userSelect = "none"; // Prevent text selection
-                    chromaticButton.title = "Chromatic";
-
-                    // Create target pitch mode button
-                    const targetPitchButton = document.createElement("div");
-                    targetPitchButton.style.flex = "1";
-                    targetPitchButton.style.display = "flex";
-                    targetPitchButton.style.alignItems = "center";
-                    targetPitchButton.style.justifyContent = "center";
-                    targetPitchButton.style.borderRadius = "22px"; // Increased radius
-                    targetPitchButton.style.cursor = "pointer";
-                    targetPitchButton.style.transition = "all 0.2s ease"; // Faster transition
-                    targetPitchButton.style.userSelect = "none"; // Prevent text selection
-                    targetPitchButton.title = "Target pitch";
-
-                    // Create icons
-                    const chromaticIcon = document.createElement("img");
-                    chromaticIcon.src = "header-icons/chromatic-mode.svg";
-                    chromaticIcon.style.width = "32px"; // Increased icon size further
-                    chromaticIcon.style.height = "32px";
-                    chromaticIcon.style.filter = "brightness(0)"; // Make icon black
-                    chromaticIcon.style.pointerEvents = "none"; // Prevent icon from interfering with clicks
-
-                    const targetIcon = document.createElement("img");
-                    targetIcon.src = "header-icons/target-pitch-mode.svg";
-                    targetIcon.style.width = "32px"; // Increased icon size further
-                    targetIcon.style.height = "32px";
-                    targetIcon.style.filter = "brightness(0)"; // Make icon black
-                    targetIcon.style.pointerEvents = "none"; // Prevent icon from interfering with clicks
-
-                    // Function to update button styles
-                    const updateButtonStyles = () => {
-                        if (tunerMode === "chromatic") {
-                            chromaticButton.style.backgroundColor = "#A6CEFF"; // Blue for active
-                            targetPitchButton.style.backgroundColor = "#FFFFFF"; // White for inactive
-                        } else {
-                            chromaticButton.style.backgroundColor = "#FFFFFF"; // White for inactive
-                            targetPitchButton.style.backgroundColor = "#A6CEFF"; // Blue for active
-                        }
-                    };
-
-                    // Add click handlers with debounce to prevent double clicks
-                    let isClickable = true;
-                    const handleClick = mode => {
-                        if (!isClickable) return;
-                        isClickable = false;
-                        tunerMode = mode;
-                        updateButtonStyles();
-                        setTimeout(() => {
-                            isClickable = true;
-                        }, 200); // Re-enable after 200ms
-                    };
-
-                    chromaticButton.onclick = () => handleClick("chromatic");
-                    targetPitchButton.onclick = () => handleClick("target");
-
-                    // Assemble the toggle
-                    chromaticButton.appendChild(chromaticIcon);
-                    targetPitchButton.appendChild(targetIcon);
-                    modeToggle.appendChild(chromaticButton);
-                    modeToggle.appendChild(targetPitchButton);
-
-                    // Initial style update
-                    updateButtonStyles();
-
-                    tunerContainer.appendChild(modeToggle);
-
-                    // Create note display
-                    const noteText = document.createElement("div");
-                    noteText.id = "noteText";
-                    noteText.style.fontSize = "64px";
-                    noteText.style.fontWeight = "bold";
-                    noteText.style.marginBottom = "5px";
-
-                    // Create cents deviation display
-                    const centsText = document.createElement("div");
-                    centsText.id = "centsText";
-                    centsText.style.fontSize = "14px";
-                    centsText.style.color = "#666666";
-                    centsText.style.marginBottom = "5px";
-
-                    // Create tune direction display
-                    const tuneDirection = document.createElement("div");
-                    tuneDirection.id = "tuneDirection";
-                    tuneDirection.style.fontSize = "18px";
-                    tuneDirection.style.color = "#FF4500";
-
-                    // Append all elements
-                    noteDisplayContainer.appendChild(noteText);
-                    noteDisplayContainer.appendChild(centsText);
-                    noteDisplayContainer.appendChild(tuneDirection);
-                    tunerContainer.appendChild(noteDisplayContainer);
                 }
 
                 // Update displays if they exist
@@ -3554,9 +3738,14 @@ function Synth() {
         this._tunerRafId = null;
         this._tunerSegments = null;
         if (this.tunerMic) {
+            if (this.tunerAnalyser) {
+                this.tunerMic.disconnect(this.tunerAnalyser);
+                this.tunerAnalyser.dispose();
+            }
             this.tunerMic.close();
         }
         this.tunerAnalyser = null;
+        this.tunerMic = null;
     };
 
     const frequencyToNote = frequency => {
@@ -3777,6 +3966,16 @@ function Synth() {
         _disposeRecordingPlayer();
         _revokeRecordingURL();
 
+        if (this.analyser) {
+            try {
+                this.mic.disconnect(this.analyser);
+                this.analyser.dispose();
+            } catch (e) {
+                console.debug("Error disposing analyser:", e);
+            }
+            this.analyser = null;
+        }
+
         for (const turtle in instruments) {
             for (const instrumentName in instruments[turtle]) {
                 if (
@@ -3840,7 +4039,7 @@ function Synth() {
     this.startingPitchOctave = 4;
     this.octaveTranspose = 0;
     this.inTemperament = "equal";
-    this.changeInTemperament = "equal";
+    this.changeInTemperament = false;
     this.inTransposition = 0;
     this.transposition = 2;
     this.playbackRate = 1;

@@ -13,15 +13,15 @@
    global
 
    ValueBlock, NOINPUTERRORMSG, NANERRORMSG, last, FlowBlock,
-   FlowClampBlock, Singer, numberToPitch, frequencyToPitch, getNote,
-   INVALIDPITCH, pitchToNumber, LeftBlock, SHARP, FLAT, DOUBLEFLAT,
-   DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
-   NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
-   YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
-   nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
-   NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
-   INTERVALVALUES
- */
+    FlowClampBlock, Singer, numberToPitch, frequencyToPitch, getNote,
+    INVALIDPITCH, pitchToNumber, LeftBlock, SHARP, FLAT, DOUBLEFLAT,
+     DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
+    NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
+    YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
+    nthDegreeToPitch, getCurrentEDO, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
+     NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
+     INTERVALVALUES, CENTSSYMBOL, noteToObj
+  */
 
 /* exported setupPitchBlocks */
 
@@ -129,6 +129,8 @@ function setupPitchBlocks(activity) {
     class InvertModeBlock extends ValueBlock {
         constructor() {
             super("invertmode");
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("pitch", activity);
             this.formBlock({ outType: "textout" });
             this.hidden = true;
@@ -283,7 +285,7 @@ function setupPitchBlocks(activity) {
                 undefined,
                 activity
             );
-            tur.singer.lastNotePlayed = [obj[0] + obj[1], tur.singer.lastNotePlayed[1]];
+            tur.singer.lastNotePlayed = [obj[0] + obj[1], tur.singer.lastNotePlayed?.[1] ?? 4];
         }
 
         arg(logo, turtle, blk) {
@@ -300,10 +302,7 @@ function setupPitchBlocks(activity) {
                 let obj;
                 if (tur.singer.lastNotePlayed !== null) {
                     if (typeof tur.singer.lastNotePlayed[0] === "string") {
-                        const len = tur.singer.lastNotePlayed[0].length;
-                        const pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                        const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
-                        obj = [pitch, octave];
+                        obj = noteToObj(tur.singer.lastNotePlayed[0]);
                     } else {
                         // Hertz?
                         obj = frequencyToPitch(tur.singer.lastNotePlayed[0]);
@@ -421,6 +420,9 @@ function setupPitchBlocks(activity) {
     class OutputToolsBlocks extends LeftBlock {
         constructor() {
             super("outputtools", _("pitch converter"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.extraWidth = 50;
@@ -490,7 +492,9 @@ function setupPitchBlocks(activity) {
                 if (cblk1 !== null) {
                     arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 }
-                if (activity.blocks.blockList[cblk1].name === "notename") {
+                if (cblk1 === null) {
+                    notePlayed = "G4";
+                } else if (activity.blocks.blockList[cblk1].name === "notename") {
                     notePlayed = arg1 + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else if (
                     activity.blocks.blockList[cblk1].name === "solfege" ||
@@ -877,6 +881,9 @@ function setupPitchBlocks(activity) {
     class AccidentalNameBlock extends ValueBlock {
         constructor() {
             super("accidentalname", _("accidental selector"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _(
@@ -893,6 +900,8 @@ function setupPitchBlocks(activity) {
     class EastIndianSolfegeBlock extends ValueBlock {
         constructor() {
             super("eastindiansolfege", _("east indian solfege"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("Pitch can be specified in terms of ni dha pa ma ga re sa."),
@@ -907,6 +916,8 @@ function setupPitchBlocks(activity) {
     class NoteNameBlock extends ValueBlock {
         constructor() {
             super("notename", _("note name"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("Pitch can be specified in terms of C D E F G A B."),
@@ -922,6 +933,8 @@ function setupPitchBlocks(activity) {
     class SolfegeBlock extends ValueBlock {
         constructor() {
             super("solfege", _("solfege"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("Pitch can be specified in terms of do re mi fa sol la ti."),
@@ -937,8 +950,21 @@ function setupPitchBlocks(activity) {
     class CustomNoteBlock extends ValueBlock {
         constructor() {
             super("customNote");
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("pitch", activity);
             this.hidden = true;
+        }
+
+        static _parseCents(value) {
+            if (typeof value !== "string") return [value, 0];
+            const match = value.match(
+                new RegExp(`^([A-Ga-g](?:[#b♯♭]|𝄪|𝄫)?)(\\(([+-]\\d+)${CENTSSYMBOL}\\))?$`)
+            );
+            if (match) {
+                return [match[1], match[3] !== undefined ? parseInt(match[3], 10) : 0];
+            }
+            return [value, 0];
         }
 
         flow(args, logo, turtle, blk) {
@@ -947,9 +973,9 @@ function setupPitchBlocks(activity) {
                 logo.stopTurtle = true;
                 return;
             } else {
-                const note = args[0];
+                const [note, cents] = CustomNoteBlock._parseCents(args[0]);
                 const octave = args[1];
-                return Singer.processPitch(activity, note, octave, 0);
+                return Singer.processPitch(activity, note, octave, cents, turtle, blk);
             }
         }
     }
@@ -1229,8 +1255,13 @@ function setupPitchBlocks(activity) {
         constructor() {
             super("custompitch", _("custom pitch"));
             this.setPalette("pitch", activity);
+            this.formBlock({
+                args: 2,
+                argTypes: ["anyin", "anyin"],
+                defaults: ["C", 4]
+            });
             this.makeMacro((x, y) => [
-                [0, "pitch", x, y, [null, 1, 2, null]],
+                [0, "custompitch", x, y, [null, 1, 2, null]],
                 [1, ["customNote", { value: "C(+0¢)" }], 0, 0, [0]],
                 [2, ["number", { value: 4 }], 0, 0, [0]]
             ]);
@@ -1242,7 +1273,9 @@ function setupPitchBlocks(activity) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 logo.stopTurtle = true;
             } else {
-                return Singer.PitchActions.playPitch(args[0], args[1], 0, turtle, blk);
+                const [note, cents] = CustomNoteBlock._parseCents(args[0]);
+                const octave = args[1];
+                return Singer.PitchActions.playPitch(note, octave, cents, turtle, blk);
             }
         }
     }
@@ -1597,6 +1630,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: a measure of frequency: one cycle per second
             super("hertz", _("hertz"));
+            this.setCapability("soundSpecifier");
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
@@ -1700,6 +1734,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: a mapping of pitch to the 88 piano keys
             super("pitchnumber", _("pitch number"));
+            this.setCapability("soundSpecifier");
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
@@ -1784,6 +1819,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
             super("nthmodalpitch", _("nth modal pitch"));
+            this.setCapability("soundSpecifier");
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7];
             this.setHelpString([
@@ -1829,6 +1865,8 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
             super("scaledegree2", _("scale degree"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("pitch", activity);
             this.extraWidth = 10;
             this.setHelpString([
@@ -1861,6 +1899,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: step some number of notes in current musical scale
             super("steppitch", _("scalar step") + " (+/–)");
+            this.setCapability("soundSpecifier");
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
@@ -1902,6 +1941,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
             super("pitch", _("pitch"));
+            this.setCapability("soundSpecifier");
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
@@ -1963,9 +2003,6 @@ function setupPitchBlocks(activity) {
                     }
 
                     scaledegree = Number(scaledegree.replace(attr, ""));
-                    if (attr !== NATURAL) {
-                        note += attr;
-                    }
 
                     const obj = keySignatureToMode(tur.singer.keySignature);
 
@@ -1980,10 +2017,10 @@ function setupPitchBlocks(activity) {
                     }
                     scaledegree = Math.abs(scaledegree);
 
-                    let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
-                    if (obj[0].substr(1) === FLAT) {
+                    let ref = NOTESTEP[obj[0].slice(0, 1)] - 1;
+                    if (obj[0].slice(1) === FLAT) {
                         ref--;
-                    } else if (obj[0].substr(1) === SHARP) {
+                    } else if (obj[0].slice(1) === SHARP) {
                         ref++;
                     }
                     note = scaleDegreeToPitchMapping(
@@ -1992,6 +2029,10 @@ function setupPitchBlocks(activity) {
                         tur.singer.movable,
                         null
                     );
+                    if (attr !== NATURAL) {
+                        note += attr;
+                    }
+
                     let semitones = ref;
 
                     semitones += NOTESFLAT.includes(note)
@@ -2031,11 +2072,14 @@ function setupPitchBlocks(activity) {
                 arg0 = Number(arg0);
 
                 // We interpret numbers two different ways:
-                //  (1) a positive integer between 1 and 12 is taken to be a movable solfege, e.g. 1 : do, 2 : re ...
+                //  (1) a positive integer between 1 and currentEDO is taken to be
+                //      a movable solfege, e.g. 1 : do, 2 : re ...
                 //  (2) if frequency is input, ignore octave (arg1)
                 // Negative numbers will throw an error.
 
-                if (arg0 <= 12) {
+                const currentEDO = getCurrentEDO(logo.synth.inTemperament);
+
+                if (arg0 <= currentEDO) {
                     // movable solfege
                     if (arg0 < 1) {
                         activity.errorMsg(INVALIDPITCH, blk);
@@ -2044,7 +2088,8 @@ function setupPitchBlocks(activity) {
 
                     const [noteName, offset] = nthDegreeToPitch(
                         tur.singer.keySignature,
-                        Math.round(arg0)
+                        Math.round(arg0),
+                        currentEDO
                     );
                     note = noteName;
                     octave =
@@ -2082,7 +2127,7 @@ function setupPitchBlocks(activity) {
                     if (![SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT].includes(accSym)) {
                         accSym = NATURAL;
                     } else {
-                        arg0 = arg0.substr(0, arg0.length - 1);
+                        arg0 = arg0.slice(0, arg0.length - 1);
                     }
                     note = NOTENAMES.includes(arg0.toUpperCase())
                         ? SOLFEGECONVERSIONTABLE[arg0.toUpperCase()]

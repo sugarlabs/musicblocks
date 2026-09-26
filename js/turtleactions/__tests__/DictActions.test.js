@@ -64,10 +64,8 @@ describe("setupDictActions", () => {
                 color: "red",
                 value: 10,
                 chroma: 0.5,
-                pensize: 2,
                 stroke: 2,
                 font: "Arial",
-                orientation: 90,
                 turtle: {
                     orientation: 90
                 },
@@ -152,11 +150,29 @@ describe("setupDictActions", () => {
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
             expect(pitchNumber).toBe(60);
             expect(activity.errorMsg).toHaveBeenCalledWith(INVALIDPITCH, 1);
+            expect(pitchToNumber).toHaveBeenCalledWith("G", 4, "C");
         });
 
-        it("should return undefined for an unsupported key", () => {
-            const result = Turtle.DictActions._GetDict(0, turtle, "unsupportedKey");
-            expect(result).toBeUndefined();
+        it("should subtract pitchNumberOffset from the computed pitch number", () => {
+            targetTurtle.singer.pitchNumberOffset = 15;
+            const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number");
+            expect(pitchNumber).toBe(60 - 15);
+        });
+
+        it("should return 0 and show error with literal key in message", () => {
+            // Use "$&" as the key — with string replacement, $& expands to the
+            // matched text ("%s") and would produce "Unknown key: %s", corrupting
+            // the message. The callback replacer preserves it literally.
+            const result = Turtle.DictActions._GetDict(0, turtle, "$&", 5);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Unknown key: $&", 5);
+        });
+
+        it("should pass blk to errorMsg and preserve $$ literally", () => {
+            // "$$" inserts a literal "$" in string replacement — callback ensures
+            // the key is embedded verbatim without any special-character expansion.
+            Turtle.DictActions._GetDict(0, turtle, "$$", 99);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Unknown key: $$", 99);
         });
     });
 
@@ -175,10 +191,32 @@ describe("setupDictActions", () => {
             Turtle.DictActions.SetDictValue(0, turtle, key, value);
             expect(targetTurtle.painter[method]).toHaveBeenCalledWith(...args);
         });
+
+        it("should handle unsupported key gracefully without doing anything", () => {
+            Turtle.DictActions.SetDictValue(0, turtle, "unsupportedKey", "value");
+            const painterMethods = [
+                "doSetColor",
+                "doSetValue",
+                "doSetChroma",
+                "doSetPensize",
+                "doSetFont",
+                "doSetHeading",
+                "doSetXY"
+            ];
+            painterMethods.forEach(method => {
+                expect(targetTurtle.painter[method]).not.toHaveBeenCalled();
+            });
+        });
+
+        it("should support lowercase setDictValue alias", () => {
+            Turtle.DictActions.setDictValue(0, turtle, "color", "blue");
+            expect(targetTurtle.painter.doSetColor).toHaveBeenCalledWith("blue");
+        });
     });
 
     describe("SerializeDict", () => {
         it("should serialize the turtle dictionary correctly", () => {
+            activity.logo.turtleDicts[turtle] = {}; // 0 not in turtleDicts[turtle]
             const serialized = Turtle.DictActions.SerializeDict(0, turtle);
             const expected = JSON.stringify({
                 "color": "red",
@@ -294,6 +332,15 @@ describe("setupDictActions", () => {
             expect(activity.logo.turtleDicts[turtle]["testDict"]["key"]).toBe("value");
             consoleSpy.mockRestore();
         });
+
+        it("should set value in existing dictionary without recreating it", () => {
+            activity.logo.turtleDicts[turtle] = {
+                existingDict: { oldKey: "oldValue" }
+            };
+            Turtle.DictActions.setValue("existingDict", "newKey", "newValue", turtle);
+            expect(activity.logo.turtleDicts[turtle].existingDict.oldKey).toBe("oldValue");
+            expect(activity.logo.turtleDicts[turtle].existingDict.newKey).toBe("newValue");
+        });
     });
 
     describe("getValue", () => {
@@ -317,6 +364,13 @@ describe("setupDictActions", () => {
             };
             const result = Turtle.DictActions.getValue("testDict", "nonexistentKey", turtle);
             expect(result).toBe("Key with this name does not exist in testDict");
+        });
+
+        it("should initialize turtleDicts if it does not exist for the turtle", () => {
+            delete activity.logo.turtleDicts[turtle];
+            const result = Turtle.DictActions.getValue("testDict", "key", turtle);
+            expect(result).toBe("Dictionary with this name does not exist");
+            expect(activity.logo.turtleDicts[turtle]).toEqual({});
         });
     });
 });

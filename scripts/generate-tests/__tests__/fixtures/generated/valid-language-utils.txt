@@ -1,0 +1,39 @@
+/**
+ * @license
+ * MusicBlocks v3.7.1
+ * Copyright (C) 2026 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+const LanguageUtils = require("../language-utils");
+
+describe("normalizeLanguageCode", () => {
+    it("maps a menu code to its locale file name", () => {
+        expect(LanguageUtils.normalizeLanguageCode("enUK")).toBe("en_GB");
+    });
+
+    it("defaults an empty or non-string input to English", () => {
+        expect(LanguageUtils.normalizeLanguageCode("")).toBe("en");
+        expect(LanguageUtils.normalizeLanguageCode(null)).toBe("en");
+    });
+
+    it("routes any Japanese variant to the ja translations", () => {
+        expect(LanguageUtils.normalizeLanguageCode("ja-something")).toBe("ja");
+    });
+
+    it("passes an already-normalised code straight through", () => {
+        expect(LanguageUtils.normalizeLanguageCode("de")).toBe("de");
+    });
+});

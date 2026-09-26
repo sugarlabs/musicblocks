@@ -33,6 +33,20 @@ body:not(.dark):not(.highcontrast) .ui-autocomplete li:hover {
     background-color: var(--color-bg-tertiary) !important;
 }
 
+.ui-autocomplete .search-no-results,
+.ui-autocomplete .search-no-results:hover,
+.ui-autocomplete .search-no-results.ui-state-focus,
+.ui-autocomplete .search-no-results.ui-state-active {
+    cursor: default;
+    font-style: italic;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+body:not(.dark):not(.highcontrast) .ui-autocomplete .search-no-results:hover {
+    background-color: var(--color-bg-primary) !important;
+}
+
 body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     background-color: var(--color-bg-secondary) !important;
 }
@@ -104,7 +118,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     transform: translate(-50%, -50%);
     width: 400px;
     padding: 24px;
-    background-color: var(--color-bg-primary);
+    background-color: var(--color-panel-bg);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     z-index: 10000;
@@ -118,7 +132,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .modal-message {
-    color: black;
+    color: var(--color-text-primary);
     font-size: 16px;
     margin-bottom: 24px;
 }
@@ -135,7 +149,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     font-weight: bold;
     cursor: pointer;
     background-color: var(--color-brand-primary);
-    color: white;
+    color: var(--color-text-inverse);
     margin-right: 16px;
     transition: background-color 0.2s ease;
 }
@@ -152,11 +166,66 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     cursor: pointer;
     transition: background-color 0.2s ease;
     background-color: var(--color-bg-tertiary);
-    color: black;
+    color: var(--color-text-primary);
 }
 
 .cancel-button:hover {
-    background-color: #afafaf;
+    background-color: var(--color-border-primary);
+}
+
+/* Plugin dialog modal styles */
+.plugin-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+}
+
+.plugin-modal-select {
+    width: 100% !important;
+    padding: 10px 12px !important;
+    margin-bottom: 24px;
+    font-size: 16px;
+    font-weight: normal !important;
+    text-align: left !important;
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text-primary);
+    border: 2px solid var(--color-border-primary) !important;
+    border-radius: 8px;
+    cursor: pointer;
+    appearance: auto;
+    transition: border-color 0.2s ease;
+}
+
+.plugin-modal-select:focus {
+    border-color: var(--color-brand-primary) !important;
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+.plugin-modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.plugin-upload-button {
+    border: 2px solid var(--color-brand-primary);
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: transparent;
+    color: var(--color-brand-primary);
+    transition: all 0.2s ease;
+}
+
+.plugin-upload-button:hover {
+    background-color: var(--color-brand-primary);
+    color: var(--color-text-inverse);
 }
 
 .modal {
@@ -235,6 +304,9 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     transition: all 0.2s ease;
     margin-left: 8px;
 }
+#searchDragHandle {
+    pointer-events: auto;
+}
 
 #search:focus {
     border-color: var(--color-brand-primary-hover);
@@ -247,42 +319,56 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 #helpfulSearchDiv {
-    display: block !important;
-    position: absolute;
+    position: fixed !important;
     background-color: var(--color-bg-secondary);
-    padding: 2px;
+    padding: 0;
     border: 1px solid var(--color-border-primary);
-    width: 230px;
-    z-index: 1;
+    border-radius: 24px;
+    width: 320px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    height: 46px;
+    overflow: hidden;
 }
 
 #helpfulSearch {
-    padding: 2px;
-    border: 2px solid grey;
-    width: 220px;
-    height: 20px;
+    padding: 0 40px 0 28px;
+    border: none;
+    width: 100%;
+    height: 46px;
     font-size: large;
+    background-color: transparent;
+    color: inherit;
+    outline: none;
+    display: block;
+    box-sizing: border-box;
 }
 
 #crossButton {
     position: absolute;
     top: 50%;
-    right: -30px;
+    right: 10px;
     transform: translateY(-50%);
-    background: transparent;
+    background: rgba(80, 80, 80, 0.5);
     border: none;
-    font-size: large;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    color: white;
+    font-size: 14px;
     cursor: pointer;
+    line-height: 22px;
+    text-align: center;
 }
 
 .trash-view {
     position: relative;
-    background-color: white;
+    background-color: var(--color-bg-primary);
     max-width: 396px;
     max-height: 200px;
     overflow-y: auto;
     font-size: 16px;
-    color: black;
+    color: var(--color-text-primary);
     border: 2px solid var(--color-brand-secondary);
     list-style-type: none;
     margin: 0;
@@ -333,7 +419,29 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     justify-content: center;
     width: 48px;
     height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: inherit;
+    font: inherit;
     cursor: pointer;
+}
+
+#restoreLastIcon:hover,
+#restoreAllIcon:hover,
+#restoreLastIcon:focus-visible,
+#restoreAllIcon:focus-visible {
+    background-color: var(--color-brand-primary-hover);
+    outline: 2px solid var(--color-text-inverse);
+    outline-offset: -2px;
+}
+
+.highcontrast #restoreLastIcon:hover .material-icons,
+.highcontrast #restoreAllIcon:hover .material-icons,
+.highcontrast #restoreLastIcon:focus-visible .material-icons,
+.highcontrast #restoreAllIcon:focus-visible .material-icons {
+    color: var(--color-text-inverse) !important;
 }
 
 .material-icons.md-48 {
@@ -431,8 +539,29 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     line-height: 30px;
 }
 
-.blink {
+#record {
+    position: relative;
+}
+
+#record .dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+}
+
+#record.recording .dot {
+    color: red;
     animation: blink-animation 1.5s infinite;
+}
+
+@media (max-width: 690px) {
+    #record .ring,
+    #record .dot {
+        font-size: 26px;
+        margin: 0;
+        width: auto;
+    }
 }
 
 @keyframes blink-animation {
@@ -579,6 +708,22 @@ nav {
     color: white;
 }
 
+/* Auxiliary (secondary) toolbar opened by the 3-dot menu.
+   Its icon groups (ul.aux.left / ul.aux.right) are floated, and the toolbar
+   otherwise inherits the fixed 64px nav height, so when the icons wrap to a
+   second row (e.g. in advanced mode at some browser-zoom widths) that row
+   spilled below the blue background into the workspace. Contain the floated
+   rows and let the blue band grow to cover them, while keeping a single 64px
+   row when the icons fit. */
+#aux-toolbar,
+#aux-toolbar .nav-wrapper {
+    height: auto;
+    min-height: 64px;
+}
+#aux-toolbar .nav-wrapper {
+    display: flow-root;
+}
+
 nav .nav-container {
     padding: 0 0px;
 }
@@ -704,7 +849,7 @@ img.icon:hover {
 }
 
 body {
-    background-color: #92b5c8 !important;
+    background-color: var(--color-bg-primary);
     /*  2.5B 7/4 */
     padding: 0;
     margin: 0;
@@ -718,7 +863,7 @@ body.noScroll {
 
 body.samples-shown {
     overflow-y: scroll;
-    background: white !important;
+    background: var(--color-bg-primary);
 }
 
 select {
@@ -976,7 +1121,7 @@ table {
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: transparent;
     width: 680px;
 }
 
@@ -1270,6 +1415,21 @@ table {
     margin: auto;
 }
 
+#helpBodyDiv .help-tour-image,
+#helpBodyDiv .help-tour-detailed-icon,
+#helpBodyDiv .help-tour-icon {
+    display: block;
+    margin: 0 auto 0.5rem;
+}
+
+#helpBodyDiv .help-tour-large-image {
+    max-width: 100%;
+    max-height: min(38vh, 220px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
 #helpBodyDiv p {
     margin: 0.5rem 0;
 }
@@ -1318,9 +1478,18 @@ table {
 }
 
 @media (max-width: 600px) {
+    #helpBodyDiv {
+        justify-content: flex-start;
+        padding-top: 1rem;
+    }
+
     #helpBodyDiv .icon-container {
         margin-top: 0;
         padding-top: 0;
+    }
+
+    #helpBodyDiv .help-tour-large-image {
+        max-height: min(32vh, 180px);
     }
 
     .icon-container #findIcon,
@@ -1481,6 +1650,62 @@ input.timbreName {
     background: #8cc6ff;
     border: 1px solid black;
     text-align: center;
+}
+
+/* ==========================================================================
+   PhraseMaker Widget Token-Backed Component Styles
+   ========================================================================== */
+
+.pm-widget-container {
+    position: absolute;
+    left: 55px;
+    right: 0;
+    width: -webkit-fill-available;
+    height: 100%;
+    height: -webkit-fill-available;
+}
+
+.pm-win-body {
+    position: absolute;
+    width: 100%;
+    width: -webkit-fill-available;
+    height: 100%;
+    height: -webkit-fill-available;
+    background: var(--color-widget-frame-bg);
+}
+
+.pm-lyrics-row {
+    position: sticky;
+    top: 0;
+}
+
+.pm-lyrics-label {
+    position: sticky;
+    left: 1.2px;
+    z-index: 1;
+    text-align: center;
+}
+
+.pm-lyrics-cell {
+    font-family: var(--font-family-system, sans-serif);
+    cursor: default;
+    border-spacing: 1px 1px;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    padding: 0;
+    border-radius: var(--radius-md, 6px);
+    border: none;
+}
+
+.pm-lyrics-input {
+    width: 100%;
+    font-size: inherit;
+    font-family: var(--font-family-system, sans-serif);
+    cursor: default;
+    box-sizing: border-box;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-md, 6px);
 }
 
 .popup {
@@ -2050,14 +2275,33 @@ table {
 .msgCloseIcon {
     width: 28px;
     height: 28px;
-    filter: invert(100%);
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition:
         background-color 0.3s,
         filter 0.3s;
 }
 
-.msgCloseIcon:hover {
+.msgCloseIcon img {
+    width: 28px;
+    height: 28px;
+    filter: invert(100%);
+    transition: filter 0.3s;
+}
+
+.msgCloseIcon:hover img {
     filter: invert(0%);
+}
+
+.msgCloseIcon:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
 }
 
 .disable_highlighting {
@@ -2113,8 +2357,8 @@ table {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: var(--color-brand-primary-hover);
-    color: white;
+    background-color: var(--color-notification-bg);
+    color: var(--color-notification-text);
     padding: 15px 20px;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
@@ -2265,6 +2509,7 @@ table {
 .pitch-staircase-btn,
 .pitch-staircase-step {
     background-color: var(--color-selector-bg);
+    color: var(--color-selector-text);
     transition: background-color 0.2s ease;
 }
 

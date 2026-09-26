@@ -225,33 +225,18 @@ function setupMeterActions(activity) {
             // Always null tur.interval after cancellation to prevent
             // stale ID no-op on the next Play.
             if (tur.interval !== undefined) {
-                if (
-                    activity.logo._timerManager !== undefined &&
-                    activity.logo._timerManager.clearInterval(tur.interval)
-                ) {
-                    // cleared by ManagedTimer
-                } else {
-                    clearInterval(tur.interval);
-                }
-
+                activity.logo._timerManager.clearInterval(tur.interval);
                 tur.interval = undefined;
             }
             activity.stage.dispatchEvent(eventName);
             // Use ManagedTimer.setGuardedInterval instead of raw setInterval
             // so doStopTurtles clearAll() cancels this interval in one sweep.
             // The aborted() predicate auto-destructs the interval on Stop.
-            if (activity.logo._timerManager !== undefined) {
-                tur.interval = activity.logo._timerManager.setGuardedInterval(
-                    () => activity.stage.dispatchEvent(eventName),
-                    duration * 1000,
-                    () => activity.logo.stopTurtle
-                );
-            } else {
-                tur.interval = setInterval(
-                    () => activity.stage.dispatchEvent(eventName),
-                    duration * 1000
-                );
-            }
+            tur.interval = activity.logo._timerManager.setGuardedInterval(
+                () => activity.stage.dispatchEvent(eventName),
+                duration * 1000,
+                () => activity.logo.stopTurtle
+            );
         }
 
         static onStrongBeatDo(beat, action, isflow, receivedArg, turtle, blk) {
@@ -303,7 +288,7 @@ function setupMeterActions(activity) {
             const listenerName = "_drift_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }

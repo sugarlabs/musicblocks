@@ -69,12 +69,17 @@ function setupHeapBlocks(activity) {
          * @returns {string} - The JSON string representation of the heap.
          */
         arg(logo, turtle, blk) {
+            if (!(turtle in logo.turtleHeaps)) {
+                logo.turtleHeaps[turtle] = [];
+            }
+
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
                     "print"
             ) {
                 logo.statusFields.push([blk, "heap"]);
+                return JSON.stringify([]);
             } else {
                 return JSON.stringify(logo.turtleHeaps[turtle]);
             }
@@ -216,6 +221,7 @@ function setupHeapBlocks(activity) {
                     "print"
             ) {
                 logo.statusFields.push([blk, "heapLength"]);
+                return 0;
             } else {
                 // Return the length of the heap
                 return logo.turtleHeaps[turtle].length;
@@ -392,6 +398,10 @@ function setupHeapBlocks(activity) {
          * @param {number} turtle - The turtle number.
          */
         flow(args, logo, turtle) {
+            if (!(turtle in logo.turtleHeaps)) {
+                logo.turtleHeaps[turtle] = [];
+            }
+
             // Reverse the order of the turtle's heap
             logo.turtleHeaps[turtle] = logo.turtleHeaps[turtle].reverse();
         }
@@ -558,7 +568,7 @@ function setupHeapBlocks(activity) {
                 return;
             }
 
-            if (typeof args[0] !== "number" || typeof args[1] !== "number") {
+            if (typeof args[0] !== "number") {
                 activity.errorMsg(NANERRORMSG, blk);
                 return;
             }

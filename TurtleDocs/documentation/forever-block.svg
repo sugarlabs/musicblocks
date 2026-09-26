@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg2831"
+   version="1.1"
+   viewBox="0 0 42.06875 25.796875"
+   height="25.796875mm"
+   width="42.068748mm">
+  <defs
+     id="defs2825" />
+  <metadata
+     id="metadata2828">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(89.471298,-103.31249)"
+     id="layer1">
+    <g
+       id="g2614"
+       transform="matrix(0.26458333,0,0,0.26458333,-202.44838,45.633327)">
+      <g
+         transform="translate(427,218)"
+         id="g466">
+        <g
+           transform="scale(1.5)"
+           id="g464">
+          <path
+             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 11.123047 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+             style="fill:#d98a43;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path458" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text462">
+            <tspan
+               x="5"
+               y="15"
+               id="tspan460">forever</tspan>
+          </text>
+        </g>
+      </g>
+      <g
+         transform="translate(440.5,249.5)"
+         id="g572">
+        <g
+           transform="scale(1.5)"
+           id="g570">
+          <path
+             d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 70 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -70 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+             style="fill:#ffbf00;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path564" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text568">
+            <tspan
+               x="86"
+               y="14"
+               id="tspan566">action</tspan>
+          </text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -13,7 +13,7 @@
    global
 
    _, FlowBlock, NOINPUTERRORMSG, ValueBlock, docById, toFixed2,
-   LeftBlock, BooleanSensorBlock, NANERRORMSG, hex2rgb, searchColors,
+   LeftBlock, BooleanSensorBlock, NANERRORMSG, hex2rgb, hexToRGB, isValidHex, searchColors,
    Tone, platformColor, _THIS_IS_MUSIC_BLOCKS_
  */
 
@@ -89,37 +89,46 @@ function setupSensorsBlocks(activity) {
             inputElem.style.mozUserSelect = "text";
             inputElem.style.msUserSelect = "text";
 
-            docById("labelDiv").replaceChildren(inputElem);
+            const labelDiv = docById("labelDiv");
+            if (labelDiv) {
+                labelDiv.replaceChildren(inputElem);
+            }
             const cblk = activity.blocks.blockList[blk].connections[1];
-            if (cblk !== null) {
+            if (cblk !== null && activity.blocks.blockList[cblk]) {
                 inputElem.placeholder = activity.blocks.blockList[cblk].value;
             }
-            inputElem.style.left = activity.turtles.getTurtle(turtle).container.x + "px";
-            inputElem.style.top = activity.turtles.getTurtle(turtle).container.y + "px";
+            const turtleObj = activity.turtles.getTurtle(turtle);
+            if (turtleObj && turtleObj.container) {
+                inputElem.style.left = turtleObj.container.x + "px";
+                inputElem.style.top = turtleObj.container.y + "px";
+            }
             inputElem.focus();
 
-            docById("labelDiv").classList.add("hasKeyboard");
+            if (labelDiv) {
+                labelDiv.classList.add("hasKeyboard");
+            }
 
             // Add a handler to continue the flow after the input.
             function __keyPressed(event) {
-                if (event.keyCode === 13) {
+                if (event.key === "Enter") {
                     // RETURN
-                    const inputElem = docById("textLabel");
                     const value = inputElem.value;
                     if (isNaN(value)) {
                         logo.inputValues[turtle] = value;
                     } else {
-                        logo.inputValues[turtle] = Number(value);
+                        logo.inputValues[turtle] = parseFloat(value);
                     }
-
                     inputElem.blur();
                     inputElem.style.display = "none";
                     logo.clearTurtleRun(turtle);
-                    docById("labelDiv").classList.remove("hasKeyboard");
+                    const currentLabelDiv = docById("labelDiv");
+                    if (currentLabelDiv) {
+                        currentLabelDiv.classList.remove("hasKeyboard");
+                    }
                 }
             }
 
-            docById("textLabel").addEventListener("keypress", __keyPressed);
+            inputElem.addEventListener("keypress", __keyPressed);
         }
     }
     /**
@@ -552,8 +561,8 @@ function setupSensorsBlocks(activity) {
             let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
 
             // Handle hex and rgb color formats
-            if (colorString.includes("#")) {
-                colorString = hex2rgb(colorString.split("#")[1]);
+            if (isValidHex(colorString)) {
+                colorString = hex2rgb(colorString);
             }
 
             const obj = colorString.split("(")[1].split(",");
@@ -672,10 +681,23 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The background color index.
          */
         getBackgroundColor() {
-            const [r, g, b] = platformColor.background
-                .match(/\(([^)]+)\)/)[1]
-                .split(/,\s*/)
-                .map(Number);
+            let r;
+            let g;
+            let b;
+            const background = platformColor.background;
+
+            if (isValidHex(background)) {
+                const rgb = hexToRGB(background);
+                r = rgb.r;
+                g = rgb.g;
+                b = rgb.b;
+            } else {
+                [r, g, b] = background
+                    .match(/\(([^)]+)\)/)[1]
+                    .split(/,\s*/)
+                    .map(Number);
+            }
+
             return searchColors(r, g, b);
         }
 

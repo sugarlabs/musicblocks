@@ -202,8 +202,11 @@ describe("LogoDependencies constructor — optional dependency defaults", () => 
     test("utils falls back to globals when omitted", () => {
         const deps = new LogoDependencies(createValidDeps({ utils: undefined }));
         expect(deps.utils.last).toBe(global.last);
+
+        expect(deps.cameraUtils).toBe(global.CameraUtils);
         expect(deps.utils.doUseCamera).toBe(global.doUseCamera);
         expect(deps.utils.doStopVideoCam).toBe(global.doStopVideoCam);
+
         expect(deps.utils.getIntervalDirection).toBe(global.getIntervalDirection);
         expect(deps.utils.getIntervalNumber).toBe(global.getIntervalNumber);
         expect(deps.utils.mixedNumber).toBe(global.mixedNumber);
@@ -337,8 +340,11 @@ describe("LogoDependencies.fromActivity", () => {
     test("global util functions are picked up", () => {
         const deps = LogoDependencies.fromActivity(createMockActivity());
         expect(deps.utils.last).toBe(global.last);
+
+        expect(deps.cameraUtils).toBe(global.CameraUtils);
         expect(deps.utils.doUseCamera).toBe(global.doUseCamera);
         expect(deps.utils.doStopVideoCam).toBe(global.doStopVideoCam);
+
         expect(deps.utils.getIntervalDirection).toBe(global.getIntervalDirection);
         expect(deps.utils.getIntervalNumber).toBe(global.getIntervalNumber);
         expect(deps.utils.mixedNumber).toBe(global.mixedNumber);

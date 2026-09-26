@@ -102,6 +102,10 @@ const retryWithBackoff = async ({
             return result;
         }
 
+        if (count === maxRetries) {
+            break;
+        }
+
         if (typeof onRetry === "function") {
             onRetry(count);
         }

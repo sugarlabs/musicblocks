@@ -21,6 +21,7 @@ module.exports = {
                 "docs", // documentation only
                 "feat", // a new feature
                 "fix", // a bug fix
+                "i18n", // internationalization / localization
                 "perf", // performance improvement
                 "refactor", // neither fixes a bug nor adds a feature
                 "revert", // reverts a previous commit

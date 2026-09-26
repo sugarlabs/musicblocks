@@ -10,106 +10,62 @@ function TunerDisplay(canvas, width, height) {
     this.note = "A";
     this.cents = 0;
     this.frequency = 440;
-    this.chromaticMode = true; // Default to chromatic mode
-
-    // Create mode toggle container
-    this.modeContainer = document.createElement("div");
-    Object.assign(this.modeContainer.style, {
-        position: "absolute",
-        top: "20px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        display: "flex",
-        backgroundColor: "#FFFFFF",
-        borderRadius: "20px",
-        padding: "4px",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-    });
-    canvas.parentElement.appendChild(this.modeContainer);
-
-    // Create mode buttons wrapper
-    const buttonsWrapper = document.createElement("div");
-    Object.assign(buttonsWrapper.style, {
-        display: "flex",
-        gap: "4px",
-        position: "relative"
-    });
-    this.modeContainer.appendChild(buttonsWrapper);
-
-    // Create chromatic mode button
-    this.chromaticButton = document.createElement("div");
-    Object.assign(this.chromaticButton.style, {
-        width: "40px",
-        height: "32px",
-        borderRadius: "16px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-        transition: "all 0.3s ease"
-    });
-    const chromaticIcon = document.createElement("img");
-    Object.assign(chromaticIcon, {
-        src: "header-icons/chromatic-mode.svg",
-        width: "20",
-        height: "20",
-        alt: ""
-    });
-    this.chromaticButton.appendChild(chromaticIcon);
-    buttonsWrapper.appendChild(this.chromaticButton);
-
-    // Create target pitch mode button
-    this.targetPitchButton = document.createElement("div");
-    Object.assign(this.targetPitchButton.style, {
-        width: "40px",
-        height: "32px",
-        borderRadius: "16px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-        transition: "all 0.3s ease"
-    });
-    const targetIcon = document.createElement("img");
-    Object.assign(targetIcon, {
-        src: "header-icons/target-pitch-mode.svg",
-        width: "20",
-        height: "20",
-        alt: ""
-    });
-    this.targetPitchButton.appendChild(targetIcon);
-    buttonsWrapper.appendChild(this.targetPitchButton);
-
-    // Add click handlers
-    this.chromaticButton.onclick = () => {
-        this.chromaticMode = true;
-        this.updateButtonStyles();
-    };
-
-    this.targetPitchButton.onclick = () => {
-        this.chromaticMode = false;
-        this.updateButtonStyles();
-    };
-
-    // Initial button styles
-    this.updateButtonStyles();
+    this._cachedTheme = null;
+    this._selectorBg = null;
+    this._textColor = null;
+    this._successColor = null;
+    this._errorColor = null;
 }
 
 /**
- * Updates the styles of mode toggle buttons based on current mode
+ * Resolves and caches CSS token colors for Canvas 2D rendering,
+ * updating only when document theme changes.
+ * @private
+ * @returns {{ selectorBg: string, textColor: string, successColor: string, errorColor: string }}
  */
-TunerDisplay.prototype.updateButtonStyles = function () {
-    if (this.chromaticMode) {
-        this.chromaticButton.style.backgroundColor = platformColor.selectorBackground;
-        this.chromaticButton.querySelector("img").style.filter = "brightness(0) invert(1)";
-        this.targetPitchButton.style.backgroundColor = "transparent";
-        this.targetPitchButton.querySelector("img").style.filter = "none";
-    } else {
-        this.targetPitchButton.style.backgroundColor = platformColor.selectorBackground;
-        this.targetPitchButton.querySelector("img").style.filter = "brightness(0) invert(1)";
-        this.chromaticButton.style.backgroundColor = "transparent";
-        this.chromaticButton.querySelector("img").style.filter = "none";
+TunerDisplay.prototype._getCanvasColors = function () {
+    const currentTheme =
+        typeof document !== "undefined" && document.body ? document.body.className : "";
+    if (this._cachedTheme !== currentTheme || !this._selectorBg) {
+        this._cachedTheme = currentTheme;
+        if (typeof getComputedStyle !== "undefined" && document.body) {
+            const style = getComputedStyle(document.body);
+            this._selectorBg = style.getPropertyValue("--color-selector-bg").trim() || "#8cc6ff";
+            this._textColor = style.getPropertyValue("--color-text-primary").trim() || "#000000";
+            this._successColor = style.getPropertyValue("--color-success").trim() || "#10b981";
+            this._errorColor = style.getPropertyValue("--color-error").trim() || "#ef4444";
+        } else {
+            this._selectorBg = "#8cc6ff";
+            this._textColor = "#000000";
+            this._successColor = "#10b981";
+            this._errorColor = "#ef4444";
+        }
     }
+    return {
+        selectorBg: this._selectorBg,
+        textColor: this._textColor,
+        successColor: this._successColor,
+        errorColor: this._errorColor
+    };
+};
+
+/**
+ * Standard student-tuner window: within ±5 cents is treated as in tune.
+ */
+TunerDisplay.IN_TUNE_CENTS = 5;
+
+/**
+ * Needle color for the current cents offset. Green when in tune, red otherwise.
+ *
+ * @param {number} cents
+ * @param {{ successColor: string, errorColor: string }} [colors]
+ * @returns {string}
+ */
+TunerDisplay.prototype._indicatorColor = function (cents, colors) {
+    const palette = colors || this._getCanvasColors();
+    return Math.abs(cents) <= TunerDisplay.IN_TUNE_CENTS
+        ? palette.successColor
+        : palette.errorColor;
 };
 
 /**
@@ -132,6 +88,7 @@ TunerDisplay.prototype.draw = function () {
     const ctx = this.ctx;
     const width = this.width;
     const height = this.height;
+    const { selectorBg, textColor, successColor, errorColor } = this._getCanvasColors();
 
     // Clear the canvas
     ctx.clearRect(0, 0, width, height);
@@ -143,23 +100,23 @@ TunerDisplay.prototype.draw = function () {
     const meterY = height - 80; // Base position of meter
 
     // Draw the tuning meter background
-    ctx.fillStyle = platformColor.selectorBackground || "#e0e0e0";
+    ctx.fillStyle = selectorBg;
     ctx.fillRect(meterX, meterY, meterWidth, meterHeight);
 
     // Draw the center line
-    ctx.fillStyle = platformColor.textColor || "#000000";
+    ctx.fillStyle = textColor;
     ctx.fillRect(meterX + meterWidth / 2 - 1, meterY, 2, meterHeight);
 
     // Draw the indicator
     const indicatorX = meterX + meterWidth / 2 + (this.cents / 50) * (meterWidth / 2);
-    ctx.fillStyle = "#ff0000";
+    ctx.fillStyle = this._indicatorColor(this.cents, { successColor, errorColor });
     ctx.fillRect(indicatorX - 2, meterY - 5, 4, meterHeight + 10);
 
     // Position text much lower in the canvas
     // Draw the note
     ctx.font = "bold 48px Arial";
     ctx.textAlign = "center";
-    ctx.fillStyle = platformColor.textColor || "#000000";
+    ctx.fillStyle = textColor;
     ctx.fillText(this.note, width / 2, height - 200); // Much lower position
 
     // Draw the cents deviation
@@ -184,21 +141,35 @@ const TunerUtils = {
      * @param {number} frequency - The frequency to convert
      * @returns {Array} [note, cents, frequency]
      */
-    frequencyToPitch: function (frequency) {
+    frequencyToPitch: function (frequency, edo) {
         const A4 = 440;
         const C0 = A4 * Math.pow(2, -4.75);
-        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        const currentEDO = edo || 12;
+        const noteNames = generateNoteNames(currentEDO);
 
         if (frequency < C0) {
             return ["C", 0, C0];
         }
 
-        const h = Math.round(12 * Math.log2(frequency / C0));
-        const octave = Math.floor(h / 12);
-        const n = h % 12;
-        const cents = Math.round(1200 * Math.log2(frequency / (C0 * Math.pow(2, h / 12))));
+        const h = Math.round(currentEDO * Math.log2(frequency / C0));
+        const octave = Math.floor(h / currentEDO);
+        const steppedN = ((h % currentEDO) + currentEDO) % currentEDO;
+        const cents = Math.round(1200 * Math.log2(frequency / (C0 * Math.pow(2, h / currentEDO))));
 
-        return [noteNames[n], cents, frequency];
+        return [noteNames[steppedN], cents, frequency];
+    },
+
+    /**
+     * Converts a detected frequency to a note and cents offset.
+     * @param {number} frequency - The frequency to convert.
+     * @param {number} [edo] - The equal division of the octave.
+     * @returns {{note: string, cents: number}}
+     */
+    frequencyToNote: function (frequency, edo) {
+        if (frequency <= 0) return { note: "---", cents: 0 };
+
+        const result = this.frequencyToPitch(frequency, edo);
+        return { note: result[0], cents: result[1] };
     },
 
     /**
@@ -211,6 +182,12 @@ const TunerUtils = {
         return Math.pow(2, (baseCents + adjustment) / 1200);
     }
 };
+
+if (typeof window !== "undefined") {
+    window.TunerDisplay = TunerDisplay;
+    window.TunerUtils = TunerUtils;
+}
+
 if (typeof module !== "undefined") {
     module.exports = { TunerDisplay, TunerUtils };
 }

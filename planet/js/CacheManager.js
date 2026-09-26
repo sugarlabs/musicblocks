@@ -421,7 +421,7 @@ class CacheManager {
      * @private
      */
     _isExpired(expiry) {
-        return Date.now() > expiry;
+        return Date.now() >= expiry;
     }
 
     /**
