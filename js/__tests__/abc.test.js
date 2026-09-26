@@ -1147,3 +1147,28 @@ describe("saveAbcOutput - one K: field per turtle", () => {
         expect(result.replace(/\n+$/, "")).not.toContain("\n\n");
     });
 });
+
+describe("saveAbcOutput - one voice per turtle", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    const build = staging => ({
+        logo: {
+            notationOutput: "",
+            notationNotes: Object.fromEntries(Object.keys(staging).map(t => [t, ""])),
+            notation: { notationStaging: staging }
+        },
+        turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) }
+    });
+
+    it("gives each turtle its own numbered V: field", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
+
+        expect(result.split("\n").filter(line => line.startsWith("V:"))).toEqual(["V:1", "V:2"]);
+    });
+
+    it("starts each V: field on its own line", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
+
+        expect(result).not.toMatch(/\S +V:/);
+    });
+});
