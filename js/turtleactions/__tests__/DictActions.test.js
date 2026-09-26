@@ -215,6 +215,22 @@ describe("setupDictActions", () => {
     });
 
     describe("SerializeDict", () => {
+        it("should not crash when turtleDicts[turtle] is undefined", () => {
+            delete activity.logo.turtleDicts[turtle];
+            const serialized = Turtle.DictActions.SerializeDict(0, turtle);
+            const expected = JSON.stringify({
+                "color": "red",
+                "shade": 10,
+                "grey": 0.5,
+                "pen size": 2,
+                "font": "Arial",
+                "heading": 90,
+                "y": 200,
+                "x": 100
+            });
+            expect(serialized).toBe(expected);
+        });
+
         it("should serialize the turtle dictionary correctly", () => {
             activity.logo.turtleDicts[turtle] = {}; // 0 not in turtleDicts[turtle]
             const serialized = Turtle.DictActions.SerializeDict(0, turtle);

@@ -194,7 +194,10 @@ function setupDictActions(activity) {
             this_dict["y"] = activity.turtles.screenY2turtleY(targetTur.container.y);
             this_dict["x"] = activity.turtles.screenX2turtleX(targetTur.container.x);
 
-            if (target in activity.logo.turtleDicts[turtle]) {
+            if (
+                turtle in activity.logo.turtleDicts &&
+                target in activity.logo.turtleDicts[turtle]
+            ) {
                 for (const key in activity.logo.turtleDicts[turtle][target]) {
                     this_dict[key] = activity.logo.turtleDicts[turtle][target][key];
                 }
