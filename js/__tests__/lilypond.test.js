@@ -178,6 +178,78 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("g' 8 \\staccato ");
     });
 
+    // One note of a triplet of eighth notes, as notation.js stages it.
+    const tripletNote = pitch => [[pitch], 1, 8, [3, 4], 8, -1, false];
+
+    test("should write a natural as the plain note name followed by !", () => {
+        logo.notation.notationStaging[turtle] = [[["C♮4"], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("c'!4 ");
+    });
+
+    test("should write double sharps and double flats", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C𝄪4"], 4, 0, null, 0, -1, false],
+            [["E𝄫4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("cisis'4 eeses'4 ");
+    });
+
+    test("should round the tempo to a whole number of beats per minute", () => {
+        logo.notation.notationStaging[turtle] = ["tempo", 90.5, "4"];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tempo 4 = 91\n");
+    });
+
+    test("should quote markup text so Lilypond does not parse it", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C4"], 4, 0, null, 0, -1, false],
+            "markdown",
+            '50% "loud" {x} a\\b'
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain('_\\markup { "50% \\"loud\\" {x} a\\\\b" } ');
+    });
+
+    test("should keep a slur that spans a tuplet inside the tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin slur",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4"),
+            "end slur",
+            [["F4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("{ c' 8(  d' 8e' 8)  } f'4 ");
+    });
+
+    test("should keep a crescendo that spans a tuplet inside the tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin crescendo",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4"),
+            "end crescendo",
+            [["F4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("{ c' 8\\< d' 8e' 8\\! } f'4 ");
+    });
+
+    test("should accent tuplet notes inside an articulation", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin articulation",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4"),
+            "end articulation"
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("{ c' 8->d' 8->e' 8->} ");
+    });
+
     test("should place staccato after the chord on notes inside a tuplet", () => {
         logo.notation.notationStaging[turtle] = [[["C4", "E4"], 4, 8, [3, 2], 8, -1, true]];
         processLilypondNotes(lilypond, logo, turtle);
@@ -188,14 +260,14 @@ describe("processLilypondNotes", () => {
         logo.notation.notationStaging[turtle] = ["markup", "Test Markup"];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain(
-            "^\\markup { \\abs-fontsize #6 { Test Markup } } "
+            '^\\markup { \\abs-fontsize #6 { "Test Markup" } } '
         );
     });
 
     test("should process a markdown command correctly", () => {
         logo.notation.notationStaging[turtle] = ["markdown", "Test Markdown"];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("_\\markup { Test Markdown } ");
+        expect(logo.notationNotes[turtle]).toContain('_\\markup { "Test Markdown" } ');
     });
 
     test("should process a break command correctly", () => {
@@ -476,6 +548,16 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain("sn4 r4 sn4 sn4");
     });
 
+    test("should keep drum voices out of the guitar tablature", () => {
+        activity.logo.notation.notationDrumStaging = {
+            0: [[["sn"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("\\drumzeroVoice\n");
+        expect(result).toContain('\\context TabVoice = "Turtlezero"');
+        expect(result).not.toContain('\\context TabVoice = "drumzero"');
+    });
+
     test("should handle empty drum staging correctly", () => {
         activity.logo.notation.notationDrumStaging = {
             0: []
@@ -486,8 +568,8 @@ describe("saveLilypondOutput", () => {
 
     test("should handle multiple turtles correctly", () => {
         const result = saveLilypondOutput(activity);
-        expect(result).toContain("Turtle0 = {");
-        expect(result).toContain("Turtle1 = {");
+        expect(result).toContain("Turtlezero = {");
+        expect(result).toContain("Turtleone = {");
     });
 
     test("should handle unique short instrument names correctly", () => {
@@ -547,9 +629,9 @@ describe("saveLilypondOutput", () => {
 
         const result = saveLilypondOutput(activity);
 
-        expect(result).toContain('\\context TabVoice = "Turtle0" \\Turtle0');
+        expect(result).toContain('\\context TabVoice = "Turtlezero" \\Turtlezero');
         expect(result).toContain('shortInstrumentName = "Tu"');
-        expect(result).toContain("Turtle1Voice = \\new Staff \\with {");
+        expect(result).toContain("TurtleoneVoice = \\new Staff \\with {");
     });
 
     test("guitar tablature groups each instrument by its own clef, not turtle 0's", () => {
@@ -566,10 +648,10 @@ describe("saveLilypondOutput", () => {
 
         const result = saveLilypondOutput(activity);
 
-        const scoreVoice0 = result.indexOf("\\Turtle0Voice\n");
-        const scoreVoice1 = result.indexOf("\\Turtle1Voice\n");
-        const tab0 = result.indexOf('\\context TabVoice = "Turtle0"');
-        const tab1 = result.indexOf('\\context TabVoice = "Turtle1"');
+        const scoreVoice0 = result.indexOf("\\TurtlezeroVoice\n");
+        const scoreVoice1 = result.indexOf("\\TurtleoneVoice\n");
+        const tab0 = result.indexOf('\\context TabVoice = "Turtlezero"');
+        const tab1 = result.indexOf('\\context TabVoice = "Turtleone"');
 
         expect(scoreVoice0).toBeGreaterThan(-1);
         expect(scoreVoice1).toBeGreaterThan(-1);
@@ -577,7 +659,7 @@ describe("saveLilypondOutput", () => {
         expect(tab1).toBeGreaterThan(-1);
 
         // the score section above already groups treble on top, bass_8 on
-        // the bottom, so Turtle1 (treble) lists before Turtle0 (bass_8)
+        // the bottom, so Turtleone (treble) lists before Turtlezero (bass_8)
         expect(scoreVoice1).toBeLessThan(scoreVoice0);
         // the guitar tablature section must match that same ordering,
         // grouping each instrument by its own clef instead of turtle 0's
@@ -771,5 +853,49 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain('shortInstrumentName = "ft"');
         expect(result).toContain('shortInstrumentName = "ab"');
         expect(result).toContain('shortInstrumentName = "aab"');
+    });
+
+    test("should spell out digits and drop punctuation in voice identifiers", () => {
+        activity.turtles.turtleList = {
+            0: { name: "Voice 1" },
+            1: { name: "Bob's-flute" }
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("Voiceone = {");
+        expect(result).toContain("Bobsflute = {");
+        expect(result).toContain('instrumentName = "Voice 1"');
+        expect(result).toContain('instrumentName = "Bob\'s-flute"');
+        expect(result).toContain("\\VoiceoneVoice\n");
+        expect(result).toContain("\\BobsfluteVoice\n");
+    });
+
+    test("should give turtles with the same name their own voices", () => {
+        activity.turtles.turtleList = {
+            0: { name: "Piano" },
+            1: { name: "Piano" }
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("Piano = {");
+        expect(result).toContain("Pianoone = {");
+        expect(result).toContain("\\PianoVoice\n");
+        expect(result).toContain("\\PianooneVoice\n");
+    });
+
+    test("should list an unnamed turtle under the same voice it was written to", () => {
+        activity.turtles.turtleList = {
+            0: { name: "start" },
+            1: { name: "" }
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("brownrat = {");
+        expect(result).toContain("\\brownratVoice\n");
+        expect(result.match(/\\mouseVoice\n/g)).toHaveLength(1);
+    });
+
+    test("should end the last voice with a bar even when every turtle has a drum slot", () => {
+        activity.logo.notation.notationDrumStaging = { 0: [], 1: [] };
+        const result = saveLilypondOutput(activity);
+        expect(result.match(/\\bar "\|\."/g)).toHaveLength(1);
+        expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar "\|\."/);
     });
 });
