@@ -1121,3 +1121,29 @@ describe("processABCNotes - key signatures", () => {
         });
     });
 });
+
+describe("saveAbcOutput - one K: field per turtle", () => {
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    const build = staging => ({
+        logo: {
+            notationOutput: "",
+            notationNotes: Object.fromEntries(Object.keys(staging).map(t => [t, ""])),
+            notation: { notationStaging: staging }
+        },
+        turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) }
+    });
+
+    it("starts each turtle's K: field on its own line", () => {
+        const result = saveAbcOutput(build({ 0: [note("C4")], 1: [note("D4")] }));
+
+        expect(result.split("\n").filter(line => line.startsWith("K:"))).toHaveLength(2);
+        expect(result).not.toMatch(/\S +K:/);
+    });
+
+    it("does not leave a blank line after an empty turtle", () => {
+        const result = saveAbcOutput(build({ 0: [], 1: [note("D4")] }));
+
+        expect(result.replace(/\n+$/, "")).not.toContain("\n\n");
+    });
+});

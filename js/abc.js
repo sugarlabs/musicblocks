@@ -651,12 +651,19 @@ const processABCNotes = function (logo, turtle, keySignature = "C major") {
  */
 const saveAbcOutput = function (activity) {
     const outputParts = [getABCHeader()];
+    let atLineStart = true;
 
     for (const t in activity.logo.notation.notationStaging) {
         const keySignature = activity.turtles.ithTurtle(t).singer.keySignature;
+        // A K: field is only a field at the start of a line.
+        if (!atLineStart) {
+            outputParts.push("\n");
+        }
         outputParts.push("K:" + abcKeySignature(keySignature).field + "\n");
         processABCNotes(activity.logo, t, keySignature);
-        outputParts.push(activity.logo.notationNotes[t]);
+        const notes = activity.logo.notationNotes[t];
+        outputParts.push(notes);
+        atLineStart = notes === "" || notes.endsWith("\n");
     }
 
     outputParts.push("\n");
