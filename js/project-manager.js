@@ -568,15 +568,56 @@ class ProjectManager {
             that._doHardStopButton();
         }
 
+        // Clear the Git tracking for the new project — mirrors the
+        // same cleanup done in activity.js _afterDelete (which is only
+        // reached via a different code path).
+        const gitKeys = [
+            "mbGitRepoName",
+            "mbGitHashedKey",
+            "mbGitDisplayName",
+            "mbGitLastSavedHash",
+            "mbGitCurrentSha",
+            "mbGitCurrentDraftId",
+            "mbGitCurrentProjectId"
+        ];
+        for (const key of gitKeys) {
+            if (typeof that.storage.removeItem === "function") {
+                that.storage.removeItem(key);
+            } else {
+                delete that.storage[key];
+            }
+        }
+        if (that.gitDropdownUI && typeof that.gitDropdownUI.clearForNewProject === "function") {
+            that.gitDropdownUI.clearForNewProject();
+        } else if (that.gitDropdownUI && typeof that.gitDropdownUI._syncMenuState === "function") {
+            that.gitDropdownUI._syncMenuState();
+        }
+
         if (
             that.planet !== undefined &&
             that.planet.planet !== null &&
             that.planet.getCurrentProjectName() !== _("My Project")
         ) {
+            // Save the current project before switching away from it.
             that.planet.saveLocally();
+            // Create the new project slot and clear the canvas synchronously.
             that.planet.initialiseNewProject();
-            pm._loadStart(that);
-            that.planet.saveLocally();
+            // _loadStart is async: it fires loadNewBlocks and then emits
+            // "finishedLoading". We save the NEW project only after that
+            // event fires so we capture the fresh start blocks, not stale data.
+            const loadPromise = pm._loadStart(that);
+            if (loadPromise && typeof loadPromise.then === "function") {
+                loadPromise
+                    .then(() => {
+                        that.planet.saveLocally();
+                    })
+                    .catch(() => {
+                        // Best-effort — ignore if _loadStart rejects unexpectedly.
+                        that.planet.saveLocally();
+                    });
+            } else {
+                that.planet.saveLocally();
+            }
         } else {
             that.toolbar.closeAuxToolbar((act, resize) => act._showHideAuxMenu(resize));
 
@@ -1050,6 +1091,12 @@ class ProjectManager {
                                     that.stage.addEventListener("trashsignal", __listener, false);
                                     that.sendAllToTrash(false, false);
                                     that._allClear(false, true);
+                                    if (
+                                        that.gitDropdownUI &&
+                                        typeof that.gitDropdownUI.clearForNewProject === "function"
+                                    ) {
+                                        that.gitDropdownUI.clearForNewProject();
+                                    }
                                     if (that.planet) {
                                         that.planet.closePlanet();
                                         that.planet.initialiseNewProject(

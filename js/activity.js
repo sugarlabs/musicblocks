@@ -2833,7 +2833,15 @@ class Activity {
                 this.save.saveBlockArtworkPNG.bind(this.save)
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
+            // Initialise the Git dropdown ("My Project") after the planet
+            // is ready so activity.prepareExport() is available.
+            if (typeof GitDropdownUI !== "undefined") {
+                this.gitDropdownUI = new GitDropdownUI();
+                this.gitDropdownUI.init(this);
+                this.toolbar.renderGitDropdownIcon(this.gitDropdownUI);
+            }
             this.toolbar.renderMenuIcon(this.showHideAuxMenu);
+
             this.toolbar.renderHelpIcon(this.showHelp, this.showKeyboardShortcuts);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
@@ -2865,6 +2873,17 @@ class Activity {
             }
 
             window.saveLocally = this.saveLocally;
+
+            // Keep the Git dirty-check hash up to date after every local save.
+            if (this.gitDropdownUI) {
+                const _origSaveLocally = this.saveLocally;
+                this.saveLocally = (...args) => {
+                    const result = _origSaveLocally.apply(this, args);
+                    this.gitDropdownUI.onSaveLocally();
+                    return result;
+                };
+                window.saveLocally = this.saveLocally;
+            }
 
             // Auto-save live workspace every 5 minutes to guard against
             // data loss from browser crashes (see issue #2994).

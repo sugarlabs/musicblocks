@@ -105,10 +105,11 @@ class ProjectStorage {
         return this.ImageDataURL;
     }
 
-    async initialiseNewProject(name, data, image) {
+    async initialiseNewProject(name, data, image, publishedData) {
         name = name ?? this.defaultProjectName;
         data = data ?? null;
         image = image ?? null;
+        publishedData = publishedData ?? null;
 
         const c = this.generateID();
         this.data.CurrentProject = c;
@@ -116,18 +117,174 @@ class ProjectStorage {
         this.data.Projects[c].ProjectName = name;
         this.data.Projects[c].ProjectData = data;
         this.data.Projects[c].ProjectImage = image;
-        this.data.Projects[c].PublishedData = null;
+        this.data.Projects[c].PublishedData = publishedData;
+        this.data.Projects[c].GitRepoData = null; // GitHub repo link
+        this.data.Projects[c].commitDrafts = []; // offline pending commits (max 5)
+        this.data.Projects[c].cachedCommits = []; // last 3 synced commit metadata
+        this.data.Projects[c].pendingRepoCreation = null; // queued POST /create (offline-first)
         this.data.Projects[c].DateLastModified = Date.now();
         await this.save();
+        return c;
     }
 
     async renameProject(id, name) {
         this.data.Projects[id].ProjectName = name;
         await this.save();
+        if (this.Planet && typeof this.Planet._postGitState === "function") {
+            this.Planet._postGitState(id);
+        }
     }
 
     async addPublishedData(id, data) {
         this.data.Projects[id].PublishedData = data;
+        await this.save();
+    }
+
+    /**
+     * Stores the GitHub repo slug for a project that has a repo but
+     * has NOT yet been published to the planet (visible=0).
+     * Also stores description, tags, and the ownership key so Time Travel
+     * can be restored when switching between projects.
+     */
+    async addGitRepoData(id, repoName, description, tags, hashedKey) {
+        // Guard: auto-initialise the project slot if it doesn't exist yet.
+        // This can happen when a brand-new project clicks "Save a spot" while
+        // offline before the project has been persisted to ProjectStorage.
+        if (!this.data.Projects[id]) {
+            this.data.Projects[id] = {
+                ProjectName: this.defaultProjectName,
+                ProjectData: null,
+                ProjectImage: null,
+                PublishedData: null,
+                GitRepoData: null,
+                commitDrafts: [],
+                cachedCommits: [],
+                pendingRepoCreation: null,
+                DateLastModified: Date.now()
+            };
+        }
+        this.data.Projects[id].GitRepoData = {
+            repoName,
+            description: description || "",
+            tags: tags || [],
+            hashedKey: hashedKey || ""
+        };
+        await this.save();
+    }
+
+    /**
+     * Stores the details needed to create a GitHub repo once back online.
+     * Called when a student clicks "Save a spot" while offline.
+     * @param {string} id       project ID
+     * @param {Object} details  { projectName, description, tags, creatorName, thumbnail, localDraftId }
+     * @returns {Promise<void>}
+     */
+    async setPendingRepoCreation(id, details) {
+        // Auto-initialise the project slot if it doesn't exist yet.
+        if (!this.data.Projects[id]) {
+            this.data.Projects[id] = {
+                ProjectName: this.defaultProjectName,
+                ProjectData: null,
+                ProjectImage: null,
+                PublishedData: null,
+                GitRepoData: null,
+                commitDrafts: [],
+                cachedCommits: [],
+                pendingRepoCreation: null,
+                DateLastModified: Date.now()
+            };
+        }
+        this.data.Projects[id].pendingRepoCreation = { ...details, status: "pending" };
+        await this.save();
+    }
+
+    /**
+     * Clears the pendingRepoCreation flag once the repo has been created on GitHub.
+     * @param {string} id  project ID
+     * @returns {Promise<void>}
+     */
+    async clearPendingRepoCreation(id) {
+        if (!this.data.Projects[id]) return;
+        this.data.Projects[id].pendingRepoCreation = null;
+        await this.save();
+    }
+
+    /**
+     * Returns how many drafts for a project currently have status 'pending'.
+     * Used by OfflineCommitManager to enforce the 5-draft cap.
+     * @param {string} id  project ID
+     * @returns {number}
+     */
+    getPendingDraftCount(id) {
+        const drafts = this.data.Projects[id]?.commitDrafts || [];
+        return drafts.filter(d => d.status === "pending").length;
+    }
+
+    /**
+     * Appends an offline commit draft to a project.
+     * Returns false (and does NOT save) if the pending cap of 5 is already reached.
+     * @param {string} id     project ID
+     * @param {Object} draft  { id, message, data, timestamp, status: 'pending' }
+     * @returns {Promise<boolean>} true if saved, false if capped
+     */
+    async addCommitDraft(id, draft) {
+        if (!this.data.Projects[id]) return false;
+
+        // Ensure the field exists on older project entries loaded from storage
+        if (!Array.isArray(this.data.Projects[id].commitDrafts)) {
+            this.data.Projects[id].commitDrafts = [];
+        }
+
+        const pendingCount = this.getPendingDraftCount(id);
+        if (pendingCount >= 5) {
+            // Cap reached — caller must show a blocking message to the student
+            return false;
+        }
+
+        this.data.Projects[id].commitDrafts.push(draft);
+        await this.save();
+        return true;
+    }
+
+    /**
+     * Returns the cachedCommits array for a project (last 3 synced from GitHub).
+     * @param {string} id  project ID
+     * @returns {Array}
+     */
+    getCachedCommits(id) {
+        return this.data.Projects[id]?.cachedCommits || [];
+    }
+
+    /**
+     * Replaces the cachedCommits array, trimmed to the last 3 entries.
+     * @param {string} id       project ID
+     * @param {Array}  commits  array of { sha, message, author, date }
+     * @returns {Promise<void>}
+     */
+    async setCachedCommits(id, commits) {
+        if (!this.data.Projects[id]) return;
+        if (!Array.isArray(this.data.Projects[id].cachedCommits)) {
+            this.data.Projects[id].cachedCommits = [];
+        }
+        // Keep only the 3 most recent
+        this.data.Projects[id].cachedCommits = commits.slice(0, 3);
+        await this.save();
+    }
+
+    /**
+     * Updates the status of a specific draft (e.g. pending → synced).
+     * @param {string} id        project ID
+     * @param {string} draftId   the draft's uuid
+     * @param {string} status    new status string
+     * @param {string} [sha]     GitHub commit SHA (set after successful sync)
+     * @returns {Promise<void>}
+     */
+    async updateDraftStatus(id, draftId, status, sha) {
+        if (!this.data.Projects[id]) return;
+        const draft = (this.data.Projects[id].commitDrafts || []).find(d => d.id === draftId);
+        if (!draft) return;
+        draft.status = status;
+        if (sha) draft.sha = sha;
         await this.save();
     }
 

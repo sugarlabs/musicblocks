@@ -137,8 +137,9 @@ class ToolbarUI {
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
                 ["saveButtonAdvanced", _("Save project as HTML")],
-                ["planetIcon", _("Find and share projects")],
-                ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+                ["planetIcon", _("Git Planet")],
+                ["planetIconDisabled", _("Offline. Git Planet is unavailable")],
+                ["gitProjectBtn", _("My Project")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), true],
@@ -215,8 +216,9 @@ class ToolbarUI {
                 _("Load project from file"),
                 _("Save project"),
                 _("Save project"),
-                _("Find and share projects"),
-                _("Offline. Sharing is unavailable"),
+                _("Git Planet"),
+                _("Offline. Git Planet is unavailable"),
+                _("My Project"),
                 _("Auxiliary menu"),
                 _("Help and shortcuts"),
                 _("Help"),
@@ -273,8 +275,9 @@ class ToolbarUI {
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
                 ["saveButtonAdvanced", _("Save project as HTML")],
-                ["planetIcon", _("Find and share projects")],
-                ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+                ["planetIcon", _("Git Planet")],
+                ["planetIconDisabled", _("Offline. Git Planet is unavailable")],
+                ["gitProjectBtn", _("My Project")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), true],
@@ -303,6 +306,9 @@ class ToolbarUI {
                 ["save-png", _("Save turtle artwork as PNG"), true],
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), true],
                 ["save-blockartwork-png", _("Save block artwork as PNG"), true],
+                ["git-create", _("Track my project"), true],
+                ["git-commit", _("Mark this moment"), true],
+                ["git-history", _("Time travel"), true],
                 ["new-project", _("Confirm"), true],
                 ["enUS", "English (United States)", true],
                 ["enUK", "English (United Kingdom)", true],
@@ -345,8 +351,9 @@ class ToolbarUI {
                 _("Load project from file"),
                 _("Save project"),
                 _("Save project as HTML"),
-                _("Find and share projects"),
-                _("Offline. Sharing is unavailable"),
+                _("Git Planet"),
+                _("Offline. Git Planet is unavailable"),
+                _("My Project"),
                 _("Auxiliary menu"),
                 _("Help and shortcuts"),
                 _("Help"),
@@ -1338,6 +1345,17 @@ class ToolbarUI {
                 if (shortcutsOnclick) {
                     shortcutsOnclick(this.activity);
                 }
+            };
+        }
+
+        const gitTutorialItem = docById("gitTutorialItem");
+        if (gitTutorialItem && typeof GitTutorial !== "undefined") {
+            gitTutorialItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                GitTutorial.open(this.activity);
             };
         }
 
@@ -2481,6 +2499,29 @@ class ToolbarUI {
             if (btn) btn.style.color = color;
             this._dimTimeout = null;
         }, 500);
+    }
+
+    /**
+     * Renders the "My Project" Git dropdown icon and wires up the Materialize
+     * dropdown trigger. The menu item visibility is managed by GitDropdownUI.
+     *
+     * @public
+     * @param {GitDropdownUI} gitDropdownUI - The GitDropdownUI instance.
+     * @returns {void}
+     */
+    renderGitDropdownIcon(gitDropdownUI) {
+        const btn = docById("gitProjectBtn");
+        if (!btn) return;
+
+        const sync = () => {
+            if (gitDropdownUI && typeof gitDropdownUI._syncMenuState === "function") {
+                gitDropdownUI._syncMenuState();
+            }
+        };
+
+        btn.addEventListener("click", sync);
+        btn.addEventListener("mouseenter", sync);
+        btn.addEventListener("focus", sync);
     }
 }
 

@@ -93,6 +93,13 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     background-color: var(--color-bg-secondary) !important;
 }
 
+/* Override the above rule for our git/mb-dialog modals — they need fg text, not border-colour */
+.dark #floatingWindows > .windowFrame.mb-system-dialog > .wfWinBody .wfbWidget,
+.dark .mb-system-dialog .wfbWidget {
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-secondary) !important;
+}
+
 .dark .popupMsg {
     background-color: var(--color-brand-primary-hover);
     /* --color-text-secondary (#d1d5db) was designed for text on the dark
@@ -556,6 +563,13 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     background-color: var(--color-bg-secondary) !important;
 }
 
+/* Override the above for our git/mb-dialog modals — they need fg text on dark bg */
+.highcontrast #floatingWindows > .windowFrame.mb-system-dialog > .wfWinBody .wfbWidget,
+.highcontrast .mb-system-dialog .wfbWidget {
+    color: #fff !important;
+    background-color: #000 !important;
+}
+
 .highcontrast .popupMsg {
     background-color: var(--color-bg-inverse);
     color: var(--color-text-inverse);
@@ -738,3 +752,594 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .material-tooltip span {
     color: var(--color-text-primary) !important;
 }
+
+/* ==========================================================================
+   Time Travel — Winding Map Timeline
+   ========================================================================== */
+
+/* ── frame shell ── */
+.git-tt-frame {
+    background: #ffffff;
+    border-radius: 20px !important;
+    box-shadow: 0 24px 56px rgba(0,0,0,0.18) !important;
+    border: none !important;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── top bar ── */
+.git-tt-topbar {
+    padding: 26px 24px 22px !important;
+    background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%) !important;
+    border-bottom: 3px dashed #90caf9 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-shrink: 0;
+}
+
+.git-tt-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.git-tt-badge {
+    width: 52px; height: 52px;
+    border-radius: 16px;
+    background: linear-gradient(140deg, #2196f3, #1565c0);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 14px rgba(33,150,243,0.35);
+    transform: rotate(-5deg);
+    flex-shrink: 0;
+}
+
+.git-tt-title {
+    display: block;
+    font-weight: 800;
+    font-size: 20px;
+    color: #1f2937;
+    line-height: 1.2;
+}
+
+.git-tt-subtitle {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-top: 3px;
+}
+
+/* ── scrollable body ── */
+.git-tt-body {
+    display: block !important;   /* override wfWinBody flex-row */
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 0 24px;
+    background: #eef5ff;  /* subtle blue tint — map atmosphere, not noise */
+}
+
+/* ── winding path wrap ── */
+.git-tt-wrap {
+    position: relative;
+    padding: 36px 0 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 72px;   /* generous gap — curves stay gradual, content breathes */
+}
+
+/* ── individual stop ── */
+.git-tt-stop {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+}
+/* right stop: text on left fills space, node pushed to right edge */
+.git-tt-stop.right {
+    flex-direction: row-reverse;
+    padding: 0 12px 0 28px;
+}
+/* left stop: node on left edge, text fills right */
+.git-tt-stop.left {
+    flex-direction: row;
+    padding: 0 28px 0 12px;
+}
+.git-tt-stop.right .git-tt-text { align-items: flex-end; text-align: right; }
+.git-tt-stop.left  .git-tt-text { align-items: flex-start; text-align: left; }
+.git-tt-stop.right .git-tt-btn-row { justify-content: flex-end; }
+.git-tt-stop.left  .git-tt-btn-row { justify-content: flex-start; }
+
+/* ── node bubble ── */
+.git-tt-node {
+    flex: 0 0 auto;
+    width: 64px; height: 64px;
+    border-radius: 50% 46% 50% 50% / 46% 50% 50% 54%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.13);
+    border: 5px solid #fff;
+    position: relative;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    z-index: 1;
+}
+.git-tt-node:hover { transform: scale(1.1) rotate(-5deg); }
+.git-tt-node svg { width: 26px; height: 26px; }
+
+/* "now" node — bigger + pulsing green glow */
+.git-tt-node.now {
+    width: 80px; height: 80px;
+    animation: git-tt-pulse 2.4s ease-in-out infinite;
+}
+.git-tt-node.now svg { width: 32px; height: 32px; }
+
+@keyframes git-tt-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(33,150,243,.5), 0 8px 20px rgba(0,0,0,0.14); }
+    50%      { box-shadow: 0 0 0 10px rgba(33,150,243,0), 0 8px 20px rgba(0,0,0,0.14); }
+}
+
+/* "YOU ARE HERE" label */
+.git-tt-you-here {
+    position: absolute;
+    top: -14px; left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    background: #fdd835;
+    color: #5d4000;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 7px;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+    letter-spacing: 0.04em;
+}
+
+/* node color classes — "c-green" uses MB toolbar blue; rest stay vibrant */
+.git-tt-node.c-now    { background: linear-gradient(150deg, #fff176, #fdd835); }
+.git-tt-node.c-green  { background: linear-gradient(150deg, #2196f3, #1565c0); }
+.git-tt-node.c-pink   { background: linear-gradient(150deg, #ef9a9a, #e57373); }
+.git-tt-node.c-teal   { background: linear-gradient(150deg, #4db6ac, #00897b); }
+.git-tt-node.c-orange { background: linear-gradient(150deg, #ffb74d, #fb8c00); }
+.git-tt-node.c-blue   { background: linear-gradient(150deg, #64b5f6, #1e88e5); }
+.git-tt-node.c-purple { background: linear-gradient(150deg, #9575cd, #5e35b1); }
+.git-tt-node.c-red    { background: linear-gradient(150deg, #e57373, #c62828); }
+.git-tt-node.c-grey   { background: linear-gradient(150deg, #cfd8dc, #90a4ae); }
+
+/* Amber "sync pending" node — offline draft awaiting network */
+.git-tt-node.c-pending {
+    background: linear-gradient(150deg, #fcd34d, #d97706);
+    box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.5);
+}
+@keyframes git-pending-pulse {
+    0%   { box-shadow: 0 0 0 0   rgba(217, 119, 6, 0.5); }
+    60%  { box-shadow: 0 0 0 10px rgba(217, 119, 6, 0);  }
+    100% { box-shadow: 0 0 0 0   rgba(217, 119, 6, 0);   }
+}
+.git-tt-node.pending-node {
+    animation: git-pending-pulse 2s ease-out infinite;
+}
+
+/* "Sync Pending" badge — amber pill next to commit message */
+.git-tt-sync-pending-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #92400e;
+    color: #fef3c7;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+
+/* ── text column ── */
+.git-tt-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    z-index: 1;
+}
+
+.git-tt-msg {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+
+.git-tt-latest-badge {
+    background: #2196f3;
+    color: #fff;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 1px 7px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.git-tt-btn-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Date text lives inline in .git-tt-btn-row, always to the RIGHT of the button */
+.git-tt-date-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    white-space: nowrap;
+    align-self: center;
+    order: 1;  /* left stops: date to the RIGHT of the button */
+}
+.git-tt-stop:hover .git-tt-date-text { opacity: 1; }
+
+/* right stops: text is on the left, so date sits to the LEFT of the button */
+.git-tt-stop.right .git-tt-date-text { order: -1; }
+
+
+/* "Take me here" button — MB toolbar blue */
+.git-tt-go-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(150deg, #2196f3, #1565c0);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #0d47a1, 0 6px 14px rgba(33,150,243,0.25);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+.git-tt-go-btn:hover  { transform: translateY(-1px); }
+.git-tt-go-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #0d47a1; }
+
+/* "your song right now" chip */
+.git-tt-now-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #5d4000;
+    background: #fff9c4;
+    padding: 5px 12px;
+    border-radius: 10px;
+}
+
+/* "Clear Changes" button — same 3D design as go-btn, red to signal destructive */
+.git-tt-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(150deg, #ef5350, #c62828);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #b71c1c, 0 6px 14px rgba(198,40,40,0.25);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+.git-tt-clear-btn:hover  { transform: translateY(-1px); }
+.git-tt-clear-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #b71c1c; }
+
+/* start-flag note */
+.git-tt-flag-note {
+    font-size: 11.5px;
+    font-style: italic;
+    color: #9ca3af;
+    margin-bottom: 1px;
+}
+
+/* dark-mode overrides */
+.dark .git-tt-frame { background: #1f2937; }
+.dark .git-tt-topbar { background: linear-gradient(135deg, #0d2744 0%, #1a3558 100%) !important; border-bottom-color: #1565c0 !important; }
+.dark .git-tt-msg  { color: #f9fafb; }
+.dark .git-tt-now-chip { background: #5d4a00; color: #fdd835; }
+.dark .git-tt-node { border-color: #1f2937; }
+.dark .git-tt-title { color: #f9fafb; }
+.dark .git-tt-subtitle { color: #9ca3af; }
+
+/* ── "Just Go Back" discard button inside unsaved-work guard ── */
+.git-guard-discard-btn {
+    border: 1px solid var(--color-error, #ef4444) !important;
+    color: var(--color-error, #ef4444) !important;
+}
+
+.git-guard-discard-btn:hover {
+    background: var(--color-error, #ef4444) !important;
+    color: #fff !important;
+}
+
+/* ==========================================================================
+   Toast (fallback if activity.textMsg is unavailable)
+   ========================================================================== */
+
+.git-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: var(--radius-lg, 8px);
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 20000;
+    pointer-events: none;
+    animation: git-toast-in 0.2s ease;
+    box-shadow: var(--shadow-md);
+    max-width: 90vw;
+    text-align: center;
+}
+
+.git-toast--info {
+    background: var(--color-info-bg, #dbeafe);
+    color: var(--color-info, #3b82f6);
+}
+.git-toast--success {
+    background: var(--color-success-bg, #d1fae5);
+    color: var(--color-success, #10b981);
+}
+.git-toast--error {
+    background: var(--color-error-bg, #fee2e2);
+    color: var(--color-error, #ef4444);
+}
+
+@keyframes git-toast-in {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* ==========================================================================
+   Dark Mode Overrides — Git Dropdown
+   ========================================================================== */
+
+.dark .git-timeline-dot {
+    border-color: #1f2937;
+}
+
+.dark .git-timeline-go-back-btn {
+    color: var(--color-brand-primary);
+    border-color: var(--color-brand-primary);
+}
+
+.dark .git-timeline-go-back-btn:hover:not(:disabled) {
+    background: var(--color-brand-primary);
+    color: #111827;
+}
+
+/* ==========================================================================
+   High-Contrast Mode Overrides — Git Dropdown
+   ========================================================================== */
+
+.highcontrast .git-timeline-go-back-btn {
+    border-color: #ffff00 !important;
+    color: #ffff00 !important;
+}
+
+
+.highcontrast .git-timeline-go-back-btn:hover:not(:disabled) {
+    background: #ffff00 !important;
+    color: #000 !important;
+}
+
+.highcontrast .git-timeline-latest-badge {
+    background: #00ff00 !important;
+    color: #000 !important;
+}
+
+/* ==========================================================================
+   MBDialog (alert / prompt modals) — dark & high-contrast
+   ========================================================================== */
+
+/* Message text inherits color-text-primary via widget.style.color in mb-dialog.js already,
+   but ensure it overrides any computed white-on-white / black-on-black */
+.dark .mb-system-dialog .wfbWidget,
+.dark .mb-system-dialog .wfbWidget p,
+.dark .mb-system-dialog .wfbWidget div {
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-secondary) !important;
+}
+
+.highcontrast .mb-system-dialog .wfbWidget,
+.highcontrast .mb-system-dialog .wfbWidget p,
+.highcontrast .mb-system-dialog .wfbWidget div {
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-secondary) !important;
+}
+
+/* Input field inside MBDialog prompt */
+.dark .mb-system-dialog input[type="text"] {
+    background-color: #2a2a2d !important;
+    color: #f0f0f0 !important;
+    border-color: #555 !important;
+}
+
+.highcontrast .mb-system-dialog input[type="text"] {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+/* Confirm / OK buttons */
+.dark .mb-system-dialog .confirm-button {
+    background-color: #1565c0 !important;
+    color: #fff !important;
+    border: none !important;
+}
+.dark .mb-system-dialog .confirm-button:hover {
+    background-color: #1976d2 !important;
+}
+
+.highcontrast .mb-system-dialog .confirm-button {
+    background-color: #ffff00 !important;
+    color: #000 !important;
+    border: 2px solid #fff !important;
+}
+.highcontrast .mb-system-dialog .confirm-button:hover {
+    background-color: #e0e000 !important;
+}
+
+/* Cancel buttons */
+.dark .mb-system-dialog .cancel-button {
+    background-color: #3a3a3d !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #555 !important;
+}
+.dark .mb-system-dialog .cancel-button:hover {
+    background-color: #afafaf;
+}
+
+/* In dark/HC modes the hardcoded 'color: black' on .cancel-button is invisible */
+.dark .cancel-button,
+.highcontrast .cancel-button {
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-bg-tertiary, #3a3a3d) !important;
+}
+.dark .cancel-button:hover,
+.highcontrast .cancel-button:hover {
+    background-color: #5a5a5d !important;
+}
+
+.highcontrast .mb-system-dialog .cancel-button {
+    background-color: #000 !important;
+    color: #fff !important;
+    border: 2px solid #fff !important;
+}
+.highcontrast .mb-system-dialog .cancel-button:hover {
+    background-color: #333 !important;
+}
+
+/* ==========================================================================
+   git-system-dialog (Clear Changes / Unsaved Work guard dialogs)
+   ========================================================================== */
+
+.dark .git-system-dialog,
+.dark .git-system-widget {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+}
+
+.dark .git-system-widget p,
+.dark .git-system-widget span {
+    color: var(--color-text-primary) !important;
+}
+
+.highcontrast .git-system-dialog,
+.highcontrast .git-system-widget {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+.highcontrast .git-system-widget p,
+.highcontrast .git-system-widget span {
+    color: #fff !important;
+}
+
+/* Discard / destructive button in guard dialogs */
+.dark .git-guard-discard-btn {
+    border-color: #ef5350 !important;
+    color: #ef5350 !important;
+    background-color: transparent !important;
+}
+.dark .git-guard-discard-btn:hover {
+    background-color: #ef5350 !important;
+    color: #fff !important;
+}
+
+.highcontrast .git-guard-discard-btn {
+    border-color: #ff6b6b !important;
+    color: #ff6b6b !important;
+    background-color: #000 !important;
+}
+.highcontrast .git-guard-discard-btn:hover {
+    background-color: #ff6b6b !important;
+    color: #000 !important;
+}
+
+/* ==========================================================================
+   Time Travel panel — dark & high-contrast
+   ========================================================================== */
+
+/* Body / background */
+.dark .git-tt-body   { background: #111827; }
+.dark .git-tt-wrap   { /* no extra bg needed — body covers it */ }
+
+/* Flag note ("The very beginning") */
+.dark .git-tt-flag-note   { color: #6b7280; }
+.highcontrast .git-tt-flag-note { color: #aaa !important; }
+
+/* Date text */
+.dark .git-tt-date-text   { color: #6b7280; }
+.highcontrast .git-tt-date-text { color: #ccc !important; }
+
+/* Node border */
+.highcontrast .git-tt-node { border-color: #000 !important; }
+
+/* Latest badge */
+.dark .git-tt-latest-badge         { background: #1565c0; color: #fff; }
+.highcontrast .git-tt-latest-badge { background: #00ff00 !important; color: #000 !important; }
+
+/* YOU ARE HERE badge */
+.dark .git-tt-you-here {
+    background: #fdd835;
+    color: #5d4000;
+}
+.highcontrast .git-tt-you-here {
+    background: #ffff00 !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+}
+
+/* Top-bar title/subtitle */
+.highcontrast .git-tt-title    { color: #fff !important; }
+.highcontrast .git-tt-subtitle { color: #ccc !important; }
+.highcontrast .git-tt-topbar {
+    background: #000 !important;
+    border-bottom-color: #fff !important;
+}
+.highcontrast .git-tt-frame  { background: #000 !important; }
+.highcontrast .git-tt-body   { background: #111 !important; }
+.highcontrast .git-tt-msg    { color: #fff !important; }
+
+/* Go / Clear buttons — high contrast */
+.highcontrast .git-tt-go-btn {
+    background: #ffff00 !important;
+    color: #000 !important;
+    box-shadow: 0 3px 0 #b8b800, 0 6px 12px rgba(255,255,0,0.2) !important;
+}
+.highcontrast .git-tt-clear-btn {
+    background: #ff4444 !important;
+    color: #fff !important;
+    box-shadow: 0 3px 0 #990000, 0 6px 12px rgba(255,0,0,0.2) !important;
+}
+
+

@@ -140,6 +140,9 @@ class Publisher {
         const a = [];
 
         for (let i = 0; i < arr.length; i++) {
+            if (!this.Planet.TagsManifest || !this.Planet.TagsManifest[arr[i]]) {
+                continue; // Skip tag if it's missing from the dynamic manifest
+            }
             const o = {};
             o.tag = this.Planet.TagsManifest[arr[i]].TagName;
             o.id = arr[i];
@@ -168,9 +171,24 @@ class Publisher {
         const name = this.ProjectTable[id].ProjectName;
         let image = this.ProjectTable[id].ProjectImage;
         const published = this.ProjectTable[id].PublishedData;
+        const gitRepoData = this.ProjectTable[id].GitRepoData || null;
         const DATA = this.ProjectTable[id].ProjectData;
-        const description = published !== null ? published.ProjectDescription : "";
-        const tags = published !== null ? published.ProjectTags : this.dataToTags(DATA);
+
+        // Description priority: previously published > git repo (fork source) > empty
+        const description =
+            published && published.ProjectDescription
+                ? published.ProjectDescription
+                : gitRepoData && gitRepoData.description
+                  ? gitRepoData.description
+                  : "";
+
+        // Tags priority: previously published > git repo (fork source) > auto-detected from blocks
+        const tags =
+            published && published.ProjectTags
+                ? published.ProjectTags
+                : gitRepoData && gitRepoData.tags && gitRepoData.tags.length
+                  ? gitRepoData.tags
+                  : this.dataToTags(DATA);
 
         document.getElementById("publisher-ptitle").textContent = _(
             `${published !== null ? "Republish" : "Publish"}  Project`
@@ -248,22 +266,33 @@ class Publisher {
             submitobj.ProjectID = id;
             submitobj.ProjectName = title.value;
             submitobj.ProjectDescription = description.value;
-            // parseProject() now resolves proto block names to display names when running
-            // inside Music Blocks iframe by accessing window.parent.activity.blocks.palettes.
-            // This improves project searchability by using human-friendly names (e.g., "pitch"
-            // display name) instead of proto identifiers in ProjectSearchKeywords.
             submitobj.ProjectSearchKeywords = this.parseProject(this.ProjectTable[id].ProjectData);
-            submitobj.ProjectData = Planet.ProjectStorage.encodeTB(
-                this.ProjectTable[id].ProjectData
-            );
+            // GitServerInterface expects the raw project JSON object, not encoded TB.
+            // If ProjectData is a string, parse it; if already an object, use as-is.
+            let rawProjectData = this.ProjectTable[id].ProjectData;
+            try {
+                rawProjectData =
+                    typeof rawProjectData === "string"
+                        ? JSON.parse(rawProjectData)
+                        : rawProjectData;
+            } catch (_) {
+                /* keep as string */
+            }
+            submitobj.ProjectData = rawProjectData;
             submitobj.ProjectImage = this.ProjectTable[id].ProjectImage;
             submitobj.ProjectIsMusicBlocks = Planet.IsMusicBlocks ? 1 : 0;
             submitobj.ProjectCreatorName = Planet.ProjectStorage.getDefaultCreatorName();
-            submitobj.ProjectTags = this.getTags();
-            const send = JSON.stringify(submitobj);
+            // Convert tag objects to comma-separated theme string for the new backend
+            const tagArr = this.getTags(); // returns array of tag-id strings
+            submitobj.ProjectTags = tagArr; // kept for legacy compat
+            submitobj.theme = tagArr.join(","); // new backend field
+            submitobj.repoName = title.value;
+            submitobj.description = description.value;
+            submitobj.creatorName = Planet.ProjectStorage.getDefaultCreatorName();
+
             const published = {};
             published.ProjectDescription = description.value;
-            published.ProjectTags = this.getTags();
+            published.ProjectTags = tagArr;
             document.getElementById("publisher-submit").style.cursor = "wait";
             document.getElementById("publisher-cancel").style.cursor = "wait";
 
@@ -287,12 +316,100 @@ class Publisher {
                 ].style.cursor = "wait";
 
             document.body.style.cursor = "wait";
-            Planet.ServerInterface.addProject(
-                send,
-                function (data) {
-                    this.afterPublishProject(data, id, title.value, published);
-                }.bind(this)
-            );
+
+            // ── Determine publish path ────────────────────────────────────
+            // Check if this project already has a GitHub repo:
+            //   1. GitRepoData.repoName — set when a project was forked
+            //      (repo exists, visible=0, just needs flipping to 1)
+            //   2. PublishedData.repoName — set after a prior successful publish
+            //      (repo exists, visible=1, user is re-publishing after an edit)
+            // If neither exists, create a fresh repo then publish.
+            const projectEntry = this.ProjectTable[id];
+            const gitRepoData = projectEntry.GitRepoData;
+            const existingPublished = projectEntry.PublishedData;
+
+            const existingRepoName =
+                gitRepoData && gitRepoData.repoName
+                    ? gitRepoData.repoName
+                    : existingPublished && existingPublished.repoName
+                      ? existingPublished.repoName
+                      : null;
+            const existingKey = existingRepoName
+                ? Planet.ServerInterface.getKey(existingRepoName)
+                : null;
+
+            if (existingRepoName && existingKey) {
+                // ── REPO EXISTS: just flip visible=1 ─────────────────────
+                // The project is already on GitHub — no new repo needed.
+                // Also pass the current title, description, and tags so SQLite
+                // is updated to what the student chose before publishing.
+                published.repoName = existingRepoName;
+
+                const descriptionVal = document.getElementById("publish-description").value || "";
+                const tagsVal = this.getTags();
+                // Capture the thumbnail at publish time — this is the canonical image.
+                // It is whatever is on the student's canvas right now, which may differ
+                // from what was saved at repo-creation time (e.g. blank canvas).
+                const thumbnailVal = this.ProjectTable[id].ProjectImage || null;
+
+                Planet.ServerInterface.publishProject(
+                    existingRepoName,
+                    existingKey,
+                    publishData => {
+                        const combined = {
+                            success: publishData.success,
+                            error: publishData.error || null
+                        };
+                        this.afterPublishProject(combined, id, title.value, published);
+                    },
+                    title.value, // updated project name
+                    descriptionVal, // updated description
+                    tagsVal, // updated tags
+                    thumbnailVal // canonical thumbnail = canvas state right now
+                );
+            } else {
+                // ── NO REPO YET: create one, then publish ─────────────────
+                const send = JSON.stringify(submitobj);
+
+                Planet.ServerInterface.addProject(send, createData => {
+                    if (!createData.success) {
+                        this.afterPublishProject(createData, id, title.value, published);
+                        return;
+                    }
+
+                    const repoName = createData.repository;
+                    const key = createData.key;
+
+                    // Store the repo slug so LocalCard can link to it later.
+                    published.repoName = repoName;
+
+                    const descriptionVal =
+                        document.getElementById("publish-description").value || "";
+                    const tagsVal = this.getTags();
+                    Planet.ProjectStorage.addGitRepoData(id, repoName, descriptionVal, tagsVal, key)
+                        .then(() => Planet._postGitState(id))
+                        .catch(e => console.error(e));
+
+                    // Capture the thumbnail at publish time (canonical image).
+                    const thumbnailVal = this.ProjectTable[id].ProjectImage || null;
+
+                    Planet.ServerInterface.publishProject(
+                        repoName,
+                        key,
+                        publishData => {
+                            const combined = {
+                                success: publishData.success,
+                                error: publishData.error || null
+                            };
+                            this.afterPublishProject(combined, id, title.value, published);
+                        },
+                        undefined, // projectName already set during /create
+                        undefined, // description already set during /create
+                        undefined, // tags already set during /create
+                        thumbnailVal // canonical thumbnail = canvas state right now
+                    );
+                });
+            }
         }
     }
 
@@ -411,16 +528,26 @@ class Publisher {
         const Planet = this.Planet;
 
         if (!Planet.ConnectedToServer) {
-            let element = document.getElementById("publisher-form");
-            element.parentNode.removeChild(element);
-            element = document.getElementById("publisher-submit");
-            element.parentNode.removeChild(element);
-            const frag = document.createRange().createContextualFragment(this.PublisherOfflineHTML);
-            document.getElementById("publisher-content").appendChild(frag);
-        } else {
-            this.addTags();
-            this.initSubmit();
+            // Keep the form intact so the student can still queue a publish offline.
+            // The OfflineCommitManager will replay the POST /create + /publish when
+            // connectivity returns. Show a dismissible amber banner instead of
+            // removing the form entirely.
+            const banner = document.createElement("div");
+            banner.id = "publisher-offline-banner";
+            banner.style.cssText =
+                "background:#92400e;color:#fff;border-radius:4px;padding:10px 14px;" +
+                "margin-bottom:12px;font-size:13px;display:flex;align-items:flex-start;gap:8px;";
+            banner.innerHTML =
+                `<svg viewBox="0 0 24 24" fill="white" width="16" height="16" style="flex-shrink:0;margin-top:1px">` +
+                `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>` +
+                `</svg>` +
+                `<span>You're currently offline. You can still fill in the details — your project will be queued and published automatically when you reconnect.</span>`;
+            const content = document.getElementById("publisher-content");
+            if (content) content.insertBefore(banner, content.firstChild);
         }
+
+        this.addTags();
+        this.initSubmit();
     }
 }
 

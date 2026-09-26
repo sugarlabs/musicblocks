@@ -58,7 +58,7 @@ describe("StringHelper", () => {
             helperObj.init();
 
             const elem = document.getElementById("logo-container");
-            expect(elem.textContent).toBe("InitialPlanet");
+            expect(elem.textContent).toBe("InitialGit Planet");
         });
 
         it("should init and set attribute if property is provided", () => {
@@ -142,14 +142,14 @@ describe("StringHelper", () => {
                 document.body.innerHTML = '<div id="logo-container"></div>';
                 helper.init();
                 const elem = document.getElementById("logo-container");
-                expect(elem.textContent).toBe("Planet");
+                expect(elem.textContent).toBe("Git Planet");
             });
 
             it("should append to existing textContent", () => {
                 document.body.innerHTML = '<div id="logo-container">Prefix</div>';
                 helper.init();
                 const elem = document.getElementById("logo-container");
-                expect(elem.textContent).toBe("PrefixPlanet");
+                expect(elem.textContent).toBe("PrefixGit Planet");
             });
 
             it("should set placeholder attribute for search input", () => {
@@ -163,7 +163,7 @@ describe("StringHelper", () => {
                 document.body.innerHTML =
                     '<div id="logo-container"></div><div id="localtitle"></div>';
                 helper.init();
-                expect(document.getElementById("logo-container").textContent).toBe("Planet");
+                expect(document.getElementById("logo-container").textContent).toBe("Git Planet");
                 expect(document.getElementById("localtitle").textContent).toBe("My Projects");
             });
 
