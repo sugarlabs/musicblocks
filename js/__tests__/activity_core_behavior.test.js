@@ -827,4 +827,263 @@ describe("Activity Core Behaviors and Lifecycle", () => {
             );
         });
     });
+
+    describe("Display and Turtle Execution Event Handlers (Lines 2146–2249)", () => {
+        it("_changeBlockVisibility toggles block and palette visibility and switches icon", () => {
+            const changeImageMock = jest.fn();
+            const sandbox = loadActivitySandbox({
+                overrides: {
+                    changeImage: changeImageMock,
+                    SHOWBLOCKSBUTTON: "show-blocks.svg",
+                    HIDEBLOCKSFADEDBUTTON: "hide-blocks.svg"
+                }
+            });
+            const act = sandbox.activity;
+
+            const hideContainer = document.createElement("div");
+            const btnImg = document.createElement("img");
+            hideContainer.appendChild(btnImg);
+            act.hideBlocksContainer = hideContainer;
+
+            act.blocks = {
+                visible: true,
+                hideBlocks: jest.fn(() => {
+                    act.blocks.visible = false;
+                }),
+                showBlocks: jest.fn(() => {
+                    act.blocks.visible = true;
+                })
+            };
+            act.palettes = {
+                hide: jest.fn(),
+                show: jest.fn()
+            };
+
+            // First toggle: hides blocks and palettes
+            act._changeBlockVisibility();
+            expect(act.blocks.hideBlocks).toHaveBeenCalledTimes(1);
+            expect(act.palettes.hide).toHaveBeenCalledTimes(1);
+            expect(act.showBlocksAfterRun).toBe(false);
+            expect(changeImageMock).toHaveBeenCalledWith(
+                btnImg,
+                "show-blocks.svg",
+                "hide-blocks.svg"
+            );
+
+            // Second toggle: reveals blocks and palettes
+            act._changeBlockVisibility();
+            expect(act.blocks.showBlocks).toHaveBeenCalledTimes(1);
+            expect(act.palettes.show).toHaveBeenCalledTimes(1);
+            expect(changeImageMock).toHaveBeenCalledWith(
+                btnImg,
+                "hide-blocks.svg",
+                "show-blocks.svg"
+            );
+        });
+
+        it("onRunTurtle and onStopTurtle update toolbar, announce states to screen reader, and restore UI controls", () => {
+            const sandbox = loadActivitySandbox({
+                overrides: {
+                    platformColor: { stopIconcolor: "red" },
+                    window: {
+                        ...global.window,
+                        platformColor: { stopIconcolor: "red" }
+                    }
+                }
+            });
+            const act = sandbox.activity;
+
+            const saveBtn = document.createElement("button");
+            saveBtn.id = "saveButton";
+            saveBtn.disabled = true;
+            saveBtn.classList.add("grey-text", "inactiveLink");
+            document.body.appendChild(saveBtn);
+
+            const recordBtn = document.createElement("button");
+            recordBtn.id = "record";
+            recordBtn.classList.add("grey-text", "inactiveLink");
+            document.body.appendChild(recordBtn);
+
+            act.toolbar = {
+                highlightStop: jest.fn(),
+                resetStop: jest.fn()
+            };
+            act.blocks = {
+                showBlocks: jest.fn()
+            };
+            act.showBlocksAfterRun = true;
+
+            // Turtle runs
+            act.onRunTurtle();
+            expect(act.toolbar.highlightStop).toHaveBeenCalledWith("red");
+            expect(sandbox.announceToScreenReader).toHaveBeenCalledWith("Program running.");
+
+            // Turtle stops
+            act.onStopTurtle();
+            expect(act.blocks.showBlocks).toHaveBeenCalledTimes(1);
+            expect(act.showBlocksAfterRun).toBe(false);
+            expect(act.toolbar.resetStop).toHaveBeenCalledTimes(1);
+            expect(saveBtn.disabled).toBe(false);
+            expect(saveBtn.classList.contains("grey-text")).toBe(false);
+            expect(recordBtn.classList.contains("grey-text")).toBe(false);
+            expect(sandbox.announceToScreenReader).toHaveBeenCalledWith("Program stopped.");
+        });
+
+        it("clearCache uncaches and recaches un-trashed blocks", () => {
+            const sandbox = loadActivitySandbox();
+            const act = sandbox.activity;
+
+            const mockBlock = {
+                trash: false,
+                container: { uncache: jest.fn(), cache: jest.fn() },
+                bitmap: { uncache: jest.fn(), cache: jest.fn() }
+            };
+            const trashedBlock = {
+                trash: true,
+                container: { uncache: jest.fn(), cache: jest.fn() },
+                bitmap: { uncache: jest.fn(), cache: jest.fn() }
+            };
+
+            act.blocks = {
+                blockList: [mockBlock, trashedBlock]
+            };
+
+            act.clearCache();
+
+            expect(mockBlock.container.uncache).toHaveBeenCalledTimes(1);
+            expect(mockBlock.container.cache).toHaveBeenCalledTimes(1);
+            expect(mockBlock.bitmap.uncache).toHaveBeenCalledTimes(1);
+            expect(mockBlock.bitmap.cache).toHaveBeenCalledTimes(1);
+
+            expect(trashedBlock.container.uncache).not.toHaveBeenCalled();
+            expect(trashedBlock.bitmap.uncache).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("Sampler Widget, Grids, and Canvas Helpers (Lines 1530–1638)", () => {
+        it("makeSamplerWidget loads standard sampler stack into blocks", () => {
+            const sandbox = loadActivitySandbox();
+            const act = sandbox.activity;
+
+            act.blocks = {
+                loadNewBlocks: jest.fn()
+            };
+            act.blocksContainer = { x: 20, y: 30 };
+
+            act.makeSamplerWidget("snare", "base64audio...");
+
+            expect(act.blocks.loadNewBlocks).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.arrayContaining([0, "sampler", 280, 270, [null, 1, 8]]),
+                    expect.arrayContaining([1, "settimbre", 0, 0, [0, 2, 6, 7]]),
+                    expect.arrayContaining([
+                        3,
+                        ["audiofile", { value: ["snare", "base64audio..."] }],
+                        0,
+                        0,
+                        [2]
+                    ])
+                ])
+            );
+        });
+
+        it("getStageScale, getStageX, and getStageY transform coordinates accurately", () => {
+            const sandbox = loadActivitySandbox();
+            const act = sandbox.activity;
+
+            act.turtleBlocksScale = 2.0;
+            act.stageX = 400;
+            act.stageY = 300;
+            act.toolbarHeight = 50;
+            act.turtles = {
+                screenX2turtleX: jest.fn(val => val - 50),
+                screenY2turtleY: jest.fn(val => val - 25)
+            };
+
+            expect(act.getStageScale()).toBe(2.0);
+            expect(act.getStageX()).toBe(150); // (400 / 2) - 50 = 150
+            expect(act.turtles.screenX2turtleX).toHaveBeenCalledWith(200);
+
+            expect(act.getStageY()).toBe(100); // ((300 - 50) / 2) - 25 = 100
+            expect(act.turtles.screenY2turtleY).toHaveBeenCalledWith(125);
+        });
+
+        it("printBlockSVG and printBlockPNG delegate to exportersModule", async () => {
+            const mockExporters = {
+                printBlockSVG: jest.fn(() => "<svg></svg>"),
+                printBlockPNG: jest.fn().mockResolvedValue("blob:png")
+            };
+            let capturedDefineCallback = null;
+            const sandbox = loadActivitySandbox({
+                overrides: {
+                    define: (deps, cb) => {
+                        capturedDefineCallback = cb;
+                    },
+                    createDefaultStack: jest.fn(),
+                    createjs: {},
+                    Tone: {},
+                    GIFAnimator: class {},
+                    SuperGif: class {}
+                }
+            });
+
+            const act = sandbox.activity;
+            act.setupDependencies = jest.fn();
+            act.domReady = jest.fn();
+            act.doContextMenus = jest.fn();
+            act.doPluginsAndPaletteCols = jest.fn();
+
+            capturedDefineCallback({}, mockExporters);
+
+            expect(act.printBlockSVG()).toBe("<svg></svg>");
+            expect(mockExporters.printBlockSVG).toHaveBeenCalledWith(act);
+
+            const pngResult = await act.printBlockPNG();
+            expect(pngResult).toBe("blob:png");
+            expect(mockExporters.printBlockPNG).toHaveBeenCalledWith(act);
+        });
+    });
+
+    describe("Built-In Plugin Loading Security & Handler (Lines 2454–2509)", () => {
+        it("rejects plugin names with unsafe path traversal characters", () => {
+            const mockErrorHandler = {
+                warn: jest.fn(),
+                capture: jest.fn(),
+                recoverable: jest.fn()
+            };
+            const sandbox = loadActivitySandbox({
+                overrides: {
+                    ErrorHandler: mockErrorHandler
+                }
+            });
+            const act = sandbox.activity;
+
+            act.pluginController = {
+                loadBuiltInPluginFromXHR: jest.fn()
+            };
+
+            act._loadBuiltInPlugin("../evil_plugin");
+            expect(act.pluginController.loadBuiltInPluginFromXHR).not.toHaveBeenCalled();
+            expect(mockErrorHandler.warn).toHaveBeenCalledWith(
+                expect.stringContaining("Invalid plugin name rejected"),
+                expect.any(Object)
+            );
+        });
+
+        it("accepts valid alphanumeric plugin names and delegates to pluginController", async () => {
+            const sandbox = loadActivitySandbox();
+            const act = sandbox.activity;
+
+            act.textMsg = jest.fn();
+            act.palettes = { visible: false, hide: jest.fn() };
+            act.pluginController = {
+                loadBuiltInPluginFromXHR: jest.fn().mockResolvedValue(true)
+            };
+
+            act._loadBuiltInPlugin("synth-sampler_v2");
+            expect(act.pluginController.loadBuiltInPluginFromXHR).toHaveBeenCalledWith(
+                "synth-sampler_v2"
+            );
+        });
+    });
 });
