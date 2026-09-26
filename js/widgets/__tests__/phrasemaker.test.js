@@ -3245,6 +3245,7 @@ describe("PhraseMaker Widget", () => {
             phraseMaker.docById = jest.fn(() => null);
 
             expect(() => phraseMaker.widgetWindow.onclose()).not.toThrow();
+            expect(phraseMaker.widgetWindow.destroy).toHaveBeenCalledTimes(1);
         });
     });
 });
