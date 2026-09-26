@@ -78,6 +78,20 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+@media (max-width: 600px) {
+    #newdropdown {
+        position: fixed !important;
+        left: 50% !important;
+        transform: translateX(-50%);
+        max-width: calc(100vw - 32px);
+        box-sizing: border-box;
+    }
+
+    #confirmation-message {
+        white-space: normal;
+    }
+}
+
 #newdropdown li {
     text-align: center;
     width: fit-content;
