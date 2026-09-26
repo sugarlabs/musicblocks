@@ -1496,14 +1496,22 @@ describe("AST2BlockList Class", () => {
             [3, ["modename", { value: "major" }], 0, 0, [1]],
             [4, "interval", 0, 0, [1, 5, null, 6]],
             [5, ["number", { value: 5 }], 0, 0, [4]],
-            [6, "semitoneinterval", 0, 0, [4, 7, null, 8]],
-            [7, ["intervalname", {}], 0, 0, [6]],
-            [8, "semitoneinterval", 0, 0, [6, 9, null, 10]],
-            [9, ["intervalname", {}], 0, 0, [8]],
-            [10, "settemperament", 0, 0, [8, 11, 12, 13, null]],
-            [11, ["temperamentname", { value: "equal" }], 0, 0, [10]],
-            [12, ["notename", { value: "C" }], 0, 0, [10]],
-            [13, ["number", { value: 4 }], 0, 0, [10]]
+            [6, "semitoneinterval", 0, 0, [4, 7, null, 12]],
+            [7, "plus", 0, 0, [6, 8, 9]],
+            [8, ["number", { value: 4 }], 0, 0, [7]],
+            [9, "multiply", 0, 0, [7, 10, 11]],
+            [10, ["number", { value: 0 }], 0, 0, [9]],
+            [11, ["number", { value: 12 }], 0, 0, [9]],
+            [12, "semitoneinterval", 0, 0, [6, 13, null, 18]],
+            [13, "plus", 0, 0, [12, 14, 15]],
+            [14, ["text", { value: "major 3" }], 0, 0, [13]],
+            [15, "multiply", 0, 0, [13, 16, 17]],
+            [16, ["number", { value: 0 }], 0, 0, [15]],
+            [17, ["number", { value: 12 }], 0, 0, [15]],
+            [18, "settemperament", 0, 0, [12, 19, 20, 21, null]],
+            [19, ["temperamentname", { value: "equal" }], 0, 0, [18]],
+            [20, ["notename", { value: "C" }], 0, 0, [18]],
+            [21, ["number", { value: 4 }], 0, 0, [18]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
