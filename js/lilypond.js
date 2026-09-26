@@ -115,6 +115,22 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     let note;
     let notes;
 
+    // A slur or hairpin begins on the first note written after it is staged.
+    const __startQueuedSpanners = () => {
+        if (queueSlur) {
+            queueSlur = false;
+            logo.notationNotes[turtle] += "(  ";
+        }
+        if (queueCrescendo) {
+            queueCrescendo = false;
+            logo.notationNotes[turtle] += "\\< ";
+        }
+        if (queueDecrescendo) {
+            queueDecrescendo = false;
+            logo.notationNotes[turtle] += "\\> ";
+        }
+    };
+
     const __processTuplet = (logo, turtle, i, count) => {
         let j = 0;
         let k = 0;
@@ -143,9 +159,15 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                 logo.notationNotes[turtle] +=
                     logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
 
+                if (articulation) {
+                    logo.notationNotes[turtle] += "->";
+                }
+
                 if (logo.notation.notationStaging[turtle][i + j][NOTATIONSTACCATO]) {
                     logo.notationNotes[turtle] += " \\staccato ";
                 }
+
+                __startQueuedSpanners();
 
                 j++; // Jump to next note.
                 k++; // Increment notes in tuplet.
@@ -159,30 +181,37 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             }
         }
 
-        if (i + j - 1 < logo.notation.notationStaging[turtle].length - 1) {
-            const nextObj = logo.notation.notationStaging[turtle][i + j];
-            // Workaround to a Lilypond "feature": if a slur
-            // ends on a tuplet, the closing ) must be inside
-            // the closing } of the tuplet. Same for markup.
-            if (typeof nextObj === "string" && nextObj === ")") {
-                logo.notationNotes[turtle] += ")} ";
-                i += 1;
-            } else if (typeof nextObj === "string" && nextObj === "markup") {
+        // Workaround to a Lilypond "feature": if a slur or hairpin
+        // ends on the last note of a tuplet, the closing ) or \! must
+        // be inside the closing } of the tuplet. Same for markup.
+        let nextObj = logo.notation.notationStaging[turtle][i + j];
+        while (
+            ["end slur", "end crescendo", "end decrescendo", "markup", "markdown"].includes(nextObj)
+        ) {
+            if (nextObj === "end slur") {
+                logo.notationNotes[turtle] += ")  ";
+                j += 1;
+            } else if (nextObj === "end crescendo" || nextObj === "end decrescendo") {
+                logo.notationNotes[turtle] += "\\! ";
+                j += 1;
+            } else if (nextObj === "markup") {
                 logo.notationNotes[turtle] +=
                     "^\\markup { \\abs-fontsize #6 { " +
-                    logo.notation.notationStaging[turtle][i + j + 1] +
-                    " } } } ";
-                j += 2;
-            } else if (typeof nextObj === "string" && nextObj === "markdown") {
-                logo.notationNotes[turtle] +=
-                    "_\\markup {" + logo.notation.notationStaging[turtle][i + j + 1] + "} } ";
+                    toLilypondString(logo.notation.notationStaging[turtle][i + j + 1]) +
+                    " } } ";
                 j += 2;
             } else {
-                logo.notationNotes[turtle] += "} ";
+                logo.notationNotes[turtle] +=
+                    "_\\markup { " +
+                    toLilypondString(logo.notation.notationStaging[turtle][i + j + 1]) +
+                    " } ";
+                j += 2;
             }
-        } else {
-            logo.notationNotes[turtle] += "} ";
+
+            nextObj = logo.notation.notationStaging[turtle][i + j];
         }
+
+        logo.notationNotes[turtle] += "} ";
 
         return j;
     };
@@ -616,18 +645,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                 tupletDuration = 0;
             }
 
-            if (queueSlur) {
-                queueSlur = false;
-                logo.notationNotes[turtle] += "(  ";
-            }
-            if (queueCrescendo) {
-                queueCrescendo = false;
-                logo.notationNotes[turtle] += "\\< ";
-            }
-            if (queueDecrescendo) {
-                queueDecrescendo = false;
-                logo.notationNotes[turtle] += "\\> ";
-            }
+            __startQueuedSpanners();
         }
     }
 };

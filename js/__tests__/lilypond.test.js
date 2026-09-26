@@ -178,6 +178,9 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("g' 8 \\staccato ");
     });
 
+    // One note of a triplet of eighth notes, as notation.js stages it.
+    const tripletNote = pitch => [[pitch], 1, 8, [3, 4], 8, -1, false];
+
     test("should write a natural as the plain note name followed by !", () => {
         logo.notation.notationStaging[turtle] = [[["C♮4"], 4, 0, null, 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
@@ -207,6 +210,44 @@ describe("processLilypondNotes", () => {
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain('_\\markup { "50% \\"loud\\" {x} a\\\\b" } ');
+    });
+
+    test("should keep a slur that spans a tuplet inside the tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin slur",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4"),
+            "end slur",
+            [["F4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("{ c' 8(  d' 8e' 8)  } f'4 ");
+    });
+
+    test("should keep a crescendo that spans a tuplet inside the tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin crescendo",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4"),
+            "end crescendo",
+            [["F4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("{ c' 8\\< d' 8e' 8\\! } f'4 ");
+    });
+
+    test("should accent tuplet notes inside an articulation", () => {
+        logo.notation.notationStaging[turtle] = [
+            "begin articulation",
+            tripletNote("C4"),
+            tripletNote("D4"),
+            tripletNote("E4"),
+            "end articulation"
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("{ c' 8->d' 8->e' 8->} ");
     });
 
     test("should place staccato after the chord on notes inside a tuplet", () => {
