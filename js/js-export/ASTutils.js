@@ -34,6 +34,28 @@ class ASTUtils {
     }
 
     /**
+     * Returns a valid JavaScript identifier for an action name.
+     *
+     * Action names are free text ("chorus 2", "1st verse"), but an action is exported as a
+     * `let` binding that its calls refer to, so the name has to be an identifier and there is
+     * no string form to fall back to the way boxes fall back to setBox. Characters that can't
+     * appear in an identifier become "_", and names that would still not parse, or would
+     * shadow what the generated code itself uses (mouse, actionArgs, Math, ...), get a leading
+     * "_". Letters outside ASCII are kept, so non-English action names read the same.
+     *
+     * @static
+     * @param {String} name - action name
+     * @returns {String} identifier
+     */
+    static _getActionIdentifier(name) {
+        let id = String(name).replace(/[^\p{ID_Continue}$]/gu, "_");
+        if (!/^[\p{ID_Start}_$]/u.test(id) || ASTUtils._RESERVED_NAMES.has(id)) {
+            id = "_" + id;
+        }
+        return id;
+    }
+
+    /**
      * Returns the names of every identifier used in the given ASTs.
      *
      * @static
@@ -72,6 +94,18 @@ class ASTUtils {
             arguments: args
         };
     }
+
+    /**
+     * Names an exported action can't take: reserved words, plus the names the generated code
+     * relies on (a top-level `let Math` would break every Math.floor in the program).
+     */
+    static _RESERVED_NAMES = new Set(
+        `await break case catch class const continue debugger default delete do else enum export
+        extends false finally for function if implements import in instanceof interface let new
+        null package private protected public return static super switch this throw true try
+        typeof var void while with yield arguments eval undefined NaN Infinity
+        mouse actionArgs Mouse MusicBlocks Math MathUtility`.split(/\s+/)
+    );
 
     /**
      * @static
@@ -450,7 +484,7 @@ class ASTUtils {
                     type: "VariableDeclarator",
                     id: {
                         type: "Identifier",
-                        name: `${methodName}`
+                        name: ASTUtils._getActionIdentifier(methodName)
                     },
                     init: {
                         type: "ArrowFunctionExpression",
@@ -543,7 +577,7 @@ class ASTUtils {
             if (props.action) {
                 AST["expression"]["argument"]["callee"] = {
                     type: "Identifier",
-                    name: `${methodName}`
+                    name: ASTUtils._getActionIdentifier(methodName)
                 };
                 AST["expression"]["argument"]["arguments"] = [
                     {
