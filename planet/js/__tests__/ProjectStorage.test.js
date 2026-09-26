@@ -512,6 +512,24 @@ describe("ProjectStorage", () => {
             expect(storage.data.Projects["proj1"].DateLastModified).toBeGreaterThanOrEqual(before);
         });
 
+        it("should save to the requested project after the current project changes", async () => {
+            storage.data.Projects.proj2 = {
+                ProjectName: "New Project",
+                ProjectData: "new-project-data",
+                ProjectImage: "new-project-image",
+                PublishedData: null,
+                DateLastModified: 0
+            };
+            storage.data.CurrentProject = "proj2";
+
+            await storage.saveLocally("updated-old-data", "updated-old-image", "proj1");
+
+            expect(storage.data.Projects.proj1.ProjectData).toBe("updated-old-data");
+            expect(storage.data.Projects.proj1.ProjectImage).toBe("updated-old-image");
+            expect(storage.data.Projects.proj2.ProjectData).toBe("new-project-data");
+            expect(storage.data.Projects.proj2.ProjectImage).toBe("new-project-image");
+        });
+
         it("should create a new project if CurrentProject is undefined", async () => {
             storage.data.CurrentProject = undefined;
             const initSpy = jest.spyOn(storage, "initialiseNewProject").mockResolvedValue();

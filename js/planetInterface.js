@@ -202,19 +202,23 @@ class PlanetInterface {
 
         /**
          * Initializes a new project with the provided name or a default name.
-         * Clears the canvas, resets project data, and refreshes the canvas.
+         * Resets project state and optionally clears and refreshes the workspace.
          * @param {string} [name] - The name of the new project.
+         * @param {boolean} [clearWorkspace=true] - Whether to clear the current workspace.
          */
-        this.initialiseNewProject = name => {
+        this.initialiseNewProject = (name, clearWorkspace = true) => {
             const projectStorage = this._getProjectStorage();
             if (!projectStorage) return;
 
-            projectStorage.initialiseNewProject(name);
-            this.activity.sendAllToTrash();
-            this.activity.refreshCanvas();
+            const initialization = projectStorage.initialiseNewProject(name);
+            if (clearWorkspace) {
+                this.activity.sendAllToTrash();
+                this.activity.refreshCanvas();
+            }
             this.activity.blocks.trashStacks = [];
             this.activity.blocks.actionHistory = [];
             this.activity.blocks.redoActionHistory = [];
+            return initialization;
         };
 
         /**
@@ -256,30 +260,33 @@ class PlanetInterface {
                 }
             };
             try {
+                const projectStorage = this.planet.ProjectStorage;
+                const projectId =
+                    typeof projectStorage.getCurrentProjectID === "function"
+                        ? projectStorage.getCurrentProjectID()
+                        : undefined;
+                const saveProject = image =>
+                    projectId === undefined
+                        ? projectStorage.saveLocally(data, image)
+                        : projectStorage.saveLocally(data, image, projectId);
                 if (svgData === null || svgData === undefined || svgData === "") {
-                    return Promise.resolve(
-                        this.planet.ProjectStorage.saveLocally(data, null)
-                    ).catch(handleSaveError);
+                    return Promise.resolve(saveProject(null)).catch(handleSaveError);
                 } else {
                     const fallbackImage =
-                        typeof this.planet.ProjectStorage.getCurrentProjectImage === "function"
-                            ? this.planet.ProjectStorage.getCurrentProjectImage()
+                        typeof projectStorage.getCurrentProjectImage === "function"
+                            ? projectStorage.getCurrentProjectImage()
                             : null;
-                    const savePromise = Promise.resolve(
-                        this.planet.ProjectStorage.saveLocally(data, fallbackImage)
-                    ).catch(handleSaveError);
+                    const savePromise = Promise.resolve(saveProject(fallbackImage)).catch(
+                        handleSaveError
+                    );
                     const img = new Image();
-                    const t = this;
                     img.onload = () => {
                         try {
                             const bitmap = new createjs.Bitmap(img);
                             const bounds = bitmap.getBounds();
                             bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                             Promise.resolve(
-                                t.planet.ProjectStorage.saveLocally(
-                                    data,
-                                    bitmap.bitmapCache.getCacheDataURL()
-                                )
+                                saveProject(bitmap.bitmapCache.getCacheDataURL())
                             ).catch(handleSaveError);
                         } catch (error) {
                             console.error(error);
