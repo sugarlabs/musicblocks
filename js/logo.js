@@ -122,12 +122,16 @@ class Logo {
             typeof LogoDependencies !== "undefined"
                 ? LogoDependencies
                 : require("./LogoDependencies");
+        const hasErrorHandlerProperty =
+            activityOrDeps !== null &&
+            typeof activityOrDeps === "object" &&
+            Object.prototype.hasOwnProperty.call(activityOrDeps, "errorHandler");
         const isLegacyActivity =
             activityOrDeps !== null &&
             typeof activityOrDeps === "object" &&
             !Array.isArray(activityOrDeps) &&
             !(activityOrDeps instanceof LD) &&
-            typeof activityOrDeps.errorHandler !== "function";
+            !hasErrorHandlerProperty;
         const isExplicitDeps = !isLegacyActivity;
 
         if (isExplicitDeps) {
