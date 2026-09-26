@@ -651,12 +651,32 @@ const processABCNotes = function (logo, turtle, keySignature = "C major") {
  */
 const saveAbcOutput = function (activity) {
     const outputParts = [getABCHeader()];
+    let atLineStart = true;
+    let voice = 0;
 
     for (const t in activity.logo.notation.notationStaging) {
         const keySignature = activity.turtles.ithTurtle(t).singer.keySignature;
-        outputParts.push("K:" + abcKeySignature(keySignature).field + "\n");
         processABCNotes(activity.logo, t, keySignature);
-        outputParts.push(activity.logo.notationNotes[t]);
+
+        // A turtle that staged only fields, a meter say, has notation to write
+        // but no music, and an empty voice is worse than none.
+        const staged = activity.logo.notation.notationStaging[t] || [];
+        if (!staged.some(entry => Array.isArray(entry))) {
+            continue;
+        }
+
+        const notes = activity.logo.notationNotes[t];
+        voice += 1;
+        // A V: or K: field is only a field at the start of a line.
+        if (!atLineStart) {
+            outputParts.push("\n");
+        }
+        // Without a V: field every turtle lands in one voice, one after another.
+        // The id is not a bare number, so a staged [V:1] cannot claim these notes.
+        outputParts.push("V:t" + voice + "\n");
+        outputParts.push("K:" + abcKeySignature(keySignature).field + "\n");
+        outputParts.push(notes);
+        atLineStart = notes === "" || notes.endsWith("\n");
     }
 
     outputParts.push("\n");
